@@ -1,0 +1,27 @@
+{
+  "name": "one-map-react-workspace",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "bun@1.4.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "check": "biome check .",
+    "format": "biome format --write .",
+    "check:docs": "bun scripts/check-docs.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "bun scripts/build.mjs",
+    "test:package": "bun run build && bun scripts/test-package.mjs",
+    "validate": "bun run check && bun run check:docs && bun run typecheck && bun run test:package",
+    "pack": "bun run build && mkdir -p artifacts && cd packages/one-map-react && bun pm pack --destination ../../artifacts --ignore-scripts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "typescript": "7.0.2"
+  }
+}

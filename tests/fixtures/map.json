@@ -1,0 +1,79 @@
+{
+  "emptyStyle": {
+    "version": 8,
+    "sources": {},
+    "layers": [
+      {
+        "id": "fixture-background",
+        "type": "background",
+        "paint": {
+          "background-color": "#f5f5f5"
+        }
+      }
+    ]
+  },
+  "initialViewState": {
+    "longitude": -122.34,
+    "latitude": 47.61,
+    "zoom": 11,
+    "bearing": 0,
+    "pitch": 0
+  },
+  "routes": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "route-1",
+        "properties": {
+          "route": "north",
+          "selected": false
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-122.36, 47.6], [-122.34, 47.62], [-122.32, 47.64]]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "route-2",
+        "properties": {
+          "route": "south",
+          "selected": false
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-122.36, 47.58], [-122.34, 47.59], [-122.32, 47.6]]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "route-offscreen",
+        "properties": {
+          "route": "offscreen",
+          "selected": false
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-120, 46], [-119.9, 46.1]]
+        }
+      }
+    ]
+  },
+  "markers": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "marker-1",
+        "properties": {
+          "label": "Seattle"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.34, 47.61]
+        }
+      }
+    ]
+  }
+}

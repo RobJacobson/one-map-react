@@ -1,0 +1,128 @@
+{
+  "status": "implemented; routine verification passed; runtime acceptance awaiting permission",
+  "recordedAt": "2026-10-10T05:21:53.403488+00:00",
+  "artifact": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-0ced23de2a1998ef6131f879fdfd15820582f0b6b446e963995ff51cc34345c1.tgz",
+    "sha256": "0ced23de2a1998ef6131f879fdfd15820582f0b6b446e963995ff51cc34345c1"
+  },
+  "rejectedArtifact": {
+    "sha256": "c066c1bcc2360355d4add1d7eae2f12ffbb1172c9fe1dbbd4aad460f832e8151",
+    "originalPathPreserved": true,
+    "archiveDirectory": "artifacts/refactor-correction/rejected"
+  },
+  "baseline": {
+    "path": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/focused-modules/baseline",
+    "files": 357,
+    "unchanged": true
+  },
+  "changes": [
+    "Flattened single-operation folders and colocated props/options with implementations.",
+    "Consolidated configuration and extension registration under private state owners.",
+    "Added explicit domain indexes while preserving selected peer boundaries.",
+    "Returned caller-specific helpers to their owners; retained shared validation and substantive native operations.",
+    "Documented provider ownership, attachment transitions, binding, cleanup, pooling, native transport, and imperative publication.",
+    "Reconciled coding guide and package expectations; excluded evidence copies from Jest module discovery."
+  ],
+  "checks": {
+    "validate": {
+      "status": "passed",
+      "command": "bun run validate",
+      "artifactEnvironment": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-0ced23de2a1998ef6131f879fdfd15820582f0b6b446e963995ff51cc34345c1.tgz",
+      "tests": 139,
+      "breakdown": {
+        "unit": 45,
+        "adapter": 9,
+        "nativeMocked": 85
+      },
+      "log": "artifacts/refactor-correction/validate-artifact.log"
+    },
+    "coverage": {
+      "status": "passed",
+      "command": "bun run coverage:validate",
+      "entries": 12131,
+      "log": "artifacts/refactor-correction/coverage.log"
+    },
+    "publicAPI": {
+      "status": "passed",
+      "exports": "artifacts/refactor-correction/public-export-comparison.json",
+      "semanticDeclarations": "artifacts/refactor-correction/public-contract-comparison.ts",
+      "log": "artifacts/refactor-correction/api-comparison.log",
+      "nominalBrand": "Compared opaque string keys and brand value type across independent unique-symbol snapshots."
+    },
+    "validationComparison": {
+      "status": "passed",
+      "cases": 748,
+      "report": "artifacts/refactor-correction/validation-comparison.json"
+    },
+    "publicDocumentation": {
+      "status": "passed",
+      "exports": 75,
+      "report": "artifacts/refactor-correction/public-documentation.json",
+      "reviewedBaselineDifferences": "Retained the existing getMapSettings documentation correction on both web entries: controller construction does not check readiness/backend; method calls perform those checks."
+    },
+    "declarationPreservation": {
+      "status": "passed",
+      "declarations": 338,
+      "report": "artifacts/refactor-correction/declaration-preservation.json"
+    },
+    "nativeSourcePreservation": {
+      "status": "passed",
+      "report": "artifacts/refactor-correction/native-preservation.json",
+      "scope": "Static source comparisons only; no native compilation or runtime acceptance."
+    },
+    "runtimeDependencyGraph": {
+      "status": "passed",
+      "runtimeModules": 172,
+      "cycles": 0,
+      "validationDependsOnNormalization": false,
+      "scope": "Emitted relative ESM dependencies; selected peer isolation is checked by packed package and selection suites."
+    },
+    "packedSelection": {
+      "status": "passed",
+      "modes": 6,
+      "report": "/private/tmp/one-map-react-selection-lBgE9C/results.json",
+      "retainedReport": "artifacts/refactor-correction/selection-results.json"
+    },
+    "artifactPublication": {
+      "status": "passed",
+      "files": 749,
+      "report": "artifacts/refactor-correction/publication-manifest.json",
+      "comparison": "Every packed file matches the current package bytes."
+    },
+    "metadataAndStageAssignments": {
+      "status": "unchanged",
+      "packageExportsPeersPins": "byte-identical to baseline",
+      "nativeSourceSets": "Android byte-identical to baseline; retained the rejected refactor’s recursive CocoaPods common/selected-backend globs, reviewed against the source tree.",
+      "historicalRecords": "byte-identical to the pre-correction snapshot"
+    }
+  },
+  "manualReview": {
+    "responsibilities": "Reviewed the target tree by ownership; shared predicates and substantive lifecycle operations remain separate. No file-count or export-count target.",
+    "indexes": "Explicit domain exports; implementations import directly within domains. No package-root imports or mixed-backend barrel.",
+    "comments": "Reviewed public declarations and prioritized ownership/transition/cleanup contracts. No duplicated API prose on re-exports.",
+    "ordering": "Runtime declaration structures and native operation bodies preserved; hooks, effect dependencies, resource ordering, token ownership and error redaction unchanged.",
+    "documentation": "Coding guide reconciled, source links updated, checkpoint and ledger distinguish routine checks from runtime acceptance; no-ai-slop editorial pass applied."
+  },
+  "runtimeAcceptance": {
+    "status": "awaiting explicit user permission",
+    "executed": false,
+    "proposal": "docs/refactor-correction-checkpoint.md",
+    "environments": [
+      "mapbox-web",
+      "maplibre-web",
+      "mixed-mapbox-web Metro transport",
+      "mixed-maplibre-web Metro transport",
+      "mapbox-ios",
+      "mapbox-android",
+      "maplibre-ios",
+      "maplibre-android"
+    ],
+    "estimatedDuration": "1–2 hours, longer if builds or environment setup fail",
+    "prerequisites": [
+      "Additional disk capacity for fresh native consumers and builds; about 2.8 GiB free at checkpoint.",
+      "Recheck Chromium, Maestro, Java 17, Android SDK, Xcode, native template, and ignored credential configuration."
+    ],
+    "historicalAcceptanceUnchanged": true
+  },
+  "commit": "not requested; none created"
+}

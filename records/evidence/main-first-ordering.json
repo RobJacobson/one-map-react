@@ -1,0 +1,402 @@
+{
+  "schemaVersion": 1,
+  "stage": "S04",
+  "recordedAt": "2026-10-10T02:53:24.440550+00:00",
+  "status": "passed",
+  "scope": "Main-first declaration ordering in package modules, handwritten native bridges and first-party examples through S04; documentation and review enforce the convention.",
+  "excluded": [
+    "scripts",
+    "tests",
+    "generated code",
+    "upstream repositories",
+    "later-stage features"
+  ],
+  "changedFiles": [
+    "packages/one-map-react/src/core/validation.ts",
+    "packages/one-map-react/src/core/errors.ts",
+    "packages/one-map-react/src/core/capabilities.ts",
+    "packages/one-map-react/src/core/session.ts",
+    "packages/one-map-react/src/core/registry.ts",
+    "packages/one-map-react/src/core/context.tsx",
+    "packages/one-map-react/src/adapters/web-configuration.ts",
+    "packages/one-map-react/src/adapters/web-context.ts",
+    "packages/one-map-react/src/adapters/native-host.ts",
+    "packages/one-map-react/src/adapters/web-pool.tsx",
+    "packages/one-map-react/src/adapters/web.tsx",
+    "packages/one-map-react/src/adapters/web-settings-driver.ts",
+    "packages/one-map-react/src/adapters/web-settings.ts",
+    "packages/one-map-react/src/adapters/web-host.ts",
+    "packages/one-map-react/src/adapters/native-lifecycle.ts",
+    "packages/one-map-react/src/adapters/mapbox-native/map.tsx",
+    "packages/one-map-react/src/adapters/mapbox-native/tokens.ts",
+    "packages/one-map-react/src/adapters/mapbox-native/initial-camera.ts",
+    "packages/one-map-react/src/adapters/mapbox-native/configuration.ts",
+    "packages/one-map-react/src/adapters/maplibre-native/map.tsx",
+    "examples/native-mapbox/s04-acceptance.tsx",
+    "examples/native-mapbox/passive-sdk-observer.java",
+    "examples/native-mapbox/passive-sdk-observer.swift",
+    "examples/web/src/App.tsx",
+    "examples/web/src/S04Ownership.tsx",
+    "examples/web/src/selected-adapter.ts",
+    "examples/web/src/fixture-transport.ts",
+    "examples/native-shared/lifecycle.tsx",
+    "examples/native-maplibre/s04-lifecycle.tsx",
+    "examples/native-maplibre/native-probe/OneMapS04Probe.m",
+    "examples/native-maplibre/native-probe/OneMapS04Probe.java",
+    "docs/coding-style.md",
+    "packages/one-map-react/native/ios/OneMapNativeLifecycle.mm",
+    "packages/one-map-react/native/ios/mapbox/OneMapRenderer.swift",
+    "packages/one-map-react/native/android/src/mapbox/java/com/onemap/lifecycle/OneMapRenderer.java",
+    "packages/one-map-react/native/android/src/main/java/com/onemap/lifecycle/OneMapNativeLifecycleModule.java"
+  ],
+  "reviewedModules": [
+    "packages/one-map-react/native/selection.cjs",
+    "examples/native-shared/lifecycle.tsx",
+    "examples/native-mapbox/babel.config.cjs",
+    "examples/native-mapbox/passive-sdk-observer.swift",
+    "examples/native-mapbox/passive-sdk-observer.java",
+    "examples/native-mapbox/s04-acceptance.tsx",
+    "examples/native-mapbox/metro.config.cjs",
+    "examples/native-maplibre/metro.config.cjs",
+    "examples/native-maplibre/s04-lifecycle.tsx",
+    "examples/native-maplibre/babel.config.cjs",
+    "packages/one-map-react/native/ios/mapbox/OneMapRenderer.swift",
+    "packages/one-map-react/native/ios/OneMapRenderer.h",
+    "examples/web/src/fixture-transport.ts",
+    "examples/web/src/selected-adapter.ts",
+    "examples/web/src/S04Ownership.tsx",
+    "examples/web/src/main.tsx",
+    "examples/web/src/App.tsx",
+    "packages/one-map-react/native/ios/OneMapNativeLifecycle.mm",
+    "packages/one-map-react/native/ios/maplibre/OneMapRenderer.m",
+    "packages/one-map-react/native/android/src/main/java/com/onemap/lifecycle/OneMapNativeLifecyclePackage.java",
+    "packages/one-map-react/native/android/src/main/java/com/onemap/lifecycle/OneMapNativeLifecycleModule.java",
+    "examples/native-maplibre/native-probe/OneMapS04Probe.java",
+    "examples/native-maplibre/native-probe/OneMapS04Probe.m",
+    "packages/one-map-react/src/mapbox-web.ts",
+    "packages/one-map-react/src/index.ts",
+    "packages/one-map-react/src/maplibre-native.ts",
+    "packages/one-map-react/src/maplibre-web.ts",
+    "packages/one-map-react/native/android/src/mapbox/java/com/onemap/lifecycle/OneMapRenderer.java",
+    "packages/one-map-react/src/mapbox-native.ts",
+    "packages/one-map-react/src/metro-web-transformer.cjs",
+    "packages/one-map-react/native/android/src/maplibre/java/com/onemap/lifecycle/OneMapRenderer.java",
+    "packages/one-map-react/src/metro-web-assets.cjs",
+    "packages/one-map-react/src/metro-web.cjs",
+    "packages/one-map-react/src/core/map-configuration.ts",
+    "packages/one-map-react/src/core/context.tsx",
+    "packages/one-map-react/src/core/registry.ts",
+    "packages/one-map-react/src/core/session.ts",
+    "packages/one-map-react/src/core/types.ts",
+    "packages/one-map-react/src/core/extensions.ts",
+    "packages/one-map-react/src/core/capabilities.ts",
+    "packages/one-map-react/src/core/errors.ts",
+    "packages/one-map-react/src/core/validation.ts",
+    "packages/one-map-react/src/adapters/native-lifecycle.ts",
+    "packages/one-map-react/src/adapters/web-host.ts",
+    "packages/one-map-react/src/adapters/web-settings.ts",
+    "packages/one-map-react/src/adapters/native-accessibility.ts",
+    "packages/one-map-react/src/adapters/mapbox-web-driver.ts",
+    "packages/one-map-react/src/adapters/web-settings-driver.ts",
+    "packages/one-map-react/src/adapters/web.tsx",
+    "packages/one-map-react/src/adapters/web-initial-camera.ts",
+    "packages/one-map-react/src/adapters/web-pool.tsx",
+    "packages/one-map-react/src/adapters/web-render.ts",
+    "packages/one-map-react/src/adapters/native-host.ts",
+    "packages/one-map-react/src/adapters/maplibre-native/initial-camera.ts",
+    "packages/one-map-react/src/adapters/maplibre-native/map.tsx",
+    "packages/one-map-react/src/adapters/maplibre-native/host-props.ts",
+    "packages/one-map-react/src/adapters/maplibre-native/lifecycle-contracts.ts",
+    "packages/one-map-react/src/adapters/web-context.ts",
+    "packages/one-map-react/src/adapters/web-configuration.ts",
+    "packages/one-map-react/src/adapters/lifecycle.ts",
+    "packages/one-map-react/src/adapters/selection.ts",
+    "packages/one-map-react/src/adapters/mapbox-native/configuration.ts",
+    "packages/one-map-react/src/adapters/mapbox-native/initial-camera.ts",
+    "packages/one-map-react/src/adapters/mapbox-native/layout.ts",
+    "packages/one-map-react/src/adapters/mapbox-native/tokens.ts",
+    "packages/one-map-react/src/adapters/mapbox-native/map.tsx",
+    "packages/one-map-react/src/adapters/mapbox-native/lifecycle-contracts.ts",
+    "packages/one-map-react/src/adapters/maplibre-web-driver.ts"
+  ],
+  "baseline": {
+    "directory": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/baseline",
+    "manifest": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/baseline/manifest.json",
+    "manifestSha256": "2185e876aa77ce153b66ced8956cdfd0910253012219ffc46366291a1d0e8775",
+    "capturedFiles": 186,
+    "includesUntrackedSource": true,
+    "comparison": {
+      "changedTypeScriptFiles": 27,
+      "astEquivalence": "passed",
+      "eagerSetupSequence": "passed",
+      "classStateInitialization": "passed",
+      "javaFiles": 6,
+      "javaSyntaxAndEquivalence": "passed",
+      "swiftParsing": "passed",
+      "objectiveCAndSwiftMethodText": "passed",
+      "declarationDocumentation": "passed",
+      "unchangedBaselineFiles": 147,
+      "unexpectedChanges": [],
+      "acceptanceMetadataChanges": [
+        "records/evidence/main-first-ordering.json",
+        "records/stage-status.json",
+        "docs/implementation-status.md",
+        "docs/decisions/0006-s04-acceptance.md"
+      ]
+    },
+    "comparisonEvidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/baseline/baseline-comparison.json",
+    "method": "TypeScript AST/declaration comparison allowing top-level and class callable-member movement; independent eager statements and state-field order compared separately. Java parser trees and Objective-C/Swift method text compared; Swift parser and native compilation validate syntax. Declaration documentation stays attached. Function bodies preserve nested closures, React hook order, SDK dispatch and lifecycle subscription order.",
+    "retainedTooling": "One-time baseline comparison utilities are retained outside the repository; no automated ordering rule was added.",
+    "reviewableDiff": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/source-reordering.diff"
+  },
+  "exceptions": [
+    {
+      "files": [
+        "packages/one-map-react/src/mapbox-native.ts",
+        "packages/one-map-react/src/mapbox-web.ts",
+        "packages/one-map-react/src/maplibre-web.ts",
+        "packages/one-map-react/src/maplibre-native.ts"
+      ],
+      "reason": "Adapter selection and factory results execute eagerly; called factories remain defined before those initializations."
+    },
+    {
+      "files": [
+        "examples/web/src/selected-adapter.ts",
+        "examples/web/src/main.tsx",
+        "examples/native-mapbox/s04-acceptance.tsx"
+      ],
+      "reason": "Worker transport, passive SDK observers, adapter selection and application rendering/registration retain their existing eager execution sequence."
+    },
+    {
+      "files": ["packages/one-map-react/src/core/errors.ts"],
+      "reason": "Error subclasses require their base class to be initialized first."
+    },
+    {
+      "files": [
+        "packages/one-map-react/src/core/context.tsx",
+        "packages/one-map-react/src/adapters/web.tsx",
+        "packages/one-map-react/src/adapters/web-pool.tsx",
+        "packages/one-map-react/src/adapters/mapbox-native/map.tsx",
+        "packages/one-map-react/src/adapters/maplibre-native/map.tsx",
+        "examples/native-mapbox/s04-acceptance.tsx",
+        "examples/native-maplibre/s04-lifecycle.tsx"
+      ],
+      "reason": "Hook order, nested closure setup, immediate uses and returns remain unchanged inside callable bodies."
+    },
+    {
+      "files": [
+        "packages/one-map-react/native/android/src/main/java/com/onemap/lifecycle/OneMapNativeLifecycleModule.java"
+      ],
+      "reason": "findInitialMap and retryInitialMap call each other during host discovery; they stay adjacent below public operations, with a local explanation."
+    }
+  ],
+  "artifact": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c.tgz",
+    "sha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c"
+  },
+  "staticChecks": {
+    "validate": {
+      "status": "passed",
+      "command": "bun run validate",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-main-first-validation.log"
+    },
+    "testCount": 136,
+    "selection": {
+      "status": "passed",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-react-selection-WkF8sT/results.json"
+    },
+    "mixedMetroTransport": {
+      "status": "passed",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "command": "bun run test:web:metro-transport",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-react-selection-WkF8sT/renderer-transports.json"
+    },
+    "swiftParsing": {
+      "status": "passed",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-main-first-swift-parse.log"
+    },
+    "finalPackedSourceIdentity": {
+      "status": "passed",
+      "filesCompared": 177,
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/packed-source-comparison.json",
+      "publicationFilesCompared": 180
+    },
+    "coverage": {
+      "status": "passed",
+      "command": "bun run coverage:validate",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-main-first-coverage.log"
+    },
+    "finalRecordChecks": {
+      "status": "passed",
+      "commands": [
+        "bun run check",
+        "bun run check:docs",
+        "bun run coverage:validate"
+      ],
+      "logs": [
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-main-first-final-check.log",
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-main-first-final-docs.log",
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-main-first-final-coverage.log"
+      ]
+    }
+  },
+  "runtime": {
+    "mapbox-web": {
+      "status": "passed",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-react-web-lifecycle-dLLC7n/results.json"
+    },
+    "maplibre-web": {
+      "status": "passed",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-react-web-lifecycle-dLLC7n/results.json"
+    },
+    "mapbox-ios": {
+      "status": "passed",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/runtime/mapbox-ios/runtime-report.json",
+      "originalEvidence": "/private/tmp/one-map-react-main-first-mapbox/artifacts/s04-ios-runtime-1791596178220/runtime-report.json",
+      "marker": "mapbox-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c-e1ec020504965951691dd4c847f5cfb9a7dc5930761e492c5fd762b742c583f7",
+      "junitSha256": "76733ae8419ef2c9dbfc44508d4a6e4802d88c98591fe78ca242803075e80bb3",
+      "observationsSha256": "6d1d3e6436d907fd6a2f8c7f721f6948dad8cd1b5a7cb8b96f4c898c9b05cca9",
+      "scope": "Full canonical S04 flow, actual SDK observations, installed simulator executable and bundle identity."
+    },
+    "mapbox-android": {
+      "status": "passed",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/runtime/mapbox-android/runtime-report.json",
+      "originalEvidence": "/private/tmp/one-map-react-main-first-mapbox/artifacts/s04-android-runtime-1791599182153/runtime-report.json",
+      "marker": "mapbox-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c-e1ec020504965951691dd4c847f5cfb9a7dc5930761e492c5fd762b742c583f7",
+      "junitSha256": "f4bfa3b9a188a71e96241f21b082844b20513b3664e5c3ed552d616d4de278f7",
+      "observationsSha256": "1a7ed09e48abd7e159eb8a2d67aac13aef8339bed1d0fcb4d86bbb08d4764872",
+      "scope": "Full canonical S04 flow, actual SDK observations, installed emulator APK and embedded bundle identity."
+    },
+    "maplibre-ios": {
+      "status": "passed",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "fullCanonicalFlow": true,
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/runtime/maplibre-ios/result.json",
+      "originalEvidence": "/private/tmp/one-map-main-first-maplibre-ios-runtime/result.json",
+      "marker": "maplibre-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c-eced556351e7f2c7b3c39cbe717bc881bc4df2c7b3422dad0d33e29012f1760d",
+      "junitSha256": "9fca9fb907a6814b8082be964318248e5b1f50080d42cff725e16840944ff5d7",
+      "installedProof": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/runtime/maplibre-ios/installed-proof.json",
+      "scope": "Full canonical S04 flow, installed simulator executable and embedded bundle identity."
+    },
+    "maplibre-android": {
+      "status": "passed",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "fullCanonicalFlow": true,
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/runtime/maplibre-android/result.json",
+      "originalEvidence": "/private/tmp/one-map-main-first-maplibre-android-runtime/result.json",
+      "marker": "maplibre-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c-eced556351e7f2c7b3c39cbe717bc881bc4df2c7b3422dad0d33e29012f1760d",
+      "junitSha256": "346f4be29867fea4af88d03a46b5c1ac42363b8bd8bd5806e8b5099aa6e0fd71",
+      "installedProof": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/runtime/maplibre-android/installed-proof.json",
+      "scope": "Full canonical S04 flow, installed emulator APK and embedded bundle identity."
+    }
+  },
+  "acceptance": "Renewed S04 and S04.generated-host acceptance for this exact artifact after full validation, both browser lifecycle suites, both mixed Metro transports and all four fresh Release native canonical flows. Historical evidence remains unchanged; later stages remain planned.",
+  "defaults": {
+    "newLintRule": false,
+    "apiChanges": false,
+    "dependencyChanges": false,
+    "commit": false,
+    "publication": false
+  },
+  "nativeBuilds": {
+    "mapbox-ios": {
+      "status": "passed",
+      "configuration": "Release",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "consumer": "/private/tmp/one-map-react-main-first-mapbox",
+      "originalReport": "/private/tmp/one-map-react-main-first-mapbox/artifacts/ios-1791595732023/report.json",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/native-builds/mapbox/ios-1791595732023/report.json",
+      "installation": "executable and embedded bundle hashes verified",
+      "applicationId": "com.onemap.harness.mapbox",
+      "marker": "mapbox-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c-e1ec020504965951691dd4c847f5cfb9a7dc5930761e492c5fd762b742c583f7",
+      "publicationFiles": 180,
+      "nativeDependencyGraph": "unverified",
+      "binaryDependencyIsolation": "unverified"
+    },
+    "mapbox-android": {
+      "status": "passed",
+      "configuration": "Release",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "consumer": "/private/tmp/one-map-react-main-first-mapbox",
+      "originalReport": "/private/tmp/one-map-react-main-first-mapbox/artifacts/android-1791596063142/report.json",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/native-builds/mapbox/android-1791596063142/report.json",
+      "installation": "installed APK hash verified",
+      "applicationId": "com.onemap.harness.mapbox",
+      "marker": "mapbox-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c-e1ec020504965951691dd4c847f5cfb9a7dc5930761e492c5fd762b742c583f7",
+      "publicationFiles": 180,
+      "nativeDependencyGraph": "opposite SDK absent; inspect native-dependencies.log for pinned selected SDK",
+      "binaryDependencyIsolation": "unverified"
+    },
+    "maplibre-ios": {
+      "status": "passed",
+      "configuration": "Release",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "consumer": "/private/tmp/one-map-react-main-first-maplibre",
+      "originalReport": "/private/tmp/one-map-react-main-first-maplibre/artifacts/ios-1791596074935/report.json",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/native-builds/maplibre/ios-1791596074935/report.json",
+      "installation": "executable and embedded bundle hashes verified",
+      "applicationId": "com.onemap.harness.maplibre",
+      "marker": "maplibre-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c-eced556351e7f2c7b3c39cbe717bc881bc4df2c7b3422dad0d33e29012f1760d",
+      "publicationFiles": 180,
+      "nativeDependencyGraph": "MapLibre SPM6.31.0 resolved; opposite wrapper/SDK absent from Pod and SPM locks",
+      "binaryDependencyIsolation": "App Mach-O links MapLibre; no Mapbox dynamic dependency"
+    },
+    "maplibre-android": {
+      "status": "passed",
+      "configuration": "Release",
+      "artifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+      "consumer": "/private/tmp/one-map-react-main-first-maplibre",
+      "originalReport": "/private/tmp/one-map-react-main-first-maplibre/artifacts/android-1791595860361/report.json",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/native-builds/maplibre/android-1791595860361/report.json",
+      "installation": "installed APK hash verified",
+      "applicationId": "com.onemap.harness.maplibre",
+      "marker": "maplibre-9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c-eced556351e7f2c7b3c39cbe717bc881bc4df2c7b3422dad0d33e29012f1760d",
+      "publicationFiles": 180,
+      "nativeDependencyGraph": "MapLibre Android13.6.1 OpenGL resolved; opposite SDK absent",
+      "binaryDependencyIsolation": "APK contains libmaplibre.so; no Mapbox native library or com/mapbox DEX class descriptor"
+    }
+  },
+  "retainedFailures": [
+    {
+      "status": "failed",
+      "reason": "Gradle daemon could not resolve npx; the full Node/npm PATH and a daemon restart resolved the environment failure. No source change.",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/native-builds/mapbox/android-1791595988367/report.json"
+    },
+    {
+      "status": "failed",
+      "reason": "Gradle daemon could not resolve npx; the full Node/npm PATH and a daemon restart resolved the environment failure. No source change.",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/native-builds/maplibre/android-1791595758854/report.json"
+    },
+    {
+      "status": "failed",
+      "reason": "The canonical flow hit its 30-minute deadline after host clamshell sleep and long maintenance-sleep intervals paused UI execution. The system sleep log confirms the interruption. No failed assertion was logged; unchanged source, artifact and canonical flow are retried under temporary sleep inhibition.",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/runtime/mapbox-android-timeout/runtime-report.json",
+      "environmentEvidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/one-map-main-first-sleep-causes.log"
+    }
+  ],
+  "environment": {
+    "bun": "1.4.1",
+    "browser": "Chromium 156.0.8078.4",
+    "ios": "iPhone 18 Pro simulator, iOS 27.0, arm64",
+    "iosDevice": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "android": "emulator-5554, API 37, arm64-v8a",
+    "maestro": "2.11.0",
+    "nativeCacheStrategy": "APFS clones of isolated consumer caches; final tarball freshly installed, Release builds executed, new markers and installed executable/bundle hashes verified.",
+    "scope": "Simulator/emulator canonical S04 checks; existing platform and later-stage limitations remain unchanged.",
+    "restoration": {
+      "status": "passed",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/main-first-ordering/environment-restoration.json"
+    }
+  },
+  "metadataFiles": [
+    "records/evidence/main-first-ordering.json",
+    "records/stage-status.json",
+    "docs/implementation-status.md",
+    "docs/decisions/0006-s04-acceptance.md"
+  ]
+}

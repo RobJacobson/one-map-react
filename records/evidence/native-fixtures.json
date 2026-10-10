@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "checks": [
+    {
+      "schemaVersion": 1,
+      "backend": "mapbox",
+      "output": "/private/tmp/one-map-native-mapbox-d85Jzu",
+      "appName": "OneMapMapbox",
+      "applicationId": "com.onemap.harness.mapbox",
+      "packageArtifact": "one-map-0.0.0.tgz",
+      "artifactIntegrity": "sha512-lsLqYVU8iKsUZtWNFbZw1pV+9DKQLJcQU6eU3LUq1VH6rQ0yVHJy1hk7bebBU2JeFNKmd0Q/720qwR3it+ObTw==",
+      "template": {
+        "package": "@react-native-community/template",
+        "version": "0.87.1",
+        "sourceRevision": "485f6ec0d0efb023bc2c0c87bae75d4aa4897607",
+        "tarball": "https://registry.npmjs.org/@react-native-community/template/-/template-0.87.1.tgz",
+        "integrity": "sha512-BScXP5sUoCCb4piD8EBIcxsxstfY5ME/hZ1K9mMDScfUnjQxiIWwEskIgkWfzRPuXwhMEWwREbgmaswLZqfa6A==",
+        "cachedTarball": "/private/tmp/one-map-native-template.tgz"
+      },
+      "selectedBinding": {
+        "name": "@rnmapbox/maps",
+        "version": "10.3.7",
+        "sourceRevision": "0f50e8164c1aefe45de9ed9cde310f310076a310"
+      },
+      "nativeSDK": {
+        "ios": "11.23.1",
+        "android": "11.23.1"
+      },
+      "generation": "passed",
+      "installedPeerGraph": "passed",
+      "autolinkingConfiguration": "passed",
+      "linkedSDKs": "unverified",
+      "buildAndRuntime": "unverified",
+      "scenario": "Map lifecycle/camera app pending S04; template generation is not runtime conformance."
+    },
+    {
+      "schemaVersion": 1,
+      "backend": "maplibre",
+      "output": "/private/tmp/one-map-native-maplibre-1TiJnO",
+      "appName": "OneMapMaplibre",
+      "applicationId": "com.onemap.harness.maplibre",
+      "packageArtifact": "one-map-0.0.0.tgz",
+      "artifactIntegrity": "sha512-lsLqYVU8iKsUZtWNFbZw1pV+9DKQLJcQU6eU3LUq1VH6rQ0yVHJy1hk7bebBU2JeFNKmd0Q/720qwR3it+ObTw==",
+      "template": {
+        "package": "@react-native-community/template",
+        "version": "0.87.1",
+        "sourceRevision": "485f6ec0d0efb023bc2c0c87bae75d4aa4897607",
+        "tarball": "https://registry.npmjs.org/@react-native-community/template/-/template-0.87.1.tgz",
+        "integrity": "sha512-BScXP5sUoCCb4piD8EBIcxsxstfY5ME/hZ1K9mMDScfUnjQxiIWwEskIgkWfzRPuXwhMEWwREbgmaswLZqfa6A==",
+        "cachedTarball": "/private/tmp/one-map-native-template.tgz"
+      },
+      "selectedBinding": {
+        "name": "@maplibre/maplibre-react-native",
+        "version": "11.5.0",
+        "sourceRevision": "059f46b2dc728fb6259af91b27a071bcda19a2ae"
+      },
+      "nativeSDK": {
+        "ios": "6.31.0",
+        "android": "13.6.1"
+      },
+      "generation": "passed",
+      "installedPeerGraph": "passed",
+      "autolinkingConfiguration": "passed",
+      "linkedSDKs": "unverified",
+      "buildAndRuntime": "unverified",
+      "scenario": "Map lifecycle/camera app pending S04; template generation is not runtime conformance."
+    }
+  ],
+  "limitations": [
+    "Generation, installed JS peers and autolinking configuration only; native linking/build/runtime remains unverified."
+  ]
+}

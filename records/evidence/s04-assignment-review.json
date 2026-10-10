@@ -1,0 +1,2515 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-08T10:33:34.817649+00:00",
+  "status": "primary-assignment-review-complete; no feature acceptance inferred",
+  "basis": "Assignment decisions recorded here. The classification worksheet was removed. Coverage provenance remains in records/api-coverage.json.",
+  "scope": "Responsibilities remain mandatory. Only stage assignments and supporting rationale change; expected support, disposition, implementation and verification statuses remain unchanged.",
+  "primaryDecisions": [
+    "Keep renderer loaded/isStyleLoaded operations in S04 because readiness is part of lifecycle acceptance.",
+    "Keep all 43 proposed wrapper-internal entries pending S04 until public export/ref reachability is audited; do not turn them into internal dispositions on naming alone.",
+    "Reuse existing child stages for raster-array, global state, featuresets, iconsets, models and indoor responsibilities. Retain every previously required child stage.",
+    "Put renderer diagnostic overlays under S48a with a dedicated child, because the specification has no S48e stage.",
+    "Native tintColor remains S04 investigation: Android wrapper setter is a no-op; wrapper absence alone does not establish SDK unsupported status.",
+    "MapView.props.localizeLabels remains its existing S48d.label-localization assignment until per-map ownership and reset semantics are resolved with the S04 configuration contract."
+  ],
+  "sourceReview": {
+    "publishedDeclarations": [
+      "node_modules/mapbox-gl/dist/mapbox-gl.d.ts",
+      "node_modules/maplibre-gl/dist/maplibre-gl.d.ts"
+    ],
+    "styleSchemas": [
+      "/private/tmp/one-map-research-web/mapbox-gl/src/style-spec/reference/v8.json",
+      "/private/tmp/one-map-research-web/maplibre-style-spec/src/reference/v8.json"
+    ],
+    "nativeSources": [
+      "node_modules/@rnmapbox/maps/src/components/MapView.tsx",
+      "node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXMapView.swift",
+      "node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapViewManager.kt"
+    ],
+    "additionalPinnedSources": "Every change retains the exact inventory provenance in records/api-coverage.json."
+  },
+  "changes": [
+    {
+      "id": "rnmapbox:rnmapbox.export.MapState",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.export.ScreenPointPayload",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.properties",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.properties.bounds",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.properties.bounds.ne",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.properties.bounds.sw",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.properties.center",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.properties.heading",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.properties.pitch",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.properties.zoom",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapState.timestamp",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.props.regionDidChangeDebounceTime",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.props.regionWillChangeDebounceTime",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RegionPayload",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RegionPayload.animated",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RegionPayload.heading",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RegionPayload.isUserInteraction",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RegionPayload.pitch",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RegionPayload.visibleBounds",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RegionPayload.zoomLevel",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.ScreenPointPayload",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.ScreenPointPayload.screenPointX",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.ScreenPointPayload.screenPointY",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.areTilesLoaded",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.fire",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.frameReady",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.idle",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.isEasing",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.isMoving",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.isRotating",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.on",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.areTilesLoaded",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.fire",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.frameReady",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.idle",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.isEasing",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.isMoving",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.isRotating",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.on",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.areTilesLoaded",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.fire",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.isMoving",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.isRotating",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.on",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.areTilesLoaded",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.fire",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.isMoving",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.isRotating",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.on",
+      "from": "S04",
+      "to": "S06a",
+      "group": "map-events",
+      "rationale": "The APIs concern normalized event payloads/subscriptions, event ordering or observation of movement/loading rather than ordinary map creation.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:style-spec.$root.centerAltitude",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.2.1/src/reference/v8.json"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:style-spec.$root.roll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.2.1/src/reference/v8.json"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:ViewState",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L61"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:ViewState.bearing",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L64"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:ViewState.bounds",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L66"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:ViewState.center",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L62"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:ViewState.pitch",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L65"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:ViewState.zoom",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L63"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.props.contentInset",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.initialViewState.bounds",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/mapbox.ts#L40"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.initialViewState.fitBoundsOptions",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/mapbox.ts#L42"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.fitScreenCoordinates",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.getHorizontalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.getVerticalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.resetNorth",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.setVerticalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.snapToNorth",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.fitScreenCoordinates",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.getHorizontalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.getVerticalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.resetNorth",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.setVerticalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.snapToNorth",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.bearing",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.camera",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.center",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.pitch",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.zoom",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.MapOptions.roll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.initialViewState.bounds",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/maplibre/maplibre.ts#L43"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.initialViewState.fitBoundsOptions",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/maplibre/maplibre.ts#L45"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.roll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.fitScreenCoordinates",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.getRoll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.getVerticalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.resetNorth",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.setRoll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.setVerticalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.snapToNorth",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.fitScreenCoordinates",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.getRoll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.getVerticalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.resetNorth",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.setRoll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.setVerticalFieldOfView",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.snapToNorth",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.MapOptions.roll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.bearing",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.center",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.centerAltitude",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.pitch",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.roll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.zoom",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSpecification.roll",
+      "from": "S04",
+      "to": "S05",
+      "group": "camera-options-commands",
+      "rationale": "Camera fields, north reset/snap, screen fitting and field-of-view have camera semantics, constraints and timing already assigned to S05.",
+      "upstreamSource": "https://unpkg.com/@maplibre/maplibre-gl-style-spec@26.4.4/dist/index.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.latitude",
+      "from": "S04",
+      "to": "S12",
+      "group": "controlled-camera-props",
+      "rationale": "Top-level react-map-gl camera props change camera continuously; they are not initial-only camera values.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/types/common.ts#L21"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.longitude",
+      "from": "S04",
+      "to": "S12",
+      "group": "controlled-camera-props",
+      "rationale": "Top-level react-map-gl camera props change camera continuously; they are not initial-only camera values.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/types/common.ts#L19"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.latitude",
+      "from": "S04",
+      "to": "S12",
+      "group": "controlled-camera-props",
+      "rationale": "Top-level react-map-gl camera props change camera continuously; they are not initial-only camera values.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/types/common.ts#L21"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.longitude",
+      "from": "S04",
+      "to": "S12",
+      "group": "controlled-camera-props",
+      "rationale": "Top-level react-map-gl camera props change camera continuously; they are not initial-only camera values.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/types/common.ts#L19"
+    },
+    {
+      "id": "web:web.mapbox.MapOptions.hash",
+      "from": "S04",
+      "to": "S12.url-camera-state",
+      "group": "url-camera-state",
+      "rationale": "hash installs URL-camera ownership and synchronization, including named hash parameters and teardown, beyond an inert constructor flag.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.hash",
+      "from": "S04",
+      "to": "S12.url-camera-state",
+      "group": "url-camera-state",
+      "rationale": "hash installs URL-camera ownership and synchronization, including named hash parameters and teardown, beyond an inert constructor flag.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.MapOptions.hash",
+      "from": "S04",
+      "to": "S12.url-camera-state",
+      "group": "url-camera-state",
+      "rationale": "hash installs URL-camera ownership and synchronization, including named hash parameters and teardown, beyond an inert constructor flag.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapOptions.hash",
+      "from": "S04",
+      "to": "S12.url-camera-state",
+      "group": "url-camera-state",
+      "rationale": "hash installs URL-camera ownership and synchronization, including named hash parameters and teardown, beyond an inert constructor flag.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.hash",
+      "from": "S04",
+      "to": "S12.url-camera-state",
+      "group": "url-camera-state",
+      "rationale": "hash installs URL-camera ownership and synchronization, including named hash parameters and teardown, beyond an inert constructor flag.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.MapOptions.hash",
+      "from": "S04",
+      "to": "S12.url-camera-state",
+      "group": "url-camera-state",
+      "rationale": "hash installs URL-camera ownership and synchronization, including named hash parameters and teardown, beyond an inert constructor flag.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:QueryRenderedFeaturesOptions",
+      "from": "S04",
+      "to": "S10b",
+      "group": "rendered-query-options",
+      "rationale": "QueryRenderedFeaturesOptions filter/layers are query selection semantics.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L81"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:QueryRenderedFeaturesOptions.filter",
+      "from": "S04",
+      "to": "S10b",
+      "group": "rendered-query-options",
+      "rationale": "QueryRenderedFeaturesOptions filter/layers are query selection semantics.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L85"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:QueryRenderedFeaturesOptions.layers",
+      "from": "S04",
+      "to": "S10b",
+      "group": "rendered-query-options",
+      "rationale": "QueryRenderedFeaturesOptions filter/layers are query selection semantics.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L90"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.queryRasterValue",
+      "from": "S04",
+      "to": "S22.raster-array",
+      "group": "raster-array-query",
+      "rationale": "queryRasterValue consumes raster source ID, coordinates and bands and returns a promised sample result; it belongs with the independently staged raster-array source family.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.queryRasterValue",
+      "from": "S04",
+      "to": "S22.raster-array",
+      "group": "raster-array-query",
+      "rationale": "queryRasterValue consumes raster source ID, coordinates and bands and returns a promised sample result; it belongs with the independently staged raster-array source family.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.coveringTiles",
+      "from": "S04",
+      "to": "S25.covering-tiles",
+      "group": "tile-coverage-query",
+      "rationale": "coveringTiles enumerates tiles covering a viewport at configured size/zoom, not merely map readiness or loaded features.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.coveringTiles",
+      "from": "S04",
+      "to": "S25.covering-tiles",
+      "group": "tile-coverage-query",
+      "rationale": "coveringTiles enumerates tiles covering a viewport at configured size/zoom, not merely map readiness or loaded features.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.addControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.hasControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.removeControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.addControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.hasControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.removeControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.addControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.hasControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.removeControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.addControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.hasControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.removeControl",
+      "from": "S04",
+      "to": "S29",
+      "group": "custom-control-registration",
+      "rationale": "addControl/removeControl/hasControl are the already planned control registration/update/cleanup responsibility.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.addInteraction",
+      "from": "S04",
+      "to": "S06a.interactions",
+      "group": "feature-interactions",
+      "rationale": "addInteraction/removeInteraction manage delegated target-feature interactions and persistent event registrations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.removeInteraction",
+      "from": "S04",
+      "to": "S06a.interactions",
+      "group": "feature-interactions",
+      "rationale": "addInteraction/removeInteraction manage delegated target-feature interactions and persistent event registrations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.addInteraction",
+      "from": "S04",
+      "to": "S06a.interactions",
+      "group": "feature-interactions",
+      "rationale": "addInteraction/removeInteraction manage delegated target-feature interactions and persistent event registrations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.removeInteraction",
+      "from": "S04",
+      "to": "S06a.interactions",
+      "group": "feature-interactions",
+      "rationale": "addInteraction/removeInteraction manage delegated target-feature interactions and persistent event registrations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.styleDiffing",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/mapbox.ts#L66"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.getStyle",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.getStyle",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.setStyle",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.sources",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.transition",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.styleDiffing",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/maplibre/maplibre.ts#L69"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.getStyle",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.getStyle",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.setStyle",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.sources",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.transition",
+      "from": "S04",
+      "to": "S09",
+      "group": "style-resource-lifecycle",
+      "rationale": "getStyle/setStyle/styleDiffing plus root sources/resource graph have generation, ownership and source/layer recovery semantics.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.layers",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-layer-graph",
+      "rationale": "Root layers and appearance definitions define styling/resource translation, already owned by S08.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.appearance.condition",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-layer-graph",
+      "rationale": "Root layers and appearance definitions define styling/resource translation, already owned by S08.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.appearance.properties",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-layer-graph",
+      "rationale": "Root layers and appearance definitions define styling/resource translation, already owned by S08.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.layers",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-layer-graph",
+      "rationale": "Root layers and appearance definitions define styling/resource translation, already owned by S08.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.function.base",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.function.colorSpace",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.function.default",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.function.property",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.function.type",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.geometry_type.values",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.property-type.color-ramp",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.property-type.constant",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.property-type.data-constant",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.property-type.data-driven",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.function.base",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.function.colorSpace",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.function.default",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.function.property",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.function.type",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.geometry_type.values",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.interpolation_name.cubic-bezier",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.interpolation_name.exponential",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.interpolation_name.linear",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.property-type.color-ramp",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.property-type.constant",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.property-type.cross-faded",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.property-type.cross-faded-data-driven",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.property-type.data-constant",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.property-type.data-driven",
+      "from": "S04",
+      "to": "S08",
+      "group": "style-expression-schema",
+      "rationale": "Function/interpolation/promoteId/property-type/style schema metadata describe expression/source/layer validation grammar, not map constructor options.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:style-spec.$root.font-faces",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.2.1/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.glyphs",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSpecification.glyphs",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.getGlyphs",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.setGlyphs",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.getGlyphs",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.setGlyphs",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.font-faces",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.glyphs",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSpecification.glyphs",
+      "from": "S04",
+      "to": "S08.font-resources",
+      "group": "glyph-font-resources",
+      "rationale": "glyphs/font-faces/getGlyphs/setGlyphs define text rendering resources and font resolution/fallback, with request and backend support requirements.",
+      "upstreamSource": "https://unpkg.com/@maplibre/maplibre-gl-style-spec@26.4.4/dist/index.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.getGlobalState",
+      "from": "S04",
+      "to": "S43-global-state",
+      "group": "global-expression-state",
+      "rationale": "MapLibre root state and getGlobalState/setGlobalStateProperty are global expression inputs, distinct from feature state and map readiness.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.setGlobalStateProperty",
+      "from": "S04",
+      "to": "S43-global-state",
+      "group": "global-expression-state",
+      "rationale": "MapLibre root state and getGlobalState/setGlobalStateProperty are global expression inputs, distinct from feature state and map readiness.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.getGlobalState",
+      "from": "S04",
+      "to": "S43-global-state",
+      "group": "global-expression-state",
+      "rationale": "MapLibre root state and getGlobalState/setGlobalStateProperty are global expression inputs, distinct from feature state and map readiness.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.setGlobalStateProperty",
+      "from": "S04",
+      "to": "S43-global-state",
+      "group": "global-expression-state",
+      "rationale": "MapLibre root state and getGlobalState/setGlobalStateProperty are global expression inputs, distinct from feature state and map readiness.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.state",
+      "from": "S04",
+      "to": "S43-global-state",
+      "group": "global-expression-state",
+      "rationale": "MapLibre root state and getGlobalState/setGlobalStateProperty are global expression inputs, distinct from feature state and map readiness.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSpecification.state",
+      "from": "S04",
+      "to": "S43-global-state",
+      "group": "global-expression-state",
+      "rationale": "MapLibre root state and getGlobalState/setGlobalStateProperty are global expression inputs, distinct from feature state and map readiness.",
+      "upstreamSource": "https://unpkg.com/@maplibre/maplibre-gl-style-spec@26.4.4/dist/index.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.getSchema",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.setColorTheme",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.setSchema",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.getSchema",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.setColorTheme",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.setSchema",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$doc.use-theme",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.color-theme",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.fragment",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.imports",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.schema",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.colorTheme.data",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.schema.*",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSpecification.color-theme",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.StyleSpecification.fragment",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.StyleSpecification.schema",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-import-configuration",
+      "rationale": "Style import/configuration/schema/color-theme operations already belong to S45; typed settings cannot be replaced by getMap().",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.projection",
+      "from": "S04",
+      "to": "S39",
+      "group": "projection-root",
+      "rationale": "Projection alters coordinate/camera/rendering semantics and has its own planned stage.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.projection",
+      "from": "S04",
+      "to": "S39",
+      "group": "projection-root",
+      "rationale": "Projection alters coordinate/camera/rendering semantics and has its own planned stage.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.terrain",
+      "from": "S04",
+      "to": "S38",
+      "group": "terrain-root",
+      "rationale": "Terrain requires elevation sources and rendering/query semantics.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.terrain",
+      "from": "S04",
+      "to": "S38",
+      "group": "terrain-root",
+      "rationale": "Terrain requires elevation sources and rendering/query semantics.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.light",
+      "from": "S04",
+      "to": "S40",
+      "group": "light-roots",
+      "rationale": "Lighting is the already planned independent renderer effect family.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.lights",
+      "from": "S04",
+      "to": "S40",
+      "group": "light-roots",
+      "rationale": "Lighting is the already planned independent renderer effect family.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.light",
+      "from": "S04",
+      "to": "S40",
+      "group": "light-roots",
+      "rationale": "Lighting is the already planned independent renderer effect family.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.fog",
+      "from": "S04",
+      "to": "S41",
+      "group": "atmosphere-roots",
+      "rationale": "Atmospheric style effects have their own planned stage.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.sky",
+      "from": "S04",
+      "to": "S41",
+      "group": "atmosphere-roots",
+      "rationale": "Atmospheric style effects have their own planned stage.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.rain",
+      "from": "S04",
+      "to": "S42a",
+      "group": "rain-root",
+      "rationale": "Rain is the explicitly staged precipitation family.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.snow",
+      "from": "S04",
+      "to": "S42b",
+      "group": "snow-root",
+      "rationale": "Snow is the explicitly staged precipitation family.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.featuresets",
+      "from": "S04",
+      "to": "S45.featuresets",
+      "group": "advanced-style-roots",
+      "rationale": "These root fields contain independent advanced resource, layer or interaction families; they are not ordinary map settings.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.iconsets",
+      "from": "S04",
+      "to": "S23.iconsets",
+      "group": "advanced-style-roots",
+      "rationale": "These root fields contain independent advanced resource, layer or interaction families; they are not ordinary map settings.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.indoor",
+      "from": "S04",
+      "to": "S45.indoor",
+      "group": "advanced-style-roots",
+      "rationale": "These root fields contain independent advanced resource, layer or interaction families; they are not ordinary map settings.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.models",
+      "from": "S04",
+      "to": "S43.model",
+      "group": "advanced-style-roots",
+      "rationale": "These root fields contain independent advanced resource, layer or interaction families; they are not ordinary map settings.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.export.getAccessToken",
+      "from": "S04",
+      "to": "S48d.credentials",
+      "group": "credentials-module",
+      "rationale": "SDK get/setAccessToken are process/module configuration with multi-provider and initialization-order semantics. Existing adapter token setup covers initialization only.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/RNMBXModule.ts"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.export.setAccessToken",
+      "from": "S04",
+      "to": "S48d.credentials",
+      "group": "credentials-module",
+      "rationale": "SDK get/setAccessToken are process/module configuration with multi-provider and initialization-order semantics. Existing adapter token setup covers initialization only.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/RNMBXModule.ts"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.RNMBXModule.getAccessToken",
+      "from": "S04",
+      "to": "S48d.credentials",
+      "group": "credentials-module",
+      "rationale": "SDK get/setAccessToken are process/module configuration with multi-provider and initialization-order semantics. Existing adapter token setup covers initialization only.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/RNMBXModule.ts"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.RNMBXModule.setAccessToken",
+      "from": "S04",
+      "to": "S48d.credentials",
+      "group": "credentials-module",
+      "rationale": "SDK get/setAccessToken are process/module configuration with multi-provider and initialization-order semantics. Existing adapter token setup covers initialization only.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/RNMBXModule.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.RTLTextPlugin",
+      "from": "S04",
+      "to": "S48d.rtl-plugin",
+      "group": "rtl-plugin-module",
+      "rationale": "Pinned react-map-gl set-globals configures the shared rendering module/plugin and lazy loading, not an individual map property.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/utils/set-globals.ts#L9"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.RTLTextPlugin",
+      "from": "S04",
+      "to": "S48d.rtl-plugin",
+      "group": "rtl-plugin-module",
+      "rationale": "Pinned react-map-gl set-globals configures the shared rendering module/plugin and lazy loading, not an individual map property.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/utils/set-globals.ts#L7"
+    },
+    {
+      "id": "web:web.mapbox.MapOptions.animationFrameProvider",
+      "from": "S04",
+      "to": "S48c.render-scheduling",
+      "group": "render-scheduling",
+      "rationale": "animationFrameProvider/redraw affect frame scheduling and need scoped callback ownership, not a general ordinary scalar setting.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.animationFrameProvider",
+      "from": "S04",
+      "to": "S48c.render-scheduling",
+      "group": "render-scheduling",
+      "rationale": "animationFrameProvider/redraw affect frame scheduling and need scoped callback ownership, not a general ordinary scalar setting.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.MapOptions.animationFrameProvider",
+      "from": "S04",
+      "to": "S48c.render-scheduling",
+      "group": "render-scheduling",
+      "rationale": "animationFrameProvider/redraw affect frame scheduling and need scoped callback ownership, not a general ordinary scalar setting.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.redraw",
+      "from": "S04",
+      "to": "S48c.render-scheduling",
+      "group": "render-scheduling",
+      "rationale": "animationFrameProvider/redraw affect frame scheduling and need scoped callback ownership, not a general ordinary scalar setting.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.redraw",
+      "from": "S04",
+      "to": "S48c.render-scheduling",
+      "group": "render-scheduling",
+      "rationale": "animationFrameProvider/redraw affect frame scheduling and need scoped callback ownership, not a general ordinary scalar setting.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.refreshTiles",
+      "from": "S04",
+      "to": "S47.tile-refresh",
+      "group": "tile-refresh",
+      "rationale": "refreshTiles reloads selected source tiles and has network/cache side effects.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.refreshTiles",
+      "from": "S04",
+      "to": "S47.tile-refresh",
+      "group": "tile-refresh",
+      "rationale": "refreshTiles reloads selected source tiles and has network/cache side effects.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapOptions.devtools",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.MapProps.devtools",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.showOverdrawInspector",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.showParseStatus",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.speedIndexTiming",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.vertices",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.MapOptions.devtools",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.showOverdrawInspector",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.vertices",
+      "from": "S04",
+      "to": "S48a.renderer-diagnostics",
+      "group": "renderer-diagnostics",
+      "rationale": "devtools/showOverdrawInspector/showParseStatus/speedIndexTiming/vertices inspect or visualize rendering rather than initial map lifecycle.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "maplibre-native:maplibre-native:MapRef",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx#L93"
+    },
+    {
+      "id": "web:web.mapbox.MapRef",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/create-ref.ts#L30"
+    },
+    {
+      "id": "web:web.mapbox.MapRef.getContainer",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.getContainer",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.handlers",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.style",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.version",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/mapbox-gl@3.32.0/dist/mapbox-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapRef",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/maplibre/create-ref.ts#L28"
+    },
+    {
+      "id": "web:web.maplibre.MapRef.getContainer",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.getContainer",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.style",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.version",
+      "from": "S04",
+      "to": "S49a",
+      "group": "backend-handle-types",
+      "rationale": "Raw renderer container/style/handler objects and broad native/web ref types require typed validity/lifetime and ownership rules; a raw handle cannot replace implementation of assigned operations.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.props.deselectAnnotationOnTap",
+      "from": "S04",
+      "to": "S14",
+      "group": "annotation-deselection",
+      "rationale": "The setting controls selected static annotation behavior and event emission.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.$root.sprite",
+      "from": "S04",
+      "to": "S23",
+      "group": "sprite-root",
+      "rationale": "Sprite atlases supply image resources with loading and recovery lifecycle.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.$root.sprite",
+      "from": "S04",
+      "to": "S23",
+      "group": "sprite-root",
+      "rationale": "Sprite atlases supply image resources with loading and recovery lifecycle.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.MapOptions.rollEnabled",
+      "from": "S04",
+      "to": "S06b",
+      "group": "camera-roll-gesture",
+      "rationale": "Pinned MapLibre MapOptions documents rollEnabled as the drag-to-rotate roll control enable flag; it is distinct from camera roll angle.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.MapProps.rollEnabled",
+      "from": "S04",
+      "to": "S06b",
+      "group": "camera-roll-gesture",
+      "rationale": "Pinned MapLibre MapOptions documents rollEnabled as the drag-to-rotate roll control enable flag; it is distinct from camera roll angle.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "web:web.maplibre.Renderer.MapOptions.rollEnabled",
+      "from": "S04",
+      "to": "S06b",
+      "group": "camera-roll-gesture",
+      "rationale": "Pinned MapLibre MapOptions documents rollEnabled as the drag-to-rotate roll control enable flag; it is distinct from camera roll angle.",
+      "upstreamSource": "https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.d.ts"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.Point.x",
+      "from": "S04",
+      "to": "S10a",
+      "group": "native-point-type",
+      "rationale": "Native named x/y Point fields need normalized tuple/logical coordinate conventions, including ornament uses; these are not camera orientation fields.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.Point.y",
+      "from": "S04",
+      "to": "S10a",
+      "group": "native-point-type",
+      "rationale": "Native named x/y Point fields need normalized tuple/logical coordinate conventions, including ornament uses; these are not camera orientation fields.",
+      "upstreamSource": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.option.array",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-config-option-schema",
+      "rationale": "The option grammar describes configurable style import schema values/defaults/ranges/editor metadata.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.option.default",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-config-option-schema",
+      "rationale": "The option grammar describes configurable style import schema values/defaults/ranges/editor metadata.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.option.maxValue",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-config-option-schema",
+      "rationale": "The option grammar describes configurable style import schema values/defaults/ranges/editor metadata.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.option.minValue",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-config-option-schema",
+      "rationale": "The option grammar describes configurable style import schema values/defaults/ranges/editor metadata.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.option.stepValue",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-config-option-schema",
+      "rationale": "The option grammar describes configurable style import schema values/defaults/ranges/editor metadata.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.option.type",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-config-option-schema",
+      "rationale": "The option grammar describes configurable style import schema values/defaults/ranges/editor metadata.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.option.values",
+      "from": "S04",
+      "to": "S45",
+      "group": "style-config-option-schema",
+      "rationale": "The option grammar describes configurable style import schema values/defaults/ranges/editor metadata.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.mapbox.StyleSchema.promoteId.*",
+      "from": "S04",
+      "to": "S16",
+      "group": "vector-promote-id-schema",
+      "rationale": "The dictionary form of promoteId maps source-layer names to ID properties in vector source definitions.",
+      "upstreamSource": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/style-spec/reference/v8.json"
+    },
+    {
+      "id": "web:web.maplibre.StyleSchema.promoteId.*",
+      "from": "S04",
+      "to": "S16",
+      "group": "vector-promote-id-schema",
+      "rationale": "The dictionary form of promoteId maps source-layer names to ID properties in vector source definitions.",
+      "upstreamSource": "https://github.com/maplibre/maplibre-style-spec/blob/v26.4.4/src/reference/v8.json"
+    }
+  ],
+  "retained": [
+    {
+      "id": "web:web.mapbox.MapRef.isStyleLoaded",
+      "stage": "S04",
+      "reason": "Readiness and style completion belong to S04; event-subscription normalization remains S06a."
+    },
+    {
+      "id": "web:web.mapbox.MapRef.loaded",
+      "stage": "S04",
+      "reason": "Readiness and style completion belong to S04; event-subscription normalization remains S06a."
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.isStyleLoaded",
+      "stage": "S04",
+      "reason": "Readiness and style completion belong to S04; event-subscription normalization remains S06a."
+    },
+    {
+      "id": "web:web.mapbox.Renderer.Map.loaded",
+      "stage": "S04",
+      "reason": "Readiness and style completion belong to S04; event-subscription normalization remains S06a."
+    },
+    {
+      "id": "web:web.maplibre.MapRef.isStyleLoaded",
+      "stage": "S04",
+      "reason": "Readiness and style completion belong to S04; event-subscription normalization remains S06a."
+    },
+    {
+      "id": "web:web.maplibre.MapRef.loaded",
+      "stage": "S04",
+      "reason": "Readiness and style completion belong to S04; event-subscription normalization remains S06a."
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.isStyleLoaded",
+      "stage": "S04",
+      "reason": "Readiness and style completion belong to S04; event-subscription normalization remains S06a."
+    },
+    {
+      "id": "web:web.maplibre.Renderer.Map.loaded",
+      "stage": "S04",
+      "reason": "Readiness and style completion belong to S04; event-subscription normalization remains S06a."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.CallbablePropKeys",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.Debounced",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.Debounced.clear",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.Debounced.flush",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base._preRefMapMethodQueue.method",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base._preRefMapMethodQueue.method.args",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base._preRefMapMethodQueue.method.name",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base._preRefMapMethodQueue.resolver",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.componentDidCatch",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.componentWillMount",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.componentWillReceiveProps",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.componentWillUpdate",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.contextType",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.forceUpdate",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.getSnapshotBeforeUpdate",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.props",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.setState",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.shouldComponentUpdate",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.UNSAFE_componentWillMount",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.UNSAFE_componentWillReceiveProps",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.UNSAFE_componentWillUpdate",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onCameraChanged.payload",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onChange.payload",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onChange.payload.isAnimatingFromUserInteraction",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onChange.type",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onDebouncedRegionDidChange.isAnimatingFromUserInteraction",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onDebouncedRegionWillChange.isAnimatingFromUserInteraction",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onLongPress.payload",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onPress.payload",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onRegionWillChange.isAnimatingFromUserInteraction",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.deprecationLogged",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.deprecationLogged.contentInset",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.deprecationLogged.regionDidChange",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.deprecationLogged.regionIsChanging",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.logger",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.height",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.isReady",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.isUserInteraction",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.region",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.width",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.NativeProps",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RNMBXMapViewRefType",
+      "stage": "S04",
+      "reason": "Wrapper-internal disposition requires a separate reachability audit."
+    }
+  ],
+  "verification": {
+    "inventoryEntryCountBefore": 11837,
+    "expectedSupportChanged": false,
+    "dispositionsChanged": false,
+    "acceptanceChanged": false
+  },
+  "additionalSourceFinding": {
+    "entries": [
+      "web:web.maplibre.MapOptions.reduceMotion",
+      "web:web.maplibre.MapProps.reduceMotion",
+      "web:web.maplibre.Renderer.MapOptions.reduceMotion"
+    ],
+    "to": "S48d.reduced-motion",
+    "source": "https://github.com/maplibre/maplibre-gl-js/blob/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/map.ts#L798-L800",
+    "sourcePath": "node_modules/maplibre-gl/src/ui/map.ts",
+    "reason": "Constructor sets shared browser.prefersReducedMotion; process/module ownership required. No unsupported disposition or acceptance inferred."
+  }
+}

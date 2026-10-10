@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "stage": "S04",
+  "status": "implemented-unverified",
+  "changes": [
+    "Named local function options, results, renderer ports, camera snapshots and lifecycle factory return types.",
+    "Backend-local lifecycle contracts remove type-only back edges into native map components.",
+    "Capability decisions are pure; diagnostics publish and deduplicate only after commit.",
+    "Web lifecycle phases and native bridge formatting clarify ownership and teardown.",
+    "Coding-style guide defines when to extract named contracts."
+  ],
+  "staticChecks": {
+    "validate": {
+      "status": "passed",
+      "testCount": 136,
+      "command": "bun run validate",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/coding-style-audit/validate.log"
+    }
+  },
+  "nativeChecks": {
+    "scope": "Targeted compilation only; not a native application build or SDK runtime acceptance.",
+    "mapboxAndroidBridge": {
+      "status": "passed",
+      "sourceSha256": "a72ff064c556ddb438ca7e5f022273e9b49e027c2dc11c2057ebeb74404ea6d5",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/coding-style-audit/mapbox-javac.log",
+      "scope": "Compiles the changed bridge against cached selected-renderer classes, React Native dependencies and Android 37 resources."
+    },
+    "maplibreAndroidBridge": {
+      "status": "passed",
+      "sourceSha256": "a72ff064c556ddb438ca7e5f022273e9b49e027c2dc11c2057ebeb74404ea6d5",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/coding-style-audit/maplibre-javac.log",
+      "scope": "Compiles the changed bridge against cached selected-renderer classes, React Native dependencies and Android 37 resources."
+    },
+    "maplibreIOSRenderer": {
+      "status": "passed",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphonesimulator",
+        "clang",
+        "-fsyntax-only",
+        "-fobjc-arc",
+        "-fblocks",
+        "-target",
+        "arm64-apple-ios18.0-simulator",
+        "-fmodules",
+        "-fmodules-cache-path=/private/tmp/one-map-native-module-cache",
+        "/Users/rob/code/mapbox-code/one-map/packages/one-map-react/native/ios/maplibre/OneMapRenderer.m"
+      ],
+      "sourceSha256": "10e934dbd4e24ade3e06bdddeaf489c3d3e2fac57a8ce0426ceb09eb57c4a5a7",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/coding-style-audit/maplibre-objc.log",
+      "scope": "Objective-C syntax/type check against the simulator SDK; existing header nullability and completion-block capture warnings remain."
+    }
+  },
+  "runtimeAcceptance": {
+    "status": "unverified",
+    "lastAcceptedArtifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+    "historicalEvidence": "records/evidence/s04-style-cleanup.json",
+    "required": "Fresh native application builds and all six SDK runtime cells for the revised artifact."
+  },
+  "sourceSha256": {
+    "packages/one-map-react/src/adapters/lifecycle.ts": "62fc12b5f51f85f60509b723449d7202f73c53f613a4ea25c8106178f47fe6c9",
+    "packages/one-map-react/src/adapters/mapbox-native/configuration.ts": "5d0abc7b125c48603be89716bd05653f4ff842fba5cd001c453fd4c76023b1ce",
+    "packages/one-map-react/src/adapters/mapbox-native/initial-camera.ts": "5882b85958dd61271de45c50a56345486c18793e4976776fbfbe79154a4aab37",
+    "packages/one-map-react/src/adapters/mapbox-native/layout.ts": "fdc663e837834e7987bb9e29e96fdfb983c3a2f449f8ef985ff27274970f0cc5",
+    "packages/one-map-react/src/adapters/mapbox-native/lifecycle-contracts.ts": "96f6792df8b8e9ad945296f6186101335a8cd59db36e0c4d8975e6b3b765b9f4",
+    "packages/one-map-react/src/adapters/mapbox-native/map.tsx": "1aa322f2b1bb5de3c7883afad9b6f14bd8d0e9e40f04c042568a975ad20e42c0",
+    "packages/one-map-react/src/adapters/mapbox-native/tokens.ts": "e7f5a497ba911634fb788f1b9a768533e259347032364e680bef6389477192f0",
+    "packages/one-map-react/src/adapters/mapbox-web-driver.ts": "dda63957508661d8dc6fb256ac01fe42ceb219df4fa6deef38eecee7bbf987ee",
+    "packages/one-map-react/src/adapters/maplibre-native/host-props.ts": "7c78264ffb314b39fa77da96a628cf2c3706bf92ef3cf7f72d6412d13bf4f08c",
+    "packages/one-map-react/src/adapters/maplibre-native/initial-camera.ts": "b94dbc590501065fccba3bbaf5957aa492d9842efe917ae31aceda8e650e76e7",
+    "packages/one-map-react/src/adapters/maplibre-native/lifecycle-contracts.ts": "bad554297db918fe71be762210db40e7045b083df51d38550952f7d1cc6c9bc1",
+    "packages/one-map-react/src/adapters/maplibre-native/map.tsx": "03c694f0cd86acdf4d5966386bfc6eaa52ebf34cb7a4bb2f23e060d6379253ba",
+    "packages/one-map-react/src/adapters/maplibre-web-driver.ts": "6fb12728826fe4b20111dccc17cc77d6c484393d799d50176a1bf792afb01dd4",
+    "packages/one-map-react/src/adapters/native-accessibility.ts": "fcd76fbff4dfd31cc9410e49770e402a3596e2b4bf1ad4e7ecfbea4057d73b82",
+    "packages/one-map-react/src/adapters/native-host.ts": "37f6dc9a84247d2ca7303db315cc247b80dbee61cc69cd0df57b80abf42949fa",
+    "packages/one-map-react/src/adapters/native-lifecycle.ts": "38a22f0710d130750d8a6f47f3a543ff10a2b4f8485addb22ece6fa460e4581c",
+    "packages/one-map-react/src/adapters/selection.ts": "cfedb1d5de9e91e6a756bc9a3282445be64e59b6d208097da3ab6a64b452304e",
+    "packages/one-map-react/src/adapters/web-configuration.ts": "5c9abd1b2c962b8be0ca49467cf6d4de54ab82e2f2b0bdb98843616f4128e759",
+    "packages/one-map-react/src/adapters/web-context.ts": "5f970dc70cd4d834c2c3f46015eb16d92fd85315aef00c1beea374237966c5a0",
+    "packages/one-map-react/src/adapters/web-host.ts": "a879a7390ee6291df279330ddf2de982e4ecb6bf5ef95f902e768a0fa42f3245",
+    "packages/one-map-react/src/adapters/web-initial-camera.ts": "074cb9d61da97b7b58d89b028987377091e9ddf4277831b06f22271b9b109454",
+    "packages/one-map-react/src/adapters/web-pool.tsx": "c9ee1e4074048d2ca8b9f7d6b8309de3c7d1c00f70e287e8e4a5a99de64127f6",
+    "packages/one-map-react/src/adapters/web-render.ts": "14378f70fa8ed184e0e8211e32011290a87b901809a534994ac7a4829bda6038",
+    "packages/one-map-react/src/adapters/web-settings-driver.ts": "af734a5550fe5c69bcdf1a325067ef47c5c9ce11807ee5b42b1d56e7d6fc6924",
+    "packages/one-map-react/src/adapters/web-settings.ts": "a47ca67bfa6568607553d5f15b3bfa31cbf337beb2289ed75cec726a6a36f9de",
+    "packages/one-map-react/src/adapters/web.tsx": "8e919e919482b8c690c9e385c3c7b401a1e7ff20aca76fecf1c532f058b03d37",
+    "packages/one-map-react/src/core/capabilities.ts": "632cb8c3e49deea449884512ea546c06ac697ce1e0a4e52c58f7d4d3f7852992",
+    "packages/one-map-react/src/core/context.tsx": "f3bb5870caa856e0f0de1d89bcbef2cfa4b4bceba0379cba981261321b2c2cf4",
+    "packages/one-map-react/src/core/errors.ts": "57c5c875fbcaaa9cc9cff3ce1e93fb67a9485180ec3d9178675a5280771f0b3f",
+    "packages/one-map-react/src/core/extensions.ts": "896b072dff6f49e4cb8a1fa60964830123cfabdce8a089301c4a6c8b4372a460",
+    "packages/one-map-react/src/core/map-configuration.ts": "7f0adf155d1334e52c734df77859e15bcfc217c7b40ca37cc5276aab7da7497b",
+    "packages/one-map-react/src/core/registry.ts": "a2d9c674c0915154957c587562061f74edfd7b3e801b3785f90b8dbe3d249db6",
+    "packages/one-map-react/src/core/session.ts": "00b5220ae978abc1baf06b90ff32dbb2367cea138cd004f977ddd2a4fd9d20d9",
+    "packages/one-map-react/src/core/types.ts": "5c0c9cfb6a4d3a06dbce1a49222f3b6b2221efc8d0f6c9f9e1deae692e5186da",
+    "packages/one-map-react/src/core/validation.ts": "20cbbb8baf7b3869c48b8c50984ae9ed1be0bea010d2c470224461be24721600",
+    "packages/one-map-react/src/index.ts": "9592ab2d4446e531832fdeca829714f04293ce6a715330c4aded74a4160f10b4",
+    "packages/one-map-react/src/mapbox-native.ts": "e3d93ccdd6c90b6f689c05f2ecb5f087423d8422249e3c9ed83570936cc8ae53",
+    "packages/one-map-react/src/mapbox-web.ts": "e317e7168f22d22c170918de46cb97d332e37d9e0b0fe2608b10052f2b42c764",
+    "packages/one-map-react/src/maplibre-native.ts": "790042ad2f029022cda885851b29c2a14fbba4252cb6333a359359468520fe5e",
+    "packages/one-map-react/src/maplibre-web.ts": "61454a6614ec36d6180de3e31c7166085a1ae22777409e20bb348c9791989035",
+    "packages/one-map-react/src/metro-web-assets.cjs": "9c1c08acd98995a0e285838793a73ed25ee0d44afc8414ca12917a0f89c1f022",
+    "packages/one-map-react/src/metro-web-assets.d.cts": "13df44459b822866a4fcbbfd2428a7675c78eb0410ada63b9fbff8327a142e5b",
+    "packages/one-map-react/src/metro-web-transformer.cjs": "199ac80cf291e6b4edbd3184083f4ae4838e9b7b6159f5d3888715ea166953c3",
+    "packages/one-map-react/src/metro-web.cjs": "a737b6bd3f6114fb4d323eb079864ace715dd5f9804758f97840e118029312e2",
+    "packages/one-map-react/src/metro-web.d.cts": "ed6f1ea4865b01b159a748eb58db6648bb1bca516f3d253368258f692c91a4ff"
+  }
+}

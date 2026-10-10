@@ -1,0 +1,514 @@
+{
+  "schemaVersion": 1,
+  "stage": "S04",
+  "recordedAt": "2026-10-10T00:06:20.630814+00:00",
+  "status": "passed",
+  "artifact": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2.tgz",
+    "sha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2"
+  },
+  "staticChecks": {
+    "validate": {
+      "status": "passed",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-validate.log"
+    },
+    "testCount": 133,
+    "multilineGuardAudit": {
+      "status": "passed",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-multiline-guards.log"
+    },
+    "declarationDocumentation": {
+      "status": "passed",
+      "namedTypes": 63,
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-declaration-documentation.json",
+      "memberAudit": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-declaration-member-audit.log"
+    },
+    "selection": {
+      "status": "passed",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-selection-results.json"
+    },
+    "mixedMetroTransport": {
+      "status": "passed",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-renderer-transports.json",
+      "command": "bun run test:web:metro-transport",
+      "commandLog": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-metro.log",
+      "selectionReport": "/private/tmp/one-map-react-selection-eDGrYo/results.json"
+    },
+    "coverage": {
+      "status": "passed",
+      "entries": 12131,
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-coverage.log",
+      "scope": "Inventory provenance, stage assignments and six-environment cell structure; runtime scenarios remain separate evidence."
+    },
+    "publicationManifest": {
+      "status": "passed",
+      "fileCount": 172,
+      "scope": "Actual tarball manifest equals publication-file paths in all four native build reports; installed hashes verified by each build."
+    },
+    "componentReturnContracts": {
+      "status": "passed",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-component-return-contracts.json"
+    },
+    "finalRecordChecks": {
+      "status": "passed",
+      "commands": [
+        "bun run check",
+        "bun run check:docs",
+        "bun run typecheck",
+        "bun run coverage:validate"
+      ],
+      "coverageLog": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-final-record-checks.log"
+    },
+    "finalPackedSourceIdentity": {
+      "status": "passed",
+      "filesCompared": 169,
+      "scope": "Current dist, native source and package README bytes match the artifact accepted in all six runtime cells."
+    }
+  },
+  "runtime": {
+    "mapbox-web": {
+      "status": "passed",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-05Mi3F/results.json",
+      "scope": "Browser lifecycle, host updates/removal, settings/defaults, provider reuse, external WebGL context disposal and development Strict Mode replay.",
+      "command": "bun run test:web:lifecycle",
+      "commandLog": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-web-lifecycle.log",
+      "environment": {
+        "ONE_MAP_VALIDATION_ROOT": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup",
+        "ONE_MAP_ARTIFACT": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2.tgz",
+        "ONE_MAP_CHROMIUM_PATH": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/browsers/chromium-1248/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+        "browser": "156.0.8078.4",
+        "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-05Mi3F/mapbox"
+      }
+    },
+    "maplibre-web": {
+      "status": "passed",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-05Mi3F/results.json",
+      "scope": "Browser lifecycle, host updates/removal, settings/defaults, provider reuse, external WebGL context disposal and development Strict Mode replay.",
+      "command": "bun run test:web:lifecycle",
+      "commandLog": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-web-lifecycle.log",
+      "environment": {
+        "ONE_MAP_VALIDATION_ROOT": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup",
+        "ONE_MAP_ARTIFACT": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2.tgz",
+        "ONE_MAP_CHROMIUM_PATH": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/browsers/chromium-1248/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+        "browser": "156.0.8078.4",
+        "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-05Mi3F/maplibre"
+      }
+    },
+    "mapbox-ios": {
+      "status": "passed",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/s04-ios-runtime-1791589276524/runtime-report.json",
+      "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup",
+      "marker": "mapbox-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2-df95be715b1d5a0f7bc0cf217996cfc056de6c4f32304294d23de207fcb7e9cb",
+      "junitSha256": "bce68611a42d4a5f4bd4f21f20fa00777cd3183921cb5d0de1d135550b1065e9",
+      "observationsSha256": "232e07e36d2312b19f9a2801ecd4d8cf2daa938539b7e30400ef8b02bfbfcd62",
+      "scope": "Actual simulator/emulator SDK and receiving-host behavior; no physical-device/TV/screen-reader claim.",
+      "startedAt": "2026-10-09T23:41:16.528Z",
+      "endedAt": "2026-10-09T23:46:50.322Z",
+      "commandLog": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-mapbox-ios-runtime.log",
+      "runner": "bun scripts/run-mapbox-s04.mjs",
+      "runnerArgs": [
+        "--build-report",
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/ios-1791588571395/report.json",
+        "--device",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+        "--maestro",
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/tools/maestro-2.11.0/maestro/bin/maestro"
+      ]
+    },
+    "mapbox-android": {
+      "status": "passed",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "commandLog": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-mapbox-android-runtime.log",
+      "runner": "bun scripts/run-mapbox-s04.mjs",
+      "runnerArgs": [
+        "--build-report",
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/android-1791588572308/report.json",
+        "--device",
+        "emulator-5554",
+        "--maestro",
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/tools/maestro-2.11.0/maestro/bin/maestro"
+      ],
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/s04-android-runtime-1791590077714/runtime-report.json",
+      "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup",
+      "marker": "mapbox-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2-df95be715b1d5a0f7bc0cf217996cfc056de6c4f32304294d23de207fcb7e9cb",
+      "junitSha256": "d72049f4a5ef31a4a799b7663030ead0141d17472a07185ca7f74444a57814d0",
+      "observationsSha256": "a5fd023e58eaaa2f7253aef2e3e32c784814c48140449446b45ae22e0edd947d",
+      "scope": "Actual simulator/emulator SDK and receiving-host behavior; no physical-device/TV/screen-reader claim.",
+      "startedAt": "2026-10-09T23:54:37.721Z",
+      "endedAt": "2026-10-10T00:05:26.128Z"
+    },
+    "maplibre-ios": {
+      "status": "passed",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-ios-runtime/result.json",
+      "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup",
+      "device": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "marker": "maplibre-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2-c0bdc032615165fa9fff4277c4860d882a2dfb28df4d66e3cf53ebe47d3078e3",
+      "junit": {
+        "path": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-ios-runtime/junit.xml",
+        "sha256": "8c4ffc8a735a23c46aa7c0852f3f7efb5b03f49e75dedc6484660a0df1a50669"
+      },
+      "commandsEvidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-ios-runtime/command.json",
+      "installedProof": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-ios-runtime/installed-proof.json",
+      "scope": "Full canonical S04 flow; simulator/emulator only, no physical-device/TV/screen-reader certification."
+    },
+    "maplibre-android": {
+      "status": "passed",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-android-runtime-2/result.json",
+      "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup",
+      "device": "emulator-5554",
+      "marker": "maplibre-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2-c0bdc032615165fa9fff4277c4860d882a2dfb28df4d66e3cf53ebe47d3078e3",
+      "junit": {
+        "path": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-android-runtime-2/junit.xml",
+        "sha256": "41e1b5d7caa8a44aa681f4e619a853a02f9e61d664ed79164fc9014de4e5074a"
+      },
+      "commandsEvidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-android-runtime-2/command.json",
+      "installedProof": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-android-runtime-2/installed-proof.json",
+      "scope": "Full canonical S04 flow; simulator/emulator only, no physical-device/TV/screen-reader certification."
+    }
+  },
+  "retainedFailures": [
+    {
+      "status": "failed",
+      "reason": "Sandbox denied initial Bun install temp-directory write; native guards rejected stale installed README bytes before native builds. Reinstalled the final local file dependency outside the sandbox and restarted builds.",
+      "reports": [
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/ios-1791585526713/report.json",
+        "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/artifacts/android-1791585523576/report.json"
+      ]
+    },
+    {
+      "status": "failed",
+      "reason": "Mapbox iOS intermediate runtime stopped at fixture-server preflight before scenarios; required local fixture server was started and the intermediate rerun passed.",
+      "report": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/s04-ios-runtime-1791585788762/runtime-report.json"
+    },
+    {
+      "status": "failed",
+      "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+      "reason": "Android navigator input was s04-touchs04-tint after eraseText, before tint dispatch. Screenshot showed handwriting/input toolbar and an unfocused native field. Unchanged intermediate flow passed with handwriting disabled and software keyboard shown; original failure retained.",
+      "report": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/s04-android-runtime-1791586442901/runtime-report.json"
+    },
+    {
+      "status": "failed",
+      "reason": "MapLibre Android runner received a mistyped build-report path and stopped before launching scenarios; corrected to the executed build report and retained preflight log.",
+      "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-maplibre-android-runtime.log"
+    }
+  ],
+  "priorAcceptance": {
+    "artifactSha256": "f61cdf66806c435653dd56939adf8b389a9f5b892e3d30226d8e3e802f9a1ba8",
+    "status": "historical; does not verify this cleanup"
+  },
+  "scope": "Behavior-preserving style/documentation and internal lifecycle/settings extraction through S04. Later stages remain planned.",
+  "intermediateCandidates": [
+    {
+      "artifact": {
+        "path": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/intermediate-5a5d993a.tgz",
+        "sha256": "5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962"
+      },
+      "runtime": {
+        "mapbox-web": {
+          "status": "passed",
+          "artifactSha256": "5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-7yn5Ez/results.json",
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-7yn5Ez/mapbox",
+          "browser": "156.0.8078.4",
+          "scope": "Packed artifact SHA256 5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962; isolated selected-peer Vite production build. Lifecycle slice only."
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "artifactSha256": "5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-7yn5Ez/results.json",
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-7yn5Ez/maplibre",
+          "browser": "156.0.8078.4",
+          "scope": "Packed artifact SHA256 5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962; isolated selected-peer Vite production build. Lifecycle slice only."
+        },
+        "mapbox-ios": {
+          "status": "passed",
+          "artifactSha256": "5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/s04-ios-runtime-1791585819439/runtime-report.json"
+        },
+        "mapbox-android": {
+          "status": "unverified",
+          "artifactSha256": "5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962"
+        },
+        "maplibre-ios": {
+          "status": "unverified",
+          "artifactSha256": "5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962"
+        },
+        "maplibre-android": {
+          "status": "superseded",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/maplibre-android-runtime/result.json",
+          "reason": "Stopped by agent after final artifact was frozen; partial flow is not final acceptance."
+        }
+      },
+      "staticChecks": {
+        "validate": "passed",
+        "testCount": 133,
+        "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/validate.log",
+        "declarationDocumentation": {
+          "status": "passed",
+          "namedTypes": 63,
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/declaration-documentation.json",
+          "memberAudit": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/declaration-member-audit.log",
+          "scope": "Owning docs on named types and owned members; manual review of public callable parameters, returns, errors, units, defaults and stage status."
+        },
+        "selection": {
+          "status": "passed",
+          "artifactSha256": "5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-selection-0Iba9O/results.json"
+        },
+        "mixedMetroTransport": {
+          "status": "passed",
+          "artifactSha256": "5a5d993a1bf0b123a470dae17d82557a2d9bc01705846c36a2c08e9acd885962",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-selection-0Iba9O/renderer-transports.json"
+        },
+        "coverage": {
+          "status": "passed",
+          "entries": 12131,
+          "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/coverage.log",
+          "scope": "Inventory provenance, stage assignments and six-environment cell structure; runtime effects require the separate recorded scenarios."
+        }
+      },
+      "reason": "Superseded after final manual review added missing error-name documentation, clarified lifecycle flag names, and completed multiline guard braces. Runtime still in progress; no intermediate candidate renews final acceptance."
+    },
+    {
+      "artifact": {
+        "path": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/intermediate-9ad4c2da.tgz",
+        "sha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f"
+      },
+      "runtime": {
+        "mapbox-web": {
+          "status": "passed",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-roWZoi/results.json",
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-roWZoi/mapbox",
+          "browser": "156.0.8078.4",
+          "scope": "Lifecycle, host updates/removal, configuration/settings/defaults, provider reuse, external WebGL context disposal and development Strict Mode replay."
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-roWZoi/results.json",
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/one-map-react-web-lifecycle-roWZoi/maplibre",
+          "browser": "156.0.8078.4",
+          "scope": "Lifecycle, host updates/removal, configuration/settings/defaults, provider reuse, external WebGL context disposal and development Strict Mode replay."
+        },
+        "mapbox-ios": {
+          "status": "passed",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/s04-ios-runtime-1791586463827/runtime-report.json",
+          "scope": "Complete canonical S04 native flow with installed identity, SDK observations and passing JUnit."
+        },
+        "mapbox-android": {
+          "status": "passed",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/s04-android-runtime-1791586955296/runtime-report.json"
+        },
+        "maplibre-ios": {
+          "status": "passed",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/final-maplibre-ios-runtime/result.json"
+        },
+        "maplibre-android": {
+          "status": "unverified",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f"
+        }
+      },
+      "staticChecks": {
+        "validate": {
+          "status": "passed",
+          "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/final-validate.log"
+        },
+        "testCount": 133,
+        "multilineGuardAudit": {
+          "status": "passed",
+          "log": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/multiline-guards.log"
+        },
+        "declarationDocumentation": {
+          "status": "passed",
+          "namedTypes": 63,
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/final-declaration-documentation.json",
+          "memberAudit": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/final-declaration-member-audit.log"
+        },
+        "selection": {
+          "status": "passed",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/final-selection-results.json"
+        },
+        "mixedMetroTransport": {
+          "status": "passed",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/final-renderer-transports.json"
+        }
+      },
+      "nativeBuilds": {
+        "mapbox-ios": {
+          "status": "passed",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/ios-1791586299014/report.json",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "publicationFileCount": 172,
+          "installation": "executable and embedded bundle hashes verified",
+          "executableSha256": "c33e622c4cf1c4f098c1d9d8786625b9fca740c5b0555cd87b638d3b2a96b4c8",
+          "embeddedBundleSha256": "4470128a73eb603d6c10ec76180b7da5d1ee89bab6149b7e63cd776391c74da9",
+          "nativeDependencyGraph": "unverified",
+          "binaryDependencyIsolation": "unverified"
+        },
+        "mapbox-android": {
+          "status": "passed",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/android-1791586296711/report.json",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "publicationFileCount": 172,
+          "installation": "installed APK hash verified",
+          "executableSha256": "8ff539a4e117c6e3b4de67e73298d6e09d69d355b5ee470dbcd16635ccb36697",
+          "embeddedBundleSha256": "b60af4f7094ab4efafdcf30ed2f5d4b9a08d8a2f007b9c47c89eb545bd17ba67",
+          "nativeDependencyGraph": "opposite SDK absent; inspect native-dependencies.log for pinned selected SDK",
+          "binaryDependencyIsolation": "unverified"
+        },
+        "maplibre-ios": {
+          "status": "passed",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/artifacts/ios-1791586296704/report.json",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "publicationFileCount": 172,
+          "installation": "executable and embedded bundle hashes verified",
+          "executableSha256": "5a8d0551596ca69ca2f01106af62c0e8e3c0c5f0fe3e2b2f1844a43531299c07",
+          "embeddedBundleSha256": "494baef2f01a587ccab6d4e854423c213f5aac364bf5fe0564ac94c1e91b3b4c",
+          "nativeDependencyGraph": "MapLibre SPM6.31.0 resolved; opposite wrapper/SDK absent from Pod and SPM locks",
+          "binaryDependencyIsolation": "App Mach-O links MapLibre; no Mapbox dynamic dependency"
+        },
+        "maplibre-android": {
+          "status": "passed",
+          "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/artifacts/android-1791586443080/report.json",
+          "artifactSha256": "9ad4c2da763182b77a92d9b4b72e3d00f2a45d0483d9fb8f7bfc75677d14fc7f",
+          "publicationFileCount": 172,
+          "installation": "installed APK hash verified",
+          "executableSha256": "acc5768b0cb764f0040fe4141f606afee7df650c45e0ba5b372c7b55d6780fcc",
+          "embeddedBundleSha256": "cd4346bc2d5f20ba8a3fbc4a70c76a64fc08d46f5be04a0d6aca63129d5c94d8",
+          "nativeDependencyGraph": "MapLibre Android13.6.1 OpenGL resolved; opposite SDK absent",
+          "binaryDependencyIsolation": "APK contains libmaplibre.so; no Mapbox native library or com/mapbox DEX class descriptor"
+        }
+      },
+      "reason": "Superseded after declaration comparison restored the original JSX.Element return contracts for three components. Earlier passes do not verify the final artifact."
+    }
+  ],
+  "sourceReview": {
+    "status": "passed",
+    "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/change-inventory.json",
+    "workaroundReferences": "Native SDK/React Native bug compositions identify tests or decisions and their removal conditions. Mount-registration timing guards document lifecycle ordering.",
+    "nativeFormatting": "Manual first-party formatting; no formatter dependency added."
+  },
+  "nativeBuilds": {
+    "mapbox-ios": {
+      "status": "passed",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/ios-1791588571395/report.json",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "publicationFileCount": 172,
+      "installation": "executable and embedded bundle hashes verified",
+      "binary": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMapbox.app",
+      "executableSha256": "c118b79e393a61f1fc7efdcb551d139a3308818327e498b0a8ebf8189fe615d5",
+      "embeddedBundleSha256": "8593a6d2a7457cc7c4f8a4e3dbc476039fdcdb284e29854dbf5b16ac550378c8",
+      "marker": "mapbox-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2-df95be715b1d5a0f7bc0cf217996cfc056de6c4f32304294d23de207fcb7e9cb",
+      "nativeDependencyGraph": "unverified",
+      "binaryDependencyIsolation": "unverified",
+      "supplementarySDKIsolation": {
+        "status": "passed",
+        "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-mapbox-native-isolation.json"
+      },
+      "commandsEvidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/ios-1791588571395/report.json"
+    },
+    "mapbox-android": {
+      "status": "passed",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/android-1791588572308/report.json",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "publicationFileCount": 172,
+      "installation": "installed APK hash verified",
+      "binary": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/android/app/build/outputs/apk/release/app-release.apk",
+      "executableSha256": "3f32f475fe6ca36200028f9423f06404a17c13d33a6faac4bfa18d74f233f588",
+      "embeddedBundleSha256": "2b7c326477ec4e31100e8f53b6bcb909d976718a09e5538b46c1040b53769b7d",
+      "marker": "mapbox-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2-df95be715b1d5a0f7bc0cf217996cfc056de6c4f32304294d23de207fcb7e9cb",
+      "nativeDependencyGraph": "opposite SDK absent; inspect native-dependencies.log for pinned selected SDK",
+      "binaryDependencyIsolation": "unverified",
+      "supplementarySDKIsolation": {
+        "status": "passed",
+        "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-mapbox-native-isolation.json"
+      },
+      "commandsEvidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/mapbox/style-cleanup/artifacts/android-1791588572308/report.json"
+    },
+    "maplibre-ios": {
+      "status": "passed",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/artifacts/ios-1791588573369/report.json",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "publicationFileCount": 172,
+      "installation": "executable and embedded bundle hashes verified",
+      "binary": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app",
+      "executableSha256": "5a8d0551596ca69ca2f01106af62c0e8e3c0c5f0fe3e2b2f1844a43531299c07",
+      "embeddedBundleSha256": "18bac2fe4a68961f941eae53e2e3e7856de733037223f853b76d2ca534183484",
+      "marker": "maplibre-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2-c0bdc032615165fa9fff4277c4860d882a2dfb28df4d66e3cf53ebe47d3078e3",
+      "nativeDependencyGraph": "MapLibre SPM6.31.0 resolved; opposite wrapper/SDK absent from Pod and SPM locks",
+      "binaryDependencyIsolation": "App Mach-O links MapLibre; no Mapbox dynamic dependency",
+      "commandsEvidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/artifacts/ios-1791588573369/report.json"
+    },
+    "maplibre-android": {
+      "status": "passed",
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/artifacts/android-1791588573715/report.json",
+      "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+      "publicationFileCount": 172,
+      "installation": "installed APK hash verified",
+      "binary": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/android/app/build/outputs/apk/release/app-release.apk",
+      "executableSha256": "8232627512ada7779af3ccbd370ea432806ff1acdd6e3cc52ae4dec916b1da0f",
+      "embeddedBundleSha256": "c992f961468055e3716d2af2cfb6b5b7dbbe9c00d81f58650ad9bdbd4545ceea",
+      "marker": "maplibre-7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2-c0bdc032615165fa9fff4277c4860d882a2dfb28df4d66e3cf53ebe47d3078e3",
+      "nativeDependencyGraph": "MapLibre Android13.6.1 OpenGL resolved; opposite SDK absent",
+      "binaryDependencyIsolation": "APK contains libmaplibre.so; no Mapbox native library or com/mapbox DEX class descriptor",
+      "commandsEvidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/maplibre-style-cleanup/artifacts/android-1791588573715/report.json"
+    }
+  },
+  "environment": {
+    "browser": "Chromium 156.0.8078.4",
+    "ios": "iPhone 18 Pro simulator, iOS 27.0, arm64",
+    "iosDevice": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "android": "emulator-5554, arm64-v8a",
+    "maestro": "2.11.0",
+    "java": "Zulu 17.0.20.1",
+    "reactNative": "0.87.1",
+    "react": "19.2.3",
+    "mapboxNativeWrapper": "10.3.7",
+    "maplibreNativeWrapper": "11.5.0",
+    "scope": "Simulator/emulator checks; no physical-device, TV, hardware or screen-reader certification.",
+    "androidInputMethodAdjustment": {
+      "initialStylusHandwriting": "null (unset)",
+      "initialShowIMEWithHardwareKeyboard": "0",
+      "temporaryStylusHandwriting": "0",
+      "temporaryShowIMEWithHardwareKeyboard": "1",
+      "commands": [
+        "adb -s emulator-5554 shell settings put secure stylus_handwriting_enabled 0",
+        "adb -s emulator-5554 shell settings put secure show_ime_with_hard_keyboard 1",
+        "adb -s emulator-5554 shell am force-stop com.google.android.inputmethod.latin"
+      ],
+      "restore": {
+        "status": "passed",
+        "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-environment-restoration.json"
+      }
+    },
+    "xcode": "27.0 (27A266a)",
+    "bun": "1.4.1",
+    "androidAPI": 37,
+    "androidABI": "arm64-v8a",
+    "nativeCacheStrategy": "APFS clones of isolated consumer caches; final tarball freshly installed, Release builds executed, new markers and installed executable/bundle hashes verified.",
+    "completedIOSHarnessCleanup": {
+      "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/style-cleanup/accepted-ios-harness-cleanup.json",
+      "scope": "Task-owned iOS harness apps stopped after passing final flows; installed identities and evidence retained."
+    },
+    "mapboxGLJS": "3.32.0",
+    "maplibreGLJS": "6.13.0",
+    "reactMapGL": "8.1.3",
+    "mapboxNativeSDK": "11.23.1",
+    "maplibreIOSSDK": "6.31.0",
+    "maplibreAndroidSDK": "13.6.1"
+  },
+  "acceptance": "All six canonical S04 runtime cells passed against the same final packed artifact. Static/package/selection checks and installed publication/binary identities passed. Later feature stages remain planned."
+}
