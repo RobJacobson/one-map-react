@@ -1,0 +1,421 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-08T11:27:35Z",
+  "stage": "S04",
+  "status": "investigated; implementation and runtime acceptance pending",
+  "scope": "Read-only feasibility investigation of common MapRef.resize on Mapbox and MapLibre iOS and Android. No production, shared contract, capability, or coverage ledger changes; no new native builds.",
+  "conclusion": {
+    "status": "Proposed API",
+    "text": "Retain resize(): Promise<void> as an explicit request to reconcile the existing renderer with its current native host layout. Native implementations must dispatch real layout or viewport work and request rendering where required. Both wrappers omit a public resize operation, but the SDK source provides plausible implementation paths; unsupported is not substantiated.",
+    "confidence": "Source feasibility only. The native bridge and its explicit command contract have not been implemented or runtime verified."
+  },
+  "baseline": [
+    {
+      "package": "@rnmapbox/maps",
+      "version": "10.3.7",
+      "sourceRevision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+      "sdk": {
+        "ios": "Mapbox Maps 11.23.1",
+        "android": "Mapbox Maps android-ndk27 11.23.1",
+        "common": "24.23.1"
+      }
+    },
+    {
+      "package": "@maplibre/maplibre-react-native",
+      "version": "11.5.0",
+      "sourceRevision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+      "sdk": {
+        "ios": "MapLibre Native 6.31.0",
+        "android": "MapLibre Native android-sdk-opengl 13.6.1"
+      },
+      "iosDistributionRevision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683"
+    },
+    {
+      "package": "react-native",
+      "version": "0.87.1",
+      "react": "19.2.3"
+    }
+  ],
+  "relatedCoverageIds": [
+    "web:web.mapbox.MapRef.resize",
+    "web:web.mapbox.Renderer.Map.resize",
+    "web:web.maplibre.MapRef.resize",
+    "web:web.maplibre.Renderer.Map.resize",
+    "rnmapbox:rnmapbox.host.NativeMethods.setNativeProps",
+    "rnmapbox:rnmapbox.host.ViewProps.onLayout",
+    "rnmapbox:rnmapbox.MapView.MapView.setNativeProps",
+    "maplibre-native:maplibre-native:MapProps.onLayout"
+  ],
+  "currentBehavior": {
+    "status": "Existing API",
+    "common": "resize has no size arguments; the host owns layout. The promise acknowledges validation and dispatch, not camera settling or a rendered frame. Shared MapSession rejects before readiness or after driver detachment.",
+    "web": "The web adapter calls the selected renderer ref resize; automatic host changes also invoke it. A call with unchanged dimensions can leave visible output unchanged while still being a real renderer operation.",
+    "native": "Both native resize drivers remain explicitly pending. Actual lifecycle evidence establishes automatic 220-to-360 host resizing, readiness, teardown and remount, not successful MapRef.resize.",
+    "evidence": ["mapbox-lifecycle.json", "maplibre-lifecycle.json"],
+    "zeroSizeGap": "Mapbox one-map-react readiness requires finite positive host layout. The current MapLibre lifecycle marks ready from SDK map/style load without a positive-layout condition. This investigation does not change either behavior."
+  },
+  "cells": [
+    {
+      "environment": "mapbox-android",
+      "disposition": "composition",
+      "expectedSupport": "investigation required; no unsupported disposition",
+      "sourceIds": [
+        "rnmapbox-android",
+        "mapbox-android-bytecode",
+        "mapbox-android-controller"
+      ],
+      "proposal": "A selected native bridge can resolve the owned RNMBXMapView and SDK child on the UI thread, reconcile child bounds with the current wrapper bounds, then call public SDK MapView.onSizeChanged(width,height). This overload queues surface reconciliation even at equal dimensions. The bridge can also use public MapboxMap.triggerRepaint if the explicit command needs a separate rendering request.",
+      "limitations": "Use actual native pixel dimensions, not guessed JavaScript density conversion. A UI-thread acknowledgment precedes completion of queued renderer work. Existing wrapper layout using old child right/bottom must not be copied without checking current parent dimensions."
+    },
+    {
+      "environment": "maplibre-android",
+      "disposition": "composition",
+      "expectedSupport": "investigation required; no unsupported disposition",
+      "sourceIds": [
+        "maplibre-android",
+        "maplibre-android-bytecode",
+        "maplibre-android-render"
+      ],
+      "proposal": "A selected bridge can resolve the owned MLRNMapView, force and measure layout against its current parent bounds, invoke its existing layout behavior and public mapLibreMap.triggerRepaint. Changed native bounds enter SDK onSizeChanged and resizeView.",
+      "limitations": "The SDK size callback is protected. Existing reflow uses current measured dimensions and unchanged bounds, so it cannot prove forced viewport reconciliation by itself. Verify same-size explicit dispatch and recovery from a stale renderer viewport before acceptance; a wrapper-specific native command or owned subclass composition remains an investigation if public layout does not meet that test."
+    },
+    {
+      "environment": "maplibre-ios",
+      "disposition": "composition",
+      "expectedSupport": "investigation required; no unsupported disposition",
+      "sourceIds": ["maplibre-ios", "maplibre-ios-sdk"],
+      "proposal": "Resolve the owned MLRNMapView/MLNMapView, request UIKit layout and run layoutIfNeeded on the UI thread against current host bounds. SDK layoutSubviews reconciles rendering view layout and map size, including when the requested size equals the existing size.",
+      "limitations": "Test actual SDK layout dispatch and subsequent rendering. Wrapper invalidate is feature teardown; private setNeedsRerender is not a public rendering API and must not be used."
+    },
+    {
+      "environment": "mapbox-ios",
+      "disposition": "composition",
+      "expectedSupport": "investigation required; no unsupported disposition",
+      "sourceIds": [
+        "rnmapbox-ios",
+        "mapbox-ios-view",
+        "mapbox-ios-map",
+        "mapbox-ios-size-tracking"
+      ],
+      "proposal": "Resolve the owned SDK MapView, request UIKit layout against the current native host and use public MapboxMap.triggerRepaint for rendering dispatch. Preserve the SDK automatic resize animation mechanism.",
+      "limitations": "With the default automatic animation, layoutSubviews alone does not assign SDK size; the internal SizeTrackingLayer handles actual bounds changes and ignores equal sizes. SDK size and updateDrawableSize setters are internal. A public resizingAnimation.none layout temporarily forces the immediate size path, but changes animation behavior and requires a separate accepted contract and test; it is an alternative to investigate, not an implemented default."
+    }
+  ],
+  "bridgeProposal": {
+    "status": "Proposed API",
+    "publicContract": "Keep the existing no-argument MapRef.resize(): Promise<void>. Resolve only after validating the current owned generation and dispatching an actual native layout or viewport operation. Do not wait for frame settling.",
+    "ownership": "Use a one-map-react-owned native host reference and mount generation to locate only its selected SDK descendant. Do not depend on either wrapper private JavaScript _nativeRef/nativeRef. Fabric component views own the concrete wrapper view through contentView; account for that containment during lookup.",
+    "nativePackaging": "A backend-neutral layout bridge could avoid SDK linkage if its real behavior meets all four tests. SDK-specific reconciliation should use separately selected native implementations; verify selected peer installs and linked binaries so a Mapbox consumer does not link MapLibre or vice versa.",
+    "readiness": "Validate finite positive native dimensions before dispatch. Proposed zero-size behavior is MapNotReadyError until a usable native layout exists. Capability support remains independent of current size/readiness. Primary must accept this decision and align both native readiness paths.",
+    "teardown": "Validate mount generation before enqueueing and again inside the native UI block; reject detached or replaced ownership before acknowledgment. Never operate on a recycled React tag belonging to a new map. Cancel retained requests/listeners during teardown and settle each promise once. Shared MapSession already guards detachment after driver resolution.",
+    "preservation": "Preserve map identity, camera, style, sources, feature state and event subscriptions. Resize must not remount, restart initial camera dispatch, replace a style, or change ornaments as an indirect trigger.",
+    "errors": "Report missing usable attachment as MapNotReadyError and unexpected native dispatch failure as redacted MapBackendError. An unfinished bridge remains a pending implementation error, not UnsupportedFeatureError."
+  },
+  "rejectedShortcuts": [
+    {
+      "operation": "Return Promise.resolve or rerender unchanged React props",
+      "reason": "Neither establishes a native layout or renderer operation."
+    },
+    {
+      "operation": "Write the same style dimensions through RNMapbox setNativeProps",
+      "reason": "This forwards properties but does not acknowledge layout. Identical values may be elided; MapLibre MapRef does not expose the corresponding method."
+    },
+    {
+      "operation": "Dispatch an invented resize view-manager command",
+      "reason": "Neither wrapper declares that native command; dispatchViewManagerCommand cannot create its implementation."
+    },
+    {
+      "operation": "Call invalidate, force remount, or toggle a size by one pixel",
+      "reason": "These destroy resources or visibly change layout and violate a request to resize the existing map to its current host."
+    },
+    {
+      "operation": "Treat triggerRepaint as a viewport resize",
+      "reason": "Rendering a frame does not establish host measurement or viewport reconciliation."
+    }
+  ],
+  "checks": [
+    {
+      "id": "published-wrapper-inspection",
+      "status": "passed",
+      "scope": "Pinned wrapper declarations, JavaScript refs, codegen modules and native layout implementations inspected; local source SHA256 recorded."
+    },
+    {
+      "id": "android-public-bytecode",
+      "status": "passed",
+      "scope": "javap inspected classes extracted from exact installed published AARs. Mapbox public onSizeChanged overloads and MapLibre protected onSizeChanged confirmed; disassembly retained outside the repository."
+    },
+    {
+      "id": "pinned-sdk-source",
+      "status": "passed",
+      "scope": "Installed Mapbox Swift source and pinned public SDK source reviewed. This establishes code paths and access visibility, not new runtime behavior."
+    },
+    {
+      "id": "automatic-native-host-resize",
+      "status": "passed",
+      "scope": "Existing independent lifecycle records establish host resizing on four native cells. This is previous evidence, not a resize command test."
+    },
+    {
+      "id": "explicit-native-resize",
+      "status": "unverified",
+      "scope": "No owned native resize bridge exists and no explicit command acceptance test has run."
+    }
+  ],
+  "requiredTests": [
+    {
+      "id": "real-dispatch",
+      "status": "planned",
+      "scenario": "Instrument native UI dispatch and SDK viewport reconciliation separately. A same-bounds command must dispatch real layout/viewport work; unchanged pixels are allowed when the viewport is already correct."
+    },
+    {
+      "id": "current-host-reconciliation",
+      "status": "planned",
+      "scenario": "Change host bounds and use native frame/SDK viewport or projection measurements to show an explicit command reaches current dimensions. Include a controlled stale-viewport fixture; automatic host layout alone cannot pass this command assertion."
+    },
+    {
+      "id": "renderer-observation",
+      "status": "planned",
+      "scenario": "Subscribe before the command to renderer/frame observations, then use bounded conditions for projection and fixture pixels. Keep command acknowledgment independent of frame settling."
+    },
+    {
+      "id": "zero-and-recovery",
+      "status": "planned",
+      "scenario": "Start at zero, shrink to zero after readiness, then restore positive size. Verify chosen MapNotReady contract and recovery without map or resource recreation."
+    },
+    {
+      "id": "ownership-and-concurrency",
+      "status": "planned",
+      "scenario": "Queue resize and detach before the UI block; remount with the same id and recycled tag. Verify the old request rejects without touching the new generation. Include StrictMode replay and repeated concurrent calls."
+    },
+    {
+      "id": "resource-preservation",
+      "status": "planned",
+      "scenario": "After resize verify camera, initial-camera dispatch count, style/source/layer identity and feature state remain unchanged. Include native marker child interactions and MapLibre marker layout restoration."
+    },
+    {
+      "id": "selected-native-isolation",
+      "status": "planned",
+      "scenario": "Build packed selected-peer consumers with only the selected bridge/wrapper; inspect installed packages, real JavaScript bundles and linked native SDK binaries separately."
+    }
+  ],
+  "decisionsRequested": [
+    "Accept explicit native layout/viewport dispatch as the common resize acknowledgment, with rendered results observed separately.",
+    "Choose native bridge ownership and selected-backend packaging; do not weaken the contract to a successful no-op.",
+    "Align zero-size readiness and rejection across native adapters before enabling resize.",
+    "Resolve Mapbox iOS equal-size reconciliation and MapLibre Android protected viewport path through focused native bridge tests."
+  ],
+  "sources": [
+    {
+      "id": "rnmapbox-js",
+      "status": "Existing API",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1165",
+      "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/components/MapView.tsx",
+      "sha256": "7d6ff199f30fdbc4875422c2277b5ceda27651989180bd0170493ca0b0a11306",
+      "claims": [
+        "The internal onLayout records width and height and enables native rendering without requiring positive dimensions.",
+        "Public setNativeProps forwards to the internal native ref when it exists; it does not acknowledge native layout or expose a resize operation."
+      ]
+    },
+    {
+      "id": "rnmapbox-module",
+      "status": "Existing API",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/specs/NativeMapViewModule.ts",
+      "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/specs/NativeMapViewModule.ts",
+      "sha256": "8481a234679c06b851e090751cb1af02689b988176faac2931061e4ef1ef2666",
+      "claims": [
+        "The codegen module declares no resize, layout, or repaint command."
+      ]
+    },
+    {
+      "id": "rnmapbox-ios",
+      "status": "Existing API",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/ios/RNMBX/RNMBXMapView.swift#L416",
+      "localPath": "/private/tmp/one-map-research-rnmapbox/package/ios/RNMBX/RNMBXMapView.swift",
+      "sha256": "10ad6d760abf783602c5411ac59014e1c79e18a71797fd230ecc6be5cfaa2b63",
+      "claims": [
+        "The wrapper layoutSubviews runs UIKit layout and initial camera layout once.",
+        "invalidate removes features, cancels observers, removes the SDK view and releases it; it is teardown, not resize."
+      ]
+    },
+    {
+      "id": "rnmapbox-android",
+      "status": "Existing API",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt#L1450",
+      "localPath": "/private/tmp/one-map-research-rnmapbox/package/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+      "sha256": "5077d12b72fa97b7de21a389a34075bb5476413ff92863f03b874ba8fda0430b",
+      "claims": [
+        "workaroundToRelayoutChildOfMapView requests and forces SDK view layout, measures to wrapper dimensions, then lays out using the existing child bounds. Its guard returns only when both SDK dimensions are zero.",
+        "onLayoutChange posts SDK view measurement to the wrapper dimensions and layout using existing child bounds. Neither method returns an acknowledgment to JavaScript."
+      ]
+    },
+    {
+      "id": "maplibre-js",
+      "status": "Existing API",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/src/components/map/Map.tsx#L561",
+      "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/components/map/Map.tsx",
+      "sha256": "2f4d12411e3a7d9b020d311842fae127c535e9d6835316fe3a69cb30bd8ef61f",
+      "claims": [
+        "MapRef and useImperativeHandle expose custom map operations, without resize, setNativeProps, measure, or a public SDK view ref.",
+        "The outer onLayout enables native rendering without requiring positive dimensions."
+      ]
+    },
+    {
+      "id": "maplibre-module",
+      "status": "Existing API",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/src/components/map/NativeMapViewModule.ts",
+      "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/components/map/NativeMapViewModule.ts",
+      "sha256": "319a7182c6e2b8ed6c2d8af22d79786ef8965b16da23ec28581475f6c1426ac5",
+      "claims": [
+        "The codegen module declares no resize, layout, or repaint command."
+      ]
+    },
+    {
+      "id": "maplibre-ios",
+      "status": "Existing API",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/ios/components/map-view/MLRNMapView.m#L73",
+      "localPath": "/private/tmp/one-map-research-maplibre-native/package/ios/components/map-view/MLRNMapView.m",
+      "sha256": "ce9b0d0b487e671e9edcb3bf384964906fb8fc866cbbc1ba1537bc8382d5e776",
+      "claims": [
+        "MLRNMapView subclasses MLNMapView; layoutSubviews invokes SDK layout and initial camera layout once.",
+        "invalidate removes React features from the map; it must not substitute for resize."
+      ]
+    },
+    {
+      "id": "maplibre-android",
+      "status": "Existing API",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt#L549",
+      "localPath": "/private/tmp/one-map-research-maplibre-native/package/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt",
+      "sha256": "53e644028f7fa92f40f79cf3bb6f41c81485a9c8f71a5c0e9e96354b27537eb2",
+      "claims": [
+        "MLRNMapView subclasses the SDK MapView. reflow posts measurement using existing measured dimensions and layout using existing bounds.",
+        "onLayout temporarily removes and restores marker views around SDK layout when not paused and schedules ornament updates when bounds change. A new bridge must preserve these behaviors."
+      ]
+    },
+    {
+      "id": "mapbox-ios-view",
+      "status": "Existing API",
+      "url": "https://github.com/mapbox/mapbox-maps-ios/blob/v11.23.1/Sources/MapboxMaps/Foundation/MapView.swift#L625",
+      "localPath": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/ios/Pods/MapboxMaps/Sources/MapboxMaps/Foundation/MapView.swift",
+      "sha256": "ff8a0c713b49888cf9a286efe14ef5daf5497d7e7480cc1202d6dab1a3dbe88d",
+      "claims": [
+        "Public layoutSubviews sets the Metal view frame and SDK size only when autoResizeDrawable is enabled.",
+        "Public resizingAnimation defaults to automatic. none enables autoResizeDrawable; automatic uses the SDK size tracking mechanism. updateDrawableSize is internal."
+      ]
+    },
+    {
+      "id": "mapbox-ios-size-tracking",
+      "status": "Existing API",
+      "url": "https://github.com/mapbox/mapbox-maps-ios/blob/v11.23.1/Sources/MapboxMaps/Foundation/SizeTrackingLayer.swift#L31",
+      "localPath": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/ios/Pods/MapboxMaps/Sources/MapboxMaps/Foundation/SizeTrackingLayer.swift",
+      "sha256": "0a0df60e46f067000f1421f13724ad3bfabd2c4b60a34220d43a729b4f79d529",
+      "claims": [
+        "The internal bounds observer returns when sizes are equal; actual bounds changes notify the resize delegate immediately or after animation completion."
+      ]
+    },
+    {
+      "id": "mapbox-ios-map",
+      "status": "Existing API",
+      "url": "https://github.com/mapbox/mapbox-maps-ios/blob/v11.23.1/Sources/MapboxMaps/Foundation/MapboxMap.swift#L240",
+      "localPath": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/ios/Pods/MapboxMaps/Sources/MapboxMaps/Foundation/MapboxMap.swift",
+      "sha256": "412d7f945f87cd301e248b346a64212d192c3002f525501236966a6bf90039fd",
+      "claims": [
+        "triggerRepaint is public and requests rendering. The size property setter is internal, so an add-on module cannot assign SDK viewport size through this API."
+      ]
+    },
+    {
+      "id": "mapbox-android-bytecode",
+      "status": "Existing API",
+      "url": "https://github.com/mapbox/mapbox-maps-android/blob/v11.23.1/maps-sdk/src/main/java/com/mapbox/maps/MapView.kt#L196",
+      "localPath": "/private/tmp/one-map-native-resize-research/mapbox-mapview.javap.txt",
+      "sha256": "f0c3f2e662b45c25de54421c8fab1e3766fb8f9ede5f7d89e1c7970505d962b7",
+      "claims": [
+        "The exact published MapView class has public four-argument and two-argument onSizeChanged overloads; the two-argument overload dispatches to MapController."
+      ]
+    },
+    {
+      "id": "maplibre-android-bytecode",
+      "status": "Existing API",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/platform/android/MapLibreAndroid/src/main/java/org/maplibre/android/maps/MapView.java#L537",
+      "localPath": "/private/tmp/one-map-native-resize-research/maplibre-mapview.javap.txt",
+      "sha256": "6d5617560998817c4aab7ccbd8ac05c6b07cd64f1a388b3adab5fb317131d0e6",
+      "claims": [
+        "The exact published SDK MapView class has a protected onSizeChanged override, which invokes NativeMap.resizeView."
+      ]
+    },
+    {
+      "id": "one-map-react-web",
+      "status": "Existing API",
+      "url": null,
+      "localPath": "/Users/rob/code/mapbox-code/one-map/packages/one-map-react/src/adapters/web.tsx",
+      "sha256": "10119b456c104ba35375d6bf28aae8f9f63a695a45423e4e3096ee69c832ae18",
+      "claims": [
+        "The existing web driver checks active attachment and invokes the wrapper map ref resize. It does not await renderer settling.",
+        "A ResizeObserver also invokes resize on ordinary host changes."
+      ]
+    },
+    {
+      "id": "one-map-react-session",
+      "status": "Existing API",
+      "url": null,
+      "localPath": "/Users/rob/code/mapbox-code/one-map/packages/one-map-react/src/core/session.ts",
+      "sha256": "255909cbe7d8e2527048df5590d8edd4da3c152f30adbff029f77ab81e34beb4",
+      "claims": [
+        "MapRef.resize passes through the shared ready driver gate and rejects a command whose driver detaches before its promise resolves."
+      ]
+    },
+    {
+      "id": "one-map-react-native-pending",
+      "status": "Existing API",
+      "url": null,
+      "localPath": "/Users/rob/code/mapbox-code/one-map/packages/one-map-react/src/adapters/lifecycle.ts",
+      "sha256": "6f242ae070620f8e7b59e620d7181ff7c634fc3655e78bc1c1055f23f2b316e2",
+      "claims": [
+        "Native lifecycle drivers currently use an explicit pending MapBackendError for resize. This records unfinished implementation, not unsupported SDK behavior."
+      ]
+    },
+    {
+      "id": "mapbox-android-controller",
+      "status": "Existing API",
+      "url": "https://github.com/mapbox/mapbox-maps-android/blob/v11.23.1/maps-sdk/src/main/java/com/mapbox/maps/MapController.kt#L231",
+      "claims": [
+        "onSizeChanged clears the size-ready flag, queues a renderer surface-size operation and then restores the flag even when dimensions are equal. It also informs plugins. Dispatch does not imply render-thread completion."
+      ]
+    },
+    {
+      "id": "maplibre-ios-sdk",
+      "status": "Existing API",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/platform/ios/src/MLNMapView.mm#L1236",
+      "claims": [
+        "layoutSubviews invokes the rendering view layoutChanged operation and sets the map size from current bounds, then updates ornaments and annotations.",
+        "setNeedsRerender is implementation-only and absent from the public MLNMapView header; calling that selector is not a public SDK contract."
+      ]
+    },
+    {
+      "id": "maplibre-android-render",
+      "status": "Existing API",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/platform/android/MapLibreAndroid/src/main/java/org/maplibre/android/maps/MapLibreMap.java#L93",
+      "claims": [
+        "The public triggerRepaint method delegates to NativeMap.triggerRepaint. It requests a frame, without itself resizing the viewport."
+      ]
+    },
+    {
+      "id": "rn-command-registration",
+      "status": "Existing API",
+      "url": "https://github.com/facebook/react-native/blob/v0.87.1/packages/react-native/Libraries/ReactNative/UIManager.js#L210",
+      "claims": [
+        "dispatchViewManagerCommand routes a registered native command; an invented resize command does not provide implementation absent from wrapper codegen."
+      ]
+    }
+  ],
+  "temporaryArtifacts": {
+    "path": "/private/tmp/one-map-native-resize-research",
+    "purpose": "Read-only extracted SDK bytecode signatures and inspection script; no native build or production patch."
+  },
+  "notEstablished": [
+    "Native explicit resize implementation or successful dispatch",
+    "Rendered convergence after explicit resize",
+    "Animated resize compatibility on Mapbox iOS",
+    "Zero-size runtime behavior",
+    "Physical-device results",
+    "Completion of S04"
+  ]
+}

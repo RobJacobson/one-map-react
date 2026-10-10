@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "rootDir": "./packages/one-map-react/src",
+    "outDir": "./packages/one-map-react/dist"
+  }
+}

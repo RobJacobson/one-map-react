@@ -1,0 +1,2298 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-08T10:29:25.602037+00:00",
+  "stage": "S04",
+  "status": "Observed bounded lifecycle on MapLibre Android and iOS; remaining S04 inventory and broader acceptance are pending",
+  "sourceCode": {
+    "files": [
+      {
+        "path": "packages/one-map-react/src/adapters/maplibre-native/Map.tsx",
+        "sha256": "053ef5205ee7d4467039fac9abd50646254edbcee35d7406cd3e562e10102afa"
+      },
+      {
+        "path": "packages/one-map-react/src/adapters/maplibre-native/host-props.ts",
+        "sha256": "ea5ced986ba5ced35826ea2919e232afb2f058beb84cf2867af30ae719dd7947"
+      },
+      {
+        "path": "packages/one-map-react/src/maplibre-native.ts",
+        "sha256": "1eaef94b6df3ade08acafe19cdf9e1e1c89f477c08c116de86740700e1fa3f8f"
+      },
+      {
+        "path": "scripts/build-native.mjs",
+        "sha256": "cd2fb9c8dc4aa81416c5d2f2e9c7f4616b0972b40abb05d44099d3eed52b419c"
+      },
+      {
+        "path": "examples/native-shared/lifecycle.tsx",
+        "sha256": "17f2bddbc279bfcc55dd2c70c2426fc368c55c9e912578350d2990545ecdc9be"
+      }
+    ],
+    "limitation": "Current source hashes are snapshots; the executed c1e20526ddec packed artifact and binary hashes identify the tested code. Subsequent root/core or adapter changes require a new packed-runtime run."
+  },
+  "package": {
+    "packedSha256": "c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739",
+    "consumer": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+    "installedPeerIsolation": "passed",
+    "react": "19.2.3",
+    "reactNative": "0.87.1",
+    "wrapper": {
+      "name": "@maplibre/maplibre-react-native",
+      "version": "11.5.0",
+      "sourceRevision": "059f46b2dc728fb6259af91b27a071bcda19a2ae"
+    },
+    "oppositePeer": "absent",
+    "correctedRootExport": "import namespace followed by named export",
+    "localTarballCache": "Unique content-hash tarball name required after refreshing the same consumer; replacing a reused filename with --force restored the previous Bun cache entry.",
+    "artifactVerification": {
+      "status": "passed",
+      "packedArtifact": "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+      "packedSha256": "c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739",
+      "publicationFileCount": 87,
+      "publicationFiles": [
+        {
+          "path": "package.json",
+          "packedSha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e",
+          "installedSha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e"
+        },
+        {
+          "path": "README.md",
+          "packedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "installedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "dist/adapters/lifecycle.d.ts",
+          "packedSha256": "a4e3a12615df0361639e83877743485e68a4c4b37b0f647dc7ba74a34781b9d8",
+          "installedSha256": "a4e3a12615df0361639e83877743485e68a4c4b37b0f647dc7ba74a34781b9d8"
+        },
+        {
+          "path": "dist/adapters/lifecycle.d.ts.map",
+          "packedSha256": "21a84719bf00e998cbd96a7ddc8bc75657c01c84cc535ffd69201069ace4f98c",
+          "installedSha256": "21a84719bf00e998cbd96a7ddc8bc75657c01c84cc535ffd69201069ace4f98c"
+        },
+        {
+          "path": "dist/adapters/lifecycle.js",
+          "packedSha256": "151620c4c4dec428e7a4c64e64889da740ce1711c2d9c882b853e015feeb4cb4",
+          "installedSha256": "151620c4c4dec428e7a4c64e64889da740ce1711c2d9c882b853e015feeb4cb4"
+        },
+        {
+          "path": "dist/adapters/lifecycle.js.map",
+          "packedSha256": "65997c1eb2924df5778cb872fad27581ee3fffed38b3a6bc9faa5794e0466a85",
+          "installedSha256": "65997c1eb2924df5778cb872fad27581ee3fffed38b3a6bc9faa5794e0466a85"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.d.ts",
+          "packedSha256": "54967d9f173615c739481c1b1401c6e69671d058429a4732ba11949914580efb",
+          "installedSha256": "54967d9f173615c739481c1b1401c6e69671d058429a4732ba11949914580efb"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.d.ts.map",
+          "packedSha256": "7f50a1275a7f96ac1f9561796b0e30290f5b76577d547187689ac890be916d1f",
+          "installedSha256": "7f50a1275a7f96ac1f9561796b0e30290f5b76577d547187689ac890be916d1f"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.js",
+          "packedSha256": "0c670d9acc939b12ec2f4a2732e8cee764ffbce92ec1d276a6b832cf8d7dd906",
+          "installedSha256": "0c670d9acc939b12ec2f4a2732e8cee764ffbce92ec1d276a6b832cf8d7dd906"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.js.map",
+          "packedSha256": "9d6e140f55fbcd7f4b955ff24b6c145a5bdc7699ed2cd7e0d031a79f4075bc6f",
+          "installedSha256": "9d6e140f55fbcd7f4b955ff24b6c145a5bdc7699ed2cd7e0d031a79f4075bc6f"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.d.ts",
+          "packedSha256": "f8be40e4eef527fd1a4367f70284b6419454d34c7ebddc6118f07c754bb128c4",
+          "installedSha256": "f8be40e4eef527fd1a4367f70284b6419454d34c7ebddc6118f07c754bb128c4"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.d.ts.map",
+          "packedSha256": "c7b827ed50a8552fb448b2737ac8850c770e82fc397ff3aacfcdf133d9a973bd",
+          "installedSha256": "c7b827ed50a8552fb448b2737ac8850c770e82fc397ff3aacfcdf133d9a973bd"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.js",
+          "packedSha256": "4cc82c0e9332501c1b97f8e8813c87f14a7f8579e365b4c2d05452d7e011f90e",
+          "installedSha256": "4cc82c0e9332501c1b97f8e8813c87f14a7f8579e365b4c2d05452d7e011f90e"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.js.map",
+          "packedSha256": "9b87a9211a900f67a97140b24c2638654cb65078d4acb1ff6e8660751f836c0e",
+          "installedSha256": "9b87a9211a900f67a97140b24c2638654cb65078d4acb1ff6e8660751f836c0e"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.d.ts",
+          "packedSha256": "ef10ec725432a6bf1a5c5b76bf41af430dbe2b4c604d10423c06d62172fb56c6",
+          "installedSha256": "ef10ec725432a6bf1a5c5b76bf41af430dbe2b4c604d10423c06d62172fb56c6"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.d.ts.map",
+          "packedSha256": "01779f56c27f2e266bf9b531c1a38d8b86f48d2c142a4a3ae85111ea92a87e2a",
+          "installedSha256": "01779f56c27f2e266bf9b531c1a38d8b86f48d2c142a4a3ae85111ea92a87e2a"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.js",
+          "packedSha256": "f15871bae2f1bd25062ce40b7199d4f22a24788b2feb194bf65acd9369776dbb",
+          "installedSha256": "f15871bae2f1bd25062ce40b7199d4f22a24788b2feb194bf65acd9369776dbb"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.js.map",
+          "packedSha256": "800a1c5d34e7ea574194dbdd20602c7e2e32fd846ff9deeff720451129b10e67",
+          "installedSha256": "800a1c5d34e7ea574194dbdd20602c7e2e32fd846ff9deeff720451129b10e67"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.d.ts",
+          "packedSha256": "5000b6b55eacb948185929d21184bdc100e62c652869936366828e922ec6119d",
+          "installedSha256": "5000b6b55eacb948185929d21184bdc100e62c652869936366828e922ec6119d"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.d.ts.map",
+          "packedSha256": "8fcfdc6619a5e1dea1424a03510993ca74cacd3f423d9b5a2293556f38648f31",
+          "installedSha256": "8fcfdc6619a5e1dea1424a03510993ca74cacd3f423d9b5a2293556f38648f31"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.js",
+          "packedSha256": "d0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1",
+          "installedSha256": "d0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.js.map",
+          "packedSha256": "c6828c3d7cc13d5f68ccfd2d07864d32d4afb00c993d852a19396f36c8d7341a",
+          "installedSha256": "c6828c3d7cc13d5f68ccfd2d07864d32d4afb00c993d852a19396f36c8d7341a"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.d.ts",
+          "packedSha256": "a8c38fe3050524df6b223140f385c4bed0bd1da6b7bed9f6c50a2194f9a66659",
+          "installedSha256": "a8c38fe3050524df6b223140f385c4bed0bd1da6b7bed9f6c50a2194f9a66659"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.d.ts.map",
+          "packedSha256": "77bf751eae8adaa045a2a9056573504ac4c76c63b55cc28a873f3a092bc44808",
+          "installedSha256": "77bf751eae8adaa045a2a9056573504ac4c76c63b55cc28a873f3a092bc44808"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.js",
+          "packedSha256": "0509c8fd4b5e8ca9c8e7f94c6dcd4abe059f25931a3cd9ce6f1533178924e31c",
+          "installedSha256": "0509c8fd4b5e8ca9c8e7f94c6dcd4abe059f25931a3cd9ce6f1533178924e31c"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.js.map",
+          "packedSha256": "0abb6ee0fdeed552fecc421cc1a004de0a35d5bbc1204a18a813158584c3677a",
+          "installedSha256": "0abb6ee0fdeed552fecc421cc1a004de0a35d5bbc1204a18a813158584c3677a"
+        },
+        {
+          "path": "dist/adapters/selection.d.ts",
+          "packedSha256": "6a9e42526c393525e07f64b4a83713655a41e34f402973b4fa0effce4a5d63e7",
+          "installedSha256": "6a9e42526c393525e07f64b4a83713655a41e34f402973b4fa0effce4a5d63e7"
+        },
+        {
+          "path": "dist/adapters/selection.d.ts.map",
+          "packedSha256": "ecac2607961c315888290ccfebcf8425951834d42e8610bd940a7049baf97eed",
+          "installedSha256": "ecac2607961c315888290ccfebcf8425951834d42e8610bd940a7049baf97eed"
+        },
+        {
+          "path": "dist/adapters/selection.js",
+          "packedSha256": "d09253ef574b1e1cbdd0d2036801228da56cce40313c1706aa5e5848f2753e4b",
+          "installedSha256": "d09253ef574b1e1cbdd0d2036801228da56cce40313c1706aa5e5848f2753e4b"
+        },
+        {
+          "path": "dist/adapters/selection.js.map",
+          "packedSha256": "edd81fc27d0cdff81a97b5812b8b39edc3fb8fa3b637dfae4eec2085c0d6b245",
+          "installedSha256": "edd81fc27d0cdff81a97b5812b8b39edc3fb8fa3b637dfae4eec2085c0d6b245"
+        },
+        {
+          "path": "dist/adapters/web.d.ts",
+          "packedSha256": "04de23a35679399819d9c1f6302d5d29fe6ff9b1261c11f9beb946c1cd92eb49",
+          "installedSha256": "04de23a35679399819d9c1f6302d5d29fe6ff9b1261c11f9beb946c1cd92eb49"
+        },
+        {
+          "path": "dist/adapters/web.d.ts.map",
+          "packedSha256": "a8628f28ebfdcb0460dd4c6161a450faf199e148267ae76e9aab76d0d7e81808",
+          "installedSha256": "a8628f28ebfdcb0460dd4c6161a450faf199e148267ae76e9aab76d0d7e81808"
+        },
+        {
+          "path": "dist/adapters/web.js",
+          "packedSha256": "87dc8563e67f4ba70c827fda3152b7b475863776fb560b5ae20f3aa093ad008f",
+          "installedSha256": "87dc8563e67f4ba70c827fda3152b7b475863776fb560b5ae20f3aa093ad008f"
+        },
+        {
+          "path": "dist/adapters/web.js.map",
+          "packedSha256": "f9457e381dc4106dc0be6125e1eeb8bcf503b946a72f4b258a1a0e3653ceae57",
+          "installedSha256": "f9457e381dc4106dc0be6125e1eeb8bcf503b946a72f4b258a1a0e3653ceae57"
+        },
+        {
+          "path": "dist/core/capabilities.d.ts",
+          "packedSha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515",
+          "installedSha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515"
+        },
+        {
+          "path": "dist/core/capabilities.d.ts.map",
+          "packedSha256": "4de6d1ea2d40cb336f5ec7caeacb23306b06ca355baaedebf5ca901b28e44968",
+          "installedSha256": "4de6d1ea2d40cb336f5ec7caeacb23306b06ca355baaedebf5ca901b28e44968"
+        },
+        {
+          "path": "dist/core/capabilities.js",
+          "packedSha256": "e1e544eb806c761a3cc589964c9031ee5c0bf29d0cfdc9454da568607bbe48a3",
+          "installedSha256": "e1e544eb806c761a3cc589964c9031ee5c0bf29d0cfdc9454da568607bbe48a3"
+        },
+        {
+          "path": "dist/core/capabilities.js.map",
+          "packedSha256": "d0105b4c2bd5c585a2002812c035e6b9e231865789aa7238f67b7200c0875fc7",
+          "installedSha256": "d0105b4c2bd5c585a2002812c035e6b9e231865789aa7238f67b7200c0875fc7"
+        },
+        {
+          "path": "dist/core/context.d.ts",
+          "packedSha256": "4e29d7e5e4c1342652f81613edf9b06e54285b96cb6d4839ab668de2864d2983",
+          "installedSha256": "4e29d7e5e4c1342652f81613edf9b06e54285b96cb6d4839ab668de2864d2983"
+        },
+        {
+          "path": "dist/core/context.d.ts.map",
+          "packedSha256": "357bd0c83338766d59bd9ff55321d3f6882182c073f0b271e4d6c86332916278",
+          "installedSha256": "357bd0c83338766d59bd9ff55321d3f6882182c073f0b271e4d6c86332916278"
+        },
+        {
+          "path": "dist/core/context.js",
+          "packedSha256": "00f244ee0b1aec7f48157dea6429c96e4389b31945ecf0c8008b1ff2e1b66847",
+          "installedSha256": "00f244ee0b1aec7f48157dea6429c96e4389b31945ecf0c8008b1ff2e1b66847"
+        },
+        {
+          "path": "dist/core/context.js.map",
+          "packedSha256": "71362847fba8630315b8890b7253f4867b485b8ab042f17a4a989d775666675b",
+          "installedSha256": "71362847fba8630315b8890b7253f4867b485b8ab042f17a4a989d775666675b"
+        },
+        {
+          "path": "dist/core/errors.d.ts",
+          "packedSha256": "f747c139c70fda88de6531c733639d237c80cb03ec38fd6cf9fd44f651cfaf8b",
+          "installedSha256": "f747c139c70fda88de6531c733639d237c80cb03ec38fd6cf9fd44f651cfaf8b"
+        },
+        {
+          "path": "dist/core/errors.d.ts.map",
+          "packedSha256": "7a1c32e3b285145d8419ced9a3dd001217998876ff8ef9b2fb35be8f0688d8d8",
+          "installedSha256": "7a1c32e3b285145d8419ced9a3dd001217998876ff8ef9b2fb35be8f0688d8d8"
+        },
+        {
+          "path": "dist/core/errors.js",
+          "packedSha256": "e3b76ae6b5e11371f63967dbadf08c74fed69b4cc623163e4650ff2b4da3d5aa",
+          "installedSha256": "e3b76ae6b5e11371f63967dbadf08c74fed69b4cc623163e4650ff2b4da3d5aa"
+        },
+        {
+          "path": "dist/core/errors.js.map",
+          "packedSha256": "2bf2fbb0c79592622e0cd4c0438857a4b20dd7bda7a874ecb860a7785cf195cc",
+          "installedSha256": "2bf2fbb0c79592622e0cd4c0438857a4b20dd7bda7a874ecb860a7785cf195cc"
+        },
+        {
+          "path": "dist/core/registry.d.ts",
+          "packedSha256": "fbd38a8d39b6344323ce8eba1a4af8d21946e932c97ddb99d3f9be5f60ae6a10",
+          "installedSha256": "fbd38a8d39b6344323ce8eba1a4af8d21946e932c97ddb99d3f9be5f60ae6a10"
+        },
+        {
+          "path": "dist/core/registry.d.ts.map",
+          "packedSha256": "170fc5cdfb5e2d33a29ff846dbc2be8c50bbb9a2b18c48f7abe6788c252b6c70",
+          "installedSha256": "170fc5cdfb5e2d33a29ff846dbc2be8c50bbb9a2b18c48f7abe6788c252b6c70"
+        },
+        {
+          "path": "dist/core/registry.js",
+          "packedSha256": "b6f3b8a60a8f1807447ee1e8105f6f2598027d856abc1ac265f10e079c8d32b5",
+          "installedSha256": "b6f3b8a60a8f1807447ee1e8105f6f2598027d856abc1ac265f10e079c8d32b5"
+        },
+        {
+          "path": "dist/core/registry.js.map",
+          "packedSha256": "dfa003b938c018d956f1215a52a1a2fd2f53d5dd975a9dbed43dc35b193e55a4",
+          "installedSha256": "dfa003b938c018d956f1215a52a1a2fd2f53d5dd975a9dbed43dc35b193e55a4"
+        },
+        {
+          "path": "dist/core/session.d.ts",
+          "packedSha256": "94b256072b2c33edea489ede1e6c4b2ba6aa7c31f813e329249c579c2f82bb4c",
+          "installedSha256": "94b256072b2c33edea489ede1e6c4b2ba6aa7c31f813e329249c579c2f82bb4c"
+        },
+        {
+          "path": "dist/core/session.d.ts.map",
+          "packedSha256": "73335c06312aa436321fa95e3bbf71ee4ff80c5be81bd7da1be48e249fa30418",
+          "installedSha256": "73335c06312aa436321fa95e3bbf71ee4ff80c5be81bd7da1be48e249fa30418"
+        },
+        {
+          "path": "dist/core/session.js",
+          "packedSha256": "d574f4ab5a3e8f06a1b42401229913780a04b2b098c73ce7fbe2b96fd0b378bb",
+          "installedSha256": "d574f4ab5a3e8f06a1b42401229913780a04b2b098c73ce7fbe2b96fd0b378bb"
+        },
+        {
+          "path": "dist/core/session.js.map",
+          "packedSha256": "c656134a75c612d4e951821e540a7da0d8d67630d0a468016eb6639f2628f370",
+          "installedSha256": "c656134a75c612d4e951821e540a7da0d8d67630d0a468016eb6639f2628f370"
+        },
+        {
+          "path": "dist/core/types.d.ts",
+          "packedSha256": "5430b4f08a3bc0d40e8bff39af46bce3d9662045d765123efa607865823717fa",
+          "installedSha256": "5430b4f08a3bc0d40e8bff39af46bce3d9662045d765123efa607865823717fa"
+        },
+        {
+          "path": "dist/core/types.d.ts.map",
+          "packedSha256": "065cb1ff31f0cdbbbb0ab2f48d3d1d0cd51c7d14ed113ed651bcee48c8bc31bf",
+          "installedSha256": "065cb1ff31f0cdbbbb0ab2f48d3d1d0cd51c7d14ed113ed651bcee48c8bc31bf"
+        },
+        {
+          "path": "dist/core/types.js",
+          "packedSha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2",
+          "installedSha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2"
+        },
+        {
+          "path": "dist/core/types.js.map",
+          "packedSha256": "b983b4b425e50da613e8903a38b843e3c88824da62e9f3ed2a7ae7fc96c1f8ee",
+          "installedSha256": "b983b4b425e50da613e8903a38b843e3c88824da62e9f3ed2a7ae7fc96c1f8ee"
+        },
+        {
+          "path": "dist/core/validation.d.ts",
+          "packedSha256": "66881ecb5cf408b3255fe92d7ef8bd25b6d8588983a822e2c6014751d256c4bc",
+          "installedSha256": "66881ecb5cf408b3255fe92d7ef8bd25b6d8588983a822e2c6014751d256c4bc"
+        },
+        {
+          "path": "dist/core/validation.d.ts.map",
+          "packedSha256": "3d2a385c62fe7220b7bd171ec5bece593a33c0feebefbb4d857592d45da35b29",
+          "installedSha256": "3d2a385c62fe7220b7bd171ec5bece593a33c0feebefbb4d857592d45da35b29"
+        },
+        {
+          "path": "dist/core/validation.js",
+          "packedSha256": "14273d335902ad922645a0a6d8ce4a88f666730ef4c1e7eebedeefe9da876638",
+          "installedSha256": "14273d335902ad922645a0a6d8ce4a88f666730ef4c1e7eebedeefe9da876638"
+        },
+        {
+          "path": "dist/core/validation.js.map",
+          "packedSha256": "b07a278733ec8ef2090887209e46d7929fb805a57c105104d5e2ea227094e0e5",
+          "installedSha256": "b07a278733ec8ef2090887209e46d7929fb805a57c105104d5e2ea227094e0e5"
+        },
+        {
+          "path": "dist/index.d.ts",
+          "packedSha256": "0685d35825294cc02075111932286fcd443a711d0a6fc8634dc2eb356a57da61",
+          "installedSha256": "0685d35825294cc02075111932286fcd443a711d0a6fc8634dc2eb356a57da61"
+        },
+        {
+          "path": "dist/index.d.ts.map",
+          "packedSha256": "2d0bbfd1009d87cc64237afc5330a776f3571e4441809e2b4a051cf2cba6fb9b",
+          "installedSha256": "2d0bbfd1009d87cc64237afc5330a776f3571e4441809e2b4a051cf2cba6fb9b"
+        },
+        {
+          "path": "dist/index.js",
+          "packedSha256": "1a508f98ff95e4bb0a1dc9684843cdc8d2a87027e068360d2cc2b0a539863b65",
+          "installedSha256": "1a508f98ff95e4bb0a1dc9684843cdc8d2a87027e068360d2cc2b0a539863b65"
+        },
+        {
+          "path": "dist/index.js.map",
+          "packedSha256": "825e1642f2afec53d5ed41dc7658c6a846ef1a5ce361611d11356904243a6e7f",
+          "installedSha256": "825e1642f2afec53d5ed41dc7658c6a846ef1a5ce361611d11356904243a6e7f"
+        },
+        {
+          "path": "dist/mapbox-native.d.ts",
+          "packedSha256": "9ca58aa3bb5f22025184dbb554abd359f1e4e8feeac137d82594b3436d0dba1b",
+          "installedSha256": "9ca58aa3bb5f22025184dbb554abd359f1e4e8feeac137d82594b3436d0dba1b"
+        },
+        {
+          "path": "dist/mapbox-native.d.ts.map",
+          "packedSha256": "84ee1377b1f3be74807f4379e2fb8beead13378afbc7e75e02418b53caa038fa",
+          "installedSha256": "84ee1377b1f3be74807f4379e2fb8beead13378afbc7e75e02418b53caa038fa"
+        },
+        {
+          "path": "dist/mapbox-native.js",
+          "packedSha256": "7f45080de9a031be16ad9e8188f6d663f57adaa28754d17afaa116c173835887",
+          "installedSha256": "7f45080de9a031be16ad9e8188f6d663f57adaa28754d17afaa116c173835887"
+        },
+        {
+          "path": "dist/mapbox-native.js.map",
+          "packedSha256": "2f78bc2b57ba0109b3657b80e39949278b1e83ada866a4208d8c9e56ed21660f",
+          "installedSha256": "2f78bc2b57ba0109b3657b80e39949278b1e83ada866a4208d8c9e56ed21660f"
+        },
+        {
+          "path": "dist/mapbox-web.d.ts",
+          "packedSha256": "addad1252795f24a1d872ef9d631edfca8a23ffc8d06b18e3886886ce784ed68",
+          "installedSha256": "addad1252795f24a1d872ef9d631edfca8a23ffc8d06b18e3886886ce784ed68"
+        },
+        {
+          "path": "dist/mapbox-web.d.ts.map",
+          "packedSha256": "c7495106d8f60f336fa54e049755f93a2c019516304df96c9f50a6f9f821103e",
+          "installedSha256": "c7495106d8f60f336fa54e049755f93a2c019516304df96c9f50a6f9f821103e"
+        },
+        {
+          "path": "dist/mapbox-web.js",
+          "packedSha256": "560fafc4d60c1b95e526a8707e95533f4731e58f6ceb21748f764af60f5e6606",
+          "installedSha256": "560fafc4d60c1b95e526a8707e95533f4731e58f6ceb21748f764af60f5e6606"
+        },
+        {
+          "path": "dist/mapbox-web.js.map",
+          "packedSha256": "4e197decd3f659011f336e37501120387f30914bf7292c1e0ef9835b94831fea",
+          "installedSha256": "4e197decd3f659011f336e37501120387f30914bf7292c1e0ef9835b94831fea"
+        },
+        {
+          "path": "dist/maplibre-native.d.ts",
+          "packedSha256": "e4a3d9d99053d4633931443d0f2e85f6da1e5b5b7241c60d8a2b1c4f5e2006d5",
+          "installedSha256": "e4a3d9d99053d4633931443d0f2e85f6da1e5b5b7241c60d8a2b1c4f5e2006d5"
+        },
+        {
+          "path": "dist/maplibre-native.d.ts.map",
+          "packedSha256": "68c5c0302e5e6671db1e22de6f694190741ea5b259d88132f3d642f0fbe8fe4c",
+          "installedSha256": "68c5c0302e5e6671db1e22de6f694190741ea5b259d88132f3d642f0fbe8fe4c"
+        },
+        {
+          "path": "dist/maplibre-native.js",
+          "packedSha256": "91fa46ad18b0a200ea60942ec9738a92147a2c450305216a8cb84f50414faa1f",
+          "installedSha256": "91fa46ad18b0a200ea60942ec9738a92147a2c450305216a8cb84f50414faa1f"
+        },
+        {
+          "path": "dist/maplibre-native.js.map",
+          "packedSha256": "9e68cf08390ff60e4562d0c0b8256961668c287af00adc8f6c33c19a02373076",
+          "installedSha256": "9e68cf08390ff60e4562d0c0b8256961668c287af00adc8f6c33c19a02373076"
+        },
+        {
+          "path": "dist/maplibre-web.d.ts",
+          "packedSha256": "d742eb1ff645eeb2d91b75d645f9ddc26f93e3338b844d8eb9a0cc1e0868dc3b",
+          "installedSha256": "d742eb1ff645eeb2d91b75d645f9ddc26f93e3338b844d8eb9a0cc1e0868dc3b"
+        },
+        {
+          "path": "dist/maplibre-web.d.ts.map",
+          "packedSha256": "009708aedd0085d2b22ed412d770d660f32a678cb40cfd2e93f3f3ac81dad7c6",
+          "installedSha256": "009708aedd0085d2b22ed412d770d660f32a678cb40cfd2e93f3f3ac81dad7c6"
+        },
+        {
+          "path": "dist/maplibre-web.js",
+          "packedSha256": "80acbac7e5453c149bd9993142139755eaf27e9499d4dded3cc66f5ff23ad88e",
+          "installedSha256": "80acbac7e5453c149bd9993142139755eaf27e9499d4dded3cc66f5ff23ad88e"
+        },
+        {
+          "path": "dist/maplibre-web.js.map",
+          "packedSha256": "bd5aec4336cab223e66f312d3e87030f489308f864dd478f93b3bd8082d55efa",
+          "installedSha256": "bd5aec4336cab223e66f312d3e87030f489308f864dd478f93b3bd8082d55efa"
+        },
+        {
+          "path": "dist/metro-web-assets.cjs",
+          "packedSha256": "0d6773b5551355cbe6e04dba10b328c04e4d33079787e3b520ff2cdcec527636",
+          "installedSha256": "0d6773b5551355cbe6e04dba10b328c04e4d33079787e3b520ff2cdcec527636"
+        },
+        {
+          "path": "dist/metro-web-assets.d.cts",
+          "packedSha256": "b4185e51b802bfabe893da3056b67fbfbec953fb1f8e99e0dde1b8851eb2cb24",
+          "installedSha256": "b4185e51b802bfabe893da3056b67fbfbec953fb1f8e99e0dde1b8851eb2cb24"
+        },
+        {
+          "path": "dist/metro-web-transformer.cjs",
+          "packedSha256": "ce7901558a50182b43f0a7e7e47a22d6b8f7942a221e5fd1b41820c5ca768db4",
+          "installedSha256": "ce7901558a50182b43f0a7e7e47a22d6b8f7942a221e5fd1b41820c5ca768db4"
+        },
+        {
+          "path": "dist/metro-web.cjs",
+          "packedSha256": "6eec01548bf97274edecc15574d087a86a640b0963ae2d49ab83307c84f532c2",
+          "installedSha256": "6eec01548bf97274edecc15574d087a86a640b0963ae2d49ab83307c84f532c2"
+        },
+        {
+          "path": "dist/metro-web.d.cts",
+          "packedSha256": "95d29dc17128cbca1faa91319497ed5cbd6944e26aecd8f595be97b102e80d5e",
+          "installedSha256": "95d29dc17128cbca1faa91319497ed5cbd6944e26aecd8f595be97b102e80d5e"
+        }
+      ],
+      "report": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791453231248/report.json",
+      "tests": {
+        "manifestSelectionWithMultipleTarballs": "passed with an invalid lexically first decoy tarball",
+        "staleAdapter": "expected failure when adapter bytes changed while dist/index.js stayed unchanged",
+        "restoration": "All 87 publication files match after restoring adapter bytes"
+      },
+      "testDetails": {
+        "manifestSelection": {
+          "exitCode": 0,
+          "stdout": "PASS all 87 publication files match /private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz: /private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791453230618\n",
+          "stderr": ""
+        },
+        "staleAdapter": {
+          "exitCode": 1,
+          "stdout": "",
+          "stderr": "Installed publication file differs from packed artifact: dist/adapters/maplibre-native/Map.js; use a unique tarball filename to invalidate Bun's local-file cache\n+ actual - expected\n\n+ 'b5f4158034d33f89ed344b46f03f89eb2c16abfe21d7c71c42d9213e9d1da370'\n- 'd0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1'\n\nReport: /private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791453231081/report.json\n"
+        },
+        "restored": {
+          "exitCode": 0,
+          "stdout": "PASS all 87 publication files match /private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz: /private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791453231248\n",
+          "stderr": ""
+        }
+      },
+      "limits": "Verification-only runs did not rebuild or reinstall the native app. The existing c1e20526ddec artifact, installed APK identity, marker, and Android lifecycle runtime evidence remain valid."
+    }
+  },
+  "javascriptBundle": {
+    "configuration": "Release",
+    "embedded": true,
+    "embeddedBundleSha256": "f92736bfcc8c788f08ee6579fa8d9007091fde9e2e26652547f2fa1e6de9bf5c",
+    "visibleBuildMarker": "maplibre-c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739-4b42c1e604bdbdaba5dfe5834e410a0b6be75303b07c1d7edbaa9352d7d4410c",
+    "sourceHashes": {
+      "index.js": "923f6db3c2996730bcab029422c7b4fe80b3060e5321bba97b7816b783015ddd",
+      "App.tsx": "31d18b0943174a60cad1b52553973262960ad85beca8e3d1c9a3a3917131ce03",
+      "LifecycleHarness.tsx": "17f2bddbc279bfcc55dd2c70c2426fc368c55c9e912578350d2990545ecdc9be",
+      "selected-adapter.ts": "7b68cd7e0f05c0c35c4e794431c67cea37319002b4be99350a1ea473c2545a23"
+    },
+    "markerObserved": true,
+    "metroServerUsed": false
+  },
+  "android": {
+    "sdk": "13.6.1 OpenGL",
+    "toolchain": {
+      "java": "17.0.20.1",
+      "gradle": "9.4.1",
+      "androidBuildTools": "37.0.0",
+      "compileSdk": "37",
+      "targetSdk": "36",
+      "ndk": "27.1.12297006",
+      "architecture": "arm64-v8a"
+    },
+    "applicationId": "com.onemap.harness.maplibre",
+    "device": "emulator-5554",
+    "build": "passed",
+    "installation": "installed APK hash verified",
+    "binarySha256": "0978cda0892a8c3bfcabf97e33d3762711f6d9c307cbc0496db8ee34e791fbcf",
+    "nativeDependencyGraph": "MapLibre Android13.6.1 OpenGL resolved; opposite SDK absent",
+    "binaryDependencyIsolation": "APK contains libmaplibre.so; no Mapbox native library or com/mapbox DEX class descriptor",
+    "commands": [
+      {
+        "command": "./gradlew",
+        "args": [
+          ":app:assembleRelease",
+          "--console=plain",
+          "-PreactNativeArchitectures=arm64-v8a"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157/android",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/gradle.log",
+        "exitCode": 0
+      },
+      {
+        "command": "./gradlew",
+        "args": [
+          ":app:dependencies",
+          "--configuration",
+          "releaseRuntimeClasspath",
+          "--console=plain"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157/android",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/native-dependencies.log",
+        "exitCode": 0
+      },
+      {
+        "command": "unzip",
+        "args": [
+          "-Z1",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/android/app/build/outputs/apk/release/app-release.apk"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/apk-contents.log",
+        "exitCode": 0
+      },
+      {
+        "command": "unzip",
+        "args": [
+          "-p",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/android/app/build/outputs/apk/release/app-release.apk",
+          "assets/index.android.bundle"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/embedded-bundle.log",
+        "exitCode": 0
+      },
+      {
+        "command": "unzip",
+        "args": [
+          "-p",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/android/app/build/outputs/apk/release/app-release.apk",
+          "classes.dex"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/classes.dex.log",
+        "exitCode": 0
+      },
+      {
+        "command": "unzip",
+        "args": [
+          "-p",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/android/app/build/outputs/apk/release/app-release.apk",
+          "classes2.dex"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/classes2.dex.log",
+        "exitCode": 0
+      },
+      {
+        "command": "unzip",
+        "args": [
+          "-p",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/android/app/build/outputs/apk/release/app-release.apk",
+          "classes3.dex"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/classes3.dex.log",
+        "exitCode": 0
+      },
+      {
+        "command": "/Users/rob/Library/Android/sdk/build-tools/37.0.0/aapt",
+        "args": [
+          "dump",
+          "badging",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/android/app/build/outputs/apk/release/app-release.apk"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/apk-identity.log",
+        "exitCode": 0
+      },
+      {
+        "command": "adb",
+        "args": [
+          "-s",
+          "emulator-5554",
+          "install",
+          "-r",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/android/app/build/outputs/apk/release/app-release.apk"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/install.log",
+        "exitCode": 0
+      },
+      {
+        "command": "adb",
+        "args": [
+          "-s",
+          "emulator-5554",
+          "shell",
+          "pm",
+          "path",
+          "com.onemap.harness.maplibre"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/installed-path.log",
+        "exitCode": 0
+      },
+      {
+        "command": "adb",
+        "args": [
+          "-s",
+          "emulator-5554",
+          "pull",
+          "/data/app/~~oCGrH9JYOJWOTu_Nf4FfiQ==/com.onemap.harness.maplibre-WbF7M4qiupY2f2nyfzy80Q==/base.apk",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/installed.apk"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/installed-apk.log",
+        "exitCode": 0
+      }
+    ],
+    "report": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/report.json",
+    "runtime": {
+      "status": "observed",
+      "assertions": [
+        "Visible marker matches packed artifact and fixture source hashes",
+        "Initial ready:true follows one map load event and one style load event",
+        "Getter before load rejects MapNotReadyError",
+        "Native map host changes from approximately220dp to360dp while ready remains true",
+        "Getter after readiness explicitly rejects pending implementation MapBackendError",
+        "Unmount changes ready:false and retained getter rejects MapNotReadyError",
+        "Remount becomes ready:true with cumulative load2/style2 events",
+        "No lifecycle error callback observed",
+        "Screenshot visibly renders local style background and green route after remount"
+      ],
+      "observations": {
+        "initial": [
+          {
+            "text": "maplibre-c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739-4b42c1e604bdbdaba5dfe5834e410a0b6be75303b07c1d7edbaa9352d7d4410c",
+            "id": "lifecycle-build-marker",
+            "bounds": "[42,134][1038,271]"
+          },
+          {
+            "text": "Ready: true",
+            "id": "lifecycle-ready",
+            "bounds": "[42,364][1038,415]"
+          },
+          {
+            "text": "Load events: 1; style events: 1",
+            "id": "lifecycle-loaded",
+            "bounds": "[42,436][1038,487]"
+          },
+          {
+            "text": "Before load: passed: MapNotReadyError",
+            "id": "lifecycle-before-load",
+            "bounds": "[42,508][1038,559]"
+          },
+          {
+            "text": "After unmount: unverified",
+            "id": "lifecycle-after-unmount",
+            "bounds": "[42,580][1038,631]"
+          },
+          {
+            "text": "Observed host size: 379.4285583496094 x 220.19049072265625",
+            "id": "lifecycle-size",
+            "bounds": "[42,652][1038,746]"
+          },
+          {
+            "text": "Getter: unverified",
+            "id": "lifecycle-command-result",
+            "bounds": "[42,767][1038,818]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-toggle",
+            "bounds": "[42,839][1038,932]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-resize",
+            "bounds": "[42,953][1038,1046]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-check-command",
+            "bounds": "[42,1067][1038,1160]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-map-host-view",
+            "bounds": "[42,1181][1038,1759]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-map-host",
+            "bounds": "[42,1181][1038,1759]"
+          },
+          {
+            "text": "Errors: none observed",
+            "id": "lifecycle-error-log",
+            "bounds": "[42,1779][1038,1830]"
+          }
+        ],
+        "resized": [
+          {
+            "text": "maplibre-c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739-4b42c1e604bdbdaba5dfe5834e410a0b6be75303b07c1d7edbaa9352d7d4410c",
+            "id": "lifecycle-build-marker",
+            "bounds": "[42,134][1038,271]"
+          },
+          {
+            "text": "Ready: true",
+            "id": "lifecycle-ready",
+            "bounds": "[42,364][1038,415]"
+          },
+          {
+            "text": "Load events: 1; style events: 1",
+            "id": "lifecycle-loaded",
+            "bounds": "[42,436][1038,487]"
+          },
+          {
+            "text": "Before load: passed: MapNotReadyError",
+            "id": "lifecycle-before-load",
+            "bounds": "[42,508][1038,559]"
+          },
+          {
+            "text": "After unmount: unverified",
+            "id": "lifecycle-after-unmount",
+            "bounds": "[42,580][1038,631]"
+          },
+          {
+            "text": "Observed host size: 379.4285583496094 x 360.0000305175781",
+            "id": "lifecycle-size",
+            "bounds": "[42,652][1038,746]"
+          },
+          {
+            "text": "Getter: unverified",
+            "id": "lifecycle-command-result",
+            "bounds": "[42,767][1038,818]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-toggle",
+            "bounds": "[42,839][1038,932]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-resize",
+            "bounds": "[42,953][1038,1046]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-check-command",
+            "bounds": "[42,1067][1038,1160]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-map-host-view",
+            "bounds": "[42,1181][1038,2126]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-map-host",
+            "bounds": "[42,1181][1038,2126]"
+          },
+          {
+            "text": "Errors: none observed",
+            "id": "lifecycle-error-log",
+            "bounds": "[42,2147][1038,2198]"
+          }
+        ],
+        "getter": [
+          {
+            "text": "maplibre-c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739-4b42c1e604bdbdaba5dfe5834e410a0b6be75303b07c1d7edbaa9352d7d4410c",
+            "id": "lifecycle-build-marker",
+            "bounds": "[42,134][1038,271]"
+          },
+          {
+            "text": "Ready: true",
+            "id": "lifecycle-ready",
+            "bounds": "[42,364][1038,415]"
+          },
+          {
+            "text": "Load events: 1; style events: 1",
+            "id": "lifecycle-loaded",
+            "bounds": "[42,436][1038,487]"
+          },
+          {
+            "text": "Before load: passed: MapNotReadyError",
+            "id": "lifecycle-before-load",
+            "bounds": "[42,508][1038,559]"
+          },
+          {
+            "text": "After unmount: unverified",
+            "id": "lifecycle-after-unmount",
+            "bounds": "[42,580][1038,631]"
+          },
+          {
+            "text": "Observed host size: 379.4285583496094 x 360.0000305175781",
+            "id": "lifecycle-size",
+            "bounds": "[42,652][1038,746]"
+          },
+          {
+            "text": "Getter: MapBackendError: getZoom is not implemented yet for maplibre-native; this is pending work, not an SDK limitation.",
+            "id": "lifecycle-command-result",
+            "bounds": "[42,767][1038,904]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-toggle",
+            "bounds": "[42,925][1038,1018]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-resize",
+            "bounds": "[42,1039][1038,1132]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-check-command",
+            "bounds": "[42,1153][1038,1246]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-map-host-view",
+            "bounds": "[42,1267][1038,2212]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-map-host",
+            "bounds": "[42,1267][1038,2212]"
+          },
+          {
+            "text": "Errors: none observed",
+            "id": "lifecycle-error-log",
+            "bounds": "[42,2233][1038,2284]"
+          }
+        ],
+        "unmounted": [
+          {
+            "text": "maplibre-c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739-4b42c1e604bdbdaba5dfe5834e410a0b6be75303b07c1d7edbaa9352d7d4410c",
+            "id": "lifecycle-build-marker",
+            "bounds": "[42,134][1038,271]"
+          },
+          {
+            "text": "Ready: false",
+            "id": "lifecycle-ready",
+            "bounds": "[42,364][1038,415]"
+          },
+          {
+            "text": "Load events: 1; style events: 1",
+            "id": "lifecycle-loaded",
+            "bounds": "[42,436][1038,487]"
+          },
+          {
+            "text": "Before load: passed: MapNotReadyError",
+            "id": "lifecycle-before-load",
+            "bounds": "[42,508][1038,559]"
+          },
+          {
+            "text": "After unmount: passed: MapNotReadyError",
+            "id": "lifecycle-after-unmount",
+            "bounds": "[42,580][1038,631]"
+          },
+          {
+            "text": "Observed host size: 379.4285583496094 x 360.0000305175781",
+            "id": "lifecycle-size",
+            "bounds": "[42,652][1038,746]"
+          },
+          {
+            "text": "Getter: MapBackendError: getZoom is not implemented yet for maplibre-native; this is pending work, not an SDK limitation.",
+            "id": "lifecycle-command-result",
+            "bounds": "[42,767][1038,904]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-toggle",
+            "bounds": "[42,925][1038,1018]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-resize",
+            "bounds": "[42,1039][1038,1132]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-check-command",
+            "bounds": "[42,1153][1038,1246]"
+          },
+          {
+            "text": "Errors: none observed",
+            "id": "lifecycle-error-log",
+            "bounds": "[42,1288][1038,1339]"
+          }
+        ],
+        "remounted": [
+          {
+            "text": "maplibre-c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739-4b42c1e604bdbdaba5dfe5834e410a0b6be75303b07c1d7edbaa9352d7d4410c",
+            "id": "lifecycle-build-marker",
+            "bounds": "[42,134][1038,271]"
+          },
+          {
+            "text": "Ready: true",
+            "id": "lifecycle-ready",
+            "bounds": "[42,364][1038,415]"
+          },
+          {
+            "text": "Load events: 2; style events: 2",
+            "id": "lifecycle-loaded",
+            "bounds": "[42,436][1038,487]"
+          },
+          {
+            "text": "Before load: passed: MapNotReadyError",
+            "id": "lifecycle-before-load",
+            "bounds": "[42,508][1038,559]"
+          },
+          {
+            "text": "After unmount: passed: MapNotReadyError",
+            "id": "lifecycle-after-unmount",
+            "bounds": "[42,580][1038,631]"
+          },
+          {
+            "text": "Observed host size: 379.4285583496094 x 360.0000305175781",
+            "id": "lifecycle-size",
+            "bounds": "[42,652][1038,746]"
+          },
+          {
+            "text": "Getter: MapBackendError: getZoom is not implemented yet for maplibre-native; this is pending work, not an SDK limitation.",
+            "id": "lifecycle-command-result",
+            "bounds": "[42,767][1038,904]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-toggle",
+            "bounds": "[42,925][1038,1018]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-resize",
+            "bounds": "[42,1039][1038,1132]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-check-command",
+            "bounds": "[42,1153][1038,1246]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-map-host-view",
+            "bounds": "[42,1267][1038,2212]"
+          },
+          {
+            "text": "",
+            "id": "lifecycle-map-host",
+            "bounds": "[42,1267][1038,2212]"
+          },
+          {
+            "text": "Errors: none observed",
+            "id": "lifecycle-error-log",
+            "bounds": "[42,2233][1038,2284]"
+          }
+        ]
+      },
+      "screenshot": {
+        "path": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/remounted.png",
+        "sha256": "b233d9c43c54d7fedd3a34c00a572efe6656feaf414fcf8807ef89cae7c81b1a"
+      },
+      "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/runtime-rerun.log",
+      "limitations": [
+        "No native camera getter/initial camera value certification",
+        "No gesture or interactive event certification",
+        "No source/layer facade certification: route is renderer style data",
+        "No style replacement generation certification",
+        "No StrictMode native device replay certification",
+        "Mapbox cross-backend and iOS runtime are separate evidence"
+      ],
+      "failureCaseBoundaries": "The retained-ref and before-load failures are actual MapNotReadyError observations. The post-readiness getter failure is pending implementation and does not claim SDK unsupported status."
+    }
+  },
+  "ios": {
+    "status": "Release binary/install and bounded actual lifecycle passed",
+    "sdk": "SPM6.31.0",
+    "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683",
+    "wrapperPod": {
+      "name": "MapLibreReactNative",
+      "version": "11.5.0"
+    },
+    "report": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/report.json",
+    "packageArtifactVerification": {
+      "status": "passed",
+      "publicationFileCount": 87,
+      "packedSha256": "c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739"
+    },
+    "marker": "maplibre-c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739-4b42c1e604bdbdaba5dfe5834e410a0b6be75303b07c1d7edbaa9352d7d4410c",
+    "sourceHashes": {
+      "index.js": "923f6db3c2996730bcab029422c7b4fe80b3060e5321bba97b7816b783015ddd",
+      "App.tsx": "31d18b0943174a60cad1b52553973262960ad85beca8e3d1c9a3a3917131ce03",
+      "LifecycleHarness.tsx": "17f2bddbc279bfcc55dd2c70c2426fc368c55c9e912578350d2990545ecdc9be",
+      "selected-adapter.ts": "7b68cd7e0f05c0c35c4e794431c67cea37319002b4be99350a1ea473c2545a23"
+    },
+    "nativeHostSourceHashes": {
+      "Podfile": "e9102e42d2c4c1c9fe9ec9eb4e4d3f009a3dfae0efcecf4a6baae1cf62e4251f",
+      "OneMapMaplibre/AppDelegate.swift": "e78cf8862ae89b4ddfc981c20e7e8db4bd2c11940e2f7cfac0455eb6d1e74442",
+      "OneMapMaplibre/Info.plist": "51568fce95a79d824d75187c6e981f9b25535883302a1c943ab5e90ea24f3d45",
+      "OneMapMaplibre.xcodeproj/project.pbxproj": "3eb21211ef7193f644c0cadea1727c0639a191bdd06367ac6c20ca05c9d494e2"
+    },
+    "podLock": {
+      "path": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/Podfile.lock",
+      "sha256": "0d787e800866b5359f4004d4ff0faf93a2f2c2f64e5ae973f2290bdf0973cdc5"
+    },
+    "spmLock": {
+      "path": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/Package.resolved",
+      "sha256": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+      "pins": [
+        {
+          "identity": "maplibre-gl-native-distribution",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+          "state": {
+            "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683",
+            "version": "6.31.0"
+          }
+        }
+      ]
+    },
+    "nativeDependencyGraph": "MapLibre SPM6.31.0 resolved; opposite wrapper/SDK absent from Pod and SPM locks",
+    "binaryDependencyIsolation": {
+      "status": "passed",
+      "description": "The app and packaged framework Mach-O dynamic references contain no Mapbox SDK dependency. Packaged frameworks are MapLibre, React, ReactNativeDependencies, and hermesvm.",
+      "closureReport": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/binary-closure.json",
+      "frameworks": [
+        {
+          "name": "MapLibre.framework",
+          "sha256": "a830be17b376c41aa197426d3770b5619a735694ddf3d1c53274d9039ed09216",
+          "linkedLibraries": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Frameworks/MapLibre.framework/MapLibre (architecture x86_64):\n\t@rpath/MapLibre.framework/MapLibre (compatibility version 0.0.0, current version 0.0.0)\n\t/System/Library/Frameworks/MobileCoreServices.framework/MobileCoreServices (compatibility version 1.0.0, current version 1226.0.0)\n\t/System/Library/Frameworks/Security.framework/Security (compatibility version 1.0.0, current version 61901.120.67)\n\t/System/Library/Frameworks/WebKit.framework/WebKit (compatibility version 1.0.0, current version 624.2.5)\n\t/usr/lib/libz.1.dylib (compatibility version 1.0.0, current version 1.2.12)\n\t/usr/lib/libsqlite3.dylib (compatibility version 9.0.0, current version 382.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)\n\t/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)\n\t/System/Library/Frameworks/CoreLocation.framework/CoreLocation (compatibility version 1.0.0, current version 3075.0.8)\n\t/System/Library/Frameworks/QuartzCore.framework/QuartzCore (compatibility version 1.2.0, current version 1195.14.4)\n\t/System/Library/Frameworks/CoreImage.framework/CoreImage (compatibility version 1.0.0, current version 7.0.0)\n\t/System/Library/Frameworks/MetalKit.framework/MetalKit (compatibility version 1.0.0, current version 173.7.0)\n\t/System/Library/Frameworks/CoreText.framework/CoreText (compatibility version 1.0.0, current version 877.4.0)\n\t/System/Library/Frameworks/ImageIO.framework/ImageIO (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration (compatibility version 1.0.0, current version 1405.120.5)\n\t/System/Library/Frameworks/Metal.framework/Metal (compatibility version 1.0.0, current version 373.2.0)\n\t/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 9126.5.5)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 5026.5.4)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)\n/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Frameworks/MapLibre.framework/MapLibre (architecture arm64):\n\t@rpath/MapLibre.framework/MapLibre (compatibility version 0.0.0, current version 0.0.0)\n\t/System/Library/Frameworks/MobileCoreServices.framework/MobileCoreServices (compatibility version 1.0.0, current version 1226.0.0)\n\t/System/Library/Frameworks/Security.framework/Security (compatibility version 1.0.0, current version 61901.120.67)\n\t/System/Library/Frameworks/WebKit.framework/WebKit (compatibility version 1.0.0, current version 624.2.5)\n\t/usr/lib/libz.1.dylib (compatibility version 1.0.0, current version 1.2.12)\n\t/usr/lib/libsqlite3.dylib (compatibility version 9.0.0, current version 382.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)\n\t/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)\n\t/System/Library/Frameworks/CoreLocation.framework/CoreLocation (compatibility version 1.0.0, current version 3075.0.8)\n\t/System/Library/Frameworks/QuartzCore.framework/QuartzCore (compatibility version 1.2.0, current version 1195.14.4)\n\t/System/Library/Frameworks/CoreImage.framework/CoreImage (compatibility version 1.0.0, current version 7.0.0)\n\t/System/Library/Frameworks/MetalKit.framework/MetalKit (compatibility version 1.0.0, current version 173.7.0)\n\t/System/Library/Frameworks/CoreText.framework/CoreText (compatibility version 1.0.0, current version 877.4.0)\n\t/System/Library/Frameworks/ImageIO.framework/ImageIO (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration (compatibility version 1.0.0, current version 1405.120.5)\n\t/System/Library/Frameworks/Metal.framework/Metal (compatibility version 1.0.0, current version 373.2.0)\n\t/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 9126.5.5)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 5026.5.4)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)\n"
+        },
+        {
+          "name": "React.framework",
+          "sha256": "a0e2c58102ccd4ed9bebec6c4694123335535191c312acdc34ac736c97eb4cd8",
+          "linkedLibraries": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Frameworks/React.framework/React (architecture x86_64):\n\t@rpath/React.framework/React (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1900.180.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 3502.0.0)\n\t/System/Library/Frameworks/CoreServices.framework/CoreServices (compatibility version 1.0.0, current version 1226.0.0)\n\t/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 8506.1.101)\n\t/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 1889.5.3)\n\t/System/Library/Frameworks/Accelerate.framework/Accelerate (compatibility version 1.0.0, current version 4.0.0)\n\t/System/Library/Frameworks/AudioToolbox.framework/AudioToolbox (compatibility version 1.0.0, current version 1000.0.0)\n\t@rpath/ReactNativeDependencies.framework/ReactNativeDependencies (compatibility version 0.0.0, current version 0.0.0)\n\t@rpath/hermesvm.framework/hermesvm (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 3502.0.0)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1351.0.0)\n\t/System/Library/Frameworks/Combine.framework/Combine (compatibility version 1.0.0, current version 3022.0.0)\n\t/System/Library/Frameworks/CoreText.framework/CoreText (compatibility version 1.0.0, current version 844.5.0)\n\t/System/Library/Frameworks/ImageIO.framework/ImageIO (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/QuartzCore.framework/QuartzCore (compatibility version 1.2.0, current version 1.11.0)\n\t/System/Library/Frameworks/SwiftUI.framework/SwiftUI (compatibility version 1.0.0, current version 6.5.4)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 1.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0, weak)\n\t/usr/lib/swift/libswiftCoreImage.dylib (compatibility version 1.0.0, current version 2.1.0, weak)\n\t/usr/lib/swift/libswiftDarwin.dylib (compatibility version 1.0.0, current version 310.100.8, weak)\n\t/usr/lib/swift/libswiftDataDetection.dylib (compatibility version 1.0.0, current version 801.2.0, weak)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 54.0.0, weak)\n\t/usr/lib/swift/libswiftMetal.dylib (compatibility version 1.0.0, current version 368.12.0, weak)\n\t/usr/lib/swift/libswiftOSLog.dylib (compatibility version 1.0.0, current version 8.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 940.4.0, weak)\n\t/usr/lib/swift/libswiftQuartzCore.dylib (compatibility version 1.0.0, current version 4.0.0, weak)\n\t/usr/lib/swift/libswiftSpatial.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (compatibility version 1.0.0, current version 841.8.0, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 69.120.3, weak)\n\t/usr/lib/swift/libswift_Concurrency.dylib (compatibility version 1.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftos.dylib (compatibility version 1.0.0, current version 1062.100.1, weak)\n\t/usr/lib/swift/libswiftsimd.dylib (compatibility version 1.0.0, current version 21.0.0, weak)\n\t/usr/lib/swift/libswiftFoundation.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftUIKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftCoreGraphics.dylib (compatibility version 1.0.0, current version 120.100.0)\n/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Frameworks/React.framework/React (architecture arm64):\n\t@rpath/React.framework/React (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1900.180.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 3502.0.0)\n\t/System/Library/Frameworks/CoreServices.framework/CoreServices (compatibility version 1.0.0, current version 1226.0.0)\n\t/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 8506.1.101)\n\t/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 1889.5.3)\n\t/System/Library/Frameworks/Accelerate.framework/Accelerate (compatibility version 1.0.0, current version 4.0.0)\n\t/System/Library/Frameworks/AudioToolbox.framework/AudioToolbox (compatibility version 1.0.0, current version 1000.0.0)\n\t@rpath/ReactNativeDependencies.framework/ReactNativeDependencies (compatibility version 0.0.0, current version 0.0.0)\n\t@rpath/hermesvm.framework/hermesvm (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 3502.0.0)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1351.0.0)\n\t/System/Library/Frameworks/Combine.framework/Combine (compatibility version 1.0.0, current version 3022.0.0)\n\t/System/Library/Frameworks/CoreText.framework/CoreText (compatibility version 1.0.0, current version 844.5.0)\n\t/System/Library/Frameworks/ImageIO.framework/ImageIO (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/QuartzCore.framework/QuartzCore (compatibility version 1.2.0, current version 1.11.0)\n\t/System/Library/Frameworks/SwiftUI.framework/SwiftUI (compatibility version 1.0.0, current version 6.5.4)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 1.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0, weak)\n\t/usr/lib/swift/libswiftCoreImage.dylib (compatibility version 1.0.0, current version 2.1.0, weak)\n\t/usr/lib/swift/libswiftDarwin.dylib (compatibility version 1.0.0, current version 310.100.8, weak)\n\t/usr/lib/swift/libswiftDataDetection.dylib (compatibility version 1.0.0, current version 801.2.0, weak)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 54.0.0, weak)\n\t/usr/lib/swift/libswiftMetal.dylib (compatibility version 1.0.0, current version 368.12.0, weak)\n\t/usr/lib/swift/libswiftOSLog.dylib (compatibility version 1.0.0, current version 8.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 940.4.0, weak)\n\t/usr/lib/swift/libswiftQuartzCore.dylib (compatibility version 1.0.0, current version 4.0.0, weak)\n\t/usr/lib/swift/libswiftSpatial.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (compatibility version 1.0.0, current version 841.8.0, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 69.120.3, weak)\n\t/usr/lib/swift/libswift_Concurrency.dylib (compatibility version 1.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftos.dylib (compatibility version 1.0.0, current version 1062.100.1, weak)\n\t/usr/lib/swift/libswiftsimd.dylib (compatibility version 1.0.0, current version 21.0.0, weak)\n\t/usr/lib/swift/libswiftFoundation.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftUIKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftCoreGraphics.dylib (compatibility version 1.0.0, current version 120.100.0)\n"
+        },
+        {
+          "name": "ReactNativeDependencies.framework",
+          "sha256": "8e58d70fc8f35d8d3ae5c11ec354ec1d2ba7cde624182e33953792ab77f0313f",
+          "linkedLibraries": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Frameworks/ReactNativeDependencies.framework/ReactNativeDependencies (architecture x86_64):\n\t@rpath/ReactNativeDependencies.framework/ReactNativeDependencies (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1900.180.0)\n\t/usr/lib/libc++abi.dylib (compatibility version 1.0.0, current version 1900.180.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1351.0.0)\n\t/System/Library/Frameworks/CFNetwork.framework/CFNetwork (compatibility version 1.0.0, current version 3826.255.131)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 3502.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 3502.0.0)\n\t/System/Library/Frameworks/Security.framework/Security (compatibility version 1.0.0, current version 61439.122.1)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Frameworks/ReactNativeDependencies.framework/ReactNativeDependencies (architecture arm64):\n\t@rpath/ReactNativeDependencies.framework/ReactNativeDependencies (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1900.180.0)\n\t/usr/lib/libc++abi.dylib (compatibility version 1.0.0, current version 1900.180.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1351.0.0)\n\t/System/Library/Frameworks/CFNetwork.framework/CFNetwork (compatibility version 1.0.0, current version 3826.255.131)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 3502.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 3502.0.0)\n\t/System/Library/Frameworks/Security.framework/Security (compatibility version 1.0.0, current version 61439.122.1)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n"
+        },
+        {
+          "name": "hermesvm.framework",
+          "sha256": "956af81e233d1ec4310a65d87c298d842093d18a053ffc6061ab1d32aa25a1a5",
+          "linkedLibraries": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Frameworks/hermesvm.framework/hermesvm (architecture x86_64):\n\t@rpath/hermesvm.framework/hermesvm (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 3502.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 3502.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1900.180.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1351.0.0)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Frameworks/hermesvm.framework/hermesvm (architecture arm64):\n\t@rpath/hermesvm.framework/hermesvm (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 3502.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 3502.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1900.180.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1351.0.0)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n"
+        }
+      ],
+      "sdkInfo": {
+        "CFBundleIdentifier": "com.maplibre.mapbox",
+        "CFBundleShortVersionString": "6.31.0",
+        "CFBundleVersion": "6.31.0"
+      },
+      "legacyIdentifierNote": "MapLibre.framework retains upstream CFBundleIdentifier com.maplibre.mapbox; this identifier alone does not indicate that a Mapbox SDK is linked."
+    },
+    "build": {
+      "status": "passed",
+      "configuration": "Release",
+      "executableSha256": "d488c05e11005df99d4314b4cc9ac105c2045512e6fab93b25b660fe190d59d4",
+      "embeddedBundleSha256": "7729e0bac413fd13cd8f9118d3a78e2054df79feb2aba6745d5a811313d52858",
+      "sceneDelegate": "OneMapMaplibre.SceneDelegate",
+      "builtInfoPlistSha256": "48f701ec8a5ba73718a1b4944d9b9ba1ebe54bfab2e5788ab7db7ecbbb6efe47",
+      "appArchive": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/OneMapMaplibre-Release-simulator.tgz",
+      "appArchiveSha256": "fae67f600dc37976c42defa21ba35e25e90331c8d29b6c499a3d18e15c97846e"
+    },
+    "installation": "executable and embedded bundle hashes verified",
+    "commands": [
+      {
+        "command": "tar",
+        "args": [
+          "-tf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-list.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-tvf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-metadata.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/package.json"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-0.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/README.md"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-1.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/lifecycle.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-2.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/lifecycle.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-3.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/lifecycle.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-4.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/lifecycle.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-5.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/host.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-6.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/host.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-7.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/host.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-8.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/host.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-9.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/map.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-10.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/map.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-11.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/map.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-12.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/map.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-13.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/tokens.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-14.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/tokens.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-15.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/tokens.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-16.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/mapbox-native/tokens.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-17.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/maplibre-native/Map.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-18.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/maplibre-native/Map.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-19.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/maplibre-native/Map.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-20.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/maplibre-native/Map.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-21.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/maplibre-native/host-props.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-22.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/maplibre-native/host-props.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-23.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/maplibre-native/host-props.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-24.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/maplibre-native/host-props.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-25.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/selection.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-26.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/selection.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-27.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/selection.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-28.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/selection.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-29.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/web.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-30.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/web.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-31.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/web.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-32.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/adapters/web.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-33.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/capabilities.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-34.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/capabilities.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-35.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/capabilities.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-36.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/capabilities.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-37.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/context.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-38.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/context.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-39.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/context.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-40.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/context.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-41.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/errors.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-42.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/errors.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-43.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/errors.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-44.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/errors.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-45.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/registry.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-46.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/registry.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-47.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/registry.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-48.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/registry.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-49.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/session.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-50.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/session.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-51.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/session.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-52.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/session.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-53.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/types.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-54.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/types.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-55.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/types.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-56.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/types.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-57.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/validation.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-58.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/validation.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-59.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/validation.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-60.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/core/validation.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-61.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/index.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-62.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/index.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-63.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/index.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-64.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/index.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-65.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/mapbox-native.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-66.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/mapbox-native.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-67.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/mapbox-native.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-68.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/mapbox-native.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-69.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/mapbox-web.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-70.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/mapbox-web.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-71.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/mapbox-web.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-72.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/mapbox-web.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-73.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/maplibre-native.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-74.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/maplibre-native.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-75.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/maplibre-native.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-76.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/maplibre-native.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-77.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/maplibre-web.d.ts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-78.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/maplibre-web.d.ts.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-79.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/maplibre-web.js"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-80.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/maplibre-web.js.map"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-81.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/metro-web-assets.cjs"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-82.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/metro-web-assets.d.cts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-83.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/metro-web-transformer.cjs"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-84.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/metro-web.cjs"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-85.log",
+        "exitCode": 0
+      },
+      {
+        "command": "tar",
+        "args": [
+          "-xOf",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/.artifacts/one-map-react-c1e20526ddec.tgz",
+          "package/dist/metro-web.d.cts"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/packed-file-86.log",
+        "exitCode": 0
+      },
+      {
+        "command": "pod",
+        "args": ["install"],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157/ios",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/pods.log",
+        "exitCode": 0
+      },
+      {
+        "command": "xcodebuild",
+        "args": [
+          "-workspace",
+          "OneMapMaplibre.xcworkspace",
+          "-scheme",
+          "OneMapMaplibre",
+          "-configuration",
+          "Release",
+          "-sdk",
+          "iphonesimulator",
+          "-destination",
+          "id=8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "-derivedDataPath",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data",
+          "-packageAuthorizationProvider",
+          "netrc",
+          "CODE_SIGNING_ALLOWED=NO",
+          "build"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157/ios",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/xcodebuild.log",
+        "exitCode": 0
+      },
+      {
+        "command": "/usr/libexec/PlistBuddy",
+        "args": [
+          "-c",
+          "Print :CFBundleIdentifier",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/Info.plist"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/bundle-id.log",
+        "exitCode": 0
+      },
+      {
+        "command": "otool",
+        "args": [
+          "-L",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app/OneMapMaplibre"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/linked-libraries.log",
+        "exitCode": 0
+      },
+      {
+        "command": "xcrun",
+        "args": [
+          "simctl",
+          "install",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMaplibre.app"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/install.log",
+        "exitCode": 0
+      },
+      {
+        "command": "xcrun",
+        "args": [
+          "simctl",
+          "get_app_container",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "com.onemap.harness.maplibre",
+          "app"
+        ],
+        "cwd": "/private/tmp/one-map-lifecycle-maplibre-23593157",
+        "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/installed-container.log",
+        "exitCode": 0
+      }
+    ],
+    "publicPackageAuthorization": {
+      "provider": "netrc",
+      "credentialRequirement": "Public package requires no download token",
+      "supportedOption": "xcodebuild -packageAuthorizationProvider netrc",
+      "basis": "Installed Xcode27.0 -help lists keychain|netrc; the default keychain provider stalled in SecItemCopyMatching, while the netrc retry resolved the identical pinned SDK."
+    },
+    "hostConfiguration": {
+      "existing": "React Native0.87.1 template modified by approved materializer to provide UISceneDelegate and deployment floor15.1; frozen React, React Native, and mapping SDK versions preserved",
+      "approval": "Parent accepted these template-host build/runtime compatibility changes after Mapbox iOS evidence; this fixture copies the exact generated setup."
+    },
+    "runtime": {
+      "status": "passed",
+      "runner": "Maestro2.11.0",
+      "device": "iPhone18Pro iOS27.0 simulator 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "flow": "tests/native-runtime/maplibre-lifecycle.yaml",
+      "flowSha256": "381d4da1030ec4b6f658e18dd2daec3f1ff1fc417e2ed6e40a114a76a7eaaa29",
+      "junit": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/runtime-1/junit.xml",
+      "commands": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/runtime-1/2026-10-08_032711/MapLibre lifecycle from packed one-map-react/commands.json",
+      "completedCommandCount": 32,
+      "durationSeconds": 22.376,
+      "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/maestro-runtime-1.log",
+      "assertions": [
+        "Visible full marker matches verified installed packed artifact and fixture source hashes",
+        "Ready:true follows map load and style load; initial cumulative counts1/1",
+        "Getter before load rejects MapNotReadyError",
+        "Observed host height220 changes to approximately360 after resize",
+        "Getter after readiness rejects explicit pending implementation MapBackendError",
+        "Unmount yields Ready:false and retained getter rejects MapNotReadyError",
+        "Remount yields Ready:true with cumulative map/style loads2/2",
+        "No lifecycle error callback observed",
+        "Both inspected screenshots render the local dark style background and green route"
+      ],
+      "screenshots": [
+        {
+          "path": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/runtime-1/2026-10-08_032711/MapLibre lifecycle from packed one-map-react/takeScreenshot/maplibre-initial-route.png",
+          "sha256": "9f1042a7205d5a50d98ba6b11a602e7a485b640a29d9074c318ed3241edfd2fb",
+          "visuallyInspected": true
+        },
+        {
+          "path": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791455098252/runtime-1/2026-10-08_032711/MapLibre lifecycle from packed one-map-react/takeScreenshot/maplibre-remounted-route.png",
+          "sha256": "9742e2a104cab4bfee54785cc25cbc6ffb003b7bc2487dec9a4d262cb986eda7",
+          "visuallyInspected": true
+        }
+      ],
+      "nativeSizePrecision": "Initial height220; remounted height359.9999694824219. Flow accepts bounded floating point rounding near target heights.",
+      "tokenConfigured": false,
+      "limitations": [
+        "No native camera getter/initial camera value certification",
+        "No gesture or interactive event certification",
+        "No source/layer facade certification: route is renderer style data",
+        "No style replacement generation certification",
+        "No StrictMode native device replay certification",
+        "No certification of all React Native host props or all S04 inventory entries"
+      ]
+    },
+    "preservation": "Complete app archive, per-file hashes/framework closure, SDK locks, package verification, build/install logs, JUnit/commands/screenshots preserved before deleting only this consumer Build/Intermediates.noindex."
+  },
+  "failuresAndReruns": [
+    {
+      "kind": "disk exhaustion",
+      "reports": [
+        "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452072922/report.json",
+        "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791452072191/report.json"
+      ],
+      "resolution": "Preserved logs/binaries/locks; removed only disposable temporary bootstrap Pods and Android intermediate outputs; serialized builds"
+    },
+    {
+      "kind": "React Native default Babel namespace export incompatibility",
+      "report": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452244174/report.json",
+      "resolution": "Parent corrected common root export and repacked"
+    },
+    {
+      "kind": "Stale Bun same-path local tarball cache",
+      "report": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452400060/report.json",
+      "resolution": "Unique hash-suffixed tarball filename and reinstall verified corrected installed entry"
+    },
+    {
+      "kind": "Observer assertion on collapsed empty native View",
+      "assertion": "lifecycle-unmounted testID not present in accessibility tree",
+      "resolution": "Asserted observable ready:false and retained-ref MapNotReadyError; no adapter change"
+    },
+    {
+      "kind": "Observer acted before cold-start UI was ready",
+      "log": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/android-1791452446784/runtime-run.log",
+      "resolution": "Bounded UI readiness capture before controls; complete rerun passed"
+    },
+    {
+      "kind": "Xcode public package download stalled in keychain authorization",
+      "report": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791454637878/report.json",
+      "sample": "/private/tmp/one-map-lifecycle-maplibre-23593157/artifacts/ios-1791454637878/xcodebuild-sample.txt",
+      "observedStack": "SwiftPM BinaryArtifactsManager.download -> KeychainAuthorizationProvider -> SecItemCopyMatching -> SecurityServer decrypt wait",
+      "resolution": "Terminated only this stalled Xcode process after preserving its sample/logs; supported netrc provider resolved identical public package and full build/runtime passed. No keychain values read or printed."
+    }
+  ],
+  "acceptanceLimits": "This evidence establishes the bounded native lifecycle scenario for the identified packed artifact on MapLibre Android and iOS. It does not establish full S04 completion, all native inventory fields, or all six environment acceptance checks.",
+  "sources": [
+    {
+      "subject": "Pinned React wrapper",
+      "url": "https://github.com/maplibre/maplibre-react-native/tree/059f46b2dc728fb6259af91b27a071bcda19a2ae"
+    },
+    {
+      "subject": "Resolved iOS SDK package source",
+      "url": "https://github.com/maplibre/maplibre-gl-native-distribution/blob/13e41ab3d77ff5113e7e5d4ee87803b1f81f5683/Package.swift"
+    },
+    {
+      "subject": "Published frozen React Native package",
+      "url": "https://registry.npmjs.org/react-native/-/react-native-0.87.1.tgz"
+    }
+  ],
+  "environments": {
+    "android": "maplibre-android",
+    "ios": "maplibre-ios"
+  },
+  "currentAcceptance": {
+    "record": "records/evidence/s04-style-cleanup.json",
+    "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+    "status": "passed",
+    "scope": "Current S04 cleanup acceptance is held in the linked record. Earlier observations and unavailable checks in this file remain historical evidence."
+  }
+}

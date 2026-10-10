@@ -1,0 +1,2076 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-08T11:07:24.363227+00:00",
+  "stage": "S04",
+  "status": "Passed stated Mapbox iOS/Android lifecycle subset on same guarded production artifact; broader S04 acceptance remains unverified",
+  "scope": [
+    "real wrapper MapView and Camera mount",
+    "initial embedded style and camera",
+    "native host sizing and resize",
+    "load/style readiness notifications",
+    "map unmount, retained handle invalidation and remount",
+    "pending command failure remains explicit"
+  ],
+  "notEstablished": [
+    "S04 completion across six environments",
+    "Source/Layer facade rendering",
+    "camera getter or movement implementation",
+    "strict controlled camera",
+    "style replacement and recovery",
+    "native load-failure runtime contract",
+    "physical-device behavior",
+    "capture API or independent static rendering"
+  ],
+  "sourceCode": {
+    "files": [
+      {
+        "path": "packages/one-map-react/src/mapbox-native.ts",
+        "sha256": "8a29c8ea0c8d3661dca65eb3cf487f4291788e6622ea1cfab679f0c8ba3c944a"
+      },
+      {
+        "path": "packages/one-map-react/src/adapters/mapbox-native/map.tsx",
+        "sha256": "b7fb5848b2e2199fa45cdb6271cdad3f8f04be7908ed1648c34f77c8e2c58242"
+      },
+      {
+        "path": "packages/one-map-react/src/adapters/mapbox-native/tokens.ts",
+        "sha256": "cfb6b29c0cb2025ec6590ea9cdcca160fd9faeb7d1a1b95eec586408466df4c9"
+      },
+      {
+        "path": "packages/one-map-react/src/adapters/mapbox-native/host.ts",
+        "sha256": "f1d3597c35789e496db9e02cbfa9b2de3d9598f656d0ed310c23a4bf53dc5986"
+      },
+      {
+        "path": "scripts/materialize-native.mjs",
+        "sha256": "e3b9ca3365af058cd75f86572dd3acf513477c21c548d3f5795cd28aeb25ef54"
+      },
+      {
+        "path": "scripts/prepare-native-lifecycle.mjs",
+        "sha256": "6862c0e21308dca7068bb77036dbf61efee531d968feab40e4464d5812e3cbde"
+      },
+      {
+        "path": "examples/native-shared/lifecycle.tsx",
+        "sha256": "17f2bddbc279bfcc55dd2c70c2426fc368c55c9e912578350d2990545ecdc9be"
+      },
+      {
+        "path": "tests/native-runtime/mapbox-lifecycle.yaml",
+        "sha256": "fbe078bf56f2ea472f1efb04c8ebb1b9f7fa8ffdb73e77bb2ee9d46c9094ecda"
+      }
+    ],
+    "limitation": "Source hashes identify current snapshots; packed and installed binary hashes identify code actually exercised."
+  },
+  "package": {
+    "packedArtifact": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/.artifacts/one-map-react-9e98435ff3787f83.tgz",
+    "packedSha256": "9e98435ff3787f836a6d94d60e75e0163bcb8b8c7656f6ef82ef4028f5986acf",
+    "consumer": "/private/tmp/one-map-lifecycle-mapbox-s04-installed",
+    "react": "19.2.3",
+    "reactNative": "0.87.1",
+    "wrapper": {
+      "name": "@rnmapbox/maps",
+      "version": "10.3.7",
+      "sourceRevision": "0f50e8164c1aefe45de9ed9cde310f310076a310"
+    },
+    "installedPeerIsolation": "passed",
+    "oppositePeer": "absent",
+    "artifactVerification": {
+      "status": "passed",
+      "publicationFileCount": 95,
+      "publicationFiles": [
+        {
+          "path": "package.json",
+          "packedSha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e",
+          "installedSha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e"
+        },
+        {
+          "path": "README.md",
+          "packedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "installedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "dist/adapters/lifecycle.d.ts",
+          "packedSha256": "a4e3a12615df0361639e83877743485e68a4c4b37b0f647dc7ba74a34781b9d8",
+          "installedSha256": "a4e3a12615df0361639e83877743485e68a4c4b37b0f647dc7ba74a34781b9d8"
+        },
+        {
+          "path": "dist/adapters/lifecycle.d.ts.map",
+          "packedSha256": "21a84719bf00e998cbd96a7ddc8bc75657c01c84cc535ffd69201069ace4f98c",
+          "installedSha256": "21a84719bf00e998cbd96a7ddc8bc75657c01c84cc535ffd69201069ace4f98c"
+        },
+        {
+          "path": "dist/adapters/lifecycle.js",
+          "packedSha256": "151620c4c4dec428e7a4c64e64889da740ce1711c2d9c882b853e015feeb4cb4",
+          "installedSha256": "151620c4c4dec428e7a4c64e64889da740ce1711c2d9c882b853e015feeb4cb4"
+        },
+        {
+          "path": "dist/adapters/lifecycle.js.map",
+          "packedSha256": "65997c1eb2924df5778cb872fad27581ee3fffed38b3a6bc9faa5794e0466a85",
+          "installedSha256": "65997c1eb2924df5778cb872fad27581ee3fffed38b3a6bc9faa5794e0466a85"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.d.ts",
+          "packedSha256": "54967d9f173615c739481c1b1401c6e69671d058429a4732ba11949914580efb",
+          "installedSha256": "54967d9f173615c739481c1b1401c6e69671d058429a4732ba11949914580efb"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.d.ts.map",
+          "packedSha256": "fce02243d7886d26e863d4932862eb4abc8ab2b826396fef204ecd0a2d127885",
+          "installedSha256": "fce02243d7886d26e863d4932862eb4abc8ab2b826396fef204ecd0a2d127885"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.js",
+          "packedSha256": "0ecfa4bc990907ca2b252121ad527e3bfe577812b62c5c5535e29a446247948d",
+          "installedSha256": "0ecfa4bc990907ca2b252121ad527e3bfe577812b62c5c5535e29a446247948d"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.js.map",
+          "packedSha256": "8befc69c397706bdcce2b314c5660e735dafe357628857e46f1c55b04c6e5461",
+          "installedSha256": "8befc69c397706bdcce2b314c5660e735dafe357628857e46f1c55b04c6e5461"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.d.ts",
+          "packedSha256": "f8be40e4eef527fd1a4367f70284b6419454d34c7ebddc6118f07c754bb128c4",
+          "installedSha256": "f8be40e4eef527fd1a4367f70284b6419454d34c7ebddc6118f07c754bb128c4"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.d.ts.map",
+          "packedSha256": "c355d27db37a4bb52d6de6c5344529c2ce3fdb11b36b39d39aa1e02981c0be22",
+          "installedSha256": "c355d27db37a4bb52d6de6c5344529c2ce3fdb11b36b39d39aa1e02981c0be22"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.js",
+          "packedSha256": "8ddc814f2d50f86f0268ab80cb08bdbd6d981a86ddd5592e8a79ed48a8b9862f",
+          "installedSha256": "8ddc814f2d50f86f0268ab80cb08bdbd6d981a86ddd5592e8a79ed48a8b9862f"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.js.map",
+          "packedSha256": "32dc5d571586a07ab7ce15fd44ed3a56e8e0339b59af1782024a0382fd339064",
+          "installedSha256": "32dc5d571586a07ab7ce15fd44ed3a56e8e0339b59af1782024a0382fd339064"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.d.ts",
+          "packedSha256": "ef10ec725432a6bf1a5c5b76bf41af430dbe2b4c604d10423c06d62172fb56c6",
+          "installedSha256": "ef10ec725432a6bf1a5c5b76bf41af430dbe2b4c604d10423c06d62172fb56c6"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.d.ts.map",
+          "packedSha256": "01779f56c27f2e266bf9b531c1a38d8b86f48d2c142a4a3ae85111ea92a87e2a",
+          "installedSha256": "01779f56c27f2e266bf9b531c1a38d8b86f48d2c142a4a3ae85111ea92a87e2a"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.js",
+          "packedSha256": "f15871bae2f1bd25062ce40b7199d4f22a24788b2feb194bf65acd9369776dbb",
+          "installedSha256": "f15871bae2f1bd25062ce40b7199d4f22a24788b2feb194bf65acd9369776dbb"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.js.map",
+          "packedSha256": "800a1c5d34e7ea574194dbdd20602c7e2e32fd846ff9deeff720451129b10e67",
+          "installedSha256": "800a1c5d34e7ea574194dbdd20602c7e2e32fd846ff9deeff720451129b10e67"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.d.ts",
+          "packedSha256": "5000b6b55eacb948185929d21184bdc100e62c652869936366828e922ec6119d",
+          "installedSha256": "5000b6b55eacb948185929d21184bdc100e62c652869936366828e922ec6119d"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.d.ts.map",
+          "packedSha256": "8fcfdc6619a5e1dea1424a03510993ca74cacd3f423d9b5a2293556f38648f31",
+          "installedSha256": "8fcfdc6619a5e1dea1424a03510993ca74cacd3f423d9b5a2293556f38648f31"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.js",
+          "packedSha256": "d0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1",
+          "installedSha256": "d0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.js.map",
+          "packedSha256": "c6828c3d7cc13d5f68ccfd2d07864d32d4afb00c993d852a19396f36c8d7341a",
+          "installedSha256": "c6828c3d7cc13d5f68ccfd2d07864d32d4afb00c993d852a19396f36c8d7341a"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.d.ts",
+          "packedSha256": "a8c38fe3050524df6b223140f385c4bed0bd1da6b7bed9f6c50a2194f9a66659",
+          "installedSha256": "a8c38fe3050524df6b223140f385c4bed0bd1da6b7bed9f6c50a2194f9a66659"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.d.ts.map",
+          "packedSha256": "77bf751eae8adaa045a2a9056573504ac4c76c63b55cc28a873f3a092bc44808",
+          "installedSha256": "77bf751eae8adaa045a2a9056573504ac4c76c63b55cc28a873f3a092bc44808"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.js",
+          "packedSha256": "0d84c139ad6dc24647629ac191796df082f5ec4ecefcdfdeb00f1456197d613b",
+          "installedSha256": "0d84c139ad6dc24647629ac191796df082f5ec4ecefcdfdeb00f1456197d613b"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.js.map",
+          "packedSha256": "679698aeb7a0642adce772db016b18efe16a71033a5acee7b24451b4254b722b",
+          "installedSha256": "679698aeb7a0642adce772db016b18efe16a71033a5acee7b24451b4254b722b"
+        },
+        {
+          "path": "dist/adapters/selection.d.ts",
+          "packedSha256": "6a9e42526c393525e07f64b4a83713655a41e34f402973b4fa0effce4a5d63e7",
+          "installedSha256": "6a9e42526c393525e07f64b4a83713655a41e34f402973b4fa0effce4a5d63e7"
+        },
+        {
+          "path": "dist/adapters/selection.d.ts.map",
+          "packedSha256": "ecac2607961c315888290ccfebcf8425951834d42e8610bd940a7049baf97eed",
+          "installedSha256": "ecac2607961c315888290ccfebcf8425951834d42e8610bd940a7049baf97eed"
+        },
+        {
+          "path": "dist/adapters/selection.js",
+          "packedSha256": "d09253ef574b1e1cbdd0d2036801228da56cce40313c1706aa5e5848f2753e4b",
+          "installedSha256": "d09253ef574b1e1cbdd0d2036801228da56cce40313c1706aa5e5848f2753e4b"
+        },
+        {
+          "path": "dist/adapters/selection.js.map",
+          "packedSha256": "edd81fc27d0cdff81a97b5812b8b39edc3fb8fa3b637dfae4eec2085c0d6b245",
+          "installedSha256": "edd81fc27d0cdff81a97b5812b8b39edc3fb8fa3b637dfae4eec2085c0d6b245"
+        },
+        {
+          "path": "dist/adapters/web-configuration.d.ts",
+          "packedSha256": "8e464135f76a93a73e1cdf26935740deb4a9c20ef97ab2c2edeb9c295429d7f2",
+          "installedSha256": "8e464135f76a93a73e1cdf26935740deb4a9c20ef97ab2c2edeb9c295429d7f2"
+        },
+        {
+          "path": "dist/adapters/web-configuration.d.ts.map",
+          "packedSha256": "2c25b10cf90172560af7124e570deffbc4d0f121790d4f2f6a7d504a806f3ec8",
+          "installedSha256": "2c25b10cf90172560af7124e570deffbc4d0f121790d4f2f6a7d504a806f3ec8"
+        },
+        {
+          "path": "dist/adapters/web-configuration.js",
+          "packedSha256": "4f1ffdd1615cdbeae29bb5a38e7367aab65e64334cc4b7d307396eed11113f2c",
+          "installedSha256": "4f1ffdd1615cdbeae29bb5a38e7367aab65e64334cc4b7d307396eed11113f2c"
+        },
+        {
+          "path": "dist/adapters/web-configuration.js.map",
+          "packedSha256": "a87188c13cb30b45f9590edcf350c40484fa67c45010034f618351ffce06de8d",
+          "installedSha256": "a87188c13cb30b45f9590edcf350c40484fa67c45010034f618351ffce06de8d"
+        },
+        {
+          "path": "dist/adapters/web.d.ts",
+          "packedSha256": "b4f6c8c91e239600348df3842ca8719d9807974576c3eb0b709ef397c648486f",
+          "installedSha256": "b4f6c8c91e239600348df3842ca8719d9807974576c3eb0b709ef397c648486f"
+        },
+        {
+          "path": "dist/adapters/web.d.ts.map",
+          "packedSha256": "43c1081c2a337de2acc926e801193fb02246a17669976e6cc4d1a5a062de5cc3",
+          "installedSha256": "43c1081c2a337de2acc926e801193fb02246a17669976e6cc4d1a5a062de5cc3"
+        },
+        {
+          "path": "dist/adapters/web.js",
+          "packedSha256": "db7d31c1472696e2a9eac7d3a519c6c3866a46a39c049c32c0139adba0d96d98",
+          "installedSha256": "db7d31c1472696e2a9eac7d3a519c6c3866a46a39c049c32c0139adba0d96d98"
+        },
+        {
+          "path": "dist/adapters/web.js.map",
+          "packedSha256": "e326505aab80e57b3c8e900fd62f4198c9705c9e1f4a788cc8bbe59e26ee4ead",
+          "installedSha256": "e326505aab80e57b3c8e900fd62f4198c9705c9e1f4a788cc8bbe59e26ee4ead"
+        },
+        {
+          "path": "dist/core/capabilities.d.ts",
+          "packedSha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515",
+          "installedSha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515"
+        },
+        {
+          "path": "dist/core/capabilities.d.ts.map",
+          "packedSha256": "4de6d1ea2d40cb336f5ec7caeacb23306b06ca355baaedebf5ca901b28e44968",
+          "installedSha256": "4de6d1ea2d40cb336f5ec7caeacb23306b06ca355baaedebf5ca901b28e44968"
+        },
+        {
+          "path": "dist/core/capabilities.js",
+          "packedSha256": "e1e544eb806c761a3cc589964c9031ee5c0bf29d0cfdc9454da568607bbe48a3",
+          "installedSha256": "e1e544eb806c761a3cc589964c9031ee5c0bf29d0cfdc9454da568607bbe48a3"
+        },
+        {
+          "path": "dist/core/capabilities.js.map",
+          "packedSha256": "d0105b4c2bd5c585a2002812c035e6b9e231865789aa7238f67b7200c0875fc7",
+          "installedSha256": "d0105b4c2bd5c585a2002812c035e6b9e231865789aa7238f67b7200c0875fc7"
+        },
+        {
+          "path": "dist/core/context.d.ts",
+          "packedSha256": "4e29d7e5e4c1342652f81613edf9b06e54285b96cb6d4839ab668de2864d2983",
+          "installedSha256": "4e29d7e5e4c1342652f81613edf9b06e54285b96cb6d4839ab668de2864d2983"
+        },
+        {
+          "path": "dist/core/context.d.ts.map",
+          "packedSha256": "a1d3b9b4bae32ce11f6046e203272579225f9b53ef4a68caf89514817c4fc11a",
+          "installedSha256": "a1d3b9b4bae32ce11f6046e203272579225f9b53ef4a68caf89514817c4fc11a"
+        },
+        {
+          "path": "dist/core/context.js",
+          "packedSha256": "ae581b74ab6f0a53bc372a58a068fa7ac390372a468a87be634a4638b786e075",
+          "installedSha256": "ae581b74ab6f0a53bc372a58a068fa7ac390372a468a87be634a4638b786e075"
+        },
+        {
+          "path": "dist/core/context.js.map",
+          "packedSha256": "3f51f8f3c6ab212d1d20ad2e63b2545925b8495f88a1d13ee9ce5b35273bc6dc",
+          "installedSha256": "3f51f8f3c6ab212d1d20ad2e63b2545925b8495f88a1d13ee9ce5b35273bc6dc"
+        },
+        {
+          "path": "dist/core/errors.d.ts",
+          "packedSha256": "3ac2307e6a8953dac8555e8e500688c54b121b7e0407dfc487cb67611f4994bf",
+          "installedSha256": "3ac2307e6a8953dac8555e8e500688c54b121b7e0407dfc487cb67611f4994bf"
+        },
+        {
+          "path": "dist/core/errors.d.ts.map",
+          "packedSha256": "88f9d736b5e9be319cd63829497dda67f7b5093fe486324dccb4a0a7b97293e4",
+          "installedSha256": "88f9d736b5e9be319cd63829497dda67f7b5093fe486324dccb4a0a7b97293e4"
+        },
+        {
+          "path": "dist/core/errors.js",
+          "packedSha256": "a2dfe1d3e9b8d0e4623cd03dcfbf2c5ce1b45749e7dbeb39db27ce1b5b87b133",
+          "installedSha256": "a2dfe1d3e9b8d0e4623cd03dcfbf2c5ce1b45749e7dbeb39db27ce1b5b87b133"
+        },
+        {
+          "path": "dist/core/errors.js.map",
+          "packedSha256": "40bcacb5d5a160cb821241c0b9e702347bd05bac4d49531ea9c91bbf88f2676e",
+          "installedSha256": "40bcacb5d5a160cb821241c0b9e702347bd05bac4d49531ea9c91bbf88f2676e"
+        },
+        {
+          "path": "dist/core/map-configuration.d.ts",
+          "packedSha256": "cc2adbb9fc8157e8f09a14fb1677ed40681066747e4024619eedf821d4209998",
+          "installedSha256": "cc2adbb9fc8157e8f09a14fb1677ed40681066747e4024619eedf821d4209998"
+        },
+        {
+          "path": "dist/core/map-configuration.d.ts.map",
+          "packedSha256": "39ecffd3aea0a097886cbb2aee71a15e60118ca36373d94b2742f02a8074aea0",
+          "installedSha256": "39ecffd3aea0a097886cbb2aee71a15e60118ca36373d94b2742f02a8074aea0"
+        },
+        {
+          "path": "dist/core/map-configuration.js",
+          "packedSha256": "6ed15e13dcecab9930b52f5be97b2fc1631a5de1188d33fa89ff71fcbac52a86",
+          "installedSha256": "6ed15e13dcecab9930b52f5be97b2fc1631a5de1188d33fa89ff71fcbac52a86"
+        },
+        {
+          "path": "dist/core/map-configuration.js.map",
+          "packedSha256": "299a6d182cf48fc02bfcdc7bb9f6729b3e94ccfaf971c2cfc8d11248a1f9a06c",
+          "installedSha256": "299a6d182cf48fc02bfcdc7bb9f6729b3e94ccfaf971c2cfc8d11248a1f9a06c"
+        },
+        {
+          "path": "dist/core/registry.d.ts",
+          "packedSha256": "fbd38a8d39b6344323ce8eba1a4af8d21946e932c97ddb99d3f9be5f60ae6a10",
+          "installedSha256": "fbd38a8d39b6344323ce8eba1a4af8d21946e932c97ddb99d3f9be5f60ae6a10"
+        },
+        {
+          "path": "dist/core/registry.d.ts.map",
+          "packedSha256": "170fc5cdfb5e2d33a29ff846dbc2be8c50bbb9a2b18c48f7abe6788c252b6c70",
+          "installedSha256": "170fc5cdfb5e2d33a29ff846dbc2be8c50bbb9a2b18c48f7abe6788c252b6c70"
+        },
+        {
+          "path": "dist/core/registry.js",
+          "packedSha256": "b6f3b8a60a8f1807447ee1e8105f6f2598027d856abc1ac265f10e079c8d32b5",
+          "installedSha256": "b6f3b8a60a8f1807447ee1e8105f6f2598027d856abc1ac265f10e079c8d32b5"
+        },
+        {
+          "path": "dist/core/registry.js.map",
+          "packedSha256": "dfa003b938c018d956f1215a52a1a2fd2f53d5dd975a9dbed43dc35b193e55a4",
+          "installedSha256": "dfa003b938c018d956f1215a52a1a2fd2f53d5dd975a9dbed43dc35b193e55a4"
+        },
+        {
+          "path": "dist/core/session.d.ts",
+          "packedSha256": "94b256072b2c33edea489ede1e6c4b2ba6aa7c31f813e329249c579c2f82bb4c",
+          "installedSha256": "94b256072b2c33edea489ede1e6c4b2ba6aa7c31f813e329249c579c2f82bb4c"
+        },
+        {
+          "path": "dist/core/session.d.ts.map",
+          "packedSha256": "73335c06312aa436321fa95e3bbf71ee4ff80c5be81bd7da1be48e249fa30418",
+          "installedSha256": "73335c06312aa436321fa95e3bbf71ee4ff80c5be81bd7da1be48e249fa30418"
+        },
+        {
+          "path": "dist/core/session.js",
+          "packedSha256": "d574f4ab5a3e8f06a1b42401229913780a04b2b098c73ce7fbe2b96fd0b378bb",
+          "installedSha256": "d574f4ab5a3e8f06a1b42401229913780a04b2b098c73ce7fbe2b96fd0b378bb"
+        },
+        {
+          "path": "dist/core/session.js.map",
+          "packedSha256": "c656134a75c612d4e951821e540a7da0d8d67630d0a468016eb6639f2628f370",
+          "installedSha256": "c656134a75c612d4e951821e540a7da0d8d67630d0a468016eb6639f2628f370"
+        },
+        {
+          "path": "dist/core/types.d.ts",
+          "packedSha256": "d5f8323d3c80f0a21b21e00a489327c7b430aee25da4087e7bcf36babbfefbfb",
+          "installedSha256": "d5f8323d3c80f0a21b21e00a489327c7b430aee25da4087e7bcf36babbfefbfb"
+        },
+        {
+          "path": "dist/core/types.d.ts.map",
+          "packedSha256": "ffc39fe07b5b491d2f634baef24d5e39229a02218e1ce908d3557ba7bd96514a",
+          "installedSha256": "ffc39fe07b5b491d2f634baef24d5e39229a02218e1ce908d3557ba7bd96514a"
+        },
+        {
+          "path": "dist/core/types.js",
+          "packedSha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2",
+          "installedSha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2"
+        },
+        {
+          "path": "dist/core/types.js.map",
+          "packedSha256": "b983b4b425e50da613e8903a38b843e3c88824da62e9f3ed2a7ae7fc96c1f8ee",
+          "installedSha256": "b983b4b425e50da613e8903a38b843e3c88824da62e9f3ed2a7ae7fc96c1f8ee"
+        },
+        {
+          "path": "dist/core/validation.d.ts",
+          "packedSha256": "66881ecb5cf408b3255fe92d7ef8bd25b6d8588983a822e2c6014751d256c4bc",
+          "installedSha256": "66881ecb5cf408b3255fe92d7ef8bd25b6d8588983a822e2c6014751d256c4bc"
+        },
+        {
+          "path": "dist/core/validation.d.ts.map",
+          "packedSha256": "d9b1d704bf764725eeec6820b9c84a8a9e5aeea1b8521b28ba056324f6da303a",
+          "installedSha256": "d9b1d704bf764725eeec6820b9c84a8a9e5aeea1b8521b28ba056324f6da303a"
+        },
+        {
+          "path": "dist/core/validation.js",
+          "packedSha256": "44eec1a17398cd80115fc5ab98037a2280ceaf003d28278830d9a60203ffa176",
+          "installedSha256": "44eec1a17398cd80115fc5ab98037a2280ceaf003d28278830d9a60203ffa176"
+        },
+        {
+          "path": "dist/core/validation.js.map",
+          "packedSha256": "362a9126f0af209af9a5745b070fa8d723132cc3a64ada5eb885f97623a490db",
+          "installedSha256": "362a9126f0af209af9a5745b070fa8d723132cc3a64ada5eb885f97623a490db"
+        },
+        {
+          "path": "dist/index.d.ts",
+          "packedSha256": "5ca15fc5f235d97e3bb4b4d28a58d0672b344b8e9988fb7b55d3f7dae88afe90",
+          "installedSha256": "5ca15fc5f235d97e3bb4b4d28a58d0672b344b8e9988fb7b55d3f7dae88afe90"
+        },
+        {
+          "path": "dist/index.d.ts.map",
+          "packedSha256": "6684475972e01ce0ac0e05a6d5a848714f5ba539218c2630dadceac10d96235c",
+          "installedSha256": "6684475972e01ce0ac0e05a6d5a848714f5ba539218c2630dadceac10d96235c"
+        },
+        {
+          "path": "dist/index.js",
+          "packedSha256": "1a508f98ff95e4bb0a1dc9684843cdc8d2a87027e068360d2cc2b0a539863b65",
+          "installedSha256": "1a508f98ff95e4bb0a1dc9684843cdc8d2a87027e068360d2cc2b0a539863b65"
+        },
+        {
+          "path": "dist/index.js.map",
+          "packedSha256": "6e96bc14ef7c441204664128f61b8d042337ff8377ed55229d5111eebf1a4bd6",
+          "installedSha256": "6e96bc14ef7c441204664128f61b8d042337ff8377ed55229d5111eebf1a4bd6"
+        },
+        {
+          "path": "dist/mapbox-native.d.ts",
+          "packedSha256": "9ca58aa3bb5f22025184dbb554abd359f1e4e8feeac137d82594b3436d0dba1b",
+          "installedSha256": "9ca58aa3bb5f22025184dbb554abd359f1e4e8feeac137d82594b3436d0dba1b"
+        },
+        {
+          "path": "dist/mapbox-native.d.ts.map",
+          "packedSha256": "84ee1377b1f3be74807f4379e2fb8beead13378afbc7e75e02418b53caa038fa",
+          "installedSha256": "84ee1377b1f3be74807f4379e2fb8beead13378afbc7e75e02418b53caa038fa"
+        },
+        {
+          "path": "dist/mapbox-native.js",
+          "packedSha256": "7f45080de9a031be16ad9e8188f6d663f57adaa28754d17afaa116c173835887",
+          "installedSha256": "7f45080de9a031be16ad9e8188f6d663f57adaa28754d17afaa116c173835887"
+        },
+        {
+          "path": "dist/mapbox-native.js.map",
+          "packedSha256": "2f78bc2b57ba0109b3657b80e39949278b1e83ada866a4208d8c9e56ed21660f",
+          "installedSha256": "2f78bc2b57ba0109b3657b80e39949278b1e83ada866a4208d8c9e56ed21660f"
+        },
+        {
+          "path": "dist/mapbox-web.d.ts",
+          "packedSha256": "3c79cd5a6c8816ec78417b43c2dda709d421334c58dbf745882631e0881d8349",
+          "installedSha256": "3c79cd5a6c8816ec78417b43c2dda709d421334c58dbf745882631e0881d8349"
+        },
+        {
+          "path": "dist/mapbox-web.d.ts.map",
+          "packedSha256": "e82bd21f6e5551b8853ed8bc0dc42c7466abedd9d2dc74e6809051c012a3c335",
+          "installedSha256": "e82bd21f6e5551b8853ed8bc0dc42c7466abedd9d2dc74e6809051c012a3c335"
+        },
+        {
+          "path": "dist/mapbox-web.js",
+          "packedSha256": "2c682f9cf6931e413e836bacaf88dc6256b99c4fc9d73291aa15db7847640026",
+          "installedSha256": "2c682f9cf6931e413e836bacaf88dc6256b99c4fc9d73291aa15db7847640026"
+        },
+        {
+          "path": "dist/mapbox-web.js.map",
+          "packedSha256": "1d0758a16d7f2247c5391595a20836f59e4478a82bc000d5e451ecd94de0e85e",
+          "installedSha256": "1d0758a16d7f2247c5391595a20836f59e4478a82bc000d5e451ecd94de0e85e"
+        },
+        {
+          "path": "dist/maplibre-native.d.ts",
+          "packedSha256": "e4a3d9d99053d4633931443d0f2e85f6da1e5b5b7241c60d8a2b1c4f5e2006d5",
+          "installedSha256": "e4a3d9d99053d4633931443d0f2e85f6da1e5b5b7241c60d8a2b1c4f5e2006d5"
+        },
+        {
+          "path": "dist/maplibre-native.d.ts.map",
+          "packedSha256": "68c5c0302e5e6671db1e22de6f694190741ea5b259d88132f3d642f0fbe8fe4c",
+          "installedSha256": "68c5c0302e5e6671db1e22de6f694190741ea5b259d88132f3d642f0fbe8fe4c"
+        },
+        {
+          "path": "dist/maplibre-native.js",
+          "packedSha256": "91fa46ad18b0a200ea60942ec9738a92147a2c450305216a8cb84f50414faa1f",
+          "installedSha256": "91fa46ad18b0a200ea60942ec9738a92147a2c450305216a8cb84f50414faa1f"
+        },
+        {
+          "path": "dist/maplibre-native.js.map",
+          "packedSha256": "9e68cf08390ff60e4562d0c0b8256961668c287af00adc8f6c33c19a02373076",
+          "installedSha256": "9e68cf08390ff60e4562d0c0b8256961668c287af00adc8f6c33c19a02373076"
+        },
+        {
+          "path": "dist/maplibre-web.d.ts",
+          "packedSha256": "335fe999752c69aaecb0ed18b87e3693d652ca63b1e155ac297e8844cc86a0fe",
+          "installedSha256": "335fe999752c69aaecb0ed18b87e3693d652ca63b1e155ac297e8844cc86a0fe"
+        },
+        {
+          "path": "dist/maplibre-web.d.ts.map",
+          "packedSha256": "f57121a9e4fb2b4be645953cdc682f309826e060c8a51de024930e970951ba5d",
+          "installedSha256": "f57121a9e4fb2b4be645953cdc682f309826e060c8a51de024930e970951ba5d"
+        },
+        {
+          "path": "dist/maplibre-web.js",
+          "packedSha256": "9d4f8a8c6d2cd65e13d300f3120b8cfa9768baadaecb8574e35df5165f79a048",
+          "installedSha256": "9d4f8a8c6d2cd65e13d300f3120b8cfa9768baadaecb8574e35df5165f79a048"
+        },
+        {
+          "path": "dist/maplibre-web.js.map",
+          "packedSha256": "0d44197e961ff8f8f111e640c4aede57d0946e100dcae791faaadcd405c1bf4d",
+          "installedSha256": "0d44197e961ff8f8f111e640c4aede57d0946e100dcae791faaadcd405c1bf4d"
+        },
+        {
+          "path": "dist/metro-web-assets.cjs",
+          "packedSha256": "0d6773b5551355cbe6e04dba10b328c04e4d33079787e3b520ff2cdcec527636",
+          "installedSha256": "0d6773b5551355cbe6e04dba10b328c04e4d33079787e3b520ff2cdcec527636"
+        },
+        {
+          "path": "dist/metro-web-assets.d.cts",
+          "packedSha256": "b4185e51b802bfabe893da3056b67fbfbec953fb1f8e99e0dde1b8851eb2cb24",
+          "installedSha256": "b4185e51b802bfabe893da3056b67fbfbec953fb1f8e99e0dde1b8851eb2cb24"
+        },
+        {
+          "path": "dist/metro-web-transformer.cjs",
+          "packedSha256": "ce7901558a50182b43f0a7e7e47a22d6b8f7942a221e5fd1b41820c5ca768db4",
+          "installedSha256": "ce7901558a50182b43f0a7e7e47a22d6b8f7942a221e5fd1b41820c5ca768db4"
+        },
+        {
+          "path": "dist/metro-web.cjs",
+          "packedSha256": "6eec01548bf97274edecc15574d087a86a640b0963ae2d49ab83307c84f532c2",
+          "installedSha256": "6eec01548bf97274edecc15574d087a86a640b0963ae2d49ab83307c84f532c2"
+        },
+        {
+          "path": "dist/metro-web.d.cts",
+          "packedSha256": "95d29dc17128cbca1faa91319497ed5cbd6944e26aecd8f595be97b102e80d5e",
+          "installedSha256": "95d29dc17128cbca1faa91319497ed5cbd6944e26aecd8f595be97b102e80d5e"
+        }
+      ],
+      "buildReport": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791457156163/report.json"
+    },
+    "javascriptDependencyGraph": {
+      "status": "passed on selected packed native consumer",
+      "sourceCount": 688,
+      "selectedWrapperSourceCount": 128,
+      "oppositeWrapperSourceCount": 0,
+      "report": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-1791456921835/source-graph.json",
+      "limitation": "Actual Android Release source map establishes selected JavaScript graph; iOS installed embedded bundle identity verified separately."
+    },
+    "credentials": {
+      "runtimeEnvironmentVariable": "MAPBOX_PUBLIC_TOKEN",
+      "runtimeTokenPresent": true,
+      "libraryReadsEnvironment": false,
+      "generatedCredentialFileCommitted": false,
+      "generatedCredentialFileMode": "0600",
+      "additionalSDKDownloadCredential": "not requested for successful pinned CocoaPods install or anonymous Mapbox Maven download; download-token environment cleared and Gradle properties absent",
+      "logs": "credential patterns redacted"
+    },
+    "artifactNotes": [
+      "Unique content-hash tarball filename avoids Bun reuse of stale local tarball cache entry.",
+      "Both current native runtime runs use this exact95-file artifact; final release conformance must rerun the eventual release artifact."
+    ]
+  },
+  "ios": {
+    "status": "passed for stated lifecycle subset",
+    "device": {
+      "name": "iPhone 18 Pro",
+      "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "runtime": "iOS27.0",
+      "kind": "simulator"
+    },
+    "toolchain": {
+      "xcode": "27.0",
+      "buildVersion": "27A266a",
+      "maestro": "2.11.0"
+    },
+    "configuration": "Release",
+    "applicationId": "com.onemap.harness.mapbox",
+    "marker": "mapbox-9e98435ff3787f836a6d94d60e75e0163bcb8b8c7656f6ef82ef4028f5986acf-358b334d81cb9087f80ff84d6158ba2a9514342eebb7e11a0541ba840025652a",
+    "executableSha256": "3099169dc097f3145c784489fc68283be3af7781d28d26bbe1d2d7467017cf38",
+    "embeddedBundleSha256": "035e46da40a05addcd1dd9aff43edb6279325a97e92475b673d9bbaea2db6bd2",
+    "installation": "executable and embedded bundle hashes verified",
+    "buildReport": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791457156163/report.json",
+    "podLockSha256": "6fe1b7d55d0ca852b7dff1218914393dc8b64c2ce88448d9a0e52f36a660c3f8",
+    "nativeDependencyGraph": "MapboxMaps 11.23.1, MapboxCoreMaps 11.23.1, MapboxCommon 24.23.1; no MapLibre in pod lock",
+    "binaryDependencyIsolation": "all app framework Mach-O dependency lists inspected; Mapbox framework trio present, no MapLibre in bundle or links",
+    "frameworks": [
+      {
+        "name": "MapboxCommon",
+        "executableSha256": "016d3809ee2cc6a6fb59c0def8181c2c9513d70e7733c0273d76eaabb5736d2a",
+        "bundleId": "com.mapbox.common",
+        "version": "24.23.1"
+      },
+      {
+        "name": "MapboxCoreMaps",
+        "executableSha256": "4dfe3163bee3393a0488bc3fd7573dfbd8b3eeb4f51d4746977733accc352c37",
+        "bundleId": "com.mapbox.maps",
+        "version": "11.23.1"
+      },
+      {
+        "name": "MapboxMaps",
+        "executableSha256": "bcc1bdcd1c5de608ad590568a1c2be8c234e4c5b7c859c96d0dc5170145d019d",
+        "bundleId": "org.cocoapods.MapboxMaps",
+        "version": "11.23.1"
+      },
+      {
+        "name": "React",
+        "executableSha256": "a0e2c58102ccd4ed9bebec6c4694123335535191c312acdc34ac736c97eb4cd8",
+        "bundleId": "react-native.React",
+        "version": "1.0"
+      },
+      {
+        "name": "ReactNativeDependencies",
+        "executableSha256": "8e58d70fc8f35d8d3ae5c11ec354ec1d2ba7cde624182e33953792ab77f0313f",
+        "bundleId": "third-party.ReactNativeDependencies",
+        "version": "1.0"
+      },
+      {
+        "name": "Turf",
+        "executableSha256": "e1641ce58eda9910f4cd3a3daae42be6abd3abf1b575bcbc133adab6414dfeb1",
+        "bundleId": "com.mapbox.turf",
+        "version": "4.0.0"
+      },
+      {
+        "name": "hermesvm",
+        "executableSha256": "956af81e233d1ec4310a65d87c298d842093d18a053ffc6061ab1d32aa25a1a5",
+        "bundleId": "dev.hermesengine.iphonesimulator",
+        "version": "1.0.0"
+      }
+    ],
+    "completeBinaryInspection": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791457156163/binary-inspection.json",
+    "preservedApp": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-derived-data/Build/Products/Release-iphonesimulator/OneMapMapbox.app",
+    "appArchive": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791457156163/OneMapMapbox-Release-simulator.tgz",
+    "appArchiveSha256": "bed2628a9c1b319e612664f323d500455e93070466150429da1e1256cc9e2ff0",
+    "hostSourceHashes": {
+      "AppDelegate.swift": "2cb482922b8e32ae09e36f69c029828f935d88f9d44e8c14df2fe45b8386f5d0",
+      "Info.plist": "97f47a1a641a70c5183458641fbd6cb99a4184dab507ab14211756e69d88b4c8"
+    },
+    "hostAdaptations": {
+      "deploymentFloor": "Generated pod targets below React Native minimum raised to15.1; SDK versions unchanged.",
+      "sceneLifecycle": "SceneDelegate owns UIWindow(windowScene:); application retains factory/delegate/launch options; built Info.plist declares OneMapMapbox.SceneDelegate and a single scene.",
+      "reference": "https://developer.apple.com/documentation/uikit/transitioning-to-the-uikit-scene-based-life-cycle"
+    },
+    "runtime": {
+      "status": "passed",
+      "suite": "Mapbox lifecycle from packed one-map-react",
+      "durationSeconds": 22.763,
+      "junit": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-production-camera/junit.xml",
+      "artifacts": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-production-camera",
+      "flow": "tests/native-runtime/mapbox-lifecycle.yaml",
+      "flowSha256": "fbe078bf56f2ea472f1efb04c8ebb1b9f7fa8ffdb73e77bb2ee9d46c9094ecda",
+      "checks": {
+        "currentReleaseMarker": "passed",
+        "initialLoadAndStyleEvents": "passed (1 each)",
+        "readiness": "passed (true after map load and internal initial dispatch)",
+        "beforeLoadGetter": "passed (MapNotReadyError)",
+        "hostSize": "passed (370 x 219.999969 to 370 x 360.000031; half-unit tolerance)",
+        "readyGetter": "passed (expected MapBackendError for pending getZoom)",
+        "unmountRetainedGetter": "passed (MapNotReadyError)",
+        "unmountedReadiness": "passed (false)",
+        "remount": "passed (ready true; load 2/style 2)",
+        "errorLog": "passed (none observed)",
+        "renderedRoute": "passed by manual visual inspection of initial and enlarged remount screenshots"
+      },
+      "screenshots": [
+        {
+          "path": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-production-camera/2026-10-08_040443/Mapbox lifecycle from packed one-map-react/takeScreenshot/mapbox-initial-route.png",
+          "sha256": "28b5513c7b7115aed430f28cb3e28f6bd73a9099c8db621541c7cd906bb7b55d"
+        },
+        {
+          "path": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-production-camera/2026-10-08_040443/Mapbox lifecycle from packed one-map-react/takeScreenshot/mapbox-remounted-route.png",
+          "sha256": "78dc29ea460271e3b67c8f5b016b2173fa0e1ab657ab21cdcee6559245629115"
+        }
+      ],
+      "measurementNote": "Native layout may differ by a fraction of a logical unit; flow accepts half-unit rounding tolerance."
+    },
+    "packageSha256": "9e98435ff3787f836a6d94d60e75e0163bcb8b8c7656f6ef82ef4028f5986acf"
+  },
+  "android": {
+    "status": "passed for stated lifecycle subset on guarded production artifact",
+    "device": {
+      "serial": "emulator-5554",
+      "kind": "emulator",
+      "android": "17",
+      "api": 37
+    },
+    "configuration": "Release",
+    "architecture": "arm64-v8a",
+    "applicationId": "com.onemap.harness.mapbox",
+    "marker": "mapbox-9e98435ff3787f836a6d94d60e75e0163bcb8b8c7656f6ef82ef4028f5986acf-358b334d81cb9087f80ff84d6158ba2a9514342eebb7e11a0541ba840025652a",
+    "build": "passed",
+    "buildReport": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-1791456921835/report.json",
+    "binarySha256": "2b5e5ab20ce0d8180f0e251afa8aa68a8d4b842c6c03c03bf2cdc957a01c2ab0",
+    "embeddedBundleSha256": "ac2b604ad86ce79cc9ff542e82c1310c75cfe4f25cae89bb9108ae053c969fdd",
+    "installation": "installed APK hash verified",
+    "nativeDependencyGraph": "Mapbox android-ndk27:11.23.1, common-ndk27:24.23.1, turf:6.11.0; no MapLibre",
+    "binaryDependencyIsolation": "passed",
+    "completeBinaryInspection": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-1791456921835/binary-inspection.json",
+    "preservedAPK": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-1791456921835/installed.apk",
+    "anonymousSDKDownload": "passed with download-token environment cleared and Gradle properties absent",
+    "runtime": {
+      "status": "passed",
+      "junit": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-android-production-camera/junit.xml",
+      "durationSeconds": 25.361,
+      "flow": "tests/native-runtime/mapbox-lifecycle.yaml",
+      "flowSha256": "fbe078bf56f2ea472f1efb04c8ebb1b9f7fa8ffdb73e77bb2ee9d46c9094ecda",
+      "checks": {
+        "currentReleaseMarker": "passed",
+        "readinessAndLoadStyle": "passed (true; load and style 1 to 2 each)",
+        "beforeLoadGetter": "passed (MapNotReadyError)",
+        "hostResize": "passed (379.428558 x 220.190460 to 379.428558 x 360.000031; half-unit tolerance)",
+        "readyGetter": "passed (expected MapBackendError for pending getZoom)",
+        "unmountRetainedGetter": "passed (MapNotReadyError)",
+        "unmountedReadiness": "passed (false)",
+        "remount": "passed (ready true; load 2/style 2)",
+        "renderedRoute": "passed by manual review of initial and enlarged remount screenshots",
+        "errorLog": "passed (none observed)"
+      },
+      "screenshots": [
+        {
+          "path": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-android-production-camera/2026-10-08_035644/Mapbox lifecycle from packed one-map-react/takeScreenshot/mapbox-initial-route.png",
+          "sha256": "f5d25bb8eaa9d8eb6cfea9eba07aff8af9c4894fb6e5daf2cffc835655e875b5"
+        },
+        {
+          "path": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-android-production-camera/2026-10-08_035644/Mapbox lifecycle from packed one-map-react/takeScreenshot/mapbox-remounted-route.png",
+          "sha256": "33267f1ba52565286b19caaf8d69cfc7575a42759dc05c9388a659d6efdbd076"
+        }
+      ],
+      "nativeLoadFailureAndPhysicalDevice": "unverified"
+    },
+    "diagnosticInvestigation": {
+      "scope": "temporary consumer-only installed file modification, excluded from packed conformance",
+      "identity": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-diagnostic-remount/diagnostic-identity.json",
+      "originalObservations": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-diagnostic-remount/observations.json",
+      "correctedObservations": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-diagnostic-remount/observations-camera-rerun.json",
+      "originalCenter": [-122.34, 47.040182144806664],
+      "requestedAndCorrectedCenter": [-122.34, 47.61],
+      "zoom": 12,
+      "originalLoadedSourceCount": 1,
+      "originalRenderedCount": 0,
+      "correctedLoadedSourceCount": 3,
+      "correctedRenderedCount": 2,
+      "sourceGeometry": "Route remains near latitude 47.61; loaded-data counts preserve SDK duplicates.",
+      "conclusion": "Observed remount failure is camera initialization, not missing embedded source. Exact native layout timing mechanism is inferred from wrapper attach-time defaultStop implementation.",
+      "reference": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt#L99",
+      "runtimeArtifacts": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-android-diagnostic-camera",
+      "productionChange": "wait for active/configured refs, map load and positive finite host layout; one internal initial camera dispatch before ready/onLoad acceptance; retain initial-only props",
+      "productionStaticChecks": "Passed TypeScript, Biome and 3 native suites (33 tests)",
+      "productionRuntime": "Passed on verified packed Android (25.361 seconds) and iOS (22.763 seconds) with artifact 9e98435ff3787f836a6d94d60e75e0163bcb8b8c7656f6ef82ef4028f5986acf",
+      "originalInstalledLibraryRestoration": "Original87publication files restored and verified; then95file guarded production artifact installed/verified on both native consumers and current simulator/emulator apps."
+    },
+    "package": {
+      "packedArtifact": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/.artifacts/one-map-react-9e98435ff3787f83.tgz",
+      "packedSha256": "9e98435ff3787f836a6d94d60e75e0163bcb8b8c7656f6ef82ef4028f5986acf",
+      "artifactVerification": "passed",
+      "publicationFileCount": 95,
+      "publicationFiles": [
+        {
+          "path": "package.json",
+          "packedSha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e",
+          "installedSha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e"
+        },
+        {
+          "path": "README.md",
+          "packedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "installedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "dist/adapters/lifecycle.d.ts",
+          "packedSha256": "a4e3a12615df0361639e83877743485e68a4c4b37b0f647dc7ba74a34781b9d8",
+          "installedSha256": "a4e3a12615df0361639e83877743485e68a4c4b37b0f647dc7ba74a34781b9d8"
+        },
+        {
+          "path": "dist/adapters/lifecycle.d.ts.map",
+          "packedSha256": "21a84719bf00e998cbd96a7ddc8bc75657c01c84cc535ffd69201069ace4f98c",
+          "installedSha256": "21a84719bf00e998cbd96a7ddc8bc75657c01c84cc535ffd69201069ace4f98c"
+        },
+        {
+          "path": "dist/adapters/lifecycle.js",
+          "packedSha256": "151620c4c4dec428e7a4c64e64889da740ce1711c2d9c882b853e015feeb4cb4",
+          "installedSha256": "151620c4c4dec428e7a4c64e64889da740ce1711c2d9c882b853e015feeb4cb4"
+        },
+        {
+          "path": "dist/adapters/lifecycle.js.map",
+          "packedSha256": "65997c1eb2924df5778cb872fad27581ee3fffed38b3a6bc9faa5794e0466a85",
+          "installedSha256": "65997c1eb2924df5778cb872fad27581ee3fffed38b3a6bc9faa5794e0466a85"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.d.ts",
+          "packedSha256": "54967d9f173615c739481c1b1401c6e69671d058429a4732ba11949914580efb",
+          "installedSha256": "54967d9f173615c739481c1b1401c6e69671d058429a4732ba11949914580efb"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.d.ts.map",
+          "packedSha256": "fce02243d7886d26e863d4932862eb4abc8ab2b826396fef204ecd0a2d127885",
+          "installedSha256": "fce02243d7886d26e863d4932862eb4abc8ab2b826396fef204ecd0a2d127885"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.js",
+          "packedSha256": "0ecfa4bc990907ca2b252121ad527e3bfe577812b62c5c5535e29a446247948d",
+          "installedSha256": "0ecfa4bc990907ca2b252121ad527e3bfe577812b62c5c5535e29a446247948d"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/host.js.map",
+          "packedSha256": "8befc69c397706bdcce2b314c5660e735dafe357628857e46f1c55b04c6e5461",
+          "installedSha256": "8befc69c397706bdcce2b314c5660e735dafe357628857e46f1c55b04c6e5461"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.d.ts",
+          "packedSha256": "f8be40e4eef527fd1a4367f70284b6419454d34c7ebddc6118f07c754bb128c4",
+          "installedSha256": "f8be40e4eef527fd1a4367f70284b6419454d34c7ebddc6118f07c754bb128c4"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.d.ts.map",
+          "packedSha256": "c355d27db37a4bb52d6de6c5344529c2ce3fdb11b36b39d39aa1e02981c0be22",
+          "installedSha256": "c355d27db37a4bb52d6de6c5344529c2ce3fdb11b36b39d39aa1e02981c0be22"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.js",
+          "packedSha256": "8ddc814f2d50f86f0268ab80cb08bdbd6d981a86ddd5592e8a79ed48a8b9862f",
+          "installedSha256": "8ddc814f2d50f86f0268ab80cb08bdbd6d981a86ddd5592e8a79ed48a8b9862f"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/map.js.map",
+          "packedSha256": "32dc5d571586a07ab7ce15fd44ed3a56e8e0339b59af1782024a0382fd339064",
+          "installedSha256": "32dc5d571586a07ab7ce15fd44ed3a56e8e0339b59af1782024a0382fd339064"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.d.ts",
+          "packedSha256": "ef10ec725432a6bf1a5c5b76bf41af430dbe2b4c604d10423c06d62172fb56c6",
+          "installedSha256": "ef10ec725432a6bf1a5c5b76bf41af430dbe2b4c604d10423c06d62172fb56c6"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.d.ts.map",
+          "packedSha256": "01779f56c27f2e266bf9b531c1a38d8b86f48d2c142a4a3ae85111ea92a87e2a",
+          "installedSha256": "01779f56c27f2e266bf9b531c1a38d8b86f48d2c142a4a3ae85111ea92a87e2a"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.js",
+          "packedSha256": "f15871bae2f1bd25062ce40b7199d4f22a24788b2feb194bf65acd9369776dbb",
+          "installedSha256": "f15871bae2f1bd25062ce40b7199d4f22a24788b2feb194bf65acd9369776dbb"
+        },
+        {
+          "path": "dist/adapters/mapbox-native/tokens.js.map",
+          "packedSha256": "800a1c5d34e7ea574194dbdd20602c7e2e32fd846ff9deeff720451129b10e67",
+          "installedSha256": "800a1c5d34e7ea574194dbdd20602c7e2e32fd846ff9deeff720451129b10e67"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.d.ts",
+          "packedSha256": "5000b6b55eacb948185929d21184bdc100e62c652869936366828e922ec6119d",
+          "installedSha256": "5000b6b55eacb948185929d21184bdc100e62c652869936366828e922ec6119d"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.d.ts.map",
+          "packedSha256": "8fcfdc6619a5e1dea1424a03510993ca74cacd3f423d9b5a2293556f38648f31",
+          "installedSha256": "8fcfdc6619a5e1dea1424a03510993ca74cacd3f423d9b5a2293556f38648f31"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.js",
+          "packedSha256": "d0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1",
+          "installedSha256": "d0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/Map.js.map",
+          "packedSha256": "c6828c3d7cc13d5f68ccfd2d07864d32d4afb00c993d852a19396f36c8d7341a",
+          "installedSha256": "c6828c3d7cc13d5f68ccfd2d07864d32d4afb00c993d852a19396f36c8d7341a"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.d.ts",
+          "packedSha256": "a8c38fe3050524df6b223140f385c4bed0bd1da6b7bed9f6c50a2194f9a66659",
+          "installedSha256": "a8c38fe3050524df6b223140f385c4bed0bd1da6b7bed9f6c50a2194f9a66659"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.d.ts.map",
+          "packedSha256": "77bf751eae8adaa045a2a9056573504ac4c76c63b55cc28a873f3a092bc44808",
+          "installedSha256": "77bf751eae8adaa045a2a9056573504ac4c76c63b55cc28a873f3a092bc44808"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.js",
+          "packedSha256": "0d84c139ad6dc24647629ac191796df082f5ec4ecefcdfdeb00f1456197d613b",
+          "installedSha256": "0d84c139ad6dc24647629ac191796df082f5ec4ecefcdfdeb00f1456197d613b"
+        },
+        {
+          "path": "dist/adapters/maplibre-native/host-props.js.map",
+          "packedSha256": "679698aeb7a0642adce772db016b18efe16a71033a5acee7b24451b4254b722b",
+          "installedSha256": "679698aeb7a0642adce772db016b18efe16a71033a5acee7b24451b4254b722b"
+        },
+        {
+          "path": "dist/adapters/selection.d.ts",
+          "packedSha256": "6a9e42526c393525e07f64b4a83713655a41e34f402973b4fa0effce4a5d63e7",
+          "installedSha256": "6a9e42526c393525e07f64b4a83713655a41e34f402973b4fa0effce4a5d63e7"
+        },
+        {
+          "path": "dist/adapters/selection.d.ts.map",
+          "packedSha256": "ecac2607961c315888290ccfebcf8425951834d42e8610bd940a7049baf97eed",
+          "installedSha256": "ecac2607961c315888290ccfebcf8425951834d42e8610bd940a7049baf97eed"
+        },
+        {
+          "path": "dist/adapters/selection.js",
+          "packedSha256": "d09253ef574b1e1cbdd0d2036801228da56cce40313c1706aa5e5848f2753e4b",
+          "installedSha256": "d09253ef574b1e1cbdd0d2036801228da56cce40313c1706aa5e5848f2753e4b"
+        },
+        {
+          "path": "dist/adapters/selection.js.map",
+          "packedSha256": "edd81fc27d0cdff81a97b5812b8b39edc3fb8fa3b637dfae4eec2085c0d6b245",
+          "installedSha256": "edd81fc27d0cdff81a97b5812b8b39edc3fb8fa3b637dfae4eec2085c0d6b245"
+        },
+        {
+          "path": "dist/adapters/web-configuration.d.ts",
+          "packedSha256": "8e464135f76a93a73e1cdf26935740deb4a9c20ef97ab2c2edeb9c295429d7f2",
+          "installedSha256": "8e464135f76a93a73e1cdf26935740deb4a9c20ef97ab2c2edeb9c295429d7f2"
+        },
+        {
+          "path": "dist/adapters/web-configuration.d.ts.map",
+          "packedSha256": "2c25b10cf90172560af7124e570deffbc4d0f121790d4f2f6a7d504a806f3ec8",
+          "installedSha256": "2c25b10cf90172560af7124e570deffbc4d0f121790d4f2f6a7d504a806f3ec8"
+        },
+        {
+          "path": "dist/adapters/web-configuration.js",
+          "packedSha256": "4f1ffdd1615cdbeae29bb5a38e7367aab65e64334cc4b7d307396eed11113f2c",
+          "installedSha256": "4f1ffdd1615cdbeae29bb5a38e7367aab65e64334cc4b7d307396eed11113f2c"
+        },
+        {
+          "path": "dist/adapters/web-configuration.js.map",
+          "packedSha256": "a87188c13cb30b45f9590edcf350c40484fa67c45010034f618351ffce06de8d",
+          "installedSha256": "a87188c13cb30b45f9590edcf350c40484fa67c45010034f618351ffce06de8d"
+        },
+        {
+          "path": "dist/adapters/web.d.ts",
+          "packedSha256": "b4f6c8c91e239600348df3842ca8719d9807974576c3eb0b709ef397c648486f",
+          "installedSha256": "b4f6c8c91e239600348df3842ca8719d9807974576c3eb0b709ef397c648486f"
+        },
+        {
+          "path": "dist/adapters/web.d.ts.map",
+          "packedSha256": "43c1081c2a337de2acc926e801193fb02246a17669976e6cc4d1a5a062de5cc3",
+          "installedSha256": "43c1081c2a337de2acc926e801193fb02246a17669976e6cc4d1a5a062de5cc3"
+        },
+        {
+          "path": "dist/adapters/web.js",
+          "packedSha256": "db7d31c1472696e2a9eac7d3a519c6c3866a46a39c049c32c0139adba0d96d98",
+          "installedSha256": "db7d31c1472696e2a9eac7d3a519c6c3866a46a39c049c32c0139adba0d96d98"
+        },
+        {
+          "path": "dist/adapters/web.js.map",
+          "packedSha256": "e326505aab80e57b3c8e900fd62f4198c9705c9e1f4a788cc8bbe59e26ee4ead",
+          "installedSha256": "e326505aab80e57b3c8e900fd62f4198c9705c9e1f4a788cc8bbe59e26ee4ead"
+        },
+        {
+          "path": "dist/core/capabilities.d.ts",
+          "packedSha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515",
+          "installedSha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515"
+        },
+        {
+          "path": "dist/core/capabilities.d.ts.map",
+          "packedSha256": "4de6d1ea2d40cb336f5ec7caeacb23306b06ca355baaedebf5ca901b28e44968",
+          "installedSha256": "4de6d1ea2d40cb336f5ec7caeacb23306b06ca355baaedebf5ca901b28e44968"
+        },
+        {
+          "path": "dist/core/capabilities.js",
+          "packedSha256": "e1e544eb806c761a3cc589964c9031ee5c0bf29d0cfdc9454da568607bbe48a3",
+          "installedSha256": "e1e544eb806c761a3cc589964c9031ee5c0bf29d0cfdc9454da568607bbe48a3"
+        },
+        {
+          "path": "dist/core/capabilities.js.map",
+          "packedSha256": "d0105b4c2bd5c585a2002812c035e6b9e231865789aa7238f67b7200c0875fc7",
+          "installedSha256": "d0105b4c2bd5c585a2002812c035e6b9e231865789aa7238f67b7200c0875fc7"
+        },
+        {
+          "path": "dist/core/context.d.ts",
+          "packedSha256": "4e29d7e5e4c1342652f81613edf9b06e54285b96cb6d4839ab668de2864d2983",
+          "installedSha256": "4e29d7e5e4c1342652f81613edf9b06e54285b96cb6d4839ab668de2864d2983"
+        },
+        {
+          "path": "dist/core/context.d.ts.map",
+          "packedSha256": "a1d3b9b4bae32ce11f6046e203272579225f9b53ef4a68caf89514817c4fc11a",
+          "installedSha256": "a1d3b9b4bae32ce11f6046e203272579225f9b53ef4a68caf89514817c4fc11a"
+        },
+        {
+          "path": "dist/core/context.js",
+          "packedSha256": "ae581b74ab6f0a53bc372a58a068fa7ac390372a468a87be634a4638b786e075",
+          "installedSha256": "ae581b74ab6f0a53bc372a58a068fa7ac390372a468a87be634a4638b786e075"
+        },
+        {
+          "path": "dist/core/context.js.map",
+          "packedSha256": "3f51f8f3c6ab212d1d20ad2e63b2545925b8495f88a1d13ee9ce5b35273bc6dc",
+          "installedSha256": "3f51f8f3c6ab212d1d20ad2e63b2545925b8495f88a1d13ee9ce5b35273bc6dc"
+        },
+        {
+          "path": "dist/core/errors.d.ts",
+          "packedSha256": "3ac2307e6a8953dac8555e8e500688c54b121b7e0407dfc487cb67611f4994bf",
+          "installedSha256": "3ac2307e6a8953dac8555e8e500688c54b121b7e0407dfc487cb67611f4994bf"
+        },
+        {
+          "path": "dist/core/errors.d.ts.map",
+          "packedSha256": "88f9d736b5e9be319cd63829497dda67f7b5093fe486324dccb4a0a7b97293e4",
+          "installedSha256": "88f9d736b5e9be319cd63829497dda67f7b5093fe486324dccb4a0a7b97293e4"
+        },
+        {
+          "path": "dist/core/errors.js",
+          "packedSha256": "a2dfe1d3e9b8d0e4623cd03dcfbf2c5ce1b45749e7dbeb39db27ce1b5b87b133",
+          "installedSha256": "a2dfe1d3e9b8d0e4623cd03dcfbf2c5ce1b45749e7dbeb39db27ce1b5b87b133"
+        },
+        {
+          "path": "dist/core/errors.js.map",
+          "packedSha256": "40bcacb5d5a160cb821241c0b9e702347bd05bac4d49531ea9c91bbf88f2676e",
+          "installedSha256": "40bcacb5d5a160cb821241c0b9e702347bd05bac4d49531ea9c91bbf88f2676e"
+        },
+        {
+          "path": "dist/core/map-configuration.d.ts",
+          "packedSha256": "cc2adbb9fc8157e8f09a14fb1677ed40681066747e4024619eedf821d4209998",
+          "installedSha256": "cc2adbb9fc8157e8f09a14fb1677ed40681066747e4024619eedf821d4209998"
+        },
+        {
+          "path": "dist/core/map-configuration.d.ts.map",
+          "packedSha256": "39ecffd3aea0a097886cbb2aee71a15e60118ca36373d94b2742f02a8074aea0",
+          "installedSha256": "39ecffd3aea0a097886cbb2aee71a15e60118ca36373d94b2742f02a8074aea0"
+        },
+        {
+          "path": "dist/core/map-configuration.js",
+          "packedSha256": "6ed15e13dcecab9930b52f5be97b2fc1631a5de1188d33fa89ff71fcbac52a86",
+          "installedSha256": "6ed15e13dcecab9930b52f5be97b2fc1631a5de1188d33fa89ff71fcbac52a86"
+        },
+        {
+          "path": "dist/core/map-configuration.js.map",
+          "packedSha256": "299a6d182cf48fc02bfcdc7bb9f6729b3e94ccfaf971c2cfc8d11248a1f9a06c",
+          "installedSha256": "299a6d182cf48fc02bfcdc7bb9f6729b3e94ccfaf971c2cfc8d11248a1f9a06c"
+        },
+        {
+          "path": "dist/core/registry.d.ts",
+          "packedSha256": "fbd38a8d39b6344323ce8eba1a4af8d21946e932c97ddb99d3f9be5f60ae6a10",
+          "installedSha256": "fbd38a8d39b6344323ce8eba1a4af8d21946e932c97ddb99d3f9be5f60ae6a10"
+        },
+        {
+          "path": "dist/core/registry.d.ts.map",
+          "packedSha256": "170fc5cdfb5e2d33a29ff846dbc2be8c50bbb9a2b18c48f7abe6788c252b6c70",
+          "installedSha256": "170fc5cdfb5e2d33a29ff846dbc2be8c50bbb9a2b18c48f7abe6788c252b6c70"
+        },
+        {
+          "path": "dist/core/registry.js",
+          "packedSha256": "b6f3b8a60a8f1807447ee1e8105f6f2598027d856abc1ac265f10e079c8d32b5",
+          "installedSha256": "b6f3b8a60a8f1807447ee1e8105f6f2598027d856abc1ac265f10e079c8d32b5"
+        },
+        {
+          "path": "dist/core/registry.js.map",
+          "packedSha256": "dfa003b938c018d956f1215a52a1a2fd2f53d5dd975a9dbed43dc35b193e55a4",
+          "installedSha256": "dfa003b938c018d956f1215a52a1a2fd2f53d5dd975a9dbed43dc35b193e55a4"
+        },
+        {
+          "path": "dist/core/session.d.ts",
+          "packedSha256": "94b256072b2c33edea489ede1e6c4b2ba6aa7c31f813e329249c579c2f82bb4c",
+          "installedSha256": "94b256072b2c33edea489ede1e6c4b2ba6aa7c31f813e329249c579c2f82bb4c"
+        },
+        {
+          "path": "dist/core/session.d.ts.map",
+          "packedSha256": "73335c06312aa436321fa95e3bbf71ee4ff80c5be81bd7da1be48e249fa30418",
+          "installedSha256": "73335c06312aa436321fa95e3bbf71ee4ff80c5be81bd7da1be48e249fa30418"
+        },
+        {
+          "path": "dist/core/session.js",
+          "packedSha256": "d574f4ab5a3e8f06a1b42401229913780a04b2b098c73ce7fbe2b96fd0b378bb",
+          "installedSha256": "d574f4ab5a3e8f06a1b42401229913780a04b2b098c73ce7fbe2b96fd0b378bb"
+        },
+        {
+          "path": "dist/core/session.js.map",
+          "packedSha256": "c656134a75c612d4e951821e540a7da0d8d67630d0a468016eb6639f2628f370",
+          "installedSha256": "c656134a75c612d4e951821e540a7da0d8d67630d0a468016eb6639f2628f370"
+        },
+        {
+          "path": "dist/core/types.d.ts",
+          "packedSha256": "d5f8323d3c80f0a21b21e00a489327c7b430aee25da4087e7bcf36babbfefbfb",
+          "installedSha256": "d5f8323d3c80f0a21b21e00a489327c7b430aee25da4087e7bcf36babbfefbfb"
+        },
+        {
+          "path": "dist/core/types.d.ts.map",
+          "packedSha256": "ffc39fe07b5b491d2f634baef24d5e39229a02218e1ce908d3557ba7bd96514a",
+          "installedSha256": "ffc39fe07b5b491d2f634baef24d5e39229a02218e1ce908d3557ba7bd96514a"
+        },
+        {
+          "path": "dist/core/types.js",
+          "packedSha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2",
+          "installedSha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2"
+        },
+        {
+          "path": "dist/core/types.js.map",
+          "packedSha256": "b983b4b425e50da613e8903a38b843e3c88824da62e9f3ed2a7ae7fc96c1f8ee",
+          "installedSha256": "b983b4b425e50da613e8903a38b843e3c88824da62e9f3ed2a7ae7fc96c1f8ee"
+        },
+        {
+          "path": "dist/core/validation.d.ts",
+          "packedSha256": "66881ecb5cf408b3255fe92d7ef8bd25b6d8588983a822e2c6014751d256c4bc",
+          "installedSha256": "66881ecb5cf408b3255fe92d7ef8bd25b6d8588983a822e2c6014751d256c4bc"
+        },
+        {
+          "path": "dist/core/validation.d.ts.map",
+          "packedSha256": "d9b1d704bf764725eeec6820b9c84a8a9e5aeea1b8521b28ba056324f6da303a",
+          "installedSha256": "d9b1d704bf764725eeec6820b9c84a8a9e5aeea1b8521b28ba056324f6da303a"
+        },
+        {
+          "path": "dist/core/validation.js",
+          "packedSha256": "44eec1a17398cd80115fc5ab98037a2280ceaf003d28278830d9a60203ffa176",
+          "installedSha256": "44eec1a17398cd80115fc5ab98037a2280ceaf003d28278830d9a60203ffa176"
+        },
+        {
+          "path": "dist/core/validation.js.map",
+          "packedSha256": "362a9126f0af209af9a5745b070fa8d723132cc3a64ada5eb885f97623a490db",
+          "installedSha256": "362a9126f0af209af9a5745b070fa8d723132cc3a64ada5eb885f97623a490db"
+        },
+        {
+          "path": "dist/index.d.ts",
+          "packedSha256": "5ca15fc5f235d97e3bb4b4d28a58d0672b344b8e9988fb7b55d3f7dae88afe90",
+          "installedSha256": "5ca15fc5f235d97e3bb4b4d28a58d0672b344b8e9988fb7b55d3f7dae88afe90"
+        },
+        {
+          "path": "dist/index.d.ts.map",
+          "packedSha256": "6684475972e01ce0ac0e05a6d5a848714f5ba539218c2630dadceac10d96235c",
+          "installedSha256": "6684475972e01ce0ac0e05a6d5a848714f5ba539218c2630dadceac10d96235c"
+        },
+        {
+          "path": "dist/index.js",
+          "packedSha256": "1a508f98ff95e4bb0a1dc9684843cdc8d2a87027e068360d2cc2b0a539863b65",
+          "installedSha256": "1a508f98ff95e4bb0a1dc9684843cdc8d2a87027e068360d2cc2b0a539863b65"
+        },
+        {
+          "path": "dist/index.js.map",
+          "packedSha256": "6e96bc14ef7c441204664128f61b8d042337ff8377ed55229d5111eebf1a4bd6",
+          "installedSha256": "6e96bc14ef7c441204664128f61b8d042337ff8377ed55229d5111eebf1a4bd6"
+        },
+        {
+          "path": "dist/mapbox-native.d.ts",
+          "packedSha256": "9ca58aa3bb5f22025184dbb554abd359f1e4e8feeac137d82594b3436d0dba1b",
+          "installedSha256": "9ca58aa3bb5f22025184dbb554abd359f1e4e8feeac137d82594b3436d0dba1b"
+        },
+        {
+          "path": "dist/mapbox-native.d.ts.map",
+          "packedSha256": "84ee1377b1f3be74807f4379e2fb8beead13378afbc7e75e02418b53caa038fa",
+          "installedSha256": "84ee1377b1f3be74807f4379e2fb8beead13378afbc7e75e02418b53caa038fa"
+        },
+        {
+          "path": "dist/mapbox-native.js",
+          "packedSha256": "7f45080de9a031be16ad9e8188f6d663f57adaa28754d17afaa116c173835887",
+          "installedSha256": "7f45080de9a031be16ad9e8188f6d663f57adaa28754d17afaa116c173835887"
+        },
+        {
+          "path": "dist/mapbox-native.js.map",
+          "packedSha256": "2f78bc2b57ba0109b3657b80e39949278b1e83ada866a4208d8c9e56ed21660f",
+          "installedSha256": "2f78bc2b57ba0109b3657b80e39949278b1e83ada866a4208d8c9e56ed21660f"
+        },
+        {
+          "path": "dist/mapbox-web.d.ts",
+          "packedSha256": "3c79cd5a6c8816ec78417b43c2dda709d421334c58dbf745882631e0881d8349",
+          "installedSha256": "3c79cd5a6c8816ec78417b43c2dda709d421334c58dbf745882631e0881d8349"
+        },
+        {
+          "path": "dist/mapbox-web.d.ts.map",
+          "packedSha256": "e82bd21f6e5551b8853ed8bc0dc42c7466abedd9d2dc74e6809051c012a3c335",
+          "installedSha256": "e82bd21f6e5551b8853ed8bc0dc42c7466abedd9d2dc74e6809051c012a3c335"
+        },
+        {
+          "path": "dist/mapbox-web.js",
+          "packedSha256": "2c682f9cf6931e413e836bacaf88dc6256b99c4fc9d73291aa15db7847640026",
+          "installedSha256": "2c682f9cf6931e413e836bacaf88dc6256b99c4fc9d73291aa15db7847640026"
+        },
+        {
+          "path": "dist/mapbox-web.js.map",
+          "packedSha256": "1d0758a16d7f2247c5391595a20836f59e4478a82bc000d5e451ecd94de0e85e",
+          "installedSha256": "1d0758a16d7f2247c5391595a20836f59e4478a82bc000d5e451ecd94de0e85e"
+        },
+        {
+          "path": "dist/maplibre-native.d.ts",
+          "packedSha256": "e4a3d9d99053d4633931443d0f2e85f6da1e5b5b7241c60d8a2b1c4f5e2006d5",
+          "installedSha256": "e4a3d9d99053d4633931443d0f2e85f6da1e5b5b7241c60d8a2b1c4f5e2006d5"
+        },
+        {
+          "path": "dist/maplibre-native.d.ts.map",
+          "packedSha256": "68c5c0302e5e6671db1e22de6f694190741ea5b259d88132f3d642f0fbe8fe4c",
+          "installedSha256": "68c5c0302e5e6671db1e22de6f694190741ea5b259d88132f3d642f0fbe8fe4c"
+        },
+        {
+          "path": "dist/maplibre-native.js",
+          "packedSha256": "91fa46ad18b0a200ea60942ec9738a92147a2c450305216a8cb84f50414faa1f",
+          "installedSha256": "91fa46ad18b0a200ea60942ec9738a92147a2c450305216a8cb84f50414faa1f"
+        },
+        {
+          "path": "dist/maplibre-native.js.map",
+          "packedSha256": "9e68cf08390ff60e4562d0c0b8256961668c287af00adc8f6c33c19a02373076",
+          "installedSha256": "9e68cf08390ff60e4562d0c0b8256961668c287af00adc8f6c33c19a02373076"
+        },
+        {
+          "path": "dist/maplibre-web.d.ts",
+          "packedSha256": "335fe999752c69aaecb0ed18b87e3693d652ca63b1e155ac297e8844cc86a0fe",
+          "installedSha256": "335fe999752c69aaecb0ed18b87e3693d652ca63b1e155ac297e8844cc86a0fe"
+        },
+        {
+          "path": "dist/maplibre-web.d.ts.map",
+          "packedSha256": "f57121a9e4fb2b4be645953cdc682f309826e060c8a51de024930e970951ba5d",
+          "installedSha256": "f57121a9e4fb2b4be645953cdc682f309826e060c8a51de024930e970951ba5d"
+        },
+        {
+          "path": "dist/maplibre-web.js",
+          "packedSha256": "9d4f8a8c6d2cd65e13d300f3120b8cfa9768baadaecb8574e35df5165f79a048",
+          "installedSha256": "9d4f8a8c6d2cd65e13d300f3120b8cfa9768baadaecb8574e35df5165f79a048"
+        },
+        {
+          "path": "dist/maplibre-web.js.map",
+          "packedSha256": "0d44197e961ff8f8f111e640c4aede57d0946e100dcae791faaadcd405c1bf4d",
+          "installedSha256": "0d44197e961ff8f8f111e640c4aede57d0946e100dcae791faaadcd405c1bf4d"
+        },
+        {
+          "path": "dist/metro-web-assets.cjs",
+          "packedSha256": "0d6773b5551355cbe6e04dba10b328c04e4d33079787e3b520ff2cdcec527636",
+          "installedSha256": "0d6773b5551355cbe6e04dba10b328c04e4d33079787e3b520ff2cdcec527636"
+        },
+        {
+          "path": "dist/metro-web-assets.d.cts",
+          "packedSha256": "b4185e51b802bfabe893da3056b67fbfbec953fb1f8e99e0dde1b8851eb2cb24",
+          "installedSha256": "b4185e51b802bfabe893da3056b67fbfbec953fb1f8e99e0dde1b8851eb2cb24"
+        },
+        {
+          "path": "dist/metro-web-transformer.cjs",
+          "packedSha256": "ce7901558a50182b43f0a7e7e47a22d6b8f7942a221e5fd1b41820c5ca768db4",
+          "installedSha256": "ce7901558a50182b43f0a7e7e47a22d6b8f7942a221e5fd1b41820c5ca768db4"
+        },
+        {
+          "path": "dist/metro-web.cjs",
+          "packedSha256": "6eec01548bf97274edecc15574d087a86a640b0963ae2d49ab83307c84f532c2",
+          "installedSha256": "6eec01548bf97274edecc15574d087a86a640b0963ae2d49ab83307c84f532c2"
+        },
+        {
+          "path": "dist/metro-web.d.cts",
+          "packedSha256": "95d29dc17128cbca1faa91319497ed5cbd6944e26aecd8f595be97b102e80d5e",
+          "installedSha256": "95d29dc17128cbca1faa91319497ed5cbd6944e26aecd8f595be97b102e80d5e"
+        }
+      ],
+      "sourceGraph": {
+        "status": "passed",
+        "sourceCount": 689,
+        "selectedWrapperSourceCount": 128,
+        "oppositeWrapperSourceCount": 0,
+        "sourceMap": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-1791456921835/index.android.bundle.packager.map",
+        "sourceMapSha256": "30ecbe2e32aea273cda5aa9aded212bda2a741ddd8e24372eff02d5d7f277201"
+      }
+    }
+  },
+  "retainedFailures": [
+    {
+      "check": "initial sandbox install",
+      "status": "failed",
+      "reason": "Bun tempdir EPERM",
+      "evidence": "/private/tmp/one-map-lifecycle-mapbox-s04/lifecycle-materialization.log",
+      "resolution": "scoped escalated offline fresh install passed"
+    },
+    {
+      "check": "initial CocoaPods install",
+      "status": "failed",
+      "reason": "ENOSPC copying cached Hermes",
+      "evidence": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/lifecycle-pods.log",
+      "resolution": "partial Pods removed; disk reclaimed; pinned pod rerun passed",
+      "rerunEvidence": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/lifecycle-pods-rerun.log"
+    },
+    {
+      "check": "first Xcode Release build",
+      "status": "failed",
+      "reason": "Xcode27 rejects Mapbox resource pod iOS14 deployment target",
+      "evidence": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791452715126/report.json",
+      "resolution": "generated pod target floor set to RN host15.1"
+    },
+    {
+      "check": "first Maestro runtime",
+      "status": "failed",
+      "reason": "UIKit SIGTRAP before React because template omitted required scene lifecycle",
+      "evidence": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-first/junit.xml",
+      "crashReport": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-first/scene-lifecycle-crash.ips",
+      "resolution": "scene-owned host window with retained RNfactory and built scene manifest; same packed library rerun passed"
+    },
+    {
+      "check": "first scene-bootstrap materialization",
+      "status": "failed",
+      "reason": "RCTNewArchEnabled field is generated by pods and absent from raw template",
+      "evidence": [
+        "/private/tmp/one-map-scene-check-mapbox",
+        "/private/tmp/one-map-scene-check-maplibre"
+      ],
+      "resolution": "anchor scene manifest on raw-template UILaunchStoryboardName; both fresh generation paths and plist structures passed"
+    },
+    {
+      "check": "first Android Release build",
+      "status": "failed",
+      "reason": "Mapbox SDK Maven repository absent from generated host",
+      "evidence": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/android-1791455336958/report.json",
+      "resolution": "exact repository from pinned RNMapbox plugin added; anonymous SDK resolution and same pinned Release build passed"
+    },
+    {
+      "check": "first Android lifecycle size assertion",
+      "status": "failed",
+      "reason": "exact220 did not account for actual220.19046020507812 native pixel rounding",
+      "evidence": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-android/junit.xml",
+      "resolution": "half-unit tolerance; sameAPK UI assertions passed"
+    },
+    {
+      "check": "Android enlarged-host remount visual review",
+      "status": "failed",
+      "reason": "route absent at360 after remount despite ready/load/style success; edge-scroll experiment also failed visually",
+      "evidence": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-android-edge-scroll",
+      "resolution": "Diagnostic isolated the wrong center. Guarded production initial camera dispatch after map load and layout corrected rendering; real Android and iOS reruns passed with the same packed artifact."
+    }
+  ],
+  "cleanup": {
+    "removed": "only current consumer disposable DerivedData Build/Intermediates.noindex, Android app/build/intermediates and app/.cxx",
+    "preserved": [
+      "built app",
+      "both successful build app archives",
+      "framework and file hash manifests",
+      "native locks",
+      "redacted logs",
+      "JUnit and command traces",
+      "screenshots",
+      "packed tarball",
+      "original and guarded production APKs",
+      "actual Android packager source maps",
+      "consumer-only diagnostic identities and observations"
+    ],
+    "stageAcceptance": "not claimed"
+  },
+  "previousRuns": [
+    {
+      "package": {
+        "packedArtifact": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/.artifacts/one-map-react-c1e20526ddecd562.tgz",
+        "packedSha256": "c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739",
+        "consumer": "/private/tmp/one-map-lifecycle-mapbox-s04-installed",
+        "react": "19.2.3",
+        "reactNative": "0.87.1",
+        "wrapper": {
+          "name": "@rnmapbox/maps",
+          "version": "10.3.7",
+          "sourceRevision": "0f50e8164c1aefe45de9ed9cde310f310076a310"
+        },
+        "installedPeerIsolation": "passed",
+        "oppositePeer": "absent",
+        "artifactVerification": {
+          "status": "passed",
+          "publicationFileCount": 87,
+          "publicationFiles": [
+            {
+              "path": "package.json",
+              "packedSha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e",
+              "installedSha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e"
+            },
+            {
+              "path": "README.md",
+              "packedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "installedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "dist/adapters/lifecycle.d.ts",
+              "packedSha256": "a4e3a12615df0361639e83877743485e68a4c4b37b0f647dc7ba74a34781b9d8",
+              "installedSha256": "a4e3a12615df0361639e83877743485e68a4c4b37b0f647dc7ba74a34781b9d8"
+            },
+            {
+              "path": "dist/adapters/lifecycle.d.ts.map",
+              "packedSha256": "21a84719bf00e998cbd96a7ddc8bc75657c01c84cc535ffd69201069ace4f98c",
+              "installedSha256": "21a84719bf00e998cbd96a7ddc8bc75657c01c84cc535ffd69201069ace4f98c"
+            },
+            {
+              "path": "dist/adapters/lifecycle.js",
+              "packedSha256": "151620c4c4dec428e7a4c64e64889da740ce1711c2d9c882b853e015feeb4cb4",
+              "installedSha256": "151620c4c4dec428e7a4c64e64889da740ce1711c2d9c882b853e015feeb4cb4"
+            },
+            {
+              "path": "dist/adapters/lifecycle.js.map",
+              "packedSha256": "65997c1eb2924df5778cb872fad27581ee3fffed38b3a6bc9faa5794e0466a85",
+              "installedSha256": "65997c1eb2924df5778cb872fad27581ee3fffed38b3a6bc9faa5794e0466a85"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/host.d.ts",
+              "packedSha256": "54967d9f173615c739481c1b1401c6e69671d058429a4732ba11949914580efb",
+              "installedSha256": "54967d9f173615c739481c1b1401c6e69671d058429a4732ba11949914580efb"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/host.d.ts.map",
+              "packedSha256": "7f50a1275a7f96ac1f9561796b0e30290f5b76577d547187689ac890be916d1f",
+              "installedSha256": "7f50a1275a7f96ac1f9561796b0e30290f5b76577d547187689ac890be916d1f"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/host.js",
+              "packedSha256": "0c670d9acc939b12ec2f4a2732e8cee764ffbce92ec1d276a6b832cf8d7dd906",
+              "installedSha256": "0c670d9acc939b12ec2f4a2732e8cee764ffbce92ec1d276a6b832cf8d7dd906"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/host.js.map",
+              "packedSha256": "9d6e140f55fbcd7f4b955ff24b6c145a5bdc7699ed2cd7e0d031a79f4075bc6f",
+              "installedSha256": "9d6e140f55fbcd7f4b955ff24b6c145a5bdc7699ed2cd7e0d031a79f4075bc6f"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/map.d.ts",
+              "packedSha256": "f8be40e4eef527fd1a4367f70284b6419454d34c7ebddc6118f07c754bb128c4",
+              "installedSha256": "f8be40e4eef527fd1a4367f70284b6419454d34c7ebddc6118f07c754bb128c4"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/map.d.ts.map",
+              "packedSha256": "c7b827ed50a8552fb448b2737ac8850c770e82fc397ff3aacfcdf133d9a973bd",
+              "installedSha256": "c7b827ed50a8552fb448b2737ac8850c770e82fc397ff3aacfcdf133d9a973bd"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/map.js",
+              "packedSha256": "4cc82c0e9332501c1b97f8e8813c87f14a7f8579e365b4c2d05452d7e011f90e",
+              "installedSha256": "4cc82c0e9332501c1b97f8e8813c87f14a7f8579e365b4c2d05452d7e011f90e"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/map.js.map",
+              "packedSha256": "9b87a9211a900f67a97140b24c2638654cb65078d4acb1ff6e8660751f836c0e",
+              "installedSha256": "9b87a9211a900f67a97140b24c2638654cb65078d4acb1ff6e8660751f836c0e"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/tokens.d.ts",
+              "packedSha256": "ef10ec725432a6bf1a5c5b76bf41af430dbe2b4c604d10423c06d62172fb56c6",
+              "installedSha256": "ef10ec725432a6bf1a5c5b76bf41af430dbe2b4c604d10423c06d62172fb56c6"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/tokens.d.ts.map",
+              "packedSha256": "01779f56c27f2e266bf9b531c1a38d8b86f48d2c142a4a3ae85111ea92a87e2a",
+              "installedSha256": "01779f56c27f2e266bf9b531c1a38d8b86f48d2c142a4a3ae85111ea92a87e2a"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/tokens.js",
+              "packedSha256": "f15871bae2f1bd25062ce40b7199d4f22a24788b2feb194bf65acd9369776dbb",
+              "installedSha256": "f15871bae2f1bd25062ce40b7199d4f22a24788b2feb194bf65acd9369776dbb"
+            },
+            {
+              "path": "dist/adapters/mapbox-native/tokens.js.map",
+              "packedSha256": "800a1c5d34e7ea574194dbdd20602c7e2e32fd846ff9deeff720451129b10e67",
+              "installedSha256": "800a1c5d34e7ea574194dbdd20602c7e2e32fd846ff9deeff720451129b10e67"
+            },
+            {
+              "path": "dist/adapters/maplibre-native/Map.d.ts",
+              "packedSha256": "5000b6b55eacb948185929d21184bdc100e62c652869936366828e922ec6119d",
+              "installedSha256": "5000b6b55eacb948185929d21184bdc100e62c652869936366828e922ec6119d"
+            },
+            {
+              "path": "dist/adapters/maplibre-native/Map.d.ts.map",
+              "packedSha256": "8fcfdc6619a5e1dea1424a03510993ca74cacd3f423d9b5a2293556f38648f31",
+              "installedSha256": "8fcfdc6619a5e1dea1424a03510993ca74cacd3f423d9b5a2293556f38648f31"
+            },
+            {
+              "path": "dist/adapters/maplibre-native/Map.js",
+              "packedSha256": "d0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1",
+              "installedSha256": "d0c8621281bfc981113798f7d9424c07fadcb814e78c801ac1606bf30316dca1"
+            },
+            {
+              "path": "dist/adapters/maplibre-native/Map.js.map",
+              "packedSha256": "c6828c3d7cc13d5f68ccfd2d07864d32d4afb00c993d852a19396f36c8d7341a",
+              "installedSha256": "c6828c3d7cc13d5f68ccfd2d07864d32d4afb00c993d852a19396f36c8d7341a"
+            },
+            {
+              "path": "dist/adapters/maplibre-native/host-props.d.ts",
+              "packedSha256": "a8c38fe3050524df6b223140f385c4bed0bd1da6b7bed9f6c50a2194f9a66659",
+              "installedSha256": "a8c38fe3050524df6b223140f385c4bed0bd1da6b7bed9f6c50a2194f9a66659"
+            },
+            {
+              "path": "dist/adapters/maplibre-native/host-props.d.ts.map",
+              "packedSha256": "77bf751eae8adaa045a2a9056573504ac4c76c63b55cc28a873f3a092bc44808",
+              "installedSha256": "77bf751eae8adaa045a2a9056573504ac4c76c63b55cc28a873f3a092bc44808"
+            },
+            {
+              "path": "dist/adapters/maplibre-native/host-props.js",
+              "packedSha256": "0509c8fd4b5e8ca9c8e7f94c6dcd4abe059f25931a3cd9ce6f1533178924e31c",
+              "installedSha256": "0509c8fd4b5e8ca9c8e7f94c6dcd4abe059f25931a3cd9ce6f1533178924e31c"
+            },
+            {
+              "path": "dist/adapters/maplibre-native/host-props.js.map",
+              "packedSha256": "0abb6ee0fdeed552fecc421cc1a004de0a35d5bbc1204a18a813158584c3677a",
+              "installedSha256": "0abb6ee0fdeed552fecc421cc1a004de0a35d5bbc1204a18a813158584c3677a"
+            },
+            {
+              "path": "dist/adapters/selection.d.ts",
+              "packedSha256": "6a9e42526c393525e07f64b4a83713655a41e34f402973b4fa0effce4a5d63e7",
+              "installedSha256": "6a9e42526c393525e07f64b4a83713655a41e34f402973b4fa0effce4a5d63e7"
+            },
+            {
+              "path": "dist/adapters/selection.d.ts.map",
+              "packedSha256": "ecac2607961c315888290ccfebcf8425951834d42e8610bd940a7049baf97eed",
+              "installedSha256": "ecac2607961c315888290ccfebcf8425951834d42e8610bd940a7049baf97eed"
+            },
+            {
+              "path": "dist/adapters/selection.js",
+              "packedSha256": "d09253ef574b1e1cbdd0d2036801228da56cce40313c1706aa5e5848f2753e4b",
+              "installedSha256": "d09253ef574b1e1cbdd0d2036801228da56cce40313c1706aa5e5848f2753e4b"
+            },
+            {
+              "path": "dist/adapters/selection.js.map",
+              "packedSha256": "edd81fc27d0cdff81a97b5812b8b39edc3fb8fa3b637dfae4eec2085c0d6b245",
+              "installedSha256": "edd81fc27d0cdff81a97b5812b8b39edc3fb8fa3b637dfae4eec2085c0d6b245"
+            },
+            {
+              "path": "dist/adapters/web.d.ts",
+              "packedSha256": "04de23a35679399819d9c1f6302d5d29fe6ff9b1261c11f9beb946c1cd92eb49",
+              "installedSha256": "04de23a35679399819d9c1f6302d5d29fe6ff9b1261c11f9beb946c1cd92eb49"
+            },
+            {
+              "path": "dist/adapters/web.d.ts.map",
+              "packedSha256": "a8628f28ebfdcb0460dd4c6161a450faf199e148267ae76e9aab76d0d7e81808",
+              "installedSha256": "a8628f28ebfdcb0460dd4c6161a450faf199e148267ae76e9aab76d0d7e81808"
+            },
+            {
+              "path": "dist/adapters/web.js",
+              "packedSha256": "87dc8563e67f4ba70c827fda3152b7b475863776fb560b5ae20f3aa093ad008f",
+              "installedSha256": "87dc8563e67f4ba70c827fda3152b7b475863776fb560b5ae20f3aa093ad008f"
+            },
+            {
+              "path": "dist/adapters/web.js.map",
+              "packedSha256": "f9457e381dc4106dc0be6125e1eeb8bcf503b946a72f4b258a1a0e3653ceae57",
+              "installedSha256": "f9457e381dc4106dc0be6125e1eeb8bcf503b946a72f4b258a1a0e3653ceae57"
+            },
+            {
+              "path": "dist/core/capabilities.d.ts",
+              "packedSha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515",
+              "installedSha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515"
+            },
+            {
+              "path": "dist/core/capabilities.d.ts.map",
+              "packedSha256": "4de6d1ea2d40cb336f5ec7caeacb23306b06ca355baaedebf5ca901b28e44968",
+              "installedSha256": "4de6d1ea2d40cb336f5ec7caeacb23306b06ca355baaedebf5ca901b28e44968"
+            },
+            {
+              "path": "dist/core/capabilities.js",
+              "packedSha256": "e1e544eb806c761a3cc589964c9031ee5c0bf29d0cfdc9454da568607bbe48a3",
+              "installedSha256": "e1e544eb806c761a3cc589964c9031ee5c0bf29d0cfdc9454da568607bbe48a3"
+            },
+            {
+              "path": "dist/core/capabilities.js.map",
+              "packedSha256": "d0105b4c2bd5c585a2002812c035e6b9e231865789aa7238f67b7200c0875fc7",
+              "installedSha256": "d0105b4c2bd5c585a2002812c035e6b9e231865789aa7238f67b7200c0875fc7"
+            },
+            {
+              "path": "dist/core/context.d.ts",
+              "packedSha256": "4e29d7e5e4c1342652f81613edf9b06e54285b96cb6d4839ab668de2864d2983",
+              "installedSha256": "4e29d7e5e4c1342652f81613edf9b06e54285b96cb6d4839ab668de2864d2983"
+            },
+            {
+              "path": "dist/core/context.d.ts.map",
+              "packedSha256": "357bd0c83338766d59bd9ff55321d3f6882182c073f0b271e4d6c86332916278",
+              "installedSha256": "357bd0c83338766d59bd9ff55321d3f6882182c073f0b271e4d6c86332916278"
+            },
+            {
+              "path": "dist/core/context.js",
+              "packedSha256": "00f244ee0b1aec7f48157dea6429c96e4389b31945ecf0c8008b1ff2e1b66847",
+              "installedSha256": "00f244ee0b1aec7f48157dea6429c96e4389b31945ecf0c8008b1ff2e1b66847"
+            },
+            {
+              "path": "dist/core/context.js.map",
+              "packedSha256": "71362847fba8630315b8890b7253f4867b485b8ab042f17a4a989d775666675b",
+              "installedSha256": "71362847fba8630315b8890b7253f4867b485b8ab042f17a4a989d775666675b"
+            },
+            {
+              "path": "dist/core/errors.d.ts",
+              "packedSha256": "f747c139c70fda88de6531c733639d237c80cb03ec38fd6cf9fd44f651cfaf8b",
+              "installedSha256": "f747c139c70fda88de6531c733639d237c80cb03ec38fd6cf9fd44f651cfaf8b"
+            },
+            {
+              "path": "dist/core/errors.d.ts.map",
+              "packedSha256": "7a1c32e3b285145d8419ced9a3dd001217998876ff8ef9b2fb35be8f0688d8d8",
+              "installedSha256": "7a1c32e3b285145d8419ced9a3dd001217998876ff8ef9b2fb35be8f0688d8d8"
+            },
+            {
+              "path": "dist/core/errors.js",
+              "packedSha256": "e3b76ae6b5e11371f63967dbadf08c74fed69b4cc623163e4650ff2b4da3d5aa",
+              "installedSha256": "e3b76ae6b5e11371f63967dbadf08c74fed69b4cc623163e4650ff2b4da3d5aa"
+            },
+            {
+              "path": "dist/core/errors.js.map",
+              "packedSha256": "2bf2fbb0c79592622e0cd4c0438857a4b20dd7bda7a874ecb860a7785cf195cc",
+              "installedSha256": "2bf2fbb0c79592622e0cd4c0438857a4b20dd7bda7a874ecb860a7785cf195cc"
+            },
+            {
+              "path": "dist/core/registry.d.ts",
+              "packedSha256": "fbd38a8d39b6344323ce8eba1a4af8d21946e932c97ddb99d3f9be5f60ae6a10",
+              "installedSha256": "fbd38a8d39b6344323ce8eba1a4af8d21946e932c97ddb99d3f9be5f60ae6a10"
+            },
+            {
+              "path": "dist/core/registry.d.ts.map",
+              "packedSha256": "170fc5cdfb5e2d33a29ff846dbc2be8c50bbb9a2b18c48f7abe6788c252b6c70",
+              "installedSha256": "170fc5cdfb5e2d33a29ff846dbc2be8c50bbb9a2b18c48f7abe6788c252b6c70"
+            },
+            {
+              "path": "dist/core/registry.js",
+              "packedSha256": "b6f3b8a60a8f1807447ee1e8105f6f2598027d856abc1ac265f10e079c8d32b5",
+              "installedSha256": "b6f3b8a60a8f1807447ee1e8105f6f2598027d856abc1ac265f10e079c8d32b5"
+            },
+            {
+              "path": "dist/core/registry.js.map",
+              "packedSha256": "dfa003b938c018d956f1215a52a1a2fd2f53d5dd975a9dbed43dc35b193e55a4",
+              "installedSha256": "dfa003b938c018d956f1215a52a1a2fd2f53d5dd975a9dbed43dc35b193e55a4"
+            },
+            {
+              "path": "dist/core/session.d.ts",
+              "packedSha256": "94b256072b2c33edea489ede1e6c4b2ba6aa7c31f813e329249c579c2f82bb4c",
+              "installedSha256": "94b256072b2c33edea489ede1e6c4b2ba6aa7c31f813e329249c579c2f82bb4c"
+            },
+            {
+              "path": "dist/core/session.d.ts.map",
+              "packedSha256": "73335c06312aa436321fa95e3bbf71ee4ff80c5be81bd7da1be48e249fa30418",
+              "installedSha256": "73335c06312aa436321fa95e3bbf71ee4ff80c5be81bd7da1be48e249fa30418"
+            },
+            {
+              "path": "dist/core/session.js",
+              "packedSha256": "d574f4ab5a3e8f06a1b42401229913780a04b2b098c73ce7fbe2b96fd0b378bb",
+              "installedSha256": "d574f4ab5a3e8f06a1b42401229913780a04b2b098c73ce7fbe2b96fd0b378bb"
+            },
+            {
+              "path": "dist/core/session.js.map",
+              "packedSha256": "c656134a75c612d4e951821e540a7da0d8d67630d0a468016eb6639f2628f370",
+              "installedSha256": "c656134a75c612d4e951821e540a7da0d8d67630d0a468016eb6639f2628f370"
+            },
+            {
+              "path": "dist/core/types.d.ts",
+              "packedSha256": "5430b4f08a3bc0d40e8bff39af46bce3d9662045d765123efa607865823717fa",
+              "installedSha256": "5430b4f08a3bc0d40e8bff39af46bce3d9662045d765123efa607865823717fa"
+            },
+            {
+              "path": "dist/core/types.d.ts.map",
+              "packedSha256": "065cb1ff31f0cdbbbb0ab2f48d3d1d0cd51c7d14ed113ed651bcee48c8bc31bf",
+              "installedSha256": "065cb1ff31f0cdbbbb0ab2f48d3d1d0cd51c7d14ed113ed651bcee48c8bc31bf"
+            },
+            {
+              "path": "dist/core/types.js",
+              "packedSha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2",
+              "installedSha256": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2"
+            },
+            {
+              "path": "dist/core/types.js.map",
+              "packedSha256": "b983b4b425e50da613e8903a38b843e3c88824da62e9f3ed2a7ae7fc96c1f8ee",
+              "installedSha256": "b983b4b425e50da613e8903a38b843e3c88824da62e9f3ed2a7ae7fc96c1f8ee"
+            },
+            {
+              "path": "dist/core/validation.d.ts",
+              "packedSha256": "66881ecb5cf408b3255fe92d7ef8bd25b6d8588983a822e2c6014751d256c4bc",
+              "installedSha256": "66881ecb5cf408b3255fe92d7ef8bd25b6d8588983a822e2c6014751d256c4bc"
+            },
+            {
+              "path": "dist/core/validation.d.ts.map",
+              "packedSha256": "3d2a385c62fe7220b7bd171ec5bece593a33c0feebefbb4d857592d45da35b29",
+              "installedSha256": "3d2a385c62fe7220b7bd171ec5bece593a33c0feebefbb4d857592d45da35b29"
+            },
+            {
+              "path": "dist/core/validation.js",
+              "packedSha256": "14273d335902ad922645a0a6d8ce4a88f666730ef4c1e7eebedeefe9da876638",
+              "installedSha256": "14273d335902ad922645a0a6d8ce4a88f666730ef4c1e7eebedeefe9da876638"
+            },
+            {
+              "path": "dist/core/validation.js.map",
+              "packedSha256": "b07a278733ec8ef2090887209e46d7929fb805a57c105104d5e2ea227094e0e5",
+              "installedSha256": "b07a278733ec8ef2090887209e46d7929fb805a57c105104d5e2ea227094e0e5"
+            },
+            {
+              "path": "dist/index.d.ts",
+              "packedSha256": "0685d35825294cc02075111932286fcd443a711d0a6fc8634dc2eb356a57da61",
+              "installedSha256": "0685d35825294cc02075111932286fcd443a711d0a6fc8634dc2eb356a57da61"
+            },
+            {
+              "path": "dist/index.d.ts.map",
+              "packedSha256": "2d0bbfd1009d87cc64237afc5330a776f3571e4441809e2b4a051cf2cba6fb9b",
+              "installedSha256": "2d0bbfd1009d87cc64237afc5330a776f3571e4441809e2b4a051cf2cba6fb9b"
+            },
+            {
+              "path": "dist/index.js",
+              "packedSha256": "1a508f98ff95e4bb0a1dc9684843cdc8d2a87027e068360d2cc2b0a539863b65",
+              "installedSha256": "1a508f98ff95e4bb0a1dc9684843cdc8d2a87027e068360d2cc2b0a539863b65"
+            },
+            {
+              "path": "dist/index.js.map",
+              "packedSha256": "825e1642f2afec53d5ed41dc7658c6a846ef1a5ce361611d11356904243a6e7f",
+              "installedSha256": "825e1642f2afec53d5ed41dc7658c6a846ef1a5ce361611d11356904243a6e7f"
+            },
+            {
+              "path": "dist/mapbox-native.d.ts",
+              "packedSha256": "9ca58aa3bb5f22025184dbb554abd359f1e4e8feeac137d82594b3436d0dba1b",
+              "installedSha256": "9ca58aa3bb5f22025184dbb554abd359f1e4e8feeac137d82594b3436d0dba1b"
+            },
+            {
+              "path": "dist/mapbox-native.d.ts.map",
+              "packedSha256": "84ee1377b1f3be74807f4379e2fb8beead13378afbc7e75e02418b53caa038fa",
+              "installedSha256": "84ee1377b1f3be74807f4379e2fb8beead13378afbc7e75e02418b53caa038fa"
+            },
+            {
+              "path": "dist/mapbox-native.js",
+              "packedSha256": "7f45080de9a031be16ad9e8188f6d663f57adaa28754d17afaa116c173835887",
+              "installedSha256": "7f45080de9a031be16ad9e8188f6d663f57adaa28754d17afaa116c173835887"
+            },
+            {
+              "path": "dist/mapbox-native.js.map",
+              "packedSha256": "2f78bc2b57ba0109b3657b80e39949278b1e83ada866a4208d8c9e56ed21660f",
+              "installedSha256": "2f78bc2b57ba0109b3657b80e39949278b1e83ada866a4208d8c9e56ed21660f"
+            },
+            {
+              "path": "dist/mapbox-web.d.ts",
+              "packedSha256": "addad1252795f24a1d872ef9d631edfca8a23ffc8d06b18e3886886ce784ed68",
+              "installedSha256": "addad1252795f24a1d872ef9d631edfca8a23ffc8d06b18e3886886ce784ed68"
+            },
+            {
+              "path": "dist/mapbox-web.d.ts.map",
+              "packedSha256": "c7495106d8f60f336fa54e049755f93a2c019516304df96c9f50a6f9f821103e",
+              "installedSha256": "c7495106d8f60f336fa54e049755f93a2c019516304df96c9f50a6f9f821103e"
+            },
+            {
+              "path": "dist/mapbox-web.js",
+              "packedSha256": "560fafc4d60c1b95e526a8707e95533f4731e58f6ceb21748f764af60f5e6606",
+              "installedSha256": "560fafc4d60c1b95e526a8707e95533f4731e58f6ceb21748f764af60f5e6606"
+            },
+            {
+              "path": "dist/mapbox-web.js.map",
+              "packedSha256": "4e197decd3f659011f336e37501120387f30914bf7292c1e0ef9835b94831fea",
+              "installedSha256": "4e197decd3f659011f336e37501120387f30914bf7292c1e0ef9835b94831fea"
+            },
+            {
+              "path": "dist/maplibre-native.d.ts",
+              "packedSha256": "e4a3d9d99053d4633931443d0f2e85f6da1e5b5b7241c60d8a2b1c4f5e2006d5",
+              "installedSha256": "e4a3d9d99053d4633931443d0f2e85f6da1e5b5b7241c60d8a2b1c4f5e2006d5"
+            },
+            {
+              "path": "dist/maplibre-native.d.ts.map",
+              "packedSha256": "68c5c0302e5e6671db1e22de6f694190741ea5b259d88132f3d642f0fbe8fe4c",
+              "installedSha256": "68c5c0302e5e6671db1e22de6f694190741ea5b259d88132f3d642f0fbe8fe4c"
+            },
+            {
+              "path": "dist/maplibre-native.js",
+              "packedSha256": "91fa46ad18b0a200ea60942ec9738a92147a2c450305216a8cb84f50414faa1f",
+              "installedSha256": "91fa46ad18b0a200ea60942ec9738a92147a2c450305216a8cb84f50414faa1f"
+            },
+            {
+              "path": "dist/maplibre-native.js.map",
+              "packedSha256": "9e68cf08390ff60e4562d0c0b8256961668c287af00adc8f6c33c19a02373076",
+              "installedSha256": "9e68cf08390ff60e4562d0c0b8256961668c287af00adc8f6c33c19a02373076"
+            },
+            {
+              "path": "dist/maplibre-web.d.ts",
+              "packedSha256": "d742eb1ff645eeb2d91b75d645f9ddc26f93e3338b844d8eb9a0cc1e0868dc3b",
+              "installedSha256": "d742eb1ff645eeb2d91b75d645f9ddc26f93e3338b844d8eb9a0cc1e0868dc3b"
+            },
+            {
+              "path": "dist/maplibre-web.d.ts.map",
+              "packedSha256": "009708aedd0085d2b22ed412d770d660f32a678cb40cfd2e93f3f3ac81dad7c6",
+              "installedSha256": "009708aedd0085d2b22ed412d770d660f32a678cb40cfd2e93f3f3ac81dad7c6"
+            },
+            {
+              "path": "dist/maplibre-web.js",
+              "packedSha256": "80acbac7e5453c149bd9993142139755eaf27e9499d4dded3cc66f5ff23ad88e",
+              "installedSha256": "80acbac7e5453c149bd9993142139755eaf27e9499d4dded3cc66f5ff23ad88e"
+            },
+            {
+              "path": "dist/maplibre-web.js.map",
+              "packedSha256": "bd5aec4336cab223e66f312d3e87030f489308f864dd478f93b3bd8082d55efa",
+              "installedSha256": "bd5aec4336cab223e66f312d3e87030f489308f864dd478f93b3bd8082d55efa"
+            },
+            {
+              "path": "dist/metro-web-assets.cjs",
+              "packedSha256": "0d6773b5551355cbe6e04dba10b328c04e4d33079787e3b520ff2cdcec527636",
+              "installedSha256": "0d6773b5551355cbe6e04dba10b328c04e4d33079787e3b520ff2cdcec527636"
+            },
+            {
+              "path": "dist/metro-web-assets.d.cts",
+              "packedSha256": "b4185e51b802bfabe893da3056b67fbfbec953fb1f8e99e0dde1b8851eb2cb24",
+              "installedSha256": "b4185e51b802bfabe893da3056b67fbfbec953fb1f8e99e0dde1b8851eb2cb24"
+            },
+            {
+              "path": "dist/metro-web-transformer.cjs",
+              "packedSha256": "ce7901558a50182b43f0a7e7e47a22d6b8f7942a221e5fd1b41820c5ca768db4",
+              "installedSha256": "ce7901558a50182b43f0a7e7e47a22d6b8f7942a221e5fd1b41820c5ca768db4"
+            },
+            {
+              "path": "dist/metro-web.cjs",
+              "packedSha256": "6eec01548bf97274edecc15574d087a86a640b0963ae2d49ab83307c84f532c2",
+              "installedSha256": "6eec01548bf97274edecc15574d087a86a640b0963ae2d49ab83307c84f532c2"
+            },
+            {
+              "path": "dist/metro-web.d.cts",
+              "packedSha256": "95d29dc17128cbca1faa91319497ed5cbd6944e26aecd8f595be97b102e80d5e",
+              "installedSha256": "95d29dc17128cbca1faa91319497ed5cbd6944e26aecd8f595be97b102e80d5e"
+            }
+          ],
+          "buildReport": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791453553875/report.json"
+        },
+        "javascriptDependencyGraph": {
+          "status": "passed",
+          "sourceCount": 685,
+          "selectedModuleCount": 128,
+          "oppositeModules": [],
+          "selectedSources": [
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/index.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/Mapbox.native.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/classes/index.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/classes/AnimatedCoordinatesArray.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/classes/AnimatedExtractCoordinateFromArray.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/classes/AnimatedPoint.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/classes/AnimatedRouteCoordinatesArray.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/classes/AnimatedShape.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Atmosphere.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXAtmosphereNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/StyleValue.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/BridgeValue.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/index.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/styleMap.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Camera.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXCameraNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXCameraModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/NativeCommands.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/geoUtils.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Rain.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXRainNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/ShapeSource.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXShapeSourceNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXShapeSourceModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/AbstractSource.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/NativeBridgeComponent.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/deprecation.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Snow.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXSnowNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/SymbolLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXSymbolLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/AbstractLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/filterUtils.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Terrain.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXTerrainNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Viewport.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXViewportNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXViewportModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/getAnnotationsLayerID.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/requestAndroidLocationPermissions.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/RNMBXModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/MapView.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXMapViewNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeMapViewModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/Logger.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Light.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXLightNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/nativeRef.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/PointAnnotation.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/checkRequiredProps.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXPointAnnotationNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXPointAnnotationModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Callout.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXCalloutNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/PointAnnotationManager.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXPointAnnotationManagerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Annotation.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/utils/animated/Animated.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/ImageSource.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXImageSourceNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/FillLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXFillLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/FillExtrusionLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXFillExtrusionLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/LineLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXLineLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/CircleLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXCircleLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/RasterLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXRasterLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/BackgroundLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXBackgroundLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/StyleImport.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXStyleImportNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/UserLocation.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/location/locationManager.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXLocationModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/HeadingIndicator.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/assets/heading.png",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Images.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXImagesNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Image.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXImageNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXImageModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/LocationPuck.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXNativeUserLocationNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/VectorSource.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXVectorSourceNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/RasterSource.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXRasterSourceNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/RasterArraySource.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXRasterArraySourceNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/RasterDemSource.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXRasterDemSourceNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Models.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXModelsNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/HeatmapLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXHeatmapLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/SkyLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXSkyLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/ModelLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXModelLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/RasterParticleLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXRasterParticleLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/HillshadeLayer.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXHillshadeLayerNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/CustomLocationProvider.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXCustomLocationProviderNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/CameraGestureObserver.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXCameraGestureObserverNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/offline/offlineManager.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/offline/OfflineCreatePackOptions.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/offline/OfflinePack.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/offline/offlineManagerLegacy.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/offline/OfflinePackLegacy.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/offline/TileStore.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXTileStoreModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/snapshot/snapshotManager.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/modules/snapshot/SnapshotOptions.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/MarkerView.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXMarkerViewContentNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/RNMBXMarkerViewNativeComponent.ts",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/components/Style.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/shapeAnimators/MovePointShapeAnimator.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXMovePointShapeAnimatorModule.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/shapeAnimators/ShapeAnimatorManager.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/shapeAnimators/ChangeLineOffsetsShapeAnimator.js",
+            "/private/tmp/one-map-lifecycle-mapbox-s04-installed/node_modules/@rnmapbox/maps/lib/module/specs/NativeRNMBXChangeLineOffsetsShapeAnimatorModule.js"
+          ],
+          "bundleSha256": "1e53e02105c3a9080ceb6276f550f0c55c50cac648700ef260d5a2a9b5f7ec38",
+          "sourceMapSha256": "bd2db5ff6139a8b35cf8cc4da3d5beefa7ba840bfb0cc462c9cdbeabf44261d0",
+          "limitation": "This independently rebundled source graph uses the verified packed consumer; installed Hermes bundle identity is verified separately."
+        },
+        "credentials": {
+          "runtimeEnvironmentVariable": "MAPBOX_PUBLIC_TOKEN",
+          "runtimeTokenPresent": true,
+          "libraryReadsEnvironment": false,
+          "generatedCredentialFileCommitted": false,
+          "generatedCredentialFileMode": "0600",
+          "additionalSDKDownloadCredential": "not requested for successful pinned CocoaPods install or anonymous Mapbox Maven download; download-token environment cleared and Gradle properties absent",
+          "logs": "credential patterns redacted"
+        },
+        "artifactNotes": [
+          "Original c1e artifact retained before Android camera initialization correction;95-file production artifact recorded separately."
+        ]
+      },
+      "ios": {
+        "status": "passed for stated lifecycle subset",
+        "device": {
+          "name": "iPhone 18 Pro",
+          "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "runtime": "iOS27.0",
+          "kind": "simulator"
+        },
+        "toolchain": {
+          "xcode": "27.0",
+          "buildVersion": "27A266a",
+          "maestro": "2.11.0"
+        },
+        "configuration": "Release",
+        "applicationId": "com.onemap.harness.mapbox",
+        "marker": "mapbox-c1e20526ddecd56267d23ca5e89ca713dbd960b591696200dafb4268e8266739-358b334d81cb9087f80ff84d6158ba2a9514342eebb7e11a0541ba840025652a",
+        "executableSha256": "3099169dc097f3145c784489fc68283be3af7781d28d26bbe1d2d7467017cf38",
+        "embeddedBundleSha256": "cab25eda8923b2c5a657507a2bd29b10c4bc69d048dcb1114a04c5c5445b3cc4",
+        "installation": "executable and embedded bundle hashes verified",
+        "buildReport": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791453553875/report.json",
+        "podLockSha256": "6fe1b7d55d0ca852b7dff1218914393dc8b64c2ce88448d9a0e52f36a660c3f8",
+        "nativeDependencyGraph": "MapboxMaps11.23.1,MapboxCoreMaps11.23.1,MapboxCommon24.23.1; no MapLibre in pod lock",
+        "binaryDependencyIsolation": "all app framework Mach-O dependency lists inspected; Mapbox framework trio present, no MapLibre in bundle or links",
+        "frameworks": [
+          {
+            "name": "MapboxCommon",
+            "executableSha256": "016d3809ee2cc6a6fb59c0def8181c2c9513d70e7733c0273d76eaabb5736d2a",
+            "bundleId": "com.mapbox.common",
+            "version": "24.23.1"
+          },
+          {
+            "name": "MapboxCoreMaps",
+            "executableSha256": "4dfe3163bee3393a0488bc3fd7573dfbd8b3eeb4f51d4746977733accc352c37",
+            "bundleId": "com.mapbox.maps",
+            "version": "11.23.1"
+          },
+          {
+            "name": "MapboxMaps",
+            "executableSha256": "bcc1bdcd1c5de608ad590568a1c2be8c234e4c5b7c859c96d0dc5170145d019d",
+            "bundleId": "org.cocoapods.MapboxMaps",
+            "version": "11.23.1"
+          },
+          {
+            "name": "React",
+            "executableSha256": "a0e2c58102ccd4ed9bebec6c4694123335535191c312acdc34ac736c97eb4cd8",
+            "bundleId": "react-native.React",
+            "version": "1.0"
+          },
+          {
+            "name": "ReactNativeDependencies",
+            "executableSha256": "8e58d70fc8f35d8d3ae5c11ec354ec1d2ba7cde624182e33953792ab77f0313f",
+            "bundleId": "third-party.ReactNativeDependencies",
+            "version": "1.0"
+          },
+          {
+            "name": "Turf",
+            "executableSha256": "e1641ce58eda9910f4cd3a3daae42be6abd3abf1b575bcbc133adab6414dfeb1",
+            "bundleId": "com.mapbox.turf",
+            "version": "4.0.0"
+          },
+          {
+            "name": "hermesvm",
+            "executableSha256": "956af81e233d1ec4310a65d87c298d842093d18a053ffc6061ab1d32aa25a1a5",
+            "bundleId": "dev.hermesengine.iphonesimulator",
+            "version": "1.0.0"
+          }
+        ],
+        "completeBinaryInspection": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791453553875/binary-inspection.json",
+        "preservedApp": "Preserved by appArchive and its recorded hash; original working Products path reused for current build.",
+        "appArchive": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/ios-1791453553875/OneMapMapbox-Release-simulator.tgz",
+        "appArchiveSha256": "566fc1b3556f92e5189c1ebd66a67fb5437b61f4c076ac57a09228489b16b3d9",
+        "hostSourceHashes": {
+          "AppDelegate.swift": "2cb482922b8e32ae09e36f69c029828f935d88f9d44e8c14df2fe45b8386f5d0",
+          "Info.plist": "97f47a1a641a70c5183458641fbd6cb99a4184dab507ab14211756e69d88b4c8"
+        },
+        "hostAdaptations": {
+          "deploymentFloor": "Generated pod targets below React Native minimum raised to15.1; SDK versions unchanged.",
+          "sceneLifecycle": "SceneDelegate owns UIWindow(windowScene:); application retains factory/delegate/launch options; built Info.plist declares OneMapMapbox.SceneDelegate and a single scene.",
+          "reference": "https://developer.apple.com/documentation/uikit/transitioning-to-the-uikit-scene-based-life-cycle"
+        },
+        "runtime": {
+          "status": "passed",
+          "suite": "Mapbox lifecycle from packed one-map-react",
+          "durationSeconds": 23.347,
+          "junit": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-scene/junit.xml",
+          "artifacts": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-scene",
+          "flow": "tests/native-runtime/mapbox-lifecycle.yaml",
+          "flowSha256": "6fdd0f4158094dda9085bf26954f1fd43e59f8005881d8bbfb16bccc3cebae86",
+          "checks": {
+            "currentReleaseMarker": "passed",
+            "initialLoadAndStyleEvents": "passed (1 each)",
+            "readiness": "passed (true after load)",
+            "beforeLoadGetter": "passed (MapNotReadyError)",
+            "hostSize": "passed (370x220 to approximately370x360 logical units)",
+            "readyGetter": "passed expected MapBackendError pending getZoom",
+            "unmountRetainedGetter": "passed (MapNotReadyError)",
+            "unmountedReadiness": "passed (false)",
+            "remount": "passed (ready true; load2/style2)",
+            "errorLog": "passed (none observed)",
+            "renderedRoute": "passed by manual visual inspection of initial/remounted screenshots"
+          },
+          "screenshots": [
+            {
+              "path": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-scene/2026-10-08_030249/Mapbox lifecycle from packed one-map-react/takeScreenshot/mapbox-initial-route.png",
+              "sha256": "24559d8655bd7b64bc40b9225ec4fa79be457be2be9eff91e35f4f8961cc5b90"
+            },
+            {
+              "path": "/private/tmp/one-map-lifecycle-mapbox-s04-installed/artifacts/runtime-ios-scene/2026-10-08_030249/Mapbox lifecycle from packed one-map-react/takeScreenshot/mapbox-remounted-route.png",
+              "sha256": "67b455f76c7361418c7a826318623c4fcc4eae11d25d65169b026c4dcbc7f1b1"
+            }
+          ],
+          "measurementNote": "Native layout can report359.9999694824219 for requested360 after remount; logical measurements require numerical tolerance."
+        }
+      },
+      "scope": "original c1e artifact iOS lifecycle subset, retained before diagnosed Android initialization correction"
+    }
+  ],
+  "staticChecks": {
+    "typescript": "passed",
+    "biome": "passed",
+    "nativeJest": "3 suites, 33 tests passed",
+    "nativeMockScope": "Mock tests exercise component lifecycle/contracts; actual runtime evidence recorded separately."
+  },
+  "currentAcceptance": {
+    "record": "records/evidence/s04-style-cleanup.json",
+    "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+    "status": "passed",
+    "scope": "Current S04 cleanup acceptance is held in the linked record. Earlier observations and unavailable checks in this file remain historical evidence."
+  }
+}

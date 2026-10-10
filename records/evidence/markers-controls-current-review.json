@@ -1,0 +1,2268 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-10-08",
+  "recordedAt": "2026-10-08T10:46:34.044496+00:00",
+  "status": "current pinned source/declaration/editorial review completed; runtime investigations remain pending",
+  "scope": {
+    "edited": [
+      "docs/markers-and-controls.md",
+      "records/evidence/markers-controls-current-review.json"
+    ],
+    "unchanged": [
+      "common contracts and implementations",
+      "coverage/stage ledgers",
+      "other documentation and decisions",
+      "upstream checkouts"
+    ],
+    "priorEvidence": "records/evidence/documentation-style-review.json",
+    "priorGapResolved": "historical-marker-control-comparisons source/declaration revalidation; owning-stage behavioral gates remain"
+  },
+  "instructionsRead": [
+    {
+      "path": "docs/STYLE_GUIDE.md",
+      "sha256": "2503bc4c3dbb24e79c70814d99f4568d59d79eabe20f55e2bd5484c1e06f0aaf",
+      "scope": "complete guide, all sections"
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "5104236f29fb5fb13768dcc55352cb6d25b459d987d318ced2d692103b8aa56b"
+    },
+    {
+      "path": "/Users/rob/.agents/skills/no-ai-slop/SKILL.md",
+      "scope": "complete skill and eval.md"
+    }
+  ],
+  "document": {
+    "path": "docs/markers-and-controls.md",
+    "sha256": "fcccf15536e078c2b4d2f38eb02871f366099d0fcd81968490dfa464c800f795",
+    "lineCount": 422
+  },
+  "sourceChecks": {
+    "directory": "/private/tmp/one-map-marker-sources-omiz1424",
+    "results": [
+      {
+        "key": "ml-annotation",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/view-annotation/ViewAnnotation.tsx",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/src/components/annotations/view-annotation/ViewAnnotation.tsx",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/components/annotations/view-annotation/ViewAnnotation.tsx",
+        "localSha256": "1dc565dbbeed42c8d7b82359008728d2f64cde96eb1bb0209141597211fcaa0d",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/view-annotation/ViewAnnotation.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-annotation.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "1dc565dbbeed42c8d7b82359008728d2f64cde96eb1bb0209141597211fcaa0d",
+        "status": "passed"
+      },
+      {
+        "key": "ml-annotation-docs",
+        "url": "https://maplibre.org/maplibre-react-native/docs/components/annotations/view-annotation/",
+        "kind": "readable-docs",
+        "status": "not-source-identity-check"
+      },
+      {
+        "key": "ml-callout",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/callout/Callout.tsx",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/src/components/annotations/callout/Callout.tsx",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/components/annotations/callout/Callout.tsx",
+        "localSha256": "2964383cd81634cc77dc04327469c1a70d8bf85a99bf4acae183cce4c0ed63a4",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/callout/Callout.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-callout.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "2964383cd81634cc77dc04327469c1a70d8bf85a99bf4acae183cce4c0ed63a4",
+        "status": "passed"
+      },
+      {
+        "key": "ml-index",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/src/index.ts",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/index.ts",
+        "localSha256": "64f3757c0ce4aa6a4f26ace3c1f1f9a05928b6449f4878753e42e6ba7dfb1203",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-index.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "64f3757c0ce4aa6a4f26ace3c1f1f9a05928b6449f4878753e42e6ba7dfb1203",
+        "status": "passed"
+      },
+      {
+        "key": "ml-layer-annotation",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/LayerAnnotation.tsx",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/src/components/annotations/LayerAnnotation.tsx",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/components/annotations/LayerAnnotation.tsx",
+        "localSha256": "21422ec0caa97d8317508f799c0ceea2feba268dc64317f157ef1afc6443257f",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/LayerAnnotation.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-layer-annotation.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "21422ec0caa97d8317508f799c0ceea2feba268dc64317f157ef1afc6443257f",
+        "status": "passed"
+      },
+      {
+        "key": "ml-map",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/src/components/map/Map.tsx",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/components/map/Map.tsx",
+        "localSha256": "2f4d12411e3a7d9b020d311842fae127c535e9d6835316fe3a69cb30bd8ef61f",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-map.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "2f4d12411e3a7d9b020d311842fae127c535e9d6835316fe3a69cb30bd8ef61f",
+        "status": "passed"
+      },
+      {
+        "key": "ml-marker",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/src/components/annotations/marker/Marker.tsx",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/components/annotations/marker/Marker.tsx",
+        "localSha256": "29db1675c29158cb8945ac87e3e6c952cddf4af1728e25306bab861709b8b3b2",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-marker.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "29db1675c29158cb8945ac87e3e6c952cddf4af1728e25306bab861709b8b3b2",
+        "status": "passed"
+      },
+      {
+        "key": "rn-annotation",
+        "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/PointAnnotation.tsx",
+        "repository": "rnmapbox/maps",
+        "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+        "path": "src/components/PointAnnotation.tsx",
+        "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/components/PointAnnotation.tsx",
+        "localSha256": "049fbb7dc0dbee7af9d4e4f65cf7cf47d6420745cefd83a86e30e3386073fb94",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/PointAnnotation.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/rn-annotation.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "049fbb7dc0dbee7af9d4e4f65cf7cf47d6420745cefd83a86e30e3386073fb94",
+        "status": "passed"
+      },
+      {
+        "key": "rn-annotation-layer",
+        "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Annotation.tsx",
+        "repository": "rnmapbox/maps",
+        "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+        "path": "src/components/Annotation.tsx",
+        "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/components/Annotation.tsx",
+        "localSha256": "aa993e35451234314a8177a7ea8fc417f9e0c32e7da2cb8a87bb7534066e7ebf",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Annotation.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/rn-annotation-layer.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "aa993e35451234314a8177a7ea8fc417f9e0c32e7da2cb8a87bb7534066e7ebf",
+        "status": "passed"
+      },
+      {
+        "key": "rn-callout",
+        "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Callout.tsx",
+        "repository": "rnmapbox/maps",
+        "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+        "path": "src/components/Callout.tsx",
+        "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/components/Callout.tsx",
+        "localSha256": "4e78c76b470f631c13f6434394f083cfe1ed80331484e585292440efd72f3fb2",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Callout.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/rn-callout.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "4e78c76b470f631c13f6434394f083cfe1ed80331484e585292440efd72f3fb2",
+        "status": "passed"
+      },
+      {
+        "key": "rn-index",
+        "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts",
+        "repository": "rnmapbox/maps",
+        "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+        "path": "src/Mapbox.native.ts",
+        "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/Mapbox.native.ts",
+        "localSha256": "dfef6188527b89fa1883adc033245b0082d54530ad233a899d11f911c89433df",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/rn-index.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "dfef6188527b89fa1883adc033245b0082d54530ad233a899d11f911c89433df",
+        "status": "passed"
+      },
+      {
+        "key": "rn-map",
+        "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx",
+        "repository": "rnmapbox/maps",
+        "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+        "path": "src/components/MapView.tsx",
+        "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/components/MapView.tsx",
+        "localSha256": "7d6ff199f30fdbc4875422c2277b5ceda27651989180bd0170493ca0b0a11306",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/rn-map.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "7d6ff199f30fdbc4875422c2277b5ceda27651989180bd0170493ca0b0a11306",
+        "status": "passed"
+      },
+      {
+        "key": "rn-marker",
+        "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx",
+        "repository": "rnmapbox/maps",
+        "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+        "path": "src/components/MarkerView.tsx",
+        "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/components/MarkerView.tsx",
+        "localSha256": "195e13a63e80fc6e0e9731d9f3a8e04fc3622f0127184fde273b579c208c33b7",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/rn-marker.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "195e13a63e80fc6e0e9731d9f3a8e04fc3622f0127184fde273b579c208c33b7",
+        "status": "passed"
+      },
+      {
+        "key": "web-control",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/use-control.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-maplibre/src/components/use-control.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/use-control.ts",
+        "localSha256": "f18cda75e860e76cbf85cc82d0d1f76475cb4f4e7fc23ba331fef6cdf37507bc",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/use-control.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-control.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "f18cda75e860e76cbf85cc82d0d1f76475cb4f4e7fc23ba331fef6cdf37507bc",
+        "status": "passed"
+      },
+      {
+        "key": "web-index",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/index.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-maplibre/src/index.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/index.ts",
+        "localSha256": "2edc2bb958d559edd93bdb0d10fc2943027b86ca256479d87b50ae3dc42f25a0",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/index.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-index.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "2edc2bb958d559edd93bdb0d10fc2943027b86ca256479d87b50ae3dc42f25a0",
+        "status": "passed"
+      },
+      {
+        "key": "web-marker",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-maplibre/src/components/marker.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/marker.ts",
+        "localSha256": "ad88d7df076e7e884db742230122efd6137a00a8f6ac88af7d4c78abb1c963df",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-marker.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "ad88d7df076e7e884db742230122efd6137a00a8f6ac88af7d4c78abb1c963df",
+        "status": "passed"
+      },
+      {
+        "key": "web-popup",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/popup.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-maplibre/src/components/popup.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/popup.ts",
+        "localSha256": "82208dddf85f283383f1c79b93cacabf6c5e1304083e8da8023e62cc5870fdbc",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/popup.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-popup.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "82208dddf85f283383f1c79b93cacabf6c5e1304083e8da8023e62cc5870fdbc",
+        "status": "passed"
+      },
+      {
+        "key": "web-source",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/source.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-maplibre/src/components/source.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/source.ts",
+        "localSha256": "27af1a16e367739f45069d42ed8bf8e2915e5afa3eeb89063de22f6f7a0e9538",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/source.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-source.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "27af1a16e367739f45069d42ed8bf8e2915e5afa3eeb89063de22f6f7a0e9538",
+        "status": "passed"
+      },
+      {
+        "key": "web-use-map",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/use-map.tsx",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-maplibre/src/components/use-map.tsx",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/use-map.tsx",
+        "localSha256": "0f227f45144434109014b3f2cd8c69ebe73f5a59c8e3b234e53f26d40e3947d2",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/use-map.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-use-map.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "0f227f45144434109014b3f2cd8c69ebe73f5a59c8e3b234e53f26d40e3947d2",
+        "status": "passed"
+      },
+      {
+        "key": "ml-native-marker",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/android/src/main/java/org/maplibre/reactnative/components/annotations/markerview/MLRNMarkerView.kt",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/android/src/main/java/org/maplibre/reactnative/components/annotations/markerview/MLRNMarkerView.kt",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/android/src/main/java/org/maplibre/reactnative/components/annotations/markerview/MLRNMarkerView.kt",
+        "localSha256": "10a2fec45200796a04346d06c68dfdf01ea3ca87d7624cd627f1573f073d9fb1",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/android/src/main/java/org/maplibre/reactnative/components/annotations/markerview/MLRNMarkerView.kt",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-native-marker.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "10a2fec45200796a04346d06c68dfdf01ea3ca87d7624cd627f1573f073d9fb1",
+        "status": "passed"
+      },
+      {
+        "key": "mb-sdk-marker",
+        "url": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/ui/marker.ts",
+        "repository": "mapbox/mapbox-gl-js",
+        "revision": "v3.32.0",
+        "path": "src/ui/marker.ts",
+        "localPath": "/private/tmp/one-map-research-web/mapbox-gl/src/ui/marker.ts",
+        "localSha256": "f5fb39d0540a44dd102e2fb41abc1cc9ee40ccb70a137536421d61b97b162dee",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/mapbox/mapbox-gl-js/v3.32.0/src/ui/marker.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/mb-sdk-marker.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "f5fb39d0540a44dd102e2fb41abc1cc9ee40ccb70a137536421d61b97b162dee",
+        "status": "passed"
+      },
+      {
+        "key": "ml-sdk-marker",
+        "url": "https://github.com/maplibre/maplibre-gl-js/blob/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/marker.ts",
+        "repository": "maplibre/maplibre-gl-js",
+        "revision": "f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d",
+        "path": "src/ui/marker.ts",
+        "localPath": "/private/tmp/one-map-research-web/maplibre-gl/src/ui/marker.ts",
+        "localSha256": "2e359b191d75f8745bfdd44567fbc7e9ae33f1b4fe487b8461076eb669b71e3f",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-gl-js/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/marker.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-sdk-marker.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "2e359b191d75f8745bfdd44567fbc7e9ae33f1b4fe487b8461076eb669b71e3f",
+        "status": "passed"
+      },
+      {
+        "key": "web-mapbox-index",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/index.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-mapbox/src/index.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/index.ts",
+        "localSha256": "eb17b168dd5382b5bcbd04fcef5294732ffb7abc5b1c4707969ec2889f711191",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/index.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-mapbox-index.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "eb17b168dd5382b5bcbd04fcef5294732ffb7abc5b1c4707969ec2889f711191",
+        "status": "passed"
+      },
+      {
+        "key": "web-navigation",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/navigation-control.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-maplibre/src/components/navigation-control.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/navigation-control.ts",
+        "localSha256": "90de3c44dfb2b7f6e871c6e60ac8dc5f5eb37bae7cd7f019678502e2f350b758",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/navigation-control.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-navigation.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "90de3c44dfb2b7f6e871c6e60ac8dc5f5eb37bae7cd7f019678502e2f350b758",
+        "status": "passed"
+      },
+      {
+        "key": "web-scale",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/scale-control.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-maplibre/src/components/scale-control.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/scale-control.ts",
+        "localSha256": "ea22f2b2b4683a695f246cb51f4bcb8cac4725549fd69dbe9b8bb67df56583ad",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/scale-control.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-scale.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "ea22f2b2b4683a695f246cb51f4bcb8cac4725549fd69dbe9b8bb67df56583ad",
+        "status": "passed"
+      },
+      {
+        "key": "web-mapbox-marker",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/components/marker.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-mapbox/src/components/marker.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/components/marker.ts",
+        "localSha256": "ec9ceec177d8238f24093e48243915da4aa9ba69579b22cc74722d6b14887e29",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/components/marker.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-mapbox-marker.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "ec9ceec177d8238f24093e48243915da4aa9ba69579b22cc74722d6b14887e29",
+        "status": "passed"
+      },
+      {
+        "key": "web-mapbox-popup",
+        "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/components/popup.ts",
+        "repository": "visgl/react-map-gl",
+        "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+        "path": "modules/react-mapbox/src/components/popup.ts",
+        "localPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/components/popup.ts",
+        "localSha256": "765b334275727fe15589e002b2658d3ab04cccec0ef39d88d583f3589659c817",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/components/popup.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/web-mapbox-popup.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "765b334275727fe15589e002b2658d3ab04cccec0ef39d88d583f3589659c817",
+        "status": "passed"
+      },
+      {
+        "key": "mb-sdk-popup",
+        "url": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/ui/popup.ts",
+        "repository": "mapbox/mapbox-gl-js",
+        "revision": "v3.32.0",
+        "path": "src/ui/popup.ts",
+        "localPath": "/private/tmp/one-map-research-web/mapbox-gl/src/ui/popup.ts",
+        "localSha256": "3e65ecd6cb8f2a75b54209ae730bf6302fff42ec3bf6fa17cc6a31b4309f36cc",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/mapbox/mapbox-gl-js/v3.32.0/src/ui/popup.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/mb-sdk-popup.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "3e65ecd6cb8f2a75b54209ae730bf6302fff42ec3bf6fa17cc6a31b4309f36cc",
+        "status": "passed"
+      },
+      {
+        "key": "ml-sdk-popup",
+        "url": "https://github.com/maplibre/maplibre-gl-js/blob/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/popup.ts",
+        "repository": "maplibre/maplibre-gl-js",
+        "revision": "f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d",
+        "path": "src/ui/popup.ts",
+        "localPath": "/private/tmp/one-map-research-web/maplibre-gl/src/ui/popup.ts",
+        "localSha256": "7cbd2f16496cc0312a1fdde78b2c62411ad6f494813dedeb6a6f28b939e8a280",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-gl-js/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/popup.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-sdk-popup.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "7cbd2f16496cc0312a1fdde78b2c62411ad6f494813dedeb6a6f28b939e8a280",
+        "status": "passed"
+      },
+      {
+        "key": "rn-native-annotation",
+        "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/android/src/main/java/com/rnmapbox/rnmbx/components/annotation/RNMBXPointAnnotation.kt",
+        "repository": "rnmapbox/maps",
+        "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/annotation/RNMBXPointAnnotation.kt",
+        "localPath": "/private/tmp/one-map-research-rnmapbox/package/android/src/main/java/com/rnmapbox/rnmbx/components/annotation/RNMBXPointAnnotation.kt",
+        "localSha256": "9aaa94ed1834f4589dc4f41a77d3c931d3ae7f4b6110ffdaf7a3ddb91e5e6236",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/android/src/main/java/com/rnmapbox/rnmbx/components/annotation/RNMBXPointAnnotation.kt",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/rn-native-annotation.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "9aaa94ed1834f4589dc4f41a77d3c931d3ae7f4b6110ffdaf7a3ddb91e5e6236",
+        "status": "passed"
+      },
+      {
+        "key": "ml-native-annotation",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/android/src/main/java/org/maplibre/reactnative/components/annotations/pointannotation/MLRNPointAnnotation.kt",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/android/src/main/java/org/maplibre/reactnative/components/annotations/pointannotation/MLRNPointAnnotation.kt",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/android/src/main/java/org/maplibre/reactnative/components/annotations/pointannotation/MLRNPointAnnotation.kt",
+        "localSha256": "693ae0535cff4b38ff019928a682650c8946bbc63023ba69d9b5b0d335216d9c",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/android/src/main/java/org/maplibre/reactnative/components/annotations/pointannotation/MLRNPointAnnotation.kt",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-native-annotation.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "693ae0535cff4b38ff019928a682650c8946bbc63023ba69d9b5b0d335216d9c",
+        "status": "passed"
+      },
+      {
+        "key": "rn-camera",
+        "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Camera.tsx",
+        "repository": "rnmapbox/maps",
+        "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+        "path": "src/components/Camera.tsx",
+        "localPath": "/private/tmp/one-map-research-rnmapbox/package/src/components/Camera.tsx",
+        "localSha256": "4323f70c6d640160d66a6b2e3f5affc7a25281f33e20a6412068099043e649d2",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Camera.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/rn-camera.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "4323f70c6d640160d66a6b2e3f5affc7a25281f33e20a6412068099043e649d2",
+        "status": "passed"
+      },
+      {
+        "key": "ml-camera",
+        "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/camera/Camera.tsx",
+        "repository": "maplibre/maplibre-react-native",
+        "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+        "path": "package/src/components/camera/Camera.tsx",
+        "localPath": "/private/tmp/one-map-research-maplibre-native/package/src/components/camera/Camera.tsx",
+        "localSha256": "3c47aeebf87fe92c22ef746ee93716b9684ea02f8ee7bbec2fe4db7ee0c687f8",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/camera/Camera.tsx",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-camera.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "3c47aeebf87fe92c22ef746ee93716b9684ea02f8ee7bbec2fe4db7ee0c687f8",
+        "status": "passed"
+      },
+      {
+        "key": "mb-sdk-control",
+        "url": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/ui/map.ts",
+        "repository": "mapbox/mapbox-gl-js",
+        "revision": "v3.32.0",
+        "path": "src/ui/map.ts",
+        "localPath": "/private/tmp/one-map-research-web/mapbox-gl/src/ui/map.ts",
+        "localSha256": "2ebec03573e04b72fa594e0eddd9b9898a16e1134348b553bddee022441be391",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/mapbox/mapbox-gl-js/v3.32.0/src/ui/map.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/mb-sdk-control.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "2ebec03573e04b72fa594e0eddd9b9898a16e1134348b553bddee022441be391",
+        "status": "passed"
+      },
+      {
+        "key": "ml-sdk-control",
+        "url": "https://github.com/maplibre/maplibre-gl-js/blob/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/control/control.ts",
+        "repository": "maplibre/maplibre-gl-js",
+        "revision": "f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d",
+        "path": "src/ui/control/control.ts",
+        "localPath": "/private/tmp/one-map-research-web/maplibre-gl/src/ui/control/control.ts",
+        "localSha256": "e3eddf60de5fda8f28f22d9b9bb8b3f0bc96c958c2afae611f3d282a6f66fd1b",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/maplibre/maplibre-gl-js/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/control/control.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-omiz1424/ml-sdk-control.txt"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "retrievedSha256": "e3eddf60de5fda8f28f22d9b9bb8b3f0bc96c958c2afae611f3d282a6f66fd1b",
+        "status": "passed"
+      }
+    ]
+  },
+  "retainedInitialSourceFailure": {
+    "results": [
+      {
+        "key": "mb-sdk-marker",
+        "url": "https://github.com/mapbox/mapbox-gl-js/blob/b98dd3c17d8429da2944973097690358ad07b52b/src/ui/marker.ts",
+        "repository": "mapbox/mapbox-gl-js",
+        "revision": "b98dd3c17d8429da2944973097690358ad07b52b",
+        "path": "src/ui/marker.ts",
+        "localPath": "/private/tmp/one-map-research-web/mapbox-gl/src/ui/marker.ts",
+        "localSha256": "f5fb39d0540a44dd102e2fb41abc1cc9ee40ccb70a137536421d61b97b162dee",
+        "command": [
+          "curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "35",
+          "https://raw.githubusercontent.com/mapbox/mapbox-gl-js/b98dd3c17d8429da2944973097690358ad07b52b/src/ui/marker.ts",
+          "--output",
+          "/private/tmp/one-map-marker-sources-nlkk6ium/mb-sdk-marker.txt"
+        ],
+        "exitCode": 56,
+        "output": "curl: (56) The requested URL returned error: 404\n",
+        "status": "failed"
+      }
+    ],
+    "resolution": "Mapbox GL JS npm metadata gitHead returned HTTP404. Its SDK citation now uses reachable release tag v3.32.0; the fetched body matches the inspected release hash. Published 3.32.0 declarations were checked independently. Baseline metadata is unchanged."
+  },
+  "readableDocumentationChecks": [
+    {
+      "url": "https://maplibre.org/maplibre-react-native/docs/components/annotations/view-annotation/",
+      "status": "retrieved via web tool",
+      "claim": "Documents Android bitmap children, native event tuple, selection/title and refresh; current source separately checked"
+    },
+    {
+      "url": "https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/marker",
+      "status": "retrieved via web tool",
+      "claim": "DOM children/default marker, drag events, reactive and construction-only options"
+    },
+    {
+      "url": "https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/popup",
+      "status": "retrieved via web tool",
+      "claim": "Independent React popup and callback/option reference; pinned branch details govern update comparisons"
+    },
+    {
+      "url": "https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/use-control",
+      "status": "retrieved via official-domain search",
+      "claim": "useControl creation/add/removal and corner options"
+    },
+    {
+      "url": "https://rnmapbox.github.io/docs/MarkerView",
+      "status": "unavailable",
+      "failures": ["web tool retrieval unavailable", "directcurlHTTP404"],
+      "resolution": "Do not publish unavailable guide link; pinned source with public JSDoc and installed declarations remains the evidence"
+    }
+  ],
+  "materialComparisonRows": [
+    {
+      "line": 23,
+      "table": 1,
+      "section": "Point content components",
+      "cells": [
+        "[`MarkerView`: interactive native children][rn-marker]",
+        "[`Marker`: interactive native children][ml-marker]",
+        "[`Marker`: DOM children][web-marker]",
+        "Agreed live-child default; proposed `Marker renderMode=\"view\"` adapts host interaction."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 24,
+      "table": 1,
+      "section": "Point content components",
+      "cells": [
+        "[`PointAnnotation`: draggable; Android bitmap children][rn-annotation]",
+        "[`ViewAnnotation`: draggable; Android bitmap children][ml-annotation]",
+        "[`Marker` dragging and DOM content][web-marker]",
+        "Agreed explicit annotation mode; proposed `Marker renderMode=\"annotation\"` adapts static children and drag events."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/PointAnnotation.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/view-annotation/ViewAnnotation.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 25,
+      "table": 1,
+      "section": "Point content components",
+      "cells": [
+        "[`Annotation`: convenience point source/layers][rn-annotation-layer]",
+        "[`LayerAnnotation`: convenience point source/layers][ml-layer-annotation]",
+        "[`Source` plus `Layer`][web-source]",
+        "Compose `Source` and `Layer`; translate helper animation and source-press behavior explicitly."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Annotation.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/LayerAnnotation.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/source.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 26,
+      "table": 1,
+      "section": "Point content components",
+      "cells": [
+        "[`Callout` attached to annotation][rn-callout]",
+        "[`Callout` attached to annotation][ml-callout]",
+        "[`Popup` at an independent position][web-popup]",
+        "Capability-gated standalone `Popup`; native attachment is not a direct equivalent."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Callout.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/callout/Callout.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/popup.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 38,
+      "table": 2,
+      "section": "Marker properties",
+      "cells": [
+        "[`coordinate: [lng, lat]`][rn-marker]",
+        "[`lngLat: [lng, lat]`][ml-marker]",
+        "[`longitude`, `latitude`][web-marker]",
+        "`longitude`, `latitude`; convert to native tuples."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 39,
+      "table": 2,
+      "section": "Marker properties",
+      "cells": [
+        "[`anchor: {x, y}` in normalized view coordinates][rn-marker]",
+        "[Named `anchor`][ml-marker]",
+        "[Named `anchor`][web-marker]",
+        "Named anchor; translate to normalized native coordinates."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 40,
+      "table": 2,
+      "section": "Marker properties",
+      "cells": [
+        "[No declared MarkerView offset prop][rn-marker]",
+        "[`offset: [x, y]`][ml-marker]",
+        "[`offset` accepts point-like values][web-marker]",
+        "`offset: [x, y]`; RNMapbox emulation requires anchor/hit-region validation."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 41,
+      "table": 2,
+      "section": "Marker properties",
+      "cells": [
+        "[Anchor/coordinate changes flow to native props][rn-marker]",
+        "[Anchor/offset/coordinate changes flow to native props][ml-marker]",
+        "[Anchor is construction-only; coordinates/rotation/dragging are updated by setters][web-marker]",
+        "Implement the proposed update contract explicitly; changing an anchor may require wrapper remount or verified SDK adaptation."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 47,
+      "table": 3,
+      "section": "Marker properties",
+      "cells": [
+        "[`isSelected` on MarkerView][rn-marker]; [`selected` on PointAnnotation][rn-annotation]",
+        "[`selected` on Marker is iOS-only][ml-marker]; [ViewAnnotation also exposes `selected`][ml-annotation]",
+        "[Popup association; no matching general selected prop][web-marker]",
+        "Selection belongs to application state; annotation selection is an extension."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx",
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/PointAnnotation.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx",
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/view-annotation/ViewAnnotation.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 48,
+      "table": 3,
+      "section": "Marker properties",
+      "cells": [
+        "[MarkerView child presses; no dedicated `onPress`][rn-marker]",
+        "[`onPress`: native event][ml-marker]",
+        "[`onClick`: browser marker event][web-marker]",
+        "`onClick` normalized by adapter, without exposing required raw events."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 49,
+      "table": 3,
+      "section": "Marker properties",
+      "cells": [
+        "[MarkerView has no `draggable`; PointAnnotation does][rn-annotation]",
+        "[Marker has no `draggable`; ViewAnnotation does][ml-annotation]",
+        "[`draggable`, drag callbacks][web-marker]",
+        "`draggable` depends on render mode and capability."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/PointAnnotation.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/view-annotation/ViewAnnotation.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 50,
+      "table": 3,
+      "section": "Marker properties",
+      "cells": [
+        "[`stopGesturePropagation`: Android child gesture containment; default false][rn-marker]",
+        "[No corresponding declared Marker option][ml-marker]",
+        "[DOM child/browser propagation and SDK drag handling][web-marker]",
+        "Preserve child interaction; native gesture containment needs a named mapping and physical-touch evidence."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 56,
+      "table": 4,
+      "section": "Marker properties",
+      "cells": [
+        "[`style` and `pointerEvents` forwarded by MarkerView][rn-marker]",
+        "[Marker extends and forwards native `ViewProps`][ml-marker]",
+        "[CSS `style`, class and DOM options][web-marker]",
+        "Host-specific styling; common geometry does not imply shared child UI."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 57,
+      "table": 4,
+      "section": "Marker properties",
+      "cells": [
+        "[`allowOverlap`, `allowOverlapWithPuck`][rn-marker]",
+        "[No corresponding declared Marker props][ml-marker]",
+        "[DOM marker behavior, separate from symbol collisions][web-marker]",
+        "Explicit collision capability; no silent emulation claim."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 58,
+      "table": 4,
+      "section": "Marker properties",
+      "cells": [
+        "[No matching live-marker rotation props][rn-marker]",
+        "[No matching declared Marker rotation props][ml-marker]",
+        "[`rotation`, rotation/pitch alignment; SDK-specific options][web-marker]",
+        "Named capability/extension options; investigate adaptation before substantiating unsupported behavior."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 59,
+      "table": 4,
+      "section": "Marker properties",
+      "cells": [
+        "[Native child element required][rn-marker]",
+        "[Native child element required][ml-marker]",
+        "[Children optional; default SDK marker][web-marker]",
+        "Proposed optional children with a one-map-react-owned default marker; artwork/default geometry remain open."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MarkerView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/marker/Marker.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/marker.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 208,
+      "table": 5,
+      "section": "Popups and callouts",
+      "cells": [
+        "[`Callout` under PointAnnotation][rn-callout]",
+        "[`Callout` under ViewAnnotation][ml-callout]",
+        "[`Popup` independently mounted][web-popup]",
+        "Standalone `Popup` capability; common longitude/latitude and children."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Callout.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/callout/Callout.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/popup.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 209,
+      "table": 5,
+      "section": "Popups and callouts",
+      "cells": [
+        "[Annotation selection and required iOS title][rn-annotation]",
+        "[Annotation selection and required iOS title][ml-annotation]",
+        "[Popup open/close callbacks and DOM options][web-popup]",
+        "React mount controls visibility; `onClose` reports a requested dismissal."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/PointAnnotation.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/view-annotation/ViewAnnotation.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/popup.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 210,
+      "table": 5,
+      "section": "Popups and callouts",
+      "cells": [
+        "[`style` on animated wrapper, `containerStyle`, `textStyle` and bubble/tip styles][rn-callout]",
+        "[`style` on native container, `animatedStyle`, `titleStyle` and bubble/tip styles][ml-callout]",
+        "[CSS style/class, anchor, offset and SDK popup options][web-popup]",
+        "Convert named styling fields explicitly; native overlay/attachment work remains open."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Callout.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/callout/Callout.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/popup.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 211,
+      "table": 5,
+      "section": "Popups and callouts",
+      "cells": [
+        "[No standalone Callout `onClose` prop; annotation selection callbacks][rn-annotation]",
+        "[No standalone Callout `onClose` prop; `onSelect`/`onDeselect`][ml-annotation]",
+        "[Close listener detached before unmount removes the popup][web-popup]",
+        "Agreed requested-dismissal callback and teardown distinction; native composition must implement it."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/PointAnnotation.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/view-annotation/ViewAnnotation.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/popup.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 212,
+      "table": 5,
+      "section": "Popups and callouts",
+      "cells": [
+        "[Annotation title/selection and native Callout props][rn-annotation]",
+        "[Annotation title/selection and native Callout props][ml-annotation]",
+        "[SDK close-button/click/focus options are read during construction; wrapper updates a narrower field set][web-popup]",
+        "Define constructor/update/reset semantics; native dismissal and focus require explicit composition."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/PointAnnotation.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/annotations/view-annotation/ViewAnnotation.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/popup.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 292,
+      "table": 6,
+      "section": "Controls and map access",
+      "cells": [
+        "[`attributionEnabled`, `logoEnabled`, `compassEnabled`, `scaleBarEnabled` map props][rn-map]",
+        "[`attribution`, `logo`, `compass`, `scaleBar` map props][ml-map]",
+        "[`AttributionControl`, `NavigationControl`, `ScaleControl` child components][web-index]",
+        "Normalize common ornament intent; richer controls are separate components."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/index.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 293,
+      "table": 6,
+      "section": "Controls and map access",
+      "cells": [
+        "[No standard navigation/fullscreen React controls][rn-index]",
+        "[No standard navigation/fullscreen React controls][ml-index]",
+        "[`NavigationControl`, `FullscreenControl`][web-index]",
+        "Navigation UI may be one-map-react-owned; browser fullscreen is a capability."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/index.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 294,
+      "table": 6,
+      "section": "Controls and map access",
+      "cells": [
+        "[No GL JS `IControl` host][rn-index]",
+        "[No GL JS `IControl` host][ml-index]",
+        "[`useControl`][web-control]",
+        "Web-control extension; native controls require host-appropriate UI."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/use-control.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 295,
+      "table": 6,
+      "section": "Controls and map access",
+      "cells": [
+        "[Native refs and application context][rn-index]",
+        "[Native refs and application context][ml-index]",
+        "[`MapProvider`; `useMap()` returns a collection plus `current`][web-use-map]",
+        "Agreed `OneMapProvider` selects an adapter and owns the registry; `useMap` exposes common refs."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/use-map.tsx"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 296,
+      "table": 6,
+      "section": "Controls and map access",
+      "cells": [
+        "[No Terrain/Globe/Logo control-component exports][rn-index]",
+        "[No Terrain/Globe/Logo control-component exports][ml-index]",
+        "[MapLibre exports Terrain/Globe/Logo controls][web-index]; [Mapbox entry omits them][web-mapbox-index]",
+        "Named backend capability/control paths; missing wrapper controls do not establish unavailable SDK rendering."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/index.ts",
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/index.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 297,
+      "table": 6,
+      "section": "Controls and map access",
+      "cells": [
+        "[Corner/margin ornament positions; scale-bar units declared][rn-map]",
+        "[Corner/margin positions; Android scale bar restricted to top-left][ml-map]",
+        "[Control corner strings; ScaleControl `unit`/`maxWidth` updates][web-scale]",
+        "Validate placement/unit combinations; unsupported placement cannot silently become another corner."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/scale-control.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    },
+    {
+      "line": 298,
+      "table": 6,
+      "section": "Controls and map access",
+      "cells": [
+        "[No corresponding wrapper control update lifecycle][rn-index]",
+        "[No corresponding wrapper control update lifecycle][ml-index]",
+        "[`useControl` creates/adds/removes once; NavigationControl options are construction-only][web-navigation]",
+        "A typed web-control extension must define updates, remount boundaries, ownership and cleanup."
+      ],
+      "upstreamSources": [
+        [
+          "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts"
+        ],
+        [
+          "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts"
+        ],
+        [
+          "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/navigation-control.ts"
+        ]
+      ],
+      "status": "source/declaration review completed; no runtime equivalence claim"
+    }
+  ],
+  "revalidatedFindings": [
+    {
+      "subject": "Live native children and bitmap annotations",
+      "sources": [
+        "rn-marker",
+        "ml-marker",
+        "rn-annotation",
+        "ml-annotation",
+        "rn-native-annotation",
+        "ml-native-annotation"
+      ],
+      "finding": "RNMapbox MarkerView and MapLibre Marker declare live children; Android annotations convert children to bitmaps. MapLibre iOS Marker delegates to ViewAnnotation. These paths do not establish equivalent physical touches."
+    },
+    {
+      "subject": "Offsets and anchors",
+      "sources": [
+        "rn-marker",
+        "ml-marker",
+        "ml-native-marker",
+        "web-marker",
+        "web-mapbox-marker"
+      ],
+      "finding": "RNMapbox declares normalized anchors and no MarkerView offset. MapLibre converts named anchors and scales Android offsets by density. Web marker anchors are read during construction, while setter-backed fields update. The proposed update/reset contract remains pending."
+    },
+    {
+      "subject": "RNMapbox child gesture containment",
+      "sources": ["rn-marker"],
+      "finding": "stopGesturePropagation defaults to false and is documented for Android. Preserve nested child interaction; the missing MapLibre wrapper option does not prove SDK impossibility."
+    },
+    {
+      "subject": "Selection and dragging",
+      "sources": [
+        "rn-annotation",
+        "ml-marker",
+        "ml-annotation",
+        "web-marker",
+        "web-mapbox-marker"
+      ],
+      "finding": "MapLibre Marker selected is documented for iOS. Native live markers declare no draggable prop; annotations declare dragging. RNMapbox supplies a decoded GeoJSON feature, MapLibre supplies nativeEvent.lngLat, and web supplies an SDK LngLat. Native live dragging requires investigation."
+    },
+    {
+      "subject": "Annotation helpers",
+      "sources": ["rn-annotation-layer", "ml-layer-annotation"],
+      "finding": "Both native annotation helpers compose animated point sources and layer children. Source/Layer composition must preserve requested animation and press handling."
+    },
+    {
+      "subject": "Popup dismissal/cleanup",
+      "sources": [
+        "rn-callout",
+        "ml-callout",
+        "rn-annotation",
+        "ml-annotation",
+        "web-popup",
+        "web-mapbox-popup"
+      ],
+      "finding": "Native callouts attach to annotations whose iOS callouts require a title. Callout has no standalone onClose. Both web wrappers detach the close listener before teardown removal. The agreed requested-dismissal/unmount distinction is preserved; native composition remains proposed."
+    },
+    {
+      "subject": "Popup update differences",
+      "sources": [
+        "web-popup",
+        "web-mapbox-popup",
+        "mb-sdk-popup",
+        "ml-sdk-popup"
+      ],
+      "finding": "The Mapbox wrapper assigns anchor in the branch for a changed truthy offset; MapLibre assigns it in the anchor/maxWidth branch. Closing and focus options initialize SDK construction. Proposed updates and resets require independent tests."
+    },
+    {
+      "subject": "Callout styling",
+      "sources": ["rn-callout", "ml-callout"],
+      "finding": "RNMapbox style applies to the animated wrapper and containerStyle to the native container. MapLibre style applies to the native container and animatedStyle to its wrapper. RNMapbox textStyle versus MapLibre titleStyle needs an explicit conversion."
+    },
+    {
+      "subject": "Controls and ornaments",
+      "sources": [
+        "rn-map",
+        "ml-map",
+        "web-index",
+        "web-mapbox-index",
+        "web-navigation",
+        "web-scale",
+        "web-control",
+        "mb-sdk-control",
+        "ml-sdk-control"
+      ],
+      "finding": "MapLibre Android documents scaleBarPosition as top-left only. MapLibre web exports Terrain/Globe/Logo controls that Mapbox web omits. IControl.onAdd returns a DOM element; native wrappers declare no browser control host. Navigation options initialize construction; ScaleControl updates unit/maxWidth."
+    },
+    {
+      "subject": "Registry ownership",
+      "sources": ["web-use-map"],
+      "finding": "react-map-gl useMap returns a named collection plus current. Implemented one-map-react useMap(id) returns a singular common ref and throws explicit missing-context/map errors. Its usage example type-checks; camera command success remains pending."
+    }
+  ],
+  "exampleChecks": {
+    "status": "passed",
+    "command": [
+      "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+      "--noEmit",
+      "-p",
+      "/private/tmp/one-map-markers-examples-gdwfkgg7/tsconfig.json"
+    ],
+    "directory": "/private/tmp/one-map-markers-examples-gdwfkgg7",
+    "exitCode": 0,
+    "output": "",
+    "examples": [
+      {
+        "fenceIndex": 1,
+        "file": "excerpt-1.tsx",
+        "sha256": "bf6e621387df6582bed097177f15b5d8642874360719eb61c4aa28865e9f3c59",
+        "imports": [
+          "import { MarkerView } from \"@rnmapbox/maps\";",
+          "import { Pressable, Text } from \"react-native\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 2,
+        "file": "excerpt-2.tsx",
+        "sha256": "2a92c43fd6fa8ef39e0e9a6d82470e141f78bdfbfc3ed72c2b6f9853fe2fae9f",
+        "imports": [
+          "import { Marker } from \"@maplibre/maplibre-react-native\";",
+          "import { Text } from \"react-native\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 3,
+        "file": "excerpt-3.tsx",
+        "sha256": "7c7d9010045a92a6d217ce35b3258dcff5662acd58c16fe10b4dddb681a8ece3",
+        "imports": ["import { Marker } from \"react-map-gl/maplibre\";"],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 3,
+        "file": "excerpt-3-mapbox.tsx",
+        "sha256": "ee5e0cef371514048a367c1a1538b81a41153fdee575ecaff2e7e3040e935f13",
+        "scope": "same web example with Mapbox entry point",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 5,
+        "file": "excerpt-5.tsx",
+        "sha256": "e32219ff13fa661a408736a3aec27c69faa83345f546734993352c43d73c2d4f",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { PointAnnotation } from \"@rnmapbox/maps\";",
+          "import { Text } from \"react-native\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 6,
+        "file": "excerpt-6.tsx",
+        "sha256": "53184af739e266430566e85ec7b135cc981dde417df465e3411903cab51f8003",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { ViewAnnotation } from \"@maplibre/maplibre-react-native\";",
+          "import { Text } from \"react-native\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 7,
+        "file": "excerpt-7.tsx",
+        "sha256": "ab9a0bad6ec09608c26da72ace311efe216b53e9c6814f889710ddc837c8f39a",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { Marker } from \"react-map-gl/maplibre\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 7,
+        "file": "excerpt-7-mapbox.tsx",
+        "sha256": "784939f4bedcaf794d76d0334c9cecf147f0eb24de365d51d503fc191f6166e5",
+        "scope": "same web example with Mapbox entry point",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 9,
+        "file": "excerpt-9.tsx",
+        "sha256": "6fe8de41b1e17100aad0842f35e9656565fc0afe402cb053e6db4c2b966d3369",
+        "imports": [
+          "import { PointAnnotation, Callout } from \"@rnmapbox/maps\";",
+          "import { Text } from \"react-native\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 10,
+        "file": "excerpt-10.tsx",
+        "sha256": "36e4a88ab520463d366fb17066a3c3e59870af6777f47026500d5254a2d91d81",
+        "imports": [
+          "import { ViewAnnotation, Callout } from \"@maplibre/maplibre-react-native\";",
+          "import { Text } from \"react-native\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 11,
+        "file": "excerpt-11.tsx",
+        "sha256": "75e90c60d90a49cade9d3d26970ee09d5009241da9d0b8736f8d3812b777cd1c",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { Popup } from \"react-map-gl/maplibre\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 11,
+        "file": "excerpt-11-mapbox.tsx",
+        "sha256": "05afd6f42017f61c7f4cb2841d040a59558aad2ee4595cf185940cb51bba3cfb",
+        "scope": "same web example with Mapbox entry point",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 13,
+        "file": "excerpt-13.tsx",
+        "sha256": "e71bd463ccd02c3cc6112478770e6ba75baae9a21d13e7c77a56231d161062e7",
+        "imports": [
+          "import { useRef, type ComponentRef } from \"react\";",
+          "import { Camera } from \"@rnmapbox/maps\";",
+          "import { Button } from \"react-native\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 14,
+        "file": "excerpt-14.tsx",
+        "sha256": "a937bfb5fb7495910e4e0570f12924a2e97130069e400f4f5c6b8e6f17e80ad4",
+        "imports": [
+          "import { useRef } from \"react\";",
+          "import { Camera, type CameraRef } from \"@maplibre/maplibre-react-native\";",
+          "import { Button } from \"react-native\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 15,
+        "file": "excerpt-15.tsx",
+        "sha256": "063e6419c68ba7bbb72993dc9573b5c11b5fb68a367911f204133ab8833f5950",
+        "imports": [
+          "import { useRef } from \"react\";",
+          "import { type MapRef } from \"react-map-gl/maplibre\";"
+        ],
+        "scope": "published upstream declarations",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 15,
+        "file": "excerpt-15-mapbox.tsx",
+        "sha256": "55c74e601034993a5651d5918ae73d3cdb8428d40e01526cf20aa640dc7b8659",
+        "scope": "same web example with Mapbox entry point",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 16,
+        "file": "excerpt-16.tsx",
+        "sha256": "4cd5f8d99015e73b53a06e93ccfdf5d740c4624d89692084668fb3e4e3d8e214",
+        "imports": [
+          "import { useMap } from \"one-map-react\";",
+          "import { Button } from \"react-native\";"
+        ],
+        "scope": "implemented one-map-react handle declarations",
+        "addedSetup": ["surrounding function component"]
+      }
+    ],
+    "excludedProposals": [
+      {
+        "fenceIndex": 4,
+        "file": "excerpt-4.tsx",
+        "sha256": "7c624498a99b8cd307e6983184836bc93cf9a2be21a5c859acbba7e695dd6b32",
+        "imports": [
+          "import { Marker } from \"one-map-react\";",
+          "import { Text } from \"react-native\";"
+        ],
+        "scope": "proposed unimplemented export",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 8,
+        "file": "excerpt-8.tsx",
+        "sha256": "e250bf25922edf20d040a0a0105a3ec8502b37ce34eda4312e618bd147d5cf01",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { Marker } from \"one-map-react\";",
+          "import { Text } from \"react-native\";"
+        ],
+        "scope": "proposed unimplemented export",
+        "addedSetup": ["surrounding function component"]
+      },
+      {
+        "fenceIndex": 12,
+        "file": "excerpt-12.tsx",
+        "sha256": "d8f2ec6d8140575315cc320b73624233592e0f82b77e7800ae515684d90ffa40",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { Popup } from \"one-map-react\";",
+          "import { Text } from \"react-native\";"
+        ],
+        "scope": "proposed unimplemented export",
+        "addedSetup": ["surrounding function component"]
+      }
+    ],
+    "config": {
+      "compilerOptions": {
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "jsx": "react-jsx",
+        "strict": true,
+        "skipLibCheck": true,
+        "lib": ["ES2022", "DOM"],
+        "types": ["react", "react-dom"],
+        "paths": {
+          "one-map-react": [
+            "/Users/rob/code/mapbox-code/one-map/packages/one-map-react/dist/index.d.ts"
+          ]
+        }
+      },
+      "files": [
+        "excerpt-1.tsx",
+        "excerpt-2.tsx",
+        "excerpt-3.tsx",
+        "excerpt-3-mapbox.tsx",
+        "excerpt-5.tsx",
+        "excerpt-6.tsx",
+        "excerpt-7.tsx",
+        "excerpt-7-mapbox.tsx",
+        "excerpt-9.tsx",
+        "excerpt-10.tsx",
+        "excerpt-11.tsx",
+        "excerpt-11-mapbox.tsx",
+        "excerpt-13.tsx",
+        "excerpt-14.tsx",
+        "excerpt-15.tsx",
+        "excerpt-15-mapbox.tsx",
+        "excerpt-16.tsx"
+      ]
+    },
+    "proposalAvailabilityCheck": {
+      "status": "expected unavailable exports confirmed",
+      "command": [
+        "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "/private/tmp/one-map-markers-examples-gdwfkgg7/tsconfig-proposals.json"
+      ],
+      "exitCode": 1,
+      "output": "../../../../../private/tmp/one-map-markers-examples-gdwfkgg7/excerpt-12.tsx(2,10): error TS2305: Module '\"one-map-react\"' has no exported member 'Popup'.\n../../../../../private/tmp/one-map-markers-examples-gdwfkgg7/excerpt-4.tsx(1,10): error TS2305: Module '\"one-map-react\"' has no exported member 'Marker'.\n../../../../../private/tmp/one-map-markers-examples-gdwfkgg7/excerpt-8.tsx(2,10): error TS2305: Module '\"one-map-react\"' has no exported member 'Marker'.\n../../../../../private/tmp/one-map-markers-examples-gdwfkgg7/excerpt-8.tsx(14,15): error TS7006: Parameter 'event' implicitly has an 'any' type.\n",
+      "limitations": "This intentionally failing check confirms Marker and Popup are not public exports. No synthetic proposed declarations were used; the proposal snippets are excluded from the positive usage check."
+    },
+    "installedVersions": [
+      {
+        "package": "@rnmapbox/maps",
+        "version": "10.3.7",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/package.json",
+        "manifestSha256": "bc95a6a9a09c0ffff41f3b049b8b15c28975b671208aaae3d6fcc15bb5138861"
+      },
+      {
+        "package": "@maplibre/maplibre-react-native",
+        "version": "11.5.0",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/package.json",
+        "manifestSha256": "13cad2ed700ffbc475cbf90050a7a1322add8fc2a8ba1c9ec958f89f771607e4"
+      },
+      {
+        "package": "react-map-gl",
+        "version": "8.1.3",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/react-map-gl/package.json",
+        "manifestSha256": "c7a2ed33b6110ff6b38d1861c50ee6692807524bbdba0271b28bb5c2b04ba5f2"
+      },
+      {
+        "package": "mapbox-gl",
+        "version": "3.32.0",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/mapbox-gl/package.json",
+        "manifestSha256": "61583b4f0cb34379c6d72f0415ba84569578b7bcfe2da2a311b32ed71a3977a2"
+      },
+      {
+        "package": "maplibre-gl",
+        "version": "6.13.0",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/maplibre-gl/package.json",
+        "manifestSha256": "40e1d90335e645bca6cc004fc9f774011b5a6427b7c330a337524cecc91fbf8c"
+      },
+      {
+        "package": "react",
+        "version": "19.2.3",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/react/package.json",
+        "manifestSha256": "c383aced6a67c8d06f02996015c0a163e78532a330a96dff1ccfd107b00ab326"
+      },
+      {
+        "package": "react-dom",
+        "version": "19.2.3",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/react-dom/package.json",
+        "manifestSha256": "d926f158e1be15885aaeac259c39567a46f6525fbdd14c380528486c31459996"
+      },
+      {
+        "package": "react-native",
+        "version": "0.87.1",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/react-native/package.json",
+        "manifestSha256": "8c939f43cd569562f00f13a5b7326f14b13d7a4909e4bedec3fc4d73096858de"
+      },
+      {
+        "package": "typescript",
+        "version": "7.0.2",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/typescript/package.json",
+        "manifestSha256": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e"
+      },
+      {
+        "package": "@types/react",
+        "version": "19.3.0",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/@types/react/package.json",
+        "manifestSha256": "505c0df4cd73d6a02c946bd9b81451584bd9c83ea72d75cff9b826efceaa19c2"
+      },
+      {
+        "package": "@types/react-dom",
+        "version": "19.3.0",
+        "manifest": "/Users/rob/code/mapbox-code/one-map/node_modules/@types/react-dom/package.json",
+        "manifestSha256": "4a2052bb362c34f1d39cfe0818b6fe01a9f988b609e8b7e4832aff7dbf2f7180"
+      }
+    ],
+    "declarationFiles": [
+      {
+        "package": "RNMapbox",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/lib/typescript/src/components/MarkerView.d.ts",
+        "sha256": "0c3f8989fd57b7850f314b5329b9abe10daca10f144c1bfe533bbf9e7bef9313"
+      },
+      {
+        "package": "RNMapbox",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/lib/typescript/src/components/PointAnnotation.d.ts",
+        "sha256": "aff59bb4d5df68d33d0cce61834bedb80ec1af319dcb3af8e04f5a5822f318fd"
+      },
+      {
+        "package": "RNMapbox",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/lib/typescript/src/components/Callout.d.ts",
+        "sha256": "d61137a768b837e416841467a001419d185f8159ce3fbbca927d6fcb534fa14b"
+      },
+      {
+        "package": "MapLibre React Native",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/lib/typescript/module/components/annotations/marker/Marker.d.ts",
+        "sha256": "f6b70b1f496baafb553d153c4ae2cf36f7f8d6e04ac389305241c5f1f3733ca5"
+      },
+      {
+        "package": "MapLibre React Native",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/lib/typescript/module/components/annotations/view-annotation/ViewAnnotation.d.ts",
+        "sha256": "c59952de312fa8709c162879197e343b78018515893abf8f95e7274df5be0633"
+      },
+      {
+        "package": "MapLibre React Native",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/lib/typescript/module/components/annotations/callout/Callout.d.ts",
+        "sha256": "9e6bff0658b547fcad72cbc78ddfc69be52bd6c6f195bf0b7809516675b87563"
+      },
+      {
+        "package": "react-map-gl Mapbox entry",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/react-map-gl/dist/mapbox.d.ts",
+        "sha256": "b1a177c0b3fb9cf17398ea94a0d1c5e22dd6736841ec9b5425e500a7cf43eb35"
+      },
+      {
+        "package": "react-map-gl MapLibre entry",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/react-map-gl/dist/maplibre.d.ts",
+        "sha256": "13c3a6f8331bf248134563a703f6abbf9e51269657dc17d587cf269a0e3ec740"
+      },
+      {
+        "package": "Mapbox GL JS",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/mapbox-gl/dist/mapbox-gl.d.ts",
+        "sha256": "5de389cafdd753315b2b0e5551a58023d95dda55154afce88db61256b8d21ff9"
+      },
+      {
+        "package": "MapLibre GL JS",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/maplibre-gl/dist/maplibre-gl.d.ts",
+        "sha256": "d8cd07feadf98305442d2068428fd5509bdc71d90a0a1a1b4caf5ab28d0a339c"
+      },
+      {
+        "package": "one-map-react built common declarations",
+        "path": "/Users/rob/code/mapbox-code/one-map/packages/one-map-react/dist/index.d.ts",
+        "sha256": "5ca15fc5f235d97e3bb4b4d28a58d0672b344b8e9988fb7b55d3f7dae88afe90"
+      },
+      {
+        "package": "one-map-react built core types",
+        "path": "/Users/rob/code/mapbox-code/one-map/packages/one-map-react/dist/core/types.d.ts",
+        "sha256": "d5f8323d3c80f0a21b21e00a489327c7b430aee25da4087e7bcf36babbfefbfb"
+      }
+    ],
+    "scope": "Strict TypeScript 7.0.2 usage checks against installed published declarations, with skipLibCheck. A surrounding function supplies omitted hook scope. one-map-react declarations resolve from the built workspace. Sixteen documented TSX excerpts contain twelve upstream examples, one implemented common handle example and three unimplemented proposals; four matching Mapbox-web variations produce seventeen positive checks. No application, packed-consumer or renderer interaction was executed."
+  },
+  "reviewDimensions": [
+    {
+      "dimension": "Audience and terminology",
+      "status": "passed",
+      "finding": "Renderer/wrapper/adapter distinctions, source/layer definitions, backend/platform terminology, and native versus DOM child boundaries are stated."
+    },
+    {
+      "dimension": "Voice and explanations",
+      "status": "passed",
+      "finding": "Concrete prop, update and default consequences are retained. The no-ai-slop pass protects technical qualifications and named contracts."
+    },
+    {
+      "dimension": "Markdown paragraph formatting",
+      "status": "passed",
+      "finding": "Single physical prose lines, paragraph separation and balanced fences passed the structural check."
+    },
+    {
+      "dimension": "Architecture and reference structure",
+      "status": "passed",
+      "finding": "Related fields use six four-column tables. Four-way examples share task, coordinates and content; helper composition links to the source/layer reference."
+    },
+    {
+      "dimension": "Facts and proposal status",
+      "status": "passed",
+      "finding": "Existing source/declaration facts remain separate from agreed marker/dismissal decisions and proposed components. Implemented registry declarations do not imply command or component support."
+    },
+    {
+      "dimension": "Code examples",
+      "status": "passed-with-explicit-limits",
+      "finding": "Marker, drag and popup excerpts share ferry coordinates/IDs/content. All custom buttons request zoom 13. Native and DOM children retain their host boundary; practical examples pass and absent exports are recorded."
+    },
+    {
+      "dimension": "Sources and links",
+      "status": "passed-with-preserved-retrieval-failures",
+      "finding": "Thirty-four pinned source files were retrieved and hash-matched. Mapbox release-tag fallback and unavailable RNMapbox readable docs are retained. Relative paths and heading anchors passed."
+    },
+    {
+      "dimension": "Portability and errors",
+      "status": "passed",
+      "finding": "Wrapper omissions, pending work, substantiated unsupported features, invalid context, readiness and operational errors remain distinct. Raw SDK handles do not replace proposed adapter work."
+    },
+    {
+      "dimension": "Writing references and no-ai-slop",
+      "status": "passed",
+      "finding": "The complete repository guide and no-ai-slop skill/eval were applied. API identifiers, return/event details, proposal labels and runtime qualifications are preserved."
+    },
+    {
+      "dimension": "Review before delivery and cross-document consistency",
+      "status": "passed",
+      "finding": "Agreed live children, explicit annotation mode and dismissal/unmount contracts align with the baseline and architecture. No shared contract or stage acceptance was changed."
+    }
+  ],
+  "remainingRuntimeInvestigations": [
+    {
+      "stage": "S13a",
+      "scope": "Default-marker appearance/collision policy; native child touches, nested scrolls, click bubbling, map suppression and accessibility; anchor/offset measurement, density, touch regions and updates."
+    },
+    {
+      "stage": "S13b",
+      "scope": "Native live dragging and gesture composition with interactive children; interruption/cleanup. Substantiate an unavailable contract rather than inferring it from a missing draggable prop."
+    },
+    {
+      "stage": "S14",
+      "scope": "Annotation drag payloads, selection and coordinate acceptance; bitmap refresh after image changes; cleanup and animated helper/source-press composition."
+    },
+    {
+      "stage": "S15",
+      "scope": "Native standalone popup anchor/overlay prototype; camera tracking, measurement, offscreen positions, focus and interaction; requested dismissal, unmount and StrictMode; anchor changes, offset clearing and closing-option updates."
+    },
+    {
+      "stage": "S26",
+      "scope": "Native ornament positions, defaults and required attribution. Verify composition for MapLibre Android scale-bar corners before recording unsupported placement."
+    },
+    {
+      "stage": "S27",
+      "scope": "Navigation readiness, command failure, target-map ownership, settings updates, subscriptions and cleanup. The custom button examples do not certify a navigation component."
+    },
+    {
+      "stage": "S28",
+      "scope": "Browser fullscreen behavior, failures, exit and cleanup; substantiate native availability separately."
+    },
+    {
+      "stage": "S29",
+      "scope": "Typed web useControl registration/update/removal and native UI composition. Browser DOM control hosting is not claimed on native."
+    },
+    {
+      "stage": "S39",
+      "scope": "Projection controls and supported SDK projections. A missing wrapper control does not establish a renderer limitation."
+    }
+  ],
+  "limitations": [
+    "No physical native child-touch, dragging, browser popup/control or six-environment conformance scenario ran in this bounded review.",
+    "Declarations and source branches establish caller usage and inspected implementation facts, not runtime equivalence or one-map-react component support.",
+    "Proposed Marker/Popup exports remain absent; no synthetic declarations were supplied.",
+    "The prior documentation-style-review.json remains an earlier snapshot. This record resolves its marker/control source-revalidation gap only.",
+    "Installed backend research dependencies are available together for declaration checks. This does not establish selected-peer, bundle or native SDK isolation."
+  ],
+  "structuralChecks": {
+    "status": "passed",
+    "issues": [],
+    "fencesBalanced": true,
+    "singlePhysicalProseLines": true,
+    "forcedBreaks": false,
+    "sdkComparisonTables": 6,
+    "sdkComparisonRows": 28,
+    "columns": [
+      "RNMapbox",
+      "MapLibre React Native",
+      "react-map-gl",
+      "Proposed one-map-react API"
+    ],
+    "upstreamCellsMissingCitations": 0,
+    "relativeLinks": [
+      {
+        "url": "decisions/0001-baselines-and-ownership.md#accepted-portable-defaults",
+        "targetExists": true,
+        "anchorChecked": true
+      },
+      {
+        "url": "version-baseline.json",
+        "targetExists": true,
+        "anchorChecked": false
+      },
+      {
+        "url": "api-coverage.md",
+        "targetExists": true,
+        "anchorChecked": false
+      },
+      {
+        "url": "evidence/markers-controls-current-review.json",
+        "targetExists": true,
+        "anchorChecked": false
+      },
+      {
+        "url": "sources-and-layers.md",
+        "targetExists": true,
+        "anchorChecked": false
+      },
+      {
+        "url": "decisions/0002-portable-contracts.md#public-values-and-ownership",
+        "targetExists": true,
+        "anchorChecked": true
+      },
+      {
+        "url": "maps-and-camera.md#initial-camera-examples",
+        "targetExists": true,
+        "anchorChecked": true
+      },
+      {
+        "url": "capabilities-and-extensions.md",
+        "targetExists": true,
+        "anchorChecked": false
+      },
+      {
+        "url": "maps-and-camera.md",
+        "targetExists": true,
+        "anchorChecked": false
+      },
+      {
+        "url": "sources-and-layers.md",
+        "targetExists": true,
+        "anchorChecked": false
+      }
+    ],
+    "sourceReferences": 38
+  }
+}

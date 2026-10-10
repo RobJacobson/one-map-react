@@ -1,0 +1,2902 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-10-08",
+  "status": "current-upstream-source-and-declaration-review-complete",
+  "document": {
+    "path": "docs/maps-and-camera.md",
+    "sha256": "17c66953218c57838f6defaa5b38b19dc378f2be343bcf468f76a02f840d0542"
+  },
+  "scope": "Bounded map/camera documentation advance supporting S04-S12. This is not S50 acceptance, complete API inventory, packed-consumer execution or renderer conformance. Only maps-and-camera.md and this evidence record were edited.",
+  "baselineSource": "records/version-baseline.json",
+  "provenanceNotes": [
+    "RNMapbox and MapLibre React Native sources retrieved from their frozen commits and compared byte-for-byte with installed release sources.",
+    "react-map-gl source retrieved from the frozen commit; both @vis.gl wrapper 8.1.3 installed source trees match corresponding inspected files byte-for-byte.",
+    "Mapbox GL JS source uses valid v3.32.0 release-tag provenance rather than the inaccessible npm metadata gitHead; bodies match the researched release source. Published 3.32.0 declarations are separately type-checked.",
+    "MapLibre GL JS source retrieved from the frozen commit; bodies match the published 6.13.0 source files.",
+    "All 34 pinned-source HTTP retrieval succeeded. Readable live API docs supplement the pinned implementation evidence and are not substituted for it."
+  ],
+  "sourceFiles": [
+    {
+      "id": "rn-map",
+      "repo": "rnmapbox/maps",
+      "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+      "path": "src/components/MapView.tsx",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx",
+      "rawUrl": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/src/components/MapView.tsx",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/rn-map.tsx",
+      "sha256": "7d6ff199f30fdbc4875422c2277b5ceda27651989180bd0170493ca0b0a11306",
+      "lineCount": 1305,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 46,
+          "endLine": 154,
+          "construct": "GestureSettings/MapState payload shapes"
+        },
+        {
+          "startLine": 171,
+          "endLine": 220,
+          "construct": "style, frame rate and gesture props"
+        },
+        {
+          "startLine": 286,
+          "endLine": 438,
+          "construct": "surface view, touch/camera/load/style callbacks"
+        },
+        {
+          "startLine": 683,
+          "endLine": 731,
+          "construct": "projection/bounds promise methods"
+        },
+        {
+          "startLine": 870,
+          "endLine": 895,
+          "construct": "center/zoom promises"
+        },
+        {
+          "startLine": 1024,
+          "endLine": 1078,
+          "construct": "native payload decoding"
+        },
+        {
+          "startLine": 1190,
+          "endLine": 1290,
+          "construct": "container and native child lifecycle"
+        }
+      ]
+    },
+    {
+      "id": "rn-camera",
+      "repo": "rnmapbox/maps",
+      "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+      "path": "src/components/Camera.tsx",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Camera.tsx",
+      "rawUrl": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/Camera.tsx",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/src/components/Camera.tsx",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/rn-camera.tsx",
+      "sha256": "4323f70c6d640160d66a6b2e3f5affc7a25281f33e20a6412068099043e649d2",
+      "lineCount": 719,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 92,
+          "endLine": 261,
+          "construct": "camera ref and props, padding, follow and constraints"
+        },
+        {
+          "startLine": 320,
+          "endLine": 384,
+          "construct": "native stop field conversion"
+        },
+        {
+          "startLine": 468,
+          "endLine": 556,
+          "construct": "setCamera/fitBounds/flyTo/moveTo/zoomTo helpers"
+        }
+      ]
+    },
+    {
+      "id": "rn-index",
+      "repo": "rnmapbox/maps",
+      "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+      "path": "src/Mapbox.native.ts",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts",
+      "rawUrl": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/src/Mapbox.native.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/rn-index.ts",
+      "sha256": "dfef6188527b89fa1883adc033245b0082d54530ad233a899d11f911c89433df",
+      "lineCount": 139,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 139,
+          "construct": "public exports inspected"
+        }
+      ]
+    },
+    {
+      "id": "rn-camera-android",
+      "repo": "rnmapbox/maps",
+      "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+      "path": "android/src/main/java/com/rnmapbox/rnmbx/components/camera/CameraStop.kt",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/android/src/main/java/com/rnmapbox/rnmbx/components/camera/CameraStop.kt",
+      "rawUrl": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/android/src/main/java/com/rnmapbox/rnmbx/components/camera/CameraStop.kt",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/camera/CameraStop.kt",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/rn-camera-android.kt",
+      "sha256": "7d6eafdf48aa8681d866bbb854aa7a57488874f15d3ae47d2950ab57c9ea5dbc",
+      "lineCount": 243,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 22,
+          "endLine": 36,
+          "construct": "default camera mode/duration"
+        },
+        {
+          "startLine": 160,
+          "endLine": 204,
+          "construct": "stop field and explicit mode parsing"
+        }
+      ]
+    },
+    {
+      "id": "rn-camera-ios",
+      "repo": "rnmapbox/maps",
+      "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+      "path": "ios/RNMBX/RNMBXCamera.swift",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/ios/RNMBX/RNMBXCamera.swift",
+      "rawUrl": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/ios/RNMBX/RNMBXCamera.swift",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXCamera.swift",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/rn-camera-ios.swift",
+      "sha256": "9422ae484ca32a743ef879cc352fd24596ffc56f832054296fd7049a86e5fa1e",
+      "lineCount": 767,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 550,
+          "endLine": 584,
+          "construct": "default flight parsing and initial nonanimated camera"
+        }
+      ]
+    },
+    {
+      "id": "rn-geometry-android",
+      "repo": "rnmapbox/maps",
+      "revision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+      "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+      "rawUrl": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/rn-geometry-android.kt",
+      "sha256": "5077d12b72fa97b7de21a389a34075bb5476413ff92863f03b874ba8fda0430b",
+      "lineCount": 1678,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 958,
+          "endLine": 1004,
+          "construct": "density conversions and projection dispatch"
+        }
+      ]
+    },
+    {
+      "id": "ml-map",
+      "repo": "maplibre/maplibre-react-native",
+      "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+      "path": "package/src/components/map/Map.tsx",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/map/Map.tsx",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/src/components/map/Map.tsx",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/ml-map.tsx",
+      "sha256": "2f4d12411e3a7d9b020d311842fae127c535e9d6835316fe3a69cb30bd8ef61f",
+      "lineCount": 697,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 57,
+          "endLine": 202,
+          "construct": "view state and promise ref shapes"
+        },
+        {
+          "startLine": 284,
+          "endLine": 440,
+          "construct": "required mapStyle, host props and gestures"
+        },
+        {
+          "startLine": 451,
+          "endLine": 549,
+          "construct": "native event callbacks"
+        },
+        {
+          "startLine": 560,
+          "endLine": 591,
+          "construct": "getters/projection delegation"
+        },
+        {
+          "startLine": 663,
+          "endLine": 697,
+          "construct": "native style serialization/container lifecycle"
+        }
+      ]
+    },
+    {
+      "id": "ml-camera",
+      "repo": "maplibre/maplibre-react-native",
+      "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+      "path": "package/src/components/camera/Camera.tsx",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/camera/Camera.tsx",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/components/camera/Camera.tsx",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/src/components/camera/Camera.tsx",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/ml-camera.tsx",
+      "sha256": "3c47aeebf87fe92c22ef746ee93716b9684ea02f8ee7bbec2fe4db7ee0c687f8",
+      "lineCount": 344,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 18,
+          "endLine": 266,
+          "construct": "camera option/stop/ref and prop declarations"
+        },
+        {
+          "startLine": 284,
+          "endLine": 343,
+          "construct": "setStop native promise and convenience command delegation"
+        }
+      ]
+    },
+    {
+      "id": "ml-index",
+      "repo": "maplibre/maplibre-react-native",
+      "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+      "path": "package/src/index.ts",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/index.ts",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/src/index.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/ml-index.ts",
+      "sha256": "64f3757c0ce4aa6a4f26ace3c1f1f9a05928b6449f4878753e42e6ba7dfb1203",
+      "lineCount": 202,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 202,
+          "construct": "public exports inspected"
+        }
+      ]
+    },
+    {
+      "id": "ml-bounds",
+      "repo": "maplibre/maplibre-react-native",
+      "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+      "path": "package/src/types/LngLatBounds.ts",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/types/LngLatBounds.ts",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/types/LngLatBounds.ts",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/src/types/LngLatBounds.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/ml-bounds.ts",
+      "sha256": "b18dfdc431c37ec84263ab1b779a33e4f4a2a5cdf6f1106437f63d336728f2cb",
+      "lineCount": 12,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 12,
+          "construct": "flat southwest/northeast tuple"
+        }
+      ]
+    },
+    {
+      "id": "ml-padding",
+      "repo": "maplibre/maplibre-react-native",
+      "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+      "path": "package/src/types/ViewPadding.ts",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/types/ViewPadding.ts",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/types/ViewPadding.ts",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/src/types/ViewPadding.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/ml-padding.ts",
+      "sha256": "bfdef8af57eee08ff672cf9a5d3662db64e4397b94c60d213d2125bd828f6082",
+      "lineCount": 9,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 9,
+          "construct": "optional logical padding sides"
+        }
+      ]
+    },
+    {
+      "id": "ml-press",
+      "repo": "maplibre/maplibre-react-native",
+      "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+      "path": "package/src/types/PressEvent.ts",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/types/PressEvent.ts",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/src/types/PressEvent.ts",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/src/types/PressEvent.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/ml-press.ts",
+      "sha256": "7d57aa2627cf2bd17468837ce7a0b19c1189789c4ee11f034441762170b20c6c",
+      "lineCount": 17,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 17,
+          "construct": "lngLat and point tuples"
+        }
+      ]
+    },
+    {
+      "id": "ml-geometry-android",
+      "repo": "maplibre/maplibre-react-native",
+      "revision": "059f46b2dc728fb6259af91b27a071bcda19a2ae",
+      "path": "package/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt",
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt",
+      "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/ml-geometry-android.kt",
+      "sha256": "53e644028f7fa92f40f79cf3bb6f41c81485a9c8f71a5c0e9e96354b27537eb2",
+      "lineCount": 1618,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1127,
+          "endLine": 1148,
+          "construct": "density-aware projection and inverse"
+        },
+        {
+          "startLine": 1256,
+          "endLine": 1288,
+          "construct": "separate zoom and double-tap settings"
+        }
+      ]
+    },
+    {
+      "id": "web-maplibre-map",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-maplibre/src/components/map.tsx",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/map.tsx",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/map.tsx",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/map.tsx",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-maplibre-map.tsx",
+      "sha256": "94d7fd9fbde0e5fd592d1dfd7079a660a2ecbb0585056f600dae6d1113cf631b",
+      "lineCount": 137,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-maplibre/src/components/map.tsx",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 18,
+          "endLine": 38,
+          "construct": "inherited renderer MapOptions plus wrapper props"
+        },
+        {
+          "startLine": 46,
+          "endLine": 111,
+          "construct": "selected SDK import, ref/readiness and lifecycle"
+        },
+        {
+          "startLine": 131,
+          "endLine": 137,
+          "construct": "CSS container and children"
+        }
+      ]
+    },
+    {
+      "id": "web-maplibre-props",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-maplibre/src/maplibre/maplibre.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/maplibre/maplibre.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/maplibre/maplibre.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/maplibre/maplibre.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-maplibre-props.ts",
+      "sha256": "27ac9fa8f6fd3bf1f5a224bf4201a90c37d28ab9e892d0416acffdeab917bd60",
+      "lineCount": 658,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-maplibre/src/maplibre/maplibre.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 41,
+          "endLine": 109,
+          "construct": "camera/init/style/constraint props"
+        },
+        {
+          "startLine": 128,
+          "endLine": 181,
+          "construct": "pointer/camera/style event and handler mappings"
+        },
+        {
+          "startLine": 297,
+          "endLine": 374,
+          "construct": "renderer construction and v6 camera-update setter"
+        },
+        {
+          "startLine": 565,
+          "endLine": 604,
+          "construct": "handler updates and proposed camera/control callback"
+        }
+      ]
+    },
+    {
+      "id": "web-maplibre-common",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-maplibre/src/types/common.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/types/common.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/types/common.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/types/common.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-maplibre-common.ts",
+      "sha256": "4e856725018f94d01e974f47191f15f984ff885c865366887dc7787a5c236ed1",
+      "lineCount": 34,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-maplibre/src/types/common.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 34,
+          "construct": "renderer tuple/padding types and camera view state"
+        }
+      ]
+    },
+    {
+      "id": "web-maplibre-events",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-maplibre/src/types/events.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/types/events.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/types/events.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/types/events.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-maplibre-events.ts",
+      "sha256": "87773cfefe387ec8753f5bf4fbe8b7808cb0db1d7cc88f7896f572f758779f39",
+      "lineCount": 134,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-maplibre/src/types/events.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 39,
+          "endLine": 86,
+          "construct": "mouse/touch/camera/load/style/error callback declarations"
+        },
+        {
+          "startLine": 111,
+          "endLine": 134,
+          "construct": "movement proposal payload types"
+        }
+      ]
+    },
+    {
+      "id": "web-maplibre-ref",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-maplibre/src/maplibre/create-ref.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/maplibre/create-ref.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/maplibre/create-ref.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/maplibre/create-ref.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-maplibre-ref.ts",
+      "sha256": "5ba6c4615ab0be7705a002fcf7167bfa5720793af77cf1ef0c35184ce8c26a0a",
+      "lineCount": 70,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-maplibre/src/maplibre/create-ref.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 70,
+          "construct": "skip mutation methods and bind public SDK methods"
+        }
+      ]
+    },
+    {
+      "id": "web-maplibre-geolocate",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-maplibre/src/components/geolocate-control.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/geolocate-control.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/components/geolocate-control.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/components/geolocate-control.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-maplibre-geolocate.ts",
+      "sha256": "8e54ff2f2890e5e06c6dbe3ab6f79c6721939b6ebab957015b8992110b930792",
+      "lineCount": 81,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-maplibre/src/components/geolocate-control.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 11,
+          "endLine": 77,
+          "construct": "SDK control option pass-through and tracking event subscriptions"
+        }
+      ]
+    },
+    {
+      "id": "web-maplibre-index",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-maplibre/src/index.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/index.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-maplibre/src/index.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-maplibre/src/index.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-maplibre-index.ts",
+      "sha256": "2edc2bb958d559edd93bdb0d10fc2943027b86ca256479d87b50ae3dc42f25a0",
+      "lineCount": 39,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-maplibre/src/index.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 39,
+          "construct": "public exports inspected"
+        }
+      ]
+    },
+    {
+      "id": "web-mapbox-map",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-mapbox/src/components/map.tsx",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/components/map.tsx",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/components/map.tsx",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/components/map.tsx",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-mapbox-map.tsx",
+      "sha256": "8fdf40d1fee229707f107e0f89dc90c2ff788c503c3e8a8d3fd81174dc59e89d",
+      "lineCount": 136,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/src/components/map.tsx",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 18,
+          "endLine": 38,
+          "construct": "inherited renderer MapOptions plus wrapper props"
+        },
+        {
+          "startLine": 46,
+          "endLine": 110,
+          "construct": "selected SDK import, ref/readiness and lifecycle"
+        },
+        {
+          "startLine": 130,
+          "endLine": 136,
+          "construct": "CSS container and children"
+        }
+      ]
+    },
+    {
+      "id": "web-mapbox-props",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-mapbox/src/mapbox/mapbox.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/mapbox.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/mapbox.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/mapbox/mapbox.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-mapbox-props.ts",
+      "sha256": "faf7a48d245340d60dc4e5f986a7a87eb51b1335fa860f561ff18d371a6fd4c4",
+      "lineCount": 709,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/src/mapbox/mapbox.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 31,
+          "endLine": 90,
+          "construct": "camera/init/style props"
+        },
+        {
+          "startLine": 107,
+          "endLine": 164,
+          "construct": "event/handler maps"
+        },
+        {
+          "startLine": 294,
+          "endLine": 380,
+          "construct": "renderer construction, proxy installation and styledata hook"
+        },
+        {
+          "startLine": 626,
+          "endLine": 669,
+          "construct": "camera proposals/event handling"
+        }
+      ]
+    },
+    {
+      "id": "web-mapbox-common",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-mapbox/src/types/common.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/types/common.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/types/common.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/types/common.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-mapbox-common.ts",
+      "sha256": "297d1da80bb0938864b6cee8d6215dd977d7178d2a39eae7de5b6999de0f27d3",
+      "lineCount": 36,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/src/types/common.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 36,
+          "construct": "renderer tuple/padding types and camera view state"
+        }
+      ]
+    },
+    {
+      "id": "web-mapbox-events",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-mapbox/src/types/events.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/types/events.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/types/events.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/types/events.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-mapbox-events.ts",
+      "sha256": "905e55f41afcdce316ef72af3f6273507a0686b8080c6ee6bc5e97758adaa1f4",
+      "lineCount": 125,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/src/types/events.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 25,
+          "endLine": 74,
+          "construct": "mouse/touch/camera/load/style/error callbacks"
+        },
+        {
+          "startLine": 87,
+          "endLine": 110,
+          "construct": "movement proposal payload types"
+        }
+      ]
+    },
+    {
+      "id": "web-mapbox-ref",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-mapbox/src/mapbox/create-ref.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/create-ref.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/create-ref.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/mapbox/create-ref.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-mapbox-ref.ts",
+      "sha256": "cbb482fa33f574b74a9c4e421852f8e0c178bf2f21b5313bf0d693f13f8ce3fe",
+      "lineCount": 109,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/src/mapbox/create-ref.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 93,
+          "construct": "skip methods, controlled getters and coordinate/query transform handling"
+        }
+      ]
+    },
+    {
+      "id": "web-mapbox-geolocate",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-mapbox/src/components/geolocate-control.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/components/geolocate-control.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/components/geolocate-control.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/components/geolocate-control.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-mapbox-geolocate.ts",
+      "sha256": "ddcd9c4c84e42f5b3b0bdf48ec0ad1bbcd16d19834d21c7896d52793dc60ceb5",
+      "lineCount": 81,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/src/components/geolocate-control.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 11,
+          "endLine": 77,
+          "construct": "SDK control option pass-through and tracking event subscriptions"
+        }
+      ]
+    },
+    {
+      "id": "web-mapbox-index",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-mapbox/src/index.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/index.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/index.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/index.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-mapbox-index.ts",
+      "sha256": "eb17b168dd5382b5bcbd04fcef5294732ffb7abc5b1c4707969ec2889f711191",
+      "lineCount": 33,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/src/index.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 1,
+          "endLine": 33,
+          "construct": "public exports inspected"
+        }
+      ]
+    },
+    {
+      "id": "web-mapbox-proxy",
+      "repo": "visgl/react-map-gl",
+      "revision": "3df834290bdecf4f5c9b90d7c117d95af12c1f0a",
+      "path": "modules/react-mapbox/src/mapbox/proxy-transform.ts",
+      "url": "https://github.com/visgl/react-map-gl/blob/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/proxy-transform.ts",
+      "rawUrl": "https://raw.githubusercontent.com/visgl/react-map-gl/3df834290bdecf4f5c9b90d7c117d95af12c1f0a/modules/react-mapbox/src/mapbox/proxy-transform.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/react-map-gl-source/modules/react-mapbox/src/mapbox/proxy-transform.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/web-mapbox-proxy.ts",
+      "sha256": "daa5232f28e31f52a4a8920e4897a89cfc40491fb3b1ff5a726198e14913d769",
+      "lineCount": 150,
+      "status": "passed",
+      "localByteIdentity": true,
+      "installedPackageSource": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/src/mapbox/proxy-transform.ts",
+      "installedPackageSourceByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 39,
+          "endLine": 150,
+          "construct": "controlled/proposed transform handling"
+        }
+      ]
+    },
+    {
+      "id": "sdk-mapbox-map",
+      "repo": "mapbox/mapbox-gl-js",
+      "revision": "v3.32.0",
+      "path": "src/ui/map.ts",
+      "url": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/ui/map.ts",
+      "rawUrl": "https://raw.githubusercontent.com/mapbox/mapbox-gl-js/v3.32.0/src/ui/map.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/mapbox-gl/src/ui/map.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/sdk-mapbox-map.ts",
+      "sha256": "2ebec03573e04b72fa594e0eddd9b9898a16e1134348b553bddee022441be391",
+      "lineCount": 5511,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 159,
+          "endLine": 217,
+          "construct": "renderer constructor gestures and constraints"
+        },
+        {
+          "startLine": 2464,
+          "endLine": 2472,
+          "construct": "style-loaded condition"
+        },
+        {
+          "startLine": 4518,
+          "endLine": 4527,
+          "construct": "render-frame scheduling"
+        },
+        {
+          "startLine": 5080,
+          "endLine": 5127,
+          "construct": "browser/custom animation frame provider"
+        }
+      ]
+    },
+    {
+      "id": "sdk-mapbox-camera",
+      "repo": "mapbox/mapbox-gl-js",
+      "revision": "v3.32.0",
+      "path": "src/ui/camera.ts",
+      "url": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/ui/camera.ts",
+      "rawUrl": "https://raw.githubusercontent.com/mapbox/mapbox-gl-js/v3.32.0/src/ui/camera.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/mapbox-gl/src/ui/camera.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/sdk-mapbox-camera.ts",
+      "sha256": "c472cf87b87d2074dcd715f73f9cb4d91194b5dd4901f41b90f2bfbf1ab5b42b",
+      "lineCount": 1997,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 57,
+          "endLine": 97,
+          "construct": "camera options/padding"
+        },
+        {
+          "startLine": 138,
+          "endLine": 148,
+          "construct": "duration/easing callback"
+        },
+        {
+          "startLine": 1030,
+          "endLine": 1038,
+          "construct": "fitBounds signature"
+        },
+        {
+          "startLine": 1150,
+          "endLine": 1158,
+          "construct": "jumpTo signature"
+        },
+        {
+          "startLine": 1370,
+          "endLine": 1385,
+          "construct": "easeTo signature"
+        },
+        {
+          "startLine": 1644,
+          "endLine": 1655,
+          "construct": "flyTo signature"
+        }
+      ]
+    },
+    {
+      "id": "sdk-mapbox-touch",
+      "repo": "mapbox/mapbox-gl-js",
+      "revision": "v3.32.0",
+      "path": "src/ui/handler/shim/touch_zoom_rotate.ts",
+      "url": "https://github.com/mapbox/mapbox-gl-js/blob/v3.32.0/src/ui/handler/shim/touch_zoom_rotate.ts",
+      "rawUrl": "https://raw.githubusercontent.com/mapbox/mapbox-gl-js/v3.32.0/src/ui/handler/shim/touch_zoom_rotate.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/mapbox-gl/src/ui/handler/shim/touch_zoom_rotate.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/sdk-mapbox-touch.ts",
+      "sha256": "7b1dccb40437a9e9a3f62ac8a92724747ae6cbbfa46fbdd40aaa0a4e4af4766f",
+      "lineCount": 166,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 94,
+          "endLine": 129,
+          "construct": "disable/enable pinch rotation independently"
+        }
+      ]
+    },
+    {
+      "id": "sdk-maplibre-map",
+      "repo": "maplibre/maplibre-gl-js",
+      "revision": "f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d",
+      "path": "src/ui/map.ts",
+      "url": "https://github.com/maplibre/maplibre-gl-js/blob/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/map.ts",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-gl-js/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/map.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/maplibre-gl-npm/src/ui/map.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/sdk-maplibre-map.ts",
+      "sha256": "5b1134d77f2bdeed8c5aa2453fbf082f43621f97fef9b30f0b95381cbb9a89cf",
+      "lineCount": 4712,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 84,
+          "endLine": 217,
+          "construct": "renderer constructor gestures and constraints"
+        },
+        {
+          "startLine": 1022,
+          "endLine": 1028,
+          "construct": "public camera-update setter"
+        },
+        {
+          "startLine": 1034,
+          "endLine": 1043,
+          "construct": "center object getter"
+        },
+        {
+          "startLine": 1708,
+          "endLine": 1717,
+          "construct": "bounds object getter"
+        },
+        {
+          "startLine": 2057,
+          "endLine": 2089,
+          "construct": "coordinate projection methods"
+        },
+        {
+          "startLine": 4316,
+          "endLine": 4352,
+          "construct": "loaded condition and render frame requests"
+        },
+        {
+          "startLine": 4566,
+          "endLine": 4590,
+          "construct": "browser repaint scheduling"
+        }
+      ]
+    },
+    {
+      "id": "sdk-maplibre-camera",
+      "repo": "maplibre/maplibre-gl-js",
+      "revision": "f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d",
+      "path": "src/ui/camera.ts",
+      "url": "https://github.com/maplibre/maplibre-gl-js/blob/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/camera.ts",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-gl-js/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/camera.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/maplibre-gl-npm/src/ui/camera.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/sdk-maplibre-camera.ts",
+      "sha256": "c4b480e7fbc185a048d81052d5dc36b3cbbab14302625fcc1fbd7a08a0626ff1",
+      "lineCount": 1609,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 70,
+          "endLine": 130,
+          "construct": "camera options and padding"
+        },
+        {
+          "startLine": 745,
+          "endLine": 790,
+          "construct": "fitBounds and jumpTo"
+        },
+        {
+          "startLine": 897,
+          "endLine": 908,
+          "construct": "easeTo"
+        },
+        {
+          "startLine": 1250,
+          "endLine": 1288,
+          "construct": "camera proposal/update application"
+        },
+        {
+          "startLine": 1355,
+          "endLine": 1366,
+          "construct": "flyTo"
+        }
+      ]
+    },
+    {
+      "id": "sdk-maplibre-touch",
+      "repo": "maplibre/maplibre-gl-js",
+      "revision": "f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d",
+      "path": "src/ui/handler/shim/two_fingers_touch.ts",
+      "url": "https://github.com/maplibre/maplibre-gl-js/blob/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/handler/shim/two_fingers_touch.ts",
+      "rawUrl": "https://raw.githubusercontent.com/maplibre/maplibre-gl-js/f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d/src/ui/handler/shim/two_fingers_touch.ts",
+      "comparisonPath": "/private/tmp/one-map-research-web/maplibre-gl-npm/src/ui/handler/shim/two_fingers_touch.ts",
+      "httpStatus": 200,
+      "sourceFile": "/private/tmp/one-map-camera-current-research/sdk-maplibre-touch.ts",
+      "sha256": "c620aaa2e9fe98ab32dae8702d409704ae69b75d766e4fc66f6e00c44185e52a",
+      "lineCount": 139,
+      "status": "passed",
+      "localByteIdentity": true,
+      "inspectionLocations": [
+        {
+          "startLine": 113,
+          "endLine": 139,
+          "construct": "disable/enable pinch rotation independently"
+        }
+      ]
+    }
+  ],
+  "materialComparisonRows": [
+    {
+      "id": "map-containers.1",
+      "documentLine": 21,
+      "section": "Map containers",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`MapView`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`Map`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`MapLibre Map`][web-map] / [`Mapbox Map`][web-mapbox-map]",
+          "sourceIds": [
+            "web-maplibre-map",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`Map`; native camera children are internal.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "map-containers.2",
+      "documentLine": 22,
+      "section": "Map containers",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`styleURL`, serialized `styleJSON`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`mapStyle`: URL or style object][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`mapStyle`: URL or style object][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`mapStyle`: URL or supported style object; serialize for RNMapbox.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "map-containers.3",
+      "documentLine": 23,
+      "section": "Map containers",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`ViewProps.style`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`ViewProps.style`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`style`: CSS properties][web-map]",
+          "sourceIds": [
+            "web-maplibre-map",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`style` retains host-specific typing; common width/height layout is translated where valid.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "map-containers.4",
+      "documentLine": 24,
+      "section": "Map containers",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`scrollEnabled`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`dragPan`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`dragPan`][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`dragPan?: boolean`; rename and apply explicitly.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "map-containers.5",
+      "documentLine": 25,
+      "section": "Map containers",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`zoomEnabled`, `gestureSettings`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`touchZoom`, `doubleTapZoom`, `doubleTapHoldZoom`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`touchZoomRotate`, `scrollZoom`, `doubleClickZoom`][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Separate `touchZoom`, `touchRotate`, and `doubleTapZoom` intent; desktop options are capabilities.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "map-containers.6",
+      "documentLine": 26,
+      "section": "Map containers",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`rotateEnabled`, `pitchEnabled`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`touchRotate`, `touchPitch`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`touchZoomRotate`, `touchPitch`, `dragRotate`][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`touchRotate` and `touchPitch`; adapt coupled web gesture handlers.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "map-containers.7",
+      "documentLine": 27,
+      "section": "Map containers",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`surfaceView`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`androidView`: surface or texture][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[Browser canvas and WebGL context][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Native renderer-view choice is a backend extension.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "map-containers.8",
+      "documentLine": 28,
+      "section": "Map containers",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`preferredFramesPerSecond`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`preferredFramesPerSecond`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[Browser render scheduling][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Native frame-rate request is an extension; no fabricated web equivalent.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.1",
+      "documentLine": 40,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`Camera` child][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`Camera` child][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[Camera props on `Map`][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Camera props on `Map`; adapters manage native `Camera`.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.2",
+      "documentLine": 41,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`defaultSettings`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`initialViewState` on `Camera`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`initialViewState` on `Map`][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`Map.initialViewState`; initialization only.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.3",
+      "documentLine": 42,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`centerCoordinate: [lng, lat]`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`center: [lng, lat]`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`longitude`, `latitude`][web-common]",
+          "sourceIds": [
+            "web-maplibre-common",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`longitude`, `latitude` in view state; convert to tuples.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.4",
+      "documentLine": 43,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`zoomLevel`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`zoom`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`zoom`][web-common]",
+          "sourceIds": [
+            "web-maplibre-common",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`zoom`; rename RNMapbox's field.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.5",
+      "documentLine": 44,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`heading`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`bearing`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`bearing`][web-common]",
+          "sourceIds": [
+            "web-maplibre-common",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`bearing`; rename RNMapbox's field and validate orientation.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.6",
+      "documentLine": 45,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`pitch`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`pitch`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`pitch`][web-common]",
+          "sourceIds": [
+            "web-maplibre-common",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`pitch`; preserve the name and validate backend ranges.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.7",
+      "documentLine": 46,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`paddingTop/Right/Bottom/Left` inside `padding`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`padding: {top, right, bottom, left}`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`padding: {top, right, bottom, left}`][web-common]",
+          "sourceIds": [
+            "web-maplibre-common",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Full padding object with missing sides normalized to zero.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.8",
+      "documentLine": 47,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`bounds: {ne, sw}`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`bounds: [west, south, east, north]`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`initialViewState.bounds` accepts GL JS bounds][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Bounds `[[west, south], [east, north]]`; explicit conversion.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.9",
+      "documentLine": 48,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`minZoomLevel`, `maxZoomLevel`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`minZoom`, `maxZoom` on `Camera`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`minZoom`, `maxZoom` on `Map`][web-props]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`Map.minZoom`, `Map.maxZoom`; configure native camera.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.10",
+      "documentLine": 49,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`maxBounds: {ne, sw}`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`maxBounds`: flat bounds][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`maplibre`: flat `[west, south, east, north]` declaration][web-props]; [`mapbox`: SDK bounds-like option][web-mapbox-map]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`Map.maxBounds`: common bounds tuple; convert per entry point.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.11",
+      "documentLine": 50,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`animationDuration`, `animationMode`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`duration`, named `easing`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`Mapbox`][sdk-mapbox-camera] / [`MapLibre`][sdk-maplibre-camera] command options include duration and easing callback",
+          "sourceIds": [
+            "sdk-mapbox-camera",
+            "sdk-maplibre-camera",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-maplibre-map"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Command `duration`; `jumpTo`/`easeTo`/`flyTo` select movement intent. Arbitrary easing is a capability.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.12",
+      "documentLine": 51,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`followUserLocation`, follow fields][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`trackUserLocation`, ordinary camera fields][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`GeolocateControl` tracking][web-geolocate]",
+          "sourceIds": [
+            "web-maplibre-geolocate",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Location-follow extension; not ordinary controlled view state.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "camera-configuration.13",
+      "documentLine": 52,
+      "section": "Camera configuration",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[Declarative camera targets and native callbacks][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[Declarative stops and native callbacks][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[React-controlled camera machinery][web-camera-impl]",
+          "sourceIds": [
+            "web-maplibre-props",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`viewState` and `onMove`; strict equivalence requires `controlledCamera` capability.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "events-and-readiness.1",
+      "documentLine": 253,
+      "section": "Events and readiness",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`onCameraChanged`, `onMapIdle`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`onRegionIsChanging`, `onRegionDidChange`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`onMove`, `onMoveEnd`, `onIdle`][web-events]",
+          "sourceIds": [
+            "web-maplibre-events",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`onMove`, `onMoveEnd`, `onIdle`; normalize payloads and define settling separately from resource idleness.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "events-and-readiness.2",
+      "documentLine": 254,
+      "section": "Events and readiness",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`onPress`, GeoJSON point payload with screen-point properties][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`onPress`, `nativeEvent.lngLat` and `point` tuples][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`MapLibre onClick`][web-events] / [`Mapbox onClick`][web-mapbox-events], SDK event objects",
+          "sourceIds": [
+            "web-maplibre-events",
+            "web-mapbox-events",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`onClick({lngLat, point, features?})`; tuples and arrays, no required raw SDK event.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "events-and-readiness.3",
+      "documentLine": 255,
+      "section": "Events and readiness",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`onLongPress`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`onLongPress`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[No dedicated wrapper long-press callback][web-events]",
+          "sourceIds": [
+            "web-maplibre-events",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`onLongPress` capability; browser gesture recognition would be an explicit implementation.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "events-and-readiness.4",
+      "documentLine": 256,
+      "section": "Events and readiness",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`onDidFinishLoadingStyle`, load callbacks][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`onDidFinishLoadingStyle`, load callbacks][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`onLoad`, `onStyleData`, `onError`][web-events]",
+          "sourceIds": [
+            "web-maplibre-events",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`onLoad` for initial map/style readiness; separate `onStyleLoad` for replacements and `onError` for failures.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.1",
+      "documentLine": 266,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`Camera.moveTo(center, 0)` or `setCamera` with `animationMode: \"none\"`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`CameraRef.jumpTo(options)`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`MapRef.jumpTo(options)`][web-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`MapRef.jumpTo(options): Promise<void>`; internal camera dispatch with explicit nonanimated intent.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.2",
+      "documentLine": 267,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`Camera.setCamera` with ease mode][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`CameraRef.easeTo(options)`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`MapRef.easeTo(options)`][web-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`easeTo(options): Promise<void>`; translate camera options and dispatch.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.3",
+      "documentLine": 268,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`Camera.flyTo(center, duration)` or `setCamera` with explicit flight mode][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`CameraRef.flyTo(options)`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`MapRef.flyTo(options)`][web-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`flyTo(options): Promise<void>`; select flight mode explicitly. Advanced flight-path controls are capabilities.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.4",
+      "documentLine": 269,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`Camera.fitBounds(ne, sw, padding?, duration?)`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`CameraRef.fitBounds(flatBounds, options?)`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`MapRef.fitBounds(bounds, options?)`][web-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`fitBounds(commonBounds, options?): Promise<void>`.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.5",
+      "documentLine": 270,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`Camera.zoomTo(zoom, duration?)`][rn-camera]",
+          "sourceIds": ["rn-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`CameraRef.zoomTo(zoom, options?)`][ml-camera]",
+          "sourceIds": ["ml-camera"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`MapRef.zoomTo(zoom, options?)`][web-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`zoomTo(zoom, options?): Promise<void>`.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.6",
+      "documentLine": 271,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`MapView.getCenter`, `getZoom`: promises][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`MapRef.getCenter`, `getZoom`: promises][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[Synchronous MapLibre getters][web-ref]; [Mapbox ref getters read the controlled transform][web-mapbox-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Promise-based getters; tuples instead of SDK classes.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.7",
+      "documentLine": 272,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`getPointInView`, `getCoordinateFromView`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`project`, `unproject`][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`project`, `unproject`][web-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`project` and `unproject`, returning promises of tuples.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.8",
+      "documentLine": 273,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[`getVisibleBounds`][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[`getBounds`: flat tuple][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`getBounds`: SDK bounds object][web-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "`getBounds(): Promise<Bounds>`; normalize corner order.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    },
+    {
+      "id": "imperative-refs.9",
+      "documentLine": 274,
+      "section": "Imperative refs",
+      "upstreamChecks": [
+        {
+          "upstream": "RNMapbox",
+          "comparedInterface": "[No raw GL JS map][rn-map]",
+          "sourceIds": ["rn-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "MapLibre React Native",
+          "comparedInterface": "[No raw GL JS map][ml-map]",
+          "sourceIds": ["ml-map"],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        },
+        {
+          "upstream": "react-map-gl",
+          "comparedInterface": "[`getMap()`][web-ref]",
+          "sourceIds": [
+            "web-maplibre-ref",
+            "web-mapbox-map",
+            "web-mapbox-props",
+            "web-mapbox-common",
+            "web-mapbox-events",
+            "web-mapbox-ref",
+            "sdk-mapbox-map",
+            "sdk-mapbox-camera",
+            "sdk-maplibre-map",
+            "sdk-maplibre-camera"
+          ],
+          "status": "current-declaration-and-source-reviewed",
+          "runtimeVerifiedByThisReview": false
+        }
+      ],
+      "oneMapMapping": "Backend extension only; no portable raw map promise.",
+      "oneMapStatus": "Agreed/proposed mapping only; fulfillment and acceptance remain in feature-stage evidence."
+    }
+  ],
+  "findings": [
+    {
+      "id": "maplibre-native-required-style",
+      "sourceIds": ["ml-map"],
+      "status": "corrected-documentation",
+      "finding": "MapLibre React Native mapStyle is required. The controlled excerpt lacked it and failed current declaration checking. All controlled excerpts now include the matching explicit style URL."
+    },
+    {
+      "id": "entry-specific-max-bounds",
+      "sourceIds": [
+        "web-maplibre-props",
+        "web-mapbox-map",
+        "sdk-mapbox-map",
+        "sdk-maplibre-map"
+      ],
+      "status": "documented-current-source",
+      "finding": "The MapLibre wrapper declares maxBounds as a flat four-number tuple despite its SDK allowing broader bounds-like input. The Mapbox entry inherits SDK bounds-like input. Common bounds require entry-specific conversion."
+    },
+    {
+      "id": "rnmapbox-flight-defaults",
+      "sourceIds": ["rn-camera", "rn-camera-android", "rn-camera-ios"],
+      "status": "documented-current-source-runtime-unverified",
+      "finding": "The flyTo convenience helper sets center/duration without an explicit mode. Android CameraStop defaults EASE; iOS parsing defaults flight. The equivalent flight excerpt now uses setCamera with animationMode flyTo. This source observation does not verify an actual animation."
+    },
+    {
+      "id": "native-camera-return-annotation",
+      "sourceIds": ["ml-camera"],
+      "status": "documented-current-source-runtime-unverified",
+      "finding": "Convenience CameraRef commands are declared void, while implementation arrows return the Promise from setStop. Neither annotation nor delegation establishes animation-completion timing."
+    },
+    {
+      "id": "entry-specific-style-refresh",
+      "sourceIds": [
+        "web-mapbox-props",
+        "web-maplibre-props",
+        "sdk-mapbox-map",
+        "sdk-maplibre-map"
+      ],
+      "status": "documented-current-source-runtime-unverified",
+      "finding": "The Mapbox wrapper refreshes style components on styledata; MapLibre does so on style.load. Both SDKs expose style.load. An adapter readiness contract cannot treat wrapper style-data callbacks as equivalent."
+    },
+    {
+      "id": "controlled-camera-mechanisms",
+      "sourceIds": [
+        "web-mapbox-proxy",
+        "web-mapbox-props",
+        "web-maplibre-props",
+        "sdk-maplibre-map",
+        "sdk-maplibre-camera",
+        "rn-camera",
+        "ml-camera"
+      ],
+      "status": "documented-current-source-native-strict-control-unverified",
+      "finding": "Mapbox wrapper proxy distinguishes proposed and controlled transforms. MapLibre wrapper installs its renderer camera-update callback and applies controlled props to proposed updates. Native declarative targets and event callbacks do not prove rejection/clamping equivalence."
+    },
+    {
+      "id": "logical-coordinate-units",
+      "sourceIds": ["rn-geometry-android", "ml-geometry-android"],
+      "status": "documented-current-source-runtime-unverified",
+      "finding": "The inspected Android wrappers divide projected renderer points by display density and multiply inverse-projection input by it. Adapters must avoid duplicate conversions; multi-density/padding/resize runtime cases remain required."
+    },
+    {
+      "id": "coupled-gesture-combinations",
+      "sourceIds": [
+        "ml-map",
+        "ml-geometry-android",
+        "sdk-mapbox-touch",
+        "sdk-maplibre-touch"
+      ],
+      "status": "documented-current-source-runtime-unverified",
+      "finding": "Native MapLibre documents zoom/double-tap coupling and separately applies explicit Android flags. Both browser handlers provide independent pinch-rotation disabling. Physical gestures and combined defaults still need S06b evidence."
+    }
+  ],
+  "readableDocumentation": [
+    {
+      "url": "https://rnmapbox.github.io/docs/components/MapView",
+      "retrieval": "passed",
+      "versionEvidence": "Live readable reference only; corresponding pinned source remains authoritative."
+    },
+    {
+      "url": "https://rnmapbox.github.io/docs/components/Camera",
+      "retrieval": "passed",
+      "versionEvidence": "Live readable reference only; corresponding pinned source remains authoritative."
+    },
+    {
+      "url": "https://maplibre.org/maplibre-react-native/docs/components/map/",
+      "retrieval": "passed",
+      "versionEvidence": "Live readable reference only; corresponding pinned source remains authoritative."
+    },
+    {
+      "url": "https://maplibre.org/maplibre-react-native/docs/components/camera/",
+      "retrieval": "passed",
+      "versionEvidence": "Live readable reference only; corresponding pinned source remains authoritative."
+    },
+    {
+      "url": "https://visgl.github.io/react-map-gl/docs/api-reference/mapbox/map",
+      "retrieval": "passed",
+      "versionEvidence": "Live readable reference only; corresponding pinned source remains authoritative."
+    },
+    {
+      "url": "https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/map",
+      "retrieval": "passed",
+      "versionEvidence": "Live readable reference only; corresponding pinned source remains authoritative."
+    }
+  ],
+  "exampleChecks": {
+    "status": "passed",
+    "command": [
+      "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+      "--noEmit",
+      "-p",
+      "/private/tmp/one-map-camera-examples-_5gjy5nk/tsconfig.json"
+    ],
+    "exitCode": 0,
+    "directory": "/private/tmp/one-map-camera-examples-_5gjy5nk",
+    "examples": [
+      {
+        "fenceIndex": 1,
+        "file": "excerpt-1.tsx",
+        "kind": "upstream declaration",
+        "imports": ["import { MapView, Camera } from \"@rnmapbox/maps\";"],
+        "addedSetup": ["surrounding function component"],
+        "sha256": "c0d54869d4bee35aa03b5271b82de1a9b858a79ab20515552a104899a1872117"
+      },
+      {
+        "fenceIndex": 2,
+        "file": "excerpt-2.tsx",
+        "kind": "upstream declaration",
+        "imports": [
+          "import { Map, Camera } from \"@maplibre/maplibre-react-native\";"
+        ],
+        "addedSetup": ["surrounding function component"],
+        "sha256": "e93bfa6ecbf5aa325a478aef7bf0c500c71ffee658ff4003a83852d0382f8097"
+      },
+      {
+        "fenceIndex": 3,
+        "file": "excerpt-3.tsx",
+        "kind": "upstream declaration",
+        "imports": [
+          "import Map from \"react-map-gl/maplibre\";",
+          "import \"maplibre-gl/dist/maplibre-gl.css\";"
+        ],
+        "addedSetup": ["surrounding function component"],
+        "sha256": "6f7e372083198956d74d45b20de7aa57c8af75c51b6c1bd833e4c8d92fc6cf26"
+      },
+      {
+        "fenceIndex": 3,
+        "file": "excerpt-3-mapbox.tsx",
+        "kind": "upstream declaration",
+        "variation": "same example with Mapbox web entry and stylesheet",
+        "addedSetup": ["surrounding function component"],
+        "sha256": "e895621e8e49d5206fc3bc14a655e7e4185f51897578ed7ae0ae45a27a98b014"
+      },
+      {
+        "fenceIndex": 4,
+        "file": "excerpt-4.tsx",
+        "kind": "one-map-react declaration",
+        "imports": ["import { Map } from \"one-map-react\";"],
+        "addedSetup": ["surrounding function component"],
+        "sha256": "b319eacc68148b00337db96c06c37e476be6dc4700a6557ca0590c5a799ab21e"
+      },
+      {
+        "fenceIndex": 5,
+        "file": "excerpt-5.tsx",
+        "kind": "upstream declaration",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { MapView, Camera } from \"@rnmapbox/maps\";"
+        ],
+        "addedSetup": ["surrounding function component"],
+        "sha256": "12bb4f1b7a9d9508ec3dc2de057c96328365eb056e0fd29f298bad84703a3869"
+      },
+      {
+        "fenceIndex": 6,
+        "file": "excerpt-6.tsx",
+        "kind": "upstream declaration",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { Map, Camera } from \"@maplibre/maplibre-react-native\";"
+        ],
+        "addedSetup": ["surrounding function component"],
+        "sha256": "e32f5e622f308a8190119cd95e57294ffc229e4bfea0f1c9a126c4cb6ebb7e94"
+      },
+      {
+        "fenceIndex": 7,
+        "file": "excerpt-7.tsx",
+        "kind": "upstream declaration",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import Map from \"react-map-gl/maplibre\";"
+        ],
+        "addedSetup": ["surrounding function component"],
+        "sha256": "dec69b133c58b015e3c4dd41c0e2fc62d8c32601c3034f7894a2c982d15efbdd"
+      },
+      {
+        "fenceIndex": 7,
+        "file": "excerpt-7-mapbox.tsx",
+        "kind": "upstream declaration",
+        "variation": "same example with Mapbox web entry and stylesheet",
+        "addedSetup": ["surrounding function component"],
+        "sha256": "0cd7afdf98e763910d61eff8274dfb50a4a45610bcf6efb2d01bb7eccb97e072"
+      },
+      {
+        "fenceIndex": 8,
+        "file": "excerpt-8.tsx",
+        "kind": "one-map-react declaration",
+        "imports": [
+          "import { useState } from \"react\";",
+          "import { Map, type ViewState } from \"one-map-react\";"
+        ],
+        "addedSetup": ["surrounding function component"],
+        "sha256": "7b5e683c457ccdb8e97379301faf847b4a2b8ee1c94b38f19dff4633b5720e60"
+      },
+      {
+        "fenceIndex": 9,
+        "file": "ref-rn.ts",
+        "kind": "upstream declaration",
+        "addedSetup": ["imports and typed initialized ref declaration"],
+        "sha256": "ca92d58d0882c8b5d51789d2a23e5358c636d70f534a8380092d91646ba30cf0"
+      },
+      {
+        "fenceIndex": 10,
+        "file": "ref-ml.ts",
+        "kind": "upstream declaration",
+        "addedSetup": ["imports and typed initialized ref declaration"],
+        "sha256": "985f22ca6b526ad6eda92070ca3daf23494cf3aeefe53ea6a741eb4e868b37b3"
+      },
+      {
+        "fenceIndex": 11,
+        "file": "ref-web.ts",
+        "kind": "upstream declaration",
+        "addedSetup": ["imports and typed initialized ref declaration"],
+        "sha256": "5205f1e1a6a987f5dde1aec7067566ed3dcf7f6bae3c1ded78eee1393b7a254b"
+      },
+      {
+        "fenceIndex": 11,
+        "file": "ref-web-mapbox.ts",
+        "kind": "upstream declaration",
+        "variation": "same imperative excerpt with Mapbox web ref",
+        "addedSetup": ["imports and typed initialized ref declaration"],
+        "sha256": "00d11a27d9dcb5efc39f451c72775cc159d9b77a4214a8d07fd8f6b40ebe19ba"
+      },
+      {
+        "fenceIndex": 12,
+        "file": "ref-one-map-react.ts",
+        "kind": "one-map-react declaration",
+        "addedSetup": ["imports and typed initialized ref declaration"],
+        "sha256": "e8a10a350a1e48ab30f04f4c20fd7afc4fdf284008be0ca9e7b0e5406e899ada"
+      }
+    ],
+    "output": "",
+    "scope": "Current installed published declarations: eight documented TSX excerpts plus matching Mapbox-web variants of the two web excerpts; four documented imperative excerpts with typed initialized refs plus the Mapbox-web ref variant. Synthetic setup supplies component scope, CSS declaration and typed ref imports only. No SDK/native runtime execution.",
+    "retainedInitialFailure": {
+      "status": "failed",
+      "command": [
+        "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "/private/tmp/one-map-camera-examples-o0pkldt2/tsconfig.json"
+      ],
+      "exitCode": 1,
+      "directory": "/private/tmp/one-map-camera-examples-o0pkldt2",
+      "examples": [
+        {
+          "fenceIndex": 1,
+          "file": "excerpt-1.tsx",
+          "kind": "upstream declaration",
+          "imports": ["import { MapView, Camera } from \"@rnmapbox/maps\";"],
+          "addedSetup": ["surrounding function component"],
+          "sha256": "c0d54869d4bee35aa03b5271b82de1a9b858a79ab20515552a104899a1872117"
+        },
+        {
+          "fenceIndex": 2,
+          "file": "excerpt-2.tsx",
+          "kind": "upstream declaration",
+          "imports": [
+            "import { Map, Camera } from \"@maplibre/maplibre-react-native\";"
+          ],
+          "addedSetup": ["surrounding function component"],
+          "sha256": "e93bfa6ecbf5aa325a478aef7bf0c500c71ffee658ff4003a83852d0382f8097"
+        },
+        {
+          "fenceIndex": 3,
+          "file": "excerpt-3.tsx",
+          "kind": "upstream declaration",
+          "imports": [
+            "import Map from \"react-map-gl/maplibre\";",
+            "import \"maplibre-gl/dist/maplibre-gl.css\";"
+          ],
+          "addedSetup": ["surrounding function component"],
+          "sha256": "6f7e372083198956d74d45b20de7aa57c8af75c51b6c1bd833e4c8d92fc6cf26"
+        },
+        {
+          "fenceIndex": 3,
+          "file": "excerpt-3-mapbox.tsx",
+          "kind": "upstream declaration",
+          "variation": "same example with Mapbox web entry and stylesheet",
+          "addedSetup": ["surrounding function component"],
+          "sha256": "e895621e8e49d5206fc3bc14a655e7e4185f51897578ed7ae0ae45a27a98b014"
+        },
+        {
+          "fenceIndex": 4,
+          "file": "excerpt-4.tsx",
+          "kind": "one-map-react declaration",
+          "imports": ["import { Map } from \"one-map-react\";"],
+          "addedSetup": ["surrounding function component"],
+          "sha256": "b319eacc68148b00337db96c06c37e476be6dc4700a6557ca0590c5a799ab21e"
+        },
+        {
+          "fenceIndex": 5,
+          "file": "excerpt-5.tsx",
+          "kind": "upstream declaration",
+          "imports": [
+            "import { useState } from \"react\";",
+            "import { MapView, Camera } from \"@rnmapbox/maps\";"
+          ],
+          "addedSetup": ["surrounding function component"],
+          "sha256": "f2d75a4071b09cce5b00046faf18ebb256fd31aeba79a521d268d2ea12bd2c75"
+        },
+        {
+          "fenceIndex": 6,
+          "file": "excerpt-6.tsx",
+          "kind": "upstream declaration",
+          "imports": [
+            "import { useState } from \"react\";",
+            "import { Map, Camera } from \"@maplibre/maplibre-react-native\";"
+          ],
+          "addedSetup": ["surrounding function component"],
+          "sha256": "6c462df411f8832c79b9b7a72901190159e9728aef72c20ce1d3a228878e7055"
+        },
+        {
+          "fenceIndex": 7,
+          "file": "excerpt-7.tsx",
+          "kind": "upstream declaration",
+          "imports": [
+            "import { useState } from \"react\";",
+            "import Map from \"react-map-gl/maplibre\";"
+          ],
+          "addedSetup": ["surrounding function component"],
+          "sha256": "b993935b43050853b7ab84f56b55c4948bf5d3f86c80d88c1951f1ff11b59035"
+        },
+        {
+          "fenceIndex": 7,
+          "file": "excerpt-7-mapbox.tsx",
+          "kind": "upstream declaration",
+          "variation": "same example with Mapbox web entry and stylesheet",
+          "addedSetup": ["surrounding function component"],
+          "sha256": "71029f131bd94b141aeb027b5d33ac787b95d8fd478a57eb8a7bc57ddd85e281"
+        },
+        {
+          "fenceIndex": 8,
+          "file": "excerpt-8.tsx",
+          "kind": "one-map-react declaration",
+          "imports": [
+            "import { useState } from \"react\";",
+            "import { Map, type ViewState } from \"one-map-react\";"
+          ],
+          "addedSetup": ["surrounding function component"],
+          "sha256": "7b5e683c457ccdb8e97379301faf847b4a2b8ee1c94b38f19dff4633b5720e60"
+        }
+      ],
+      "output": "excerpt-6.tsx(11,2): error TS2741: Property 'mapStyle' is missing in type '{ onRegionIsChanging: ({ nativeEvent }: Readonly<{ bubbles: boolean | undefined; cancelable: boolean | undefined; currentTarget: number | ReactNativeElement; defaultPrevented: boolean | undefined; ... 11 more ...; type: string | undefined; }>) => void; children: Element; }' but required in type 'MapProps'.\n",
+      "scope": "Current installed published declarations; eight documented TSX excerpts plus matching Mapbox-web variations for the two MapLibre-web excerpts. Only explicitly omitted component scope and CSS declaration setup are supplied. This does not execute renderers or native control."
+    },
+    "initialFailureResolution": "MapLibre React Native requires mapStyle. Added the same explicit style URL to each controlled-camera excerpt; the original declaration failure remains retained.",
+    "counts": {
+      "documentedTSX": 8,
+      "additionalWebTSXEntryVariations": 2,
+      "documentedImperative": 4,
+      "additionalWebRefVariation": 1,
+      "total": 15
+    },
+    "versions": {
+      "typescript": "7.0.2",
+      "react": "19.2.3",
+      "react-native": "0.87.1",
+      "@types/react": "19.3.0",
+      "@types/react-dom": "19.3.0",
+      "@rnmapbox/maps": "10.3.7",
+      "@maplibre/maplibre-react-native": "11.5.0",
+      "react-map-gl": "8.1.3",
+      "@vis.gl/react-mapbox": "8.1.3",
+      "@vis.gl/react-maplibre": "8.1.3",
+      "mapbox-gl": "3.32.0",
+      "maplibre-gl": "6.13.0"
+    },
+    "declarationFiles": [
+      {
+        "package": "@rnmapbox/maps",
+        "version": "10.3.7",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/@rnmapbox/maps/lib/typescript/src/index.native.d.ts",
+        "sha256": "02a638b3c0994cbf7d4b1437730325304a54a0f63eec898badb65748fcae829e"
+      },
+      {
+        "package": "@maplibre/maplibre-react-native",
+        "version": "11.5.0",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/@maplibre/maplibre-react-native/lib/typescript/module/index.d.ts",
+        "sha256": "79eb71cff09c03172b9d9815ef716871d423fc84dd6c339b694a07813b8bda77"
+      },
+      {
+        "package": "react-map-gl",
+        "version": "8.1.3",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/react-map-gl/dist/mapbox.d.ts",
+        "sha256": "b1a177c0b3fb9cf17398ea94a0d1c5e22dd6736841ec9b5425e500a7cf43eb35"
+      },
+      {
+        "package": "react-map-gl",
+        "version": "8.1.3",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/react-map-gl/dist/maplibre.d.ts",
+        "sha256": "13c3a6f8331bf248134563a703f6abbf9e51269657dc17d587cf269a0e3ec740"
+      },
+      {
+        "package": "mapbox-gl",
+        "version": "3.32.0",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/mapbox-gl/dist/mapbox-gl.d.ts",
+        "sha256": "5de389cafdd753315b2b0e5551a58023d95dda55154afce88db61256b8d21ff9"
+      },
+      {
+        "package": "maplibre-gl",
+        "version": "6.13.0",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/maplibre-gl/dist/maplibre-gl.d.ts",
+        "sha256": "d8cd07feadf98305442d2068428fd5509bdc71d90a0a1a1b4caf5ab28d0a339c"
+      },
+      {
+        "package": "@vis.gl/react-mapbox",
+        "version": "8.1.3",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-mapbox/dist/index.d.ts",
+        "sha256": "a905f5736a2d75aaf3d06422aea88f76dee178e26ff7fbc04694e4d3a2293e3c"
+      },
+      {
+        "package": "@vis.gl/react-maplibre",
+        "version": "8.1.3",
+        "path": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-map-gl@8.1.3+e287d54bb0f7bbd4/node_modules/@vis.gl/react-maplibre/dist/index.d.ts",
+        "sha256": "da23468cedf5352e83d22a58174c9f7c7da82a0a70009f9108dd7175a7719da7"
+      }
+    ]
+  },
+  "structuralChecks": {
+    "status": "passed",
+    "sdkComparisonTables": 4,
+    "sdkComparisonRows": 34,
+    "issues": []
+  },
+  "remainingRuntimeInvestigations": [
+    {
+      "stage": "S04",
+      "scope": "Initialization, resize, readiness, ref ownership, failure cleanup and disposal across the required environments; this review does not change existing scoped lifecycle evidence."
+    },
+    {
+      "stage": "S05",
+      "scope": "Command dispatch/interruption, explicit animation modes, constraints, padding and observed settling. Source defaults alone do not verify actual flights."
+    },
+    {
+      "stage": "S06a",
+      "scope": "Initial/style readiness, event ordering and normalized payloads/origin; styledata differs from style.load and map idleness differs from movement settling."
+    },
+    {
+      "stage": "S06b",
+      "scope": "Combined touch flags and double-tap/quick-zoom behavior through physical gestures."
+    },
+    {
+      "stage": "S09",
+      "scope": "Owned-resource restoration after style/source replacement without mutating unrelated style resources."
+    },
+    {
+      "stage": "S10a",
+      "scope": "Projection/bounds round trips, corner order, pixel density, padding, resize and antimeridian cases."
+    },
+    {
+      "stage": "S10b",
+      "scope": "Rendered-query scope/loading/result/error behavior remains outside this source/type review; no query-scope certification follows from matching refs."
+    },
+    {
+      "stage": "S12",
+      "scope": "Native controlled-camera acceptance, rejection, clamping and imperative commands; separate weaker mode only through its explicit agreed contract."
+    }
+  ],
+  "limitations": [
+    "No native simulator, browser renderer, animation, physical gesture or query scenario was executed in this bounded task.",
+    "TSX checks use installed current declarations with skipLibCheck and explicit omitted setup. They validate caller usage, not upstream declaration internals or runnable applications.",
+    "Other reference documents retain their separately qualified historical comparisons; this review updates only maps-and-camera.md.",
+    "The prior documentation-style-review.json is an immutable snapshot of its earlier document hashes and factual gaps; this new record provides the later map/camera revalidation.",
+    "SDK classes remain upstream ref types in research fixtures; no common one-map-react contract or implementation was changed."
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "name": "one-map-react",
+  "version": "0.0.0",
+  "description": "A thin React map facade with explicitly selected Mapbox and MapLibre backends.",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json",
+    "./mapbox-web": {
+      "types": "./dist/mapbox-web.d.ts",
+      "import": "./dist/mapbox-web.js",
+      "default": "./dist/mapbox-web.js"
+    },
+    "./mapbox-native": {
+      "types": "./dist/mapbox-native.d.ts",
+      "import": "./dist/mapbox-native.js",
+      "default": "./dist/mapbox-native.js"
+    },
+    "./mapbox": {
+      "browser": {
+        "types": "./dist/mapbox-web.d.ts",
+        "default": "./dist/mapbox-web.js"
+      },
+      "react-native": {
+        "types": "./dist/mapbox-native.d.ts",
+        "default": "./dist/mapbox-native.js"
+      },
+      "types": "./dist/mapbox-web.d.ts",
+      "default": "./dist/mapbox-web.js"
+    },
+    "./maplibre-web": {
+      "types": "./dist/maplibre-web.d.ts",
+      "import": "./dist/maplibre-web.js",
+      "default": "./dist/maplibre-web.js"
+    },
+    "./maplibre-native": {
+      "types": "./dist/maplibre-native.d.ts",
+      "import": "./dist/maplibre-native.js",
+      "default": "./dist/maplibre-native.js"
+    },
+    "./maplibre": {
+      "browser": {
+        "types": "./dist/maplibre-web.d.ts",
+        "default": "./dist/maplibre-web.js"
+      },
+      "react-native": {
+        "types": "./dist/maplibre-native.d.ts",
+        "default": "./dist/maplibre-native.js"
+      },
+      "types": "./dist/maplibre-web.d.ts",
+      "default": "./dist/maplibre-web.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "peerDependencies": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.87.1",
+    "react-map-gl": "8.1.3",
+    "mapbox-gl": "3.32.0",
+    "maplibre-gl": "6.13.0",
+    "@rnmapbox/maps": "10.3.7",
+    "@maplibre/maplibre-react-native": "11.5.0"
+  },
+  "peerDependenciesMeta": {
+    "react-dom": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "react-map-gl": {
+      "optional": true
+    },
+    "mapbox-gl": {
+      "optional": true
+    },
+    "maplibre-gl": {
+      "optional": true
+    },
+    "@rnmapbox/maps": {
+      "optional": true
+    },
+    "@maplibre/maplibre-react-native": {
+      "optional": true
+    }
+  }
+}

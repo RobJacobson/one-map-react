@@ -1,0 +1,1797 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-08T11:19:36.387739+00:00",
+  "status": "Primary disposition decisions accepted; extension and host-state implementations remain pending.",
+  "sourceAudit": "records/evidence/rnmapbox-map-ref-reachability.json",
+  "scope": {
+    "exactEntries": 43,
+    "coverageEntryCountBefore": 11837,
+    "coverageEntryCountAfter": 11837,
+    "summary": {
+      "accepted-internal": 31,
+      "retained-extension": 7,
+      "retained-pending": 5
+    },
+    "runtimeVerification": "None from this audit; accepted verification is limited to source/declaration responsibility."
+  },
+  "decisions": [
+    {
+      "id": "rnmapbox:rnmapbox.MapView.CallbablePropKeys",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Local callback-key const/type is not exported. Its union is recoverable through the public handler parameter. It lists event props; it is not a map operation. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [462, 487],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L462-L487"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1173, 1178],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1173-L1178"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [353, 354],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onMapIdle",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.Debounced",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Local intersection alias is not exported; its callable and clear/flush shape is exposed through the public ref field. This names the JS debounce implementation. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [489, 489],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L489"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [568, 587],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L568-L587"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [355, 358],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.Debounced.clear",
+      "decision": "retained-extension",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S06a.legacy-event-delivery",
+        "disposition": "extension"
+      },
+      "reason": "Publicly callable debounce methods cancel or immediately deliver pending legacy region callbacks. This independently changes application event timing, so the proposed internal disposition is rejected.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [489, 489],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L489"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [568, 587],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L568-L587"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [355, 358],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [409, 414],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        },
+        {
+          "package": "debounce",
+          "version": "2.2.0",
+          "path": "index.js",
+          "lines": [74, 95],
+          "url": "https://github.com/sindresorhus/debounce/blob/v2.2.0/index.js#L74-L95",
+          "artifact": "https://registry.npmjs.org/debounce/-/debounce-2.2.0.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.Debounced.flush",
+      "decision": "retained-extension",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S06a.legacy-event-delivery",
+        "disposition": "extension"
+      },
+      "reason": "Publicly callable debounce methods cancel or immediately deliver pending legacy region callbacks. This independently changes application event timing, so the proposed internal disposition is rejected.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [489, 489],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L489"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [568, 587],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L568-L587"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [355, 358],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [409, 414],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        },
+        {
+          "package": "debounce",
+          "version": "2.2.0",
+          "path": "index.js",
+          "lines": [74, 95],
+          "url": "https://github.com/sindresorhus/debounce/blob/v2.2.0/index.js#L74-L95",
+          "artifact": "https://registry.npmjs.org/debounce/-/debounce-2.2.0.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Generated declaration-only base identifier names the intersection produced by NativeBridgeComponent(React.PureComponent<Props>, NativeMapViewModule). Not a public named constructor. Its members can still be exposed through MapView. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [11, 18],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L11-L18"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [359, 401],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base._preRefMapMethodQueue.method",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Public, mutable array entry shape is reachable through the ref. Wrapper queues native command names/arguments and promise resolvers before a native ref exists, then drains the queue through runNativeMethod. Directly editing queue entries is wrapper transport bookkeeping, not a separate renderer API. Native command behavior must remain covered by the public command stages. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [19, 30],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L19-L30"
+        },
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [46, 88],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L46-L88"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1199, 1204],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1199-L1204"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [362, 368],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base._preRefMapMethodQueue.method.args",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Public, mutable array entry shape is reachable through the ref. Wrapper queues native command names/arguments and promise resolvers before a native ref exists, then drains the queue through runNativeMethod. Directly editing queue entries is wrapper transport bookkeeping, not a separate renderer API. Native command behavior must remain covered by the public command stages. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [19, 30],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L19-L30"
+        },
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [46, 88],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L46-L88"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1199, 1204],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1199-L1204"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [362, 368],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base._preRefMapMethodQueue.method.name",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Public, mutable array entry shape is reachable through the ref. Wrapper queues native command names/arguments and promise resolvers before a native ref exists, then drains the queue through runNativeMethod. Directly editing queue entries is wrapper transport bookkeeping, not a separate renderer API. Native command behavior must remain covered by the public command stages. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [19, 30],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L19-L30"
+        },
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [46, 88],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L46-L88"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1199, 1204],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1199-L1204"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [362, 368],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base._preRefMapMethodQueue.resolver",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Public, mutable array entry shape is reachable through the ref. Wrapper queues native command names/arguments and promise resolvers before a native ref exists, then drains the queue through runNativeMethod. Directly editing queue entries is wrapper transport bookkeeping, not a separate renderer API. Native command behavior must remain covered by the public command stages. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [19, 30],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L19-L30"
+        },
+        {
+          "path": "src/components/NativeBridgeComponent.tsx",
+          "lines": [46, 88],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/NativeBridgeComponent.tsx#L46-L88"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1199, 1204],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1199-L1204"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [362, 368],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.componentDidCatch",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [382, 382],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.componentWillMount",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [385, 385],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.componentWillReceiveProps",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [387, 387],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.componentWillUpdate",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [389, 389],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.contextType",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional constructor static inherited in the generated intersection, not an instance ref field. MapView and NativeBridgeComponent do not assign it. React context configuration is not a renderer map setting. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [395, 395],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.forceUpdate",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Actual inherited React framework method is callable through the ref. It schedules a React update; it is not a camera/style renderer command. MapView uses setState internally for layout and legacy region state. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [375, 375],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.getSnapshotBeforeUpdate",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [383, 383],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.props",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Inherited readonly React props container is visible through the ref. Reading it is not an independent map API. Individual documented MapView options and event callbacks retain their separate coverage obligations. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [377, 377],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.setState",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Actual inherited React framework method is callable through the ref. It schedules a React update; it is not a camera/style renderer command. MapView uses setState internally for layout and legacy region state. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [374, 374],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.shouldComponentUpdate",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [380, 380],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.UNSAFE_componentWillMount",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [386, 386],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.UNSAFE_componentWillReceiveProps",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [388, 388],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView_base.UNSAFE_componentWillUpdate",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Optional inherited React lifecycle declaration is visible in the instance type. Neither MapView nor NativeBridgeComponent supplies this method. Frozen React19.2.3 PureComponent.prototype also has no such method; declaration reachability does not establish a callable runtime function on an unmodified instance. React owns lifecycle scheduling, not the map renderer. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [493, 496],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L493-L496"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [579, 596],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L579-L596"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [390, 390],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onCameraChanged.payload",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Payload/type belongs to the native synthetic-event argument of a publicly reachable underscore handler, not a ref method property. These handlers decode JSON if needed and dispatch application callbacks. Preserve decoded event payloads and timing in S06; do not invent an independent S04 payload accessor. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onChange.payload",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Payload/type belongs to the native synthetic-event argument of a publicly reachable underscore handler, not a ref method property. These handlers decode JSON if needed and dispatch application callbacks. Preserve decoded event payloads and timing in S06; do not invent an independent S04 payload accessor. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onChange.payload.isAnimatingFromUserInteraction",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Extra boolean belongs to the handler argument properties, not to the callable object. It is forwarded/tracked by legacy-region JS helpers; public onRegionWillChange/onRegionDidChange declarations expose RegionPayload without this extra field. No Android/iOS source producer of this exact key exists in the pinned package. Keep legacy-event migration/behavior investigation in S06; this does not prove the SDK lacks equivalent interaction or animation information. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onChange.type",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Payload/type belongs to the native synthetic-event argument of a publicly reachable underscore handler, not a ref method property. These handlers decode JSON if needed and dispatch application callbacks. Preserve decoded event payloads and timing in S06; do not invent an independent S04 payload accessor. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onDebouncedRegionDidChange.isAnimatingFromUserInteraction",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Extra boolean belongs to the handler argument properties, not to the callable object. It is forwarded/tracked by legacy-region JS helpers; public onRegionWillChange/onRegionDidChange declarations expose RegionPayload without this extra field. No Android/iOS source producer of this exact key exists in the pinned package. Keep legacy-event migration/behavior investigation in S06; this does not prove the SDK lacks equivalent interaction or animation information. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onDebouncedRegionWillChange.isAnimatingFromUserInteraction",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Extra boolean belongs to the handler argument properties, not to the callable object. It is forwarded/tracked by legacy-region JS helpers; public onRegionWillChange/onRegionDidChange declarations expose RegionPayload without this extra field. No Android/iOS source producer of this exact key exists in the pinned package. Keep legacy-event migration/behavior investigation in S06; this does not prove the SDK lacks equivalent interaction or animation information. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onLongPress.payload",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Payload/type belongs to the native synthetic-event argument of a publicly reachable underscore handler, not a ref method property. These handlers decode JSON if needed and dispatch application callbacks. Preserve decoded event payloads and timing in S06; do not invent an independent S04 payload accessor. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onPress.payload",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Payload/type belongs to the native synthetic-event argument of a publicly reachable underscore handler, not a ref method property. These handlers decode JSON if needed and dispatch application callbacks. Preserve decoded event payloads and timing in S06; do not invent an independent S04 payload accessor. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView._onRegionWillChange.isAnimatingFromUserInteraction",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Extra boolean belongs to the handler argument properties, not to the callable object. It is forwarded/tracked by legacy-region JS helpers; public onRegionWillChange/onRegionDidChange declarations expose RegionPayload without this extra field. No Android/iOS source producer of this exact key exists in the pinned package. Keep legacy-event migration/behavior investigation in S06; this does not prove the SDK lacks equivalent interaction or animation information. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1016, 1088],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1016-L1088"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1090, 1119],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1090-L1119"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [522, 538],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L522-L538"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [340, 372],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L340-L372"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [594, 620],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onLongPress",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionWillChange",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onRegionDidChange",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.deprecationLogged",
+      "decision": "retained-extension",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S48a.wrapper-warnings",
+        "disposition": "extension"
+      },
+      "reason": "Publicly mutable per-map flags suppress repeated deprecation warnings. Re-enabling or suppressing a warning changes observable logging, so the proposed internal disposition is rejected.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [512, 520],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L512-L520"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [639, 673],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L639-L673"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1180, 1196],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1180-L1196"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [403, 407],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.deprecationLogged.contentInset",
+      "decision": "retained-extension",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S48a.wrapper-warnings",
+        "disposition": "extension"
+      },
+      "reason": "Publicly mutable per-map flags suppress repeated deprecation warnings. Re-enabling or suppressing a warning changes observable logging, so the proposed internal disposition is rejected.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [512, 520],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L512-L520"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [639, 673],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L639-L673"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1180, 1196],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1180-L1196"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [403, 407],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.deprecationLogged.regionDidChange",
+      "decision": "retained-extension",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S48a.wrapper-warnings",
+        "disposition": "extension"
+      },
+      "reason": "Publicly mutable per-map flags suppress repeated deprecation warnings. Re-enabling or suppressing a warning changes observable logging, so the proposed internal disposition is rejected.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [512, 520],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L512-L520"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [639, 673],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L639-L673"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1180, 1196],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1180-L1196"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [403, 407],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.deprecationLogged.regionIsChanging",
+      "decision": "retained-extension",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S48a.wrapper-warnings",
+        "disposition": "extension"
+      },
+      "reason": "Publicly mutable per-map flags suppress repeated deprecation warnings. Re-enabling or suppressing a warning changes observable logging, so the proposed internal disposition is rejected.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [512, 520],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L512-L520"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [639, 673],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L639-L673"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1180, 1196],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1180-L1196"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [403, 407],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.logger",
+      "decision": "retained-extension",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S48a",
+        "disposition": "extension"
+      },
+      "reason": "The ref property exposes the shared Logger singleton; application logging configuration remains required under the assigned logging extension.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [521, 521],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L521"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [550, 551],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L550-L551"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [583, 587],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L583-L587"
+        },
+        {
+          "path": "src/Mapbox.native.ts",
+          "lines": [81, 81],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/Mapbox.native.ts#L81"
+        },
+        {
+          "path": "src/utils/Logger.ts",
+          "lines": [19, 31],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/utils/Logger.ts#L19-L31"
+        },
+        {
+          "path": "src/utils/Logger.ts",
+          "lines": [38, 57],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/utils/Logger.ts#L38-L57"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [408, 408],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.Logger.Logger.sharedInstance",
+          "stage": "S48a",
+          "disposition": "extension"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.Logger.Logger.setLogCallback",
+          "stage": "S48a",
+          "disposition": "extension"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.Logger.Logger.setLogLevel",
+          "stage": "S48a",
+          "disposition": "extension"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.height",
+      "decision": "retained-pending",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "reason": "Public React state number written from outer View layout height; not an independent map size command. Host sizing/layout obligations stay in S04. Public state reachability and application observation remain assigned work; the proposed internal disposition is not accepted.",
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.RegionPayload.isUserInteraction",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.isReady",
+      "decision": "retained-pending",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "reason": "Public boolean|null becomes true on outer View layout and gates creation of the native MapView. It does not mean SDK style/map loaded. Preserve actual map/style readiness callbacks; do not satisfy MapRef.isReady from this field. Public state reachability and application observation remain assigned work; the proposed internal disposition is not accepted.",
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.RegionPayload.isUserInteraction",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.isUserInteraction",
+      "decision": "retained-pending",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "reason": "Public React state boolean copied from the legacy region-will-change callback payload. This is wrapper state, not a current SDK camera getter. Preserve user-interaction event semantics in S06. Public state reachability and application observation remain assigned work; the proposed internal disposition is not accepted.",
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.RegionPayload.isUserInteraction",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.region",
+      "decision": "retained-pending",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "reason": "Public React state is declared null, but _onRegionDidChange assigns a GeoJSON region feature. Record this source/declaration mismatch rather than promising a null-only runtime value. Camera/region getters and events retain their own obligations. Public state reachability and application observation remain assigned work; the proposed internal disposition is not accepted.",
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.RegionPayload.isUserInteraction",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.MapView.state.width",
+      "decision": "retained-pending",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "reason": "Public React state number written from outer View layout width; not an independent map size command. Host sizing/layout obligations stay in S04. Public state reachability and application observation remain assigned work; the proposed internal disposition is not accepted.",
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.RegionPayload.isUserInteraction",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.NativeProps",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Local alias is not named-exported but is recoverable through public setNativeProps. It replaces application callbacks with serialized native-event callback signatures. Marking this alias internal must not exclude documented user props or their mutable renderer effects. Generic raw setNativeProps is already internal in the ledger; ordinary configuration remains required. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1207, 1211],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1207-L1211"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1285, 1301],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1285-L1301"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [626, 639],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": [
+        {
+          "id": "rnmapbox:rnmapbox.MapView.MapView.setNativeProps",
+          "stage": "S02",
+          "disposition": "internal"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onCameraChanged",
+          "stage": "S06a",
+          "disposition": "common"
+        },
+        {
+          "id": "rnmapbox:rnmapbox.MapView.props.onPress",
+          "stage": "S06a",
+          "disposition": "common"
+        }
+      ]
+    },
+    {
+      "id": "rnmapbox:rnmapbox.MapView.RNMBXMapViewRefType",
+      "decision": "accepted-internal",
+      "before": {
+        "stage": "S04",
+        "disposition": "common"
+      },
+      "after": {
+        "stage": "S00.ref-shapes",
+        "disposition": "internal"
+      },
+      "reason": "Local alias is not named-exported but is recoverable through public _nativeRef/_setNativeRef. It types the actual host native component and React Native NativeMethods, not the exported MapView ref itself. Native host ref reachability cannot substitute for typed ordinary map options/operations. This entry supplies a type/transport/framework shape rather than an independent mapping operation. Application props, decoded events, command delivery and typed host options remain assigned through the preserved counterparts; no decision relies on underscore spelling or TypeScript privacy.",
+      "sourceRanges": [
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [539, 539],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L539"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1199, 1211],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1199-L1211"
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "lines": [1301, 1305],
+          "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx#L1301-L1305"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [415, 415],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "lines": [616, 640],
+          "artifact": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        }
+      ],
+      "preservedCounterparts": []
+    }
+  ]
+}

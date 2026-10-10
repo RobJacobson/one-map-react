@@ -1,0 +1,533 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-08T11:55:18.682438+00:00",
+  "stage": "S04",
+  "status": "Implemented with scoped verification; complete host acceptance remains pending.",
+  "contract": "docs/decisions/0005-host-properties.md",
+  "staticChecks": {
+    "build": "passed",
+    "typecheck": "passed",
+    "unitTests": {
+      "status": "passed",
+      "count": 29
+    },
+    "adapterSSRTests": {
+      "status": "passed",
+      "count": 8
+    },
+    "nativeComponentTests": {
+      "status": "passed",
+      "count": 35,
+      "scope": "Actual one-map-react adapter with SDK/native view components mocked; host attributes and callback replacement, not physical input behavior."
+    },
+    "commonPackedConsumer": {
+      "status": "passed",
+      "consumer": "/private/tmp/one-map-common-consumer-VIREuc",
+      "scope": "React-only common entry, strict ES2022 declarations without mapping/native/DOM peers."
+    },
+    "latestPostPrototypeGuard": {
+      "typecheck": "passed",
+      "unitTests": 29,
+      "adapterSSRTests": 8,
+      "nativeComponentTests": 35,
+      "biome": "passed"
+    }
+  },
+  "webRuntime": {
+    "status": "passed",
+    "artifact": "/private/tmp/one-map-web-lifecycle-Mt8io5/one-map-0.0.0.tgz",
+    "artifactSha256": "a86346a3cb11c13b3b09eb739a42316d4ff882eeff775861da0d1474d07fc5a5",
+    "report": "/private/tmp/one-map-web-lifecycle-Mt8io5/results.json",
+    "assertionSnapshot": "/private/tmp/one-map-web-lifecycle-Mt8io5/lifecycle-executed.mjs",
+    "assertionSnapshotSha256": "8074da3a64401c2ee9300b00cd68a34e77059576c12e0b3ce07809de05e3bd9e",
+    "scope": "Both selected-peer packed production browser renderers, typed host updates/removal, focus callback replacement, stable logical identifier and renderer load count; other lifecycle assertions also passed.",
+    "sourceDeltaAfterRun": "Added plain-object prototype validation and report check labels afterward; these are covered by units and do not change the valid-object runtime path. Final artifact repeat remains required."
+  },
+  "declarationFixtures": {
+    "artifact": "/private/tmp/one-map-selection-vzGUA8/one-map-0.0.0.tgz",
+    "results": [
+      {
+        "mode": "mapbox-web",
+        "status": "passed",
+        "cachedPackages": 37,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/mapbox-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed",
+          "skipLibCheck": false
+        },
+        "nativeRuntime": "not applicable"
+      },
+      {
+        "mode": "maplibre-web",
+        "status": "passed",
+        "cachedPackages": 59,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/maplibre-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed",
+          "skipLibCheck": false
+        },
+        "nativeRuntime": "not applicable"
+      },
+      {
+        "mode": "mapbox-native",
+        "status": "passed",
+        "cachedPackages": 307,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/mapbox-native",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "maplibre-native",
+        "status": "passed",
+        "cachedPackages": 301,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/maplibre-native",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "mixed-mapbox-web",
+        "status": "passed",
+        "cachedPackages": 330,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/mixed-mapbox-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "mixed-maplibre-web",
+        "status": "passed",
+        "cachedPackages": 359,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/mixed-maplibre-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      }
+    ],
+    "artifactSha256": "301bd19374883b47c626a62591ca68fbf17b8334e8746c4d48e938691645e6a4",
+    "report": "/private/tmp/one-map-selection-vzGUA8/results.json"
+  },
+  "nativeGeneratedHostAudit": {
+    "status": "assignment-accepted-runtime-pending",
+    "audit": "records/evidence/native-generated-host-inventory.json",
+    "decisions": "records/evidence/native-generated-host-decisions.json",
+    "resolvedHostProps": 112,
+    "additiveEntries": 294,
+    "inventoryCount": 12131,
+    "preservedTVEntryAssessments": 10
+  },
+  "documentExamples": {
+    "status": "passed",
+    "command": [
+      "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+      "--noEmit",
+      "-p",
+      "/private/tmp/one-map-host-decision-examples-enjnzl32/tsconfig.json"
+    ],
+    "exitCode": 0,
+    "output": "",
+    "directory": "/private/tmp/one-map-host-decision-examples-enjnzl32",
+    "documentSha256": "0653edee1a885acf7cba6958abcbd021149278f66bcd3f251040edcee9bb6d19",
+    "examples": [
+      {
+        "fenceIndex": 1,
+        "file": "host-1.tsx",
+        "sha256": "e8efc8d805533f1c905b89cc4904f489e8c7df19cc7a106f42dc97a53a6c3233",
+        "addedSetup": []
+      },
+      {
+        "fenceIndex": 2,
+        "file": "host-2.tsx",
+        "sha256": "40c041bbb51645ed570f985887ed3c610a110b07fa98744e6809d009da288cc9",
+        "addedSetup": []
+      },
+      {
+        "fenceIndex": 3,
+        "file": "host-3.tsx",
+        "sha256": "acfe28d529ceeabe84cb9f2657d7e54950973dc98593812f9d80dccc095d1a03",
+        "addedSetup": []
+      },
+      {
+        "fenceIndex": 4,
+        "file": "host-4.tsx",
+        "sha256": "55f43ffa6b16752325415ffe0cb74314442dd74f583d8f4cf4d0026fba13b3b2",
+        "addedSetup": []
+      },
+      {
+        "file": "host-3-mapbox.tsx",
+        "variation": "same declared host goal with other selected web entry; Mapbox token setup remains omitted",
+        "sha256": "9fa72d4f34f90a92915bd592c0a8ec5f58b149e64b5ea6e93f8925c4a9643ecc"
+      },
+      {
+        "file": "host-4-mapbox.tsx",
+        "variation": "same declared host goal with other selected web entry; Mapbox token setup remains omitted",
+        "sha256": "69fe4d3117b1bc9139dd5b90fa634f0e36a53f14c43f33af606e3e80869eddfb"
+      },
+      {
+        "file": "host-4-mapbox-native.tsx",
+        "variation": "native selected helper with native attributes as explained in document; native builds, token/bootstrap and focus behavior remain unverified",
+        "sha256": "5009234b649bb53774e9e04c1879a380db53f122be7b7d54d62a123044a80c2b"
+      },
+      {
+        "file": "host-4-maplibre-native.tsx",
+        "variation": "native selected helper with native attributes as explained in document; native builds, token/bootstrap and focus behavior remain unverified",
+        "sha256": "c6d1c33a1a5f669af8b6193419f3041f1418720b1e71d9911efc11671a183375"
+      }
+    ],
+    "scope": "Eight declaration checks: four documented excerpts and four selected web/native variations. Installed frozen research declarations and workspace-built common/selected helper declarations; no runtime, packed isolation or native focus claim.",
+    "postCheckEditorialChange": "Added matched Mapbox map-id citation, native TS policy, selection evidence link and generated-audit candidate wording. Excerpts unchanged; no error suppression.",
+    "retainedInitialCSSFailure": {
+      "status": "failed",
+      "command": [
+        "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "/private/tmp/one-map-host-decision-examples-ldz43fm9/tsconfig.json"
+      ],
+      "exitCode": 1,
+      "output": "host-3-mapbox.tsx(2,8): error TS2882: Cannot find module or type declarations for side-effect import of 'mapbox-gl/dist/mapbox-gl.css'.\nhost-3.tsx(2,8): error TS2882: Cannot find module or type declarations for side-effect import of 'maplibre-gl/dist/maplibre-gl.css'.\nhost-4-mapbox.tsx(3,8): error TS2882: Cannot find module or type declarations for side-effect import of 'mapbox-gl/dist/mapbox-gl.css'.\nhost-4.tsx(3,8): error TS2882: Cannot find module or type declarations for side-effect import of 'maplibre-gl/dist/maplibre-gl.css'.\n",
+      "directory": "/private/tmp/one-map-host-decision-examples-ldz43fm9",
+      "documentSha256": "3ee81cfb71bd667a64e836ddcf2f838495b065e96e00493b8483da556f656480",
+      "examples": [
+        {
+          "fenceIndex": 1,
+          "file": "host-1.tsx",
+          "sha256": "e8efc8d805533f1c905b89cc4904f489e8c7df19cc7a106f42dc97a53a6c3233",
+          "addedSetup": []
+        },
+        {
+          "fenceIndex": 2,
+          "file": "host-2.tsx",
+          "sha256": "40c041bbb51645ed570f985887ed3c610a110b07fa98744e6809d009da288cc9",
+          "addedSetup": []
+        },
+        {
+          "fenceIndex": 3,
+          "file": "host-3.tsx",
+          "sha256": "acfe28d529ceeabe84cb9f2657d7e54950973dc98593812f9d80dccc095d1a03",
+          "addedSetup": []
+        },
+        {
+          "fenceIndex": 4,
+          "file": "host-4.tsx",
+          "sha256": "55f43ffa6b16752325415ffe0cb74314442dd74f583d8f4cf4d0026fba13b3b2",
+          "addedSetup": []
+        },
+        {
+          "file": "host-3-mapbox.tsx",
+          "variation": "same declared host goal with other selected web entry; Mapbox token setup remains omitted",
+          "sha256": "9fa72d4f34f90a92915bd592c0a8ec5f58b149e64b5ea6e93f8925c4a9643ecc"
+        },
+        {
+          "file": "host-4-mapbox.tsx",
+          "variation": "same declared host goal with other selected web entry; Mapbox token setup remains omitted",
+          "sha256": "69fe4d3117b1bc9139dd5b90fa634f0e36a53f14c43f33af606e3e80869eddfb"
+        },
+        {
+          "file": "host-4-mapbox-native.tsx",
+          "variation": "native selected helper with native attributes as explained in document; native builds, token/bootstrap and focus behavior remain unverified",
+          "sha256": "5009234b649bb53774e9e04c1879a380db53f122be7b7d54d62a123044a80c2b"
+        },
+        {
+          "file": "host-4-maplibre-native.tsx",
+          "variation": "native selected helper with native attributes as explained in document; native builds, token/bootstrap and focus behavior remain unverified",
+          "sha256": "c6d1c33a1a5f669af8b6193419f3041f1418720b1e71d9911efc11671a183375"
+        }
+      ],
+      "scope": "Eight declaration checks: four documented excerpts and four selected web/native variations. Installed frozen research declarations and workspace-built common/selected helper declarations; no runtime, packed isolation or native focus claim."
+    },
+    "cssRepair": "Enabled installed Vite/client CSS module declarations, as supplied by the web bundler; added explicit setup note to document. No CSS import removed or invented map API.",
+    "finalProseFollowup": {
+      "document": {
+        "path": "docs/decisions/0005-host-properties.md",
+        "sha256": "68134cd950d63836074035751dc79c94b7f7bda67e6963e5199dbe84ef1ca657"
+      },
+      "tsxFencesUnchanged": true,
+      "scope": "Only Remaining acceptance prose changed after the retained eight-example passing run; its original document hash remains the executed snapshot."
+    }
+  },
+  "documentationReaderReview": {
+    "status": "decision-specific full-guide reader/source/declaration review passed; host runtime and final-artifact gates remain open",
+    "evidence": "records/evidence/documentation-current-review.json",
+    "scope": "Complete-guide pinned-source/type/reader/editorial review of decision0005; exact four examples and four selected-entry variations type-check. SDK mocks and source audits do not establish native host runtime behavior.",
+    "document": {
+      "path": "docs/decisions/0005-host-properties.md",
+      "sha256": "68134cd950d63836074035751dc79c94b7f7bda67e6963e5199dbe84ef1ca657"
+    },
+    "currentFollowup": {
+      "reviewedOn": "2026-10-08",
+      "status": "Complete-guide scoped reader followup; complete S04/S50/S51 acceptance remains open.",
+      "historyNote": "Original 16-Markdown/11837-inventory review and example-run hashes remain historical proof. This additive snapshot records later primary assignments and package results without rewriting earlier acceptance.",
+      "currentCounts": {
+        "markdownFiles": 17,
+        "sdkComparisonTables": 22,
+        "inventoryEntries": 12131,
+        "summedMarkdownEntries": 12131,
+        "acceptedAdditiveGeneratedHostEntries": 294,
+        "retainedHistoricalTVAssessments": 10
+      },
+      "documents": [
+        {
+          "path": "docs/decisions/0005-host-properties.md",
+          "sha256": "68134cd950d63836074035751dc79c94b7f7bda67e6963e5199dbe84ef1ca657"
+        },
+        {
+          "path": "docs/README.md",
+          "sha256": "7f5f19422bc9babe43f71cf0a72daf4e8ad27d9d3097e3279ae84122c3697af2"
+        }
+      ],
+      "inventoryParity": {
+        "status": "passed",
+        "sources": [
+          {
+            "path": "records/api-coverage.json",
+            "sha256": "e69745a8de1cf06591c7a76d185510c107edadf63bd3dc020d0eaec9f0fedbee"
+          },
+          {
+            "path": "docs/api-coverage.md",
+            "sha256": "89cb5de387d6435803800976ac71e5a3d57a42f886d9970b36642e90c5b0082f"
+          },
+          {
+            "path": "records/evidence/native-generated-host-decisions.json",
+            "sha256": "efe2c86eeb1adddeb491e87fb6a18f78df3cf8eb944d2759b347d3757eb3e7e5"
+          }
+        ],
+        "scope": "Inventory assignment parity; applicable new support cells require investigation and native behavior remains unverified."
+      },
+      "selectedPackageEvidence": {
+        "source": {
+          "path": "records/evidence/selection.json",
+          "sha256": "dab84182bb55f551612d1bb6eda970f70141f23ace86e1d8935527111cf492cf"
+        },
+        "field": "typedHostFullFollowup",
+        "artifact": "/private/tmp/one-map-selection-vzGUA8/one-map-0.0.0.tgz",
+        "artifactSha256": "301bd19374883b47c626a62591ca68fbf17b8334e8746c4d48e938691645e6a4",
+        "report": "/private/tmp/one-map-selection-vzGUA8/results.json",
+        "results": [
+          {
+            "mode": "mapbox-web",
+            "status": "passed",
+            "declarationChecks": {
+              "application": "passed",
+              "publishedDeclarations": "passed",
+              "skipLibCheck": false
+            },
+            "nativeRuntime": "not applicable"
+          },
+          {
+            "mode": "maplibre-web",
+            "status": "passed",
+            "declarationChecks": {
+              "application": "passed",
+              "publishedDeclarations": "passed",
+              "skipLibCheck": false
+            },
+            "nativeRuntime": "not applicable"
+          },
+          {
+            "mode": "mapbox-native",
+            "status": "passed",
+            "declarationChecks": {
+              "application": "passed",
+              "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+              "skipLibCheck": true,
+              "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+              "diagnostics": [
+                "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+                "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+                "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+              ],
+              "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+              "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+            },
+            "nativeRuntime": "unverified: requires React Native host/native SDK build"
+          },
+          {
+            "mode": "maplibre-native",
+            "status": "passed",
+            "declarationChecks": {
+              "application": "passed",
+              "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+              "skipLibCheck": true,
+              "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+              "diagnostics": [
+                "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+                "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+                "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+              ],
+              "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+              "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+            },
+            "nativeRuntime": "unverified: requires React Native host/native SDK build"
+          },
+          {
+            "mode": "mixed-mapbox-web",
+            "status": "passed",
+            "declarationChecks": {
+              "application": "passed",
+              "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+              "skipLibCheck": true,
+              "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+              "diagnostics": [
+                "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+                "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+                "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+              ],
+              "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+              "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+            },
+            "nativeRuntime": "unverified: requires React Native host/native SDK build"
+          },
+          {
+            "mode": "mixed-maplibre-web",
+            "status": "passed",
+            "declarationChecks": {
+              "application": "passed",
+              "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+              "skipLibCheck": true,
+              "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+              "diagnostics": [
+                "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+                "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+                "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+              ],
+              "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+              "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+            },
+            "nativeRuntime": "unverified: requires React Native host/native SDK build"
+          }
+        ],
+        "scope": "All six selected-peer configurations. Web strict declarations; native-containing configurations: strict artifact declarations and RN-standard strict app checks, plus exact independent RN-only library diagnostics retained. Browser/native/Metro-web graphs, alias/factory types and missing-selected-peer contracts verified.",
+        "verification": "Independent inspection of retained primary results; package suite was not rerun by this reader review."
+      },
+      "primaryHostEvidenceSnapshot": {
+        "path": "records/evidence/host-properties.json",
+        "sha256": "18d1f320cf90ad12f344e233e202f33c34c538b180889a7ac221a71660b4be0d"
+      },
+      "structuralChecks": {
+        "command": "bun run check:docs",
+        "exitCode": 0,
+        "output": "PASS documentation structure: 17 Markdown files, 22 SDK comparison tables, paragraphs, fences and local links.",
+        "scope": "Structural checks; full-guide semantic/source/example checks remain recorded in the decision reader review.",
+        "evidenceFormatting": {
+          "command": "bunx biome check records/evidence/documentation-current-review.json",
+          "exitCode": 0,
+          "output": "Checked 1 file. No fixes applied."
+        }
+      },
+      "remainingGates": [
+        "Current packed selected-peer checks pass all six modes, including strict reachable own published declarations; S51 must repeat required checks against the final release artifact.",
+        "Primary accepted 294 additive assignments under S04.generated-host; applicable support cells remain requires-investigation/runtime-unverified. Ten historical TV declaration assessments remain pending.",
+        "Native accessibility, identifier lookup, focus hardware, responder/pointer/touch delivery and cleanup require actual target-platform observations.",
+        "Complete per-host attribute/runtime coverage, ordinary S04 map configuration and S50/S51 final documentation/conformance remain unfinished."
+      ]
+    },
+    "completeGuide": true
+  },
+  "retainedFailures": [
+    {
+      "status": "failed",
+      "check": "Initial selected host key type check",
+      "reason": "Five TV-only fields in the handwritten RN ViewProps inventory are absent from actual generated root ViewProps.",
+      "resolution": "Resolve the public root declarations; type the helper with the actual root ViewProps, retain old coverage pending primary disposition."
+    },
+    {
+      "status": "failed",
+      "check": "Attempt to inspect TypeScript 7 via legacy createProgram API",
+      "reason": "The default TypeScript export contains version metadata rather than the old compiler API.",
+      "resolution": "Use the installed TypeScript 7 unstable/sync API; generated property introspection succeeded."
+    },
+    {
+      "status": "failed",
+      "check": "Workspace typecheck after selected export edit",
+      "reason": "Private workspace examples resolve built package declarations, which had not yet been regenerated.",
+      "resolution": "Build declarations then rerun typecheck; passed."
+    },
+    {
+      "status": "failed",
+      "check": "Full strict native library declarations",
+      "report": "/private/tmp/one-map-selection-2niDzG/failure.json",
+      "baseline": "/private/tmp/one-map-selection-2niDzG/mapbox-native/rn-baseline-diagnostics.log",
+      "diagnostics": [
+        "TS2411 AnimatedProps19:3",
+        "TS2344 VirtualizedList17:58",
+        "TS2416 ReactNativeDocument29:7"
+      ],
+      "resolution": "Independent RN-only repro exactly matches full strict diagnostics; standard RN strict app config and own artifact declarations as strict .ts inputs pass in all native-containing modes. Upstream library diagnostics remain failed, not erased."
+    }
+  ],
+  "sourceHashes": {
+    "packages/one-map-react/src/adapters/native-host.ts": "bb63c78df3d264970206f8f0f7da695bc3d313d3c3bf3728e2014ad85df37fe5",
+    "packages/one-map-react/src/adapters/web-host.ts": "8ebcb8c64de2059ced672b4d59f2f2086c2a774dee448e19ed65b18dc46ee740",
+    "tests/unit/host-props.test.ts": "78a91e0f6de8e874e2b57f2c5697c089e7554ec3b9a9e40b209d5dcb6b2ec541",
+    "tests/native/mapbox-lifecycle.test.tsx": "7dc905ca36d930612aad7bf54ecbabc9d9330a812d22140f024deda095dbee67",
+    "tests/native/maplibre-lifecycle.test.tsx": "fc3c425bd9b34777ce3c8c8c05baf3d436436bc8fde6073944bcfd92020accb8",
+    "examples/web/src/App.tsx": "4eefc8747fc7e0dab95de1bf81cf0008a19259549cd94924aadfa5f917f4fcf5",
+    "docs/decisions/0005-host-properties.md": "68134cd950d63836074035751dc79c94b7f7bda67e6963e5199dbe84ef1ca657"
+  },
+  "requiredRemaining": [
+    "Native identifier lookup/accessibility/responder/pointer/input runtime acceptance in all four native cells.",
+    "Per-attribute runtime assertions required by owning coverage beyond the scoped browser tests.",
+    "Complete S04 and S51 conformance.",
+    "Primary disposition for ten retained TV declaration entries.",
+    "Final-artifact package and runtime repeats at S51."
+  ],
+  "primaryDocumentationDelta": {
+    "file": "docs/maps-and-camera.md",
+    "sha256": "86c8691880ad9afdc49c8c8bbca5f9999a14d41a298c24e33e41d6de373891a5",
+    "scope": "Added discoverable selected createHostProps link; existing current-source reference snapshot remains historical."
+  },
+  "currentAcceptance": {
+    "record": "records/evidence/s04-style-cleanup.json",
+    "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+    "status": "passed",
+    "scope": "Current S04 cleanup acceptance is held in the linked record. Earlier observations and unavailable checks in this file remain historical evidence."
+  }
+}

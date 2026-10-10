@@ -1,0 +1,1398 @@
+{
+  "artifact": "/private/tmp/one-map-selection-yVTKtB/one-map-0.0.0.tgz",
+  "results": [
+    {
+      "mode": "mapbox-web",
+      "status": "passed",
+      "cachedPackages": 37,
+      "consumer": "/private/tmp/one-map-selection-yVTKtB/mapbox-web",
+      "nativeRuntime": "not applicable"
+    },
+    {
+      "mode": "maplibre-web",
+      "status": "passed",
+      "cachedPackages": 59,
+      "consumer": "/private/tmp/one-map-selection-yVTKtB/maplibre-web",
+      "nativeRuntime": "not applicable"
+    },
+    {
+      "mode": "mapbox-native",
+      "status": "passed",
+      "cachedPackages": 307,
+      "consumer": "/private/tmp/one-map-selection-yVTKtB/mapbox-native",
+      "nativeRuntime": "unverified: requires React Native host/native SDK build"
+    },
+    {
+      "mode": "maplibre-native",
+      "status": "passed",
+      "cachedPackages": 301,
+      "consumer": "/private/tmp/one-map-selection-yVTKtB/maplibre-native",
+      "nativeRuntime": "unverified: requires React Native host/native SDK build"
+    },
+    {
+      "mode": "mixed-mapbox-web",
+      "status": "passed",
+      "cachedPackages": 330,
+      "consumer": "/private/tmp/one-map-selection-yVTKtB/mixed-mapbox-web",
+      "nativeRuntime": "unverified: requires React Native host/native SDK build"
+    },
+    {
+      "mode": "mixed-maplibre-web",
+      "status": "passed",
+      "cachedPackages": 359,
+      "consumer": "/private/tmp/one-map-selection-yVTKtB/mixed-maplibre-web",
+      "nativeRuntime": "unverified: requires React Native host/native SDK build"
+    }
+  ],
+  "schemaVersion": 1,
+  "artifactSha256": "88eed4de022aaa7dc6dcbc9dbdf5d0a53f63f030d25f6d5048af365b8282caf6",
+  "browserHelper": {
+    "browser": "156.0.8078.4",
+    "fixture": "native-import-helper.mjs",
+    "passed": [
+      "native browser module import",
+      "module rejection preservation",
+      "owned helper reuse",
+      "conflicting global rejection"
+    ],
+    "limitations": [
+      "This verifies browser import semantics; it does not execute a renderer or its workers."
+    ]
+  },
+  "retainedFailures": [
+    {
+      "status": "failed",
+      "path": "/private/tmp/one-map-selection-qOj9Te/failure.json",
+      "cause": "Mapbox computed browser import rejected by ordinary Metro transform; rerun passed with scoped helper."
+    },
+    {
+      "status": "failed",
+      "path": "/private/tmp/one-map-selection-imOcGB/failure.json",
+      "cause": "MapLibre modern syntax rejected by ordinary RN Babel; rerun passed with scoped renderer transform."
+    },
+    {
+      "stage": "S04",
+      "status": "failed",
+      "path": "/private/tmp/one-map-selection-ALG1GQ/mixed-maplibre-web/browser-sdk-execution-failure.json",
+      "cause": "Classic script execution rejected MapLibre import.meta; module delivery with sibling worker assets subsequently passed direct SDK transport."
+    },
+    {
+      "status": "failed",
+      "path": "/private/tmp/one-map-selection-2niDzG/failure.json",
+      "cause": "Exporting native host types exposes three RN0.87.1 generated-library declaration defects. Independent RN-only fixture reproduces them. Rerun verifies strict own artifact declarations and standard host app config while retaining all three upstream diagnostics."
+    }
+  ],
+  "directSDKTransport": {
+    "mapbox": {
+      "backend": "mapbox",
+      "browser": "156.0.8078.4",
+      "delivery": "module script; packaged helper copies exact selected SDK worker assets to served sibling URLs",
+      "assets": {
+        "backend": "mapbox",
+        "source": {
+          "package": "mapbox-gl",
+          "version": "3.32.0"
+        },
+        "destinationDirectory": "/private/tmp/one-map-selection-yVTKtB/mixed-mapbox-web/transport-assets",
+        "assets": []
+      },
+      "observations": {
+        "version": "3.32.0",
+        "workersBeforeMap": 0,
+        "load": true,
+        "initial": {
+          "revision": 1,
+          "rendered": 2,
+          "source": 4
+        },
+        "updated": {
+          "revision": 2,
+          "rendered": 2,
+          "source": 4
+        },
+        "beforeRemoval": 1,
+        "afterRemoval": 0,
+        "mapErrors": []
+      },
+      "workers": [
+        {
+          "url": "blob:http://127.0.0.1:63217/80330632-7554-4a6d-9b77-61d0089ae234",
+          "type": "module",
+          "sent": 21,
+          "received": 12,
+          "terminated": true,
+          "errors": []
+        }
+      ],
+      "requests": ["/", "/renderer.css", "/transport.bundle.js"],
+      "externalRequests": [
+        "https://events.mapbox.com/events/v2",
+        "https://events.mapbox.com/events/v2",
+        "https://events.mapbox.com/events/v2",
+        "https://api.mapbox.com/map-sessions/v1"
+      ],
+      "workerClosures": 1,
+      "limitations": [
+        "Direct SDK transport validation; one-map-react facade behavior is not exercised."
+      ]
+    },
+    "maplibre": {
+      "backend": "maplibre",
+      "browser": "156.0.8078.4",
+      "delivery": "module script; packaged helper copies exact selected SDK worker assets to served sibling URLs",
+      "assets": {
+        "backend": "maplibre",
+        "source": {
+          "package": "maplibre-gl",
+          "version": "6.13.0"
+        },
+        "destinationDirectory": "/private/tmp/one-map-selection-yVTKtB/mixed-maplibre-web/transport-assets",
+        "assets": [
+          {
+            "name": "maplibre-gl-worker.mjs",
+            "sha256": "53a2dd60f76c7b9201a3cc007b755d98ce4b52403843fef5c90c41780fe62e91",
+            "bytes": 508314,
+            "disposition": "reused"
+          },
+          {
+            "name": "maplibre-gl-worker-dev.mjs",
+            "sha256": "87b51d8995fa06ba7e7e3a12bdf08f196d8b0ede37e3ea2a9acaa211e104eeae",
+            "bytes": 1164735,
+            "disposition": "reused"
+          },
+          {
+            "name": "maplibre-gl-LICENSE.txt",
+            "sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2",
+            "bytes": 5984,
+            "disposition": "reused"
+          }
+        ]
+      },
+      "observations": {
+        "version": "6.13.0",
+        "workersBeforeMap": 0,
+        "load": true,
+        "initial": {
+          "revision": 1,
+          "rendered": 2,
+          "source": 4
+        },
+        "updated": {
+          "revision": 2,
+          "rendered": 2,
+          "source": 4
+        },
+        "beforeRemoval": 1,
+        "afterRemoval": 0,
+        "globalPoolBeforeRemoval": {
+          "1": true,
+          "global-dispatcher": true
+        },
+        "globalPoolAfterRemoval": {
+          "global-dispatcher": true
+        },
+        "mapErrors": []
+      },
+      "workers": [
+        {
+          "url": "http://127.0.0.1:63162/maplibre-gl-worker.mjs?v=6.13.0",
+          "type": "module",
+          "sent": 18,
+          "received": 18,
+          "terminated": false,
+          "errors": []
+        }
+      ],
+      "requests": [
+        "/",
+        "/renderer.css",
+        "/transport.bundle.js",
+        "/maplibre-gl-worker.mjs"
+      ],
+      "externalRequests": [],
+      "workerClosures": 0,
+      "limitations": [
+        "Direct SDK transport validation; one-map-react facade behavior is not exercised."
+      ]
+    }
+  },
+  "constructorConfigurationFollowup": {
+    "artifact": "/private/tmp/one-map-selection-B4eN5d/one-map-0.0.0.tgz",
+    "results": [
+      {
+        "mode": "mapbox-web",
+        "status": "passed",
+        "cachedPackages": 37,
+        "consumer": "/private/tmp/one-map-selection-B4eN5d/mapbox-web",
+        "nativeRuntime": "not applicable"
+      },
+      {
+        "mode": "maplibre-web",
+        "status": "passed",
+        "cachedPackages": 59,
+        "consumer": "/private/tmp/one-map-selection-B4eN5d/maplibre-web",
+        "nativeRuntime": "not applicable"
+      }
+    ],
+    "schemaVersion": 1,
+    "artifactSha256": "9e98435ff3787f836a6d94d60e75e0163bcb8b8c7656f6ef82ef4028f5986acf",
+    "report": "/private/tmp/one-map-selection-B4eN5d/results.json",
+    "scope": "Selected-only web declaration, constructor factory/opaque Map.configuration, explicit and browser-first alias imports, browser graphs, and missing-selected-peer failures. Native and mixed-engine modes were not rerun for this artifact."
+  },
+  "typedHostFullFollowup": {
+    "artifact": "/private/tmp/one-map-selection-vzGUA8/one-map-0.0.0.tgz",
+    "results": [
+      {
+        "mode": "mapbox-web",
+        "status": "passed",
+        "cachedPackages": 37,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/mapbox-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed",
+          "skipLibCheck": false
+        },
+        "nativeRuntime": "not applicable"
+      },
+      {
+        "mode": "maplibre-web",
+        "status": "passed",
+        "cachedPackages": 59,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/maplibre-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed",
+          "skipLibCheck": false
+        },
+        "nativeRuntime": "not applicable"
+      },
+      {
+        "mode": "mapbox-native",
+        "status": "passed",
+        "cachedPackages": 307,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/mapbox-native",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "maplibre-native",
+        "status": "passed",
+        "cachedPackages": 301,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/maplibre-native",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "mixed-mapbox-web",
+        "status": "passed",
+        "cachedPackages": 330,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/mixed-mapbox-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "mixed-maplibre-web",
+        "status": "passed",
+        "cachedPackages": 359,
+        "consumer": "/private/tmp/one-map-selection-vzGUA8/mixed-maplibre-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      }
+    ],
+    "artifactSha256": "301bd19374883b47c626a62591ca68fbf17b8334e8746c4d48e938691645e6a4",
+    "report": "/private/tmp/one-map-selection-vzGUA8/results.json",
+    "scope": "All six selected-peer configurations. Web strict declarations; native-containing configurations: strict artifact declarations and RN-standard strict app checks, plus exact independent RN-only library diagnostics retained. Browser/native/Metro-web graphs, alias/factory types and missing-selected-peer contracts verified."
+  },
+  "s04FinalCandidate": {
+    "artifact": "/Users/rob/code/mapbox-code/one-map/artifacts/s04/candidate-7/one-map-0.0.0.tgz",
+    "artifactSha256": "36923c24b6b7763b6978298e9efb10160e692f07d92dcfc4b823948e6eed028a",
+    "results": [
+      {
+        "mode": "mapbox-web",
+        "status": "passed",
+        "cachedPackages": 37,
+        "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-mdHMsn/mapbox-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed",
+          "skipLibCheck": false
+        },
+        "nativeRuntime": "not applicable"
+      },
+      {
+        "mode": "maplibre-web",
+        "status": "passed",
+        "cachedPackages": 59,
+        "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-mdHMsn/maplibre-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed",
+          "skipLibCheck": false
+        },
+        "nativeRuntime": "not applicable"
+      },
+      {
+        "mode": "mapbox-native",
+        "status": "passed",
+        "cachedPackages": 307,
+        "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-mdHMsn/mapbox-native",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "maplibre-native",
+        "status": "passed",
+        "cachedPackages": 301,
+        "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-mdHMsn/maplibre-native",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+          "diagnostics": [
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "mixed-mapbox-web",
+        "status": "passed",
+        "cachedPackages": 330,
+        "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-mdHMsn/mixed-mapbox-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+          "diagnostics": [
+            "src/types/globals.d.ts(146,8): error TS2300:",
+            "src/types/globals.d.ts(147,8): error TS2300:",
+            "src/types/globals.d.ts(148,8): error TS2300:",
+            "src/types/globals.d.ts(166,7): error TS2403:",
+            "src/types/globals.d.ts(180,7): error TS2403:",
+            "src/types/globals.d.ts(201,9): error TS2300:",
+            "src/types/globals.d.ts(266,5): error TS2717:",
+            "src/types/globals.d.ts(275,5): error TS2717:",
+            "src/types/globals.d.ts(285,14): error TS2717:",
+            "src/types/globals.d.ts(289,7): error TS2403:",
+            "src/types/globals.d.ts(294,8): error TS2300:",
+            "src/types/globals.d.ts(313,7): error TS2403:",
+            "src/types/globals.d.ts(398,5): error TS2717:",
+            "src/types/globals.d.ts(399,5): error TS2717:",
+            "src/types/globals.d.ts(400,5): error TS2717:",
+            "src/types/globals.d.ts(401,5): error TS2717:",
+            "src/types/globals.d.ts(402,5): error TS2717:",
+            "src/types/globals.d.ts(403,5): error TS2717:",
+            "src/types/globals.d.ts(404,5): error TS2717:",
+            "src/types/globals.d.ts(455,8): error TS2300:",
+            "src/types/globals.d.ts(464,14): error TS2687:",
+            "src/types/globals.d.ts(465,14): error TS2687:",
+            "src/types/globals.d.ts(466,14): error TS2687:",
+            "src/types/globals.d.ts(467,14): error TS2687:",
+            "src/types/globals.d.ts(469,14): error TS2687:",
+            "src/types/globals.d.ts(470,14): error TS2687:",
+            "src/types/globals.d.ts(471,14): error TS2687:",
+            "src/types/globals.d.ts(472,14): error TS2687:",
+            "src/types/globals.d.ts(475,14): error TS2687:",
+            "src/types/globals.d.ts(481,7): error TS2403:",
+            "src/types/globals.d.ts(559,14): error TS2717:",
+            "src/types/globals.d.ts(563,5): error TS2717:",
+            "src/types/globals.d.ts(564,5): error TS2717:",
+            "src/types/globals.d.ts(565,5): error TS2717:",
+            "src/types/globals.d.ts(566,5): error TS2717:",
+            "src/types/globals.d.ts(567,5): error TS2300:",
+            "src/types/globals.d.ts(568,5): error TS2300:",
+            "src/types/globals.d.ts(571,7): error TS2403:",
+            "src/types/globals.d.ts(594,9): error TS2300:",
+            "src/types/globals.d.ts(663,9): error TS2300:",
+            "src/types/globals.d.ts(688,14): error TS2717:",
+            "src/types/globals.d.ts(701,14): error TS2717:",
+            "src/types/globals.d.ts(702,14): error TS2717:",
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      },
+      {
+        "mode": "mixed-maplibre-web",
+        "status": "passed",
+        "cachedPackages": 359,
+        "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-mdHMsn/mixed-maplibre-web",
+        "declarationChecks": {
+          "application": "passed",
+          "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+          "skipLibCheck": true,
+          "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+          "diagnostics": [
+            "src/types/globals.d.ts(146,8): error TS2300:",
+            "src/types/globals.d.ts(147,8): error TS2300:",
+            "src/types/globals.d.ts(148,8): error TS2300:",
+            "src/types/globals.d.ts(166,7): error TS2403:",
+            "src/types/globals.d.ts(180,7): error TS2403:",
+            "src/types/globals.d.ts(201,9): error TS2300:",
+            "src/types/globals.d.ts(266,5): error TS2717:",
+            "src/types/globals.d.ts(275,5): error TS2717:",
+            "src/types/globals.d.ts(285,14): error TS2717:",
+            "src/types/globals.d.ts(289,7): error TS2403:",
+            "src/types/globals.d.ts(294,8): error TS2300:",
+            "src/types/globals.d.ts(313,7): error TS2403:",
+            "src/types/globals.d.ts(398,5): error TS2717:",
+            "src/types/globals.d.ts(399,5): error TS2717:",
+            "src/types/globals.d.ts(400,5): error TS2717:",
+            "src/types/globals.d.ts(401,5): error TS2717:",
+            "src/types/globals.d.ts(402,5): error TS2717:",
+            "src/types/globals.d.ts(403,5): error TS2717:",
+            "src/types/globals.d.ts(404,5): error TS2717:",
+            "src/types/globals.d.ts(455,8): error TS2300:",
+            "src/types/globals.d.ts(464,14): error TS2687:",
+            "src/types/globals.d.ts(465,14): error TS2687:",
+            "src/types/globals.d.ts(466,14): error TS2687:",
+            "src/types/globals.d.ts(467,14): error TS2687:",
+            "src/types/globals.d.ts(469,14): error TS2687:",
+            "src/types/globals.d.ts(470,14): error TS2687:",
+            "src/types/globals.d.ts(471,14): error TS2687:",
+            "src/types/globals.d.ts(472,14): error TS2687:",
+            "src/types/globals.d.ts(475,14): error TS2687:",
+            "src/types/globals.d.ts(481,7): error TS2403:",
+            "src/types/globals.d.ts(559,14): error TS2717:",
+            "src/types/globals.d.ts(563,5): error TS2717:",
+            "src/types/globals.d.ts(564,5): error TS2717:",
+            "src/types/globals.d.ts(565,5): error TS2717:",
+            "src/types/globals.d.ts(566,5): error TS2717:",
+            "src/types/globals.d.ts(567,5): error TS2300:",
+            "src/types/globals.d.ts(568,5): error TS2300:",
+            "src/types/globals.d.ts(571,7): error TS2403:",
+            "src/types/globals.d.ts(594,9): error TS2300:",
+            "src/types/globals.d.ts(663,9): error TS2300:",
+            "src/types/globals.d.ts(688,14): error TS2717:",
+            "src/types/globals.d.ts(701,14): error TS2717:",
+            "src/types/globals.d.ts(702,14): error TS2717:",
+            "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+            "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+            "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+          ],
+          "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+        },
+        "nativeRuntime": "unverified: requires React Native host/native SDK build"
+      }
+    ],
+    "report": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-mdHMsn/results.json"
+  },
+  "s04CandidateHistory": [
+    {
+      "artifact": "/private/tmp/one-map-s04-integrated-candidate/one-map-0.0.0.tgz",
+      "artifactSha256": "5db790db53dc66129179e5c69444565f89cc8f13c61946b8106d4271c7c139d3",
+      "results": [
+        {
+          "mode": "mapbox-web",
+          "status": "passed",
+          "cachedPackages": 37,
+          "consumer": "/private/tmp/one-map-selection-LzKyuz/mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "maplibre-web",
+          "status": "passed",
+          "cachedPackages": 59,
+          "consumer": "/private/tmp/one-map-selection-LzKyuz/maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "mapbox-native",
+          "status": "passed",
+          "cachedPackages": 307,
+          "consumer": "/private/tmp/one-map-selection-LzKyuz/mapbox-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "maplibre-native",
+          "status": "passed",
+          "cachedPackages": 301,
+          "consumer": "/private/tmp/one-map-selection-LzKyuz/maplibre-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-mapbox-web",
+          "status": "passed",
+          "cachedPackages": 330,
+          "consumer": "/private/tmp/one-map-selection-LzKyuz/mixed-mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+            "diagnostics": [
+              "src/types/globals.d.ts(146,8): error TS2300:",
+              "src/types/globals.d.ts(147,8): error TS2300:",
+              "src/types/globals.d.ts(148,8): error TS2300:",
+              "src/types/globals.d.ts(166,7): error TS2403:",
+              "src/types/globals.d.ts(180,7): error TS2403:",
+              "src/types/globals.d.ts(201,9): error TS2300:",
+              "src/types/globals.d.ts(266,5): error TS2717:",
+              "src/types/globals.d.ts(275,5): error TS2717:",
+              "src/types/globals.d.ts(285,14): error TS2717:",
+              "src/types/globals.d.ts(289,7): error TS2403:",
+              "src/types/globals.d.ts(294,8): error TS2300:",
+              "src/types/globals.d.ts(313,7): error TS2403:",
+              "src/types/globals.d.ts(398,5): error TS2717:",
+              "src/types/globals.d.ts(399,5): error TS2717:",
+              "src/types/globals.d.ts(400,5): error TS2717:",
+              "src/types/globals.d.ts(401,5): error TS2717:",
+              "src/types/globals.d.ts(402,5): error TS2717:",
+              "src/types/globals.d.ts(403,5): error TS2717:",
+              "src/types/globals.d.ts(404,5): error TS2717:",
+              "src/types/globals.d.ts(455,8): error TS2300:",
+              "src/types/globals.d.ts(464,14): error TS2687:",
+              "src/types/globals.d.ts(465,14): error TS2687:",
+              "src/types/globals.d.ts(466,14): error TS2687:",
+              "src/types/globals.d.ts(467,14): error TS2687:",
+              "src/types/globals.d.ts(469,14): error TS2687:",
+              "src/types/globals.d.ts(470,14): error TS2687:",
+              "src/types/globals.d.ts(471,14): error TS2687:",
+              "src/types/globals.d.ts(472,14): error TS2687:",
+              "src/types/globals.d.ts(475,14): error TS2687:",
+              "src/types/globals.d.ts(481,7): error TS2403:",
+              "src/types/globals.d.ts(559,14): error TS2717:",
+              "src/types/globals.d.ts(563,5): error TS2717:",
+              "src/types/globals.d.ts(564,5): error TS2717:",
+              "src/types/globals.d.ts(565,5): error TS2717:",
+              "src/types/globals.d.ts(566,5): error TS2717:",
+              "src/types/globals.d.ts(567,5): error TS2300:",
+              "src/types/globals.d.ts(568,5): error TS2300:",
+              "src/types/globals.d.ts(571,7): error TS2403:",
+              "src/types/globals.d.ts(594,9): error TS2300:",
+              "src/types/globals.d.ts(663,9): error TS2300:",
+              "src/types/globals.d.ts(688,14): error TS2717:",
+              "src/types/globals.d.ts(701,14): error TS2717:",
+              "src/types/globals.d.ts(702,14): error TS2717:",
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-maplibre-web",
+          "status": "passed",
+          "cachedPackages": 359,
+          "consumer": "/private/tmp/one-map-selection-LzKyuz/mixed-maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+            "diagnostics": [
+              "src/types/globals.d.ts(146,8): error TS2300:",
+              "src/types/globals.d.ts(147,8): error TS2300:",
+              "src/types/globals.d.ts(148,8): error TS2300:",
+              "src/types/globals.d.ts(166,7): error TS2403:",
+              "src/types/globals.d.ts(180,7): error TS2403:",
+              "src/types/globals.d.ts(201,9): error TS2300:",
+              "src/types/globals.d.ts(266,5): error TS2717:",
+              "src/types/globals.d.ts(275,5): error TS2717:",
+              "src/types/globals.d.ts(285,14): error TS2717:",
+              "src/types/globals.d.ts(289,7): error TS2403:",
+              "src/types/globals.d.ts(294,8): error TS2300:",
+              "src/types/globals.d.ts(313,7): error TS2403:",
+              "src/types/globals.d.ts(398,5): error TS2717:",
+              "src/types/globals.d.ts(399,5): error TS2717:",
+              "src/types/globals.d.ts(400,5): error TS2717:",
+              "src/types/globals.d.ts(401,5): error TS2717:",
+              "src/types/globals.d.ts(402,5): error TS2717:",
+              "src/types/globals.d.ts(403,5): error TS2717:",
+              "src/types/globals.d.ts(404,5): error TS2717:",
+              "src/types/globals.d.ts(455,8): error TS2300:",
+              "src/types/globals.d.ts(464,14): error TS2687:",
+              "src/types/globals.d.ts(465,14): error TS2687:",
+              "src/types/globals.d.ts(466,14): error TS2687:",
+              "src/types/globals.d.ts(467,14): error TS2687:",
+              "src/types/globals.d.ts(469,14): error TS2687:",
+              "src/types/globals.d.ts(470,14): error TS2687:",
+              "src/types/globals.d.ts(471,14): error TS2687:",
+              "src/types/globals.d.ts(472,14): error TS2687:",
+              "src/types/globals.d.ts(475,14): error TS2687:",
+              "src/types/globals.d.ts(481,7): error TS2403:",
+              "src/types/globals.d.ts(559,14): error TS2717:",
+              "src/types/globals.d.ts(563,5): error TS2717:",
+              "src/types/globals.d.ts(564,5): error TS2717:",
+              "src/types/globals.d.ts(565,5): error TS2717:",
+              "src/types/globals.d.ts(566,5): error TS2717:",
+              "src/types/globals.d.ts(567,5): error TS2300:",
+              "src/types/globals.d.ts(568,5): error TS2300:",
+              "src/types/globals.d.ts(571,7): error TS2403:",
+              "src/types/globals.d.ts(594,9): error TS2300:",
+              "src/types/globals.d.ts(663,9): error TS2300:",
+              "src/types/globals.d.ts(688,14): error TS2717:",
+              "src/types/globals.d.ts(701,14): error TS2717:",
+              "src/types/globals.d.ts(702,14): error TS2717:",
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        }
+      ]
+    },
+    {
+      "artifact": "/private/tmp/one-map-s04-replay-fix-probe/one-map-0.0.0.tgz",
+      "artifactSha256": "dc56eb68794295996085518dcda5de5f9ff85d61049d264631d0fbbf7fa840bd",
+      "results": [
+        {
+          "mode": "mapbox-web",
+          "status": "passed",
+          "cachedPackages": 37,
+          "consumer": "/private/tmp/one-map-selection-4TJ8ct/mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "maplibre-web",
+          "status": "passed",
+          "cachedPackages": 59,
+          "consumer": "/private/tmp/one-map-selection-4TJ8ct/maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "mapbox-native",
+          "status": "passed",
+          "cachedPackages": 307,
+          "consumer": "/private/tmp/one-map-selection-4TJ8ct/mapbox-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "maplibre-native",
+          "status": "passed",
+          "cachedPackages": 301,
+          "consumer": "/private/tmp/one-map-selection-4TJ8ct/maplibre-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-mapbox-web",
+          "status": "passed",
+          "cachedPackages": 330,
+          "consumer": "/private/tmp/one-map-selection-4TJ8ct/mixed-mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+            "diagnostics": [
+              "src/types/globals.d.ts(146,8): error TS2300:",
+              "src/types/globals.d.ts(147,8): error TS2300:",
+              "src/types/globals.d.ts(148,8): error TS2300:",
+              "src/types/globals.d.ts(166,7): error TS2403:",
+              "src/types/globals.d.ts(180,7): error TS2403:",
+              "src/types/globals.d.ts(201,9): error TS2300:",
+              "src/types/globals.d.ts(266,5): error TS2717:",
+              "src/types/globals.d.ts(275,5): error TS2717:",
+              "src/types/globals.d.ts(285,14): error TS2717:",
+              "src/types/globals.d.ts(289,7): error TS2403:",
+              "src/types/globals.d.ts(294,8): error TS2300:",
+              "src/types/globals.d.ts(313,7): error TS2403:",
+              "src/types/globals.d.ts(398,5): error TS2717:",
+              "src/types/globals.d.ts(399,5): error TS2717:",
+              "src/types/globals.d.ts(400,5): error TS2717:",
+              "src/types/globals.d.ts(401,5): error TS2717:",
+              "src/types/globals.d.ts(402,5): error TS2717:",
+              "src/types/globals.d.ts(403,5): error TS2717:",
+              "src/types/globals.d.ts(404,5): error TS2717:",
+              "src/types/globals.d.ts(455,8): error TS2300:",
+              "src/types/globals.d.ts(464,14): error TS2687:",
+              "src/types/globals.d.ts(465,14): error TS2687:",
+              "src/types/globals.d.ts(466,14): error TS2687:",
+              "src/types/globals.d.ts(467,14): error TS2687:",
+              "src/types/globals.d.ts(469,14): error TS2687:",
+              "src/types/globals.d.ts(470,14): error TS2687:",
+              "src/types/globals.d.ts(471,14): error TS2687:",
+              "src/types/globals.d.ts(472,14): error TS2687:",
+              "src/types/globals.d.ts(475,14): error TS2687:",
+              "src/types/globals.d.ts(481,7): error TS2403:",
+              "src/types/globals.d.ts(559,14): error TS2717:",
+              "src/types/globals.d.ts(563,5): error TS2717:",
+              "src/types/globals.d.ts(564,5): error TS2717:",
+              "src/types/globals.d.ts(565,5): error TS2717:",
+              "src/types/globals.d.ts(566,5): error TS2717:",
+              "src/types/globals.d.ts(567,5): error TS2300:",
+              "src/types/globals.d.ts(568,5): error TS2300:",
+              "src/types/globals.d.ts(571,7): error TS2403:",
+              "src/types/globals.d.ts(594,9): error TS2300:",
+              "src/types/globals.d.ts(663,9): error TS2300:",
+              "src/types/globals.d.ts(688,14): error TS2717:",
+              "src/types/globals.d.ts(701,14): error TS2717:",
+              "src/types/globals.d.ts(702,14): error TS2717:",
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-maplibre-web",
+          "status": "passed",
+          "cachedPackages": 359,
+          "consumer": "/private/tmp/one-map-selection-4TJ8ct/mixed-maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+            "diagnostics": [
+              "src/types/globals.d.ts(146,8): error TS2300:",
+              "src/types/globals.d.ts(147,8): error TS2300:",
+              "src/types/globals.d.ts(148,8): error TS2300:",
+              "src/types/globals.d.ts(166,7): error TS2403:",
+              "src/types/globals.d.ts(180,7): error TS2403:",
+              "src/types/globals.d.ts(201,9): error TS2300:",
+              "src/types/globals.d.ts(266,5): error TS2717:",
+              "src/types/globals.d.ts(275,5): error TS2717:",
+              "src/types/globals.d.ts(285,14): error TS2717:",
+              "src/types/globals.d.ts(289,7): error TS2403:",
+              "src/types/globals.d.ts(294,8): error TS2300:",
+              "src/types/globals.d.ts(313,7): error TS2403:",
+              "src/types/globals.d.ts(398,5): error TS2717:",
+              "src/types/globals.d.ts(399,5): error TS2717:",
+              "src/types/globals.d.ts(400,5): error TS2717:",
+              "src/types/globals.d.ts(401,5): error TS2717:",
+              "src/types/globals.d.ts(402,5): error TS2717:",
+              "src/types/globals.d.ts(403,5): error TS2717:",
+              "src/types/globals.d.ts(404,5): error TS2717:",
+              "src/types/globals.d.ts(455,8): error TS2300:",
+              "src/types/globals.d.ts(464,14): error TS2687:",
+              "src/types/globals.d.ts(465,14): error TS2687:",
+              "src/types/globals.d.ts(466,14): error TS2687:",
+              "src/types/globals.d.ts(467,14): error TS2687:",
+              "src/types/globals.d.ts(469,14): error TS2687:",
+              "src/types/globals.d.ts(470,14): error TS2687:",
+              "src/types/globals.d.ts(471,14): error TS2687:",
+              "src/types/globals.d.ts(472,14): error TS2687:",
+              "src/types/globals.d.ts(475,14): error TS2687:",
+              "src/types/globals.d.ts(481,7): error TS2403:",
+              "src/types/globals.d.ts(559,14): error TS2717:",
+              "src/types/globals.d.ts(563,5): error TS2717:",
+              "src/types/globals.d.ts(564,5): error TS2717:",
+              "src/types/globals.d.ts(565,5): error TS2717:",
+              "src/types/globals.d.ts(566,5): error TS2717:",
+              "src/types/globals.d.ts(567,5): error TS2300:",
+              "src/types/globals.d.ts(568,5): error TS2300:",
+              "src/types/globals.d.ts(571,7): error TS2403:",
+              "src/types/globals.d.ts(594,9): error TS2300:",
+              "src/types/globals.d.ts(663,9): error TS2300:",
+              "src/types/globals.d.ts(688,14): error TS2717:",
+              "src/types/globals.d.ts(701,14): error TS2717:",
+              "src/types/globals.d.ts(702,14): error TS2717:",
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        }
+      ],
+      "directSDKTransport": {
+        "artifact": "/private/tmp/one-map-s04-replay-fix-probe/one-map-0.0.0.tgz",
+        "artifactSha256": "dc56eb68794295996085518dcda5de5f9ff85d61049d264631d0fbbf7fa840bd",
+        "selectionReport": "/private/tmp/one-map-selection-4TJ8ct/results.json",
+        "results": [
+          {
+            "mode": "mixed-mapbox-web",
+            "status": "passed",
+            "evidence": "/private/tmp/one-map-selection-4TJ8ct/mixed-mapbox-web/renderer-transport-evidence.json"
+          },
+          {
+            "mode": "mixed-maplibre-web",
+            "status": "passed",
+            "evidence": "/private/tmp/one-map-selection-4TJ8ct/mixed-maplibre-web/renderer-transport-evidence.json"
+          }
+        ],
+        "scope": "Direct SDK transport under the packed Metro helpers. one-map-react facade acceptance is recorded by the separate browser lifecycle suite."
+      }
+    },
+    {
+      "artifact": "/Users/rob/code/mapbox-code/one-map/artifacts/s04/one-map-0.0.0.tgz",
+      "artifactSha256": "43179b0b54d7de531cd4d838f00305a6b2e2a709def12b15fd3f8f771003e939",
+      "results": [
+        {
+          "mode": "mapbox-web",
+          "status": "passed",
+          "cachedPackages": 37,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "maplibre-web",
+          "status": "passed",
+          "cachedPackages": 59,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "mapbox-native",
+          "status": "passed",
+          "cachedPackages": 307,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/mapbox-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "maplibre-native",
+          "status": "passed",
+          "cachedPackages": 301,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/maplibre-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-mapbox-web",
+          "status": "passed",
+          "cachedPackages": 330,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/mixed-mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+            "diagnostics": [
+              "src/types/globals.d.ts(146,8): error TS2300:",
+              "src/types/globals.d.ts(147,8): error TS2300:",
+              "src/types/globals.d.ts(148,8): error TS2300:",
+              "src/types/globals.d.ts(166,7): error TS2403:",
+              "src/types/globals.d.ts(180,7): error TS2403:",
+              "src/types/globals.d.ts(201,9): error TS2300:",
+              "src/types/globals.d.ts(266,5): error TS2717:",
+              "src/types/globals.d.ts(275,5): error TS2717:",
+              "src/types/globals.d.ts(285,14): error TS2717:",
+              "src/types/globals.d.ts(289,7): error TS2403:",
+              "src/types/globals.d.ts(294,8): error TS2300:",
+              "src/types/globals.d.ts(313,7): error TS2403:",
+              "src/types/globals.d.ts(398,5): error TS2717:",
+              "src/types/globals.d.ts(399,5): error TS2717:",
+              "src/types/globals.d.ts(400,5): error TS2717:",
+              "src/types/globals.d.ts(401,5): error TS2717:",
+              "src/types/globals.d.ts(402,5): error TS2717:",
+              "src/types/globals.d.ts(403,5): error TS2717:",
+              "src/types/globals.d.ts(404,5): error TS2717:",
+              "src/types/globals.d.ts(455,8): error TS2300:",
+              "src/types/globals.d.ts(464,14): error TS2687:",
+              "src/types/globals.d.ts(465,14): error TS2687:",
+              "src/types/globals.d.ts(466,14): error TS2687:",
+              "src/types/globals.d.ts(467,14): error TS2687:",
+              "src/types/globals.d.ts(469,14): error TS2687:",
+              "src/types/globals.d.ts(470,14): error TS2687:",
+              "src/types/globals.d.ts(471,14): error TS2687:",
+              "src/types/globals.d.ts(472,14): error TS2687:",
+              "src/types/globals.d.ts(475,14): error TS2687:",
+              "src/types/globals.d.ts(481,7): error TS2403:",
+              "src/types/globals.d.ts(559,14): error TS2717:",
+              "src/types/globals.d.ts(563,5): error TS2717:",
+              "src/types/globals.d.ts(564,5): error TS2717:",
+              "src/types/globals.d.ts(565,5): error TS2717:",
+              "src/types/globals.d.ts(566,5): error TS2717:",
+              "src/types/globals.d.ts(567,5): error TS2300:",
+              "src/types/globals.d.ts(568,5): error TS2300:",
+              "src/types/globals.d.ts(571,7): error TS2403:",
+              "src/types/globals.d.ts(594,9): error TS2300:",
+              "src/types/globals.d.ts(663,9): error TS2300:",
+              "src/types/globals.d.ts(688,14): error TS2717:",
+              "src/types/globals.d.ts(701,14): error TS2717:",
+              "src/types/globals.d.ts(702,14): error TS2717:",
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-maplibre-web",
+          "status": "passed",
+          "cachedPackages": 359,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/mixed-maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+            "diagnostics": [
+              "src/types/globals.d.ts(146,8): error TS2300:",
+              "src/types/globals.d.ts(147,8): error TS2300:",
+              "src/types/globals.d.ts(148,8): error TS2300:",
+              "src/types/globals.d.ts(166,7): error TS2403:",
+              "src/types/globals.d.ts(180,7): error TS2403:",
+              "src/types/globals.d.ts(201,9): error TS2300:",
+              "src/types/globals.d.ts(266,5): error TS2717:",
+              "src/types/globals.d.ts(275,5): error TS2717:",
+              "src/types/globals.d.ts(285,14): error TS2717:",
+              "src/types/globals.d.ts(289,7): error TS2403:",
+              "src/types/globals.d.ts(294,8): error TS2300:",
+              "src/types/globals.d.ts(313,7): error TS2403:",
+              "src/types/globals.d.ts(398,5): error TS2717:",
+              "src/types/globals.d.ts(399,5): error TS2717:",
+              "src/types/globals.d.ts(400,5): error TS2717:",
+              "src/types/globals.d.ts(401,5): error TS2717:",
+              "src/types/globals.d.ts(402,5): error TS2717:",
+              "src/types/globals.d.ts(403,5): error TS2717:",
+              "src/types/globals.d.ts(404,5): error TS2717:",
+              "src/types/globals.d.ts(455,8): error TS2300:",
+              "src/types/globals.d.ts(464,14): error TS2687:",
+              "src/types/globals.d.ts(465,14): error TS2687:",
+              "src/types/globals.d.ts(466,14): error TS2687:",
+              "src/types/globals.d.ts(467,14): error TS2687:",
+              "src/types/globals.d.ts(469,14): error TS2687:",
+              "src/types/globals.d.ts(470,14): error TS2687:",
+              "src/types/globals.d.ts(471,14): error TS2687:",
+              "src/types/globals.d.ts(472,14): error TS2687:",
+              "src/types/globals.d.ts(475,14): error TS2687:",
+              "src/types/globals.d.ts(481,7): error TS2403:",
+              "src/types/globals.d.ts(559,14): error TS2717:",
+              "src/types/globals.d.ts(563,5): error TS2717:",
+              "src/types/globals.d.ts(564,5): error TS2717:",
+              "src/types/globals.d.ts(565,5): error TS2717:",
+              "src/types/globals.d.ts(566,5): error TS2717:",
+              "src/types/globals.d.ts(567,5): error TS2300:",
+              "src/types/globals.d.ts(568,5): error TS2300:",
+              "src/types/globals.d.ts(571,7): error TS2403:",
+              "src/types/globals.d.ts(594,9): error TS2300:",
+              "src/types/globals.d.ts(663,9): error TS2300:",
+              "src/types/globals.d.ts(688,14): error TS2717:",
+              "src/types/globals.d.ts(701,14): error TS2717:",
+              "src/types/globals.d.ts(702,14): error TS2717:",
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        }
+      ],
+      "rendererTransport": {
+        "artifact": "/Users/rob/code/mapbox-code/one-map/artifacts/s04/one-map-0.0.0.tgz",
+        "artifactSha256": "43179b0b54d7de531cd4d838f00305a6b2e2a709def12b15fd3f8f771003e939",
+        "selectionReport": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/results.json",
+        "results": [
+          {
+            "mode": "mixed-mapbox-web",
+            "status": "passed",
+            "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/mixed-mapbox-web/renderer-transport-evidence.json"
+          },
+          {
+            "mode": "mixed-maplibre-web",
+            "status": "passed",
+            "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-gJMz96/mixed-maplibre-web/renderer-transport-evidence.json"
+          }
+        ],
+        "scope": "Direct SDK transport under the packed Metro helpers. one-map-react facade acceptance is recorded by the separate browser lifecycle suite."
+      },
+      "persistentEvidenceRoot": "/Users/rob/code/mapbox-code/.one-map-s04-evidence"
+    },
+    {
+      "artifact": "/Users/rob/code/mapbox-code/one-map/artifacts/s04/candidate-5/one-map-0.0.0.tgz",
+      "artifactSha256": "649108afbcf2dd8b2b5005239aa8b0b55fb18846a8ff19942011110d2bc8bbea",
+      "results": [
+        {
+          "mode": "mapbox-web",
+          "status": "passed",
+          "cachedPackages": 37,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "maplibre-web",
+          "status": "passed",
+          "cachedPackages": 59,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "mapbox-native",
+          "status": "passed",
+          "cachedPackages": 307,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/mapbox-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "maplibre-native",
+          "status": "passed",
+          "cachedPackages": 301,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/maplibre-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-mapbox-web",
+          "status": "passed",
+          "cachedPackages": 330,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/mixed-mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+            "diagnostics": [
+              "src/types/globals.d.ts(146,8): error TS2300:",
+              "src/types/globals.d.ts(147,8): error TS2300:",
+              "src/types/globals.d.ts(148,8): error TS2300:",
+              "src/types/globals.d.ts(166,7): error TS2403:",
+              "src/types/globals.d.ts(180,7): error TS2403:",
+              "src/types/globals.d.ts(201,9): error TS2300:",
+              "src/types/globals.d.ts(266,5): error TS2717:",
+              "src/types/globals.d.ts(275,5): error TS2717:",
+              "src/types/globals.d.ts(285,14): error TS2717:",
+              "src/types/globals.d.ts(289,7): error TS2403:",
+              "src/types/globals.d.ts(294,8): error TS2300:",
+              "src/types/globals.d.ts(313,7): error TS2403:",
+              "src/types/globals.d.ts(398,5): error TS2717:",
+              "src/types/globals.d.ts(399,5): error TS2717:",
+              "src/types/globals.d.ts(400,5): error TS2717:",
+              "src/types/globals.d.ts(401,5): error TS2717:",
+              "src/types/globals.d.ts(402,5): error TS2717:",
+              "src/types/globals.d.ts(403,5): error TS2717:",
+              "src/types/globals.d.ts(404,5): error TS2717:",
+              "src/types/globals.d.ts(455,8): error TS2300:",
+              "src/types/globals.d.ts(464,14): error TS2687:",
+              "src/types/globals.d.ts(465,14): error TS2687:",
+              "src/types/globals.d.ts(466,14): error TS2687:",
+              "src/types/globals.d.ts(467,14): error TS2687:",
+              "src/types/globals.d.ts(469,14): error TS2687:",
+              "src/types/globals.d.ts(470,14): error TS2687:",
+              "src/types/globals.d.ts(471,14): error TS2687:",
+              "src/types/globals.d.ts(472,14): error TS2687:",
+              "src/types/globals.d.ts(475,14): error TS2687:",
+              "src/types/globals.d.ts(481,7): error TS2403:",
+              "src/types/globals.d.ts(559,14): error TS2717:",
+              "src/types/globals.d.ts(563,5): error TS2717:",
+              "src/types/globals.d.ts(564,5): error TS2717:",
+              "src/types/globals.d.ts(565,5): error TS2717:",
+              "src/types/globals.d.ts(566,5): error TS2717:",
+              "src/types/globals.d.ts(567,5): error TS2300:",
+              "src/types/globals.d.ts(568,5): error TS2300:",
+              "src/types/globals.d.ts(571,7): error TS2403:",
+              "src/types/globals.d.ts(594,9): error TS2300:",
+              "src/types/globals.d.ts(663,9): error TS2300:",
+              "src/types/globals.d.ts(688,14): error TS2717:",
+              "src/types/globals.d.ts(701,14): error TS2717:",
+              "src/types/globals.d.ts(702,14): error TS2717:",
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-maplibre-web",
+          "status": "passed",
+          "cachedPackages": 359,
+          "consumer": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/mixed-maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: RN generated declarations and DOM/global conflicts reproduced independently with identical libraries and retained",
+            "diagnostics": [
+              "src/types/globals.d.ts(146,8): error TS2300:",
+              "src/types/globals.d.ts(147,8): error TS2300:",
+              "src/types/globals.d.ts(148,8): error TS2300:",
+              "src/types/globals.d.ts(166,7): error TS2403:",
+              "src/types/globals.d.ts(180,7): error TS2403:",
+              "src/types/globals.d.ts(201,9): error TS2300:",
+              "src/types/globals.d.ts(266,5): error TS2717:",
+              "src/types/globals.d.ts(275,5): error TS2717:",
+              "src/types/globals.d.ts(285,14): error TS2717:",
+              "src/types/globals.d.ts(289,7): error TS2403:",
+              "src/types/globals.d.ts(294,8): error TS2300:",
+              "src/types/globals.d.ts(313,7): error TS2403:",
+              "src/types/globals.d.ts(398,5): error TS2717:",
+              "src/types/globals.d.ts(399,5): error TS2717:",
+              "src/types/globals.d.ts(400,5): error TS2717:",
+              "src/types/globals.d.ts(401,5): error TS2717:",
+              "src/types/globals.d.ts(402,5): error TS2717:",
+              "src/types/globals.d.ts(403,5): error TS2717:",
+              "src/types/globals.d.ts(404,5): error TS2717:",
+              "src/types/globals.d.ts(455,8): error TS2300:",
+              "src/types/globals.d.ts(464,14): error TS2687:",
+              "src/types/globals.d.ts(465,14): error TS2687:",
+              "src/types/globals.d.ts(466,14): error TS2687:",
+              "src/types/globals.d.ts(467,14): error TS2687:",
+              "src/types/globals.d.ts(469,14): error TS2687:",
+              "src/types/globals.d.ts(470,14): error TS2687:",
+              "src/types/globals.d.ts(471,14): error TS2687:",
+              "src/types/globals.d.ts(472,14): error TS2687:",
+              "src/types/globals.d.ts(475,14): error TS2687:",
+              "src/types/globals.d.ts(481,7): error TS2403:",
+              "src/types/globals.d.ts(559,14): error TS2717:",
+              "src/types/globals.d.ts(563,5): error TS2717:",
+              "src/types/globals.d.ts(564,5): error TS2717:",
+              "src/types/globals.d.ts(565,5): error TS2717:",
+              "src/types/globals.d.ts(566,5): error TS2717:",
+              "src/types/globals.d.ts(567,5): error TS2300:",
+              "src/types/globals.d.ts(568,5): error TS2300:",
+              "src/types/globals.d.ts(571,7): error TS2403:",
+              "src/types/globals.d.ts(594,9): error TS2300:",
+              "src/types/globals.d.ts(663,9): error TS2300:",
+              "src/types/globals.d.ts(688,14): error TS2717:",
+              "src/types/globals.d.ts(701,14): error TS2717:",
+              "src/types/globals.d.ts(702,14): error TS2717:",
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        }
+      ],
+      "directSDKTransport": {
+        "artifact": "/Users/rob/code/mapbox-code/one-map/artifacts/s04/candidate-5/one-map-0.0.0.tgz",
+        "artifactSha256": "649108afbcf2dd8b2b5005239aa8b0b55fb18846a8ff19942011110d2bc8bbea",
+        "selectionReport": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/results.json",
+        "results": [
+          {
+            "mode": "mixed-mapbox-web",
+            "status": "passed",
+            "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/mixed-mapbox-web/renderer-transport-evidence.json"
+          },
+          {
+            "mode": "mixed-maplibre-web",
+            "status": "passed",
+            "evidence": "/Users/rob/code/mapbox-code/.one-map-s04-evidence/one-map-selection-Oqqn0b/mixed-maplibre-web/renderer-transport-evidence.json"
+          }
+        ],
+        "scope": "Direct SDK transport under the packed Metro helpers. one-map-react facade acceptance is recorded by the separate browser lifecycle suite."
+      }
+    }
+  ],
+  "currentAcceptance": {
+    "record": "records/evidence/s04-style-cleanup.json",
+    "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+    "status": "passed",
+    "scope": "Current S04 cleanup acceptance is held in the linked record. Earlier observations and unavailable checks in this file remain historical evidence."
+  }
+}

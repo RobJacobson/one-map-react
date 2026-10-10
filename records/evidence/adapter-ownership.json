@@ -1,0 +1,212 @@
+{
+  "date": "2026-10-10",
+  "status": "implemented-unverified",
+  "scope": "Platform-first adapter organization, backend-owned configuration/settings/tint, and enforced import boundaries",
+  "artifact": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-440f9dd3ad5611b144410cf8f7c2b7e19fdb89062fe667133d9425104f4c7465.tgz",
+  "artifactSha256": "440f9dd3ad5611b144410cf8f7c2b7e19fdb89062fe667133d9425104f4c7465",
+  "routineValidation": {
+    "command": "bun run validate",
+    "status": "passed",
+    "log": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/validation.log",
+    "unitTests": 59,
+    "adapterContextTests": 9,
+    "mockedNativeTests": 91,
+    "selectionModes": [
+      {
+        "mode": "mapbox-web",
+        "status": "passed"
+      },
+      {
+        "mode": "maplibre-web",
+        "status": "passed"
+      },
+      {
+        "mode": "mapbox-native",
+        "status": "passed"
+      },
+      {
+        "mode": "maplibre-native",
+        "status": "passed"
+      },
+      {
+        "mode": "mixed-mapbox-web",
+        "status": "passed"
+      },
+      {
+        "mode": "mixed-maplibre-web",
+        "status": "passed"
+      }
+    ]
+  },
+  "declarationComparison": {
+    "status": "passed",
+    "publicEntries": 4,
+    "declarations": 18,
+    "report": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/public-declarations.json"
+  },
+  "selectionEvidence": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/selection.json",
+  "initialAttempt": {
+    "status": "environment failure",
+    "reason": "Default Bun registry metadata cache was empty; reran offline using an existing frozen registry cache without changing dependency versions",
+    "log": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/initial-validation.log"
+  },
+  "runtimeAcceptance": {
+    "status": "aborted",
+    "reason": "User requested Abort all tests. Running Mapbox Android canonical flow and Mapbox iOS build were terminated; no further tests will run.",
+    "environments": [
+      "Mapbox web Chromium",
+      "MapLibre web Chromium",
+      "both mixed Metro browser configurations",
+      "Mapbox iOS",
+      "Mapbox Android",
+      "MapLibre iOS",
+      "MapLibre Android"
+    ],
+    "checkpoint": "docs/adapter-ownership-checkpoint.md",
+    "authorization": "User replied Yes to the exact artifact and checkpoint acceptance scope on 2026-10-10.",
+    "browserReport": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/browser-results.json",
+    "metroReport": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/metro-results.json",
+    "deviceStartingState": {
+      "ios": "shut down",
+      "android": "no emulator running"
+    },
+    "nativePreflight": {
+      "status": "stopped",
+      "reason": "User aborted all tests."
+    },
+    "results": [
+      {
+        "environment": "Mapbox web Chromium",
+        "status": "passed"
+      },
+      {
+        "environment": "MapLibre web Chromium",
+        "status": "passed"
+      },
+      {
+        "environment": "both mixed Metro browser configurations",
+        "status": "passed"
+      },
+      {
+        "environment": "Mapbox iOS",
+        "status": "aborted"
+      },
+      {
+        "environment": "Mapbox Android",
+        "status": "aborted"
+      },
+      {
+        "environment": "MapLibre iOS",
+        "status": "environment failure"
+      },
+      {
+        "environment": "MapLibre Android",
+        "status": "unverified"
+      }
+    ],
+    "fixtureServer": "Stopped after the user requested abort.",
+    "storageCleanup": {
+      "authorization": "User replied Yes on 2026-10-10 to removal of the two named old consumers after preserving reports and logs.",
+      "removedRoots": [
+        "/private/tmp/one-map-react-main-first-mapbox",
+        "/private/tmp/one-map-react-main-first-maplibre"
+      ],
+      "retainedEvidenceRoot": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/retained-main-first",
+      "archives": [
+        {
+          "backend": "mapbox",
+          "path": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/retained-main-first/mapbox.tar.gz",
+          "sha256": "9182e6186f199d00087e27c1f88888136a91b9d3878ff022b0765564482784b7",
+          "preservedFiles": 4980,
+          "verification": "Every archived file checksum matched the original before deleting the named consumer. Reports, logs, screenshots and fixture sources preserved; generated build binaries/caches omitted."
+        },
+        {
+          "backend": "maplibre",
+          "path": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/retained-main-first/maplibre.tar.gz",
+          "sha256": "c61636e377606464e53a1eef7bb708003709c653c652281d3f1d090edb6de77c",
+          "preservedFiles": 3983,
+          "verification": "Every archived file checksum matched the original before deleting the named consumer. Reports, logs, screenshots and fixture sources preserved; generated build binaries/caches omitted."
+        }
+      ]
+    },
+    "retainedFailures": [
+      {
+        "step": "Mapbox offline materialization",
+        "reason": "Pinned React Native CLI cache metadata missing; fresh preparation completed with registry metadata retrieval.",
+        "log": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/mapbox-preparation.log"
+      },
+      {
+        "step": "Mapbox Android build/install",
+        "reason": "Gradle Release build succeeded; installation failed because adb was absent from PATH. The command path was corrected for the same artifact and consumer.",
+        "report": "/private/tmp/one-map-adapter-mapbox-440f9dd3/artifacts/android-1791656831804/report.json"
+      }
+    ],
+    "generatedCacheCleanup": {
+      "scope": "Dependency and package caches created by this task beneath /private/tmp/one-map-adapter-validation and /private/tmp/one-map-adapter-browser",
+      "retained": "Packed archives, manifests, fixtures, bundles, reports, logs, browser/Metro runtime outputs remain at their original paths."
+    },
+    "nativeBuilds": [
+      {
+        "environment": "Mapbox Android",
+        "status": "passed",
+        "report": "/private/tmp/one-map-adapter-mapbox-440f9dd3/artifacts/android-1791656978918/report.json",
+        "runtime": "aborted",
+        "runtimeReport": "/private/tmp/one-map-adapter-mapbox-440f9dd3/artifacts/s04-android-runtime-1791657118744/runtime-report.json"
+      },
+      {
+        "environment": "MapLibre iOS",
+        "status": "passed",
+        "report": "/private/tmp/one-map-react-adapter-maplibre-440f9dd3/artifacts/ios-1791658009822/report.json",
+        "runtime": "environment failure",
+        "runtimeReport": "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/maplibre-ios-runtime/result.json",
+        "reason": "Maestro failed extracting its iOS test driver with No space left on device before the canonical flow began."
+      },
+      {
+        "environment": "Mapbox iOS",
+        "status": "aborted",
+        "report": "/private/tmp/one-map-adapter-mapbox-440f9dd3/artifacts/ios-1791658356239/report.json"
+      },
+      {
+        "environment": "MapLibre Android",
+        "status": "not run"
+      }
+    ],
+    "environmentRestoration": {
+      "ios": "Shutdown",
+      "android": "stopped",
+      "testBuildServerRunners": 0,
+      "fixtureServer": "stopped"
+    }
+  },
+  "publicApi": "Existing names, option/settings types, peer versions and conditional exports preserved; private implementation paths changed",
+  "nativeTransport": "Native bridge protocol and native-language implementations unchanged",
+  "historicalEvidence": "Previous runtime results apply only to their recorded artifacts; original evidence records were not rewritten",
+  "storageRetention": {
+    "policy": "User requested minimal retention. Raw logs and compressed backups were discarded after outcomes were recorded. Compact JSON reports and declaration/selection comparisons remain.",
+    "discarded": [
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/validation.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/mapbox-hash-install.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/mapbox-android-build.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/metro-transport.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/mapbox-ios-build.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/emulator.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/native-fixtures.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/maplibre-preparation.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/initial-validation.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/mapbox-android-build-environment-correction.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/maplibre-ios-build.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/maplibre-hash-install.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/maplibre-s04-preparation.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/maplibre-s04-typecheck.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/mapbox-android-runtime.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/mapbox-preparation-online.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/maplibre-ios-runtime.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/mapbox-preparation.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/browser-lifecycle.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/maplibre-ios-runtime/maestro.log",
+      "/Users/rob/code/mapbox-code/.one-map-adapter-evidence/retained-main-first"
+    ],
+    "historicalS04Summaries": "records/evidence/s04-retained-results.json",
+    "noTestsRun": true
+  }
+}

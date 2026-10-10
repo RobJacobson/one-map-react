@@ -1,0 +1,1490 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-10-08",
+  "status": "complete-guide-supporting-documentation-review-with-explicit-stage-and-runtime-gaps",
+  "scope": {
+    "directory": "docs",
+    "allMarkdownReviewed": 16,
+    "edited": [
+      "docs/architecture.md",
+      "docs/README.md",
+      "docs/testing.md",
+      "records/evidence/documentation-current-review.json"
+    ],
+    "readOnly": [
+      "other references and decisions",
+      "implementation/status/coverage/inventory",
+      "source/package/test files and upstream checkouts"
+    ],
+    "acceptance": "No S50, S51, complete S04, full compatibility, complete runnable application or native/physical-device conformance claimed.",
+    "snapshotNote": "Original complete-guide supporting review: 16 Markdown files. Decision0005 adds a seventeenth document; original reviewedMarkdown hashes and checks remain historical snapshots."
+  },
+  "guideSource": {
+    "path": "docs/STYLE_GUIDE.md",
+    "sha256": "2503bc4c3dbb24e79c70814d99f4568d59d79eabe20f55e2bd5484c1e06f0aaf",
+    "scope": "Entire guide, not paragraph-only review"
+  },
+  "editorialSkill": {
+    "path": "/Users/rob/.agents/skills/no-ai-slop/SKILL.md",
+    "sha256": "992b365f51a2f62cf4c1c5ed22049a9ee551dfea677550c1a72b371c0ceadd62",
+    "evalPath": "/Users/rob/.agents/skills/no-ai-slop/eval.md",
+    "scope": "Complete skill/editorial evaluation; API names, defaults, status qualifications and examples protected."
+  },
+  "reviewedMarkdown": [
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "5104236f29fb5fb13768dcc55352cb6d25b459d987d318ced2d692103b8aa56b",
+      "lineCount": 27,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Documentation directions preserve wrapper reuse, optional peers, strict unavailable vs pending handling, and extension completeness.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "961b140ef25a120e16cf82cea6074d71e226fbf79051a38de3395effdb2ca016",
+      "lineCount": 22,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Edited index identifies all current reference reviews, constructor decision, scoped runtime status and remaining developer-documentation/release gates.",
+      "editedByThisReview": true,
+      "snapshotChangedDuringReview": true,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/STYLE_GUIDE.md",
+      "sha256": "2503bc4c3dbb24e79c70814d99f4568d59d79eabe20f55e2bd5484c1e06f0aaf",
+      "lineCount": 127,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Complete guide applied across terminology, voice, paragraphs, architecture/reference structure, status labels, examples, sources, portability/errors and final reader review.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/api-coverage.md",
+      "sha256": "b73f309744b244d2eb82a80e575a979723245dc2cd823cf902d0bad779698f3c",
+      "lineCount": 119,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Read generated count/distribution view.11837 is the inventoried-entry denominator, not implemented compatibility. Validate current parity below; primary owns inventory amendments.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": true,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "04ff30fdc6a1b85f8aa2020609c2cbfac45d995880cb208283f4dca6e96a5a64",
+      "lineCount": 229,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Edited current source basis, declared/proposed API distinction, future source/layer adapter mechanisms, pending native camera feasibility, error classes, host options and constructor ownership. Equivalent layer/setup declarations checked.",
+      "editedByThisReview": true,
+      "snapshotChangedDuringReview": true,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/capabilities-and-extensions.md",
+      "sha256": "7f967ed29ee438c845bf39d9128bdc214e79fd8122224995edf32dbbe8a97e24",
+      "lineCount": 278,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Current narrow typed capabilities/errors distinct from pending extension methods; offline completion/identity, capture/output, permission normalization and all advanced families retained.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 4
+    },
+    {
+      "path": "docs/decisions/0001-baselines-and-ownership.md",
+      "sha256": "e0518ecde1a8cb492640dc64a6e5e11054972ac093e191d3455804538a385e89",
+      "lineCount": 27,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Stable wrapper/renderer/compatible React host pins, query order/duplicates, feature-state reset, live marker default, popup teardown and native feasibility remain authoritative accepted defaults.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/decisions/0002-portable-contracts.md",
+      "sha256": "26ab8f0cd26d1987442fadc387a368790033e23004aae415efbba693ebe885a7",
+      "lineCount": 27,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Common types/provider registration/error ownership, pending vs unavailable, narrow ignore policy and optional package isolation agree with references and architecture.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/decisions/0003-adapter-selection.md",
+      "sha256": "39b3e63fbfc8f3ea9bfa92d0b0036e88859adea003577f3de060b1aa34f495bd",
+      "lineCount": 51,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Explicit/browser-first aliases, helper/global/worker ownership and development direct-SDK scope stay distinct from facade/native binary and full conformance evidence.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/decisions/0004-map-constructor-configuration.md",
+      "sha256": "3c7f4424427658aad3641f000b5d8dc0faaf46d1b7ffc9aa71b8abb51a5d2af5",
+      "lineCount": 137,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Scoped implemented web factory and forwarding, immutable settings, omitted defaults, host updates, initial camera vs style replacement and unimplemented native/mutable/global facilities remain clear. Equivalent maps use same style/camera/size; native and web interaction settings are qualified.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 1
+    },
+    {
+      "path": "docs/implementation-status.md",
+      "sha256": "20dd9a93bc523e373e815d22cde925c3d0cfe0463ef4ee62dad0d65f4c057787",
+      "lineCount": 137,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Read generated ledger, current results and all child-stage rows. Stage status remains distinct from scoped runtime; primary reconciles current native/artifact/source-only acceptance. This reviewer did not edit.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": true,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/implementation.md",
+      "sha256": "4bb34ba26001a1214b4c1cf93cb4491c4753a76efd4ab8a35e94dd436c0e950f",
+      "lineCount": 184,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Read entire specification. Full assigned extension families, six-environment gates, independent stage acceptance and blank root/package READMEs preserved. Primary corrected S11 reset wording during review.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": true,
+      "sdkComparisonTables": 0
+    },
+    {
+      "path": "docs/maps-and-camera.md",
+      "sha256": "b7d6b066a8b174dbc2a061f65dce42aec8616aa996863aaaa76494766ee789cb",
+      "lineCount": 349,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Current source review, equivalent camera examples and explicit controlled/readiness/geometry runtime questions preserved. New constructor paragraph agrees with decision0004.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 4
+    },
+    {
+      "path": "docs/markers-and-controls.md",
+      "sha256": "fcccf15536e078c2b4d2f38eb02871f366099d0fcd81968490dfa464c800f795",
+      "lineCount": 422,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Current source review and equivalent point/drag/callout/control examples; absent proposed exports, actual host children, wrapper omission vs gesture/overlay feasibility and physical touches remain explicit.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 6
+    },
+    {
+      "path": "docs/sources-and-layers.md",
+      "sha256": "06eed535e3ae32adce1a2e374cbc22e77178d536007dbfec80922155350e109b",
+      "lineCount": 372,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Current sources, schema omissions, immutable options/property reset, queries/clusters, agreed feature-state reset and ownership remain separate from implementation evidence.",
+      "editedByThisReview": false,
+      "snapshotChangedDuringReview": false,
+      "sdkComparisonTables": 6
+    },
+    {
+      "path": "docs/testing.md",
+      "sha256": "faa41fb310499eaca4294e7e2aa3724ccb100731b3d03b9375ff10cd8795cba4",
+      "lineCount": 172,
+      "review": "complete-guide semantic and structural review; remaining stage questions preserved",
+      "notes": "Edited positive/proposed declaration distinction, constructor acceptance scenarios, agreed feature-state reset, check:docs and explicit pending full runners; independent expected support and physical-device gates preserved.",
+      "editedByThisReview": true,
+      "snapshotChangedDuringReview": true,
+      "sdkComparisonTables": 0
+    }
+  ],
+  "currentReferenceReviews": [
+    {
+      "path": "records/evidence/maps-camera-current-review.json",
+      "sha256": "7410a712f945276605d0f11e6afb160553584769e82902c380a9f8d328196e51",
+      "status": "current-upstream-source-and-declaration-review-complete",
+      "document": "docs/maps-and-camera.md",
+      "recordedDocumentSha256": "17c66953218c57838f6defaa5b38b19dc378f2be343bcf468f76a02f840d0542",
+      "currentDocumentSha256": "b7d6b066a8b174dbc2a061f65dce42aec8616aa996863aaaa76494766ee789cb",
+      "currentHashMatchesRecorded": false,
+      "snapshotNote": "Earlier exact review remains immutable. Maps/camera subsequently gained the constructor-decision link; this rollup separately reviews that addition. No earlier source/declaration evidence is rewritten.",
+      "materialRows": 34,
+      "runtimeVerification": "No broad runtime compatibility inferred; each record retains owning-stage questions."
+    },
+    {
+      "path": "records/evidence/sources-layers-current-review.json",
+      "sha256": "8a990ff4a99cf832a44fcef67ac99fd803657b758b60b004a25777c3fc945d1f",
+      "status": "current-upstream-source-and-declaration-review-complete-with-explicit-runtime-questions",
+      "document": "docs/sources-and-layers.md",
+      "recordedDocumentSha256": "06eed535e3ae32adce1a2e374cbc22e77178d536007dbfec80922155350e109b",
+      "currentDocumentSha256": "06eed535e3ae32adce1a2e374cbc22e77178d536007dbfec80922155350e109b",
+      "currentHashMatchesRecorded": true,
+      "snapshotNote": "Current source/declaration review snapshot matches this document.",
+      "materialRows": 39,
+      "runtimeVerification": "No broad runtime compatibility inferred; each record retains owning-stage questions."
+    },
+    {
+      "path": "records/evidence/markers-controls-current-review.json",
+      "sha256": "6f6db69872e9871f59d4edbd38d6a5cbde338e068cb2e0c864f2a3ae70c60adb",
+      "status": "current pinned source/declaration/editorial review completed; runtime investigations remain pending",
+      "document": "docs/markers-and-controls.md",
+      "recordedDocumentSha256": "fcccf15536e078c2b4d2f38eb02871f366099d0fcd81968490dfa464c800f795",
+      "currentDocumentSha256": "fcccf15536e078c2b4d2f38eb02871f366099d0fcd81968490dfa464c800f795",
+      "currentHashMatchesRecorded": true,
+      "snapshotNote": "Current source/declaration review snapshot matches this document.",
+      "materialRows": 28,
+      "runtimeVerification": "No broad runtime compatibility inferred; each record retains owning-stage questions."
+    },
+    {
+      "path": "records/evidence/capabilities-extensions-current-review.json",
+      "sha256": "48f69aa247b5177e02d34d820e654a26862cd8fe0d50809186a2d75d34a945aa",
+      "status": "current-upstream-source-and-declaration-review-complete-with-explicit-runtime-questions",
+      "document": "docs/capabilities-and-extensions.md",
+      "recordedDocumentSha256": "7f967ed29ee438c845bf39d9128bdc214e79fd8122224995edf32dbbe8a97e24",
+      "currentDocumentSha256": "7f967ed29ee438c845bf39d9128bdc214e79fd8122224995edf32dbbe8a97e24",
+      "currentHashMatchesRecorded": true,
+      "snapshotNote": "Current source/declaration review snapshot matches this document.",
+      "materialRows": 25,
+      "runtimeVerification": "No broad runtime compatibility inferred; each record retains owning-stage questions."
+    }
+  ],
+  "additionalPinnedSource": {
+    "id": "rn-pod",
+    "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/rnmapbox-maps.podspec",
+    "rawUrl": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/rnmapbox-maps.podspec",
+    "httpStatus": 200,
+    "sha256": "c08004c274a275e9408210fb3224afc684c55e8c82bee096d528a83bebaf1cd6",
+    "byteIdentity": true,
+    "comparisonPath": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/@rnmapbox+maps@10.3.7+ddc99e88f5efa762/node_modules/@rnmapbox/maps/rnmapbox-maps.podspec",
+    "sourcePath": "/private/tmp/one-map-docs-current-research/rnmapbox-maps.podspec"
+  },
+  "historicalMotivationSources": [
+    {
+      "repository": "RobJacobson/ferryjoy-app",
+      "revision": "862d7102ac7ea75116d68e6bca4427733ba9db64",
+      "path": "src/components/map/map-view/MapView.web.tsx",
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/map-view/MapView.web.tsx",
+      "command": [
+        "git",
+        "show",
+        "862d7102ac7ea75116d68e6bca4427733ba9db64:src/components/map/map-view/MapView.web.tsx"
+      ],
+      "sha256": "ee8f0ecaec9c657d8afa60a174e1529e66c39f0c5dec66a86ac52f6e3d9d2c6a",
+      "sourcePath": "/private/tmp/one-map-docs-current-research/ferry-MapView.web.tsx",
+      "status": "read-only pinned local Git object inspected; historical motivation only"
+    },
+    {
+      "repository": "RobJacobson/ferryjoy-app",
+      "revision": "862d7102ac7ea75116d68e6bca4427733ba9db64",
+      "path": "src/components/map/map-view/getDirectCamera.ts",
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/map-view/getDirectCamera.ts",
+      "command": [
+        "git",
+        "show",
+        "862d7102ac7ea75116d68e6bca4427733ba9db64:src/components/map/map-view/getDirectCamera.ts"
+      ],
+      "sha256": "408438788b7f93ae96b923ee411b7b21ffbbb105b1b9314ca090c78724ffb13c",
+      "sourcePath": "/private/tmp/one-map-docs-current-research/ferry-getDirectCamera.ts",
+      "status": "read-only pinned local Git object inspected; historical motivation only"
+    },
+    {
+      "repository": "RobJacobson/ferryjoy-app",
+      "revision": "862d7102ac7ea75116d68e6bca4427733ba9db64",
+      "path": "src/components/map/map-view/MapView.tsx",
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/map-view/MapView.tsx",
+      "command": [
+        "git",
+        "show",
+        "862d7102ac7ea75116d68e6bca4427733ba9db64:src/components/map/map-view/MapView.tsx"
+      ],
+      "sha256": "9dc0d471b5ff4da9087cb182164e3838d7579210e00927679abb66dcc635f7a2",
+      "sourcePath": "/private/tmp/one-map-docs-current-research/ferry-MapView.tsx",
+      "status": "read-only pinned local Git object inspected; historical motivation only"
+    },
+    {
+      "repository": "RobJacobson/ferryjoy-app",
+      "revision": "862d7102ac7ea75116d68e6bca4427733ba9db64",
+      "path": "src/components/map/camera/Camera.web.tsx",
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/camera/Camera.web.tsx",
+      "command": [
+        "git",
+        "show",
+        "862d7102ac7ea75116d68e6bca4427733ba9db64:src/components/map/camera/Camera.web.tsx"
+      ],
+      "sha256": "aeac89951641d2a0a09353547938f14e5832bcdb9be963ef6dbf2938afd9042b",
+      "sourcePath": "/private/tmp/one-map-docs-current-research/ferry-Camera.web.tsx",
+      "status": "read-only pinned local Git object inspected; historical motivation only"
+    },
+    {
+      "repository": "RobJacobson/ferryjoy-app",
+      "revision": "862d7102ac7ea75116d68e6bca4427733ba9db64",
+      "path": "src/components/map/camera/Camera.tsx",
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/camera/Camera.tsx",
+      "command": [
+        "git",
+        "show",
+        "862d7102ac7ea75116d68e6bca4427733ba9db64:src/components/map/camera/Camera.tsx"
+      ],
+      "sha256": "14581d0eca433a3a396fa2725b057a732224302a883f66d84731118ac6d89270",
+      "sourcePath": "/private/tmp/one-map-docs-current-research/ferry-Camera.tsx",
+      "status": "read-only pinned local Git object inspected; historical motivation only"
+    },
+    {
+      "repository": "RobJacobson/ferryjoy-app",
+      "revision": "862d7102ac7ea75116d68e6bca4427733ba9db64",
+      "path": "src/components/map/line-layer/LineLayer.web.tsx",
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/line-layer/LineLayer.web.tsx",
+      "command": [
+        "git",
+        "show",
+        "862d7102ac7ea75116d68e6bca4427733ba9db64:src/components/map/line-layer/LineLayer.web.tsx"
+      ],
+      "sha256": "fac403c239545bb9d87242c1875b29054146cc98733ff22bd8d5627c526b21a8",
+      "sourcePath": "/private/tmp/one-map-docs-current-research/ferry-LineLayer.web.tsx",
+      "status": "read-only pinned local Git object inspected; historical motivation only"
+    }
+  ],
+  "consistencyEvidence": [
+    {
+      "path": "docs/STYLE_GUIDE.md",
+      "sha256": "2503bc4c3dbb24e79c70814d99f4568d59d79eabe20f55e2bd5484c1e06f0aaf",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "5104236f29fb5fb13768dcc55352cb6d25b459d987d318ced2d692103b8aa56b",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "records/version-baseline.json",
+      "sha256": "90f00bf6be67fdb9f3a6eaff8cdca9e86f8e87151b0d7abbd4a2ef74a1852858",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "records/evidence/documentation-style-review.json",
+      "sha256": "143172da97b606bc6383e376cc0996fa1a15f29161ec1a37227d5eacb2d89330",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "docs/decisions/0001-baselines-and-ownership.md",
+      "sha256": "e0518ecde1a8cb492640dc64a6e5e11054972ac093e191d3455804538a385e89",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "docs/decisions/0002-portable-contracts.md",
+      "sha256": "26ab8f0cd26d1987442fadc387a368790033e23004aae415efbba693ebe885a7",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "docs/decisions/0003-adapter-selection.md",
+      "sha256": "39b3e63fbfc8f3ea9bfa92d0b0036e88859adea003577f3de060b1aa34f495bd",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "docs/decisions/0004-map-constructor-configuration.md",
+      "sha256": "3c7f4424427658aad3641f000b5d8dc0faaf46d1b7ffc9aa71b8abb51a5d2af5",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "records/evidence/s04-assignment-review.json",
+      "sha256": "934aaf7dcd59e6d81deb38b47ebdf272aa2c488c4c4357b3c1f165d816823946",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "records/evidence/web-lifecycle.json",
+      "sha256": "768330eac4bfe6ecfa1eb03acb69aed9dda3e34510cf87403938d3d53395e10e",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "records/evidence/selection.json",
+      "sha256": "c37e5e70770012e09b7dde14a76bb6bfe531ea9a092b94435c1f30bcc5e79115",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "records/evidence/maplibre-lifecycle.json",
+      "sha256": "a3625132c17f9c56fad65213e569f65ea823a009f9cb52076f90b9b9f1aaa76a",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "records/evidence/mapbox-lifecycle.json",
+      "sha256": "272f96590803f968490deae8747d4dffd9d907fb0752ad5fea6b95ce198b99be",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "packages/one-map-react/src/core/types.ts",
+      "sha256": "132173c272a80b10462d7426eabc15ab695474f3da346b45a59d4fef5d12bc91",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "packages/one-map-react/src/core/capabilities.ts",
+      "sha256": "a68db426c7aaf3d845a036ba1d2b1d71d72538a51b1e6c7d70cf80f79f91d544",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "packages/one-map-react/src/core/errors.ts",
+      "sha256": "a7fc71d7b426e3e1fbb52381614beb2ee714973a73fe47c4d970ef0e77ea7e9c",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "packages/one-map-react/src/core/map-configuration.ts",
+      "sha256": "498586718dada2431948e6e93a84ac7e276406871b9748da4fafac6406c01747",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web.tsx",
+      "sha256": "10119b456c104ba35375d6bf28aae8f9f63a695a45423e4e3096ee69c832ae18",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "packages/one-map-react/package.json",
+      "sha256": "e0e029325066ede4f56378843bcbf62f9eae6d86833633b0572d7e83183eb54e",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "package.json",
+      "sha256": "b3ed5046d3587e7d1ca8ad1ef85fddd485ed036ad934b03b188dd6d5b92f8e53",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    },
+    {
+      "path": "scripts/pending.mjs",
+      "sha256": "ca17c4c183e74bd6598520165d7ce7b979a7d957c3b95173a9aec5c73a3d6710",
+      "scope": "Read-only consistency/source-snapshot evidence; prior runtime results not rerun or broadened by this review."
+    }
+  ],
+  "nativePublicDeclarationEntry": {
+    "package": "react-native",
+    "version": "0.87.1",
+    "typesEntry": "./types_generated/index.d.ts",
+    "sha256": "34b15149f573c1d032f3049dfce13b9136255783aa77763f8f1a64beaef770d3",
+    "status": "Public declaration entry identified. Field-by-field inherited-host inventory amendment remains primary research, not SDK unsupported proof."
+  },
+  "changes": [
+    {
+      "path": "docs/architecture.md",
+      "change": "Current pinned wrapper citations replace qualified historical RNMapbox/react-map-gl sources only where current reference checks establish the claim. Added exact current RN podspec and retained historical Ferryjoy source provenance."
+    },
+    {
+      "path": "docs/architecture.md",
+      "change": "Implemented core declarations/errors are separated from proposed marker/popup/extensions and pending renderer mechanisms. Native strict control stays pending feasibility until substantiated limitation; constructor and mutable/host settings retain separate ownership."
+    },
+    {
+      "path": "docs/README.md",
+      "change": "Links constructor decision and current review rollup; all four source/declaration reviews are identified while full conformance remains incomplete."
+    },
+    {
+      "path": "docs/testing.md",
+      "change": "Implemented example checks and retained proposal diagnostics separated. Added structural check command, explicit pending full web/native runners, constructor-specific assertions and agreed feature-state reset acceptance."
+    }
+  ],
+  "checks": {
+    "status": "passed",
+    "command": [
+      "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+      "--noEmit",
+      "-p",
+      "/private/tmp/one-map-docs-rollup-examples-jibtzdbc/tsconfig.json"
+    ],
+    "exitCode": 0,
+    "output": "",
+    "examples": [
+      {
+        "file": "architecture-1.tsx",
+        "document": "docs/architecture.md",
+        "fenceIndex": 1,
+        "addedSetup": [],
+        "sha256": "080bd587b6ffc73e0aa7a4f883f6db576f3b916e92d898efa5bf08daa8d6d088"
+      },
+      {
+        "file": "architecture-2.tsx",
+        "document": "docs/architecture.md",
+        "fenceIndex": 2,
+        "addedSetup": [],
+        "sha256": "b52ea1f1926cf167c0eb75a1673bc2139410d8f07b585a3b98c7cf79366c4242"
+      },
+      {
+        "file": "architecture-3.tsx",
+        "document": "docs/architecture.md",
+        "fenceIndex": 3,
+        "addedSetup": [],
+        "sha256": "e96fed380337e0aebe92f035aad4b09325eb32bd3f398c67efbc0e8f455136c1"
+      },
+      {
+        "file": "architecture-4.tsx",
+        "document": "docs/architecture.md",
+        "fenceIndex": 4,
+        "addedSetup": [],
+        "sha256": "187f074b2a6a4194100739eb740ccd818be58eb30fecfe87b8e8dbeadac29acd"
+      },
+      {
+        "file": "architecture-5.tsx",
+        "document": "docs/architecture.md",
+        "fenceIndex": 5,
+        "addedSetup": [],
+        "sha256": "0bb9e74a78c317b0d88d22ce5a3cb919e69fada43045c1b099b1fef8ffadf7f1"
+      },
+      {
+        "file": "architecture-3-mapbox.tsx",
+        "variation": "same layer using other selected web entry",
+        "sha256": "6cb487e79fedcb3eae11e3c3bd95120f0daccd5d46659aa360454be94c89b5e9"
+      }
+    ],
+    "directory": "/private/tmp/one-map-docs-rollup-examples-jibtzdbc",
+    "scope": "Exact architecture declarations only. Map/source initialization, sizing, credentials and native builds remain explicitly omitted. No SDK execution or packed isolation claim.",
+    "nativeAliasVariation": {
+      "status": "passed",
+      "command": [
+        "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "/private/tmp/one-map-docs-rollup-examples-jibtzdbc/tsconfig.native.json"
+      ],
+      "exitCode": 0,
+      "output": "",
+      "scope": "Same setup excerpt with explicit native alias declaration mapping; no native runtime or condition-resolver execution."
+    },
+    "pendingRunnerAssertions": [
+      {
+        "command": ["bun", "run", "test:web"],
+        "exitCode": 2,
+        "output": "$ bun scripts/pending.mjs web\nUNVERIFIED: web suite is pending its owning implementation stage.\n",
+        "expectedExitCode": 2,
+        "status": "passed-pending-status-assertion",
+        "runtimeExecuted": false
+      },
+      {
+        "command": ["bun", "run", "test:native:mapbox:ios"],
+        "exitCode": 2,
+        "output": "$ bun scripts/pending.mjs native-mapbox-ios\nUNVERIFIED: native-mapbox-ios suite is pending its owning implementation stage.\n",
+        "expectedExitCode": 2,
+        "status": "passed-pending-status-assertion",
+        "runtimeExecuted": false
+      },
+      {
+        "command": ["bun", "run", "test:native:mapbox:android"],
+        "exitCode": 2,
+        "output": "$ bun scripts/pending.mjs native-mapbox-android\nUNVERIFIED: native-mapbox-android suite is pending its owning implementation stage.\n",
+        "expectedExitCode": 2,
+        "status": "passed-pending-status-assertion",
+        "runtimeExecuted": false
+      },
+      {
+        "command": ["bun", "run", "test:native:maplibre:ios"],
+        "exitCode": 2,
+        "output": "$ bun scripts/pending.mjs native-maplibre-ios\nUNVERIFIED: native-maplibre-ios suite is pending its owning implementation stage.\n",
+        "expectedExitCode": 2,
+        "status": "passed-pending-status-assertion",
+        "runtimeExecuted": false
+      },
+      {
+        "command": ["bun", "run", "test:native:maplibre:android"],
+        "exitCode": 2,
+        "output": "$ bun scripts/pending.mjs native-maplibre-android\nUNVERIFIED: native-maplibre-android suite is pending its owning implementation stage.\n",
+        "expectedExitCode": 2,
+        "status": "passed-pending-status-assertion",
+        "runtimeExecuted": false
+      }
+    ],
+    "initialFailure": {
+      "report": {
+        "status": "failed",
+        "command": [
+          "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+          "--noEmit",
+          "-p",
+          "/private/tmp/one-map-docs-rollup-examples-hk6yn6mr/tsconfig.json"
+        ],
+        "exitCode": 1,
+        "output": "error TS2688: Cannot find type definition file for 'react'.\n  The file is in the program because:\n    Entry point of type library 'react' specified in compilerOptions\n",
+        "examples": [
+          {
+            "file": "architecture-1.tsx",
+            "document": "docs/architecture.md",
+            "fenceIndex": 1,
+            "addedSetup": [],
+            "sha256": "080bd587b6ffc73e0aa7a4f883f6db576f3b916e92d898efa5bf08daa8d6d088"
+          },
+          {
+            "file": "architecture-2.tsx",
+            "document": "docs/architecture.md",
+            "fenceIndex": 2,
+            "addedSetup": [],
+            "sha256": "b52ea1f1926cf167c0eb75a1673bc2139410d8f07b585a3b98c7cf79366c4242"
+          },
+          {
+            "file": "architecture-3.tsx",
+            "document": "docs/architecture.md",
+            "fenceIndex": 3,
+            "addedSetup": [],
+            "sha256": "e96fed380337e0aebe92f035aad4b09325eb32bd3f398c67efbc0e8f455136c1"
+          },
+          {
+            "file": "architecture-4.tsx",
+            "document": "docs/architecture.md",
+            "fenceIndex": 4,
+            "addedSetup": [],
+            "sha256": "187f074b2a6a4194100739eb740ccd818be58eb30fecfe87b8e8dbeadac29acd"
+          },
+          {
+            "file": "architecture-5.tsx",
+            "document": "docs/architecture.md",
+            "fenceIndex": 5,
+            "addedSetup": [],
+            "sha256": "0bb9e74a78c317b0d88d22ce5a3cb919e69fada43045c1b099b1fef8ffadf7f1"
+          },
+          {
+            "file": "architecture-3-mapbox.tsx",
+            "variation": "same layer using other selected web entry",
+            "sha256": "6cb487e79fedcb3eae11e3c3bd95120f0daccd5d46659aa360454be94c89b5e9"
+          }
+        ],
+        "directory": "/private/tmp/one-map-docs-rollup-examples-hk6yn6mr",
+        "scope": "Exact architecture declarations only. Map/source initialization, sizing, credentials and native builds remain explicitly omitted. No SDK execution or packed isolation claim."
+      },
+      "nativeReport": {
+        "status": "failed",
+        "command": [
+          "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+          "--noEmit",
+          "-p",
+          "/private/tmp/one-map-docs-rollup-examples-hk6yn6mr/tsconfig.native.json"
+        ],
+        "exitCode": 1,
+        "output": "error TS2688: Cannot find type definition file for 'react'.\n  The file is in the program because:\n    Entry point of type library 'react' specified in compilerOptions\n",
+        "scope": "Same setup excerpt with explicit native alias declaration mapping; no native runtime or condition-resolver execution."
+      },
+      "diagnosis": "Temporary fixture lacked access to installed React type libraries; TS2688 was fixture setup, not example or SDK incompatibility.",
+      "repair": "Added explicit temporary node_modules symlink to the installed frozen research graph. No source/example changes or error suppression. This is not a package-isolation test."
+    }
+  },
+  "retainedInitialStructuralFailure": {
+    "command": "bun run check:docs",
+    "exitCode": 1,
+    "issues": [
+      "Missing current-review JSON link while evidence generation failed on assumed manifest.types key.",
+      "Architecture research-basis paragraphs lacked a blank separator."
+    ],
+    "repair": "Used actual React Native exports[.] types entry, created evidence, inserted paragraph separator, then reran checks."
+  },
+  "inventoryViewParity": {
+    "status": "passed",
+    "inventoryEntries": 11837,
+    "summedMarkdownEntries": 11837,
+    "meaning": "Inventoried API entries, not implemented compatibility. Parent-owned inherited-host-prop amendments can change this snapshot.",
+    "snapshotNote": "Original 11837-entry snapshot retained. Primary generated-host assignments preserve those rows and add 294; current parity appears in currentFollowup."
+  },
+  "stageStatusSnapshot": {
+    "S00": "complete",
+    "S01": "complete",
+    "S02": "complete",
+    "S03": "complete",
+    "S04": "in-progress",
+    "S50": "planned",
+    "S51": "planned"
+  },
+  "blankReadmeRequirement": [
+    {
+      "path": "README.md",
+      "bytes": 0,
+      "status": "passed"
+    },
+    {
+      "path": "packages/one-map-react/README.md",
+      "bytes": 0,
+      "status": "passed"
+    }
+  ],
+  "guideReviewDimensions": [
+    {
+      "dimension": "audience; defined source/layer/camera and renderer/wrapper/adapter/service relationships",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "consistent names, backend/platform terms and API spelling",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "direct connected prose, no filler/promotional claims and restrained meaningful headings",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "single physical paragraphs/list prose, blank separation and code-only structural line breaks",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "architectural four-path diagram; exhaustive material in task references",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "required four SDK comparison columns and near-claim pinned citations",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "Existing API/Agreed design/Proposed API/Open question and implementation/verification separation",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "matching task/data/coordinates/IDs/style and DOM/native child boundaries in equivalent examples",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "imports/setup omissions, versioned declaration checks and retained failures; examples not certified apps",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "exact source revisions/date, live readable references supplement version evidence",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "pending/wrapper omission vs substantiated unsupported, invalid, not-ready and operational failure",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "observable defaults/timing/updates/removal/interaction and ownership consequences",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "package install, JavaScript graph and native autolinking distinctions; mixed setups",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "independent expected-support fixtures and physical-device/runtime limits",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    },
+    {
+      "dimension": "architecture/common contracts and all four references agree on accepted defaults and remaining work",
+      "status": "passed-with-explicit-pending-stage-qualifications"
+    }
+  ],
+  "resolvedHistoricalReviewGaps": [
+    {
+      "id": "historical-map-camera-comparisons",
+      "scope": "Current source/declaration revalidation only; runtime and complete publication gates remain pending.",
+      "evidence": "records/evidence/maps-camera-current-review.json + this architecture review"
+    },
+    {
+      "id": "historical-source-layer-comparisons",
+      "scope": "Current source/declaration revalidation only; runtime and complete publication gates remain pending.",
+      "evidence": "records/evidence/sources-layers-current-review.json"
+    },
+    {
+      "id": "historical-marker-control-comparisons",
+      "scope": "Current source/declaration revalidation only; runtime and complete publication gates remain pending.",
+      "evidence": "records/evidence/markers-controls-current-review.json"
+    },
+    {
+      "id": "historical-extension-comparisons",
+      "scope": "Current source/declaration revalidation only; runtime and complete publication gates remain pending.",
+      "evidence": "records/evidence/capabilities-extensions-current-review.json"
+    }
+  ],
+  "coordinationFindings": [
+    {
+      "document": "docs/implementation.md",
+      "issue": "S11 wording previously made retention/reset sound undecided despite accepted reset policy.",
+      "status": "corrected by primary during review; this reviewer did not edit."
+    },
+    {
+      "document": "docs/implementation-status.md",
+      "issue": "S02 next action had stale ImplementS03 wording.",
+      "status": "corrected by primary/generator during review; this reviewer did not edit."
+    }
+  ],
+  "remainingGaps": [
+    {
+      "stage": "S04 and child configuration/global stages",
+      "gap": "Complete ordinary map/host configuration and retained reachable state investigations, selected-entry helpers, native tint/localization/reset and mutable/global ownership. Source-only/internal shape acceptance does not fulfill callable behavior."
+    },
+    {
+      "stage": "S00/S04 inherited host props",
+      "gap": "Primary is reconciling React Native0.87.1 public types_generated root against historical handwritten ViewProps. Revalidate added/removed inherited fields and their usable selected-host paths; do not label declaration absence SDK unsupported. This rollup does not accept the amendment."
+    },
+    {
+      "stage": "S05-S49 feature stages",
+      "gap": "Each current reference retains behavioral camera/gesture/drag/popup/query/loading/style/feature-state/offline/capture/location/advanced-extension questions. Owning stages need positive, operational-failure, supported/unsupported and cleanup observations; physical devices where simulators are insufficient."
+    },
+    {
+      "stage": "S50",
+      "gap": "Complete reader-facing installation, mixed-engine setup, migration, implemented extension usage and assembled type-checked/runtime examples. Proposed Marker/Popup/extensions remain absent; retained diagnostics are not runnable compatibility examples."
+    },
+    {
+      "stage": "S51",
+      "gap": "Full required six-environment suites, independent expected-support/coverage reconciliation and final packed artifact/peer/version release checks remain incomplete. Scoped lifecycle/direct-SDK/selection evidence retains its artifact/build/mode limits."
+    }
+  ],
+  "limitations": [
+    "Reviewed all16 Markdown documents semantically; no edits to generated status/coverage, other references/decisions or source implementation. Parent-owned snapshots can change concurrently.",
+    "Existing exact reference source/declaration evidence reused rather than claiming every upstream source was independently refetched in this rollup. New RN podspec fetched HTTP200 and byte-matched; Ferryjoy historical local Git objects inspected read-only.",
+    "Seven new architecture declaration checks pass using installed research graph and workspace-built common declarations with skipLibCheck. This is not selected-peer/packed consumer isolation or complete app runtime proof. Initial React type-resolution setup failure remains retained.",
+    "Five full runtime commands returned pending exit2 as expected. No browser/native SDK/hardware/gesture/runtime suite executed by this supporting docs review.",
+    "Current source/declaration review resolves qualified historical comparison gaps only. Earlier documentation-style-review and reference evidence JSON files remain immutable; source assertions do not imply current adapter fulfillment."
+  ],
+  "structuralChecks": {
+    "command": "bun run check:docs",
+    "exitCode": 0,
+    "output": "PASS documentation structure: 16 Markdown files, 21 SDK comparison tables, paragraphs, fences and local links.",
+    "scope": "Structure only; complete-guide semantic/editorial/source/example review recorded separately.",
+    "evidenceFormatting": {
+      "command": "bunx biome check records/evidence/documentation-current-review.json",
+      "exitCode": 0,
+      "output": "Checked 1 file. No fixes applied."
+    }
+  },
+  "additionalReaderReviews": [
+    {
+      "schemaVersion": 1,
+      "reviewedOn": "2026-10-08",
+      "document": {
+        "path": "docs/decisions/0005-host-properties.md",
+        "sha256": "68134cd950d63836074035751dc79c94b7f7bda67e6963e5199dbe84ef1ca657"
+      },
+      "status": "decision-specific full-guide reader/source/declaration review passed; host runtime and final-artifact gates remain open",
+      "scope": {
+        "edited": [
+          "docs/decisions/0005-host-properties.md",
+          "appended decision-specific reader review to records/evidence/documentation-current-review.json",
+          "docs/README.md: concise host-decision crosslink authorized in final followup"
+        ],
+        "unchanged": [
+          "prior rollup snapshots",
+          "facade API/implementation",
+          "coverage and stage ledger",
+          "other Markdown docs except the authorized README crosslink"
+        ],
+        "acceptance": "Independent reader/source/declaration review plus current primary selected-package evidence; no full S04/S50/S51, native focus/accessibility/input or six-environment conformance acceptance inferred."
+      },
+      "guide": {
+        "path": "docs/STYLE_GUIDE.md",
+        "sha256": "2503bc4c3dbb24e79c70814d99f4568d59d79eabe20f55e2bd5484c1e06f0aaf",
+        "applied": "Complete guide, including source/status/terminology/equivalent examples and error/ownership consequences; no-ai-slop skill/editorial evaluation applied."
+      },
+      "newPinnedSourceChecks": [
+        {
+          "id": "react-html-types",
+          "url": "https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz",
+          "httpStatus": 200,
+          "package": "@types/react",
+          "version": "19.3.0",
+          "tarballSha256": "ffa77ffdbdc82e5f67a0fd74d750990375a7dfd8685ec7f10a27c0db128f7766",
+          "member": "react/index.d.ts",
+          "sourceSha256": "045c1b395851aa71ef76393398466330fe1eeebc113c8085eefc6d84abea3a88",
+          "installedByteIdentity": true,
+          "sourcePath": "/private/tmp/one-map-host-decision-source/react-index.d.ts"
+        },
+        {
+          "id": "rn-view-source",
+          "url": "https://github.com/facebook/react-native/blob/v0.87.1/packages/react-native/Libraries/Components/View/ViewPropTypes.js",
+          "httpStatus": 200,
+          "revision": "v0.87.1",
+          "sourceSha256": "03b0fadc939e7cbffeaf94a505572edd16a9298c8f1980aa35c5862a812eb402",
+          "installedByteIdentity": true,
+          "sourcePath": "/private/tmp/one-map-host-decision-source/ViewPropTypes.js"
+        },
+        {
+          "id": "rn-typescript-config",
+          "url": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+          "httpStatus": 200,
+          "revision": "v0.87.1",
+          "sourceSha256": "86ff4a8dd7c279443a487eb404ba3794be81a1585641b089081c3e1ceba50084",
+          "sourcePath": "/private/tmp/one-map-host-decision-source/rn-tsconfig.json",
+          "inspectedSettings": {
+            "strict": true,
+            "skipLibCheck": true
+          }
+        }
+      ],
+      "existingPinnedWrapperSourceBasis": [
+        {
+          "path": "records/evidence/capabilities-extensions-current-review.json",
+          "sha256": "48f69aa247b5177e02d34d820e654a26862cd8fe0d50809186a2d75d34a945aa",
+          "sourceIds": [
+            "rn-map",
+            "ml-map",
+            "web-mapbox-map",
+            "web-maplibre-map"
+          ],
+          "meaning": "Pinned wrapper forwarding/container sources previously fetched and byte-matched; exact installed render blocks inspected again in this task."
+        }
+      ],
+      "implementationSources": [
+        {
+          "path": "packages/one-map-react/src/adapters/web-host.ts",
+          "sha256": "8ebcb8c64de2059ced672b4d59f2f2086c2a774dee448e19ed65b18dc46ee740",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/adapters/native-host.ts",
+          "sha256": "bb63c78df3d264970206f8f0f7da695bc3d313d3c3bf3728e2014ad85df37fe5",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/adapters/web.tsx",
+          "sha256": "10119b456c104ba35375d6bf28aae8f9f63a695a45423e4e3096ee69c832ae18",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/adapters/mapbox-native/map.tsx",
+          "sha256": "b7fb5848b2e2199fa45cdb6271cdad3f8f04be7908ed1648c34f77c8e2c58242",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/adapters/mapbox-native/host.ts",
+          "sha256": "e25bd8fd4ba16252fac791e97857e1a929525788d28f505b2c343e475fbbfb71",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/adapters/maplibre-native/Map.tsx",
+          "sha256": "053ef5205ee7d4467039fac9abd50646254edbcee35d7406cd3e562e10102afa",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/adapters/maplibre-native/host-props.ts",
+          "sha256": "e56d77c053f6e857afa1094c8d37a4af80604f2a147f137ab838cb0a9e551792",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/mapbox-web.ts",
+          "sha256": "66b98d50c5ea865c6ec14210ee506c75a393fa0c9d7a38749ea991ed689ece8d",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/maplibre-web.ts",
+          "sha256": "eae9bc766acedd44d4a9b2c9c16a4ac1815853e744994d11e5900ed232c46d1b",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/mapbox-native.ts",
+          "sha256": "8fcdfd4bdbb51667f323e6985320f2573fe0feb4fef15e61616559f77bacd1ec",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/maplibre-native.ts",
+          "sha256": "7a919bfc4997a051dd7ca722121c1e3aac0dfc8e0b1c5dd8cd61a67bffa64da5",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/core/types.ts",
+          "sha256": "132173c272a80b10462d7426eabc15ab695474f3da346b45a59d4fef5d12bc91",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/src/index.ts",
+          "sha256": "8f35ad552aeaa996c32450e67417521c10582837738bd12270bfc901091121b6",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/dist/adapters/native-host.d.ts",
+          "sha256": "9a8ee86ca4c7f5c5058627c6e3cffcefc4fa9e99ee7cce12aa2d1ccf67a8d00d",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        },
+        {
+          "path": "packages/one-map-react/dist/adapters/web-host.d.ts",
+          "sha256": "46c4d75489552a27c76092ecfd1263a62ba300496b15647b79b685e8afef246c",
+          "scope": "Read-only selected type/export, record/key checks, forwarding/ownership or common-entry isolation inspection."
+        }
+      ],
+      "upstreamTypeAudit": {
+        "path": "records/evidence/native-generated-host-inventory.json",
+        "sha256": "932c9db4fd2674f7d3f5a93b101eab67e899bcb7fbe52be87b754950420d0b76",
+        "rootHostKeys": 112,
+        "helperWhitelistMatchesAuditedKeys": true,
+        "meaning": "Current default generated RN root, excluding owned style/children; immutable audit proposals remain source research. Primary additive assignment decisions are recorded separately; runtime attribute behavior remains unverified."
+      },
+      "hostEvidenceSnapshot": {
+        "path": "records/evidence/host-properties.json",
+        "sha256": "a0db9dd7feb297f41c826c0eaead58f743f76810e43bdf9fdebcf681416b677b",
+        "scope": "Existing primary packed browser and mocked native evidence, not rerun by this reader review; artifact/sourceDeltaAfterRun and pending declaration/final gates preserved."
+      },
+      "exampleChecks": {
+        "status": "passed",
+        "command": [
+          "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+          "--noEmit",
+          "-p",
+          "/private/tmp/one-map-host-decision-examples-enjnzl32/tsconfig.json"
+        ],
+        "exitCode": 0,
+        "output": "",
+        "directory": "/private/tmp/one-map-host-decision-examples-enjnzl32",
+        "documentSha256": "0653edee1a885acf7cba6958abcbd021149278f66bcd3f251040edcee9bb6d19",
+        "examples": [
+          {
+            "fenceIndex": 1,
+            "file": "host-1.tsx",
+            "sha256": "e8efc8d805533f1c905b89cc4904f489e8c7df19cc7a106f42dc97a53a6c3233",
+            "addedSetup": []
+          },
+          {
+            "fenceIndex": 2,
+            "file": "host-2.tsx",
+            "sha256": "40c041bbb51645ed570f985887ed3c610a110b07fa98744e6809d009da288cc9",
+            "addedSetup": []
+          },
+          {
+            "fenceIndex": 3,
+            "file": "host-3.tsx",
+            "sha256": "acfe28d529ceeabe84cb9f2657d7e54950973dc98593812f9d80dccc095d1a03",
+            "addedSetup": []
+          },
+          {
+            "fenceIndex": 4,
+            "file": "host-4.tsx",
+            "sha256": "55f43ffa6b16752325415ffe0cb74314442dd74f583d8f4cf4d0026fba13b3b2",
+            "addedSetup": []
+          },
+          {
+            "file": "host-3-mapbox.tsx",
+            "variation": "same declared host goal with other selected web entry; Mapbox token setup remains omitted",
+            "sha256": "9fa72d4f34f90a92915bd592c0a8ec5f58b149e64b5ea6e93f8925c4a9643ecc"
+          },
+          {
+            "file": "host-4-mapbox.tsx",
+            "variation": "same declared host goal with other selected web entry; Mapbox token setup remains omitted",
+            "sha256": "69fe4d3117b1bc9139dd5b90fa634f0e36a53f14c43f33af606e3e80869eddfb"
+          },
+          {
+            "file": "host-4-mapbox-native.tsx",
+            "variation": "native selected helper with native attributes as explained in document; native builds, token/bootstrap and focus behavior remain unverified",
+            "sha256": "5009234b649bb53774e9e04c1879a380db53f122be7b7d54d62a123044a80c2b"
+          },
+          {
+            "file": "host-4-maplibre-native.tsx",
+            "variation": "native selected helper with native attributes as explained in document; native builds, token/bootstrap and focus behavior remain unverified",
+            "sha256": "c6d1c33a1a5f669af8b6193419f3041f1418720b1e71d9911efc11671a183375"
+          }
+        ],
+        "scope": "Eight declaration checks: four documented excerpts and four selected web/native variations. Installed frozen research declarations and workspace-built common/selected helper declarations; no runtime, packed isolation or native focus claim.",
+        "postCheckEditorialChange": "Added matched Mapbox map-id citation, native TS policy, selection evidence link and generated-audit candidate wording. Excerpts unchanged; no error suppression.",
+        "retainedInitialCSSFailure": {
+          "status": "failed",
+          "command": [
+            "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+            "--noEmit",
+            "-p",
+            "/private/tmp/one-map-host-decision-examples-ldz43fm9/tsconfig.json"
+          ],
+          "exitCode": 1,
+          "output": "host-3-mapbox.tsx(2,8): error TS2882: Cannot find module or type declarations for side-effect import of 'mapbox-gl/dist/mapbox-gl.css'.\nhost-3.tsx(2,8): error TS2882: Cannot find module or type declarations for side-effect import of 'maplibre-gl/dist/maplibre-gl.css'.\nhost-4-mapbox.tsx(3,8): error TS2882: Cannot find module or type declarations for side-effect import of 'mapbox-gl/dist/mapbox-gl.css'.\nhost-4.tsx(3,8): error TS2882: Cannot find module or type declarations for side-effect import of 'maplibre-gl/dist/maplibre-gl.css'.\n",
+          "directory": "/private/tmp/one-map-host-decision-examples-ldz43fm9",
+          "documentSha256": "3ee81cfb71bd667a64e836ddcf2f838495b065e96e00493b8483da556f656480",
+          "examples": [
+            {
+              "fenceIndex": 1,
+              "file": "host-1.tsx",
+              "sha256": "e8efc8d805533f1c905b89cc4904f489e8c7df19cc7a106f42dc97a53a6c3233",
+              "addedSetup": []
+            },
+            {
+              "fenceIndex": 2,
+              "file": "host-2.tsx",
+              "sha256": "40c041bbb51645ed570f985887ed3c610a110b07fa98744e6809d009da288cc9",
+              "addedSetup": []
+            },
+            {
+              "fenceIndex": 3,
+              "file": "host-3.tsx",
+              "sha256": "acfe28d529ceeabe84cb9f2657d7e54950973dc98593812f9d80dccc095d1a03",
+              "addedSetup": []
+            },
+            {
+              "fenceIndex": 4,
+              "file": "host-4.tsx",
+              "sha256": "55f43ffa6b16752325415ffe0cb74314442dd74f583d8f4cf4d0026fba13b3b2",
+              "addedSetup": []
+            },
+            {
+              "file": "host-3-mapbox.tsx",
+              "variation": "same declared host goal with other selected web entry; Mapbox token setup remains omitted",
+              "sha256": "9fa72d4f34f90a92915bd592c0a8ec5f58b149e64b5ea6e93f8925c4a9643ecc"
+            },
+            {
+              "file": "host-4-mapbox.tsx",
+              "variation": "same declared host goal with other selected web entry; Mapbox token setup remains omitted",
+              "sha256": "69fe4d3117b1bc9139dd5b90fa634f0e36a53f14c43f33af606e3e80869eddfb"
+            },
+            {
+              "file": "host-4-mapbox-native.tsx",
+              "variation": "native selected helper with native attributes as explained in document; native builds, token/bootstrap and focus behavior remain unverified",
+              "sha256": "5009234b649bb53774e9e04c1879a380db53f122be7b7d54d62a123044a80c2b"
+            },
+            {
+              "file": "host-4-maplibre-native.tsx",
+              "variation": "native selected helper with native attributes as explained in document; native builds, token/bootstrap and focus behavior remain unverified",
+              "sha256": "c6d1c33a1a5f669af8b6193419f3041f1418720b1e71d9911efc11671a183375"
+            }
+          ],
+          "scope": "Eight declaration checks: four documented excerpts and four selected web/native variations. Installed frozen research declarations and workspace-built common/selected helper declarations; no runtime, packed isolation or native focus claim."
+        },
+        "cssRepair": "Enabled installed Vite/client CSS module declarations, as supplied by the web bundler; added explicit setup note to document. No CSS import removed or invented map API.",
+        "finalProseFollowup": {
+          "document": {
+            "path": "docs/decisions/0005-host-properties.md",
+            "sha256": "68134cd950d63836074035751dc79c94b7f7bda67e6963e5199dbe84ef1ca657"
+          },
+          "tsxFencesUnchanged": true,
+          "scope": "Only Remaining acceptance prose changed after the retained eight-example passing run; its original document hash remains the executed snapshot."
+        }
+      },
+      "nativePeerDiagnosticChecks": {
+        "status": "peer-diagnostic-reproduction-and-compatible-application-checks-passed",
+        "directory": "/private/tmp/one-map-host-strict-probe-y64ucm5v",
+        "results": [
+          {
+            "fixture": "rn-only",
+            "skipLibCheck": false,
+            "command": [
+              "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+              "--noEmit",
+              "-p",
+              "/private/tmp/one-map-host-strict-probe-y64ucm5v/rn-only-all-strict.json"
+            ],
+            "exitCode": 1,
+            "output": "../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411: Property 'style' of type 'Readonly<{ [$$Key$$: string]: true; }> | undefined' is not assignable to 'string' index type 'true | Readonly<{ [$$Key$$: string]: true; }>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344: Type 'typeof VirtualizedList' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.\n  Type 'typeof VirtualizedList' is not assignable to type 'ComponentClass<any, any>'.\n    Types of property 'getDerivedStateFromProps' are incompatible.\n      Type '(newProps: VirtualizedListProps, prevState: State) => State' is not assignable to type 'GetDerivedStateFromProps<any, any>'.\n        Types of parameters 'newProps' and 'nextProps' are incompatible.\n          Type 'Readonly<any>' is not assignable to type 'VirtualizedListProps'.\n            Type 'Readonly<any>' is missing the following properties from type 'Omit<RequiredVirtualizedListProps, keyof OptionalVirtualizedListProps>': getItem, getItemCount\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416: Property 'textContent' in type 'ReactNativeDocument' is not assignable to the same property in base type 'ReadOnlyNode'.\n  Type 'null' is not assignable to type 'string'.\n"
+          },
+          {
+            "fixture": "rn-only",
+            "skipLibCheck": true,
+            "command": [
+              "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+              "--noEmit",
+              "-p",
+              "/private/tmp/one-map-host-strict-probe-y64ucm5v/rn-only-compatible.json"
+            ],
+            "exitCode": 0,
+            "output": ""
+          },
+          {
+            "fixture": "selected-host",
+            "skipLibCheck": false,
+            "command": [
+              "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+              "--noEmit",
+              "-p",
+              "/private/tmp/one-map-host-strict-probe-y64ucm5v/selected-host-all-strict.json"
+            ],
+            "exitCode": 1,
+            "output": "../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411: Property 'style' of type 'Readonly<{ [$$Key$$: string]: true; }> | undefined' is not assignable to 'string' index type 'true | Readonly<{ [$$Key$$: string]: true; }>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344: Type 'typeof VirtualizedList' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.\n  Type 'typeof VirtualizedList' is not assignable to type 'ComponentClass<any, any>'.\n    Types of property 'getDerivedStateFromProps' are incompatible.\n      Type '(newProps: VirtualizedListProps, prevState: State) => State' is not assignable to type 'GetDerivedStateFromProps<any, any>'.\n        Types of parameters 'newProps' and 'nextProps' are incompatible.\n          Type 'Readonly<any>' is not assignable to type 'VirtualizedListProps'.\n            Type 'Readonly<any>' is missing the following properties from type 'Omit<RequiredVirtualizedListProps, keyof OptionalVirtualizedListProps>': getItem, getItemCount\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416: Property 'textContent' in type 'ReactNativeDocument' is not assignable to the same property in base type 'ReadOnlyNode'.\n  Type 'null' is not assignable to type 'string'.\n"
+          },
+          {
+            "fixture": "selected-host",
+            "skipLibCheck": true,
+            "command": [
+              "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+              "--noEmit",
+              "-p",
+              "/private/tmp/one-map-host-strict-probe-y64ucm5v/selected-host-compatible.json"
+            ],
+            "exitCode": 0,
+            "output": ""
+          }
+        ],
+        "exactDiagnosticCodes": ["TS2344", "TS2411", "TS2416"],
+        "scope": "Installed frozen RN0.87.1 generated root defects reproduced independently with same codes in RN-only and public selected helper import. No SDK runtime or own-published-declaration audit acceptance.",
+        "retainedInitialFixtureLibraryFailure": {
+          "status": "fixture-lib-incompatible-with-native-host",
+          "reason": "Borrowed browser lib DOM from earlier fixture; added duplicate native/browser global diagnostics. Replaced browser DOM lib with a native JavaScript-only ESNext lib for the probe before exact upstream diagnostic comparison. The official RN config has its own explicit JavaScript library list.",
+          "results": [
+            {
+              "command": [
+                "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+                "--noEmit",
+                "-p",
+                "/private/tmp/one-map-host-strict-probe-zqo3qtbp/rn-only-all-strict.json"
+              ],
+              "exitCode": 1,
+              "output": "../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@types+react@19.3.0/node_modules/@types/react/global.d.ts(156,11): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(3352,11): error TS2300: Duplicate identifier 'AbortController'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(3367,13): error TS2300: Duplicate identifier 'AbortController'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(3381,11): error TS2300: Duplicate identifier 'AbortSignal'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(3408,13): error TS2300: Duplicate identifier 'AbortSignal'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(15036,11): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(15080,13): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37320,5): error TS2687: All declarations of 'hash' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37326,5): error TS2687: All declarations of 'host' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37332,5): error TS2687: All declarations of 'hostname' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37338,5): error TS2687: All declarations of 'href' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37351,5): error TS2687: All declarations of 'password' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37357,5): error TS2687: All declarations of 'pathname' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37363,5): error TS2687: All declarations of 'port' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37369,5): error TS2687: All declarations of 'protocol' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37387,5): error TS2687: All declarations of 'username' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(40929,5): error TS2300: Duplicate identifier 'addEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(40930,5): error TS2300: Duplicate identifier 'addEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(40931,5): error TS2300: Duplicate identifier 'removeEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(40932,5): error TS2300: Duplicate identifier 'removeEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44139,6): error TS2300: Duplicate identifier 'BlobPart'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44141,6): error TS2300: Duplicate identifier 'BufferSource'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44227,6): error TS2300: Duplicate identifier 'RequestInfo'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44297,6): error TS2300: Duplicate identifier 'EndingType'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44476,6): error TS2300: Duplicate identifier 'XMLHttpRequestResponseType'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44613,11): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(146,8): error TS2300: Duplicate identifier 'EndingType'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(147,8): error TS2300: Duplicate identifier 'BlobPart'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(148,8): error TS2300: Duplicate identifier 'BufferSource'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(166,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'Blob' must be of type '{ new (blobParts?: BlobPart[] | undefined, options?: BlobPropertyBag | undefined): Blob; prototype: Blob; }', but here has type '{ new (blobParts?: (string | Blob)[] | undefined, options?: BlobOptions | undefined): Blob; prototype: Blob; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(180,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'File' must be of type '{ new (fileBits: BlobPart[], fileName: string, options?: FilePropertyBag | undefined): File; prototype: File; }', but here has type '{ new (fileParts: BlobPart[], name: string, options?: FilePropertyBag | undefined): File; prototype: File; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(201,9): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(266,5): error TS2717: Subsequent property declarations must have the same type.  Property 'body' must be of type 'BodyInit | null | undefined', but here has type 'BodyInit_ | undefined'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(275,5): error TS2717: Subsequent property declarations must have the same type.  Property 'signal' must be of type 'AbortSignal | null | undefined', but here has type 'AbortSignal | undefined'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(285,14): error TS2717: Subsequent property declarations must have the same type.  Property 'signal' must be of type 'AbortSignal', but here has type 'AbortSignal'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(289,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'Request' must be of type '{ new (input: URL | RequestInfo, init?: RequestInit | undefined): Request; prototype: Request; }', but here has type '{ new (input: string | Request, init?: RequestInit | undefined): Request; prototype: Request; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(294,8): error TS2300: Duplicate identifier 'RequestInfo'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(313,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'Response' must be of type '{ new (body?: BodyInit | null | undefined, init?: ResponseInit | undefined): Response; prototype: Response; error(): Response; json(data: any, init?: ResponseInit | undefined): Response; redirect(url: string | URL, status?: number | undefined): Response; }', but here has type '{ new (body?: BodyInit_ | undefined, init?: ResponseInit | undefined): Response; prototype: Response; error(): Response; json(data: any, init?: ResponseInit | undefined): Response; redirect: (url: string | URL, status?: number | undefined) => Response; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(398,5): error TS2717: Subsequent property declarations must have the same type.  Property 'abort' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(399,5): error TS2717: Subsequent property declarations must have the same type.  Property 'error' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(400,5): error TS2717: Subsequent property declarations must have the same type.  Property 'load' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(401,5): error TS2717: Subsequent property declarations must have the same type.  Property 'loadend' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(402,5): error TS2717: Subsequent property declarations must have the same type.  Property 'loadstart' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(403,5): error TS2717: Subsequent property declarations must have the same type.  Property 'progress' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(404,5): error TS2717: Subsequent property declarations must have the same type.  Property 'timeout' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(455,8): error TS2300: Duplicate identifier 'XMLHttpRequestResponseType'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(464,14): error TS2687: All declarations of 'hash' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(465,14): error TS2687: All declarations of 'host' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(466,14): error TS2687: All declarations of 'hostname' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(467,14): error TS2687: All declarations of 'href' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(469,14): error TS2687: All declarations of 'password' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(470,14): error TS2687: All declarations of 'pathname' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(471,14): error TS2687: All declarations of 'port' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(472,14): error TS2687: All declarations of 'protocol' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(475,14): error TS2687: All declarations of 'username' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(481,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'URL' must be of type '{ new (url: string | URL, base?: string | URL | undefined): URL; prototype: URL; canParse(url: string | URL, base?: string | URL | undefined): boolean; createObjectURL(obj: Blob | MediaSource): string; parse(url: string | URL, base?: string | ... 1 more ... | undefined): URL | null; revokeObjectURL(url: string): voi...', but here has type '{ new (url: string | URL, base?: string | URL | undefined): URL; prototype: URL; createObjectURL(obj: Blob): string; revokeObjectURL(url: string): void; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(559,14): error TS2717: Subsequent property declarations must have the same type.  Property 'readyState' must be of type '0 | 1 | 2 | 3', but here has type 'number'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(563,5): error TS2717: Subsequent property declarations must have the same type.  Property 'onopen' must be of type '((this: WebSocket, ev: Event) => any) | null', but here has type '(() => void) | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(564,5): error TS2717: Subsequent property declarations must have the same type.  Property 'onmessage' must be of type '((this: WebSocket, ev: MessageEvent<any>) => any) | null', but here has type '((event: WebSocketMessageEvent) => void) | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(565,5): error TS2717: Subsequent property declarations must have the same type.  Property 'onerror' must be of type '((this: WebSocket, ev: Event) => any) | null', but here has type '((event: WebSocketErrorEvent) => void) | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(566,5): error TS2717: Subsequent property declarations must have the same type.  Property 'onclose' must be of type '((this: WebSocket, ev: CloseEvent) => any) | null', but here has type '((event: WebSocketCloseEvent) => void) | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(567,5): error TS2300: Duplicate identifier 'addEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(568,5): error TS2300: Duplicate identifier 'removeEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(571,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'WebSocket' must be of type '{ new (url: string | URL, protocols?: string | string[] | undefined): WebSocket; prototype: WebSocket; readonly CONNECTING: 0; readonly OPEN: 1; readonly CLOSING: 2; readonly CLOSED: 3; }', but here has type '{ new (uri: string, protocols?: string | string[] | null | undefined, options?: { [optionName: string]: any; headers: { [headerName: string]: string; }; } | null | undefined): WebSocket; ... 4 more ...; readonly OPEN: number; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(594,9): error TS2300: Duplicate identifier 'AbortSignal'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(663,9): error TS2300: Duplicate identifier 'AbortController'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(688,14): error TS2717: Subsequent property declarations must have the same type.  Property 'error' must be of type 'DOMException | null', but here has type 'Error | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(701,14): error TS2717: Subsequent property declarations must have the same type.  Property 'readyState' must be of type '0 | 1 | 2', but here has type 'number'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(702,14): error TS2717: Subsequent property declarations must have the same type.  Property 'result' must be of type 'string | ArrayBuffer | null', but here has type 'string | ArrayBuffer'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411: Property 'style' of type 'Readonly<{ [$$Key$$: string]: true; }> | undefined' is not assignable to 'string' index type 'true | Readonly<{ [$$Key$$: string]: true; }>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344: Type 'typeof VirtualizedList' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.\n  Type 'typeof VirtualizedList' is not assignable to type 'ComponentClass<any, any>'.\n    Types of property 'getDerivedStateFromProps' are incompatible.\n      Type '(newProps: VirtualizedListProps, prevState: State) => State' is not assignable to type 'GetDerivedStateFromProps<any, any>'.\n        Types of parameters 'newProps' and 'nextProps' are incompatible.\n          Type 'Readonly<any>' is not assignable to type 'VirtualizedListProps'.\n            Type 'Readonly<any>' is missing the following properties from type 'Omit<RequiredVirtualizedListProps, keyof OptionalVirtualizedListProps>': getItem, getItemCount\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416: Property 'textContent' in type 'ReactNativeDocument' is not assignable to the same property in base type 'ReadOnlyNode'.\n  Type 'null' is not assignable to type 'string'.\n"
+            },
+            {
+              "command": [
+                "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+                "--noEmit",
+                "-p",
+                "/private/tmp/one-map-host-strict-probe-zqo3qtbp/selected-host-all-strict.json"
+              ],
+              "exitCode": 1,
+              "output": "../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@types+react@19.3.0/node_modules/@types/react/global.d.ts(156,11): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(3352,11): error TS2300: Duplicate identifier 'AbortController'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(3367,13): error TS2300: Duplicate identifier 'AbortController'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(3381,11): error TS2300: Duplicate identifier 'AbortSignal'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(3408,13): error TS2300: Duplicate identifier 'AbortSignal'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(15036,11): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(15080,13): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37320,5): error TS2687: All declarations of 'hash' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37326,5): error TS2687: All declarations of 'host' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37332,5): error TS2687: All declarations of 'hostname' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37338,5): error TS2687: All declarations of 'href' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37351,5): error TS2687: All declarations of 'password' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37357,5): error TS2687: All declarations of 'pathname' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37363,5): error TS2687: All declarations of 'port' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37369,5): error TS2687: All declarations of 'protocol' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(37387,5): error TS2687: All declarations of 'username' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(40929,5): error TS2300: Duplicate identifier 'addEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(40930,5): error TS2300: Duplicate identifier 'addEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(40931,5): error TS2300: Duplicate identifier 'removeEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(40932,5): error TS2300: Duplicate identifier 'removeEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44139,6): error TS2300: Duplicate identifier 'BlobPart'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44141,6): error TS2300: Duplicate identifier 'BufferSource'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44227,6): error TS2300: Duplicate identifier 'RequestInfo'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44297,6): error TS2300: Duplicate identifier 'EndingType'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44476,6): error TS2300: Duplicate identifier 'XMLHttpRequestResponseType'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/@typescript+typescript-darwin-arm64@7.0.2/node_modules/@typescript/typescript-darwin-arm64/lib/lib.dom.d.ts(44613,11): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(146,8): error TS2300: Duplicate identifier 'EndingType'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(147,8): error TS2300: Duplicate identifier 'BlobPart'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(148,8): error TS2300: Duplicate identifier 'BufferSource'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(166,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'Blob' must be of type '{ new (blobParts?: BlobPart[] | undefined, options?: BlobPropertyBag | undefined): Blob; prototype: Blob; }', but here has type '{ new (blobParts?: (string | Blob)[] | undefined, options?: BlobOptions | undefined): Blob; prototype: Blob; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(180,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'File' must be of type '{ new (fileBits: BlobPart[], fileName: string, options?: FilePropertyBag | undefined): File; prototype: File; }', but here has type '{ new (fileParts: BlobPart[], name: string, options?: FilePropertyBag | undefined): File; prototype: File; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(201,9): error TS2300: Duplicate identifier 'FormData'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(266,5): error TS2717: Subsequent property declarations must have the same type.  Property 'body' must be of type 'BodyInit | null | undefined', but here has type 'BodyInit_ | undefined'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(275,5): error TS2717: Subsequent property declarations must have the same type.  Property 'signal' must be of type 'AbortSignal | null | undefined', but here has type 'AbortSignal | undefined'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(285,14): error TS2717: Subsequent property declarations must have the same type.  Property 'signal' must be of type 'AbortSignal', but here has type 'AbortSignal'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(289,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'Request' must be of type '{ new (input: URL | RequestInfo, init?: RequestInit | undefined): Request; prototype: Request; }', but here has type '{ new (input: string | Request, init?: RequestInit | undefined): Request; prototype: Request; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(294,8): error TS2300: Duplicate identifier 'RequestInfo'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(313,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'Response' must be of type '{ new (body?: BodyInit | null | undefined, init?: ResponseInit | undefined): Response; prototype: Response; error(): Response; json(data: any, init?: ResponseInit | undefined): Response; redirect(url: string | URL, status?: number | undefined): Response; }', but here has type '{ new (body?: BodyInit_ | undefined, init?: ResponseInit | undefined): Response; prototype: Response; error(): Response; json(data: any, init?: ResponseInit | undefined): Response; redirect: (url: string | URL, status?: number | undefined) => Response; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(398,5): error TS2717: Subsequent property declarations must have the same type.  Property 'abort' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(399,5): error TS2717: Subsequent property declarations must have the same type.  Property 'error' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(400,5): error TS2717: Subsequent property declarations must have the same type.  Property 'load' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(401,5): error TS2717: Subsequent property declarations must have the same type.  Property 'loadend' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(402,5): error TS2717: Subsequent property declarations must have the same type.  Property 'loadstart' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(403,5): error TS2717: Subsequent property declarations must have the same type.  Property 'progress' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(404,5): error TS2717: Subsequent property declarations must have the same type.  Property 'timeout' must be of type 'ProgressEvent<XMLHttpRequestEventTarget>', but here has type 'ProgressEvent<EventTarget>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(455,8): error TS2300: Duplicate identifier 'XMLHttpRequestResponseType'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(464,14): error TS2687: All declarations of 'hash' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(465,14): error TS2687: All declarations of 'host' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(466,14): error TS2687: All declarations of 'hostname' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(467,14): error TS2687: All declarations of 'href' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(469,14): error TS2687: All declarations of 'password' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(470,14): error TS2687: All declarations of 'pathname' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(471,14): error TS2687: All declarations of 'port' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(472,14): error TS2687: All declarations of 'protocol' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(475,14): error TS2687: All declarations of 'username' must have identical modifiers.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(481,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'URL' must be of type '{ new (url: string | URL, base?: string | URL | undefined): URL; prototype: URL; canParse(url: string | URL, base?: string | URL | undefined): boolean; createObjectURL(obj: Blob | MediaSource): string; parse(url: string | URL, base?: string | ... 1 more ... | undefined): URL | null; revokeObjectURL(url: string): voi...', but here has type '{ new (url: string | URL, base?: string | URL | undefined): URL; prototype: URL; createObjectURL(obj: Blob): string; revokeObjectURL(url: string): void; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(559,14): error TS2717: Subsequent property declarations must have the same type.  Property 'readyState' must be of type '0 | 1 | 2 | 3', but here has type 'number'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(563,5): error TS2717: Subsequent property declarations must have the same type.  Property 'onopen' must be of type '((this: WebSocket, ev: Event) => any) | null', but here has type '(() => void) | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(564,5): error TS2717: Subsequent property declarations must have the same type.  Property 'onmessage' must be of type '((this: WebSocket, ev: MessageEvent<any>) => any) | null', but here has type '((event: WebSocketMessageEvent) => void) | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(565,5): error TS2717: Subsequent property declarations must have the same type.  Property 'onerror' must be of type '((this: WebSocket, ev: Event) => any) | null', but here has type '((event: WebSocketErrorEvent) => void) | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(566,5): error TS2717: Subsequent property declarations must have the same type.  Property 'onclose' must be of type '((this: WebSocket, ev: CloseEvent) => any) | null', but here has type '((event: WebSocketCloseEvent) => void) | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(567,5): error TS2300: Duplicate identifier 'addEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(568,5): error TS2300: Duplicate identifier 'removeEventListener'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(571,7): error TS2403: Subsequent variable declarations must have the same type.  Variable 'WebSocket' must be of type '{ new (url: string | URL, protocols?: string | string[] | undefined): WebSocket; prototype: WebSocket; readonly CONNECTING: 0; readonly OPEN: 1; readonly CLOSING: 2; readonly CLOSED: 3; }', but here has type '{ new (uri: string, protocols?: string | string[] | null | undefined, options?: { [optionName: string]: any; headers: { [headerName: string]: string; }; } | null | undefined): WebSocket; ... 4 more ...; readonly OPEN: number; }'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(594,9): error TS2300: Duplicate identifier 'AbortSignal'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(663,9): error TS2300: Duplicate identifier 'AbortController'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(688,14): error TS2717: Subsequent property declarations must have the same type.  Property 'error' must be of type 'DOMException | null', but here has type 'Error | null'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(701,14): error TS2717: Subsequent property declarations must have the same type.  Property 'readyState' must be of type '0 | 1 | 2', but here has type 'number'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/src/types/globals.d.ts(702,14): error TS2717: Subsequent property declarations must have the same type.  Property 'result' must be of type 'string | ArrayBuffer | null', but here has type 'string | ArrayBuffer'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411: Property 'style' of type 'Readonly<{ [$$Key$$: string]: true; }> | undefined' is not assignable to 'string' index type 'true | Readonly<{ [$$Key$$: string]: true; }>'.\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344: Type 'typeof VirtualizedList' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.\n  Type 'typeof VirtualizedList' is not assignable to type 'ComponentClass<any, any>'.\n    Types of property 'getDerivedStateFromProps' are incompatible.\n      Type '(newProps: VirtualizedListProps, prevState: State) => State' is not assignable to type 'GetDerivedStateFromProps<any, any>'.\n        Types of parameters 'newProps' and 'nextProps' are incompatible.\n          Type 'Readonly<any>' is not assignable to type 'VirtualizedListProps'.\n            Type 'Readonly<any>' is missing the following properties from type 'Omit<RequiredVirtualizedListProps, keyof OptionalVirtualizedListProps>': getItem, getItemCount\n../../../Users/rob/code/mapbox-code/one-map/node_modules/.bun/react-native@0.87.1+b22b691e1493047a/node_modules/react-native/types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416: Property 'textContent' in type 'ReactNativeDocument' is not assignable to the same property in base type 'ReadOnlyNode'.\n  Type 'null' is not assignable to type 'string'.\n"
+            }
+          ]
+        }
+      },
+      "pureHelperObservation": {
+        "command": "bun /private/tmp/one-map-host-helper-observation.ts",
+        "exitCode": 0,
+        "scriptSha256": "57ef69675f641c43495dc84a56115228e322f2ce61102221ebbefb9bfbcbfb51",
+        "status": "passed",
+        "observations": [
+          "outer records copied and frozen",
+          "callbacks preserve identity",
+          "native nested accessibility state preserves identity and is not frozen",
+          "web owned marker and native style ownership rejected with InvalidMapOptionError"
+        ],
+        "scope": "Actual pure helper functions only; no SDK, DOM, native view or input behavior executed."
+      },
+      "changes": [
+        "Added exact source/declaration citations in all upstream identifier cells, including both browser map-id sources.",
+        "Clarified native token initialization omission and required web CSS loader/type setup.",
+        "Explicitly separated declaration and record/key validation from exhaustive runtime attribute-value validation; web unknown keys are not runtime-whitelisted.",
+        "Documented native strict/skipLibCheck/default generated-root policy with pinned official RN source and separate own-declaration auditing requirement.",
+        "Generated-host audit described as identifying candidates, not silently accepting new coverage or declaring SDK limitations.",
+        "Final followup records accepted generated-host assignments, passing current selected-peer package checks, retained TV/runtime gates and README discovery link."
+      ],
+      "readerFindings": [
+        {
+          "subject": "goal and system boundaries",
+          "finding": "Host accessibility/focus/identifier props control the receiving UI view; dimensions use Map.style, registration uses Map.id, and renderer initialization uses separate configuration."
+        },
+        {
+          "subject": "four equivalent examples",
+          "finding": "Same empty style, Seattle center/zoom, host ID,320x240 size, accessibility label and focus-log task. Native upstream owns explicit outer View; web owns div. Native keyboard/focus equivalence is explicitly unverified."
+        },
+        {
+          "subject": "selected host types and common surface",
+          "finding": "WebHostProps/NativeHostProps are exported only from selected entries; common hostProps remains a record. Inspection finds no helper/SDK class import added to common entry. This source inspection does not replace packed common/selection checks."
+        },
+        {
+          "subject": "native forwarding path",
+          "finding": "Mapbox applies host properties to one-map-react-owned outer View and composes onLayout for readiness; MapLibre forwards them through wrapper props to its native map child. Layout callbacks retain receiving-host scope and are not map rendering/readiness events."
+        },
+        {
+          "subject": "updates and nested ownership",
+          "finding": "Factory freeze is shallow, callback/nested references preserved, new outer records supply updates. Browser runtime evidence checks removal/focus replacement/identity; native component evidence is mocked and does not verify physical input."
+        },
+        {
+          "subject": "upstream declarations",
+          "finding": "With a native JavaScript-only lib, RN-only and selected helper imports produce exact TS2344/TS2411/TS2416; compatible strict application checks skip peer declaration checking. Earlier browser DOM lib conflicts and CSS setup failures remain retained. Own published declaration audit and full selection are separate primary checks."
+        }
+      ],
+      "fullGuideDimensions": {
+        "status": "passed-with-explicit-remaining-acceptance",
+        "dimensions": [
+          "audience and host/renderer/wrapper/adapter terms",
+          "direct connected prose and specific ownership consequences",
+          "single physical paragraphs/list prose and restrained headings",
+          "task-based operation description and four comparison columns",
+          "Existing API/Agreed design/Implemented scope/Open question labels",
+          "proposed column names implemented narrow helper scope without claiming full coverage",
+          "equivalent task/setup/data/host styling and native/DOM children",
+          "near-claim exact current sources with readable source blocks",
+          "errors/validation separate from unfinished implementation and SDK limitations",
+          "platform focus, native identifier and responder/pointer limits explicit",
+          "architecture/constructor/error/capability contracts consistent",
+          "no-ai-slop pass preserves identifiers and source-backed qualifications"
+        ]
+      },
+      "structuralChecks": {
+        "command": "bun run check:docs",
+        "exitCode": 0,
+        "output": "PASS documentation structure: 17 Markdown files, 22 SDK comparison tables, paragraphs, fences and local links.",
+        "decisionTables": 1,
+        "decisionRows": 2,
+        "allUpstreamCellsCited": true
+      },
+      "remainingGates": [
+        "Current packed selected-peer checks pass all six modes, including strict reachable own published declarations; S51 must repeat required checks against the final release artifact.",
+        "Primary accepted 294 additive assignments under S04.generated-host; applicable support cells remain requires-investigation/runtime-unverified. Ten historical TV declaration assessments remain pending.",
+        "Native accessibility, identifier lookup, focus hardware, responder/pointer/touch delivery and cleanup require actual target-platform observations.",
+        "Complete per-host attribute/runtime coverage, ordinary S04 map configuration and S50/S51 final documentation/conformance remain unfinished."
+      ]
+    }
+  ],
+  "currentFollowup": {
+    "reviewedOn": "2026-10-08",
+    "status": "Complete-guide scoped reader followup; complete S04/S50/S51 acceptance remains open.",
+    "historyNote": "Original 16-Markdown/11837-inventory review and example-run hashes remain historical proof. This additive snapshot records later primary assignments and package results without rewriting earlier acceptance.",
+    "currentCounts": {
+      "markdownFiles": 17,
+      "sdkComparisonTables": 22,
+      "inventoryEntries": 12131,
+      "summedMarkdownEntries": 12131,
+      "acceptedAdditiveGeneratedHostEntries": 294,
+      "retainedHistoricalTVAssessments": 10
+    },
+    "documents": [
+      {
+        "path": "docs/decisions/0005-host-properties.md",
+        "sha256": "68134cd950d63836074035751dc79c94b7f7bda67e6963e5199dbe84ef1ca657"
+      },
+      {
+        "path": "docs/README.md",
+        "sha256": "7f5f19422bc9babe43f71cf0a72daf4e8ad27d9d3097e3279ae84122c3697af2"
+      }
+    ],
+    "inventoryParity": {
+      "status": "passed",
+      "sources": [
+        {
+          "path": "records/api-coverage.json",
+          "sha256": "e69745a8de1cf06591c7a76d185510c107edadf63bd3dc020d0eaec9f0fedbee"
+        },
+        {
+          "path": "docs/api-coverage.md",
+          "sha256": "89cb5de387d6435803800976ac71e5a3d57a42f886d9970b36642e90c5b0082f"
+        },
+        {
+          "path": "records/evidence/native-generated-host-decisions.json",
+          "sha256": "efe2c86eeb1adddeb491e87fb6a18f78df3cf8eb944d2759b347d3757eb3e7e5"
+        }
+      ],
+      "scope": "Inventory assignment parity; applicable new support cells require investigation and native behavior remains unverified."
+    },
+    "selectedPackageEvidence": {
+      "source": {
+        "path": "records/evidence/selection.json",
+        "sha256": "dab84182bb55f551612d1bb6eda970f70141f23ace86e1d8935527111cf492cf"
+      },
+      "field": "typedHostFullFollowup",
+      "artifact": "/private/tmp/one-map-selection-vzGUA8/one-map-0.0.0.tgz",
+      "artifactSha256": "301bd19374883b47c626a62591ca68fbf17b8334e8746c4d48e938691645e6a4",
+      "report": "/private/tmp/one-map-selection-vzGUA8/results.json",
+      "results": [
+        {
+          "mode": "mapbox-web",
+          "status": "passed",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "maplibre-web",
+          "status": "passed",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "mapbox-native",
+          "status": "passed",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "maplibre-native",
+          "status": "passed",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-mapbox-web",
+          "status": "passed",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-maplibre-web",
+          "status": "passed",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        }
+      ],
+      "scope": "All six selected-peer configurations. Web strict declarations; native-containing configurations: strict artifact declarations and RN-standard strict app checks, plus exact independent RN-only library diagnostics retained. Browser/native/Metro-web graphs, alias/factory types and missing-selected-peer contracts verified.",
+      "verification": "Independent inspection of retained primary results; package suite was not rerun by this reader review."
+    },
+    "primaryHostEvidenceSnapshot": {
+      "path": "records/evidence/host-properties.json",
+      "sha256": "18d1f320cf90ad12f344e233e202f33c34c538b180889a7ac221a71660b4be0d"
+    },
+    "structuralChecks": {
+      "command": "bun run check:docs",
+      "exitCode": 0,
+      "output": "PASS documentation structure: 17 Markdown files, 22 SDK comparison tables, paragraphs, fences and local links.",
+      "scope": "Structural checks; full-guide semantic/source/example checks remain recorded in the decision reader review.",
+      "evidenceFormatting": {
+        "command": "bunx biome check records/evidence/documentation-current-review.json",
+        "exitCode": 0,
+        "output": "Checked 1 file. No fixes applied."
+      }
+    },
+    "remainingGates": [
+      "Current packed selected-peer checks pass all six modes, including strict reachable own published declarations; S51 must repeat required checks against the final release artifact.",
+      "Primary accepted 294 additive assignments under S04.generated-host; applicable support cells remain requires-investigation/runtime-unverified. Ten historical TV declaration assessments remain pending.",
+      "Native accessibility, identifier lookup, focus hardware, responder/pointer/touch delivery and cleanup require actual target-platform observations.",
+      "Complete per-host attribute/runtime coverage, ordinary S04 map configuration and S50/S51 final documentation/conformance remain unfinished."
+    ]
+  },
+  "s04ReaderPasses": [
+    {
+      "scope": "Complete style guide and no-ai-slop evaluation; current selected host/configuration/lifecycle paths and proposal-versus-implemented labels, equivalent examples, pinned citations, paragraphs/tables/local links; native actual acceptance remains pending",
+      "files": [
+        {
+          "path": "docs/decisions/0004-map-constructor-configuration.md",
+          "sha256": "0f2913a737c318bf0fa03594066a402d5afe89e534857034733f20c9ac52bbf2"
+        },
+        {
+          "path": "docs/decisions/0005-host-properties.md",
+          "sha256": "63547aae365aacf515db2087c96ee9f102637204c381180b798a5c20f009e23c"
+        },
+        {
+          "path": "docs/decisions/0006-s04-acceptance.md",
+          "sha256": "2dcfdfd90693cf0ce2b7ff1d8cadcd3a2856be1c38b35b48ba701d0ec3e9c810"
+        },
+        {
+          "path": "docs/maps-and-camera.md",
+          "sha256": "7d5e2f6b750bb8af5e250dbe5526686bb33d0472189a1dcfad0a1e1f2bd57d78"
+        },
+        {
+          "path": "docs/implementation-status.md",
+          "sha256": "f7999defcd6a7295419220abf3d4a712a20fe5b8e811986d2ca011697f992bb1"
+        },
+        {
+          "path": "docs/api-coverage.md",
+          "sha256": "92bb83b96a306dc4fa0213a6815b19bd27ea059678cff37115e89188987c40d1"
+        },
+        {
+          "path": "docs/testing.md",
+          "sha256": "156019d5b66bc8cc2f97018a1d7823789ddaaa7e46a996157ada61cbe53ad468"
+        }
+      ],
+      "editorialResult": "passed for reviewed current draft; final accepted status text needs closing read",
+      "coverageReader": "records/evidence/native-generated-host-inventory.json",
+      "structuralResult": "18 Markdown files/23 four-column SDK comparisons passed; structure does not certify source/runtime accuracy",
+      "retainedGap": "Native current-artifact runtime completion pending; specialized host effects are explicitly outside forwarding claims"
+    }
+  ]
+}

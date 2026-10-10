@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "revision": "workspace without Git metadata",
+  "baseline": "../version-baseline.json",
+  "checks": [
+    {
+      "stage": "S00",
+      "command": "node scripts/coverage.mjs --reconcile",
+      "status": "passed",
+      "count": 11837
+    },
+    {
+      "stage": "S01",
+      "command": "bun install --frozen-lockfile --offline",
+      "status": "passed"
+    },
+    {
+      "stage": "S01",
+      "command": "bun run check; bun run typecheck; bun run build; bun pm pack --dry-run",
+      "status": "passed"
+    },
+    {
+      "stage": "S02",
+      "command": "bun test tests/unit",
+      "status": "passed",
+      "tests": 9
+    },
+    {
+      "stage": "S02",
+      "command": "bun run test:package",
+      "status": "passed",
+      "evidence": "/private/tmp/one-map-common-consumer-Q38OpY",
+      "scope": "Packed common entry only; no backend or DOM dependency."
+    },
+    {
+      "stage": "S03",
+      "command": "bun run test:adapters",
+      "status": "passed",
+      "bunTests": 8,
+      "nativeJestTests": 7,
+      "scope": "React provider/context with native host mocks; no map SDK execution."
+    },
+    {
+      "stage": "S02",
+      "command": "bun run test:unit",
+      "status": "passed",
+      "tests": 17,
+      "scope": "Portable validation, errors, readiness notifications and registry ownership."
+    },
+    {
+      "stage": "S02",
+      "command": "bun run test:package",
+      "status": "passed",
+      "evidence": "/private/tmp/one-map-common-consumer-HUK7L6",
+      "scope": "Compatible React19.2.3 common packed entry without backend or DOM dependencies."
+    },
+    {
+      "stage": "S04",
+      "command": "bun run check; bun run typecheck",
+      "status": "passed",
+      "scope": "Includes actual lifecycle adapters, shared harnesses, and production browser runner."
+    },
+    {
+      "stage": "S04",
+      "command": "bun run test:unit",
+      "status": "passed",
+      "tests": 22,
+      "scope": "Portable contracts, registry, and Mapbox token ownership; no SDK execution."
+    },
+    {
+      "stage": "S04",
+      "command": "bun run test:adapters",
+      "status": "passed",
+      "bunTests": 8,
+      "nativeJestTests": 30,
+      "scope": "Mounted context and both native lifecycle adapters with native wrapper mocks; actual SDK behavior is separate."
+    },
+    {
+      "stage": "S04",
+      "command": "bun run test:package",
+      "status": "passed",
+      "evidence": "/private/tmp/one-map-common-consumer-OuFCW3",
+      "scope": "Packed common entry after explicit error names; strict declarations, no backend/DOM peers."
+    }
+  ],
+  "failures": [
+    {
+      "command": "bun run test:package",
+      "status": "failed",
+      "cause": "Bun global cache/temp sandbox EPERM",
+      "consumers": [
+        "/private/tmp/one-map-common-consumer-OF3s0g",
+        "/private/tmp/one-map-common-consumer-8T3dFw"
+      ]
+    },
+    {
+      "command": "bun run test:package",
+      "status": "failed",
+      "cause": "Package cache seed lookup and manifest resolution",
+      "consumers": [
+        "/private/tmp/one-map-common-consumer-ankU5L",
+        "/private/tmp/one-map-common-consumer-qV6Wg6",
+        "/private/tmp/one-map-common-consumer-bqOBtx"
+      ]
+    },
+    {
+      "stage": "S03",
+      "command": "node node_modules/jest/bin/jest.js --config jest.native.config.cjs --runInBand",
+      "status": "failed",
+      "cause": "Bun .bun nested ESM preset excluded from transform; fixed explicit transform pattern."
+    },
+    {
+      "stage": "S03",
+      "command": "native context component tests/typecheck",
+      "status": "failed",
+      "cause": "Jest globals and Babel runtime available transitively but not exposed at root; fixed explicit pinned development dependencies."
+    }
+  ],
+  "resolution": "Per-consumer writable cache and tempdir with exact selected package metadata. Failures preserved; package runner correction, not renderer flakiness.",
+  "runtime": {
+    "mapbox-web": "unverified",
+    "maplibre-web": "unverified",
+    "mapbox-ios": "unverified",
+    "mapbox-android": "unverified",
+    "maplibre-ios": "unverified",
+    "maplibre-android": "unverified"
+  },
+  "runtimeScope": "This foundation suite does not execute map renderers. Web and native lifecycle evidence are separate reports; full conformance remains unverified."
+}

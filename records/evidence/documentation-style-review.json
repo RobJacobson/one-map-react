@@ -1,0 +1,1027 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-10-08",
+  "status": "editorial-review-complete-with-explicit-factual-gaps",
+  "scope": {
+    "directory": "docs",
+    "reviewedMarkdownCount": 12,
+    "excluded": [
+      {
+        "path": "docs/api-coverage.md",
+        "reason": "Generated inventory view; parent owns generator and coverage."
+      },
+      {
+        "path": "docs/implementation-status.md",
+        "reason": "Generated stage ledger; parent owns stage acceptance."
+      },
+      {
+        "path": "docs/decisions/0003-adapter-selection.md",
+        "reason": "Concurrent parent ownership; reviewed references to this decision but did not edit its contents."
+      }
+    ],
+    "untouched": [
+      "source and adapter implementations",
+      "coverage and stage JSON",
+      "package/build/test code",
+      "upstream checkouts",
+      "tokens and ignored local configuration"
+    ]
+  },
+  "instructionsRead": [
+    {
+      "path": "docs/STYLE_GUIDE.md",
+      "scope": "Complete guide, all sections",
+      "sha256": "2503bc4c3dbb24e79c70814d99f4568d59d79eabe20f55e2bd5484c1e06f0aaf"
+    },
+    {
+      "path": "/Users/rob/.agents/skills/no-ai-slop/SKILL.md",
+      "scope": "Complete skill and final eval.md; technical identifiers/qualifications protected"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "5104236f29fb5fb13768dcc55352cb6d25b459d987d318ced2d692103b8aa56b",
+      "lineCount": 27,
+      "sdkComparisonTables": 0,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "4195e1a8195e1d1a2fa382398469a5a3a536f17b7a6a23bcaccc92f44af52549",
+      "lineCount": 18,
+      "sdkComparisonTables": 0,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/STYLE_GUIDE.md",
+      "sha256": "2503bc4c3dbb24e79c70814d99f4568d59d79eabe20f55e2bd5484c1e06f0aaf",
+      "lineCount": 127,
+      "sdkComparisonTables": 0,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "7f2dc07c193e5a5443a0c0992d253f5e82095f8557a42b80712e8d1fb53d5136",
+      "lineCount": 227,
+      "sdkComparisonTables": 0,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/capabilities-and-extensions.md",
+      "sha256": "1d6a4fb847502f14b397bf2e8595e81d566015626ed7f14876ed6a693c6dfef1",
+      "lineCount": 253,
+      "sdkComparisonTables": 4,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/decisions/0001-baselines-and-ownership.md",
+      "sha256": "e0518ecde1a8cb492640dc64a6e5e11054972ac093e191d3455804538a385e89",
+      "lineCount": 27,
+      "sdkComparisonTables": 0,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/decisions/0002-portable-contracts.md",
+      "sha256": "26ab8f0cd26d1987442fadc387a368790033e23004aae415efbba693ebe885a7",
+      "lineCount": 27,
+      "sdkComparisonTables": 0,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/implementation.md",
+      "sha256": "0a9bde6736d1b62b8b93f4282bcf9696ad85fc9dd68962fee39064e751a57316",
+      "lineCount": 184,
+      "sdkComparisonTables": 0,
+      "otherTables": 7,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/maps-and-camera.md",
+      "sha256": "9b723a790052ab3b98884ed5c80de0999866652d37bfe42a22c2490dbd8ecc5f",
+      "lineCount": 311,
+      "sdkComparisonTables": 4,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/markers-and-controls.md",
+      "sha256": "300a57e49ad3e50ad1221f309d044f46083192ad42bccb2bff0de4e005463a88",
+      "lineCount": 264,
+      "sdkComparisonTables": 4,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/sources-and-layers.md",
+      "sha256": "40c5ec903c96ed4c4af5b150d6408c08d59a78fc39f9005f33d924f0c2bdee58",
+      "lineCount": 356,
+      "sdkComparisonTables": 6,
+      "otherTables": 0,
+      "fencesBalanced": true
+    },
+    {
+      "path": "docs/testing.md",
+      "sha256": "338a4f352f03e375ed21b84fc6d8d98772e16d236f9dc2e3b1eefd78841a715b",
+      "lineCount": 167,
+      "sdkComparisonTables": 0,
+      "otherTables": 5,
+      "fencesBalanced": true
+    }
+  ],
+  "reviewDimensions": [
+    {
+      "dimension": "Audience and terminology",
+      "result": "reviewed",
+      "evidence": "Preserved renderer/wrapper/adapter/service distinctions, consistent backend/platform names and longitude/latitude conventions. Explained GeoJSON, TileJSON, raster DEM and image corners where needed."
+    },
+    {
+      "dimension": "Voice and explanations",
+      "result": "reviewed",
+      "evidence": "Removed filler and interpretive emphasis; preserved direct technical prose, limitations and the brief project-name origin."
+    },
+    {
+      "dimension": "Markdown paragraph formatting",
+      "result": "passed",
+      "evidence": "No adjacent physical prose lines, forced breaks or trailing whitespace; balanced fences. STYLE_GUIDE quoted <br> prohibition is an inline-code example, not a forced break."
+    },
+    {
+      "dimension": "Architecture and reference structure",
+      "result": "reviewed",
+      "evidence": "Preserved four-path diagram, reference task grouping, motivation, dependency ownership and unresolved choices. Added equivalent four-wrapper layer/update excerpts to cover nontrivial differences without changing contracts."
+    },
+    {
+      "dimension": "Comparison tables",
+      "result": "passed",
+      "evidence": {
+        "tables": 18,
+        "rows": 120,
+        "columns": [
+          "RNMapbox",
+          "MapLibre React Native",
+          "react-map-gl",
+          "Proposed one-map-react API"
+        ],
+        "upstreamCellsMissingCitations": 0,
+        "mappingReview": "Checked rename/conversion/adaptation/capability/ownership descriptions; accepted required Source.id and Layer.id now align with common declarations."
+      }
+    },
+    {
+      "dimension": "Facts and proposal status",
+      "result": "reviewed-with-factual-gaps",
+      "evidence": "Historical Existing API labels explicitly exclude current baseline/support claims. Agreed common declarations, implemented provider registry/capabilities/errors, pending resource behavior and proposed extension/marker signatures are distinguished. Removed stale claims that package/test foundations do not exist."
+    },
+    {
+      "dimension": "Code examples",
+      "result": "declaration-checks-passed-with-explicit-limits",
+      "evidence": "Matching data/coordinates/IDs/styles in four-way examples; controlled camera imports/state setup supplied. Seven implemented one-map-react declaration excerpts type-check; upstream historical and proposed extension/marker snippets are illustrative, not certified runnable examples."
+    },
+    {
+      "dimension": "Sources and links",
+      "result": "path-and-retrieval-checks-passed-with-semantic-limits",
+      "evidence": "Relative targets and heading anchors checked. Historical commits/tags retained; current baseline and inventory linked separately. Pinned-source paths checked using Git objects, exact installed release paths or raw public HTTP reads. No wholesale version substitution."
+    },
+    {
+      "dimension": "Portability and errors",
+      "result": "reviewed",
+      "evidence": "Retained strict unsupported policy, explicit cursor degradation, invalid/not-ready/backend failure distinctions, promise dispatch timing, controlled camera limits, source-state reset policy and separate installed/bundled/linked dependencies."
+    },
+    {
+      "dimension": "Writing references and no-ai-slop",
+      "result": "reviewed",
+      "evidence": "Complete skill/eval applied; status bold labels and tables follow the user guide. Technical test harness terminology and quoted instructional examples are preserved. Equivalent examples were added to satisfy the explicit documentation guide, with no new compatibility claims."
+    },
+    {
+      "dimension": "Review before delivery and cross-document consistency",
+      "result": "reviewed-with-factual-gaps",
+      "evidence": "Aligned accepted IDs, provider/useMap ownership, feature-state reset, exact initial peer pins, ESM facade/Node helper boundary, scoped lifecycle command and remaining complete conformance. Outstanding factual investigations below remain S50/owning-stage work."
+    }
+  ],
+  "structuralChecks": {
+    "status": "passed",
+    "issues": [],
+    "localTargetsAndHeadingAnchors": "passed",
+    "fences": "passed",
+    "paragraphAndListProse": "single physical lines"
+  },
+  "sourcePathChecks": [
+    {
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/camera/Camera.web.tsx",
+      "method": "application source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/line-layer/LineLayer.web.tsx",
+      "method": "application source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/RobJacobson/ferryjoy-app/blob/862d7102ac7ea75116d68e6bca4427733ba9db64/src/components/map/map-view/MapView.web.tsx",
+      "method": "application source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/anthropics/skills/blob/main/skills/doc-coauthoring/SKILL.md",
+      "method": "Official repository page retrieved through web tool",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately",
+      "initialCheckStatus": "unverified"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/MapLibreReactNative.podspec",
+      "method": "Public pinned raw-source HTTP 200 body read",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately",
+      "initialCheckStatus": "unverified",
+      "retrieval": {
+        "url": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/MapLibreReactNative.podspec",
+        "httpStatus": 200,
+        "bytes": 3350,
+        "status": "passed",
+        "method": "HTTP response body read"
+      }
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/android/gradle.properties",
+      "method": "Public pinned raw-source HTTP 200 body read",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately",
+      "initialCheckStatus": "unverified",
+      "retrieval": {
+        "url": "https://raw.githubusercontent.com/maplibre/maplibre-react-native/059f46b2dc728fb6259af91b27a071bcda19a2ae/package/android/gradle.properties",
+        "httpStatus": 200,
+        "bytes": 670,
+        "status": "passed",
+        "method": "HTTP response body read"
+      }
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/annotations/LayerAnnotation.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/annotations/callout/Callout.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/annotations/marker/Marker.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/annotations/view-annotation/ViewAnnotation.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/camera/Camera.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/images/Images.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/layer/Layer.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/map/Map.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/sources/geojson-source/GeoJSONSource.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/sources/image-source/ImageSource.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/sources/raster-dem-source/RasterDEMSource.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/sources/raster-source/RasterSource.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/components/sources/vector-source/VectorSource.tsx",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/index.ts",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/modules/location/LocationManager.ts",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/modules/offline/OfflineManager.ts",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/modules/static-map/StaticMapManager.ts",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/blob/v11.5.0/package/src/types/PixelPointBounds.ts",
+      "method": "exact installed release path",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/react-native-community/cli/blob/main/docs/autolinking.md",
+      "method": "Official repository page retrieved through web tool",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately",
+      "initialCheckStatus": "unverified"
+    },
+    {
+      "url": "https://github.com/react-native-community/template/blob/0.87.1/template/package.json",
+      "method": "Official repository page retrieved through web tool",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately",
+      "initialCheckStatus": "unverified"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/package.json",
+      "method": "Public pinned raw-source HTTP 200 body read",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately",
+      "initialCheckStatus": "failed",
+      "retrieval": {
+        "url": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/package.json",
+        "httpStatus": 200,
+        "bytes": 11372,
+        "status": "passed",
+        "method": "HTTP response body read"
+      }
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/plugin/src/withMapbox.ts",
+      "method": "Public pinned raw-source HTTP 200 body read",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately",
+      "initialCheckStatus": "failed",
+      "retrieval": {
+        "url": "https://raw.githubusercontent.com/rnmapbox/maps/0f50e8164c1aefe45de9ed9cde310f310076a310/plugin/src/withMapbox.ts",
+        "httpStatus": 200,
+        "bytes": 13503,
+        "status": "passed",
+        "method": "HTTP response body read"
+      }
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/rnmapbox-maps.podspec",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/Mapbox.native.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/Annotation.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/Callout.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/Camera.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/ImageSource.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/Images.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/LineLayer.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/MapView.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/MarkerView.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/PointAnnotation.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/RasterArraySource.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/RasterDemSource.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/RasterSource.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/ShapeSource.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/Style.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/components/VectorSource.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/modules/location/locationManager.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/modules/offline/OfflineCreatePackOptions.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/modules/offline/offlineManager.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/modules/snapshot/SnapshotOptions.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/rnmapbox/maps/blob/6c91a70c4631613349ba53a35ef906a47c566478/src/modules/snapshot/snapshotManager.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-mapbox/src/components/source.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-mapbox/src/mapbox/mapbox.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/components/geolocate-control.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/components/layer.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/components/map.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/components/marker.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/components/popup.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/components/source.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/components/use-control.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/components/use-map.tsx",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/index.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/maplibre/create-ref.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/maplibre/maplibre.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/types/common.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    },
+    {
+      "url": "https://github.com/visgl/react-map-gl/blob/1afe1a98580680c870eeb1139c40a94835333705/modules/react-maplibre/src/types/events.ts",
+      "method": "historical source Git object",
+      "status": "passed",
+      "lineAnchorValidated": false,
+      "claimValidation": "path identity/retrieval only; semantic comparison status is recorded separately"
+    }
+  ],
+  "readableExternalDocumentationChecks": [
+    {
+      "url": "https://bun.com/docs/test",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://developers.google.com/style",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://diataxis.fr/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://docs.maestro.dev/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://docs.mapbox.com/android/maps/guides/camera-and-animation/camera/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://docs.mapbox.com/ios/maps/guides/camera-and-animation/camera/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://docs.mapbox.com/mapbox-gl-js/guides/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://docs.mapbox.com/style-spec/guides/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#peerdependenciesmeta",
+      "status": "passed",
+      "method": "Public HTTP 200 body read after web tool returned 503",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://maplibre.org/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://maplibre.org/maplibre-react-native/docs/components/annotations/view-annotation/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://maplibre.org/maplibre-react-native/docs/setup/getting-started/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://maplibre.org/maplibre-style-spec/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://metrobundler.dev/docs/package-exports/",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://playwright.dev/docs/intro",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://playwright.dev/docs/test-assertions",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    },
+    {
+      "url": "https://reactnative.dev/docs/testing-overview",
+      "status": "passed",
+      "method": "Official/readable documentation page retrieved through web tool",
+      "scope": "Reachability and relevant guidance checked; live guidance is not pinned implementation evidence."
+    }
+  ],
+  "otherRepositoryLinks": [
+    {
+      "url": "https://github.com/maplibre/maplibre-react-native/releases/tag/v11.5.0",
+      "status": "passed",
+      "method": "Repository/release page retrieved through web tool"
+    },
+    {
+      "url": "https://github.com/mobile-dev-inc/Maestro/releases/tag/cli-2.11.0",
+      "status": "passed",
+      "method": "Repository/release page retrieved through web tool"
+    },
+    {
+      "url": "https://github.com/petergyang/no-ai-slop",
+      "status": "passed",
+      "method": "Repository/release page retrieved through web tool"
+    }
+  ],
+  "exampleChecks": {
+    "status": "passed",
+    "command": [
+      "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+      "--noEmit",
+      "-p",
+      "/private/tmp/one-map-doc-examples-8bul5wn3/tsconfig.json"
+    ],
+    "consumerDirectory": "/private/tmp/one-map-doc-examples-8bul5wn3",
+    "scope": "Current implemented one-map-react TSX declaration excerpts only. Synthetic component wrappers supply explicitly omitted setup. This is declaration usage checking, not runnable-application, packed-consumer, upstream-example, or runtime evidence.",
+    "examples": [
+      {
+        "document": "docs/architecture.md",
+        "fenceIndex": 4,
+        "file": "architecture-4.tsx",
+        "omittedSetupProvided": ["function component wrapper"]
+      },
+      {
+        "document": "docs/architecture.md",
+        "fenceIndex": 5,
+        "file": "architecture-5.tsx",
+        "omittedSetupProvided": []
+      },
+      {
+        "document": "docs/maps-and-camera.md",
+        "fenceIndex": 4,
+        "file": "maps-and-camera-4.tsx",
+        "omittedSetupProvided": ["function component wrapper"]
+      },
+      {
+        "document": "docs/maps-and-camera.md",
+        "fenceIndex": 8,
+        "file": "maps-and-camera-8.tsx",
+        "omittedSetupProvided": ["function component wrapper"]
+      },
+      {
+        "document": "docs/sources-and-layers.md",
+        "fenceIndex": 5,
+        "file": "sources-and-layers-5.tsx",
+        "omittedSetupProvided": [
+          "function component wrapper",
+          "shared GeoJSON fixture"
+        ]
+      },
+      {
+        "document": "docs/sources-and-layers.md",
+        "fenceIndex": 9,
+        "file": "sources-and-layers-9.tsx",
+        "omittedSetupProvided": [
+          "function component wrapper",
+          "boolean React state"
+        ]
+      },
+      {
+        "document": "docs/capabilities-and-extensions.md",
+        "fenceIndex": 2,
+        "file": "capabilities-and-extensions-2.tsx",
+        "omittedSetupProvided": ["function component wrapper"]
+      }
+    ],
+    "exitCode": 0,
+    "output": "",
+    "checkedDeclarationFiles": [
+      {
+        "path": "packages/one-map-react/dist/index.d.ts",
+        "sha256": "0685d35825294cc02075111932286fcd443a711d0a6fc8634dc2eb356a57da61"
+      },
+      {
+        "path": "packages/one-map-react/dist/core/types.d.ts",
+        "sha256": "5430b4f08a3bc0d40e8bff39af46bce3d9662045d765123efa607865823717fa"
+      },
+      {
+        "path": "packages/one-map-react/dist/core/capabilities.d.ts",
+        "sha256": "6fff168d104b4c411a1e0fa94851d3a932315325b138708776fb6daa0adbe515"
+      },
+      {
+        "path": "packages/one-map-react/dist/maplibre-web.d.ts",
+        "sha256": "d742eb1ff645eeb2d91b75d645f9ddc26f93e3338b844d8eb9a0cc1e0868dc3b"
+      }
+    ],
+    "retainedInitialFailure": {
+      "status": "failed",
+      "command": [
+        "/Users/rob/code/mapbox-code/one-map/node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "/private/tmp/one-map-doc-examples-54g0dn96/tsconfig.json"
+      ],
+      "consumerDirectory": "/private/tmp/one-map-doc-examples-54g0dn96",
+      "scope": "Current implemented one-map-react TSX declaration excerpts only. Synthetic component wrappers supply explicitly omitted setup. This is declaration usage checking, not runnable-application, packed-consumer, upstream-example, or runtime evidence.",
+      "examples": [
+        {
+          "document": "docs/architecture.md",
+          "fenceIndex": 4,
+          "file": "architecture-4.tsx",
+          "omittedSetupProvided": ["function component wrapper"]
+        },
+        {
+          "document": "docs/architecture.md",
+          "fenceIndex": 5,
+          "file": "architecture-5.tsx",
+          "omittedSetupProvided": ["function component wrapper"]
+        },
+        {
+          "document": "docs/maps-and-camera.md",
+          "fenceIndex": 4,
+          "file": "maps-and-camera-4.tsx",
+          "omittedSetupProvided": ["function component wrapper"]
+        },
+        {
+          "document": "docs/maps-and-camera.md",
+          "fenceIndex": 8,
+          "file": "maps-and-camera-8.tsx",
+          "omittedSetupProvided": ["function component wrapper"]
+        },
+        {
+          "document": "docs/sources-and-layers.md",
+          "fenceIndex": 5,
+          "file": "sources-and-layers-5.tsx",
+          "omittedSetupProvided": [
+            "function component wrapper",
+            "shared GeoJSON fixture"
+          ]
+        },
+        {
+          "document": "docs/sources-and-layers.md",
+          "fenceIndex": 9,
+          "file": "sources-and-layers-9.tsx",
+          "omittedSetupProvided": [
+            "function component wrapper",
+            "boolean React state"
+          ]
+        },
+        {
+          "document": "docs/capabilities-and-extensions.md",
+          "fenceIndex": 2,
+          "file": "capabilities-and-extensions-2.tsx",
+          "omittedSetupProvided": ["function component wrapper"]
+        }
+      ],
+      "exitCode": 1,
+      "output": "architecture-5.tsx(5,1): error TS1184: Modifiers cannot appear here.\n"
+    },
+    "failureResolution": "The review harness incorrectly nested an already exported complete component in another function. The harness now preserves that complete component. No documentation/API correction was required."
+  },
+  "preservedLimitations": [
+    "GitHub pinned source links were validated by file identity/retrieval; this does not validate every historical table assertion against current stable releases.",
+    "The historical local RNMapbox checkout lacks the 10.3.7 Git object; pinned raw sources were retrieved successfully instead. Initial local-object failures and web cache misses were retrieval limitations, not broken-link conclusions.",
+    "No source-line anchors appear in the reviewed source links; links identify exact files rather than validating line-number claims.",
+    "Examples use workspace-built current declaration paths for practical usage checking; this review did not assemble all snippets into applications or independently repeat packed-consumer/runtime suites.",
+    "Parent-owned generated coverage/status and selection decision were excluded from mutation. Their current evidence was used only to qualify documentation status.",
+    "This review completes bounded editorial work and does not mark S50 or final implementation conformance complete."
+  ],
+  "remainingFactualInvestigations": [
+    {
+      "id": "historical-map-camera-comparisons",
+      "stage": "S50",
+      "documents": ["docs/maps-and-camera.md", "docs/architecture.md"],
+      "status": "unverified-current-baseline-comparison",
+      "investigation": "Revalidate the historical RNMapbox 10.3.3 / react-map-gl 8.1.0-alpha.2 comparisons against pinned RNMapbox 10.3.7 / react-map-gl 8.1.3: container/host fields, camera limits and gestures, camera/event payloads, command timing, projection/bounds, readiness and controlled-camera interception. Replace individual source citations only after checking the corresponding current implementation.",
+      "requiredEvidence": "Current pinned wrapper source/declarations and checked equivalent upstream examples; owning camera/event stages provide independent six-environment runtime evidence."
+    },
+    {
+      "id": "historical-source-layer-comparisons",
+      "stage": "S50",
+      "documents": ["docs/sources-and-layers.md"],
+      "status": "unverified-current-baseline-comparison",
+      "investigation": "Revalidate source kinds/options, layer field and ordering support, immutable option updates, source ownership, property removal/reset, query result and coordinate shapes, cluster signatures, image conversion and feature-state behavior against current stable wrappers/renderers. Field inventory or matching names alone does not establish behavior.",
+      "requiredEvidence": "Pinned current source links per material comparison; source/layer/query/feature-state owning-stage renderer scenarios, including reset and frame observations."
+    },
+    {
+      "id": "historical-marker-control-comparisons",
+      "stage": "S50",
+      "documents": ["docs/markers-and-controls.md"],
+      "status": "unverified-current-baseline-comparison",
+      "investigation": "Revalidate live-view/bitmap annotation child behavior, dragging, offsets/anchors, popup attachment/dismissal, ornaments, controls and registry APIs. MapLibre 11.5.0 historical pin already matches the implementation wrapper, but its platform/runtime comparisons still need the owning-stage evidence.",
+      "requiredEvidence": "Current source and checked equivalent examples; real native child touches, dragging and popup teardown scenarios rather than callback invocation."
+    },
+    {
+      "id": "historical-extension-comparisons",
+      "stage": "S50",
+      "documents": ["docs/capabilities-and-extensions.md"],
+      "status": "unverified-current-baseline-comparison",
+      "investigation": "Revalidate offline pack identity/options/download progress, capture/static image options and contents, location permission/tracking/display, custom layers, and renderer-specific facilities against pinned current versions. Extension signatures remain proposals; wrapper omissions do not prove SDK limitations.",
+      "requiredEvidence": "Current pinned source and extension declarations; each extension owning stage supplies success, operational failure, unsupported outcomes and cleanup evidence."
+    },
+    {
+      "id": "complete-conformance-and-upgrade-claims",
+      "stage": "S50",
+      "documents": [
+        "docs/testing.md",
+        "docs/README.md",
+        "docs/architecture.md",
+        "docs/decisions/0001-baselines-and-ownership.md"
+      ],
+      "status": "unverified-required-stage-work",
+      "investigation": "Maintain the separation between scoped production browser lifecycle, direct-SDK Metro transport, selected-peer/native autolinking checks, the scoped MapLibre Android lifecycle and the still incomplete six-environment conformance matrix. Verify installed native build identities/resolved SDK locks, remaining platform/runtime gates and future supported-version expansion before compatibility certification.",
+      "requiredEvidence": "Stage ledger and per-scenario build/renderer evidence; S51 release conformance remains a separate gate."
+    }
+  ]
+}

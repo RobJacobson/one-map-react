@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-08T11:17:42.320425+00:00",
+  "stage": "S04",
+  "status": "implemented-with-scoped-runtime-verification",
+  "contract": "docs/decisions/0004-map-constructor-configuration.md",
+  "runtime": "records/evidence/web-lifecycle.json",
+  "runtimeArtifact": "/private/tmp/one-map-web-lifecycle-u41AD6/one-map-0.0.0.tgz",
+  "runtimeScope": "Two selected-peer production browser renderers: disabled canvas interaction, Mapbox actual WebGL antialias/preserveDrawingBuffer attributes, host resize despite trackResize=false, constructor change InvalidMapOptionError with teardown. Other individual constructor effects remain unverified.",
+  "staticChecks": {
+    "typecheck": "passed",
+    "build": "passed",
+    "unitTests": {
+      "status": "passed",
+      "count": 26
+    },
+    "adapterSSRTests": {
+      "status": "passed",
+      "count": 8
+    },
+    "nativeComponentTests": {
+      "status": "passed",
+      "count": 33
+    },
+    "commonPackedConsumer": {
+      "status": "passed",
+      "path": "/private/tmp/one-map-common-consumer-GeA3Fl",
+      "scope": "Common import and strict ES2022 declarations with only React, no SDK/native/DOM peers"
+    },
+    "constructorOptionDeclarations": "Explicit owned field types satisfy selected SDK MapOptions Pick at compile time.",
+    "selectedWebPackedConsumers": {
+      "artifact": "/private/tmp/one-map-selection-B4eN5d/one-map-0.0.0.tgz",
+      "results": [
+        {
+          "mode": "mapbox-web",
+          "status": "passed",
+          "cachedPackages": 37,
+          "consumer": "/private/tmp/one-map-selection-B4eN5d/mapbox-web",
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "maplibre-web",
+          "status": "passed",
+          "cachedPackages": 59,
+          "consumer": "/private/tmp/one-map-selection-B4eN5d/maplibre-web",
+          "nativeRuntime": "not applicable"
+        }
+      ],
+      "schemaVersion": 1,
+      "artifactSha256": "9e98435ff3787f836a6d94d60e75e0163bcb8b8c7656f6ef82ef4028f5986acf",
+      "report": "/private/tmp/one-map-selection-B4eN5d/results.json",
+      "scope": "Selected-only web declaration, constructor factory/opaque Map.configuration, explicit and browser-first alias imports, browser graphs, and missing-selected-peer failures. Native and mixed-engine modes were not rerun for this artifact."
+    },
+    "selectedNativeMixedPackedConsumers": {
+      "artifact": "/private/tmp/one-map-selection-vzGUA8/one-map-0.0.0.tgz",
+      "results": [
+        {
+          "mode": "mapbox-web",
+          "status": "passed",
+          "cachedPackages": 37,
+          "consumer": "/private/tmp/one-map-selection-vzGUA8/mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "maplibre-web",
+          "status": "passed",
+          "cachedPackages": 59,
+          "consumer": "/private/tmp/one-map-selection-vzGUA8/maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed",
+            "skipLibCheck": false
+          },
+          "nativeRuntime": "not applicable"
+        },
+        {
+          "mode": "mapbox-native",
+          "status": "passed",
+          "cachedPackages": 307,
+          "consumer": "/private/tmp/one-map-selection-vzGUA8/mapbox-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "maplibre-native",
+          "status": "passed",
+          "cachedPackages": 301,
+          "consumer": "/private/tmp/one-map-selection-vzGUA8/maplibre-native",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-mapbox-web",
+          "status": "passed",
+          "cachedPackages": 330,
+          "consumer": "/private/tmp/one-map-selection-vzGUA8/mixed-mapbox-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        },
+        {
+          "mode": "mixed-maplibre-web",
+          "status": "passed",
+          "cachedPackages": 359,
+          "consumer": "/private/tmp/one-map-selection-vzGUA8/mixed-maplibre-web",
+          "declarationChecks": {
+            "application": "passed",
+            "publishedDeclarations": "passed: reachable artifact declarations checked as strict .ts inputs",
+            "skipLibCheck": true,
+            "upstreamStrictDeclarations": "failed: exact three RN-only diagnostics reproduced independently and retained",
+            "diagnostics": [
+              "types_generated/Libraries/Animated/nodes/AnimatedProps.d.ts(19,3): error TS2411:",
+              "types_generated/Libraries/Lists/VirtualizedList.d.ts(17,58): error TS2344:",
+              "types_generated/src/private/webapis/dom/nodes/ReactNativeDocument.d.ts(29,7): error TS2416:"
+            ],
+            "officialHostConfiguration": "https://github.com/facebook/react-native/blob/v0.87.1/packages/typescript-config/tsconfig.json#L29-L38",
+            "legacyDeclarationCondition": "Not enabled; current generated public API remains selected."
+          },
+          "nativeRuntime": "unverified: requires React Native host/native SDK build"
+        }
+      ],
+      "artifactSha256": "301bd19374883b47c626a62591ca68fbf17b8334e8746c4d48e938691645e6a4",
+      "report": "/private/tmp/one-map-selection-vzGUA8/results.json"
+    }
+  },
+  "documentExamples": {
+    "status": "passed",
+    "count": 4,
+    "scope": "TSX declaration checking only; complete app runtime not claimed.",
+    "fixtures": "artifacts/constructor-doc-examples",
+    "command": "bunx tsc -p artifacts/constructor-doc-examples/tsconfig.json",
+    "retainedFailures": [
+      {
+        "status": "failed",
+        "error": "TS5112: TypeScript 7 requires --ignoreConfig when passing explicit files beside tsconfig.json.",
+        "resolution": "Use a scoped example project."
+      },
+      {
+        "status": "failed",
+        "error": "Side-effect CSS declarations and one-map-react workspace path resolution missing in temporary fixtures.",
+        "resolution": "Provide CSS asset ambient declarations and paths to built one-map-react declarations."
+      }
+    ]
+  },
+  "documentationReview": {
+    "wholeGuideRead": "docs/STYLE_GUIDE.md",
+    "sourceStatusLabels": "Agreed design, Existing API, Open question retained; implemented claims scoped.",
+    "comparisonTableColumns": [
+      "RNMapbox",
+      "MapLibre React Native",
+      "react-map-gl",
+      "Proposed one-map-react API"
+    ],
+    "equivalentExamples": "Same empty style, longitude/latitude, zoom, 320x240 logical host; native/web interaction threshold difference explicit.",
+    "linkedWritingReferencesRead": [
+      "https://developers.google.com/style",
+      "https://diataxis.fr/",
+      "https://raw.githubusercontent.com/anthropics/skills/main/skills/doc-coauthoring/SKILL.md"
+    ],
+    "referenceApplication": "Follow project style first, separate architecture explanation from task reference, refine and test reader understanding without repeating known intake questions.",
+    "editorialPass": "Direct subjects, consistent SDK/wrapper/backend terminology, no strengthened technical claims.",
+    "structuralCheck": {
+      "status": "passed",
+      "command": "bun run check:docs",
+      "markdownFiles": 16,
+      "sdkComparisonTables": 21,
+      "scope": "Physical paragraph lines, forced breaks, comparison column headings, balanced fences and local link/heading targets only."
+    },
+    "retainedCheckerFailure": {
+      "status": "failed",
+      "error": "Checker treated a backtick-quoted <br> example in STYLE_GUIDE.md as a rendered forced break.",
+      "resolution": "Ignore inline code when checking rendered prose break markers; full-doc rerun passed."
+    },
+    "independentReaderReview": {
+      "status": "passed-after-revision",
+      "reviewer": "review_extensions_plan",
+      "scope": "Read-only contract/source/full-guide reader review of decision0004. Reviewer also checked implementation; this is not a blind-context test.",
+      "initialFindings": [
+        "Add primary citations for the3-pixel click tolerance defaults.",
+        "Distinguish constructor rejection from initialViewState snapshots, host updates and pending mapStyle replacement.",
+        "State selected factory runtime imports and pending native factory availability.",
+        "Link native style and web wrapper sources directly in comparison cells."
+      ],
+      "resolution": "All findings addressed; exact SDK source lines verified, reader rerun found no remaining issue."
+    }
+  },
+  "requiredRemaining": [
+    "S51 final-artifact selected-peer adapter/alias/declaration regressions; current all-six host followup passed with explicitly retained RN library defects.",
+    "Option-specific renderer observations for remaining constructor fields.",
+    "Native ordinary configuration and typed host boundaries.",
+    "Mutable settings, reuse and external GL ownership investigations.",
+    "Complete S04 acceptance and S51 final-artifact reruns."
+  ],
+  "documentHashes": {
+    "docs/decisions/0004-map-constructor-configuration.md": "3c7f4424427658aad3641f000b5d8dc0faaf46d1b7ffc9aa71b8abb51a5d2af5",
+    "docs/maps-and-camera.md": "b7d6b066a8b174dbc2a061f65dce42aec8616aa996863aaaa76494766ee789cb",
+    "docs/architecture.md": "702e03df380315f7548458817c01e8a8a24fb61d260a52f7e34723c250b17af4",
+    "docs/README.md": "68df4a5d8acc508bc35446342c8fa7e9f27f0061705665576f6b8bdff7ae6479"
+  },
+  "laterDocumentationFollowup": {
+    "evidence": "records/evidence/documentation-current-review.json",
+    "scope": "Architecture/index full-guide update and host-property crosslinks after constructor reader review; original reviewed hashes preserved.",
+    "currentHashes": {
+      "docs/maps-and-camera.md": "86c8691880ad9afdc49c8c8bbca5f9999a14d41a298c24e33e41d6de373891a5",
+      "docs/architecture.md": "04ff30fdc6a1b85f8aa2020609c2cbfac45d995880cb208283f4dca6e96a5a64",
+      "docs/README.md": "7f5f19422bc9babe43f71cf0a72daf4e8ad27d9d3097e3279ae84122c3697af2"
+    }
+  },
+  "currentAcceptance": {
+    "record": "records/evidence/s04-style-cleanup.json",
+    "artifactSha256": "7a5057f07f3c333d9d03bb62b91e7b19e28b72cf93d1201522c2c9a35092e1c2",
+    "status": "passed",
+    "scope": "Current S04 cleanup acceptance is held in the linked record. Earlier observations and unavailable checks in this file remain historical evidence."
+  }
+}

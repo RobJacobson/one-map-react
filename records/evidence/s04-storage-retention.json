@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-10",
+  "scope": "/Users/rob/code/mapbox-code/.one-map-s04-evidence",
+  "authorization": "User requested retaining nothing unless absolutely necessary after reviewing the 52.3 GB evidence folder.",
+  "retention": "Only compact machine-readable test result/provenance reports are retained. Raw logs, screenshots, generated applications, dependencies, build outputs, historical binaries and downloadable tools are disposable.",
+  "status": "purged",
+  "historicalPaths": "Original external report paths map to compact summaries in s04-retained-results.json. Raw reports/logs/binaries/screenshots are intentionally discarded; historical repository records remain unchanged.",
+  "tests": "No tests or builds were run.",
+  "reportsRetained": 462,
+  "uniqueSummaries": 287,
+  "summaryPath": "/Users/rob/code/mapbox-code/one-map/records/evidence/s04-retained-results.json",
+  "summaryBytes": 1571650,
+  "summarySha256": "5f5a988bd2ac1e90adbe59443253fffa1059f002f43c5365d30878d9c5ac74bb",
+  "freeBytesBefore": 4602720256,
+  "freeBytesAfter": 27819188224,
+  "freeBytesFinal": 27782385664,
+  "recentRunRawBackups": "Discarded compressed logs and raw recent-run .log files; compact JSON reports retained in .one-map-adapter-evidence."
+}

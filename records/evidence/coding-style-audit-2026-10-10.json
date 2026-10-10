@@ -1,0 +1,324 @@
+{
+  "status": "implemented-unverified",
+  "recordedDate": "2026-10-10",
+  "scope": "All nine coding-style audit findings; current S04 and S04.generated-host artifact requires renewed acceptance.",
+  "baseline": "/private/tmp/one-map-audit-20261010/baseline",
+  "historicalAcceptedArtifactSha256": "9ac0cd2754d3f9a17f52105ee72e48bb9d101f7f257e1752f2e70408648d785c",
+  "historicalEvidenceUnchanged": true,
+  "checks": {
+    "validate": {
+      "status": "passed",
+      "command": "bun run validate",
+      "environment": {
+        "PATH_prefix": "/private/tmp/one-map-main-first-runtime/bun-darwin-aarch64:/Users/rob/.nvm/versions/node/v24.14.0/bin",
+        "BUN_INSTALL_CACHE_DIR": "/private/tmp/one-map-comment-correction-registry-cache",
+        "ONE_MAP_VALIDATION_ROOT": "/private/tmp/one-map-audit-20261010/validation"
+      },
+      "log": "/private/tmp/one-map-audit-20261010/validate-cached.log",
+      "tests": 150,
+      "breakdown": {
+        "unit": 50,
+        "adapter": 9,
+        "nativeMocked": 91
+      },
+      "commonPackageReport": "/private/tmp/one-map-audit-20261010/validation/one-map-react-common-consumer-57IlFH/result.json",
+      "selectionReport": "/private/tmp/one-map-audit-20261010/validation/one-map-react-selection-Su1q8i/results.json",
+      "selectionModes": 6,
+      "priorAttempts": [
+        {
+          "log": "/private/tmp/one-map-audit-20261010/validate.log",
+          "result": "Failed because Bun bare test filter also discovered an archived test copy; explicit ./tests paths corrected the routine scripts without changing archive files."
+        },
+        {
+          "log": "/private/tmp/one-map-audit-20261010/validate-explicit-tests.log",
+          "result": "Source checks, all tests and build passed; isolated package install failed because default Bun cache lacked offline registry manifests. Existing populated cache supplied for successful rerun."
+        }
+      ],
+      "artifact": {
+        "path": "/private/tmp/one-map-audit-20261010/validation/one-map-react-selection-Su1q8i/one-map-react-0.0.0.tgz",
+        "sha256": "add25e7359038e950d694fb4aba34a9c557a04cbe4ac918ef9d8a39c6c08bb64"
+      }
+    },
+    "coverage": {
+      "status": "passed",
+      "command": "bun run coverage:validate",
+      "entries": 12131,
+      "log": "/private/tmp/one-map-audit-20261010/coverage.log"
+    },
+    "webConfigurationComparison": {
+      "status": "passed",
+      "cases": 540,
+      "scope": "Independent baseline comparison; process-local WebGL stubs, no real renderer."
+    },
+    "targeted": {
+      "status": "passed",
+      "commands": [
+        "bun test tests/unit/map-configuration.test.ts tests/unit/metro-web-assets.test.ts",
+        "node node_modules/jest/bin/jest.js --config jest.native.config.cjs --runInBand tests/native/mapbox-lifecycle.test.tsx",
+        "bun run typecheck"
+      ],
+      "scope": "Targeted configuration/filesystem and native mocked transport regressions; final aggregate includes all added tests."
+    },
+    "finalTargeted": {
+      "status": "passed",
+      "commands": [
+        "bun run check",
+        "bun run typecheck",
+        "node node_modules/jest/bin/jest.js --config jest.native.config.cjs --runInBand tests/native/mapbox-lifecycle.test.tsx",
+        "bun run build",
+        "bun pm pack --cwd packages/one-map-react --destination /private/tmp/one-map-audit-20261010/final-artifact --ignore-scripts"
+      ],
+      "nativeMockedMapboxTests": 36,
+      "logs": [
+        "/private/tmp/one-map-audit-20261010/final-check.log",
+        "/private/tmp/one-map-audit-20261010/final-targeted.log",
+        "/private/tmp/one-map-audit-20261010/final-build.log",
+        "/private/tmp/one-map-audit-20261010/final-pack.log"
+      ],
+      "note": "final-targeted.log retains intermediate formatter failure before final-check.log passes; typecheck/native tests succeeded after guard-brace edit."
+    },
+    "publicDeclarationReview": {
+      "status": "passed",
+      "method": "Independent parent agent inline Python comparison of named public exports and TypeScript declaration texts/comments against archived baseline.",
+      "entryPoints": [
+        "common",
+        "mapbox-web",
+        "maplibre-web",
+        "mapbox-native",
+        "maplibre-native"
+      ],
+      "optionContracts": "MapboxWebInitialOptions and MapLibreWebInitialOptions declarations with comments unchanged.",
+      "owningDocumentation": "Built MapRef, settings, and configuration declarations retain documentation."
+    },
+    "finalArtifactPublication": {
+      "status": "passed",
+      "files": 773,
+      "scope": "Every packed file matches final package bytes; no native build or renderer acceptance."
+    }
+  },
+  "runtimeAcceptance": {
+    "status": "unverified; awaiting explicit user permission",
+    "executed": false,
+    "environments": [
+      "mapbox-web",
+      "maplibre-web",
+      "mixed Metro web transports for both engines",
+      "mapbox-ios",
+      "mapbox-android",
+      "maplibre-ios",
+      "maplibre-android"
+    ],
+    "proposedCommands": [
+      "bun run test:web:lifecycle",
+      "bun run test:web:metro-transport",
+      "Fresh isolated selected native Release builds and canonical S04 flows for both backends on iOS and Android"
+    ],
+    "estimatedDuration": "1\u20132 hours, longer if build or environment prerequisites fail",
+    "timingPolicy": "docs/testing.md#acceptance-timing-and-user-permission"
+  },
+  "commit": "not requested; none created",
+  "retainedCoverageVerification": "Verified S04 coverage cells reference historical artifacts and evidence, not acceptance of this revision.",
+  "artifact": {
+    "path": "/private/tmp/one-map-audit-20261010/final-artifact/one-map-react-0.0.0.tgz",
+    "sha256": "d1ac3542adbe7733e13d367e795177c74b0e9b96f937f9ffb2e214a750d8f8d5",
+    "finalRevisionDifference": "Only braces and formatter layout added to the tint acknowledgement guard after aggregate verification; semantics unchanged. Final build/check/type/native tests passed; package selection checks identify the aggregate-tested hash explicitly."
+  },
+  "changedFiles": [
+    {
+      "path": "docs/decisions/0006-s04-acceptance.md",
+      "status": "modified"
+    },
+    {
+      "path": "docs/implementation-status.md",
+      "status": "modified"
+    },
+    {
+      "path": "package.json",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/native/android/src/mapbox/java/com/onemap/lifecycle/OneMapRendererStyle.java",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/mapbox-native/begin-tint-reconciliation.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/mapbox-native/configuration.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/mapbox-native/normalization/normalize-native-tint.ts",
+      "status": "added"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/mapbox-native/validation/validate-native-tint.ts",
+      "status": "added"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/mapbox-web/create-map-configuration.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/mapbox-web/create-web-settings-driver.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/maplibre-native/maplibre-native-map.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/maplibre-web/create-map-configuration.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/native-host/use-native-accessibility.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/native-transport/initialize-native-style.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/native-transport/reconcile-native-accessibility.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/native-transport/tint-native-host.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web-configuration.ts",
+      "status": "removed"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web-configuration/configuration-options.ts",
+      "status": "added"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web-configuration/create-web-configuration.ts",
+      "status": "added"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web-configuration/index.ts",
+      "status": "added"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web-configuration/normalization/normalize-web-options.ts",
+      "status": "added"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web-configuration/validation/validate-web-options.ts",
+      "status": "added"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web-settings/create-mapbox-web-map-settings.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web-settings/create-web-map-settings.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web/create-web-map-component.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web/settings-driver.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/core/session/map-session.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/mapbox-web.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/maplibre-web.ts",
+      "status": "modified"
+    },
+    {
+      "path": "packages/one-map-react/src/metro-web-assets.cjs",
+      "status": "modified"
+    },
+    {
+      "path": "records/evidence/coding-style-audit-2026-10-10.json",
+      "status": "added"
+    },
+    {
+      "path": "records/stage-status.json",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/coverage.mjs",
+      "status": "modified"
+    },
+    {
+      "path": "tests/native/mapbox-lifecycle.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "tests/unit/map-configuration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "tests/unit/metro-web-assets.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "tests/unit/web-lifecycle.test.tsx",
+      "status": "modified"
+    }
+  ],
+  "reviewDiff": "/private/tmp/one-map-audit-20261010/review.diff",
+  "findings": [
+    {
+      "id": 1,
+      "resolution": "Synchronous initial-style invocation failures disable late events, remove the listener, and stop the watch; cleanup errors preserve the primary exception."
+    },
+    {
+      "id": 2,
+      "resolution": "Tint and accessibility readiness codes become MapNotReadyError; other failures remain redacted backend errors. Accessibility and MapLibre render-error sinks accept both classes."
+    },
+    {
+      "id": 3,
+      "resolution": "Web configuration has a factory, option contracts, and separate validation/normalization modules. Native tint uses backend-local validation and normalization; conversion/error/getter order is preserved."
+    },
+    {
+      "id": 4,
+      "resolution": "All MapSession public operations and ready getter have explicit return types matching MapRef; capabilities/supports use their owning contracts."
+    },
+    {
+      "id": 5,
+      "resolution": "Named asset preflight/copy and tint acknowledgement callback factories preserve ordered effects and stale-attachment guards."
+    },
+    {
+      "id": 6,
+      "resolution": "Ten settings method TSDoc comments separate summaries from tags."
+    },
+    {
+      "id": 7,
+      "resolution": "Web helpers follow first-call order without changing component hooks or effects."
+    },
+    {
+      "id": 8,
+      "resolution": "One named expected-support selector replaces both nested ternaries."
+    },
+    {
+      "id": 9,
+      "resolution": "Native Java separates constructors/methods and expands subscription guards without behavior changes."
+    }
+  ],
+  "manualReview": {
+    "status": "passed",
+    "publicAPI": "Package export map, peers and capability flags unchanged; selected option contracts retain public documentation in generated declarations. Native transport/sink error types are internal. Built and packed declarations passed common/selected/mixed consumer checks.",
+    "validationDependencies": "No validation module imports normalization. Outer web fields remain sorted and read once; context values retain original read timing. Native processColor is called once.",
+    "lifecycle": "Subscribe-before-dispatch, asynchronous rejection/disposal, application callback identity and stale tint acknowledgements reviewed and covered by tests.",
+    "native": "Java source readability changes preserve statement and subscription ordering; no native compilation or runtime claim.",
+    "documentation": "Applied no-ai-slop editorial guidance; current status and retained historical coverage evidence distinguished.",
+    "findings": "Independent final review confirmed all nine fixes, explicit helper ordering, ten TSDoc separators, no validator-to-normalizer dependencies, old private module removal, and native behavior preservation."
+  }
+}
