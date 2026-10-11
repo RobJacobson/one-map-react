@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "types": ["jest"],
+    "resolveJsonModule": true
+  },
+  "include": [
+    "packages/one-map-react/src/**/*.ts",
+    "packages/one-map-react/src/**/*.tsx",
+    "packages/one-map-react/test/**/*.ts",
+    "packages/one-map-react/test/**/*.tsx"
+  ]
+}

@@ -10,6 +10,8 @@ This reference covers component and property mappings, updates, queries, cluster
 
 **Agreed design:** Source/layer declarations, required stable component IDs, promise-based map methods, and portable feature-state values follow [the portable contract decision](decisions/0002-portable-contracts.md). Resource ownership, conversion, and runtime behavior remain assigned implementation work. Additional source/query/image interfaces below are proposed until their owning stages establish the contract and evidence.
 
+**Implemented in TF02:** `Source` accepts `type: "geojson"`, a required `id`, and object `data`. `Layer` accepts `type: "line"` with `paint["line-color"]`, `paint["line-width"]`, and optional `layout["line-cap"]`. RNMapbox renders `ShapeSource` plus `LineLayer` with `shape` and camelCase `lineColor`, `lineWidth`, and `lineCap`. MapLibre Native renders `GeoJSONSource` plus `Layer`. Web forwards react-map-gl `Source` and `Layer`. The common `Layer` remains the direct child of the wrapper source: RNMapbox injects `sourceID`, and MapLibre Native and react-map-gl inject `source`; `Layer` forwards that injected prop. Other source families, layer types, expressions, queries, and feature state stay future contracts. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7. See the [TF02 record](tf02-shared-map.md).
+
 ## Research basis
 
 Inspected October 8, 2026: [RNMapbox 10.3.7][rn-index] at `0f50e8164c1aefe45de9ed9cde310f310076a310`; [MapLibre React Native 11.5.0][ml-index] at `059f46b2dc728fb6259af91b27a071bcda19a2ae`; react-map-gl 8.1.3's [Mapbox][web-mapbox-index] and [MapLibre][web-index] entries at `3df834290bdecf4f5c9b90d7c117d95af12c1f0a`; [Mapbox GL JS 3.32.0][sdk-mapbox-map] at release tag `v3.32.0`; and [MapLibre GL JS 6.13.0][sdk-maplibre-map] at `f67ac5e45ce441c6eef7c395ad2bbde7ed717c5d`. [version-baseline.json](../records/version-baseline.json) records the package pins and provenance. The renderers' style specifications share established concepts and have different extensions; these comparisons make no overall parity claim.
@@ -140,13 +142,13 @@ import { Source, Layer } from "react-map-gl/maplibre";
 </Source>;
 ```
 
-The agreed one-map-react declaration keeps that shape; the owning stages still need to fulfill its runtime behavior:
+The TF02 one-map-react components keep that shape for this GeoJSON line:
 
 ```tsx
 import { Source, Layer } from "one-map-react";
 
-// Agreed declaration; adapter resource behavior remains unfinished.
-// Inside Map with a selected adapter.
+// Inside Map with a selected adapter. Layer stays the Source child
+// so the wrapper can inject source or sourceID.
 <Source id="routes" type="geojson" data={routes}>
   <Layer
     id="route-line"
