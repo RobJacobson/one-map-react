@@ -15,31 +15,77 @@ import type { ExternalDrawingContext, MapProps } from "../src/map-types.js";
 import { Source } from "../src/source.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
+const mockJumpTo = jest.fn(() => Promise.resolve());
+const mockEaseTo = jest.fn(() => Promise.resolve());
+const mockFitBounds = jest.fn(() => Promise.resolve());
+const mockZoomTo = jest.fn(() => Promise.resolve());
+const mockGetCenter = jest.fn(async () => [-122.34, 47.61]);
+const mockGetZoom = jest.fn(async () => 11);
+const mockGetBearing = jest.fn(async () => 4);
+const mockGetPitch = jest.fn(async () => 1);
+const mockGetBounds = jest.fn(async () => [170, -10, -170, 10]);
+const mockProject = jest.fn(async () => [12, 34]);
+const mockUnproject = jest.fn(async () => [-122.34, 47.61]);
 
 jest.mock("@maplibre/maplibre-react-native", () => {
   const React = require("react");
   let mapSerial = 0;
 
   return {
-    Map: jest.fn(({ children, ...props }: { children?: React.ReactNode }) => {
-      const [mapId] = React.useState(() => {
-        mapSerial += 1;
-        return String(mapSerial);
-      });
+    Map: jest.fn(
+      ({
+        children,
+        ref,
+        ...props
+      }: {
+        children?: React.ReactNode;
+        ref?: React.Ref<{ getCenter: typeof mockGetCenter }>;
+      }) => {
+        const [mapId] = React.useState(() => {
+          mapSerial += 1;
+          return String(mapSerial);
+        });
 
-      return React.createElement(
-        "MaplibreMap",
-        { ...props, testID: "wrapper-map", mapId },
-        children
-      );
-    }),
-    Camera: React.forwardRef(
-      (props: object, ref: React.Ref<{ flyTo: typeof mockFlyTo }>) => {
         React.useImperativeHandle(ref, () => ({
-          flyTo: mockFlyTo,
+          getCenter: mockGetCenter,
+          getZoom: mockGetZoom,
+          getBearing: mockGetBearing,
+          getPitch: mockGetPitch,
+          getBounds: mockGetBounds,
+          project: mockProject,
+          unproject: mockUnproject,
         }));
 
-        return React.createElement("Camera", props);
+        return React.createElement(
+          "MaplibreMap",
+          { ...props, testID: "wrapper-map", mapId },
+          children
+        );
+      }
+    ),
+    Camera: React.forwardRef(
+      (
+        props: object,
+        ref: React.Ref<{
+          flyTo: typeof mockFlyTo;
+          jumpTo: typeof mockJumpTo;
+          easeTo: typeof mockEaseTo;
+          fitBounds: typeof mockFitBounds;
+          zoomTo: typeof mockZoomTo;
+        }>
+      ) => {
+        React.useImperativeHandle(ref, () => ({
+          flyTo: mockFlyTo,
+          jumpTo: mockJumpTo,
+          easeTo: mockEaseTo,
+          fitBounds: mockFitBounds,
+          zoomTo: mockZoomTo,
+        }));
+
+        return React.createElement("Camera", {
+          ...props,
+          testID: "wrapper-camera",
+        });
       }
     ),
     GeoJSONSource: ({
@@ -232,14 +278,10 @@ describe("maplibre-native adapter", () => {
       },
     });
 
-    expect(onMove).toHaveBeenCalledTimes(2);
+    expect(onMove).toHaveBeenCalledTimes(1);
     expect(onMove).toHaveBeenLastCalledWith({
-      viewState: {
-        ...initialViewState,
-        longitude: -122.32,
-        latitude: 47.64,
-      },
-      origin: "unknown",
+      viewState: initialViewState,
+      origin: "user",
     });
 
     await rendered.unmount();
@@ -262,7 +304,7 @@ describe("maplibre-native adapter", () => {
       },
     });
 
-    expect(onMove).toHaveBeenCalledTimes(2);
+    expect(onMove).toHaveBeenCalledTimes(1);
   });
 
   test("rerender keeps the wrapper map id and a new mount replaces it", async () => {
@@ -354,5 +396,166 @@ describe("maplibre-native adapter", () => {
     expect(lastMapProps<{ readonly mapStyle?: string }>().mapStyle).toBe(
       "https://example.com/style.json"
     );
+  });
+
+  test("commands wait for style load and convert an antimeridian fit", async () => {
+    mockJumpTo.mockClear();
+    mockFitBounds.mockClear();
+    const ref = createRef<MapRef>();
+
+    await render(example(ref));
+
+    await expect(ref.current?.jumpTo({ zoom: 8 })).rejects.toThrow(
+      "Map camera is not attached."
+    );
+    expect(mockJumpTo).not.toHaveBeenCalled();
+
+    finishMapLoad();
+    await ref.current?.jumpTo({ zoom: 8 });
+    await ref.current?.fitBounds(
+      [
+        [170, -10],
+        [-170, 10],
+      ],
+      { duration: 300 }
+    );
+
+    expect(mockJumpTo).toHaveBeenCalledWith({ zoom: 8 });
+    expect(mockFitBounds).toHaveBeenCalledWith([170, -10, -170, 10], {
+      duration: 300,
+    });
+  });
+
+  test("an easing function and stop() are rejected after style load", async () => {
+    const ref = createRef<MapRef>();
+
+    await render(example(ref));
+    finishMapLoad();
+
+    await expect(
+      ref.current?.flyTo({
+        center: [-122.34, 47.61],
+        easing: () => 0,
+      })
+    ).rejects.toThrow("An easing function is not available on native maps.");
+    await expect(ref.current?.stop()).rejects.toThrow(
+      "stop() is not available on native maps."
+    );
+  });
+
+  test("getters convert flat bounds and reject padding", async () => {
+    const ref = createRef<MapRef>();
+
+    await render(example(ref));
+
+    await expect(ref.current?.getBearing()).resolves.toBe(4);
+    await expect(ref.current?.getBounds()).resolves.toEqual([
+      [170, -10],
+      [-170, 10],
+    ]);
+    await expect(ref.current?.project([-122.34, 47.61])).resolves.toEqual([
+      12, 34,
+    ]);
+    await expect(ref.current?.getPadding()).rejects.toThrow(
+      "getPadding() is not available on maplibre-native."
+    );
+  });
+
+  test("touchZoom false still passes an explicit double tap", async () => {
+    await render(
+      example(undefined, undefined, {
+        touchZoom: false,
+        doubleTapZoom: true,
+      })
+    );
+
+    expect(lastMapProps<object>()).toEqual(
+      expect.objectContaining({
+        touchZoom: false,
+        doubleTapZoom: true,
+        doubleTapHoldZoom: true,
+      })
+    );
+  });
+
+  test("hash is rejected before a map is created", async () => {
+    MapMock.mockClear();
+
+    await expect(
+      render(example(undefined, undefined, { hash: true }))
+    ).rejects.toThrow("hash is not available on native maps.");
+    expect(MapMock).not.toHaveBeenCalled();
+  });
+
+  test("controlled viewState is written onto the camera", async () => {
+    const rendered = await render(
+      example(undefined, undefined, {
+        viewState: { ...initialViewState, zoom: 12 },
+      })
+    );
+
+    expect(rendered.getByTestId("wrapper-camera").props).toEqual(
+      expect.objectContaining({
+        center: [-122.34, 47.61],
+        zoom: 12,
+        bearing: 0,
+        pitch: 0,
+      })
+    );
+  });
+
+  test("the first settled region reports onMove and onMoveEnd", async () => {
+    const onMove = jest.fn();
+    const onMoveEnd = jest.fn();
+
+    await render(example(undefined, onMove, { onMoveEnd }));
+    const props = lastMapProps<{
+      onRegionDidChange: (event: object) => void;
+    }>();
+
+    props.onRegionDidChange({
+      nativeEvent: {
+        center: [-122.34, 47.61],
+        zoom: 11,
+        bearing: 0,
+        pitch: 0,
+        userInteraction: false,
+      },
+    });
+
+    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(onMoveEnd).toHaveBeenCalledTimes(1);
+  });
+
+  test("onClick converts the press and stops after unmount", async () => {
+    const onClick = jest.fn();
+    const rendered = await render(example(undefined, undefined, { onClick }));
+    const props = lastMapProps<{
+      onPress: (event: object) => void;
+    }>();
+
+    props.onPress({
+      nativeEvent: {
+        lngLat: [-122.34, 47.61],
+        point: [8, 9],
+        features: [{ id: "pier" }],
+      },
+    });
+
+    expect(onClick).toHaveBeenCalledWith({
+      lngLat: [-122.34, 47.61],
+      point: [8, 9],
+      features: [{ id: "pier" }],
+    });
+
+    await rendered.unmount();
+    props.onPress({
+      nativeEvent: {
+        lngLat: [-122, 47],
+        point: [1, 2],
+      },
+    });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });

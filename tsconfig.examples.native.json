@@ -18,6 +18,9 @@
   "include": [
     "examples/shared/route-map.tsx",
     "examples/shared/lifecycle-smoke.ts",
+    "examples/shared/camera-smoke.ts",
+    "examples/shared/smoke-target.ts",
+    "examples/shared/native-camera-screen.tsx",
     "examples/native-mapbox/App.tsx",
     "examples/native-maplibre/App.tsx"
   ]

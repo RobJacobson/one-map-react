@@ -33,7 +33,11 @@ const {
   resetWebMapMock,
   getStyleTarget,
   flyTo: mockFlyTo,
+  jumpTo: mockJumpTo,
+  fitBounds: mockFitBounds,
+  stop: mockStop,
   resize: mockResize,
+  disableRotation,
 } = jest.requireMock("react-map-gl/mapbox") as WebMapMockModule;
 
 const example = (
@@ -458,5 +462,101 @@ describe("mapbox-web adapter", () => {
     props.onLoad();
 
     expect(secondLoad).toHaveBeenCalledTimes(1);
+  });
+
+  test("commands, getters, and controlled viewState go to the wrapper", async () => {
+    const ref = createRef<MapRef>();
+    const rendered = render(
+      example(ref, undefined, {
+        viewState: { ...initialViewState, zoom: 12 },
+        minZoom: 2,
+        maxBounds: [
+          [170, -10],
+          [-170, 10],
+        ],
+      })
+    );
+
+    expect(lastMapProps<object>()).toEqual(
+      expect.objectContaining({
+        viewState: { ...initialViewState, zoom: 12 },
+        minZoom: 2,
+        maxBounds: [170, -10, -170, 10],
+      })
+    );
+
+    await ref.current?.jumpTo({ center: [-122.3, 47.6] });
+    await ref.current?.fitBounds(
+      [
+        [170, -10],
+        [-170, 10],
+      ],
+      { duration: 200 }
+    );
+    await ref.current?.stop();
+
+    expect(mockJumpTo).toHaveBeenCalledWith({ center: [-122.3, 47.6] });
+    expect(mockFitBounds).toHaveBeenCalledWith(
+      [
+        [170, -10],
+        [-170, 10],
+      ],
+      { duration: 200 }
+    );
+    expect(mockStop).toHaveBeenCalled();
+    await expect(ref.current?.getCenter()).resolves.toEqual([-122.34, 47.61]);
+    await expect(ref.current?.getBounds()).resolves.toEqual([
+      [170, -10],
+      [-170, 10],
+    ]);
+    await expect(ref.current?.getMaxBounds()).resolves.toBeNull();
+
+    rendered.rerender(
+      example(ref, undefined, {
+        viewState: { ...initialViewState, zoom: 13 },
+      })
+    );
+
+    expect(lastMapProps<{ viewState: { zoom: number } }>().viewState.zoom).toBe(
+      13
+    );
+  });
+
+  test("touchRotate false disables rotation without disabling pinch zoom", () => {
+    render(example(undefined, undefined, { touchRotate: false }));
+
+    expect(lastMapProps<{ touchZoomRotate?: boolean }>().touchZoomRotate).toBe(
+      true
+    );
+    expect(disableRotation).toHaveBeenCalled();
+  });
+
+  test("onClick converts the wrapper event and onLongPress is rejected", () => {
+    const onClick = jest.fn();
+    const rendered = render(example(undefined, undefined, { onClick }));
+    const props = lastMapProps<{
+      onClick: (event: object) => void;
+    }>();
+
+    props.onClick({
+      lngLat: { lng: -122.34, lat: 47.61 },
+      point: { x: 8, y: 9 },
+    });
+
+    expect(onClick).toHaveBeenCalledWith({
+      lngLat: [-122.34, 47.61],
+      point: [8, 9],
+    });
+
+    rendered.unmount();
+    props.onClick({
+      lngLat: { lng: -122, lat: 47 },
+      point: { x: 1, y: 1 },
+    });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(() =>
+      render(example(undefined, undefined, { onLongPress: jest.fn() }))
+    ).toThrow("onLongPress is not available on web maps.");
   });
 });

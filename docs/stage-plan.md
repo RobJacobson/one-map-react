@@ -1,6 +1,6 @@
 # Thin facade stage plan
 
-**Agreed delivery plan for the thin-facade direction.** TF01 and TF02 are complete. The TF02 six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03 is complete. Its renderer smoke passed. TF04–TF10 have not started. [Requirements](requirements.md) define scope and ownership. [Testing policy](testing-policy.md) defines checks and acceptance timing. This plan replaces the old S00–S51 execution sequence; TF identifiers distinguish new work from historical S04 acceptance and inventory assignments.
+**Agreed delivery plan for the thin-facade direction.** TF01 and TF02 are complete. The TF02 six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03 is complete. Its renderer smoke passed. TF04's camera, gesture, and interaction API is implemented in the package. Its renderer smoke passed. TF05–TF10 have not started. Do not start TF05 until the owner asks. [Requirements](requirements.md) define scope and ownership. [Testing policy](testing-policy.md) defines checks and acceptance timing. This plan replaces the old S00–S51 execution sequence; TF identifiers distinguish new work from historical S04 acceptance and inventory assignments.
 
 ## How stages complete
 
@@ -55,4 +55,6 @@ TF01 is complete. The old implementation and obsolete tooling have been retired 
 
 TF02 is complete. It implements `MapSetup`, common `Map` / `Source` / `Layer`, and four adapter translations for the Seattle route example. Focused Jest mounts and packed selection checks are in `validate`; selected-peer isolation is `bun run test:peers`. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7. See the [TF02 record](tf02-shared-map.md).
 
-TF03's web `reuseMaps`, external `gl`, and load, style, error, and resize callbacks are implemented. Native `reuseMaps` and `gl` are rejected because the pinned wrappers have no reuse facility. Mocked Jest covers reuse identity, callbacks, children, Strict Mode, and that rejection. The renderer smoke passed. See the [TF03 record](tf03-reuse.md). Full API coverage remains required across the subsequent stages.
+TF03's web `reuseMaps`, external `gl`, and load, style, error, and resize callbacks are implemented. Native `reuseMaps` and `gl` are rejected because the pinned wrappers have no reuse facility. Mocked Jest covers reuse identity, callbacks, children, Strict Mode, and that rejection. The renderer smoke passed. See the [TF03 record](tf03-reuse.md).
+
+TF04's camera commands, getters, bounds, padding, gesture flags, and interaction callbacks are implemented. Web `viewState` is delegated. Native `viewState` writes camera props, and `controlledCamera` is not advertised. Mocked Jest covers the conversions and adapter calls. The renderer smoke passed. See the [TF04 record](tf04-camera.md). Full API coverage remains required across the subsequent stages. Do not start TF05 until the owner asks.

@@ -1,6 +1,6 @@
 # TF03 reuse and lifecycle
 
-**Implemented in the package. The renderer smoke passed.** Web maps can opt into react-map-gl's map reuse. Native maps reject that option because the pinned wrappers have no reuse facility. Load, style, error, and resize callbacks are translated where the wrapper has them. Jest covers the mocked contract. The six-environment smoke passed on packed SHA-256 `1a6c2970f10f185f5cd82b5bdb160a7c6e51dad04e009c3f65000e42b418d2cf`. Web reuse keeps the canvas and reports `onStyleLoad`. Native remounts create a new map. TF04 has not started.
+**Implemented in the package. The renderer smoke passed.** Web maps can opt into react-map-gl's map reuse. Native maps reject that option because the pinned wrappers have no reuse facility. Load, style, error, and resize callbacks are translated where the wrapper has them. Jest covers the mocked contract. The six-environment smoke passed on packed SHA-256 `1a6c2970f10f185f5cd82b5bdb160a7c6e51dad04e009c3f65000e42b418d2cf`. Web reuse keeps the canvas and reports `onStyleLoad`. Native remounts create a new map. Camera, gestures, and interaction events are recorded in [TF04](tf04-camera.md).
 
 ## Contract
 
@@ -57,7 +57,7 @@ import { adapter } from "one-map-react/maplibre-web";
 
 ## What stays later
 
-Gesture and interaction options, including `interactive`, `clickTolerance`, `scrollZoom`, `dragPan`, and the native gesture flags, stay TF04. `preserveDrawingBuffer` and `canvasContextAttributes` stay TF08. Renderer settings such as `antialias`, `language`, `worldview`, `projection`, `fog`, and `terrain` stay TF09. Host `style` width, height, and flex stay on `Map`. Other inherited host attributes are not forwarded one by one in this stage. Control and ornament presentation stays TF07. The historical inventory ledger is not regenerated here.
+Gesture and interaction options, including `interactive`, `clickTolerance`, `scrollZoom`, `dragPan`, and the native gesture flags, are recorded in [TF04](tf04-camera.md). `preserveDrawingBuffer` and `canvasContextAttributes` stay TF08. Renderer settings such as `antialias`, `language`, `worldview`, `projection`, `fog`, and `terrain` stay TF09. Host `style` width, height, and flex stay on `Map`. Other inherited host attributes are not forwarded one by one in this stage. Control and ornament presentation stays TF07. The historical inventory ledger is not regenerated here.
 
 The retired provider pool, configuration fingerprints, and `createMapConfiguration` factory are not this implementation. They remain described in the [constructor decision](decisions/0004-map-constructor-configuration.md) as history.
 

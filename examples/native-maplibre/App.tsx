@@ -4,9 +4,18 @@ import { useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
+import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { RouteMap } from "../shared/route-map.js";
+import { smokeTarget } from "../shared/smoke-target.js";
 
-const App = () => {
+const App = () =>
+  smokeTarget === "tf04" ? (
+    <NativeCameraScreen adapter={adapter} doubleTap />
+  ) : (
+    <LifecycleApp />
+  );
+
+const LifecycleApp = () => {
   const mapRef = useRef<MapRef>(null);
   const smoke = useLifecycleSmoke({
     mapRef,

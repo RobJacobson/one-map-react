@@ -1,4 +1,5 @@
 const { readMapboxAccessToken } = require("../mapbox-token.cjs");
+const inlineSmokeTarget = require("../inline-smoke-target.cjs");
 
 const exampleRoot = __dirname;
 
@@ -34,5 +35,5 @@ const inlineMapboxAccessToken = ({ types: t }) => ({
 
 module.exports = {
   presets: ["module:@react-native/babel-preset"],
-  plugins: [inlineMapboxAccessToken],
+  plugins: [inlineMapboxAccessToken, inlineSmokeTarget],
 };

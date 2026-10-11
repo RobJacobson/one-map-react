@@ -1,4 +1,5 @@
 import {
+  type ClickEvent,
   type ExternalDrawingContext,
   Layer,
   type MapErrorEvent,
@@ -8,6 +9,7 @@ import {
   type MoveEvent,
   Map as OneMap,
   Source,
+  type ViewState,
 } from "one-map-react";
 import { forwardRef } from "react";
 
@@ -22,7 +24,12 @@ interface RouteMapProps {
   readonly mapStyle?: MapStyle;
   readonly reuseMaps?: boolean;
   readonly gl?: ExternalDrawingContext;
+  readonly viewState?: ViewState;
+  readonly touchZoom?: false;
+  readonly doubleTapZoom?: true;
   readonly onMove?: (event: MoveEvent) => void;
+  readonly onMoveEnd?: (event: MoveEvent) => void;
+  readonly onClick?: (event: ClickEvent) => void;
   readonly onLoad?: () => void;
   readonly onStyleLoad?: () => void;
   readonly onError?: (event: MapErrorEvent) => void;
@@ -31,22 +38,41 @@ interface RouteMapProps {
 /**
  * Shared Seattle route map used by the web and native example shells.
  *
- * Shells own remount, fly-to, tokens, host layout, and the TF03 smoke
- * controls. The default map does not opt into reuse.
+ * Shells own remount, fly-to, tokens, host layout, and the smoke controls.
+ * The default map does not opt into reuse.
  */
 export const RouteMap = forwardRef<MapRef, RouteMapProps>(
   (
-    { style, mapStyle, reuseMaps, gl, onMove, onLoad, onStyleLoad, onError },
+    {
+      style,
+      mapStyle,
+      reuseMaps,
+      gl,
+      viewState,
+      touchZoom,
+      doubleTapZoom,
+      onMove,
+      onMoveEnd,
+      onClick,
+      onLoad,
+      onStyleLoad,
+      onError,
+    },
     ref
   ) => (
     <OneMap
       ref={ref}
       mapStyle={mapStyle ?? emptyStyle}
       initialViewState={initialViewState}
+      viewState={viewState}
+      touchZoom={touchZoom}
+      doubleTapZoom={doubleTapZoom}
       style={style}
       reuseMaps={reuseMaps}
       gl={gl}
       onMove={onMove}
+      onMoveEnd={onMoveEnd}
+      onClick={onClick}
       onLoad={onLoad}
       onStyleLoad={onStyleLoad}
       onError={onError}

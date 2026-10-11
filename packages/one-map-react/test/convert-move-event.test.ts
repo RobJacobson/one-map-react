@@ -1,6 +1,9 @@
 import { describe, expect, test } from "@jest/globals";
 
 import {
+  clickEventFromMaplibreNative,
+  clickEventFromRnmapbox,
+  clickEventFromWeb,
   moveEventFromMaplibreNative,
   moveEventFromRnmapbox,
   moveEventFromWeb,
@@ -57,6 +60,33 @@ describe("move event conversion", () => {
     expect(moveEventFromWeb(viewState, undefined)).toEqual({
       viewState,
       origin: "unknown",
+    });
+  });
+
+  test("clicks use coordinate and point tuples", () => {
+    expect(
+      clickEventFromWeb({
+        lngLat: { lng: -122.34, lat: 47.61 },
+        point: { x: 8, y: 9 },
+        features: [{ id: "pier" }],
+      })
+    ).toEqual({
+      lngLat: [-122.34, 47.61],
+      point: [8, 9],
+      features: [{ id: "pier" }],
+    });
+    expect(
+      clickEventFromRnmapbox({
+        geometry: { coordinates: [-122.34, 47.61] },
+        properties: { screenPointX: 8, screenPointY: 9 },
+      })
+    ).toEqual({
+      lngLat: [-122.34, 47.61],
+      point: [8, 9],
+    });
+    expect(clickEventFromMaplibreNative([-122.34, 47.61], [8, 9])).toEqual({
+      lngLat: [-122.34, 47.61],
+      point: [8, 9],
     });
   });
 });

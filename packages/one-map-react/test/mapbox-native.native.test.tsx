@@ -15,6 +15,14 @@ import type { ExternalDrawingContext, MapProps } from "../src/map-types.js";
 import { Source } from "../src/source.js";
 
 const mockSetCamera = jest.fn();
+const mockGetCenter = jest.fn(async () => [-122.34, 47.61]);
+const mockGetZoom = jest.fn(async () => 11);
+const mockGetVisibleBounds = jest.fn(async () => [
+  [-122.2, 47.7],
+  [-122.4, 47.5],
+]);
+const mockGetPointInView = jest.fn(async () => [12, 34]);
+const mockGetCoordinateFromView = jest.fn(async () => [-122.34, 47.61]);
 
 jest.mock("@rnmapbox/maps", () => {
   const React = require("react");
@@ -24,15 +32,27 @@ jest.mock("@rnmapbox/maps", () => {
     MapView: jest.fn(
       ({
         children,
+        ref,
         ...props
       }: {
         children?: React.ReactNode;
+        ref?: React.Ref<{
+          getCenter: typeof mockGetCenter;
+        }>;
         [key: string]: unknown;
       }) => {
         const [mapId] = React.useState(() => {
           mapSerial += 1;
           return String(mapSerial);
         });
+
+        React.useImperativeHandle(ref, () => ({
+          getCenter: mockGetCenter,
+          getZoom: mockGetZoom,
+          getVisibleBounds: mockGetVisibleBounds,
+          getPointInView: mockGetPointInView,
+          getCoordinateFromView: mockGetCoordinateFromView,
+        }));
 
         return React.createElement(
           "MapView",
@@ -47,7 +67,10 @@ jest.mock("@rnmapbox/maps", () => {
           setCamera: mockSetCamera,
         }));
 
-        return React.createElement("Camera", props);
+        return React.createElement("Camera", {
+          ...props,
+          testID: "wrapper-camera",
+        });
       }
     ),
     ShapeSource: ({
@@ -71,12 +94,13 @@ jest.mock("@rnmapbox/maps", () => {
     LineLayer: jest.fn((props: object) =>
       React.createElement("LineLayer", props)
     ),
+    CameraGestureObserver: () => null,
   };
 });
 
 import { LineLayer, MapView } from "@rnmapbox/maps";
 
-import { adapter } from "../src/mapbox-native.js";
+import { adapter, MapboxGestureSettings } from "../src/mapbox-native.js";
 
 const MapViewMock = MapView as unknown as jest.Mock;
 const LineLayerMock = LineLayer as unknown as jest.Mock;
@@ -205,7 +229,7 @@ describe("mapbox-native adapter", () => {
       gestures: { isGestureActive: false },
     });
 
-    expect(onMove).toHaveBeenCalledTimes(2);
+    expect(onMove).toHaveBeenCalledTimes(1);
 
     await rendered.unmount();
     onCameraChanged({
@@ -228,7 +252,7 @@ describe("mapbox-native adapter", () => {
       gestures: { isGestureActive: false },
     });
 
-    expect(onMove).toHaveBeenCalledTimes(2);
+    expect(onMove).toHaveBeenCalledTimes(1);
   });
 
   test("rerender keeps the wrapper map id and a new mount replaces it", async () => {
@@ -326,6 +350,231 @@ describe("mapbox-native adapter", () => {
 
     expect(lastMapProps<{ readonly styleURL?: string }>().styleURL).toBe(
       "https://example.com/style.json"
+    );
+  });
+
+  test("jumpTo, easeTo, fitBounds, and zoomTo set explicit animation modes", async () => {
+    mockSetCamera.mockClear();
+    const ref = createRef<MapRef>();
+
+    await render(example(ref));
+    await ref.current?.jumpTo({ center: [-122.3, 47.6] });
+    await ref.current?.easeTo({
+      zoom: 12,
+      duration: 400,
+      padding: { top: 8 },
+    });
+    await ref.current?.fitBounds(
+      [
+        [170, -10],
+        [-170, 10],
+      ],
+      { duration: 500 }
+    );
+    await ref.current?.zoomTo(9, { duration: 0 });
+
+    expect(mockSetCamera).toHaveBeenNthCalledWith(1, {
+      type: "CameraStop",
+      centerCoordinate: [-122.3, 47.6],
+      animationMode: "none",
+    });
+    expect(mockSetCamera).toHaveBeenNthCalledWith(2, {
+      type: "CameraStop",
+      zoomLevel: 12,
+      animationDuration: 400,
+      padding: {
+        paddingTop: 8,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0,
+      },
+      animationMode: "easeTo",
+    });
+    expect(mockSetCamera).toHaveBeenNthCalledWith(3, {
+      type: "CameraStop",
+      bounds: {
+        sw: [170, -10],
+        ne: [-170, 10],
+      },
+      animationDuration: 500,
+      animationMode: "easeTo",
+    });
+    expect(mockSetCamera).toHaveBeenNthCalledWith(4, {
+      type: "CameraStop",
+      zoomLevel: 9,
+      animationDuration: 0,
+      animationMode: "none",
+    });
+  });
+
+  test("an easing function and stop() are rejected", async () => {
+    mockSetCamera.mockClear();
+    const ref = createRef<MapRef>();
+
+    await render(example(ref));
+
+    await expect(
+      ref.current?.easeTo({ zoom: 4, easing: () => 1 })
+    ).rejects.toThrow("An easing function is not available on native maps.");
+    await expect(ref.current?.jumpTo({ duration: 20 })).rejects.toThrow(
+      "jumpTo does not accept a duration."
+    );
+    await expect(ref.current?.stop()).rejects.toThrow(
+      "stop() is not available on native maps."
+    );
+    expect(mockSetCamera).not.toHaveBeenCalled();
+  });
+
+  test("getters convert center, visible bounds, and points", async () => {
+    const ref = createRef<MapRef>();
+
+    await render(example(ref));
+
+    await expect(ref.current?.getCenter()).resolves.toEqual([-122.34, 47.61]);
+    await expect(ref.current?.getBounds()).resolves.toEqual([
+      [-122.4, 47.5],
+      [-122.2, 47.7],
+    ]);
+    await expect(ref.current?.project([-122.34, 47.61])).resolves.toEqual([
+      12, 34,
+    ]);
+    await expect(ref.current?.unproject([12, 34])).resolves.toEqual([
+      -122.34, 47.61,
+    ]);
+    await expect(ref.current?.getBearing()).rejects.toThrow(
+      "getBearing() is not available on mapbox-native."
+    );
+  });
+
+  test("scrollZoom is rejected before a map is created", async () => {
+    MapViewMock.mockClear();
+
+    await expect(
+      render(example(undefined, undefined, { scrollZoom: false }))
+    ).rejects.toThrow("scrollZoom is not available on native maps.");
+    expect(MapViewMock).not.toHaveBeenCalled();
+  });
+
+  test("gesture flags map onto scroll, zoom, and double tap", async () => {
+    await render(
+      example(undefined, undefined, {
+        dragPan: false,
+        touchZoom: false,
+        doubleTapZoom: true,
+      })
+    );
+
+    expect(lastMapProps<object>()).toEqual(
+      expect.objectContaining({
+        scrollEnabled: false,
+        zoomEnabled: false,
+        gestureSettings: {
+          doubleTapToZoomInEnabled: true,
+          doubleTouchToZoomOutEnabled: true,
+        },
+      })
+    );
+  });
+
+  test("controlled viewState is written onto the camera", async () => {
+    const rendered = await render(
+      example(undefined, undefined, {
+        viewState: { ...initialViewState, zoom: 12 },
+      })
+    );
+
+    expect(rendered.getByTestId("wrapper-camera").props).toEqual(
+      expect.objectContaining({
+        centerCoordinate: [-122.34, 47.61],
+        zoomLevel: 12,
+        heading: 0,
+        pitch: 0,
+        animationMode: "none",
+        animationDuration: 0,
+      })
+    );
+
+    await rendered.rerender(
+      example(undefined, undefined, {
+        viewState: { ...initialViewState, zoom: 13 },
+      })
+    );
+
+    expect(rendered.getByTestId("wrapper-camera").props.zoomLevel).toBe(13);
+    expect(
+      rendered.getByTestId("wrapper-camera").props.defaultSettings.zoomLevel
+    ).toBe(initialViewState.zoom);
+  });
+
+  test("the first idle reports onMove once, then onMoveEnd and onIdle", async () => {
+    const onMove = jest.fn();
+    const onMoveEnd = jest.fn();
+    const onIdle = jest.fn();
+
+    await render(example(undefined, onMove, { onMoveEnd, onIdle }));
+    const props = lastMapProps<{
+      onMapIdle: (state: object) => void;
+    }>();
+
+    props.onMapIdle({
+      properties: {
+        center: [-122.34, 47.61],
+        zoom: 11,
+        heading: 0,
+        pitch: 0,
+      },
+      gestures: { isGestureActive: false },
+    });
+
+    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(onMoveEnd).toHaveBeenCalledTimes(1);
+    expect(onIdle).toHaveBeenCalledTimes(1);
+  });
+
+  test("onClick converts the press feature and stops after unmount", async () => {
+    const onClick = jest.fn();
+    const rendered = await render(example(undefined, undefined, { onClick }));
+    const props = lastMapProps<{
+      onPress: (feature: object) => void;
+    }>();
+
+    props.onPress({
+      geometry: { coordinates: [-122.34, 47.61] },
+      properties: { screenPointX: 8, screenPointY: 9 },
+    });
+
+    expect(onClick).toHaveBeenCalledWith({
+      lngLat: [-122.34, 47.61],
+      point: [8, 9],
+    });
+
+    await rendered.unmount();
+    props.onPress({
+      geometry: { coordinates: [-122, 47] },
+      properties: { screenPointX: 1, screenPointY: 2 },
+    });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  test("MapboxGestureSettings are passed to the map", async () => {
+    await render(
+      <MapboxGestureSettings
+        settings={{ pinchZoomEnabled: false, quickZoomEnabled: true }}
+      >
+        {example(undefined, undefined, { doubleTapZoom: true })}
+      </MapboxGestureSettings>
+    );
+
+    expect(lastMapProps<object>()).toEqual(
+      expect.objectContaining({
+        gestureSettings: {
+          pinchZoomEnabled: false,
+          quickZoomEnabled: true,
+          doubleTapToZoomInEnabled: true,
+          doubleTouchToZoomOutEnabled: true,
+        },
+      })
     );
   });
 });

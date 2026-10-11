@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "stage": "TF04",
+  "status": "passed",
+  "completed": "2026-10-11",
+  "command": "bun scripts/tf04-camera-smoke.mjs",
+  "groups": ["web", "android", "ios"],
+  "runtime": {
+    "mapbox-web": "passed",
+    "maplibre-web": "passed",
+    "mapbox-android": "passed",
+    "maplibre-android": "passed",
+    "mapbox-ios": "passed",
+    "maplibre-ios": "passed"
+  },
+  "lines": {
+    "mapbox-web": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+    "maplibre-web": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+    "mapbox-android": "TF04 fit=ok click=hit clickAt=-122.31999,47.63726 stop=rejected held=0 doubletap=skip center=-120.00000,45.00000 note=none phase=done done=1",
+    "maplibre-android": "TF04 fit=ok click=hit clickAt=-122.32001,47.63728 stop=rejected held=0 doubletap=timeout center=-120.00000,45.00000 note=none phase=done done=1",
+    "mapbox-ios": "TF04 fit=ok click=hit clickAt=-122.32000,47.63733 stop=rejected held=0 doubletap=skip center=-121.42933,46.64154 note=none phase=done done=1",
+    "maplibre-ios": "TF04 fit=ok click=hit clickAt=-122.32000,47.63760 stop=rejected held=0 doubletap=zoomed center=-120.00000,44.99949 note=none phase=done done=1"
+  },
+  "runtimeNotes": {
+    "web": "Headless Chrome on Vite. fitBounds reached the north Seattle box. A real click hit that center. stop cancelled an 8s flight, and the center stayed at the fit. A later jumpTo was pulled back, so held=1.",
+    "android": "Rerun on emulator-5554 through Metro at the Mac LAN address 192.168.12.119:8081. debug_http_host was written before the cold start. Both engines passed. stop was rejected, and the unaccepted jump remained at -120,45, so held=0 and controlledCamera stays unadvertised. MapLibre Android SDK 13.6.1 onDoubleTapEvent requires zoom gestures, so the double tap did not zoom while touchZoom was false. That timeout is the pass.",
+    "ios": "Rerun on iPhone 18 Pro through Metro on localhost. Xcode 27 does not deliver SimulatorKit mouse events, so taps went through an XCUITest driver. Both engines passed. stop was rejected and held=0, so the unaccepted jump left the fit and controlledCamera stays unadvertised. MapLibre iOS zoomed on the double tap while pinch zoom was off."
+  },
+  "runtimeScope": "Permission covered fitBounds, click, stop, and a rejected controlled move on web and native, plus a MapLibre double tap beside touchZoom. It did not cover a TF02 or TF03 rerun. Web passed on the earlier run the same day and was not repeated. Android and iOS were rerun through Metro. All six environments passed. MapLibre Android's double tap did not zoom, which is the SDK result while pinch zoom is off. MapLibre iOS zoomed."
+}
