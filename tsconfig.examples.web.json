@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "moduleSuffixes": [""],
+    "resolveJsonModule": true,
+    "paths": {
+      "one-map-react": ["./packages/one-map-react/src/index.ts"],
+      "one-map-react/mapbox-web": [
+        "./packages/one-map-react/src/mapbox-web.tsx"
+      ],
+      "one-map-react/maplibre-web": [
+        "./packages/one-map-react/src/maplibre-web.tsx"
+      ]
+    }
+  },
+  "include": [
+    "examples/css-modules.d.ts",
+    "examples/shared/route-map.tsx",
+    "examples/web-mapbox/src/**/*.tsx",
+    "examples/web-mapbox/env.d.ts",
+    "examples/web-maplibre/src/**/*.tsx"
+  ]
+}

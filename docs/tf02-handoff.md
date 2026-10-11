@@ -1,6 +1,6 @@
 # TF02 handoff: working shared map
 
-**Ready for the next agent; TF02 has not started.** Begin when the user requests TF02. TF01 removed the previous implementation and established the package and selection foundation. Read [requirements](requirements.md), [stage plan](stage-plan.md), [testing policy](testing-policy.md), and [coding style](coding-style.md) before changing code.
+**Historical stage brief.** TF02 is complete. See the [TF02 record](tf02-shared-map.md). This page preserves the original brief.
 
 ## Intended result
 

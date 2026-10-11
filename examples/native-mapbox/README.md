@@ -1,0 +1,24 @@
+# Mapbox native example
+
+React Native 0.87 shell around the shared Seattle route map, using `one-map-react/mapbox-native`. The `app.json` name is `OneMapMapbox`; the generator uses the same name so the native module matches `AppRegistry`.
+
+From the repository root, `bun run build` writes the package `dist/` this shell imports. Then generate the ignored `ios/` and `android/` trees. This command copies the template `Gemfile` as well. It does not install JavaScript packages or CocoaPods, and it does not build or launch an app:
+
+```sh
+bun scripts/setup-native-example.mjs native-mapbox
+```
+
+Set the public Mapbox token in the shell or a gitignored `.env` file before Metro bundles the app. The shell variable `MAPBOX_ACCESS_TOKEN` wins. Otherwise the bundle reads `.env` in this directory, then `.env` at the repository root. Copy the root `.env.example` to either place and set the token there, or export the variable in the shell that starts Metro. Do not commit a token. Babel inlines that public value into the local bundle, so a secret token must not be used. Restart Metro after changing it.
+
+Then, from this directory:
+
+```sh
+bun install
+bundle install
+cd ios && bundle exec pod install && cd ..
+bun run ios
+# or
+bun run android
+```
+
+Do not install `@maplibre/maplibre-react-native` in this example. Runtime builds are acceptance work; do not launch them from routine checks.

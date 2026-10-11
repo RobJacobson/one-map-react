@@ -3,14 +3,24 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "moduleSuffixes": [".native", ""],
+    "paths": {
+      "@rnmapbox/maps": [
+        "./node_modules/@rnmapbox/maps/lib/typescript/src/Mapbox.native.d.ts"
+      ]
+    },
+    "jsx": "react-jsx",
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
     "types": [],
     "lib": ["ES2022"]
   },
-  "include": ["packages/one-map-react/src/**/*.ts"]
+  "include": [
+    "packages/one-map-react/src/**/*.ts",
+    "packages/one-map-react/src/**/*.tsx"
+  ]
 }

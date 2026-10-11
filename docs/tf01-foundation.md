@@ -1,6 +1,6 @@
 # TF01 foundation record
 
-**TF01 complete, 2026-10-10. TF02 has not started.** The user authorized backup verification, retirement of the old implementation and tooling, and the minimal package foundation. Map rendering was outside this checkpoint.
+**TF01 complete, 2026-10-10.** The user authorized backup verification, retirement of the old implementation and tooling, and the minimal package foundation. Map rendering was outside this checkpoint. Later TF02 status is in the [TF02 record](tf02-shared-map.md).
 
 ## Backup and retirement
 
@@ -33,4 +33,4 @@ The package checks extract the actual tarball into temporary consumers outside t
 
 The tested package SHA-256 was `745737b9b5d9ed95fa0eee49e133ca044b65992e05a8f18847c897814b76fd88`. A separate `bun run pack` produced the same hash: 15 files, 6.70 KB unpacked and 2.65 KB packed. The generated local archive and temporary dependency download cache were removed after verification.
 
-The [TF02 handoff](tf02-handoff.md) describes the next implementation and the verification still required. Do not report historical S04 outcomes as acceptance of the replacement.
+The [TF02 record](tf02-shared-map.md) describes the completed shared map. The [TF02 handoff](tf02-handoff.md) remains the original brief. Do not report historical S04 outcomes as acceptance of the replacement.

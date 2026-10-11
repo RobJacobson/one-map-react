@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "paths": {
+      "@rnmapbox/maps": [
+        "./node_modules/@rnmapbox/maps/lib/typescript/src/Mapbox.native.d.ts"
+      ],
+      "one-map-react": ["./packages/one-map-react/src/index.ts"],
+      "one-map-react/mapbox-native": [
+        "./packages/one-map-react/src/mapbox-native.tsx"
+      ],
+      "one-map-react/maplibre-native": [
+        "./packages/one-map-react/src/maplibre-native.tsx"
+      ]
+    }
+  },
+  "include": [
+    "examples/shared/route-map.tsx",
+    "examples/native-mapbox/App.tsx",
+    "examples/native-maplibre/App.tsx"
+  ]
+}

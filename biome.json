@@ -10,7 +10,9 @@
       "!**/.agents",
       "!**/.codex",
       "!**/bun.lock",
-      "!records"
+      "!records",
+      "!**/examples/*/ios",
+      "!**/examples/*/android"
     ]
   },
   "formatter": {
