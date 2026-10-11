@@ -1,5 +1,5 @@
 /**
- * Error thrown when `flyTo` has no camera call that the wrapper will apply.
+ * Error thrown when a camera command has no call the wrapper will apply.
  *
  * The camera or map ref is missing, or MapLibre Native has not reported style
  * load. Before that load, `setStop` can resolve after the native map drops the

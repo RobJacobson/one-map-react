@@ -19,7 +19,23 @@ interface PooledMap {
 
 interface MapHandle {
   flyTo: () => unknown;
+  jumpTo: () => unknown;
+  easeTo: () => unknown;
+  fitBounds: () => unknown;
+  zoomTo: () => unknown;
+  stop: () => unknown;
   resize: () => unknown;
+  getCenter: () => unknown;
+  getZoom: () => unknown;
+  getBearing: () => unknown;
+  getPitch: () => unknown;
+  getPadding: () => unknown;
+  getBounds: () => unknown;
+  getMinZoom: () => unknown;
+  getMaxZoom: () => unknown;
+  getMaxBounds: () => unknown;
+  project: () => unknown;
+  unproject: () => unknown;
   getMap: () => StyleLoadTarget;
 }
 
@@ -31,6 +47,10 @@ export interface StyleLoadTarget {
   emitIdle: () => void;
   listenerCount: () => number;
   isStyleLoaded: () => boolean;
+  touchZoomRotate: {
+    disableRotation: () => void;
+    enableRotation: () => void;
+  };
 }
 
 interface WebMapMockProps {
@@ -52,7 +72,35 @@ interface WebMapMockProps {
  */
 export const createWebMapMock = () => {
   const flyTo = jest.fn(() => ({ id: "map" }));
+  const jumpTo = jest.fn();
+  const easeTo = jest.fn();
+  const fitBounds = jest.fn();
+  const zoomTo = jest.fn();
+  const stop = jest.fn();
   const resize = jest.fn();
+  const getCenter = jest.fn(() => ({ lng: -122.34, lat: 47.61 }));
+  const getZoom = jest.fn(() => 11);
+  const getBearing = jest.fn(() => 4);
+  const getPitch = jest.fn(() => 1);
+  const getPadding = jest.fn(() => ({
+    top: 1,
+    right: 2,
+    bottom: 3,
+    left: 4,
+  }));
+  const getBounds = jest.fn(() => ({
+    getWest: () => 170,
+    getSouth: () => -10,
+    getEast: () => -170,
+    getNorth: () => 10,
+  }));
+  const getMinZoom = jest.fn(() => 2);
+  const getMaxZoom = jest.fn(() => 18);
+  const getMaxBounds = jest.fn(() => null);
+  const project = jest.fn(() => ({ x: 12, y: 34 }));
+  const unproject = jest.fn(() => ({ lng: -122.34, lat: 47.61 }));
+  const disableRotation = jest.fn();
+  const enableRotation = jest.fn();
   let saved: PooledMap | null = null;
   let serial = 0;
   let currentStyleTarget: StyleLoadTarget | null = null;
@@ -62,7 +110,25 @@ export const createWebMapMock = () => {
     serial = 0;
     currentStyleTarget = null;
     flyTo.mockClear();
+    jumpTo.mockClear();
+    easeTo.mockClear();
+    fitBounds.mockClear();
+    zoomTo.mockClear();
+    stop.mockClear();
     resize.mockClear();
+    getCenter.mockClear();
+    getZoom.mockClear();
+    getBearing.mockClear();
+    getPitch.mockClear();
+    getPadding.mockClear();
+    getBounds.mockClear();
+    getMinZoom.mockClear();
+    getMaxZoom.mockClear();
+    getMaxBounds.mockClear();
+    project.mockClear();
+    unproject.mockClear();
+    disableRotation.mockClear();
+    enableRotation.mockClear();
   };
 
   const WrapperMap = jest.fn(
@@ -80,7 +146,10 @@ export const createWebMapMock = () => {
         return {
           id: String(serial),
           contextWidth: gl === undefined ? "" : String(gl.drawingBufferWidth),
-          styleTarget: createStyleTarget(),
+          styleTarget: createStyleTarget({
+            disableRotation,
+            enableRotation,
+          }),
           constructed: true,
         };
       });
@@ -104,7 +173,23 @@ export const createWebMapMock = () => {
         ref,
         () => ({
           flyTo,
+          jumpTo,
+          easeTo,
+          fitBounds,
+          zoomTo,
+          stop,
           resize,
+          getCenter,
+          getZoom,
+          getBearing,
+          getPitch,
+          getPadding,
+          getBounds,
+          getMinZoom,
+          getMaxZoom,
+          getMaxBounds,
+          project,
+          unproject,
           getMap: () => record.styleTarget,
         }),
         [record.styleTarget]
@@ -147,13 +232,23 @@ export const createWebMapMock = () => {
     Source,
     Layer,
     flyTo,
+    jumpTo,
+    easeTo,
+    fitBounds,
+    zoomTo,
+    stop,
     resize,
+    getCenter,
+    disableRotation,
+    enableRotation,
     resetWebMapMock,
     getStyleTarget: () => currentStyleTarget,
   };
 };
 
-const createStyleTarget = (): StyleLoadTarget => {
+const createStyleTarget = (
+  touchZoomRotate: StyleLoadTarget["touchZoomRotate"]
+): StyleLoadTarget => {
   const listeners = new Map<string, Set<() => void>>();
   let loaded = false;
   const listenersFor = (type: string): Set<() => void> => {
@@ -195,5 +290,6 @@ const createStyleTarget = (): StyleLoadTarget => {
     },
     listenerCount: () => listeners.get("style.load")?.size ?? 0,
     isStyleLoaded: () => loaded,
+    touchZoomRotate,
   };
 };

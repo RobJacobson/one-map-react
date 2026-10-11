@@ -1,6 +1,23 @@
 export type { Adapter, Backend } from "./adapter.js";
-export type { FlyToOptions, MapRef, ViewState } from "./camera-types.js";
-export type { MapErrorEvent, MoveEvent, MoveOrigin } from "./event-types.js";
+export type {
+  Bounds,
+  CameraCommandOptions,
+  CameraEasing,
+  FitBoundsOptions,
+  FlyToOptions,
+  LngLat,
+  MapRef,
+  Padding,
+  Point,
+  ViewState,
+  ZoomToOptions,
+} from "./camera-types.js";
+export type {
+  ClickEvent,
+  MapErrorEvent,
+  MoveEvent,
+  MoveOrigin,
+} from "./event-types.js";
 export { Layer } from "./layer.js";
 export { Map } from "./map.js";
 export { MapSetup } from "./map-setup.js";

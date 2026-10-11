@@ -5,7 +5,9 @@ import { useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
+import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { RouteMap } from "../shared/route-map.js";
+import { smokeTarget } from "../shared/smoke-target.js";
 
 // Mapbox.native.d.ts hides setAccessToken inside a combined const export.
 // The runtime module still provides it.
@@ -26,7 +28,14 @@ if (!mapboxAccessToken) {
 
 void setAccessToken(mapboxAccessToken);
 
-const App = () => {
+const App = () =>
+  smokeTarget === "tf04" ? (
+    <NativeCameraScreen adapter={adapter} doubleTap={false} />
+  ) : (
+    <LifecycleApp />
+  );
+
+const LifecycleApp = () => {
   const mapRef = useRef<MapRef>(null);
   const smoke = useLifecycleSmoke({
     mapRef,
