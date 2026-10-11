@@ -11,6 +11,7 @@ import type { MapRef } from "../src/camera-types.js";
 import { Layer } from "../src/layer.js";
 import { Map as OneMap } from "../src/map.js";
 import { MapSetup } from "../src/map-setup.js";
+import type { ExternalDrawingContext, MapProps } from "../src/map-types.js";
 import { Source } from "../src/source.js";
 
 const mockSetCamera = jest.fn();
@@ -80,7 +81,27 @@ import { adapter } from "../src/mapbox-native.js";
 const MapViewMock = MapView as unknown as jest.Mock;
 const LineLayerMock = LineLayer as unknown as jest.Mock;
 
-const example = (ref?: Ref<MapRef>, onMove?: (event: object) => void) => (
+const lastMapProps = <Props,>(): Props => {
+  const lastCall = MapViewMock.mock.calls.at(-1);
+
+  if (!lastCall) {
+    throw new Error("MapView was not rendered");
+  }
+
+  return lastCall[0] as Props;
+};
+
+const drawingContext = (): ExternalDrawingContext => ({
+  canvas: {},
+  drawingBufferWidth: 1,
+  drawingBufferHeight: 1,
+});
+
+const example = (
+  ref?: Ref<MapRef>,
+  onMove?: (event: object) => void,
+  extra?: Partial<MapProps>
+) => (
   <MapSetup adapter={adapter}>
     <OneMap
       ref={ref}
@@ -88,6 +109,7 @@ const example = (ref?: Ref<MapRef>, onMove?: (event: object) => void) => (
       initialViewState={initialViewState}
       style={{ flex: 1 }}
       onMove={onMove}
+      {...extra}
     >
       <Source id="routes" type="geojson" data={routes}>
         <Layer
@@ -170,6 +192,21 @@ describe("mapbox-native adapter", () => {
       origin: "user",
     });
 
+    const onMapIdle = (lastCall[0] as { onMapIdle: (state: object) => void })
+      .onMapIdle;
+
+    onMapIdle({
+      properties: {
+        center: [-122.32, 47.64],
+        zoom: 11,
+        heading: 0,
+        pitch: 0,
+      },
+      gestures: { isGestureActive: false },
+    });
+
+    expect(onMove).toHaveBeenCalledTimes(2);
+
     await rendered.unmount();
     onCameraChanged({
       properties: {
@@ -181,7 +218,17 @@ describe("mapbox-native adapter", () => {
       gestures: { isGestureActive: true },
     });
 
-    expect(onMove).toHaveBeenCalledTimes(1);
+    onMapIdle({
+      properties: {
+        center: [-122.3, 47.6],
+        zoom: 12,
+        heading: 0,
+        pitch: 0,
+      },
+      gestures: { isGestureActive: false },
+    });
+
+    expect(onMove).toHaveBeenCalledTimes(2);
   });
 
   test("rerender keeps the wrapper map id and a new mount replaces it", async () => {
@@ -196,5 +243,89 @@ describe("mapbox-native adapter", () => {
     const second = await render(example());
 
     expect(second.getByTestId("wrapper-map").props.mapId).not.toBe(firstId);
+  });
+
+  test("reuseMaps is rejected before a map is created", async () => {
+    MapViewMock.mockClear();
+
+    await expect(
+      render(example(undefined, undefined, { reuseMaps: true }))
+    ).rejects.toThrow(
+      "reuseMaps is not available on native maps. Remounting creates a new map."
+    );
+    expect(MapViewMock).not.toHaveBeenCalled();
+  });
+
+  test("gl is rejected before a map is created", async () => {
+    MapViewMock.mockClear();
+
+    await expect(
+      render(example(undefined, undefined, { gl: drawingContext() }))
+    ).rejects.toThrow(
+      "gl is a web drawing context and is not available on native maps."
+    );
+    expect(MapViewMock).not.toHaveBeenCalled();
+  });
+
+  test("resize() is rejected", async () => {
+    const ref = createRef<MapRef>();
+
+    await render(example(ref));
+
+    await expect(ref.current?.resize()).rejects.toThrow(
+      "resize() is not available on native maps. Size follows the host style."
+    );
+  });
+
+  test("load, style, and error callbacks map to the wrapper and stop after unmount", async () => {
+    const onLoad = jest.fn();
+    const onStyleLoad = jest.fn();
+    const onError = jest.fn();
+    const rendered = await render(
+      example(undefined, undefined, { onLoad, onStyleLoad, onError })
+    );
+    const props = lastMapProps<{
+      onDidFinishLoadingMap: () => void;
+      onDidFinishLoadingStyle: () => void;
+      onMapLoadingError: (payload?: unknown) => void;
+    }>();
+
+    props.onDidFinishLoadingMap();
+    props.onDidFinishLoadingStyle();
+    props.onMapLoadingError();
+    // iOS includes tileId and sourceId. Android never calls this prop.
+    props.onMapLoadingError({
+      error: "tile failed",
+      tileId: "x:1 y:2 z:3",
+      sourceId: "streets",
+    });
+
+    expect(onLoad).toHaveBeenCalledTimes(1);
+    expect(onStyleLoad).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenNthCalledWith(1, {});
+    expect(onError).toHaveBeenNthCalledWith(2, { error: "tile failed" });
+
+    await rendered.unmount();
+    props.onDidFinishLoadingMap();
+    props.onDidFinishLoadingStyle();
+    props.onMapLoadingError({ error: "later" });
+
+    expect(onLoad).toHaveBeenCalledTimes(1);
+    expect(onStyleLoad).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledTimes(2);
+  });
+
+  test("a style update is passed to the wrapper", async () => {
+    const rendered = await render(example());
+
+    await rendered.rerender(
+      example(undefined, undefined, {
+        mapStyle: "https://example.com/style.json",
+      })
+    );
+
+    expect(lastMapProps<{ readonly styleURL?: string }>().styleURL).toBe(
+      "https://example.com/style.json"
+    );
   });
 });

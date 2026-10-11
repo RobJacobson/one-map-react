@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "stage": "TF03",
+  "status": "complete",
+  "completed": "2026-10-11",
+  "packageSha256": "1a6c2970f10f185f5cd82b5bdb160a7c6e51dad04e009c3f65000e42b418d2cf",
+  "checks": {
+    "validate": {
+      "status": "passed",
+      "format": "biome check",
+      "docs": "23 Markdown files, 24 SDK comparison tables",
+      "types": "tsconfig.json, tsconfig.test.json, tsconfig.examples.web.json, and tsconfig.examples.native.json",
+      "tests": "10 suites, 73 tests",
+      "package": "13 isolated selections; common entry without backend types; selected-entry file resolution"
+    }
+  },
+  "runtime": {
+    "mapbox-web-reuse": "passed",
+    "mapbox-web-gl": "passed",
+    "maplibre-web-reuse": "passed",
+    "maplibre-web-gl": "passed",
+    "mapbox-ios": "passed",
+    "mapbox-android": "passed",
+    "maplibre-ios": "passed",
+    "maplibre-android": "passed"
+  },
+  "runtimeNotes": {
+    "mapbox-web-reuse": "Headless Chrome. loads=2 styles=2 errors=0 canvas=same. The blue route stayed on the reused canvas.",
+    "maplibre-web-reuse": "Headless Chrome. loads=2 styles=2 errors=0 canvas=same. The blue route stayed on the reused canvas.",
+    "mapbox-web-gl": "Headless Chrome. loads=2 styles=2 canvas=same context=first. The first supplied context was painted. The second context passed on remount was not. The page canvas stayed blank because the context remains bound to the canvas it was created on.",
+    "maplibre-web-gl": "Headless Chrome. loads=2 styles=2 canvas=same context=first. Same context result as Mapbox web.",
+    "mapbox-ios": "iPhone 18 Pro. loads=2 styles=2 errors=1. Error: Failed to load style 'mapbox://styles/mapbox/not-a-style': HTTP status code 404. Style not found. Remount -122.34,47.61. The route was visible on the remounted map before the bad style. A relaunch ended on the same line. onMapIdle supplied the settled camera when onCameraChanged did not.",
+    "maplibre-ios": "iPhone 18 Pro Max. First done line: loads=2 styles=2 errors=1 error=omitted remount=-122.34,47.61. Later style retries raised the error count and still omitted error. onRegionDidChange supplied the opening camera.",
+    "mapbox-android": "emulator-5554. loads=2 styles=2 errors=0 error=timeout remount=-122.34,0.00. The remount left the north camera and kept latitude 0, which is pinned @rnmapbox/maps 10.3.7 on a cold style cache. onError was not called.",
+    "maplibre-android": "emulator-5554. First done line: loads=2 styles=2 errors=1 error=omitted remount=-122.34,47.61. The missing style then retried."
+  },
+  "runtimeScope": "Permission covered web reuse, a separate external-context case, and native load, remount, and loading-error behavior. It did not cover a TF02 Seattle-route rerun or TF04. None of the native remounts show native reuse. TF03 is complete. TF04 has not started."
+}

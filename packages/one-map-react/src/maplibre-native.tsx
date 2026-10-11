@@ -23,18 +23,40 @@ import { moveEventFromMaplibreNative } from "./convert-move-event.js";
 import { invokeWrapper } from "./invoke-wrapper.js";
 import type { MapProps } from "./map-types.js";
 import { missingCameraError } from "./missing-camera.js";
+import {
+  assertNativeMapOptions,
+  nativeResizeError,
+} from "./native-map-options.js";
 import type { LayerProps, SourceProps } from "./source-types.js";
 import { useActiveCallback } from "./use-active-callback.js";
 import { useFrozenValue } from "./use-frozen-value.js";
 
 const MaplibreNativeMap = forwardRef<MapRef, MapProps>(
-  ({ mapStyle, initialViewState, style, onMove, children }, ref) => {
+  (
+    {
+      mapStyle,
+      initialViewState,
+      style,
+      onMove,
+      onLoad,
+      onStyleLoad,
+      onError,
+      reuseMaps,
+      gl,
+      children,
+    },
+    ref
+  ) => {
     const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
-    // Style load is the public signal that MapLibre will apply an imperative
-    // stop. Before that, setStop can resolve after the native map drops it.
+    // onDidFinishLoadingMap is the signal that MapLibre will apply an
+    // imperative stop. Before that, setStop can resolve after the native map
+    // drops it. The same callback is the common onLoad event.
     const mapLoaded = useRef(false);
     const frozenViewState = useFrozenValue(initialViewState);
     const reportMove = useActiveCallback(onMove);
+    const reportLoad = useActiveCallback(onLoad);
+    const reportStyleLoad = useActiveCallback(onStyleLoad);
+    const reportError = useActiveCallback(onError);
 
     useImperativeHandle(ref, () => ({
       flyTo: async (options) => {
@@ -46,7 +68,28 @@ const MaplibreNativeMap = forwardRef<MapRef, MapProps>(
 
         await invokeWrapper(camera.flyTo(toMaplibreFlyToOptions(options)));
       },
+      resize: async () => {
+        throw nativeResizeError();
+      },
     }));
+
+    assertNativeMapOptions(reuseMaps, gl);
+
+    const reportRegion = (
+      event: NativeSyntheticEvent<ViewStateChangeEvent>
+    ) => {
+      const nativeEvent = event.nativeEvent;
+
+      reportMove(
+        moveEventFromMaplibreNative(
+          nativeEvent.center,
+          nativeEvent.zoom,
+          nativeEvent.bearing,
+          nativeEvent.pitch,
+          nativeEvent.userInteraction
+        )
+      );
+    };
 
     return (
       <MaplibreMap
@@ -55,22 +98,16 @@ const MaplibreNativeMap = forwardRef<MapRef, MapProps>(
         mapStyle={mapStyle}
         onDidFinishLoadingMap={() => {
           mapLoaded.current = true;
+          reportLoad();
         }}
-        onRegionIsChanging={(
-          event: NativeSyntheticEvent<ViewStateChangeEvent>
-        ) => {
-          const nativeEvent = event.nativeEvent;
-
-          reportMove(
-            moveEventFromMaplibreNative(
-              nativeEvent.center,
-              nativeEvent.zoom,
-              nativeEvent.bearing,
-              nativeEvent.pitch,
-              nativeEvent.userInteraction
-            )
-          );
+        onDidFinishLoadingStyle={() => {
+          reportStyleLoad();
         }}
+        onDidFailLoadingMap={() => {
+          reportError({});
+        }}
+        onRegionIsChanging={reportRegion}
+        onRegionDidChange={reportRegion}
       >
         <Camera
           ref={cameraRef}

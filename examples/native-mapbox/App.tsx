@@ -1,9 +1,10 @@
 import * as Mapbox from "@rnmapbox/maps";
 import { type MapRef, MapSetup } from "one-map-react";
 import { adapter } from "one-map-react/mapbox-native";
-import { useRef, useState } from "react";
-import { Button, StyleSheet, View } from "react-native";
+import { useRef } from "react";
+import { Button, StyleSheet, Text, View } from "react-native";
 
+import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
 import { RouteMap } from "../shared/route-map.js";
 
 // Mapbox.native.d.ts hides setAccessToken inside a combined const export.
@@ -27,35 +28,29 @@ void setAccessToken(mapboxAccessToken);
 
 const App = () => {
   const mapRef = useRef<MapRef>(null);
-  const [generation, setGeneration] = useState(0);
+  const smoke = useLifecycleSmoke({
+    mapRef,
+    failureStyleUrl: "mapbox://styles/mapbox/not-a-style",
+  });
 
   return (
     <MapSetup adapter={adapter}>
       <View style={styles.screen}>
         <View style={styles.toolbar}>
-          <Button
-            title="Fly north"
-            onPress={() => {
-              void mapRef.current?.flyTo({
-                center: [-122.32, 47.64],
-                duration: 1000,
-              });
-            }}
-          />
-          <Button
-            title="Remount"
-            onPress={() => {
-              setGeneration((current) => current + 1);
-            }}
-          />
+          <Button title="Fly north" onPress={smoke.flyNorth} />
+          <Button title="Remount" onPress={smoke.remount} />
+          <Button title="Bad style" onPress={smoke.failStyle} />
         </View>
+        <Text testID="tf03-status">{smoke.status}</Text>
         <RouteMap
-          key={generation}
+          key={smoke.generation}
           ref={mapRef}
+          mapStyle={smoke.mapStyle}
           style={{ flex: 1 }}
-          onMove={(event) => {
-            console.log(event.origin, event.viewState);
-          }}
+          onLoad={smoke.onLoad}
+          onStyleLoad={smoke.onStyleLoad}
+          onError={smoke.onError}
+          onMove={smoke.onMove}
         />
       </View>
     </MapSetup>
