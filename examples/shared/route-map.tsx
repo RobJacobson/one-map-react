@@ -1,7 +1,10 @@
 import {
+  type ExternalDrawingContext,
   Layer,
+  type MapErrorEvent,
   type MapLayoutStyle,
   type MapRef,
+  type MapStyle,
   type MoveEvent,
   Map as OneMap,
   Source,
@@ -16,22 +19,37 @@ import {
 
 interface RouteMapProps {
   readonly style?: MapLayoutStyle;
+  readonly mapStyle?: MapStyle;
+  readonly reuseMaps?: boolean;
+  readonly gl?: ExternalDrawingContext;
   readonly onMove?: (event: MoveEvent) => void;
+  readonly onLoad?: () => void;
+  readonly onStyleLoad?: () => void;
+  readonly onError?: (event: MapErrorEvent) => void;
 }
 
 /**
  * Shared Seattle route map used by the web and native example shells.
  *
- * Shells own remount, fly-to, tokens, and host layout.
+ * Shells own remount, fly-to, tokens, host layout, and the TF03 smoke
+ * controls. The default map does not opt into reuse.
  */
 export const RouteMap = forwardRef<MapRef, RouteMapProps>(
-  ({ style, onMove }, ref) => (
+  (
+    { style, mapStyle, reuseMaps, gl, onMove, onLoad, onStyleLoad, onError },
+    ref
+  ) => (
     <OneMap
       ref={ref}
-      mapStyle={emptyStyle}
+      mapStyle={mapStyle ?? emptyStyle}
       initialViewState={initialViewState}
       style={style}
+      reuseMaps={reuseMaps}
+      gl={gl}
       onMove={onMove}
+      onLoad={onLoad}
+      onStyleLoad={onStyleLoad}
+      onError={onError}
     >
       <Source id="routes" type="geojson" data={routes}>
         <Layer

@@ -16,9 +16,11 @@ const path = require("node:path");
  * @param {string} platform
  */
 const resolveModule = (shellRoot, context, moduleName, platform) => {
-  const { resolve } = require(require.resolve("metro-resolver", {
-    paths: [shellRoot],
-  }));
+  const { resolve } = require(
+    require.resolve("metro-resolver", {
+      paths: [shellRoot],
+    })
+  );
 
   return resolve(context, moduleName, platform);
 };

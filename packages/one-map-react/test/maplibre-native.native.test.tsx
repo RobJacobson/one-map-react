@@ -11,6 +11,7 @@ import type { MapRef } from "../src/camera-types.js";
 import { Layer } from "../src/layer.js";
 import { Map as OneMap } from "../src/map.js";
 import { MapSetup } from "../src/map-setup.js";
+import type { ExternalDrawingContext, MapProps } from "../src/map-types.js";
 import { Source } from "../src/source.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
@@ -73,6 +74,22 @@ import { adapter } from "../src/maplibre-native.js";
 const MapMock = MaplibreMap as unknown as jest.Mock;
 const LayerMock = MaplibreLayer as unknown as jest.Mock;
 
+const lastMapProps = <Props,>(): Props => {
+  const lastCall = MapMock.mock.calls.at(-1);
+
+  if (!lastCall) {
+    throw new Error("Map was not rendered");
+  }
+
+  return lastCall[0] as Props;
+};
+
+const drawingContext = (): ExternalDrawingContext => ({
+  canvas: {},
+  drawingBufferWidth: 1,
+  drawingBufferHeight: 1,
+});
+
 const finishMapLoad = (): void => {
   const lastCall = MapMock.mock.calls.at(-1);
 
@@ -91,7 +108,11 @@ const finishMapLoad = (): void => {
   onDidFinishLoadingMap();
 };
 
-const example = (ref?: Ref<MapRef>, onMove?: (event: object) => void) => (
+const example = (
+  ref?: Ref<MapRef>,
+  onMove?: (event: object) => void,
+  extra?: Partial<MapProps>
+) => (
   <MapSetup adapter={adapter}>
     <OneMap
       ref={ref}
@@ -99,6 +120,7 @@ const example = (ref?: Ref<MapRef>, onMove?: (event: object) => void) => (
       initialViewState={initialViewState}
       style={{ flex: 1 }}
       onMove={onMove}
+      {...extra}
     >
       <Source id="routes" type="geojson" data={routes}>
         <Layer
@@ -196,6 +218,30 @@ describe("maplibre-native adapter", () => {
       origin: "user",
     });
 
+    const onRegionDidChange = (
+      lastCall[0] as { onRegionDidChange: (event: object) => void }
+    ).onRegionDidChange;
+
+    onRegionDidChange({
+      nativeEvent: {
+        center: [-122.32, 47.64],
+        zoom: 11,
+        bearing: 0,
+        pitch: 0,
+        userInteraction: false,
+      },
+    });
+
+    expect(onMove).toHaveBeenCalledTimes(2);
+    expect(onMove).toHaveBeenLastCalledWith({
+      viewState: {
+        ...initialViewState,
+        longitude: -122.32,
+        latitude: 47.64,
+      },
+      origin: "unknown",
+    });
+
     await rendered.unmount();
     onRegionIsChanging({
       nativeEvent: {
@@ -206,8 +252,17 @@ describe("maplibre-native adapter", () => {
         userInteraction: true,
       },
     });
+    onRegionDidChange({
+      nativeEvent: {
+        center: [-122.3, 47.6],
+        zoom: 12,
+        bearing: 0,
+        pitch: 0,
+        userInteraction: false,
+      },
+    });
 
-    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(onMove).toHaveBeenCalledTimes(2);
   });
 
   test("rerender keeps the wrapper map id and a new mount replaces it", async () => {
@@ -222,5 +277,82 @@ describe("maplibre-native adapter", () => {
     const second = await render(example());
 
     expect(second.getByTestId("wrapper-map").props.mapId).not.toBe(firstId);
+  });
+
+  test("reuseMaps is rejected before a map is created", async () => {
+    MapMock.mockClear();
+
+    await expect(
+      render(example(undefined, undefined, { reuseMaps: true }))
+    ).rejects.toThrow(
+      "reuseMaps is not available on native maps. Remounting creates a new map."
+    );
+    expect(MapMock).not.toHaveBeenCalled();
+  });
+
+  test("gl is rejected before a map is created", async () => {
+    MapMock.mockClear();
+
+    await expect(
+      render(example(undefined, undefined, { gl: drawingContext() }))
+    ).rejects.toThrow(
+      "gl is a web drawing context and is not available on native maps."
+    );
+    expect(MapMock).not.toHaveBeenCalled();
+  });
+
+  test("resize() is rejected", async () => {
+    const ref = createRef<MapRef>();
+
+    await render(example(ref));
+
+    await expect(ref.current?.resize()).rejects.toThrow(
+      "resize() is not available on native maps. Size follows the host style."
+    );
+  });
+
+  test("load, style, and error callbacks map to the wrapper and stop after unmount", async () => {
+    const onLoad = jest.fn();
+    const onStyleLoad = jest.fn();
+    const onError = jest.fn();
+    const rendered = await render(
+      example(undefined, undefined, { onLoad, onStyleLoad, onError })
+    );
+    const props = lastMapProps<{
+      onDidFinishLoadingMap: () => void;
+      onDidFinishLoadingStyle: () => void;
+      onDidFailLoadingMap: () => void;
+    }>();
+
+    props.onDidFinishLoadingMap();
+    props.onDidFinishLoadingStyle();
+    props.onDidFailLoadingMap();
+
+    expect(onLoad).toHaveBeenCalledTimes(1);
+    expect(onStyleLoad).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith({});
+
+    await rendered.unmount();
+    props.onDidFinishLoadingMap();
+    props.onDidFinishLoadingStyle();
+    props.onDidFailLoadingMap();
+
+    expect(onLoad).toHaveBeenCalledTimes(1);
+    expect(onStyleLoad).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledTimes(1);
+  });
+
+  test("a style update is passed to the wrapper", async () => {
+    const rendered = await render(example());
+
+    await rendered.rerender(
+      example(undefined, undefined, {
+        mapStyle: "https://example.com/style.json",
+      })
+    );
+
+    expect(lastMapProps<{ readonly mapStyle?: string }>().mapStyle).toBe(
+      "https://example.com/style.json"
+    );
   });
 });

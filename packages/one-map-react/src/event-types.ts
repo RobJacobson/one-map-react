@@ -17,3 +17,16 @@ export interface MoveEvent {
   /** Movement origin, or `unknown` when the wrapper does not establish it. */
   readonly origin: MoveOrigin;
 }
+
+/**
+ * Failure reported by the map wrapper.
+ *
+ * Web adapters copy the wrapper's `error` value. Mapbox native copies the
+ * error string when iOS `onMapLoadingError` includes one. Android's pinned
+ * `@rnmapbox/maps` 10.3.7 does not deliver that callback. MapLibre native
+ * omits `error` because that wrapper drops the message before JavaScript.
+ */
+export interface MapErrorEvent {
+  /** Wrapper or renderer error, when the callback includes one. */
+  readonly error?: unknown;
+}

@@ -10,7 +10,7 @@ The expected opening view is longitude -122.34, latitude 47.61, zoom 11, from `t
 
 Android mount and remount both logged `onMove` with origin `unknown`, longitude 0, latitude 0, then zoom 0.6917435191712747. The route was off screen. A pixel scan of the opening screenshot found no route-colored pixels in the map area. Fly north then logged longitude -122.32, latitude 47.64, zoom 11, origin `unknown`, and the blue line was visible. Remount created a new map: the camera left the flown view. That new map again opened at 0, 0.
 
-The compact record is [tf02-shared-map.json](../records/evidence/tf02-shared-map.json). The stage record is [tf02-shared-map.md](tf02-shared-map.md). TF02 is complete. Map reuse is TF03; do not start it until the owner asks.
+The compact record is [tf02-shared-map.json](../records/evidence/tf02-shared-map.json). The stage record is [tf02-shared-map.md](tf02-shared-map.md). TF02 is complete. Map reuse is recorded in [TF03](tf03-reuse.md).
 
 ## What already works on this build
 

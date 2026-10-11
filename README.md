@@ -2,7 +2,7 @@
 
 one-map-react is being built as a thin React facade over RNMapbox, MapLibre React Native, and react-map-gl. Applications choose a backend at setup and use a shared map API, generally following react-map-gl. Full upstream API coverage and map reuse are requirements.
 
-**Current status: TF02 complete.** The package renders one GeoJSON line map through four adapters, and the six-environment smoke passed. Mapbox Android opens at longitude 0, latitude 0 because that is pinned `@rnmapbox/maps` 10.3.7 on a cold style cache; the facade passes the same `defaultSettings`. Map reuse remains TF03.
+**Current status: TF02 complete. TF03's reuse API is implemented, and its renderer smoke passed.** The package renders one GeoJSON line map through four adapters, and the six-environment smoke passed. Mapbox Android opens at longitude 0, latitude 0 because that is pinned `@rnmapbox/maps` 10.3.7 on a cold style cache; the facade passes the same `defaultSettings`. Web `reuseMaps` uses the react-map-gl pool. Native remounts create a new map. See [TF03](docs/tf03-reuse.md).
 
 ## Development
 

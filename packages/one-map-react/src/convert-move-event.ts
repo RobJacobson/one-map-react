@@ -67,7 +67,8 @@ export const moveEventFromRnmapbox = (
 };
 
 /**
- * Builds a move event from MapLibre Native `onRegionIsChanging`.
+ * Builds a move event from MapLibre Native `onRegionIsChanging` or
+ * `onRegionDidChange`.
  *
  * @param center - `[longitude, latitude]`.
  * @param zoom - Native zoom.

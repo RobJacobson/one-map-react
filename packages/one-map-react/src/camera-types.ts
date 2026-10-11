@@ -40,4 +40,13 @@ export interface MapRef {
    * not yet reported that its style finished loading.
    */
   flyTo: (options: FlyToOptions) => Promise<void>;
+  /**
+   * Asks a web map to measure its container.
+   *
+   * @returns A promise that fulfills when the wrapper accepts the call.
+   * Fulfillment does not mean a frame was painted.
+   * @throws When the web map ref is missing, or when the adapter is native.
+   * Native maps take their size from the host style and have no resize method.
+   */
+  resize: () => Promise<void>;
 }

@@ -17,6 +17,7 @@
   "include": [
     "examples/css-modules.d.ts",
     "examples/shared/route-map.tsx",
+    "examples/shared/web-lifecycle-app.tsx",
     "examples/web-mapbox/src/**/*.tsx",
     "examples/web-mapbox/env.d.ts",
     "examples/web-maplibre/src/**/*.tsx"

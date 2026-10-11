@@ -1,6 +1,6 @@
 # one-map-react documentation
 
-one-map-react is being built as a thin facade over RNMapbox, MapLibre React Native, and react-map-gl. Full API coverage, mixed backend selection, and map reuse remain requirements. TF01 established the package and selection foundation. TF02 is complete. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache.
+one-map-react is being built as a thin facade over RNMapbox, MapLibre React Native, and react-map-gl. Full API coverage, mixed backend selection, and map reuse remain requirements. TF01 established the package and selection foundation. TF02 is complete. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03's reuse and lifecycle API is implemented, and its renderer smoke passed.
 
 ## Current direction
 
@@ -10,7 +10,7 @@ Read these documents in order:
 2. [Stage plan](stage-plan.md): TF01–TF10, with a working shared map before expanding coverage.
 3. [Testing policy](testing-policy.md): tests selected by changed behavior, runtime permission, and compact evidence.
 
-The [TF01 record](tf01-foundation.md) describes backup verification, removal, and foundation checks. The [TF02 record](tf02-shared-map.md) describes the completed shared map and its architecture trace. The [TF02 handoff](tf02-handoff.md) remains the original stage brief. The [Android camera handoff](tf02-android-camera-handoff.md) records why the Mapbox Android opening camera matches the pinned wrapper. Historical S04 acceptance does not certify this replacement.
+The [TF01 record](tf01-foundation.md) describes backup verification, removal, and foundation checks. The [TF02 record](tf02-shared-map.md) describes the completed shared map and its architecture trace. The [TF02 handoff](tf02-handoff.md) remains the original stage brief. The [Android camera handoff](tf02-android-camera-handoff.md) records why the Mapbox Android opening camera matches the pinned wrapper. The [TF03 record](tf03-reuse.md) describes the completed reuse and lifecycle stage. Historical S04 acceptance does not certify this replacement.
 
 ## Contributor guidance
 
