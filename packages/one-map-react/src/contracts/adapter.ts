@@ -5,8 +5,10 @@ import type {
 } from "react";
 
 import type { MapRef } from "./camera-types.js";
+import type { ImagesProps } from "./images-types.js";
+import type { LayerProps } from "./layer-types.js";
 import type { MapProps } from "./map-types.js";
-import type { LayerProps, SourceProps } from "./source-types.js";
+import type { SourceProps } from "./source-types.js";
 
 /** Explicit engine and host selection; native covers both iOS and Android. */
 export type Backend =
@@ -26,8 +28,10 @@ export interface Adapter {
   readonly backend: Backend;
   /** Map container, camera, commands, and movement events. */
   readonly Map: ForwardRefExoticComponent<MapProps & RefAttributes<MapRef>>;
-  /** GeoJSON source that nests child layers. */
+  /** Source that nests child layers. */
   readonly Source: ComponentType<SourceProps>;
-  /** Line layer that forwards a parent-injected source id. */
+  /** Layer that forwards a parent-injected source id. */
   readonly Layer: ComponentType<LayerProps>;
+  /** Style images registered on the enclosing map. */
+  readonly Images: ComponentType<ImagesProps>;
 }

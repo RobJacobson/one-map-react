@@ -26,5 +26,32 @@
     "android": "Rerun on emulator-5554 through Metro at the Mac LAN address 192.168.12.119:8081. debug_http_host was written before the cold start. Both engines passed. stop was rejected, and the unaccepted jump remained at -120,45, so held=0 and controlledCamera stays unadvertised. MapLibre Android SDK 13.6.1 onDoubleTapEvent requires zoom gestures, so the double tap did not zoom while touchZoom was false. That timeout is the pass.",
     "ios": "Rerun on iPhone 18 Pro through Metro on localhost. Xcode 27 does not deliver SimulatorKit mouse events, so taps went through an XCUITest driver. Both engines passed. stop was rejected and held=0, so the unaccepted jump left the fit and controlledCamera stays unadvertised. MapLibre iOS zoomed on the double tap while pinch zoom was off."
   },
-  "runtimeScope": "Permission covered fitBounds, click, stop, and a rejected controlled move on web and native, plus a MapLibre double tap beside touchZoom. It did not cover a TF02 or TF03 rerun. Web passed on the earlier run the same day and was not repeated. Android and iOS were rerun through Metro. All six environments passed. MapLibre Android's double tap did not zoom, which is the SDK result while pinch zoom is off. MapLibre iOS zoomed."
+  "runtimeScope": "Permission covered fitBounds, click, stop, and a rejected controlled move on web and native, plus a MapLibre double tap beside touchZoom. It did not cover a TF02 or TF03 rerun. Web passed on the earlier run the same day and was not repeated. Android and iOS were rerun through Metro. All six environments passed. MapLibre Android's double tap did not zoom, which is the SDK result while pinch zoom is off. MapLibre iOS zoomed.",
+  "reverified": {
+    "completed": "2026-10-11",
+    "reason": "Structural restructure of src into contracts/, facade/, and adapters/ subfolders with no behavior change; every environment rerun to confirm the refactored package.",
+    "packageSha256": "aca7d17173b8de217c29e6d2ea21727247865580681766eef0636cef23987cd1",
+    "commands": [
+      "bun scripts/tf04-camera-smoke.mjs web",
+      "bun scripts/tf04-camera-smoke.mjs android",
+      "bun scripts/tf04-camera-smoke.mjs ios"
+    ],
+    "runtime": {
+      "mapbox-web": "passed",
+      "maplibre-web": "passed",
+      "mapbox-android": "passed",
+      "maplibre-android": "passed",
+      "mapbox-ios": "passed",
+      "maplibre-ios": "passed"
+    },
+    "lines": {
+      "mapbox-web": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+      "maplibre-web": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+      "mapbox-android": "fit=ok click=hit stop=rejected held=0 doubletap=skip; passed",
+      "maplibre-android": "fit=ok click=hit stop=rejected held=0 doubletap=timeout; passed",
+      "mapbox-ios": "fit=ok click=hit stop=rejected held=0; passed",
+      "maplibre-ios": "fit=ok click=hit stop=rejected held=0 doubletap=zoomed; passed"
+    },
+    "notes": "All six environments passed on the first attempt through subagents, sequential native waves over Metro 8081 (web ~29s, Android ~63s, iOS ~68s). Field values matched the original run; only clickAt/center decimals differed per renderer."
+  }
 }

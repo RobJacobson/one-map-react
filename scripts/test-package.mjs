@@ -150,7 +150,7 @@ const main = async () => {
     for (const file of files) {
       assert.match(
         file,
-        /^package\/(?:dist\/[^/]+|package.json|README.md|LICENSE)$/
+        /^package\/(?:dist\/.+|package.json|README.md|LICENSE)$/
       );
     }
 
@@ -203,7 +203,7 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     );
     assert.equal(
       run("node", [join(consumer, "common.mjs")], consumer),
-      JSON.stringify(["Layer", "Map", "MapSetup", "Source"])
+      JSON.stringify(["Images", "Layer", "Map", "MapSetup", "Source"])
     );
   }
 

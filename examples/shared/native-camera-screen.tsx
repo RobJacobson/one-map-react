@@ -26,8 +26,7 @@ export const NativeCameraScreen = ({
     mapRef,
     platform: "native",
     doubleTap,
-    statusUrl:
-      Platform.OS === "ios" ? "http://127.0.0.1:8799/tf04" : undefined,
+    statusUrl: Platform.OS === "ios" ? "http://127.0.0.1:8799/tf04" : undefined,
   });
 
   return (

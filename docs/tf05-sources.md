@@ -1,0 +1,62 @@
+# TF05 sources, layers, images, and updates
+
+**Implemented in the package. The renderer smoke passed.** Web Mapbox and MapLibre mounted the portable source and layer set, reset a removed paint key, updated GeoJSON data, rebuilt after style replacement, and cleaned up transient sources. Both Android engines and both iOS engines passed the same cases. Jest covers the conversion through the mocked adapters. See [records/evidence/tf05-sources.json](../records/evidence/tf05-sources.json).
+
+## Contract
+
+`Source` accepts a discriminated union on `type`. The portable families are `geojson`, `vector`, `raster`, `raster-dem`, and `image`; every source requires a stable `id`. GeoJSON `data` is a facade-owned geometry, feature, or feature collection, or a URL string. A tiled source takes a TileJSON `url` or a `tiles` template list. An image source takes a `url` and four corners ordered top-left, top-right, bottom-right, bottom-left. Types describe those shapes; the converters remap field names and do not re-validate ranges, empty strings, or GeoJSON kinds. Invalid values are deferred to the selected map library. Options the selected adapter cannot honor still throw.
+
+`Layer` accepts a union over eight portable types: `background`, `fill`, `line`, `circle`, `symbol`, `raster`, `heatmap`, and `fill-extrusion`. Paint and layout objects are keyed by style-specification property names with facade-owned value types. Unknown keys, wrong-group keys, zoom bounds, and background filters are not checked at runtime. Native adapters still reject `icon-overlap`, `text-overlap`, and `text-variable-anchor-offset`. `beforeId` is the ordering field. `id`, `type`, `"source-layer"`, and an injected `source` or `sourceID` are creation inputs; paint, layout, filter, zoom range, and `beforeId` may change between renders.
+
+`Expression` and `FilterExpression` are structural readonly arrays preserved intact on every adapter. The facade does not claim a union of all vendor expression operators, and it does not interpret filter contents.
+
+`Images` takes a record of style image name to a URL string or a `{ url, sdf }` entry. Empty names and empty URLs are forwarded; the selected registration path handles them. Native bundled numeric asset handles stay a named native extension; URL entries are the portable core.
+
+## Source conversion
+
+| RNMapbox | MapLibre React Native | react-map-gl | Proposed one-map-react API |
+| --- | --- | --- | --- |
+| `ShapeSource` takes `shape` or `url`; `VectorSource`, `RasterSource`, and `RasterDemSource` take `url` or `tileUrlTemplates`; `ImageSource` takes `url` and four corners. | `GeoJSONSource`, `VectorSource`, `RasterSource`, `RasterDEMSource`, and `ImageSource` follow style-spec names. | `Source` forwards style-spec fields. | One `Source` union. GeoJSON object data becomes RNMapbox `shape`, a data URL becomes RNMapbox `url`; `tiles` becomes `tileUrlTemplates`. |
+| Zoom fields are `minZoomLevel` and `maxZoomLevel`. | `minzoom` and `maxzoom`. | `minzoom` and `maxzoom`. | Style-spec names, renamed for RNMapbox. |
+| `tms` boolean. | `scheme` string. | `scheme` string. | `scheme: "xyz" or "tms"`; `"tms"` converts to RNMapbox `tms: true`. |
+| `RasterDemSource` declares no encoding prop. | `RasterDEMSource` accepts `encoding`. | Style-spec `encoding`. | `encoding` is portable; setting it on mapbox-native throws. |
+| `RasterDemSource` declares no attribution or `tms` prop. | `RasterDEMSource` accepts `attribution`; no `scheme`. | Style-spec `attribution` and `scheme`. | `attribution` is portable; setting it on mapbox-native throws. `scheme` is portable on web; setting it on either native adapter throws. |
+| No `generateId` or `promoteId` source prop. | No `generateId` or `promoteId` source prop. | Style-spec fields. | Portable on web; setting either on a native adapter throws with the wrapper named. |
+
+GeoJSON `data` updates are delegated: RNMapbox receives a new `shape` or `url`, MapLibre Native receives new `data`, and react-map-gl applies its own source diffing (`setData`). The facade adds no coordination for data updates.
+
+## Layer conversion
+
+RNMapbox receives one camelCase `style` object through its typed layer components (`LineLayer`, `CircleLayer`, `FillLayer`, `SymbolLayer`, `RasterLayer`, `HeatmapLayer`, `FillExtrusionLayer`, `BackgroundLayer`). Each adapter defines a per-family converter (`toRnmapboxShapeSource`, `toRnmapboxLineLayer`, and so on) colocated in the adapter module: the converter takes the narrowed portable props, returns the wrapper component's own props derived with `ComponentProps`, and lists every field mapping explicitly; the source and layer components switch on `type` only to pair a case with component and converter. MapLibre Native's generic `Layer` receives `type`, paint, layout, `"source-layer"`, `filter`, and `beforeId` unchanged, and its source components list the style-spec fields as JSX attributes. Web forwards the props to react-map-gl, which already matches style-spec naming, so the adapter drops `children` and copies the readonly `tiles` and `coordinates` arrays.
+
+| RNMapbox | MapLibre React Native | react-map-gl | Proposed one-map-react API |
+| --- | --- | --- | --- |
+| `sourceID`, `sourceLayerID`, `belowLayerID`, `minZoomLevel`, `maxZoomLevel`. | `source`, `sourceLayerID`, `beforeId`, `minzoom`, `maxzoom`. | `source`, `source-layer`, `beforeId`, `minzoom`, `maxzoom`. | `source` (injected by the parent source), `"source-layer"`, `beforeId`, `minzoom`, `maxzoom`; renamed per wrapper. |
+| Style map predates `icon-overlap`, `text-overlap`, and `text-variable-anchor-offset`. | Style map predates the same three symbol layout keys. | Both pinned web SDKs support them. | Keys stay in the portable types and throw only on the native adapters; the gate drops when the pinned wrappers add them. |
+| Removed style keys reset when the wrapper applies the next `style` object. | Generic `Layer` applies the next style props. | react-map-gl diffs paint and layout and resets removed keys. | Delegated to the wrapper. Mocked tests record the exact props each wrapper receives; the smoke exercises a removed `line-color`. |
+
+Changing a source `id`/`type`, an immutable source creation option (everything except GeoJSON `data` and image `url`/`coordinates`), or a layer's `id`/`type`/`"source-layer"` throws with "Remount it with a new React key to recreate the resource." The first render's values win for the component's lifetime, so no backend silently applies a change another ignores.
+
+## Clustering
+
+GeoJSON clustering options `cluster`, `clusterRadius`, `clusterMaxZoom`, `clusterProperties`, `buffer`, `tolerance`, and `lineMetrics` are portable; `clusterMaxZoom` becomes RNMapbox `clusterMaxZoomLevel`. `clusterMinPoints` throws on mapbox-native because the pinned `ShapeSource` has no such prop, and `generateId`/`promoteId` throw on both native adapters as recorded above. Cluster query methods stay TF06.
+
+## Images
+
+The common `Images` component renders the adapter's registration path. RNMapbox receives the entry record as-is; MapLibre Native converts `{ url, sdf }` to `{ source: { uri }, sdf }`, because the wrapper resolves object entries through React Native's `Image.resolveAssetSource`, which rejects a bare URL string. Both native wrappers register after style readiness and re-register after style replacement on their own.
+
+Web has no wrapper component, so the adapter registers through the map handle and waits until `isStyleLoaded()` is true. `hasImage`, `removeImage`, and `addImage` throw while the style is not loaded, so those calls wait and the `style.load` listener retries. `hasImage` gates the load, the entry-specific loader decodes the URL (Mapbox GL's `loadImage` is callback-based while MapLibre GL's returns a promise, so each web adapter supplies its own `loadWebImage`), and `addImage` registers the decoded image. Registration is keyed by entry contents, not object identity, so a new `images` record with the same names and URLs does not reload. Added or removed names update in place. A load that finishes after that name's URL or `sdf` changed, or after the style unloads, is ignored. `style.load` re-registers the current entries after style replacement and after the first load. `styledata` restores only images this component already added that the style dropped, so tile activity does not retry a failed URL. A failed load or a thrown `addImage` leaves the image unregistered so the next `style.load` retries. Unmount removes only the images the component itself added. The common `Images` component throws "Images must render inside Map." when it is not a `Map` descendant, so every adapter raises the same error.
+
+## Style replacement and removal
+
+Replacing `mapStyle` rebuilds owned sources, layers, and images on every adapter. react-map-gl removes layers before their sources and re-adds both against the new style; the native wrappers re-attach their owned resources after the new style loads; web images re-register through the `styledata` listener above. The web `onStyleLoad` listener re-attaches when `mapStyle` changes so an in-place style diff that never emits `style.load` still reports once the current style is loaded. The fixture server serves a valid empty Mapbox Vector Tile rather than HTTP 204, because MapLibre Android treats 204 as a failed tile and never finishes map load. Android Metro inlines the host LAN address for fixture URLs: MapLibre Android's HTTP stack times out on the emulator's `10.0.2.2` alias. The facade does not adopt style-owned sources: RNMapbox's `existing` flag is not exposed. Ordering and rebuild were confirmed by the six-environment smoke.
+
+## Deferred decisions
+
+`raster-array` stays Mapbox-only and web `video`/`canvas` sources stay web-only; all three move to TF09, including the unresolved MapLibre web canvas transport recorded as an open question in [sources and layers](sources-and-layers.md). Rendered/source queries, feature state, and cluster query methods stay TF06. Source press handling and `interactiveLayerIds` stay TF07. Terrain stays TF09.
+
+## Checks
+
+`bun run validate` runs format, docs, types, Jest, and packed selection, and passes. Mocked adapter tests cover source field renames, kebab-to-camel layer style, cluster renames, capability rejections, expression passthrough, and unset-key omission on both native adapters, every source family and all eight layer types on both web adapters, GeoJSON data updates, image `url`/`coordinates` updates, removed paint keys, a cleared filter, immutable-option rejection, image registration, removal, style-load gating, an `addImage` failure retry, `styledata` re-registration, Images-outside-Map rejection, and the stable-options hook.
+
+The example smoke adds a TF05 scenario to [examples/shared](../examples/shared/sources-map.tsx): a vector source with a fill layer, a raster source with a raster layer, an image source, a GeoJSON route with a line layer, and a marker source with circle and symbol layers sharing a registered image. The symbol layer uses `icon-image` only; `text-field` is omitted because Mapbox GL requires a style `glyphs` URL for it, and the fixture styles have none. The scenario removes a paint key to exercise reset, updates the GeoJSON data, replaces the style to observe the rebuild, and removes the transient sources. The six-environment run is recorded in [records/evidence/tf05-sources.json](../records/evidence/tf05-sources.json).

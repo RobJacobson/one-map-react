@@ -12,6 +12,19 @@
       }
     ]
   },
+  "replacementStyle": {
+    "version": 8,
+    "sources": {},
+    "layers": [
+      {
+        "id": "replacement-background",
+        "type": "background",
+        "paint": {
+          "background-color": "#eef2ff"
+        }
+      }
+    ]
+  },
   "initialViewState": {
     "longitude": -122.34,
     "latitude": 47.61,

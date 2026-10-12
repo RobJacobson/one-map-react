@@ -1,18 +1,25 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
-import { render } from "@testing-library/react";
-import { createRef, type Ref, StrictMode } from "react";
+import { render, waitFor } from "@testing-library/react";
+import { createRef, type ReactNode, type Ref, StrictMode } from "react";
 
 import {
   emptyStyle,
   initialViewState,
+  replacementStyle,
   routes,
 } from "../../../tests/fixtures/map-fixture.js";
-import type { MapRef } from "../src/camera-types.js";
-import { Layer } from "../src/layer.js";
-import { Map as OneMap } from "../src/map.js";
-import { MapSetup } from "../src/map-setup.js";
-import type { ExternalDrawingContext, MapProps } from "../src/map-types.js";
-import { Source } from "../src/source.js";
+import type { MapRef } from "../src/contracts/camera-types.js";
+import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
+import type {
+  ExternalDrawingContext,
+  MapProps,
+} from "../src/contracts/map-types.js";
+import type { SourceProps } from "../src/contracts/source-types.js";
+import { Images } from "../src/facade/images.js";
+import { Layer } from "../src/facade/layer.js";
+import { Map as OneMap } from "../src/facade/map.js";
+import { MapSetup } from "../src/facade/map-setup.js";
+import { Source } from "../src/facade/source.js";
 import type { createWebMapMock } from "./create-web-map-mock.js";
 
 jest.mock("react-map-gl/mapbox", () => {
@@ -21,7 +28,11 @@ jest.mock("react-map-gl/mapbox", () => {
   return createWebMapMock();
 });
 
-import { Layer as MapboxLayer, Map as MapboxMap } from "react-map-gl/mapbox";
+import {
+  Layer as MapboxLayer,
+  Map as MapboxMap,
+  Source as MapboxSource,
+} from "react-map-gl/mapbox";
 
 import { adapter } from "../src/mapbox-web.js";
 
@@ -29,6 +40,7 @@ type WebMapMockModule = ReturnType<typeof createWebMapMock>;
 
 const MapMock = MapboxMap as unknown as jest.Mock;
 const LayerMock = MapboxLayer as unknown as jest.Mock;
+const SourceMock = MapboxSource as unknown as jest.Mock;
 const {
   resetWebMapMock,
   getStyleTarget,
@@ -334,6 +346,29 @@ describe("mapbox-web adapter", () => {
     expect(onStyleLoad).toHaveBeenCalledTimes(2);
   });
 
+  test("a mapStyle replacement reports onStyleLoad when the style is already loaded", () => {
+    const onStyleLoad = jest.fn();
+    const rendered = render(example(undefined, undefined, { onStyleLoad }));
+    const styleTarget = getStyleTarget();
+
+    if (!styleTarget) {
+      throw new Error("Map did not attach a style listener");
+    }
+
+    styleTarget.emitStyleLoad();
+
+    expect(onStyleLoad).toHaveBeenCalledTimes(1);
+
+    rendered.rerender(
+      example(undefined, undefined, {
+        onStyleLoad,
+        mapStyle: replacementStyle,
+      })
+    );
+
+    expect(onStyleLoad).toHaveBeenCalledTimes(2);
+  });
+
   test("a reused map reports onStyleLoad when idle finds the style loaded", () => {
     const onStyleLoad = jest.fn();
 
@@ -558,5 +593,552 @@ describe("mapbox-web adapter", () => {
     expect(() =>
       render(example(undefined, undefined, { onLongPress: jest.fn() }))
     ).toThrow("onLongPress is not available on web maps.");
+  });
+});
+
+const tree = (children: ReactNode) => (
+  <MapSetup adapter={adapter}>
+    <OneMap
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      style={{ width: "100%", height: 400 }}
+    >
+      {children}
+    </OneMap>
+  </MapSetup>
+);
+
+describe("mapbox-web sources and layers", () => {
+  beforeEach(() => {
+    resetWebMapMock();
+  });
+
+  const sourceCases: ReadonlyArray<readonly [string, SourceProps]> = [
+    [
+      "vector",
+      {
+        id: "tiles",
+        type: "vector",
+        tiles: ["https://example.com/{z}/{x}/{y}.pbf"],
+        minzoom: 2,
+        maxzoom: 16,
+        scheme: "tms",
+        attribution: "Example",
+      },
+    ],
+    [
+      "raster",
+      {
+        id: "base",
+        type: "raster",
+        url: "https://example.com/raster.json",
+        tileSize: 512,
+      },
+    ],
+    [
+      "raster-dem",
+      {
+        id: "terrain",
+        type: "raster-dem",
+        url: "https://example.com/terrain.json",
+        encoding: "mapbox",
+        attribution: "Example",
+        scheme: "tms",
+      },
+    ],
+  ];
+
+  test.each(sourceCases)(
+    "a %s source forwards style-spec fields",
+    (_family, props) => {
+      render(tree(<Source {...props} />));
+
+      expect(SourceMock).toHaveBeenCalledWith(
+        expect.objectContaining({ ...props }),
+        undefined
+      );
+    }
+  );
+
+  test("an image source forwards copied corners", () => {
+    const coordinates = [
+      [-122.5, 47.8],
+      [-122.1, 47.8],
+      [-122.1, 47.4],
+      [-122.5, 47.4],
+    ] as const;
+
+    render(
+      tree(
+        <Source
+          id="overlay"
+          type="image"
+          url="https://example.com/overlay.png"
+          coordinates={coordinates}
+        />
+      )
+    );
+
+    const forwarded = SourceMock.mock.calls.at(-1)?.[0] as {
+      coordinates: unknown;
+    };
+
+    expect(forwarded.coordinates).toEqual([
+      [-122.5, 47.8],
+      [-122.1, 47.8],
+      [-122.1, 47.4],
+      [-122.5, 47.4],
+    ]);
+    expect(forwarded.coordinates).not.toBe(coordinates);
+  });
+
+  test("a geojson source forwards cluster options and data updates", () => {
+    const updated = { type: "FeatureCollection" as const, features: [] };
+    const rendered = render(
+      tree(
+        <Source
+          id="points"
+          type="geojson"
+          data={routes}
+          cluster
+          clusterRadius={50}
+          clusterMaxZoom={12}
+        />
+      )
+    );
+
+    expect(SourceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "points",
+        data: routes,
+        cluster: true,
+        clusterRadius: 50,
+        clusterMaxZoom: 12,
+      }),
+      undefined
+    );
+
+    rendered.rerender(
+      tree(
+        <Source
+          id="points"
+          type="geojson"
+          data={updated}
+          cluster
+          clusterRadius={50}
+          clusterMaxZoom={12}
+        />
+      )
+    );
+
+    expect(SourceMock.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ data: updated })
+    );
+  });
+
+  test("changing a source creation option throws", () => {
+    const rendered = render(
+      tree(<Source id="points" type="geojson" data={routes} cluster={false} />)
+    );
+
+    expect(() =>
+      rendered.rerender(
+        tree(<Source id="points" type="geojson" data={routes} cluster />)
+      )
+    ).toThrow('Source "points" changed the creation option "cluster".');
+  });
+
+  const layerCases: ReadonlyArray<
+    readonly [LayerType, Record<string, unknown>]
+  > = [
+    ["background", { "background-color": "#ffffff" }],
+    ["fill", { "fill-color": "#111111" }],
+    ["line", { "line-color": "#222222" }],
+    ["circle", { "circle-radius": 4 }],
+    ["symbol", { "text-color": "#333333" }],
+    ["raster", { "raster-opacity": 0.5 }],
+    ["heatmap", { "heatmap-radius": 8 }],
+    ["fill-extrusion", { "fill-extrusion-height": 10 }],
+  ];
+
+  test.each(layerCases)("a %s layer forwards type and paint", (type, paint) => {
+    LayerMock.mockClear();
+    const layerProps = {
+      id: `l-${type}`,
+      type,
+      paint,
+    } as unknown as LayerProps;
+
+    render(
+      tree(
+        <Source id="routes" type="geojson" data={routes}>
+          <Layer {...layerProps} />
+        </Source>
+      )
+    );
+
+    expect(LayerMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: `l-${type}`,
+        type,
+        paint,
+      }),
+      undefined
+    );
+  });
+
+  test("a layer forwards filter, beforeId, and source-layer", () => {
+    render(
+      tree(
+        <Source id="tiles" type="vector" url="https://example.com/t.json">
+          <Layer
+            id="roads"
+            type="line"
+            source-layer="road"
+            filter={["==", ["get", "class"], "street"]}
+            minzoom={5}
+            maxzoom={18}
+            beforeId="labels"
+            paint={{ "line-width": 2 }}
+          />
+        </Source>
+      )
+    );
+
+    expect(LayerMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "roads",
+        type: "line",
+        source: "tiles",
+        "source-layer": "road",
+        filter: ["==", ["get", "class"], "street"],
+        minzoom: 5,
+        maxzoom: 18,
+        beforeId: "labels",
+        paint: { "line-width": 2 },
+      }),
+      undefined
+    );
+  });
+
+  test("a removed paint key leaves the layer props", () => {
+    const rendered = render(
+      tree(
+        <Source id="routes" type="geojson" data={routes}>
+          <Layer
+            id="route-line"
+            type="line"
+            paint={{ "line-color": "#2563eb", "line-width": 3 }}
+          />
+        </Source>
+      )
+    );
+
+    rendered.rerender(
+      tree(
+        <Source id="routes" type="geojson" data={routes}>
+          <Layer
+            id="route-line"
+            type="line"
+            paint={{ "line-color": "#2563eb" }}
+          />
+        </Source>
+      )
+    );
+
+    expect(LayerMock.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ paint: { "line-color": "#2563eb" } })
+    );
+  });
+
+  test("changing the injected source throws and asks for a remount", () => {
+    const rendered = render(
+      tree(<Layer id="route-line" type="line" source="routes" />)
+    );
+
+    expect(() =>
+      rendered.rerender(
+        tree(<Layer id="route-line" type="line" source="other" />)
+      )
+    ).toThrow('Layer "route-line" changed the creation option "source".');
+  });
+});
+
+describe("mapbox-web images", () => {
+  const loadedStyle = () => {
+    const target = getStyleTarget();
+
+    if (!target) {
+      throw new Error("Map did not attach");
+    }
+
+    target.emitStyleLoad();
+
+    return target;
+  };
+
+  beforeEach(() => {
+    resetWebMapMock();
+  });
+
+  test("entries register through the callback loader and remove on unmount", async () => {
+    const rendered = render(
+      tree(
+        <Images
+          images={{
+            marker: "https://example.com/marker.png",
+            shield: { url: "https://example.com/shield.png", sdf: true },
+          }}
+        />
+      )
+    );
+    const target = loadedStyle();
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledTimes(2);
+    });
+    expect(target.loadImage).toHaveBeenCalledWith(
+      "https://example.com/marker.png",
+      expect.any(Function)
+    );
+    expect(target.addImage).toHaveBeenCalledWith(
+      "marker",
+      expect.objectContaining({ url: "https://example.com/marker.png" }),
+      {}
+    );
+    expect(target.addImage).toHaveBeenCalledWith(
+      "shield",
+      expect.objectContaining({ url: "https://example.com/shield.png" }),
+      { sdf: true }
+    );
+
+    rendered.unmount();
+
+    expect(target.removeImage).toHaveBeenCalledWith("marker");
+    expect(target.removeImage).toHaveBeenCalledWith("shield");
+  });
+
+  test("a replaced style drops images and styledata re-registers them", async () => {
+    render(tree(<Images images={{ marker: "https://example.com/m.png" }} />));
+    const target = loadedStyle();
+
+    await waitFor(() => {
+      expect(target.hasImage("marker")).toBe(true);
+    });
+
+    // Style replacement drops registered images on the renderer.
+    target.clearImages();
+    target.emitStyleData();
+
+    await waitFor(() => {
+      expect(target.hasImage("marker")).toBe(true);
+    });
+    expect(target.addImage).toHaveBeenCalledTimes(2);
+  });
+
+  test("style.load re-registers current entries after a replacement", async () => {
+    render(tree(<Images images={{ marker: "https://example.com/m.png" }} />));
+    const target = loadedStyle();
+
+    await waitFor(() => {
+      expect(target.hasImage("marker")).toBe(true);
+    });
+
+    target.clearImages();
+    target.emitStyleLoad();
+
+    await waitFor(() => {
+      expect(target.hasImage("marker")).toBe(true);
+    });
+    expect(target.addImage).toHaveBeenCalledTimes(2);
+  });
+
+  test("a new images object with the same entries does not reload", async () => {
+    const rendered = render(
+      tree(<Images images={{ marker: "https://example.com/m.png" }} />)
+    );
+    const target = loadedStyle();
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledTimes(1);
+    });
+
+    rendered.rerender(
+      tree(<Images images={{ marker: "https://example.com/m.png" }} />)
+    );
+
+    expect(target.removeImage).not.toHaveBeenCalled();
+    expect(target.addImage).toHaveBeenCalledTimes(1);
+  });
+
+  test("added and removed entries update without reloading the rest", async () => {
+    const rendered = render(
+      tree(
+        <Images
+          images={{
+            marker: "https://example.com/marker.png",
+            shield: "https://example.com/shield.png",
+          }}
+        />
+      )
+    );
+    const target = loadedStyle();
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledTimes(2);
+    });
+
+    rendered.rerender(
+      tree(
+        <Images
+          images={{
+            marker: "https://example.com/marker.png",
+            pin: "https://example.com/pin.png",
+          }}
+        />
+      )
+    );
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledWith(
+        "pin",
+        expect.objectContaining({ url: "https://example.com/pin.png" }),
+        {}
+      );
+    });
+    expect(target.removeImage).toHaveBeenCalledWith("shield");
+    expect(target.removeImage).not.toHaveBeenCalledWith("marker");
+    expect(target.hasImage("marker")).toBe(true);
+  });
+
+  test("a changed URL reloads that image", async () => {
+    const rendered = render(
+      tree(<Images images={{ marker: "https://example.com/a.png" }} />)
+    );
+    const target = loadedStyle();
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledTimes(1);
+    });
+
+    rendered.rerender(
+      tree(<Images images={{ marker: "https://example.com/b.png" }} />)
+    );
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledWith(
+        "marker",
+        expect.objectContaining({ url: "https://example.com/b.png" }),
+        {}
+      );
+    });
+    expect(target.removeImage).toHaveBeenCalledWith("marker");
+  });
+
+  test("a URL change while a load is pending registers only the new image", async () => {
+    const rendered = render(tree(null));
+    const target = loadedStyle();
+
+    const pending = new Map<
+      string,
+      (error: unknown, image?: unknown) => void
+    >();
+
+    target.loadImage.mockImplementation(
+      (url: string, callback?: (error: unknown, image?: unknown) => void) => {
+        if (callback) {
+          pending.set(url, callback);
+        }
+
+        return undefined;
+      }
+    );
+
+    rendered.rerender(
+      tree(<Images images={{ marker: "https://example.com/a.png" }} />)
+    );
+
+    expect(pending.has("https://example.com/a.png")).toBe(true);
+
+    rendered.rerender(
+      tree(<Images images={{ marker: "https://example.com/b.png" }} />)
+    );
+
+    expect(pending.has("https://example.com/b.png")).toBe(true);
+
+    pending.get("https://example.com/a.png")?.(null, {
+      url: "https://example.com/a.png",
+      width: 1,
+      height: 1,
+    });
+    expect(target.addImage).not.toHaveBeenCalled();
+
+    pending.get("https://example.com/b.png")?.(null, {
+      url: "https://example.com/b.png",
+      width: 1,
+      height: 1,
+    });
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledTimes(1);
+    });
+    expect(target.addImage).toHaveBeenCalledWith(
+      "marker",
+      expect.objectContaining({ url: "https://example.com/b.png" }),
+      {}
+    );
+  });
+
+  test("registration waits until the style is loaded", async () => {
+    render(tree(<Images images={{ marker: "https://example.com/m.png" }} />));
+    const target = getStyleTarget();
+
+    if (!target) {
+      throw new Error("Map did not attach");
+    }
+
+    expect(target.addImage).not.toHaveBeenCalled();
+
+    target.emitStyleLoad();
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledTimes(1);
+    });
+    expect(target.hasImage("marker")).toBe(true);
+  });
+
+  test("a thrown addImage stays unregistered until the next style.load", async () => {
+    render(tree(<Images images={{ marker: "https://example.com/m.png" }} />));
+    const target = getStyleTarget();
+
+    if (!target) {
+      throw new Error("Map did not attach");
+    }
+
+    target.addImage.mockImplementationOnce(() => {
+      throw new Error("addImage failed");
+    });
+    target.emitStyleLoad();
+
+    await waitFor(() => {
+      expect(target.addImage).toHaveBeenCalledTimes(1);
+    });
+    expect(target.hasImage("marker")).toBe(false);
+
+    target.emitStyleLoad();
+
+    await waitFor(() => {
+      expect(target.hasImage("marker")).toBe(true);
+    });
+  });
+
+  test("images outside a map are rejected", () => {
+    expect(() =>
+      render(
+        <MapSetup adapter={adapter}>
+          <Images images={{ marker: "https://example.com/m.png" }} />
+        </MapSetup>
+      )
+    ).toThrow("Images must render inside Map.");
   });
 });

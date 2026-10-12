@@ -1,11 +1,11 @@
 import { describe, expect, test } from "@jest/globals";
 
+import { toRnmapboxGestures } from "../src/adapters/mapbox-native/convert-gestures.js";
+import { toMaplibreGestures } from "../src/adapters/maplibre-native/convert-gestures.js";
 import {
-  toMaplibreGestures,
-  toRnmapboxGestures,
   toWebGestureProps,
   webTouchZoomRotate,
-} from "../src/convert-gestures.js";
+} from "../src/adapters/web/convert-gestures.js";
 
 describe("gesture conversion", () => {
   test("web keeps pinch zoom when rotation is off", () => {

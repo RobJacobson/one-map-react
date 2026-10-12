@@ -56,6 +56,10 @@ try {
     join(root, "tests/fixtures/map.json"),
     join(output, "tests/fixtures/map.json")
   );
+  cpSync(
+    join(root, "tests/fixtures/map-fixture.ts"),
+    join(output, "tests/fixtures/map-fixture.ts")
+  );
 
   run(
     "bun",

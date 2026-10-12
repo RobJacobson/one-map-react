@@ -45,6 +45,19 @@ export interface StyleLoadTarget {
   emitStyleLoad: () => void;
   emitLoad: () => void;
   emitIdle: () => void;
+  emitStyleData: () => void;
+  clearImages: () => void;
+  hasImage: (name: string) => boolean;
+  addImage: jest.Mock<
+    (name: string, image: unknown, options?: { sdf?: boolean }) => void
+  >;
+  removeImage: jest.Mock<(name: string) => void>;
+  loadImage: jest.Mock<
+    (
+      url: string,
+      callback?: (error: unknown, image?: unknown) => void
+    ) => unknown
+  >;
   listenerCount: () => number;
   isStyleLoaded: () => boolean;
   touchZoomRotate: {
@@ -129,6 +142,8 @@ export const createWebMapMock = () => {
     unproject.mockClear();
     disableRotation.mockClear();
     enableRotation.mockClear();
+    Source.mockClear();
+    Layer.mockClear();
   };
 
   const WrapperMap = jest.fn(
@@ -208,29 +223,38 @@ export const createWebMapMock = () => {
     }
   );
 
-  const Source = ({
-    id,
-    children,
-  }: {
-    readonly id: string;
-    readonly children?: ReactNode;
-  }) =>
-    createElement(
-      "div",
-      { id },
-      Children.map(children, (child) =>
-        isValidElement<{ readonly source?: string }>(child)
-          ? cloneElement(child, { source: id })
-          : child
+  const Source = jest.fn(
+    ({
+      id,
+      children,
+    }: {
+      readonly id: string;
+      readonly children?: ReactNode;
+    }) =>
+      createElement(
+        "div",
+        { id },
+        Children.map(children, (child) =>
+          isValidElement<{ readonly source?: string }>(child)
+            ? cloneElement(child, { source: id })
+            : child
+        )
       )
-    );
+  );
 
   const Layer = jest.fn(() => createElement("div"));
+
+  const useMap = () => ({
+    current: currentStyleTarget
+      ? { getMap: () => currentStyleTarget }
+      : undefined,
+  });
 
   return {
     Map: WrapperMap,
     Source,
     Layer,
+    useMap,
     flyTo,
     jumpTo,
     easeTo,
@@ -250,6 +274,7 @@ const createStyleTarget = (
   touchZoomRotate: StyleLoadTarget["touchZoomRotate"]
 ): StyleLoadTarget => {
   const listeners = new Map<string, Set<() => void>>();
+  const images = new Map<string, unknown>();
   let loaded = false;
   const listenersFor = (type: string): Set<() => void> => {
     const found = listeners.get(type);
@@ -288,6 +313,37 @@ const createStyleTarget = (
     emitIdle: () => {
       emit("idle");
     },
+    // styledata fires during ordinary style activity, so it does not mark
+    // the style loaded the way the completion events do.
+    emitStyleData: () => {
+      for (const listener of [...listenersFor("styledata")]) {
+        listener();
+      }
+    },
+    clearImages: () => {
+      images.clear();
+    },
+    hasImage: (name) => images.has(name),
+    addImage: jest.fn((name: string, image: unknown) => {
+      images.set(name, image);
+    }),
+    removeImage: jest.fn((name: string) => {
+      images.delete(name);
+    }),
+    // Mapbox GL loads through a callback and MapLibre GL through a promise;
+    // this one double serves both calling conventions.
+    loadImage: jest.fn(
+      (url: string, callback?: (error: unknown, image?: unknown) => void) => {
+        const image = { url, width: 1, height: 1 };
+
+        if (callback) {
+          callback(null, image);
+          return undefined;
+        }
+
+        return Promise.resolve({ data: image });
+      }
+    ),
     listenerCount: () => listeners.get("style.load")?.size ?? 0,
     isStyleLoaded: () => loaded,
     touchZoomRotate,

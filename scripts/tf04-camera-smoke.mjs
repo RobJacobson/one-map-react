@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
-import { createServer } from "node:http";
 import { mkdtempSync, rmSync } from "node:fs";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -285,12 +285,17 @@ async function allowNearbyDevices() {
   const started = Date.now();
 
   while (Date.now() - started < 8000) {
-    await command("adb", ["shell", "uiautomator", "dump", "/sdcard/ui.xml"]).catch(
-      () => ""
-    );
-    const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]).catch(
-      () => ""
-    );
+    await command("adb", [
+      "shell",
+      "uiautomator",
+      "dump",
+      "/sdcard/ui.xml",
+    ]).catch(() => "");
+    const xml = await command("adb", [
+      "exec-out",
+      "cat",
+      "/sdcard/ui.xml",
+    ]).catch(() => "");
     const point = /nearby devices/i.test(xml) ? allowButtonPoint(xml) : null;
 
     if (point) {
@@ -331,9 +336,12 @@ async function readAndroidStatus() {
     return fromLog;
   }
 
-  await command("adb", ["shell", "uiautomator", "dump", "/sdcard/ui.xml"]).catch(
-    () => ""
-  );
+  await command("adb", [
+    "shell",
+    "uiautomator",
+    "dump",
+    "/sdcard/ui.xml",
+  ]).catch(() => "");
   const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]).catch(
     () => ""
   );
@@ -342,7 +350,12 @@ async function readAndroidStatus() {
 }
 
 async function startIosTapDriver() {
-  const listed = await command("xcrun", ["simctl", "list", "devices", "booted"]);
+  const listed = await command("xcrun", [
+    "simctl",
+    "list",
+    "devices",
+    "booted",
+  ]);
 
   if (!listed.includes("iPhone 18 Pro")) {
     throw new Error("iPhone 18 Pro is not booted");
@@ -536,9 +549,12 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
     await build.catch(() => undefined);
 
     if (platform === "ios") {
-      await command("xcrun", ["simctl", "terminate", "booted", applicationId]).catch(
-        () => undefined
-      );
+      await command("xcrun", [
+        "simctl",
+        "terminate",
+        "booted",
+        applicationId,
+      ]).catch(() => undefined);
     }
 
     await statusPort?.close();
@@ -593,7 +609,9 @@ async function watchNative({
     await delay(300);
   }
 
-  throw new Error(`Native smoke ended at: ${(await readStatus()) || "no status"}`);
+  throw new Error(
+    `Native smoke ended at: ${(await readStatus()) || "no status"}`
+  );
 }
 
 function latestStatus(log) {

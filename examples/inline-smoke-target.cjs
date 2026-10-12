@@ -1,7 +1,7 @@
-const isSmokeTarget = (node) => {
+const isEnvRead = (node, name) => {
   if (node.type !== "MemberExpression" || node.computed) return false;
   if (node.property.type !== "Identifier") return false;
-  if (node.property.name !== "ONE_MAP_SMOKE") return false;
+  if (node.property.name !== name) return false;
 
   const env = node.object;
 
@@ -13,17 +13,30 @@ const isSmokeTarget = (node) => {
   return env.object.type === "Identifier" && env.object.name === "process";
 };
 
+const smokeTarget = () => {
+  if (process.env.ONE_MAP_SMOKE === "tf05") return "tf05";
+  if (process.env.ONE_MAP_SMOKE === "tf04") return "tf04";
+
+  return "tf03";
+};
+
 // Metro does not pass shell variables into the device bundle.
-// This replaces process.env.ONE_MAP_SMOKE while the bundle is built.
+// This replaces process.env.ONE_MAP_SMOKE and process.env.TF05_BASE while
+// the bundle is built.
 const inlineSmokeTarget = ({ types: t }) => ({
   name: "inline-smoke-target",
   visitor: {
     MemberExpression: (nodePath) => {
-      if (!isSmokeTarget(nodePath.node)) return;
+      if (isEnvRead(nodePath.node, "ONE_MAP_SMOKE")) {
+        nodePath.replaceWith(t.stringLiteral(smokeTarget()));
+        return;
+      }
 
-      const target = process.env.ONE_MAP_SMOKE === "tf04" ? "tf04" : "tf03";
-
-      nodePath.replaceWith(t.stringLiteral(target));
+      if (isEnvRead(nodePath.node, "TF05_BASE")) {
+        nodePath.replaceWith(
+          t.stringLiteral(process.env.TF05_BASE ?? "http://127.0.0.1:8798")
+        );
+      }
     },
   },
 });

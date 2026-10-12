@@ -1,0 +1,188 @@
+import type { ComponentType, CSSProperties, ReactNode, Ref } from "react";
+
+import type { Backend } from "../../contracts/adapter.js";
+import type {
+  Bounds,
+  LngLat,
+  Padding,
+  Point,
+  ViewState,
+} from "../../contracts/camera-types.js";
+import type {
+  ExternalDrawingContext,
+  MapProps,
+} from "../../contracts/map-types.js";
+
+interface TouchZoomRotateHandler {
+  disableRotation: () => void;
+  enableRotation: () => void;
+}
+
+interface StyleLoadTarget {
+  on: (type: "style.load" | "load" | "idle", listener: () => void) => void;
+  off: (type: "style.load" | "load" | "idle", listener: () => void) => void;
+  // Pinned maplibre-gl returns void while no style is loaded; mapbox-gl
+  // returns boolean. Callers treat non-true as not loaded.
+  isStyleLoaded: () => unknown;
+  touchZoomRotate?: TouchZoomRotateHandler;
+}
+
+interface WebMapHandle {
+  jumpTo: (options: object) => unknown;
+  easeTo: (options: object) => unknown;
+  flyTo: (options: object) => unknown;
+  fitBounds: (bounds: Bounds, options?: object) => unknown;
+  zoomTo: (zoom: number, options?: object) => unknown;
+  stop: () => unknown;
+  resize: () => unknown;
+  getCenter: () => unknown;
+  getZoom: () => unknown;
+  getBearing: () => unknown;
+  getPitch: () => unknown;
+  getPadding: () => unknown;
+  getBounds: () => unknown;
+  getMinZoom: () => unknown;
+  getMaxZoom: () => unknown;
+  getMaxBounds: () => unknown;
+  project: (lngLat: LngLat) => unknown;
+  unproject: (point: Point) => unknown;
+  getMap: () => StyleLoadTarget;
+}
+
+interface WebMoveNotice {
+  readonly viewState: ViewState;
+  readonly originalEvent?: unknown;
+}
+
+interface WebPointerNotice {
+  readonly lngLat?: unknown;
+  readonly point?: unknown;
+  readonly features?: readonly object[];
+}
+
+interface WebErrorNotice {
+  readonly error?: unknown;
+}
+
+interface WebViewState extends ViewState {
+  readonly padding?: Required<Padding>;
+}
+
+interface WebMapProps {
+  readonly mapStyle: MapProps["mapStyle"];
+  readonly initialViewState: WebViewState;
+  readonly viewState?: WebViewState;
+  readonly minZoom?: number;
+  readonly maxZoom?: number;
+  readonly maxBounds?: readonly [number, number, number, number];
+  readonly style?: CSSProperties;
+  readonly reuseMaps?: boolean;
+  readonly gl?: ExternalDrawingContext;
+  readonly interactive?: boolean;
+  readonly dragPan?: boolean;
+  readonly scrollZoom?: boolean;
+  readonly doubleClickZoom?: boolean;
+  readonly dragRotate?: boolean;
+  readonly boxZoom?: boolean;
+  readonly keyboard?: boolean;
+  readonly cooperativeGestures?: boolean;
+  readonly clickTolerance?: number;
+  readonly hash?: boolean | string;
+  readonly touchPitch?: boolean;
+  readonly touchZoomRotate?: boolean;
+  readonly onMove?: (event: WebMoveNotice) => void;
+  readonly onMoveStart?: (event: WebMoveNotice) => void;
+  readonly onMoveEnd?: (event: WebMoveNotice) => void;
+  readonly onIdle?: () => void;
+  readonly onClick?: (event: WebPointerNotice) => void;
+  readonly onDblClick?: (event: WebPointerNotice) => void;
+  readonly onContextMenu?: (event: WebPointerNotice) => void;
+  readonly onMouseDown?: (event: WebPointerNotice) => void;
+  readonly onMouseUp?: (event: WebPointerNotice) => void;
+  readonly onMouseMove?: (event: WebPointerNotice) => void;
+  readonly onMouseEnter?: (event: WebPointerNotice) => void;
+  readonly onMouseLeave?: (event: WebPointerNotice) => void;
+  readonly onMouseOver?: (event: WebPointerNotice) => void;
+  readonly onMouseOut?: (event: WebPointerNotice) => void;
+  readonly onWheel?: (event: WebPointerNotice) => void;
+  readonly onDrag?: (event: WebMoveNotice) => void;
+  readonly onDragStart?: (event: WebMoveNotice) => void;
+  readonly onDragEnd?: (event: WebMoveNotice) => void;
+  readonly onTouchStart?: (event: WebPointerNotice) => void;
+  readonly onTouchMove?: (event: WebPointerNotice) => void;
+  readonly onTouchEnd?: (event: WebPointerNotice) => void;
+  readonly onTouchCancel?: (event: WebPointerNotice) => void;
+  readonly onLoad?: () => void;
+  readonly onError?: (event: WebErrorNotice) => void;
+  readonly onResize?: () => void;
+  readonly children?: ReactNode;
+  readonly ref?: Ref<WebMapHandle>;
+}
+
+/**
+ * Props at the react-map-gl source and layer boundary.
+ *
+ * The facade converts common props before forwarding, so the wrapper's
+ * fields stay opaque here. react-map-gl accepts every style-spec source
+ * and layer field; the index signature covers that surface without
+ * importing wrapper types into this shared web module.
+ */
+export interface WebForwardedProps {
+  /** Resource id. */
+  readonly id?: string;
+  /** Nested layers for a source. */
+  readonly children?: ReactNode;
+  /** Forwarded style-spec fields. */
+  readonly [key: string]: unknown;
+}
+
+/**
+ * Style image operations used from the web map instance. Image loading
+ * differs by renderer (Mapbox callbacks, MapLibre promises), so each web
+ * adapter supplies `loadWebImage` on the wrapper record.
+ */
+interface WebImageMap {
+  // Pinned maplibre-gl returns void while no style is loaded; mapbox-gl
+  // returns boolean. Callers treat non-true as not loaded.
+  isStyleLoaded: () => unknown;
+  hasImage: (name: string) => boolean;
+  // Each renderer declares its own image union; this boundary accepts any
+  // decoded image a renderer-specific loadWebImage produced.
+  // biome-ignore lint/suspicious/noExplicitAny: renderer-specific image union
+  addImage: (name: string, image: any, options?: { sdf?: boolean }) => void;
+  removeImage: (name: string) => void;
+  on: (type: "styledata" | "style.load", listener: () => void) => void;
+  off: (type: "styledata" | "style.load", listener: () => void) => void;
+}
+
+/**
+ * Maps visible to a component inside react-map-gl; `current` is the
+ * enclosing map.
+ */
+interface WebMapSelection {
+  readonly current?: { readonly getMap: () => WebImageMap };
+}
+
+interface WebWrapper<
+  Name extends Extract<Backend, "mapbox-web" | "maplibre-web">,
+> {
+  readonly backend: Name;
+  readonly Map: ComponentType<WebMapProps>;
+  readonly Source: ComponentType<WebForwardedProps>;
+  readonly Layer: ComponentType<WebForwardedProps>;
+  readonly useMap: () => WebMapSelection;
+  readonly loadWebImage: (map: WebImageMap, url: string) => Promise<unknown>;
+}
+
+export type {
+  StyleLoadTarget,
+  WebErrorNotice,
+  WebImageMap,
+  WebMapHandle,
+  WebMapProps,
+  WebMapSelection,
+  WebMoveNotice,
+  WebPointerNotice,
+  WebViewState,
+  WebWrapper,
+};

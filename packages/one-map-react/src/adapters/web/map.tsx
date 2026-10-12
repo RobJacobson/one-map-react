@@ -1,9 +1,5 @@
 import {
-  type ComponentType,
-  type CSSProperties,
   forwardRef,
-  type ReactNode,
-  type Ref,
   useCallback,
   useImperativeHandle,
   useLayoutEffect,
@@ -11,179 +7,36 @@ import {
   useState,
 } from "react";
 
-import type { Adapter, Backend } from "./adapter.js";
+import type { Backend } from "../../contracts/adapter.js";
+import type { MapRef } from "../../contracts/camera-types.js";
+import type { ClickEvent, MoveEvent } from "../../contracts/event-types.js";
+import type { MapProps } from "../../contracts/map-types.js";
+import { useActiveCallback } from "../shared/use-active-callback.js";
+import { useFrozenValue } from "../shared/use-frozen-value.js";
+import { normalizePadding, toFlatBounds } from "../shared/wrapper-values.js";
 import type {
-  Bounds,
-  LngLat,
-  MapRef,
-  Padding,
-  Point,
-  ViewState,
-} from "./camera-types.js";
-import {
-  assertBounds,
-  boundsFromGeographic,
-  lngLatFromWrapper,
-  normalizePadding,
-  paddingFromWrapper,
-  pointFromWrapper,
-  rejectJumpTiming,
-  toFlatBounds,
-  toWebCommandOptions,
-  toWebFitBoundsOptions,
-  toWebFlyToOptions,
-  toWebInitialViewState,
-  toWebZoomToOptions,
-} from "./convert-camera.js";
+  StyleLoadTarget,
+  WebMapHandle,
+  WebMoveNotice,
+  WebPointerNotice,
+  WebWrapper,
+} from "./contracts.js";
+import { toWebInitialViewState } from "./convert-camera.js";
 import { toWebGestureProps } from "./convert-gestures.js";
 import { clickEventFromWeb, moveEventFromWeb } from "./convert-move-event.js";
-import type { ClickEvent, MoveEvent } from "./event-types.js";
-import { invokeWrapper } from "./invoke-wrapper.js";
-import type { ExternalDrawingContext, MapProps } from "./map-types.js";
-import { missingCameraError } from "./missing-camera.js";
-import type { LayerProps, SourceProps } from "./source-types.js";
-import { useActiveCallback } from "./use-active-callback.js";
-import { useFrozenValue } from "./use-frozen-value.js";
-
-interface TouchZoomRotateHandler {
-  disableRotation: () => void;
-  enableRotation: () => void;
-}
-
-interface StyleLoadTarget {
-  on: (type: "style.load" | "load" | "idle", listener: () => void) => void;
-  off: (type: "style.load" | "load" | "idle", listener: () => void) => void;
-  isStyleLoaded: () => boolean;
-  touchZoomRotate?: TouchZoomRotateHandler;
-}
-
-interface WebMapHandle {
-  jumpTo: (options: object) => unknown;
-  easeTo: (options: object) => unknown;
-  flyTo: (options: object) => unknown;
-  fitBounds: (bounds: Bounds, options?: object) => unknown;
-  zoomTo: (zoom: number, options?: object) => unknown;
-  stop: () => unknown;
-  resize: () => unknown;
-  getCenter: () => unknown;
-  getZoom: () => unknown;
-  getBearing: () => unknown;
-  getPitch: () => unknown;
-  getPadding: () => unknown;
-  getBounds: () => unknown;
-  getMinZoom: () => unknown;
-  getMaxZoom: () => unknown;
-  getMaxBounds: () => unknown;
-  project: (lngLat: LngLat) => unknown;
-  unproject: (point: Point) => unknown;
-  getMap: () => StyleLoadTarget;
-}
-
-interface WebMoveNotice {
-  readonly viewState: ViewState;
-  readonly originalEvent?: unknown;
-}
-
-interface WebPointerNotice {
-  readonly lngLat?: unknown;
-  readonly point?: unknown;
-  readonly features?: readonly object[];
-}
-
-interface WebErrorNotice {
-  readonly error?: unknown;
-}
-
-interface WebViewState extends ViewState {
-  readonly padding?: Required<Padding>;
-}
-
-interface WebMapProps {
-  readonly mapStyle: MapProps["mapStyle"];
-  readonly initialViewState: WebViewState;
-  readonly viewState?: WebViewState;
-  readonly minZoom?: number;
-  readonly maxZoom?: number;
-  readonly maxBounds?: readonly [number, number, number, number];
-  readonly style?: CSSProperties;
-  readonly reuseMaps?: boolean;
-  readonly gl?: ExternalDrawingContext;
-  readonly interactive?: boolean;
-  readonly dragPan?: boolean;
-  readonly scrollZoom?: boolean;
-  readonly doubleClickZoom?: boolean;
-  readonly dragRotate?: boolean;
-  readonly boxZoom?: boolean;
-  readonly keyboard?: boolean;
-  readonly cooperativeGestures?: boolean;
-  readonly clickTolerance?: number;
-  readonly hash?: boolean | string;
-  readonly touchPitch?: boolean;
-  readonly touchZoomRotate?: boolean;
-  readonly onMove?: (event: WebMoveNotice) => void;
-  readonly onMoveStart?: (event: WebMoveNotice) => void;
-  readonly onMoveEnd?: (event: WebMoveNotice) => void;
-  readonly onIdle?: () => void;
-  readonly onClick?: (event: WebPointerNotice) => void;
-  readonly onDblClick?: (event: WebPointerNotice) => void;
-  readonly onContextMenu?: (event: WebPointerNotice) => void;
-  readonly onMouseDown?: (event: WebPointerNotice) => void;
-  readonly onMouseUp?: (event: WebPointerNotice) => void;
-  readonly onMouseMove?: (event: WebPointerNotice) => void;
-  readonly onMouseEnter?: (event: WebPointerNotice) => void;
-  readonly onMouseLeave?: (event: WebPointerNotice) => void;
-  readonly onMouseOver?: (event: WebPointerNotice) => void;
-  readonly onMouseOut?: (event: WebPointerNotice) => void;
-  readonly onWheel?: (event: WebPointerNotice) => void;
-  readonly onDrag?: (event: WebMoveNotice) => void;
-  readonly onDragStart?: (event: WebMoveNotice) => void;
-  readonly onDragEnd?: (event: WebMoveNotice) => void;
-  readonly onTouchStart?: (event: WebPointerNotice) => void;
-  readonly onTouchMove?: (event: WebPointerNotice) => void;
-  readonly onTouchEnd?: (event: WebPointerNotice) => void;
-  readonly onTouchCancel?: (event: WebPointerNotice) => void;
-  readonly onLoad?: () => void;
-  readonly onError?: (event: WebErrorNotice) => void;
-  readonly onResize?: () => void;
-  readonly children?: ReactNode;
-  readonly ref?: Ref<WebMapHandle>;
-}
-
-interface WebSourceProps {
-  readonly id: string;
-  readonly type: "geojson";
-  readonly data: SourceProps["data"];
-  readonly children?: ReactNode;
-}
-
-interface WebLayerProps {
-  readonly id: string;
-  readonly type: "line";
-  readonly source?: string;
-  readonly paint: LayerProps["paint"];
-  readonly layout?: LayerProps["layout"];
-}
-
-interface WebWrapper<
-  Name extends Extract<Backend, "mapbox-web" | "maplibre-web">,
-> {
-  readonly backend: Name;
-  readonly Map: ComponentType<WebMapProps>;
-  readonly Source: ComponentType<WebSourceProps>;
-  readonly Layer: ComponentType<WebLayerProps>;
-}
+import { createWebMapRef } from "./map-ref.js";
 
 /**
- * Builds a web adapter that delegates to a react-map-gl Map, Source, and Layer.
+ * Builds a web Map component that delegates to a react-map-gl Map.
  *
  * @param wrapper - Selected react-map-gl entry components and backend name.
- * @returns An adapter for {@link MapSetup}.
+ * @returns A Map component for the web adapter record.
  */
-export const createWebAdapter = <
+export const createWebMap = <
   Name extends Extract<Backend, "mapbox-web" | "maplibre-web">,
 >(
   wrapper: WebWrapper<Name>
-): Adapter & { readonly backend: Name } => {
+) => {
   const WebMap = forwardRef<MapRef, MapProps>(
     (
       {
@@ -289,9 +142,11 @@ export const createWebAdapter = <
       // this commit, while isStyleLoaded() is still false; the map load that
       // follows then reports once. reuse() can fire that load before this
       // listener exists and still leave isStyleLoaded() false, so the next
-      // idle reports once when the style is loaded. The listener is
-      // facade-owned, so logical unmount removes it even when reuseMaps
-      // keeps the renderer.
+      // idle reports once when the style is loaded. A later mapStyle
+      // replacement re-runs this effect so an in-place style diff that
+      // never emits style.load still reports once the current style is
+      // loaded. The listener is facade-owned, so logical unmount removes
+      // it even when reuseMaps keeps the renderer.
       useLayoutEffect(() => {
         if (!styleMap) {
           return;
@@ -326,7 +181,7 @@ export const createWebAdapter = <
           styleMap.off("load", reportMissedStyleLoad);
           styleMap.off("idle", reportMissedStyleLoad);
         };
-      }, [styleMap]);
+      }, [styleMap, mapStyle]);
 
       // Pinch zoom and rotation are one handler. Disabling the handler would
       // also disable zoom, so rotation is turned off on the handler itself.
@@ -434,151 +289,7 @@ export const createWebAdapter = <
     }
   );
 
-  const WebSource = ({ id, data, children }: SourceProps) => (
-    <wrapper.Source id={id} type="geojson" data={data}>
-      {children}
-    </wrapper.Source>
-  );
-
-  const WebLayer = ({ id, paint, layout, source }: LayerProps) => (
-    <wrapper.Layer
-      id={id}
-      type="line"
-      source={source}
-      paint={paint}
-      layout={layout}
-    />
-  );
-
-  return {
-    backend: wrapper.backend,
-    Map: WebMap,
-    Source: WebSource,
-    Layer: WebLayer,
-  };
-};
-
-const createWebMapRef = (mapRef: {
-  readonly current: WebMapHandle | null;
-}): MapRef => ({
-  jumpTo: async (options) => {
-    rejectJumpTiming(options);
-    const map = requireWebMap(mapRef.current);
-
-    await invokeWrapper(map.jumpTo(toWebCommandOptions(options)));
-  },
-  easeTo: async (options) => {
-    const map = requireWebMap(mapRef.current);
-
-    await invokeWrapper(map.easeTo(toWebCommandOptions(options)));
-  },
-  flyTo: async (options) => {
-    const map = requireWebMap(mapRef.current);
-
-    await invokeWrapper(map.flyTo(toWebFlyToOptions(options)));
-  },
-  fitBounds: async (bounds, options) => {
-    const map = requireWebMap(mapRef.current);
-
-    await invokeWrapper(
-      map.fitBounds(assertBounds(bounds), toWebFitBoundsOptions(options))
-    );
-  },
-  zoomTo: async (zoom, options) => {
-    const map = requireWebMap(mapRef.current);
-
-    await invokeWrapper(map.zoomTo(zoom, toWebZoomToOptions(options)));
-  },
-  stop: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    await invokeWrapper(map.stop());
-  },
-  getCenter: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    return lngLatFromWrapper(await map.getCenter());
-  },
-  getZoom: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    return finiteNumber(await map.getZoom(), "zoom");
-  },
-  getBearing: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    return finiteNumber(await map.getBearing(), "bearing");
-  },
-  getPitch: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    return finiteNumber(await map.getPitch(), "pitch");
-  },
-  getPadding: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    return paddingFromWrapper(await map.getPadding());
-  },
-  getBounds: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    return boundsFromGeographic(await map.getBounds());
-  },
-  getMinZoom: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    return finiteNumber(await map.getMinZoom(), "min zoom");
-  },
-  getMaxZoom: async () => {
-    const map = requireWebMap(mapRef.current);
-
-    return finiteNumber(await map.getMaxZoom(), "max zoom");
-  },
-  getMaxBounds: async () => {
-    const map = requireWebMap(mapRef.current);
-    const value = await map.getMaxBounds();
-
-    if (value == null) {
-      return null;
-    }
-
-    return boundsFromGeographic(value);
-  },
-  project: async (lngLat) => {
-    const map = requireWebMap(mapRef.current);
-
-    return pointFromWrapper(await map.project(lngLat));
-  },
-  unproject: async (point) => {
-    const map = requireWebMap(mapRef.current);
-
-    return lngLatFromWrapper(await map.unproject(point));
-  },
-  resize: async () => {
-    const map = mapRef.current;
-
-    if (!map) {
-      throw missingMapError();
-    }
-
-    await invokeWrapper(map.resize());
-  },
-});
-
-const requireWebMap = (map: WebMapHandle | null): WebMapHandle => {
-  if (!map) {
-    throw missingCameraError();
-  }
-
-  return map;
-};
-
-const finiteNumber = (value: unknown, name: string): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error(`Map ${name} must be a finite number.`);
-  }
-
-  return value;
+  return WebMap;
 };
 
 const bindMove = (
@@ -617,10 +328,3 @@ const assertWebLongPress = (onLongPress: unknown): void => {
     );
   }
 };
-
-/**
- * Error thrown when `resize()` has no web map to measure.
- *
- * @returns An error describing the missing map.
- */
-const missingMapError = (): Error => new Error("Map is not attached.");
