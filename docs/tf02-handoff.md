@@ -12,7 +12,7 @@ The shared API generally follows react-map-gl. Delegate web behavior to react-ma
 
 | Location | Current responsibility |
 | --- | --- |
-| `packages/one-map-react/src/adapter.ts` | `Adapter` selection descriptor and four-name `Backend` union. |
+| `packages/one-map-react/src/contracts/adapter.ts` (flat `src/adapter.ts` at TF01) | `Adapter` selection descriptor and four-name `Backend` union. |
 | `packages/one-map-react/src/index.ts` | Backend-free type exports. No React or renderer imports. |
 | Four explicit source entries | Export `adapter` with a literal backend name. No wrapper is loaded. |
 | `packages/one-map-react/package.json` | Four explicit paths, common entry, two conditional aliases, optional backend peers, narrow publication contents. |

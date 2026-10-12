@@ -1,14 +1,18 @@
 import { describe, expect, test } from "@jest/globals";
 
 import {
-  clickEventFromMaplibreNative,
   clickEventFromRnmapbox,
-  clickEventFromWeb,
-  moveEventFromMaplibreNative,
   moveEventFromRnmapbox,
+} from "../src/adapters/mapbox-native/convert-move-event.js";
+import {
+  clickEventFromMaplibreNative,
+  moveEventFromMaplibreNative,
+} from "../src/adapters/maplibre-native/convert-move-event.js";
+import { originFromUserInteraction } from "../src/adapters/shared/move-event.js";
+import {
+  clickEventFromWeb,
   moveEventFromWeb,
-  originFromUserInteraction,
-} from "../src/convert-move-event.js";
+} from "../src/adapters/web/convert-move-event.js";
 
 const viewState = {
   longitude: -122.34,

@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useContext } from "react";
 
-import type { Adapter } from "./adapter.js";
+import type { Adapter } from "../contracts/adapter.js";
 
 const AdapterContext = createContext<Adapter | null>(null);
 

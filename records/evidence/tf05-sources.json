@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "stage": "TF05",
+  "status": "passed",
+  "completed": "2026-10-11",
+  "command": "bun scripts/tf05-sources-smoke.mjs",
+  "packageSha256": "41e9edf0f67398f664c9e9319b93107475e91649975913179c57d659897483d1",
+  "groups": ["web", "android", "ios"],
+  "checks": {
+    "validate": {
+      "status": "passed",
+      "format": "biome check",
+      "docs": "25 Markdown files, 27 SDK comparison tables",
+      "types": "tsconfig.json, tsconfig.test.json, tsconfig.examples.web.json, and tsconfig.examples.native.json",
+      "tests": "14 suites, 250 tests",
+      "package": "13 isolated selections; common entry without backend types; selected-entry file resolution"
+    }
+  },
+  "runtime": {
+    "mapbox-web": "passed",
+    "maplibre-web": "passed",
+    "mapbox-android": "passed",
+    "maplibre-android": "passed",
+    "mapbox-ios": "passed",
+    "maplibre-ios": "passed"
+  },
+  "lines": {
+    "mapbox-web": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+    "maplibre-web": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+    "mapbox-android": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+    "maplibre-android": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+    "mapbox-ios": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+    "maplibre-ios": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1"
+  },
+  "runtimeNotes": {
+    "web": "Headless Chrome on Vite. Both engines mounted vector, raster, image, and GeoJSON sources, reset a removed line-color, updated GeoJSON data, rebuilt after style replacement, and cleaned up the transient sources. Mapbox web reports onStyleLoad after a mapStyle change even when the renderer diffs in place and does not emit style.load.",
+    "android": "emulator-5554 through Metro at the Mac LAN address 192.168.12.119:8081. Fixture URLs use that same LAN address on port 8798. MapLibre Android's HTTP stack times out on the emulator 10.0.2.2 alias, so that alias is not used. Both engines passed.",
+    "ios": "Rerun on iPhone through Metro on localhost after the vector tile URL moved to /vt/ so Mapbox iOS would not reuse an earlier tile that omitted extent. Both engines passed."
+  },
+  "runtimeScope": "Permission covered the six-environment sources smoke: mount, paint-key reset, GeoJSON data update, style-replacement rebuild, and transient source removal. Web and Android passed on bun scripts/tf05-sources-smoke.mjs all. iOS was rerun through bun scripts/tf05-sources-smoke.mjs ios after the tile URL change. It did not cover a TF02, TF03, or TF04 rerun. raster-array, video, and canvas stay TF09.",
+  "reverified": {
+    "completed": "2026-10-11",
+    "reason": "Structural restructure of src into contracts/, facade/, and adapters/ subfolders with no behavior change; every environment rerun to confirm the refactored package.",
+    "packageSha256": "aca7d17173b8de217c29e6d2ea21727247865580681766eef0636cef23987cd1",
+    "commands": [
+      "bun scripts/tf05-sources-smoke.mjs web",
+      "bun scripts/tf05-sources-smoke.mjs android",
+      "bun scripts/tf05-sources-smoke.mjs ios"
+    ],
+    "runtime": {
+      "mapbox-web": "passed",
+      "maplibre-web": "passed",
+      "mapbox-android": "passed",
+      "maplibre-android": "passed",
+      "mapbox-ios": "passed",
+      "maplibre-ios": "passed"
+    },
+    "lines": {
+      "mapbox-web": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "maplibre-web": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "mapbox-android": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "maplibre-android": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "mapbox-ios": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "maplibre-ios": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1"
+    },
+    "notes": "All six environments passed on the first attempt through subagents, sequential native waves over Metro 8081 (web ~21s, Android ~38s, iOS ~64s). iOS observed the full five-phase progression per engine. Field values were identical to the original run. The tests figure in checks reflects the original checkpoint; post-restructure validate passes with 11 Jest suites, 226 tests."
+  }
+}

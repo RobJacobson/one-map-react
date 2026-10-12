@@ -1,4 +1,7 @@
-import type { ExternalDrawingContext, MapProps } from "./map-types.js";
+import type {
+  ExternalDrawingContext,
+  MapProps,
+} from "../contracts/map-types.js";
 
 /**
  * Rejects map options the native wrappers do not implement.

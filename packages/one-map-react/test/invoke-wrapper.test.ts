@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { invokeWrapper } from "../src/invoke-wrapper.js";
+import { invokeWrapper } from "../src/adapters/shared/invoke-wrapper.js";
 
 describe("invokeWrapper", () => {
   test("resolves after a void return", async () => {

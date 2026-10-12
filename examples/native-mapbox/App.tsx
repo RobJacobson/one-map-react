@@ -6,6 +6,7 @@ import { Button, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
+import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
 import { RouteMap } from "../shared/route-map.js";
 import { smokeTarget } from "../shared/smoke-target.js";
 
@@ -28,12 +29,17 @@ if (!mapboxAccessToken) {
 
 void setAccessToken(mapboxAccessToken);
 
-const App = () =>
-  smokeTarget === "tf04" ? (
-    <NativeCameraScreen adapter={adapter} doubleTap={false} />
-  ) : (
-    <LifecycleApp />
-  );
+const App = () => {
+  if (smokeTarget === "tf05") {
+    return <NativeSourcesScreen adapter={adapter} />;
+  }
+
+  if (smokeTarget === "tf04") {
+    return <NativeCameraScreen adapter={adapter} doubleTap={false} />;
+  }
+
+  return <LifecycleApp />;
+};
 
 const LifecycleApp = () => {
   const mapRef = useRef<MapRef>(null);

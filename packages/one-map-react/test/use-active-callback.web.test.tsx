@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 
-import { useActiveCallback } from "../src/use-active-callback.js";
+import { useActiveCallback } from "../src/adapters/shared/use-active-callback.js";
 
 const committed = jest.fn();
 const pending = jest.fn();

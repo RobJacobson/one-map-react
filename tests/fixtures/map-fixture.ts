@@ -1,6 +1,6 @@
-import type { ViewState } from "../../packages/one-map-react/src/camera-types.js";
-import type { GeoJsonFeatureCollection } from "../../packages/one-map-react/src/source-types.js";
-import type { StyleDocument } from "../../packages/one-map-react/src/style-types.js";
+import type { ViewState } from "../../packages/one-map-react/src/contracts/camera-types.js";
+import type { GeoJsonFeatureCollection } from "../../packages/one-map-react/src/contracts/source-types.js";
+import type { StyleDocument } from "../../packages/one-map-react/src/contracts/style-types.js";
 import fixture from "./map.json" with { type: "json" };
 
 // These readers run while the module loads, so they stay above the exports.
@@ -22,23 +22,33 @@ const styleDocument = (style: {
 
 const featureCollection = (data: {
   readonly type: string;
-  readonly features: readonly object[];
+  readonly features: readonly { readonly type: string }[];
 }): GeoJsonFeatureCollection => {
   if (data.type !== "FeatureCollection") {
     throw new Error("Fixture routes must be a FeatureCollection.");
   }
 
-  return {
-    type: "FeatureCollection",
-    features: data.features,
-  };
+  for (const feature of data.features) {
+    if (feature.type !== "Feature") {
+      throw new Error("Fixture route entries must be Features.");
+    }
+  }
+
+  // JSON imports widen string literals; the checks above pin the shape.
+  return data as GeoJsonFeatureCollection;
 };
 
 /** Local empty style from `map.json`, checked as a style document. */
 export const emptyStyle = styleDocument(fixture.emptyStyle);
+
+/** Replacement style from `map.json`, checked as a style document. */
+export const replacementStyle = styleDocument(fixture.replacementStyle);
 
 /** Seattle camera from `map.json`. */
 export const initialViewState: ViewState = fixture.initialViewState;
 
 /** Route FeatureCollection from `map.json`. */
 export const routes = featureCollection(fixture.routes);
+
+/** Point FeatureCollection from `map.json` with a `label` property. */
+export const markers = featureCollection(fixture.markers);

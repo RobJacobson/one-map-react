@@ -1,18 +1,23 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { render } from "@testing-library/react-native";
-import { createRef, type Ref } from "react";
+import { createRef, type ReactNode, type Ref } from "react";
 
 import {
   emptyStyle,
   initialViewState,
   routes,
 } from "../../../tests/fixtures/map-fixture.js";
-import type { MapRef } from "../src/camera-types.js";
-import { Layer } from "../src/layer.js";
-import { Map as OneMap } from "../src/map.js";
-import { MapSetup } from "../src/map-setup.js";
-import type { ExternalDrawingContext, MapProps } from "../src/map-types.js";
-import { Source } from "../src/source.js";
+import type { MapRef } from "../src/contracts/camera-types.js";
+import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
+import type {
+  ExternalDrawingContext,
+  MapProps,
+} from "../src/contracts/map-types.js";
+import { Images } from "../src/facade/images.js";
+import { Layer } from "../src/facade/layer.js";
+import { Map as OneMap } from "../src/facade/map.js";
+import { MapSetup } from "../src/facade/map-setup.js";
+import { Source } from "../src/facade/source.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
 const mockJumpTo = jest.fn(() => Promise.resolve());
@@ -30,6 +35,28 @@ const mockUnproject = jest.fn(async () => [-122.34, 47.61]);
 jest.mock("@maplibre/maplibre-react-native", () => {
   const React = require("react");
   let mapSerial = 0;
+
+  const sourceComponent = (name: string) =>
+    jest.fn(
+      ({
+        id,
+        children,
+        ...props
+      }: {
+        id: string;
+        children?: React.ReactNode;
+        [key: string]: unknown;
+      }) =>
+        React.createElement(
+          name,
+          { id, ...props },
+          React.Children.map(children, (child: React.ReactNode) =>
+            React.isValidElement(child)
+              ? React.cloneElement(child as React.ReactElement, { source: id })
+              : child
+          )
+        )
+    );
 
   return {
     Map: jest.fn(
@@ -88,37 +115,37 @@ jest.mock("@maplibre/maplibre-react-native", () => {
         });
       }
     ),
-    GeoJSONSource: ({
-      id,
-      data,
-      children,
-    }: {
-      id: string;
-      data: object;
-      children?: React.ReactNode;
-    }) =>
-      React.createElement(
-        "GeoJSONSource",
-        { id, data },
-        React.Children.map(children, (child: React.ReactNode) =>
-          React.isValidElement(child)
-            ? React.cloneElement(child as React.ReactElement, { source: id })
-            : child
-        )
-      ),
+    GeoJSONSource: sourceComponent("GeoJSONSource"),
+    VectorSource: sourceComponent("VectorSource"),
+    RasterSource: sourceComponent("RasterSource"),
+    RasterDEMSource: sourceComponent("RasterDEMSource"),
+    ImageSource: sourceComponent("ImageSource"),
+    Images: jest.fn(() => null),
     Layer: jest.fn((props: object) => React.createElement("Layer", props)),
   };
 });
 
 import {
+  GeoJSONSource,
+  ImageSource,
+  Images as MaplibreImages,
   Layer as MaplibreLayer,
   Map as MaplibreMap,
+  RasterDEMSource,
+  RasterSource,
+  VectorSource,
 } from "@maplibre/maplibre-react-native";
 
 import { adapter } from "../src/maplibre-native.js";
 
 const MapMock = MaplibreMap as unknown as jest.Mock;
 const LayerMock = MaplibreLayer as unknown as jest.Mock;
+const GeoJSONSourceMock = GeoJSONSource as unknown as jest.Mock;
+const VectorSourceMock = VectorSource as unknown as jest.Mock;
+const RasterSourceMock = RasterSource as unknown as jest.Mock;
+const RasterDEMSourceMock = RasterDEMSource as unknown as jest.Mock;
+const ImageSourceMock = ImageSource as unknown as jest.Mock;
+const ImagesMock = MaplibreImages as unknown as jest.Mock;
 
 const lastMapProps = <Props,>(): Props => {
   const lastCall = MapMock.mock.calls.at(-1);
@@ -557,5 +584,503 @@ describe("maplibre-native adapter", () => {
     });
 
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+});
+
+const tree = (children: ReactNode) => (
+  <MapSetup adapter={adapter}>
+    <OneMap
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      style={{ flex: 1 }}
+    >
+      {children}
+    </OneMap>
+  </MapSetup>
+);
+
+describe("maplibre-native source families", () => {
+  test("geojson cluster options forward under style-spec names", async () => {
+    GeoJSONSourceMock.mockClear();
+    await render(
+      tree(
+        <Source
+          id="points"
+          type="geojson"
+          data={routes}
+          cluster
+          clusterRadius={50}
+          clusterMinPoints={3}
+          clusterMaxZoom={12}
+          maxzoom={14}
+          lineMetrics
+        />
+      )
+    );
+
+    expect(GeoJSONSourceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "points",
+        cluster: true,
+        clusterRadius: 50,
+        clusterMinPoints: 3,
+        clusterMaxZoom: 12,
+        maxzoom: 14,
+        lineMetrics: true,
+      }),
+      undefined
+    );
+  });
+
+  test("generateId and promoteId are rejected", async () => {
+    await expect(
+      render(tree(<Source id="a" type="geojson" data={routes} generateId />))
+    ).rejects.toThrow("generateId is not available on maplibre-native.");
+    await expect(
+      render(
+        tree(<Source id="b" type="geojson" data={routes} promoteId="route" />)
+      )
+    ).rejects.toThrow("promoteId is not available on maplibre-native.");
+  });
+
+  test("a vector source forwards spec fields", async () => {
+    await render(
+      tree(
+        <Source
+          id="tiles"
+          type="vector"
+          tiles={["https://example.com/{z}/{x}/{y}.pbf"]}
+          minzoom={2}
+          maxzoom={16}
+          scheme="tms"
+          attribution="Example"
+        />
+      )
+    );
+
+    expect(VectorSourceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "tiles",
+        tiles: ["https://example.com/{z}/{x}/{y}.pbf"],
+        minzoom: 2,
+        maxzoom: 16,
+        scheme: "tms",
+        attribution: "Example",
+      }),
+      undefined
+    );
+  });
+
+  test("a raster source keeps tileSize", async () => {
+    await render(
+      tree(
+        <Source
+          id="base"
+          type="raster"
+          url="https://example.com/raster.json"
+          tileSize={512}
+        />
+      )
+    );
+
+    expect(RasterSourceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "base",
+        url: "https://example.com/raster.json",
+        tileSize: 512,
+      }),
+      undefined
+    );
+  });
+
+  test("a raster-dem source forwards encoding and attribution", async () => {
+    await render(
+      tree(
+        <Source
+          id="terrain"
+          type="raster-dem"
+          url="https://example.com/terrain.json"
+          encoding="terrarium"
+          attribution="Example"
+        />
+      )
+    );
+
+    expect(RasterDEMSourceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "terrain",
+        url: "https://example.com/terrain.json",
+        encoding: "terrarium",
+        attribution: "Example",
+      }),
+      undefined
+    );
+  });
+
+  test("a raster-dem source rejects scheme", async () => {
+    await expect(
+      render(
+        tree(
+          <Source
+            id="terrain"
+            type="raster-dem"
+            url="https://example.com/terrain.json"
+            scheme="tms"
+          />
+        )
+      )
+    ).rejects.toThrow("scheme is not available on maplibre-native.");
+  });
+
+  test("an image source forwards four corners", async () => {
+    await render(
+      tree(
+        <Source
+          id="overlay"
+          type="image"
+          url="https://example.com/overlay.png"
+          coordinates={[
+            [-122.5, 47.8],
+            [-122.1, 47.8],
+            [-122.1, 47.4],
+            [-122.5, 47.4],
+          ]}
+        />
+      )
+    );
+
+    expect(ImageSourceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "overlay",
+        url: "https://example.com/overlay.png",
+        coordinates: [
+          [-122.5, 47.8],
+          [-122.1, 47.8],
+          [-122.1, 47.4],
+          [-122.5, 47.4],
+        ],
+      }),
+      undefined
+    );
+  });
+
+  test("updated image url and coordinates reach the wrapper", async () => {
+    const rendered = await render(
+      tree(
+        <Source
+          id="overlay"
+          type="image"
+          url="https://example.com/overlay.png"
+          coordinates={[
+            [-122.5, 47.8],
+            [-122.1, 47.8],
+            [-122.1, 47.4],
+            [-122.5, 47.4],
+          ]}
+        />
+      )
+    );
+
+    await rendered.rerender(
+      tree(
+        <Source
+          id="overlay"
+          type="image"
+          url="https://example.com/overlay-b.png"
+          coordinates={[
+            [-122.4, 47.7],
+            [-122.2, 47.7],
+            [-122.2, 47.5],
+            [-122.4, 47.5],
+          ]}
+        />
+      )
+    );
+
+    expect(ImageSourceMock.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({
+        id: "overlay",
+        url: "https://example.com/overlay-b.png",
+        coordinates: [
+          [-122.4, 47.7],
+          [-122.2, 47.7],
+          [-122.2, 47.5],
+          [-122.4, 47.5],
+        ],
+      })
+    );
+  });
+
+  test("updated geojson data reaches the wrapper", async () => {
+    const updated = {
+      type: "FeatureCollection" as const,
+      features: [],
+    };
+    const rendered = await render(
+      tree(<Source id="routes" type="geojson" data={routes} />)
+    );
+
+    await rendered.rerender(
+      tree(<Source id="routes" type="geojson" data={updated} />)
+    );
+
+    expect(GeoJSONSourceMock.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ id: "routes", data: updated })
+    );
+  });
+
+  test("changing a creation option throws and asks for a remount", async () => {
+    const rendered = await render(
+      tree(<Source id="points" type="geojson" data={routes} cluster={false} />)
+    );
+
+    await expect(async () =>
+      rendered.rerender(
+        tree(<Source id="points" type="geojson" data={routes} cluster />)
+      )
+    ).rejects.toThrow(
+      'Source "points" changed the creation option "cluster". Remount it with a new React key to recreate the resource.'
+    );
+  });
+});
+
+describe("maplibre-native layers", () => {
+  const layerCases: ReadonlyArray<
+    readonly [LayerType, Record<string, unknown>]
+  > = [
+    ["background", { "background-color": "#ffffff" }],
+    ["fill", { "fill-color": "#111111" }],
+    ["line", { "line-color": "#222222" }],
+    ["circle", { "circle-radius": 4 }],
+    ["symbol", { "text-color": "#333333" }],
+    ["raster", { "raster-opacity": 0.5 }],
+    ["heatmap", { "heatmap-radius": 8 }],
+    ["fill-extrusion", { "fill-extrusion-height": 10 }],
+  ];
+
+  test.each(layerCases)(
+    "a %s layer forwards type and paint",
+    async (type, paint) => {
+      LayerMock.mockClear();
+      const layerProps = {
+        id: `l-${type}`,
+        type,
+        paint,
+      } as unknown as LayerProps;
+
+      await render(
+        tree(
+          <Source id="routes" type="geojson" data={routes}>
+            <Layer {...layerProps} />
+          </Source>
+        )
+      );
+
+      expect(LayerMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: `l-${type}`,
+          type,
+          paint,
+        }),
+        undefined
+      );
+    }
+  );
+
+  test("the generic layer receives spec paint, layout, and fields", async () => {
+    LayerMock.mockClear();
+    await render(
+      tree(
+        <Source id="tiles" type="vector" url="https://example.com/t.json">
+          <Layer
+            id="roads"
+            type="line"
+            source-layer="road"
+            filter={["==", ["get", "class"], "street"]}
+            minzoom={5}
+            maxzoom={18}
+            beforeId="labels"
+            paint={{ "line-width": 2 }}
+            layout={{ "line-cap": "round" }}
+          />
+        </Source>
+      )
+    );
+
+    expect(LayerMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "roads",
+        type: "line",
+        source: "tiles",
+        "source-layer": "road",
+        filter: ["==", ["get", "class"], "street"],
+        minzoom: 5,
+        maxzoom: 18,
+        beforeId: "labels",
+        paint: { "line-width": 2 },
+        layout: { "line-cap": "round" },
+      }),
+      undefined
+    );
+  });
+
+  test("a removed paint key leaves the paint prop", async () => {
+    LayerMock.mockClear();
+    const rendered = await render(
+      tree(
+        <Source id="routes" type="geojson" data={routes}>
+          <Layer
+            id="route-line"
+            type="line"
+            paint={{ "line-color": "#2563eb", "line-width": 3 }}
+          />
+        </Source>
+      )
+    );
+
+    await rendered.rerender(
+      tree(
+        <Source id="routes" type="geojson" data={routes}>
+          <Layer
+            id="route-line"
+            type="line"
+            paint={{ "line-color": "#2563eb" }}
+          />
+        </Source>
+      )
+    );
+
+    expect(LayerMock.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ paint: { "line-color": "#2563eb" } })
+    );
+  });
+
+  test("a removed filter is passed as undefined", async () => {
+    LayerMock.mockClear();
+    const rendered = await render(
+      tree(
+        <Source id="tiles" type="vector" url="https://example.com/t.json">
+          <Layer
+            id="roads"
+            type="line"
+            source-layer="road"
+            filter={["==", ["get", "class"], "street"]}
+          />
+        </Source>
+      )
+    );
+
+    await rendered.rerender(
+      tree(
+        <Source id="tiles" type="vector" url="https://example.com/t.json">
+          <Layer id="roads" type="line" source-layer="road" />
+        </Source>
+      )
+    );
+
+    const props = LayerMock.mock.calls.at(-1)?.[0] as { filter?: unknown };
+
+    expect(Object.hasOwn(props, "filter")).toBe(true);
+    expect(props.filter).toBeUndefined();
+  });
+
+  test("a gated symbol layout key is rejected", async () => {
+    await expect(
+      render(
+        tree(
+          <Source id="routes" type="geojson" data={routes}>
+            <Layer
+              id="gated"
+              type="symbol"
+              layout={{ "text-overlap": "always" }}
+            />
+          </Source>
+        )
+      )
+    ).rejects.toThrow("text-overlap is not available on maplibre-native.");
+  });
+
+  test("a later gated symbol layout key is rejected after a valid mount", async () => {
+    const rendered = await render(
+      tree(
+        <Source id="routes" type="geojson" data={routes}>
+          <Layer
+            id="labels"
+            type="symbol"
+            layout={{ "text-field": ["get", "name"] }}
+          />
+        </Source>
+      )
+    );
+
+    await expect(async () =>
+      rendered.rerender(
+        tree(
+          <Source id="routes" type="geojson" data={routes}>
+            <Layer
+              id="labels"
+              type="symbol"
+              layout={{
+                "text-field": ["get", "name"],
+                "text-overlap": "always",
+              }}
+            />
+          </Source>
+        )
+      )
+    ).rejects.toThrow("text-overlap is not available on maplibre-native.");
+  });
+
+  test("changing the injected source throws and asks for a remount", async () => {
+    const rendered = await render(
+      tree(<Layer id="route-line" type="line" source="routes" />)
+    );
+
+    await expect(async () =>
+      rendered.rerender(
+        tree(<Layer id="route-line" type="line" source="other" />)
+      )
+    ).rejects.toThrow(
+      'Layer "route-line" changed the creation option "source".'
+    );
+  });
+});
+
+describe("maplibre-native images", () => {
+  test("entries convert to source and sdf fields", async () => {
+    ImagesMock.mockClear();
+    await render(
+      tree(
+        <Images
+          images={{
+            marker: "https://example.com/marker.png",
+            shield: { url: "https://example.com/shield.png", sdf: true },
+          }}
+        />
+      )
+    );
+
+    expect(ImagesMock).toHaveBeenCalledWith(
+      {
+        images: {
+          marker: "https://example.com/marker.png",
+          shield: {
+            source: { uri: "https://example.com/shield.png" },
+            sdf: true,
+          },
+        },
+      },
+      undefined
+    );
+  });
+
+  test("images outside a map are rejected", async () => {
+    await expect(
+      render(
+        <MapSetup adapter={adapter}>
+          <Images images={{ marker: "https://example.com/m.png" }} />
+        </MapSetup>
+      )
+    ).rejects.toThrow("Images must render inside Map.");
   });
 });
