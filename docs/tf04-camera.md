@@ -4,6 +4,8 @@
 
 The recorded renderer result applies to the historical artifact in the evidence record. The TF06 correction adds mutable web padding with a one-time zero reset, portable `doubleTapZoom` mapped to the shared double-click handler, rejection of contradictory tap/click flags, and restoration of facade-owned rotation on reset and unmount. Rotation restoration does not enable a disabled pinch handler. The approved corrected web run passed both engines for mutable padding, shared double-click handling, rotation reset/reuse, and the eight-handler interaction master override with explicit/default restoration. See the [current acceptance record](../records/evidence/tf04-tf06-acceptance-plan.json) for the package hash, attempts, commands, and environments. The command is `bun scripts/tf04-camera-smoke.mjs web corrections`. Both native adapters now reject a supplied `fitBounds.maxZoom` before camera dispatch. This is a gap in the pinned React wrappers, with native cap coverage pending; it does not establish a limitation in the underlying SDKs.
 
+The owner has deferred native fit-cap support and retained the rejection. The [native fitBounds.maxZoom memo](native-fitbounds-maxzoom-memo.md) records the issue, current handling, and proposed upstream changes for both React Native wrappers.
+
 ## Contract
 
 `Bounds` is `[[west, south], [east, north]]`. The numbers are not sorted. A west value greater than east is an antimeridian span. Invalid corners throw before a wrapper call.
