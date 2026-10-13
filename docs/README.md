@@ -14,6 +14,8 @@ The [TF01 record](tf01-foundation.md) describes backup verification, removal, an
 
 ## Contributor guidance
 
+The [native fitBounds.maxZoom memo](native-fitbounds-maxzoom-memo.md) records the current native rejection and the deferred proposal for upstream support in RNMapbox and MapLibre React Native.
+
 Keep using the [coding guide](coding-style.md) and [documentation style guide](STYLE_GUIDE.md). The coding guide retains formatting, functional programming, naming, public documentation, and cleanup guidance, with local consolidation allowed where it improves readability. Follow [agent instructions](AGENTS.md) when editing these documents.
 
 ## Preserved research
