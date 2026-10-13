@@ -8,6 +8,8 @@ import {
   type ComponentRef,
   forwardRef,
   useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
   useRef,
 } from "react";
 import type { NativeSyntheticEvent, StyleProp, ViewStyle } from "react-native";
@@ -32,6 +34,10 @@ import {
   moveEventFromMaplibreNative,
 } from "./convert-move-event.js";
 import { createMaplibreMapRef } from "./map-ref.js";
+import {
+  MaplibreSourceContext,
+  MaplibreSourceRegistry,
+} from "./source-registry.js";
 
 type MaplibrePressEvent = Parameters<
   NonNullable<ComponentProps<typeof MaplibreMap>["onPress"]>
@@ -77,6 +83,15 @@ export const MaplibreNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
   // drops it. The same callback is the common onLoad event.
   const mapLoaded = useRef(false);
   const sawMove = useRef(false);
+  const sources = useMemo(() => new MaplibreSourceRegistry(), []);
+  const styleKey = JSON.stringify(mapStyle);
+  const previousStyle = useRef(styleKey);
+  useLayoutEffect(() => {
+    if (previousStyle.current !== styleKey) {
+      previousStyle.current = styleKey;
+      sources.featureState.resetStyle();
+    }
+  }, [sources, styleKey]);
   const frozenViewState = useFrozenValue(initialViewState);
   const reportMove = useActiveCallback(onMove);
   const reportMoveStart = useActiveCallback(onMoveStart);
@@ -86,6 +101,9 @@ export const MaplibreNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
   const reportLoad = useActiveCallback(onLoad);
   const reportStyleLoad = useActiveCallback(onStyleLoad);
   const reportError = useActiveCallback(onError);
+  const flushFeatureState = useActiveCallback(() => {
+    void sources.featureState.flush((error) => reportError({ error }));
+  });
   const gestures = toMaplibreGestures({
     interactive,
     dragPan,
@@ -96,7 +114,7 @@ export const MaplibreNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
   });
 
   useImperativeHandle(ref, () =>
-    createMaplibreMapRef(cameraRef, mapRef, mapLoaded)
+    createMaplibreMapRef(cameraRef, mapRef, mapLoaded, sources)
   );
 
   assertNativeMapOptions(reuseMaps, gl);
@@ -140,61 +158,67 @@ export const MaplibreNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
     maxBounds === undefined ? undefined : mutableFlatBounds(maxBounds);
 
   return (
-    <MaplibreMap
-      ref={mapRef}
-      // MapLayoutStyle.width is any string, not only a native dimension.
-      style={style as StyleProp<ViewStyle>}
-      mapStyle={mapStyle}
-      {...gestures}
-      onDidFinishLoadingMap={() => {
-        mapLoaded.current = true;
-        reportLoad();
-      }}
-      onDidFinishLoadingStyle={() => {
-        reportStyleLoad();
-      }}
-      onDidFailLoadingMap={() => {
-        reportError({});
-      }}
-      onRegionWillChange={
-        onMoveStart
-          ? (event: MaplibreRegionEvent) => {
-              reportRegion(event, "start");
-            }
-          : undefined
-      }
-      onRegionIsChanging={(event: MaplibreRegionEvent) => {
-        reportRegion(event, "change");
-      }}
-      onRegionDidChange={(event: MaplibreRegionEvent) => {
-        reportRegion(event, "end");
-      }}
-      onPress={
-        onClick
-          ? (event: MaplibrePressEvent) => {
-              reportClick(pressEvent(event.nativeEvent));
-            }
-          : undefined
-      }
-      onLongPress={
-        onLongPress
-          ? (event: MaplibrePressEvent) => {
-              reportLongPress(pressEvent(event.nativeEvent));
-            }
-          : undefined
-      }
-    >
-      <Camera
-        ref={cameraRef}
-        initialViewState={toMaplibreInitialViewState(frozenViewState)}
-        minZoom={minZoom}
-        maxZoom={maxZoom}
-        maxBounds={flatMaxBounds}
-        padding={padding === undefined ? undefined : normalizePadding(padding)}
-        {...(controlled ?? {})}
-      />
-      {children}
-    </MaplibreMap>
+    <MaplibreSourceContext.Provider value={sources}>
+      <MaplibreMap
+        ref={mapRef}
+        // MapLayoutStyle.width is any string, not only a native dimension.
+        style={style as StyleProp<ViewStyle>}
+        mapStyle={mapStyle}
+        {...gestures}
+        onDidFinishRenderingFrameFully={flushFeatureState}
+        onDidFinishLoadingMap={() => {
+          mapLoaded.current = true;
+          reportLoad();
+        }}
+        onDidFinishLoadingStyle={() => {
+          sources.featureState.resetStyle();
+          reportStyleLoad();
+        }}
+        onDidFailLoadingMap={() => {
+          reportError({});
+        }}
+        onRegionWillChange={
+          onMoveStart
+            ? (event: MaplibreRegionEvent) => {
+                reportRegion(event, "start");
+              }
+            : undefined
+        }
+        onRegionIsChanging={(event: MaplibreRegionEvent) => {
+          reportRegion(event, "change");
+        }}
+        onRegionDidChange={(event: MaplibreRegionEvent) => {
+          reportRegion(event, "end");
+        }}
+        onPress={
+          onClick
+            ? (event: MaplibrePressEvent) => {
+                reportClick(pressEvent(event.nativeEvent));
+              }
+            : undefined
+        }
+        onLongPress={
+          onLongPress
+            ? (event: MaplibrePressEvent) => {
+                reportLongPress(pressEvent(event.nativeEvent));
+              }
+            : undefined
+        }
+      >
+        <Camera
+          ref={cameraRef}
+          initialViewState={toMaplibreInitialViewState(frozenViewState)}
+          minZoom={minZoom}
+          maxZoom={maxZoom}
+          maxBounds={flatMaxBounds}
+          padding={
+            padding === undefined ? undefined : normalizePadding(padding)
+          }
+          {...(controlled ?? {})}
+        />
+        {children}
+      </MaplibreMap>
+    </MaplibreSourceContext.Provider>
   );
 });
 

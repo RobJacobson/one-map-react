@@ -7,28 +7,39 @@ import type { GestureSelection } from "../../contracts/map-types.js";
  * `touchRotate` is false, the result keeps that handler on so the adapter can
  * disable rotation without disabling zoom.
  *
- * @param selection - Gesture flags. Omitted flags are left off the result.
+ * `interactive: false` disables every mutable handler. Clearing that override
+ * restores explicit flags or the wrapper's defaults for omitted flags.
+ *
+ * @param selection - Gesture flags. Omitted flags use wrapper defaults.
  * @returns Props whose values were set, plus `touchZoomRotate` when the pinch
  * handler has to change.
  */
 export const toWebGestureProps = (selection: GestureSelection) =>
   defined({
     interactive: selection.interactive,
-    dragPan: selection.dragPan,
-    scrollZoom: selection.scrollZoom,
-    doubleClickZoom: selection.doubleClickZoom,
-    dragRotate: selection.dragRotate,
-    boxZoom: selection.boxZoom,
-    keyboard: selection.keyboard,
+    dragPan: forcedOff(selection.interactive, selection.dragPan),
+    scrollZoom: forcedOff(selection.interactive, selection.scrollZoom),
+    doubleClickZoom: forcedOff(
+      selection.interactive,
+      webDoubleZoom(selection.doubleTapZoom, selection.doubleClickZoom)
+    ),
+    dragRotate: forcedOff(selection.interactive, selection.dragRotate),
+    boxZoom: forcedOff(selection.interactive, selection.boxZoom),
+    keyboard: forcedOff(selection.interactive, selection.keyboard),
     cooperativeGestures: selection.cooperativeGestures,
     clickTolerance: selection.clickTolerance,
     hash: selection.hash,
-    touchPitch: selection.touchPitch,
-    touchZoomRotate: webTouchZoomRotate(
-      selection.touchZoom,
-      selection.touchRotate
+    touchPitch: forcedOff(selection.interactive, selection.touchPitch),
+    touchZoomRotate: forcedOff(
+      selection.interactive,
+      webTouchZoomRotate(selection.touchZoom, selection.touchRotate)
     ),
   });
+
+const forcedOff = (
+  interactive: boolean | undefined,
+  flag: boolean | undefined
+): boolean | undefined => (interactive === false ? false : flag);
 
 /**
  * Chooses the web pinch handler value.
@@ -59,3 +70,15 @@ const defined = <Value>(
   Object.fromEntries(
     Object.entries(values).filter((entry) => entry[1] !== undefined)
   ) as Record<string, Value>;
+
+const webDoubleZoom = (
+  tap: boolean | undefined,
+  click: boolean | undefined
+): boolean | undefined => {
+  if (tap !== undefined && click !== undefined && tap !== click) {
+    throw new Error(
+      "doubleTapZoom and doubleClickZoom must agree on web maps."
+    );
+  }
+  return tap ?? click;
+};

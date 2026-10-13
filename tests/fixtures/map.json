@@ -25,6 +25,60 @@
       }
     ]
   },
+  "queriesStyle": {
+    "version": 8,
+    "sources": {},
+    "layers": [
+      {
+        "id": "queries-background",
+        "type": "background",
+        "paint": {
+          "background-color": "#f5f5f5"
+        }
+      }
+    ]
+  },
+  "clusteredPoints": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": 1,
+        "properties": { "kind": "route" },
+        "geometry": { "type": "Point", "coordinates": [-122.35, 47.62] }
+      },
+      {
+        "type": "Feature",
+        "id": 2,
+        "properties": { "kind": "route" },
+        "geometry": { "type": "Point", "coordinates": [-122.33, 47.62] }
+      },
+      {
+        "type": "Feature",
+        "id": 3,
+        "properties": { "kind": "route" },
+        "geometry": { "type": "Point", "coordinates": [-122.34, 47.63] }
+      },
+      {
+        "type": "Feature",
+        "id": 4,
+        "properties": { "kind": "route" },
+        "geometry": { "type": "Point", "coordinates": [-122.35, 47.6] }
+      },
+      {
+        "type": "Feature",
+        "id": 5,
+        "properties": { "kind": "route" },
+        "geometry": { "type": "Point", "coordinates": [-122.33, 47.6] }
+      },
+      {
+        "type": "Feature",
+        "id": 6,
+        "properties": { "kind": "route" },
+        "geometry": { "type": "Point", "coordinates": [-122.34, 47.59] }
+      }
+    ]
+  },
   "initialViewState": {
     "longitude": -122.34,
     "latitude": 47.61,
@@ -68,7 +122,7 @@
         },
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-120, 46], [-119.9, 46.1]]
+          "coordinates": [[-74, 40.7], [-73.9, 40.8]]
         }
       }
     ]
@@ -85,6 +139,39 @@
         "geometry": {
           "type": "Point",
           "coordinates": [-122.34, 47.61]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "marker-2",
+        "properties": {
+          "label": "North"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.34, 47.64]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "marker-3",
+        "properties": {
+          "label": "South"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.34, 47.58]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "marker-offscreen",
+        "properties": {
+          "label": "Far"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-120.0, 46.0]
         }
       }
     ]

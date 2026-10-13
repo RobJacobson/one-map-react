@@ -82,10 +82,16 @@ export const toMaplibreCommand = (options: CameraCommandOptions) => {
  * The wrapper's `fitBounds` selects flight when easing is omitted.
  *
  * @param options - Fit options.
- * @returns Padding, duration, bearing, pitch, and max zoom that were set.
- * @throws When `easing` is a function.
+ * @returns Padding, duration, bearing, and pitch that were set.
+ * @throws When `easing` is a function or `maxZoom` is supplied.
  */
 export const toMaplibreFitBoundsOptions = (options: FitBoundsOptions = {}) => {
+  if (options.maxZoom !== undefined) {
+    throw new Error(
+      "fitBounds.maxZoom is unavailable through the pinned native camera wrapper."
+    );
+  }
+
   rejectNativeEasing(options.easing);
 
   return {
@@ -95,7 +101,6 @@ export const toMaplibreFitBoundsOptions = (options: FitBoundsOptions = {}) => {
     ...(options.duration === undefined ? {} : { duration: options.duration }),
     ...(options.bearing === undefined ? {} : { bearing: options.bearing }),
     ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
-    ...(options.maxZoom === undefined ? {} : { maxZoom: options.maxZoom }),
   };
 };
 

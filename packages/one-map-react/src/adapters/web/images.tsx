@@ -51,9 +51,11 @@ export const createWebImages = <
       let released = false;
       const owned = new Map<string, ImageRegistration>();
       const inFlight = new Map<string, ImageRegistration>();
+      const pendingRemovals = new Set<string>();
 
-      // hasImage, removeImage, and addImage throw while the style is not
-      // loaded. Skip them and leave the name unregistered so style.load retries.
+      // Wait for style completion before starting registration. Image removal
+      // remains available during loading on both pinned renderers; an absent
+      // or destroyed style is guarded at each image-method call.
       const styleReady = (): boolean => {
         try {
           return map.isStyleLoaded() === true;
@@ -94,7 +96,7 @@ export const createWebImages = <
 
         void wrapper.loadWebImage(map, fields.url).then(
           (data) => {
-            if (!registrationEquals(inFlight.get(name), fields)) {
+            if (inFlight.get(name) !== fields) {
               return;
             }
 
@@ -120,7 +122,7 @@ export const createWebImages = <
             }
           },
           () => {
-            if (!registrationEquals(inFlight.get(name), fields)) {
+            if (inFlight.get(name) !== fields) {
               return;
             }
 
@@ -132,31 +134,47 @@ export const createWebImages = <
       const removeName = (name: string): void => {
         inFlight.delete(name);
         owned.delete(name);
-
-        if (!styleReady()) {
-          return;
-        }
+        pendingRemovals.add(name);
 
         try {
           if (map.hasImage(name)) {
             map.removeImage(name);
           }
+          pendingRemovals.delete(name);
         } catch {
           // The style no longer exposes the image.
         }
       };
 
       const sync = (next: ImagesProps["images"]): void => {
-        if (!styleReady()) {
-          return;
-        }
-
         const nextNames = new Set(Object.keys(next));
 
-        for (const name of [...owned.keys()]) {
+        for (const name of new Set([
+          ...owned.keys(),
+          ...inFlight.keys(),
+          ...pendingRemovals,
+        ])) {
           if (!nextNames.has(name)) {
             removeName(name);
           }
+        }
+
+        // Cancel replaced loads even when renderer image methods are unavailable.
+        for (const [name, entry] of Object.entries(next)) {
+          const current = owned.get(name) ?? inFlight.get(name);
+          if (
+            current &&
+            !registrationEquals(current, imageRegistration(entry))
+          ) {
+            removeName(name);
+          }
+        }
+
+        if (!styleReady()) {
+          return;
+        }
+        for (const name of pendingRemovals) {
+          removeName(name);
         }
 
         for (const [name, entry] of Object.entries(next)) {
@@ -218,23 +236,23 @@ export const createWebImages = <
 
       return () => {
         released = true;
+        inFlight.clear();
         map.off("styledata", restoreOwned);
         map.off("style.load", restoreAll);
         syncRef.current = () => {};
 
-        if (!styleReady()) {
-          return;
-        }
-
-        for (const name of owned.keys()) {
+        for (const name of new Set([...owned.keys(), ...pendingRemovals])) {
           try {
             if (map.hasImage(name)) {
               map.removeImage(name);
             }
           } catch {
-            break;
+            // An absent or destroyed style must not prevent other removals.
           }
         }
+
+        owned.clear();
+        pendingRemovals.clear();
       };
     }, [map]);
 

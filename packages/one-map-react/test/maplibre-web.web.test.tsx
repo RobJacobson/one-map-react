@@ -20,6 +20,7 @@ import { Map as OneMap } from "../src/facade/map.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Source } from "../src/facade/source.js";
 import type { createWebMapMock } from "./create-web-map-mock.js";
+import { runWebFollowupRegressions } from "./web-followup-regressions.js";
 
 jest.mock("react-map-gl/maplibre", () => {
   const { createWebMapMock } = require("./create-web-map-mock.js");
@@ -42,9 +43,18 @@ const LayerMock = MaplibreLayer as unknown as jest.Mock;
 const SourceMock = MaplibreSource as unknown as jest.Mock;
 const {
   resetWebMapMock,
+  enableRotation,
+  disableRotation,
   getStyleTarget,
   flyTo: mockFlyTo,
   resize: mockResize,
+  queryRenderedFeatures: mockQueryRenderedFeatures,
+  querySourceFeatures: mockQuerySourceFeatures,
+  getSource: mockGetSource,
+  setFeatureState: mockSetFeatureState,
+  getFeatureState: mockGetFeatureState,
+  removeFeatureState: mockRemoveFeatureState,
+  registerMockSource,
 } = jest.requireMock("react-map-gl/maplibre") as WebMapMockModule;
 
 const example = (
@@ -778,4 +788,380 @@ describe("maplibre-web images", () => {
     });
     expect(target.addImage).toHaveBeenCalledTimes(2);
   });
+});
+
+// MapLibre GL cluster sources return promises rather than callbacks.
+const maplibreClusterSource = {
+  getClusterExpansionZoom: jest.fn(async () => 13),
+  getClusterChildren: jest.fn(async () => [{ type: "Feature", id: 11 }]),
+  getClusterLeaves: jest.fn(async () => [
+    { type: "Feature", id: 21 },
+    { type: "Feature", id: 22 },
+  ]),
+};
+
+describe("maplibre-web queries and feature state", () => {
+  beforeEach(() => {
+    resetWebMapMock();
+  });
+
+  test("queryRenderedFeatures forwards point, bounds, and viewport targets", async () => {
+    const ref = createRef<MapRef>();
+
+    render(example(ref));
+    await ref.current?.queryRenderedFeatures([240, 320], {
+      layers: ["route-line"],
+      filter: ["==", "kind", "route"],
+    });
+
+    expect(mockQueryRenderedFeatures).toHaveBeenCalledWith([240, 320], {
+      layers: ["route-line"],
+      filter: ["==", "kind", "route"],
+    });
+
+    await ref.current?.queryRenderedFeatures([
+      [10, 20],
+      [30, 40],
+    ]);
+
+    expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith(
+      [
+        [10, 20],
+        [30, 40],
+      ],
+      undefined
+    );
+
+    await ref.current?.queryRenderedFeatures(undefined);
+
+    expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith(
+      undefined,
+      undefined
+    );
+  });
+
+  test("querySourceFeatures forwards the source id and options", async () => {
+    const ref = createRef<MapRef>();
+
+    render(example(ref));
+    await ref.current?.querySourceFeatures("routes", {
+      sourceLayer: "way",
+      filter: ["==", "kind", "route"],
+    });
+
+    expect(mockQuerySourceFeatures).toHaveBeenCalledWith("routes", {
+      sourceLayer: "way",
+      filter: ["==", "kind", "route"],
+    });
+  });
+
+  test("cluster methods await the promise-returning source", async () => {
+    const ref = createRef<MapRef>();
+
+    registerMockSource("routes", maplibreClusterSource);
+    render(example(ref));
+
+    await expect(
+      ref.current?.getClusterExpansionZoom("routes", 7)
+    ).resolves.toBe(13);
+    expect(maplibreClusterSource.getClusterExpansionZoom).toHaveBeenCalledWith(
+      7
+    );
+
+    await expect(
+      ref.current?.getClusterLeaves("routes", 7, 10, 2)
+    ).resolves.toHaveLength(2);
+    expect(maplibreClusterSource.getClusterLeaves).toHaveBeenCalledWith(
+      7,
+      10,
+      2
+    );
+
+    await expect(
+      ref.current?.getClusterChildren("routes", 7)
+    ).resolves.toHaveLength(1);
+  });
+
+  test("cluster methods reject when the source is missing", async () => {
+    const ref = createRef<MapRef>();
+
+    render(example(ref));
+
+    await expect(
+      ref.current?.getClusterLeaves("unknown", 7, 10, 0)
+    ).rejects.toThrow('Source "unknown" is not present');
+  });
+
+  test("setFeatureState rejects sparse arrays before renderer dispatch", async () => {
+    const ref = createRef<MapRef>();
+
+    render(example(ref));
+
+    await expect(
+      ref.current?.setFeatureState(
+        { source: "routes", id: "route-1" },
+        { meta: { values: new Array<number>(1) } }
+      )
+    ).rejects.toThrow('Feature state key "meta"');
+    expect(mockSetFeatureState).not.toHaveBeenCalled();
+  });
+
+  test("feature state methods forward identifiers and validate state", async () => {
+    const ref = createRef<MapRef>();
+
+    render(example(ref));
+    await ref.current?.setFeatureState(
+      { source: "routes", id: "route-1" },
+      { selected: true }
+    );
+
+    expect(mockSetFeatureState).toHaveBeenCalledWith(
+      { source: "routes", id: "route-1" },
+      { selected: true }
+    );
+
+    await expect(
+      ref.current?.getFeatureState({ source: "routes", id: 9 })
+    ).resolves.toEqual({});
+    await ref.current?.removeFeatureState(
+      { source: "routes", id: 9, sourceLayer: "way" },
+      "selected"
+    );
+
+    expect(mockRemoveFeatureState).toHaveBeenCalledWith(
+      { source: "routes", id: 9, sourceLayer: "way" },
+      "selected"
+    );
+
+    await expect(
+      ref.current?.setFeatureState(
+        { source: "routes", id: "route-1" },
+        { selected: Number.NaN }
+      )
+    ).rejects.toThrow("non-finite");
+    expect(mockGetSource).toHaveBeenCalledWith("routes");
+  });
+});
+
+describe("web correction regressions", () => {
+  beforeEach(() => resetWebMapMock());
+  test("padding updates and resets once without controlling the camera", () => {
+    const rendered = render(example());
+    const props = () =>
+      MapMock.mock.calls.at(-1)?.[0] as {
+        padding?: object;
+        viewState?: object;
+        initialViewState?: object;
+      };
+    expect(props().padding).toBeUndefined();
+    rendered.rerender(example(undefined, undefined, { padding: { top: 24 } }));
+    expect(props().padding).toEqual({ top: 24, bottom: 0, left: 0, right: 0 });
+    expect(props().viewState).toBeUndefined();
+    rendered.rerender(example());
+    expect(props().padding).toEqual({ top: 0, bottom: 0, left: 0, right: 0 });
+    rendered.rerender(example());
+    expect(props().padding).toBeUndefined();
+  });
+  test("double-tap and double-click flags share the web handler", () => {
+    const rendered = render(
+      example(undefined, undefined, { doubleTapZoom: false })
+    );
+    expect(MapMock.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ doubleClickZoom: false })
+    );
+    rendered.rerender(
+      example(undefined, undefined, {
+        doubleTapZoom: true,
+        doubleClickZoom: true,
+      })
+    );
+    expect(MapMock.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ doubleClickZoom: true })
+    );
+    rendered.rerender(example());
+    expect(MapMock.mock.calls.at(-1)?.[0]).not.toHaveProperty(
+      "doubleClickZoom"
+    );
+    expect(() =>
+      rendered.rerender(
+        example(undefined, undefined, {
+          doubleTapZoom: false,
+          doubleClickZoom: true,
+        })
+      )
+    ).toThrow("must agree");
+  });
+  test("rotation reset and unmount release overrides on reused maps", () => {
+    const rendered = render(
+      example(undefined, undefined, { touchRotate: false, reuseMaps: true })
+    );
+    expect(disableRotation).toHaveBeenCalledTimes(1);
+    rendered.rerender(
+      example(undefined, undefined, { touchZoom: false, reuseMaps: true })
+    );
+    expect(enableRotation).toHaveBeenCalledTimes(1);
+    expect(MapMock.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ touchZoomRotate: false })
+    );
+    rendered.rerender(
+      example(undefined, undefined, { touchRotate: false, reuseMaps: true })
+    );
+    rendered.unmount();
+    expect(enableRotation).toHaveBeenCalledTimes(2);
+    render(example(undefined, undefined, { reuseMaps: true }));
+    expect(enableRotation).toHaveBeenCalledTimes(2);
+  });
+  test.each(["set", "get", "remove"] as const)(
+    "%s feature state preflights source families and vector sourceLayer",
+    async (method) => {
+      const ref = createRef<MapRef>();
+      render(example(ref));
+      const dispatch = (source: string, sourceLayer?: string) => {
+        const target = { source, sourceLayer, id: 7 };
+        if (method === "set")
+          return ref.current?.setFeatureState(target, { selected: true });
+        if (method === "get") return ref.current?.getFeatureState(target);
+        return ref.current?.removeFeatureState(target);
+      };
+      await expect(dispatch("absent")).rejects.toThrow("not present");
+      registerMockSource("terrain", { type: "raster-dem" });
+      await expect(dispatch("terrain")).rejects.toThrow("GeoJSON or vector");
+      registerMockSource("tiles", { type: "vector" });
+      await expect(dispatch("tiles")).rejects.toThrow("nonempty sourceLayer");
+      await expect(dispatch("tiles", "  ")).rejects.toThrow(
+        "nonempty sourceLayer"
+      );
+      expect(mockSetFeatureState).not.toHaveBeenCalled();
+      expect(mockGetFeatureState).not.toHaveBeenCalled();
+      expect(mockRemoveFeatureState).not.toHaveBeenCalled();
+      await dispatch("tiles", "way");
+    }
+  );
+  test.each([undefined, null])(
+    "absent web state result %s rejects",
+    async (absent) => {
+      const ref = createRef<MapRef>();
+      render(example(ref));
+      mockGetFeatureState.mockImplementationOnce(
+        // Deliberate malformed renderer response at the test boundary.
+        () => absent as unknown as Record<string, unknown>
+      );
+      await expect(
+        ref.current?.getFeatureState({ source: "routes", id: 1 })
+      ).rejects.toThrow("returned no result");
+    }
+  );
+  test("removing a pending image during style loading invalidates its completion", async () => {
+    const rendered = render(
+      tree(<Images images={{ delayed: "https://example.com/delayed.png" }} />)
+    );
+    const target = getStyleTarget();
+    if (!target) throw new Error("missing mock map");
+    target.emitStyleLoad();
+    // First let the initial registration finish, then start a deferred replacement.
+    await waitFor(() => expect(target.hasImage("delayed")).toBe(true));
+    let finish: (data: unknown) => void = () => {};
+    target.loadImage.mockImplementationOnce((_url, callback) => {
+      const promise = new Promise<unknown>((resolve) => {
+        finish = (data) => {
+          callback?.(null, data);
+          resolve({ data });
+        };
+      });
+      return promise;
+    });
+    rendered.rerender(
+      tree(<Images images={{ delayed: "https://example.com/replaced.png" }} />)
+    );
+    const ready = jest.spyOn(target, "isStyleLoaded").mockReturnValue(false);
+    rendered.rerender(tree(<Images images={{}} />));
+    ready.mockReturnValue(true);
+    finish({ width: 1, height: 1, data: new Uint8Array(4) });
+    await Promise.resolve();
+    target.emitStyleLoad();
+    await waitFor(() => expect(target.hasImage("delayed")).toBe(false));
+    expect(target.addImage).toHaveBeenCalledTimes(1);
+    ready.mockRestore();
+  });
+});
+
+test("registered image removals retry when image methods are unavailable", async () => {
+  resetWebMapMock();
+  const rendered = render(
+    tree(<Images images={{ marker: "https://example.com/marker.png" }} />)
+  );
+  const target = getStyleTarget();
+  if (!target) throw new Error("missing mock map");
+  target.emitStyleLoad();
+  await waitFor(() => expect(target.hasImage("marker")).toBe(true));
+  const ready = jest.spyOn(target, "isStyleLoaded").mockReturnValue(false);
+  target.removeImage.mockImplementationOnce(() => {
+    throw new Error("Style image methods unavailable.");
+  });
+  rendered.rerender(tree(<Images images={{}} />));
+  expect(target.hasImage("marker")).toBe(true);
+  ready.mockReturnValue(true);
+  target.emitStyleLoad();
+  expect(target.hasImage("marker")).toBe(false);
+  ready.mockRestore();
+});
+
+runWebFollowupRegressions(
+  adapter,
+  jest.requireMock("react-map-gl/maplibre") as WebMapMockModule
+);
+
+test("a removed and re-added image ignores the earlier load of the same URL", async () => {
+  resetWebMapMock();
+  const rendered = render(tree(<Images images={{}} />));
+  const target = getStyleTarget();
+  if (!target) throw new Error("missing mock map");
+  target.emitStyleLoad();
+  const completions: Array<(image: object) => void> = [];
+  target.loadImage.mockImplementation(
+    (_url, callback) =>
+      new Promise((resolve) => {
+        completions.push((image) => {
+          callback?.(null, image);
+          resolve({ data: image });
+        });
+      })
+  );
+  const entry = { marker: "https://example.com/marker.png" };
+  rendered.rerender(tree(<Images images={entry} />));
+  rendered.rerender(tree(<Images images={{}} />));
+  rendered.rerender(tree(<Images images={entry} />));
+  expect(completions).toHaveLength(2);
+  completions[0]?.({ version: "stale" });
+  await Promise.resolve();
+  expect(target.hasImage("marker")).toBe(false);
+  completions[1]?.({ version: "current" });
+  await waitFor(() => expect(target.hasImage("marker")).toBe(true));
+  expect(target.addImage).toHaveBeenCalledWith(
+    "marker",
+    { version: "current" },
+    {}
+  );
+});
+
+test("controlled web padding receives a zero reset", () => {
+  resetWebMapMock();
+  const rendered = render(
+    example(undefined, undefined, {
+      viewState: initialViewState,
+      padding: { left: 30 },
+    })
+  );
+  rendered.rerender(
+    example(undefined, undefined, { viewState: initialViewState })
+  );
+  expect(MapMock.mock.calls.at(-1)?.[0]).toEqual(
+    expect.objectContaining({
+      viewState: {
+        ...initialViewState,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+      },
+      padding: { top: 0, bottom: 0, left: 0, right: 0 },
+    })
+  );
 });

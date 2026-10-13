@@ -26,7 +26,10 @@ export interface ImagesProps {
   /**
    * Images registered on the enclosing map's style, keyed by the name symbol
    * layers reference in `icon-image` and pattern properties. Entries may
-   * change between renders; removed entries are unregistered.
+   * change between renders; removed entries are unregistered. Web cleanup
+   * attempts removal during style loading and on logical unmount, including
+   * when the wrapper retains a reusable renderer. An absent or destroyed
+   * style is guarded; late image loads cannot register after release.
    */
   readonly images: Readonly<Record<string, ImageEntry>>;
 }

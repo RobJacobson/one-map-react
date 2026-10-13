@@ -14,6 +14,8 @@ const isEnvRead = (node, name) => {
 };
 
 const smokeTarget = () => {
+  if (process.env.ONE_MAP_SMOKE === "tf06-lifetimes") return "tf06-lifetimes";
+  if (process.env.ONE_MAP_SMOKE === "tf06") return "tf06";
   if (process.env.ONE_MAP_SMOKE === "tf05") return "tf05";
   if (process.env.ONE_MAP_SMOKE === "tf04") return "tf04";
 
@@ -21,7 +23,7 @@ const smokeTarget = () => {
 };
 
 // Metro does not pass shell variables into the device bundle.
-// This replaces process.env.ONE_MAP_SMOKE and process.env.TF05_BASE while
+// This replaces process.env.ONE_MAP_SMOKE, TF05_BASE and TF06_BASE while
 // the bundle is built.
 const inlineSmokeTarget = ({ types: t }) => ({
   name: "inline-smoke-target",
@@ -35,6 +37,12 @@ const inlineSmokeTarget = ({ types: t }) => ({
       if (isEnvRead(nodePath.node, "TF05_BASE")) {
         nodePath.replaceWith(
           t.stringLiteral(process.env.TF05_BASE ?? "http://127.0.0.1:8798")
+        );
+      }
+
+      if (isEnvRead(nodePath.node, "TF06_BASE")) {
+        nodePath.replaceWith(
+          t.stringLiteral(process.env.TF06_BASE ?? "http://127.0.0.1:8798")
         );
       }
     },

@@ -145,7 +145,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   ) -> Bool {
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
-    delegate.dependencyProvider = RCTAppDependencyProvider()
+    delegate.dependencyProvider = OneMapDependencyProvider()
 
     reactNativeDelegate = delegate
     reactNativeFactory = factory
@@ -195,6 +195,16 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 #else
     Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
+  }
+}
+
+class OneMapDependencyProvider: RCTAppDependencyProvider {
+  override func unstableModulesRequiringMainQueueSetup() -> [String] {
+    // RN 0.87.1 codegen lists its sample module, which this example does not link.
+    // Preserve every other main-queue requirement and module lookup failure.
+    super.unstableModulesRequiringMainQueueSetup().filter {
+      $0 != "SampleTurboModule"
+    }
   }
 }
 `;
@@ -308,7 +318,16 @@ for (const [key, { appName, directory }] of Object.entries(selected)) {
       if (!podfile.includes("$MLRN.post_install")) {
         const patched = podfile.replace(
           "    react_native_post_install(",
-          "    $MLRN.post_install(installer)\n    react_native_post_install("
+          `    $MLRN.post_install(installer)
+    # MapLibre 11.5 uses quoted React headers; RN 0.87 ships them in a prebuilt framework.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'MapLibreReactNative'
+      target.build_configurations.each do |config|
+        headers = config.build_settings['HEADER_SEARCH_PATHS'] || ['$(inherited)']
+        config.build_settings['HEADER_SEARCH_PATHS'] = [headers, '$(PODS_XCFRAMEWORKS_BUILD_DIR)/React-Core-prebuilt/React.framework/Headers'].flatten
+      end
+    end
+    react_native_post_install(`
         );
 
         if (patched === podfile) {

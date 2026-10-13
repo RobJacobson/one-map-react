@@ -3,7 +3,13 @@
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],
     "types": ["jest"],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "one-map-react": ["./packages/one-map-react/src/index.ts"],
+      "@rnmapbox/maps": [
+        "./node_modules/@rnmapbox/maps/lib/typescript/src/Mapbox.native.d.ts"
+      ]
+    }
   },
   "include": [
     "packages/one-map-react/src/**/*.ts",

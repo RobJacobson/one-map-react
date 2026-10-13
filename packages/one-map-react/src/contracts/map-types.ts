@@ -67,7 +67,11 @@ export interface MapProps {
    * crosses the antimeridian.
    */
   readonly maxBounds?: Bounds;
-  /** Padding in logical map-view units. Missing sides become zero. */
+  /**
+   * Padding in logical map-view units. Missing sides become zero.
+   * Web updates are mutable; clearing an override sends a zero reset once.
+   * Initial omission preserves the wrapper default.
+   */
   readonly padding?: Padding;
   /** Host layout for the map container. */
   readonly style?: MapLayoutStyle;
@@ -88,8 +92,10 @@ export interface MapProps {
   /**
    * Turns interaction on or off.
    *
-   * On native maps, `false` forces the portable gesture flags off. Omitted
-   * leaves each flag to the wrapper unless that flag is set.
+   * `false` forces every web handler and the portable native gesture flags
+   * off, even when an individual flag is true. Web updates are mutable;
+   * clearing the override restores explicit flags or wrapper defaults.
+   * Omitted leaves each flag to the wrapper unless that flag is set.
    */
   readonly interactive?: boolean;
   /** Enables one-finger panning. RNMapbox receives this as `scrollEnabled`. */
@@ -101,7 +107,8 @@ export interface MapProps {
    *
    * Web pinch zoom and rotation are one handler. When zoom stays on and this
    * is `false`, the adapter leaves zoom enabled and disables rotation on that
-   * handler.
+   * handler. Clearing this override or unmounting restores rotation without
+   * enabling a disabled pinch handler.
    */
   readonly touchRotate?: boolean;
   /** Enables the pitch gesture. */
@@ -113,6 +120,8 @@ export interface MapProps {
    * recognizer independent of pinch zoom. Android SDK 13.6.1 still requires
    * zoom gestures, so this does not restore a double tap while `touchZoom`
    * is `false`. RNMapbox receives the double-tap entries of `gestureSettings`.
+   * Web uses the double-click handler. If both flags are supplied, their
+   * values must agree; omission preserves the wrapper default.
    */
   readonly doubleTapZoom?: boolean;
   /**
@@ -124,7 +133,8 @@ export interface MapProps {
   /**
    * Enables double-click zoom.
    *
-   * Native adapters throw when this is set.
+   * Native adapters throw when this is set. On web this shares the
+   * double-tap handler and must agree with a supplied `doubleTapZoom`.
    */
   readonly doubleClickZoom?: boolean;
   /**

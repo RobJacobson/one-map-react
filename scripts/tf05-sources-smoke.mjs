@@ -9,6 +9,11 @@ const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
 const group = process.argv[2] ?? "web";
+const corrections = process.argv[3] === "corrections";
+if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
+  throw new Error("The corrections scope requires: web corrections.");
+}
+const webScenario = corrections ? "corrections" : "sources";
 
 if (!["web", "android", "ios", "all"].includes(group)) {
   console.error("Use web, android, ios, or all.");
@@ -100,7 +105,7 @@ async function runWeb(directory, port, label) {
       `--user-data-dir=${profile}`,
       "--window-size=1280,800",
       "--no-first-run",
-      `http://127.0.0.1:${port}/?tf05=sources`,
+      `http://127.0.0.1:${port}/?tf05=${webScenario}`,
     ],
     { stdio: "ignore" }
   );
@@ -108,6 +113,13 @@ async function runWeb(directory, port, label) {
   try {
     await waitFor(() => viteLog.includes("Local:"), 30000, `${label} server`);
     const page = await attachPage(port + 1000);
+    if (corrections) {
+      try {
+        return await runWebCorrections(page);
+      } finally {
+        page.close();
+      }
+    }
     const status = await watchWeb(page, label);
 
     return judge(status);
@@ -132,7 +144,8 @@ async function attachPage(debugPort) {
       `http://127.0.0.1:${debugPort}/json/list`
     ).catch(() => []);
     const page = listed.find(
-      (target) => target.type === "page" && target.url.includes("tf05=sources")
+      (target) =>
+        target.type === "page" && target.url.includes(`tf05=${webScenario}`)
     );
 
     if (page?.webSocketDebuggerUrl) {
@@ -581,10 +594,80 @@ const emptyVectorTile = encodeEmptyVectorTile("land", 4096, 2);
 // loopback addresses all receive reachable tile URLs.
 async function startFixtureServer() {
   const pixel = pngPixel([220, 38, 38, 255]);
+  let holdResources = false;
+  const heldResponses = new Set();
+  const sendResource = (response, contentType, body) => {
+    response.writeHead(200, {
+      "Access-Control-Allow-Origin": "*",
+      "Cache-Control": "no-store",
+      "Content-Type": contentType,
+    });
+    response.end(body);
+  };
   const server = createServer((request, response) => {
     const origin = `http://${request.headers.host ?? "127.0.0.1:8798"}`;
     const cors = { "Access-Control-Allow-Origin": "*" };
     const url = request.url?.split("?")[0] ?? "/";
+
+    if (url === "/hold/reset" || url === "/hold/release") {
+      holdResources = url === "/hold/reset";
+      if (!holdResources) {
+        for (const resource of heldResponses) {
+          sendResource(resource.response, resource.contentType, resource.body);
+        }
+        heldResponses.clear();
+      }
+      sendResource(response, "text/plain", "ok");
+      return;
+    }
+
+    if (url === "/held-points.geojson" || url === "/held-marker.png") {
+      const image = url === "/held-marker.png";
+      const resource = {
+        response,
+        contentType: image ? "image/png" : "application/json",
+        body: image
+          ? pixel
+          : JSON.stringify({ type: "FeatureCollection", features: [] }),
+      };
+      if (holdResources) {
+        heldResponses.add(resource);
+        response.once("close", () => heldResponses.delete(resource));
+      } else {
+        sendResource(response, resource.contentType, resource.body);
+      }
+      return;
+    }
+
+    if (url === "/delayed-style.json") {
+      setTimeout(() => {
+        response.writeHead(200, {
+          ...cors,
+          "Content-Type": "application/json",
+        });
+        response.end(
+          JSON.stringify({
+            version: 8,
+            sources: {},
+            layers: [
+              {
+                id: "replacement-background",
+                type: "background",
+                paint: { "background-color": "#f8fafc" },
+              },
+            ],
+          })
+        );
+      }, 1500);
+      return;
+    }
+    if (url === "/delayed-marker.png") {
+      setTimeout(() => {
+        response.writeHead(200, { ...cors, "Content-Type": "image/png" });
+        response.end(pixel);
+      }, 3500);
+      return;
+    }
 
     if (url === "/tiles.json") {
       response.writeHead(200, { ...cors, "Content-Type": "application/json" });
@@ -722,6 +805,7 @@ function connect(url) {
           const result = await send("Runtime.evaluate", {
             expression,
             returnByValue: true,
+            awaitPromise: true,
           });
 
           if (result.exceptionDetails) {
@@ -843,5 +927,129 @@ async function freePort(port) {
 
   await delay(500);
 }
+
+const runWebCorrections = async (page) => {
+  const renderer = "window.__oneMapCorrectionRenderer";
+  const observe = async (expression, label, timeout = 10000) => {
+    const deadline = Date.now() + timeout;
+    while (Date.now() < deadline) {
+      const error = await page.evaluate(
+        "document.querySelector('#corrections-error')?.textContent"
+      );
+      if (error && error !== "none") throw new Error(error);
+      if (await page.evaluate(expression)) return;
+      await delay(100);
+    }
+    throw new Error(`${label} timed out`);
+  };
+  const click = (id) =>
+    page.evaluate(`document.getElementById(${JSON.stringify(id)}).click()`);
+  const hold = (action) =>
+    page.evaluate(
+      `fetch("http://127.0.0.1:8798/hold/${action}").then(response => { if (!response.ok) throw new Error("Fixture gate failed"); return response.text(); })`
+    );
+  await observe(
+    `${renderer}?.isStyleLoaded() === true`,
+    "initial style",
+    20000
+  );
+  // Instrument only completion of the real renderer's image load, after decode.
+  await page.evaluate(`(() => {
+    const map = ${renderer};
+    const original = map.loadImage;
+    window.__oneMapOriginalImageLoad = original;
+    window.__oneMapImageStarted = false;
+    window.__oneMapImageSettled = false;
+    map.loadImage = function(url, callback) {
+      window.__oneMapImageStarted = true;
+      if (callback) return original.call(this, url, (error, image) => { callback(error, image); requestAnimationFrame(() => { window.__oneMapImageSettled = true; }); });
+      return original.call(this, url).finally(() => { requestAnimationFrame(() => { window.__oneMapImageSettled = true; }); });
+    };
+  })()`);
+  await click("image-start");
+  await observe("window.__oneMapImageStarted === true", "image load started");
+  await hold("reset");
+  await click("resource-start");
+  await observe(
+    `${renderer}.isStyleLoaded() !== true && window.__oneMapImageSettled === false`,
+    "style loading during pending image"
+  );
+  await click("image-remove");
+  await hold("release");
+  await observe(
+    `${renderer}.isStyleLoaded() === true && window.__oneMapImageSettled === true`,
+    "style and removed load settle"
+  );
+  if (await page.evaluate(`${renderer}.hasImage("delayed")`))
+    throw new Error("Removed pending image registered after completion");
+  await click("resource-stop");
+  await observe(
+    `${renderer}.getSource("held-loading-source") == null`,
+    "first held resource released"
+  );
+
+  await click("image-register");
+  await observe(`${renderer}.hasImage("owned")`, "registered owned image");
+  await hold("reset");
+  await click("resource-start");
+  await observe(
+    `${renderer}.hasImage("owned") && ${renderer}.isStyleLoaded() === false`,
+    "owned image present while same style loads"
+  );
+  await page.evaluate(`void (window.__oneMapPreviousRenderer = ${renderer})`);
+  await click("map-toggle");
+  await observe(
+    `!${renderer} && window.__oneMapPreviousRenderer.hasImage("owned") === false`,
+    "loading-style unmount removes owned image"
+  );
+  await hold("release");
+  await click("map-toggle");
+  await observe(
+    `${renderer} === window.__oneMapPreviousRenderer && ${renderer}.isStyleLoaded() === true && ${renderer}.hasImage("owned") === false`,
+    "same renderer reuse keeps owned image absent",
+    20000
+  );
+
+  await hold("reset");
+  await page.evaluate(
+    "window.__oneMapImageStarted = false; window.__oneMapImageSettled = false"
+  );
+  await click("image-held");
+  await observe(
+    "window.__oneMapImageStarted && !window.__oneMapImageSettled",
+    "held image decode starts"
+  );
+  await click("resource-start");
+  await observe(
+    `${renderer}.isStyleLoaded() === false && !window.__oneMapImageSettled`,
+    "pending image during loading style"
+  );
+  await click("map-toggle");
+  await observe(`!${renderer}`, "pending image session released");
+  await click("map-toggle");
+  await observe(
+    `${renderer} === window.__oneMapPreviousRenderer && ${renderer}.isStyleLoaded() === true`,
+    "renderer reused before old decode completes",
+    20000
+  );
+  await hold("release");
+  await observe("window.__oneMapImageSettled", "released image decode settles");
+  if (await page.evaluate(`${renderer}.hasImage("held")`))
+    throw new Error("Released image load registered on reused renderer");
+  await page.evaluate(
+    `void (${renderer}.loadImage = window.__oneMapOriginalImageLoad)`
+  );
+
+  return {
+    status: "passed",
+    scenarios: [
+      "pending image removal during style loading",
+      "owned image removal during same-style loading",
+      "owned image absence after renderer reuse",
+      "late image load cannot register after session release/reuse",
+    ],
+    mode: "real automation",
+  };
+};
 
 await main();

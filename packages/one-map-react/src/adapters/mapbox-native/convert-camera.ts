@@ -128,12 +128,17 @@ export const toRnmapboxStop = (
  * @param bounds - Southwest then northeast corners.
  * @param options - Padding, duration, bearing, and pitch.
  * @returns An RNMapbox camera stop with `animationMode: "easeTo"`.
- * @throws When the bounds are invalid or `easing` is set.
+ * @throws When the bounds are invalid, `easing` is set, or `maxZoom` is supplied.
  */
 export const toRnmapboxFitBoundsStop = (
   bounds: Bounds,
   options: FitBoundsOptions = {}
 ) => {
+  if (options.maxZoom !== undefined) {
+    throw new Error(
+      "fitBounds.maxZoom is unavailable through the pinned native camera wrapper."
+    );
+  }
   rejectNativeEasing(options.easing);
 
   return {

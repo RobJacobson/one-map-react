@@ -1,0 +1,1907 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-12",
+  "scope": "TF06 native vector lifetimes and keyed vector/GeoJSON source-family transitions",
+  "status": "passed: all four scoped native environments; both iOS engines passed fresh builds and installations",
+  "authorization": "User explicitly requested add and run this scoped acceptance with subagents; preserve work, no commit or TF07.",
+  "baseRevision": "82a7ade",
+  "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+  "commands": [
+    "bun scripts/tf06-queries-smoke.mjs android lifetimes",
+    "bun scripts/tf06-queries-smoke.mjs ios lifetimes"
+  ],
+  "estimatedDuration": "20\u201340 minutes; up to one hour for native rebuilds or diagnosis",
+  "validation": {
+    "command": "bun run validate",
+    "status": "passed",
+    "jestTests": 457,
+    "jestSuites": 16,
+    "typecheckProjects": 4,
+    "packedSelections": 13,
+    "babelSelectorCases": 6,
+    "fixtureGeometryAndNamespaceChecks": "passed",
+    "cleanupRegression": "Passed under Node24.14.0 and Bun1.4.1, live/exited group leaders and descendants.",
+    "nativeEngineAndDeviceSelectionRegression": "passed"
+  },
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "exclusiveResources": [
+      "Metro8081",
+      "MVTfixture8798",
+      "iOSstatus8799",
+      "native builds",
+      "simulators",
+      "app installs"
+    ],
+    "execution": "four native environments sequential; preparation and review delegated separately"
+  },
+  "scenario": [
+    "two numeric ids in two vector source layers",
+    "key removal preserves count",
+    "whole-state removal",
+    "vector namespaces remain independent",
+    "same-family vector remount clears written state",
+    "style-only reset with unchanged vector source key and URL",
+    "keyed vector to GeoJSON clears incompatible namespace",
+    "keyed GeoJSON to vector clears incompatible namespace",
+    "post-transition vector remount clears all written identifiers"
+  ],
+  "environment": {
+    "host": "macOS arm64",
+    "Bun": "1.4.1",
+    "Node": "24.14.0",
+    "Xcode": "27.0 (27A266a)",
+    "Android": "Medium_Phone arm64 API37/37.1, emulator-5554",
+    "iOS": "iPhone18Pro iOS27.0, 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "RNMapbox": "10.3.7",
+    "MapLibreRN": "11.5.0",
+    "React": "19.2.3",
+    "ReactNative": "0.87.1"
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "packageSha256": "8667a9637aa4eaf0325a8ee57e1313f019db1746c87436155ced4ad0087e32b0",
+      "harnessHashes": {
+        "scripts/tf06-queries-smoke.mjs": "625f009e4e81dffe9cd093de68563c9ae622c6f2e73cc6d551fba939f4e16240",
+        "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+        "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+        "examples/shared/lifetimes-map.tsx": "2e2c2c9711019d68772d644ceb1f589f10c85850f9fba3acd3d30507bcdb3f7f",
+        "examples/shared/lifetimes-smoke.ts": "9db3d9dff50830e24be40e70e762128d4de1ed8ae4896c447fc8976611893d19",
+        "examples/shared/tf06-base.ts": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+        "examples/inline-smoke-target.cjs": "08cde928fdc28fd7708782dd2c943b7389df4fc71fcf774eaa529086b16b5718",
+        "examples/shared/smoke-target.ts": "a6fdc7b4eb49de66a1b81b4d7341c46bbff7f25137126784437734fdab627c83",
+        "examples/native-mapbox/App.tsx": "7fd75929b112efcfa2d8a889cafe1ca0646ef9cb579e9645a5a65a8c7a4eb7d1",
+        "examples/native-maplibre/App.tsx": "e03c80f6559c48972a2a35c03a8cfc6f7ac55265795034e6e46c279afc939be6",
+        "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+        "tests/fixtures/map.json": "31b56a57fd52357d5e6e5644b713c7b8b400dea2fa4477469abedc6f398ebe7d",
+        "packages/one-map-react/test/lifetimes-smoke.web.test.tsx": "3dca1c8bc8085fcc5876d4ab755946f2e41207869ffbdadd2c143da8ef3cb1bb",
+        "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+        "examples/inline-smoke-target.test.mjs": "44cf2903e8a3ac242d626a6cc57c33b9e63520cae69d003b30600cbf0f529d7c"
+      },
+      "groups": {
+        "android": {
+          "command": "bun scripts/tf06-queries-smoke.mjs android lifetimes",
+          "exitCode": 1,
+          "durationSeconds": 69.23,
+          "lastStatus": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=pending final-remount=pending error=whole-state-removal-routes/1-timed-out-after-5000-ms. phase=done done=1",
+          "failure": "retained vector state; cleanup ReferenceError; MapLibre Android not reached"
+        },
+        "ios": {
+          "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes",
+          "exitCode": 1,
+          "durationSeconds": 0.09,
+          "lastStatus": null,
+          "failure": "preflight port8081 occupied; neither iOS scenario reached"
+        }
+      },
+      "diagnosis": [
+        "Android returned retained vector state after keyed vector\u2192GeoJSON\u2192vector: prior family journal had been discarded.",
+        "Coordinator introduced cleanup helpers below awaited top-level execution, causing temporal-dead-zone ReferenceError; leftover owned Metro blocked iOS preflight."
+      ],
+      "status": "failed; investigating; original attempts preserved",
+      "installedBuilds": {
+        "scope": "tf06-native-vector-lifetimes",
+        "android": {
+          "command": "bun scripts/tf06-queries-smoke.mjs android lifetimes",
+          "exitCode": 1,
+          "durationSeconds": 69.23,
+          "attempt": "first; preserved",
+          "engineReached": "mapbox-android only; driver aborts before maplibre-android",
+          "lastStatus": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=pending final-remount=pending error=whole-state-removal-routes/1-timed-out-after-5000-ms. phase=done done=1",
+          "cleanupError": "ReferenceError: Cannot access stopOwnedProcess before initialization at runNative line 531",
+          "installedApp": {
+            "package": "com.onemapmapbox",
+            "versionName": "1.0",
+            "versionCode": 1,
+            "targetSdk": 36,
+            "installedUpdatedAt": "2026-10-12 17:29:48",
+            "installedApkSha256": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+            "matchesBuiltApk": true
+          },
+          "maplibreInstalled": {
+            "package": "com.onemapmaplibre",
+            "versionName": "1.0",
+            "versionCode": 1,
+            "installedUpdatedAt": "2026-10-12 17:02:23",
+            "reachedByAttempt": false
+          }
+        },
+        "ios": {
+          "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes",
+          "exitCode": 1,
+          "durationSeconds": 0.09,
+          "attempt": "first; preserved",
+          "result": "stopped at preflight because worker-owned Metro port 8081 remained occupied after Android harness cleanup failure; no build/scenario ran"
+        },
+        "cleanup": {
+          "stoppedWorkerOwnedPids": [
+            94221,
+            94222
+          ],
+          "ports8081_8799_8798": "clear",
+          "androidAvd": "left booted for coordinator-directed follow-up; worker started it",
+          "preexistingEmulator5560": "left untouched",
+          "iosSimulator": "left booted"
+        }
+      }
+    },
+    {
+      "number": 2,
+      "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+      "harnessHashes": {
+        "scripts/tf06-queries-smoke.mjs": "07bac2f4a87c6db1f225dfd530e46abd1187d6bf6404d54bfce50f848c69d0da",
+        "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+        "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+        "examples/shared/lifetimes-map.tsx": "2e2c2c9711019d68772d644ceb1f589f10c85850f9fba3acd3d30507bcdb3f7f",
+        "examples/shared/lifetimes-smoke.ts": "9db3d9dff50830e24be40e70e762128d4de1ed8ae4896c447fc8976611893d19",
+        "examples/shared/tf06-base.ts": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+        "examples/inline-smoke-target.cjs": "08cde928fdc28fd7708782dd2c943b7389df4fc71fcf774eaa529086b16b5718",
+        "examples/shared/smoke-target.ts": "a6fdc7b4eb49de66a1b81b4d7341c46bbff7f25137126784437734fdab627c83",
+        "examples/native-mapbox/App.tsx": "7fd75929b112efcfa2d8a889cafe1ca0646ef9cb579e9645a5a65a8c7a4eb7d1",
+        "examples/native-maplibre/App.tsx": "e03c80f6559c48972a2a35c03a8cfc6f7ac55265795034e6e46c279afc939be6",
+        "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+        "tests/fixtures/map.json": "31b56a57fd52357d5e6e5644b713c7b8b400dea2fa4477469abedc6f398ebe7d",
+        "packages/one-map-react/test/lifetimes-smoke.web.test.tsx": "3dca1c8bc8085fcc5876d4ab755946f2e41207869ffbdadd2c143da8ef3cb1bb",
+        "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+        "examples/inline-smoke-target.test.mjs": "44cf2903e8a3ac242d626a6cc57c33b9e63520cae69d003b30600cbf0f529d7c",
+        "scripts/native-smoke-process.mjs": "ed88ca022de4b1b25c905ce0ff8fc3f503370940dc2c719180b9f0886b957d2e",
+        "scripts/native-smoke-process.test.mjs": "c248b1d4f10c9de7318fbf7b969ad8134a3d395b95d5e1e6869de8cf687534c5",
+        "packages/one-map-react/src/adapters/shared/native-feature-state.ts": "2acc97a46fb3ace81cc64cef8db408b09c8c5a020797953adf35c55016023d13",
+        "packages/one-map-react/test/native-feature-state.test.ts": "5b3672f2cc0fbd3934478afe5441ceff6462157106532ee810a660257d3aa12c",
+        "packages/one-map-react/test/mapbox-native.native.test.tsx": "6b18ab47ed43252eb34982fe97270e31796f39667b7ee5da4d8a942df6d0bff4",
+        "packages/one-map-react/test/maplibre-native.native.test.tsx": "c712a1c17404ae69238bfb74b43156300b9db9f10df2c39af96a2b7c022066b1"
+      },
+      "groups": {
+        "android": {
+          "command": "bun scripts/tf06-queries-smoke.mjs android lifetimes",
+          "exitCode": 1,
+          "durationSeconds": 53.2,
+          "results": {
+            "mapbox-android": {
+              "status": "passed",
+              "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+              "fields": {
+                "loaded": "1",
+                "vector-queries": "ok",
+                "key-remove": "ok",
+                "whole-remove": "ok",
+                "vector-namespaces": "ok",
+                "vector-remount": "cleared",
+                "vector-style": "cleared",
+                "vector-to-geojson": "cleared",
+                "geojson-to-vector": "cleared",
+                "final-remount": "cleared",
+                "error": "none",
+                "phase": "done",
+                "done": "1"
+              },
+              "fixtureRequests": [
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 716
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 716
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 716
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 716
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 716
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 716
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 716
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 716
+                }
+              ]
+            },
+            "maplibre-android": {
+              "status": "failed",
+              "error": "--------\n* What went wrong:\nExecution failed for task ':app:mergeDebugNativeLibs'.\n> A failure occurred while executing com.android.build.gradle.internal.tasks.MergeNativeLibsTask$MergeNativeLibsTaskWorkAction > No space left on device * Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org.\n============================================================================== 2: Task failed with an exception.\n-----------\n* What went wrong:\njava.io.IOException: No space left on device * Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org.\n============================================================================== BUILD FAILED in 36s FAILURE: Build failed with an exception. * What went wrong:\nFailed to notify root build lifecycle listener.\n> Could not update /Users/rob/.gradle/caches/9.4.1/file-changes/last-build.bin\n> Could not update /Users/rob/code/mapbox-code/one-map/examples/native-maplibre/android/.gradle/9.4.1/fileChanges/last-build.bin * Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org. BUILD FAILED in 36s FAILURE: Build failed with an exception. * What went wrong:\nCould not receive a message from the daemon. * Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org.\nerror: script \"android\" exited with code 1\n",
+              "log": "$ react-native start --port \"8081\" --reset-cache --host \"0.0.0.0\"\n\nWelcome to React Native v0.87\nStarting dev server on http://0.0.0.0:8081\n\n\n                        \u2592\u2592\u2593\u2593\u2593\u2593\u2592\u2592\n                     \u2592\u2593\u2593\u2593\u2592\u2592\u2591\u2591\u2592\u2592\u2593\u2593\u2593\u2592\n                  \u2592\u2593\u2593\u2593\u2593\u2591\u2591\u2591\u2592\u2592\u2592\u2592\u2591\u2591\u2591\u2593\u2593\u2593\u2593\u2592\n                 \u2593\u2593\u2592\u2592\u2592\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2592\u2592\u2592\u2593\u2593\n                 \u2593\u2593\u2591\u2591\u2591\u2591\u2591\u2592\u2593\u2593\u2593\u2593\u2593\u2593\u2592\u2591\u2591\u2591\u2591\u2591\u2593\u2593\n                 \u2593\u2593\u2591\u2591\u2593\u2593\u2592\u2591\u2591\u2591\u2592\u2592\u2591\u2591\u2591\u2592\u2593\u2592\u2591\u2591\u2593\u2593\n                 \u2593\u2593\u2591\u2591\u2593\u2593\u2593\u2593\u2593\u2592\u2592\u2592\u2592\u2593\u2593\u2593\u2593\u2592\u2591\u2591\u2593\u2593\n                 \u2593\u2593\u2591\u2591\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2592\u2591\u2591\u2593\u2593\n                 \u2593\u2593\u2592\u2591\u2591\u2592\u2592\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2592\u2591\u2591\u2591\u2592\u2593\u2593\n                  \u2592\u2593\u2593\u2593\u2592\u2591\u2591\u2591\u2592\u2593\u2593\u2592\u2591\u2591\u2591\u2592\u2593\u2593\u2593\u2592\n                     \u2592\u2593\u2593\u2593\u2592\u2591\u2591\u2591\u2591\u2592\u2593\u2593\u2593\u2592\n                        \u2592\u2592\u2593\u2593\u2593\u2593\u2592\u2592\n\n\n WARN  the transform cache was reset.\n                Welcome to Metro v0.87.1\n              Fast - Scalable - Integrated\n\n\n INFO  Dev server ready. Press Ctrl+C to exit.\n INFO  Interactive mode is not supported in this environment\n[metro-file-map] Cache write error\n: Error: ENOSPC: no space left on device, open '/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/metro-file-map-f407579e2f04d21684aa910cc280f9c7-45b4478a1e0164c5ba8589ec2b07c099'\n    at async open (node:internal/fs/promises:637:25)\n    at async Object.writeFile (node:internal/fs/promises:1239:14)\n    at async /Users/rob/code/mapbox-code/one-map/examples/native-maplibre/node_modules/metro-file-map/src/cache/DiskCacheManager.js:80:11 {\n  errno: -28,\n  code: 'ENOSPC',\n  syscall: 'open',\n  path: '/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/metro-file-map-f407579e2f04d21684aa910cc280f9c7-45b4478a1e0164c5ba8589ec2b07c099'\n}\n"
+            }
+          }
+        },
+        "ios": {
+          "status": "not run",
+          "reason": "Disk full; coordinator stopped before iOS build."
+        }
+      },
+      "installedBuilds": {
+        "scope": "tf06-native-vector-lifetimes-retry-2",
+        "artifact": {
+          "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+          "distFiles": 130,
+          "verifiedCopies": 5
+        },
+        "android": {
+          "command": "bun scripts/tf06-queries-smoke.mjs android lifetimes",
+          "exitCode": 1,
+          "durationSeconds": 53.2,
+          "attempt": "retry-2; preserved",
+          "mapbox-android": {
+            "status": "passed",
+            "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+            "installedPackage": "com.onemapmapbox",
+            "versionName": "1.0",
+            "versionCode": 1,
+            "installedUpdatedAt": "2026-10-12 17:35:11",
+            "installedApkSha256": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+            "builtApkSha256": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+            "matchesBuiltApk": true
+          },
+          "maplibre-android": {
+            "status": "failed",
+            "error": "No space left on device during :app:mergeDebugNativeLibs; Gradle and Metro cache writes also failed with ENOSPC",
+            "installedPackage": "com.onemapmaplibre",
+            "installedVersionName": "1.0",
+            "installedVersionCode": 1,
+            "builtOrInstalledMatchingArtifact": false
+          },
+          "overall": "Driver completed Mapbox group then failed MapLibre native build."
+        },
+        "ios": {
+          "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes",
+          "status": "not-run",
+          "reason": "Host volume had 111 MiB free (100% capacity) after Android ENOSPC; coordinator directed not to start iOS."
+        },
+        "environment": {
+          "freeSpaceAtCheck": "111 MiB",
+          "largestScopedBuildOutputs": {
+            "native-mapbox/android/app/build": "2.4G",
+            "native-maplibre/android/app/build": "788M",
+            "native-mapbox/ios/build": "328K",
+            "native-maplibre/ios/build": "336K"
+          },
+          "assignedPorts8081_8799_8798": "clear",
+          "ownedMetroOrBuildProcesses": "none; shared Gradle daemons left untouched",
+          "androidEmulator5554": "left booted for coordinator retry",
+          "preexistingEmulator5560": "untouched",
+          "preexistingIosSimulator": "left booted"
+        }
+      },
+      "status": "Mapbox Android passed; MapLibre Android build failed ENOSPC; iOS deferred"
+    },
+    {
+      "number": 3,
+      "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+      "harnessHashes": {
+        "scripts/tf06-queries-smoke.mjs": "6101faf2e0255ce663d15541b023ec141604bfee1886e0b136d23100ab2b4ed5",
+        "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+        "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+        "examples/shared/lifetimes-map.tsx": "2e2c2c9711019d68772d644ceb1f589f10c85850f9fba3acd3d30507bcdb3f7f",
+        "examples/shared/lifetimes-smoke.ts": "9db3d9dff50830e24be40e70e762128d4de1ed8ae4896c447fc8976611893d19",
+        "examples/shared/tf06-base.ts": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+        "examples/inline-smoke-target.cjs": "08cde928fdc28fd7708782dd2c943b7389df4fc71fcf774eaa529086b16b5718",
+        "examples/shared/smoke-target.ts": "a6fdc7b4eb49de66a1b81b4d7341c46bbff7f25137126784437734fdab627c83",
+        "examples/native-mapbox/App.tsx": "7fd75929b112efcfa2d8a889cafe1ca0646ef9cb579e9645a5a65a8c7a4eb7d1",
+        "examples/native-maplibre/App.tsx": "e03c80f6559c48972a2a35c03a8cfc6f7ac55265795034e6e46c279afc939be6",
+        "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+        "tests/fixtures/map.json": "31b56a57fd52357d5e6e5644b713c7b8b400dea2fa4477469abedc6f398ebe7d",
+        "packages/one-map-react/test/lifetimes-smoke.web.test.tsx": "3dca1c8bc8085fcc5876d4ab755946f2e41207869ffbdadd2c143da8ef3cb1bb",
+        "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+        "examples/inline-smoke-target.test.mjs": "44cf2903e8a3ac242d626a6cc57c33b9e63520cae69d003b30600cbf0f529d7c",
+        "scripts/native-smoke-process.mjs": "ed88ca022de4b1b25c905ce0ff8fc3f503370940dc2c719180b9f0886b957d2e",
+        "scripts/native-smoke-process.test.mjs": "c248b1d4f10c9de7318fbf7b969ad8134a3d395b95d5e1e6869de8cf687534c5",
+        "packages/one-map-react/src/adapters/shared/native-feature-state.ts": "2acc97a46fb3ace81cc64cef8db408b09c8c5a020797953adf35c55016023d13",
+        "packages/one-map-react/test/native-feature-state.test.ts": "5b3672f2cc0fbd3934478afe5441ceff6462157106532ee810a660257d3aa12c",
+        "packages/one-map-react/test/mapbox-native.native.test.tsx": "6b18ab47ed43252eb34982fe97270e31796f39667b7ee5da4d8a942df6d0bff4",
+        "packages/one-map-react/test/maplibre-native.native.test.tsx": "c712a1c17404ae69238bfb74b43156300b9db9f10df2c39af96a2b7c022066b1",
+        "scripts/tf06-smoke-selection.mjs": "f63c745eebad12c9be5ae8ec3e4a3f9eb2019311f8ef0b2fb85a55c3ee52e7f3",
+        "scripts/tf06-smoke-selection.test.mjs": "50ff3c61aa4f7a294f1f8a3a4bcf8b28dcfb93077ab07a19c7bdff0bc5e54f31"
+      },
+      "groups": {
+        "maplibre-android": {
+          "command": "bun scripts/tf06-queries-smoke.mjs android lifetimes maplibre",
+          "exitCode": 0,
+          "durationSeconds": 32.57,
+          "results": {
+            "maplibre-android": {
+              "status": "passed",
+              "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+              "fields": {
+                "loaded": "1",
+                "vector-queries": "ok",
+                "key-remove": "ok",
+                "whole-remove": "ok",
+                "vector-namespaces": "ok",
+                "vector-remount": "cleared",
+                "vector-style": "cleared",
+                "vector-to-geojson": "cleared",
+                "geojson-to-vector": "cleared",
+                "final-remount": "cleared",
+                "error": "none",
+                "phase": "done",
+                "done": "1"
+              },
+              "fixtureRequests": [
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 716
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 716
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 716
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 716
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 716
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 716
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 716
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 716
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                }
+              ]
+            }
+          }
+        }
+      },
+      "status": "MapLibre Android passed; iOS handled separately with verified baseline binary reuse"
+    },
+    {
+      "number": 4,
+      "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+      "harnessHashes": {
+        "scripts/tf06-queries-smoke.mjs": "6fcc1793dfd7bcd817fb32ed315c61ad2dc789b5be7e6d17ae5ecd8743a30ac9",
+        "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+        "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+        "examples/shared/lifetimes-map.tsx": "2e2c2c9711019d68772d644ceb1f589f10c85850f9fba3acd3d30507bcdb3f7f",
+        "examples/shared/lifetimes-smoke.ts": "9db3d9dff50830e24be40e70e762128d4de1ed8ae4896c447fc8976611893d19",
+        "examples/shared/tf06-base.ts": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+        "examples/inline-smoke-target.cjs": "08cde928fdc28fd7708782dd2c943b7389df4fc71fcf774eaa529086b16b5718",
+        "examples/shared/smoke-target.ts": "a6fdc7b4eb49de66a1b81b4d7341c46bbff7f25137126784437734fdab627c83",
+        "examples/native-mapbox/App.tsx": "7fd75929b112efcfa2d8a889cafe1ca0646ef9cb579e9645a5a65a8c7a4eb7d1",
+        "examples/native-maplibre/App.tsx": "e03c80f6559c48972a2a35c03a8cfc6f7ac55265795034e6e46c279afc939be6",
+        "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+        "tests/fixtures/map.json": "31b56a57fd52357d5e6e5644b713c7b8b400dea2fa4477469abedc6f398ebe7d",
+        "packages/one-map-react/test/lifetimes-smoke.web.test.tsx": "3dca1c8bc8085fcc5876d4ab755946f2e41207869ffbdadd2c143da8ef3cb1bb",
+        "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+        "examples/inline-smoke-target.test.mjs": "44cf2903e8a3ac242d626a6cc57c33b9e63520cae69d003b30600cbf0f529d7c",
+        "scripts/native-smoke-process.mjs": "ed88ca022de4b1b25c905ce0ff8fc3f503370940dc2c719180b9f0886b957d2e",
+        "scripts/native-smoke-process.test.mjs": "c248b1d4f10c9de7318fbf7b969ad8134a3d395b95d5e1e6869de8cf687534c5",
+        "packages/one-map-react/src/adapters/shared/native-feature-state.ts": "2acc97a46fb3ace81cc64cef8db408b09c8c5a020797953adf35c55016023d13",
+        "packages/one-map-react/test/native-feature-state.test.ts": "5b3672f2cc0fbd3934478afe5441ceff6462157106532ee810a660257d3aa12c",
+        "packages/one-map-react/test/mapbox-native.native.test.tsx": "6b18ab47ed43252eb34982fe97270e31796f39667b7ee5da4d8a942df6d0bff4",
+        "packages/one-map-react/test/maplibre-native.native.test.tsx": "c712a1c17404ae69238bfb74b43156300b9db9f10df2c39af96a2b7c022066b1",
+        "scripts/tf06-smoke-selection.mjs": "2bf6a07aa61e28ced6283066cad4dd860c1a13ec52e73ffe47cc6dcee29919d7",
+        "scripts/tf06-smoke-selection.test.mjs": "2d27a797831f70e56b2252c3fd850beb1cbdb505a036db9ee913368169ae68a5"
+      },
+      "groups": {
+        "mapbox-ios": {
+          "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+          "exitCode": 1,
+          "durationSeconds": 9.73,
+          "results": {},
+          "lastStatus": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1"
+        },
+        "maplibre-ios": {
+          "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre",
+          "exitCode": 0,
+          "durationSeconds": 7.26,
+          "results": {
+            "maplibre-ios": {
+              "status": "passed",
+              "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+              "fields": {
+                "loaded": "1",
+                "vector-queries": "ok",
+                "key-remove": "ok",
+                "whole-remove": "ok",
+                "vector-namespaces": "ok",
+                "vector-remount": "cleared",
+                "vector-style": "cleared",
+                "vector-to-geojson": "cleared",
+                "geojson-to-vector": "cleared",
+                "final-remount": "cleared",
+                "error": "none",
+                "phase": "done",
+                "done": "1"
+              },
+              "fixtureRequests": [
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                }
+              ],
+              "reusedNativeBuild": true,
+              "installedExecutableSha256": "339c5ce669f68b9e6e0606732937f6882992ec98df9e9ddedf658aa4121ffd46"
+            }
+          },
+          "lastStatus": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1"
+        }
+      },
+      "installedBuilds": {
+        "scope": "tf06-native-vector-lifetimes-continuation",
+        "artifact": {
+          "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+          "distFiles": 130,
+          "verifiedCopies": 5
+        },
+        "ios": {
+          "simulator": "iPhone 18 Pro",
+          "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "preexistingBooted": true,
+          "mapbox-ios": {
+            "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+            "exitCode": 1,
+            "durationSeconds": 9.73,
+            "scenarioStatus": "passed; final TF06L line has all checks ok/cleared, error=none, done=1",
+            "runnerIssue": "after scenario completion, cleanup helper process-group kill failed EPERM (native-smoke-process.mjs:14)",
+            "reusedNativeBuild": true,
+            "bundleId": "org.reactjs.native.example.OneMapMapbox",
+            "version": "1.0",
+            "build": "1",
+            "installedExecutableSha256": "4cab089c7276e5b7523bec24ee730b8e4a6c5041f474050c5a5ec1729b2c0723",
+            "matchesApprovedDigest": true,
+            "fixtureRevisions": "status progression captured; structured fixture request block was not emitted because cleanup threw after final status"
+          },
+          "maplibre-ios": {
+            "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre",
+            "exitCode": 0,
+            "durationSeconds": 7.26,
+            "scenarioStatus": "passed; TF06L all checks ok/cleared, error=none, done=1",
+            "reusedNativeBuild": true,
+            "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+            "version": "1.0",
+            "build": "1",
+            "installedExecutableSha256": "339c5ce669f68b9e6e0606732937f6882992ec98df9e9ddedf658aa4121ffd46",
+            "matchesApprovedDigest": true,
+            "fixtureRevisions": [
+              0,
+              1,
+              3,
+              4
+            ]
+          }
+        },
+        "cleanup": {
+          "workerStartedAndroid5554": "stopped",
+          "preexistingAndroid5560": "untouched",
+          "preexistingIosSimulator": "left booted",
+          "generatedOutputsRemoved": [
+            "examples/native-maplibre/android/app/build",
+            "examples/native-maplibre/android/app/.cxx"
+          ],
+          "iosBuilds": "reused; no build outputs removed",
+          "assignedPorts8081_8799_8798": "clear"
+        },
+        "priorAndroidOutcome": {}
+      },
+      "status": "Both iOS renderer flows passed; MapboxIOS wrapper exit1 from group SIGKILL EPERM after successful scenario. MaplibreIOS exit0."
+    },
+    {
+      "number": 5,
+      "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+      "harnessHashes": {
+        "scripts/tf06-queries-smoke.mjs": "6fcc1793dfd7bcd817fb32ed315c61ad2dc789b5be7e6d17ae5ecd8743a30ac9",
+        "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+        "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+        "examples/shared/lifetimes-map.tsx": "2e2c2c9711019d68772d644ceb1f589f10c85850f9fba3acd3d30507bcdb3f7f",
+        "examples/shared/lifetimes-smoke.ts": "9db3d9dff50830e24be40e70e762128d4de1ed8ae4896c447fc8976611893d19",
+        "examples/shared/tf06-base.ts": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+        "examples/inline-smoke-target.cjs": "08cde928fdc28fd7708782dd2c943b7389df4fc71fcf774eaa529086b16b5718",
+        "examples/shared/smoke-target.ts": "a6fdc7b4eb49de66a1b81b4d7341c46bbff7f25137126784437734fdab627c83",
+        "examples/native-mapbox/App.tsx": "7fd75929b112efcfa2d8a889cafe1ca0646ef9cb579e9645a5a65a8c7a4eb7d1",
+        "examples/native-maplibre/App.tsx": "e03c80f6559c48972a2a35c03a8cfc6f7ac55265795034e6e46c279afc939be6",
+        "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+        "tests/fixtures/map.json": "31b56a57fd52357d5e6e5644b713c7b8b400dea2fa4477469abedc6f398ebe7d",
+        "packages/one-map-react/test/lifetimes-smoke.web.test.tsx": "3dca1c8bc8085fcc5876d4ab755946f2e41207869ffbdadd2c143da8ef3cb1bb",
+        "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+        "examples/inline-smoke-target.test.mjs": "44cf2903e8a3ac242d626a6cc57c33b9e63520cae69d003b30600cbf0f529d7c",
+        "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+        "scripts/native-smoke-process.test.mjs": "c248b1d4f10c9de7318fbf7b969ad8134a3d395b95d5e1e6869de8cf687534c5",
+        "packages/one-map-react/src/adapters/shared/native-feature-state.ts": "2acc97a46fb3ace81cc64cef8db408b09c8c5a020797953adf35c55016023d13",
+        "packages/one-map-react/test/native-feature-state.test.ts": "5b3672f2cc0fbd3934478afe5441ceff6462157106532ee810a660257d3aa12c",
+        "packages/one-map-react/test/mapbox-native.native.test.tsx": "6b18ab47ed43252eb34982fe97270e31796f39667b7ee5da4d8a942df6d0bff4",
+        "packages/one-map-react/test/maplibre-native.native.test.tsx": "c712a1c17404ae69238bfb74b43156300b9db9f10df2c39af96a2b7c022066b1",
+        "scripts/tf06-smoke-selection.mjs": "2bf6a07aa61e28ced6283066cad4dd860c1a13ec52e73ffe47cc6dcee29919d7",
+        "scripts/tf06-smoke-selection.test.mjs": "2d27a797831f70e56b2252c3fd850beb1cbdb505a036db9ee913368169ae68a5"
+      },
+      "groups": {
+        "mapbox-ios": {
+          "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+          "exitCode": 0,
+          "durationSeconds": 7.79,
+          "results": {
+            "mapbox-ios": {
+              "status": "passed",
+              "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+              "fields": {
+                "loaded": "1",
+                "vector-queries": "ok",
+                "key-remove": "ok",
+                "whole-remove": "ok",
+                "vector-namespaces": "ok",
+                "vector-remount": "cleared",
+                "vector-style": "cleared",
+                "vector-to-geojson": "cleared",
+                "geojson-to-vector": "cleared",
+                "final-remount": "cleared",
+                "error": "none",
+                "phase": "done",
+                "done": "1"
+              },
+              "fixtureRequests": [
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 0,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 1,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                },
+                {
+                  "revision": 3,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 715
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 328,
+                  "y": 714
+                },
+                {
+                  "revision": 4,
+                  "z": 11,
+                  "x": 327,
+                  "y": 714
+                }
+              ],
+              "reusedNativeBuild": true,
+              "installedExecutableSha256": "4cab089c7276e5b7523bec24ee730b8e4a6c5041f474050c5a5ec1729b2c0723"
+            }
+          }
+        }
+      },
+      "installedBuilds": {
+        "scope": "tf06-native-vector-lifetimes-final-mapbox-ios-cleanup-verification",
+        "artifact": {
+          "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+          "distFiles": 130,
+          "verifiedCopies": 5
+        },
+        "previousAttempt": {
+          "path": "../ios-continuation/mapbox-ios.log",
+          "scenario": "passed all TF06L fields",
+          "exitCode": 1,
+          "issue": "post-scenario cleanup process-group kill returned EPERM"
+        },
+        "finalAttempt": {
+          "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+          "exitCode": 0,
+          "durationSeconds": 7.79,
+          "status": "passed; loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fixtureRevisions": [
+            0,
+            1,
+            3,
+            4
+          ],
+          "reusedNativeBuild": true,
+          "bundleId": "org.reactjs.native.example.OneMapMapbox",
+          "version": "1.0",
+          "build": "1",
+          "installedExecutableSha256": "4cab089c7276e5b7523bec24ee730b8e4a6c5041f474050c5a5ec1729b2c0723"
+        },
+        "cleanup": {
+          "assignedPorts8081_8799_8798": "clear",
+          "preexistingIPhone18Pro": "left booted",
+          "android5554": "already stopped",
+          "preexistingAndroid5560": "untouched"
+        }
+      },
+      "status": "MapboxIOS passed with clean exit; final cleanup successful"
+    }
+  ],
+  "excluded": [
+    "TF07",
+    "commit",
+    "publish",
+    "web acceptance",
+    "SDK upgrades"
+  ],
+  "retention": "Keep compact outcomes and installed-build/harness identity; remove owned logs, archives and build caches after investigation.",
+  "artifactVerification": {
+    "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+    "distFiles": 130,
+    "verifiedCopies": 5,
+    "harnessHashes": {
+      "scripts/tf06-queries-smoke.mjs": "6fcc1793dfd7bcd817fb32ed315c61ad2dc789b5be7e6d17ae5ecd8743a30ac9",
+      "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+      "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+      "examples/shared/lifetimes-map.tsx": "2e2c2c9711019d68772d644ceb1f589f10c85850f9fba3acd3d30507bcdb3f7f",
+      "examples/shared/lifetimes-smoke.ts": "9db3d9dff50830e24be40e70e762128d4de1ed8ae4896c447fc8976611893d19",
+      "examples/shared/tf06-base.ts": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+      "examples/inline-smoke-target.cjs": "08cde928fdc28fd7708782dd2c943b7389df4fc71fcf774eaa529086b16b5718",
+      "examples/shared/smoke-target.ts": "a6fdc7b4eb49de66a1b81b4d7341c46bbff7f25137126784437734fdab627c83",
+      "examples/native-mapbox/App.tsx": "7fd75929b112efcfa2d8a889cafe1ca0646ef9cb579e9645a5a65a8c7a4eb7d1",
+      "examples/native-maplibre/App.tsx": "e03c80f6559c48972a2a35c03a8cfc6f7ac55265795034e6e46c279afc939be6",
+      "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+      "tests/fixtures/map.json": "31b56a57fd52357d5e6e5644b713c7b8b400dea2fa4477469abedc6f398ebe7d",
+      "packages/one-map-react/test/lifetimes-smoke.web.test.tsx": "3dca1c8bc8085fcc5876d4ab755946f2e41207869ffbdadd2c143da8ef3cb1bb",
+      "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+      "examples/inline-smoke-target.test.mjs": "44cf2903e8a3ac242d626a6cc57c33b9e63520cae69d003b30600cbf0f529d7c",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "scripts/native-smoke-process.test.mjs": "c248b1d4f10c9de7318fbf7b969ad8134a3d395b95d5e1e6869de8cf687534c5",
+      "packages/one-map-react/src/adapters/shared/native-feature-state.ts": "2acc97a46fb3ace81cc64cef8db408b09c8c5a020797953adf35c55016023d13",
+      "packages/one-map-react/test/native-feature-state.test.ts": "5b3672f2cc0fbd3934478afe5441ceff6462157106532ee810a660257d3aa12c",
+      "packages/one-map-react/test/mapbox-native.native.test.tsx": "6b18ab47ed43252eb34982fe97270e31796f39667b7ee5da4d8a942df6d0bff4",
+      "packages/one-map-react/test/maplibre-native.native.test.tsx": "c712a1c17404ae69238bfb74b43156300b9db9f10df2c39af96a2b7c022066b1",
+      "scripts/tf06-smoke-selection.mjs": "2bf6a07aa61e28ced6283066cad4dd860c1a13ec52e73ffe47cc6dcee29919d7",
+      "scripts/tf06-smoke-selection.test.mjs": "2d27a797831f70e56b2252c3fd850beb1cbdb505a036db9ee913368169ae68a5"
+    },
+    "launcherSha256": "3eb9e7ecac31a099d89f0c61315aeeb4a350d91493048c5a983e75832a2d91c5"
+  },
+  "review": {
+    "status": "completed before renderer execution",
+    "findingsCorrected": [
+      "Driver success criteria distinguish operation ok from lifetime cleared",
+      "TF06_BASE is inlined into device bundle and tested",
+      "Status server startup protected by cleanup",
+      "Owned Metro process group terminated and port release observed",
+      "Android app stopped between engines"
+    ],
+    "scenarioReview": "Independent subagent reviewed known ids/layers, revision barriers, stable-key style phase, written state before transitions, whole-state and namespace checks, local MVT encoding.",
+    "continuation": "Independent subagent verified engine selection, unchanged defaults, identifiers, scope guards and output keys.",
+    "androidDeviceScope": "Independent review verified required serial before fixture startup and pinned CLI device/build/install behavior."
+  },
+  "initialValidation": {
+    "command": "bun run validate",
+    "status": "passed",
+    "jestTests": 446,
+    "jestSuites": 16,
+    "typecheckProjects": 4,
+    "packedSelections": 13,
+    "babelSelectorCases": 6,
+    "fixtureGeometryAndNamespaceChecks": "passed"
+  },
+  "correction": {
+    "implementation": "Retain per-family written-target journals, selecting/resetting only current family through current handle; retain per-source queue and generations.",
+    "regressions": "42 shared state tests and both native adapter suites cover family roundtrips, multiple IDs/layers, pending writes, invalidation and reset errors.",
+    "harness": "Cleanup helper imported before awaited execution; stop exited-parent descendants; confirm absent group on macOS EPERM instead of hiding permission failures.",
+    "review": "Independent stronger subagent reviewed corrected journals; no substantive issues.",
+    "finalCleanup": "Node and Bun regressions both pass; on group EPERM inspect only owned group, ignore zombies, signal remaining live members positively; actual permission errors stay visible."
+  },
+  "artifactImpactReview": {
+    "changedPackedFiles": [
+      "dist/adapters/shared/native-feature-state.d.ts",
+      "dist/adapters/shared/native-feature-state.js"
+    ],
+    "previousSixEnvironmentArtifact": "8667a9637aa4eaf0325a8ee57e1313f019db1746c87436155ced4ad0087e32b0",
+    "reasonForScope": "New library change selects retained native per-family written-target journals. Web runtime bundles and dependencies unchanged. Existing same-family lifetime paths retain their queue/reset behavior; this scoped run covers native vector lifetime/style resets and both keyed family directions on both engines and OS targets. Prior full TF06 results remain historical; the current artifact receives only the explicitly requested added native scenario.",
+    "fullSixEnvironmentRerun": "not run for this added native scope"
+  },
+  "continuationCommands": [
+    "bun scripts/tf06-queries-smoke.mjs android lifetimes maplibre",
+    "bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+    "bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre"
+  ],
+  "diskRecovery": {
+    "failure": "ENOSPC after corrected Mapbox Android pass; MapLibre native-library merge failed.",
+    "deleted": "Only owned Android app/build and app/.cxx caches in both native examples; first-attempt duplicate pulled APK removed after hash saved.",
+    "freeGiBAfterCleanup": 2.98,
+    "strategy": "Single-engine continuation; capture installed identities then release owned build outputs before next engine.",
+    "androidBuildScope": "ANDROID_SERIAL=emulator-5554; --device emulator-5554 --active-arch-only restricts builds to arm64-v8a; earlier CLI built all4ABIs.",
+    "memoryRecovery": "Verified Gradle9.4PID61657 completed only this native-maplibre build before stopping it; other Gradle versions remained untouched. Continuation disables persistent Gradle daemon through GRADLE_OPTS; worker-owned Android emulator stops before iOS to release memory.",
+    "continuationLauncherSha256": "8aa0fd64604639ab968b786652cf9b220d7164a5dd60ea66d507ea080b29ffbd"
+  },
+  "iosBinaryReuse": {
+    "reason": "Available disk remained ~1.45GiB after owned build cleanup. Native app source, SDKs and codegen unchanged; only packed native-feature-state JS/declaration changed.",
+    "baselineRecord": "records/evidence/tf04-tf06-acceptance-plan.json nativeRemountResolution.execution.installedIdentity.ios",
+    "expected": {
+      "mapbox-ios": "4cab089c7276e5b7523bec24ee730b8e4a6c5041f474050c5a5ec1729b2c0723",
+      "maplibre-ios": "339c5ce669f68b9e6e0606732937f6882992ec98df9e9ddedf658aa4121ffd46"
+    },
+    "method": "TF06_IOS_BINARY_SHA256 must match installed CFBundleExecutable digest before launch; one lifetime engine required. New frozen JS artifact and TF06L scene served by reset-cache Metro.",
+    "limitation": "Real iOS renderer scenario is executed, but no fresh iOS native compilation/install for this continuation.",
+    "historical": true
+  },
+  "runtime": {
+    "mapbox-android": {
+      "status": "passed",
+      "attempt": 2,
+      "command": "bun scripts/tf06-queries-smoke.mjs android lifetimes",
+      "groupExitCode": 1,
+      "groupDurationSeconds": 53.2,
+      "fields": {
+        "loaded": "1",
+        "vector-queries": "ok",
+        "key-remove": "ok",
+        "whole-remove": "ok",
+        "vector-namespaces": "ok",
+        "vector-remount": "cleared",
+        "vector-style": "cleared",
+        "vector-to-geojson": "cleared",
+        "geojson-to-vector": "cleared",
+        "final-remount": "cleared",
+        "error": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "fixtureRevisions": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "reusedNativeBuild": false,
+      "harnessHashesRecord": "attempts[1].harnessHashes",
+      "groupExitExplanation": "Mapbox engine passed; same group later failed MapLibre build ENOSPC, which passed its separate continuation.",
+      "installedIdentity": {
+        "installedPackage": "com.onemapmapbox",
+        "versionName": "1.0",
+        "versionCode": 1,
+        "installedUpdatedAt": "2026-10-12 17:35:11",
+        "installedApkSha256": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+        "builtApkSha256": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+        "matchesBuiltApk": true,
+        "provenance": "Native worker compared installed and built APK digests before deleting owned build outputs."
+      }
+    },
+    "maplibre-android": {
+      "status": "passed",
+      "attempt": 3,
+      "command": "bun scripts/tf06-queries-smoke.mjs android lifetimes maplibre",
+      "groupExitCode": 0,
+      "groupDurationSeconds": 32.57,
+      "fields": {
+        "loaded": "1",
+        "vector-queries": "ok",
+        "key-remove": "ok",
+        "whole-remove": "ok",
+        "vector-namespaces": "ok",
+        "vector-remount": "cleared",
+        "vector-style": "cleared",
+        "vector-to-geojson": "cleared",
+        "geojson-to-vector": "cleared",
+        "final-remount": "cleared",
+        "error": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "fixtureRevisions": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "reusedNativeBuild": false,
+      "harnessHashesRecord": "attempts[2].harnessHashes",
+      "installedIdentity": {
+        "applicationId": "com.onemapmaplibre",
+        "version": "1.0",
+        "versionCode": 1,
+        "updatedAt": "2026-10-12 17:46:06 America/Los_Angeles",
+        "installedApkSha256": "cb795a8491fa908b9640d4e4ec5c908b639511265d2d8b7b34ec305b80aa224f",
+        "matchesBuiltApk": true,
+        "buildArchitecture": "arm64-v8a",
+        "provenance": "Native worker observed on-device sha256sum equal to built APK before deleting owned build outputs."
+      }
+    },
+    "maplibre-ios": {
+      "status": "passed",
+      "command": "env -u TF06_IOS_BINARY_SHA256 bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre",
+      "groupExitCode": 0,
+      "groupDurationSeconds": 71,
+      "fields": {
+        "loaded": "1",
+        "vector-queries": "ok",
+        "key-remove": "ok",
+        "whole-remove": "ok",
+        "vector-namespaces": "ok",
+        "vector-remount": "cleared",
+        "vector-style": "cleared",
+        "vector-to-geojson": "cleared",
+        "geojson-to-vector": "cleared",
+        "final-remount": "cleared",
+        "error": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "fixtureRevisions": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "reusedNativeBuild": false,
+      "freshNativeBuild": true,
+      "evidence": "freshIosBuildAcceptance.results.maplibre-ios",
+      "installedIdentity": {
+        "derivedDataPath": "/Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi",
+        "productApp": "Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+        "productExecutableMtime": "2026-10-13T01:23:44.882Z",
+        "installedApp": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/AD4300B9-A157-47C1-BB15-90FF136D5E4C/OneMapMaplibre.app",
+        "bundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+        "executable": "OneMapMaplibre",
+        "version": "1.0",
+        "buildNumber": "1",
+        "minimumOS": "15.1",
+        "executableSha256": "339c5ce669f68b9e6e0606732937f6882992ec98df9e9ddedf658aa4121ffd46",
+        "debugDylibSha256": "710b4927e134d9cc3a24a6ec745b94a077a63b05d0f94cf65c8916444d76bd1d",
+        "regularFileManifest": {
+          "productFileCount": 174,
+          "installedFileCount": 174,
+          "productManifestSha256": "8329ba72d47d20c19fa678c1aebd61eed43235055cc67cfd520dbabef7847a7f",
+          "installedManifestSha256": "8329ba72d47d20c19fa678c1aebd61eed43235055cc67cfd520dbabef7847a7f",
+          "equal": true,
+          "differences": [],
+          "symlinksExcluded": true
+        },
+        "xcodeActivityLog": "Logs/Build/8A5D22AD-79C6-4810-9DC5-4AEA92C99F25.xcactivitylog",
+        "xcodeActivityLogSha256": "07808da01f68abf0cd36f250f5119b6e4876e3736f915051d80f878e56e8eb2e",
+        "activityEvidence": {
+          "swiftCompileTasks": 3,
+          "appLinkTasks": 2,
+          "validation": 1,
+          "touch": 1,
+          "buildStatus": "native CLI exit 0; installed app launched and TF06L passed"
+        }
+      },
+      "harnessHashesRecord": "artifactVerification.harnessHashes"
+    },
+    "mapbox-ios": {
+      "status": "passed",
+      "command": "env -u TF06_IOS_BINARY_SHA256 bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+      "groupExitCode": 0,
+      "groupDurationSeconds": 210,
+      "fields": {
+        "loaded": "1",
+        "vector-queries": "ok",
+        "key-remove": "ok",
+        "whole-remove": "ok",
+        "vector-namespaces": "ok",
+        "vector-remount": "cleared",
+        "vector-style": "cleared",
+        "vector-to-geojson": "cleared",
+        "geojson-to-vector": "cleared",
+        "final-remount": "cleared",
+        "error": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "fixtureRevisions": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "reusedNativeBuild": false,
+      "freshNativeBuild": true,
+      "evidence": "freshIosBuildAcceptance.results.mapbox-ios",
+      "installedIdentity": {
+        "derivedDataPath": "/Users/rob/Library/Developer/Xcode/DerivedData/OneMapMapbox-hkvapfhlfnilzcebalhjleqayxty",
+        "productApp": "Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+        "productAppMtime": "2026-10-13T01:20:26.466Z",
+        "installedApp": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/67307638-6B6B-4C9F-B41D-D4D35440D516/OneMapMapbox.app",
+        "bundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+        "executable": "OneMapMapbox",
+        "version": "1.0",
+        "buildNumber": "1",
+        "minimumOS": "15.1",
+        "executableSha256": "01b89ad0a36801b23d19f6be5d3f9e2baff12e330213474f844ea15d222cb7c1",
+        "debugDylibSha256": "7b98bc363d43d6e6ce8a1c3a1e9c33b277f49acac0024c4a7577d4d911e960b7",
+        "installedExecutableAndDebugDylibMatch": true,
+        "xcodeActivityLog": "Logs/Build/AC830805-078B-4B94-8B1A-9951C2F9C51B.xcactivitylog",
+        "activityEvidence": "Xcode activity log shows SwiftCompile and app packaging, validation, and touch; native CLI command exited 0 and harness passed.",
+        "xcodeActivityLogSha256": "ebd0f49b1440f17e792818bc1d8ae7d48ec35e35f5018f0716e3fc2eefbc7965"
+      },
+      "harnessHashesRecord": "artifactVerification.harnessHashes"
+    }
+  },
+  "scopeLimits": [
+    "Renderer checks only facade-written state, two known numeric ids and two vector source layers; pending-operation races remain mocked.",
+    "Initial iOS attempts used verified existing native binaries. Later user-authorized fresh iOS builds, verified installations and reruns passed for both engines; see freshIosBuildAcceptance.",
+    "Prior six-environment TF06 scenario and web corrections were not repeated for this added native scope."
+  ],
+  "commit": "Not committed; HEAD82a7ade unchanged; TF07 not started.",
+  "cleanup": {
+    "status": "complete: compact evidence retained; owned temporary logs, package archives and generated native build outputs removed",
+    "ports": [
+      8081,
+      8798,
+      8799
+    ],
+    "portsStatus": "clear per worker",
+    "android5554": "worker-started emulator stopped",
+    "iosSimulator": "preexisting iPhone18Pro remains booted",
+    "preexistingAndroid5560": "not started/stopped by this task; continuation explicitly targets5554",
+    "preserved": [
+      "all source/uncommitted work",
+      "Pods and dependencies",
+      "SDKs/SourcePackages",
+      "small iOS codegen inputs",
+      "simulator definitions/data",
+      "current verified dist copies"
+    ],
+    "freeSpaceGiBReportedByWorker": 9.6,
+    "finalRemovedBuildPaths": [
+      "examples/native-mapbox/android/build",
+      "examples/native-mapbox/node_modules/@rnmapbox/maps/android/build",
+      "examples/native-maplibre/android/build",
+      "examples/native-maplibre/node_modules/@maplibre/maplibre-react-native/android/build"
+    ],
+    "temporaryAcceptanceWorkspaceRemoved": true,
+    "finalVerification": "Frozen package archive SHA256, all 130 dist files in five copies and all current harness hashes matched before archive deletion; final formatting, documentation structure and git diff whitespace checks passed."
+  },
+  "freshIosBuildAcceptance": {
+    "status": "passed: fresh native builds, verified installations and scoped TF06 acceptance for both iOS engines",
+    "authorization": "User explicitly requested fresh iOS builds and scoped TF06 vector lifetime/keyed family acceptance with subagents; preserve work, no commit, no TF07.",
+    "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+    "artifactVerification": {
+      "distFiles": 130,
+      "verifiedCopies": 5,
+      "harnessHashesMatch": true
+    },
+    "commands": [
+      "env -u TF06_IOS_BINARY_SHA256 bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+      "env -u TF06_IOS_BINARY_SHA256 bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre"
+    ],
+    "environment": {
+      "host": "macOS arm64",
+      "Bun": "1.4.1",
+      "Node": "24.14.0",
+      "Xcode": "27.0 (27A266a)",
+      "Android": "Medium_Phone arm64 API37/37.1, emulator-5554",
+      "iOS": "iPhone18Pro iOS27.0, 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "RNMapbox": "10.3.7",
+      "MapLibreRN": "11.5.0",
+      "React": "19.2.3",
+      "ReactNative": "0.87.1"
+    },
+    "worker": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "resources": "One worker exclusively owns Metro8081, MVT8798, status8799, iPhone18Pro and native build/install paths; sequential iOS engines. Stronger review subagent runs read-only preparation in parallel."
+    },
+    "priorEvidence": "Existing attempts, binary-reuse outcomes and their original limitations are retained as historical evidence. Fresh build results are appended separately.",
+    "excluded": [
+      "Android reruns",
+      "web acceptance",
+      "TF07",
+      "commit",
+      "publish"
+    ],
+    "preflight": {
+      "simulator": "Assigned iPhone18Pro booted, iOS27.0",
+      "ports": "8081/8798/8799 clear",
+      "freeSpaceGiB": 7.3,
+      "cleanBuildOutputs": "Both previous workspace DerivedData roots absent; retained iOS build folders only ~328K/~336K generated inputs.",
+      "review": "Pinned run-ios fresh path compiles and installs. Installed app content manifests must match built app because CLI installation alone is insufficient proof. Do not rerun native setup that replaces generated native trees."
+    },
+    "results": {
+      "mapbox-ios": {
+        "artifact": {
+          "packedArchiveSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+          "exampleCopies": 4,
+          "rootFiles": 130
+        },
+        "run": {
+          "engine": "mapbox",
+          "scope": "ios lifetimes",
+          "command": "env -u TF06_IOS_BINARY_SHA256 bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+          "exitCode": 0,
+          "durationSeconds": 210,
+          "finishedAt": "2026-10-13T01:21:09.399Z",
+          "result": {
+            "status": "passed",
+            "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+            "fields": {
+              "loaded": "1",
+              "vector-queries": "ok",
+              "key-remove": "ok",
+              "whole-remove": "ok",
+              "vector-namespaces": "ok",
+              "vector-remount": "cleared",
+              "vector-style": "cleared",
+              "vector-to-geojson": "cleared",
+              "geojson-to-vector": "cleared",
+              "final-remount": "cleared",
+              "error": "none",
+              "phase": "done",
+              "done": "1"
+            },
+            "fixtureRequests": [
+              {
+                "revision": 0,
+                "z": 11,
+                "x": 328,
+                "y": 715
+              },
+              {
+                "revision": 0,
+                "z": 11,
+                "x": 327,
+                "y": 715
+              },
+              {
+                "revision": 0,
+                "z": 11,
+                "x": 328,
+                "y": 714
+              },
+              {
+                "revision": 0,
+                "z": 11,
+                "x": 327,
+                "y": 714
+              },
+              {
+                "revision": 1,
+                "z": 11,
+                "x": 327,
+                "y": 714
+              },
+              {
+                "revision": 1,
+                "z": 11,
+                "x": 328,
+                "y": 715
+              },
+              {
+                "revision": 1,
+                "z": 11,
+                "x": 327,
+                "y": 715
+              },
+              {
+                "revision": 1,
+                "z": 11,
+                "x": 328,
+                "y": 714
+              },
+              {
+                "revision": 3,
+                "z": 11,
+                "x": 328,
+                "y": 715
+              },
+              {
+                "revision": 3,
+                "z": 11,
+                "x": 327,
+                "y": 715
+              },
+              {
+                "revision": 3,
+                "z": 11,
+                "x": 327,
+                "y": 714
+              },
+              {
+                "revision": 3,
+                "z": 11,
+                "x": 328,
+                "y": 714
+              },
+              {
+                "revision": 4,
+                "z": 11,
+                "x": 328,
+                "y": 715
+              },
+              {
+                "revision": 4,
+                "z": 11,
+                "x": 328,
+                "y": 714
+              },
+              {
+                "revision": 4,
+                "z": 11,
+                "x": 327,
+                "y": 714
+              },
+              {
+                "revision": 4,
+                "z": 11,
+                "x": 327,
+                "y": 715
+              }
+            ]
+          },
+          "fixtureRevisions": [
+            0,
+            1,
+            3,
+            4
+          ],
+          "startedAt": "2026-10-13T01:17:39.833Z"
+        },
+        "environment": {
+          "device": "iPhone 18 Pro",
+          "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "ios": "27.0",
+          "bootedDeviceCount": 1,
+          "xcode": "27.0 (27A266a)",
+          "xcrun": "72",
+          "assignedPorts": {
+            "8081": "owned Metro released after run",
+            "8798": "fixture closed after run",
+            "8799": "status server closed after run"
+          }
+        },
+        "build": {
+          "derivedDataPath": "/Users/rob/Library/Developer/Xcode/DerivedData/OneMapMapbox-hkvapfhlfnilzcebalhjleqayxty",
+          "productApp": "Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+          "productAppMtime": "2026-10-13T01:20:26.466Z",
+          "installedApp": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/67307638-6B6B-4C9F-B41D-D4D35440D516/OneMapMapbox.app",
+          "bundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+          "executable": "OneMapMapbox",
+          "version": "1.0",
+          "buildNumber": "1",
+          "minimumOS": "15.1",
+          "executableSha256": "01b89ad0a36801b23d19f6be5d3f9e2baff12e330213474f844ea15d222cb7c1",
+          "debugDylibSha256": "7b98bc363d43d6e6ce8a1c3a1e9c33b277f49acac0024c4a7577d4d911e960b7",
+          "installedExecutableAndDebugDylibMatch": true,
+          "xcodeActivityLog": "Logs/Build/AC830805-078B-4B94-8B1A-9951C2F9C51B.xcactivitylog",
+          "activityEvidence": "Xcode activity log shows SwiftCompile and app packaging, validation, and touch; native CLI command exited 0 and harness passed.",
+          "xcodeActivityLogSha256": "ebd0f49b1440f17e792818bc1d8ae7d48ec35e35f5018f0716e3fc2eefbc7965"
+        },
+        "cleanup": {
+          "remove": [
+            "Build",
+            "Logs",
+            "Index.noindex"
+          ],
+          "estimatedBytes": "~1.1 GiB",
+          "keep": [
+            "SourcePackages",
+            "Pods",
+            "generated iOS inputs",
+            "simulator app installation"
+          ]
+        }
+      },
+      "maplibre-ios": {
+        "artifact": {
+          "packedArchiveSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+          "exampleCopies": 4,
+          "rootFiles": 130
+        },
+        "run": {
+          "engine": "maplibre",
+          "scope": "ios lifetimes",
+          "command": "env -u TF06_IOS_BINARY_SHA256 bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre",
+          "exitCode": 0,
+          "startedAt": "2026-10-13T01:22:48.190Z",
+          "finishedAt": "2026-10-13T01:23:59.584Z",
+          "durationSeconds": 71,
+          "result": {
+            "status": "passed",
+            "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+            "fields": {
+              "loaded": "1",
+              "vector-queries": "ok",
+              "key-remove": "ok",
+              "whole-remove": "ok",
+              "vector-namespaces": "ok",
+              "vector-remount": "cleared",
+              "vector-style": "cleared",
+              "vector-to-geojson": "cleared",
+              "geojson-to-vector": "cleared",
+              "final-remount": "cleared",
+              "error": "none",
+              "phase": "done",
+              "done": "1"
+            },
+            "fixtureRequests": [
+              {
+                "revision": 0,
+                "z": 11,
+                "x": 328,
+                "y": 715
+              },
+              {
+                "revision": 0,
+                "z": 11,
+                "x": 327,
+                "y": 715
+              },
+              {
+                "revision": 0,
+                "z": 11,
+                "x": 328,
+                "y": 714
+              },
+              {
+                "revision": 0,
+                "z": 11,
+                "x": 327,
+                "y": 714
+              },
+              {
+                "revision": 1,
+                "z": 11,
+                "x": 328,
+                "y": 715
+              },
+              {
+                "revision": 1,
+                "z": 11,
+                "x": 327,
+                "y": 715
+              },
+              {
+                "revision": 1,
+                "z": 11,
+                "x": 328,
+                "y": 714
+              },
+              {
+                "revision": 1,
+                "z": 11,
+                "x": 327,
+                "y": 714
+              },
+              {
+                "revision": 3,
+                "z": 11,
+                "x": 328,
+                "y": 715
+              },
+              {
+                "revision": 3,
+                "z": 11,
+                "x": 327,
+                "y": 715
+              },
+              {
+                "revision": 3,
+                "z": 11,
+                "x": 328,
+                "y": 714
+              },
+              {
+                "revision": 3,
+                "z": 11,
+                "x": 327,
+                "y": 714
+              },
+              {
+                "revision": 4,
+                "z": 11,
+                "x": 328,
+                "y": 715
+              },
+              {
+                "revision": 4,
+                "z": 11,
+                "x": 327,
+                "y": 715
+              },
+              {
+                "revision": 4,
+                "z": 11,
+                "x": 328,
+                "y": 714
+              },
+              {
+                "revision": 4,
+                "z": 11,
+                "x": 327,
+                "y": 714
+              }
+            ]
+          },
+          "fixtureRevisions": [
+            0,
+            1,
+            3,
+            4
+          ]
+        },
+        "environment": {
+          "device": "iPhone 18 Pro",
+          "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "ios": "27.0",
+          "bootedDeviceCount": 1,
+          "xcode": "27.0 (27A266a)",
+          "xcrun": "72",
+          "assignedPorts": {
+            "8081": "owned Metro released after run",
+            "8798": "fixture closed after run",
+            "8799": "status server closed after run"
+          }
+        },
+        "build": {
+          "derivedDataPath": "/Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi",
+          "productApp": "Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+          "productExecutableMtime": "2026-10-13T01:23:44.882Z",
+          "installedApp": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/AD4300B9-A157-47C1-BB15-90FF136D5E4C/OneMapMaplibre.app",
+          "bundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+          "executable": "OneMapMaplibre",
+          "version": "1.0",
+          "buildNumber": "1",
+          "minimumOS": "15.1",
+          "executableSha256": "339c5ce669f68b9e6e0606732937f6882992ec98df9e9ddedf658aa4121ffd46",
+          "debugDylibSha256": "710b4927e134d9cc3a24a6ec745b94a077a63b05d0f94cf65c8916444d76bd1d",
+          "regularFileManifest": {
+            "productFileCount": 174,
+            "installedFileCount": 174,
+            "productManifestSha256": "8329ba72d47d20c19fa678c1aebd61eed43235055cc67cfd520dbabef7847a7f",
+            "installedManifestSha256": "8329ba72d47d20c19fa678c1aebd61eed43235055cc67cfd520dbabef7847a7f",
+            "equal": true,
+            "differences": [],
+            "symlinksExcluded": true
+          },
+          "xcodeActivityLog": "Logs/Build/8A5D22AD-79C6-4810-9DC5-4AEA92C99F25.xcactivitylog",
+          "xcodeActivityLogSha256": "07808da01f68abf0cd36f250f5119b6e4876e3736f915051d80f878e56e8eb2e",
+          "activityEvidence": {
+            "swiftCompileTasks": 3,
+            "appLinkTasks": 2,
+            "validation": 1,
+            "touch": 1,
+            "buildStatus": "native CLI exit 0; installed app launched and TF06L passed"
+          }
+        },
+        "cleanup": {
+          "remove": [
+            "Build",
+            "Logs",
+            "Index.noindex"
+          ],
+          "estimatedBytes": "~546 MiB",
+          "keep": [
+            "SourcePackages",
+            "Pods",
+            "generated iOS inputs",
+            "simulator app installation"
+          ]
+        }
+      }
+    },
+    "binaryReuse": false,
+    "priorRuntime": {
+      "mapbox-ios": {
+        "status": "passed",
+        "attempt": 5,
+        "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+        "groupExitCode": 0,
+        "groupDurationSeconds": 7.79,
+        "fields": {
+          "loaded": "1",
+          "vector-queries": "ok",
+          "key-remove": "ok",
+          "whole-remove": "ok",
+          "vector-namespaces": "ok",
+          "vector-remount": "cleared",
+          "vector-style": "cleared",
+          "vector-to-geojson": "cleared",
+          "geojson-to-vector": "cleared",
+          "final-remount": "cleared",
+          "error": "none",
+          "phase": "done",
+          "done": "1"
+        },
+        "fixtureRevisions": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "reusedNativeBuild": true,
+        "harnessHashesRecord": "attempts[4].harnessHashes",
+        "installedIdentity": {
+          "reusedNativeBuild": true,
+          "bundleId": "org.reactjs.native.example.OneMapMapbox",
+          "version": "1.0",
+          "build": "1",
+          "installedExecutableSha256": "4cab089c7276e5b7523bec24ee730b8e4a6c5041f474050c5a5ec1729b2c0723",
+          "matchesApprovedDigest": true
+        }
+      },
+      "maplibre-ios": {
+        "status": "passed",
+        "attempt": 4,
+        "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre",
+        "groupExitCode": 0,
+        "groupDurationSeconds": 7.26,
+        "fields": {
+          "loaded": "1",
+          "vector-queries": "ok",
+          "key-remove": "ok",
+          "whole-remove": "ok",
+          "vector-namespaces": "ok",
+          "vector-remount": "cleared",
+          "vector-style": "cleared",
+          "vector-to-geojson": "cleared",
+          "geojson-to-vector": "cleared",
+          "final-remount": "cleared",
+          "error": "none",
+          "phase": "done",
+          "done": "1"
+        },
+        "fixtureRevisions": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "reusedNativeBuild": true,
+        "harnessHashesRecord": "attempts[3].harnessHashes",
+        "installedIdentity": {
+          "reusedNativeBuild": true,
+          "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+          "version": "1.0",
+          "build": "1",
+          "installedExecutableSha256": "339c5ce669f68b9e6e0606732937f6882992ec98df9e9ddedf658aa4121ffd46",
+          "matchesApprovedDigest": true
+        }
+      }
+    },
+    "validationPolicy": "No implementation or harness changes; previously passed457-test validation remains attached to this unchanged artifact. Final documentation/formatting and artifact checks run after evidence updates.",
+    "cleanup": {
+      "status": "complete",
+      "removed": "Each owned workspace DerivedData Build, Logs and Index output; empty run-created secondary Logs; temporary acceptance logs and package archive removed after compact evidence saved.",
+      "preserved": [
+        "installed apps",
+        "preexisting booted iPhone18Pro",
+        "Pods/dependencies",
+        "generated iOS inputs",
+        "SourcePackages/SDKs",
+        "all existing source and uncommitted work"
+      ],
+      "ports": "8081/8798/8799 clear; no owned Metro process remains",
+      "freeSpaceGiB": 5.4,
+      "unrelatedProcesses": "No unrelated process stopped; unrelated Android build left alone."
+    },
+    "finalVerification": {
+      "formatting": "passed;162files",
+      "documentationStructure": "passed;27Markdownfiles/29comparison tables",
+      "whitespace": "git diff --check passed",
+      "artifact": "Unchanged SHA256,130dist files across five copies and all current harness hashes verified after both runs.",
+      "review": "Stronger read-only preparation and final evidence review; no substantive acceptance issue found.",
+      "head": "82a7ade;no commit"
+    }
+  },
+  "postAcceptanceValidationCorrection": {
+    "status": "passed; sparse-array gap and stale reference resolved",
+    "record": "records/evidence/tf06-followup-audit.json sparseArrayResolution",
+    "packageSha256": "3bd2f7a1ee0e48c53e602653d2c86248dac5cc08e5217a46cdc04edcd31502ed",
+    "tests": 467,
+    "priorRendererArtifact": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+    "rendererAcceptance": "Prior real-renderer outcomes retained on their original artifacts; input-validation follow-up verified with shared and all-adapter regressions plus routine validation."
+  }
+}

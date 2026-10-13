@@ -8,6 +8,7 @@ import {
   type Ref,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useState,
 } from "react";
 
@@ -36,16 +37,64 @@ interface MapHandle {
   getMaxBounds: () => unknown;
   project: () => unknown;
   unproject: () => unknown;
+  queryRenderedFeatures: (geometry?: unknown, options?: object) => unknown;
+  querySourceFeatures: (sourceId: string, params?: object) => unknown;
+  getSource: (id: string) => unknown;
+  getLayer: (id: string) => unknown;
+  setFeatureState: (target: object, state: object) => unknown;
+  getFeatureState: (target: object) => unknown;
+  removeFeatureState: (target: object, key?: string) => unknown;
   getMap: () => StyleLoadTarget;
 }
 
+/** Cluster methods the mock GeoJSON source exposes. */
+export interface ClusterSourceMock {
+  readonly getClusterExpansionZoom: jest.Mock<
+    (
+      clusterId: number,
+      callback?: (error: unknown, zoom: number) => void
+    ) => unknown
+  >;
+  readonly getClusterChildren: jest.Mock<
+    (
+      clusterId: number,
+      callback?: (error: unknown, features: readonly object[]) => void
+    ) => unknown
+  >;
+  readonly getClusterLeaves: jest.Mock<
+    (
+      clusterId: number,
+      limit: number,
+      offset: number,
+      callback?: (error: unknown, features: readonly object[]) => void
+    ) => unknown
+  >;
+}
+
+/** Mutable handler names updated by the pinned react-map-gl entries. */
+export const webHandlerNames = [
+  "dragPan",
+  "scrollZoom",
+  "doubleClickZoom",
+  "dragRotate",
+  "boxZoom",
+  "keyboard",
+  "touchZoomRotate",
+  "touchPitch",
+] as const;
+
+type WebHandlerName = (typeof webHandlerNames)[number];
+type ErrorNotice = { readonly error?: unknown };
+type HandlerProps = Partial<Record<WebHandlerName, boolean>>;
+
 export interface StyleLoadTarget {
-  on: (type: string, listener: () => void) => void;
-  off: (type: string, listener: () => void) => void;
+  on: (type: string, listener: (event: ErrorNotice) => void) => void;
+  off: (type: string, listener: (event: ErrorNotice) => void) => void;
   emitStyleLoad: () => void;
   emitLoad: () => void;
   emitIdle: () => void;
   emitStyleData: () => void;
+  emitError: (error: unknown) => void;
   clearImages: () => void;
   hasImage: (name: string) => boolean;
   addImage: jest.Mock<
@@ -58,7 +107,9 @@ export interface StyleLoadTarget {
       callback?: (error: unknown, image?: unknown) => void
     ) => unknown
   >;
-  listenerCount: () => number;
+  listenerCount: (type?: string) => number;
+  handlers: Record<WebHandlerName, { isEnabled: () => boolean }>;
+  applyHandlerProps: (props: HandlerProps) => void;
   isStyleLoaded: () => boolean;
   touchZoomRotate: {
     disableRotation: () => void;
@@ -66,11 +117,12 @@ export interface StyleLoadTarget {
   };
 }
 
-interface WebMapMockProps {
+interface WebMapMockProps extends HandlerProps {
   readonly children?: ReactNode;
   readonly ref?: Ref<MapHandle>;
   readonly reuseMaps?: boolean;
   readonly gl?: { readonly drawingBufferWidth: number };
+  readonly onError?: (event: ErrorNotice) => void;
 }
 
 /**
@@ -112,6 +164,81 @@ export const createWebMapMock = () => {
   const getMaxBounds = jest.fn(() => null);
   const project = jest.fn(() => ({ x: 12, y: 34 }));
   const unproject = jest.fn(() => ({ lng: -122.34, lat: 47.61 }));
+  const queriedFeatures = [
+    { type: "Feature", id: 1, properties: { kind: "route" } },
+    { type: "Feature", id: 1, properties: { kind: "route" } },
+  ];
+  const queryRenderedFeatures = jest.fn(() => queriedFeatures);
+  const querySourceFeatures = jest.fn(() => queriedFeatures.slice(0, 1));
+  const clusterSource: ClusterSourceMock = {
+    // Mapbox GL reports through a trailing callback; call it so the
+    // mapbox-web adapter's promise resolves.
+    getClusterExpansionZoom: jest.fn(
+      (
+        _clusterId: number,
+        callback?: (error: unknown, zoom: number) => void
+      ) => {
+        callback?.(null, 13);
+
+        return undefined;
+      }
+    ),
+    getClusterChildren: jest.fn(
+      (
+        _clusterId: number,
+        callback?: (error: unknown, features: readonly object[]) => void
+      ) => {
+        callback?.(null, [{ type: "Feature", id: 11 }]);
+
+        return undefined;
+      }
+    ),
+    getClusterLeaves: jest.fn(
+      (
+        _clusterId: number,
+        _limit: number,
+        _offset: number,
+        callback?: (error: unknown, features: readonly object[]) => void
+      ) => {
+        callback?.(null, [
+          { type: "Feature", id: 21 },
+          { type: "Feature", id: 22 },
+        ]);
+
+        return undefined;
+      }
+    ),
+  };
+  const sources = new Map<string, unknown>();
+  const getSource = jest.fn((id: string) => sources.get(id));
+  const layers = new Map<string, object>();
+  const getLayer = jest.fn((id: string) => layers.get(id));
+  const setFeatureState = jest.fn();
+  const featureState = new Map<string, Record<string, unknown>>();
+  const getFeatureState = jest.fn(
+    (target: { source?: string; id?: string | number }) => {
+      const key = `${target?.source}/${target?.id}`;
+
+      return featureState.get(key) ?? {};
+    }
+  );
+  const removeFeatureState = jest.fn(
+    (target: { source?: string; id?: string | number }, key?: string) => {
+      const stateKey = `${target?.source}/${target?.id}`;
+      const current = featureState.get(stateKey);
+
+      if (!current) {
+        return;
+      }
+
+      if (key === undefined) {
+        featureState.delete(stateKey);
+        return;
+      }
+
+      delete current[key];
+    }
+  );
   const disableRotation = jest.fn();
   const enableRotation = jest.fn();
   let saved: PooledMap | null = null;
@@ -140,6 +267,19 @@ export const createWebMapMock = () => {
     getMaxBounds.mockClear();
     project.mockClear();
     unproject.mockClear();
+    queryRenderedFeatures.mockClear();
+    querySourceFeatures.mockClear();
+    clusterSource.getClusterExpansionZoom.mockClear();
+    clusterSource.getClusterChildren.mockClear();
+    clusterSource.getClusterLeaves.mockClear();
+    sources.clear();
+    getSource.mockClear();
+    layers.clear();
+    getLayer.mockClear();
+    setFeatureState.mockClear();
+    featureState.clear();
+    getFeatureState.mockClear();
+    removeFeatureState.mockClear();
     disableRotation.mockClear();
     enableRotation.mockClear();
     Source.mockClear();
@@ -147,7 +287,14 @@ export const createWebMapMock = () => {
   };
 
   const WrapperMap = jest.fn(
-    ({ children, ref, reuseMaps, gl }: WebMapMockProps) => {
+    ({
+      children,
+      ref,
+      reuseMaps,
+      gl,
+      onError,
+      ...handlerProps
+    }: WebMapMockProps) => {
       const [record] = useState(() => {
         if (reuseMaps && saved) {
           const reused = saved;
@@ -170,6 +317,16 @@ export const createWebMapMock = () => {
       });
 
       currentStyleTarget = record.styleTarget;
+
+      useLayoutEffect(() => {
+        record.styleTarget.applyHandlerProps(handlerProps);
+      });
+
+      useLayoutEffect(() => {
+        if (!onError) return;
+        record.styleTarget.on("error", onError);
+        return () => record.styleTarget.off("error", onError);
+      }, [record.styleTarget, onError]);
 
       useEffect(
         () => () => {
@@ -205,6 +362,13 @@ export const createWebMapMock = () => {
           getMaxBounds,
           project,
           unproject,
+          queryRenderedFeatures,
+          querySourceFeatures,
+          getSource,
+          getLayer,
+          setFeatureState,
+          getFeatureState,
+          removeFeatureState,
           getMap: () => record.styleTarget,
         }),
         [record.styleTarget]
@@ -226,12 +390,21 @@ export const createWebMapMock = () => {
   const Source = jest.fn(
     ({
       id,
+      type,
       children,
     }: {
       readonly id: string;
+      readonly type?: string;
       readonly children?: ReactNode;
-    }) =>
-      createElement(
+    }) => {
+      useEffect(() => {
+        const entry = { type };
+        if (!sources.has(id)) sources.set(id, entry);
+        return () => {
+          if (sources.get(id) === entry) sources.delete(id);
+        };
+      }, [id, type]);
+      return createElement(
         "div",
         { id },
         Children.map(children, (child) =>
@@ -239,10 +412,20 @@ export const createWebMapMock = () => {
             ? cloneElement(child, { source: id })
             : child
         )
-      )
+      );
+    }
   );
 
-  const Layer = jest.fn(() => createElement("div"));
+  const Layer = jest.fn(({ id }: { readonly id: string }) => {
+    useEffect(() => {
+      const entry = { id };
+      layers.set(id, entry);
+      return () => {
+        if (layers.get(id) === entry) layers.delete(id);
+      };
+    }, [id]);
+    return createElement("div");
+  });
 
   const useMap = () => ({
     current: currentStyleTarget
@@ -267,23 +450,45 @@ export const createWebMapMock = () => {
     enableRotation,
     resetWebMapMock,
     getStyleTarget: () => currentStyleTarget,
+    queryRenderedFeatures,
+    querySourceFeatures,
+    getSource,
+    getLayer,
+    setFeatureState,
+    getFeatureState,
+    removeFeatureState,
+    clusterSource,
+    registerMockSource: (id: string, source: unknown): void => {
+      sources.set(id, source);
+    },
   };
 };
 
 const createStyleTarget = (
   touchZoomRotate: StyleLoadTarget["touchZoomRotate"]
 ): StyleLoadTarget => {
-  const listeners = new Map<string, Set<() => void>>();
+  const listeners = new Map<string, Set<(event: ErrorNotice) => void>>();
   const images = new Map<string, unknown>();
+  const enabled = new Map<WebHandlerName, boolean>(
+    webHandlerNames.map((name) => [name, true])
+  );
+  const handlers = Object.fromEntries(
+    webHandlerNames.map((name) => [
+      name,
+      {
+        isEnabled: () => enabled.get(name) === true,
+      },
+    ])
+  ) as StyleLoadTarget["handlers"];
   let loaded = false;
-  const listenersFor = (type: string): Set<() => void> => {
+  const listenersFor = (type: string): Set<(event: ErrorNotice) => void> => {
     const found = listeners.get(type);
 
     if (found) {
       return found;
     }
 
-    const created = new Set<() => void>();
+    const created = new Set<(event: ErrorNotice) => void>();
 
     listeners.set(type, created);
 
@@ -293,7 +498,7 @@ const createStyleTarget = (
     loaded = true;
 
     for (const listener of [...listenersFor(type)]) {
-      listener();
+      listener({});
     }
   };
 
@@ -317,7 +522,12 @@ const createStyleTarget = (
     // the style loaded the way the completion events do.
     emitStyleData: () => {
       for (const listener of [...listenersFor("styledata")]) {
-        listener();
+        listener({});
+      }
+    },
+    emitError: (error) => {
+      for (const listener of [...listenersFor("error")]) {
+        listener({ error });
       }
     },
     clearImages: () => {
@@ -344,7 +554,15 @@ const createStyleTarget = (
         return Promise.resolve({ data: image });
       }
     ),
-    listenerCount: () => listeners.get("style.load")?.size ?? 0,
+    listenerCount: (type = "style.load") => listeners.get(type)?.size ?? 0,
+    handlers,
+    // Pinned wrappers default omitted handler props to true on updates. The
+    // master interactive prop is constructor-only and is not read here.
+    applyHandlerProps: (props) => {
+      for (const name of webHandlerNames) {
+        enabled.set(name, props[name] ?? true);
+      }
+    },
     isStyleLoaded: () => loaded,
     touchZoomRotate,
   };

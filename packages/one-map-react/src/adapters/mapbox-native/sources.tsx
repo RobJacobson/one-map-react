@@ -5,7 +5,8 @@ import {
   ShapeSource,
   VectorSource,
 } from "@rnmapbox/maps";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ComponentRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import type {
   GeoJsonSourceProps,
@@ -20,22 +21,15 @@ import {
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
+import { useGeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
 /** Mapbox-native source that dispatches to the matching RNMapbox source. */
 export const MapboxNativeSource = (props: SourceProps) => {
   switch (props.type) {
     case "geojson":
-      return (
-        <ShapeSource {...toRnmapboxShapeSource(props)}>
-          {props.children}
-        </ShapeSource>
-      );
+      return <MapboxNativeGeoJsonSource {...props} />;
     case "vector":
-      return (
-        <VectorSource {...toRnmapboxVectorSource(props)}>
-          {props.children}
-        </VectorSource>
-      );
+      return <MapboxNativeVectorSource {...props} />;
     case "raster":
       return (
         <RasterSource {...toRnmapboxRasterSource(props)}>
@@ -55,6 +49,51 @@ export const MapboxNativeSource = (props: SourceProps) => {
         </ImageSource>
       );
   }
+};
+
+/**
+ * GeoJSON source that registers its `ShapeSource` ref for cluster queries.
+ *
+ * The registry only exists inside a mapbox-native Map; a source rendered
+ * elsewhere still renders but does not register.
+ *
+ * @param props - Common GeoJSON source props.
+ * @returns The RNMapbox `ShapeSource` with nested layers.
+ * @throws When an option is unavailable on the pinned RNMapbox wrapper.
+ */
+const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
+  const registry = useGeoJsonSourceRegistry();
+  const sourceRef = useRef<ComponentRef<typeof ShapeSource>>(null);
+
+  useLayoutEffect(() => {
+    if (!registry) {
+      return;
+    }
+
+    return registry.register(props.id, sourceRef.current);
+  }, [registry, props.id]);
+
+  return (
+    <ShapeSource ref={sourceRef} {...toRnmapboxShapeSource(props)}>
+      {props.children}
+    </ShapeSource>
+  );
+};
+
+/** Registers the vector source lifetime for native feature-state reset. */
+const MapboxNativeVectorSource = (props: VectorSourceProps) => {
+  const registry = useGeoJsonSourceRegistry();
+
+  useLayoutEffect(
+    () => registry?.featureState.register(props.id, "vector"),
+    [registry, props.id]
+  );
+
+  return (
+    <VectorSource {...toRnmapboxVectorSource(props)}>
+      {props.children}
+    </VectorSource>
+  );
 };
 
 /**
@@ -163,6 +202,7 @@ const toRnmapboxRasterDemSource = (
     tileUrlTemplates: props.tiles?.map((template) => template),
     minZoomLevel: props.minzoom,
     maxZoomLevel: props.maxzoom,
+    tileSize: props.tileSize,
   };
 };
 

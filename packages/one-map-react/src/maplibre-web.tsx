@@ -15,6 +15,19 @@ import type { Adapter } from "./contracts/adapter.js";
 
 type MaplibreMapInstance = ReturnType<MaplibreMapRef["getMap"]>;
 
+// MapLibre GL JS cluster sources return promises directly.
+interface MaplibreClusterCaller {
+  readonly getClusterExpansionZoom: (clusterId: number) => Promise<number>;
+  readonly getClusterChildren: (
+    clusterId: number
+  ) => Promise<readonly object[]>;
+  readonly getClusterLeaves: (
+    clusterId: number,
+    limit: number,
+    offset: number
+  ) => Promise<readonly object[]>;
+}
+
 // The react-map-gl components accept the full style-spec surface; the facade
 // converts props before they reach this boundary.
 /** Selects maplibre-web and supplies react-map-gl MapLibre components. */
@@ -31,4 +44,19 @@ export const adapter: Adapter & { readonly backend: "maplibre-web" } =
       (map as MaplibreMapInstance)
         .loadImage(url)
         .then((response) => response.data),
+    // MapLibre GL cluster methods return promises directly.
+    callWebCluster: (source, method, args) => {
+      const [clusterId, limit, offset] = args as [number, number, number];
+      const clusterSource = source as unknown as MaplibreClusterCaller;
+
+      if (method === "getClusterLeaves") {
+        return clusterSource.getClusterLeaves(clusterId, limit, offset);
+      }
+
+      if (method === "getClusterChildren") {
+        return clusterSource.getClusterChildren(clusterId);
+      }
+
+      return clusterSource.getClusterExpansionZoom(clusterId);
+    },
   });
