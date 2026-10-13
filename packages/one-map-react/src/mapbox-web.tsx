@@ -15,6 +15,24 @@ import type { Adapter } from "./contracts/adapter.js";
 
 type MapboxMapInstance = ReturnType<MapboxMapRef["getMap"]>;
 
+// Mapbox GL JS cluster sources report results through a trailing callback.
+interface MapboxClusterCaller {
+  readonly getClusterExpansionZoom: (
+    clusterId: number,
+    callback: (error: unknown, zoom: number) => void
+  ) => unknown;
+  readonly getClusterChildren: (
+    clusterId: number,
+    callback: (error: unknown, features: readonly object[]) => void
+  ) => unknown;
+  readonly getClusterLeaves: (
+    clusterId: number,
+    limit: number,
+    offset: number,
+    callback: (error: unknown, features: readonly object[]) => void
+  ) => unknown;
+}
+
 // The react-map-gl components accept the full style-spec surface; the facade
 // converts props before they reach this boundary.
 /** Selects mapbox-web and supplies react-map-gl Mapbox components. */
@@ -37,5 +55,32 @@ export const adapter: Adapter & { readonly backend: "mapbox-web" } =
 
           resolve(image);
         });
+      }),
+    // Mapbox GL JS cluster methods take a trailing callback; translate it
+    // into the shared promise result.
+    callWebCluster: (source, method, args) =>
+      new Promise((resolve, reject) => {
+        const [clusterId, limit, offset] = args as [number, number, number];
+        const clusterSource = source as unknown as MapboxClusterCaller;
+        const onResult = (error: unknown, result: unknown): void => {
+          if (error) {
+            reject(error instanceof Error ? error : new Error(String(error)));
+            return;
+          }
+
+          resolve(result);
+        };
+
+        if (method === "getClusterLeaves") {
+          clusterSource.getClusterLeaves(clusterId, limit, offset, onResult);
+          return;
+        }
+
+        if (method === "getClusterChildren") {
+          clusterSource.getClusterChildren(clusterId, onResult);
+          return;
+        }
+
+        clusterSource.getClusterExpansionZoom(clusterId, onResult);
       }),
   });

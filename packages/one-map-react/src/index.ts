@@ -65,6 +65,17 @@ export type {
   MapProps,
 } from "./contracts/map-types.js";
 export type {
+  ClusterQueryMethods,
+  FeatureIdentifier,
+  FeatureQueryMethods,
+  FeatureState,
+  FeatureStateMethods,
+  FeatureStateValue,
+  QueryRenderedFeaturesOptions,
+  QuerySourceFeaturesOptions,
+  ScreenBounds,
+} from "./contracts/query-types.js";
+export type {
   GeoJsonData,
   GeoJsonFeature,
   GeoJsonFeatureCollection,

@@ -18,6 +18,12 @@ export default defineConfig(() => {
   const mapboxAccessToken = readMapboxAccessToken(shellRoot);
 
   return {
+    cacheDir: process.env.ONE_MAP_SMOKE_CACHE_ROOT
+      ? path.join(
+          process.env.ONE_MAP_SMOKE_CACHE_ROOT,
+          "web-mapbox/node_modules/.vite"
+        )
+      : undefined,
     plugins: [pinBareImportsToShell(shellRoot), react()],
     // Public token from the shell or a .env file. Only this value
     // reaches the client.
@@ -29,7 +35,13 @@ export default defineConfig(() => {
     // unbundled so its mapbox-gl import is the same module that receives
     // the access token.
     resolve: {
-      dedupe: ["react", "react-dom", "mapbox-gl"],
+      dedupe: [
+        "react",
+        "react-dom",
+        "mapbox-gl",
+        "react-map-gl",
+        "@vis.gl/react-mapbox",
+      ],
     },
     optimizeDeps: {
       include: ["mapbox-gl"],

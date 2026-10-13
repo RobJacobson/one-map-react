@@ -37,6 +37,14 @@ Routine formatting, documentation, type, unit, mocked component, library build, 
 
 The stage plan's acceptance criteria do not authorize execution. Once a relevant approved run passes, repeat it only for a subsequent change that can affect the result, an unresolved failure, or the final release gate.
 
+## Smoke workers and models
+
+Prefer subagents for approved smoke-test execution. A stronger coordinator prepares the harness, freezes and verifies the artifact, assigns resources, reviews failures, and decides the final acceptance outcome. Use GPT-6 Luna (`gpt-6-luna`) with low reasoning for fixed web smoke commands and medium reasoning for a worker that manages native builds, devices, and processes. If that model is unavailable, record the replacement model and reason before dispatch.
+
+Run independent workers in parallel when their resources are isolated. Assign separate server and debugger ports, browser profiles, temporary output directories, and Vite caches. Give one worker exclusive ownership of shared Metro ports, simulators, native build directories, app installations, and device logs; keep that worker's native runs sequential. Synchronize example package copies from the verified artifact before starting any worker, and leave them unchanged while tests run.
+
+Workers execute their assigned scope, preserve first-attempt results, and report unexpected failures to the coordinator. They do not change production code, refresh dependencies, or retry independently. The coordinator diagnoses failures and records any approved retry without replacing the original result. Subagents follow the same acceptance permission and retention rules as the coordinator.
+
 ## Evidence and artifact identity
 
 Record the revision or artifact, selected versions, environments, scenario scope, result, and whether execution used mocks, real automation, or a manual procedure. Native acceptance must establish that the intended build is installed. Preserve the distinction between code review, declaration checking, and runtime verification.

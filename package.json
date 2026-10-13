@@ -16,7 +16,7 @@
     "check:docs": "bun scripts/check-docs.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json && tsc --noEmit -p tsconfig.examples.web.json && tsc --noEmit -p tsconfig.examples.native.json",
     "build": "bun scripts/build.mjs",
-    "test": "jest --runInBand && bun examples/mapbox-token.test.mjs",
+    "test": "jest --runInBand && bun examples/mapbox-token.test.mjs && bun examples/inline-smoke-target.test.mjs && bun scripts/tf06-lifetimes-fixture.test.mjs && node scripts/native-smoke-process.test.mjs && bun scripts/native-smoke-process.test.mjs && bun scripts/tf06-smoke-selection.test.mjs",
     "test:peers": "bun run build && bun scripts/test-peers.mjs",
     "test:package": "bun run build && bun scripts/test-package.mjs",
     "test:example-resolution": "bun run build && bun scripts/test-example-resolution.mjs",

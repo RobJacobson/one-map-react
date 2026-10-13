@@ -19,8 +19,10 @@ interface TouchZoomRotateHandler {
 }
 
 interface StyleLoadTarget {
-  on: (type: "style.load" | "load" | "idle", listener: () => void) => void;
-  off: (type: "style.load" | "load" | "idle", listener: () => void) => void;
+  on(type: "style.load" | "load" | "idle", listener: () => void): void;
+  on(type: "error", listener: (event: WebErrorNotice) => void): void;
+  off(type: "style.load" | "load" | "idle", listener: () => void): void;
+  off(type: "error", listener: (event: WebErrorNotice) => void): void;
   // Pinned maplibre-gl returns void while no style is loaded; mapbox-gl
   // returns boolean. Callers treat non-true as not loaded.
   isStyleLoaded: () => unknown;
@@ -46,8 +48,34 @@ interface WebMapHandle {
   getMaxBounds: () => unknown;
   project: (lngLat: LngLat) => unknown;
   unproject: (point: Point) => unknown;
+  queryRenderedFeatures: (geometry?: unknown, options?: object) => unknown;
+  querySourceFeatures: (sourceId: string, params?: object) => unknown;
+  getSource: (id: string) => unknown;
+  getLayer: (id: string) => unknown;
+  setFeatureState: (target: object, state: object) => unknown;
+  getFeatureState: (target: object) => unknown;
+  removeFeatureState: (target: object, key?: string) => unknown;
   getMap: () => StyleLoadTarget;
 }
+
+/**
+ * Cluster methods on a web GeoJSON source.
+ *
+ * Mapbox GL reports results through a trailing callback while MapLibre GL
+ * returns promises, so both entries see one rest-argument signature and
+ * normalize the result through {@link WebWrapper.callWebCluster}.
+ */
+interface WebClusterSource {
+  readonly getClusterExpansionZoom: (...args: unknown[]) => unknown;
+  readonly getClusterChildren: (...args: unknown[]) => unknown;
+  readonly getClusterLeaves: (...args: unknown[]) => unknown;
+}
+
+/** Cluster method name shared by both web renderers. */
+type WebClusterMethod =
+  | "getClusterExpansionZoom"
+  | "getClusterChildren"
+  | "getClusterLeaves";
 
 interface WebMoveNotice {
   readonly viewState: ViewState;
@@ -72,6 +100,7 @@ interface WebMapProps {
   readonly mapStyle: MapProps["mapStyle"];
   readonly initialViewState: WebViewState;
   readonly viewState?: WebViewState;
+  readonly padding?: Required<Padding>;
   readonly minZoom?: number;
   readonly maxZoom?: number;
   readonly maxBounds?: readonly [number, number, number, number];
@@ -172,10 +201,24 @@ interface WebWrapper<
   readonly Layer: ComponentType<WebForwardedProps>;
   readonly useMap: () => WebMapSelection;
   readonly loadWebImage: (map: WebImageMap, url: string) => Promise<unknown>;
+  /**
+   * Invokes a cluster method on a web GeoJSON source.
+   *
+   * Mapbox GL takes a trailing callback; MapLibre GL returns a promise. The
+   * shared surface passes the source and forwarded arguments and adopts the
+   * renderer's own result channel.
+   */
+  readonly callWebCluster: (
+    source: WebClusterSource,
+    method: WebClusterMethod,
+    args: readonly unknown[]
+  ) => Promise<unknown>;
 }
 
 export type {
   StyleLoadTarget,
+  WebClusterMethod,
+  WebClusterSource,
   WebErrorNotice,
   WebImageMap,
   WebMapHandle,

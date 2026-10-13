@@ -8,11 +8,211 @@ const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
 const group = process.argv[2] ?? "web";
+const corrections = process.argv[3] === "corrections";
+if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
+  throw new Error("The corrections scope requires: web corrections.");
+}
+const webScenario = corrections ? "corrections" : "camera";
 
 if (!["web", "android", "ios", "all"].includes(group)) {
   console.error("Use web, android, ios, or all.");
   process.exit(1);
 }
+
+// These helpers initialize before the script's eager web dispatch below.
+const runWebCorrections = async (page) => {
+  const renderer = "window.__oneMapCorrectionRenderer";
+  const observe = async (expression, label, timeout = 5000) => {
+    const deadline = Date.now() + timeout;
+    while (Date.now() < deadline) {
+      const error = await page.evaluate(
+        "document.querySelector('#corrections-error')?.textContent"
+      );
+      if (error && error !== "none") throw new Error(error);
+      if (await page.evaluate(expression)) return;
+      await delay(100);
+    }
+    throw new Error(`${label} timed out`);
+  };
+  const click = (id) =>
+    page.evaluate(`document.getElementById(${JSON.stringify(id)}).click()`);
+  const handlers = [
+    "dragPan",
+    "scrollZoom",
+    "doubleClickZoom",
+    "dragRotate",
+    "boxZoom",
+    "keyboard",
+    "touchZoomRotate",
+    "touchPitch",
+  ];
+  const handlerState = (disabled = []) =>
+    handlers
+      .map(
+        (name) =>
+          `Boolean(${renderer}.${name}.isEnabled()) === ${!disabled.includes(name)}`
+      )
+      .join(" && ");
+  const doubleClick = async () => {
+    const point = await page.evaluate(
+      `(() => { const box = document.querySelector("canvas").getBoundingClientRect(); return { x: box.left + box.width / 2, y: box.top + box.height / 2 }; })()`
+    );
+    for (const clickCount of [1, 2]) {
+      for (const type of ["mousePressed", "mouseReleased"]) {
+        await page.send("Input.dispatchMouseEvent", {
+          type,
+          ...point,
+          button: "left",
+          clickCount,
+        });
+      }
+    }
+  };
+  await observe(
+    `${renderer}?.isStyleLoaded() === true`,
+    "initial style",
+    20000
+  );
+  await observe(`${renderer}.getPadding().top === 24`, "initial padding");
+  await page.evaluate(
+    `void ${renderer}.jumpTo({center: [-122.3, 47.65], zoom: 11})`
+  );
+  await click("padding-update");
+  await observe(
+    `${renderer}.getPadding().top === 64 && Math.abs(${renderer}.getCenter().lat - 47.65) < 0.001`,
+    "padding update preserves uncontrolled camera"
+  );
+  await click("padding-reset");
+  await observe(
+    `Object.values(${renderer}.getPadding()).every(value => value === 0)`,
+    "padding reset"
+  );
+  await observe(
+    `!${renderer}.doubleClickZoom.isEnabled() && ${renderer}.touchZoomRotate._rotationDisabled === true`,
+    "disabled double tap and rotation"
+  );
+  await click("gesture-reset");
+  await observe(
+    `${renderer}.touchZoomRotate._rotationDisabled === false && !${renderer}.touchZoomRotate.isEnabled()`,
+    "rotation reset keeps pinch disabled"
+  );
+  await click("gesture-enable");
+  await observe(
+    `${renderer}.doubleClickZoom.isEnabled() && ${renderer}.touchZoomRotate.isEnabled()`,
+    "gesture enable"
+  );
+  const initialZoom = await page.evaluate(`${renderer}.getZoom()`);
+  await doubleClick();
+  await observe(
+    `${renderer}.getZoom() > ${initialZoom} + 0.5`,
+    "physical double click zoom"
+  );
+  await observe(`${renderer}.isMoving() === false`, "zoom settles");
+  await click("rotation-disable");
+  await observe(
+    `${renderer}.touchZoomRotate._rotationDisabled === true`,
+    "rotation override"
+  );
+  await page.evaluate(`void (window.__oneMapPreviousRenderer = ${renderer})`);
+  await click("map-toggle");
+  await observe(
+    `!${renderer} && window.__oneMapPreviousRenderer.touchZoomRotate._rotationDisabled === false`,
+    "unmount releases rotation"
+  );
+  await click("map-toggle");
+  await observe(
+    `${renderer} === window.__oneMapPreviousRenderer && ${renderer}.touchZoomRotate._rotationDisabled === false`,
+    "reused renderer rotation default",
+    20000
+  );
+
+  await click("interaction-off");
+  await observe(handlerState(handlers), "master disables all handlers");
+  await click("interaction-individual");
+  await observe(
+    handlerState(handlers),
+    "individual flags cannot override disabled master"
+  );
+
+  const disabledZoom = await page.evaluate(`${renderer}.getZoom()`);
+  await page.evaluate(
+    `(() => { window.__oneMapDisabledDoubleClick = false; document.querySelector("canvas").addEventListener("dblclick", () => { window.__oneMapDisabledDoubleClick = true; }, {once: true}); })()`
+  );
+  await doubleClick();
+  await observe(
+    "window.__oneMapDisabledDoubleClick === true",
+    "disabled physical double click arrives"
+  );
+  // Observe several rendered frames so a delayed gesture animation cannot pass.
+  const stableUntil = Date.now() + 750;
+  while (Date.now() < stableUntil) {
+    if (
+      !(await page.evaluate(
+        `Math.abs(${renderer}.getZoom() - ${disabledZoom}) < 0.001 && ${renderer}.isMoving() === false`
+      ))
+    ) {
+      throw new Error("Disabled physical double click changed the camera.");
+    }
+    await page.evaluate(
+      "new Promise(resolve => { requestAnimationFrame(() => resolve(true)); setTimeout(() => resolve(true), 100); })"
+    );
+  }
+
+  await click("interaction-on");
+  await observe(handlerState(), "master restores explicit enabled gestures");
+  await click("interaction-explicit");
+  const explicitDisabled = ["dragPan", "scrollZoom", "touchZoomRotate"];
+  await observe(
+    `${handlerState(explicitDisabled)} && ${renderer}.touchZoomRotate._rotationDisabled === false`,
+    "explicit disabled gestures survive enabled master"
+  );
+  await click("interaction-off");
+  await observe(handlerState(handlers), "master disables explicit settings");
+  await click("interaction-clear");
+  await observe(
+    handlerState(explicitDisabled),
+    "cleared master restores explicit gesture settings"
+  );
+  await click("interaction-defaults");
+  await observe(handlerState(), "omitted gestures restore wrapper defaults");
+
+  await click("interaction-off");
+  await observe(handlerState(handlers), "disabled settings before reuse");
+  await page.evaluate(`void (window.__oneMapPreviousRenderer = ${renderer})`);
+  await click("map-toggle");
+  await observe(`!${renderer}`, "disabled map unmount");
+  await click("interaction-on");
+  await click("map-toggle");
+  await observe(
+    `${renderer} === window.__oneMapPreviousRenderer && ${handlerState()}`,
+    "reused renderer applies next enabled settings",
+    20000
+  );
+  await click("interaction-off");
+  await observe(handlerState(handlers), "reused renderer master disable");
+  await click("map-toggle");
+  await observe(`!${renderer}`, "second map unmount");
+  await click("map-toggle");
+  await observe(
+    `${renderer} === window.__oneMapPreviousRenderer && ${handlerState(handlers)}`,
+    "reused renderer retains disabled settings",
+    20000
+  );
+  return {
+    status: "passed",
+    scenarios: [
+      "padding update/reset",
+      "double tap zoom",
+      "rotation reset with pinch disabled",
+      "rotation release/reuse",
+      "master disables all eight handlers",
+      "disabled physical double click",
+      "explicit/default gesture restoration",
+      "interaction settings on renderer reuse",
+    ],
+    mode: "real automation",
+  };
+};
 
 const results = {};
 
@@ -96,7 +296,7 @@ async function runWeb(directory, port, label) {
       `--user-data-dir=${profile}`,
       "--window-size=1280,800",
       "--no-first-run",
-      `http://127.0.0.1:${port}/?tf04=camera`,
+      `http://127.0.0.1:${port}/?tf04=${webScenario}`,
     ],
     { stdio: "ignore" }
   );
@@ -104,6 +304,13 @@ async function runWeb(directory, port, label) {
   try {
     await waitFor(() => viteLog.includes("Local:"), 30000, `${label} server`);
     const page = await attachPage(port + 1000);
+    if (corrections) {
+      try {
+        return await runWebCorrections(page);
+      } finally {
+        page.close();
+      }
+    }
     const status = await watchWeb(page, label);
 
     return judge(status, false);
@@ -128,7 +335,8 @@ async function attachPage(debugPort) {
       `http://127.0.0.1:${debugPort}/json/list`
     ).catch(() => []);
     const page = listed.find(
-      (target) => target.type === "page" && target.url.includes("tf04=camera")
+      (target) =>
+        target.type === "page" && target.url.includes(`tf04=${webScenario}`)
     );
 
     if (page?.webSocketDebuggerUrl) {
@@ -713,6 +921,7 @@ function connect(url) {
           const result = await send("Runtime.evaluate", {
             expression,
             returnByValue: true,
+            awaitPromise: true,
           });
 
           if (result.exceptionDetails) {

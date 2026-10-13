@@ -5,11 +5,21 @@ import { Button, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
+import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
+import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
 import { RouteMap } from "../shared/route-map.js";
 import { smokeTarget } from "../shared/smoke-target.js";
 
 const App = () => {
+  if (smokeTarget === "tf06-lifetimes") {
+    return <NativeLifetimesScreen adapter={adapter} />;
+  }
+
+  if (smokeTarget === "tf06") {
+    return <NativeQueriesScreen adapter={adapter} />;
+  }
+
   if (smokeTarget === "tf05") {
     return <NativeSourcesScreen adapter={adapter} />;
   }

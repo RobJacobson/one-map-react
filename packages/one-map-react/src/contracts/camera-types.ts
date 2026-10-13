@@ -1,3 +1,9 @@
+import type {
+  ClusterQueryMethods,
+  FeatureQueryMethods,
+  FeatureStateMethods,
+} from "./query-types.js";
+
 /**
  * Longitude and latitude, in degrees, as `[longitude, latitude]`.
  */
@@ -119,7 +125,12 @@ export interface FitBoundsOptions {
    * Web forwards it. Native rejects it.
    */
   readonly easing?: CameraEasing;
-  /** Highest zoom the fit may use. */
+  /**
+   * Highest zoom the fit may use on web.
+   *
+   * Native adapters reject a supplied value because the pinned React
+   * wrappers do not expose a fit-specific cap. Native cap coverage is pending.
+   */
   readonly maxZoom?: number;
 }
 
@@ -143,8 +154,15 @@ export interface ZoomToOptions {
  * Command promises adopt the wrapper call. Fulfillment means the wrapper
  * accepted the call. It does not mean the animation finished or a frame
  * was painted. A missing camera or map ref rejects before the wrapper call.
+ *
+ * Query, cluster, and feature-state methods are defined by
+ * {@link FeatureQueryMethods}, {@link ClusterQueryMethods}, and
+ * {@link FeatureStateMethods}.
  */
-export interface MapRef {
+export interface MapRef
+  extends FeatureQueryMethods,
+    ClusterQueryMethods,
+    FeatureStateMethods {
   /**
    * Moves the camera without animation.
    *

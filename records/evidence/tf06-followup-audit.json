@@ -1,0 +1,1416 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-10-12",
+  "scope": "Current one-map implementation through TF06 and the supplied correction checklist",
+  "baseRevision": "82a7ade",
+  "packageSha256": "f23acfc763702ad982c294fa24ea7762a16b396ec2e2cf2d0123b20dab7f4692",
+  "result": "Three additional correctness findings; supplied corrections are present and their routine regressions pass. Real-renderer acceptance remains unverified.",
+  "checks": {
+    "validate": {
+      "command": "bun run validate",
+      "status": "passed",
+      "testSuites": 14,
+      "tests": 325,
+      "packageSelections": 13,
+      "scope": "Formatting, documentation structure, source/test/example types, mocked tests, build, packed selection"
+    },
+    "scriptSyntax": "node --check passed for TF04, TF05, and TF06 smoke drivers",
+    "followupProbes": {
+      "mode": "Routine mocked tests and pinned wrapper methods with fake handlers; no renderer constructed",
+      "sourceQuery": "Expected missing-source rejection failed: promise resolved with []",
+      "imageCleanup": "Expected absent image after loading-style unmount and map reuse failed: retained image was still registered",
+      "interactive": "Both pinned react-map-gl entries made zero handler changes for interactive true -> false; changing dragPan false -> true under interactive=false enabled dragPan",
+      "retention": "Temporary Jest probe removed; no production implementation changed"
+    }
+  },
+  "correctionsReviewed": [
+    "RNMapbox numeric cluster id conversion to a GeoJSON cluster Point",
+    "Web feature-state source preflight and absent-read rejection",
+    "JSON syntax versus feature-container normalization errors",
+    "Owner-bound native registry cleanup",
+    "MapLibre native GeoJSON loaded-tile query documentation and getData delegation",
+    "Native fitBounds.maxZoom rejection before dispatch",
+    "Mutable web padding and one-time zero reset",
+    "Shared double-tap/double-click handler and conflict rejection",
+    "Rotation restoration on clearing and logical unmount without enabling disabled pinch",
+    "RNMapbox raster DEM tileSize forwarding",
+    "Pending image removal and stale load invalidation",
+    "TF06 single-flight execution, sequential bounded observation, cancellation, synchronous replacement-style notification, and expanded query/state assertions",
+    "Strict test typing, routine validation repairs, historical evidence qualification, and sequential native acceptance tooling"
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "priority": "P2",
+      "file": "packages/one-map-react/src/adapters/web/map-ref.ts",
+      "lines": [
+        147,
+        164
+      ],
+      "title": "Web query failures can resolve as successful empty results",
+      "trigger": "Query a missing source or request a rendered query restricted to a nonexistent layer",
+      "behavior": "The adapters normalize the returned [] as success. MapLibre source queries return [] for a missing source; both web renderers emit an error and return [] for a missing rendered-query layer.",
+      "impact": "Callers cannot distinguish empty data from invalid query targets, contrary to the query failure contract",
+      "recommendation": "Preflight supported loaded sources and requested layers; propagate query-scoped renderer failures; add missing-source and missing-layer rejection regressions",
+      "basis": [
+        "Pinned maplibre-gl/src/style/style.ts querySourceFeatures and queryRenderedFeatures",
+        "Pinned mapbox-gl/dist/mapbox-gl-dev.js queryRenderedFeatures",
+        "Temporary mocked source-query rejection probe"
+      ]
+    },
+    {
+      "id": "F2",
+      "priority": "P2",
+      "file": "packages/one-map-react/src/adapters/web/images.tsx",
+      "lines": [
+        240,
+        247
+      ],
+      "title": "Loading-style unmount abandons owned images on reusable maps",
+      "trigger": "Register an image, make isStyleLoaded false, then unmount and reuse the same renderer and style",
+      "behavior": "Cleanup removes its listeners and returns before removing images. The next Images session has an empty ownership map and cannot remove the abandoned image.",
+      "impact": "Stale images survive logical unmount and can leak into subsequent maps",
+      "recommendation": "Release image ownership across loading-style unmounts, using safe removal or bounded renderer-scoped deferred cleanup that cannot remove a replacement owner's image; add a loading-style unmount/reuse regression",
+      "basis": [
+        "Temporary mocked loading-style unmount/reuse probe",
+        "Pinned react-map-gl reuse retains renderer; style update skips unchanged mapStyle"
+      ]
+    },
+    {
+      "id": "F3",
+      "priority": "P2",
+      "file": "packages/one-map-react/src/adapters/web/convert-gestures.ts",
+      "lines": [
+        15,
+        32
+      ],
+      "title": "Web interactive updates do not control existing handlers",
+      "trigger": "Change interactive true -> false after mounting, or enable an individual gesture while interactive is false",
+      "behavior": "The facade forwards interactive without deriving handler flags. The pinned wrappers update individual handler props and do not update handlers from interactive.",
+      "impact": "Interaction stays enabled after being disabled, and individual props can override the master disabled state",
+      "recommendation": "Map interactive=false onto the individual web handler props with defined reset semantics; add master-flag update, combined-flag, and reuse regressions",
+      "basis": [
+        "Both pinned react-map-gl _updateHandlers implementations executed with fake handlers and actual facade conversion",
+        "MapProps.interactive and TF04 documented portable interaction contract"
+      ]
+    }
+  ],
+  "runtimeAcceptance": {
+    "status": "unverified",
+    "reason": "Explicit permission required by AGENTS.md and docs/testing-policy.md; substantive findings remain, so acceptance was not requested or run",
+    "environments": [
+      "mapbox-web",
+      "maplibre-web",
+      "mapbox-android",
+      "maplibre-android",
+      "mapbox-ios",
+      "maplibre-ios"
+    ]
+  },
+  "resolution": {
+    "date": "2026-10-12",
+    "status": "implemented; routine validation passed; renderer acceptance unverified",
+    "packageSha256": "e6b749e13079747aae41c544e0a85769f966fb8e8e9d1a32b6e924e5f7cb9c2b",
+    "historicalEvidence": "The original audit fields, findings, probes, and package hash above describe the pre-fix artifact and are preserved unchanged.",
+    "findings": {
+      "F1": "Resolved: source-family/sourceLayer and requested-layer preflight; query-scoped synchronous renderer error capture; finally cleanup; genuine empty results preserved.",
+      "F2": "Resolved: guarded synchronous removal during loading and logical unmount; each name attempted independently; active pending removals retry on style.load; no deferred cleanup listeners.",
+      "F3": "Resolved: interactive=false disables all eight mutable web handlers; clearing restores explicit flags and omitted wrapper defaults; conflicts still reject."
+    },
+    "checks": {
+      "focused": {
+        "status": "passed",
+        "suites": 4,
+        "tests": 177,
+        "scope": "Gesture conversion, both web adapters, and TF06 smoke hook; two additional entry-removal cases were then added and passed in final validation."
+      },
+      "validate": {
+        "command": "bun run validate",
+        "status": "passed",
+        "testSuites": 14,
+        "tests": 375,
+        "addedRegressions": 50,
+        "packageSelections": 13,
+        "scope": "Formatting, documentation structure, source/test/example types, mocked tests, credential loader, build, packed selection"
+      },
+      "pinnedWrapperProbe": "Both actual react-map-gl handler-update methods passed disable/restoration with fake handlers and the final facade converter; no renderer constructed.",
+      "review": "Reviewed synchronous error-listener lifetime, unavailable-style cleanup, pending-load invalidation, handler defaults, rotation/pinch independence, and preservation of prior TF06 changes."
+    },
+    "runtimeAcceptance": {
+      "status": "unverified",
+      "reason": "User explicitly instructed not to run renderer acceptance."
+    },
+    "retention": "No temporary probes, renderer acceptance logs, screenshots, native builds, or installs created. Routine packed consumers and archive cleaned by test-package.",
+    "commit": "Not committed or published; existing uncommitted TF06 work preserved."
+  },
+  "acceptanceExecution": {
+    "date": "2026-10-12",
+    "record": "tf04-tf06-acceptance-plan.json",
+    "packageSha256": "e6b749e13079747aae41c544e0a85769f966fb8e8e9d1a32b6e924e5f7cb9c2b",
+    "routineValidation": {
+      "status": "passed",
+      "tests": 377,
+      "suites": 14,
+      "nativeBabelSelectorCases": 5,
+      "packageSelections": 13,
+      "types": "all four targets"
+    },
+    "webFollowupFindings": {
+      "F1": "passed both real web renderers: preflight, synchronous emitted errors, normal callback delivery, genuine empty results, listener balance",
+      "F2": "passed both real web renderers: pending/owned removals while loading, same-renderer reuse absence, late-load invalidation",
+      "F3": "passed both real web renderers: all eight handlers disabled/restored, explicit/default flags, physical double click, reuse"
+    },
+    "nativeAcceptance": "failed all four environments at same-id source transition; replacement-style reset not reached",
+    "newFindings": [
+      {
+        "id": "RA1",
+        "priority": "P2",
+        "title": "Native same-id source remount retains feature state",
+        "environments": [
+          "mapbox-android",
+          "maplibre-android",
+          "mapbox-ios"
+        ],
+        "observed": "Queries and explicit key/whole-state removal passed; after selected state is set again and keyed Source is remounted, selected remains observable for more than five seconds.",
+        "contract": "contracts/query-types.ts setFeatureState promises state reset when an owned source is recreated or style is replaced.",
+        "qualification": "The runner proves React same-id keyed remount. Physical native source destruction versus SDK state retention has not been independently isolated; do not label this an underlying SDK limitation yet.",
+        "recommendation": "Trace native source removal/recreation and state ownership, then implement or qualify the existing reset guarantee and add native regressions under a separate authorized native-fix scope."
+      },
+      {
+        "id": "RA2",
+        "priority": "P2",
+        "title": "MapLibre iOS source transition dispatches to an unavailable native tag",
+        "environments": [
+          "maplibre-ios"
+        ],
+        "observed": "After pre-remount queries and explicit state checks, the source transition rejects Invalid reactTag 38: could not find MLRNGeoJSONSource.",
+        "qualification": "Transient native readiness versus stale registry/ref dispatch has not been isolated. Source recreation and replacement-style state reset remain unverified.",
+        "recommendation": "Trace ref registration and native commit readiness during same-id Source remount; preserve operational errors and test any correction."
+      }
+    ],
+    "history": "Original audit and routine-only resolution above remain unchanged. This appended execution uses the final hash and latest user authorization.",
+    "nativeBehavior": "No native production changes; user constraint preserved.",
+    "commit": "None",
+    "retention": "Complete: all assigned browser/Vite/fixture/Metro/status ports clear; smoke apps terminated; only newly started Android emulator stopped; preexisting iOS simulator remains booted. Removed temporary archive/extraction, diagnostic probes, launcher, logs, lane caches, Chrome profiles, and 12 scoped generated native output directories (about 6 GiB) including repository-specific Xcode Build/Logs. Preserved source, Pods, dependencies, SDKs, simulator definitions, and preexisting example app data/installed apps."
+  },
+  "nativeRemountResolution": {
+    "date": "2026-10-12",
+    "authorization": "User explicitly requested native source-remount fixes, regressions, and affected TF06 acceptance with subagents; no commit.",
+    "status": "resolved; routine validation and affected TF06 acceptance passed",
+    "diagnosis": [
+      "Pinned RNMapbox and MapLibre React Native source attachment can adopt an existing same-id SDK source; a keyed React remount does not ensure native state reset.",
+      "Atomic smoke transitions and rendered/source revision sentinels prevent querying attaching MapLibre Fabric tags or accepting prior-source data. Both attaching and retiring tags can be unavailable; the earlier invalid-tag error alone does not distinguish them.",
+      "MapLibre refreshes imperative source handles on render; passive registration previously captured an earlier handle."
+    ],
+    "implementation": [
+      "NativeFeatureState remembers facade-written identifiers only, serializes per-source calls, and resets whole state after fully rendered frames or before replacement state operations, ordered after pending old writes. Automatic resets coalesce; failures report once through onError and block later state calls until a new lifetime or style.",
+      "GeoJSON and vector lifetimes register in layout effects with owner-bound cleanup; MapLibre dispatch reads current source handles.",
+      "Detached or replaced operations reject; reset errors block further state dispatch for that lifetime and another remount can retry. Caller identifiers and nested validated state are copied before queueing.",
+      "Smoke scene changes are atomic; revision sentinels prove replacement data readiness; whole-state assertions detect retained secondary keys. No explicit smoke state clear or broad invalid-tag retry."
+    ],
+    "validation": {
+      "command": "bun run validate",
+      "status": "passed",
+      "jestTests": 433,
+      "jestSuites": 15,
+      "nativeBabelSelectorCases": 5,
+      "packedSelections": 13,
+      "typeChecks": 4,
+      "formatting": "passed",
+      "documentation": "passed (27 Markdown files, 29 SDK comparison tables)",
+      "build": "passed",
+      "packageSha256": "8667a9637aa4eaf0325a8ee57e1313f019db1746c87436155ced4ad0087e32b0"
+    },
+    "artifact": {
+      "sha256": "8667a9637aa4eaf0325a8ee57e1313f019db1746c87436155ced4ad0087e32b0",
+      "distFiles": 130,
+      "packedFiles": 133,
+      "verifiedConsumers": [
+        "web-mapbox",
+        "web-maplibre",
+        "native-mapbox",
+        "native-maplibre"
+      ]
+    },
+    "execution": {
+      "status": "passed: all six TF06 environments on final artifact",
+      "webWorker": {
+        "model": "gpt-6-luna",
+        "reasoningEffort": "low",
+        "command": "bun scripts/tf06-queries-smoke.mjs web",
+        "ports": [
+          4177,
+          4178,
+          5177,
+          5178
+        ]
+      },
+      "nativeWorker": {
+        "model": "gpt-6-luna",
+        "reasoningEffort": "medium",
+        "commands": [
+          "bun scripts/tf06-queries-smoke.mjs android",
+          "bun scripts/tf06-queries-smoke.mjs ios"
+        ],
+        "ports": [
+          8081,
+          8799
+        ],
+        "ordering": "Android and iOS sequential; each group serializes engines"
+      },
+      "parallelism": "Web worker overlaps exclusive native worker with separate temporary caches. No package changes during execution.",
+      "estimatedDuration": "30\u201360 minutes for fresh native build caches; web usually under five minutes; estimate excludes diagnosis and preparation.",
+      "web": {
+        "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/web-resolved bun scripts/tf06-queries-smoke.mjs web",
+        "exitCode": 0,
+        "durationSeconds": 3.53,
+        "results": {
+          "mapbox-web": {
+            "status": "passed",
+            "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+            "fields": {
+              "loaded": "1",
+              "point": "ok",
+              "bounds": "ok",
+              "viewport": "ok",
+              "empty": "ok",
+              "source": "ok",
+              "cluster-zoom": "ok",
+              "leaves": "ok",
+              "children": "ok",
+              "set-state": "ok",
+              "get-state": "ok",
+              "remove-state": "ok",
+              "filters": "ok",
+              "pagination": "ok",
+              "whole-state": "ok",
+              "recreated-state": "cleared",
+              "cleared-state": "cleared",
+              "error": "none",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            },
+            "corrections": {
+              "missing-source": "ok",
+              "unsupported-source": "ok",
+              "vector-layer-omitted": "ok",
+              "vector-layer-0": "ok",
+              "vector-layer-3": "ok",
+              "missing-rendered-layer": "ok",
+              "omitted-layers": "ok",
+              "empty-layers": "ok",
+              "rendered-emitted-error": "ok",
+              "source-emitted-error": "ok",
+              "empty-result": "ok",
+              "subsequent-query": "ok",
+              "listener-cleanup": "ok"
+            }
+          },
+          "maplibre-web": {
+            "status": "passed",
+            "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+            "fields": {
+              "loaded": "1",
+              "point": "ok",
+              "bounds": "ok",
+              "viewport": "ok",
+              "empty": "ok",
+              "source": "ok",
+              "cluster-zoom": "ok",
+              "leaves": "ok",
+              "children": "ok",
+              "set-state": "ok",
+              "get-state": "ok",
+              "remove-state": "ok",
+              "filters": "ok",
+              "pagination": "ok",
+              "whole-state": "ok",
+              "recreated-state": "cleared",
+              "cleared-state": "cleared",
+              "error": "none",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            },
+            "corrections": {
+              "missing-source": "ok",
+              "unsupported-source": "ok",
+              "vector-layer-omitted": "ok",
+              "vector-layer-0": "ok",
+              "vector-layer-3": "ok",
+              "missing-rendered-layer": "ok",
+              "omitted-layers": "ok",
+              "empty-layers": "ok",
+              "rendered-emitted-error": "ok",
+              "source-emitted-error": "ok",
+              "empty-result": "ok",
+              "subsequent-query": "ok",
+              "listener-cleanup": "ok"
+            }
+          }
+        }
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "artifactSha256": "3e852933e9dd14a4b73e212ac1898304adc0d45b97218768e5c37f0f9de2b84b",
+          "routineValidation": {
+            "jestTests": 401,
+            "jestSuites": 15,
+            "status": "passed"
+          },
+          "lanes": {
+            "web": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/web bun scripts/tf06-queries-smoke.mjs web",
+              "exitCode": 0,
+              "durationSeconds": 4.83,
+              "results": {
+                "mapbox-web": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  },
+                  "corrections": {
+                    "missing-source": "ok",
+                    "unsupported-source": "ok",
+                    "vector-layer-omitted": "ok",
+                    "vector-layer-0": "ok",
+                    "vector-layer-3": "ok",
+                    "missing-rendered-layer": "ok",
+                    "omitted-layers": "ok",
+                    "empty-layers": "ok",
+                    "rendered-emitted-error": "ok",
+                    "source-emitted-error": "ok",
+                    "empty-result": "ok",
+                    "subsequent-query": "ok",
+                    "listener-cleanup": "ok"
+                  }
+                },
+                "maplibre-web": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  },
+                  "corrections": {
+                    "missing-source": "ok",
+                    "unsupported-source": "ok",
+                    "vector-layer-omitted": "ok",
+                    "vector-layer-0": "ok",
+                    "vector-layer-3": "ok",
+                    "missing-rendered-layer": "ok",
+                    "omitted-layers": "ok",
+                    "empty-layers": "ok",
+                    "rendered-emitted-error": "ok",
+                    "source-emitted-error": "ok",
+                    "empty-result": "ok",
+                    "subsequent-query": "ok",
+                    "listener-cleanup": "ok"
+                  }
+                }
+              }
+            },
+            "android": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/android bun scripts/tf06-queries-smoke.mjs android",
+              "exitCode": 1,
+              "durationSeconds": 96.12,
+              "results": {
+                "mapbox-android": {
+                  "status": "failed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=pending error=whole-state-removal-timed-out-after-5000-ms. note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "pending",
+                    "error": "whole-state-removal-timed-out-after-5000-ms.",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                },
+                "maplibre-android": {
+                  "status": "failed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=pending cleared-state=pending error=`reactTag`-38-resolved-to-`view`-null-which-is-null-or-a-wrong-type note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "pending",
+                    "cleared-state": "pending",
+                    "error": "`reactTag`-38-resolved-to-`view`-null-which-is-null-or-a-wrong-type",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                }
+              }
+            },
+            "ios": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/ios bun scripts/tf06-queries-smoke.mjs ios",
+              "exitCode": 1,
+              "durationSeconds": 30.05,
+              "results": {
+                "mapbox-ios": {
+                  "status": "failed",
+                  "error": "ates.noindex/Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/82b82416624d2658e5098eb0a28c15c5-common-args.resp -DFOLLY_MOBILE\\=1 -DFOLLY_USE_LIBCPP\\=1 -DFOLLY_CFG_NO_COROUTINES\\=1 -DFOLLY_HAVE_CLOCK_GETTIME\\=1 -Wno-comma -Wno-shorten-64-to-32 -Wno-documentation -Wno-nullability-completeness -std\\=c++20 -include /Users/rob/code/mapbox-code/one-map/examples/native-mapbox/ios/Pods/Target\\ Support\\ Files/ReactCodegen/ReactCodegen-prefix.pch -MMD -MT dependencies -MF /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMapbox-hkvapfhlfnilzcebalhjleqayxty/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/EventEmitters.d --serialize-diagnostics /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMapbox-hkvapfhlfnilzcebalhjleqayxty/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/EventEmitters.dia -c /Users/rob/code/mapbox-code/one-map/examples/native-mapbox/ios/build/generated/ios/ReactCodegen/react/renderer/components/rnmapbox_maps_specs/EventEmitters.cpp -o /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMapbox-hkvapfhlfnilzcebalhjleqayxty/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/EventEmitters.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/EventEmitters.o\nerror Build input file cannot be found: '/Users/rob/code/mapbox-code/one-map/examples/native-mapbox/ios/build/generated/ios/ReactCodegen/react/renderer/components/rnmapbox_maps_specs/EventEmitters.cpp'. Did you forget to declare this file as an output of a script phase or custom build rule which produces it? (in target 'ReactCodegen' from project 'Pods')\nerror Failed to build ios project. \"xcodebuild\" exited with error code '65'. To debug build logs further, consider building your app with Xcode.app, by opening 'OneMapMapbox.xcworkspace'.\nerror: script \"ios\" exited with code 1\n",
+                  "buildFailure": "ReactCodegen referenced generated C++ inputs removed by earlier cleanup; no fresh build/install or runtime assertions."
+                },
+                "maplibre-ios": {
+                  "status": "failed",
+                  "error": "/Objects-normal/arm64/82b82416624d2658e5098eb0a28c15c5-common-args.resp -DFOLLY_MOBILE\\=1 -DFOLLY_USE_LIBCPP\\=1 -DFOLLY_CFG_NO_COROUTINES\\=1 -DFOLLY_HAVE_CLOCK_GETTIME\\=1 -Wno-comma -Wno-shorten-64-to-32 -Wno-documentation -Wno-nullability-completeness -std\\=c++20 -include /Users/rob/code/mapbox-code/one-map/examples/native-maplibre/ios/Pods/Target\\ Support\\ Files/ReactCodegen/ReactCodegen-prefix.pch -MMD -MT dependencies -MF /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/ComponentDescriptors.d --serialize-diagnostics /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/ComponentDescriptors.dia -c /Users/rob/code/mapbox-code/one-map/examples/native-maplibre/ios/build/generated/ios/ReactCodegen/react/renderer/components/MapLibreReactNativeSpec/ComponentDescriptors.cpp -o /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/ComponentDescriptors.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/ReactCodegen.build/Objects-normal/arm64/ComponentDescriptors.o\nerror Build input file cannot be found: '/Users/rob/code/mapbox-code/one-map/examples/native-maplibre/ios/build/generated/ios/ReactCodegen/react/renderer/components/MapLibreReactNativeSpec/ComponentDescriptors.cpp'. Did you forget to declare this file as an output of a script phase or custom build rule which produces it? (in target 'ReactCodegen' from project 'Pods')\nerror Failed to build ios project. \"xcodebuild\" exited with error code '65'. To debug build logs further, consider building your app with Xcode.app, by opening 'OneMapMaplibre.xcworkspace'.\nerror: script \"ios\" exited with code 1\n",
+                  "buildFailure": "ReactCodegen referenced generated C++ inputs removed by earlier cleanup; no fresh build/install or runtime assertions."
+                }
+              }
+            }
+          },
+          "androidApkSha256": {
+            "mapbox": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+            "maplibre": "0424b2b8fb1ec8ca3a54e3a8b35fbe5302d9390730e6c1f29db2f120cbbb1573"
+          },
+          "disposition": "Preserve first failure. Add explicit native style invalidation, prove source readiness through stable-map rendered generation before source-tag commands, regenerate pinned React Native iOS codegen inputs, validate and freeze a new artifact before scoped retry."
+        },
+        {
+          "attempt": 2,
+          "artifactSha256": "49db4ec870030e5072816c564f542b4c97cf2be7cf17518d9c074f5a43c3b8bc",
+          "routineValidation": {
+            "status": "passed",
+            "jestTests": 411,
+            "jestSuites": 15,
+            "typeChecks": 4,
+            "nativeBabelSelectorCases": 5,
+            "packedSelections": 13
+          },
+          "lanes": {
+            "web": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/web-retry bun scripts/tf06-queries-smoke.mjs web",
+              "exitCode": 1,
+              "durationSeconds": 5.12,
+              "results": {
+                "mapbox-web": {
+                  "status": "failed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=pending cleared-state=pending error=Layer-\"queries-line\"-is-not-present-in-the-loaded-style. note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "pending",
+                    "cleared-state": "pending",
+                    "error": "Layer-\"queries-line\"-is-not-present-in-the-loaded-style.",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                },
+                "maplibre-web": {
+                  "status": "failed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=pending cleared-state=pending error=Layer-\"queries-line\"-is-not-present-in-the-loaded-style. note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "pending",
+                    "cleared-state": "pending",
+                    "error": "Layer-\"queries-line\"-is-not-present-in-the-loaded-style.",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                }
+              }
+            },
+            "android": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/android-retry bun scripts/tf06-queries-smoke.mjs android",
+              "exitCode": 0,
+              "durationSeconds": 43.01,
+              "results": {
+                "mapbox-android": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                },
+                "maplibre-android": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                }
+              }
+            },
+            "ios": {
+              "command": "bun scripts/tf06-queries-smoke.mjs ios",
+              "status": "interrupted after verified fatal example startup redbox",
+              "exitCode": null,
+              "results": {
+                "mapbox-ios": {
+                  "status": "failed",
+                  "partialOutcome": "Fresh build/install; base queries and source remount passed; style reset pending when SampleTurboModule lookup produced a redbox."
+                },
+                "maplibre-ios": {
+                  "status": "not executed",
+                  "reason": "Coordinator stopped the shared native lane after verifying the example provider defect."
+                }
+              },
+              "diagnosis": "RN 0.87.1 generated main-queue provider requests SampleTurboModule although the example does not link it.",
+              "retention": "Partial status and screenshot inspected; no complete lane summary or exact completed-run duration exists."
+            }
+          }
+        },
+        {
+          "attempt": 3,
+          "artifactSha256": "ed95305aac0a614b42e404c646935d972167c0fce102ef4ff28a53aa1708559f",
+          "routineValidation": {
+            "status": "passed",
+            "jestTests": 421,
+            "jestSuites": 15
+          },
+          "lanes": {
+            "web": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/web-final bun scripts/tf06-queries-smoke.mjs web",
+              "exitCode": 0,
+              "durationSeconds": 4.06,
+              "results": {
+                "mapbox-web": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  },
+                  "corrections": {
+                    "missing-source": "ok",
+                    "unsupported-source": "ok",
+                    "vector-layer-omitted": "ok",
+                    "vector-layer-0": "ok",
+                    "vector-layer-3": "ok",
+                    "missing-rendered-layer": "ok",
+                    "omitted-layers": "ok",
+                    "empty-layers": "ok",
+                    "rendered-emitted-error": "ok",
+                    "source-emitted-error": "ok",
+                    "empty-result": "ok",
+                    "subsequent-query": "ok",
+                    "listener-cleanup": "ok"
+                  }
+                },
+                "maplibre-web": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  },
+                  "corrections": {
+                    "missing-source": "ok",
+                    "unsupported-source": "ok",
+                    "vector-layer-omitted": "ok",
+                    "vector-layer-0": "ok",
+                    "vector-layer-3": "ok",
+                    "missing-rendered-layer": "ok",
+                    "omitted-layers": "ok",
+                    "empty-layers": "ok",
+                    "rendered-emitted-error": "ok",
+                    "source-emitted-error": "ok",
+                    "empty-result": "ok",
+                    "subsequent-query": "ok",
+                    "listener-cleanup": "ok"
+                  }
+                }
+              }
+            },
+            "android": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/android-final bun scripts/tf06-queries-smoke.mjs android",
+              "exitCode": 1,
+              "durationSeconds": 294.96,
+              "results": {
+                "mapbox-android": {
+                  "status": "failed",
+                  "error": "Native smoke ended at: no status"
+                },
+                "maplibre-android": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                }
+              }
+            },
+            "ios": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/ios-final bun scripts/tf06-queries-smoke.mjs ios",
+              "exitCode": 1,
+              "durationSeconds": 50.14,
+              "results": {
+                "mapbox-ios": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                },
+                "maplibre-ios": {
+                  "status": "failed",
+                  "error": "protocol -Wdeprecated-declarations -Winvalid-offsetof -Wno-sign-conversion -Winfinite-recursion -Wmove -Wcomma -Wblock-capture-autoreleasing -Wstrict-prototypes -Wrange-loop-analysis -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi/Index.noindex/DataStore @/Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/MapLibreReactNative.build/Objects-normal/arm64/af3fcb34312c57c0f52879cdce924b91-common-args.resp -DRCT_NEW_ARCH_ENABLED\\=1 -include /Users/rob/code/mapbox-code/one-map/examples/native-maplibre/ios/Pods/Target\\ Support\\ Files/MapLibreReactNative/MapLibreReactNative-prefix.pch -MMD -MT dependencies -MF /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/MapLibreReactNative.build/Objects-normal/arm64/MLRNLogModule.d --serialize-diagnostics /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/MapLibreReactNative.build/Objects-normal/arm64/MLRNLogModule.dia -c /Users/rob/code/mapbox-code/one-map/examples/native-maplibre/node_modules/@maplibre/maplibre-react-native/ios/modules/logging/MLRNLogModule.mm -o /Users/rob/Library/Developer/Xcode/DerivedData/OneMapMaplibre-ewxoazgcincsvjfcwtqtylkgkzvi/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/MapLibreReactNative.build/Objects-normal/arm64/MLRNLogModule.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/MapLibreReactNative.build/Objects-normal/arm64/MLRNLogModule.o\nerror Failed to build ios project. \"xcodebuild\" exited with error code '65'. To debug build logs further, consider building your app with Xcode.app, by opening 'OneMapMaplibre.xcworkspace'.\nerror: script \"ios\" exited with code 1\n"
+                }
+              }
+            }
+          },
+          "nativeIdentity": {
+            "androidMapboxApkSha256": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+            "androidMaplibreApkSha256": "0424b2b8fb1ec8ca3a54e3a8b35fbe5302d9390730e6c1f29db2f120cbbb1573",
+            "iosMapboxExecutableSha256": "4cab089c7276e5b7523bec24ee730b8e4a6c5041f474050c5a5ec1729b2c0723",
+            "iosMapboxBuildTime": "2026-10-12 16:56:04 America/Los_Angeles",
+            "iosMaplibre": "No fresh build/install; stale executable not counted."
+          },
+          "qualifications": [
+            "Mapbox Android had no status; diagnostic uiautomator calls collided with runner polling. Collision is recorded but not established as the cause.",
+            "MapLibre iOS failed before runtime; existing React Native prebuilt framework contains RCTFabricComponentsPlugins.h but MapLibre quoted include could not find it.",
+            "Independent review found source-family transition journal mismatch; next artifact will correct it."
+          ]
+        },
+        {
+          "attempt": 4,
+          "artifactSha256": "8667a9637aa4eaf0325a8ee57e1313f019db1746c87436155ced4ad0087e32b0",
+          "routineValidation": {
+            "status": "passed",
+            "jestTests": 433,
+            "jestSuites": 15,
+            "typeChecks": 4,
+            "nativeBabelSelectorCases": 5,
+            "packedSelections": 13
+          },
+          "lanes": {
+            "web": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/web-resolved bun scripts/tf06-queries-smoke.mjs web",
+              "exitCode": 0,
+              "durationSeconds": 3.53,
+              "results": {
+                "mapbox-web": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  },
+                  "corrections": {
+                    "missing-source": "ok",
+                    "unsupported-source": "ok",
+                    "vector-layer-omitted": "ok",
+                    "vector-layer-0": "ok",
+                    "vector-layer-3": "ok",
+                    "missing-rendered-layer": "ok",
+                    "omitted-layers": "ok",
+                    "empty-layers": "ok",
+                    "rendered-emitted-error": "ok",
+                    "source-emitted-error": "ok",
+                    "empty-result": "ok",
+                    "subsequent-query": "ok",
+                    "listener-cleanup": "ok"
+                  }
+                },
+                "maplibre-web": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  },
+                  "corrections": {
+                    "missing-source": "ok",
+                    "unsupported-source": "ok",
+                    "vector-layer-omitted": "ok",
+                    "vector-layer-0": "ok",
+                    "vector-layer-3": "ok",
+                    "missing-rendered-layer": "ok",
+                    "omitted-layers": "ok",
+                    "empty-layers": "ok",
+                    "rendered-emitted-error": "ok",
+                    "source-emitted-error": "ok",
+                    "empty-result": "ok",
+                    "subsequent-query": "ok",
+                    "listener-cleanup": "ok"
+                  }
+                }
+              }
+            },
+            "android": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/android-resolved bun scripts/tf06-queries-smoke.mjs android",
+              "exitCode": 0,
+              "durationSeconds": 33.69,
+              "results": {
+                "mapbox-android": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                },
+                "maplibre-android": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                }
+              }
+            },
+            "ios": {
+              "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/ios-resolved bun scripts/tf06-queries-smoke.mjs ios",
+              "exitCode": 0,
+              "durationSeconds": 52.47,
+              "results": {
+                "mapbox-ios": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                },
+                "maplibre-ios": {
+                  "status": "passed",
+                  "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+                  "fields": {
+                    "loaded": "1",
+                    "point": "ok",
+                    "bounds": "ok",
+                    "viewport": "ok",
+                    "empty": "ok",
+                    "source": "ok",
+                    "cluster-zoom": "ok",
+                    "leaves": "ok",
+                    "children": "ok",
+                    "set-state": "ok",
+                    "get-state": "ok",
+                    "remove-state": "ok",
+                    "filters": "ok",
+                    "pagination": "ok",
+                    "whole-state": "ok",
+                    "recreated-state": "cleared",
+                    "cleared-state": "cleared",
+                    "error": "none",
+                    "note": "none",
+                    "phase": "done",
+                    "done": "1"
+                  }
+                }
+              }
+            }
+          },
+          "installedIdentity": {
+            "android": {
+              "device": "Medium_Phone, arm64 API37/37.1, emulator-5554",
+              "mapbox": {
+                "applicationId": "com.onemapmapbox",
+                "version": "1.0",
+                "versionCode": 1,
+                "apkSha256": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+                "apkMtime": "2026-10-12 16:06:49 America/Los_Angeles"
+              },
+              "maplibre": {
+                "applicationId": "com.onemapmaplibre",
+                "version": "1.0",
+                "versionCode": 1,
+                "apkSha256": "0424b2b8fb1ec8ca3a54e3a8b35fbe5302d9390730e6c1f29db2f120cbbb1573",
+                "apkMtime": "2026-10-12 16:07:33 America/Los_Angeles"
+              }
+            },
+            "ios": {
+              "device": "iPhone 18 Pro, iOS27.0, 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+              "mapbox": {
+                "bundleId": "org.reactjs.native.example.OneMapMapbox",
+                "version": "1.0",
+                "build": 1,
+                "executableSha256": "4cab089c7276e5b7523bec24ee730b8e4a6c5041f474050c5a5ec1729b2c0723",
+                "appMtime": "2026-10-12 16:56:04 America/Los_Angeles"
+              },
+              "maplibre": {
+                "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+                "version": "1.0",
+                "build": 1,
+                "executableSha256": "339c5ce669f68b9e6e0606732937f6882992ec98df9e9ddedf658aa4121ffd46",
+                "appMtime": "2026-10-12 17:03:38 America/Los_Angeles"
+              }
+            },
+            "verification": "Both current native CLI build/install commands succeeded before status was judged. Unchanged native binary outputs were legitimately reused; package JavaScript came from the frozen verified example copies through fresh Metro sessions, not from an embedded package archive."
+          }
+        }
+      ],
+      "currentAttempt": 4,
+      "android": {
+        "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/android-resolved bun scripts/tf06-queries-smoke.mjs android",
+        "exitCode": 0,
+        "durationSeconds": 33.69,
+        "results": {
+          "mapbox-android": {
+            "status": "passed",
+            "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+            "fields": {
+              "loaded": "1",
+              "point": "ok",
+              "bounds": "ok",
+              "viewport": "ok",
+              "empty": "ok",
+              "source": "ok",
+              "cluster-zoom": "ok",
+              "leaves": "ok",
+              "children": "ok",
+              "set-state": "ok",
+              "get-state": "ok",
+              "remove-state": "ok",
+              "filters": "ok",
+              "pagination": "ok",
+              "whole-state": "ok",
+              "recreated-state": "cleared",
+              "cleared-state": "cleared",
+              "error": "none",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            }
+          },
+          "maplibre-android": {
+            "status": "passed",
+            "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+            "fields": {
+              "loaded": "1",
+              "point": "ok",
+              "bounds": "ok",
+              "viewport": "ok",
+              "empty": "ok",
+              "source": "ok",
+              "cluster-zoom": "ok",
+              "leaves": "ok",
+              "children": "ok",
+              "set-state": "ok",
+              "get-state": "ok",
+              "remove-state": "ok",
+              "filters": "ok",
+              "pagination": "ok",
+              "whole-state": "ok",
+              "recreated-state": "cleared",
+              "cleared-state": "cleared",
+              "error": "none",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            }
+          }
+        }
+      },
+      "ios": {
+        "command": "ANDROID_SERIAL=emulator-5554 ONE_MAP_SMOKE_CACHE_ROOT=/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-native-remount-d_4ussw8/cache/ios-resolved bun scripts/tf06-queries-smoke.mjs ios",
+        "exitCode": 0,
+        "durationSeconds": 52.47,
+        "results": {
+          "mapbox-ios": {
+            "status": "passed",
+            "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+            "fields": {
+              "loaded": "1",
+              "point": "ok",
+              "bounds": "ok",
+              "viewport": "ok",
+              "empty": "ok",
+              "source": "ok",
+              "cluster-zoom": "ok",
+              "leaves": "ok",
+              "children": "ok",
+              "set-state": "ok",
+              "get-state": "ok",
+              "remove-state": "ok",
+              "filters": "ok",
+              "pagination": "ok",
+              "whole-state": "ok",
+              "recreated-state": "cleared",
+              "cleared-state": "cleared",
+              "error": "none",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            }
+          },
+          "maplibre-ios": {
+            "status": "passed",
+            "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+            "fields": {
+              "loaded": "1",
+              "point": "ok",
+              "bounds": "ok",
+              "viewport": "ok",
+              "empty": "ok",
+              "source": "ok",
+              "cluster-zoom": "ok",
+              "leaves": "ok",
+              "children": "ok",
+              "set-state": "ok",
+              "get-state": "ok",
+              "remove-state": "ok",
+              "filters": "ok",
+              "pagination": "ok",
+              "whole-state": "ok",
+              "recreated-state": "cleared",
+              "cleared-state": "cleared",
+              "error": "none",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            }
+          }
+        }
+      },
+      "commandProvenance": "Fixed temporary Python launcher executed web/android/ios groups with ANDROID_SERIAL=emulator-5554 and isolated ONE_MAP_SMOKE_CACHE_ROOT per lane; logged true exit status and measured durations. Luna low web execution overlapped exclusive Luna medium native execution; native groups serialized engines and OS targets.",
+      "installedIdentity": {
+        "android": {
+          "device": "Medium_Phone, arm64 API37/37.1, emulator-5554",
+          "mapbox": {
+            "applicationId": "com.onemapmapbox",
+            "version": "1.0",
+            "versionCode": 1,
+            "apkSha256": "b64925505afd6f9ebad52baa2cb26171a22a6b30149ce0399fe351ea0b61d03e",
+            "apkMtime": "2026-10-12 16:06:49 America/Los_Angeles"
+          },
+          "maplibre": {
+            "applicationId": "com.onemapmaplibre",
+            "version": "1.0",
+            "versionCode": 1,
+            "apkSha256": "0424b2b8fb1ec8ca3a54e3a8b35fbe5302d9390730e6c1f29db2f120cbbb1573",
+            "apkMtime": "2026-10-12 16:07:33 America/Los_Angeles"
+          }
+        },
+        "ios": {
+          "device": "iPhone 18 Pro, iOS27.0, 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "mapbox": {
+            "bundleId": "org.reactjs.native.example.OneMapMapbox",
+            "version": "1.0",
+            "build": 1,
+            "executableSha256": "4cab089c7276e5b7523bec24ee730b8e4a6c5041f474050c5a5ec1729b2c0723",
+            "appMtime": "2026-10-12 16:56:04 America/Los_Angeles"
+          },
+          "maplibre": {
+            "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+            "version": "1.0",
+            "build": 1,
+            "executableSha256": "339c5ce669f68b9e6e0606732937f6882992ec98df9e9ddedf658aa4121ffd46",
+            "appMtime": "2026-10-12 17:03:38 America/Los_Angeles"
+          }
+        },
+        "verification": "Both current native CLI build/install commands succeeded before status was judged. Unchanged native binary outputs were legitimately reused; package JavaScript came from the frozen verified example copies through fresh Metro sessions, not from an embedded package archive."
+      },
+      "observedDurationsSeconds": {
+        "web": 3.53,
+        "android": 33.69,
+        "ios": 52.47,
+        "note": "Measured command durations exclude preparation, emulator boot, coordinator diagnosis and prior attempts."
+      }
+    },
+    "scope": "TF06 six environments because shared smoke readiness and state-copy changes affect web; native lifecycle affects both engines and OS targets. TF04/TF05 current changes unaffected; their historical outcomes remain tied to the original artifact. No TF07, commits, or publication.",
+    "examplePrerequisites": {
+      "iosCodegen": "node node_modules/react-native/scripts/generate-codegen-artifacts.js -p . -t ios -o ios (from each native example; required if ios/build/generated was removed)",
+      "iosProvider": "Example dependency providers filter only the unlinked SampleTurboModule from RN 0.87.1 generated main-queue setup; all other lookups remain unchanged.",
+      "iosHeaders": "MapLibreReactNative target adds $(PODS_XCFRAMEWORKS_BUILD_DIR)/React-Core-prebuilt/React.framework/Headers for quoted React includes. Persisted in setup-native-example.mjs Podfile hook; applied to existing generated Podfile and Pods project. Direct xcodebuild diagnostic verification passed without dependency changes."
+    },
+    "review": {
+      "status": "passed: independent review found no remaining concrete blocker; cross-family and vector behavior has regressions, with renderer scope explicitly qualified",
+      "focusedAdapterAndSmokeTests": 183,
+      "focusedSuites": 5,
+      "frameCleanupTests": "Retained backend state clears without any subsequent facade state call; automatic failures report once; explicit state operations preserve errors.",
+      "swiftProvider": "Typed override verified against generated pinned provider protocol; persisted in setup-native-example.mjs, since generated ios directories are ignored.",
+      "additionalFinding": {
+        "status": "resolved: actual source family tracked by both adapters; incompatible identifiers discarded only across known family changes; raw style-source adoption keeps prior cleanup",
+        "trigger": "Keyed same-id GeoJSON to vector Source replacement after feature-state writes",
+        "failure": "MapLibre cleanup converts an old GeoJSON identifier through the new vector ref; missing sourceLayer poisons the new lifetime. GeoJSON sourceLayer values may be ignored, so layer presence cannot identify prior source kind.",
+        "resolutionPlan": "Track actual native source family on registration; changing family discards incompatible cleanup identifiers while preserving old-operation ordering and SDK errors. Cover both directions and delayed old writes."
+      },
+      "runtimeQualification": "Renderer scene exercises GeoJSON same-family remount and style replacement on all six environments. Native vector lifetimes, keyed family transitions and race/error cases have mocked regressions, not separate renderer certification."
+    },
+    "runtime": {
+      "mapbox-web": "passed",
+      "maplibre-web": "passed",
+      "mapbox-android": "passed",
+      "maplibre-android": "passed",
+      "mapbox-ios": "passed",
+      "maplibre-ios": "passed"
+    },
+    "resolvedFindings": [
+      "RA1: native same-id state cleanup verified on both engines and OS targets",
+      "RA2: MapLibre source dispatch waits for committed renderer generation; unavailable-tag errors remain operational errors"
+    ],
+    "retention": "Complete: assigned web/Chrome/Metro/status ports clear; smoke apps terminated; only worker-started Android emulator stopped; preexisting iOS simulator left booted. Removed temporary acceptance archives/extractions, launcher, raw logs, screenshots and compiler probes; 10 scoped Android output/cache directories and six Xcode Build/Logs/Index directories for verified repository workspaces removed. Preserved compact attempt records, source, small iOS codegen inputs required by existing Pods, pinned dependencies, SDK/SourcePackages caches, simulator definitions/app data, and final library/example dist.",
+    "commit": "None; all existing uncommitted work preserved"
+  },
+  "nativeVectorLifetimeAcceptance": {
+    "record": "records/evidence/tf06-native-lifetimes.json",
+    "status": "passed in all four native renderer environments",
+    "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+    "validation": "457 Jest tests, four type checks, build and 13 packed selections passed",
+    "scope": "Additional vector/style/keyed-family scenario passed on all four native environments; later fresh iOS builds and reruns passed for both engines. Prior records and failures preserved.",
+    "freshIosBuildAcceptance": {
+      "status": "passed for both iOS engines",
+      "record": "records/evidence/tf06-native-lifetimes.json freshIosBuildAcceptance",
+      "packageSha256": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+      "durationsSeconds": {
+        "mapbox": 210,
+        "maplibre": 71
+      },
+      "provenance": "Fresh Xcode build activity and timestamps; built and installed executable/debug library digests match; MapLibre full regular-file manifest also matches."
+    }
+  },
+  "sparseArrayResolution": {
+    "status": "resolved; routine validation passed",
+    "finding": "Array.every skipped empty slots, allowing sparse arrays that serialize as forbidden null values. The source reference also retained a stale unverified acceptance claim.",
+    "implementation": "Array-slot iteration validates missing slots as undefined before dispatch. Dense and empty arrays retain their existing behavior. Reference prose now describes the recorded six-environment and scoped native passes with artifact links.",
+    "regressions": {
+      "addedJestTests": 10,
+      "scope": "Only-hole arrays, leading/middle/trailing holes, nested objects/arrays, and no-dispatch assertions on all four adapters.",
+      "focused": {
+        "command": "bunx jest --runInBand --runTestsByPath packages/one-map-react/test/feature-values.test.ts packages/one-map-react/test/mapbox-web.web.test.tsx packages/one-map-react/test/maplibre-web.web.test.tsx packages/one-map-react/test/mapbox-native.native.test.tsx packages/one-map-react/test/maplibre-native.native.test.tsx",
+        "status": "passed",
+        "tests": 346,
+        "suites": 5
+      }
+    },
+    "validation": {
+      "command": "bun run validate",
+      "status": "passed",
+      "jestTests": 467,
+      "jestSuites": 16,
+      "typecheckProjects": 4,
+      "formatting": "passed",
+      "documentation": "27 Markdown files,29 comparison tables;structure/local links passed",
+      "build": "passed",
+      "packedSelections": 13,
+      "auxiliaryTests": "Babel selector and fixture-base checks; MVT fixture; process cleanup under Node and Bun; native engine/device/reuse selection.",
+      "existingWarning": "Bun reports unsupported moduleSuffixes; checks pass."
+    },
+    "packageSha256": "3bd2f7a1ee0e48c53e602653d2c86248dac5cc08e5217a46cdc04edcd31502ed",
+    "sourceAndRegressionHashes": {
+      "packages/one-map-react/src/adapters/shared/feature-values.ts": "a08b283ad40084f2e5c88df914e62ddf5bd63e2bf7d6598140dc6aa0a292735a",
+      "packages/one-map-react/test/feature-values.test.ts": "cafff10534914c334a8804e8ec038134219229cc59deec5e11ee2bbfbd0357a8",
+      "packages/one-map-react/test/mapbox-web.web.test.tsx": "4f7fd62f024c65279497dbfefb442e3a11659b177d88cc4d59fc6646fcb89b68",
+      "packages/one-map-react/test/maplibre-web.web.test.tsx": "7f24190a95cb8a596a183542decccd39df4ba97fefd850a44b46a686c5c331c9",
+      "packages/one-map-react/test/mapbox-native.native.test.tsx": "f1be72b70a2cb5d47f72133cdc3695138ce74dae668144e725698c0e40b3d300",
+      "packages/one-map-react/test/maplibre-native.native.test.tsx": "614f2d76b3dc929c4957141b8112ee3f24208a2c1911008004f645159c6a570b"
+    },
+    "impactReview": {
+      "previousRendererArtifact": "db25f361ad610de5f02b5988bd1569e46b685638d8402ffc473ddb1a11032e9e",
+      "changedPackedFiles": [
+        "dist/adapters/shared/feature-values.js"
+      ],
+      "reason": "This pure input-validation guard rejects sparse arrays before SDK dispatch. Existing accepted dense inputs, query conversion and renderer lifecycle paths retain their behavior; focused shared/adapter regressions cover the change.",
+      "rendererAcceptance": "Not rerun for this validation-only follow-up. Prior outcomes remain attached to their tested artifacts.",
+      "exampleCopies": "Four examples preserved at the earlier accepted artifact; root dist/build and isolated packed selections use the new artifact."
+    },
+    "retention": "Routine packed consumers and archive cleaned by test-package finally block. No renderer artifacts generated.",
+    "commit": "None; HEAD82a7ade unchanged; TF07 not started."
+  }
+}

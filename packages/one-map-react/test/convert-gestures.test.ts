@@ -8,6 +8,48 @@ import {
 } from "../src/adapters/web/convert-gestures.js";
 
 describe("gesture conversion", () => {
+  test("web interactive false disables all mutable handlers and preserves unrelated options", () => {
+    expect(
+      toWebGestureProps({
+        interactive: false,
+        dragPan: true,
+        touchZoom: true,
+        doubleTapZoom: true,
+        hash: "camera",
+        clickTolerance: 8,
+        cooperativeGestures: true,
+      })
+    ).toEqual({
+      interactive: false,
+      dragPan: false,
+      scrollZoom: false,
+      doubleClickZoom: false,
+      dragRotate: false,
+      boxZoom: false,
+      keyboard: false,
+      touchPitch: false,
+      touchZoomRotate: false,
+      hash: "camera",
+      clickTolerance: 8,
+      cooperativeGestures: true,
+    });
+    expect(toWebGestureProps({})).toEqual({});
+    expect(toWebGestureProps({ interactive: true, dragPan: false })).toEqual({
+      interactive: true,
+      dragPan: false,
+    });
+  });
+
+  test("conflicting double zoom flags reject even when interaction is disabled", () => {
+    expect(() =>
+      toWebGestureProps({
+        interactive: false,
+        doubleTapZoom: true,
+        doubleClickZoom: false,
+      })
+    ).toThrow("must agree");
+  });
+
   test("web keeps pinch zoom when rotation is off", () => {
     expect(webTouchZoomRotate(undefined, false)).toBe(true);
     expect(webTouchZoomRotate(false, false)).toBe(false);

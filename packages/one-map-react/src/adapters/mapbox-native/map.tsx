@@ -4,6 +4,8 @@ import {
   type ComponentRef,
   forwardRef,
   useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
   useRef,
 } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
@@ -28,8 +30,12 @@ import {
   clickEventFromRnmapbox,
   moveEventFromRnmapbox,
 } from "./convert-move-event.js";
+import {
+  GeoJsonSourceContext,
+  GeoJsonSourceRegistry,
+} from "./geojson-source-registry.js";
 import { useMapboxGestureSettings } from "./gesture-settings.js";
-import { createMapboxMapRef } from "./map-ref.js";
+import { createMapboxMapRef, resetMapboxFeatureState } from "./map-ref.js";
 import { mergeGestureSettings, toRnmapboxStyleProps } from "./style-props.js";
 
 type RnPressFeature = Parameters<
@@ -68,6 +74,13 @@ export const MapboxNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
   const mapViewRef = useRef<ComponentRef<typeof MapView>>(null);
   const sawMove = useRef(false);
+  const geoJsonSources = useMemo(
+    () =>
+      new GeoJsonSourceRegistry((target) =>
+        resetMapboxFeatureState(mapViewRef, target)
+      ),
+    []
+  );
   const frozenViewState = useFrozenValue(initialViewState);
   const extraGestureSettings = useMapboxGestureSettings();
   const reportMove = useActiveCallback(onMove);
@@ -78,7 +91,18 @@ export const MapboxNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
   const reportLoad = useActiveCallback(onLoad);
   const reportStyleLoad = useActiveCallback(onStyleLoad);
   const reportError = useActiveCallback(onError);
+  const flushFeatureState = useActiveCallback(() => {
+    void geoJsonSources.featureState.flush((error) => reportError({ error }));
+  });
   const styleProps = toRnmapboxStyleProps(mapStyle);
+  const styleKey = JSON.stringify(styleProps);
+  const previousStyle = useRef(styleKey);
+  useLayoutEffect(() => {
+    if (previousStyle.current !== styleKey) {
+      previousStyle.current = styleKey;
+      geoJsonSources.featureState.resetStyle();
+    }
+  }, [geoJsonSources, styleKey]);
   const gestures = toRnmapboxGestures({
     interactive,
     dragPan,
@@ -92,7 +116,9 @@ export const MapboxNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
     gestures.gestureSettings
   );
 
-  useImperativeHandle(ref, () => createMapboxMapRef(cameraRef, mapViewRef));
+  useImperativeHandle(ref, () =>
+    createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources)
+  );
 
   assertNativeMapOptions(reuseMaps, gl);
   assertNativeDesktopOptions(props);
@@ -117,54 +143,62 @@ export const MapboxNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
     : undefined;
 
   return (
-    <MapView
-      ref={mapViewRef}
-      // MapLayoutStyle.width is any string, not only a native dimension.
-      style={style as StyleProp<ViewStyle>}
-      {...styleProps}
-      {...gestures}
-      gestureSettings={gestureSettings}
-      onDidFinishLoadingMap={() => {
-        reportLoad();
-      }}
-      onDidFinishLoadingStyle={() => {
-        reportStyleLoad();
-      }}
-      onMapLoadingError={(payload: unknown) => {
-        reportError(mapLoadingErrorEvent(payload));
-      }}
-      onCameraChanged={reportChanging}
-      onMapIdle={reportSettled}
-      onPress={
-        onClick
-          ? (feature: RnPressFeature) => {
-              reportClick(clickEventFromRnmapbox(feature));
-            }
-          : undefined
-      }
-      onLongPress={
-        onLongPress
-          ? (feature: RnPressFeature) => {
-              reportLongPress(clickEventFromRnmapbox(feature));
-            }
-          : undefined
-      }
-    >
-      <Camera
-        ref={cameraRef}
-        defaultSettings={toRnmapboxDefaultSettings(frozenViewState)}
-        minZoomLevel={minZoom}
-        maxZoomLevel={maxZoom}
-        maxBounds={
-          maxBounds === undefined
-            ? undefined
-            : toRnmapboxCornerBounds(maxBounds)
+    <GeoJsonSourceContext.Provider value={geoJsonSources}>
+      <MapView
+        ref={mapViewRef}
+        // MapLayoutStyle.width is any string, not only a native dimension.
+        style={style as StyleProp<ViewStyle>}
+        {...styleProps}
+        {...gestures}
+        gestureSettings={gestureSettings}
+        onDidFinishRenderingFrameFully={flushFeatureState}
+        onDidFinishLoadingMap={() => {
+          reportLoad();
+        }}
+        onDidFinishLoadingStyle={() => {
+          // Native style diffing can retain source state. Invalidate before
+          // the callback so writes it makes belong to the loaded style.
+          geoJsonSources.featureState.resetStyle();
+          reportStyleLoad();
+        }}
+        onMapLoadingError={(payload: unknown) => {
+          reportError(mapLoadingErrorEvent(payload));
+        }}
+        onCameraChanged={reportChanging}
+        onMapIdle={reportSettled}
+        onPress={
+          onClick
+            ? (feature: RnPressFeature) => {
+                reportClick(clickEventFromRnmapbox(feature));
+              }
+            : undefined
         }
-        padding={padding === undefined ? undefined : toRnmapboxPadding(padding)}
-        {...(controlled ?? {})}
-      />
-      {children}
-    </MapView>
+        onLongPress={
+          onLongPress
+            ? (feature: RnPressFeature) => {
+                reportLongPress(clickEventFromRnmapbox(feature));
+              }
+            : undefined
+        }
+      >
+        <Camera
+          ref={cameraRef}
+          defaultSettings={toRnmapboxDefaultSettings(frozenViewState)}
+          minZoomLevel={minZoom}
+          maxZoomLevel={maxZoom}
+          maxBounds={
+            maxBounds === undefined
+              ? undefined
+              : toRnmapboxCornerBounds(maxBounds)
+          }
+          padding={
+            padding === undefined ? undefined : toRnmapboxPadding(padding)
+          }
+          {...(controlled ?? {})}
+        />
+        {children}
+      </MapView>
+    </GeoJsonSourceContext.Provider>
   );
 });
 

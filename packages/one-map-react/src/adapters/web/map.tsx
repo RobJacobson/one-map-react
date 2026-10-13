@@ -84,6 +84,7 @@ export const createWebMap = <
         touchPitch,
         scrollZoom,
         doubleClickZoom,
+        doubleTapZoom,
         dragRotate,
         boxZoom,
         keyboard,
@@ -131,7 +132,7 @@ export const createWebMap = <
         setStyleMap((current) => (current === next ? current : next));
       }, []);
 
-      useImperativeHandle(ref, () => createWebMapRef(mapRef));
+      useImperativeHandle(ref, () => createWebMapRef(mapRef, wrapper));
 
       useLayoutEffect(() => {
         reportStyleLoadRef.current = reportStyleLoad;
@@ -147,6 +148,7 @@ export const createWebMap = <
       // never emits style.load still reports once the current style is
       // loaded. The listener is facade-owned, so logical unmount removes
       // it even when reuseMaps keeps the renderer.
+      // biome-ignore lint/correctness/useExhaustiveDependencies: mapStyle rearms missed-load observation after in-place style diffs.
       useLayoutEffect(() => {
         if (!styleMap) {
           return;
@@ -198,12 +200,19 @@ export const createWebMap = <
         }
 
         handler.disableRotation();
+        return () => handler.enableRotation();
       }, [styleMap, touchRotate, touchZoom]);
 
       assertWebLongPress(onLongPress);
 
+      const hadPadding = useRef(false);
       const paddingValue =
-        padding === undefined ? undefined : normalizePadding(padding);
+        padding === undefined && !hadPadding.current
+          ? undefined
+          : normalizePadding(padding ?? 0);
+      useLayoutEffect(() => {
+        hadPadding.current = padding !== undefined;
+      }, [padding]);
       const initialCamera = {
         ...toWebInitialViewState(frozenViewState),
         ...(paddingValue === undefined ? {} : { padding: paddingValue }),
@@ -222,6 +231,7 @@ export const createWebMap = <
           mapStyle={mapStyle}
           initialViewState={initialCamera}
           viewState={controlledCamera}
+          padding={paddingValue}
           minZoom={minZoom}
           maxZoom={maxZoom}
           maxBounds={
@@ -238,6 +248,7 @@ export const createWebMap = <
             touchPitch,
             scrollZoom,
             doubleClickZoom,
+            doubleTapZoom,
             dragRotate,
             boxZoom,
             keyboard,

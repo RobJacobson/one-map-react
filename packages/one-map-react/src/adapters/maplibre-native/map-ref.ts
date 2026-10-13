@@ -10,6 +10,13 @@ import {
   nativeStopError,
   unavailableMapMethodError,
 } from "../native-map-options.js";
+import {
+  assertFeatureIdentifier,
+  assertFeatureState,
+  featureStateFromWrapper,
+  featuresFromWrapper,
+  mutableFeatureState,
+} from "../shared/feature-values.js";
 import { invokeWrapper } from "../shared/invoke-wrapper.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
@@ -24,6 +31,15 @@ import {
   toMaplibreFitBoundsOptions,
   toMaplibreFlyToOptions,
 } from "./convert-camera.js";
+import {
+  toMaplibreFeatureId,
+  toMaplibreFilter,
+  toMaplibreQueryTarget,
+  toMaplibreRenderedQueryOptions,
+  toMaplibreSourceQueryOptions,
+  toMaplibreVectorFeature,
+} from "./convert-query.js";
+import type { MaplibreSourceRegistry } from "./source-registry.js";
 
 /**
  * Builds the imperative map handle over MapLibre Native camera and map refs.
@@ -32,12 +48,14 @@ import {
  * @param mapRef - Ref to the MapLibre Native `Map`.
  * @param mapLoaded - Ref tracking `onDidFinishLoadingMap`, after which the
  * camera applies imperative stops.
+ * @param sources - Registry of mounted GeoJSON and vector source refs.
  * @returns The common map ref.
  */
 export const createMaplibreMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapRef: { readonly current: ComponentRef<typeof MaplibreMap> | null },
-  mapLoaded: { readonly current: boolean }
+  mapLoaded: { readonly current: boolean },
+  sources: MaplibreSourceRegistry
 ): MapRef => ({
   jumpTo: async (options) => {
     rejectJumpTiming(options);
@@ -104,10 +122,144 @@ export const createMaplibreMapRef = (
     lngLatFromWrapper(
       await requireMap(mapRef.current).unproject([point[0], point[1]])
     ),
+  queryRenderedFeatures: async (target, options) => {
+    const map = requireMap(mapRef.current);
+    const queryTarget = toMaplibreQueryTarget(target);
+    const queryOptions = toMaplibreRenderedQueryOptions(options);
+
+    const features =
+      queryTarget === undefined
+        ? await map.queryRenderedFeatures(
+            queryOptions as { filter?: unknown } | undefined
+          )
+        : await map.queryRenderedFeatures(queryTarget, queryOptions);
+
+    return featuresFromWrapper(features, "queryRenderedFeatures");
+  },
+  querySourceFeatures: async (sourceId, options) => {
+    const entry = sources.require(sourceId);
+
+    if (entry.kind === "geojson") {
+      // Both native getData implementations query loaded source tiles, including
+      // hidden features. Results may be clipped or duplicated at tile boundaries.
+      const collection = await entry.ref.getData(
+        toMaplibreFilter(options?.filter) as never
+      );
+
+      return featuresFromWrapper(collection, "querySourceFeatures");
+    }
+
+    return featuresFromWrapper(
+      await entry.ref.querySourceFeatures(
+        toMaplibreSourceQueryOptions(options)
+      ),
+      "querySourceFeatures"
+    );
+  },
+  getClusterExpansionZoom: async (sourceId, clusterId) => {
+    const source = sources.requireGeoJson(sourceId);
+    const zoom = await source.getClusterExpansionZoom(clusterId);
+
+    return clusterZoom(zoom);
+  },
+  getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
+    const source = sources.requireGeoJson(sourceId);
+
+    return featuresFromWrapper(
+      await source.getClusterLeaves(clusterId, limit, offset),
+      "getClusterLeaves"
+    );
+  },
+  getClusterChildren: async (sourceId, clusterId) => {
+    const source = sources.requireGeoJson(sourceId);
+
+    return featuresFromWrapper(
+      await source.getClusterChildren(clusterId),
+      "getClusterChildren"
+    );
+  },
+  setFeatureState: async (identifier, state) => {
+    const target = { ...assertFeatureIdentifier(identifier) };
+    assertFeatureState(state);
+    const mutableState = mutableFeatureState(state);
+    if (sources.require(target.source).kind === "vector")
+      toMaplibreVectorFeature(target);
+
+    await sources.featureState.run(
+      target,
+      async () => {
+        const source = sources.require(target.source);
+
+        await invokeWrapper(
+          source.kind === "geojson"
+            ? source.ref.setFeatureState(
+                toMaplibreFeatureId(target),
+                mutableState
+              )
+            : source.ref.setFeatureState(
+                toMaplibreVectorFeature(target),
+                mutableState
+              )
+        );
+      },
+      true
+    );
+  },
+  getFeatureState: async (identifier) => {
+    const target = { ...assertFeatureIdentifier(identifier) };
+    if (sources.require(target.source).kind === "vector")
+      toMaplibreVectorFeature(target);
+
+    return sources.featureState.run(target, async () => {
+      const source = sources.require(target.source);
+
+      return featureStateFromWrapper(
+        await (source.kind === "geojson"
+          ? source.ref.getFeatureState(toMaplibreFeatureId(target))
+          : source.ref.getFeatureState(toMaplibreVectorFeature(target)))
+      );
+    });
+  },
+  removeFeatureState: async (identifier, key) => {
+    const target = { ...assertFeatureIdentifier(identifier) };
+    if (sources.require(target.source).kind === "vector")
+      toMaplibreVectorFeature(target);
+
+    await sources.featureState.run(target, async () => {
+      const source = sources.require(target.source);
+
+      await invokeWrapper(
+        source.kind === "geojson"
+          ? source.ref.removeFeatureState(
+              toMaplibreFeatureId(target),
+              ...(key === undefined ? [] : [key])
+            )
+          : source.ref.removeFeatureState(
+              toMaplibreVectorFeature(target),
+              ...(key === undefined ? [] : [key])
+            )
+      );
+    });
+  },
   resize: async () => {
     throw nativeResizeError();
   },
 });
+
+/**
+ * Reads a cluster expansion zoom from the wrapper.
+ *
+ * @param value - Wrapper zoom value.
+ * @returns The zoom as a finite number.
+ * @throws When the wrapper returned a non-finite value.
+ */
+const clusterZoom = (value: unknown): number => {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new Error("Cluster expansion zoom must be a finite number.");
+  }
+
+  return value;
+};
 
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null,

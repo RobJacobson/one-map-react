@@ -1,0 +1,381 @@
+import { afterEach, beforeEach, expect, jest, test } from "@jest/globals";
+import { act, renderHook } from "@testing-library/react";
+import { isValidElement, useLayoutEffect } from "react";
+
+import { LifetimesMap } from "../../../examples/shared/lifetimes-map.js";
+import { useLifetimesSmoke } from "../../../examples/shared/lifetimes-smoke.js";
+import type { MapRef } from "../src/contracts/camera-types.js";
+import type {
+  FeatureIdentifier,
+  FeatureState,
+} from "../src/contracts/query-types.js";
+
+type Family = "geojson" | "vector";
+
+/** Model renderer generations separately from React commits and retain state on demand. */
+const fixture = (stringIds = false) => {
+  let sourceRevision = 0;
+  let renderedRevision = 0;
+  let family: Family = "vector";
+  let attached = true;
+  let phase = "vector";
+  const states = new Map<string, FeatureState>();
+  const calls: {
+    method: string;
+    revision: number;
+    family: Family;
+    phase: string;
+    target?: FeatureIdentifier;
+  }[] = [];
+  const key = (target: FeatureIdentifier) =>
+    `${target.sourceLayer ?? "geojson"}/${target.id}`;
+  const record = (method: string, target?: FeatureIdentifier) => {
+    if (!attached) throw new Error("reactTag resolved to view null");
+    if (target && (family === "vector") !== (target.sourceLayer !== undefined))
+      throw new Error("Wrong feature-state family identifier");
+    calls.push({ method, revision: sourceRevision, family, phase, target });
+  };
+  const features = (revision: number) =>
+    [1, 2].map((id) => ({
+      type: "Feature",
+      id: stringIds ? String(id) : id,
+      properties: { __oneMapSourceRevision: revision },
+      geometry: null,
+    }));
+  const queryRenderedFeatures = jest.fn(async () => features(renderedRevision));
+  const querySourceFeatures = jest.fn(
+    async (_source: string, options?: { sourceLayer?: string }) => {
+      record("querySourceFeatures");
+      if (
+        family === "vector" &&
+        !["routes", "alternates"].includes(options?.sourceLayer ?? "")
+      )
+        throw new Error("Vector sourceLayer missing");
+      if (family === "geojson" && options?.sourceLayer !== undefined)
+        throw new Error("GeoJSON sourceLayer present");
+      return features(sourceRevision);
+    }
+  );
+  const setFeatureState = jest.fn(
+    async (target: FeatureIdentifier, state: FeatureState) => {
+      record("setFeatureState", target);
+      states.set(key(target), { ...states.get(key(target)), ...state });
+    }
+  );
+  const getFeatureState = jest.fn(async (target: FeatureIdentifier) => {
+    record("getFeatureState", target);
+    return states.get(key(target)) ?? {};
+  });
+  const removeFeatureState = jest.fn(
+    async (target: FeatureIdentifier, property?: string) => {
+      record("removeFeatureState", target);
+      if (property === undefined) states.delete(key(target));
+      else {
+        const next = { ...states.get(key(target)) };
+        delete next[property];
+        states.set(key(target), next);
+      }
+    }
+  );
+  // This partial handle exercises only the smoke's documented map operations.
+  const map = {
+    jumpTo: jest.fn(async () => undefined),
+    getCenter: jest.fn(async () => [-122.34, 47.61]),
+    getZoom: jest.fn(async () => 11),
+    queryRenderedFeatures,
+    querySourceFeatures,
+    setFeatureState,
+    getFeatureState,
+    removeFeatureState,
+  } as unknown as MapRef;
+  return {
+    mapRef: { current: map },
+    queryRenderedFeatures,
+    querySourceFeatures,
+    setFeatureState,
+    getFeatureState,
+    removeFeatureState,
+    calls,
+    states,
+    detach: () => {
+      attached = false;
+    },
+    commit: (
+      revision: number,
+      nextFamily: Family,
+      retainState = false,
+      nextPhase = "vector"
+    ) => {
+      phase = nextPhase;
+      sourceRevision = revision;
+      renderedRevision = revision;
+      family = nextFamily;
+      attached = true;
+      if (!retainState) states.clear();
+    },
+  };
+};
+
+beforeEach(() => {
+  jest.useFakeTimers();
+  jest.spyOn(console, "log").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+  jest.restoreAllMocks();
+});
+
+const tick = (milliseconds: number) =>
+  act(async () => {
+    await jest.advanceTimersByTimeAsync(milliseconds);
+  });
+
+const drive = async (hook: { result: { current: { phase: string } } }) => {
+  for (
+    let step = 0;
+    step < 20 && hook.result.current.phase !== "done";
+    step += 1
+  )
+    await tick(250);
+};
+
+test.each([false, true])(
+  "vector namespaces and both keyed family transitions complete with bridge string ids=%s",
+  async (stringIds) => {
+    const renderer = fixture(stringIds);
+    const retainedBeforeTransition: number[] = [];
+    const hook = renderHook(() => {
+      const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+      useLayoutEffect(() => {
+        if (smoke.sourceRevision === 0 || smoke.phase === "done") return;
+        retainedBeforeTransition.push(renderer.states.size);
+        renderer.commit(smoke.sourceRevision, smoke.family, false, smoke.phase);
+        if (smoke.phase === "style") smoke.onStyleLoad();
+      }, [smoke.sourceRevision, smoke.family, smoke.phase, smoke.onStyleLoad]);
+      return smoke;
+    });
+    act(() => hook.result.current.onLoad());
+    await drive(hook);
+    expect(hook.result.current.phase).toBe("done");
+    expect(hook.result.current.status).toContain("vector-namespaces=ok");
+    expect(hook.result.current.status).toContain("vector-remount=cleared");
+    expect(hook.result.current.status).toContain("vector-style=cleared");
+    expect(hook.result.current.status).toContain("vector-to-geojson=cleared");
+    expect(hook.result.current.status).toContain("geojson-to-vector=cleared");
+    expect(hook.result.current.status).toContain("final-remount=cleared");
+    expect(hook.result.current.status).toContain("error=none");
+    expect(retainedBeforeTransition).toEqual([4, 4, 4, 2, 4]);
+    expect(
+      renderer.calls
+        .filter((call) => call.method === "removeFeatureState")
+        .map((call) => call.revision)
+    ).toEqual([0, 0, 2, 2]);
+    const transitions = renderer.calls.filter(
+      (call) => call.method === "setFeatureState" && call.revision >= 2
+    );
+    expect(
+      transitions.some(
+        (call) => call.revision === 2 && call.target?.sourceLayer === undefined
+      )
+    ).toBe(true);
+    expect(
+      transitions.some(
+        (call) =>
+          call.revision === 3 &&
+          call.target?.sourceLayer === "alternates" &&
+          call.target.id === 2
+      )
+    ).toBe(true);
+  }
+);
+
+test("render generation gates source and state dispatch while native attachment is pending", async () => {
+  const renderer = fixture();
+  const hook = renderHook(() => {
+    const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+    useLayoutEffect(() => {
+      if (smoke.sourceRevision === 0 || smoke.phase === "done") return;
+      renderer.detach();
+      const timer = setTimeout(() => {
+        renderer.commit(smoke.sourceRevision, smoke.family, false, smoke.phase);
+        if (smoke.phase === "style") smoke.onStyleLoad();
+      }, 500);
+      return () => clearTimeout(timer);
+    }, [smoke.sourceRevision, smoke.family, smoke.phase, smoke.onStyleLoad]);
+    return smoke;
+  });
+  act(() => hook.result.current.onLoad());
+  await tick(250);
+  expect(hook.result.current.phase).toBe("remount");
+  const count = renderer.calls.length;
+  await tick(100);
+  expect(renderer.calls).toHaveLength(count);
+  expect(
+    renderer.queryRenderedFeatures.mock.calls.every((call) => call.length <= 1)
+  ).toBe(true);
+  await drive(hook);
+  expect(hook.result.current.status).toContain("error=none");
+});
+
+test.each(["remount", "style", "to-geojson", "to-vector", "final-remount"])(
+  "retained whole state fails phase %s without smoke cleanup masking the transition",
+  async (retainPhase) => {
+    const renderer = fixture();
+    const hook = renderHook(() => {
+      const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+      useLayoutEffect(() => {
+        if (smoke.sourceRevision === 0 || smoke.phase === "done") return;
+        renderer.commit(
+          smoke.sourceRevision,
+          smoke.family,
+          smoke.phase === retainPhase,
+          smoke.phase
+        );
+        // Family namespaces differ. Simulate an erroneously retained destination
+        // namespace as well, so an old count key alone must fail whole removal.
+        if (smoke.phase === retainPhase) {
+          renderer.states.set(
+            smoke.family === "geojson" ? "geojson/1" : "routes/1",
+            { count: 2 }
+          );
+        }
+        if (smoke.phase === "style") smoke.onStyleLoad();
+      }, [smoke.sourceRevision, smoke.family, smoke.phase, smoke.onStyleLoad]);
+      return smoke;
+    });
+    act(() => hook.result.current.onLoad());
+    for (
+      let step = 0;
+      step < 35 && hook.result.current.phase !== "done";
+      step += 1
+    )
+      await tick(250);
+    expect(hook.result.current.status).toContain("error=whole-state-removal-");
+    expect(hook.result.current.status).not.toContain("error=none");
+    expect(
+      renderer.calls.filter(
+        (call) =>
+          call.method === "removeFeatureState" && call.phase === retainPhase
+      )
+    ).toHaveLength(0);
+  }
+);
+
+test("source errors reject immediately after renderer generation readiness", async () => {
+  const renderer = fixture();
+  renderer.querySourceFeatures.mockRejectedValueOnce(
+    new Error("reactTag 38 invalid")
+  );
+  const hook = renderHook(() => useLifetimesSmoke({ mapRef: renderer.mapRef }));
+  act(() => hook.result.current.onLoad());
+  await tick(250);
+  expect(hook.result.current.phase).toBe("done");
+  expect(hook.result.current.status).toContain("error=reactTag-38-invalid");
+  expect(renderer.querySourceFeatures).toHaveBeenCalledTimes(1);
+  expect(renderer.setFeatureState).not.toHaveBeenCalled();
+});
+
+test("an indefinitely stale rendered generation fails before an unpublished source is queried", async () => {
+  const renderer = fixture();
+  const hook = renderHook(() => {
+    const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+    useLayoutEffect(() => {
+      if (smoke.sourceRevision > 0) renderer.detach();
+    }, [smoke.sourceRevision]);
+    return smoke;
+  });
+  act(() => hook.result.current.onLoad());
+  await tick(250);
+  const count = renderer.querySourceFeatures.mock.calls.length;
+  await tick(10500);
+  expect(hook.result.current.status).toContain(
+    "error=rendered-source-readiness-timed-out"
+  );
+  expect(renderer.querySourceFeatures).toHaveBeenCalledTimes(count);
+});
+
+test("unmount cancels a pending generation observation without later SDK calls", async () => {
+  const renderer = fixture();
+  const hook = renderHook(() => {
+    const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+    useLayoutEffect(() => {
+      if (smoke.sourceRevision > 0) renderer.detach();
+    }, [smoke.sourceRevision]);
+    return smoke;
+  });
+  act(() => hook.result.current.onLoad());
+  await tick(250);
+  hook.unmount();
+  const calls = renderer.calls.length;
+  renderer.commit(1, "vector");
+  await tick(10000);
+  expect(renderer.calls).toHaveLength(calls);
+});
+
+test("unmount during state read prevents subsequent removal and transition dispatch", async () => {
+  const renderer = fixture();
+  let resolve: (state: FeatureState) => void = () => {};
+  renderer.getFeatureState.mockImplementationOnce(
+    () =>
+      new Promise((done) => {
+        resolve = done;
+      })
+  );
+  const hook = renderHook(() => useLifetimesSmoke({ mapRef: renderer.mapRef }));
+  act(() => hook.result.current.onLoad());
+  await tick(250);
+  expect(renderer.getFeatureState).toHaveBeenCalledTimes(1);
+  hook.unmount();
+  await act(async () => resolve({ selected: true, count: 2 }));
+  expect(renderer.removeFeatureState).not.toHaveBeenCalled();
+  expect(renderer.setFeatureState).toHaveBeenCalledTimes(1);
+});
+
+test("style replacement preserves the vector source key, revision and tile URL", async () => {
+  const renderer = fixture();
+  const inputs: {
+    phase: string;
+    family: string;
+    revision: number;
+    key: string | null;
+    tiles?: readonly string[];
+  }[] = [];
+  const hook = renderHook(() => {
+    const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+    const mapElement = LifetimesMap({
+      family: smoke.family,
+      mapStyle: smoke.mapStyle,
+      sourceRevision: smoke.sourceRevision,
+    });
+    const source = mapElement.props.children;
+    useLayoutEffect(() => {
+      if (!isValidElement<{ tiles?: readonly string[] }>(source))
+        throw new Error("Lifetime scene has no Source element.");
+      inputs.push({
+        phase: smoke.phase,
+        family: smoke.family,
+        revision: smoke.sourceRevision,
+        key: source.key,
+        tiles: source.props.tiles,
+      });
+      if (smoke.sourceRevision === 0 || smoke.phase === "done") return;
+      renderer.commit(smoke.sourceRevision, smoke.family, false, smoke.phase);
+      if (smoke.phase === "style") smoke.onStyleLoad();
+    }, [
+      source,
+      smoke.sourceRevision,
+      smoke.family,
+      smoke.phase,
+      smoke.onStyleLoad,
+    ]);
+    return smoke;
+  });
+  act(() => hook.result.current.onLoad());
+  await drive(hook);
+  const remount = inputs.find((input) => input.phase === "remount");
+  const style = inputs.find((input) => input.phase === "style");
+  expect(remount).toBeDefined();
+  expect(style).toEqual({ ...remount, phase: "style" });
+  expect(hook.result.current.status).toContain("vector-style=cleared");
+});
