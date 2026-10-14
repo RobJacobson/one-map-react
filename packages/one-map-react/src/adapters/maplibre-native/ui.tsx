@@ -28,7 +28,7 @@ import {
 export const maplibreNativeUI = createNativeUI({
   Marker: NativeMarkerOverlay,
   Annotation: forwardRef<MarkerRef, NativeMarkerHostProps>((props, ref) => (
-    <MaplibreMarkerHost {...props} ref={ref} annotation />
+    <MaplibreAnnotationHost {...props} ref={ref} />
   )),
   backend: "maplibre-native",
 });
@@ -41,27 +41,23 @@ type AnnotationEvent = Parameters<
   NonNullable<ComponentProps<typeof ViewAnnotation>["onDrag"]>
 >[0];
 
-const MaplibreMarkerHost = forwardRef<
-  MarkerRef,
-  NativeMarkerHostProps & { readonly annotation?: boolean }
->((props, ref): ReactElement => {
-  const annotationRef = useRef<ViewAnnotationRef>(null);
+const MaplibreAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
+  (props, ref): ReactElement => {
+    const annotationRef = useRef<ViewAnnotationRef>(null);
 
-  useImperativeHandle(ref, () => ({
-    refresh: async () => {
-      if (!props.annotation) return;
-      const annotation = annotationRef.current;
-      if (!annotation) throw new Error("MapLibre annotation is detached.");
-      annotation.refresh();
-    },
-  }));
+    useImperativeHandle(ref, () => ({
+      refresh: async () => {
+        const annotation = annotationRef.current;
+        if (!annotation) throw new Error("MapLibre annotation is detached.");
+        annotation.refresh();
+      },
+    }));
 
-  const normalize = (event: AnnotationEvent) => ({
-    lngLat: lngLatFromWrapper(event.nativeEvent.lngLat),
-    point: pointFromWrapper(event.nativeEvent.point),
-  });
+    const normalize = (event: AnnotationEvent) => ({
+      lngLat: lngLatFromWrapper(event.nativeEvent.lngLat),
+      point: pointFromWrapper(event.nativeEvent.point),
+    });
 
-  if (props.annotation) {
     return (
       <ViewAnnotation
         ref={annotationRef}
@@ -86,15 +82,4 @@ const MaplibreMarkerHost = forwardRef<
       </ViewAnnotation>
     );
   }
-  return (
-    <NativeMarker
-      id={props.id}
-      lngLat={[props.lngLat[0], props.lngLat[1]]}
-      anchor={props.anchor}
-      offset={[props.offset[0], props.offset[1]]}
-      onPress={(event: AnnotationEvent) => event.stopPropagation()}
-    >
-      {props.children}
-    </NativeMarker>
-  );
-});
+);

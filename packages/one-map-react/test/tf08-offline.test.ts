@@ -203,6 +203,47 @@ describe("TF08 persistent native packs", () => {
     expect(fixture.native.size).toBe(0);
     expect(fixture.packs[0].pause).not.toHaveBeenCalled();
   });
+  test.each([
+    { kind: "mapbox", state: "active", percentage: 75 },
+    { kind: "mapbox", state: "complete", percentage: 100 },
+    { kind: "maplibre", state: "active", percentage: 75 },
+    { kind: "maplibre", state: "complete", percentage: 100 },
+  ] as const)(
+    "$kind delayed initial status cannot overwrite newer $state progress",
+    async ({ kind, state, percentage }) => {
+      const fixture = offlineFixture(kind);
+      const pack = await fixture.service.createPack(options);
+      const nativePack = fixture.packs[0];
+      let finishReadback: (value: unknown) => void = () => {};
+      jest.mocked(nativePack.status).mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finishReadback = resolve;
+          })
+      );
+      const progress = jest.fn();
+      const error = jest.fn();
+      const dispose = fixture.service.subscribe(pack.id, progress, error);
+      await settle();
+
+      fixture.native
+        .get(pack.backendId)
+        ?.progress(nativePack, { state, percentage });
+      finishReadback({ state: "active", percentage: 50 });
+      await settle();
+
+      expect(progress).toHaveBeenCalledTimes(1);
+      expect(progress).toHaveBeenLastCalledWith({
+        id: pack.id,
+        state,
+        percentage,
+      });
+      expect(error).not.toHaveBeenCalled();
+      dispose();
+      await settle();
+    }
+  );
+
   test.each(["mapbox", "maplibre"] as const)(
     "%s duplicate creation preserves existing progress and error subscribers",
     async (kind) => {

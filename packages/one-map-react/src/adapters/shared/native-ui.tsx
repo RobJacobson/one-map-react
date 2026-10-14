@@ -352,6 +352,10 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const markerCoordinate = dragCoordinate ?? coordinate;
       const markerClick = (event: MarkerEvent): void => {
         click(event);
+        // RNMapbox 10.3.7 toggles selection on taps; reset until it exposes per-tap events.
+        if (options.backend === "mapbox-native") {
+          setAnnotationRevision((revision) => revision + 1);
+        }
       };
       const responders: ViewProps = isAnnotation
         ? {}

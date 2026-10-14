@@ -49,6 +49,8 @@ interface PackObserver {
   readonly subscribers: Set<Subscriber>;
   /** Serializes asynchronous observer attachment and disposal for this pack. */
   operation: Promise<void>;
+  /** Changes when an SDK progress event supersedes an in-flight status read. */
+  progressRevision: number;
   attached: boolean;
   attachment?: object;
 }
@@ -138,6 +140,7 @@ export const createOfflineService = (
                   return;
                 if (status(pack, raw).state === "complete")
                   observer.attached = false;
+                observer.progressRevision += 1;
                 emit(observer, raw);
               },
               (_pack, failure) => {
@@ -153,8 +156,14 @@ export const createOfflineService = (
             backend.unobserve(id);
             return;
           }
+          const progressRevision = observer.progressRevision;
           const raw = await pack.status();
-          if (observer.subscribers.size) emit(observer, raw);
+          if (
+            observer.subscribers.size &&
+            observer.progressRevision === progressRevision
+          ) {
+            emit(observer, raw);
+          }
         } catch (failure) {
           observer.attachment = undefined;
           observer.attached = false;
@@ -285,6 +294,7 @@ export const createOfflineService = (
               pack,
               subscribers: new Set(),
               operation: Promise.resolve(),
+              progressRevision: 0,
               attached: false,
             };
             observers.set(nativeId, observer);

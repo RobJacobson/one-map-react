@@ -1,0 +1,33 @@
+{
+  "stage": "TF07",
+  "date": "2026-10-14",
+  "baseRevision": "2fcdddfb5a023e30da8d8c990688c3d3000b40f8",
+  "findings": [1, 3],
+  "changes": [
+    "Reset common RNMapbox annotation selection through the existing keyed remount after activation, so consecutive taps each notify onClick.",
+    "Remove unreachable live-marker branches and annotation-mode flags from both native annotation hosts. Direct selected SDK marker exports are unchanged."
+  ],
+  "regressions": {
+    "beforeFix": "Both iOS and Android mocked repeated-tap cases failed with one callback for two taps.",
+    "afterFix": "Both cases pass, including drag coordinate proposals, application-owned coordinates, refresh, and activation after dragging."
+  },
+  "routine": {
+    "command": "bun run validate",
+    "status": "passed",
+    "jestTests": 548,
+    "jestSuites": 21,
+    "typeConfigurations": 4,
+    "formatting": "passed",
+    "documentation": "passed",
+    "scriptUnitChecks": "passed",
+    "libraryBuild": "passed",
+    "isolatedPackageSelections": 13,
+    "packageSha256": "5b8ccde23b566cc6a9c7dd2352734b79604497bf57dd43f15965ba2d703d72d3",
+    "firstAttempt": "Formatting, documentation, types, and all Jest tests passed. The process-cleanup script test then hit sandbox EPERM while inspecting its own test processes. Validation passed on retry outside the sandbox."
+  },
+  "runtimeAcceptance": {
+    "status": "unverified for the changed annotation behavior",
+    "reason": "Only routine checks were requested. No renderer run, native build, installation, or device scenario was launched.",
+    "affectedScope": "Common RNMapbox annotation repeated taps on iOS and Android, with drag and refresh retained. Prior renderer results remain attached to their original artifacts."
+  }
+}
