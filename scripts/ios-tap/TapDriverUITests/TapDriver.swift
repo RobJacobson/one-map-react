@@ -10,7 +10,7 @@ final class TapDriver: XCTestCase {
     while Date() < deadline {
       let request = tapRequest()
 
-      if request.hasPrefix("tap "), request != seen {
+      if (request.hasPrefix("tap ") || request.hasPrefix("locate ") || request.hasPrefix("drag ")), request != seen {
         seen = request
         (app, bundle) = perform(request, current: app, bundle: bundle)
 
@@ -29,6 +29,24 @@ final class TapDriver: XCTestCase {
     bundle: String
   ) -> (XCUIApplication?, String) {
     let parts = request.split(separator: " ")
+
+    if parts.count >= 2, parts[0] == "locate" || parts[0] == "drag" {
+      let nextBundle = String(parts[1])
+      let app = nextBundle == bundle && current != nil
+        ? current!
+        : XCUIApplication(bundleIdentifier: nextBundle)
+
+      if app.state != .runningForeground { app.activate() }
+      if parts[0] == "locate" {
+        let button = app.buttons["Locate me"].firstMatch
+        if button.waitForExistence(timeout: 15) { button.tap() }
+      } else {
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.7, dy: 0.6))
+        start.press(forDuration: 0.1, thenDragTo: end)
+      }
+      return (app, nextBundle)
+    }
 
     guard parts.count >= 5,
       let x = Double(parts[2]),

@@ -30,5 +30,8 @@
   },
   "overrides": {
     "react-dom": "19.2.3"
+  },
+  "patchedDependencies": {
+    "@maplibre/maplibre-react-native@11.5.0": "../../packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch"
   }
 }

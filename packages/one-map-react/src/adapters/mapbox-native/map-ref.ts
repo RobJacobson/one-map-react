@@ -50,8 +50,14 @@ import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 export const createMapboxMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
-  geoJsonSources: GeoJsonSourceRegistry
+  geoJsonSources: GeoJsonSourceRegistry,
+  capture?: MapRef["capture"]
 ): MapRef => ({
+  capture:
+    capture ??
+    (async () => {
+      throw new Error("Capture is not enabled on this map.");
+    }),
   jumpTo: async (options) => {
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current);

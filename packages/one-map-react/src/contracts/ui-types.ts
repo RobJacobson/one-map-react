@@ -131,7 +131,7 @@ export interface ScaleControlProps extends ControlProps {
   readonly onError?: (error: unknown) => void;
 }
 
-/** Location supplied by an application's native location service. */
+/** Measured location supplied by an application or selected service. */
 export interface GeolocationPosition {
   /** Geographic coordinate. */
   readonly lngLat: LngLat;
@@ -139,11 +139,19 @@ export interface GeolocationPosition {
   readonly accuracy?: number;
   /** Time in milliseconds since Unix epoch when available. */
   readonly timestamp?: number;
+  /** Altitude in meters when measured. */
+  readonly altitude?: number;
+  /** Vertical uncertainty in meters when measured. */
+  readonly altitudeAccuracy?: number;
+  /** Speed in meters per second when measured. */
+  readonly speed?: number;
+  /** Direction of travel in degrees clockwise from north; not device heading. */
+  readonly course?: number;
 }
 
-/** Locates and centers once; native permissions and tracking belong to TF08. */
+/** User-triggered acquisition and optional foreground following. */
 export interface GeolocateControlProps extends ControlProps {
-  /** Required on native; optional injection on web, where omission delegates browser geolocation. */
+  /** One-shot override; cannot be combined with locationProvider or tracking. */
   readonly getCurrentPosition?: () => Promise<GeolocationPosition>;
   /** Zoom used when centering a native position; default 14. */
   readonly zoom?: number;
@@ -151,8 +159,10 @@ export interface GeolocateControlProps extends ControlProps {
   readonly onGeolocate?: (position: GeolocationPosition) => void;
   /** Reports acquisition or centering failure. */
   readonly onError?: (error: unknown) => void;
-  /** Browser tracking; native true remains TF08 and fails explicitly. */
+  /** Follow acquired coordinates; user gestures suspend following until reactivation. */
   readonly trackUserLocation?: boolean;
+  /** Streaming override; otherwise uses MapSetup or the selected default. */
+  readonly locationProvider?: import("./location-types.js").LocationService;
 }
 
 /** Browser fullscreen control; native fails explicitly. */

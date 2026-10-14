@@ -1,0 +1,1920 @@
+{
+  "stage": "TF08",
+  "status": "acceptance-failed",
+  "recordedAt": "2026-10-14T06:02:56.189Z",
+  "authorization": "Run acceptance tests",
+  "routineCheckpoint": "records/evidence/tf08-implementation.json#observerAuditFollowUp",
+  "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+  "libraryUnchangedDuringAcceptance": true,
+  "scope": "Location display/follow and teardown; actual current-map PNGs and overlay inclusion; native independent image sizes/zero zoom/file/error paths; bounded native offline lifecycle and cold restart with fixture resources unavailable. Browser geolocation and physical native gestures are exercised; simulated fixes do not certify hardware sensors.",
+  "versions": {
+    "node": "24.14.0",
+    "bun": "1.4.1",
+    "react": "19.2.3",
+    "reactNative": "0.87.1",
+    "reactMapGl": "8.1.3",
+    "mapboxGl": "3.32.0",
+    "maplibreGl": "6.13.0",
+    "rnmapbox": "10.3.7",
+    "maplibreReactNative": "11.5.0",
+    "mapboxNativeIos": "11.23.1",
+    "mapboxNativeAndroid": "11.23.1",
+    "maplibreNativeIos": "6.31.0",
+    "maplibreNativeAndroid": "13.6.1",
+    "chrome": "155.0.8059.41"
+  },
+  "devices": {
+    "ios": {
+      "name": "iPhone 18 Pro",
+      "os": "iOS 27.0",
+      "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+    },
+    "android": {
+      "serial": "emulator-5556",
+      "os": "Android 16",
+      "api": 36,
+      "pixels": [
+        1080,
+        2400
+      ],
+      "secondDensity": 320
+    },
+    "physicalDevices": "None attached during the authorized run."
+  },
+  "ownership": {
+    "web": "Independent browser profiles/Vite caches; ports4191/4192, debugger5191/5192, fixtures8811/8812.",
+    "native": "One sequential native worker owns Metro8081, fixtures8798, XCTest8799, emulator and simulator. Coordinator owns preparation/diagnosis; workers did not change library code or retry independently."
+  },
+  "commands": {
+    "web": "node scripts/tf08-services-smoke.mjs web mapbox|maplibre",
+    "native": "node scripts/tf08-services-smoke.mjs android|ios mapbox|maplibre",
+    "offlineRetry": "TF08_SCOPE=offline node scripts/tf08-services-smoke.mjs android|ios maplibre",
+    "environment": "TF08_OUTPUT, TF08_LIBRARY_SHA256, TF08_RUNTIME_NODE_MODULES; native TF08_NATIVE_BINARY and TF08_NATIVE_SHA256, plus TF08_NATIVE_APP for iOS. Runner verifies dist and installed APK/launcher/dylibs before runtime."
+  },
+  "patchSha256": {
+    "rnmapbox-10.3.7-tf08.patch": "a2b146e05d8ec6ae51cf24681b9b14618a5a481e282a2406572088bf250d0a4e",
+    "maplibre-native-11.5.0-tf08.patch": "16d186536781b3f10d4e16fbb1118d99d60662f4da2b8c2e2dedfe3667cede2f"
+  },
+  "nativeArtifactsSha256": {
+    "apps/mapbox-android.apk": "73b847aac624c1d94ab67a53e44a43b004cd6398c4f94d22c0d58f2d8f63771b",
+    "apps/maplibre-android.apk": "57b463652a516a4859d6aeb350fb3eb6816d1dfd43fa41cca3a71ad2767e9959",
+    "apps/OneMapMapbox.app/OneMapMapbox": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+    "apps/OneMapMapbox.app/OneMapMapbox.debug.dylib": "573b5dd7ef0cd90ad1c190e98355eeed6464b10b14eac7c8eef5c5082164b97f",
+    "apps/OneMapMaplibre.app/OneMapMaplibre": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+    "apps/OneMapMaplibre.app/OneMapMaplibre.debug.dylib": "70c7f7ff3a7dec740a9f3ee73387b9927ef8a195ad59294fe0b68047aee1e34f"
+  },
+  "finalHarnessSha256": {
+    "scripts/tf08-services-smoke.mjs": "611eeffbf673db3e30d0af3e662cb722b2699b2aa1e6df36e2ee87d92c41cce7",
+    "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+    "scripts/tf08-image-observations.test.mjs": "8a0c439cedb26bb34da597ac361d8affcabcdbd048284b8023c85070629a554e",
+    "examples/shared/tf08-acceptance-scene.tsx": "69fd91a4087ba5b04a02401476213ad8f7a7af983b9af0da0ea96a028cbd5f29",
+    "examples/shared/native-tf08-screen.tsx": "4d234dd1bf89bf654fde18e7c562576c2f296836749f8ae59a2594af6f289a45",
+    "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+    "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "0b23127bd512c2e3ba336fae70bb3eca6d0b8e1cda9f6bee5869945fe5a217c9"
+  },
+  "harnessProvenance": "Final scoped retries record source hashes at startup. Earlier reports predate per-run source hash recording; web first-attempt runner digest was6e710833df1d7f3a9a3d7df3ace6b46170aa10346e24f78fb2ce62f660b56db3 and scene digest5e4986b6a61c22dda398d4dab68385cb5d21b83b1a66fcee3d5b1f45e6514df6. The library dist and native build identities remained unchanged across harness corrections.",
+  "buildAttempts": [
+    {
+      "environment": "android-mapbox",
+      "first": {
+        "status": "failed",
+        "reason": "Build environment PATH did not resolve npx.",
+        "logSha256": "23be2f051b5701c5e83eae365f4b1720638cb79bfd25d3ad51b6cd85ae8979e9"
+      },
+      "retry": {
+        "status": "passed",
+        "correction": "Use installed Node/npm/npx/Bun PATH; existing selected peer source retained.",
+        "logSha256": "28a558a7552bd887a45f5c246cf916141f30ef3ec387ae52104b05d975e4f2b5"
+      }
+    },
+    {
+      "environment": "android-maplibre",
+      "first": {
+        "status": "failed",
+        "reason": "Build environment PATH did not resolve npx.",
+        "logSha256": "f60c4c8b0def8fc40e2b8de0b60578e025ff75708cb5fc2e6f8affbb70f1f302"
+      },
+      "retry": {
+        "status": "passed",
+        "correction": "Use installed Node/npm/npx/Bun PATH; existing selected peer source retained.",
+        "logSha256": "52fb075079fb136bef9a05f4370fc0c024d6fedba0f7331b6f337f0a62c70cf1"
+      }
+    },
+    {
+      "environment": "ios-mapbox",
+      "first": {
+        "status": "failed",
+        "reason": "Insufficient disk space for generated Xcode build outputs.",
+        "logSha256": "8c3943b89fb4e7d6ffba25c9e70b02d2f52ab989be4921f9aa08380b03e6aa80"
+      },
+      "retry": {
+        "status": "passed",
+        "correction": "Remove rebuildable owned/current failed outputs and old Xcode intermediate/index cache; use isolated DerivedData with indexing disabled.",
+        "logSha256": "9e9063bbae57d0d77b99740f11eb1898fc14bd320e856d54dc5099620188b9a5"
+      }
+    },
+    {
+      "environment": "ios-maplibre",
+      "first": {
+        "status": "failed",
+        "reason": "Insufficient disk space for generated Xcode build outputs.",
+        "logSha256": "b721c98b3629058a69602da104ef64090f6512a1164aa2a4efb61d446da0555f"
+      },
+      "retry": {
+        "status": "passed",
+        "correction": "Remove rebuildable owned/current failed outputs and old Xcode intermediate/index cache; use isolated DerivedData with indexing disabled.",
+        "logSha256": "74b601bd7752f7fccf9e3558b497a5574e628ecb1abf494d39c2ce06f12e1c00"
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "name": "web-mapbox-first.json",
+      "validity": "valid",
+      "interpretation": "First attempt passed.",
+      "report": {
+        "environment": "mapbox-web",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "injected location display and following",
+            "status": "passed"
+          },
+          {
+            "name": "gesture interruption and resume without another watch",
+            "status": "passed"
+          },
+          {
+            "name": "browser geolocation success after activation",
+            "status": "passed"
+          },
+          {
+            "name": "browser permission denial reaches the control error callback",
+            "status": "passed"
+          },
+          {
+            "name": "retained incompatible drawing buffer rejects capture",
+            "status": "passed"
+          },
+          {
+            "name": "external incompatible drawing buffer rejects capture",
+            "status": "passed"
+          },
+          {
+            "name": "canvas export failure propagates",
+            "status": "passed"
+          },
+          {
+            "name": "actual PNG capture and overlay scope",
+            "status": "passed"
+          },
+          {
+            "name": "strict renderer capture scope",
+            "status": "passed"
+          },
+          {
+            "name": "detach releases tracking and suppresses late fixes",
+            "status": "passed"
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 0,
+        "blockedRequests": 0
+      },
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "web-maplibre-first.json",
+      "validity": "valid",
+      "interpretation": "First attempt passed.",
+      "report": {
+        "environment": "maplibre-web",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "injected location display and following",
+            "status": "passed"
+          },
+          {
+            "name": "gesture interruption and resume without another watch",
+            "status": "passed"
+          },
+          {
+            "name": "browser geolocation success after activation",
+            "status": "passed"
+          },
+          {
+            "name": "browser permission denial reaches the control error callback",
+            "status": "passed"
+          },
+          {
+            "name": "retained incompatible drawing buffer rejects capture",
+            "status": "passed"
+          },
+          {
+            "name": "external incompatible drawing buffer rejects capture",
+            "status": "passed"
+          },
+          {
+            "name": "canvas export failure propagates",
+            "status": "passed"
+          },
+          {
+            "name": "actual PNG capture and overlay scope",
+            "status": "passed"
+          },
+          {
+            "name": "strict renderer capture scope",
+            "status": "passed"
+          },
+          {
+            "name": "detach releases tracking and suppresses late fixes",
+            "status": "passed"
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 0,
+        "blockedRequests": 0
+      },
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "android-mapbox-first.json",
+      "validity": "harness-readiness-failure",
+      "interpretation": "Numeric-only readiness check rejected the renderer's string feature ID. Corrected to Number(id)===8008; same dist/APK retried.",
+      "report": {
+        "environment": "mapbox-android",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "73b847aac624c1d94ab67a53e44a43b004cd6398c4f94d22c0d58f2d8f63771b",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "failed",
+            "error": "TF08 observation timed out."
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "native gesture interruption"
+        ],
+        "resourceRequests": 0,
+        "blockedRequests": 0
+      },
+      "counts": {
+        "passed": 0,
+        "failed": 1,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "android-mapbox-readiness-retry.json",
+      "validity": "valid",
+      "interpretation": "Known feature, PNGs, control lifecycle and native position passed. Offline bounds failure blocks persistence. Report predates explicit blocked-scenario recording.",
+      "report": {
+        "environment": "mapbox-android",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "73b847aac624c1d94ab67a53e44a43b004cd6398c4f94d22c0d58f2d8f63771b",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "injected location display and following",
+            "status": "passed"
+          },
+          {
+            "name": "actual PNG capture and overlay scope",
+            "status": "passed"
+          },
+          {
+            "name": "strict renderer capture scope",
+            "status": "passed"
+          },
+          {
+            "name": "detach releases tracking and suppresses late fixes",
+            "status": "passed"
+          },
+          {
+            "name": "native gesture interruption and resume without another watch",
+            "status": "passed"
+          },
+          {
+            "name": "foreground permission boundary",
+            "status": "passed"
+          },
+          {
+            "name": "fresh native position from simulator injection",
+            "status": "passed"
+          },
+          {
+            "name": "independent zero-zoom PNG dimensions and file output",
+            "status": "passed"
+          },
+          {
+            "name": "invalid snapshot style rejects before the facade deadline",
+            "status": "passed"
+          },
+          {
+            "name": "snapshot pixel dimensions at a second Android density",
+            "status": "passed"
+          },
+          {
+            "name": "bounded offline create, observe, pause and resume",
+            "status": "failed",
+            "error": "Offline pack returned invalid bounds."
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 6,
+        "blockedRequests": 0
+      },
+      "counts": {
+        "passed": 11,
+        "failed": 1,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "ios-mapbox-first.json",
+      "validity": "superseded-by-isolated-retry",
+      "interpretation": "Capture color threshold falsely rejected profiled PNG; gesture emitted before XCTest activation settled. Offline bounds failure remains reproduced.",
+      "report": {
+        "environment": "mapbox-ios",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "injected location display and following",
+            "status": "passed"
+          },
+          {
+            "name": "actual PNG capture and overlay scope",
+            "status": "failed",
+            "error": "Known renderer point is absent from the capture."
+          },
+          {
+            "name": "strict renderer capture scope",
+            "status": "passed"
+          },
+          {
+            "name": "detach releases tracking and suppresses late fixes",
+            "status": "passed"
+          },
+          {
+            "name": "native gesture interruption and resume without another watch",
+            "status": "failed",
+            "error": "TF08 observation timed out."
+          },
+          {
+            "name": "foreground permission boundary",
+            "status": "passed"
+          },
+          {
+            "name": "fresh native position from simulator injection",
+            "status": "passed"
+          },
+          {
+            "name": "independent zero-zoom PNG dimensions and file output",
+            "status": "passed"
+          },
+          {
+            "name": "invalid snapshot style rejects before the facade deadline",
+            "status": "passed"
+          },
+          {
+            "name": "bounded offline create, observe, pause and resume",
+            "status": "failed",
+            "error": "Offline pack returned invalid bounds."
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "second iOS display density"
+        ],
+        "resourceRequests": 5,
+        "blockedRequests": 0
+      },
+      "counts": {
+        "passed": 8,
+        "failed": 3,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "android-maplibre-first.json",
+      "validity": "invalid-stale-client-contamination",
+      "interpretation": "Previous iOS Mapbox app kept polling the common command server. Android result contained an RNMapbox iOS capture rejection, proving mixed-client replies. Excluded from final conclusions.",
+      "report": {
+        "environment": "maplibre-android",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "57b463652a516a4859d6aeb350fb3eb6816d1dfd43fa41cca3a71ad2767e9959",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "injected location display and following",
+            "status": "failed",
+            "error": "Location button is absent from the native hierarchy."
+          },
+          {
+            "name": "actual PNG capture and overlay scope",
+            "status": "failed",
+            "error": "Known renderer point is absent from the capture."
+          },
+          {
+            "name": "strict renderer capture scope",
+            "status": "failed",
+            "error": "Renderer-only capture is unavailable through RNMapbox iOS view capture. Use scope backend."
+          },
+          {
+            "name": "detach releases tracking and suppresses late fixes",
+            "status": "passed"
+          },
+          {
+            "name": "native gesture interruption and resume without another watch",
+            "status": "passed"
+          },
+          {
+            "name": "foreground permission boundary",
+            "status": "passed"
+          },
+          {
+            "name": "fresh native position from simulator injection",
+            "status": "failed",
+            "error": "Location acquisition timed out."
+          },
+          {
+            "name": "independent zero-zoom PNG dimensions and file output",
+            "status": "failed",
+            "error": "unrecognised content at end of stream"
+          },
+          {
+            "name": "invalid snapshot style rejects before the facade deadline",
+            "status": "passed"
+          },
+          {
+            "name": "snapshot pixel dimensions at a second Android density",
+            "status": "passed"
+          },
+          {
+            "name": "bounded offline create, observe, pause and resume",
+            "status": "failed",
+            "error": "undefined is not a function"
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 14,
+        "blockedRequests": 0
+      },
+      "counts": {
+        "passed": 6,
+        "failed": 6,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "android-maplibre-isolated-retry.json",
+      "validity": "valid-except-offline-fixture-readiness",
+      "interpretation": "Environment/command identity guards active. Offline restart first used Seattle/zoom10 outside downloaded coverage; scoped retry uses [0,0]/zoom1. Location timeout remains observed.",
+      "report": {
+        "environment": "maplibre-android",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "57b463652a516a4859d6aeb350fb3eb6816d1dfd43fa41cca3a71ad2767e9959",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "injected location display and following",
+            "status": "passed"
+          },
+          {
+            "name": "actual PNG capture and overlay scope",
+            "status": "passed"
+          },
+          {
+            "name": "strict renderer capture scope",
+            "status": "passed"
+          },
+          {
+            "name": "detach releases tracking and suppresses late fixes",
+            "status": "passed"
+          },
+          {
+            "name": "native gesture interruption and resume without another watch",
+            "status": "passed"
+          },
+          {
+            "name": "foreground permission boundary",
+            "status": "passed"
+          },
+          {
+            "name": "fresh native position from simulator injection",
+            "status": "failed",
+            "error": "Location acquisition timed out."
+          },
+          {
+            "name": "independent zero-zoom PNG dimensions and file output",
+            "status": "passed"
+          },
+          {
+            "name": "invalid snapshot style rejects before the facade deadline",
+            "status": "passed"
+          },
+          {
+            "name": "snapshot pixel dimensions at a second Android density",
+            "status": "passed"
+          },
+          {
+            "name": "bounded offline create, observe, pause and resume",
+            "status": "passed"
+          },
+          {
+            "name": "persisted offline pack after cold restart with fixture resources unavailable",
+            "status": "failed",
+            "error": "TF08 observation timed out."
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 14,
+        "blockedRequests": 9
+      },
+      "counts": {
+        "passed": 11,
+        "failed": 2,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "ios-maplibre-isolated-retry.json",
+      "validity": "valid-except-potentially-mixed-offline-fixture",
+      "interpretation": "Environment/command identity guards active. Camera fixture was edited while Metro was active; possible hot reload affects offline restart conclusion. Scoped retry freezes source. Gesture timeout and absolute-path file rejection were observed before the offline stage.",
+      "report": {
+        "environment": "maplibre-ios",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "nativeLibraries": {
+          "OneMapMaplibre.debug.dylib": "70c7f7ff3a7dec740a9f3ee73387b9927ef8a195ad59294fe0b68047aee1e34f",
+          "__preview.dylib": "18cba1232108938b0ce9083884e375f287814a994639881394f1bca64fd65e8e"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "injected location display and following",
+            "status": "passed"
+          },
+          {
+            "name": "actual PNG capture and overlay scope",
+            "status": "passed"
+          },
+          {
+            "name": "strict renderer capture scope",
+            "status": "passed"
+          },
+          {
+            "name": "detach releases tracking and suppresses late fixes",
+            "status": "passed"
+          },
+          {
+            "name": "native gesture interruption and resume without another watch",
+            "status": "failed",
+            "error": "TF08 observation timed out."
+          },
+          {
+            "name": "foreground permission boundary",
+            "status": "passed"
+          },
+          {
+            "name": "fresh native position from simulator injection",
+            "status": "passed"
+          },
+          {
+            "name": "independent zero-zoom PNG dimensions and file output",
+            "status": "failed",
+            "error": "Image renderer returned an invalid temporary file URI."
+          },
+          {
+            "name": "invalid snapshot style rejects before the facade deadline",
+            "status": "passed"
+          },
+          {
+            "name": "bounded offline create, observe, pause and resume",
+            "status": "passed"
+          },
+          {
+            "name": "persisted offline pack after cold restart with fixture resources unavailable",
+            "status": "failed",
+            "error": "TF08 observation timed out."
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "second iOS display density"
+        ],
+        "resourceRequests": 12,
+        "blockedRequests": 9
+      },
+      "counts": {
+        "passed": 9,
+        "failed": 3,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "ios-mapbox-isolated-retry.json",
+      "validity": "valid-with-capture-reevaluation",
+      "interpretation": "Installed launcher and debug dylibs verified. Gesture passed after awaiting watch registration/drag readback. Exact saved capture reevaluated with profile-tolerant classifier.",
+      "report": {
+        "environment": "mapbox-ios",
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+        "nativeLibraries": {
+          "OneMapMapbox.debug.dylib": "573b5dd7ef0cd90ad1c190e98355eeed6464b10b14eac7c8eef5c5082164b97f",
+          "__preview.dylib": "b00aae2b446bc582eaac2a3ccdcba81dd2c355d0ea233ad78e7b87ca07765d4d"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "injected location display and following",
+            "status": "passed"
+          },
+          {
+            "name": "actual PNG capture and overlay scope",
+            "status": "failed",
+            "error": "Known renderer point is absent from the capture."
+          },
+          {
+            "name": "strict renderer capture scope",
+            "status": "passed"
+          },
+          {
+            "name": "detach releases tracking and suppresses late fixes",
+            "status": "passed"
+          },
+          {
+            "name": "native gesture interruption and resume without another watch",
+            "status": "passed"
+          },
+          {
+            "name": "foreground permission boundary",
+            "status": "passed"
+          },
+          {
+            "name": "fresh native position from simulator injection",
+            "status": "passed"
+          },
+          {
+            "name": "independent zero-zoom PNG dimensions and file output",
+            "status": "passed"
+          },
+          {
+            "name": "invalid snapshot style rejects before the facade deadline",
+            "status": "passed"
+          },
+          {
+            "name": "bounded offline create, observe, pause and resume",
+            "status": "failed",
+            "error": "Offline pack returned invalid bounds."
+          },
+          {
+            "name": "persisted offline pack after cold restart with fixture resources unavailable",
+            "status": "blocked",
+            "reason": "Offline creation/lifecycle prerequisite failed."
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "second iOS display density"
+        ],
+        "resourceRequests": 3,
+        "blockedRequests": 0
+      },
+      "counts": {
+        "passed": 9,
+        "failed": 2,
+        "blocked": 1
+      }
+    },
+    {
+      "name": "android-maplibre-offline-camera-retry.json",
+      "validity": "valid-scoped-retry",
+      "interpretation": "Offline-only scope; scene/runner source hashes recorded at start. Initial offline camera [0,0]/zoom1 is within coverage; no source edits during this run.",
+      "report": {
+        "environment": "maplibre-android",
+        "scope": "offline",
+        "startedAt": "2026-10-14T05:56:55.736Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "611eeffbf673db3e30d0af3e662cb722b2699b2aa1e6df36e2ee87d92c41cce7",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "examples/shared/tf08-acceptance-scene.tsx": "69fd91a4087ba5b04a02401476213ad8f7a7af983b9af0da0ea96a028cbd5f29",
+          "examples/shared/native-tf08-screen.tsx": "4d234dd1bf89bf654fde18e7c562576c2f296836749f8ae59a2594af6f289a45",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "0b23127bd512c2e3ba336fae70bb3eca6d0b8e1cda9f6bee5869945fe5a217c9"
+        },
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "57b463652a516a4859d6aeb350fb3eb6816d1dfd43fa41cca3a71ad2767e9959",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "bounded offline create, observe, pause and resume",
+            "status": "passed"
+          },
+          {
+            "name": "persisted offline pack after cold restart with fixture resources unavailable",
+            "status": "failed",
+            "error": "TF08 observation timed out."
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 9,
+        "blockedRequests": 9
+      },
+      "counts": {
+        "passed": 2,
+        "failed": 1,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "ios-maplibre-offline-camera-retry.json",
+      "validity": "valid-scoped-retry",
+      "interpretation": "Offline-only scope; scene/runner source hashes recorded at start. Initial offline camera [0,0]/zoom1 is within coverage; no source edits during this run.",
+      "report": {
+        "environment": "maplibre-ios",
+        "scope": "offline",
+        "startedAt": "2026-10-14T05:58:59.768Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "611eeffbf673db3e30d0af3e662cb722b2699b2aa1e6df36e2ee87d92c41cce7",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "examples/shared/tf08-acceptance-scene.tsx": "69fd91a4087ba5b04a02401476213ad8f7a7af983b9af0da0ea96a028cbd5f29",
+          "examples/shared/native-tf08-screen.tsx": "4d234dd1bf89bf654fde18e7c562576c2f296836749f8ae59a2594af6f289a45",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "0b23127bd512c2e3ba336fae70bb3eca6d0b8e1cda9f6bee5869945fe5a217c9"
+        },
+        "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+        "nativeBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "nativeLibraries": {
+          "OneMapMaplibre.debug.dylib": "70c7f7ff3a7dec740a9f3ee73387b9927ef8a195ad59294fe0b68047aee1e34f",
+          "__preview.dylib": "18cba1232108938b0ce9083884e375f287814a994639881394f1bca64fd65e8e"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed"
+          },
+          {
+            "name": "bounded offline create, observe, pause and resume",
+            "status": "passed"
+          },
+          {
+            "name": "persisted offline pack after cold restart with fixture resources unavailable",
+            "status": "failed",
+            "error": "TF08 observation timed out."
+          }
+        ],
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "second iOS display density"
+        ],
+        "resourceRequests": 9,
+        "blockedRequests": 9
+      },
+      "counts": {
+        "passed": 2,
+        "failed": 1,
+        "blocked": 0
+      }
+    }
+  ],
+  "interruptedAttempt": {
+    "environment": "maplibre-ios",
+    "name": "ios-maplibre-first",
+    "status": "interrupted-invalid",
+    "reason": "Stopped after discovering stale native clients; no final JSON. Partial output excluded from acceptance conclusions.",
+    "logSha256": "3abf46cb365abe78cb9ac2a797f76e7ad6a4f9ccab8c3a79c0eea15fc8333d50"
+  },
+  "captureReevaluation": {
+    "environment": "mapbox-ios",
+    "scenario": "actual PNG capture and overlay scope",
+    "status": "passed",
+    "method": "Coordinator reevaluated exact saved runtime PNG with profile-tolerant fixture color classifier; no new runtime or library artifact.",
+    "pngSha256": "423a1e70922b747e9bc39e9658867f52dee76cacf34bf593e9450c553657c783",
+    "pngDepth": 16,
+    "rawDominantPoint": [
+      234,
+      51,
+      35
+    ],
+    "pixels": {
+      "width": 1206,
+      "height": 2283,
+      "red": 5344,
+      "blue": 1017,
+      "green": 0,
+      "navy": 2730834,
+      "magenta": 0
+    }
+  },
+  "finalEnvironments": {
+    "mapbox-web": {
+      "status": "passed",
+      "sources": [
+        "web-mapbox-first.json"
+      ],
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "blocked": 0
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 10,
+            "featureCount": 1
+          }
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.33053185434449,
+              47.619468193806114
+            ],
+            "zoom": 11.576346746720434,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "gesture interruption and resume without another watch",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 2,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.3203756857622,
+              47.62994301381869
+            ],
+            "zoom": 11.993130691012809,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "browser geolocation success after activation",
+          "status": "passed",
+          "observation": {
+            "loads": 2,
+            "fixes": 3,
+            "errors": 0,
+            "watches": 1,
+            "releases": 1,
+            "center": [
+              -122.33033697538116,
+              47.61966305622036
+            ],
+            "zoom": 12.424542441966183,
+            "featureCount": 1
+          }
+        },
+        {
+          "name": "browser permission denial reaches the control error callback",
+          "status": "passed",
+          "observation": {
+            "observedError": true
+          }
+        },
+        {
+          "name": "retained incompatible drawing buffer rejects capture",
+          "status": "passed",
+          "observation": {
+            "explicitRejection": true
+          }
+        },
+        {
+          "name": "external incompatible drawing buffer rejects capture",
+          "status": "passed",
+          "observation": {
+            "explicitRejection": true
+          }
+        },
+        {
+          "name": "canvas export failure propagates",
+          "status": "passed",
+          "observation": {
+            "rejectedExport": true
+          }
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed",
+          "observation": {
+            "width": 1280,
+            "height": 713,
+            "red": 556,
+            "blue": 0,
+            "green": 0,
+            "navy": 912029,
+            "magenta": 0,
+            "scope": "backend",
+            "overlayInclusion": "green-host-overlay-excluded"
+          }
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed",
+          "observation": {
+            "scope": "renderer"
+          }
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed",
+          "observation": {
+            "loads": 8,
+            "fixes": 4,
+            "errors": 1,
+            "watches": 2,
+            "releases": 2
+          }
+        }
+      ]
+    },
+    "maplibre-web": {
+      "status": "passed",
+      "sources": [
+        "web-maplibre-first.json"
+      ],
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "blocked": 0
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 10,
+            "featureCount": 1
+          }
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.33050727237014,
+              47.619492773674125
+            ],
+            "zoom": 11.591308510022687,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "gesture interruption and resume without another watch",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 2,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.3200928470651,
+              47.629981024729375
+            ],
+            "zoom": 11.998168410074287,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "browser geolocation success after activation",
+          "status": "passed",
+          "observation": {
+            "loads": 2,
+            "fixes": 3,
+            "errors": 0,
+            "watches": 1,
+            "releases": 1,
+            "center": [
+              -122.33030096260296,
+              47.619699065776445
+            ],
+            "zoom": 12.503642315369282,
+            "featureCount": 1
+          }
+        },
+        {
+          "name": "browser permission denial reaches the control error callback",
+          "status": "passed",
+          "observation": {
+            "observedError": true
+          }
+        },
+        {
+          "name": "retained incompatible drawing buffer rejects capture",
+          "status": "passed",
+          "observation": {
+            "explicitRejection": true
+          }
+        },
+        {
+          "name": "external incompatible drawing buffer rejects capture",
+          "status": "passed",
+          "observation": {
+            "explicitRejection": true
+          }
+        },
+        {
+          "name": "canvas export failure propagates",
+          "status": "passed",
+          "observation": {
+            "rejectedExport": true
+          }
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed",
+          "observation": {
+            "width": 1280,
+            "height": 713,
+            "red": 556,
+            "blue": 0,
+            "green": 0,
+            "navy": 912029,
+            "magenta": 0,
+            "scope": "backend",
+            "overlayInclusion": "green-host-overlay-excluded"
+          }
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed",
+          "observation": {
+            "scope": "renderer"
+          }
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed",
+          "observation": {
+            "loads": 8,
+            "fixes": 4,
+            "errors": 1,
+            "watches": 2,
+            "releases": 2
+          }
+        }
+      ]
+    },
+    "mapbox-android": {
+      "status": "failed",
+      "sources": [
+        "android-mapbox-readiness-retry.json"
+      ],
+      "counts": {
+        "passed": 11,
+        "failed": 1,
+        "blocked": 1
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1
+          }
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.33,
+              47.61999999999999
+            ],
+            "zoom": 12,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed",
+          "observation": {
+            "width": 1080,
+            "height": 2349,
+            "red": 4075,
+            "blue": 0,
+            "green": 0,
+            "navy": 2532685,
+            "magenta": 0,
+            "scope": "backend",
+            "overlayInclusion": "green-host-overlay-excluded"
+          }
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed",
+          "observation": {
+            "scope": "renderer"
+          }
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed",
+          "observation": {
+            "loads": 2,
+            "fixes": 2,
+            "errors": 0,
+            "watches": 2,
+            "releases": 2
+          }
+        },
+        {
+          "name": "native gesture interruption and resume without another watch",
+          "status": "passed",
+          "observation": {
+            "loads": 4,
+            "fixes": 4,
+            "errors": 0,
+            "watches": 3,
+            "releases": 2,
+            "center": [
+              -122.32,
+              47.62999999999999
+            ],
+            "zoom": 12,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "foreground permission boundary",
+          "status": "passed",
+          "observation": {
+            "status": "granted",
+            "accuracy": "precise",
+            "blocked": false
+          }
+        },
+        {
+          "name": "fresh native position from simulator injection",
+          "status": "passed",
+          "observation": {
+            "lngLat": [
+              -122.3299983,
+              47.6199983
+            ],
+            "timestamp": 1791955755518,
+            "accuracy": 2.75,
+            "altitude": 0,
+            "speed": 0
+          }
+        },
+        {
+          "name": "independent zero-zoom PNG dimensions and file output",
+          "status": "passed",
+          "observation": {
+            "dataUrl": {
+              "width": 96,
+              "height": 64,
+              "red": 164,
+              "blue": 0,
+              "green": 0,
+              "navy": 5067,
+              "magenta": 0
+            },
+            "file": {
+              "width": 96,
+              "height": 64,
+              "red": 164,
+              "blue": 0,
+              "green": 0,
+              "navy": 5067,
+              "magenta": 0
+            }
+          }
+        },
+        {
+          "name": "invalid snapshot style rejects before the facade deadline",
+          "status": "passed",
+          "observation": {
+            "elapsedMs": 202
+          }
+        },
+        {
+          "name": "snapshot pixel dimensions at a second Android density",
+          "status": "passed",
+          "observation": {
+            "density": 320,
+            "width": 128,
+            "height": 80,
+            "red": 164,
+            "blue": 0,
+            "green": 0,
+            "navy": 8628,
+            "magenta": 0
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "failed",
+          "error": "Offline pack returned invalid bounds."
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "blocked",
+          "reason": "Offline creation/lifecycle prerequisite failed."
+        }
+      ]
+    },
+    "mapbox-ios": {
+      "status": "failed",
+      "sources": [
+        "ios-mapbox-isolated-retry.json"
+      ],
+      "counts": {
+        "passed": 10,
+        "failed": 1,
+        "blocked": 1
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1
+          }
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.33,
+              47.61999999999999
+            ],
+            "zoom": 12,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed",
+          "observation": {
+            "width": 1206,
+            "height": 2283,
+            "red": 5344,
+            "blue": 1017,
+            "green": 0,
+            "navy": 2730834,
+            "magenta": 0,
+            "scope": "backend",
+            "overlayInclusion": "green-host-overlay-excluded"
+          },
+          "basis": "Exact saved native PNG reevaluated; see captureReevaluation."
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed",
+          "observation": {
+            "explicitRejection": true
+          }
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed",
+          "observation": {
+            "loads": 2,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 2,
+            "releases": 2
+          }
+        },
+        {
+          "name": "native gesture interruption and resume without another watch",
+          "status": "passed",
+          "observation": {
+            "before": {
+              "loads": 4,
+              "fixes": 2,
+              "errors": 0,
+              "watches": 3,
+              "releases": 2,
+              "center": [
+                -122.33,
+                47.61999999999999
+              ],
+              "zoom": 12,
+              "featureCount": 3
+            },
+            "afterDrag": {
+              "loads": 4,
+              "fixes": 2,
+              "errors": 0,
+              "watches": 3,
+              "releases": 2,
+              "center": [
+                -122.3552927,
+                47.639280500000034
+              ],
+              "zoom": 12,
+              "featureCount": 3
+            },
+            "afterResume": {
+              "loads": 4,
+              "fixes": 3,
+              "errors": 0,
+              "watches": 3,
+              "releases": 2,
+              "center": [
+                -122.32,
+                47.62999999999999
+              ],
+              "zoom": 12,
+              "featureCount": 3
+            }
+          }
+        },
+        {
+          "name": "foreground permission boundary",
+          "status": "passed",
+          "observation": {
+            "applicationIntegrationRequired": true
+          }
+        },
+        {
+          "name": "fresh native position from simulator injection",
+          "status": "passed",
+          "observation": {
+            "lngLat": [
+              -122.33,
+              47.62
+            ],
+            "timestamp": 1791957222000,
+            "accuracy": 5,
+            "altitude": 0
+          }
+        },
+        {
+          "name": "independent zero-zoom PNG dimensions and file output",
+          "status": "passed",
+          "observation": {
+            "dataUrl": {
+              "width": 96,
+              "height": 64,
+              "red": 159,
+              "blue": 0,
+              "green": 0,
+              "navy": 4969,
+              "magenta": 0
+            },
+            "file": {
+              "width": 96,
+              "height": 64,
+              "red": 159,
+              "blue": 0,
+              "green": 0,
+              "navy": 4969,
+              "magenta": 0
+            }
+          }
+        },
+        {
+          "name": "invalid snapshot style rejects before the facade deadline",
+          "status": "passed",
+          "observation": {
+            "elapsedMs": 402
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "failed",
+          "error": "Offline pack returned invalid bounds."
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "blocked",
+          "reason": "Offline creation/lifecycle prerequisite failed."
+        }
+      ]
+    },
+    "maplibre-android": {
+      "status": "failed",
+      "sources": [
+        "android-maplibre-isolated-retry.json",
+        "android-maplibre-offline-camera-retry.json"
+      ],
+      "counts": {
+        "passed": 11,
+        "failed": 2,
+        "blocked": 0
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1
+          }
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.33,
+              47.62000000000002
+            ],
+            "zoom": 12,
+            "featureCount": 6
+          }
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed",
+          "observation": {
+            "width": 1080,
+            "height": 2349,
+            "red": 4067,
+            "blue": 0,
+            "green": 0,
+            "navy": 2525612,
+            "magenta": 0,
+            "scope": "backend",
+            "overlayInclusion": "green-host-overlay-excluded"
+          }
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed",
+          "observation": {
+            "scope": "renderer"
+          }
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed",
+          "observation": {
+            "loads": 2,
+            "fixes": 2,
+            "errors": 0,
+            "watches": 2,
+            "releases": 2
+          }
+        },
+        {
+          "name": "native gesture interruption and resume without another watch",
+          "status": "passed",
+          "observation": {
+            "loads": 4,
+            "fixes": 4,
+            "errors": 0,
+            "watches": 3,
+            "releases": 2,
+            "center": [
+              -122.32,
+              47.62999999999999
+            ],
+            "zoom": 12,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "foreground permission boundary",
+          "status": "passed",
+          "observation": {
+            "status": "granted",
+            "accuracy": "precise",
+            "blocked": false
+          }
+        },
+        {
+          "name": "fresh native position from simulator injection",
+          "status": "failed",
+          "error": "Location acquisition timed out."
+        },
+        {
+          "name": "independent zero-zoom PNG dimensions and file output",
+          "status": "passed",
+          "observation": {
+            "dataUrl": {
+              "width": 96,
+              "height": 64,
+              "red": 164,
+              "blue": 0,
+              "green": 0,
+              "navy": 5944,
+              "magenta": 0
+            },
+            "file": {
+              "width": 96,
+              "height": 64,
+              "red": 164,
+              "blue": 0,
+              "green": 0,
+              "navy": 5944,
+              "magenta": 0
+            }
+          }
+        },
+        {
+          "name": "invalid snapshot style rejects before the facade deadline",
+          "status": "passed",
+          "observation": {
+            "elapsedMs": 402
+          }
+        },
+        {
+          "name": "snapshot pixel dimensions at a second Android density",
+          "status": "passed",
+          "observation": {
+            "density": 320,
+            "width": 128,
+            "height": 80,
+            "red": 164,
+            "blue": 0,
+            "green": 0,
+            "navy": 10040,
+            "magenta": 0
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-maplibre-android-1791957423256",
+              "backendId": "349d5062-6a2a-44d4-8ad0-a94019dc313e",
+              "metadata": {
+                "test": "tf08",
+                "backend": "maplibre-native"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-maplibre-android-1791957423256",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 5,
+              "completedResourceSize": 651,
+              "completedTileCount": 4,
+              "completedTileSize": 468,
+              "requiredResourceCount": 5
+            },
+            "subscriberEventsBeforeDuplicate": 12,
+            "subscriberEventsAfterDuplicate": 22,
+            "resourceRequests": 0
+          }
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "failed",
+          "error": "TF08 observation timed out."
+        }
+      ]
+    },
+    "maplibre-ios": {
+      "status": "failed",
+      "sources": [
+        "ios-maplibre-isolated-retry.json",
+        "ios-maplibre-offline-camera-retry.json"
+      ],
+      "counts": {
+        "passed": 9,
+        "failed": 3,
+        "blocked": 0
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.33999999999827,
+              47.60999999999254
+            ],
+            "zoom": 10,
+            "featureCount": 1
+          }
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.32999999999896,
+              47.619999999989474
+            ],
+            "zoom": 12,
+            "featureCount": 3
+          }
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed",
+          "observation": {
+            "width": 1206,
+            "height": 2283,
+            "red": 5343,
+            "blue": 1029,
+            "green": 0,
+            "navy": 2738216,
+            "magenta": 0,
+            "scope": "backend",
+            "overlayInclusion": "green-host-overlay-excluded"
+          }
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed",
+          "observation": {
+            "explicitRejection": true
+          }
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed",
+          "observation": {
+            "loads": 2,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 2,
+            "releases": 2
+          }
+        },
+        {
+          "name": "native gesture interruption and resume without another watch",
+          "status": "failed",
+          "error": "TF08 observation timed out."
+        },
+        {
+          "name": "foreground permission boundary",
+          "status": "passed",
+          "observation": {
+            "status": "granted",
+            "accuracy": "unknown"
+          }
+        },
+        {
+          "name": "fresh native position from simulator injection",
+          "status": "passed",
+          "observation": {
+            "lngLat": [
+              -122.33,
+              47.62
+            ],
+            "timestamp": 1791957065914.746,
+            "accuracy": 5
+          }
+        },
+        {
+          "name": "independent zero-zoom PNG dimensions and file output",
+          "status": "failed",
+          "error": "Image renderer returned an invalid temporary file URI."
+        },
+        {
+          "name": "invalid snapshot style rejects before the facade deadline",
+          "status": "passed",
+          "observation": {
+            "elapsedMs": 402
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-maplibre-ios-1791957547135",
+              "backendId": "2da15f76-cd72-4b9f-9356-33fe734382c6",
+              "metadata": {
+                "test": "tf08",
+                "backend": "maplibre-native"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-maplibre-ios-1791957547135",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 5,
+              "completedResourceSize": 651,
+              "completedTileCount": 4,
+              "completedTileSize": 468,
+              "requiredResourceCount": 5
+            },
+            "subscriberEventsBeforeDuplicate": 8,
+            "subscriberEventsAfterDuplicate": 16,
+            "resourceRequests": 0
+          }
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "failed",
+          "error": "TF08 observation timed out."
+        }
+      ]
+    }
+  },
+  "confirmedTranslationFailures": [
+    {
+      "environments": [
+        "mapbox-android",
+        "mapbox-ios"
+      ],
+      "error": "Offline pack returned invalid bounds.",
+      "basis": "Pinned native createPack returns serialized GeoJSON point-pair bounds. offlineBounds only accepts a four-number array, so createPack rejects a pack already created by the backend.",
+      "code": "packages/one-map-react/src/adapters/shared/offline-service.ts:349"
+    },
+    {
+      "environments": [
+        "maplibre-ios"
+      ],
+      "error": "Image renderer returned an invalid temporary file URI.",
+      "basis": "Pinned MLRNImageUtils.createTempFile returns an absolute filesystem path. The facade requires file:// without adapting this peer result. Data-URL96x64 zero-zoom PNG passed before the file rejection.",
+      "code": "packages/one-map-react/src/adapters/shared/image-output.ts:67"
+    }
+  ],
+  "unresolvedRuntimeFailures": [
+    "MapLibre Android fresh location acquisition timed out despite foreground permission and simulator-injected fixes.",
+    "MapLibre iOS gesture interruption/resume timed out; the failing phase and library-versus-XCTest cause are not established.",
+    "Both MapLibre platforms completed persisted pack status but timed out loading/readback after cold restart with fixture style/tile delivery disabled, including frozen scoped retries. Successful offline rendering was not established."
+  ],
+  "unverified": [
+    "Physical-device authorization, permission revocation and sensor/course behavior.",
+    "A second iOS display density.",
+    "Global device network shutdown: fixture resource delivery returned503 while local command/Metro transport remained available.",
+    "All named cache/tile-store/legacy-manager operations and full host-overlay/ornament/puck inclusion combinations.",
+    "Pause/resume/invalidation calls and observer completion were exercised; live-download resource cancellation/byte behavior was not independently measured."
+  ],
+  "routineHarnessChecks": {
+    "status": "passed",
+    "exampleTypes": [
+      "tsconfig.examples.web.json",
+      "tsconfig.examples.native.json"
+    ],
+    "nativeSelectorCases": 7,
+    "imageClassifierRegressionCases": 4,
+    "runnerSyntax": "passed",
+    "swiftParse": "passed",
+    "formatting": "passed:218 files",
+    "documentation": "passed:31 Markdown files,32 SDK comparison tables",
+    "diffWhitespace": "passed"
+  },
+  "cleanup": {
+    "runtimeProcesses": "Owned runners exited and ports8081/8798/8799 verified clear. Android pidof returned no test-app process. Coordinator verified simulator availability and simctl termination returned found nothing to terminate for both iOS bundles.",
+    "offline": "Each run attempts deletion by its own pack ID; no offline database reset. Earlier runs before direct-delete fixture correction may have retained a test-owned Mapbox pack; removal of all prior test-owned regions is not proven.",
+    "storage": "Compact outcomes and hashes retained. Current test-derived native build/app build outputs were removed after preserving verified binaries temporarily. Temporary APK/app copies, downloaded Bun, raw logs, and resolved capture diagnostic PNG removed after evidence verification. Existing development dependencies, small pre-existing/uncertain build folders, installed development apps, and active emulator resources retained."
+  }
+}

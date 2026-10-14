@@ -24,7 +24,7 @@
     },
   },
   "patchedDependencies": {
-    "@rnmapbox/maps@10.3.7": "../../packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+    "@rnmapbox/maps@10.3.7": "../../packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
   },
   "overrides": {
     "react-dom": "19.2.3",

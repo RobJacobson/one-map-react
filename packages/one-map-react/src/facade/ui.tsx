@@ -90,7 +90,6 @@ export const GeolocateControl = (props: GeolocateControlProps) => {
   const { GeolocateControl: Implementation } = useSelectedAdapter();
   useStableOptions("GeolocateControl", {
     position: props.position,
-    trackUserLocation: props.trackUserLocation,
   });
   return <Implementation {...props} />;
 };

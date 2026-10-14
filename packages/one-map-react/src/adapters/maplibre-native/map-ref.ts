@@ -55,8 +55,14 @@ export const createMaplibreMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapRef: { readonly current: ComponentRef<typeof MaplibreMap> | null },
   mapLoaded: { readonly current: boolean },
-  sources: MaplibreSourceRegistry
+  sources: MaplibreSourceRegistry,
+  capture?: MapRef["capture"]
 ): MapRef => ({
+  capture:
+    capture ??
+    (async () => {
+      throw new Error("Capture is not enabled on this map.");
+    }),
   jumpTo: async (options) => {
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current, mapLoaded.current);

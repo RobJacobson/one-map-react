@@ -14,6 +14,7 @@ import type { MapRef } from "../../contracts/camera-types.js";
 import type { ClickEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { MapStyle } from "../../contracts/style-types.js";
+import { useMapCapture } from "../shared/map-capture.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding, toFlatBounds } from "../shared/wrapper-values.js";
@@ -52,6 +53,7 @@ export const createWebMap = <
     (
       {
         mapStyle,
+        captureEnabled = false,
         interactiveLayerIds,
         hostProps,
         initialViewState,
@@ -109,6 +111,7 @@ export const createWebMap = <
       ref
     ) => {
       const mapRef = useRef<WebMapHandle | null>(null);
+      const capture = useMapCapture(captureEnabled);
       const [styleMap, setStyleMap] = useState<StyleLoadTarget | null>(null);
       const styleKey = useMemo(() => styleContentKey(mapStyle), [mapStyle]);
       const frozenViewState = useFrozenValue(initialViewState);
@@ -147,7 +150,24 @@ export const createWebMap = <
         setStyleMap((current) => (current === next ? current : next));
       }, []);
 
-      useImperativeHandle(ref, () => createWebMapRef(mapRef, wrapper));
+      useImperativeHandle(ref, () =>
+        createWebMapRef(mapRef, wrapper, async (options) => {
+          if (options.output === "file")
+            throw new Error("Browser capture cannot return a native file URI.");
+          const canvas = mapRef.current?.getMap().getCanvas?.();
+          if (!canvas) throw new Error("Renderer canvas is unavailable.");
+          const context =
+            canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+          if (!context?.getContextAttributes()?.preserveDrawingBuffer)
+            throw new Error(
+              "Capture needs a preserved drawing buffer. Create a fresh capture-enabled map or provide a compatible context."
+            );
+          capture.layout(canvas.width, canvas.height);
+          return capture.run(options, async () =>
+            canvas.toDataURL("image/png")
+          );
+        })
+      );
 
       // Mapbox can emit load before react-map-gl commits its imperative handle.
       // Deliver the callback after attachment so camera operations are usable.
@@ -234,6 +254,17 @@ export const createWebMap = <
         return () => handler.enableRotation();
       }, [styleMap, touchRotate, touchZoom]);
 
+      useLayoutEffect(() => {
+        if (!captureEnabled || !styleMap) return;
+        const frame = () => {
+          const canvas = styleMap.getCanvas?.();
+          if (canvas) capture.layout(canvas.width, canvas.height);
+          capture.frame();
+        };
+        styleMap.on("render", frame);
+        styleMap.triggerRepaint?.();
+        return () => styleMap.off("render", frame);
+      }, [styleMap, captureEnabled, capture]);
       assertWebLongPress(onLongPress);
 
       const hadPadding = useRef(false);
@@ -284,6 +315,11 @@ export const createWebMap = <
               maxBounds === undefined ? undefined : toFlatBounds(maxBounds)
             }
             style={{ width: "100%", height: "100%" }}
+            {...(captureEnabled
+              ? wrapper.backend === "mapbox-web"
+                ? { preserveDrawingBuffer: true }
+                : { canvasContextAttributes: { preserveDrawingBuffer: true } }
+              : {})}
             reuseMaps={reuseMaps}
             gl={gl}
             {...toWebGestureProps({
@@ -307,6 +343,7 @@ export const createWebMap = <
               else pendingLoad.current = true;
             }}
             onError={(event) => {
+              capture.fail(event.error);
               reportError({ error: event.error });
             }}
             onResize={() => {

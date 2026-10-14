@@ -5,9 +5,12 @@ import type {
 } from "react";
 
 import type { MapRef } from "./camera-types.js";
+import type { StaticMapImageService } from "./capture-types.js";
 import type { ImagesProps } from "./images-types.js";
 import type { LayerProps } from "./layer-types.js";
+import type { LocationService } from "./location-types.js";
 import type { MapProps } from "./map-types.js";
+import type { OfflineService } from "./offline-types.js";
 import type { SourceProps } from "./source-types.js";
 import type {
   AttributionControlProps,
@@ -20,6 +23,16 @@ import type {
   PopupProps,
   ScaleControlProps,
 } from "./ui-types.js";
+
+/** App-level services independent of map attachment. */
+export interface MapServices {
+  /** Explicit foreground acquisition. */
+  readonly location: LocationService;
+  /** Native persistent download manager when implemented. */
+  readonly offline?: OfflineService;
+  /** Independent native snapshotter when implemented. */
+  readonly staticMapImage?: StaticMapImageService;
+}
 
 /** Explicit engine and host selection; native covers both iOS and Android. */
 export type Backend =
@@ -37,6 +50,8 @@ export type Backend =
 export interface Adapter {
   /** Backend chosen by application setup, independently of installed packages. */
   readonly backend: Backend;
+  /** Device and storage services; reading this record starts no work. */
+  readonly services: MapServices;
   /** Map container, camera, commands, and movement events. */
   readonly Map: ForwardRefExoticComponent<MapProps & RefAttributes<MapRef>>;
   /** Source that nests child layers. */

@@ -41,8 +41,14 @@ export const createWebMapRef = (
   mapRef: {
     readonly current: WebMapHandle | null;
   },
-  wrapper: WebWrapper<Extract<Backend, "mapbox-web" | "maplibre-web">>
+  wrapper: WebWrapper<Extract<Backend, "mapbox-web" | "maplibre-web">>,
+  capture?: MapRef["capture"]
 ): MapRef => ({
+  capture:
+    capture ??
+    (async () => {
+      throw new Error("Capture is not enabled on this map.");
+    }),
   jumpTo: async (options) => {
     rejectJumpTiming(options);
     const map = requireWebMap(mapRef.current);

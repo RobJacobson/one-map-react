@@ -1,0 +1,306 @@
+{
+  "stage": "TF08",
+  "status": "implemented-reviewed-routine-passed-acceptance-failed",
+  "baselineRevision": "2fcdddf",
+  "recordedLocalDate": "2026-10-13",
+  "authorization": "Implement following the proposal; run routine checks; do not run runtime acceptance until separately authorized.",
+  "implementation": {
+    "record": "docs/tf08-location-offline-capture.md",
+    "proposal": "docs/tf08-proposal.md",
+    "sourceScope": "Location service and supplied-position display; composed/native follow; native packs and named tile/cache APIs; current-map PNG capture; independent native images; explicit selected exports; wrapper patches.",
+    "coverage": {
+      "mappedEntries": 541,
+      "mappedHistoricalFamilies": {
+        "S30": 52,
+        "S32": 23,
+        "S36": 14,
+        "S31": 67,
+        "S34": 134,
+        "S35-maplibre-cache": 6,
+        "S37": 74,
+        "S35": 6,
+        "S33": 165
+      },
+      "deferredToTF09": [
+        "web:web.mapbox.SourceProps.canvas",
+        "web:web.maplibre.MapOptions.maxCanvasSize",
+        "web:web.maplibre.MapProps.maxCanvasSize",
+        "web:web.maplibre.Renderer.MapOptions.maxCanvasSize"
+      ],
+      "meaning": "Counts include fields/types/aliases and named forwarding; they are not runtime compatibility measurements."
+    },
+    "additionalRoutineScope": "Native example permission declarations are tested as XML transformations only; native generator was not executed."
+  },
+  "routine": {
+    "status": "passed",
+    "jest": {
+      "suites": 28,
+      "tests": 602,
+      "tf08FocusedTests": 55,
+      "additionalBrowserTrackingCleanupRegression": 1,
+      "result": "passed"
+    },
+    "packageSelections": {
+      "count": 13,
+      "result": "passed",
+      "artifactSha256": "c4e3d4be23ff7cd1a36224bde9e9255d59e5f14e2839bd64d6cf5008b1480fcc"
+    },
+    "selectedPeers": {
+      "result": "passed",
+      "scope": "All four explicit peer consumers on the reviewed export/declaration surface. Final local scoped-service cleanup preserves that surface."
+    },
+    "exampleResolution": {
+      "result": "passed",
+      "scope": "Sibling RouteMap web bundle; shared TF08 scene also checked in web/native TypeScript configurations."
+    },
+    "initialFailures": [
+      {
+        "check": "Existing mocks and packed-export assertions",
+        "result": "Old fixtures/whitelist lacked new services or exports; compatibility mock fields and export assertions updated; tests passed."
+      },
+      {
+        "check": "Native AppState fixture",
+        "result": "Mock lacked an active state; corrected the fixture; native lifecycle tests passed."
+      },
+      {
+        "check": "Aggregate routine cleanup",
+        "result": "Sandbox EPERM in tiny process-group cleanup test; scoped routine validation retry passed with process signaling permission. No renderer involved."
+      }
+    ],
+    "commands": [
+      "bun run validate",
+      "bun run typecheck",
+      "bunx --no-install jest --runInBand --silent",
+      "bun run test:package",
+      "bun run test:peers",
+      "bun run test:example-resolution",
+      "bun run check",
+      "bun run check:docs",
+      "git diff --check"
+    ],
+    "formatting": {
+      "result": "passed",
+      "files": 212
+    },
+    "documentation": {
+      "result": "passed",
+      "files": 31,
+      "comparisonTables": 32
+    },
+    "nativeSourceChecks": "Installed RNMapbox zero-zoom constructor executed with mocks; MapLibre native failure/cleanup and scale source assertions passed. Native compilation was not run.",
+    "tooling": {
+      "bun": "1.4.1",
+      "node": "24.19.0",
+      "typescript": "7.0.2",
+      "biome": "2.5.15"
+    }
+  },
+  "runtime": {
+    "status": "unverified-awaiting-user-authorization",
+    "executed": false,
+    "nativeBuilds": false,
+    "nativeInstallations": false,
+    "browserRenderers": false,
+    "metroTransport": false,
+    "devices": false,
+    "serviceDownloads": false
+  },
+  "acceptanceGates": [
+    "Native peer patches compile and link on both OS targets",
+    "Capture inclusion and strict renderer scope per backend",
+    "Independent image pixel dimensions at multiple densities and failed native snapshots",
+    "Bounded offline resources survive restart and render with networking disabled",
+    "Permission denial/revocation/approximate access and fresh physical location/course behavior",
+    "Native follow gesture interruption, SDK modes, and callback cleanup"
+  ],
+  "decisions": {
+    "locationCancellation": "Optional portable abort signal provides concrete control/setup-owned acquisition cleanup, without a general dispatcher. Bare one-shot injection has no cancellation facility; late results are suppressed.",
+    "iosMapboxPermission": "Default explicit permission request rejects with application integration guidance; no permission bridge was invented.",
+    "captureScope": "Backend scope preserves wrapper contents; strict renderer scope explicitly rejects iOS view-hierarchy capture.",
+    "nativePatches": "Published peer patches and application lockfile registration; source/mocked validation only.",
+    "historicalStageLedger": "records/stage-status.json remains historical; current stage status is recorded here and in docs/stage-plan.md."
+  },
+  "retention": "Routine consumer folders were removed by their scripts. Temporary Bun download/runtime and raw task logs/scripts removed after recording compact results. Library build output and installed selected dependencies retained for development.",
+  "review": {
+    "status": "complete",
+    "scope": [
+      "Provider precedence, explicit acquisition, freshness and unit conversion",
+      "Individually owned watch cleanup, cancellation before dispatch, callback-triggered teardown, and follow interruption",
+      "Persistent pack identity, missing versus failed lookups, observer fan-out, completion/resume, stale callbacks, and partial creation recovery",
+      "Capture enablement, actual drawing-buffer attributes, readiness, deadline, detach, PNG validation, and native scope differences",
+      "Independent images and pinned patch prerequisites",
+      "Common/selected explicit exports, optional peers, generated-example permission declarations, documentation and coverage scope"
+    ],
+    "runtimeClaims": "No new runtime, sensor, device, service, or native compilation claim."
+  },
+  "peerPatches": {
+    "rnmapbox-10.3.7-tf08.patch": "b10b8180712e287f89a5f81c9bff7c4533cff0f23b51c873709030997a4065b2",
+    "maplibre-native-11.5.0-tf08.patch": "2dbc046e0ab212ce2b5795d25664300ebc99c1dd73fefb7d7def85d8b362a700"
+  },
+  "auditFollowUp": {
+    "recordedLocalDate": "2026-10-13",
+    "authorization": "User requested fixes for all five TF08 code-audit findings. Routine verification only; renderer/device acceptance remains separately gated.",
+    "status": "fixed-routine-passed-runtime-held",
+    "correctedFindings": [
+      "RNMapbox iOS and Android status readback constructs a response without replacing the native pack or losing cancellation handles.",
+      "MapLibre Android observer attachment preserves download state; creation and explicit resume retain activation.",
+      "Default browser GeolocateControl rejects tracking against authoritative viewState before SDK delegation.",
+      "Resumed camera errors share acquisition cleanup and generation guards; retired errors are suppressed and active failures permit a fresh retry.",
+      "RNMapbox iOS heading-only updates retain acquisition under its original deadline; malformed geographic fixes still fail."
+    ],
+    "routine": {
+      "status": "passed",
+      "jest": {
+        "suites": 28,
+        "tests": 612,
+        "tf08FocusedTests": 65,
+        "addedRegressions": 10
+      },
+      "typecheck": {
+        "configurations": 4,
+        "result": "passed"
+      },
+      "formatting": {
+        "files": 212,
+        "result": "passed"
+      },
+      "documentation": {
+        "files": 31,
+        "comparisonTables": 32,
+        "result": "passed"
+      },
+      "build": {
+        "result": "passed"
+      },
+      "packageSelections": {
+        "count": 13,
+        "result": "passed",
+        "artifactSha256": "a9fcb28c1ee20ce99a83c7d7a7e34b8cd308dcd2632361663d540f593238451e"
+      },
+      "peerPatchChecks": {
+        "result": "passed",
+        "scope": "Native source assertions cover RNMapbox status responses retaining live pack ownership and MapLibre observation without activation. Both published patches reverse/apply cleanly and reproduce installed peer files. Snapshot constructor and image patch source checks also pass. No native compilation or execution."
+      },
+      "scriptChecks": {
+        "result": "passed",
+        "scope": "All existing routine script checks, including owned-child process cleanup under Node and Bun. No renderer processes."
+      },
+      "commands": [
+        "bun run check",
+        "bun run check:docs",
+        "bun run typecheck",
+        "bun x --no-install jest --runInBand --silent",
+        "bun run test:package",
+        "bun scripts/tf08-patches.test.mjs",
+        "Existing routine scripts listed in package.json test, including native-smoke-process.test.mjs under Node and Bun",
+        "git diff --check"
+      ],
+      "initialFailures": [
+        "New regression fixtures omitted required initialViewState and typed native payload casts; fixtures corrected and all four type configurations passed.",
+        "New native source check used a method boundary that precedes resumePackDownload; corrected to the following mergeOfflineRegions boundary and patch checks passed."
+      ],
+      "impactReview": {
+        "notRepeated": [
+          "bun run test:peers",
+          "bun run test:example-resolution"
+        ],
+        "reason": "Exports, public declarations, selected peer versions, and shared example imports are unchanged. The current package passed thirteen isolated selections and all shared examples passed TypeScript checks. Earlier peer-installation and example-bundling outcomes remain attached to their original artifact."
+      }
+    },
+    "peerPatches": {
+      "rnmapbox-10.3.7-tf08.patch": "a2b146e05d8ec6ae51cf24681b9b14618a5a481e282a2406572088bf250d0a4e",
+      "maplibre-native-11.5.0-tf08.patch": "16d186536781b3f10d4e16fbb1118d99d60662f4da2b8c2e2dedfe3667cede2f"
+    },
+    "runtime": {
+      "status": "unverified-awaiting-user-authorization",
+      "executed": false,
+      "nativeBuilds": false,
+      "nativeInstallations": false,
+      "browserRenderers": false,
+      "devices": false,
+      "serviceDownloads": false
+    },
+    "applicationAction": "Reapply the updated selected TF08 peer patch through the consuming application package manager and rebuild before native acceptance.",
+    "retention": "Only compact evidence retained; temporary patch verification trees and the downloaded Bun runtime removed after checks. Installed peer sources and library build output retained for development."
+  },
+  "observerAuditFollowUp": {
+    "recordedLocalDate": "2026-10-13",
+    "authorization": "Fix all three TF08 findings and add regression tests. Run routine checks only.",
+    "status": "fixed-routine-passed-runtime-held",
+    "correctedFindings": [
+      "Duplicate offline creation rejects without releasing an existing pack's progress/error observer; failed creation still releases its own observer and preserves persisted packs for recovery.",
+      "Resume and invalidation refresh observation after native dispatch, recovering listeners retired by completion during preparatory status readback and observing fast completion through status.",
+      "MapSetup registers watch disposal before invoking the provider and releases a returned watch if a synchronous position/error callback already unmounted the setup."
+    ],
+    "routine": {
+      "status": "passed",
+      "regressions": {
+        "added": 7,
+        "beforeFixes": "Six new cases failed on the audited implementation, reproducing all three findings; the partial-create recovery case passed.",
+        "afterFixes": "All new cases passed, including progress/error delivery after duplicate rejection and restart, partial-create recovery, synchronous callback teardown, stale-callback suppression, and idempotent disposal."
+      },
+      "jest": {
+        "suites": 28,
+        "tests": 619,
+        "tf08FocusedTests": 72,
+        "result": "passed"
+      },
+      "typecheck": {
+        "configurations": 4,
+        "result": "passed"
+      },
+      "formatting": {
+        "files": 212,
+        "result": "passed"
+      },
+      "documentation": {
+        "files": 31,
+        "comparisonTables": 32,
+        "result": "passed"
+      },
+      "build": {
+        "result": "passed"
+      },
+      "packageSelections": {
+        "count": 13,
+        "result": "passed",
+        "artifactSha256": "46f9576ba23f833a3f9fbf40309f050fd1902196ecc146e2af33859458e7a309"
+      },
+      "peerPatchAndPermissionChecks": {
+        "result": "passed",
+        "scope": "Patch application/source checks, mocked snapshot-option execution, and permission XML transformations; no native compilation or execution."
+      },
+      "commands": [
+        "node node_modules/jest/bin/jest.js --runInBand --silent",
+        "node node_modules/jest/bin/jest.js --runInBand --testPathPattern=tf08",
+        "node node_modules/typescript/bin/tsc --noEmit for tsconfig.json, tsconfig.test.json, tsconfig.examples.web.json, and tsconfig.examples.native.json",
+        "node node_modules/@biomejs/biome/bin/biome check .",
+        "node scripts/check-docs.mjs",
+        "node scripts/tf08-patches.test.mjs",
+        "node scripts/native-location-permissions.test.mjs",
+        "node scripts/build.mjs",
+        "node scripts/test-package.mjs with temporary Bun 1.4.1",
+        "git diff --check"
+      ],
+      "impactReview": "Public exports, declarations, selected peers, native patches, and example imports are unchanged. Peer installation, example bundling, and unrelated script checks were not repeated; current package selections and all example type configurations passed."
+    },
+    "runtime": {
+      "status": "unverified-awaiting-user-authorization",
+      "executed": false,
+      "nativeBuilds": false,
+      "nativeInstallations": false,
+      "browserRenderers": false,
+      "devices": false,
+      "serviceDownloads": false
+    },
+    "retention": "Only compact evidence retained. Temporary Bun tooling and packed consumers removed; installed dependencies and library build output retained for development."
+  },
+  "acceptance": {
+    "authorization": "Run acceptance tests",
+    "status": "failed",
+    "record": "records/evidence/tf08-acceptance.json",
+    "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
+    "previousRoutineOnlyRecords": "Preserved as recorded checkpoint history; later authorization supersedes the runtime hold."
+  },
+  "initialCheckpointStatus": "implemented-reviewed-routine-passed-runtime-held"
+}

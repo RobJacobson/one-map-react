@@ -1,0 +1,114 @@
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
+@@ -56,6 +56,13 @@
+         }
+     }
+ 
++    override fun onDropViewInstance(view: T) {
++        // Retired view identifiers must not accumulate in the manager cache.
++        val prefix = "${view.id}-"
++        mRateLimitedEvents.keys.removeAll { it.startsWith(prefix) }
++        super.onDropViewInstance(view)
++    }
++
+     override fun addEventEmitters(context: ThemedReactContext, view: T) {
+         mEventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(context, view.id)
+     }
+@@ -76,7 +83,9 @@
+     }
+ 
+     private fun getEventCacheKey(event: IEvent): String {
+-        return String.format("%s-%s", event.key, event.type)
++        // A manager serves multiple maps. Throttle each native view separately
++        // so one map cannot suppress another map's load, source or input event.
++        return String.format("%s-%s-%s", event.iD, event.key, event.type)
+     }
+ 
+     companion object {
+diff --git a/src/modules/snapshot/SnapshotOptions.ts b/src/modules/snapshot/SnapshotOptions.ts
+--- a/src/modules/snapshot/SnapshotOptions.ts
++++ b/src/modules/snapshot/SnapshotOptions.ts
+@@ -40,7 +40,7 @@
+     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
+     this.heading = options.heading || 0.0;
+     this.pitch = options.pitch || 0.0;
+-    this.zoomLevel = options.zoomLevel || 16.0;
++    this.zoomLevel = options.zoomLevel ?? 16.0;
+     this.width = options.width || 50.0;
+     this.height = options.height || 50.0;
+     this.writeToDisk = options.writeToDisk || false;
+diff --git a/lib/module/modules/snapshot/SnapshotOptions.js b/lib/module/modules/snapshot/SnapshotOptions.js
+--- a/lib/module/modules/snapshot/SnapshotOptions.js
++++ b/lib/module/modules/snapshot/SnapshotOptions.js
+@@ -12,7 +12,7 @@
+     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
+     this.heading = options.heading || 0.0;
+     this.pitch = options.pitch || 0.0;
+-    this.zoomLevel = options.zoomLevel || 16.0;
++    this.zoomLevel = options.zoomLevel ?? 16.0;
+     this.width = options.width || 50.0;
+     this.height = options.height || 50.0;
+     this.writeToDisk = options.writeToDisk || false;
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
+--- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
+@@ -139,7 +139,7 @@
+             )
+         )
+         builder.pixelRatio(
+-            java.lang.Float.valueOf(mContext.resources.displayMetrics.density).toInt().toFloat()
++            1.0f // Snapshot width/height are requested PNG pixels, independent of density.
+         )
+         builder.accessToken(getAccessToken(mContext))
+         return builder.build()
+diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.swift b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
+--- a/ios/RNMBX/Offline/RNMBXOfflineModule.swift
++++ b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
+@@ -208,13 +208,15 @@
+             DispatchQueue.main.async {
+               switch result {
+               case .success(let metadata):
+-                let pack = TileRegionPack(
+-                  name: name,
+-                  progress: self.toProgress(region: region),
+-                  metadata: logged("RNMBXOfflineModule.getPackStatus") { metadata as? [String:Any] } ?? [:]
++                // Status readback must preserve the live pack's cancellation handles.
++                resolver(
++                  self._makeRegionStatusPayload(
++                    name,
++                    progress: self.toProgress(region: region),
++                    state: self.tileRegionPacks[name]?.state ?? .unknown,
++                    metadata: logged("RNMBXOfflineModule.getPackStatus") { metadata as? [String:Any] } ?? [:]
++                  )
+                 )
+-                self.tileRegionPacks[name] = pack
+-                resolver(self._makeRegionStatusPayload(pack: pack))
+               case .failure(let error):
+                 Logger.log(level:.error, message: "Unable to fetch metadata for \(name)")
+                 rejecter("RNMBXOfflineModule.getPackStatus", error.localizedDescription, error)
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
+--- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
+@@ -180,13 +180,15 @@
+                 val region = it
+                 tileStore.getTileRegionMetadata(name) { expected ->
+                     expected.value?.also {
+-                        val pack = TileRegionPack(
+-                            name= name,
+-                            progress= toProgress(region),
+-                            metadata= toJSONObjectSupportingLegacyMetadata(it) ?: JSONObject()
++                        // Status readback must preserve the live pack's cancellation handle.
++                        promise.resolve(
++                            _makeRegionStatusPayload(
++                                name,
++                                toProgress(region),
++                                tileRegionPacks[name]?.state ?: TileRegionPackState.UNKNOWN,
++                                toJSONObjectSupportingLegacyMetadata(it) ?: JSONObject()
++                            )
+                         )
+-                        tileRegionPacks[name] = pack
+-                        promise.resolve(_makeRegionStatusPayload(pack))
+                     } ?: run {
+                         promise.reject(LOG_TAG, expected.error!!.message)
+                     }

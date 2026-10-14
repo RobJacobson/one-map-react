@@ -1,4 +1,4 @@
-import type { MapView } from "@rnmapbox/maps";
+import type { MapView, Camera as WrapperCamera } from "@rnmapbox/maps";
 import type {
   ComponentProps,
   ComponentType,
@@ -39,7 +39,20 @@ export type {
 } from "./adapters/shared/native-ui.js";
 
 /** Selected native map with typed renderer facilities and host attributes. */
+/** Selected SDK location follow options, applied to the existing camera. */
+export type NativeLocationOptions = Pick<
+  ComponentProps<typeof WrapperCamera>,
+  | "followUserLocation"
+  | "followUserMode"
+  | "followZoomLevel"
+  | "followPitch"
+  | "followHeading"
+  | "onUserTrackingModeChange"
+>;
+
 export interface NativeMapProps extends MapProps {
+  /** SDK follow facilities; conflicts with authoritative viewState/common follow. */
+  readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
   readonly hostProps?: ViewProps;
   /** Selected renderer options; facade-owned fields take precedence. */
@@ -100,3 +113,16 @@ export {
 export const Popup = SharedPopup as ComponentType<NativePopupProps>;
 /** Corner control with owned native host attributes and style. */
 export const Control = SharedControl as ComponentType<NativeControlProps>;
+
+export {
+  CustomLocationProvider,
+  LocationPuck,
+  locationManager as WrapperLocationManager,
+  NativeUserLocation,
+  offlineManager as WrapperOfflineManager,
+  offlineManagerLegacy,
+  requestAndroidLocationPermissions,
+  snapshotManager as WrapperSnapshotManager,
+  TileStore,
+  UserLocation as WrapperUserLocation,
+} from "@rnmapbox/maps";

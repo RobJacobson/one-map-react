@@ -54,7 +54,10 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
   const { Map: AdapterMap, backend } = useSelectedAdapter();
   const registry = useMapRegistry();
   const overlayHostName = useId();
-  useStableOptions("Map", { id: props.id });
+  useStableOptions("Map", {
+    id: props.id,
+    captureEnabled: props.captureEnabled ?? false,
+  });
   const mapRef = useRef<MapRef | null>(null);
   const [ready, setReady] = useState(false);
   const [observedCamera, setCamera] = useState(props.initialViewState);
@@ -219,11 +222,14 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
     },
     []
   );
+  const nativeLocationFollowing = selectedLocationFollowing(props);
   const session = useMemo<MapSession>(
     () => ({
       ref: mapRef,
       map: proxy,
       ready,
+      cameraControlled: props.viewState !== undefined,
+      nativeLocationFollowing,
       viewState: props.viewState ?? observedCamera,
       minZoom: props.minZoom,
       maxZoom: props.maxZoom,
@@ -243,6 +249,7 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
     [
       ready,
       props.viewState,
+      nativeLocationFollowing,
       observedCamera,
       props.minZoom,
       props.maxZoom,
@@ -344,3 +351,21 @@ const createDeferredMapRef = (ref: { current: MapRef | null }): MapRef =>
         return method(...args);
       },
   });
+
+/** Only reports the selected follow request; adapter types own its fields. */
+const selectedLocationFollowing = (props: MapProps): boolean => {
+  if (
+    !("locationOptions" in props) ||
+    !props.locationOptions ||
+    typeof props.locationOptions !== "object"
+  )
+    return false;
+  const options = props.locationOptions as {
+    followUserLocation?: boolean;
+    trackUserLocation?: unknown;
+  };
+  return (
+    options.followUserLocation === true ||
+    options.trackUserLocation !== undefined
+  );
+};

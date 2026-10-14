@@ -4,6 +4,8 @@ one-map-react is being built as a thin React facade over RNMapbox, MapLibre Reac
 
 **Current status: TF02–TF07 are implemented, and the authorized R16 renderer acceptance passed across all six environments for the recorded exercised scope.** TF07 includes markers, explicit static annotations, popups, controls, source clicks, and `useMap`; full VoiceOver and TalkBack audits are outside this checkpoint. Mapbox Android's opening camera retains the pinned `@rnmapbox/maps` 10.3.7 cold-style-cache behavior. Web `reuseMaps` uses the react-map-gl pool; native remounts create a new map. See the [stage plan](docs/stage-plan.md) and [TF07 record](docs/tf07-ui.md) for implementation and acceptance status.
 
+TF08 implements location/offline/capture APIs. Its authorized acceptance passed on both browsers and exposed native offline, file-output, and location/gesture failures. See [the TF08 record](docs/tf08-location-offline-capture.md) for the exercised scope and remaining work.
+
 ## Development
 
 Use Bun 1.4.1 and Node.js 24 (verified with 24.14.0). The build uses TypeScript 7.0.2 and formatting uses Biome 2.5.15. Wrapper packages are root development dependencies so the library typechecks against real declarations; they remain optional peers of the published package.

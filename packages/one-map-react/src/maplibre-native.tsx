@@ -1,4 +1,7 @@
-import type { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
+import type {
+  Map as MaplibreMap,
+  Camera as WrapperCamera,
+} from "@maplibre/maplibre-react-native";
 import type {
   ComponentProps,
   ComponentType,
@@ -34,7 +37,15 @@ export type {
 } from "./adapters/shared/native-ui.js";
 
 /** Selected native map with typed renderer facilities and host attributes. */
+/** Selected SDK location follow options, applied to the existing camera. */
+export type NativeLocationOptions = Pick<
+  ComponentProps<typeof WrapperCamera>,
+  "trackUserLocation" | "onTrackUserLocationChange"
+>;
+
 export interface NativeMapProps extends MapProps {
+  /** SDK follow facilities; conflicts with authoritative viewState/common follow. */
+  readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
   readonly hostProps?: ViewProps;
   /** Selected renderer options; facade-owned fields take precedence. */
@@ -97,3 +108,12 @@ export {
 export const Popup = SharedPopup as ComponentType<NativePopupProps>;
 /** Corner control with owned native host attributes and style. */
 export const Control = SharedControl as ComponentType<NativeControlProps>;
+
+export {
+  LocationManager as WrapperLocationManager,
+  NativeUserLocation,
+  OfflineManager as WrapperOfflineManager,
+  StaticMapImageManager as WrapperStaticMapImageManager,
+  UserLocation as WrapperUserLocation,
+  useCurrentPosition as useWrapperCurrentPosition,
+} from "@maplibre/maplibre-react-native";

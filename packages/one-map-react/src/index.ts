@@ -1,4 +1,4 @@
-export type { Adapter, Backend } from "./contracts/adapter.js";
+export type { Adapter, Backend, MapServices } from "./contracts/adapter.js";
 export type {
   Bounds,
   CameraCommandOptions,
@@ -12,6 +12,15 @@ export type {
   ViewState,
   ZoomToOptions,
 } from "./contracts/camera-types.js";
+export type {
+  CaptureOptions,
+  CaptureScope,
+  ImageOutput,
+  MapCapture,
+  MapImage,
+  StaticMapImageOptions,
+  StaticMapImageService,
+} from "./contracts/capture-types.js";
 export type {
   ClickEvent,
   MapErrorEvent,
@@ -61,10 +70,23 @@ export type {
   Visibility,
 } from "./contracts/layer-types.js";
 export type {
+  LocationAbortSignal,
+  LocationOptions,
+  LocationPermission,
+  LocationService,
+  UserLocationProps,
+} from "./contracts/location-types.js";
+export type {
   ExternalDrawingContext,
   MapLayoutStyle,
   MapProps,
 } from "./contracts/map-types.js";
+export type {
+  OfflinePack,
+  OfflinePackOptions,
+  OfflinePackStatus,
+  OfflineService,
+} from "./contracts/offline-types.js";
 export type {
   ClusterQueryMethods,
   FeatureIdentifier,
@@ -108,6 +130,8 @@ export type {
 export { Images } from "./facade/images.js";
 export { Layer } from "./facade/layer.js";
 export { Map, useMap } from "./facade/map.js";
+export { useMapServices } from "./facade/map-services.js";
+export type { MapSetupProps } from "./facade/map-setup.js";
 export { MapSetup } from "./facade/map-setup.js";
 export { Source } from "./facade/source.js";
 export {
@@ -120,3 +144,4 @@ export {
   Popup,
   ScaleControl,
 } from "./facade/ui.js";
+export { UserLocation } from "./facade/user-location.js";

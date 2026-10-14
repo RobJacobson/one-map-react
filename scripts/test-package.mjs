@@ -151,10 +151,12 @@ const main = async () => {
     assert(
       files.includes("package/patches/rnmapbox-10.3.7-per-view-events.patch")
     );
+    assert(files.includes("package/patches/rnmapbox-10.3.7-tf08.patch"));
+    assert(files.includes("package/patches/maplibre-native-11.5.0-tf08.patch"));
     for (const file of files) {
       assert.match(
         file,
-        /^package\/(?:dist\/.+|patches\/rnmapbox-10\.3\.7-per-view-events\.patch|package.json|README.md|LICENSE)$/
+        /^package\/(?:dist\/.+|patches\/(?:rnmapbox-10\.3\.7-(?:per-view-events|tf08)|maplibre-native-11\.5\.0-tf08)\.patch|package.json|README.md|LICENSE)$/
       );
     }
 
@@ -221,7 +223,9 @@ console.log(JSON.stringify(Object.keys(common).sort()));
         "Popup",
         "ScaleControl",
         "Source",
+        "UserLocation",
         "useMap",
+        "useMapServices",
       ])
     );
   }

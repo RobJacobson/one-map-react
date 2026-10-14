@@ -16,6 +16,10 @@ export interface MapSession {
   readonly ref: MutableRefObject<MapRef | null>;
   readonly map: MapRef;
   readonly ready: boolean;
+  /** An authoritative common viewState was supplied. */
+  readonly cameraControlled?: boolean;
+  /** Selected native camera is already following device location. */
+  readonly nativeLocationFollowing?: boolean;
   readonly viewState: ViewState | null;
   readonly minZoom?: number;
   readonly maxZoom?: number;
