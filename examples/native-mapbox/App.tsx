@@ -2,7 +2,7 @@ import * as Mapbox from "@rnmapbox/maps";
 import { type MapRef, MapSetup } from "one-map-react";
 import { adapter } from "one-map-react/mapbox-native";
 import { useRef } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
@@ -33,8 +33,22 @@ if (!mapboxAccessToken) {
 
 void setAccessToken(mapboxAccessToken);
 
+/** Uses the wrapper's SDK network switch while keeping test transport available. */
+const setNetworkConnected = (connected: boolean): Promise<boolean> =>
+  (
+    NativeModules.RNMBXModule as {
+      setConnected: (connected: boolean) => Promise<boolean>;
+    }
+  ).setConnected(connected);
+
 const App = () => {
-  if (smokeTarget === "tf08") return <NativeTf08Screen adapter={adapter} />;
+  if (smokeTarget === "tf08")
+    return (
+      <NativeTf08Screen
+        adapter={adapter}
+        setNetworkConnected={setNetworkConnected}
+      />
+    );
   if (smokeTarget === "tf07") return <NativeTf07Screen adapter={adapter} />;
   if (smokeTarget === "tf06-lifetimes") {
     return <NativeLifetimesScreen adapter={adapter} />;

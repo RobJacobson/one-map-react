@@ -1,6 +1,6 @@
 {
   "stage": "TF08",
-  "status": "implemented-reviewed-routine-passed-acceptance-failed",
+  "status": "implemented-reviewed-routine-passed-affected-acceptance-passed-scope-limited",
   "baselineRevision": "2fcdddf",
   "recordedLocalDate": "2026-10-13",
   "authorization": "Implement following the proposal; run routine checks; do not run runtime acceptance until separately authorized.",
@@ -302,5 +302,19 @@
     "libraryDistSha256": "229f5792efcc4a56d992cd102952d3dd01673e93fd65edce6c8564e3fc97bf35",
     "previousRoutineOnlyRecords": "Preserved as recorded checkpoint history; later authorization supersedes the runtime hold."
   },
-  "initialCheckpointStatus": "implemented-reviewed-routine-passed-runtime-held"
+  "initialCheckpointStatus": "implemented-reviewed-routine-passed-runtime-held",
+  "initialAcceptanceCheckpointStatus": "implemented-reviewed-routine-passed-acceptance-failed",
+  "acceptanceRepair": {
+    "status": "passed-for-affected-native-scope",
+    "authorization": "Fix the TF08 acceptance failures, add regression tests, and rerun the affected acceptance tests.",
+    "record": "records/evidence/tf08-acceptance-repair.json",
+    "recordedAt": "2026-10-14T18:39:55.501Z",
+    "libraryDistSha256": "3b8b1c0df1d8e3cfc59a6345068bd8baf7fcc0bce49d029ef37123acb1201001",
+    "nativePatchSha256": "45b97583cdf125209738dc80dc0e4ceec8d99fd89e0746674baea01e8cb0789a",
+    "remaining": [
+      "Physical-device authorization/revocation/course",
+      "Second iOS display density",
+      "Named cache/tile-store/legacy operations outside exercised scope"
+    ]
+  }
 }

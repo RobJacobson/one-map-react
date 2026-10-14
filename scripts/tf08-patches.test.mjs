@@ -154,6 +154,52 @@ const mlOffline = readFileSync(
   ),
   "utf8"
 );
+
+// The JavaScript methods must have callable native bindings on both platforms.
+for (const [platform, extension, prefix] of [
+  ["android/src/main/java/com/rnmapbox/rnmbx/modules", "kt", "fun"],
+  ["ios/RNMBX/Offline", "swift", "func"],
+]) {
+  const offline = readFileSync(
+    resolve(rnRoot, `${platform}/RNMBXOfflineModule.${extension}`),
+    "utf8"
+  );
+  const invalidate = nativeSection(
+    offline,
+    `${prefix} invalidatePack(`,
+    `${prefix} resumePackDownload(`
+  );
+  assert.match(invalidate, /startLoading\([\s\S]*acceptExpired\s*[=:] false/);
+  assert.match(
+    offline,
+    /acceptExpired\(acceptExpired\)|acceptExpired: acceptExpired/
+  );
+  // Cached counts cannot complete a refresh while its SDK callbacks are active.
+  assert.match(
+    offline,
+    /state == (?:TileRegionPackState.UNKNOWN|\.unknown).*progress.hasCompleted\(\)/
+  );
+  assert.match(offline, /generation/);
+  // Recreating the same pack ID must not reuse a cancelled load's generation.
+  assert.match(offline, /nextLoadGeneration/);
+}
+const iosOfflineBridge = readFileSync(
+  resolve(rnRoot, "ios/RNMBX/Offline/RNMBXOfflineModule.m"),
+  "utf8"
+);
+assert.match(iosOfflineBridge, /RCT_EXTERN_METHOD\(invalidatePack:/);
+for (const file of [
+  "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt",
+  "ios/RNMBX/RNMBXModule.swift",
+]) {
+  const module = readFileSync(resolve(rnRoot, file), "utf8");
+  assert.match(module, /(?:fun|func) setConnected\(/);
+  assert.match(module, /OfflineSwitch/);
+}
+assert.match(
+  readFileSync(resolve(rnRoot, "ios/RNMBX/RNMBXModule.m"), "utf8"),
+  /RCT_EXTERN_METHOD\(setConnected:/
+);
 const observer = nativeSection(
   mlOffline,
   "private fun setOfflineRegionObserver(",

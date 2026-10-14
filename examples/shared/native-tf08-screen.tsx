@@ -11,9 +11,11 @@ import {
 export const NativeTf08Screen = ({
   adapter,
   getLocationDiagnostic,
+  setNetworkConnected,
 }: {
   readonly adapter: Adapter;
   readonly getLocationDiagnostic?: () => Promise<unknown>;
+  readonly setNetworkConnected?: (connected: boolean) => Promise<boolean>;
 }) => {
   const probe = useRef<Tf08AcceptanceProbe | null>(null);
   const [status, setStatus] = useState("TF08 awaiting runner");
@@ -51,7 +53,10 @@ export const NativeTf08Screen = ({
             id: request.id,
             environment,
             ok: true,
-            value: await probe.current.command(request.action, request.value),
+            value:
+              request.action === "network" && setNetworkConnected
+                ? await setNetworkConnected(request.value?.connected === true)
+                : await probe.current.command(request.action, request.value),
           };
         } catch (error) {
           result = {
@@ -99,7 +104,7 @@ export const NativeTf08Screen = ({
       active = false;
       clearInterval(timer);
     };
-  }, [adapter.backend, getLocationDiagnostic]);
+  }, [adapter.backend, getLocationDiagnostic, setNetworkConnected]);
   return (
     <MapSetup adapter={adapter}>
       <SafeAreaView style={{ flex: 1 }}>

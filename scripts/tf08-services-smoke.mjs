@@ -554,6 +554,10 @@ const nativeOfflineScenarios = async () => {
         180000
       );
       const before = await action("offline-status", { id });
+      assert(
+        before.status.requiredResourceCount > 0,
+        "A completed offline pack must contain downloaded resources."
+      );
       await assert.rejects(action("offline-duplicate", { id }));
       const result = await action("offline-status", { id });
       assert(
@@ -591,6 +595,8 @@ const nativeOfflineScenarios = async () => {
         const persisted = await action("offline-status", { id });
         assert.equal(persisted.pack.metadata.test, "tf08");
         assert.equal(persisted.status.state, "complete");
+        if (engine === "mapbox")
+          assert.equal(await action("network", { connected: false }), false);
         await configure("injected", persisted.pack.metadata.fixtureStyle);
         await action("camera", { longitude: 0, latitude: 0, zoom: 1 });
         await delay(1000);
@@ -598,7 +604,7 @@ const nativeOfflineScenarios = async () => {
         const pixels = imagePixels(image.uri);
         assert(
           pixels.magenta > 1000,
-          "The downloaded raster did not render with resource delivery disabled."
+          "The downloaded tiles did not render with resource delivery disabled."
         );
         return {
           pack: persisted.pack,
@@ -606,7 +612,9 @@ const nativeOfflineScenarios = async () => {
           pixels,
           blockedRequests,
           networking:
-            "fixture resource sockets closed; loopback command/Metro transport retained; downloaded fixture resources have a one-hour freshness lifetime",
+            engine === "mapbox"
+              ? "Mapbox SDK network switch confirmed disconnected; fixture sockets closed; loopback command/Metro transport retained"
+              : "fixture resource sockets closed; loopback command/Metro transport retained; downloaded fixture resources have a one-hour freshness lifetime",
         };
       }
     );
@@ -617,6 +625,8 @@ const nativeOfflineScenarios = async () => {
       reason: "Offline creation/lifecycle prerequisite failed.",
     });
   resourcesAvailable = true;
+  if (engine === "mapbox")
+    assert.equal(await action("network", { connected: true }), true);
   // Invalidation expires existing resources. A completed byte count alone
   // does not prove that they were revalidated before disconnecting the app.
   // Exercise invalidation online after verifying the pristine completed pack.
@@ -634,6 +644,13 @@ const nativeOfflineScenarios = async () => {
             before.progress.length,
           15000,
           "post-invalidation subscriber delivery"
+        );
+        await until(
+          async () =>
+            (await action("offline-status", { id })).status.state ===
+            "complete",
+          180000,
+          "post-invalidation SDK completion"
         );
         const result = await action("offline-status", { id });
         assert.equal(result.errors, 0);
@@ -786,17 +803,40 @@ const serveFixtures = async () => {
       const identity = encodeURIComponent(
         fixtureRequest.searchParams.get("id") ?? "shared"
       );
-      const style = {
-        version: 8,
-        sources: offline
+      // Mapbox tile regions only support hosted tilesets; MapLibre uses the
+      // isolated raster fixture. Both draw magenta inside the bounded region.
+      const offlineSources =
+        engine === "mapbox"
           ? {
+              basemap: {
+                type: "vector",
+                url: "mapbox://mapbox.mapbox-streets-v8",
+              },
+            }
+          : {
               raster: {
                 type: "raster",
                 tiles: [`${fixtureUrl}/tile/${identity}/{z}/{x}/{y}.png`],
                 tileSize: 256,
                 maxzoom: 1,
               },
-            }
+            };
+      const offlineLayers =
+        engine === "mapbox"
+          ? [
+              {
+                id: "offline-water",
+                type: "fill",
+                source: "basemap",
+                "source-layer": "water",
+                paint: { "fill-color": "#ff00ff" },
+              },
+            ]
+          : [{ id: "offline-raster", type: "raster", source: "raster" }];
+      const style = {
+        version: 8,
+        sources: offline
+          ? offlineSources
           : {
               point: {
                 type: "geojson",
@@ -819,7 +859,7 @@ const serveFixtures = async () => {
             paint: { "background-color": "#0f1928" },
           },
           ...(offline
-            ? [{ id: "offline-raster", type: "raster", source: "raster" }]
+            ? offlineLayers
             : [
                 {
                   id: "zoom-zero-point",
@@ -1285,6 +1325,8 @@ try {
   });
 } finally {
   page?.close();
+  if (applicationId && engine === "mapbox")
+    await action("network", { connected: true }).catch(() => undefined);
   if (applicationId) {
     if (platform === "android")
       await adb(["shell", "am", "force-stop", applicationId]).catch(

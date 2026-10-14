@@ -1,7 +1,8 @@
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
+index e51687f..e3d2b95 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
-@@ -56,6 +56,13 @@
+@@ -56,6 +56,13 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac
          }
      }
  
@@ -15,7 +16,7 @@ diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEm
      override fun addEventEmitters(context: ThemedReactContext, view: T) {
          mEventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(context, view.id)
      }
-@@ -76,7 +83,9 @@
+@@ -76,7 +83,9 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac
      }
  
      private fun getEventCacheKey(event: IEvent): String {
@@ -26,71 +27,45 @@ diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEm
      }
  
      companion object {
-diff --git a/src/modules/snapshot/SnapshotOptions.ts b/src/modules/snapshot/SnapshotOptions.ts
---- a/src/modules/snapshot/SnapshotOptions.ts
-+++ b/src/modules/snapshot/SnapshotOptions.ts
-@@ -40,7 +40,7 @@
-     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
-     this.heading = options.heading || 0.0;
-     this.pitch = options.pitch || 0.0;
--    this.zoomLevel = options.zoomLevel || 16.0;
-+    this.zoomLevel = options.zoomLevel ?? 16.0;
-     this.width = options.width || 50.0;
-     this.height = options.height || 50.0;
-     this.writeToDisk = options.writeToDisk || false;
-diff --git a/lib/module/modules/snapshot/SnapshotOptions.js b/lib/module/modules/snapshot/SnapshotOptions.js
---- a/lib/module/modules/snapshot/SnapshotOptions.js
-+++ b/lib/module/modules/snapshot/SnapshotOptions.js
-@@ -12,7 +12,7 @@
-     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
-     this.heading = options.heading || 0.0;
-     this.pitch = options.pitch || 0.0;
--    this.zoomLevel = options.zoomLevel || 16.0;
-+    this.zoomLevel = options.zoomLevel ?? 16.0;
-     this.width = options.width || 50.0;
-     this.height = options.height || 50.0;
-     this.writeToDisk = options.writeToDisk || false;
-diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
---- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
-+++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
-@@ -139,7 +139,7 @@
-             )
-         )
-         builder.pixelRatio(
--            java.lang.Float.valueOf(mContext.resources.displayMetrics.density).toInt().toFloat()
-+            1.0f // Snapshot width/height are requested PNG pixels, independent of density.
-         )
-         builder.accessToken(getAccessToken(mContext))
-         return builder.build()
-diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.swift b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
---- a/ios/RNMBX/Offline/RNMBXOfflineModule.swift
-+++ b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
-@@ -208,13 +208,15 @@
-             DispatchQueue.main.async {
-               switch result {
-               case .success(let metadata):
--                let pack = TileRegionPack(
--                  name: name,
--                  progress: self.toProgress(region: region),
--                  metadata: logged("RNMBXOfflineModule.getPackStatus") { metadata as? [String:Any] } ?? [:]
-+                // Status readback must preserve the live pack's cancellation handles.
-+                resolver(
-+                  self._makeRegionStatusPayload(
-+                    name,
-+                    progress: self.toProgress(region: region),
-+                    state: self.tileRegionPacks[name]?.state ?? .unknown,
-+                    metadata: logged("RNMBXOfflineModule.getPackStatus") { metadata as? [String:Any] } ?? [:]
-+                  )
-                 )
--                self.tileRegionPacks[name] = pack
--                resolver(self._makeRegionStatusPayload(pack: pack))
-               case .failure(let error):
-                 Logger.log(level:.error, message: "Unable to fetch metadata for \(name)")
-                 rejecter("RNMBXOfflineModule.getPackStatus", error.localizedDescription, error)
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
+index b236fdf..ccdf6b9 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
+@@ -155,6 +155,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon
+         }
+     }
+ 
++    @ReactMethod
++    fun setConnected(connected: Boolean, promise: Promise) {
++        val offlineSwitch = OfflineSwitch.getInstance()
++        offlineSwitch.setMapboxStackConnected(connected)
++        promise.resolve(offlineSwitch.isMapboxStackConnected)
++    }
++
+     @ReactMethod
+     fun setAccessToken(accessToken: String?, promise: Promise) {
+         mReactContext.runOnUiQueueThread(Runnable {
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
+index ed4eab9..83de94f 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
-@@ -180,13 +180,15 @@
+@@ -46,6 +46,7 @@ enum class TileRegionPackState(val rawValue: String) {
+     UNKNOWN("unknown")
+ }
+ class TileRegionPack(var name: String, var state: TileRegionPackState = TileRegionPackState.UNKNOWN, var progress: TileRegionLoadProgress? = null, var metadata: JSONObject) {
++    @Volatile var generation = 0
+     var cancelable: Cancelable? = null
+     var loadOptions: TileRegionLoadOptions? = null
+ 
+@@ -105,6 +106,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+     ) {
+     var tileRegionPacks = HashMap<String, TileRegionPack>()
+     private var mProgressEventThrottle = 300.0
++    private var nextLoadGeneration = 0
+ 
+ 
+     val tileStore: TileStore by lazy {
+@@ -180,13 +182,15 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
                  val region = it
                  tileStore.getTileRegionMetadata(name) { expected ->
                      expected.value?.also {
@@ -112,3 +87,416 @@ diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule
                      } ?: run {
                          promise.reject(LOG_TAG, expected.error!!.message)
                      }
+@@ -197,11 +201,25 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+         }
+     }
+ 
++    @ReactMethod
++    fun invalidatePack(name: String, promise: Promise) {
++        val pack = tileRegionPacks[name]
++        if (pack != null) {
++            startLoading(pack, acceptExpired = false).map { null }.toPromise(promise, "invalidatePack")
++        } else {
++            promise.reject("invalidatePack", "Unknown offline pack: $name")
++        }
++    }
++
+     @ReactMethod
+     fun resumePackDownload(name: String, promise: Promise) {
+         val pack = tileRegionPacks[name]
+         if (pack != null) {
+-            startLoading(pack).map { null }.toPromise(promise,"resumePackDownload")
++            if (pack.state == TileRegionPackState.ACTIVE) {
++                promise.resolve(null)
++            } else {
++                startLoading(pack).map { null }.toPromise(promise,"resumePackDownload")
++            }
+         } else {
+             promise.reject("resumePackDownload", "Unknown offline pack: $name")
+         }
+@@ -212,11 +230,13 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+         val pack = tileRegionPacks[name]
+         if (pack != null) {
+             if (pack.cancelable != null) {
++                pack.generation += 1
++                pack.state = TileRegionPackState.INACTIVE
+                 pack.cancelable?.cancel()
+                 pack.cancelable = null
+                 promise.resolve(null)
+             } else {
+-                promise.reject("resumeRegionDownload", "Offline pack: $name already cancelled")
++                promise.resolve(null)
+             }
+         } else {
+             promise.reject("resumeRegionDownload", "Unknown offline region")
+@@ -245,6 +265,9 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+             return
+         }
+ 
++        pack.generation += 1
++        pack.cancelable?.cancel()
++        pack.cancelable = null
+         tileStore.removeTileRegion(name, object: TileRegionCallback {
+             override fun run(expected: Expected<TileRegionError, TileRegion>) {
+                 expected.value.also {
+@@ -275,7 +298,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+     }
+     // endregion
+ 
+-    fun startLoading(pack: TileRegionPack): Result<Unit> {
++    fun startLoading(pack: TileRegionPack, acceptExpired: Boolean = true): Result<Unit> {
+         try {
+             val id = pack.name
+             val bounds = pack.bounds
+@@ -286,7 +309,14 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                 ?: return Result.failure(IllegalArgumentException("startLoading failed as there is no styleURI in pack"))
+             val metadata = pack.metadata
+                 ?: return Result.failure(IllegalArgumentException("startLoading failed as there is no metadata in pack"))
++            // Retire callbacks from a paused or replaced load before refreshing.
++            pack.generation = ++nextLoadGeneration
++            val generation = pack.generation
++            pack.cancelable?.cancel()
++            pack.state = TileRegionPackState.ACTIVE
++            pack.progress = null
+             val stylePackOptions = StylePackLoadOptions.Builder()
++                .acceptExpired(acceptExpired)
+                 .glyphsRasterizationMode(GlyphsRasterizationMode.IDEOGRAPHS_RASTERIZED_LOCALLY)
+                 .metadata(metadata.toMapboxValue())
+                 .build()
+@@ -301,7 +331,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                 .geometry(bounds)
+                 .descriptors(descriptors)
+                 .metadata(metadata.toMapboxValue())
+-                .acceptExpired(true)
++                .acceptExpired(acceptExpired)
+                 .networkRestriction(NetworkRestriction.NONE)
+                 .averageBytesPerSecond(null)
+                 .build()
+@@ -309,6 +339,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+             val task = this.tileStore.loadTileRegion(
+                 id, loadOptions,
+                 { progress ->
++                    if (tileRegionPacks[id]?.generation != generation) return@loadTileRegion
+                     lastProgress = progress
+                     tileRegionPacks[id]!!.progress = progress
+                     tileRegionPacks[id]!!.state = TileRegionPackState.ACTIVE
+@@ -316,6 +347,8 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                     offlinePackProgressDidChange(progress, metadata, TileRegionPackState.ACTIVE)
+                 },
+                 { expected ->
++                    if (tileRegionPacks[id]?.generation != generation) return@loadTileRegion
++                    pack.cancelable = null
+                     expected.value?.also {
+                         val progress = lastProgress
+                         if (progress != null) {
+@@ -399,7 +432,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                         metadata= metadataJSON ?: JSONObject()
+                     )
+ 
+-                    if (region.hasCompleted()) {
++                    if (pack.state == TileRegionPackState.UNKNOWN && region.hasCompleted()) {
+                         pack.state = TileRegionPackState.COMPLETE
+                     }
+                     tileRegionPacks[region.id] = pack
+@@ -467,7 +500,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+         var result = Arguments.createMap()
+         if (progress != null) {
+             result = writableMapOf(
+-                "state" to (if (progress.hasCompleted()) TileRegionPackState.COMPLETE.rawValue else state.rawValue),
++                "state" to (if (state == TileRegionPackState.UNKNOWN && progress.hasCompleted()) TileRegionPackState.COMPLETE.rawValue else state.rawValue),
+                 "name" to name,
+                 "percentage" to progress.toPercentage(),
+                 "completedResourceCount" to progress.completedResourceCount,
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
+index 771884c..cf96ca3 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
+@@ -139,7 +139,7 @@ class RNMBXSnapshotModule(private val mContext: ReactApplicationContext) :
+             )
+         )
+         builder.pixelRatio(
+-            java.lang.Float.valueOf(mContext.resources.displayMetrics.density).toInt().toFloat()
++            1.0f // Snapshot width/height are requested PNG pixels, independent of density.
+         )
+         builder.accessToken(getAccessToken(mContext))
+         return builder.build()
+diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.m b/ios/RNMBX/Offline/RNMBXOfflineModule.m
+index 1808393..6ace269 100644
+--- a/ios/RNMBX/Offline/RNMBXOfflineModule.m
++++ b/ios/RNMBX/Offline/RNMBXOfflineModule.m
+@@ -6,6 +6,10 @@
+ RCT_EXTERN_METHOD(getPacks:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+ RCT_EXTERN_METHOD(createPack:(NSDictionary *) options resolver: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+ 
++RCT_EXTERN_METHOD(invalidatePack:(NSString *)name
++                  resolver:(RCTPromiseResolveBlock)resolve
++                  rejecter:(RCTPromiseRejectBlock)reject)
++
+ RCT_EXTERN_METHOD(resumePackDownload:(NSString *)name
+                   resolver:(RCTPromiseResolveBlock)resolve
+                   rejecter:(RCTPromiseRejectBlock)reject)
+diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.swift b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
+index 1253ba1..21ac195 100644
+--- a/ios/RNMBX/Offline/RNMBXOfflineModule.swift
++++ b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
+@@ -14,6 +14,7 @@ extension Date {
+ @objc(RNMBXOfflineModule)
+ class RNMBXOfflineModule: RCTEventEmitter {
+   var hasListeners = false
++  var nextLoadGeneration = 0
+   
+   static let RNMapboxInfoMetadataKey = "_rnmapbox"
+ 
+@@ -98,6 +99,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     }
+ 
+     var name: String
++    var generation = 0
+     var cancelables: [Cancelable] = []
+     var progress : TileRegionLoadProgress? = nil
+     var state : State = .inactive
+@@ -208,13 +210,15 @@ class RNMBXOfflineModule: RCTEventEmitter {
+             DispatchQueue.main.async {
+               switch result {
+               case .success(let metadata):
+-                let pack = TileRegionPack(
+-                  name: name,
+-                  progress: self.toProgress(region: region),
+-                  metadata: logged("RNMBXOfflineModule.getPackStatus") { metadata as? [String:Any] } ?? [:]
++                // Status readback must preserve the live pack's cancellation handles.
++                resolver(
++                  self._makeRegionStatusPayload(
++                    name,
++                    progress: self.toProgress(region: region),
++                    state: self.tileRegionPacks[name]?.state ?? .unknown,
++                    metadata: logged("RNMBXOfflineModule.getPackStatus") { metadata as? [String:Any] } ?? [:]
++                  )
+                 )
+-                self.tileRegionPacks[name] = pack
+-                resolver(self._makeRegionStatusPayload(pack: pack))
+               case .failure(let error):
+                 Logger.log(level:.error, message: "Unable to fetch metadata for \(name)")
+                 rejecter("RNMBXOfflineModule.getPackStatus", error.localizedDescription, error)
+@@ -229,12 +233,26 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     }
+   }
+   
++  @objc
++  func invalidatePack(_ name: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
++    DispatchQueue.main.async {
++      guard let pack = self.tileRegionPacks[name] else {
++        rejecter("invalidatePack", "Unknown offline pack: \(name)", nil)
++        return
++      }
++      self.startLoading(pack: pack, acceptExpired: false)
++      resolver(nil)
++    }
++  }
++
+   @objc
+   func resumePackDownload(_ name: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock)
+   {
+     DispatchQueue.main.async {
+       if let pack = self.tileRegionPacks[name] {
+-        self.startLoading(pack: pack)
++        if pack.state != .active {
++          self.startLoading(pack: pack)
++        }
+         resolver(nil)
+       } else {
+         rejecter("resumePackDownload", "Unknown offline pack: \(name)", nil)
+@@ -247,6 +265,9 @@ class RNMBXOfflineModule: RCTEventEmitter {
+   {
+     DispatchQueue.main.async {
+       if let pack = self.tileRegionPacks[name] {
++        self.tileRegionPacks[name]!.generation += 1
++        self.tileRegionPacks[name]!.state = pack.state == .complete ? .complete : .inactive
++        self.tileRegionPacks[name]!.cancelables = []
+         pack.cancelables.forEach { $0.cancel() }
+         resolver(nil)
+       } else {
+@@ -275,6 +296,8 @@ class RNMBXOfflineModule: RCTEventEmitter {
+         return rejecter("deletePack", "Pack: \(name) has already been deleted", nil)
+       }
+ 
++      self.tileRegionPacks[name]!.generation += 1
++      pack.cancelables.forEach { $0.cancel() }
+       self.tileStore.removeTileRegion(forId: name)
+       self.tileRegionPacks[name]!.state = .invalid
+       resolver(nil)
+@@ -343,7 +366,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     }
+   }
+   
+-  func startLoading(pack: TileRegionPack) {
++  func startLoading(pack: TileRegionPack, acceptExpired: Bool = true) {
+     let id = pack.name
+     let metadata = pack.metadata
+     let taskGroup = DispatchGroup()
+@@ -361,9 +384,16 @@ class RNMBXOfflineModule: RCTEventEmitter {
+       return
+     }
+       
++    // Retired callbacks must not complete or fail a replacement load.
++    nextLoadGeneration += 1
++    self.tileRegionPacks[id]!.generation = nextLoadGeneration
++    let generation = nextLoadGeneration
++    pack.cancelables.forEach { $0.cancel() }
++    self.tileRegionPacks[id]!.state = .active
++    self.tileRegionPacks[id]!.progress = nil
+     var downloadError = false
+     
+-    let stylePackLoadOptions = StylePackLoadOptions(glyphsRasterizationMode: .ideographsRasterizedLocally, metadata: pack.metadata)!
++    let stylePackLoadOptions = StylePackLoadOptions(glyphsRasterizationMode: .ideographsRasterizedLocally, metadata: pack.metadata, acceptExpired: acceptExpired)!
+     
+     let threadedOfflineManager = OfflineManager()
+     taskGroup.enter()
+@@ -371,6 +401,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+       // progress callbacks arrive on SDK background threads; tileRegionPacks
+       // is main-thread state (see #4252)
+       DispatchQueue.main.async {
++        guard self.tileRegionPacks[id]?.generation == generation else { return }
+         self.tileRegionPacks[id]!.state = .active
+       }
+     } completion: { result in
+@@ -379,6 +410,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+           taskGroup.leave()
+         }
+ 
++        guard self.tileRegionPacks[id]?.generation == generation else { return }
+         switch result {
+         case let .success(stylePack): break
+         case let .failure(error):
+@@ -401,7 +433,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+       geometry: bounds, // RNMBXFeatureUtils.geometryToGeometry(bounds),
+       descriptors: descriptors,
+       metadata: metadata,
+-      acceptExpired: true,
++      acceptExpired: acceptExpired,
+       networkRestriction: .none,
+       averageBytesPerSecond: nil)
+     
+@@ -413,6 +445,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+       // delivered on the "MB TileStore RW" thread; mutating tileRegionPacks
+       // here races the main thread and corrupts the dictionary (#4252)
+       DispatchQueue.main.async {
++        guard self.tileRegionPacks[id]?.generation == generation else { return }
+         lastProgress = progress
+         self.tileRegionPacks[id]!.progress = progress
+         self.tileRegionPacks[id]!.state = .active
+@@ -423,31 +456,25 @@ class RNMBXOfflineModule: RCTEventEmitter {
+             defer {
+                 taskGroup.leave()
+             }
++            guard self.tileRegionPacks[id]?.generation == generation else { return }
+             switch result {
+-            case .success(let _):
+-                if let progess = lastProgress {
+-                    self.offlinePackProgressDidChange(progress: progess, metadata: metadata, state: .complete)
+-                } else {
+-                    Logger.log(level: .warn,
+-                               message: "RNMBXOfflineModule: startLoading: tile region completed, but got no progress information")
+-                }
+-                self.tileRegionPacks[id]!.state = .complete
++            case .success: break
+             case .failure(let error):
+-                Logger.log(level: .warn,
+-                           message: "RNMBXOfflineModule: startLoading: error loading tile region: " + error.localizedDescription)
+-                
+-                self.tileRegionPacks[id]!.state = .inactive
++                downloadError = true
+                 self.offlinePackDidReceiveError(name: id, error: error)
+             }
+         }
+     }
+ 
+     taskGroup.notify(queue: .main) {
++      defer { withExtendedLifetime(threadedOfflineManager) {} }
++      guard self.tileRegionPacks[id]?.generation == generation else { return }
+       self.tileRegionPacks[id]!.cancelables = []
+       self.tileRegionPacks[id]!.state = downloadError ? .inactive : .complete
+-      // the style pack load and the tileset descriptor are tied to this
+-      // manager; it must outlive the in-flight work (#4252)
+-      withExtendedLifetime(threadedOfflineManager) {}
++      if !downloadError, let progress = lastProgress {
++        self.offlinePackProgressDidChange(progress: progress, metadata: metadata, state: .complete)
++      }
++
+     }
+ 
+     self.tileRegionPacks[id]!.cancelables = [task, stylePackTask]
+@@ -516,7 +543,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+           metadata: logged("RNMBXOfflineModule.getPacks metadata is null") { metadata } ?? [:]
+         )
+         
+-        if ((region.hasCompleted())) {
++        if pack.state == .unknown && region.hasCompleted() {
+           pack.state = .complete
+         }
+         
+@@ -605,7 +632,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     var result : [String:Any?] = [:]
+     if let progress = progress {
+       result = [
+-        "state": (progress.hasCompleted()) ? State.complete.rawValue : state.rawValue,
++        "state": (state == .unknown && progress.hasCompleted()) ? State.complete.rawValue : state.rawValue,
+         "name": name,
+         "percentage": progress.toPercentage(),
+         "completedResourceCount": progress.completedResourceCount,
+diff --git a/ios/RNMBX/RNMBXModule.m b/ios/RNMBX/RNMBXModule.m
+index 493e3fa..4f8fb3e 100644
+--- a/ios/RNMBX/RNMBXModule.m
++++ b/ios/RNMBX/RNMBXModule.m
+@@ -2,6 +2,8 @@
+ 
+ @interface RCT_EXTERN_MODULE(RNMBXModule, NSObject)
+ 
++RCT_EXTERN_METHOD(setConnected:(BOOL)connected resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
++
+ RCT_EXTERN_METHOD(setAccessToken:(NSString *)accessToken resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+ 
+ RCT_EXTERN_METHOD(addCustomHeader:(NSString *)headerName forHeaderValue:(NSString *) headerValue)
+diff --git a/ios/RNMBX/RNMBXModule.swift b/ios/RNMBX/RNMBXModule.swift
+index 6d6b169..88631b2 100644
+--- a/ios/RNMBX/RNMBXModule.swift
++++ b/ios/RNMBX/RNMBXModule.swift
+@@ -86,6 +86,13 @@ class RNMBXModule : NSObject {
+       return true
+   }
+ 
++  @objc func setConnected(_ connected: Bool,
++                          resolver: RCTPromiseResolveBlock,
++                          rejecter: RCTPromiseRejectBlock) {
++    OfflineSwitch.shared.isMapboxStackConnected = connected
++    resolver(OfflineSwitch.shared.isMapboxStackConnected)
++  }
++
+   @objc func setAccessToken(
+     _ token: String, 
+     resolver: RCTPromiseResolveBlock,
+diff --git a/lib/module/modules/snapshot/SnapshotOptions.js b/lib/module/modules/snapshot/SnapshotOptions.js
+index ea91cd6..b6fd036 100644
+--- a/lib/module/modules/snapshot/SnapshotOptions.js
++++ b/lib/module/modules/snapshot/SnapshotOptions.js
+@@ -12,7 +12,7 @@ class SnapshotOptions {
+     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
+     this.heading = options.heading || 0.0;
+     this.pitch = options.pitch || 0.0;
+-    this.zoomLevel = options.zoomLevel || 16.0;
++    this.zoomLevel = options.zoomLevel ?? 16.0;
+     this.width = options.width || 50.0;
+     this.height = options.height || 50.0;
+     this.writeToDisk = options.writeToDisk || false;
+diff --git a/src/modules/snapshot/SnapshotOptions.ts b/src/modules/snapshot/SnapshotOptions.ts
+index 766dbd8..b9791a0 100644
+--- a/src/modules/snapshot/SnapshotOptions.ts
++++ b/src/modules/snapshot/SnapshotOptions.ts
+@@ -40,7 +40,7 @@ class SnapshotOptions {
+     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
+     this.heading = options.heading || 0.0;
+     this.pitch = options.pitch || 0.0;
+-    this.zoomLevel = options.zoomLevel || 16.0;
++    this.zoomLevel = options.zoomLevel ?? 16.0;
+     this.width = options.width || 50.0;
+     this.height = options.height || 50.0;
+     this.writeToDisk = options.writeToDisk || false;
