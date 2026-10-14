@@ -1,0 +1,55 @@
+{
+  "status": "built-installed-runtime-not-started",
+  "environment": "mapbox-android",
+  "artifact": {
+    "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+    "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+    "packedSha256": "85b7b84933fcb6a1b2ac44bf7ec482de04c797fae3fadf289ee95bab9b97d5da",
+    "exampleDistSha256": {
+      "web-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "web-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "native-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "native-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49"
+    }
+  },
+  "dependencyPatch": {
+    "package": "@rnmapbox/maps@10.3.7",
+    "patchPath": "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+    "patchSha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
+    "patchedEmitterPath": "examples/native-mapbox/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt",
+    "patchedEmitterSha256": "310c73d7ccde6d21e2df1b599af9d54ee1cac4329d3285eb530f0adb2e511e34",
+    "verification": "Installed emitter matched the expected patch; the root SDK source was not modified."
+  },
+  "build": {
+    "command": "./gradlew --offline --no-daemon :app:assembleDebug",
+    "sdkRoot": "/private/tmp/one-map-tf07-rerun/sdk36",
+    "ndk": "27.1.12297006, read-only global folder linked into the owned temp SDK root; this matches the project pin.",
+    "java": "17",
+    "result": "BUILD SUCCESSFUL; 104 tasks, 72 executed and 32 up-to-date.",
+    "successfulLog": "/private/tmp/one-map-tf07-rerun/mapbox-android-r15-build.log",
+    "initialConfigurationFailure": "records/evidence/tf07-r15-initial-build-config-failure.txt"
+  },
+  "apk": {
+    "previousSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "previousPathsPreserved": [
+      "/private/tmp/one-map-tf07-rerun/mapbox-android-installed-api36.apk",
+      "/private/tmp/one-map-tf07-rerun/mapbox-android-installed.apk"
+    ],
+    "newPath": "/private/tmp/one-map-tf07-rerun/mapbox-android-per-view-events-r15.apk",
+    "newSha256": "29a662927412148fff915db13520f4d85b3432d65d9e3ff16cc9b80b0a445b9e",
+    "installedPulledPath": "/private/tmp/one-map-tf07-rerun/mapbox-android-per-view-events-r15-installed.apk",
+    "installedPulledSha256": "29a662927412148fff915db13520f4d85b3432d65d9e3ff16cc9b80b0a445b9e",
+    "installation": "Success on emulator-5556 / TF07_Rerun36; installed APK exactly matches the R15 build."
+  },
+  "scope": {
+    "device": "emulator-5556",
+    "os": "Android 16 / API 36",
+    "runtime": "Not launched. No Metro, status server, fixture service, or acceptance interaction was started.",
+    "installedAppProcess": "Not running after installation."
+  },
+  "coordinatorArtifactCorrection": {
+    "workerDeclaredPackedSha256": "a9a8ce6afccae43dfbafd33689f5343451db74e267fbd76fcc4c73f4dd91d826",
+    "correctFinalPackedSha256": "85b7b84933fcb6a1b2ac44bf7ec482de04c797fae3fadf289ee95bab9b97d5da",
+    "reason": "Worker copied the package hash from the earlier key-only patch before native view cache cleanup was added. Final patch/emitter native source and APK hashes are correct and verified. Final patch package13 passed before successful native build. This corrects provenance only; no runtime or binary changed."
+  }
+}

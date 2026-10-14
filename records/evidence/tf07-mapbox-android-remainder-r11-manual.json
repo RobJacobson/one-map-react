@@ -1,0 +1,14 @@
+{
+  "installedBinarySha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+  "libraryDistSha256": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8",
+  "environment": "mapbox-android",
+  "runId": "b843acde-6a97-4744-a8d2-5b47981dbc95",
+  "scenarios": {
+    "source-propagation": "passed",
+    "navigation-location": "passed",
+    "style-remount": "passed",
+    "host-accessibility": "passed",
+    "scale-units": "passed",
+    "popup-follow-dismissal": "passed"
+  }
+}

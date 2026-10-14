@@ -1,0 +1,44 @@
+{
+  "status": "native-build-installed-full-focused9-passed",
+  "wrapper": "@rnmapbox/maps@10.3.7",
+  "platform": "android",
+  "sourceRevision": "0f50e8164c1aefe45de9ed9cde310f310076a310",
+  "diagnosis": {
+    "source": "AbstractEventEmitter.kt: manager-wide mRateLimitedEvents and getEventCacheKey omitting event.iD; shouldDropEvent suppresses same key within10ms.",
+    "firstRun": "tf07-rerun-mapbox-android-control-layout-r14.json",
+    "readinessRetry": "tf07-rerun-mapbox-android-control-layout-r14-ready-retry.json",
+    "observed": "First run only A load, fresh retry only B load. Both used same library and installed native binary; retry stopped before scenario input.",
+    "staticExample": "Different views101 and202 emitting the same event type at1000ms and1007ms share the unpatched key and suppress the second event. Patched keys distinguish views; repeated events on the same view retain the10ms throttle. This is code-review reasoning, not an executed runtime observation.",
+    "supersededHypothesis": "Earlier native load-listener registration ordering hypothesis remains unproven; per-view cache omission is a directly inspected concrete bug."
+  },
+  "patch": {
+    "path": "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+    "sha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
+    "originalEmitterSha256": "959d64f25b2eb55108802fe50e1dff43d1aced28b79dc8c47570b0f486339a0c",
+    "installedPatchedEmitterSha256": "310c73d7ccde6d21e2df1b599af9d54ee1cac4329d3285eb530f0adb2e511e34",
+    "change": "Include native view identifier in event cache keys. Remove that view prefix when native view is dropped, preserving upstream teardown. No synthesized lifecycle callbacks.",
+    "installation": "Mapbox example Bun patchedDependencies, offline install; exact byte comparison to reviewed patched emitter passed. Package publication explicitly includes patch.",
+    "consumerRequirement": "Consumer package managers must apply included version-specific patch before native Android build for multiple Mapbox maps; remove when selected wrapper includes per-view throttling."
+  },
+  "routine": {
+    "validate": "545Jest/21suites; fourtypes, docs/format, fixture/process checks and package13 passed.",
+    "finalPatchPackaging": "13packed selections plus patch presence passed; only native patch expanded to teardown cleanup after fullvalidate.",
+    "packedSha256": "85b7b84933fcb6a1b2ac44bf7ec482de04c797fae3fadf289ee95bab9b97d5da"
+  },
+  "build": {
+    "record": "tf07-rerun-mapbox-android-build-r15.json",
+    "apkSha256": "29a662927412148fff915db13520f4d85b3432d65d9e3ff16cc9b80b0a445b9e",
+    "installedMatches": true,
+    "toolingFailure": "Initial owned tempSDK36 lacked NDK; link to existing globally installed project-pinnedNDK27 fixed configuration. No nativeSDKversion/download/globalSDK modification. Firstfailureexcerpt preserved; successfulbuild overwrote fullrawlog.",
+    "provenance": "Native dependency patch/header hashes verified; no source/SDKversion changes beyond recorded patch."
+  },
+  "acceptance": {
+    "status": "passed",
+    "scope": "fullfocused9 AndroidMapbox plus mandatory initiala/b loadcallbacks, known707/vector, enabledBNav; actualResize/rotation/pixels/touch and boundmanualidentity required.",
+    "runnerSha256": "39fd2cf7545691fe6b995cec13332ac78f9d8159c8c3fa12f61527902e342e40",
+    "readinessMilestone": "First actual Read on patched installedAPK posted a-load1 andb-load1, finite cameras11/12, known707+708/twovectorfeatures and enabledBNav. Fullfocused9 continues; no full acceptance claim yet.",
+    "record": "tf07-rerun-mapbox-android-focused-r15-visible-toolbar.json",
+    "runId": "61fcd69c-6ef3-4341-afda-8ac8e0c4b9e2",
+    "retryHistory": "FirstR14loadAonly, freshR14loadBonly preserved; key-onlylistenerordering hypothesis superseded by directmanagerwidecache diagnosis. PatchedR15readyboth; firstfocusedR15toolbar stop-stateambiguous; visibletoolbarfreshfull9passes. Noearlierresultreplaced."
+  }
+}

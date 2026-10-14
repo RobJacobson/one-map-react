@@ -1,0 +1,106 @@
+# TF07 markers and controls
+
+TF07 adds map-attached host UI to the thin facade. Its implementation covers common markers, explicit static annotations, standalone popups, feature presses, map access, and controls. Routine verification and real-renderer acceptance are separate gates. The [evidence record](../records/evidence/tf07-ui.json) records their current status; prior TF02–TF06 outcomes do not certify this change.
+
+## Common behavior
+
+`Marker` preserves live children by default. `renderMode="annotation"` explicitly accepts native bitmap content on Android. Coordinates remain application-owned: drag events propose a `lngLat`, and the application accepts that proposal by updating its coordinate props. Native live dragging starts after a 500 ms long press outside interactive children. Annotation refresh uses `MarkerRef.refresh()` after asynchronous image content becomes ready. Native live dragging remains unverified until the required touch scenarios pass on both engines and operating systems.
+
+Markers without children show a library-owned 24 × 32 logical-unit blue pin with a bottom anchor. Custom content defaults to a center anchor. Named anchors, offsets, and event coordinates use logical map-view units: CSS pixels on web and React Native points on native. Clearing an offset resets it to zero. Marker identity, anchor, and render mode require a keyed remount when changed.
+
+`Popup` mounts independently at a geographic coordinate. Application state owns its lifetime; `onClose` requests dismissal, and unmounting never requests it. Native popups compose live markers and accessible close buttons. Native callouts remain selected-entry extensions with annotation attachment and selection semantics.
+
+`useMap()` returns the enclosing common map ref. `useMap(id)` resolves a registered map in the same `MapSetup`; named consumers must mount after that map registers. Missing maps and contexts fail explicitly. Source click events carry normalized coordinates, features, and `stopPropagation()`. A source hit reaches the map callback once unless stopped. `interactiveLayerIds` selects the feature hits included with map callbacks.
+
+Navigation controls use common camera operations. Native geolocation controls require an injected `getCurrentPosition()` and provide one locate-and-center operation. Permissions, tracking, following, and native location display remain TF08. Native scale UI supports corner placement and metric, imperial, and nautical units. Browser fullscreen retains browser semantics.
+
+Native live markers, popups, and controls use `react-native-teleport@1.2.1` to move native views above the renderer while keeping children under their original React providers. The facade stores only corner placement and measured height for stacking. Each map owns a separate named portal host. Native applications install and link this optional peer, then rebuild before acceptance. The [portal decision](decisions/0007-native-control-portals.md) records the wrapper gap and the adaptation. Routine regressions cover provider updates, child state, stacking, and teardown; the [R16 runtime records](../records/evidence/tf07-runtime-rerun.json) document native drawing and touch acceptance.
+
+## Adapter responsibilities
+
+| RNMapbox | MapLibre React Native | react-map-gl | Proposed one-map-react API |
+| --- | --- | --- | --- |
+| `MarkerView` remains a direct selected export; common live content uses the per-map overlay. `PointAnnotation` supplies annotation mode. | `Marker` remains a direct selected export; common live content uses the per-map overlay. `ViewAnnotation` supplies annotation mode. | Selected `Marker` component. | `Marker`, coordinate/event conversion, shared default pin, and explicit content modes. |
+| Common live content uses projected coordinates and measured anchor bounds; annotations use measured host composition. | Common live content uses projected coordinates and measured anchor bounds; annotations delegate anchor and offset. | Marker offset updates use wrapper setters. | Logical-unit offset, explicit zero reset, and native drawing/touch-bound verification. |
+| `Callout` attaches to an annotation. | `Callout` attaches to an annotation. | Independent `Popup`. | Native standalone popup composition; named callout exports retain attachment behavior. |
+| Source presses consume the corresponding map press. | Source presses can bubble to the map. | Map feature hits route common source callbacks. | Normalized source click plus one map notification unless propagation stops. |
+| Native ornaments and common camera methods. | Native ornaments and common camera methods. | Selected standard controls and `useControl`. | Native control composition and typed selected-entry facilities. |
+
+The map peers retain the frozen TF06 versions; native portals add the pinned dependency above. The existing [marker and control research](markers-and-controls.md) links their inspected implementations and retains details about constructor options, static content, and platform differences. Missing runtime evidence is a checkpoint gate, not an SDK limitation.
+
+## Runtime checkpoint
+
+The owner authorized repairs and another six-environment run on October 13, 2026. The [repair and rerun record](../records/evidence/tf07-runtime-rerun.json) tracks the current artifact and workers. The corrected code passes 546 Jest tests in 21 suites, formatting, documentation, four type configurations, and packed-package checks. Web Mapbox and MapLibre passed their core, extended, and focused interaction checks; full assistive-technology review remains unverified.
+
+The runtime corrections buffer web load callbacks until the wrapper camera is attached, retain native map handles, measure native scales after ref attachment, and read actual renderer zoom for navigation. Common native live markers and popups project into each map’s existing portal host, where child presses and scrolling stay outside SDK gesture recognizers. Passive touch observation leaves responder ownership with children; a live drag starts after a 500 ms hold outside interactive or overflowing content and temporarily locks map gestures. Stale projections and drag results cannot affect a newer interaction. Static annotations and direct selected SDK marker exports retain their wrapper paths.
+
+Default native SDK ornaments sit beyond measured common control rows with an eight-point gap. Explicit selected positions remain application-owned. RNMapbox’s pinned iOS scale setter stores margins without applying them, so the adapter commits changed margins while the scale is hidden and restores configured visibility on a later animation frame. Viewport changes refresh those margins; obsolete frames are cancelled. Android retains normal position forwarding. Android Mapbox also restores a non-null configured gesture map or scalar enabled baseline after dragging because its pinned setters reject cleared values.
+
+Android controls pass the measured map viewport through the public portal style prop because the wrapper leaves the source portal detached. iOS retains the peer’s native host sizing. Children keep their original React providers and local state. Mapbox’s Android core, focused, configured-gesture and two-density checks passed; iOS core, focused and the latest six-field control follow-up passed under the recorded impact reviews. The latest iOS follow-up verified actual Resize, landscape and restored portrait drawing and touches, independent map access, constrained navigation, propagation, attribution and removal. The initial missed Map B press came from a development warning banner covering the child; stale landscape readbacks came from pressing the test’s portrait Read position after rotation. Physically dismissing the banner and finding the Read button’s current bounds resolved those harness failures without another producer change. The [fresh-read record](../records/evidence/tf07-rerun-mapbox-ios-control-layout-r16-fresh-read.json) preserves the accepted scope; earlier failed attempts remain separate.
+
+The pinned Android RNMapbox wrapper throttles events in a manager-wide cache keyed by type, so concurrent maps can suppress each other’s load callbacks. The [version-specific patch](../packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch) scopes keys to each native view and removes retired entries during teardown. The package ships the patch, and the example applies it through Bun’s `patchedDependencies`; other Android consumers must apply it before rebuilding. It does not synthesize lifecycle callbacks. The rebuilt, verified APK passed the full focused flow with both maps ready. The [patch record](../records/evidence/tf07-android-mapbox-per-view-event-patch.json) preserves source and binary identities and the earlier readiness failures.
+
+The Android 17 test image accepted OS input but produced black map surfaces with hardware graphics, including with Vulkan disabled. The replacement official Android 16/API 36 image passed the owned emulator’s boot, graphics and physical input probe and stayed running through Mapbox’s completed interaction flows. MapLibre Android then passed its remaining seven core fields, 320-dpi offsets, and focused nine-field flow on the assigned emulator; its 420-dpi core offsets also passed in the preserved partial run. MapLibre iOS passed all eleven core fields and all nine focused fields on the assigned simulator after the copied app bundle’s orientation metadata was corrected. The [runtime aggregate](../records/evidence/tf07-runtime-rerun.json) links each accepted run and preserves the earlier failed and incomplete attempts. Together with the accepted Mapbox and web results above, the authorized R16 exercised scope now passes across all six environments. Full VoiceOver and TalkBack audits remain outside this checkpoint.
+
+### Earlier incomplete attempt
+
+The earlier six-environment attempt concluded on October 13, 2026, using the library with all three audit findings corrected; its source SHA-256 is `40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6`. The [earlier runtime record](../records/evidence/tf07-runtime-acceptance.json) preserves individual attempts, run identities, installed binaries, observations, and coordinator interpretations. Its 517 Jest tests and routine package checks passed before acceptance; they did not establish native touch behavior.
+
+| Environment | Result | Evidence and remaining work |
+| --- | --- | --- |
+| Mapbox web | Failed | The scene's `onLoad` camera operation reported “Map camera is not attached” during initial load and remount. Other exercised controls passed; the failure remains unresolved. |
+| MapLibre web | Passed exercised scope | Core input, offsets, scale units, popup following, source propagation, camera/location controls, style/remount, fullscreen, and focused location/keyboard checks passed. Full assistive-technology review remains unverified. |
+| Mapbox Android | Unverified | The linked arm64 build passed, but the owned emulator crashed before installation and runtime. |
+| MapLibre Android | Unverified | Installed artifact, finite camera, and feature `707` readback were verified. The emulator crashed before interaction completion. |
+| Mapbox iOS | Failed, partial | Actual child isolation, offset placement/reset, popup child/dismissal, source propagation, camera/location controls, and style/remount readback were observed. A corrected gesture inside the nested scroll viewport moved the map instead of the child list. Scale presentation and unit updates remain unresolved. |
+| MapLibre iOS | Failed, partial | Installed artifact, child/offset/popup/source interactions, location, and final style/remount readback were observed. A gesture inside the nested child list moved the map; the facade scale stayed at `2 km` after a unit toggle. Zoom-out decreased the camera zoom but did not exactly invert the preceding zoom-in. |
+
+At that checkpoint, native continuous dragging, multiple-pointer and interrupted-touch cancellation, delayed annotation-image refresh, focused overlapping/vector source hits, adverse native location providers, provider updates across multiple portal hosts, resize/orientation behavior, and full accessibility review remained unverified. Maestro's ordinary iOS swipe moves after a 100 ms hold and cannot establish TF07's required 500 ms stationary hold followed by continuous dragging. Missing evidence from that input method was not a product failure. Android offset checks at two densities also remained unverified.
+
+Only test-harness corrections were made during acceptance: native renderer judgment accepts numeric `707` or bridge string `"707"`, the native fixture respects the safe area, and the temporary isolated runner gives operator-paced flows a 60-minute observation window. The library source and all four example package copies retain the frozen library digest. Prior failures and incomplete runs remain recorded separately.
+
+In that attempt, both iOS engines reached actual generation-1 renderer readback. MapLibre's runner then failed when its configured manual-report file was absent; Mapbox's final command exit was unavailable. Coordinator review applied the native judge to saved renderer observations and outcomes tied to each run, without a new runtime or injected events. The native gates remained unverified at that time. The R16 continuation outcomes are documented above and in the runtime aggregate.
+
+## Prepared runtime checks
+
+Acceptance requires explicit owner permission after implementation, structural/comment review, and routine checks pass, under the [testing policy](testing-policy.md#acceptance-timing-and-user-permission). The owner authorized the six-environment R16 rerun on October 13, 2026. The [current runtime record](../records/evidence/tf07-runtime-rerun.json) preserves the frozen artifact, worker assignments, first failures, approved retries, and scenario outcomes. The estimate is 60–120 minutes for a six-environment checkpoint, refined after native build conditions and input availability are known.
+
+The web examples select the scene with `?tf07=ui`. The native examples select it with `ONE_MAP_SMOKE=tf07`. Both use a local style, a numeric-id point feature (`707`), live and annotation markers, a standalone popup, navigation, a scale, and a custom corner control. On load the scene issues `jumpTo` to establish the viewport; it does not test the pinned Mapbox Android opening-camera behavior. The scene's test-only probe reads the actual camera and known renderer features. Configuration actions never dispatch fake pointer events or invoke production callbacks as simulated input.
+
+After authorization, the prepared core web runner is:
+
+```sh
+bun scripts/tf07-ui-smoke.mjs web
+```
+
+It assigns ports 4187/5187 and 4188/5188 to the web engines and creates temporary browser profiles. It checks child-click isolation, live and annotation dragging through browser input, source propagation, navigation zoom readback, popup dismissal, and remount teardown. Its reported scope is a subset of the complete TF07 acceptance gate. Remaining visual, offset, scale, geolocation, accessibility, style-replacement, and fullscreen scenarios require recorded interaction review; a core web pass must not be labeled full TF07 acceptance.
+
+One native worker owns the assigned Metro port (8081 by default), status 8797, the selected device, build outputs, and installations. Set `TF07_METRO_PORT` when the default port belongs to another project; the current rerun uses 8171. Set `TF07_IOS_UDID` to select the assigned simulator explicitly. Build and install the frozen artifact using the existing example procedure only after that scope is authorized. Synchronize the selected example's package copy before freezing it. Record the resulting Android APK or iOS executable SHA-256; verify the installed app before launching the flow. The runner verifies that installed digest against `TF07_NATIVE_BINARY_SHA256` and does not build or install a replacement itself.
+
+Run each native engine separately after authorization:
+
+```sh
+ANDROID_SERIAL=emulator-5554 TF07_NATIVE_BINARY_SHA256=<built-apk-sha256> bun scripts/tf07-ui-smoke.mjs android mapbox
+ANDROID_SERIAL=emulator-5554 TF07_NATIVE_BINARY_SHA256=<built-apk-sha256> bun scripts/tf07-ui-smoke.mjs android maplibre
+TF07_NATIVE_BINARY_SHA256=<built-executable-sha256> bun scripts/tf07-ui-smoke.mjs ios mapbox
+TF07_NATIVE_BINARY_SHA256=<built-executable-sha256> bun scripts/tf07-ui-smoke.mjs ios maplibre
+```
+
+Use the assigned device identifier instead of the example serial when different. These flows are operator-driven native touch checks. Native UI judgment requires manual outcomes in the JSON file selected by `TF07_MANUAL_REPORT` and readback from the running fixture. The runner prints the report identity: installed binary digest, library digest, environment, and unique run ID. The runner initializes a fresh report at that path with the printed identity and all scenarios unverified. Complete it before the final **Read renderer** action; reports from another environment, artifact, or run cannot establish a pass. The runner keeps collecting after the first remount readback. It finishes only on a new physical **Read renderer** after every identity-bound outcome is recorded as `passed` or `failed`; this allows post-remount interactions to be checked before final judgment. Without complete passing outcomes, the result stays `unverified`. Native runs remain sequential; workers retain the first result and do not retry independently.
+
+## Native touch procedure
+
+1. Press **Read renderer** after load. Confirm a finite camera, the green point feature `707`, the default pin, live and static content, scale, and controls. Check the map and child accessibility labels.
+2. Tap the live marker's child button. Confirm `child-click` increases once and the map click count stays unchanged. Scroll its nested content; confirm the child scrolls while the map camera stays fixed.
+3. Hold the live marker's noninteractive label for at least 500 ms, then drag. Confirm live content moves under the finger, emits a coordinate proposal, and remains interactive afterward. Repeat with a second finger and interrupted touch; confirm cancellation restores ordinary map gestures.
+4. Long press and drag the annotation. Confirm the static child follows the new coordinate. Do not infer interactive children from the annotation's appearance. Verify snapshot refresh with a delayed image in the focused annotation scenario.
+5. Press **offset**, then tap the visibly displaced live child and drag its label. Confirm touch bounds follow drawing. Press **offset** again and confirm zero-reset placement. Repeat at two Android display densities and record the actual density settings.
+6. Pan and zoom with the popup visible. Confirm it follows its geographic attachment and its child button works. Dismiss through the close button; confirm one `popup-close`. Show it again with **popup**, then remove/remount it through configuration; confirm teardown adds no dismissal.
+7. Tap the green source point with propagation allowed. Confirm one source and one map callback. Toggle **Stop source bubbling** and tap it again; confirm only the source callback increases. Include overlapping sources and vector hits in the focused feature-press scenario.
+8. Tap zoom in and zoom out; use renderer readback to confirm camera changes and constraint handling. Tap locate and confirm the injected position `[-122.33, 47.62]` through renderer readback. Exercise a rejected and delayed provider in the focused location scenario.
+9. Press **units** and inspect the scale text and width. Confirm native attribution remains available and control placement does not consume touches in empty overlay space.
+10. Press **style**, wait for replacement rendering, and inspect source hits, markers, and popups again. Press **remount**, repeat a child press and source press, and confirm no old callback or popup dismissal is delivered. Perform the style/remount step last, then press **Read renderer** to submit the completed observation.
+
+The manual report identifies the installed binary and records every required observation using the scenario names exported by `scripts/tf07-smoke-contract.mjs`. Use `passed`, `failed`, or `unverified`; retain failure explanations and first-attempt provenance. A later successful retry adds a new outcome rather than replacing the original.
+
+Keep compact results and artifact/version/environment identity in `records/evidence`. Remove temporary browser profiles, copied APKs, generated native outputs, and investigation logs when the checkpoint finishes, retaining screenshots only when they explain a specific unresolved result.

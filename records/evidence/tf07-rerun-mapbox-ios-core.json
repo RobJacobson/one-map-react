@@ -1,0 +1,94 @@
+{
+  "environment": "mapbox-ios",
+  "attempt": 1,
+  "status": "stopped-at-first-child-press-failure",
+  "runId": "082c2ef2-1114-4600-981c-2ec008b7e342",
+  "artifact": {
+    "sourceSha256": "0ca04feef7069502efe019de25919795b9fa2500aa460a874259411f40379991",
+    "libraryDistSha256": "746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2",
+    "installedExecutableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+    "installedDebugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "installedBinaryReuse": true,
+    "bundleId": "org.reactjs.native.example.OneMapMapbox"
+  },
+  "device": {
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "model": "iPhone 18 Pro",
+    "os": "iOS 27.0",
+    "screen": "402x874 logical points"
+  },
+  "driver": {
+    "xctestrun": "/private/tmp/one-map-tf07-rerun/derived-maestro-touchdriver/Build/Products/maestro-driver-ios_iphonesimulator27.0-arm64.xctestrun",
+    "httpPort": 22087,
+    "input": "XCTest actual touch route",
+    "initialStatus": "HTTP 200"
+  },
+  "startup": "Sandboxed xcrun launch failed before report creation; same authorized runner started with scoped access. No app failure attributed to this setup boundary.",
+  "initialObservation": {
+    "events": {
+      "popup-open": 1,
+      "style": 1,
+      "load": 1,
+      "move": 1
+    },
+    "positions": {},
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "fixture": "tf07"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.33999490737915,
+            47.57999970656695
+          ]
+        },
+        "id": 707
+      }
+    ],
+    "generation": 0,
+    "stopSourcePropagation": false
+  },
+  "childPress": {
+    "scenario": "live-child-button",
+    "method": "XCTest actual touch at logical coordinate; duration 120ms",
+    "targetBoundsPoints": [
+      140.3333,
+      470.6667,
+      261.6667,
+      487.6667
+    ],
+    "point": [
+      201,
+      479
+    ],
+    "toolResponse": "HTTP 200",
+    "result": "child-click absent; map-click absent; renderer observation unchanged",
+    "outcome": "failed; first actual runtime failure, stopped for coordinator diagnosis"
+  },
+  "manualScenarios": {
+    "live-child-button": "failed",
+    "nested-scroll": "unverified",
+    "live-drag": "unverified",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "screenshots": [
+    "/private/tmp/one-map-tf07-rerun/mapbox-ios-core-initial.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-ios-core-after-child-attempt.png"
+  ],
+  "observationPath": "/private/tmp/one-map-tf07-rerun/observation-mapbox-ios-core-child.json"
+}

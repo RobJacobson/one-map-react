@@ -1,0 +1,350 @@
+{
+  "artifact": {
+    "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+    "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+  },
+  "environment": {
+    "backend": "mapbox",
+    "platform": "ios",
+    "device": "iPhone 18 Pro",
+    "os": "iOS 27.0",
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+  },
+  "builds": [
+    {
+      "attempt": 1,
+      "result": "incomplete-peer-linkage",
+      "detail": "BUILD SUCCEEDED against Pods/Manifest.lock without Teleport. Not installed or launched; excluded from runtime acceptance."
+    },
+    {
+      "attempt": 2,
+      "result": "success",
+      "command": "xcodebuild -workspace ios/OneMapMapbox.xcworkspace -scheme OneMapMapbox -configuration Debug -destination platform=iOS Simulator,id=8B7D7CE4-228E-409F-A156-A597D4E448A5 CODE_SIGNING_ALLOWED=NO build",
+      "log": "/private/tmp/one-map-tf07-acceptance/mapbox-ios-build-teleport.log",
+      "teleport": "1.2.1 present in Podfile.lock, Pods/Manifest.lock, and compiled RNTPortalViewComponentDescriptor target"
+    }
+  ],
+  "binary": {
+    "bundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+    "bundlePath": "/private/tmp/one-map-tf07-acceptance/mapbox-ios-derived-teleport/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+    "executableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+    "debugDylibSha256": "9b25f6e1bef0d0155d20454ab3772f31cf0ecab598896a8869a8201d995e20c8",
+    "installedBundleVerified": true,
+    "installedExecutableAndDylibMatchBuild": true,
+    "teleportSymbolObservedInInstalledDebugDylib": true,
+    "frameworks": [
+      "MapboxCommon",
+      "MapboxCoreMaps",
+      "React",
+      "ReactNativeDependencies",
+      "Turf",
+      "hermesvm"
+    ]
+  },
+  "currentRun": {
+    "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb",
+    "runner": "isolated Metro8171/status8797",
+    "status": "completed-generation1-readback",
+    "execution": "agent-driven Maestro 2.11.0 native iOS taps/swipes; simctl screenshots; corrected SafeAreaView fixture",
+    "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+    "debugDylibSha256": "9b25f6e1bef0d0155d20454ab3772f31cf0ecab598896a8869a8201d995e20c8",
+    "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+    "startup": "Assigned iPhone 18 Pro / iOS 27.0 loaded TF07 fixture; generation0 initial readback succeeded.",
+    "initialReadback": {
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11,
+      "featureId": 707,
+      "featureIdType": "number in actual initial AX readback",
+      "fixture": "tf07",
+      "generation": 0,
+      "stopSourcePropagation": false,
+      "events": {
+        "popup-open": 1,
+        "style": 1,
+        "move": 2,
+        "load": 1
+      }
+    },
+    "finalReadback": {
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11,
+      "featureId": 707,
+      "featureIdType": "number",
+      "featureGeometry": [
+        -122.33999490737915,
+        47.57999970656695
+      ],
+      "fixture": "tf07",
+      "generation": 1,
+      "stopSourcePropagation": true,
+      "events": {
+        "popup-open": 2,
+        "style": 3,
+        "move": 46,
+        "load": 2,
+        "source-click": 1
+      }
+    },
+    "observations": [
+      "Prior run224: live child button tap produced child-click1 without map-click; not repeated in run0ba8.",
+      "Actual tap on visible source feature while source propagation was stopped produced source-click1, no map-click, and final stopSourcePropagation=true.",
+      "Prior run224: zoom11\u219212\u219211 was measured through separate reads. Run0ba8 independently observed zoom11\u219212 during scale diagnosis.",
+      "Style action changed the visible map to the replacement style. Remount completed; final generation1 readback showed style3/load2 and finite camera/feature707.",
+      "An annotation-coordinate swipe panned the map; continuous long-press drag remains unverified because Maestro swipe cannot hold before moving.",
+      "The common scale was absent at initial camera, appeared after camera movement, and remained 1 mi after the bounded physical units tap; units response is inconclusive.",
+      "Nested-scroll failure from prior run224 is preserved separately; corrected gesture panned the map (move76 to94, latitude47.5729864 to47.5692786).",
+      "Multi-touch/cancel, delayed imagery, overlay passthrough, Android two-density offsets, and continuous annotation/marker drag remain unverified."
+    ],
+    "scenarios": {
+      "finite-camera-feature-readback": "passed-generation0-and-final-generation1",
+      "live-child-button": "passed-in-prior-run224",
+      "nested-scroll": "failed-corrected-gesture-panned-map-in-prior-run224",
+      "live-drag": "unverified-driver-cannot-hold-before-drag",
+      "annotation-drag": "unverified-driver-cannot-hold-before-drag",
+      "offset-touch-bounds": "partial-offset-child-hit-and-reset-in-prior-run224;drag-unverified",
+      "popup-follow-dismissal": "partial-child-dismissal-in-prior-run224;follow-and-teardown-unverified",
+      "source-propagation": "stopped-passed;allowed-passed-in-prior-run224",
+      "navigation-location": "passed-in-prior-run224",
+      "scale-units": "initial-scale-absent;bounded-toggle-inconclusive",
+      "style-remount": "passed-visible-style-change-remount-and-generation1-readback",
+      "host-accessibility": "unverified",
+      "multi-touch-cancel": "unverified-driver-limitation"
+    },
+    "screenshots": [
+      "/private/tmp/one-map-tf07-acceptance/mapbox-run4-startup.png",
+      "/private/tmp/one-map-tf07-acceptance/mapbox-run4-source-toggle.png",
+      "/private/tmp/one-map-tf07-acceptance/mapbox-run4-zoom.png",
+      "/private/tmp/one-map-tf07-acceptance/mapbox-run4-units-metric.png",
+      "/private/tmp/one-map-tf07-acceptance/mapbox-run4-style.png",
+      "/private/tmp/one-map-tf07-acceptance/mapbox-run4-after-remount.png",
+      "/private/tmp/one-map-tf07-acceptance/mapbox-run4-final.png"
+    ],
+    "finalHierarchy": "/private/tmp/one-map-tf07-acceptance/mapbox-run4-final-hierarchy.log",
+    "inputDriver": "Maestro CLI 2.11.0 verified wrapper; real native touches and simctl screenshots; final runner endpoints exited after final readback.",
+    "acceptanceStatus": "unverified-full-native-gate",
+    "coordinatorProvenanceReview": "Actual initial AX readback retained numeric707; prior-run scenario evidence explicitly qualified. No earlier counters or manual report are treated as run0ba8 evidence.",
+    "runnerJudgment": "Original final command exit/judgment unavailable; closed ports alone do not prove success. No manual report file was retained. Actual final native AX observation is preserved separately."
+  },
+  "attempts": [
+    {
+      "phase": "runner-start",
+      "result": "failed-before-runtime",
+      "detail": "First sandboxed runner invocation exited at xcrun before Metro/launch; no runtime started."
+    },
+    {
+      "phase": "run-1",
+      "runId": "795791dd-7246-46fe-bfc7-b177fa6d9e17",
+      "result": "startup-observed-input-discovery-failed",
+      "detail": "Elevated runner launched the app and screenshot verified the TF07 scene. First non-elevated Maestro hierarchy call said assigned device was not connected; runner stopped before touch/readback. Escalated Maestro hierarchy later succeeded."
+    },
+    {
+      "phase": "run-2-start",
+      "result": "failed-before-runtime",
+      "detail": "Same-artifact runner found owned Metro child PID 83045 still holding port 8171 after prior stop. Coordinator approved terminating only that owned process; port conflict retained."
+    },
+    {
+      "phase": "run-3-corrected-safe-area",
+      "runId": "224d943a-bf25-40e5-9b3f-8f5352c813ab",
+      "result": "partial-runtime-observation-timeout",
+      "detail": "Actual UI interactions/readbacks above were collected. Runner ended with TF07 observation timed out before style/remount generation1 final read; latest location read was visible in AX, but status POST failed after endpoint expiry."
+    },
+    {
+      "phase": "run-4-safe-area-style-remount",
+      "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb",
+      "result": "completed-generation1-readback",
+      "detail": "Fresh run with corrected SafeAreaView fixture; actual style/remount and final generation1 renderer readback succeeded. Full acceptance remains partial with listed unverified cases and preserved nested-scroll failure."
+    }
+  ],
+  "priorRuns": [
+    {
+      "runId": "224d943a-bf25-40e5-9b3f-8f5352c813ab",
+      "runner": "isolated Metro8171/status8797",
+      "status": "partial-runtime-transport-timeout",
+      "execution": "agent-driven Maestro 2.11.0 native iOS touches and simctl screenshots",
+      "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "debugDylibSha256": "9b25f6e1bef0d0155d20454ab3772f31cf0ecab598896a8869a8201d995e20c8",
+      "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "startup": "Safe-area corrected TF07 fixture loaded on assigned iPhone 18 Pro simulator; initial generation0 readback succeeded; runner later timed out after its 20-minute observation window.",
+      "verifiedRendererReadback": {
+        "events": {
+          "popup-open": 2,
+          "style": 1,
+          "load": 1,
+          "move": 119,
+          "child-click": 1,
+          "marker-click": 1,
+          "popup-close": 1,
+          "popup-child": 1
+        },
+        "positions": {},
+        "center": [
+          -122.33999999999997,
+          47.569278599999976
+        ],
+        "zoom": 11,
+        "featureId": 707,
+        "fixture": "tf07",
+        "generation": 0,
+        "stopSourcePropagation": false
+      },
+      "inputObservations": [
+        "Initial generation0 readback: finite center[-122.34000000000002,47.60999999999999], zoom11, feature id707 fixture tf07; live child tap incremented child-click1 with no map-click.",
+        "A first attempted nested-scroll group caused map pan and marker-click; coordinator reviewed and approved a corrected in-container gesture. Corrected swipe start x201,y367 within scroll viewport [140,344][261,376] / Scroll two row [140,361][261,378], ending y341; renderer still panned: move76\u219294, center latitude47.5729864\u219247.5692786, marker-click stayed1. Coordinator classified nested-scroll FAILED. Before/after screenshots: /private/tmp/one-map-tf07-acceptance/mapbox-controls.png and /private/tmp/one-map-tf07-acceptance/mapbox-corrected-scroll.png.",
+        "Maestro swipe releases after a short initial press and does not establish a continuous 500ms long-press drag. Live marker drag, annotation drag, multipointer/cancel remain unverified.",
+        "Zoom in tap followed by immediate read changed zoom11\u219212; separate Zoom out tap/read returned zoom12\u219211; center stable and feature707 retained.",
+        "Toolbar popup toggle reopened popup (popup-open2); real popup child tap incremented popup-child1; toolbar unmount left popup-close unchanged at1. Explicit Close popup tap incremented popup-close1. Popup follow remains unverified.",
+        "Offset toolbar changed live marker label/accessibility bounds by approximately(+24,-12) logical points: baseline[140,294][261,311], displaced[164,282][285,299]. Real tap on live child at displaced bounds incremented child-click1\u21922 with no additional map-click. Second offset toggle reset bounds to baseline. Continuous drag at displaced bounds and Android two-density behavior are not established.",
+        "Three `units` toolbar toggles were followed by Read renderer; bottom-left common facade ScaleControl remained visibly `2 km` each time at AX bounds[9,819][85,831]. Screenshots mapbox-units.png, mapbox-units-toggle2.png, mapbox-units-imperial.png. Top-left mile ticks are native ornament, not the common control. Scale unit change did not appear; coordinator diagnosis requested/available.",
+        "Source allowed: tap on visible green source circle incremented source-click0\u21921 and map-click0\u21921. Source stopped attempt used toolbar label tap, but label stayed `Stop source bubbling`, readback stopSourcePropagation remained false, and source-click/map-click both incremented to2; no retry before runner timeout, so stopped propagation remains unverified.",
+        "Locate me actual tap/read changed center to[-122.33,47.61999999999999], kept zoom11, incremented location1. This final UI readback was captured by Maestro hierarchy, but status post failed because the isolated runner had timed out; screenshot shows `TF07 readback transport failed`.",
+        "The active runner exited with `TF07 observation timed out` before generation1; no final style/remount Read renderer was submitted. Style/remount and host accessibility/empty overlay remain unverified."
+      ],
+      "screenshots": [
+        "/private/tmp/one-map-tf07-acceptance/mapbox-after-safearea-child.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-controls.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-corrected-scroll.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-native-controls.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-offset.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-units.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-units-toggle2.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-units-imperial.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-toolbar-scroll.png",
+        "/private/tmp/one-map-tf07-acceptance/mapbox-locate.png"
+      ],
+      "inputDriver": "Maestro CLI 2.11.0; actual native taps/swipes plus simctl screenshots. Runner/status endpoint expired after 20-minute window. No fake callbacks or readback values.",
+      "scenarios": {
+        "finite-camera-feature-readback": "passed-generation0",
+        "live-child-button": "passed-child-click-isolated",
+        "nested-scroll": "failed-corrected-gesture-panned-map",
+        "live-drag": "unverified-driver-cannot-hold-before-drag",
+        "annotation-drag": "unverified",
+        "offset-touch-bounds": "partial-offset-placement-child-hit-reset;drag-unverified",
+        "popup-follow-dismissal": "partial-popup-child-and-dismissal;teardown-no-close;follow-unverified",
+        "source-propagation": "partial-allowed-passed-stopped-unverified-toggle-not-activated",
+        "navigation-location": "passed-native-location1-center-readback-runner-post-expired",
+        "style-remount": "unverified-runner-timeout-before-final",
+        "host-accessibility": "unverified",
+        "scale-units": "failed-common-scale-remained-2-km-after-three-toggles"
+      },
+      "priorRunContext": {
+        "runId": "c52b9d03-bb9d-42aa-ad03-c0909ec016bd",
+        "status": "unverified-fixture-safe-area-block",
+        "detail": "Prior fixture host placed toolbar beneath status bar; root subsequently corrected only test-screen safe-area host. Earlier attempts retained in attempts array."
+      },
+      "latestNativeReadback": {
+        "events": {
+          "popup-open": 2,
+          "style": 1,
+          "load": 1,
+          "move": 156,
+          "child-click": 2,
+          "marker-click": 1,
+          "popup-close": 1,
+          "popup-child": 1,
+          "source-click": 2,
+          "map-click": 2,
+          "location": 1
+        },
+        "positions": {},
+        "center": [
+          -122.33,
+          47.61999999999999
+        ],
+        "zoom": 11,
+        "featureId": 707,
+        "fixture": "tf07",
+        "generation": 0,
+        "stopSourcePropagation": false
+      }
+    }
+  ],
+  "coordinatorReview": {
+    "provenance": "Applied pure native judge after execution to actual final AX renderer observation and coordinator-reviewed outcomes for this exact run; no input, status POST, or new runtime. This does not repair the missing original operator report or certify full acceptance.",
+    "identity": {
+      "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "environment": "mapbox-ios",
+      "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb"
+    },
+    "observation": {
+      "events": {
+        "popup-open": 2,
+        "style": 3,
+        "move": 46,
+        "load": 2,
+        "source-click": 1
+      },
+      "positions": {},
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11,
+      "features": [
+        {
+          "type": "Feature",
+          "id": 707,
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -122.33999490737915,
+              47.57999970656695
+            ]
+          },
+          "properties": {
+            "fixture": "tf07"
+          }
+        }
+      ],
+      "generation": 1,
+      "stopSourcePropagation": true
+    },
+    "reviewedReport": {
+      "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "environment": "mapbox-ios",
+      "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb",
+      "scenarios": {
+        "live-child-button": "unverified",
+        "nested-scroll": "unverified",
+        "live-drag": "unverified",
+        "annotation-drag": "unverified",
+        "offset-touch-bounds": "unverified",
+        "popup-follow-dismissal": "unverified",
+        "source-propagation": "unverified",
+        "navigation-location": "unverified",
+        "style-remount": "unverified",
+        "host-accessibility": "unverified",
+        "scale-units": "unverified"
+      }
+    },
+    "judgment": {
+      "status": "unverified",
+      "execution": "manual-native-touch",
+      "observed": false,
+      "manualComplete": false,
+      "remaining": [
+        "live-child-button",
+        "nested-scroll",
+        "live-drag",
+        "annotation-drag",
+        "offset-touch-bounds",
+        "popup-follow-dismissal",
+        "source-propagation",
+        "navigation-location",
+        "style-remount",
+        "host-accessibility",
+        "scale-units"
+      ]
+    },
+    "execution": "agent-driven native UI; coordinator reviewed",
+    "fullTf07Acceptance": false
+  },
+  "retention": "Temporary build/tool/log/screenshot paths are historical provenance; bulk owned test outputs removed after compact record. Selected scrolling/scale failure images retained in aggregate record."
+}

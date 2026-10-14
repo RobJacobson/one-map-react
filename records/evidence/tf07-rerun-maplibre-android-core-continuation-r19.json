@@ -1,0 +1,37 @@
+{
+  "environment": "MapLibre Android, Android 16 / API 36, emulator-5556, 1080x2400 at 420 dpi",
+  "status": "passed-core11-composite",
+  "continuationRunId": "600d8d00-5c98-4337-bdca-151b3ab94b64",
+  "priorPartialRunId": "1311e070-ce33-47cd-84a2-cf09bc113cf2",
+  "installedApkSha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "librarySourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "continuationScenarios": {
+    "active-interruption-recovery": "passed",
+    "popup-follow-dismissal": "passed",
+    "source-propagation": "passed",
+    "navigation-location": "passed",
+    "scale-units": "passed",
+    "host-accessibility": "passed",
+    "style-remount": "passed"
+  },
+  "compositePriorScenarios": {
+    "live-child-button": "passed in prior partial run",
+    "nested-scroll": "passed in prior partial run",
+    "live-drag": "passed in prior partial run",
+    "annotation-drag": "passed in prior partial run",
+    "offset-touch-bounds": "passed in prior partial run"
+  },
+  "review": "R19 completed all seven remaining core fields; combined with the five passed fields in the preserved R16 partial run, all eleven core scenarios passed against the same verified APK and library digest.",
+  "evidence": [
+    "tf07-rerun-maplibre-android-core-r16-stopped.json",
+    "tf07-rerun-maplibre-android-core-continuation-r16-timing-unverified.json",
+    "tf07-rerun-maplibre-android-core-continuation-r16-handoff.json",
+    "tf07-rerun-maplibre-android-core-continuation-r19-manual.json"
+  ],
+  "firstAttemptsPreserved": [
+    "tf07-rerun-maplibre-android-continuation-r17-start-failed.json",
+    "tf07-rerun-maplibre-android-continuation-r18-helper-timeout.json"
+  ],
+  "cleanup": "Runner and app stopped after acceptance; emulator restored to portrait at 420 dpi; assigned ports and reverse mappings cleared."
+}

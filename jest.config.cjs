@@ -22,6 +22,9 @@ module.exports = {
       preset: "@react-native/jest-preset",
       testMatch: ["<rootDir>/packages/one-map-react/test/**/*.native.test.tsx"],
       moduleNameMapper: {
+        "^react-native-teleport$": require.resolve(
+          "react-native-teleport/jest"
+        ),
         "^react-native/setup-env$": `${reactNativeRoot}/src/setup-env.js`,
         "^react-native($|/.*)": `${reactNativeRoot}/$1`,
         ...extensionlessImports,

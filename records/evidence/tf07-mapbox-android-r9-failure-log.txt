@@ -1,0 +1,43 @@
+10-13 13:32:20.908  6192  6192 D AndroidRuntime: Shutting down VM
+10-13 13:32:20.908  6192  6201 W IPCThreadState: call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+10-13 13:32:20.908  6192  6200 W IPCThreadState: call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: dispatchMountItems: caught exception, displaying mount state
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: java.lang.ClassCastException: Dynamic value from Object is not a ReadableMap
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: 	at com.facebook.react.bridge.DynamicFromObject.asMap(DynamicFromObject.kt:62)
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings$lambda$16$lambda$15(RNMBXMapViewManager.kt:158)
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda4.invoke(D8$$SyntheticClass:0)
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: 	at com.mapbox.maps.MapboxMap.gesturesPlugin(MapboxMap.kt:2625)
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings$lambda$16(RNMBXMapViewManager.kt:157)
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapView.withMap(RNMBXMapView.kt:549)
+10-13 13:32:20.940  5956  5956 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings(RNMBXMapViewManager.kt:156)
+--
+10-13 13:32:20.941  5956  5956 E unknown:SurfaceMountingManager: <RCTView id=120 parentTag=56 isRoot=false />
+10-13 13:32:20.941  5956  5956 E unknown:SurfaceMountingManager: <RCTView id=96 parentTag=98 isRoot=false />
+10-13 13:32:20.941  5956  5956 E unknown:SurfaceMountingManager: <RCTText id=72 parentTag=94 isRoot=false />
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: Exception thrown when executing UIFrameGuarded
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: java.lang.ClassCastException: Dynamic value from Object is not a ReadableMap
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.facebook.react.bridge.DynamicFromObject.asMap(DynamicFromObject.kt:62)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings$lambda$16$lambda$15(RNMBXMapViewManager.kt:158)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda4.invoke(D8$$SyntheticClass:0)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.mapbox.maps.MapboxMap.gesturesPlugin(MapboxMap.kt:2625)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings$lambda$16(RNMBXMapViewManager.kt:157)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapView.withMap(RNMBXMapView.kt:549)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings(RNMBXMapViewManager.kt:156)
+--
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at android.app.ActivityThread.main(ActivityThread.java:9067)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at java.lang.reflect.Method.invoke(Native Method)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+10-13 13:32:20.941  5956  5956 E unknown:FabricUIManager: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:932)
+10-13 13:32:20.942  5956  5956 W unknown:BridgelessReact: ReactHost{0}.handleHostException(message = "Dynamic value from Object is not a ReadableMap")
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: Exception in native call
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: java.lang.ClassCastException: Dynamic value from Object is not a ReadableMap
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: 	at com.facebook.react.bridge.DynamicFromObject.asMap(DynamicFromObject.kt:62)
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings$lambda$16$lambda$15(RNMBXMapViewManager.kt:158)
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda4.invoke(D8$$SyntheticClass:0)
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: 	at com.mapbox.maps.MapboxMap.gesturesPlugin(MapboxMap.kt:2625)
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings$lambda$16(RNMBXMapViewManager.kt:157)
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapView.withMap(RNMBXMapView.kt:549)
+10-13 13:32:20.942  5956  5956 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setGestureSettings(RNMBXMapViewManager.kt:156)

@@ -1,0 +1,361 @@
+{
+  "environment": "maplibre-web",
+  "execution": "scripts/tf07-ui-smoke.mjs web maplibre",
+  "status": "passed",
+  "firstOutcome": "setup-failure",
+  "attempts": [
+    {
+      "attempt": 1,
+      "script": "scripts/tf07-ui-smoke.mjs web maplibre",
+      "sandboxPermissions": "use_default",
+      "status": "setup-failure",
+      "phase": "start",
+      "error": "TF07 observation timed out.",
+      "interpretation": "Vite could not respond because sandboxed localhost server startup was blocked; not a product failure."
+    },
+    {
+      "attempt": 2,
+      "script": "/private/tmp/one-map-tf07-rerun/web-diagnostic.mjs web maplibre",
+      "sandboxPermissions": "use_default",
+      "status": "setup-failure",
+      "phase": "start",
+      "consoleEvents": 0,
+      "error": "TF07 observation timed out.",
+      "interpretation": "Same localhost server-startup sandbox boundary; not a product failure."
+    },
+    {
+      "attempt": 3,
+      "script": "/private/tmp/one-map-tf07-rerun/web-diagnostic.mjs web maplibre",
+      "sandboxPermissions": "require_escalated",
+      "status": "passed",
+      "phase": "complete",
+      "scope": [
+        "known-feature",
+        "child-click",
+        "live-drag",
+        "annotation-drag",
+        "source-propagation",
+        "navigation",
+        "popup-dismissal",
+        "remount-teardown"
+      ],
+      "observedEvents": {
+        "popup-open": 3,
+        "load": 2,
+        "move": 28,
+        "style": 2,
+        "marker-click": 1,
+        "child-click": 1,
+        "live-start": 1,
+        "live-drag": 6,
+        "live-end": 1,
+        "annotation-start": 1,
+        "annotation-end": 1,
+        "source-click": 2,
+        "map-click": 1,
+        "popup-close": 1
+      },
+      "observedLivePosition": [-122.32352050781279, 47.604444686584344],
+      "observedAnnotationPosition": [-122.36368927001988, 47.604444686584344],
+      "observedCenter": [-122.34, 47.61],
+      "observedZoom": 11,
+      "knownFeatureId": 707,
+      "generation": 1,
+      "stopSourcePropagation": true
+    }
+  ],
+  "artifact": {
+    "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+    "sourceSha256": "1e98df6b9f001d58b18a5b659bed4264efda61352d09d4b1648c6ac64cd2ac48"
+  },
+  "error": "TF07 observation timed out.",
+  "warning": "TypeScript emitted: moduleSuffixes is not supported yet at tsconfig.json:6:5.",
+  "diagnosticAttempt": {
+    "authorizedSameArtifactRetry": true,
+    "status": "passed-after-scoped-escalation",
+    "artifactDistSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+    "scriptSyntaxCheck": "passed"
+  },
+  "extendedScenarios": {
+    "status": "partial-failure",
+    "attempt": {
+      "script": "/private/tmp/one-map-tf07-rerun/web-extended.mjs web maplibre",
+      "sandboxPermissions": "require_escalated",
+      "status": "failed",
+      "phase": "keyboard-control",
+      "artifactDistSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+      "error": "TF07 observation timed out.",
+      "consoleErrors": 0,
+      "observedEvents": {
+        "load": 1,
+        "style": 1,
+        "move": 18,
+        "child-click": 1,
+        "popup-child": 1,
+        "location": 1
+      },
+      "observedCenterAfterLocation": [-122.32999999999998, 47.619999999999976],
+      "observedZoomAtFailure": 11,
+      "knownFeatureId": 707,
+      "visibleScale": "1 mi",
+      "completedBeforeFailure": [
+        "offsets-24-minus12",
+        "child-hit-isolation",
+        "offset-reset",
+        "metric-to-imperial-scale",
+        "popup-child",
+        "popup-follow-during-empty-overlay-pan",
+        "injected-location-camera"
+      ],
+      "remainingAfterFailure": [
+        "keyboard-tab-enter-zoom",
+        "style-replacement",
+        "remount-known-feature",
+        "child-hit-after-remount"
+      ],
+      "failureScreenshot": "not-produced-by-harness"
+    },
+    "reason": "Keyboard-control phase timed out after preceding extended scenarios completed; later style/remount assertions were not reached.",
+    "keyboardSpaceAttempt": {
+      "script": "/private/tmp/one-map-tf07-rerun/web-extended-space.mjs web maplibre",
+      "sandboxPermissions": "require_escalated",
+      "status": "scenario-assertions-passed-output-failure",
+      "keyboard": "Space transport reached Zoom in and keyboard activation proceeded through the remaining scenarios.",
+      "completedScenarios": [
+        "offsets-24-minus12",
+        "child-hit-isolation",
+        "offset-reset",
+        "metric-to-imperial-scale",
+        "popup-child",
+        "popup-follow-during-empty-overlay-pan",
+        "injected-location-camera",
+        "keyboard-zoom-control",
+        "style-replacement",
+        "remount-known-feature",
+        "child-hit-after-remount"
+      ],
+      "observedEvents": {
+        "popup-open": 2,
+        "load": 2,
+        "move": 51,
+        "style": 3,
+        "marker-click": 2,
+        "child-click": 2,
+        "popup-child": 1,
+        "location": 1
+      },
+      "observedCenterAfterRemount": [-122.34, 47.61],
+      "observedZoomAfterRemount": 11,
+      "knownFeatureId": 707,
+      "generation": 1,
+      "harnessOutputError": "ENOENT: no such file or directory, open '/private/tmp/one-map-tf07-rerun/web-maplibre/extended-final.png'",
+      "screenshot": "not-produced"
+    },
+    "focusedHarnessAttempt": {
+      "script": "/private/tmp/one-map-tf07-rerun/web-focused.mjs web maplibre",
+      "sandboxPermissions": "require_escalated",
+      "status": "failed",
+      "phase": "delayed-provider-and-teardown",
+      "artifactDistSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+      "failure": "Expected rejected-provider Locate button to be disabled; actual `button[aria-label^=Locate]`.disabled was false.",
+      "observedDom": "focused UI showed Locate me / initial / MapLibre; base scale read 2 km.",
+      "completedBeforeFailure": [
+        "physical-fullscreen-enter-and-exit",
+        "rejected-location-provider-no-camera-update"
+      ],
+      "eventsAtFailure": {
+        "load": 1,
+        "style": 1,
+        "move": 3,
+        "popup-open": 1
+      },
+      "knownFeatureId": 707,
+      "focusScreenshot": "not-produced",
+      "unreached": [
+        "delayed-provider-pending-control-removal-and-resolution",
+        "React-context-control-update-and-child-press",
+        "read-only-accessibility-and-screenshot"
+      ],
+      "fullAssistiveTechnology": "unverified"
+    },
+    "focusedHarnessRetry": {
+      "script": "/private/tmp/one-map-tf07-rerun/web-focused.mjs web maplibre",
+      "sandboxPermissions": "require_escalated",
+      "status": "passed",
+      "artifactDistSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+      "outcomes": [
+        "fullscreen-enter-exit",
+        "rejected-provider-no-camera-update",
+        "delayed-provider-pending-control-disabled-and-unmounted-before-resolution",
+        "context-update-preserves-actual-control-child-press"
+      ],
+      "providerReadback": {
+        "calls": 2,
+        "errors": 1,
+        "locations": 0,
+        "clicks": 2,
+        "zoom": 11,
+        "center": [-122.34, 47.61]
+      },
+      "accessibilityButtonLabels": [
+        "remount",
+        "style",
+        "offset",
+        "popup",
+        "units",
+        "Zoom in",
+        "Zoom out",
+        "Drag to rotate map, click to reset north",
+        "Enter fullscreen",
+        "Zoom in",
+        "Zoom out",
+        "Drag to rotate map, click to reset north",
+        "Close popup",
+        "Child button",
+        "updated",
+        "Locate me",
+        "Child button"
+      ],
+      "focusedScreenshot": {
+        "path": "/private/tmp/one-map-tf07-rerun/web-maplibre/focused-final.png",
+        "sha256": "70d0e037ba61299821e936ef29d4c497ad5fc02140343b6858d7b7b654eda4c4",
+        "visualReview": "Focused controls are visible and legible: map navigation/fullscreen controls at upper right, updated control at lower right, and MapLibre attribution. Main basemap area is a uniform light gray in this capture."
+      },
+      "fullAssistiveTechnology": "unverified"
+    },
+    "scopeRequired": [
+      "offsets-reset",
+      "scale-units",
+      "source-bubbling",
+      "location",
+      "style-remount",
+      "popup-following",
+      "empty-overlay",
+      "fullscreen",
+      "keyboard-accessibility",
+      "delayed-provider",
+      "rejected-provider"
+    ],
+    "packedConsumerHarness": "Coordinator preparation required for adverse provider cases."
+  },
+  "sharedMapR3Rerun": {
+    "change": "SharedMapR3 pan-lock change",
+    "sourceSha256": "6ef01ed4d479decc338a71b93e62a18d0bd166ba18d1b70b12ca0fd89c79385c",
+    "distSha256": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+    "consumerDistSha256": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+    "sandboxPermissions": "require_escalated",
+    "core": {
+      "status": "passed",
+      "scope": [
+        "known-feature",
+        "child-click",
+        "live-drag",
+        "annotation-drag",
+        "source-propagation",
+        "navigation",
+        "popup-dismissal",
+        "remount-teardown"
+      ],
+      "observedEvents": {
+        "popup-open": 3,
+        "load": 2,
+        "move": 29,
+        "style": 2,
+        "marker-click": 1,
+        "child-click": 1,
+        "live-start": 1,
+        "live-drag": 6,
+        "live-end": 1,
+        "annotation-start": 1,
+        "annotation-end": 1,
+        "source-click": 2,
+        "map-click": 1,
+        "popup-close": 1
+      },
+      "observedLivePosition": [-122.32352050781279, 47.604444686584344],
+      "observedAnnotationPosition": [-122.36368927001988, 47.604444686584344],
+      "knownFeatureId": 707,
+      "generation": 1,
+      "stopSourcePropagation": true
+    },
+    "extended": {
+      "status": "passed",
+      "scenarios": {
+        "offset-reset": {"status": "passed", "offset": [24, -12]},
+        "scale-units": {"status": "passed", "metric": "2 km", "imperial": "1 mi"},
+        "popup-child-follow-empty-overlay-pan": {"status": "passed", "popupDelta": [48, 24]},
+        "geolocation": {"status": "passed", "center": [-122.32999999999998, 47.619999999999976]},
+        "keyboard-control": {"status": "passed", "activated": "Zoom in"},
+        "style-remount": {"status": "passed", "styleEvents": 3, "loadEvents": 2, "childClicks": 2, "generation": 1}
+      },
+      "screenshot": {
+        "path": "/private/tmp/one-map-tf07-rerun/web-maplibre/extended-final.png",
+        "sha256": "169ff19849de8de1e337832428d14b6cf1233c22321a74b4583b4daebe7fdff3",
+        "visualReview": "Fixture controls, popup child, point features, navigation controls, scale and MapLibre attribution were visible."
+      }
+    },
+    "focused": {
+      "status": "passed",
+      "scenarios": [
+        "fullscreen-enter-exit",
+        "rejected-provider-no-camera-update",
+        "delayed-provider-pending-control-disabled-and-unmounted-before-resolution",
+        "context-update-preserves-actual-control-child-press"
+      ],
+      "providerReadback": {"calls": 2, "errors": 1, "locations": 0, "clicks": 2, "zoom": 11, "center": [-122.34, 47.61]},
+      "accessibilityButtonLabels": ["remount", "style", "offset", "popup", "units", "Zoom in", "Zoom out", "Drag to rotate map, click to reset north", "Enter fullscreen", "Zoom in", "Zoom out", "Drag to rotate map, click to reset north", "Close popup", "Child button", "updated", "Locate me", "Child button"],
+      "screenshot": {
+        "path": "/private/tmp/one-map-tf07-rerun/web-maplibre/focused-final.png",
+        "sha256": "70d0e037ba61299821e936ef29d4c497ad5fc02140343b6858d7b7b654eda4c4",
+        "visualReview": "Focused controls were legible. Main map canvas appeared uniformly light gray."
+      },
+      "fullAssistiveTechnology": "unverified"
+    }
+  },
+  "sharedMapR4Rerun": {
+    "change": "SharedMapR4 native layout state and live marker/popup hosting changes",
+    "sourceSha256": "239720a4b981b504d062e8666e5b27df4e543953342df9c8846b2981abe29c48",
+    "distSha256": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+    "packedSha256": "d6234ba322e8f8e4364ba02657743f4f515a38e449eed45c6d0c433475702b71",
+    "consumerDistSha256": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+    "sandboxPermissions": "require_escalated",
+    "core": {
+      "status": "passed",
+      "scope": ["known-feature", "child-click", "live-drag", "annotation-drag", "source-propagation", "navigation", "popup-dismissal", "remount-teardown"],
+      "observedEvents": {"popup-open": 3, "load": 2, "move": 27, "style": 2, "marker-click": 1, "child-click": 1, "live-start": 1, "live-drag": 6, "live-end": 1, "annotation-start": 1, "annotation-end": 1, "source-click": 2, "map-click": 1, "popup-close": 1},
+      "observedLivePosition": [-122.32352050781279, 47.604444686584344],
+      "observedAnnotationPosition": [-122.36368927001988, 47.604444686584344],
+      "knownFeatureId": 707,
+      "generation": 1,
+      "stopSourcePropagation": true
+    },
+    "extended": {
+      "status": "passed",
+      "scenarios": {
+        "offset-reset": {"status": "passed", "offset": [24, -12]},
+        "scale-units": {"status": "passed", "metric": "2 km", "imperial": "1 mi"},
+        "popup-child-follow-empty-overlay-pan": {"status": "passed", "popupDelta": [48, 24]},
+        "geolocation": {"status": "passed", "center": [-122.32999999999998, 47.619999999999976]},
+        "keyboard-control": {"status": "passed", "activated": "Zoom in"},
+        "style-remount": {"status": "passed", "styleEvents": 3, "loadEvents": 2, "childClicks": 2, "generation": 1}
+      },
+      "screenshot": {
+        "path": "/private/tmp/one-map-tf07-rerun/web-maplibre/extended-final.png",
+        "sha256": "c1127e73da8160c448cc3920aa28aec8ce9959ec2744788931d3e4d1be70a1ec",
+        "visualReview": "Fixture features, controls, popup child, scale and MapLibre attribution were visible."
+      }
+    },
+    "focused": {
+      "status": "passed",
+      "scenarios": ["fullscreen-enter-exit", "rejected-provider-no-camera-update", "delayed-provider-pending-control-disabled-and-unmounted-before-resolution", "context-update-preserves-actual-control-child-press"],
+      "providerReadback": {"calls": 2, "errors": 1, "locations": 0, "clicks": 2, "zoom": 11, "center": [-122.34, 47.61]},
+      "accessibilityButtonLabels": ["remount", "style", "offset", "popup", "units", "Zoom in", "Zoom out", "Drag to rotate map, click to reset north", "Enter fullscreen", "Zoom in", "Zoom out", "Drag to rotate map, click to reset north", "Close popup", "Child button", "updated", "Locate me", "Child button"],
+      "screenshot": {
+        "path": "/private/tmp/one-map-tf07-rerun/web-maplibre/focused-final.png",
+        "sha256": "70d0e037ba61299821e936ef29d4c497ad5fc02140343b6858d7b7b654eda4c4",
+        "visualReview": "Focused controls were legible; the map canvas appeared uniformly light gray."
+      },
+      "fullAssistiveTechnology": "unverified"
+    }
+  }
+}

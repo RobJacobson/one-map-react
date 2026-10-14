@@ -1,0 +1,780 @@
+{
+  "status": "accepted-r16-exercised-scope",
+  "previousAttempt": "tf07-runtime-acceptance.json",
+  "artifact": {
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "distSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "exampleDistSha256": {
+      "web-mapbox": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "web-maplibre": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "native-mapbox": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "native-maplibre": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d"
+    }
+  },
+  "routine": {
+    "formatting": "passed",
+    "documentation": "passed",
+    "types": "passed (four configs)",
+    "jest": "546 passed; 21 suites",
+    "scriptChecks": "passed; process signal checks required scoped sandbox escalation",
+    "packedSelections": "13 passed",
+    "peerConsumers": "4 passed on R14",
+    "exampleResolution": "passed on R14",
+    "validate": "passed with scoped process permissions",
+    "logScope": "R16 fullvalidate546/21, fourtypes, format/docs, fixture/process and packed13 including native SDK patch; follow-up docs passed.",
+    "docsFollowup": "Documentation-only R12 checkpoint summary structurally passed29Markdown/30SDKtables."
+  },
+  "repairs": [
+    "Buffer web load until wrapper camera attachment",
+    "Stable native map handles and passive scale measurement after ref attachment",
+    "Navigation uses actual renderer zoom",
+    "Lock native SDK gestures for marker child touch sequence; restore after end/cancel/unmount",
+    "Initialize identity-bound manual report and support isolated Metro/device selection",
+    "Keep Android native child-touch interception owned by SDK until live dragging activates; early child lock is iOS only",
+    "Give Android native acceptance toolbar explicit status-bar inset",
+    "Limit iOS child-touch ownership to dragPan; preserve tap recognizers until a live drag activates",
+    "Project common native live markers and popups into the existing per-map portal; retain child touch sequences outside SDK recognizers, update on movement/layout, discard stale projections; lock SDK gestures only after live drag activation",
+    "Observe native marker touch events without claiming a JS responder; preserve native child scroll negotiation; exclude overflowing descendants via public element dimensions; retain long-press dragging, cancellation, and stale-result guards",
+    "Keep responder negotiation passive and defer scrollable-child traversal until normal touch-start dispatch supplies currentTarget; bound traversal to the marker, preserve child ownership and long-press activation",
+    "Place default native SDK ornaments beyond measured common control rows in each corner; restore margins after removal and preserve explicit selected SDK positions",
+    "Refresh RNMapbox iOS scale position through its enabled prop when margins change, compensating for the pinned position setter missing its dirty notification; restore configured visibility and leave Android unchanged",
+    "Reapply RNMapbox iOS scale margins after native viewport changes and defer visibility restoration by an animation frame so Fabric cannot coalesce its dirty notification; cancel obsolete frames and leave Android/disabled-scale behavior unchanged",
+    "On Android Mapbox, temporarily disable all live-drag gestures through equivalent scalar native props; omit the synthesized UnsafeMixed gesture map that crashes the pinned Fabric bridge. Preserve explicit selected gesture maps and the iOS gesture path.",
+    "Restore the configured Android Mapbox zoomEnabled boolean, or the enabled native baseline, after the temporary drag lock. The pinned setter cannot accept null, and zoom uniquely lacks a wrapper default. Regression covers default enabled restoration and selected enabled/disabled settings.",
+    "Retain a non-null gesture map across Android Mapbox temporary locks when selected settings or an explicit portable doubleTapZoom flag already supply one. Lock double-tap settings over selected values, then restore the configured map. Only the wholly omitted baseline uses scalar-only locking.",
+    "Keep the direct native Control portal child materialized with collapsable=false, overriding host flattening. Resizing a flattened host displaced descendant text while retaining accessibility labels; live marker hosts already retained native roots. Preserve original React providers/state rather than remounting children.",
+    "Pass measured per-map nativeLayout width/height through Control Portal style props so Yoga recomputes corner constraints during resize/orientation even when the SDK does not attach the source portal view. Revert the ineffective R13 collapsable override. Preserve child identity, state and React ancestry.",
+    "Pinned Android RNMapbox event throttle now scopes events to each native view and clears that view cache on teardown via a packaged, consumer-applied SDK patch. Native rebuild and fresh two-map acceptance required; common lifecycle meanings unchanged.",
+    "Limit explicit NativeControl Portal viewport dimensions to Android, whose SDK parent leaves the source detached. Restore iOS native host sizing after first Map B child tap did not register; verify narrowed correction in fresh iOS scope."
+  ],
+  "androidPreparation": {
+    "probe": "Android OS-only stability",
+    "avd": "TF07_Rerun",
+    "avdHome": "/private/tmp/one-map-tf07-rerun/avd",
+    "serial": "emulator-5556",
+    "emulatorPort": 5556,
+    "adbPort": 5557,
+    "sdkEmulator": "37.1.11 (build 15917651)",
+    "host": "macOS arm64, Hypervisor.Framework",
+    "systemImage": "android-37.1/google_apis_playstore_ps16k/arm64-v8a (revision 9)",
+    "reportedAndroidRelease": "17",
+    "buildFingerprint": "google/sdk_gphone16k_arm64/emu64a16k:17/CP31.260623.012/16064790:user/dev-keys",
+    "screen": "1080x2400 at 420 dpi",
+    "avdConfig": "avd/TF07_Rerun.avd/config.ini",
+    "avdConfigSha256": "a5104d88fea3ccaeb67131d43c42878372c665af4765fdea69d8e48baaffe825",
+    "launchFlags": [
+      "-port 5556",
+      "-gpu host",
+      "-memory 4096",
+      "-no-window",
+      "-no-boot-anim",
+      "-no-snapshot",
+      "-noaudio"
+    ],
+    "outcome": "stable during approximately ten-minute OS-only probe; no restart or emulator crash observed",
+    "adb": "Repeated property reads and screenshots succeeded in about 2-4 seconds; sys.boot_completed remained 1; final guest uptime 609 seconds.",
+    "actualOsInput": [
+      "Touch input opened the Android Settings screen.",
+      "A vertical swipe in Display & touch moved from Brightness/Lock display to Color/Touch/Auto-rotate controls.",
+      "Vertical and horizontal swipes opened and changed Quick Settings pages; a further swipe and Home navigation returned to Android UI.",
+      "A few early Settings search-field coordinates were mis-targeted while search was focused; no app or system failure resulted."
+    ],
+    "guestCrashBuffer": "empty at final inspection",
+    "emulatorLog": "No failure occurred; verbose startup output showed gfxstream host rendering, the configured host GPU, and continued ColorBuffer/RenderThread activity. The process remains attached to the tool session; no failure log was produced.",
+    "representativeScreenshots": {
+      "home-final.png": "22b64db2a6d2f8b2d599173c4464ec037f39927f2f4aaac80d8847482bed8a92",
+      "quick-settings-expanded.png": "fb7910edc7dcc5c71d601a62dc2efd4fd2ac6cee97d19a111f4d19510741e6b9",
+      "display-scroll.png": "8d2c32b956fdaf7fa3d05e91a39c03d91a95b2215383702eed5c42c2fddfe954"
+    },
+    "mapAppBuildInstallMetroOrAcceptance": false,
+    "preexistingTF07AcceptanceAvdModified": false
+  },
+  "environments": {
+    "mapbox-web": {
+      "status": "passed-r4-exercised-scope",
+      "evidence": "tf07-rerun-web-mapbox.json",
+      "scope": [
+        "core",
+        "extended",
+        "focused"
+      ],
+      "remaining": [
+        "full-assistive-technology-review"
+      ],
+      "retry": "First R4 style replacement timed out with style1/generation0/noerrors; authorized click-target-instrumented retry passed all nine intended physical targets and full scope. First timeout cause remains unresolved; preserve as potential input-delivery/renderer flakiness."
+    },
+    "maplibre-web": {
+      "status": "passed-r4-exercised-scope",
+      "evidence": "tf07-rerun-web-maplibre.json",
+      "scope": [
+        "core",
+        "extended",
+        "focused"
+      ],
+      "remaining": [
+        "full-assistive-technology-review"
+      ]
+    },
+    "mapbox-android": {
+      "status": "accepted-core-focused-density-by-scoped-review",
+      "previousFailures": [
+        "tf07-rerun-mapbox-android-core-r9.json",
+        "tf07-rerun-mapbox-android-core-r10.json"
+      ],
+      "repair": "R11 non-null zoom restoration plus R10 scalar temporary lock",
+      "guestStatus": "OwnedAPI36 emulator stayed running through completed core/density/configuredgesture and fullfocused9 Mapbox flows. MapLibre fullflowstillpending.",
+      "additionalEvidence": [
+        "tf07-rerun-mapbox-android-core-r11.json",
+        "tf07-rerun-mapbox-android-source-diagnostic-r11.json",
+        "tf07-rerun-mapbox-android-inputpath-diagnostic-r11.json",
+        "tf07-rerun-mapbox-android-core-remainder-r11.json",
+        "tf07-rerun-mapbox-android-offset320-r11.json",
+        "tf07-rerun-mapbox-android-configured-gesture-r12.json",
+        "tf07-rerun-mapbox-android-focused-r12.json",
+        "tf07-rerun-mapbox-android-focused-disappearance-r12.json",
+        "tf07-rerun-mapbox-android-control-layout-r13.json",
+        "tf07-rerun-mapbox-android-control-layout-r14.json",
+        "tf07-rerun-mapbox-android-control-layout-r14-ready-retry.json",
+        "tf07-rerun-mapbox-android-build-r15.json",
+        "tf07-rerun-mapbox-android-focused-r15.json",
+        "tf07-rerun-mapbox-android-focused-r15-visible-toolbar.json"
+      ],
+      "scopedContinuation": "R11 library and APK unchanged. Retain six successful core scenarios including actual cancel/recovery and density420 offset placement. New scoped run covers all remaining core scenarios and rechecks popup plus actual post-remount child/source. Prior source-read failures remain; ordinary source/blank taps eventually reported source1/map2, suggesting observation latency or input-helper behavior. Root authorizes ordinary taps and bounded fresh physical Reads before judgment.",
+      "coreEvidence": [
+        "tf07-rerun-mapbox-android-core-r11.json",
+        "tf07-rerun-mapbox-android-core-remainder-r11.json"
+      ],
+      "coordinatorCoreReview": "R11 actualsingle-map core11 composite and420/320offset checks, plus R12configuredgesture restoration retained. R14Controlbounds only changesControldrawing/layout; R15fullfocused9 verifies affectednativeportal placement/gestures/passthrough/state/source/controls. NativeSDKpatch addsviewprefix to manager eventkeys; unchanged same-view throttle and delegation preserve prior singlemapbehavior. Olderbinaryobservations retain originalidentity; no claimthatnewAPKexecutedallretainedscenarios.",
+      "acceptedForDistSha256ByImpactReview": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "impactReview": "nativeImpactReviewR16",
+      "configurationReview": "Actual R12 native selected context+portable doubleTapZoom map loaded without error. Physical longdrag/release/reset/child/pan and restored double-tap11to12 passed, validating non-null configured-map transitions. R11 default-settings core and both-density offset evidence retained by unchanged-branch impact review.",
+      "focusedCoordinatorReview": "Runner/manualreportedpass retained, but custom childtext disappears from landscape/final pixels; explicitResizebutton skipped. Host presentation fails and resizeunverified. Rootapprovedfreshfocusedtext-update/layoutdiagnostic before productionchange.",
+      "controlLayoutReview": "R14 actual Resize, landscape and restored portrait preserve visible per-map child labels, bounds, state/context and actual touches. First six-field run stopped because B load never posted and Navigation stayed disabled. A double-Back test input then reset the screen without a guest crash. Unchanged-artifact readiness-first retry authorized; no full scope accepted yet.",
+      "focusedEvidence": "tf07-rerun-mapbox-android-focused-r15-visible-toolbar.json",
+      "coordinatorFocusedReview": {
+        "status": "accepted-full-focused9",
+        "visualReview": "Root inspected actual resize, landscape, restoredportrait and finalclear pixels. Both updatedA/Blabels retain own footer placement/state/touch; enabledBNav and ENTIRESDKscale are separated; bothSDKlogos/attributionclear. BothrealSDKattributiondialogs viewed. Earlierfullyvisibleblueannotation image and actualrefreshcounts accepted. Geographicannotationpartlyoutside smallerlandscapeviewport is expected geographicclipping, not part of control-placement guarantee.",
+        "identityReview": "All9manualpassed; run61fcd69c-6ef3-4341-afda-8ac8e0c4b9e2, installedAPK29a662...45b9e, currentdist76f0...7271d49 match. NoSDK/map/imageerrors; expectedproviderrejection countedseparately.",
+        "interactionReview": "ActualRead sequence high1/map1 then stoptrue high2/map1 then allowfalse high3/map2; vector1/Bmap1; childstate1\u2192updated1 andlater4 each ownzoom; actualResize shorttrue +rotation; Bsettledlimits12/13 withA11; delayedLocateunmount/Resolve no latecenter.",
+        "priorFailures": "R14alternatingmissingload +R15toolbarinputambiguity retained. SDKper-view patch and visiblefixture resolve tested paths. FullVoiceOver/TalkBack notclaimed."
+      }
+    },
+    "mapbox-ios": {
+      "status": "accepted-core-focused-by-scoped-review",
+      "evidence": "tf07-rerun-mapbox-ios-core-r7-evidence.json",
+      "additionalEvidence": [
+        "tf07-rerun-mapbox-ios-scale-r8.json",
+        "tf07-rerun-mapbox-ios-focused-r8-orientation.json",
+        "tf07-rerun-mapbox-ios-focused-layout-r9.json",
+        "tf07-rerun-mapbox-ios-control-layout-r15.json",
+        "tf07-rerun-mapbox-ios-control-layout-r16.json",
+        "tf07-rerun-mapbox-ios-r16-duration-diagnostic.json",
+        "tf07-rerun-mapbox-ios-r16-touch-trace.json",
+        "tf07-rerun-mapbox-ios-r16-geometry-hit-test.json",
+        "tf07-rerun-mapbox-ios-r16-objc-hit-test.json",
+        "tf07-rerun-mapbox-ios-r16-overlay-comparison.json",
+        "tf07-rerun-mapbox-ios-control-layout-r16-after-overlay.json",
+        "tf07-rerun-mapbox-ios-control-layout-r16-fresh-read.json"
+      ],
+      "currentDistSha256": "003106b20a28a8da0872580484a1a7571964202823a3ae6a4993e9b2c257802b",
+      "coordinatorReview": "Actual original R7 core, R8 scoped/focused9, and current R9 scale/layout follow-up establish the affected scope. R9 scale/resize screenshot is visually approved. Earlier runner results and failed layout attempts remain intact. Subsequent fixes only alter Mapbox iOS scale application and example orientation/layout metadata; touch/source/camera/provider/portal-state behavior is unchanged.",
+      "outsideRepresentativeScope": [
+        "full-VoiceOver-audit"
+      ],
+      "acceptedForDistSha256ByImpactReview": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "impactReview": "nativeImpactReviewR16",
+      "controlFollowupEvidence": "tf07-rerun-mapbox-ios-control-layout-r16-fresh-read.json",
+      "coordinatorControlReview": "Accepted R16 six-field follow-up after root screenshot, identity and fresh receipt review. Development banner covered first child miss; portrait Read coordinates caused stale landscape observations. Corrected physical input procedure passed without further producer changes."
+    },
+    "maplibre-ios": {
+      "status": "accepted-core11-focused9",
+      "priorEvidence": "tf07-native-ios-maplibre.json",
+      "coreEvidence": "tf07-rerun-maplibre-ios-core-r24.json",
+      "focusedEvidence": "tf07-rerun-maplibre-ios-focused-r25.json",
+      "orientationPreparation": "tf07-rerun-maplibre-ios-orientation-prep-r24.json",
+      "runIds": [
+        "739c9b6b-1e7b-4278-8ba2-ab8215f57033",
+        "104e07e3-1020-4045-8212-5b011a2e4569"
+      ],
+      "installedExecutableSha256": "fb869a1de4a7bef36182646338530302b032d4e3ba332be9c3bedb6468e749f5",
+      "acceptedForDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "outsideRepresentativeScope": ["full-VoiceOver-audit"]
+    },
+    "maplibre-android": {
+      "status": "accepted-core11-offsets320-420-focused9",
+      "priorEvidence": "tf07-native-android-maplibre.json",
+      "partialCoreEvidence": "tf07-rerun-maplibre-android-core-r16-stopped.json",
+      "coreEvidence": "tf07-rerun-maplibre-android-core-continuation-r19.json",
+      "offset320Evidence": "tf07-rerun-maplibre-android-offset320-r20.json",
+      "focusedEvidence": "tf07-rerun-maplibre-android-focused-r23.json",
+      "runIds": [
+        "600d8d00-5c98-4337-bdca-151b3ab94b64",
+        "8bde930c-214e-4ad7-b7b5-d1d35723012e",
+        "00862b8d-9b67-420f-98a8-0117c9a1541c"
+      ],
+      "density420": "Passed in the preserved R16 partial core; density320 offset suite passed in R20.",
+      "interruptionRemaining": null,
+      "infrastructure": "Unscoped ADB socket call failed before nav input. Scoped diagnosis confirmed existing host server and same guest/app PID still alive; no emulator crash.",
+      "additionalEvidence": [
+        "tf07-rerun-maplibre-android-core-r16-stopped.json",
+        "tf07-rerun-maplibre-android-core-continuation-r16-timing-unverified.json",
+        "tf07-rerun-maplibre-android-core-continuation-r16-handoff.json",
+        "tf07-rerun-maplibre-android-continuation-r17-start-failed.json",
+        "tf07-rerun-maplibre-android-continuation-r18-helper-timeout.json",
+        "tf07-rerun-maplibre-android-focused-r21-fixture-mismatch.json",
+        "tf07-rerun-maplibre-android-focused-r22-review.json"
+      ]
+    }
+  },
+  "review": {
+    "mapbox-web": "Earlier setup/transport/React configuration timing failures retained; corrected browser input checks passed.",
+    "maplibre-web": "Earlier setup/transport/React configuration timing failures retained; corrected browser input checks passed."
+  },
+  "workerAssignments": {
+    "mapbox-web": {
+      "agent": "web_mapbox_rerun",
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "ports": [
+        4187,
+        5187
+      ]
+    },
+    "maplibre-web": {
+      "agent": "web_maplibre_rerun",
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "ports": [
+        4188,
+        5188
+      ]
+    },
+    "native": {
+      "agent": "native_tf07_repair_run",
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "sequential": [
+        "mapbox-android",
+        "maplibre-android",
+        "mapbox-ios",
+        "maplibre-ios"
+      ],
+      "ports": [
+        8171,
+        8797,
+        8798
+      ],
+      "android": "emulator-5556",
+      "ios": "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+    }
+  },
+  "tooling": {
+    "maestro": {
+      "version": "2.11.0",
+      "officialArchiveSha256": "5384593cb4e7a106489e75a821d157dd43f4e438df6bc308b72e82c685e1283a",
+      "source": "https://github.com/mobile-dev-inc/Maestro/releases/tag/cli-2.11.0",
+      "iosExtension": "Temporary TouchRequest.paths forwards ordered one/two pointer paths to XCTest; no app callback injection."
+    },
+    "androidTouch": {
+      "dexSha256": "63c99f06d79e5f7e2f91e503bdc3bbcc370d477b085b6313d2e21195f5f36a4d",
+      "execution": "OS InputManagerGlobal MotionEvent synthesis with one shared downTime, 650ms stationary hold, subsequent moves and actual up/cancel/multiple-pointer events.",
+      "source": "https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/core/java/android/hardware/input/InputManagerGlobal.java"
+    },
+    "iosInterruption": {
+      "scriptSha256": "38df2bcd52c28a0073ce920cebd6e4e066b2120e1b98a3fa299319227e166cc3",
+      "method": "One actual XCTest held/dragged pointer; timed OS activation of Settings and same-PID test app; physical renderer reads and separate map pan prove cancellation.",
+      "priorFailure": "Concurrent XCTest touch and Home failed driver with only one gesture can be performed at a time; app interruption result unverified.",
+      "status": "passed-active-drag-interruption"
+    }
+  },
+  "previousArtifacts": [
+    {
+      "sourceSha256": "1e98df6b9f001d58b18a5b659bed4264efda61352d09d4b1648c6ac64cd2ac48",
+      "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+      "packedSha256": "0a508085e09173b85303563c14b44708ca0b8efce30b412ec6750232bd709eca",
+      "exampleDistSha256": {
+        "web-mapbox": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+        "web-maplibre": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+        "native-mapbox": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+        "native-maplibre": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0"
+      },
+      "harnessSha256": {
+        "scripts/tf07-ui-smoke.mjs": "3dc166830d8946748857a3797c7a5e1dd20358070e5d1e035d39f2616a3fc22e",
+        "scripts/tf07-smoke-contract.mjs": "56d2ccfb0aacc1f1b3c6e3612f1f0199613aa62e0c607ecc4f6e7b869d21966b",
+        "examples/shared/tf07-scene.tsx": "f0c5dc94c3b0d8a2a94d1d69e8d6017f078d85863c209a8eca841cee72f38ba8",
+        "examples/shared/native-tf07-screen.tsx": "39a236be7f0ed33231f7e56e4e342ff4ea7ac65f37b1bcfbf0b2a029eaf657ee",
+        "examples/shared/native-tf07-focused-screen.tmp.tsx": "c7052c9db49a1b1a633523de02a384c618abf952f0fbed65e10260e2a42155b7"
+      }
+    },
+    {
+      "sourceSha256": "0ca04feef7069502efe019de25919795b9fa2500aa460a874259411f40379991",
+      "distSha256": "746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2",
+      "packedSha256": "e854362e80fe46fff8077bdde3b3631167ebb2ba2dc8582154d42c5dde3ce6fc",
+      "exampleDistSha256": {
+        "web-mapbox": "746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2",
+        "web-maplibre": "746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2",
+        "native-mapbox": "746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2",
+        "native-maplibre": "746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2"
+      },
+      "harnessSha256": {
+        "scripts/tf07-ui-smoke.mjs": "3dc166830d8946748857a3797c7a5e1dd20358070e5d1e035d39f2616a3fc22e",
+        "scripts/tf07-smoke-contract.mjs": "56d2ccfb0aacc1f1b3c6e3612f1f0199613aa62e0c607ecc4f6e7b869d21966b",
+        "examples/shared/tf07-scene.tsx": "f0c5dc94c3b0d8a2a94d1d69e8d6017f078d85863c209a8eca841cee72f38ba8",
+        "examples/shared/native-tf07-screen.tsx": "79a8e5d6389cfbb70bc54d40f5d8a3a4959d1e6d33d943efee71414570c58fe0",
+        "examples/shared/native-tf07-focused-screen.tmp.tsx": "a61bd2bd5ab438673272c9f305f0353b8d3f7f72e2fb5fbaa2fa86d829f2a660"
+      }
+    },
+    {
+      "sourceSha256": "6ef01ed4d479decc338a71b93e62a18d0bd166ba18d1b70b12ca0fd89c79385c",
+      "distSha256": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+      "packedSha256": "77c900b77291d9d9511784b5ea465b45aa9d9afeac3c2835fe2dbf2dca697568",
+      "exampleDistSha256": {
+        "web-mapbox": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+        "web-maplibre": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+        "native-mapbox": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+        "native-maplibre": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc"
+      }
+    },
+    {
+      "sourceSha256": "239720a4b981b504d062e8666e5b27df4e543953342df9c8846b2981abe29c48",
+      "distSha256": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+      "packedSha256": "d6234ba322e8f8e4364ba02657743f4f515a38e449eed45c6d0c433475702b71",
+      "exampleDistSha256": {
+        "web-mapbox": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+        "web-maplibre": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+        "native-mapbox": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+        "native-maplibre": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e"
+      },
+      "harnessSha256": {
+        "scripts/tf07-ui-smoke.mjs": "3dc166830d8946748857a3797c7a5e1dd20358070e5d1e035d39f2616a3fc22e",
+        "scripts/tf07-smoke-contract.mjs": "56d2ccfb0aacc1f1b3c6e3612f1f0199613aa62e0c607ecc4f6e7b869d21966b",
+        "examples/shared/tf07-scene.tsx": "f0c5dc94c3b0d8a2a94d1d69e8d6017f078d85863c209a8eca841cee72f38ba8",
+        "examples/shared/native-tf07-screen.tsx": "79a8e5d6389cfbb70bc54d40f5d8a3a4959d1e6d33d943efee71414570c58fe0",
+        "examples/shared/native-tf07-focused-screen.tmp.tsx": "a61bd2bd5ab438673272c9f305f0353b8d3f7f72e2fb5fbaa2fa86d829f2a660"
+      }
+    },
+    {
+      "sourceSha256": "7d819b6ce11b2a5ebcbb20d96f170641d3b58aa0d095a14dd9bb573cb9c2ff92",
+      "distSha256": "29132434546c068bacd3b064677aae007264ad7884eb96e66c143f012ef0a894",
+      "packedSha256": "6412b98da8a67601fc4aa7cc5524ff00a8c70734ba5f0bef75a1b7d7071fea9c",
+      "exampleDistSha256": {
+        "web-mapbox": "29132434546c068bacd3b064677aae007264ad7884eb96e66c143f012ef0a894",
+        "web-maplibre": "29132434546c068bacd3b064677aae007264ad7884eb96e66c143f012ef0a894",
+        "native-mapbox": "29132434546c068bacd3b064677aae007264ad7884eb96e66c143f012ef0a894",
+        "native-maplibre": "29132434546c068bacd3b064677aae007264ad7884eb96e66c143f012ef0a894"
+      },
+      "harnessSha256": {
+        "scripts/tf07-ui-smoke.mjs": "3dc166830d8946748857a3797c7a5e1dd20358070e5d1e035d39f2616a3fc22e",
+        "scripts/tf07-smoke-contract.mjs": "56d2ccfb0aacc1f1b3c6e3612f1f0199613aa62e0c607ecc4f6e7b869d21966b",
+        "examples/shared/tf07-scene.tsx": "f0c5dc94c3b0d8a2a94d1d69e8d6017f078d85863c209a8eca841cee72f38ba8",
+        "examples/shared/native-tf07-screen.tsx": "79a8e5d6389cfbb70bc54d40f5d8a3a4959d1e6d33d943efee71414570c58fe0",
+        "examples/shared/native-tf07-focused-screen.tmp.tsx": "a61bd2bd5ab438673272c9f305f0353b8d3f7f72e2fb5fbaa2fa86d829f2a660"
+      }
+    },
+    {
+      "sourceSha256": "c12fd89132c6128584489871c9dd8d1c801b64f069dab26f9b0b6dfc09580428",
+      "distSha256": "aa12bedb72fe66b0707d09b4e42108d8a3aae66210a7a192f9084f73a5c266ac",
+      "packedSha256": "b50251ea04fdee77dbbddf2a24edfac92a5b21e3bd89a91695bef33d24d65124",
+      "exampleDistSha256": {
+        "web-mapbox": "aa12bedb72fe66b0707d09b4e42108d8a3aae66210a7a192f9084f73a5c266ac",
+        "web-maplibre": "aa12bedb72fe66b0707d09b4e42108d8a3aae66210a7a192f9084f73a5c266ac",
+        "native-mapbox": "aa12bedb72fe66b0707d09b4e42108d8a3aae66210a7a192f9084f73a5c266ac",
+        "native-maplibre": "aa12bedb72fe66b0707d09b4e42108d8a3aae66210a7a192f9084f73a5c266ac"
+      },
+      "harnessSha256": {
+        "scripts/tf07-ui-smoke.mjs": "3dc166830d8946748857a3797c7a5e1dd20358070e5d1e035d39f2616a3fc22e",
+        "scripts/tf07-smoke-contract.mjs": "56d2ccfb0aacc1f1b3c6e3612f1f0199613aa62e0c607ecc4f6e7b869d21966b",
+        "examples/shared/tf07-scene.tsx": "f0c5dc94c3b0d8a2a94d1d69e8d6017f078d85863c209a8eca841cee72f38ba8",
+        "examples/shared/native-tf07-screen.tsx": "79a8e5d6389cfbb70bc54d40f5d8a3a4959d1e6d33d943efee71414570c58fe0",
+        "examples/shared/native-tf07-focused-screen.tmp.tsx": "a61bd2bd5ab438673272c9f305f0353b8d3f7f72e2fb5fbaa2fa86d829f2a660"
+      }
+    },
+    {
+      "sourceSha256": "999a3e4179e8b129909ea47375fd13ca5f474882841b9729006bc15fa5a8b7a1",
+      "distSha256": "1f7c7d1dff905c73bedcd2cd125ef33f8949ec70304a804a1e1f057be2a3db86",
+      "packedSha256": "45684cc698b84e136069e2bbb8ccd6dda9e3a14a50a4f234e2cbe21d6b23973a",
+      "exampleDistSha256": {
+        "web-mapbox": "1f7c7d1dff905c73bedcd2cd125ef33f8949ec70304a804a1e1f057be2a3db86",
+        "web-maplibre": "1f7c7d1dff905c73bedcd2cd125ef33f8949ec70304a804a1e1f057be2a3db86",
+        "native-mapbox": "1f7c7d1dff905c73bedcd2cd125ef33f8949ec70304a804a1e1f057be2a3db86",
+        "native-maplibre": "1f7c7d1dff905c73bedcd2cd125ef33f8949ec70304a804a1e1f057be2a3db86"
+      },
+      "harnessSha256": {
+        "scripts/tf07-ui-smoke.mjs": "3dc166830d8946748857a3797c7a5e1dd20358070e5d1e035d39f2616a3fc22e",
+        "scripts/tf07-smoke-contract.mjs": "56d2ccfb0aacc1f1b3c6e3612f1f0199613aa62e0c607ecc4f6e7b869d21966b",
+        "examples/shared/tf07-scene.tsx": "f0c5dc94c3b0d8a2a94d1d69e8d6017f078d85863c209a8eca841cee72f38ba8",
+        "examples/shared/native-tf07-screen.tsx": "79a8e5d6389cfbb70bc54d40f5d8a3a4959d1e6d33d943efee71414570c58fe0",
+        "examples/shared/native-tf07-focused-screen.tmp.tsx": "35c28d30bfa8b2d5c83f0f99d36662e43125c4fd52aa295a84dce3b00c79c75c"
+      }
+    },
+    {
+      "sourceSha256": "4d1f002e8fe79dd2140b264c72095e47db6d0fcad8f1059864df17559303619c",
+      "distSha256": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd",
+      "packedSha256": "2e56c8f5a455e335dd6911faa2a05d7e406d2250c11be1dd5bf444488787d93b",
+      "exampleDistSha256": {
+        "web-mapbox": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd",
+        "web-maplibre": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd",
+        "native-mapbox": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd",
+        "native-maplibre": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd"
+      }
+    },
+    {
+      "sourceSha256": "b0f7c3092f2ad7eca3d8c0b76dd8debdde8e558e412557db3ceaaae27fc98c23",
+      "distSha256": "003106b20a28a8da0872580484a1a7571964202823a3ae6a4993e9b2c257802b",
+      "packedSha256": "365d78a799596e9f600c8a9537edb55455a2c994dd19ebdf8d64415994fd9dbd",
+      "exampleDistSha256": {
+        "web-mapbox": "003106b20a28a8da0872580484a1a7571964202823a3ae6a4993e9b2c257802b",
+        "web-maplibre": "003106b20a28a8da0872580484a1a7571964202823a3ae6a4993e9b2c257802b",
+        "native-mapbox": "003106b20a28a8da0872580484a1a7571964202823a3ae6a4993e9b2c257802b",
+        "native-maplibre": "003106b20a28a8da0872580484a1a7571964202823a3ae6a4993e9b2c257802b"
+      }
+    },
+    {
+      "sourceSha256": "053134e24f9c5ece26388f5ddea04c64c1b6d5e3784c8a1f65f0020014183bf8",
+      "distSha256": "028b12d005d0c19a1ac79bb8daf3e27f8136addaf4cb03938398229708689466",
+      "packedSha256": "713c0453913e466d6cae455800ec0c6bfc1ba04953451cbc19d550515a1c79ea",
+      "exampleDistSha256": {
+        "web-mapbox": "028b12d005d0c19a1ac79bb8daf3e27f8136addaf4cb03938398229708689466",
+        "web-maplibre": "028b12d005d0c19a1ac79bb8daf3e27f8136addaf4cb03938398229708689466",
+        "native-mapbox": "028b12d005d0c19a1ac79bb8daf3e27f8136addaf4cb03938398229708689466",
+        "native-maplibre": "028b12d005d0c19a1ac79bb8daf3e27f8136addaf4cb03938398229708689466"
+      }
+    },
+    {
+      "sourceSha256": "cd369914c2b8b4d3ef68a54745929cf4df4ad557dbf08e30c83f04dd0bf23676",
+      "distSha256": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8",
+      "packedSha256": "caf2a026015c89e7f27be910649cd40b76776de9767c75e97458155a563879b8",
+      "exampleDistSha256": {
+        "web-mapbox": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8",
+        "web-maplibre": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8",
+        "native-mapbox": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8",
+        "native-maplibre": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8"
+      }
+    },
+    {
+      "sourceSha256": "7f983e38c7e8a2df478db8b5658f14affc4deedaa3854575f4d2d5cbd6d82c9e",
+      "distSha256": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+      "packedSha256": "88fdfdca61dd0db4f064ba33f1e59718f0a2d300029c5fdf2dc199e1ce87d56d",
+      "exampleDistSha256": {
+        "web-mapbox": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+        "web-maplibre": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+        "native-mapbox": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+        "native-maplibre": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83"
+      }
+    },
+    {
+      "sourceSha256": "a4e8373e1abe39e79435cb72cfef83f24ac312ffdac878718a8c0e45cc3dbc38",
+      "distSha256": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+      "packedSha256": "e07a9298e89f8acef91fdd6e6adc6f34c8749de81c5486ebcafc826acf5e4ec5",
+      "exampleDistSha256": {
+        "web-mapbox": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+        "web-maplibre": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+        "native-mapbox": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+        "native-maplibre": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a"
+      }
+    },
+    {
+      "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+      "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "packedSha256": "22c0a7e64fcf6c94c4167ce7ef3d148f2843ca93dc71ffcf2a016392b223c0be",
+      "exampleDistSha256": {
+        "web-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+        "web-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+        "native-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+        "native-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49"
+      }
+    },
+    {
+      "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+      "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "packedSha256": "85b7b84933fcb6a1b2ac44bf7ec482de04c797fae3fadf289ee95bab9b97d5da",
+      "exampleDistSha256": {
+        "web-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+        "web-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+        "native-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+        "native-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49"
+      }
+    }
+  ],
+  "webImpactReview": {
+    "decision": "R9 changes only Mapbox native scale position application on iOS, including actual native viewport size and separated native prop commits. Native touch behavior, shared facade, MapLibre and web modules remain unchanged from R7. Retain successful R4 web checks and R7 Mapbox iOS interaction evidence with explicit scoped impact review; retain R8 actual core/scoped/focused interactions with explicit impact review; run R9 resize/orientation ornament follow-up on Mapbox iOS and full core/focused acceptance in the three remaining native environments. The acceptance harness now waits for a physical post after all run-bound manual statuses are terminal."
+  },
+  "checkpoint": "R16 six-environment runtime acceptance passed for the authorized exercised scope; full VoiceOver/TalkBack audits remain outside this checkpoint",
+  "completion": {
+    "completedAt": "2026-10-14T01:27:39Z",
+    "result": "All six authorized environments passed their recorded core, extended/focused, and native density scopes for the frozen R16 library artifact.",
+    "maplibreAndroid": [
+      "tf07-rerun-maplibre-android-core-continuation-r19.json",
+      "tf07-rerun-maplibre-android-offset320-r20.json",
+      "tf07-rerun-maplibre-android-focused-r23.json"
+    ],
+    "maplibreIos": [
+      "tf07-rerun-maplibre-ios-core-r24.json",
+      "tf07-rerun-maplibre-ios-focused-r25.json"
+    ],
+    "cleanup": "App and owned runners stopped; assigned simulator remains booted in portrait; Android emulator restored to portrait at 420 dpi; assigned ports 8171, 8797, 8798, and 22087 are clear; canonical core fixture restored. Run-specific temporary bundles, helpers, screenshots, and receipts were removed after compact evidence was saved; shared SDK, AVD, and build caches were left untouched."
+  },
+  "androidCurrentProbe": {
+    "record": "tf07-android-api36-os-probe.json",
+    "status": "passed-os-only",
+    "mapRendererAcceptance": "accepted for Mapbox and MapLibre core/focused scopes; MapLibre offsets passed at 320 and 420 dpi"
+  },
+  "r4Review": {
+    "implementation": "Reviewed projected live overlay host, measured anchors, offsets, move/layout updates, stale request cleanup and provider-preserving original React children; SDK annotations and selected SDK marker exports remain delegated.",
+    "tests": "Meaningful regressions cover offset reset, camera/layout projection, stale coordinates and late rejection, child touch ownership, drag activation/cancellation.",
+    "nativeBinaryReuse": "Teleport already linked; no peer/native changes in R4. Require installed executable/dylib or APK hash match before every flow.",
+    "editorial": "Current docs explain failed gesture-lock attempts and current overlay mapping; runtime claims remain scoped to tested artifacts."
+  },
+  "previousEnvironmentSnapshots": {
+    "R3": {
+      "mapbox-web": {
+        "status": "passed-exercised-scope",
+        "evidence": "tf07-rerun-web-mapbox.json",
+        "scope": [
+          "core",
+          "extended",
+          "focused"
+        ],
+        "remaining": [
+          "full-assistive-technology-review"
+        ]
+      },
+      "maplibre-web": {
+        "status": "passed-exercised-scope",
+        "evidence": "tf07-rerun-web-maplibre.json",
+        "scope": [
+          "core",
+          "extended",
+          "focused"
+        ],
+        "remaining": [
+          "full-assistive-technology-review"
+        ]
+      },
+      "mapbox-ios": {},
+      "maplibre-ios": {},
+      "mapbox-android": {
+        "status": "running-retry",
+        "evidence": "tf07-rerun-mapbox-android.json",
+        "firstArtifactChildPress": "failed",
+        "nativeOnlyCorrectionChildPress": "passed actual OS stationary touch; map-click unchanged",
+        "graphics": "Host GPU map surface became black after nested-list swipe; root approved host GPU with Vulkan disabled for next attempt",
+        "nestedScroll": "unverified pending corrected input and graphics diagnosis"
+      },
+      "maplibre-android": {}
+    }
+  },
+  "r5Review": {
+    "implementation": "Only native-ui.tsx touch ownership changed: passive listeners, no automatic ancestor JS responder, public native descendant dimensions keep scroll content out of marker activation. No shared map/web implementation changed.",
+    "routine": "531 Jest /21 suites; four type configs; formatting/docs; process/fixture/selection checks;13 packed package consumers passed. Selected peer and example resolution passed on R4 with unchanged public declarations/dependencies.",
+    "webImpact": "R4 browser results retained, including earlier unresolved Mapbox style timeout and successful instrumented retry. All web module/shared facade code is unchanged by R5.",
+    "priorNativeAttempts": [
+      "tf07-rerun-mapbox-ios-core-r4.json",
+      "tf07-rerun-mapbox-ios-core-r4-corrected.json"
+    ],
+    "readbackProtocol": "Physical Read renderer action required after each interaction; status endpoint returns last actual POST, not live state."
+  },
+  "r6Review": {
+    "cause": "Actual physical trace showed currentTarget null only in responder negotiation; the guard traversed beyond marker into overflowing SafeArea, suppressing live drag.",
+    "correction": "Negotiation marks eligibility without claiming; regular touch-start bounds scrollability traversal and arms long press.",
+    "regression": "Null negotiation plus an overflowing ancestor outside marker; scroll descendants remain excluded; full532/21 routine passed.",
+    "fixtureRestoredSha256": "79a8e5d6389cfbb70bc54d40f5d8a3a4959d1e6d33d943efee71414570c58fe0",
+    "webImpact": "Only native-ui touch behavior changed since R4, so browser passing checks remain valid for unchanged web/shared modules."
+  },
+  "r7Review": {
+    "finding": "R6 physical iOS Mapbox flow showed logo overlapped by scale and attribution button overlapped by custom control. Original runner also remained unverified because operator omitted manual report completion before final read.",
+    "correction": "Native SDK default ornaments sit beyond measured control rows; explicit selected SDK positions preserved; removed controls restore margins. No native peer or binary changes.",
+    "routine": "534 Jest/21 suites;fourtypes;formatting/docs;process/fixture checks;13package selections;4selected peer consumers;example resolution passed.",
+    "nativePolicy": "Fresh R7 core/manual identities and per-scenario report updates before final physical Read; then focused checks on same frozen library with separate fixture identity.",
+    "webImpact": "Only native adapters and native-only helper changed after R4; web/shared modules remain unchanged, so recorded browser scope carries forward under change-impact review."
+  },
+  "r7CoordinatorLayoutReview": {
+    "status": "failed",
+    "evidence": "/private/tmp/one-map-tf07-rerun/r7-no-warning.png",
+    "passed": [
+      "Footer SDK logo, common scale, native attribution and custom control are separated.",
+      "Native attribution physically opened and closed."
+    ],
+    "failure": "The SDK top-left multi-tick scale remains underneath Locate. Pinned RNMBXMapView.setReactScaleBarPosition stores margins without changed(.scaleBar), so a dynamic position update does not apply.",
+    "next": "After current core gates and owned process shutdown, refresh the iOS SDK scale position through its enabled prop, validate, freeze and run a targeted layout check. Preserve all R7 results."
+  },
+  "nativeImpactReviewR8": {
+    "retained": "R7 Mapbox iOS actual touch and renderer outcomes, with original runner result unchanged and retrospective post-remount evidence.",
+    "change": "R8 only refreshes Mapbox iOS SDK scale position when its margins change; live-marker touch, source routing, camera methods, portal implementation and other adapters are unchanged.",
+    "required": "R8 scoped Mapbox iOS ornament, scale, child/source/zoom and style/remount checks, followed by focused acceptance; full core/focused checks for the remaining three native environments.",
+    "r7Evidence": "tf07-rerun-mapbox-ios-core-r7-evidence.json"
+  },
+  "accessibilityScopeReview": {
+    "requirement": "docs/requirements.md:55 allows representative host forwarding checks; individual assistive-technology effects are upstream unless facade changes them.",
+    "acceptance": "Verify the facade-altered portal presentation with separate labeled child/control nodes, actual child/control presses, provider state and per-map ownership. Web additionally verifies keyboard activation.",
+    "unverifiedOutsideRepresentativeScope": "Full VoiceOver and TalkBack audits are not claimed."
+  },
+  "fixtures": {
+    "nativeCore": {
+      "path": "examples/shared/native-tf07-screen.tsx",
+      "sha256": "290c01e5379c05a1d4058989a3ca434ad432e3094e47b4eab8d48c37824a1874",
+      "change": "Fixed status/readback heights and readonly actual source projection; no fabricated input or callbacks."
+    },
+    "nativeFocused": {
+      "path": "examples/shared/native-tf07-focused-screen.tmp.tsx",
+      "sha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+      "scenarios": 9,
+      "change": "Responsive visible toolbar rows; Stop/Allow overlap label mirrors actual state. Same map/provider/source fixture; no fabricated callbacks."
+    },
+    "androidConfiguredGestureFollowup": {
+      "screenSha256": "9135ffdd40358e8717252207f654ddcf11731da15476dbc2ad2e605d0376fd5b",
+      "sceneSha256": "405f2c99697ab8b5e055e0ec2c87782c6d3d0d01b33b41095dff1b780777fa76",
+      "configuration": "Explicit portable doubleTapZoom=true and selected MapboxGestureSettings context doubleTapToZoomInEnabled=true,doubleTouchToZoomOutEnabled=true,quickZoomEnabled=false; otherwise original core scene. Dedicated native Mapbox-only diagnostic clone; no callbacks injected. Restore canonical core after run."
+    },
+    "activeNativeScreen": "Fullfocused9 with visible toolbar;SHA7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9"
+  },
+  "harnessCompletionRepair": {
+    "change": "A native generation1 read no longer completes while any scenario is unverified; completion captures a new physical renderer POST with all identity-bound outcomes terminal.",
+    "tests": "TF07 contract checks cover unfinished, failed, complete and stale-identity reports.",
+    "originalResults": "R6/R7 original runner outcomes remain unchanged; actual later observations are separate retrospective evidence."
+  },
+  "previousFixtures": [
+    {
+      "nativeCore": {
+        "path": "examples/shared/native-tf07-screen.tsx",
+        "sha256": "79a8e5d6389cfbb70bc54d40f5d8a3a4959d1e6d33d943efee71414570c58fe0"
+      },
+      "nativeFocusedPrepared": {
+        "path": "examples/shared/native-tf07-focused-screen.tmp.tsx",
+        "sha256": "35c28d30bfa8b2d5c83f0f99d36662e43125c4fd52aa295a84dce3b00c79c75c"
+      }
+    },
+    {
+      "nativeCore": {
+        "path": "examples/shared/native-tf07-screen.tsx",
+        "sha256": "290c01e5379c05a1d4058989a3ca434ad432e3094e47b4eab8d48c37824a1874",
+        "change": "Fixed status/readback heights and readonly actual source projection; no fabricated input or callbacks."
+      },
+      "nativeFocused": {
+        "path": "examples/shared/native-tf07-focused-screen.tmp.tsx",
+        "sha256": "9a9c78c54e4fa2ca7a84fc2dbbca8bbd622e42b9d6c0014072c132c0ff30b604",
+        "scenarios": 9
+      }
+    },
+    {
+      "nativeCore": {
+        "path": "examples/shared/native-tf07-screen.tsx",
+        "sha256": "290c01e5379c05a1d4058989a3ca434ad432e3094e47b4eab8d48c37824a1874",
+        "change": "Fixed status/readback heights and readonly actual source projection; no fabricated input or callbacks."
+      },
+      "nativeFocused": {
+        "path": "examples/shared/native-tf07-focused-screen.tmp.tsx",
+        "sha256": "9a9c78c54e4fa2ca7a84fc2dbbca8bbd622e42b9d6c0014072c132c0ff30b604",
+        "scenarios": 9
+      },
+      "androidConfiguredGestureFollowup": {
+        "screenSha256": "9135ffdd40358e8717252207f654ddcf11731da15476dbc2ad2e605d0376fd5b",
+        "sceneSha256": "405f2c99697ab8b5e055e0ec2c87782c6d3d0d01b33b41095dff1b780777fa76",
+        "configuration": "Explicit portable doubleTapZoom=true and selected MapboxGestureSettings context doubleTapToZoomInEnabled=true,doubleTouchToZoomOutEnabled=true,quickZoomEnabled=false; otherwise original core scene. Dedicated native Mapbox-only diagnostic clone; no callbacks injected. Restore canonical core after run."
+      },
+      "activeNativeScreen": "Full focused9, SHA9a9c78c54e4fa2ca7a84fc2dbbca8bbd622e42b9d6c0014072c132c0ff30b604"
+    }
+  ],
+  "iosOrientationConfigurationRepair": {
+    "finding": "Both example Info.plists allow only portrait for iPhone, although their iPad arrays allow landscape. Actual XCTest hardware rotation was accepted but the app correctly remained portrait.",
+    "change": "Allow portrait and both landscape orientations for iPhone in both iOS example source Info.plists.",
+    "nativePreparation": "Reuse each verified simulator app bundle, update only supported-orientation metadata, re-sign the test app and reinstall through simctl. Record previous and new executable, debug dylib and Info.plist hashes; no SDK/native code changes or dependency relink.",
+    "acceptance": "Preserve original focused attempt; authorize fresh focused iOS Mapbox retry with metadata-correct bundle, then use prepared iOS Libre bundle for its complete core/focused acceptance."
+  },
+  "focusedLandscapeFixtureRepair": {
+    "finding": "Two vertically stacked maps in landscape left each viewport too short, and the SDK scale overlapped the SDK logo on Map B. Existing actual callback/provider/state/feature results remain valid; the fixture needed adequate geometry for ornament review.",
+    "change": "Use equal side-by-side map panes in landscape and place delayed annotation image clear of corner ornaments. No production library or native-code change.",
+    "required": "Scoped actual image visibility, resize/orientation, host/ornament review and zoom-constraint follow-up on Mapbox iOS; remaining full focused runs use responsive fixture."
+  },
+  "nativeImpactReviewR9": {
+    "retained": "R7 Mapbox iOS touch/renderer proof and R8 scoped/full-focused actual outcomes, with original runner results and failed layout screenshots preserved.",
+    "change": "Only Mapbox iOS SDK scale margins are refreshed after native viewport changes, with separate hide/restore frames. Marker touch, source routing, camera methods, portals, MapLibre and web behavior remain unchanged.",
+    "required": "R9 actual resize/orientation scale clearance and control/recovery follow-up on Mapbox iOS; full R9 core/focused acceptance for Android Mapbox, Android Libre and iOS Libre.",
+    "iOSBundleMetadata": "Landscape eligibility changed, and top-level signing changed the Mapbox executable hash to f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c; actual native debug dylib is unchanged."
+  },
+  "activeFixture": "nativeCore",
+  "nativeImpactReviewR10": {
+    "retained": "R4 web Mapbox/MapLibre and accepted R7/R8/R9 Mapbox iOS core/focused evidence. R10 changes only the Android Mapbox temporary interactive=false branch; no web, iOS, shared touch, MapLibre, dependency or native binary changes.",
+    "required": "Full Android Mapbox core/focused acceptance plus both-density offset checks, followed by Android MapLibre and iOS MapLibre full core/focused acceptance.",
+    "limitation": "Explicit selected Android gestureSettings maps remain forwarded unchanged; the scoped fix avoids the pinned SDK UnsafeMixed bridge only for the facade temporary drag lock."
+  },
+  "nativeImpactReviewR11": {
+    "retained": "R4 web Mapbox/MapLibre and accepted R7/R8/R9 Mapbox iOS core/focused evidence. R11 changes only Android Mapbox zoom prop reset; web, iOS, shared touch, MapLibre and native binaries are unchanged.",
+    "required": "Full Android Mapbox core/focused acceptance and both-density offsets; Android MapLibre and iOS MapLibre full core/focused acceptance.",
+    "diagnosis": "R10 error followed physical drag completion; installed native DynamicFromObject accepts Boolean but rejects null, and zoomEnabled has no wrapper default. R9 synthesized gestureSettings likely similarly failed on clearing, rather than on object conversion. Prior failures and initial interpretation retained."
+  },
+  "harnessInputObservationReviewR11": {
+    "continuousTouches": "Tf07Touch provides actual OS continuous500ms+hold, movement, multiple pointer and cancellation; those successful gates are retained.",
+    "sdkTaps": "Use ordinary Android input touchscreen tap; after each source/map tap bound fresh physical Read collection up to15sec without repeating source/map input, so asynchronous transport snapshots do not become premature failures.",
+    "unresolved": "Exact cause of the helper tap/one-second snapshot failures is not established. Standard-input diagnostic proves eventual source+map callback receipt at baseline, not complete source propagation acceptance."
+  },
+  "nativeImpactReviewR12": {
+    "retained": "R4 web, accepted R7/R8/R9 Mapbox iOS; R11 Android Mapbox core composite and density420/320. For the R11 fixtures both selectedGestureSettings and doubleTapZoom are undefined, so the R12 suppression condition follows the identical scalar-only path. Other backend/platform paths are unchanged.",
+    "required": "R12 Android Mapbox explicit doubleTapZoom/selected-context gesture lock runtime follow-up; full focused9 Android Mapbox, then Android MapLibre and iOS MapLibre core/focused/density requirements."
+  },
+  "nativeImpactReviewR13": {
+    "retained": "Web R4 unaffected. Native marker/annotation dragging, SDK gesture reset/conversion, offsets, popup/source/camera/provider callback logic are unchanged. Retain Mapbox Android R11 core/density and R12 configured gesture evidence; retain prior Mapbox iOS non-layout/core evidence with this scoped review.",
+    "required": "Actual native Control child/provider updates, explicitResize and landscape/portrait layout, child drawing/touch/state, SDK ornaments/attribution, navigationconstraints, source passthrough and teardown on both Mapbox OS targets. Android MapLibre and iOS MapLibre still require full core/focused acceptance plus both-density Androidoffsets.",
+    "reason": "Shared NativeControl now has a stable physical View parent; affects drawing/layout/touch hierarchy across all native adapters/platforms. Routine tests cannot establish native pixels."
+  },
+  "nativeImpactReviewR14": {
+    "retained": "Web R4 unaffected. Native marker/annotation gestures/offsets, SDK gesture flags, popup and provider callback logic unchanged. Retain earlier Mapbox core/density/configured gesture and unrelated focused observations with explicit scope review. R13 materialization was ineffective and removed.",
+    "required": "Native Control updates, actualResize, landscape/portrait drawing and touch at each own map footer, SDK ornaments, attribution, navigation constraints, source passthrough and teardown on both Mapbox OS targets. MapLibre Android/iOS full core/focused and Androiddensity still pending.",
+    "diagnosis": "RNMapbox addFeature explicitly does not attach ordinary ViewGroup children. Teleport native layout-state controller suppresses updates while its source view is detached; cached portal corner constraints are not reliably refreshed by the host alone. React prop changes now carry the independently measured map viewport."
+  },
+  "r14ReadinessRetry": {
+    "reason": "Initial B map is visibly rendering and queryable but b-load never posts; no filtered tile/style/load exception. Cause unresolved. Pinned wrapper installs load listener after onMapReady, which is only a hypothesis.",
+    "scope": "Fresh unchanged R14 six-field Android Mapbox follow-up with mandatory a/b actual load and enabled Navigation at initial physical Read within60s. Preserve original result.",
+    "policy": "One native owner; no independent retry or producer edits."
+  },
+  "nativePeerPatch": {
+    "path": "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+    "sha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
+    "originalEmitterSha256": "959d64f25b2eb55108802fe50e1dff43d1aced28b79dc8c47570b0f486339a0c",
+    "installedPatchedEmitterSha256": "310c73d7ccde6d21e2df1b599af9d54ee1cac4329d3285eb530f0adb2e511e34",
+    "change": "Include native view identifier in event cache keys. Remove that view prefix when native view is dropped, preserving upstream teardown. No synthesized lifecycle callbacks.",
+    "installation": "Mapbox example Bun patchedDependencies, offline install; exact byte comparison to reviewed patched emitter passed. Package publication explicitly includes patch.",
+    "consumerRequirement": "Consumer package managers must apply included version-specific patch before native Android build for multiple Mapbox maps; remove when selected wrapper includes per-view throttling.",
+    "record": "tf07-android-mapbox-per-view-event-patch.json",
+    "installedApkSha256": "29a662927412148fff915db13520f4d85b3432d65d9e3ff16cc9b80b0a445b9e"
+  },
+  "nativeImpactReviewR15": {
+    "retained": "R4web plus prior unaffected iOS/Libre observations: native dependency patch only applies inside Mapbox Android example. JavaScript source/dist unchanged R14. Earlier Mapbox single-map interaction evidence retains original binary identity; per-view prefix does not alter same-map throttle logic.",
+    "required": "New patched Android Mapbox native build/install identity, fullfocused9 including readiness, source/host/provider/state/resize/orientation/Nav. Shared R14Control layout six-field follow-up on MapboxiOS, full core/focused/density on pending Libre targets.",
+    "limitation": "Unpatched@rnmapbox/maps10.3.7 multi-map callback delivery is not certified; consumer patch required."
+  },
+  "focusedToolbarInputRepair": {
+    "firstResult": "tf07-rerun-mapbox-android-focused-r15.json",
+    "reason": "Unexpected Theme action and Stop true-to-false discontinuity during horizontal toolbar inputs; propagation result inconclusive.",
+    "change": "Keep all nine buttons visible using responsive rows. Stop button labels whether the following press stops or allows bubbling. Read immediately after each individual action; verify bool/counters before next input.",
+    "routine": "All four type configs and formatting passed; productionJS/dist/SDKpatch/APK unchanged."
+  },
+  "nativeImpactReviewR16": {
+    "retained": "R4 web paths unaffected. R15 AndroidMapbox fullfocused9 and prior core/density/configuredgesture composite retained: Platform.OS android renders exactly the same Control Portal props as R14/R15. SDKpatch/APK unchanged. Existing iOS unrelated marker/annotation gestures, popup/source/camera/provider behavior unchanged.",
+    "required": "Fresh iOSMapbox six-field Control layout/touch/resize/rotation/state/passthrough/teardown follow-up on new JS distribution; fullcore/focused and Androiddensity acceptance in remaining Libre targets.",
+    "causeStatus": "Android detached source requires explicit bounds; iOS uses super.mountChildComponentView and native host sizing. Missed Map B touch on R15 is retained; relation to explicit bounds is tested, not established by routine tests."
+  },
+  "iosControlInputDiagnosisR16": {
+    "record": "tf07-rerun-mapbox-ios-r16-overlay-comparison.json",
+    "cause": "The React Native development warning banner covered Map B child center at (349, 823.5). After its visible X was physically pressed, the same 120 ms child press registered touch and press events, local count, and useMap zoom 12. Map A comparison also passed. No producer correction is indicated by these misses.",
+    "geometry": "Fresh per-Read public measurements matched accessibility bounds. Earlier initial measurements were stale; the 32-point difference did not establish a layout defect.",
+    "debugger": "Two owned-app LLDB attachments failed to compile CoreGraphics struct expressions; no hit chain was returned. Both diagnostic failures remain recorded. Physical before/after overlay comparison supplies the touch evidence.",
+    "harness": "Diagnostic tracing removed. Pristine visible toolbar fixture SHA 7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9 restored; all four type configurations and formatting passed. Physically dismiss the development banner before acceptance baseline; do not suppress warnings or production error gates.",
+    "required": "Fresh six-field iOS Mapbox Control acceptance, then full MapLibre core/focused checks and Android second-density checks.",
+    "observationFollowup": {
+      "record": "tf07-rerun-mapbox-ios-control-layout-r16-after-overlay.json",
+      "review": "Landscape pixels show both child labels advanced to 3 and Map B vector lines enlarged with scale changing from 0.5 mi to 0.25 mi after Zoom in. GET observations remained at counts 2/2 and zoom 12, so the stale saved result does not establish a navigation failure. Require a new collector receipt after every physical Read before judgment.",
+      "cause": "The worker continued pressing the portrait Read focus point (67,80) after landscape rotation. Fresh landscape AX placed Read focus at (137,18), so the GET responses were stale. The actual child and Zoom in inputs visibly worked.",
+      "correction": "Use the existing fresh-AX exact-label helper for every Read and Finish action. A temporary collector receipt counter must advance after each physical Read before its observation is judged. Producer and fixture bytes unchanged.",
+      "required": "Fresh six-field iOS Mapbox acceptance retry with the corrected physical Read procedure."
+    },
+    "result": "R16 six-field Control acceptance passed and coordinator reviewed. Both prior harness failures remain recorded."
+  },
+  "handoff": {
+    "reason": "The previous owner-requested handoff recorded an incomplete earlier run; its authorized continuation is now complete.",
+    "latestNativeRecord": "tf07-rerun-maplibre-ios-focused-r25.json",
+    "state": "Continuation complete. App and owned runners stopped; assigned ports8171/8797/8798/22087 clear. Android5556 booted portrait at420dpi; assigned iOS simulator booted portrait; canonical core fixture restored.",
+    "remaining": "No scenarios remain in the authorized runtime checkpoint. Full VoiceOver/TalkBack audits remain outside scope."
+  }
+}

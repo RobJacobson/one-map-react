@@ -1,0 +1,27 @@
+{
+  "environment": "MapLibre iOS",
+  "preparedAt": "2026-10-13",
+  "deviceUdid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+  "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+  "orientationMetadata": [
+    "UIInterfaceOrientationPortrait",
+    "UIInterfaceOrientationLandscapeLeft",
+    "UIInterfaceOrientationLandscapeRight"
+  ],
+  "originalInstalledExecutableSha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+  "correctedExecutableSha256": "fb869a1de4a7bef36182646338530302b032d4e3ba332be9c3bedb6468e749f5",
+  "correctedInfoPlistSha256": "53719e60713f28c7a1a14376f0398687e13a66a15b74ad3cc5ab7561be711cb2",
+  "debugDylibSha256": "9cd151b19b9ba9da0789aabbc18b18ff1bfdb237518dfe18f5f7e67b1de155b1",
+  "signature": "Top-level bundle re-signed ad hoc after the supported-orientation metadata change; strict deep verification passed.",
+  "unchangedBytesReview": {
+    "baseline": "R16 installed-bundle digest snapshot captured before the metadata edit; its per-file temporary list was removed after comparison.",
+    "comparedFrameworkFiles": 158,
+    "comparedDylibFiles": 2,
+    "mismatches": 0
+  },
+  "acceptanceRuns": [
+    "tf07-rerun-maplibre-ios-core-r24.json",
+    "tf07-rerun-maplibre-ios-focused-r25.json"
+  ],
+  "note": "Only the owned temporary app copy was changed. The original installed bundle executable hash is retained above; the new executable identity reflects the metadata-only top-level bundle signing operation, not a native rebuild."
+}

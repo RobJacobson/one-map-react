@@ -1,0 +1,27 @@
+{
+  "installedBinarySha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+  "libraryDistSha256": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd",
+  "environment": "mapbox-ios",
+  "runId": "4946cbd8-5350-4e60-a431-eb81e9c07a3e",
+  "scenarios": {
+    "annotation-image-visibility": "passed",
+    "resize-orientation": "passed",
+    "host-accessibility": "passed",
+    "navigation-constraints": "passed"
+  },
+  "evidence": {
+    "annotation-image-visibility": "actual Image button pressed; screenshot visibly shows Image ready and the blue bitmap in Map A",
+    "resize-orientation": "short=true after resize; actual app surface rotated 402x874 to 874x402; side-by-side panes each visibly show map content, then portrait restored and final Read captured",
+    "host-accessibility": "distinct labeled A/B children and Zoom controls enabled in AX and physically pressed; both About this map controls opened their actual Mapbox attribution dialogs and were canceled; unobstructed landscape screenshot shows separate scale bars, Mapbox logos and info controls in both panes; full VoiceOver audit remains out-of-scope",
+    "navigation-constraints": "Map B 12->13; plus at13 stayed13; minus reached12; minus at12 stayed12. Reads after each; Map A remained11"
+  },
+  "finalRead": "records/evidence/tf07-mapbox-ios-layout-r8-final-read.json",
+  "portraitAppFrame": {
+    "width": 402,
+    "height": 874
+  },
+  "landscapeAppFrame": {
+    "width": 874,
+    "height": 402
+  }
+}

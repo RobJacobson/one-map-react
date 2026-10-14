@@ -1,0 +1,81 @@
+{
+  "status": "stopped-at-readiness-bound",
+  "environment": "mapbox-android",
+  "runId": "fbb386a6-6960-4ef0-870a-d24456d3c525",
+  "priorRun": "00cda308-e7a2-4169-ad8f-c18d3a29ed9d",
+  "execution": "Fresh R14 focused control-layout retry; readiness-only, no scenario interactions and no Finish focus",
+  "manualReport": {
+    "path": "/private/tmp/one-map-tf07-rerun/manual-mapbox-android-control-layout-r14-readyretry.json",
+    "installedBinarySha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+    "environment": "mapbox-android",
+    "runId": "fbb386a6-6960-4ef0-870a-d24456d3c525",
+    "scenarios": {
+      "portal-context-state-multiple-maps": "unverified",
+      "resize-orientation": "unverified",
+      "host-accessibility": "unverified",
+      "navigation-constraints": "unverified",
+      "source-passthrough": "unverified",
+      "control-teardown": "unverified"
+    }
+  },
+  "artifact": {
+    "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+    "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+    "packedSha256": "22c0a7e64fcf6c94c4167ce7ef3d148f2843ca93dc71ffcf2a016392b223c0be",
+    "exampleDistSha256": {
+      "web-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "web-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "native-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "native-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49"
+    }
+  },
+  "binary": {
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "package": "com.onemapmapbox",
+    "device": "emulator-5556",
+    "avd": "TF07_Rerun36",
+    "os": "Android 16 / API 36",
+    "screen": "1080x2400 portrait",
+    "density": "420 dpi"
+  },
+  "readiness": {
+    "bound": "At least 60 seconds; first physical Read was at 15:08:29 PDT and final Read at 15:10:15 PDT.",
+    "interactions": "Only physical Read renderer taps; no focused scenario input was performed.",
+    "firstRead": null,
+    "subsequentReads": {
+      "counts": {
+        "b-load": 1
+      },
+      "aLoad": "Absent through final bounded Read.",
+      "bLoad": "1",
+      "aCenter": [-122.34000000000002, 2.1088986592431636],
+      "aZoom": 11,
+      "bCenter": [-122.34000000000002, 47.60999999999999],
+      "bZoom": 12,
+      "overlapFeatures": 0,
+      "vectorFeatures": 2
+    },
+    "mapBNavigation": {
+      "result": "Enabled at final Read.",
+      "zoomInBounds": "[21,1757]-[126,1862]",
+      "zoomOutBounds": "[21,1862]-[126,1967]"
+    },
+    "screenshots": {
+      "initial": "records/evidence/tf07-r14-ready-retry/initial.png",
+      "afterFirstRead": "records/evidence/tf07-r14-ready-retry/first-read.png",
+      "afterSecondRead": "records/evidence/tf07-r14-ready-retry/second-read.png",
+      "afterThirdRead": "records/evidence/tf07-r14-ready-retry/third-read.png",
+      "finalBound": "records/evidence/tf07-r14-ready-retry/final-60s.png"
+    },
+    "accessibilityTrees": {
+      "initial": "records/evidence/tf07-r14-ready-retry/initial.xml",
+      "afterFirstRead": "records/evidence/tf07-r14-ready-retry/first-read.xml",
+      "afterSecondRead": "records/evidence/tf07-r14-ready-retry/second-read.xml",
+      "afterThirdRead": "records/evidence/tf07-r14-ready-retry/third-read.xml",
+      "finalBound": "records/evidence/tf07-r14-ready-retry/final-60s.xml"
+    },
+    "logcat": "records/evidence/tf07-r14-ready-retry/app-logcat-filtered.txt"
+  },
+  "result": "Stopped before scenario interaction because a-load remained absent after the bounded readiness window. Map B load callback appeared, B navigation was enabled, two vector features were queryable, and overlap queries returned no features. No tile/style exception was identified from the saved filtered log."
+}

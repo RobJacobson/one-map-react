@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { LngLat } from "./camera-types.js";
+import type { SourceClickEvent } from "./event-types.js";
 
 /**
  * GeoJSON geometry accepted by the shared GeoJSON {@link Source}.
@@ -22,6 +23,10 @@ export interface GeoJsonFeature {
   readonly type: "Feature";
   /** Stable feature id used by filters, feature state, and queries. */
   readonly id?: string | number;
+  /** Source identifier included by rendered feature queries when available. */
+  readonly source?: string;
+  /** Vector source-layer identifier when included by the renderer. */
+  readonly sourceLayer?: string;
   /** Feature attributes available to expressions. */
   readonly properties?: Readonly<Record<string, unknown>> | null;
   /** Feature geometry. */
@@ -66,11 +71,14 @@ interface SourceBaseProps {
  * GeoJSON source creation options shared by every adapter.
  */
 export interface GeoJsonSourceProps extends SourceBaseProps {
+  /** Mutable callback for rendered features activated from this source. */
+  readonly onClick?: (event: SourceClickEvent) => void;
   /** Selects the GeoJSON source family. */
   readonly type: "geojson";
   /**
    * GeoJSON object or a URL that returns one. Updating `data` redraws the
-   * source without remounting; every other option is creation-only.
+   * source without remounting; onClick and selected native hitbox also update.
+   * Renderer source specification options remain creation-only.
    */
   readonly data: GeoJsonData | string;
   /** Maximum zoom level at which to create vector tiles. */
@@ -119,6 +127,8 @@ export interface GeoJsonSourceProps extends SourceBaseProps {
  * Vector tile source creation options shared by every adapter.
  */
 export interface VectorSourceProps extends SourceBaseProps {
+  /** Mutable callback for rendered features activated from this source. */
+  readonly onClick?: (event: SourceClickEvent) => void;
   /** Selects the vector tile source family. */
   readonly type: "vector";
   /** URL of a TileJSON document. Supply `url` or `tiles`, not both. */

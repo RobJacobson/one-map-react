@@ -1,0 +1,71 @@
+{
+  "priorReceipt": 9,
+  "receiptSequence": 10,
+  "observation": {
+    "events": {
+      "popup-open": 1,
+      "style": 1,
+      "move": 49,
+      "load": 1,
+      "child-click": 1,
+      "live-start": 3,
+      "live-drag": 63,
+      "live-end": 1,
+      "annotation-start": 1,
+      "annotation-end": 1
+    },
+    "positions": {
+      "live": [
+        -122.32692103558364,
+        47.60559107215721
+      ],
+      "annotation": [
+        -122.3747768839339,
+        47.6134938151564
+      ]
+    },
+    "center": [
+      -122.35636824451962,
+      47.60999999998973
+    ],
+    "zoom": 11,
+    "features": [
+      {
+        "properties": {
+          "fixture": "tf07"
+        },
+        "geometry": {
+          "coordinates": [
+            -122.33999490737915,
+            47.57999970656695
+          ],
+          "type": "Point"
+        },
+        "id": "707",
+        "type": "Feature"
+      }
+    ],
+    "generation": 0,
+    "stopSourcePropagation": false,
+    "sourcePoint": [
+      253.67596435546875,
+      514.5753784179688
+    ]
+  },
+  "physicalInput": {
+    "x": 977,
+    "y": 109,
+    "bounds": [
+      [
+        875,
+        84
+      ],
+      [
+        1080,
+        135
+      ]
+    ]
+  },
+  "accessibilityTreePath": "/private/tmp/one-map-tf07-rerun/tf07-read-receipt.xml",
+  "screenshotPath": "/private/tmp/one-map-tf07-rerun/tf07-read-receipt.png"
+}

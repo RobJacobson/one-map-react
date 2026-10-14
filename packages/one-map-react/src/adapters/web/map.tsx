@@ -1,8 +1,10 @@
 import {
   forwardRef,
+  type HTMLAttributes,
   useCallback,
   useImperativeHandle,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -11,6 +13,7 @@ import type { Backend } from "../../contracts/adapter.js";
 import type { MapRef } from "../../contracts/camera-types.js";
 import type { ClickEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
+import type { MapStyle } from "../../contracts/style-types.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding, toFlatBounds } from "../shared/wrapper-values.js";
@@ -37,10 +40,20 @@ export const createWebMap = <
 >(
   wrapper: WebWrapper<Name>
 ) => {
-  const WebMap = forwardRef<MapRef, MapProps>(
+  const WebMap = forwardRef<
+    MapRef,
+    MapProps & {
+      hostProps?: Omit<
+        HTMLAttributes<HTMLDivElement>,
+        "children" | "dangerouslySetInnerHTML"
+      >;
+    }
+  >(
     (
       {
         mapStyle,
+        interactiveLayerIds,
+        hostProps,
         initialViewState,
         viewState,
         minZoom,
@@ -97,6 +110,7 @@ export const createWebMap = <
     ) => {
       const mapRef = useRef<WebMapHandle | null>(null);
       const [styleMap, setStyleMap] = useState<StyleLoadTarget | null>(null);
+      const styleKey = useMemo(() => styleContentKey(mapStyle), [mapStyle]);
       const frozenViewState = useFrozenValue(initialViewState);
       const reportMove = useActiveCallback(onMove);
       const reportMoveStart = useActiveCallback(onMoveStart);
@@ -121,6 +135,7 @@ export const createWebMap = <
       const reportTouchEnd = useActiveCallback(onTouchEnd);
       const reportTouchCancel = useActiveCallback(onTouchCancel);
       const reportLoad = useActiveCallback(onLoad);
+      const pendingLoad = useRef(false);
       const reportStyleLoad = useActiveCallback(onStyleLoad);
       const reportError = useActiveCallback(onError);
       const reportResize = useActiveCallback(onResize);
@@ -133,6 +148,22 @@ export const createWebMap = <
       }, []);
 
       useImperativeHandle(ref, () => createWebMapRef(mapRef, wrapper));
+
+      // Mapbox can emit load before react-map-gl commits its imperative handle.
+      // Deliver the callback after attachment so camera operations are usable.
+      useLayoutEffect(() => {
+        if (styleMap && pendingLoad.current) {
+          pendingLoad.current = false;
+          reportLoad();
+        }
+      }, [styleMap, reportLoad]);
+
+      useLayoutEffect(
+        () => () => {
+          pendingLoad.current = false;
+        },
+        []
+      );
 
       useLayoutEffect(() => {
         reportStyleLoadRef.current = reportStyleLoad;
@@ -148,7 +179,7 @@ export const createWebMap = <
       // never emits style.load still reports once the current style is
       // loaded. The listener is facade-owned, so logical unmount removes
       // it even when reuseMaps keeps the renderer.
-      // biome-ignore lint/correctness/useExhaustiveDependencies: mapStyle rearms missed-load observation after in-place style diffs.
+      // biome-ignore lint/correctness/useExhaustiveDependencies: style content changes rearm missed-load observation after in-place diffs.
       useLayoutEffect(() => {
         if (!styleMap) {
           return;
@@ -183,7 +214,7 @@ export const createWebMap = <
           styleMap.off("load", reportMissedStyleLoad);
           styleMap.off("idle", reportMissedStyleLoad);
         };
-      }, [styleMap, mapStyle]);
+      }, [styleMap, styleKey]);
 
       // Pinch zoom and rotation are one handler. Disabling the handler would
       // also disable zoom, so rotation is turned off on the handler itself.
@@ -226,82 +257,111 @@ export const createWebMap = <
             };
 
       return (
-        <wrapper.Map
-          ref={setMapHandle}
-          mapStyle={mapStyle}
-          initialViewState={initialCamera}
-          viewState={controlledCamera}
-          padding={paddingValue}
-          minZoom={minZoom}
-          maxZoom={maxZoom}
-          maxBounds={
-            maxBounds === undefined ? undefined : toFlatBounds(maxBounds)
-          }
-          style={style}
-          reuseMaps={reuseMaps}
-          gl={gl}
-          {...toWebGestureProps({
-            interactive,
-            dragPan,
-            touchZoom,
-            touchRotate,
-            touchPitch,
-            scrollZoom,
-            doubleClickZoom,
-            doubleTapZoom,
-            dragRotate,
-            boxZoom,
-            keyboard,
-            cooperativeGestures,
-            clickTolerance,
-            hash,
-          })}
-          onLoad={() => {
-            reportLoad();
+        <div
+          {...hostProps}
+          style={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            ...style,
+            ...hostProps?.style,
           }}
-          onError={(event) => {
-            reportError({ error: event.error });
-          }}
-          onResize={() => {
-            reportResize();
-          }}
-          onMove={bindMove(onMove, reportMove)}
-          onMoveStart={bindMove(onMoveStart, reportMoveStart)}
-          onMoveEnd={bindMove(onMoveEnd, reportMoveEnd)}
-          onIdle={
-            onIdle
-              ? () => {
-                  reportIdle();
-                }
-              : undefined
-          }
-          onClick={bindPointer(onClick, reportClick)}
-          onDblClick={bindPointer(onDblClick, reportDblClick)}
-          onContextMenu={bindPointer(onContextMenu, reportContextMenu)}
-          onMouseDown={bindPointer(onMouseDown, reportMouseDown)}
-          onMouseUp={bindPointer(onMouseUp, reportMouseUp)}
-          onMouseMove={bindPointer(onMouseMove, reportMouseMove)}
-          onMouseEnter={bindPointer(onMouseEnter, reportMouseEnter)}
-          onMouseLeave={bindPointer(onMouseLeave, reportMouseLeave)}
-          onMouseOver={bindPointer(onMouseOver, reportMouseOver)}
-          onMouseOut={bindPointer(onMouseOut, reportMouseOut)}
-          onWheel={bindPointer(onWheel, reportWheel)}
-          onDrag={bindMove(onDrag, reportDrag)}
-          onDragStart={bindMove(onDragStart, reportDragStart)}
-          onDragEnd={bindMove(onDragEnd, reportDragEnd)}
-          onTouchStart={bindPointer(onTouchStart, reportTouchStart)}
-          onTouchMove={bindPointer(onTouchMove, reportTouchMove)}
-          onTouchEnd={bindPointer(onTouchEnd, reportTouchEnd)}
-          onTouchCancel={bindPointer(onTouchCancel, reportTouchCancel)}
         >
-          {children}
-        </wrapper.Map>
+          <wrapper.Map
+            ref={setMapHandle}
+            interactiveLayerIds={
+              interactiveLayerIds === undefined
+                ? undefined
+                : [...interactiveLayerIds]
+            }
+            mapStyle={mapStyle}
+            initialViewState={initialCamera}
+            viewState={controlledCamera}
+            padding={paddingValue}
+            minZoom={minZoom}
+            maxZoom={maxZoom}
+            maxBounds={
+              maxBounds === undefined ? undefined : toFlatBounds(maxBounds)
+            }
+            style={{ width: "100%", height: "100%" }}
+            reuseMaps={reuseMaps}
+            gl={gl}
+            {...toWebGestureProps({
+              interactive,
+              dragPan,
+              touchZoom,
+              touchRotate,
+              touchPitch,
+              scrollZoom,
+              doubleClickZoom,
+              doubleTapZoom,
+              dragRotate,
+              boxZoom,
+              keyboard,
+              cooperativeGestures,
+              clickTolerance,
+              hash,
+            })}
+            onLoad={() => {
+              if (mapRef.current) reportLoad();
+              else pendingLoad.current = true;
+            }}
+            onError={(event) => {
+              reportError({ error: event.error });
+            }}
+            onResize={() => {
+              reportResize();
+            }}
+            onMove={bindMove(onMove, reportMove)}
+            onMoveStart={bindMove(onMoveStart, reportMoveStart)}
+            onMoveEnd={bindMove(onMoveEnd, reportMoveEnd)}
+            onIdle={
+              onIdle
+                ? () => {
+                    reportIdle();
+                  }
+                : undefined
+            }
+            onClick={bindPointer(onClick, reportClick)}
+            onDblClick={bindPointer(onDblClick, reportDblClick)}
+            onContextMenu={bindPointer(onContextMenu, reportContextMenu)}
+            onMouseDown={bindPointer(onMouseDown, reportMouseDown)}
+            onMouseUp={bindPointer(onMouseUp, reportMouseUp)}
+            onMouseMove={bindPointer(onMouseMove, reportMouseMove)}
+            onMouseEnter={bindPointer(onMouseEnter, reportMouseEnter)}
+            onMouseLeave={bindPointer(onMouseLeave, reportMouseLeave)}
+            onMouseOver={bindPointer(onMouseOver, reportMouseOver)}
+            onMouseOut={bindPointer(onMouseOut, reportMouseOut)}
+            onWheel={bindPointer(onWheel, reportWheel)}
+            onDrag={bindMove(onDrag, reportDrag)}
+            onDragStart={bindMove(onDragStart, reportDragStart)}
+            onDragEnd={bindMove(onDragEnd, reportDragEnd)}
+            onTouchStart={bindPointer(onTouchStart, reportTouchStart)}
+            onTouchMove={bindPointer(onTouchMove, reportTouchMove)}
+            onTouchEnd={bindPointer(onTouchEnd, reportTouchEnd)}
+            onTouchCancel={bindPointer(onTouchCancel, reportTouchCancel)}
+          >
+            {children}
+          </wrapper.Map>
+        </div>
       );
     }
   );
 
   return WebMap;
 };
+
+/** Content equality keeps equivalent inline styles from rearming completion. */
+const styleContentKey = (style: MapStyle): string =>
+  JSON.stringify(style, (_key, value: unknown) =>
+    value !== null && typeof value === "object" && !Array.isArray(value)
+      ? Object.fromEntries(
+          Object.entries(value).sort(([left], [right]) =>
+            left.localeCompare(right)
+          )
+        )
+      : value
+  );
 
 const bindMove = (
   callback: ((event: MoveEvent) => void) | undefined,

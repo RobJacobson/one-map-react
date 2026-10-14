@@ -1,0 +1,57 @@
+{
+  "environment": "MapLibre iOS, iPhone 18 Pro simulator, iOS 27.0",
+  "status": "passed-core11",
+  "runId": "739c9b6b-1e7b-4278-8ba2-ab8215f57033",
+  "deviceUdid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+  "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+  "fixture": "tf07 core",
+  "fixtureSha256": "290c01e5379c05a1d4058989a3ca434ad432e3094e47b4eab8d48c37824a1874",
+  "librarySourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "originalInstalledExecutableSha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+  "installedExecutableSha256": "fb869a1de4a7bef36182646338530302b032d4e3ba332be9c3bedb6468e749f5",
+  "binaryPreparation": "Owned app-bundle copy changed supported iPhone orientation metadata to portrait and both landscape orientations, then received a top-level ad-hoc signature. Signature verification passed; framework and debug-dylib bytes remained unchanged.",
+  "runnerResult": "passed; observed=true; manualComplete=true; remaining=[]",
+  "finalReceiptSequence": 27,
+  "scenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-drag": "passed",
+    "annotation-drag": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow-dismissal": "passed",
+    "source-propagation": "passed",
+    "navigation-location": "passed",
+    "style-remount": "passed",
+    "host-accessibility": "passed",
+    "scale-units": "passed"
+  },
+  "finalObservation": {
+    "generation": 1,
+    "loadCount": 3,
+    "featureIds": [707],
+    "center": [-122.34000000000957, 47.61000000000788],
+    "zoom": 11,
+    "events": {
+      "popup-open": 2,
+      "child-click": 4,
+      "live-start": 2,
+      "live-drag": 93,
+      "live-end": 2,
+      "annotation-start": 1,
+      "annotation-end": 1,
+      "popup-child": 1,
+      "popup-close": 1,
+      "source-click": 3,
+      "map-click": 2,
+      "location": 1
+    }
+  },
+  "resolvedInputAttempts": "An initial toolbar touch missed above Offset and is retained as an unverified input miss. A fresh-bounds toggle visibly shifted the live child by the configured offset. A tap on the noninteractive drag label correctly reported marker-click; a tap on the displaced child button incremented child-click without a map click, the displaced label dragged, and reset restored the original placement.",
+  "evidence": [
+    "tf07-rerun-maplibre-ios-core-r24-manual.json",
+    "tf07-rerun-maplibre-ios-core-r24-accessibility.json",
+    "tf07-rerun-maplibre-ios-orientation-prep-r24.json"
+  ],
+  "outsideScope": ["full-VoiceOver-audit"]
+}

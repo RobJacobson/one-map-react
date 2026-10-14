@@ -1,0 +1,34 @@
+10-13 13:55:58.244  7466  7487 E unknown:ReconnectingWebSocket: 	at java.lang.Thread.run(Thread.java:1119)
+10-13 13:55:58.245  7466  7487 W unknown:ReconnectingWebSocket: Couldn't connect to "ws://127.0.0.1:8081/message?device=sdk_gphone64_arm64%20-%2016%20-%20API%2036&app=com.onemapmapbox&clientid=BridgelessDevSupportManager", will silently retry
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: Cannot connect to Metro.
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: 
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: Try the following to fix the issue:
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: - Ensure that Metro is running and available on the same network
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: - Ensure that your device/emulator is connected to your machine and has USB debugging enabled - run 'adb devices' to see a list of connected devices
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: - If you're on a physical device connected to the same machine, run 'adb reverse tcp:8081 tcp:8081' to forward requests from your device
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: - If your device is on the same Wi-Fi network, set 'Debug server host & port for device' in 'Dev settings' to your machine's IP address and the port of the local dev server - e.g. 10.0.1.1:8081
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: 
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: URL: 127.0.0.1:8081
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: 
+10-13 13:55:58.252  7466  7500 W ReactNativeJS: Error: undefined
+10-13 13:55:58.270   683   751 D CoreBackPreview: Window{d16ed u0 PopupWindow:170c1dd}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@4ff0fb3, mPriority=0, mIsAnimationCallback=false, mOverrideBehavior=0}
+10-13 13:55:58.512  1703  1887 I bdee    : (REDACTED) getHotwordActive::active query: %s, watch: %s, devices connected: %s
+--
+10-13 13:56:49.111  7659  7691 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.rnmapbox.rnmbx.components.styles.model.RNMBXModelsManager
+10-13 13:56:49.112  7659  7691 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.rnmapbox.rnmbx.components.camera.RNMBXCameraManager
+10-13 13:56:49.112  7659  7691 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager
+10-13 13:56:49.113  7659  7691 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$MapShadowNode
+10-13 13:56:49.113  7659  7691 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.rnmapbox.rnmbx.components.styles.sources.RNMBXShapeSourceManager
+10-13 13:56:49.113  7659  7691 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.rnmapbox.rnmbx.components.images.RNMBXImageManager
+--
+10-13 13:56:49.212   683  2745 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+10-13 13:56:49.212  7659  7691 W Mapbox  : [common\ActivityRecognitionObserver]: Required class not found: com.google.android.gms.location.FusedLocationProviderClient
+10-13 13:56:49.239  7659  7691 I ReactNativeJS: Running "OneMapMapbox" with {"rootTag":1,"initialProps":{},"fabric":true}
+10-13 13:56:49.243  7659  7698 I Mapbox  : [cpu_monitor]: Updating CPU monitor configuration: CPU threshold: 0%, Interval duration: 100 ms, 
+10-13 13:56:49.250  7659  7700 I Mapbox  : [LifecycleUtils]: Task: TaskInfo{userId=0 taskId=13 effectiveUid=10213 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 xflg=0x5 cmp=com.onemapmapbox/.MainActivity } baseActivity=ComponentInfo{com.onemapmapbox/com.onemapmapbox.MainActivity} topActivity=ComponentInfo{com.onemapmapbox/com.onemapmapbox.MainActivity} origActivity=null realActivity=ComponentInfo{com.onemapmapbox/com.onemapmapbox.MainActivity} numActivities=1 lastActiveTime=10508107 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@8f91e58} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 0 - 0, 0) topActivityInfo=ActivityInfo{960ebb1 com.onemapmapbox.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isTopActivityNoDisplay=false isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false isActivityStackTransparent=false lastNonFullscreenBounds=Rect(284, 660 - 796, 1740) capturedLink=null capturedLinkTimestamp=0 requestedVisibleTypes=-9 topActivityRequestOpenInBrowserEducationTimestamp=0 appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false eligibleForLetterboxEducation= false isLetterboxEducationEnabled= true isLetterboxDoubleTapEnabled= false eligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 topActivityAppBounds=Rect(0, 0 - 1080, 2400) isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false hasMinAspectRatioOverride=false topActivityLetterboxBounds=null cameraCompatTaskInfo=CameraCompatTaskInfo { freeformCameraCompatMode=inactive}} topActivityMainWindowFrame=null}
+--
+10-13 13:56:49.360  7659  7692 I cr_LibraryLoader: Successfully loaded native library
+10-13 13:56:49.366  7659  7692 I cr_CachingUmaRecorder: Flushed 6 samples from 6 histograms, 0 samples were dropped.
+10-13 13:56:49.369  7659  7691 W ReactNativeJS: SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+10-13 13:56:49.427  7659  7659 I om.onemapmapbox: hiddenapi: Accessing hidden field Landroid/widget/HorizontalScrollView;->mScroller:Landroid/widget/OverScroller; (runtime_flags=0, domain=platform, api=unsupported) from Lcom/facebook/react/views/scroll/ReactHorizontalScrollView; (domain=app) using reflection: allowed
+10-13 13:56:49.476  7659  7715 D nativeloader: Load /data/app/~~oR7GCrSZiCYdDngwYOJ3hw==/com.onemapmapbox-yPiATBX-0AhY2dl9tWGHKQ==/base.apk!/lib/arm64-v8a/libimagepipeline.so using class loader ns clns-9 (caller=/data/app/~~oR7GCrSZiCYdDngwYOJ3hw==/com.onemapmapbox-yPiATBX-0AhY2dl9tWGHKQ==/base.apk): ok

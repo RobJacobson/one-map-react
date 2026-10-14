@@ -1,0 +1,349 @@
+{
+  "artifact": {
+    "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+    "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+  },
+  "environment": {
+    "backend": "maplibre",
+    "platform": "ios",
+    "device": "iPhone 18 Pro",
+    "os": "iOS 27.0",
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+  },
+  "build": {
+    "result": "success",
+    "log": "/private/tmp/one-map-tf07-acceptance/maplibre-ios-build-teleport.log",
+    "teleport": "1.2.1 in Podfile.lock and Pods/Manifest.lock; RNTPortalHostView/RNTPortalView shadow-node targets compiled"
+  },
+  "binary": {
+    "bundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+    "bundlePath": "/private/tmp/one-map-tf07-acceptance/maplibre-ios-derived-teleport/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+    "executableSha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+    "debugDylibSha256": "b49dd757da494af8394a127d3adf0a34df5822ad03081868253aef9edb98be88",
+    "installedBundleVerified": true,
+    "installedExecutableAndDylibMatchBuild": true
+  },
+  "currentRun": {
+    "runId": "77974398-0adc-48fd-b010-fc433a4dac24",
+    "runner": "isolated Metro8171/status8797",
+    "status": "final-generation1-observation-runner-manual-report-missing",
+    "execution": "agent-driven Maestro 2.11.0 native taps/swipes and simctl screenshots with corrected SafeAreaView fixture",
+    "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+    "debugDylibSha256": "b49dd757da494af8394a127d3adf0a34df5822ad03081868253aef9edb98be88",
+    "initialReadback": {
+      "center": [
+        -122.3400000000085,
+        47.6099999999991
+      ],
+      "zoom": 11,
+      "featureId": 707,
+      "fixture": "tf07",
+      "generation": 0,
+      "stopSourcePropagation": false,
+      "events": {
+        "popup-open": 1,
+        "style": 1,
+        "move": 1,
+        "load": 1
+      }
+    },
+    "childReadback": {
+      "center": [
+        -122.3400000000085,
+        47.6099999999991
+      ],
+      "zoom": 11,
+      "featureId": 707,
+      "fixture": "tf07",
+      "generation": 0,
+      "stopSourcePropagation": false,
+      "events": {
+        "popup-open": 1,
+        "style": 1,
+        "move": 1,
+        "load": 1,
+        "child-click": 1
+      }
+    },
+    "nestedScroll": {
+      "status": "failed",
+      "input": "native swipe39%,60%\u219239%,56%; logical start\u2248[157,524] on 402x874, visibly over Scroll two row",
+      "readback": {
+        "center": [
+          -122.3399999999772,
+          47.60436752535161
+        ],
+        "zoom": 11,
+        "events": {
+          "move": 23,
+          "child-click": 1
+        },
+        "featureId": 707
+      },
+      "beforeScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-child.png",
+      "afterScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-scroll-after.png"
+    },
+    "inputDriver": "Maestro CLI 2.11.0 verified wrapper; native touches and simctl screenshots; no callbacks/fake readback",
+    "screenshots": [
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-after-remount.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-child.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-controls.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset-reset.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-popup-before-close.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-scroll-after.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-startup.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-style.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-toolbar-right.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-units.png",
+      "/private/tmp/one-map-tf07-acceptance/maplibre-run1-zoom.png"
+    ],
+    "scenarios": {
+      "finite-camera-feature-readback": "passed-generation0-and-final-generation1",
+      "live-child-button": "passed-child-click-isolated",
+      "nested-scroll": "failed-valid-visible-row-gesture-panned-map",
+      "live-drag": "unverified-driver-cannot-hold-before-drag",
+      "annotation-drag": "unverified-driver-cannot-hold-before-drag",
+      "offset-touch-bounds": "partial-offset-child-hit-and-visual-reset;continuous-drag-unverified",
+      "popup-follow-dismissal": "partial-child-close-reopen-and-no-teardown-close;geographic-follow-partial",
+      "source-propagation": "passed-allowed-and-stopped",
+      "navigation-location": "passed-location1-center-readback",
+      "style-remount": "passed-visible-style-change-remount-and-generation1-readback",
+      "host-accessibility": "unverified",
+      "scale-units": "failed-remained-2-km-after-physical-toggle-and-wait",
+      "multi-touch-cancel": "unverified-driver-limitation"
+    },
+    "startup": "Safe-area-corrected TF07 fixture loaded; generation0 readback valid and native app controls/MapLibre attribution visible. Renderer background appeared blank/gray in screenshots while fixture controls and markers rendered.",
+    "finalReadback": {
+      "center": [
+        -122.33999999999926,
+        47.6100000000005
+      ],
+      "zoom": 11,
+      "featureId": 707,
+      "featureGeometry": [
+        -122.33999490737915,
+        47.57999970656695
+      ],
+      "fixture": "tf07",
+      "generation": 1,
+      "stopSourcePropagation": true,
+      "events": {
+        "popup-open": 3,
+        "style": 3,
+        "move": 117,
+        "load": 3,
+        "child-click": 2,
+        "source-click": 2,
+        "map-click": 1,
+        "popup-child": 1,
+        "popup-close": 1,
+        "location": 1
+      },
+      "features": [
+        {
+          "type": "Feature",
+          "id": 707,
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -122.33999490737915,
+              47.57999970656695
+            ]
+          },
+          "properties": {
+            "fixture": "tf07"
+          }
+        }
+      ]
+    },
+    "runnerJudgment": "The native flow reached generation1 and actual readback was saved. Isolated runner exited nonzero only when reading the configured TF07_MANUAL_REPORT path, which was absent (ENOENT at tf07-ui-native-isolated.mjs:329); compact evidence contains actual native observations, no callbacks/fake values.",
+    "observations": [
+      "Initial generation0 readback: finite center[-122.3400000000085,47.6099999999991], zoom11, numeric feature id707, fixture tf07.",
+      "Tap at39%,57% on visible child produced child-click1 with no map-click. After offset tap at fresh screenshot point48%,53%, child-click advanced to2 with map-click unchanged; offset reset restored the child to the baseline visual position.",
+      "Nested scroll row gesture at39%,60% to39%,56% (logical start\u2248[157,524] on402x874) panned the map: move1\u219223 and latitude47.61\u219247.6043675. Before/after screenshots maplibre-run1-child.png and maplibre-run1-scroll-after.png.",
+      "Source propagation allowed: green source tap produced source-click1 and map-click1. After physical toolbar toggle changed Stop source bubbling\u2192Allow source bubbling, same visible feature tap produced source-click2 while map-click stayed1; stopped propagation passed.",
+      "Zoom-in changed zoom11\u219212. Zoom-out changed zoom to10.954611705474228; later reads retained this exact value. Directional zoom response observed, exact inverse step not established.",
+      "Locate me incremented location1 and read center[-122.3299999999996,47.619999999990725], zoom11.",
+      "Popup child tap incremented popup-child1. Explicit close incremented popup-close1. Toolbar reopened popup-open2; after style/remount final read shows popup-open3 and popup-close still1, so teardown added no close callback. Popup remained visible through pan/zoom screenshots; precise geographic follow remains partial.",
+      "Common scale visibly read2 km after camera movement. One physical units toggle at14%,9%, followed by 5s animation wait and renderer read, still showed2 km; units change failed visibly.",
+      "Replacement style visibly changed the map to pale blue. Remount completed; final generation1 readback confirms style3/load3 and preserves finite camera/feature707. Remount did not increment popup-close.",
+      "Maestro swipe does not establish a continuous long-press before movement; live marker drag, annotation drag, multipointer/cancel remain unverified. Delayed imagery, overlay passthrough, adverse location providers, overlaps/vector hits, and Android two-density offsets were not exercised."
+    ],
+    "finalHierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final-hierarchy.log",
+    "sourcePropagation": {
+      "allowed": {
+        "events": {
+          "source-click": 1,
+          "map-click": 1
+        },
+        "readback": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-source-allowed-hierarchy.log"
+      },
+      "stopped": {
+        "toggleLabelChanged": "Stop source bubbling \u2192 Allow source bubbling",
+        "events": {
+          "source-click": 2,
+          "map-click": 1
+        },
+        "stopSourcePropagation": true,
+        "readback": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-source-stopped-hierarchy.log"
+      }
+    },
+    "cameraControls": {
+      "zoomInReadback": {
+        "zoom": 12,
+        "hierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-zoom-in-hierarchy.log"
+      },
+      "zoomOutReadback": {
+        "zoom": 10.954611705474228,
+        "hierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-zoom-out-hierarchy.log"
+      },
+      "interpretation": "Both directions changed camera; exact inverse step not established; later reads retained10.954611705474228."
+    },
+    "locationReadback": {
+      "center": [
+        -122.3299999999996,
+        47.619999999990725
+      ],
+      "zoom": 11,
+      "locationEvents": 1,
+      "hierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-locate-hierarchy.log"
+    },
+    "scaleUnits": {
+      "visibleBefore": "2 km",
+      "input": "physical units tap14%,9%; waitForAnimationToEnd 5000ms; Read renderer",
+      "visibleAfter": "2 km",
+      "status": "failed-visible-label-unchanged",
+      "screenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-units.png",
+      "hierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-units-hierarchy.log"
+    },
+    "offsetTouch": {
+      "status": "partial-offset-and-reset-observed",
+      "offsetScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset.png",
+      "childTap": "physical point48%,53% at fresh displaced child bounds incremented child-click1\u21922; map-click remained1",
+      "readback": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset-child-hierarchy.log",
+      "resetScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset-reset.png",
+      "reset": "visual position returned to baseline; same iOS density only; drag unverified"
+    },
+    "popup": {
+      "childEvent": 1,
+      "dismissalEvent": 1,
+      "reopenedEvent": 2,
+      "finalEvents": {
+        "popup-open": 3,
+        "popup-close": 1,
+        "popup-child": 1
+      },
+      "teardown": "Remount final read did not increment popup-close; prior popup was visible through pan/zoom screenshots, geographic following only partial.",
+      "closeHierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-popup-close-hierarchy.log",
+      "finalHierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final-hierarchy.log"
+    },
+    "styleRemount": {
+      "status": "passed-visible-style-remount-generation1",
+      "styleScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-style.png",
+      "afterRemountScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-after-remount.png",
+      "finalScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final.png",
+      "finalHierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final-hierarchy.log"
+    },
+    "identityPrinted": {
+      "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+      "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "environment": "maplibre-ios",
+      "runId": "77974398-0adc-48fd-b010-fc433a4dac24"
+    }
+  },
+  "attempts": [
+    {
+      "phase": "run-1-manual-report-read",
+      "runId": "77974398-0adc-48fd-b010-fc433a4dac24",
+      "result": "runner-exited-nonzero-after-generation1",
+      "detail": "Runner successfully received final generation1, then failed to read missing configured manual report JSON path; native hierarchy/screenshot evidence retained."
+    }
+  ],
+  "coordinatorReview": {
+    "provenance": "Applied pure native judge after execution to actual final AX renderer observation and coordinator-reviewed outcomes for this exact run; no input, status POST, or new runtime. This does not repair the missing original operator report or certify full acceptance.",
+    "identity": {
+      "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+      "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "environment": "maplibre-ios",
+      "runId": "77974398-0adc-48fd-b010-fc433a4dac24"
+    },
+    "observation": {
+      "events": {
+        "popup-open": 3,
+        "style": 3,
+        "move": 117,
+        "load": 3,
+        "child-click": 2,
+        "source-click": 2,
+        "map-click": 1,
+        "popup-child": 1,
+        "popup-close": 1,
+        "location": 1
+      },
+      "positions": {},
+      "center": [
+        -122.33999999999926,
+        47.6100000000005
+      ],
+      "zoom": 11,
+      "features": [
+        {
+          "properties": {
+            "fixture": "tf07"
+          },
+          "id": 707,
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -122.33999490737915,
+              47.57999970656695
+            ]
+          }
+        }
+      ],
+      "generation": 1,
+      "stopSourcePropagation": true
+    },
+    "reviewedReport": {
+      "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+      "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "environment": "maplibre-ios",
+      "runId": "77974398-0adc-48fd-b010-fc433a4dac24",
+      "scenarios": {
+        "live-child-button": "passed",
+        "nested-scroll": "failed",
+        "live-drag": "unverified",
+        "annotation-drag": "unverified",
+        "offset-touch-bounds": "unverified",
+        "popup-follow-dismissal": "unverified",
+        "source-propagation": "passed",
+        "navigation-location": "passed",
+        "style-remount": "unverified",
+        "host-accessibility": "unverified",
+        "scale-units": "failed"
+      }
+    },
+    "judgment": {
+      "status": "unverified",
+      "execution": "manual-native-touch",
+      "observed": false,
+      "manualComplete": false,
+      "remaining": [
+        "nested-scroll",
+        "live-drag",
+        "annotation-drag",
+        "offset-touch-bounds",
+        "popup-follow-dismissal",
+        "style-remount",
+        "host-accessibility",
+        "scale-units"
+      ]
+    },
+    "execution": "agent-driven native UI; coordinator reviewed",
+    "fullTf07Acceptance": false
+  },
+  "retention": "Temporary build/tool/log/screenshot paths are historical provenance; bulk owned test outputs removed after compact record. Selected scrolling/scale failure images retained in aggregate record."
+}

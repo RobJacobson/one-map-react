@@ -1,0 +1,54 @@
+{
+  "artifact": {
+    "sourceSha256": "cd369914c2b8b4d3ef68a54745929cf4df4ad557dbf08e30c83f04dd0bf23676",
+    "distSha256": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8",
+    "packedSha256": "caf2a026015c89e7f27be910649cd40b76776de9767c75e97458155a563879b8",
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6"
+  },
+  "environment": "Mapbox Android, Android 16 / API 36, emulator-5556, 1080x2400, wm density override 320 dpi",
+  "runId": "9bc0ae79-c6b6-4f6a-b5ea-97a72315cbed",
+  "result": "passed",
+  "execution": "actual Android touchscreen input, verified OS touch helper only for continuous label drag, and physical Read renderer; installed APK and frozen dist hash verified by runner",
+  "scenarios": {
+    "offset-placement-reset": "passed; at baseline density320 live child was [425,1312]-[656,1350]. Tapping OFFSET moved it to [473,1288]-[704,1326], an exact +48px/-24px (+24dp/-12dp). Physical tap at displaced target incremented child-click to1. After long drag moved child to [535,1259]-[766,1297], tapping OFFSET reset its own displacement to [487,1283]-[718,1321], exactly -48px/+24px. Physical tap at reset target incremented child-click to2.",
+    "offset-touch-bounds": "passed; actual held650ms continuous drag started at the visible Long press to drag label center [588,1269], moved to [650,1240], and emitted live-start=1/live-drag=21/live-end=1 with coordinate proposal [-122.32935699473288,47.613356049233374]. The marker\u2019s visible child bounds moved with that coordinate update.",
+    "map-gesture-recovery": "passed; after reset/child interaction, a standard OS swipe on verified blank map area changed actual camera center from [-122.34,47.61] to [-122.3268413,47.6022367] at zoom11."
+  },
+  "finalObservation": {
+    "events": {
+      "popup-open": 1,
+      "move": 30,
+      "style": 1,
+      "load": 1,
+      "child-click": 2,
+      "live-start": 1,
+      "live-drag": 21,
+      "live-end": 1
+    },
+    "positions": {
+      "live": [
+        -122.32935699473288,
+        47.613356049233374
+      ]
+    },
+    "center": [
+      -122.3268413,
+      47.60223670000001
+    ],
+    "zoom": 11,
+    "featureId": 707,
+    "generation": 0,
+    "errors": 0
+  },
+  "evidence": {
+    "manualReport": "tf07-mapbox-android-offset320-r11-manual.json",
+    "initial": "tf07-mapbox-android-offset320-r11-initial.png",
+    "shifted": "tf07-mapbox-android-offset320-r11-shifted.png",
+    "afterDrag": "tf07-mapbox-android-offset320-r11-after-drag.png",
+    "reset": "tf07-mapbox-android-offset320-r11-reset.png",
+    "final": "tf07-mapbox-android-offset320-r11-final.png",
+    "baseline420Core": "tf07-rerun-mapbox-android-core-r11.json"
+  },
+  "cleanup": "Runner passed; restored emulator density to420 dpi, portrait 1080x2400.",
+  "coordinatorReview": "Exact recorded bounds establish24dp/-12dp at320density; actual live-end and changed coordinate, child presses at displaced/reset positions and actual camera recovery establish scoped outcomes. Corresponding420density offsets are in original R11 core, not its later remainder run."
+}

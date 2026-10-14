@@ -1,0 +1,57 @@
+{
+  "artifact": {
+    "sourceSha256": "cd369914c2b8b4d3ef68a54745929cf4df4ad557dbf08e30c83f04dd0bf23676",
+    "distSha256": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8",
+    "packedSha256": "caf2a026015c89e7f27be910649cd40b76776de9767c75e97458155a563879b8",
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "metadataCorrection": "Worker initially copied R10 source/packed fields while correctly recording R11 executed dist. Coordinator corrected those fields from the frozen R11 aggregate; binary/dist execution identity is unchanged."
+  },
+  "environment": "Mapbox Android, Android 16 / API 36, emulator-5556, 1080x2400, 420 dpi",
+  "runId": "b843acde-6a97-4744-a8d2-5b47981dbc95",
+  "result": "passed",
+  "execution": "actual Android touchscreen input and physical Read renderer actions; installed binary and frozen dist hash verified by runner",
+  "scope": "R11 core remainder; six scenarios, with prior unchanged-artifact core gates retained separately by coordinator impact review",
+  "scenarios": {
+    "source-propagation": "passed; standard OS taps on actual projected source point. Allowed produced source/map callbacks; stopped produced source only. After an edge-start toolbar swipe invoked Home, returned to the app and observed source/map counters reset; no PID was captured before Home, so continuity is not claimed. Post-return stopped tap: source=1/map absent and four physical reads across about 15 seconds stayed unchanged. Post-return allowed tap: source=2/map=1; post-remount allowed tap: source=3/map=2.",
+    "navigation-location": "passed; physical zoom-in settled 11 to 12 and zoom-out settled 12 to 11 after intermediate animation reads; Locate callback=1 and settled camera [-122.33,47.62] at zoom 11.",
+    "style-remount": "passed; actual style action yielded style=2/load=2. Remount yielded style=3/load=3/generation=1; post-remount physical live-child press incremented child-click to 1 without map click, and projected source tap incremented source/map to 3/2.",
+    "host-accessibility": "passed for representative labeled controls: separate accessible clickable live child, popup child, close popup, zoom and locate controls; live and popup child buttons were physically pressed; actual Powered by Mapbox Maps attribution dialog opened and was dismissed with Android Back. Full TalkBack audit remains unverified.",
+    "scale-units": "passed; native common scale visually changed 2 km to 1 mi and back to 2 km with distinct widths. Attribution and the scale/control footer remained visually clear in the final toast-free screenshot.",
+    "popup-follow-dismissal": "passed; popup moved from AX card bounds [726,988]-[966,1132] to [649,1101]-[889,1245] after camera/Locate movement; popup child callback=1 and physical close callback=1."
+  },
+  "finalObservation": {
+    "events": {
+      "popup-open": 2,
+      "move": 602,
+      "style": 3,
+      "load": 3,
+      "source-click": 3,
+      "map-click": 2,
+      "location": 1,
+      "popup-child": 1,
+      "popup-close": 1,
+      "child-click": 1
+    },
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "featureId": 707,
+    "generation": 1,
+    "stopSourcePropagation": false,
+    "errors": 0
+  },
+  "evidence": {
+    "finalScreenshot": "tf07-mapbox-android-remainder-r11-final.png",
+    "attributionDialogScreenshot": "tf07-mapbox-android-remainder-r11-attribution.png",
+    "imperialScaleScreenshot": "tf07-mapbox-android-remainder-r11-imperial.png",
+    "manualReport": "tf07-mapbox-android-remainder-r11-manual.json",
+    "previousCoreAndSourceDiagnostics": [
+      "tf07-rerun-mapbox-android-core-r11.json",
+      "tf07-rerun-mapbox-android-inputpath-diagnostic-r11.json"
+    ]
+  },
+  "cleanup": "Remainder runner completed passed and stopped its owned Metro/status server. Home edge-swipe and post-return counter discontinuity are retained above; no same-PID claim.",
+  "coordinatorReview": "Actual final, imperial-scale and attribution-dialog screenshots reviewed. Footer/control/logo/scale placement is clear when warning toast is dismissed. Core composite retains six actual R11 physical scenarios from original run, then uses this same-artifact scoped run for remaining gates. Source callback latency/helper tap failures remain preserved; normal taps and bounded reads establish allowed/stopped paths. Interruption gate uses original run with captured unchanged PID; the later toolbar edge-swipe reset is separately recorded without process continuity claim."
+}

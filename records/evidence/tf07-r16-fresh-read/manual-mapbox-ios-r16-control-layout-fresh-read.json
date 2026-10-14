@@ -1,0 +1,14 @@
+{
+  "installedBinarySha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "environment": "mapbox-ios",
+  "runId": "06b4c090-bfee-49da-910f-ab169f9c993f",
+  "scenarios": {
+    "portal-context-state-multiple-maps": "passed",
+    "resize-orientation": "passed",
+    "host-accessibility": "passed",
+    "navigation-constraints": "passed",
+    "source-passthrough": "passed",
+    "control-teardown": "passed"
+  }
+}

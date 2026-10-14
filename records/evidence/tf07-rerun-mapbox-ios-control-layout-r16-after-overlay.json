@@ -1,0 +1,120 @@
+{
+  "status": "stopped-at-first-navigation-anomaly",
+  "identity": {
+    "runId": "6e10e9ba-d2a2-47f0-b2ab-8a046ee8e353",
+    "environment": "mapbox-ios",
+    "installedBinarySha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "debugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "distSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "fixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9"
+  },
+  "device": {
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "orientationRestored": "portrait",
+    "state": "booted"
+  },
+  "warningBanner": {
+    "initialScreenshot": "tf07-r16-control-layout/initial-warning.png",
+    "dismissal": "physical touch at screenshot-confirmed X (371,812), 120ms",
+    "baselineAccessibilityNoWarning": true
+  },
+  "baseline": {
+    "loads": {
+      "a-load": 1,
+      "b-load": 1
+    },
+    "aCenter": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "aZoom": 11,
+    "bCenter": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "bZoom": 12,
+    "overlapIds": [
+      708,
+      707
+    ],
+    "vectorIds": [
+      2,
+      1
+    ]
+  },
+  "portalContextAndState": {
+    "initialChildPressReads": [
+      "tf07-r16-control-layout/child-a-initial.json",
+      "tf07-r16-control-layout/child-b-initial.json"
+    ],
+    "themeRead": "tf07-r16-control-layout/theme.json",
+    "theme": "updated",
+    "aZoomAfterTheme": 11,
+    "bZoomAfterTheme": 12,
+    "aCenterAfterTheme": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "bCenterAfterTheme": [
+      -122.34000000000002,
+      47.60999999999999
+    ]
+  },
+  "resize": {
+    "physicalControlPressed": true,
+    "short": true,
+    "aZoom": 11,
+    "bZoom": 12,
+    "screenshot": "tf07-r16-control-layout/resized.png",
+    "accessibility": "tf07-r16-control-layout/resize-ax.json",
+    "postResizeChildPresses": [
+      "tf07-r16-control-layout/resize-a-child.json",
+      "tf07-r16-control-layout/resize-b-child.json"
+    ],
+    "visualState": "Both labels visibly rendered at their own map footers. Child labels advanced from updated 1 to updated 2 after physical presses; map-click counts remained unchanged as expected for child isolation."
+  },
+  "landscape": {
+    "actualOrientation": "landscapeLeft",
+    "physicalRead": "tf07-r16-control-layout/landscape-read.json",
+    "screenshot": "tf07-r16-control-layout/landscape.png",
+    "accessibility": "tf07-r16-control-layout/landscape-ax.json",
+    "actualChildPressReads": [
+      "tf07-r16-control-layout/landscape-a-child.json",
+      "tf07-r16-control-layout/landscape-b-child.json"
+    ],
+    "visualState": "Side-by-side maps, both labels at own footers; after physical child presses screenshot showed each label updated 3. Map callback counts unchanged, consistent with child isolation."
+  },
+  "firstAnomaly": {
+    "scenario": "navigation-constraints",
+    "input": "In landscape, one normal 120ms physical touch at fresh enabled Map B Zoom in AX center (465,196), followed by a physical Read after 1.4 seconds.",
+    "controlFrame": {
+      "x": 445,
+      "y": 176,
+      "width": 40,
+      "height": 40
+    },
+    "beforeZoom": 12,
+    "afterZoom": 12,
+    "aZoom": 11,
+    "read": "tf07-r16-control-layout/nav-plus-read.json",
+    "screenshot": "tf07-r16-control-layout/nav-plus.png",
+    "accessibility": "tf07-r16-control-layout/nav-ax.json",
+    "outcome": "Map B renderer zoom remained 12; stop at this first unexpected navigation result. No repeat or further control input."
+  },
+  "notRun": [
+    "remaining navigation min/max and inverse controls",
+    "attribution dialogs",
+    "source passthrough",
+    "control teardown"
+  ],
+  "manualReport": "Fresh run-bound manual report was initialized; six acceptance fields remain unverified because the run stopped at the first navigation anomaly. No Finish focus pressed.",
+  "cleanup": "Owned runner/status/Metro stopped; app terminated; XCTest server healthy; assigned simulator restored to booted portrait.",
+  "coordinatorReview": {
+    "status": "stale-read-anomaly",
+    "visualEvidence": "Landscape labels advanced from 2 to 3; after Zoom in, Map B vector lines enlarged and SDK scale changed from 0.5 mi to 0.25 mi.",
+    "inputDiagnosis": "The worker sent physical Read at portrait (67,80) after rotation instead of landscape current center (137,18). No new collector receipt was established. Saved zoom12 does not establish a navigation defect.",
+    "nextRecord": "tf07-rerun-mapbox-ios-control-layout-r16-fresh-read.json"
+  }
+}

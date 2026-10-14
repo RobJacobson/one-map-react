@@ -1,0 +1,40 @@
+{
+  "artifact": {
+    "sourceSha256": "7f983e38c7e8a2df478db8b5658f14affc4deedaa3854575f4d2d5cbd6d82c9e",
+    "distSha256": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+    "packedSha256": "88fdfdca61dd0db4f064ba33f1e59718f0a2d300029c5fdf2dc199e1ce87d56d",
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "fixtureSha256": "9135ffdd40358e8717252207f654ddcf11731da15476dbc2ad2e605d0376fd5b"
+  },
+  "environment": "Mapbox Android, Android 16 / API 36, emulator-5556, 1080x2400, 420 dpi",
+  "runId": "f2a6a83b-e6d9-40aa-9270-8c43e997d1f8",
+  "result": "passed",
+  "execution": "actual Android touchscreen input; continuous held drag used verified OS touch helper; runner verified installed APK and frozen library dist",
+  "scenario": "Configured Android Mapbox gesture settings remain valid while the live marker’s temporary gesture lock applies and restores; test-only fixture includes doubleTapZoom=true plus named Mapbox gesture settings (doubleTapZoom=true, quickZoom=false).",
+  "scenarios": {
+    "offset-placement-reset": "passed; baseline live child bounds [385,1348]-[693,1399]. Actual OFFSET tap moved bounds to [448,1316]-[756,1367], exactly +63px/-32px (rounding of +24dp/-12dp at 420 dpi); physical child press incremented child-click=1. Following drag, bounds [506,1285]-[814,1336]; reset bounds [443,1317]-[751,1368], undoing exactly the offset; physical reset-child press incremented child-click=2.",
+    "offset-touch-bounds": "passed; actual650ms held continuous drag from visible label center [602,1291] to [660,1260] produced live-start=1/live-drag=21/live-end=1 and proposal [-122.33241419958867,47.61273334693317]. No bridge redbox/crash; process remained alive.",
+    "map-gesture-recovery": "passed; standard blank-map swipe after reset changed camera from [-122.34,47.61] to [-122.3297343,47.603079] at zoom11. Optional configured double-tap check also passed: two standard OS taps on blank map increased settled zoom from11 to12."
+  },
+  "finalObservation": {
+    "events": {"popup-open": 1, "move": 49, "style": 1, "load": 1, "child-click": 2, "live-start": 1, "live-drag": 21, "live-end": 1},
+    "positions": {"live": [-122.33241419958867, 47.61273334693317]},
+    "center": [-122.30942512443488, 47.5893917577326],
+    "zoom": 12,
+    "featureId": 707,
+    "generation": 0,
+    "errors": 0
+  },
+  "evidence": {
+    "manualReport": "tf07-mapbox-android-configured-gesture-r12-manual.json",
+    "initialScreenshot": "tf07-mapbox-android-configured-gesture-r12-initial.png",
+    "offsetBounds": "tf07-mapbox-android-configured-gesture-r12-offset-bounds.xml",
+    "postDragScreenshot": "tf07-mapbox-android-configured-gesture-r12-after-drag.png",
+    "postDragBounds": "tf07-mapbox-android-configured-gesture-r12-after-drag-bounds.xml",
+    "resetBounds": "tf07-mapbox-android-configured-gesture-r12-reset-bounds.xml",
+    "recoveryScreenshot": "tf07-mapbox-android-configured-gesture-r12-recovery.png",
+    "finalScreenshot": "tf07-mapbox-android-configured-gesture-r12-final.png",
+    "r11CoreComposite": "tf07-rerun-mapbox-android-core-remainder-r11.json"
+  },
+  "cleanup": "Runner passed; 420 dpi and portrait 1080x2400 retained."
+}

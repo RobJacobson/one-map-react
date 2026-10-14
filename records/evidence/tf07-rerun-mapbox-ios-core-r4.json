@@ -1,0 +1,155 @@
+{
+  "environment": "mapbox-ios",
+  "runId": "bf81c967-77c0-4627-be89-219b0340b0d2",
+  "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+  "libraryDistSha256": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+  "outcome": "superseded-incomplete-readback-protocol",
+  "evidence": {
+    "initialHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4-hierarchy1.json",
+    "postScrollHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4-hierarchy2.json",
+    "postDragHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4-hierarchy3.json",
+    "childTapScreenshot": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4-child.png",
+    "liveDragScreenshot": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4-after-drag.png",
+    "annotationDragScreenshot": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4-after-annotation-drag.png",
+    "sourceTapScreenshot": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4-source.png",
+    "manualReport": "/private/tmp/one-map-tf07-rerun/manual-mapbox-ios-core-r4.json"
+  },
+  "observations": {
+    "initialRendererRead": {
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11,
+      "featureId": 707,
+      "generation": 0
+    },
+    "childTap": {
+      "logicalPoint": [
+        201,
+        496
+      ],
+      "duration": 0.12,
+      "visibleResult": "TF07 child-click"
+    },
+    "nestedScroll": {
+      "viewportLogicalRect": [
+        140.33,
+        504.67,
+        121.33,
+        68
+      ],
+      "path": [
+        [
+          200,
+          565
+        ],
+        [
+          200,
+          555
+        ],
+        [
+          200,
+          545
+        ],
+        [
+          200,
+          535
+        ],
+        [
+          200,
+          525
+        ]
+      ],
+      "duration": 0.4,
+      "rowsBefore": {
+        "live child button": 487.67,
+        "Scroll one": 504.67
+      },
+      "rowsAfter": {
+        "live child button": 457.67,
+        "Scroll one": 474.67
+      },
+      "cameraAfter": {
+        "center": [
+          -122.34000000000002,
+          47.60999999999999
+        ],
+        "zoom": 11
+      }
+    },
+    "liveDrag": {
+      "start": [
+        201,
+        449
+      ],
+      "holdSeconds": 0.65,
+      "end": [
+        260,
+        399
+      ],
+      "visibleResult": "TF07 live-end",
+      "labelBoundsBefore": [
+        140.33,
+        440.67,
+        121.33,
+        17
+      ],
+      "labelBoundsAfter": [
+        199.33,
+        390.67,
+        121.33,
+        17
+      ]
+    },
+    "annotationDrag": {
+      "start": [
+        80,
+        472
+      ],
+      "holdSeconds": 0.65,
+      "end": [
+        130,
+        432
+      ],
+      "visibleResult": "TF07 annotation-end"
+    },
+    "sourceTapReadback": {
+      "events": {
+        "popup-open": 1,
+        "style": 1,
+        "move": 2,
+        "load": 1
+      },
+      "positions": {},
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11,
+      "generation": 0,
+      "visibleResult": "TF07 map-click",
+      "classification": "stale-unverified"
+    }
+  },
+  "firstObservationPendingReview": {
+    "scenario": "source-propagation",
+    "reason": "Physical tap on visible green source point produced TF07 map-click but no source callback in actual UI/readback.",
+    "touchLogicalPoints": [
+      {
+        "x": 201,
+        "y": 603,
+        "duration": 0.12
+      }
+    ],
+    "status": "stale-unverified",
+    "initialObservation": "Physical touch produced visible TF07 map-click while renderer readback had no source event; source projection/query-hit has not been validated against the exact map-relative touch point.",
+    "mapGlobalLogicalFrame": [
+      0,
+      116.67,
+      402,
+      673
+    ]
+  },
+  "note": "No physical Read renderer was performed after each interaction; all scenario judgments from this attempt remain unverified. Raw screenshots and readback retained."
+}

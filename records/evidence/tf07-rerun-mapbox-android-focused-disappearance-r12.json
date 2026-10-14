@@ -1,0 +1,134 @@
+{
+  "status": "targeted-diagnostic-stopped-at-first-visual-failure",
+  "runId": "f20dd0a0-b74a-48e4-bc13-c4620ec24366",
+  "environment": "mapbox-android",
+  "binarySha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+  "distSha256": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+  "artifact": {
+    "sourceSha256": "7f983e38c7e8a2df478db8b5658f14affc4deedaa3854575f4d2d5cbd6d82c9e",
+    "distSha256": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+    "packedSha256": "88fdfdca61dd0db4f064ba33f1e59718f0a2d300029c5fdf2dc199e1ce87d56d",
+    "exampleDistSha256": {
+      "web-mapbox": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+      "web-maplibre": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+      "native-mapbox": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+      "native-maplibre": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83"
+    }
+  },
+  "fixtureSha256": "9a9c78c54e4fa2ca7a84fc2dbbca8bbd622e42b9d6c0014072c132c0ff30b604",
+  "manual": {
+    "installedBinarySha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+    "environment": "mapbox-android",
+    "runId": "f20dd0a0-b74a-48e4-bc13-c4620ec24366",
+    "scenarios": {
+      "annotation-image-refresh": "unverified",
+      "overlap-source-propagation": "unverified",
+      "vector-source-hit": "unverified",
+      "location-rejected": "unverified",
+      "location-delayed-teardown": "unverified",
+      "portal-context-state-multiple-maps": "unverified",
+      "resize-orientation": "unverified",
+      "host-accessibility": "unverified",
+      "navigation-constraints": "unverified"
+    }
+  },
+  "observations": [
+    {
+      "step": "initial",
+      "actualRead": true,
+      "counts": {
+        "a-load": 1
+      },
+      "aZoom": 11,
+      "bZoom": 12,
+      "labelsVisible": [
+        "Map A initial 0",
+        "Map B initial 0"
+      ],
+      "screenshot": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-initial.png"
+    },
+    {
+      "step": "one Map A child press",
+      "actualRead": true,
+      "counts": {
+        "Map A-click": 1,
+        "Map A-map-zoom-11": 1
+      },
+      "labelsVisible": [
+        "Map A initial 1",
+        "Map B initial 0"
+      ],
+      "screenshot": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-child1.png",
+      "accessibility": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-child1.xml"
+    },
+    {
+      "step": "one Theme action",
+      "actualRead": true,
+      "theme": "updated",
+      "counts": {
+        "Map A-click": 1,
+        "Map A-map-zoom-11": 1
+      },
+      "labelsVisible": [
+        "Map A updated 1",
+        "Map B updated 0"
+      ],
+      "screenshot": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-theme1.png",
+      "accessibility": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-theme1.xml"
+    },
+    {
+      "step": "one actual Resize action; first Read before settle",
+      "actualRead": true,
+      "short": false,
+      "assessment": "Layout not yet settled; no conclusion from first snapshot."
+    },
+    {
+      "step": "settled resized portrait",
+      "actualRead": true,
+      "short": true,
+      "labelsVisible": [],
+      "screenshot": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-resized.png",
+      "accessibility": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-resized.xml",
+      "visibleText": [
+        "Map B updated 0"
+      ],
+      "visualFinding": "Root visual review found Map A text absent. Map B updated 0 was drawn at the combined screen lower-right rather than its own map footer; UIA had invalid/clipped Map A bounds.",
+      "reviewOverride": "Root review supersedes the worker\u2019s initial visual interpretation; treat resized portrait as the first visible child-text/layout failure."
+    },
+    {
+      "step": "actual landscape",
+      "actualRead": true,
+      "short": true,
+      "aZoom": 11,
+      "bZoom": 12,
+      "features": {
+        "overlap": [
+          "708",
+          "707"
+        ],
+        "vector": [
+          "2",
+          "1"
+        ]
+      },
+      "labelsVisible": [],
+      "accessibilityLabelsPresent": [
+        "Map A updated 1"
+      ],
+      "screenshot": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-landscape.png",
+      "accessibility": "records/evidence/tf07-mapbox-android-focused-r12-disappearance-landscape.xml",
+      "result": "Preserved subsequent landscape disappearance; not the first failure after root review."
+    },
+    {
+      "review": "Root\u2019s visual review corrected the worker\u2019s initial assessment of the resized screenshot. The original screenshot and accessibility XML remain unmodified."
+    }
+  ],
+  "cleanup": {
+    "runnerStopped": true,
+    "assignedPortsFree": true,
+    "emulatorLeftInLandscape": true,
+    "noFurtherDeviceInputAfterFirstMissingState": true
+  },
+  "diagnosticScope": "No Finish focus; no claim of full focused acceptance; no additional child presses or other gates."
+}

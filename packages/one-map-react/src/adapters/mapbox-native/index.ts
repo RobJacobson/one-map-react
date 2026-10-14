@@ -3,6 +3,7 @@ import { MapboxNativeImages } from "./images.js";
 import { MapboxNativeLayer } from "./layers.js";
 import { MapboxNativeMap } from "./map.js";
 import { MapboxNativeSource } from "./sources.js";
+import { mapboxNativeUI } from "./ui.js";
 
 /** Selects mapbox-native and translates RNMapbox components. */
 export const adapter: Adapter & { readonly backend: "mapbox-native" } = {
@@ -10,6 +11,7 @@ export const adapter: Adapter & { readonly backend: "mapbox-native" } = {
   Map: MapboxNativeMap,
   Source: MapboxNativeSource,
   Layer: MapboxNativeLayer,
+  ...mapboxNativeUI,
   Images: MapboxNativeImages,
 };
 

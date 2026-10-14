@@ -1,0 +1,80 @@
+{
+  "artifact": {
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8"
+  },
+  "environment": "mapbox-android-api36",
+  "runId": "ea0604fb-5458-4557-b1c1-dfaa1d638d10",
+  "result": "failed",
+  "execution": "actual Android OS MotionEvent input, physical screenshots/accessibility hierarchy, and renderer Read button",
+  "priorFailuresPreserved": [
+    "R9 Android setup timeout before app launch",
+    "R9 Android gestureSettings Fabric error",
+    "R10 Android setZoomEnabled Fabric error"
+  ],
+  "scenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-drag": "passed",
+    "annotation-drag": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow-dismissal": "passed",
+    "source-propagation": "failed",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "interruptedAt": "source-propagation; navigation/location, style/remount, host-accessibility and scale-units unverified",
+  "observations": {
+    "initial": "Physical Read returned load=1, feature 707, finite center [-122.34,47.61], zoom 11.",
+    "child": "Physical live-child press incremented child-click once with no camera change.",
+    "nestedScroll": "Actual 400 ms swipe wholly in 32dp viewport moved scroll rows upward ~21\u201322 physical px relative to stationary parent label/button; camera unchanged.",
+    "liveDrag": "Actual 650 ms stationary hold + 650 ms continuous movement produced live-start=1, live-drag=21, live-end=1 and changed live coordinate.",
+    "secondPointer": "Actual second pointer during a live drag produced additional live-start/live-drag without an additional live-end. Subsequent separate physical blank-map pan changed center, demonstrating recovery.",
+    "interruption": "While a real live-label pointer remained held, Android Home interrupted the gesture. The app was reactivated without force-stop and retained PID 6623; fresh Read showed live-start=3 and live-end remained 1. A later physical blank-map pan updated camera.",
+    "annotation": "Actual long-press and drag moved annotation from its initial screen location and fresh renderer Read reported annotation-start=1, annotation-end=1 with changed coordinate.",
+    "offset": "After physical OFFSET activation, live-child bounds shifted from [617,1204..1255..1306] to [680,1173..1224..1275] (+63px,-31px), matching 24dp,-12dp at density420 (2.625 px/dp). Child remained tappable at shifted center [834,1250]; long-press drag from offset position produced live-end=2 and new coordinate. Physical OFFSET reset restored the label position by the inverse offset.",
+    "popup": "Physical close incremented popup-close; re-open then physical map pan changed center and moved popup close-button x bounds from846..1080 to754..994. Popup child press incremented popup-child; subsequent close incremented popup-close again.",
+    "sourceFirstTap": {
+      "actualOsInput": "Tf07Touch drag x=567 y=1609 end=567,1609 hold=120ms duration=0",
+      "freshProjection": [
+        216.11013286828478,
+        468.7330525153127
+      ],
+      "mapPhysicalOrigin": [
+        0,
+        379
+      ],
+      "actualDensity": 420,
+      "conversion": "projected logical point multiplied by 2.625 plus physical map origin",
+      "visibleFeatureCenterPhysicalPx": [
+        568,
+        1609
+      ],
+      "result": "subsequent physical Read reported no source-click or map-click increment; camera, feature and projection stable"
+    },
+    "sourceDiagnostic": {
+      "actualOsInput": "Tf07Touch drag x=568 y=1609 end=568,1609 hold=120ms duration=0",
+      "result": "subsequent physical Read again showed no source-click or map-click change; same visible feature center, clear of overlays"
+    },
+    "sourceConclusion": "Two actual taps including one coordinator-authorized same-run diagnostic at the exact current projection/visible feature center produced no callbacks. Root notified; no further input performed."
+  },
+  "evidence": {
+    "initialScreenshot": "tf07-mapbox-android-r11-initial.png",
+    "liveDragScreenshot": "tf07-mapbox-android-r11-after-live.png",
+    "annotationScreenshot": "tf07-mapbox-android-r11-after-annotation.png",
+    "offsetScreenshot": "tf07-mapbox-android-r11-offset-enabled.png",
+    "popupBefore": "tf07-mapbox-android-r11-popup-before.png",
+    "popupAfterPan": "tf07-mapbox-android-r11-popup-after.png",
+    "nestedScrollRead": "tf07-mapbox-android-r11-after-scroll-read.json",
+    "nestedScrollHierarchy": "tf07-mapbox-android-r11-after-scroll-hierarchy.xml",
+    "liveRead": "tf07-mapbox-android-r11-after-live-read.json",
+    "secondPointerRead": "tf07-mapbox-android-r11-after-second-read.json",
+    "firstSourceRead": "tf07-mapbox-android-r11-source-first-read.json",
+    "sourceDiagnosticRead": "tf07-mapbox-android-r11-source-diagnostic-read.json",
+    "firstSourceTapScreenshot": "tf07-mapbox-android-r11-source-tap.png",
+    "diagnosticScreenshot": "tf07-mapbox-android-r11-source-diagnostic.png"
+  },
+  "cleanup": "Owned runner stopped after source propagation failure; emulator retained; no further input or retry."
+}

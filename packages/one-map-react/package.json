@@ -60,6 +60,7 @@
   },
   "files": [
     "dist",
+    "patches",
     "README.md",
     "LICENSE"
   ],
@@ -72,7 +73,8 @@
     "mapbox-gl": "3.32.0",
     "maplibre-gl": "6.13.0",
     "@rnmapbox/maps": "10.3.7",
-    "@maplibre/maplibre-react-native": "11.5.0"
+    "@maplibre/maplibre-react-native": "11.5.0",
+    "react-native-teleport": "1.2.1"
   },
   "peerDependenciesMeta": {
     "react-dom": {
@@ -94,6 +96,9 @@
       "optional": true
     },
     "@maplibre/maplibre-react-native": {
+      "optional": true
+    },
+    "react-native-teleport": {
       "optional": true
     }
   }

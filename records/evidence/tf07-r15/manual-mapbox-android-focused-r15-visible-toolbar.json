@@ -1,0 +1,17 @@
+{
+  "installedBinarySha256": "29a662927412148fff915db13520f4d85b3432d65d9e3ff16cc9b80b0a445b9e",
+  "libraryDistSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+  "environment": "mapbox-android",
+  "runId": "61fcd69c-6ef3-4341-afda-8ac8e0c4b9e2",
+  "scenarios": {
+    "annotation-image-refresh": "passed",
+    "overlap-source-propagation": "passed",
+    "vector-source-hit": "passed",
+    "location-rejected": "passed",
+    "location-delayed-teardown": "passed",
+    "portal-context-state-multiple-maps": "passed",
+    "resize-orientation": "passed",
+    "host-accessibility": "passed",
+    "navigation-constraints": "passed"
+  }
+}

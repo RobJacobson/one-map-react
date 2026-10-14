@@ -1,0 +1,1062 @@
+{
+  "run": {
+    "environment": "mapbox-web",
+    "attempt": 1,
+    "authorization": "TF07 Mapbox web rerun",
+    "command": "bun scripts/tf07-ui-smoke.mjs web mapbox",
+    "startedWith": {
+      "port": 4187,
+      "debugPort": 5187,
+      "cacheRoot": "/private/tmp/one-map-tf07-rerun/web-mapbox-cache",
+      "outputRoot": "/private/tmp/one-map-tf07-rerun/web-mapbox"
+    },
+    "runnerManagedBrowserProfile": true
+  },
+  "artifact": {
+    "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+    "sourceSha256": "1e98df6b9f001d58b18a5b659bed4264efda61352d09d4b1648c6ac64cd2ac48"
+  },
+  "result": {
+    "status": "failed",
+    "exitCode": 1,
+    "error": "TF07 observation timed out.",
+    "runnerOutput": "The runner returned a failed mapbox-web result after timing out while waiting for TF07 observations. Bun also printed a nonfatal warning that moduleSuffixes is unsupported.",
+    "retry": false,
+    "classification": "test-setup-failure per coordinator diagnosis of default-sandbox localhost binding; not a product failure"
+  },
+  "scenarios": {
+    "known-feature": "passed",
+    "child-click": "passed",
+    "live-drag": "passed",
+    "annotation-drag": "passed",
+    "source-propagation": "passed",
+    "navigation": "passed",
+    "popup-dismissal": "passed",
+    "remount-teardown": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow": "passed",
+    "scale-units": "passed",
+    "geolocation": "passed",
+    "accessibility": "unverified",
+    "style-replacement": "passed",
+    "fullscreen": "passed",
+    "empty-overlay": "passed",
+    "provider-delay-and-rejection": "passed on retry after harness state-commit fix; first harness attempt retained separately",
+    "source-bubbling-focused-consumer": "unverified",
+    "keyboard-accessibility": "passed (Tab+Space Zoom in activation; Enter variant retained as separate timeout)",
+    "provider-rejection": "passed",
+    "context-update-control": "passed"
+  },
+  "cleanup": {
+    "runnerManagedProfileRemoved": true,
+    "runnerManagedBrowserAndViteStopped": true,
+    "essentialFailureScreenshotRetained": false
+  },
+  "notes": [
+    "No UI observations were recorded before timeout; no input or renderer state was inferred.",
+    "The extended/focused acceptance cases require the prepared packed-consumer harness; that harness was not supplied for this run."
+  ],
+  "diagnosticAttempt": {
+    "attempt": 2,
+    "authorization": "coordinator-approved same-artifact diagnostic retry",
+    "command": "node /private/tmp/one-map-tf07-rerun/web-diagnostic.mjs web mapbox",
+    "scriptSyntaxCheck": "passed",
+    "artifact": {
+      "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0"
+    },
+    "status": "failed",
+    "phase": "start",
+    "error": "TF07 observation timed out.",
+    "readback": null,
+    "consoleEvents": [],
+    "runnerExitCode": 1,
+    "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/diagnostic-output.txt",
+    "retry": false,
+    "notes": [
+      "Failure occurred before initial-renderer phase; no renderer readback or browser console events were captured.",
+      "The first-attempt result remains recorded unchanged above."
+    ],
+    "classification": "test-setup-failure per coordinator diagnosis of default-sandbox localhost binding; not a product failure"
+  },
+  "authorizedRetry": {
+    "attempt": 3,
+    "authorization": "coordinator-approved scoped escalation retry",
+    "command": "ONE_MAP_SMOKE_CACHE_ROOT=/private/tmp/one-map-tf07-rerun/web-mapbox-cache PATH=/Users/rob/.nvm/versions/node/v24.14.0/bin:$PATH /Users/rob/.nvm/versions/node/v24.14.0/bin/node /private/tmp/one-map-tf07-rerun/web-diagnostic.mjs web mapbox",
+    "sandboxPermissions": "require_escalated",
+    "status": "passed",
+    "exitCode": 0,
+    "artifact": {
+      "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0"
+    },
+    "scope": [
+      "known-feature",
+      "child-click",
+      "live-drag",
+      "annotation-drag",
+      "source-propagation",
+      "navigation",
+      "popup-dismissal",
+      "remount-teardown"
+    ],
+    "observation": {
+      "events": {
+        "popup-open": 3,
+        "load": 2,
+        "marker-click": 1,
+        "child-click": 1,
+        "live-start": 1,
+        "live-drag": 6,
+        "style": 2,
+        "live-end": 1,
+        "annotation-start": 1,
+        "annotation-end": 1,
+        "source-click": 2,
+        "map-click": 1,
+        "move": 26,
+        "popup-close": 1
+      },
+      "positions": {
+        "live": [
+          -122.32352050781279,
+          47.60444468658437
+        ],
+        "annotation": [
+          -122.36368927001988,
+          47.60444468658437
+        ]
+      },
+      "center": [
+        -122.34,
+        47.61
+      ],
+      "zoom": 11,
+      "featureIds": [
+        707
+      ],
+      "generation": 1,
+      "stopSourcePropagation": true
+    },
+    "cleanup": {
+      "runnerManagedProfileRemoved": true,
+      "browserAndViteStopped": true
+    },
+    "remaining": [
+      "offset-touch-bounds",
+      "popup-follow",
+      "scale-units",
+      "geolocation",
+      "accessibility",
+      "style-replacement",
+      "fullscreen",
+      "empty-overlay",
+      "keyboard-accessibility",
+      "provider-delay-and-rejection",
+      "source-bubbling-focused-consumer"
+    ]
+  },
+  "extendedAttempt": {
+    "attempt": 4,
+    "authorization": "coordinator-approved extended packed-consumer UI scope",
+    "command": "node /private/tmp/one-map-tf07-rerun/web-extended.mjs web mapbox",
+    "sandboxPermissions": "require_escalated",
+    "scriptSyntaxCheck": "passed",
+    "artifact": {
+      "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0"
+    },
+    "status": "failed",
+    "exitCode": 1,
+    "phase": "keyboard-control",
+    "error": "TF07 observation timed out.",
+    "completedBeforeFailure": [
+      {
+        "scenario": "offset-touch-bounds-and-reset",
+        "status": "passed",
+        "offset": [
+          24,
+          -12
+        ],
+        "observation": "Live marker drawing shifted by 24 px horizontally and -12 px vertically; child click remained isolated; reset returned drawing to original position."
+      },
+      {
+        "scenario": "scale-units",
+        "status": "passed",
+        "metric": "1 km",
+        "imperial": "1 mi"
+      },
+      {
+        "scenario": "popup-child-follow-empty-overlay",
+        "status": "passed",
+        "observation": "Popup child callback fired; physical pan from empty map overlay changed camera and popup moved; popup-close remained 0."
+      },
+      {
+        "scenario": "geolocation",
+        "status": "passed",
+        "center": [
+          -122.32999999999998,
+          47.619999999999976
+        ]
+      },
+      {
+        "scenario": "keyboard-control",
+        "status": "failed",
+        "observation": "Tab navigation reached Zoom in; Enter did not produce the expected zoom increase. Zoom remained 11 until observation timeout."
+      }
+    ],
+    "observation": {
+      "events": {
+        "popup-open": 1,
+        "load": 1,
+        "marker-click": 1,
+        "child-click": 1,
+        "popup-child": 1,
+        "move": 17,
+        "location": 1,
+        "style": 1
+      },
+      "center": [
+        -122.32999999999998,
+        47.619999999999976
+      ],
+      "zoom": 11,
+      "featureIds": [
+        707
+      ],
+      "generation": 0
+    },
+    "consoleEvents": {
+      "errors": 0,
+      "warnings": 0,
+      "exceptions": 0
+    },
+    "dom": "Controls rendered; scale read 1 mi.",
+    "notReached": [
+      "style-replacement",
+      "post-remount feature and child checks"
+    ],
+    "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/extended-output.json",
+    "screenshot": "none; harness captures only on pass",
+    "retry": false,
+    "cleanup": {
+      "runnerManagedProfileRemoved": true,
+      "browserAndViteStopped": true
+    },
+    "remaining": [
+      "style-replacement",
+      "focus/accessibility review beyond tested keyboard sequence",
+      "fullscreen",
+      "delayed/rejected location provider",
+      "focused packed-consumer source-bubbling cases"
+    ],
+    "enterTransportInterpretation": "The isolated Enter variant timed out waiting for zoom after tabbing to Zoom in; same-scope accepted Tab+Space transport passed. Preserve the Enter result as a transport-specific failure pending coordinator interpretation."
+  },
+  "extendedSpaceAttempt": {
+    "attempt": 5,
+    "authorization": "coordinator-approved corrected keyboard transport and completion of style/remount scope",
+    "command": "node /private/tmp/one-map-tf07-rerun/web-extended-space.mjs web mapbox",
+    "sandboxPermissions": "require_escalated",
+    "scriptSyntaxCheck": "passed",
+    "artifact": {
+      "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0"
+    },
+    "status": "passed",
+    "exitCode": 0,
+    "outcomes": [
+      {
+        "scenario": "offset-reset",
+        "status": "passed",
+        "offset": [
+          24,
+          -12
+        ]
+      },
+      {
+        "scenario": "scale-units",
+        "status": "passed",
+        "metric": "2 km",
+        "imperial": "1 mi"
+      },
+      {
+        "scenario": "popup-child-follow-empty-overlay",
+        "status": "passed",
+        "popupDelta": [
+          48,
+          24
+        ]
+      },
+      {
+        "scenario": "geolocation",
+        "status": "passed",
+        "center": [
+          -122.32999999999998,
+          47.619999999999976
+        ]
+      },
+      {
+        "scenario": "keyboard-control",
+        "status": "passed",
+        "method": "Tab to Zoom in, then Space",
+        "focusedElement": "<button class=\"mapboxgl-ctrl-zoom-in\" type=\"button\" aria-label=\"Zoom in\" aria-disabled=\"false\"><span class=\"mapboxgl-ctrl-icon\" aria-hidden=\"true\" title=\"Zoom in\"></span></button>"
+      },
+      {
+        "scenario": "style-remount",
+        "status": "passed"
+      }
+    ],
+    "observation": {
+      "events": {
+        "popup-open": 2,
+        "load": 2,
+        "marker-click": 2,
+        "child-click": 2,
+        "popup-child": 1,
+        "move": 49,
+        "location": 1,
+        "style": 3
+      },
+      "center": [
+        -122.34,
+        47.61
+      ],
+      "zoom": 11,
+      "featureIds": [
+        707
+      ],
+      "generation": 1
+    },
+    "screenshot": "/private/tmp/one-map-tf07-rerun/web-mapbox/extended-final.png",
+    "screenshotReviewed": true,
+    "review": "Feature 707, live and annotation markers, popup child, scale and controls visible in final view.",
+    "cleanup": {
+      "runnerManagedProfileRemoved": true,
+      "browserAndViteStopped": true
+    }
+  },
+  "focusedAttempt": {
+    "attempt": 6,
+    "authorization": "coordinator-approved focused web scope",
+    "command": "node /private/tmp/one-map-tf07-rerun/web-focused.mjs web mapbox",
+    "sandboxPermissions": "require_escalated",
+    "scriptSyntaxCheck": "passed",
+    "artifact": {
+      "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0"
+    },
+    "status": "failed",
+    "exitCode": 1,
+    "phase": "delayed-provider-and-teardown",
+    "error": "Expected the focused Locate button to be disabled while the delayed location provider was pending; observed disabled=false.",
+    "completedBeforeFailure": [
+      {
+        "scenario": "fullscreen",
+        "status": "passed",
+        "observation": "Actual fullscreen entry and exit observed."
+      },
+      {
+        "scenario": "rejected-provider",
+        "status": "passed",
+        "observation": "Provider error count incremented and location count stayed zero."
+      }
+    ],
+    "observation": {
+      "events": {
+        "popup-open": 1,
+        "load": 1,
+        "style": 1,
+        "move": 3
+      },
+      "center": [
+        -122.34,
+        47.61
+      ],
+      "zoom": 11,
+      "featureIds": [
+        707
+      ],
+      "generation": 0
+    },
+    "notReached": [
+      "pending-control removal and provider resolution",
+      "context-preserved-control child press",
+      "accessibility button tree and final screenshot"
+    ],
+    "consoleEvents": {
+      "total": 3,
+      "errors": 0,
+      "exceptions": 0,
+      "warnings": 0
+    },
+    "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/focused-output.json",
+    "screenshot": "none; harness captures only on pass",
+    "retry": false,
+    "cleanup": {
+      "runnerManagedProfileRemoved": true,
+      "browserAndViteStopped": true
+    },
+    "harnessInterpretation": "The initial failure came from configuring delay and clicking before React committed the provider mode; this is a harness setup failure, not product evidence."
+  },
+  "focusedRetry": {
+    "attempt": 7,
+    "authorization": "coordinator-approved retry after correcting focused harness state-commit race",
+    "command": "node /private/tmp/one-map-tf07-rerun/web-focused.mjs web mapbox",
+    "sandboxPermissions": "require_escalated",
+    "scriptSyntaxCheck": "passed",
+    "artifact": {
+      "distSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0"
+    },
+    "status": "passed",
+    "exitCode": 0,
+    "outcomes": [
+      {
+        "scenario": "fullscreen",
+        "status": "passed",
+        "observation": "Actual fullscreen entry and exit observed."
+      },
+      {
+        "scenario": "rejected-provider",
+        "status": "passed",
+        "counts": {
+          "error": 1,
+          "location": 0,
+          "calls": 1,
+          "center": [
+            -122.34,
+            47.61
+          ],
+          "zoom": 11
+        }
+      },
+      {
+        "scenario": "delayed-provider-and-teardown",
+        "status": "passed",
+        "observation": "Waited for delay mode commit; pending Locate button was disabled; removed control before provider resolution; location stayed 0 and error stayed 1.",
+        "counts": {
+          "error": 1,
+          "location": 0,
+          "calls": 2,
+          "center": [
+            -122.34,
+            47.61
+          ],
+          "zoom": 11
+        }
+      },
+      {
+        "scenario": "context-preserved-control",
+        "status": "passed",
+        "observation": "Control child remained interactive across context update; click count reached 2."
+      },
+      {
+        "scenario": "accessibility-button-tree",
+        "status": "passed",
+        "labels": [
+          "remount",
+          "style",
+          "offset",
+          "popup",
+          "units",
+          "Zoom in",
+          "Zoom out",
+          "Reset bearing to north",
+          "Enter fullscreen",
+          "Zoom in",
+          "Zoom out",
+          "Reset bearing to north",
+          "Close popup",
+          "Child button",
+          "updated",
+          "Locate me",
+          "Child button"
+        ]
+      }
+    ],
+    "screenshot": "/private/tmp/one-map-tf07-rerun/web-mapbox/focused-final.png",
+    "screenshotReviewed": true,
+    "visualReview": "Fullscreen and map controls rendered; map canvas/background appeared gray/blank; Mapbox attribution was visible.",
+    "consoleEvents": "Success result did not include a console-event collection.",
+    "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/focused-retry-output.json",
+    "cleanup": {
+      "runnerManagedProfileRemoved": true,
+      "browserAndViteStopped": true
+    },
+    "remaining": [
+      "Full assistive-technology review"
+    ]
+  },
+  "r3Rerun": {
+    "authorization": "Coordinator-approved sequential TF07 Mapbox web reruns after SharedMap R3 pan-lock change; 528 tests and 21 suites had passed before run.",
+    "artifact": {
+      "sourceSha256": "6ef01ed4d479decc338a71b93e62a18d0bd166ba18d1b70b12ca0fd89c79385c",
+      "distSha256": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+      "exampleDistSha256": {
+        "web-mapbox": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+        "web-maplibre": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+        "native-mapbox": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+        "native-maplibre": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc"
+      }
+    },
+    "environment": "mapbox-web",
+    "sandboxPermissions": "require_escalated for localhost Vite/Chrome; Node 24 with Bun 1.4.1 available on PATH",
+    "cacheRoot": "/private/tmp/one-map-tf07-rerun/web-mapbox-cache",
+    "attempts": {
+      "core": {
+        "command": "node /private/tmp/one-map-tf07-rerun/web-diagnostic.mjs web mapbox",
+        "status": "passed",
+        "exitCode": 0,
+        "scope": [
+          "known-feature",
+          "child-click",
+          "live-drag",
+          "annotation-drag",
+          "source-propagation",
+          "navigation",
+          "popup-dismissal",
+          "remount-teardown"
+        ],
+        "observation": {
+          "events": {
+            "load": 2,
+            "marker-click": 1,
+            "child-click": 1,
+            "live-start": 1,
+            "live-drag": 6,
+            "live-end": 1,
+            "annotation-start": 1,
+            "annotation-end": 1,
+            "source-click": 2,
+            "map-click": 1,
+            "popup-close": 1
+          },
+          "center": [
+            -122.34,
+            47.61
+          ],
+          "zoom": 11,
+          "featureIds": [
+            707
+          ],
+          "generation": 1
+        },
+        "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/r3-core-output.json"
+      },
+      "extended": {
+        "command": "node /private/tmp/one-map-tf07-rerun/web-extended-space.mjs web mapbox",
+        "status": "passed",
+        "exitCode": 0,
+        "outcomes": [
+          {
+            "scenario": "offset-reset",
+            "status": "passed",
+            "offset": [
+              24,
+              -12
+            ]
+          },
+          {
+            "scenario": "scale-units",
+            "status": "passed",
+            "metric": "2 km",
+            "imperial": "1 mi"
+          },
+          {
+            "scenario": "popup-child-follow-empty-overlay",
+            "status": "passed",
+            "popupDelta": [
+              48,
+              24
+            ]
+          },
+          {
+            "scenario": "geolocation",
+            "status": "passed",
+            "center": [
+              -122.32999999999998,
+              47.619999999999976
+            ]
+          },
+          {
+            "scenario": "keyboard-control",
+            "status": "passed",
+            "method": "Tab+Space",
+            "focus": "Zoom in"
+          },
+          {
+            "scenario": "style-remount",
+            "status": "passed"
+          }
+        ],
+        "finalObservation": {
+          "load": 2,
+          "style": 3,
+          "childClick": 2,
+          "featureIds": [
+            707
+          ],
+          "generation": 1
+        },
+        "screenshot": "/private/tmp/one-map-tf07-rerun/web-mapbox/extended-final.png",
+        "screenshotReviewed": true,
+        "visualReview": "Known feature, live and annotation markers, popup, scale and controls visible.",
+        "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/r3-extended-output.json"
+      },
+      "focused": {
+        "command": "node /private/tmp/one-map-tf07-rerun/web-focused.mjs web mapbox",
+        "status": "passed",
+        "exitCode": 0,
+        "outcomes": [
+          {
+            "scenario": "fullscreen",
+            "status": "passed"
+          },
+          {
+            "scenario": "rejected-provider",
+            "status": "passed",
+            "errorCount": 1,
+            "locationCount": 0
+          },
+          {
+            "scenario": "delayed-provider-and-teardown",
+            "status": "passed",
+            "calls": 2,
+            "errorCount": 1,
+            "locationCount": 0
+          },
+          {
+            "scenario": "context-preserved-control",
+            "status": "passed",
+            "childPressCount": 2
+          },
+          {
+            "scenario": "accessibility-button-tree",
+            "status": "passed",
+            "labels": [
+              "Zoom in",
+              "Zoom out",
+              "Reset bearing to north",
+              "Enter fullscreen",
+              "Close popup",
+              "Child button",
+              "updated",
+              "Locate me"
+            ]
+          }
+        ],
+        "screenshot": "/private/tmp/one-map-tf07-rerun/web-mapbox/focused-final.png",
+        "screenshotReviewed": true,
+        "visualReview": "Controls and attribution visible; map canvas/background appeared gray/blank.",
+        "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/r3-focused-output.json"
+      }
+    },
+    "remaining": [
+      "Full assistive-technology review"
+    ]
+  },
+  "r4Rerun": {
+    "authorization": "Coordinator-approved R4 Mapbox web rerun following commonMap R3 pan-lock changes; frozen artifact fully validated and 529 tests/21 suites passed.",
+    "artifact": {
+      "sourceSha256": "239720a4b981b504d062e8666e5b27df4e543953342df9c8846b2981abe29c48",
+      "distSha256": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+      "exampleDistSha256": {
+        "web-mapbox": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+        "web-maplibre": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+        "native-mapbox": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+        "native-maplibre": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e"
+      },
+      "packedSha256": "d6234ba322e8f8e4364ba02657743f4f515a38e449eed45c6d0c433475702b71"
+    },
+    "environment": "mapbox-web",
+    "sandboxPermissions": "require_escalated for local Vite/Chrome",
+    "cacheRoot": "/private/tmp/one-map-tf07-rerun/web-mapbox-cache",
+    "attempts": {
+      "core": {
+        "command": "node /private/tmp/one-map-tf07-rerun/web-diagnostic.mjs web mapbox",
+        "status": "passed",
+        "exitCode": 0,
+        "scope": [
+          "known-feature",
+          "child-click",
+          "live-drag",
+          "annotation-drag",
+          "source-propagation",
+          "navigation",
+          "popup-dismissal",
+          "remount-teardown"
+        ],
+        "observation": {
+          "events": {
+            "load": 2,
+            "marker-click": 1,
+            "child-click": 1,
+            "live-start": 1,
+            "live-drag": 6,
+            "live-end": 1,
+            "annotation-start": 1,
+            "annotation-end": 1,
+            "source-click": 2,
+            "map-click": 1,
+            "popup-close": 1
+          },
+          "center": [
+            -122.34,
+            47.61
+          ],
+          "zoom": 11,
+          "featureIds": [
+            707
+          ],
+          "generation": 1
+        },
+        "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/r4-core-output.json"
+      },
+      "extended": {
+        "command": "node /private/tmp/one-map-tf07-rerun/web-extended-space.mjs web mapbox",
+        "status": "failed",
+        "exitCode": 1,
+        "phase": "style-remount",
+        "error": "TF07 observation timed out.",
+        "completedBeforeFailure": [
+          {
+            "scenario": "offset-reset",
+            "status": "passed",
+            "offset": [
+              24,
+              -12
+            ]
+          },
+          {
+            "scenario": "scale-units",
+            "status": "passed",
+            "observation": "Metric-to-imperial scale assertions passed; final DOM text was 3,000 ft, exact pre-toggle values were not retained in failure output."
+          },
+          {
+            "scenario": "popup-child-follow-empty-overlay",
+            "status": "passed",
+            "observation": "Popup-child assertion passed; physical pan changed the camera and popup-follow assertion passed."
+          },
+          {
+            "scenario": "geolocation",
+            "status": "passed",
+            "center": [
+              -122.32999999999959,
+              47.619999999999976
+            ]
+          },
+          {
+            "scenario": "keyboard-control",
+            "status": "passed",
+            "method": "Tab+Space Zoom in activation"
+          }
+        ],
+        "failureObservation": {
+          "events": {
+            "load": 1,
+            "marker-click": 1,
+            "child-click": 1,
+            "popup-child": 1,
+            "move": 48,
+            "location": 1,
+            "style": 1
+          },
+          "center": [
+            -122.32999999999959,
+            47.619999999999976
+          ],
+          "zoom": 12,
+          "featureIds": [
+            707
+          ],
+          "generation": 0
+        },
+        "failureInterpretation": "At style-remount phase the expected replacement style event/readback did not arrive; remount and final child check were not reached.",
+        "consoleEvents": {
+          "total": 3,
+          "errors": 0,
+          "exceptions": 0,
+          "warnings": 0
+        },
+        "screenshot": "none; harness captures only on pass",
+        "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/r4-extended-output.json"
+      },
+      "focused": {
+        "status": "not-run",
+        "reason": "Stopped after first unexpected failure per instruction."
+      }
+    },
+    "remaining": [
+      "Full assistive-technology review"
+    ],
+    "extendedTargetDiagnostic": {
+      "command": "node /private/tmp/one-map-tf07-rerun/web-extended-targets.mjs web mapbox",
+      "status": "passed",
+      "exitCode": 0,
+      "distSha256": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+      "outcomes": [
+        {
+          "scenario": "offset-reset",
+          "status": "passed",
+          "offset": [
+            24,
+            -12
+          ]
+        },
+        {
+          "scenario": "scale-units",
+          "status": "passed",
+          "metric": "2 km",
+          "imperial": "1 mi"
+        },
+        {
+          "scenario": "popup-child-follow-empty-overlay",
+          "status": "passed",
+          "popupDelta": [
+            48,
+            24
+          ]
+        },
+        {
+          "scenario": "geolocation",
+          "status": "passed",
+          "center": [
+            -122.32999999999998,
+            47.619999999999976
+          ]
+        },
+        {
+          "scenario": "keyboard-control",
+          "status": "passed",
+          "focusedBefore": "<button class=\"mapboxgl-ctrl-zoom-in\" type=\"button\" aria-label=\"Zoom in\" aria-disabled=\"false\"><span class=\"mapboxgl-ctrl-icon\" aria-hidden=\"true\" title=\"Zoom in\"></span></button>"
+        },
+        {
+          "scenario": "style-remount",
+          "status": "passed"
+        }
+      ],
+      "finalObservation": {
+        "events": {
+          "popup-open": 2,
+          "load": 2,
+          "marker-click": 2,
+          "child-click": 2,
+          "popup-child": 1,
+          "move": 49,
+          "location": 1,
+          "style": 3
+        },
+        "center": [
+          -122.34,
+          47.61
+        ],
+        "zoom": 11,
+        "featureIds": [
+          707
+        ],
+        "generation": 1
+      },
+      "inputTargets": [
+        {
+          "selector": "[data-tf07-action=\"offset\"]",
+          "rect": {
+            "x": 124.328125,
+            "y": 16,
+            "width": 48.375,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" data-tf07-action=\"offset\">offset</button>",
+          "targetMatches": true
+        },
+        {
+          "selector": "[data-tf07-child=\"live\"]",
+          "rect": {
+            "x": 671.21875,
+            "y": 360.5,
+            "width": 87.15625,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" data-tf07-child=\"live\">Child button</button>",
+          "targetMatches": true
+        },
+        {
+          "selector": "[data-tf07-action=\"offset\"]",
+          "rect": {
+            "x": 124.328125,
+            "y": 16,
+            "width": 48.375,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" data-tf07-action=\"offset\">offset</button>",
+          "targetMatches": true
+        },
+        {
+          "selector": "[data-tf07-action=\"units\"]",
+          "rect": {
+            "x": 225.78125,
+            "y": 16,
+            "width": 44.171875,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" data-tf07-action=\"units\">units</button>",
+          "targetMatches": true
+        },
+        {
+          "selector": "[data-tf07-child=\"popup\"]",
+          "rect": {
+            "x": 730.8828125,
+            "y": 243,
+            "width": 87.15625,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" data-tf07-child=\"popup\">Child button</button>",
+          "targetMatches": true
+        },
+        {
+          "selector": "button[aria-label=\"Locate me\"]",
+          "rect": {
+            "x": 18,
+            "y": 55,
+            "width": 78.25,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" aria-label=\"Locate me\">Locate me</button>",
+          "targetMatches": true
+        },
+        {
+          "selector": "[data-tf07-action=\"style\"]",
+          "rect": {
+            "x": 80.90625,
+            "y": 16,
+            "width": 43.421875,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" data-tf07-action=\"style\">style</button>",
+          "targetMatches": true
+        },
+        {
+          "selector": "[data-tf07-action=\"remount\"]",
+          "rect": {
+            "x": 16,
+            "y": 16,
+            "width": 64.90625,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" data-tf07-action=\"remount\">remount</button>",
+          "targetMatches": true
+        },
+        {
+          "selector": "[data-tf07-child=\"live\"]",
+          "rect": {
+            "x": 647.21875,
+            "y": 372.5,
+            "width": 87.15625,
+            "height": 21
+          },
+          "scrollY": 0,
+          "viewportHeight": 713,
+          "hit": "<button type=\"button\" data-tf07-child=\"live\">Child button</button>",
+          "targetMatches": true
+        }
+      ],
+      "styleRemountResult": "Passed on target-instrumented run. Style/remount buttons were inside the viewport, and elementFromPoint hit each actual button. The earlier timeout was not reproduced.",
+      "screenshot": "/private/tmp/one-map-tf07-rerun/web-mapbox/extended-final.png",
+      "screenshotReviewed": true,
+      "visualReview": "Feature 707, markers, popup, scale and controls visible.",
+      "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/r4-extended-targets-output.json"
+    },
+    "focused": {
+      "command": "node /private/tmp/one-map-tf07-rerun/web-focused.mjs web mapbox",
+      "status": "passed",
+      "exitCode": 0,
+      "distSha256": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+      "outcomes": [
+        {
+          "scenario": "fullscreen",
+          "status": "passed"
+        },
+        {
+          "scenario": "rejected-provider",
+          "status": "passed",
+          "counts": {
+            "load": 1,
+            "error": 1,
+            "location": 0,
+            "calls": 1,
+            "clicks": 0,
+            "zoom": 11,
+            "center": [
+              -122.34,
+              47.61
+            ]
+          }
+        },
+        {
+          "scenario": "delayed-provider-and-teardown",
+          "status": "passed",
+          "counts": {
+            "load": 1,
+            "error": 1,
+            "location": 0,
+            "calls": 2,
+            "clicks": 0,
+            "zoom": 11,
+            "center": [
+              -122.34,
+              47.61
+            ]
+          }
+        },
+        {
+          "scenario": "context-preserved-control",
+          "status": "passed"
+        }
+      ],
+      "observation": {
+        "load": 1,
+        "error": 1,
+        "location": 0,
+        "calls": 2,
+        "clicks": 2,
+        "zoom": 11,
+        "center": [
+          -122.34,
+          47.61
+        ]
+      },
+      "accessibilityButtonLabels": [
+        "remount",
+        "style",
+        "offset",
+        "popup",
+        "units",
+        "Zoom in",
+        "Zoom out",
+        "Reset bearing to north",
+        "Enter fullscreen",
+        "Zoom in",
+        "Zoom out",
+        "Reset bearing to north",
+        "Close popup",
+        "Child button",
+        "updated",
+        "Locate me",
+        "Child button"
+      ],
+      "screenshot": "/private/tmp/one-map-tf07-rerun/web-mapbox/focused-final.png",
+      "screenshotReviewed": true,
+      "visualReview": "Controls and Mapbox attribution visible; map canvas/background appeared gray/blank.",
+      "outputPath": "/private/tmp/one-map-tf07-rerun/web-mapbox/r4-focused-output.json"
+    }
+  }
+}

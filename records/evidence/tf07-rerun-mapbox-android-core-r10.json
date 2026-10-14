@@ -1,0 +1,42 @@
+{
+  "artifact": {
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "028b12d005d0c19a1ac79bb8daf3e27f8136addaf4cb03938398229708689466"
+  },
+  "environment": "mapbox-android-api36",
+  "runId": "8b60d130-353e-49e1-be26-b8785fc078b5",
+  "result": "failed",
+  "execution": "actual Android OS MotionEvent input, physical screenshots, accessibility hierarchy, and renderer Read button",
+  "priorFailure": "R9 tooling startup timeout and actual gestureSettings setter error remain separately preserved in tf07-rerun-mapbox-android-core-r9.json.",
+  "scenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-drag": "failed",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "interruptedAt": "live-drag; later gates unverified",
+  "observations": {
+    "initial": "Physical Read returned load=1, feature id 707, center [-122.34,47.61], zoom 11; initial screen showed map renderer controls, pin, popup, annotation and green point.",
+    "child": "Tapped live child at physical px [539,1373], then physically Read; child-click incremented to 1 with camera unchanged.",
+    "nestedScroll": "Continuous physical swipe [520,1465]\u2192[520,1420], wholly in the 32dp child viewport. Fresh hierarchy shows stationary Long press label and child button; Scroll one/two moved upward ~21\u201322px, renderer center and zoom unchanged.",
+    "liveDrag": "Issued actual OS MotionEvent with 650ms stationary hold then continuous move [539,1322]\u2192[650,1350]. At 13:44:01.006, before the subsequent physical Read tap, the app displayed an RN red error: \u201cDynamic value from Object is not a boolean\u201d in RNMBXMapViewManager.setZoomEnabled (line 226). The renderer JSON remains the prior pre-drag snapshot and does not establish post-drag event counts or position."
+  },
+  "evidence": {
+    "initialScreenshot": "tf07-mapbox-android-r10-initial.png",
+    "errorScreenshot": "tf07-mapbox-android-r10-live-drag-error.png",
+    "nestedScrollRendererRead": "tf07-mapbox-android-r10-after-scroll-read.json",
+    "nestedScrollHierarchy": "tf07-mapbox-android-r10-after-scroll-hierarchy.xml",
+    "compactFailureLog": "tf07-mapbox-android-r10-failure-log.txt"
+  },
+  "cleanup": "Owned runner stopped after first app failure; emulator retained; no retry performed.",
+  "coordinatorDiagnosis": "The installed DynamicFromObject accepts Boolean and ReadableMap values but rejects null. RNMapbox setters unconditionally call asBoolean/asMap. Unlike scroll/pitch/rotate, zoomEnabled has no wrapper default, so false-to-omitted restores null rather than enabled behavior. Error timing follows completed physical drag. Root infers R9 similarly cleared its synthesized map on release; earlier object-conversion wording was too broad.",
+  "readbackLimitation": "The red screen prevented a fresh physical Read after the drag. Last saved renderer read preceded dragging; its missing drag counts do not prove whether drag callbacks occurred before the reset error.",
+  "failureObservedAt": "2026-10-13 13:44:01.006 host log time"
+}

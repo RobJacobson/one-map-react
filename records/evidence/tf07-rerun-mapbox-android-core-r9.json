@@ -1,0 +1,43 @@
+{
+  "artifact": {
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "003106b20a28a8da0872580484a1a7571964202823a3ae6a4993e9b2c257802b"
+  },
+  "environment": "mapbox-android-api36",
+  "runId": "d210b6ac-3eda-4edf-8fe5-26e3e7b822af",
+  "result": "failed",
+  "execution": "actual Android OS MotionEvent input, physical screenshots, hierarchy, and renderer Read button",
+  "firstAttempt": {
+    "runId": "b103f634-2003-47b9-b947-ba15ceb42628",
+    "result": "tooling setup timeout before Metro/app launch",
+    "cause": "native-env36.sh did not place Bun on the inherited PATH used by the child Metro process; no application runtime occurred. A fresh run was started after correcting the wrapper PATH."
+  },
+  "scenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-drag": "failed",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "interruptedAt": "live-drag; later core gates unverified",
+  "observations": {
+    "initial": "Screenshot shows the TF07 screen with Mapbox controls, visible default pin, popup, annotation and green point. Physical Read renderer returned load=1, finite center [-122.34,47.61], zoom=11 and feature id 707.",
+    "child": "Tapped live child at physical px [539,1373], then physically Read; child-click incremented to 1, camera unchanged.",
+    "nestedScroll": "Continuous physical swipe from [520,1465] to [520,1420], wholly within the 32dp nested viewport. Fresh hierarchy shows stationary Long press label at y1297..1348 while Scroll one moved from y1399..1450 to y1399..1428 and Scroll two from y1450..1483 to y1428..1479. Renderer center and zoom remained unchanged.",
+    "liveDrag": "Issued actual OS MotionEvent with 650ms stationary hold and continuous move from [539,1322] to [650,1350], then physical Read. Renderer Read remained unchanged with no live-drag events. Screen displayed RN red error: \u201cDynamic value from Object is not a ReadableMap\u201d; stack names RNMBXMapViewManager.setGestureSettings (line 158) and MapboxMap.gesturesPlugin (line 2625)."
+  },
+  "evidence": {
+    "initialScreenshot": "tf07-mapbox-android-r9-initial.png",
+    "errorScreenshot": "tf07-mapbox-android-r9-live-drag-error.png",
+    "nestedScrollRendererRead": "tf07-mapbox-android-r9-after-scroll-read.json",
+    "nestedScrollHierarchy": "tf07-mapbox-android-r9-after-scroll-hierarchy.xml",
+    "compactFailureLog": "tf07-mapbox-android-r9-failure-log.txt"
+  },
+  "cleanup": "Owned Metro/status/fixture runner stopped after first application failure. Emulator retained; no retry performed."
+}

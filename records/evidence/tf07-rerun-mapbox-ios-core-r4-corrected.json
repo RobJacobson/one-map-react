@@ -1,0 +1,96 @@
+{
+  "environment": "mapbox-ios",
+  "runId": "81989ea3-8fb0-4136-b2ed-9f1120ff178b",
+  "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+  "libraryDistSha256": "26f12e60968ee6bf0f9585e4d0e21060fa665ccc660867640a211d023293f78e",
+  "outcome": "stopped-at-first-proven-runtime-failure",
+  "firstFailure": {
+    "scenario": "nested-scroll",
+    "reason": "Actual 400 ms touch path inside the settled 32-point ScrollView viewport did not move any row relative to the stationary child button; physical Read renderer confirmed camera unchanged and child-click count retained."
+  },
+  "manualReport": "/private/tmp/one-map-tf07-rerun/manual-mapbox-ios-core-r4-corrected.json",
+  "evidence": {
+    "initialHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4c-hierarchy0.json",
+    "postInitialReadHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4c-hierarchy1.json",
+    "postChildReadHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4c-hierarchy2.json",
+    "postScrollHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4c-hierarchy3.json",
+    "postScrollScreenshot": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r4c-after-scroll.png"
+  },
+  "observations": {
+    "initialRead": {
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11,
+      "featureId": 707,
+      "generation": 0
+    },
+    "liveChildTap": {
+      "logicalPoint": [
+        201,
+        496
+      ],
+      "duration": 0.12,
+      "postReadEvents": {
+        "child-click": 1,
+        "popup-open": 1,
+        "style": 1,
+        "move": 3,
+        "load": 1
+      }
+    },
+    "nestedScroll": {
+      "viewportGlobalLogicalRect": [
+        140.33,
+        504.67,
+        121.33,
+        32
+      ],
+      "actualPath": [
+        {
+          "x": 200,
+          "y": 534,
+          "time": 0
+        },
+        {
+          "x": 200,
+          "y": 528.5,
+          "time": 0.1
+        },
+        {
+          "x": 200,
+          "y": 523,
+          "time": 0.2
+        },
+        {
+          "x": 200,
+          "y": 517.5,
+          "time": 0.3
+        },
+        {
+          "x": 200,
+          "y": 512,
+          "time": 0.4
+        }
+      ],
+      "postReadCamera": {
+        "center": [
+          -122.34000000000002,
+          47.60999999999999
+        ],
+        "zoom": 11
+      },
+      "viewportRowsBefore": {
+        "Scroll one": 504.67,
+        "Scroll two": 521.67
+      },
+      "viewportRowsAfter": {
+        "Scroll one": 504.67,
+        "Scroll two": 521.67
+      },
+      "stationaryChildButtonY": 487.67,
+      "result": "No row movement; source diagnosis supplied by coordinator: marker responder arbitration blocks descendant ScrollView."
+    }
+  }
+}

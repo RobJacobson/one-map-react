@@ -1,0 +1,20 @@
+{
+  "environment": "MapLibre Android, Android 16 / API 36, emulator-5556, 1080x2400 at 320 dpi",
+  "status": "passed",
+  "runId": "8bde930c-214e-4ad7-b7b5-d1d35723012e",
+  "installedApkSha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "librarySourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "scenarios": {
+    "offset-placement-reset": "passed",
+    "offset-touch-bounds": "passed",
+    "map-gesture-recovery": "passed"
+  },
+  "input": "Actual OS MotionEvent sequence using the preserved touch helper; displaced child press and drag were followed by reset and map-pan recovery.",
+  "priorAttempt": "The R19 offset attempt used an ADB swipe that did not establish the intended continuous touch; its incomplete result remains in tf07-rerun-maplibre-android-offset320-r19-incomplete.json. R20 is a separate accepted run.",
+  "evidence": [
+    "tf07-rerun-maplibre-android-offset320-r19-incomplete.json",
+    "tf07-rerun-maplibre-android-offset320-r20-manual.json"
+  ],
+  "cleanup": "Restored 420 dpi after the run; app stopped and assigned ports cleared."
+}

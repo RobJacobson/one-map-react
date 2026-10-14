@@ -1,0 +1,37 @@
+{
+  "environment": "mapbox-ios",
+  "attempt": "R6 evidence-linked retrospective",
+  "runId": "fffc218d-22c4-405b-a825-724113fbf52d",
+  "artifact": {
+    "sourceSha256": "c12fd89132c6128584489871c9dd8d1c801b64f069dab26f9b0b6dfc09580428",
+    "libraryDistSha256": "aa12bedb72fe66b0707d09b4e42108d8a3aae66210a7a192f9084f73a5c266ac",
+    "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a"
+  },
+  "runnerResult": {
+    "status": "unverified",
+    "observed": true,
+    "manualComplete": false,
+    "reason": "The identity-bound manual report remained unverified when the final physical Read renderer press completed. Preserve the original runner result unchanged."
+  },
+  "retrospectiveScenarios": {
+    "live-child-button": {"status":"passed","evidence":"ios-mapbox-r6-child-observation.json; child-click incremented once with no map-click."},
+    "nested-scroll": {"status":"passed","evidence":"ios-mapbox-r6-scroll-observation.json; ios-mapbox-r6-child-hierarchy.json; ios-mapbox-r6-scroll-after-hierarchy.json; ScrollView rows moved 10pt while label/button stayed fixed and camera remained unchanged."},
+    "live-drag": {"status":"passed","evidence":"ios-mapbox-r6-live-drag-observation.json; ios-mapbox-r6-live-drag-after.png; actual 650ms hold then continuous move path produced live-start/drag/end and changed coordinate."},
+    "interrupted-touch": {"status":"passed","evidence":"ios-mapbox-r6-active-interrupt-touch.json; ios-mapbox-r6-active-interrupt-observation.json; same PID after OS app switch, live-start/drag advanced, live-end unchanged; separate map pan recovered."},
+    "multi-pointer-cancellation": {"status":"passed","evidence":"ios-mapbox-r6-multipointer-observation.json; ios-mapbox-r6-multipointer-pan-observation.json; actual second pointer produced map-click, no additional live-end, subsequent map pan changed camera."},
+    "annotation-drag": {"status":"passed","evidence":"ios-mapbox-r6-annotation-observation.json; actual hold-and-drag produced annotation-start/end and a changed coordinate."},
+    "offset-touch-bounds": {"status":"passed","evidence":"ios-mapbox-r6-offset-child-observation.json; ios-mapbox-r6-offset-drag-observation.json; ios-mapbox-r6-offset-after-drag-hierarchy.json; ios-mapbox-r6-offset-off-hierarchy.json; shifted child tap and drag worked, reset moved bounds exactly -24,+12pt."},
+    "popup-follow-dismissal": {"status":"passed","evidence":"ios-mapbox-r6-popup-pan-observation.json; ios-mapbox-r6-popup-child-observation.json; ios-mapbox-r6-popup-dismiss-observation.json; ios-mapbox-r6-popup-config-unmount-observation.json; actual pan moved popup, child worked, close incremented once, config unmount did not increment close."},
+    "source-propagation": {"status":"passed","evidence":"ios-mapbox-r6-source-allowed-observation.json; ios-mapbox-r6-source-stopped-verified-observation.json; allowed tap incremented source and map, stopped taps incremented source without map."},
+    "navigation-location": {"status":"passed","evidence":"ios-mapbox-r6-locate-observation.json; ios-mapbox-r6-zoom-in-observation.json; ios-mapbox-r6-zoom-out-observation.json; locate returned [-122.33,47.62], zoom changed 11→12→11."},
+    "scale-units": {"status":"unverified","evidence":"ios-mapbox-r6-scale-metric.png; ios-mapbox-r6-scale-imperial.png; ios-mapbox-r6-scale-imperial-hierarchy.json; actual labels changed 2 km (76pt) to 1 mi (60.67pt), but scale overlapped SDK attribution and corner-control layout requires R7 verification."},
+    "host-accessibility": {"status":"unverified","evidence":"Accessibility hierarchy exposed map, child, popup, locate, zoom, and attribution labels; coordinator review found scale/attribution and control/ornament overlap, pending R7 layout fix."},
+    "style-remount": {"status":"unverified","evidence":"ios-mapbox-r6-style-observation.json and runner final output showed style 2→3, generation 0→1, load 1→2, feature707 retained; post-remount child/source interactions were not recorded."},
+    "empty-overlay-touch": {"status":"passed","evidence":"ios-mapbox-r6-empty-overlay-observation.json; physical tap between bottom controls incremented map-click."}
+  },
+  "tooling": {
+    "runnerManualReport": "/private/tmp/one-map-tf07-rerun/manual-mapbox-ios-core-r6-interrupt.json",
+    "driverConcurrencyFailure": "A prior Home attempt used concurrent XCTest gestures and closed the touch-driver server; retained separately as a tooling failure. R6 subsequently used one touch request plus simctl app switching.",
+    "retention": "Per-step screenshots, hierarchies, touch records, and renderer readbacks remain in /private/tmp/one-map-tf07-rerun for coordinator review."
+  }
+}

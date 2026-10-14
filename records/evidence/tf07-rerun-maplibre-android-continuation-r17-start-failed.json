@@ -1,0 +1,41 @@
+{
+  "status": "incomplete-infrastructure",
+  "scope": "MapLibre Android core continuation; stopped before interactions",
+  "identity": {
+    "environment": "maplibre-android",
+    "runId": "0023ea43-9f23-4885-8296-81364d239d16",
+    "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+    "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "device": "emulator-5556",
+    "densityDpi": 420,
+    "fixture": "canonical core"
+  },
+  "firstFailure": {
+    "category": "runner command environment",
+    "operation": "Launch timed Android interruption gesture helper",
+    "command": "node -e '<spawn adb swipe for 10000 ms; after 1500 ms send KEYCODE_HOME>'",
+    "diagnostic": "zsh: command not found: node. The helper exited before issuing any device input.",
+    "intendedEnvironment": "/private/tmp/one-map-tf07-rerun/native-env36.sh sets PATH with /Users/rob/.nvm/versions/node/v24.14.0/bin first; the unwrapped host node command omitted that environment.",
+    "correctiveAction": "Verify Node through native-env36.sh and use that wrapper or the verified absolute Node path for each helper invocation. Retry only under a new run ID."
+  },
+  "completedEvidence": {
+    "initialPhysicalReceipt": 1,
+    "initialRead": "/private/tmp/one-map-tf07-rerun/maplibre-android-r17-initial-read.json",
+    "manualReport": "/private/tmp/one-map-tf07-rerun/manual-maplibre-android-r16-continuation-r17.json",
+    "manualScenarios": "all unverified",
+    "initialObservation": "Finite camera, load=1, generation=0, feature 707 visible, popup/style initialized. No interaction outcome is claimed."
+  },
+  "cleanup": {
+    "runnerStopped": true,
+    "ownedMetroProcessesStopped": true,
+    "status8171": "clear",
+    "status8797": "clear",
+    "status8798": "clear",
+    "assignedReversePortsRemoved": [8081, 8797],
+    "testAppStopped": true,
+    "emulator": "emulator-5556 preserved booted at 420 dpi",
+    "iosSimulator": "untouched"
+  }
+}

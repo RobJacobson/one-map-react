@@ -1,0 +1,65 @@
+{
+  "priorReceipt": 5,
+  "receiptSequence": 6,
+  "observation": {
+    "events": {
+      "popup-open": 1,
+      "style": 1,
+      "move": 26,
+      "load": 1,
+      "child-click": 1,
+      "live-start": 2,
+      "live-drag": 42,
+      "live-end": 1
+    },
+    "positions": {
+      "live": [
+        -122.32692103558364,
+        47.60559107215721
+      ]
+    },
+    "center": [
+      -122.35135251354774,
+      47.60999999998973
+    ],
+    "zoom": 11,
+    "features": [
+      {
+        "properties": {
+          "fixture": "tf07"
+        },
+        "geometry": {
+          "coordinates": [
+            -122.33999490737915,
+            47.57999970656695
+          ],
+          "type": "Point"
+        },
+        "id": "707",
+        "type": "Feature"
+      }
+    ],
+    "generation": 0,
+    "stopSourcePropagation": false,
+    "sourcePoint": [
+      239.06658935546875,
+      514.5753784179688
+    ]
+  },
+  "physicalInput": {
+    "x": 977,
+    "y": 109,
+    "bounds": [
+      [
+        875,
+        84
+      ],
+      [
+        1080,
+        135
+      ]
+    ]
+  },
+  "accessibilityTreePath": "/private/tmp/one-map-tf07-rerun/tf07-read-receipt.xml",
+  "screenshotPath": "/private/tmp/one-map-tf07-rerun/tf07-read-receipt.png"
+}

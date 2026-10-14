@@ -1,0 +1,15 @@
+{
+  "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "environment": "maplibre-android",
+  "runId": "600d8d00-5c98-4337-bdca-151b3ab94b64",
+  "scenarios": {
+    "active-interruption-recovery": "passed",
+    "source-propagation": "passed",
+    "navigation-location": "passed",
+    "style-remount": "passed",
+    "host-accessibility": "passed",
+    "scale-units": "passed",
+    "popup-follow-dismissal": "passed"
+  }
+}

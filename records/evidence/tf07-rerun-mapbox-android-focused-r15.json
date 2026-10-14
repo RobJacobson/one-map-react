@@ -1,0 +1,48 @@
+{
+  "artifact": {
+    "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+    "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+    "packedSha256": "85b7b84933fcb6a1b2ac44bf7ec482de04c797fae3fadf289ee95bab9b97d5da",
+    "installedApkSha256": "29a662927412148fff915db13520f4d85b3432d65d9e3ff16cc9b80b0a445b9e",
+    "sdkPatchSha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
+    "patchedEmitterSha256": "310c73d7ccde6d21e2df1b599af9d54ee1cac4329d3285eb530f0adb2e511e34"
+  },
+  "environment": "Mapbox Android API 36, emulator-5556, 1080x2400 at 420 dpi",
+  "fixtureSha256": "9a9c78c54e4fa2ca7a84fc2dbbca8bbd622e42b9d6c0014072c132c0ff30b604",
+  "runId": "496403e5-5521-4a5d-81f3-cfe32255733e",
+  "result": "stopped after focused source-propagation became inconclusive",
+  "execution": "Actual Android touchscreen input, physical Read renderer snapshots, screenshots and UI hierarchy; no callback injection",
+  "scenarios": {
+    "annotation-image-refresh": "passed",
+    "overlap-source-propagation": "unverified; actual allowed hit incremented high-click and map-click; later stop-state sequence was inconsistent",
+    "vector-source-hit": "unverified",
+    "location-rejected": "unverified",
+    "location-delayed-teardown": "unverified",
+    "portal-context-state-multiple-maps": "unverified; Map A and Map B child presses each visibly/readably incremented their own counters and reported zoom 11/12, but theme chronology is incidental",
+    "resize-orientation": "unverified",
+    "host-accessibility": "unverified",
+    "navigation-constraints": "unverified"
+  },
+  "observations": {
+    "readiness": "First physical Read showed a-load=1 and b-load=1, finite cameras at zoom 11/12, both overlapping features 707/708, two vector features and enabled Map B navigation.",
+    "image": "Actual IMAGE action produced a visible blue 40x40 annotation bitmap; a physical Read recorded image-load=1 and image-refresh=1. A later toolbar touch actually invoked Theme; theme=updated was recorded. Map A and B child labels still showed initial 0 at that point.",
+    "children": "A physical Map A child press followed by Read recorded Map A-click=1 and Map A-map-zoom-11=1. A later Map B child press followed by Read recorded Map B-click=1 and Map B-map-zoom-12=1; both map cameras remained finite.",
+    "overlap": "An ordinary tap at the projected visible overlap point was followed by actual Read counts high-click=1 and a-map-click=1. Stop was then observed true in a fresh status read. After one ordinary tap at the same fresh projected point and one Map B child press, a new physical Read reported high-click=2, a-map-click=2, Map B-click=1, and stop=false. This discontinuity prevents a reliable stopped-source conclusion; no additional taps were made.",
+    "cleanup": "Stopped the owned runner, force-stopped only the assigned test app, and stopped the owned Metro on 8171. Owned status/fixture services were no longer reachable. Emulator remains available."
+  },
+  "evidence": {
+    "initialScreenshot": "/private/tmp/one-map-tf07-rerun/r15-ready-initial.png",
+    "imageScreenshot": "records/evidence/tf07-r15/r15-after-image-read.png",
+    "childScreenshot": "/private/tmp/one-map-tf07-rerun/r15-child-a.png",
+    "toolbarScreenshot": "records/evidence/tf07-r15/r15-current2.png",
+    "toolbarHierarchy": "/private/tmp/one-map-tf07-rerun/r15-toolbar-reset1.xml",
+    "finalRendererRead": "records/evidence/tf07-r15/r15-read-stop-childb.json",
+    "manualReport": "records/evidence/tf07-r15/manual-mapbox-android-focused-r15.json"
+  },
+  "coordinatorReview": {
+    "image": "Root reviewed actual blue annotation pixels and image-load1/image-refresh1 counts. SDK scale below enabled Nav; each child at its own footer.",
+    "readiness": "Actual SDK a-load1/b-load1 and known707+708/vector/finite cameras establish repaired native build readiness for this run.",
+    "source": "Allowed source/map callback pair observed. Stopped propagation remains inconclusive because stop:true became stop:false across source/child/toolbar inputs; this does not establish a product failure.",
+    "fixtureRepair": "Root replaced horizontal toolbar with always-visible responsive rows and dynamic Stop/Allow label. Canonical and focused fixtureSHA7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9; fourtypes and formatting passed. Source/dist/nativeAPK unchanged. Fresh fullfocused9 authorized with physical Read immediately after each individual source action, no unrelated inputs between."
+  }
+}

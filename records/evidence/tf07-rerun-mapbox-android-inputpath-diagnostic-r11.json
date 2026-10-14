@@ -1,0 +1,73 @@
+{
+  "artifact": {
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8"
+  },
+  "environment": "mapbox-android-api36",
+  "runId": "938a49b5-5a5c-4d05-8cd6-2988a9ed44ea",
+  "result": "source diagnostic completed; remaining core scenarios unverified",
+  "scope": "one standard projected source tap and one standard blank-map tap, each followed by physical renderer Read; no drag, annotation, popup, multi-touch, configuration or production event injection",
+  "execution": "Android shell input touchscreen tap; physical Read control; actual renderer probe GET",
+  "initial": {
+    "events": {
+      "load": 1
+    },
+    "featureId": 707,
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "sourcePointLogical": [
+      205.5000000000258,
+      514.5753794954453
+    ]
+  },
+  "inputs": [
+    {
+      "kind": "source point",
+      "method": "standard adb shell input touchscreen tap",
+      "physicalPx": [
+        539,
+        1730
+      ],
+      "projectedLogical": [
+        205.5000000000258,
+        514.5753794954453
+      ],
+      "density": 420,
+      "mapBoundsPhysical": [
+        0,
+        379,
+        1080,
+        2400
+      ],
+      "resultAtImmediateRead": "source-click=0, map-click=0"
+    },
+    {
+      "kind": "empty map",
+      "method": "standard adb shell input touchscreen tap",
+      "physicalPx": [
+        900,
+        1800
+      ],
+      "resultAtImmediateRead": "source-click=1, map-click=1"
+    }
+  ],
+  "eventualReadOnlySnapshot": {
+    "source-click": 1,
+    "map-click": 2,
+    "note": "A later GET without any intervening input showed map-click incrementing from 1 to 2. This is consistent with the source point tap eventually delivering source+map callbacks and the blank-map tap adding one additional map callback; first physical Read appeared stale because native observation submission was delayed."
+  },
+  "logs": "Relevant app logs contained no error from handleTapInSources/RNMBXSource/RNMBXMapView/ReactNativeJS.",
+  "evidence": {
+    "initialScreenshot": "tf07-mapbox-android-inputpath-r11-initial.png",
+    "finalScreenshot": "tf07-mapbox-android-inputpath-r11-final.png",
+    "initialRead": "tf07-mapbox-android-inputpath-r11-initial-read.json",
+    "sourceRead": "tf07-mapbox-android-inputpath-r11-source-read.json",
+    "mapRead": "tf07-mapbox-android-inputpath-r11-map-read.json",
+    "finalReadOnlySnapshot": "tf07-mapbox-android-inputpath-r11-final-status.json",
+    "relevantLog": "tf07-mapbox-android-inputpath-r11-log.txt"
+  },
+  "cleanup": "Owned diagnostic runner stopped after the two authorized standard input paths; no additional input."
+}

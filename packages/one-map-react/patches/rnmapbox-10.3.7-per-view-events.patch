@@ -1,0 +1,28 @@
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
+@@ -56,6 +56,13 @@
+         }
+     }
+ 
++    override fun onDropViewInstance(view: T) {
++        // Retired view identifiers must not accumulate in the manager cache.
++        val prefix = "${view.id}-"
++        mRateLimitedEvents.keys.removeAll { it.startsWith(prefix) }
++        super.onDropViewInstance(view)
++    }
++
+     override fun addEventEmitters(context: ThemedReactContext, view: T) {
+         mEventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(context, view.id)
+     }
+@@ -76,7 +83,9 @@
+     }
+ 
+     private fun getEventCacheKey(event: IEvent): String {
+-        return String.format("%s-%s", event.key, event.type)
++        // A manager serves multiple maps. Throttle each native view separately
++        // so one map cannot suppress another map's load, source or input event.
++        return String.format("%s-%s-%s", event.iD, event.key, event.type)
+     }
+ 
+     companion object {

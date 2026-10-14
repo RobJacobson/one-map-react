@@ -1,0 +1,160 @@
+{
+  "recordedDate": "2026-10-12",
+  "scope": "Current one-map-react working tree through TF07, including uncommitted implementation; review and routine checks only.",
+  "status": "corrected-routine-passed-runtime-unverified",
+  "artifact": {
+    "baseRevision": "bea888029a36aa56fab24ee2b977d2bfba467346",
+    "sourceSha256": "da3b44944cdfaf2df9665df7609cc8b4e69735f8ecd2da90638b9506bacb4b15",
+    "distSha256": "3f69ad7b4821a764b6546b32d7f00e784b86d401a36a3f0b15dbe58852b208b7",
+    "digestAlgorithm": "SHA-256 of sorted recursive relative paths followed by file bytes; same directory traversal as TF07 smoke runner."
+  },
+  "findings": [
+    {
+      "priority": "P2",
+      "file": "packages/one-map-react/src/adapters/shared/native-ui.tsx",
+      "lines": [
+        495,
+        509
+      ],
+      "title": "Native controls lose nested React context",
+      "affected": "Both native adapters",
+      "reproduction": "A Control child under an application context provider inside Map receives the outside default when moved to the adapter overlay host.",
+      "expected": "Preserve the original React ancestry for custom control children.",
+      "verification": "Focused mocked native component reproduction failed: expected inside, received outside.",
+      "resolution": "fixed; permanent mocked regression passes"
+    },
+    {
+      "priority": "P2",
+      "file": "packages/one-map-react/src/adapters/shared/native-ui.tsx",
+      "lines": [
+        239,
+        242
+      ],
+      "title": "A stale unprojection rejection cancels a newer drag proposal",
+      "affected": "Live dragging on both native adapters",
+      "reproduction": "Start dragging, leave one unprojection pending, resolve a later move successfully, then reject the older request. The catch lacks the request-sequence guard used by the success path and calls cancel().",
+      "expected": "Ignore both successes and failures from superseded requests.",
+      "verification": "Focused mocked native component reproduction failed: gesture lock calls were true then false instead of remaining true.",
+      "resolution": "fixed; permanent mocked regression passes"
+    },
+    {
+      "priority": "P2",
+      "file": "packages/one-map-react/src/adapters/web/map.tsx",
+      "lines": [
+        184,
+        197
+      ],
+      "title": "Equivalent style objects cause duplicate onStyleLoad notifications",
+      "affected": "Both web adapters; TF03 lifecycle behavior",
+      "reproduction": "Rerender an already loaded map with a fresh object containing the same style. The layout effect rearms on reference identity and immediately reports another completed style load.",
+      "expected": "Notify for actual style completion or genuine missed-load recovery, without re-reporting an unchanged style.",
+      "verification": "Focused mocked web component reproduction failed: two notifications instead of one.",
+      "resolution": "fixed; permanent mocked regression passes"
+    }
+  ],
+  "routine": {
+    "formatting": "passed; Biome checked 181 files before temporary probes",
+    "documentation": "passed; 28 documents and local links",
+    "typecheck": "passed; production, tests, web examples, native examples",
+    "jest": {
+      "status": "passed",
+      "suites": 21,
+      "tests": 508,
+      "execution": "Node 24.19.0; unit and mocked web/native component tests"
+    },
+    "build": "passed; declaration and library build",
+    "scriptTests": "passed under Node: token reading, Babel smoke selection, TF06 MVT fixture, process cleanup, native engine selection, TF07 manual-observation judgment",
+    "processCleanup": "Initial sandbox run failed with EPERM. Scoped unsandboxed retry passed; no test child processes remained.",
+    "auditProbes": {
+      "status": "failed-as-expected",
+      "tests": 3,
+      "execution": "Two temporary Jest files using existing fixtures and behavioral assertions; removed after reproduction."
+    },
+    "diffWhitespace": "passed",
+    "packedPackage": "not rerun; Bun is unavailable in this execution environment",
+    "aggregateValidate": "not completed; Bun unavailable. Individual routine checks listed above were executed directly."
+  },
+  "runtime": {
+    "status": "unverified",
+    "executed": false,
+    "reason": "No real-renderer acceptance permission; TF07 remains an open runtime gate under docs/testing-policy.md."
+  },
+  "changes": "No production, example, documentation, or existing test source edits. This compact audit record is the only retained review addition.",
+  "retention": "Temporary reproduction files and raw audit logs removed; compact results retained here.",
+  "initialStatus": "three-confirmed-findings",
+  "resolution": {
+    "recordedDate": "2026-10-12",
+    "authorization": "Owner requested all three audit fixes and routine checks. No renderer acceptance requested.",
+    "artifact": {
+      "baseRevision": "bea888029a36aa56fab24ee2b977d2bfba467346",
+      "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+      "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "validatePackedPackageSha256": "575580c8fd82b9195b583ca69db2e4b45e90c592a6d7acd073a0abab7a224554"
+    },
+    "fixes": [
+      "Native Control renders children in their original ancestry through react-native-teleport 1.2.1. Only placement and measured height are stored in the map facade. Each native map owns a named portal host.",
+      "Drag failure handling checks both gesture generation and request sequence. Superseded failures are ignored; current failures still report and release the gesture lock.",
+      "Web style-load recovery uses a content key with stable object-key ordering. Equivalent inline objects retain one listener and do not repeat completion; real style changes and renderer events still report."
+    ],
+    "dependencies": {
+      "addedNativePeer": "react-native-teleport@1.2.1",
+      "mapPeers": "unchanged",
+      "nativeExamples": "Manifest and lockfile updates only; no installs/builds or CocoaPods for the examples. React DOM peer overridden to 19.2.3 to match React.",
+      "decision": "docs/decisions/0007-native-control-portals.md"
+    },
+    "routine": {
+      "validate": {
+        "command": "bun run validate",
+        "status": "passed",
+        "jestSuites": 21,
+        "jestTests": 517,
+        "packedSelections": 13,
+        "includes": [
+          "formatting",
+          "documentation and local links",
+          "production/test/web/native example types",
+          "Jest unit and mocked components",
+          "fixture/selection/process cleanup",
+          "build",
+          "packed package"
+        ]
+      },
+      "selectedPeers": {
+        "command": "bun run test:peers",
+        "status": "passed",
+        "consumers": 4,
+        "nativePortalPeerIncluded": true
+      },
+      "exampleResolution": {
+        "command": "bun run test:example-resolution",
+        "status": "passed",
+        "execution": "Temporary consumer dependency resolution and Vite bundle; no browser or Metro runtime"
+      },
+      "finalDocumentationAndFormatting": "bun run check and bun run check:docs passed after native example documentation changes",
+      "diffWhitespace": "passed",
+      "initialFailures": [
+        "Focused tests passed; first aggregate validation found test-only cleanup typing and native host-prop excess-property errors. Tests corrected; all four TypeScript checks passed.",
+        "Sandbox full validation failed at routine process cleanup with EPERM. Full scoped unsandboxed retry passed.",
+        "Initial native example lock resolution selected incompatible React DOM 19.3.0 from Teleport wildcard peer. Added 19.2.3 overrides and refreshed the transitive lock entry; no map peer upgrades."
+      ],
+      "existingWarnings": "Bun warns about its unsupported moduleSuffixes interpretation; the TypeScript checks support and pass those conditions. Existing mocked map tests emit React act warnings.",
+      "tooling": "Pinned Bun 1.4.1 fetched temporarily from npm and checked against registry SHA-512 integrity; Node 24.19.0 bundled runtime.",
+      "nativeExampleLockfiles": "Both passed bun install --frozen-lockfile --lockfile-only --ignore-scripts after the React DOM override; no peer mismatch warnings."
+    },
+    "regressions": [
+      "nested providers and provider updates",
+      "child state and effect lifetime",
+      "measured stacking and removal at all four corners",
+      "stale unprojection rejection ignored",
+      "current unprojection rejection reports and unlocks",
+      "equivalent reordered styles retain one listener and current callbacks on both web engines"
+    ],
+    "runtime": {
+      "status": "unverified",
+      "executed": false,
+      "required": "New linked native artifact with Teleport on both engines and OS targets; approved portal drawing, resizing, touch passthrough, nested contexts, stacking, multiple maps, style replacement and teardown checks."
+    },
+    "retention": "Compact record retained; temporary Bun executable, download archives, install cache, generated consumers, and audit logs removed after verification.",
+    "commit": "not requested; changes remain uncommitted"
+  }
+}

@@ -1,6 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { act, render, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { createRef, type ReactNode, type Ref } from "react";
+import { Text } from "react-native";
 
 import {
   emptyStyle,
@@ -20,6 +21,7 @@ import { Layer } from "../src/facade/layer.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Source } from "../src/facade/source.js";
+import { ScaleControl } from "../src/facade/ui.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
 const mockJumpTo = jest.fn(() => Promise.resolve());
@@ -253,7 +255,7 @@ import {
   VectorSource,
 } from "@maplibre/maplibre-react-native";
 
-import { adapter } from "../src/maplibre-native.js";
+import { adapter, Control, Map as NativeMap } from "../src/maplibre-native.js";
 
 const MapMock = MaplibreMap as unknown as jest.Mock;
 const LayerMock = MaplibreLayer as unknown as jest.Mock;
@@ -345,6 +347,89 @@ const vectorTree = (ref?: Ref<MapRef>) => (
 );
 
 describe("maplibre-native adapter", () => {
+  test("SDK ornaments stay outside measured native controls and restore after removal", async () => {
+    const explicit = {
+      logoPosition: { top: 3, left: 4 },
+      attributionPosition: { top: 5, right: 6 },
+    };
+    const scene = (controls: boolean, configured = false) => (
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          options={configured ? explicit : undefined}
+        >
+          {controls && (
+            <>
+              <Control
+                position="bottom-left"
+                hostProps={{ testID: "left-control" }}
+              >
+                <Text>Left</Text>
+              </Control>
+              <Control
+                position="bottom-right"
+                hostProps={{ testID: "right-control" }}
+              >
+                <Text>Right</Text>
+              </Control>
+            </>
+          )}
+        </NativeMap>
+      </MapSetup>
+    );
+    const view = await render(scene(true));
+    await fireEvent(view.getByTestId("left-control"), "layout", {
+      nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 26 } },
+    });
+    await fireEvent(view.getByTestId("right-control"), "layout", {
+      nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 40 } },
+    });
+    const props = lastMapProps<{
+      logoPosition: { bottom: number; left: number };
+      attributionPosition: { bottom: number; right: number };
+    }>();
+    expect(props.logoPosition.bottom).toBeGreaterThan(8 + 26);
+    expect(props.attributionPosition.bottom).toBeGreaterThan(8 + 40);
+    await view.rerender(scene(false));
+    const restored = lastMapProps<{
+      logoPosition: object;
+      attributionPosition: object;
+    }>();
+    expect(restored.logoPosition).toEqual({ bottom: 8, left: 8 });
+    expect(restored.attributionPosition).toEqual({ bottom: 8, right: 8 });
+    await view.rerender(scene(true, true));
+    const configured = lastMapProps<{
+      logoPosition: object;
+      attributionPosition: object;
+    }>();
+    expect(configured.logoPosition).toEqual(explicit.logoPosition);
+    expect(configured.attributionPosition).toEqual(
+      explicit.attributionPosition
+    );
+  });
+
+  test("scale initializes at load and changes units without camera movement", async () => {
+    mockUnproject
+      .mockResolvedValueOnce([-122.32, 47.61])
+      .mockResolvedValueOnce([-122.32, 47.61]);
+    const scene = (unit: "metric" | "imperial") => (
+      <MapSetup adapter={adapter}>
+        <OneMap mapStyle={emptyStyle} initialViewState={initialViewState}>
+          <ScaleControl unit={unit} />
+        </OneMap>
+      </MapSetup>
+    );
+    const view = await render(scene("metric"));
+    await act(async () =>
+      view.getByTestId("wrapper-map").props.onDidFinishLoadingMap()
+    );
+    await waitFor(() => expect(view.getByText("1 km")).toBeTruthy());
+    await view.rerender(scene("imperial"));
+    await waitFor(() => expect(view.getByText("2000 ft")).toBeTruthy());
+    expect(view.queryByText("1 km")).toBeNull();
+  });
+
   test("nested GeoJSONSource injects source onto the line layer", async () => {
     await render(example());
 

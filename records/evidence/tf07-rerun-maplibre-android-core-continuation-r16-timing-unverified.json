@@ -1,0 +1,32 @@
+{
+  "status": "unverified",
+  "reason": "The long-press helper completed its 10-second movement and emitted live-end before the separately invoked Home command. This run therefore tested a completed drag, not interruption cancellation.",
+  "runId": "37b16cc9-82c6-4123-894f-054645680b33",
+  "environment": "maplibre-android",
+  "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "device": "emulator-5556",
+  "appPid": "15415",
+  "initialRead": "/private/tmp/one-map-tf07-rerun/maplibre-continuation-read-initial.json",
+  "activeScreenBeforeHome": "/private/tmp/one-map-tf07-rerun/maplibre-interruption-active.png",
+  "postHomeRead": "/private/tmp/one-map-tf07-rerun/maplibre-continuation-read-interrupted.json",
+  "physicalInput": {
+    "method": "Tf07Touch OS MotionEvent drag",
+    "startPx": [541, 1322],
+    "endPx": [559, 1318],
+    "holdMs": 650,
+    "movementMs": 10000,
+    "homeMethod": "adb shell input keyevent KEYCODE_HOME",
+    "appPidAfterReactivation": "15415"
+  },
+  "observedAfter": {
+    "receiptSequence": 2,
+    "liveStart": 1,
+    "liveDrag": 21,
+    "liveEnd": 1,
+    "livePosition": [-122.33764578536451, 47.61035269705343],
+    "camera": [-122.34000000000002, 47.60999999999999, 11]
+  },
+  "interpretation": "Tool-call timing allowed the helper to finish before Home; no cancellation conclusion is drawn. The next authorized run uses one timed shell sequence with Home during the active pointer.",
+  "producerChanges": false
+}

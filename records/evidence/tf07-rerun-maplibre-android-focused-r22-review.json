@@ -1,0 +1,50 @@
+{
+  "environment": "MapLibre Android, Android 16 / API 36, emulator-5556, 1080x2400 at 420 dpi",
+  "runId": "d9f9e882-339e-4a2e-bb8a-db46a93ca8bb",
+  "runnerResult": "passed",
+  "coordinatorReview": "not accepted",
+  "installedApkSha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "focusedFixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+  "manualReport": "/private/tmp/one-map-tf07-rerun/manual-maplibre-android-focused-r16-r22.json",
+  "scenarioReview": {
+    "annotation-image-refresh": "accepted; image-load=1 and image-refresh=1, visible blue image captured",
+    "overlap-source-propagation": "accepted; allowed hit high-click=1/map-click=1; stopped hit high-click=2/map-click unchanged",
+    "vector-source-hit": "accepted; vector-click=1 and Map B map-click=1",
+    "location-rejected": "accepted; provider-call=1/provider-error=1; camera unchanged",
+    "location-delayed-teardown": "accepted; provider-call=2; locate removed before resolve; no late provider-location; camera unchanged",
+    "portal-context-state-multiple-maps": "accepted; updated-theme children on both maps reported their own zoom values 11 and 12",
+    "resize-orientation": "accepted; Resize short=true, actual landscape with both map hosts and controls visible, portrait restored with finite camera readback",
+    "host-accessibility": "accepted; separate Map A/Map B child labels, map descriptions, attribution controls and both native attribution dialogs observed",
+    "navigation-constraints": "failed/inconclusive; after the + transition and second + at max, bZoom=13; both subsequent minus receipts and later receipt24 still reported bZoom=13, so the claimed 13-to-12 transition and minimum clamp were not established"
+  },
+  "finalRunnerObservation": {
+    "focused": true,
+    "focusedComplete": true,
+    "counts": {
+      "a-load": 1,
+      "b-load": 1,
+      "image-load": 1,
+      "image-refresh": 1,
+      "high-click": 2,
+      "a-map-click": 1,
+      "vector-click": 1,
+      "b-map-click": 1,
+      "provider-call": 2,
+      "provider-error": 1,
+      "Map A-click": 1,
+      "Map A-map-zoom-11": 1,
+      "Map B-click": 1,
+      "Map B-map-zoom-12": 1
+    },
+    "mode": "delay",
+    "theme": "updated",
+    "locate": false,
+    "short": true,
+    "aZoom": 11,
+    "bZoom": 13,
+    "overlapFeatureIds": ["707", "708"],
+    "vectorFeatureIds": ["2", "1"]
+  },
+  "cleanup": "Core fixture restored and verified; runner and app stopped; assigned ports and reverse mappings clear; emulator density 420 dpi; iOS untouched."
+}

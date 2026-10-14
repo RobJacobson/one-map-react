@@ -12,7 +12,8 @@
     "@rnmapbox/maps": "10.3.7",
     "one-map-react": "file:../../packages/one-map-react",
     "react": "19.2.3",
-    "react-native": "0.87.1"
+    "react-native": "0.87.1",
+    "react-native-teleport": "1.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -26,5 +27,11 @@
   },
   "engines": {
     "node": ">= 22.11.0"
+  },
+  "overrides": {
+    "react-dom": "19.2.3"
+  },
+  "patchedDependencies": {
+    "@rnmapbox/maps@10.3.7": "../../packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch"
   }
 }

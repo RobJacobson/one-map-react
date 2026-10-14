@@ -1,0 +1,65 @@
+{
+  "artifact": {
+    "sourceSha256": "4d1f002e8fe79dd2140b264c72095e47db6d0fcad8f1059864df17559303619c",
+    "distSha256": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd",
+    "packedSha256": "2e56c8f5a455e335dd6911faa2a05d7e406d2250c11be1dd5bf444488787d93b",
+    "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a"
+  },
+  "environment": "mapbox-ios",
+  "runId": "46009bad-cce1-4ce0-9bc0-934a6df88d92",
+  "execution": "Physical XCTest touchscreen input; actual renderer readbacks after each scenario; no callback injection.",
+  "result": {
+    "status": "passed",
+    "scope": [
+      "ornament-layout",
+      "scale-units",
+      "style-remount-child-source",
+      "interaction-recovery"
+    ],
+    "observation": {
+      "generation": 1,
+      "load": 2,
+      "style": 3,
+      "popupOpen": 2,
+      "popupClose": 0,
+      "childClick": 3,
+      "sourceClick": 4,
+      "mapClick": 1,
+      "center": [-122.34000000000002, 47.60999999999999],
+      "zoom": 11,
+      "stopSourcePropagation": true,
+      "featureId": 707
+    }
+  },
+  "outcomes": {
+    "ornament-layout": {
+      "status": "passed",
+      "evidence": "Original-resolution screenshots show the SDK multi-tick scale below Locate and the footer Mapbox logo, facade scale, attribution button, and custom control separated. Physical About this map opened the Powered by Mapbox Maps sheet and Cancel closed it."
+    },
+    "scale-units": {
+      "status": "passed",
+      "evidence": "Physical units taps changed the facade scale from 2 km to 1 mi and restored 2 km; a physical renderer read while in mile mode reported finite center [-122.34, 47.61] and zoom 11."
+    },
+    "interaction-recovery": {
+      "status": "passed",
+      "evidence": "Actual child-button press incremented child-click with map-click unchanged. With source bubbling allowed, the exact visible feature tap incremented source-click and map-click; with bubbling stopped, another physical tap incremented source-click only. Physical zoom controls changed zoom 11 to 12 and back to 11."
+    },
+    "style-remount-child-source": {
+      "status": "passed",
+      "evidence": "Physical style change advanced style 1 to 2. Post-style child press incremented child-click and source tap incremented source-click only. Physical remount ended at generation 1, load 2, style 3 with finite camera and feature 707. Post-remount child and source taps incremented their respective counters; map-click and popup-close remained unchanged."
+    },
+    "accessibility": {
+      "status": "unverified",
+      "evidence": "Representative visible accessibility labels and physical control activation were checked. Full VoiceOver audit was outside this forwarding gate."
+    }
+  },
+  "visualEvidence": [
+    "/private/tmp/one-map-tf07-rerun/r8-toast-dismissed.png",
+    "/private/tmp/one-map-tf07-rerun/r8-attribution-open.png",
+    "/private/tmp/one-map-tf07-rerun/r8-attribution-closed.png",
+    "/private/tmp/one-map-tf07-rerun/r8-units-toggle1.png",
+    "/private/tmp/one-map-tf07-rerun/r8-units-restored.png",
+    "/private/tmp/one-map-tf07-rerun/r8-after-remount.png"
+  ],
+  "runnerResult": "passed; observed=true; manualComplete=true; remaining=[]"
+}

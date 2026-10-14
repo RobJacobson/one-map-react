@@ -1,0 +1,188 @@
+{
+  "stage": "TF07",
+  "status": "implemented-reviewed-runtime-incomplete",
+  "authorization": "Owner subsequently authorized TF07 runtime acceptance across all six environments using prescribed subagents on October 12, 2026.",
+  "decisions": {
+    "nativeUi": "Small host compositions over wrapper components and common map methods",
+    "liveDragging": "Passive native touch observation and bubble responder negotiation;500ms long press outside interactive or overflowing child content",
+    "defaultMarker": "Shared 24 by 32 logical-unit blue pin",
+    "nativeGeolocation": "Injected getCurrentPosition; locate and center only",
+    "trackingAndPermissions": "TF08",
+    "peers": "Unchanged frozen versions",
+    "commit": "Not requested"
+  },
+  "routine": {
+    "status": "passed",
+    "coordinator": {
+      "command": "bun run validate",
+      "checks": [
+        "Biome",
+        "documentation structure and links",
+        "production/test/web/native example TypeScript",
+        "Jest unit and mocked component tests",
+        "fixture/selection/process cleanup checks",
+        "library build",
+        "13 isolated packed-package selections"
+      ],
+      "jest": {
+        "suites": 21,
+        "tests": 508,
+        "result": "passed"
+      },
+      "packedSelections": {
+        "count": 13,
+        "result": "passed"
+      },
+      "followup": [
+        "bun run check",
+        "bun run check:docs",
+        "bun run test:package"
+      ],
+      "acceptanceLaunched": false
+    },
+    "implementationAgent": {
+      "selectedPeerConsumers": "passed",
+      "siblingExampleResolution": "passed",
+      "runtimeAcceptanceLaunched": false
+    },
+    "initialFailures": [
+      {
+        "check": "Routine process cleanup",
+        "result": "Sandbox EPERM",
+        "resolution": "Scoped Node/Bun retries passed; independent parent validate passed with routine process signaling permission."
+      },
+      {
+        "check": "Packed common exports",
+        "result": "Historical export whitelist did not include TF07",
+        "resolution": "Updated whitelist and common declaration consumer; 13 selections passed."
+      },
+      {
+        "check": "Marker anchor update regression during implementation",
+        "result": "Intermediate anchor freeze blocked mutable children",
+        "resolution": "Default anchor frozen separately from explicit creation input; web regression and final validate passed."
+      }
+    ],
+    "retention": "No orphaned routine-test processes remained at final inspection; temporary logs are removed after compact results are saved."
+  },
+  "runtime": {
+    "status": "accepted-r16-exercised-scope",
+    "executed": true,
+    "reason": "The October 13 authorization covered the six-environment R16 rerun. All six environments passed their recorded core and focused scopes; MapLibre Android offset checks passed at 320 and 420 dpi. Full VoiceOver and TalkBack audits remain outside this checkpoint.",
+    "environments": [
+      "mapbox-web",
+      "maplibre-web",
+      "mapbox-android",
+      "mapbox-ios",
+      "maplibre-android",
+      "maplibre-ios"
+    ],
+    "prepared": {
+      "web": "scripts/tf07-ui-smoke.mjs web; core interaction subset, remaining observations listed in output",
+      "native": "scripts/tf07-ui-smoke.mjs android|ios mapbox|maplibre; verified installed baseline plus manual native touch observations",
+      "procedure": "docs/tf07-ui.md"
+    },
+    "originalGate": {
+      "status": "authorized-and-completed",
+      "executed": true,
+      "authorizedAt": "2026-10-13",
+      "reason": "The owner explicitly authorized the six-environment R16 rerun."
+    },
+    "record": "tf07-runtime-rerun.json",
+    "fullTf07Acceptance": true,
+    "outsideScope": [
+      "full-VoiceOver-audit",
+      "full-TalkBack-audit"
+    ],
+    "concludedAt": "2026-10-14T01:27:39Z"
+  },
+  "review": {
+    "status": "completed",
+    "reviewedBy": "Parent coordinator after delegated implementation",
+    "unresolvedImplementationFindings": [],
+    "correctedFindings": [
+      "Own the web DOM host because react-map-gl does not forward generic HTMLAttributes.",
+      "Stabilize popup subscriptions to avoid repeated opens after camera updates.",
+      "Keep source activation independent from map interactiveLayerIds and select the topmost registered source.",
+      "Scope asynchronous hits to source attachments so keyed replacements do not receive stale queries; callback updates on the same attachment remain current.",
+      "Remove global time-based click suppression and contain native marker/source presses at wrapper event boundaries.",
+      "Copy and validate finite coordinates and offsets before native callbacks/dispatch.",
+      "Cancel stale/out-of-order native drag work and reconcile rejected annotation proposals.",
+      "Forward native popup/control host props, reject browser-only focus and unsupported expanded native attribution, and present compass pitch.",
+      "Merge selected RNMapbox gesture settings and retain named annotation-manager/control facilities."
+    ],
+    "remainingRuntimeGates": [
+      "Fix Mapbox web load/ref attachment ordering before camera operations from onLoad.",
+      "Fix or substantiate native nested-scroll behavior; valid child-area gestures panned the map in both iOS engines.",
+      "Resolve native scale initial visibility and unit-change behavior; MapLibre visible label did not change and Mapbox behavior remains unresolved.",
+      "Investigate MapLibre iOS zoom-step drift: measured12 to10.954611705474228, rather than claiming exact inversion.",
+      "Restore a stable Android renderer/input environment and finish both Android interaction procedures, including two density settings.",
+      "Verify native continuous long-press drags, multiple-pointer/interrupted-touch cancellation, delayed image refresh, focused overlapping/vector hits and adverse native location providers.",
+      "Verify portal provider updates across multiple maps, resize/orientation, and full assistive-technology behavior."
+    ],
+    "publicDocumentation": [
+      "README.md",
+      "packages/one-map-react/README.md",
+      "docs/markers-and-controls.md",
+      "docs/tf07-ui.md"
+    ],
+    "editorialPass": "no-ai-slop rules applied without changing contract or strengthening runtime claims"
+  },
+  "recordedDate": "2026-10-12",
+  "artifact": {
+    "baseRevision": "bea888029a36aa56fab24ee2b977d2bfba467346",
+    "changes": "Uncommitted TF07 implementation and review fixes",
+    "distSha256": "3f69ad7b4821a764b6546b32d7f00e784b86d401a36a3f0b15dbe58852b208b7",
+    "sourceSha256": "da3b44944cdfaf2df9665df7609cc8b4e69735f8ecd2da90638b9506bacb4b15",
+    "finalPackedPackageSha256": "f66c8bca94bc1f361fda5e6e37efe1248e8041ed682c22aa006b04425f1d447d",
+    "parentValidatePackedPackageSha256": "7140425cdec5e5b6450b1466b3deca217ab4d0fe0fff497932227756e390a47b",
+    "packageOnlyFollowup": "Public README updated after parent validate; formatting/docs and packed-package checks reran. Library source/tests unchanged."
+  },
+  "auditCorrection": {
+    "record": "tf07-current-code-audit.json",
+    "status": "three-findings-fixed-routine-passed-runtime-unverified",
+    "artifact": {
+      "baseRevision": "bea888029a36aa56fab24ee2b977d2bfba467346",
+      "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+      "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "validatePackedPackageSha256": "575580c8fd82b9195b583ca69db2e4b45e90c592a6d7acd073a0abab7a224554"
+    },
+    "newNativePeer": "react-native-teleport@1.2.1",
+    "jest": {
+      "suites": 21,
+      "tests": 517,
+      "result": "passed"
+    },
+    "packedSelections": 13,
+    "selectedPeerConsumers": 4,
+    "sharedExampleResolution": "passed",
+    "runtimeAcceptanceLaunched": true
+  },
+  "originalAuthorization": "Owner requested implementation through a subagent followed by coordinator review; no real-renderer acceptance authorization.",
+  "currentRuntimeRecord": "tf07-runtime-rerun.json",
+  "runtimeStatus": "repair-rerun-in-progress",
+  "routineRerun": {
+    "artifact": "R16",
+    "jest": "546 passed;21suites",
+    "validation": "Fullvalidate plus docsfollowup; packed13 includes SDKpatch",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "distSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "exampleDistSha256": {
+      "web-mapbox": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "web-maplibre": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "native-mapbox": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+      "native-maplibre": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d"
+    }
+  },
+  "previousRoutineReruns": [
+    {
+      "artifact": "R15",
+      "jest": "545 passed;21suites",
+      "validation": "Fullvalidate plus finalnativepatch package13; docsfollowup passed",
+      "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+      "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "packedSha256": "85b7b84933fcb6a1b2ac44bf7ec482de04c797fae3fadf289ee95bab9b97d5da",
+      "nativePatchRecord": "tf07-android-mapbox-per-view-event-patch.json"
+    }
+  ]
+}

@@ -16,7 +16,10 @@ export const createWebSource = (
   // copies the readonly `tiles` and `coordinates` arrays the wrapper declares
   // as mutable and drops `children`, which renders separately.
   const toWebSourceProps = (props: SourceProps): Record<string, unknown> => {
-    const { children: _children, ...spec } = props;
+    const { children: _children, ...options } = props;
+    const spec = { ...options } as Record<string, unknown>;
+    delete spec.onClick;
+    delete spec.hitbox;
 
     if (props.type === "image") {
       return {

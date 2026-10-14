@@ -1,0 +1,41 @@
+{
+  "artifact": {
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "distSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "installedExecutableSha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "installedDebugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3"
+  },
+  "environment": "Mapbox iOS, iPhone 18 Pro simulator, iOS 27, UDID 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+  "fixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+  "runId": "d5b81a79-4883-4d1d-b701-6b73af232107",
+  "result": "stopped; 350 ms Map B child press also produced no callback",
+  "execution": "Actual XCTest touch requests and physical renderer Read actions; no callback injection",
+  "scenarios": {
+    "portal-context-state-multiple-maps": "failed; no Map B-click after one 350 ms press and five-second read window",
+    "resize-orientation": "unverified",
+    "host-accessibility": "unverified",
+    "navigation-constraints": "unverified",
+    "source-passthrough": "unverified",
+    "control-teardown": "unverified"
+  },
+  "observations": {
+    "initialRead": "Both map loads were 1; cameras were finite at zoom 11 and 12; overlap features 707/708 and two vector features were present.",
+    "mapBChild": "Fresh hierarchy showed the enabled Map B child at X=303, Y=814.9999847, Width=91, Height=17 points. A single actual 350 ms touch at (349,823.5) was followed by four physical Read actions spanning five seconds without retapping. No read showed Map B-click; the final hierarchy retained the same visible enabled frame and initial 0 label. No Map A duration comparison was attempted because the authorized Map B diagnostic failed.",
+    "cleanup": "Stopped runner, terminated only the assigned app, and stopped only the owned Metro/status services. iPhone simulator remains booted; existing XCTest driver remains available."
+  },
+  "manualReport": "/private/tmp/one-map-tf07-rerun/manual-mapbox-ios-r16-duration-diagnostic.json",
+  "evidence": {
+    "initialRead": "/private/tmp/one-map-tf07-rerun/r16-duration-initial-read.json",
+    "preTapHierarchy": "/private/tmp/one-map-tf07-rerun/r16-duration-pre-b-hierarchy.json",
+    "touchResponse": "/private/tmp/one-map-tf07-rerun/r16-duration-b-touch.json",
+    "readsWithoutRetap": [
+      "/private/tmp/one-map-tf07-rerun/r16-duration-b-read1.json",
+      "/private/tmp/one-map-tf07-rerun/r16-duration-b-read2.json",
+      "/private/tmp/one-map-tf07-rerun/r16-duration-b-read3.json",
+      "/private/tmp/one-map-tf07-rerun/r16-duration-b-read4.json"
+    ],
+    "postTapHierarchy": "/private/tmp/one-map-tf07-rerun/r16-duration-after-b-hierarchy.json",
+    "postTapScreenshot": "/private/tmp/one-map-tf07-rerun/r16-duration-after-b.png"
+  }
+}

@@ -27,6 +27,7 @@ const backends = [
   "maplibre-gl",
   "@rnmapbox/maps",
   "@maplibre/maplibre-react-native",
+  "react-native-teleport",
 ];
 
 const explicit = [
@@ -147,10 +148,13 @@ const main = async () => {
     assert(files.includes("package/README.md"));
     assert(files.includes("package/dist/index.d.ts"));
     assert(files.includes("package/dist/index.js"));
+    assert(
+      files.includes("package/patches/rnmapbox-10.3.7-per-view-events.patch")
+    );
     for (const file of files) {
       assert.match(
         file,
-        /^package\/(?:dist\/.+|package.json|README.md|LICENSE)$/
+        /^package\/(?:dist\/.+|patches\/rnmapbox-10\.3\.7-per-view-events\.patch|package.json|README.md|LICENSE)$/
       );
     }
 
@@ -203,7 +207,22 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     );
     assert.equal(
       run("node", [join(consumer, "common.mjs")], consumer),
-      JSON.stringify(["Images", "Layer", "Map", "MapSetup", "Source"])
+      JSON.stringify([
+        "AttributionControl",
+        "Control",
+        "FullscreenControl",
+        "GeolocateControl",
+        "Images",
+        "Layer",
+        "Map",
+        "MapSetup",
+        "Marker",
+        "NavigationControl",
+        "Popup",
+        "ScaleControl",
+        "Source",
+        "useMap",
+      ])
     );
   }
 
@@ -236,9 +255,10 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     join(consumer, "selection.tsx"),
     `${imports}
 import type { Adapter, Backend } from "one-map-react";
-import { Map as OneMap, MapSetup, Source, Layer } from "one-map-react";
+import { Map as OneMap, MapSetup, Source, Layer, Marker, Popup, Control, NavigationControl, AttributionControl, ScaleControl, GeolocateControl, FullscreenControl, useMap } from "one-map-react";
 ${declarations}
 const applicationChoice = (adapter: Adapter): Backend => adapter.backend;
+void Marker; void Popup; void Control; void NavigationControl; void AttributionControl; void ScaleControl; void GeolocateControl; void FullscreenControl; void useMap;
 void MapSetup;
 void Source;
 void Layer;

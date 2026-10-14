@@ -1,0 +1,110 @@
+{
+  "environment": "mapbox-android",
+  "attempt": 1,
+  "status": "failed",
+  "runId": "4fddb8db-6d15-4a6d-ae3e-5385a797a3b6",
+  "artifact": {
+    "libraryDistSha256": "fca91365ac2e0a2a65885e45c66ce3b84791df84e29b10b270341d0e3f44d5d0",
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "package": "com.onemapmapbox"
+  },
+  "device": {
+    "serial": "emulator-5556",
+    "avd": "TF07_Rerun",
+    "androidRelease": "17",
+    "image": "Google Play Store ARM64 Android 37.1",
+    "display": "1080x2400 @ 420dpi",
+    "gpu": "host"
+  },
+  "metro": {
+    "port": 8171,
+    "reverse8081To": 8171,
+    "statusPort": 8797,
+    "reverse8797To": 8797
+  },
+  "startupTransport": {
+    "firstLaunch": "Unable to load script; debug host default bypassed adb reverse",
+    "evidence": "Metro /status and Android bundle endpoint returned HTTP 200; reverse mappings were correct. App-only RN developer preference changed through actual settings UI to 127.0.0.1:8081; same APK force-stop/relaunch loaded fixture.",
+    "firstAttemptPreserved": true
+  },
+  "firstInput": {
+    "scenario": "live-child-button",
+    "method": "adb shell input tap",
+    "coordinatesPx": [
+      530,
+      1280
+    ],
+    "boundsPx": [
+      385,
+      1256,
+      693,
+      1307
+    ],
+    "result": "no child-click callback; renderer observation unchanged"
+  },
+  "diagnosticInput": {
+    "scenario": "live-child-button",
+    "method": "Tf07Touch actual MotionEvent DOWN/120ms stationary/UP",
+    "dexSha256": "63c99f06d79e5f7e2f91e503bdc3bbcc370d477b085b6313d2e21195f5f36a4d",
+    "coordinatesPx": [
+      539,
+      1323
+    ],
+    "freshBoundsPx": [
+      385,
+      1298,
+      693,
+      1349
+    ],
+    "result": "driver reported sequence delivered; child-click, marker-click, and map-click absent"
+  },
+  "observation": {
+    "events": {
+      "popup-open": 1,
+      "move": 3,
+      "style": 1,
+      "load": 1
+    },
+    "positions": {},
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "features": [
+      {
+        "type": "Feature",
+        "id": "707",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.3399949,
+            47.5799997
+          ]
+        },
+        "properties": {
+          "fixture": "tf07"
+        }
+      }
+    ],
+    "generation": 0,
+    "stopSourcePropagation": false
+  },
+  "manualScenarios": {
+    "live-child-button": "failed",
+    "nested-scroll": "unverified",
+    "live-drag": "unverified",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "screenshots": [
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-postrelaunch.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-window-diagnostic.xml"
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "installedBinarySha256": "fb869a1de4a7bef36182646338530302b032d4e3ba332be9c3bedb6468e749f5",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "environment": "maplibre-ios",
+  "runId": "739c9b6b-1e7b-4278-8ba2-ab8215f57033",
+  "scenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-drag": "passed",
+    "annotation-drag": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow-dismissal": "passed",
+    "source-propagation": "passed",
+    "navigation-location": "passed",
+    "style-remount": "passed",
+    "host-accessibility": "passed",
+    "scale-units": "passed"
+  },
+  "fixture": "tf07 core",
+  "fixtureSha256": "290c01e5379c05a1d4058989a3ca434ad432e3094e47b4eab8d48c37824a1874",
+  "librarySourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+  "finalReceiptSequence": 27,
+  "finalObservation": {
+    "events": {
+      "popup-open": 2,
+      "move": 120,
+      "style": 3,
+      "load": 3,
+      "child-click": 4,
+      "live-start": 2,
+      "live-drag": 93,
+      "live-end": 2,
+      "annotation-start": 1,
+      "annotation-end": 1,
+      "marker-click": 1,
+      "popup-child": 1,
+      "popup-close": 1,
+      "source-click": 3,
+      "map-click": 2,
+      "location": 1
+    },
+    "positions": {
+      "live": [
+        -122.32386383073299,
+        47.61138873615198
+      ],
+      "annotation": [
+        -122.3763378906637,
+        47.60845691658284
+      ]
+    },
+    "center": [
+      -122.34000000000957,
+      47.61000000000788
+    ],
+    "zoom": 11,
+    "features": [
+      {
+        "properties": {
+          "fixture": "tf07"
+        },
+        "id": 707,
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.33999490737915,
+            47.57999970656695
+          ]
+        }
+      }
+    ],
+    "generation": 1,
+    "stopSourcePropagation": false,
+    "sourcePoint": [
+      201.00000002784583,
+      457.0753795294968
+    ]
+  },
+  "evidence": {
+    "live-child-button": [
+      "maplibre-ios-r24-core-live-child-read.json"
+    ],
+    "nested-scroll": [
+      "maplibre-ios-r24-core-nested-scroll-read.json"
+    ],
+    "live-drag": [
+      "maplibre-ios-r24-core-live-drag-read.json",
+      "maplibre-ios-r24-core-live-child-after-drag.json"
+    ],
+    "annotation-drag": [
+      "maplibre-ios-r24-core-annotation-drag.json"
+    ],
+    "offset-touch-bounds": [
+      "maplibre-ios-r24-core-offset-enable-fresh.json",
+      "maplibre-ios-r24-core-offset-child-button.json",
+      "maplibre-ios-r24-core-offset-live-drag.json",
+      "maplibre-ios-r24-core-offset-reset.json"
+    ],
+    "popup-follow-dismissal": [
+      "maplibre-ios-r24-core-popup-pan.json",
+      "maplibre-ios-r24-core-popup-child-after-pan.json",
+      "maplibre-ios-r24-core-popup-close.json"
+    ],
+    "source-propagation": [
+      "maplibre-ios-r24-core-source-propagation-open.json",
+      "maplibre-ios-r24-core-source-stop.json",
+      "maplibre-ios-r24-core-source-stopped-tap.json",
+      "maplibre-ios-r24-core-source-allow.json"
+    ],
+    "navigation-location": [
+      "maplibre-ios-r24-core-navigation-plus.json",
+      "maplibre-ios-r24-core-navigation-minus.json",
+      "maplibre-ios-r24-core-location.json"
+    ],
+    "style-remount": [
+      "maplibre-ios-r24-core-style.json",
+      "maplibre-ios-r24-core-remount.json",
+      "maplibre-ios-r24-core-post-remount-child.json",
+      "maplibre-ios-r24-core-post-remount-source.json"
+    ],
+    "host-accessibility": [
+      "maplibre-ios-r24-core-accessibility-summary.json"
+    ],
+    "scale-units": [
+      "maplibre-ios-r24-core-scale-units.json",
+      "maplibre-ios-r24-core-scale-units-after-action.png"
+    ]
+  }
+}

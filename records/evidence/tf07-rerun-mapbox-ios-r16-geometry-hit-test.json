@@ -1,0 +1,158 @@
+{
+  "status": "diagnostic-stopped",
+  "identity": {
+    "runId": "71588605-3269-4b83-9a70-d2069688a85b",
+    "environment": "mapbox-ios",
+    "installedBinarySha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "debugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "distSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "diagnosticFixtureSha256": "b234928a3772437f514a23fb311f931353ea23406e6de3a3338d13fe4dd53805"
+  },
+  "device": {
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "orientation": "portrait",
+    "state": "booted"
+  },
+  "initialActualRead": {
+    "loads": {
+      "a-load": 1,
+      "b-load": 1
+    },
+    "aCamera": {
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11
+    },
+    "bCamera": {
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 12
+    },
+    "overlapFeatures": [
+      708,
+      707
+    ],
+    "vectorFeatures": [
+      2,
+      1
+    ]
+  },
+  "measuredGeometry": {
+    "mapAHostCommits": [
+      {
+        "phase": "layout",
+        "x": 0,
+        "y": 0,
+        "width": 402,
+        "height": 446.66668701171875
+      },
+      {
+        "phase": "layout",
+        "x": 0,
+        "y": 0,
+        "width": 402,
+        "height": 382.66668701171875
+      }
+    ],
+    "mapBHostCommits": [
+      {
+        "phase": "layout",
+        "x": 0,
+        "y": 446.6666564941406,
+        "width": 402,
+        "height": 223.33331298828125
+      },
+      {
+        "phase": "layout",
+        "x": 0,
+        "y": 382.6666564941406,
+        "width": 402,
+        "height": 191.33331298828125
+      }
+    ],
+    "mapAChildMeasurements": [
+      {
+        "phase": "layout-measure",
+        "x": 0,
+        "y": 0,
+        "width": 91.33334350585938,
+        "height": 17,
+        "pageX": 302.6666564941406,
+        "pageY": 687.6666564941406
+      },
+      {
+        "phase": "read-measure",
+        "x": 0,
+        "y": 0,
+        "width": 91.33334350585938,
+        "height": 17,
+        "pageX": 302.6666564941406,
+        "pageY": 623.6666564941406
+      }
+    ],
+    "mapBChildMeasurements": [
+      {
+        "phase": "layout-measure",
+        "x": 0,
+        "y": 0,
+        "width": 91,
+        "height": 17,
+        "pageX": 303,
+        "pageY": 846.9999847412109
+      },
+      {
+        "phase": "read-measure",
+        "x": 0,
+        "y": 0,
+        "width": 91,
+        "height": 17,
+        "pageX": 303,
+        "pageY": 814.9999847412109
+      }
+    ],
+    "comparison": "Settled read-measure pageY values match visible AX frames (A 623.67; B 815). The earlier B 32pt discrepancy is not reproduced after fresh physical Read."
+  },
+  "debugger": {
+    "pid": 90886,
+    "result": "Attached only to assigned simulator app. Supplied command file failed to compile its ObjC++ expression around CGPoint/format arguments; no UIKit hit target was returned. Command sequence detached; app resumed. No system debug/security settings changed.",
+    "log": "tf07-r16-geometry/lldb.txt"
+  },
+  "physicalInputs": [
+    {
+      "target": "Map B child",
+      "point": [
+        349,
+        823.5
+      ],
+      "durationSeconds": 0.12,
+      "result": "No Map B press/touch trace; counts unchanged.",
+      "actualRead": "tf07-r16-geometry/after-map-b.json"
+    },
+    {
+      "target": "Map A child",
+      "point": [
+        349,
+        632.17
+      ],
+      "durationSeconds": 0.12,
+      "result": "touch-start/press-in/press-out/press/touch-end; Map A-click and mapZoom11 each incremented. Event pageY=632.333, locationX=46.333, locationY=8.667.",
+      "actualRead": "tf07-r16-geometry/after-map-a.json"
+    }
+  ],
+  "screenshotEvidence": [
+    "tf07-r16-geometry/initial.png",
+    "tf07-r16-geometry/final.png"
+  ],
+  "accessibilityEvidence": [
+    "tf07-r16-geometry/initial-ax.json",
+    "tf07-r16-geometry/fresh-ax.json"
+  ],
+  "runnerManual": "Diagnostic only; acceptance fields remain unverified.",
+  "cleanup": "Owned runner/status and Metro8171 stopped; assigned app terminated; XCTest driver left healthy; simulator left booted portrait."
+}

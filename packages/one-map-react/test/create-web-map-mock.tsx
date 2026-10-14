@@ -123,6 +123,7 @@ interface WebMapMockProps extends HandlerProps {
   readonly reuseMaps?: boolean;
   readonly gl?: { readonly drawingBufferWidth: number };
   readonly onError?: (event: ErrorNotice) => void;
+  readonly onLoad?: () => void;
 }
 
 /**
@@ -244,11 +245,13 @@ export const createWebMapMock = () => {
   let saved: PooledMap | null = null;
   let serial = 0;
   let currentStyleTarget: StyleLoadTarget | null = null;
+  let loadBeforeAttachment = false;
 
   const resetWebMapMock = (): void => {
     saved = null;
     serial = 0;
     currentStyleTarget = null;
+    loadBeforeAttachment = false;
     flyTo.mockClear();
     jumpTo.mockClear();
     easeTo.mockClear();
@@ -293,8 +296,10 @@ export const createWebMapMock = () => {
       reuseMaps,
       gl,
       onError,
+      onLoad,
       ...handlerProps
     }: WebMapMockProps) => {
+      const [attached, setAttached] = useState(!loadBeforeAttachment);
       const [record] = useState(() => {
         if (reuseMaps && saved) {
           const reused = saved;
@@ -317,6 +322,13 @@ export const createWebMapMock = () => {
       });
 
       currentStyleTarget = record.styleTarget;
+
+      useEffect(() => {
+        if (!attached) {
+          onLoad?.();
+          setAttached(true);
+        }
+      }, [attached, onLoad]);
 
       useLayoutEffect(() => {
         record.styleTarget.applyHandlerProps(handlerProps);
@@ -342,7 +354,7 @@ export const createWebMapMock = () => {
       );
 
       useImperativeHandle(
-        ref,
+        attached ? ref : undefined,
         () => ({
           flyTo,
           jumpTo,
@@ -449,6 +461,9 @@ export const createWebMapMock = () => {
     disableRotation,
     enableRotation,
     resetWebMapMock,
+    loadBeforeAttachment: () => {
+      loadBeforeAttachment = true;
+    },
     getStyleTarget: () => currentStyleTarget,
     queryRenderedFeatures,
     querySourceFeatures,

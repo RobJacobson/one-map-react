@@ -1,0 +1,34 @@
+{
+  "status": "incomplete-infrastructure",
+  "scope": "MapLibre Android core continuation; interrupted after active Home gesture, before renderer readback",
+  "identity": {
+    "environment": "maplibre-android",
+    "runId": "7082e576-39ba-40f8-b171-5279a33c6657",
+    "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+    "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "device": "emulator-5556",
+    "densityDpi": 420,
+    "fixture": "canonical core"
+  },
+  "firstFailure": {
+    "category": "runner helper timeout",
+    "operation": "Interrupt active Android touch and relaunch test app",
+    "diagnostic": "The helper's outer 15-second setTimeout called process.exit(124) after the swipe and Home subprocesses completed. It did not clear that timer, so the shell's `&&` chain stopped before app relaunch and renderer readback.",
+    "physicalActions": "The 10000 ms input swipe started at [541,1322] toward [559,1318]; KEYCODE_HOME was sent after 1500 ms and returned exit 0; swipe returned exit 0.",
+    "readback": "No physical renderer receipt was collected for r18; no scenario outcome is claimed.",
+    "manualReport": "/private/tmp/one-map-tf07-rerun/manual-maplibre-android-r16-continuation-r18.json",
+    "manualScenarios": "all unverified"
+  },
+  "cleanup": {
+    "runnerStopped": true,
+    "ownedMetroProcessesStopped": true,
+    "assignedReversePortsRemoved": [8081, 8797],
+    "status8171": "clear",
+    "status8797": "clear",
+    "status8798": "clear",
+    "emulator": "emulator-5556 preserved booted at 420 dpi; app is backgrounded after Home",
+    "iosSimulator": "untouched"
+  }
+}

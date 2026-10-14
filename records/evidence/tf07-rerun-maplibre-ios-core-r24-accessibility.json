@@ -1,0 +1,275 @@
+{
+  "runId": "739c9b6b-1e7b-4278-8ba2-ab8215f57033",
+  "environment": "maplibre-ios",
+  "fixtureSha256": "290c01e5379c05a1d4058989a3ca434ad432e3094e47b4eab8d48c37824a1874",
+  "installedBinarySha256": "fb869a1de4a7bef36182646338530302b032d4e3ba332be9c3bedb6468e749f5",
+  "librarySourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "endpoint": "XCTest viewHierarchy",
+  "nodes": [
+    {
+      "label": "OneMapMaplibre",
+      "identifier": "",
+      "elementType": 2,
+      "enabled": true,
+      "frame": {
+        "Height": 874,
+        "Y": 0,
+        "Width": 402,
+        "X": 0
+      }
+    },
+    {
+      "label": "remount",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Y": 62,
+        "X": 0,
+        "Height": 37.666664123535156,
+        "Width": 83.33333587646484
+      }
+    },
+    {
+      "label": "style",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Y": 62,
+        "X": 83.33333587646484,
+        "Height": 37.666664123535156,
+        "Width": 54.333335876464844
+      }
+    },
+    {
+      "label": "offset",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Y": 62,
+        "X": 137.6666717529297,
+        "Height": 37.666664123535156,
+        "Width": 62.666656494140625
+      }
+    },
+    {
+      "label": "popup",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Y": 62,
+        "X": 200.3333282470703,
+        "Height": 37.666664123535156,
+        "Width": 67.66667175292969
+      }
+    },
+    {
+      "label": "units",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Y": 62,
+        "X": 268,
+        "Height": 37.666664123535156,
+        "Width": 55
+      }
+    },
+    {
+      "label": "Read renderer",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Y": 62,
+        "X": 323,
+        "Height": 37.666664123535156,
+        "Width": 130
+      }
+    },
+    {
+      "label": "Stop source bubbling",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Y": 62,
+        "X": 453,
+        "Height": 37.666664123535156,
+        "Width": 187.66668701171875
+      }
+    },
+    {
+      "label": "TF07 map-click",
+      "identifier": "tf07-status",
+      "elementType": 48,
+      "enabled": true,
+      "frame": {
+        "Y": 99.66666412353516,
+        "X": 0,
+        "Height": 34.00000762939453,
+        "Width": 402
+      }
+    },
+    {
+      "label": "{\"events\":{\"popup-open\":2,\"move\":120,\"style\":3,\"load\":3,\"child-click\":4,\"live-start\":2,\"live-drag\":93,\"live-end\":2,\"annotation-start\":1,\"annotation-end\":1,\"marker-click\":1,\"popup-child\":1,\"popup-close\":1,\"source-click\":3,\"map-click\":2,\"location\":1},\"positions\":{\"live\":[-122.32386383073299,47.61138873615198],\"annotation\":[-122.3763378906637,47.60845691658284]},\"center\":[-122.34000000000957,47.61000000000788],\"zoom\":11,\"features\":[{\"properties\":{\"fixture\":\"tf07\"},\"id\":707,\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-122.33999490737915,47.57999970656695]}}],\"generation\":1,\"stopSourcePropagation\":false,\"sourcePoint\":[201.00000002784583,457.0753795294968]}",
+      "identifier": "tf07-readback",
+      "elementType": 48,
+      "enabled": true,
+      "frame": {
+        "Y": 133.6666717529297,
+        "X": 0,
+        "Height": 51,
+        "Width": 402
+      }
+    },
+    {
+      "label": "Map",
+      "identifier": "",
+      "elementType": 1,
+      "enabled": true,
+      "frame": {
+        "Width": 402,
+        "Height": 559.3333129882812,
+        "X": 0,
+        "Y": 246.6666717529297
+      }
+    },
+    {
+      "label": "Compass",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Width": 40,
+        "X": 354,
+        "Height": 40,
+        "Y": 319.6666717529297
+      }
+    },
+    {
+      "label": "About this map",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Width": 25.666666666666686,
+        "Height": 25.66666666666663,
+        "X": 368.3333333333333,
+        "Y": 781.3333384195964
+      }
+    },
+    {
+      "label": "Zoom in",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Width": 40,
+        "Height": 40,
+        "X": 354,
+        "Y": 192.6666717529297
+      }
+    },
+    {
+      "label": "Zoom out",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Width": 40,
+        "Height": 39.99998474121094,
+        "X": 354,
+        "Y": 232.6666717529297
+      }
+    },
+    {
+      "label": "popup",
+      "identifier": "",
+      "elementType": 48,
+      "enabled": true,
+      "frame": {
+        "Width": 79.33333587646484,
+        "Height": 17,
+        "X": 278,
+        "Y": 371.6666717529297
+      }
+    },
+    {
+      "label": "popup",
+      "identifier": "",
+      "elementType": 48,
+      "enabled": true,
+      "frame": {
+        "Width": 79.33333587646484,
+        "Height": 17,
+        "X": 278,
+        "Y": 371.6666717529297
+      }
+    },
+    {
+      "label": "live child button",
+      "identifier": "",
+      "elementType": 9,
+      "enabled": true,
+      "frame": {
+        "Width": 121.33332824707031,
+        "Height": 17,
+        "X": 164.3333282470703,
+        "Y": 484.3333282470703
+      }
+    },
+    {
+      "label": "2 mi",
+      "identifier": "",
+      "elementType": 48,
+      "enabled": true,
+      "frame": {
+        "Height": 12,
+        "X": 9,
+        "Y": 818.9999847412109,
+        "Width": 82.33333587646484
+      }
+    },
+    {
+      "label": "2 mi",
+      "identifier": "",
+      "elementType": 48,
+      "enabled": true,
+      "frame": {
+        "X": 9,
+        "Y": 818.9999847412109,
+        "Width": 82.33333587646484,
+        "Height": 12
+      }
+    },
+    {
+      "label": "Custom control",
+      "identifier": "",
+      "elementType": 48,
+      "enabled": true,
+      "frame": {
+        "X": 294.6666564941406,
+        "Width": 99.33334350585938,
+        "Y": 814.9999847412109,
+        "Height": 17
+      }
+    },
+    {
+      "label": "Custom control",
+      "identifier": "",
+      "elementType": 48,
+      "enabled": true,
+      "frame": {
+        "X": 294.6666564941406,
+        "Height": 17,
+        "Y": 814.9999847412109,
+        "Width": 99.33334350585938
+      }
+    }
+  ]
+}

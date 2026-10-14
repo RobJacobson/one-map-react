@@ -9,12 +9,14 @@ declare const process: {
  * Unset and any other value keep the TF03 lifecycle sequence.
  */
 export const smokeTarget =
-  process.env.ONE_MAP_SMOKE === "tf06-lifetimes"
-    ? "tf06-lifetimes"
-    : process.env.ONE_MAP_SMOKE === "tf06"
-      ? "tf06"
-      : process.env.ONE_MAP_SMOKE === "tf05"
-        ? "tf05"
-        : process.env.ONE_MAP_SMOKE === "tf04"
-          ? "tf04"
-          : "tf03";
+  process.env.ONE_MAP_SMOKE === "tf07"
+    ? "tf07"
+    : process.env.ONE_MAP_SMOKE === "tf06-lifetimes"
+      ? "tf06-lifetimes"
+      : process.env.ONE_MAP_SMOKE === "tf06"
+        ? "tf06"
+        : process.env.ONE_MAP_SMOKE === "tf05"
+          ? "tf05"
+          : process.env.ONE_MAP_SMOKE === "tf04"
+            ? "tf04"
+            : "tf03";

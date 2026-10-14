@@ -13,6 +13,7 @@ const backends = [
   "maplibre-gl",
   "@rnmapbox/maps",
   "@maplibre/maplibre-react-native",
+  "react-native-teleport",
 ];
 
 const peers = {
@@ -32,15 +33,19 @@ const peers = {
   ],
   "mapbox-native": [
     "react@19.2.3",
+    "react-dom@19.2.3",
     "react-native@0.87.1",
     "@types/react@19.2.18",
     "@rnmapbox/maps@10.3.7",
+    "react-native-teleport@1.2.1",
   ],
   "maplibre-native": [
     "react@19.2.3",
+    "react-dom@19.2.3",
     "react-native@0.87.1",
     "@types/react@19.2.18",
     "@maplibre/maplibre-react-native@11.5.0",
+    "react-native-teleport@1.2.1",
     "@types/geojson@7946.0.16",
   ],
 };

@@ -107,6 +107,8 @@ interface WebMapProps {
   readonly style?: CSSProperties;
   readonly reuseMaps?: boolean;
   readonly gl?: ExternalDrawingContext;
+  /** Layers included in wrapper pointer feature hits. */
+  readonly interactiveLayerIds?: string[];
   readonly interactive?: boolean;
   readonly dragPan?: boolean;
   readonly scrollZoom?: boolean;
@@ -199,6 +201,25 @@ interface WebWrapper<
   readonly Map: ComponentType<WebMapProps>;
   readonly Source: ComponentType<WebForwardedProps>;
   readonly Layer: ComponentType<WebForwardedProps>;
+  /** Live marker delegated to the selected wrapper. */
+  readonly Marker: ComponentType<WebForwardedProps>;
+  /** Standalone popup delegated to the selected wrapper. */
+  readonly Popup: ComponentType<WebForwardedProps>;
+  /** Selected wrapper navigation buttons and compass. */
+  readonly NavigationControl: ComponentType<WebForwardedProps>;
+  /** Selected wrapper attribution control. */
+  readonly AttributionControl: ComponentType<WebForwardedProps>;
+  /** Selected wrapper scale control. */
+  readonly ScaleControl: ComponentType<WebForwardedProps>;
+  /** Selected wrapper browser location control. */
+  readonly GeolocateControl: ComponentType<WebForwardedProps>;
+  /** Selected wrapper browser fullscreen control. */
+  readonly FullscreenControl: ComponentType<WebForwardedProps>;
+  /** Registers facade-owned hosts through the wrapper lifecycle. */
+  readonly useControl: (
+    create: () => WebCustomControl,
+    options: { readonly position?: string }
+  ) => WebCustomControl;
   readonly useMap: () => WebMapSelection;
   readonly loadWebImage: (map: WebImageMap, url: string) => Promise<unknown>;
   /**
@@ -215,10 +236,21 @@ interface WebWrapper<
   ) => Promise<unknown>;
 }
 
+/** DOM control owned by the facade and registered through react-map-gl. */
+interface WebCustomControl {
+  /** Portal container returned when the map adds the control. */
+  readonly element: Element & { className: string; remove(): void };
+  /** Returns the owned host; the wrapper appends it to the map. */
+  readonly onAdd: () => Element;
+  /** Removes the owned host when the wrapper releases this control. */
+  readonly onRemove: () => void;
+}
+
 export type {
   StyleLoadTarget,
   WebClusterMethod,
   WebClusterSource,
+  WebCustomControl,
   WebErrorNotice,
   WebImageMap,
   WebMapHandle,

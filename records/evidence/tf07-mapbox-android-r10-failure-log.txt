@@ -1,0 +1,49 @@
+10-13 13:44:00.960  6548  6548 D AndroidRuntime: Shutting down VM
+10-13 13:44:00.960  6548  6556 W IPCThreadState: call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+10-13 13:44:00.960  6548  6557 W IPCThreadState: call to talkWithDriver in joinThreadPool returned error: -9 (Bad file descriptor), FD: -1
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: dispatchMountItems: caught exception, displaying mount state
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: java.lang.ClassCastException: Dynamic value from Object is not a boolean
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.facebook.react.bridge.DynamicFromObject.asBoolean(DynamicFromObject.kt:26)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled$lambda$17(RNMBXMapViewManager.kt:226)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda3.invoke(D8$$SyntheticClass:0)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapView.withMapView(RNMBXMapView.kt:556)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled(RNMBXMapViewManager.kt:225)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled(RNMBXMapViewManager.kt:44)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.facebook.react.viewmanagers.RNMBXMapViewManagerDelegate.setProperty(RNMBXMapViewManagerDelegate.java:64)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.facebook.react.uimanager.ViewManager.updateProperties(ViewManager.java:102)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.facebook.react.fabric.mounting.SurfaceMountingManager.updateProps(SurfaceMountingManager.kt:672)
+10-13 13:44:01.006  6305  6305 E unknown:MountItemDispatcher: 	at com.facebook.react.fabric.mounting.SurfaceMountingManager.updateProps(SurfaceMountingManager.kt:635)
+--
+10-13 13:44:01.007  6305  6305 E unknown:SurfaceMountingManager: <RCTView id=96 parentTag=98 isRoot=false />
+10-13 13:44:01.007  6305  6305 E unknown:SurfaceMountingManager: <RCTText id=72 parentTag=94 isRoot=false />
+10-13 13:44:01.007  6305  6305 E unknown:SurfaceMountingManager: <RCTText id=144 parentTag=150 isRoot=false />
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: Exception thrown when executing UIFrameGuarded
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: java.lang.ClassCastException: Dynamic value from Object is not a boolean
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.facebook.react.bridge.DynamicFromObject.asBoolean(DynamicFromObject.kt:26)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled$lambda$17(RNMBXMapViewManager.kt:226)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda3.invoke(D8$$SyntheticClass:0)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapView.withMapView(RNMBXMapView.kt:556)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled(RNMBXMapViewManager.kt:225)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled(RNMBXMapViewManager.kt:44)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.facebook.react.viewmanagers.RNMBXMapViewManagerDelegate.setProperty(RNMBXMapViewManagerDelegate.java:64)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.facebook.react.uimanager.ViewManager.updateProperties(ViewManager.java:102)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.facebook.react.fabric.mounting.SurfaceMountingManager.updateProps(SurfaceMountingManager.kt:672)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.facebook.react.fabric.mounting.SurfaceMountingManager.updateProps(SurfaceMountingManager.kt:635)
+--
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at android.app.ActivityThread.main(ActivityThread.java:9067)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at java.lang.reflect.Method.invoke(Native Method)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+10-13 13:44:01.007  6305  6305 E unknown:FabricUIManager: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:932)
+10-13 13:44:01.008  6305  6305 W unknown:BridgelessReact: ReactHost{0}.handleHostException(message = "Dynamic value from Object is not a boolean")
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: Exception in native call
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: java.lang.ClassCastException: Dynamic value from Object is not a boolean
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.facebook.react.bridge.DynamicFromObject.asBoolean(DynamicFromObject.kt:26)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled$lambda$17(RNMBXMapViewManager.kt:226)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager$$ExternalSyntheticLambda3.invoke(D8$$SyntheticClass:0)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapView.withMapView(RNMBXMapView.kt:556)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled(RNMBXMapViewManager.kt:225)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.rnmapbox.rnmbx.components.mapview.RNMBXMapViewManager.setZoomEnabled(RNMBXMapViewManager.kt:44)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.facebook.react.viewmanagers.RNMBXMapViewManagerDelegate.setProperty(RNMBXMapViewManagerDelegate.java:64)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.facebook.react.uimanager.ViewManager.updateProperties(ViewManager.java:102)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.facebook.react.fabric.mounting.SurfaceMountingManager.updateProps(SurfaceMountingManager.kt:672)
+10-13 13:44:01.008  6305  6305 E unknown:ReactNative: 	at com.facebook.react.fabric.mounting.SurfaceMountingManager.updateProps(SurfaceMountingManager.kt:635)

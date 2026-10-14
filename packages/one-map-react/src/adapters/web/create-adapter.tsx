@@ -4,6 +4,7 @@ import { createWebImages } from "./images.js";
 import { createWebLayer } from "./layers.js";
 import { createWebMap } from "./map.js";
 import { createWebSource } from "./sources.js";
+import { createWebUi } from "./ui.js";
 
 export type { WebForwardedProps } from "./contracts.js";
 
@@ -27,5 +28,6 @@ export const createWebAdapter = <
     Source: createWebSource(wrapper),
     Layer: createWebLayer(wrapper),
     Images: WebImages,
+    ...createWebUi(wrapper),
   };
 };

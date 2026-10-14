@@ -212,7 +212,24 @@ class OneMapDependencyProvider: RCTAppDependencyProvider {
   writeFileSync(join(appDirectory, "AppDelegate.swift"), delegate);
 
   const plistPath = join(appDirectory, "Info.plist");
-  const plist = readFileSync(plistPath, "utf8");
+  const originalPlist = readFileSync(plistPath, "utf8");
+  // Generated iPhone shells default to portrait; TF07 also exercises rotation.
+  const plist = originalPlist.replace(
+    /(<key>UISupportedInterfaceOrientations<\/key>\s*<array>)([\s\S]*?)(<\/array>)/,
+    (match, opening, body, closing) => {
+      const missing = ["LandscapeLeft", "LandscapeRight"].filter(
+        (orientation) => !body.includes(`UIInterfaceOrientation${orientation}`)
+      );
+      if (!missing.length) return match;
+      return `${opening}${body.trimEnd()}${missing
+        .map(
+          (orientation) =>
+            `\n\t\t<string>UIInterfaceOrientation${orientation}</string>`
+        )
+        .join("")}\n\t${closing}`;
+    }
+  );
+  if (plist !== originalPlist) writeFileSync(plistPath, plist);
 
   if (plist.includes("UIApplicationSceneManifest")) {
     return;

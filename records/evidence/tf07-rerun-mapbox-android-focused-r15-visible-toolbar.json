@@ -1,0 +1,76 @@
+{
+  "artifact": {
+    "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+    "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+    "packedSha256": "85b7b84933fcb6a1b2ac44bf7ec482de04c797fae3fadf289ee95bab9b97d5da",
+    "installedApkSha256": "29a662927412148fff915db13520f4d85b3432d65d9e3ff16cc9b80b0a445b9e",
+    "sdkPatchSha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
+    "patchedEmitterSha256": "310c73d7ccde6d21e2df1b599af9d54ee1cac4329d3285eb530f0adb2e511e34"
+  },
+  "environment": "Mapbox Android API 36, emulator-5556, 1080x2400 at 420 dpi",
+  "fixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+  "runId": "61fcd69c-6ef3-4341-afda-8ac8e0c4b9e2",
+  "result": "passed",
+  "execution": "Actual Android touchscreen input, physical renderer Read, screenshots and accessibility hierarchy; no callback injection",
+  "scenarios": {
+    "annotation-image-refresh": "passed; visible blue image and image-load=1/image-refresh=1",
+    "overlap-source-propagation": "passed; allowed hit high-click 1/map-click 1, stopped hit high-click 2/map-click unchanged, restored allowed hit high-click 3/map-click 2",
+    "vector-source-hit": "passed; vector-click=1 and Map B map-click=1",
+    "location-rejected": "passed; provider-call=1/provider-error=1 with finite camera unchanged",
+    "location-delayed-teardown": "passed; delayed Locate disabled while pending; Drop Locate then Resolve left locate=false and camera unchanged",
+    "portal-context-state-multiple-maps": "passed; Map A and B child callbacks independently reported their own zoom 11 and 12 before/after Theme update",
+    "resize-orientation": "passed; actual Resize short=true, own-footer labels tappable, actual landscape/portrait restored with labels and state preserved",
+    "host-accessibility": "passed for representative visible labeled controls; both attribution dialogs opened and were dismissed once, controls remained separate and tappable",
+    "navigation-constraints": "passed; Map B 12\u219213, plus at max remained 13, minus\u219212, minus at min remained 12; Map A stayed 11"
+  },
+  "finalRead": {
+    "aLoad": 1,
+    "bLoad": 1,
+    "aZoom": 11,
+    "bZoom": 12,
+    "overlapFeatureIds": [
+      "707",
+      "708"
+    ],
+    "vectorFeatureCount": 2,
+    "imageLoad": 1,
+    "imageRefresh": 1,
+    "highClick": 3,
+    "aMapClick": 2,
+    "vectorClick": 1,
+    "bMapClick": 1,
+    "providerCall": 2,
+    "providerError": 1,
+    "locateConsumerPresent": false,
+    "shortLayout": true,
+    "overlapStopped": false,
+    "unhandledMapOrImageErrors": 0
+  },
+  "manualReport": "records/evidence/tf07-r15/manual-mapbox-android-focused-r15-visible-toolbar.json",
+  "evidence": {
+    "initialScreenshot": "/private/tmp/one-map-tf07-rerun/r15-visible-initial.png",
+    "resizedScreenshot": "/private/tmp/one-map-tf07-rerun/r15-visible-resize-short.png",
+    "landscapeScreenshot": "records/evidence/tf07-r15/r15-visible-landscape.png",
+    "restoredPortraitScreenshot": "/private/tmp/one-map-tf07-rerun/r15-visible-portrait-restored.png",
+    "finalScreenshot": "records/evidence/tf07-r15/r15-visible-pre-finish-final.png",
+    "finalHierarchy": "records/evidence/tf07-r15/r15-visible-pre-finish-final.xml",
+    "finalRendererRead": "records/evidence/tf07-r15/r15-visible-pre-finish-final-read.json",
+    "sourceAllowed": "records/evidence/tf07-r15/r15-visible-overlap-allowed.json",
+    "sourceStopped": "records/evidence/tf07-r15/r15-visible-overlap-stopped-hit.json",
+    "sourceRestored": "records/evidence/tf07-r15/r15-visible-overlap-allowed2.json",
+    "vectorHit": "records/evidence/tf07-r15/r15-visible-vector-hit.json",
+    "providerRejected": "records/evidence/tf07-r15/r15-visible-locate-rejected.json",
+    "providerDropped": "records/evidence/tf07-r15/r15-visible-locate-resolved-after-drop.json",
+    "runnerResult": "R15 full focused runner returned status passed with remaining=[] and focusedComplete=true",
+    "attributionA": "records/evidence/tf07-r15/r15-visible-attribution-a-open.png",
+    "attributionB": "records/evidence/tf07-r15/r15-visible-attribution-b-open.png"
+  },
+  "cleanup": "Finish was physically pressed only after all nine identity-bound statuses passed and a final Read was posted. Runner stopped its status/vector services; owned Metro and test app are stopped. Emulator retained.",
+  "coordinatorAcceptance": {
+    "status": "accepted-full-focused9",
+    "visualReview": "Root inspected actual resize, landscape, restoredportrait and finalclear pixels. Both updatedA/Blabels retain own footer placement/state/touch; enabledBNav and ENTIRESDKscale are separated; bothSDKlogos/attributionclear. BothrealSDKattributiondialogs viewed. Earlierfullyvisibleblueannotation image and actualrefreshcounts accepted. Geographicannotationpartlyoutside smallerlandscapeviewport is expected geographicclipping, not part of control-placement guarantee.",
+    "identityReview": "All9manualpassed; run61fcd69c-6ef3-4341-afda-8ac8e0c4b9e2, installedAPK29a662...45b9e, currentdist76f0...7271d49 match. NoSDK/map/imageerrors; expectedproviderrejection countedseparately.",
+    "interactionReview": "ActualRead sequence high1/map1 then stoptrue high2/map1 then allowfalse high3/map2; vector1/Bmap1; childstate1\u2192updated1 andlater4 each ownzoom; actualResize shorttrue +rotation; Bsettledlimits12/13 withA11; delayedLocateunmount/Resolve no latecenter.",
+    "priorFailures": "R14alternatingmissingload +R15toolbarinputambiguity retained. SDKper-view patch and visiblefixture resolve tested paths. FullVoiceOver/TalkBack notclaimed."
+  }
+}

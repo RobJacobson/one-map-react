@@ -1,0 +1,44 @@
+{
+  "preparedAt": "2026-10-13",
+  "deviceUdid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+  "engine": "mapbox",
+  "bundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+  "sourceInfoPlist": {
+    "path": "examples/native-mapbox/ios/OneMapMapbox/Info.plist",
+    "sha256": "c588e9712546eb17b6d768c109bd5f25ef3b2d6f5409f0c9ec76dc1b89523102",
+    "supportedIPhoneOrientations": [
+      "UIInterfaceOrientationPortrait",
+      "UIInterfaceOrientationLandscapeLeft",
+      "UIInterfaceOrientationLandscapeRight"
+    ]
+  },
+  "originalInstalledBundle": {
+    "infoPlistSha256": "71e3367c56d9b180d61ba816b04884e67fbe3ce5470ddd6c56a804ab18553fde",
+    "executableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+    "debugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "supportedIPhoneOrientations": [
+      "UIInterfaceOrientationPortrait"
+    ]
+  },
+  "correctedOwnedBundle": {
+    "path": "/private/tmp/one-map-tf07-rerun/orientation-bundles/OneMapMapbox.app",
+    "size": "124 MiB",
+    "infoPlistSha256": "959da79f21ac0c3ac1f5746974e8e0ccc0583f1ac0943f4e34c5ce116b8ef577",
+    "executableSha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "debugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "supportedIPhoneOrientations": [
+      "UIInterfaceOrientationPortrait",
+      "UIInterfaceOrientationLandscapeLeft",
+      "UIInterfaceOrientationLandscapeRight"
+    ],
+    "codesign": "Top-level ad-hoc app signature; preserve-metadata=identifier,entitlements; deep strict verification passed. Frameworks/debug dylib were left unchanged."
+  },
+  "installedCorrectedBundle": {
+    "infoPlistSha256": "959da79f21ac0c3ac1f5746974e8e0ccc0583f1ac0943f4e34c5ce116b8ef577",
+    "executableSha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "debugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "matchesOwnedCorrectedBundle": true,
+    "orientationRouteResetToPortrait": "HTTP 200 before app launch"
+  },
+  "note": "Only UISupportedInterfaceOrientations in the copied expanded Info.plist changed. The executable hash differs from the original because top-level ad-hoc signing replaces the embedded code signature; the Mach-O was not rebuilt. The debug dylib hash is unchanged."
+}
