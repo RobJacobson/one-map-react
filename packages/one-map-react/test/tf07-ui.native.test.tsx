@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import {
+  type ComponentProps,
   createContext,
   createRef,
   forwardRef,
@@ -14,6 +15,7 @@ import {
 } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { mapboxNativeUI } from "../src/adapters/mapbox-native/ui.js";
 import { maplibreNativeUI } from "../src/adapters/maplibre-native/ui.js";
 import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
 import {
@@ -32,6 +34,48 @@ import {
 } from "../src/facade/map-context.js";
 
 const refresh = jest.fn(async () => undefined);
+
+type MapboxAnnotationProps = ComponentProps<
+  typeof import("@rnmapbox/maps").PointAnnotation
+>;
+
+jest.mock("@rnmapbox/maps", () => {
+  const React = require("react");
+  const Native = require("react-native");
+  return {
+    PointAnnotation: React.forwardRef(
+      (props: MapboxAnnotationProps, ref: unknown) => {
+        const selected = React.useRef(false);
+        React.useImperativeHandle(ref, () => ({ refresh: () => undefined }));
+        return React.createElement(
+          Native.View,
+          {
+            ...props,
+            testID: "mapbox-annotation",
+            onPress: () => {
+              // RNMapbox 10.3.7 toggles selection on repeated taps on both OSes.
+              selected.current = !selected.current;
+              const event = {
+                type: "Feature" as const,
+                geometry: {
+                  type: "Point" as const,
+                  coordinates: props.coordinate,
+                },
+                properties: { screenPointX: 100, screenPointY: 200 },
+              };
+              if (selected.current) props.onSelected?.(event);
+              else props.onDeselected?.(event);
+            },
+          },
+          props.children
+        );
+      }
+    ),
+    MarkerView: () => null,
+    Callout: () => null,
+    Annotation: () => null,
+  };
+});
 
 jest.mock("@maplibre/maplibre-react-native", () => {
   const React = require("react");
@@ -814,6 +858,56 @@ describe("TF07 native UI composition", () => {
         await nativeTouch(child, "touchStart", touch(1, 2, 2));
       } else await nativeTouch(child, "touchCancel", touch(1, 2));
       expect(fixture.lock).not.toHaveBeenCalled();
+    }
+  );
+
+  test.each(["ios", "android"] as const)(
+    "Mapbox %s annotation reports consecutive taps and still supports dragging and refresh",
+    async (os) => {
+      const platform = jest.replaceProperty(Platform, "OS", os);
+      try {
+        const fixture = sessionFixture();
+        const clicked = jest.fn();
+        const dragged = jest.fn();
+        const ref = createRef<MarkerRef>();
+        const view = await render(
+          <MapSessionContext.Provider value={fixture.session}>
+            <mapboxNativeUI.Marker
+              ref={ref}
+              longitude={10}
+              latitude={20}
+              renderMode="annotation"
+              draggable
+              onClick={clicked}
+              onDragEnd={dragged}
+            />
+          </MapSessionContext.Provider>
+        );
+        await fireEvent.press(view.getByTestId("mapbox-annotation"));
+        await fireEvent.press(view.getByTestId("mapbox-annotation"));
+        expect(clicked).toHaveBeenCalledTimes(2);
+        expect(clicked).toHaveBeenLastCalledWith({
+          lngLat: [10, 20],
+          ...(os === "android" ? { point: [100, 200] } : {}),
+        });
+
+        await fireEvent(view.getByTestId("mapbox-annotation"), "dragEnd", {
+          geometry: { coordinates: [11, 21] },
+          properties: { screenPointX: 110, screenPointY: 210 },
+        });
+        expect(dragged).toHaveBeenCalledWith(
+          expect.objectContaining({ lngLat: [11, 21] })
+        );
+        expect(view.getByTestId("mapbox-annotation").props.coordinate).toEqual([
+          10, 20,
+        ]);
+        await expect(ref.current?.refresh()).resolves.toBeUndefined();
+        await fireEvent.press(view.getByTestId("mapbox-annotation"));
+        expect(clicked).toHaveBeenCalledTimes(3);
+        await view.unmount();
+      } finally {
+        platform.restore();
+      }
     }
   );
 

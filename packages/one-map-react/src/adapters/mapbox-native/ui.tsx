@@ -24,7 +24,7 @@ import {
 export const mapboxNativeUI = createNativeUI({
   Marker: NativeMarkerOverlay,
   Annotation: forwardRef<MarkerRef, NativeMarkerHostProps>((props, ref) => (
-    <MapboxMarkerHost {...props} ref={ref} annotation />
+    <MapboxAnnotationHost {...props} ref={ref} />
   )),
   backend: "mapbox-native",
 });
@@ -42,75 +42,73 @@ type AnnotationEvent = Parameters<
   NonNullable<ComponentProps<typeof Mapbox.PointAnnotation>["onSelected"]>
 >[0];
 
-const MapboxMarkerHost = forwardRef<
-  MarkerRef,
-  NativeMarkerHostProps & { readonly annotation?: boolean }
->((props, ref): ReactElement => {
-  const annotationRef =
-    useRef<InstanceType<typeof Mapbox.PointAnnotation>>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
-  const fraction = anchorFraction(props.anchor);
-  const horizontal = Math.abs(props.offset[0]);
-  const vertical = Math.abs(props.offset[1]);
-  const width = size.width + horizontal * 2;
-  const height = size.height + vertical * 2;
-  const anchor = {
-    x:
-      width > 0 ? (fraction[0] * size.width + horizontal) / width : fraction[0],
-    y:
-      height > 0
-        ? (fraction[1] * size.height + vertical) / height
-        : fraction[1],
-  };
+const MapboxAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
+  (props, ref): ReactElement => {
+    const annotationRef =
+      useRef<InstanceType<typeof Mapbox.PointAnnotation>>(null);
+    const [size, setSize] = useState({ width: 0, height: 0 });
+    const fraction = anchorFraction(props.anchor);
+    const horizontal = Math.abs(props.offset[0]);
+    const vertical = Math.abs(props.offset[1]);
+    const width = size.width + horizontal * 2;
+    const height = size.height + vertical * 2;
+    const anchor = {
+      x:
+        width > 0
+          ? (fraction[0] * size.width + horizontal) / width
+          : fraction[0],
+      y:
+        height > 0
+          ? (fraction[1] * size.height + vertical) / height
+          : fraction[1],
+    };
 
-  useImperativeHandle(ref, () => ({
-    refresh: async () => {
-      if (!props.annotation) return;
-      const annotation = annotationRef.current;
-      if (!annotation) throw new Error("RNMapbox annotation is detached.");
-      annotation.refresh();
-    },
-  }));
+    useImperativeHandle(ref, () => ({
+      refresh: async () => {
+        const annotation = annotationRef.current;
+        if (!annotation) throw new Error("RNMapbox annotation is detached.");
+        annotation.refresh();
+      },
+    }));
 
-  const measure = (event: LayoutChangeEvent): void => {
-    const { width: measuredWidth, height: measuredHeight } =
-      event.nativeEvent.layout;
-    setSize((previous) =>
-      previous.width === measuredWidth && previous.height === measuredHeight
-        ? previous
-        : { width: measuredWidth, height: measuredHeight }
-    );
-  };
-  const content = (
-    <View
-      collapsable={false}
-      style={{
-        // Symmetric anchor padding plus directional content padding moves hit bounds too.
-        paddingLeft: Math.max(0, props.offset[0] * 2),
-        paddingRight: Math.max(0, -props.offset[0] * 2),
-        paddingTop: Math.max(0, props.offset[1] * 2),
-        paddingBottom: Math.max(0, -props.offset[1] * 2),
-      }}
-    >
-      <View collapsable={false} onLayout={measure}>
-        {props.children}
+    const measure = (event: LayoutChangeEvent): void => {
+      const { width: measuredWidth, height: measuredHeight } =
+        event.nativeEvent.layout;
+      setSize((previous) =>
+        previous.width === measuredWidth && previous.height === measuredHeight
+          ? previous
+          : { width: measuredWidth, height: measuredHeight }
+      );
+    };
+    const content = (
+      <View
+        collapsable={false}
+        style={{
+          // Symmetric anchor padding plus directional content padding moves hit bounds too.
+          paddingLeft: Math.max(0, props.offset[0] * 2),
+          paddingRight: Math.max(0, -props.offset[0] * 2),
+          paddingTop: Math.max(0, props.offset[1] * 2),
+          paddingBottom: Math.max(0, -props.offset[1] * 2),
+        }}
+      >
+        <View collapsable={false} onLayout={measure}>
+          {props.children}
+        </View>
       </View>
-    </View>
-  );
-  const normalize = (event: AnnotationEvent) => ({
-    lngLat: lngLatFromWrapper(event.geometry.coordinates),
-    // Pinned RNMapbox iOS reports window coordinates for annotation screen points.
-    ...(Platform.OS === "ios"
-      ? {}
-      : {
-          point: pointFromWrapper({
-            x: event.properties.screenPointX,
-            y: event.properties.screenPointY,
+    );
+    const normalize = (event: AnnotationEvent) => ({
+      lngLat: lngLatFromWrapper(event.geometry.coordinates),
+      // Pinned RNMapbox iOS reports window coordinates for annotation screen points.
+      ...(Platform.OS === "ios"
+        ? {}
+        : {
+            point: pointFromWrapper({
+              x: event.properties.screenPointX,
+              y: event.properties.screenPointY,
+            }),
           }),
-        }),
-  });
+    });
 
-  if (props.annotation) {
     return (
       <Mapbox.PointAnnotation
         ref={annotationRef}
@@ -133,17 +131,7 @@ const MapboxMarkerHost = forwardRef<
       </Mapbox.PointAnnotation>
     );
   }
-  return (
-    <Mapbox.MarkerView
-      coordinate={[props.lngLat[0], props.lngLat[1]]}
-      anchor={anchor}
-      allowOverlap={props.allowOverlap}
-      stopGesturePropagation={props.stopGesturePropagation}
-    >
-      {content}
-    </Mapbox.MarkerView>
-  );
-});
+);
 
 const anchorFraction = (anchor: Anchor): readonly [number, number] => {
   const x = anchor.includes("left") ? 0 : anchor.includes("right") ? 1 : 0.5;
