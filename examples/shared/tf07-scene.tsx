@@ -241,7 +241,10 @@ export const Tf07Scene = ({
         draggable
         onClick={() => record("marker-click")}
         onDragStart={() => record("live-start")}
-        onDrag={() => record("live-drag")}
+        onDrag={(event) => {
+          setLive(event.lngLat);
+          record("live-drag");
+        }}
         onDragEnd={(event) => {
           lastPositions.current.live = event.lngLat;
           setLive(event.lngLat);
@@ -257,7 +260,9 @@ export const Tf07Scene = ({
         latitude={annotation[1]}
         renderMode="annotation"
         draggable
+        onClick={() => record("annotation-click")}
         onDragStart={() => record("annotation-start")}
+        onDrag={(event) => setAnnotation(event.lngLat)}
         onDragEnd={(event) => {
           lastPositions.current.annotation = event.lngLat;
           setAnnotation(event.lngLat);

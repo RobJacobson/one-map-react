@@ -1,0 +1,3152 @@
+{
+  "checkpoint": "TF07/TF08 remaining iOS failures and intermittent web drag",
+  "status": "passed",
+  "authorization": "Investigate and fix the remaining iOS failures and intermittent web drag using Ponytail, then rerun the affected acceptance tests.",
+  "date": "2026-10-14",
+  "previousEvidence": "records/evidence/tf07-tf08-ponytail-acceptance.json",
+  "artifact": {
+    "revision": "98f8bd069e49146592fedbc740d012d5e1f87745",
+    "libraryDistSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db",
+    "productionChanges": "No production library or SDK patch changes. Fixture accepts controlled drag proposals; native input is calibrated and errors retain diagnostic payloads."
+  },
+  "investigation": {
+    "web": {
+      "finding": "TF07 onDrag only reported status, rerendering the controlled react-map-gl marker with its old coordinate before mouse-up. The fixture now echoes proposals for live and annotation markers during drag.",
+      "sources": [
+        "examples/shared/tf07-scene.tsx",
+        "examples/web-mapbox/node_modules/@vis.gl/react-mapbox/dist/components/marker.js:62-63 (react-map-gl8.1.3)"
+      ],
+      "fix": "Update application-owned live and annotation coordinates in onDrag; preserve independent drag-end readback assertions."
+    },
+    "ios": {
+      "status": "MapLibre TF07 core11/11 and Mapbox TF08 complete13/13 passed on dedicated iPhone16e/iOS27.",
+      "inputFix": "Use actual device coordinates, fresh physical Read renderer actions, completion acknowledgement, explicit slow XCTest gesture velocity and calibrated hold. Native ScrollView swipe replaced ineffective short nested press-drag.",
+      "libraryFinding": "No iOS production library defect established. Original location timeout and one-off SDK offline error were not reproduced on the isolated device. Original failure reports remain preserved.",
+      "isolation": "Dedicated device and Metro8181; original iPhone18Pro and unrelated Metro8082 untouched."
+    }
+  },
+  "routineChecks": {
+    "runtime": "Bun 1.4.1 commands with bundled Node runtime first in PATH",
+    "check": "passed; Biome checked 220 files, no fixes",
+    "check_docs": "passed; 31 Markdown files and 32 SDK tables/local links; structural scope only",
+    "typecheck": "passed; tsconfig.json, tsconfig.test.json, tsconfig.examples.web.json, tsconfig.examples.native.json",
+    "jest": "passed; 28/28 suites and 630/630 tests",
+    "standalone_unit_contract": "passed; all commands after Jest in package test script, including Node and Bun process cleanup tests, TF06/TF07/TF08 checks",
+    "build_package": "passed library build and13 isolated packed package selections after acceptance finished",
+    "status": "passed",
+    "packageSha256": "501e58bafb66441fc82f4269c152eb4f67edd639530ef9f7300a504268201c9b",
+    "artifactAfterBuild": "Frozen library digest unchanged in producer and all four example copies",
+    "firstInvocationFailure": "Jest launched under incorrect runtime:27/28 suites,617tests passed; ESM load failed. Exact suite reproduced under default PATH and passed13/13 with bundled Node first; full corrected invocation passed630/28. No source or configuration workaround."
+  },
+  "web": {
+    "maplibre": {
+      "status": "passed",
+      "plannedRuns": 5,
+      "retries": 0,
+      "runs": [
+        {
+          "run": 1,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "move": 29,
+              "style": 2,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.604444686584344
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.604444686584344
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        },
+        {
+          "run": 2,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "move": 31,
+              "style": 2,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.604444686584344
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.604444686584344
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        },
+        {
+          "run": 3,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "move": 27,
+              "style": 2,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.604444686584344
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.604444686584344
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        },
+        {
+          "run": 4,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "move": 28,
+              "style": 2,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.604444686584344
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.604444686584344
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        },
+        {
+          "run": 5,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "move": 31,
+              "style": 2,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.604444686584344
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.604444686584344
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        }
+      ]
+    },
+    "mapbox": {
+      "status": "passed",
+      "plannedRuns": 5,
+      "retriesWithinCorrectedExecution": 0,
+      "setupFailures": [
+        {
+          "source": "web-mapbox-1.json",
+          "artifact": {
+            "distSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db"
+          },
+          "results": {
+            "mapbox-web": {
+              "status": "failed",
+              "error": "TF07 observation timed out."
+            }
+          }
+        },
+        {
+          "source": "web-mapbox-diagnostic.json",
+          "artifact": {
+            "distSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db"
+          },
+          "results": {
+            "mapbox-web": {
+              "status": "failed",
+              "error": "TF07 observation timed out.",
+              "rendererStatus": null,
+              "observation": null
+            }
+          }
+        },
+        {
+          "source": "web-mapbox-diagnostic2.json",
+          "artifact": {
+            "distSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db"
+          },
+          "results": {
+            "mapbox-web": {
+              "status": "failed",
+              "error": "TF07 observation timed out: web server startup."
+            }
+          }
+        }
+      ],
+      "setupDiagnosis": "Prior worker omitted require_escalated; sandbox prevented Vite server startup. Root repeated exact detached spawn with permission and observed HTTP readiness in7012ms. Corrected worker used explicit permission on every run.",
+      "runs": [
+        {
+          "run": 1,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "style": 1,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "move": 32,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.60444468658437
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.60444468658437
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        },
+        {
+          "run": 2,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "style": 1,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "move": 32,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.60444468658437
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.60444468658437
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        },
+        {
+          "run": 3,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "style": 1,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "move": 26,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.60444468658437
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.60444468658437
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        },
+        {
+          "run": 4,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "style": 2,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "move": 25,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.60444468658437
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.60444468658437
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        },
+        {
+          "run": 5,
+          "status": "passed",
+          "execution": "browser-input",
+          "scope": [
+            "known-feature",
+            "child-click",
+            "annotation-repeat-tap",
+            "live-drag",
+            "annotation-drag",
+            "source-propagation",
+            "navigation",
+            "popup-dismissal",
+            "remount-teardown"
+          ],
+          "observation": {
+            "events": {
+              "popup-open": 3,
+              "load": 2,
+              "style": 1,
+              "annotation-click": 2,
+              "marker-click": 1,
+              "child-click": 1,
+              "live-start": 1,
+              "live-drag": 6,
+              "live-end": 1,
+              "annotation-start": 1,
+              "annotation-end": 1,
+              "source-click": 2,
+              "map-click": 1,
+              "move": 31,
+              "popup-close": 1
+            },
+            "positions": {
+              "live": [
+                -122.32352050781279,
+                47.60444468658437
+              ],
+              "annotation": [
+                -122.36368927001988,
+                47.60444468658437
+              ]
+            },
+            "center": [
+              -122.34,
+              47.61
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "id": 707,
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 1,
+            "stopSourcePropagation": true
+          },
+          "remaining": [
+            "offset-touch-bounds",
+            "popup-follow",
+            "scale-units",
+            "geolocation",
+            "accessibility",
+            "style-replacement",
+            "fullscreen"
+          ]
+        }
+      ]
+    }
+  },
+  "native": {
+    "status": "passed affected core scope",
+    "scope": [
+      "Mapbox iOS TF08 all13",
+      "MapLibre iOS TF07 basic11 including previously incomplete checks"
+    ],
+    "metroPort": 8181,
+    "mapboxIosFirst": {
+      "environment": "mapbox-ios",
+      "scope": "all",
+      "startedAt": "2026-10-15T01:17:02.331Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "f278f14c3b5103a3c9030cfeb0709d3c35b5975ac0a5c08ca4cc696f91f2acbb",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "3b38cb020311736a917603b9ed06ba521265bc6fef56de0da38dc2253888570d",
+        "examples/shared/native-tf08-screen.tsx": "69fccf45473a28d8b07852aa971c436817bdfbeffa7823184e7009e9f2325cac",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "285cf1dc943a6da5a02c9b45f68dbca7ea7ef42888311778ab8eade1d87b1561"
+      },
+      "libraryDistSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db",
+      "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "nativeLibraries": {
+        "OneMapMapbox.debug.dylib": "5be94f940504312679929c47875023a2d8bd6cac2100f5f4d5ffe9b08d2ada33",
+        "__preview.dylib": "b00aae2b446bc582eaac2a3ccdcba81dd2c355d0ea233ad78e7b87ca07765d4d"
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 1
+          }
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.33,
+              47.61999999999999
+            ],
+            "zoom": 12,
+            "featureCount": 3,
+            "moving": false,
+            "moveEnds": 2
+          }
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed",
+          "observation": {
+            "width": 1170,
+            "height": 2238,
+            "red": 5343,
+            "blue": 1017,
+            "green": 0,
+            "navy": 2595978,
+            "magenta": 0,
+            "scope": "backend",
+            "overlayInclusion": "green-host-overlay-excluded"
+          }
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed",
+          "observation": {
+            "explicitRejection": true
+          }
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed",
+          "observation": {
+            "loads": 2,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 1,
+            "moving": false,
+            "moveEnds": 3,
+            "moves": [
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.34000000000002,
+                  47.60999999999999
+                ],
+                "zoom": 10
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.3317832,
+                  47.61821679999999
+                ],
+                "zoom": 11.643
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.33,
+                  47.61999999999999
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.34000000000002,
+                  47.60999999999999
+                ],
+                "zoom": 10
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.34000000000002,
+                  47.60999999999999
+                ],
+                "zoom": 10
+              }
+            ]
+          }
+        },
+        {
+          "name": "native gesture interruption and resume without another watch",
+          "status": "passed",
+          "observation": {
+            "before": {
+              "loads": 4,
+              "fixes": 2,
+              "errors": 0,
+              "watches": 2,
+              "releases": 1,
+              "center": [
+                -122.33,
+                47.61999999999999
+              ],
+              "zoom": 12,
+              "featureCount": 3,
+              "moving": false,
+              "moveEnds": 6
+            },
+            "afterDrag": {
+              "loads": 4,
+              "fixes": 2,
+              "errors": 0,
+              "watches": 2,
+              "releases": 1,
+              "center": [
+                -122.36719259999998,
+                47.64680809999999
+              ],
+              "zoom": 12,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 7
+            },
+            "afterResume": {
+              "loads": 4,
+              "fixes": 3,
+              "errors": 0,
+              "watches": 2,
+              "releases": 1,
+              "center": [
+                -122.32,
+                47.62999999999999
+              ],
+              "zoom": 12,
+              "featureCount": 3,
+              "moving": false,
+              "moveEnds": 11
+            }
+          }
+        },
+        {
+          "name": "foreground permission boundary",
+          "status": "passed",
+          "observation": {
+            "applicationIntegrationRequired": true
+          }
+        },
+        {
+          "name": "fresh native position from simulator injection",
+          "status": "passed",
+          "observation": {
+            "lngLat": [
+              -122.33,
+              47.62
+            ],
+            "timestamp": 1792027186000,
+            "accuracy": 5,
+            "altitude": 0,
+            "requestedAt": 1792027184105,
+            "completedAt": 1792027186506
+          }
+        },
+        {
+          "name": "independent zero-zoom PNG dimensions and file output",
+          "status": "passed",
+          "observation": {
+            "dataUrl": {
+              "width": 96,
+              "height": 64,
+              "red": 165,
+              "blue": 0,
+              "green": 0,
+              "navy": 4969,
+              "magenta": 0
+            },
+            "file": {
+              "width": 96,
+              "height": 64,
+              "red": 165,
+              "blue": 0,
+              "green": 0,
+              "navy": 4969,
+              "magenta": 0
+            }
+          }
+        },
+        {
+          "name": "invalid snapshot style rejects before the facade deadline",
+          "status": "passed",
+          "observation": {
+            "elapsedMs": 607
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "failed",
+          "error": "Expected values to be strictly equal:\n\n2 !== 0\n",
+          "lastRendererObservation": {
+            "loads": 4,
+            "fixes": 3,
+            "errors": 0,
+            "watches": 2,
+            "releases": 1,
+            "center": [
+              -122.32,
+              47.62999999999999
+            ],
+            "zoom": 12,
+            "featureCount": 3,
+            "moving": false,
+            "moveEnds": 11,
+            "moves": [
+              {
+                "origin": "user",
+                "center": [
+                  -122.3666766,
+                  47.64643749999996
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "user",
+                "center": [
+                  -122.3667871,
+                  47.64651690000001
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "user",
+                "center": [
+                  -122.36689369999999,
+                  47.64659340000002
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "user",
+                "center": [
+                  -122.3669964,
+                  47.64666720000001
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "user",
+                "center": [
+                  -122.36709620000002,
+                  47.646738899999995
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "user",
+                "center": [
+                  -122.36719259999998,
+                  47.64680809999999
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.3666574,
+                  47.64661750000003
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.3647659,
+                  47.64594379999998
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.3508306,
+                  47.640980600000006
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.33745600000002,
+                  47.63621710000002
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.33141899999998,
+                  47.634067000000016
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.32,
+                  47.62999999999999
+                ],
+                "zoom": 12
+              }
+            ]
+          }
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "blocked",
+          "reason": "Offline creation/lifecycle prerequisite failed."
+        }
+      ],
+      "imageObservations": [
+        {
+          "scenario": "actual PNG capture and overlay scope",
+          "width": 1170,
+          "height": 2238,
+          "red": 5343,
+          "blue": 1017,
+          "green": 0,
+          "navy": 2595978,
+          "magenta": 0
+        },
+        {
+          "scenario": "independent zero-zoom PNG dimensions and file output",
+          "width": 96,
+          "height": 64,
+          "red": 165,
+          "blue": 0,
+          "green": 0,
+          "navy": 4969,
+          "magenta": 0
+        },
+        {
+          "scenario": "independent zero-zoom PNG dimensions and file output",
+          "width": 96,
+          "height": 64,
+          "red": 165,
+          "blue": 0,
+          "green": 0,
+          "navy": 4969,
+          "magenta": 0
+        }
+      ],
+      "lastRendererObservation": {
+        "loads": 4,
+        "fixes": 3,
+        "errors": 0,
+        "watches": 2,
+        "releases": 1,
+        "center": [
+          -122.32,
+          47.62999999999999
+        ],
+        "zoom": 12,
+        "featureCount": 3,
+        "moving": false,
+        "moveEnds": 11,
+        "moves": [
+          {
+            "origin": "user",
+            "center": [
+              -122.3666766,
+              47.64643749999996
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "user",
+            "center": [
+              -122.3667871,
+              47.64651690000001
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "user",
+            "center": [
+              -122.36689369999999,
+              47.64659340000002
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "user",
+            "center": [
+              -122.3669964,
+              47.64666720000001
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "user",
+            "center": [
+              -122.36709620000002,
+              47.646738899999995
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "user",
+            "center": [
+              -122.36719259999998,
+              47.64680809999999
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.3666574,
+              47.64661750000003
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.3647659,
+              47.64594379999998
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.3508306,
+              47.640980600000006
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.33745600000002,
+              47.63621710000002
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.33141899999998,
+              47.634067000000016
+            ],
+            "zoom": 12
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.32,
+              47.62999999999999
+            ],
+            "zoom": 12
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course",
+        "second iOS display density"
+      ],
+      "resourceRequests": 4,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/style.json",
+          "available": true
+        },
+        {
+          "path": "/invalid-style.json",
+          "available": true
+        },
+        {
+          "path": "/offline-style.json?id=tf08-mapbox-ios-1792027191966",
+          "available": true
+        },
+        {
+          "path": "/offline-style.json?id=tf08-mapbox-ios-1792027191966",
+          "available": true
+        }
+      ]
+    },
+    "originalPositionTimeout": {
+      "status": "passed in both isolated complete replays",
+      "evidence": "mapboxIosFirst.scenarios fresh native position from simulator injection",
+      "limitation": "Original timeout cause was not reproduced. Dedicated device removes known foreground contention; no location-library behavior changed."
+    },
+    "offlineFollowup": {
+      "status": "focused4/4 and complete13/13 replays passed",
+      "firstFailure": "One SDK offline error reached two subscribers; count2 asserted, message previously discarded. Creation completed before error count assertion. Cold restart and invalidation were blocked.",
+      "change": "Fixture retains SDK error payloads and runner reports sanitized messages, with an assertion before deliberate duplicate creation.",
+      "diagnosticResult": "The original one-off SDK offline error was not reproduced with payload capture enabled in either scoped or complete-sequence replay. No cancellation filtering, error suppression, or production patch was added. Cause remains unknown."
+    },
+    "gestureCalibration": {
+      "status": "passed calibrated inputs",
+      "device": "iPhone16e/iOS27",
+      "udid": "31FA0161-632C-4EC3-A7EF-2669A13B4C4A",
+      "live": "1s stationary hold, slow drag,100ms final hold delivered start/9updates/end; child scrolling used native ScrollView.swipeUp, reached100% without camera movement.",
+      "annotation": "Two1s/40px inputs produced no drag start.2s/97px passed; after remount2s/40px passed without prior selection. Same short translation with longer hold establishes usable input calibration, not a native selection requirement.",
+      "uncertainty": "No underlying library failure established; original short-input failure is retained. No claim that physical users must hold2s."
+    },
+    "tf07MaplibreFinal": {
+      "status": "passed",
+      "execution": "manual-native-touch",
+      "observed": true,
+      "manualComplete": true,
+      "remaining": [],
+      "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+      "libraryDistSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db",
+      "environment": "maplibre-ios",
+      "runId": "b89a1b03-ac48-493b-89e9-d02c81faa2c7",
+      "observation": {
+        "events": {
+          "popup-open": 2,
+          "move": 161,
+          "style": 3,
+          "load": 3,
+          "child-click": 3,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 2,
+          "annotation-end": 2,
+          "map-click": 2,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1,
+          "source-click": 3
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.37095916756661,
+            47.61455183081685
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 1,
+        "stopSourcePropagation": true,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      }
+    },
+    "tf07MaplibreManual": {
+      "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+      "libraryDistSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db",
+      "environment": "maplibre-ios",
+      "runId": "b89a1b03-ac48-493b-89e9-d02c81faa2c7",
+      "scenarios": {
+        "live-child-button": "passed",
+        "nested-scroll": "passed",
+        "live-drag": "passed",
+        "annotation-drag": "passed",
+        "offset-touch-bounds": "passed",
+        "popup-follow-dismissal": "passed",
+        "source-propagation": "passed",
+        "navigation-location": "passed",
+        "style-remount": "passed",
+        "host-accessibility": "passed",
+        "scale-units": "passed"
+      },
+      "notes": {
+        "scope": "Eleven core native touch/visual gates. Full VoiceOver, multipointer cancellation, delayed bitmap refresh and focused vector/overlap gates were not rerun.",
+        "annotation": "Two 1s/40px XCTest gestures did not start. A 2s/97px gesture moved the visible card and delivered start/end; after remount a 2s/40px gesture, without selecting first, also moved the visible card and delivered start/end. The latter holds translation fixed and changes the hold; no selection requirement or library defect inferred.",
+        "offset": "Actual AX label shifted +24,-12; displaced child and label drag worked; zero reset shifted back.",
+        "scroll": "Actual nested ScrollView at 100%, camera unchanged.",
+        "popup": "AX close bounds shifted x264 to194 during map pan; child callback and one close; remount added no close.",
+        "scale": "2 km became1 mi; attribution and accessible controls present.",
+        "events": "Renderer evidence in final-interactions.json, all from this run identity."
+      },
+      "archivalNote": "Referenced temporary final-interactions.json is embedded here under tf07MaplibreObservations; raw temporary files removed after reconciliation."
+    },
+    "tf07MaplibreObservations": {
+      "child": {
+        "events": {
+          "popup-open": 1,
+          "move": 1,
+          "style": 1,
+          "load": 1,
+          "child-click": 1
+        },
+        "positions": {},
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "afterScroll": {
+        "events": {
+          "popup-open": 1,
+          "move": 1,
+          "style": 1,
+          "load": 1,
+          "child-click": 1
+        },
+        "positions": {},
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "taps": {
+        "events": {
+          "popup-open": 1,
+          "move": 1,
+          "style": 1,
+          "load": 1,
+          "child-click": 1,
+          "annotation-click": 2
+        },
+        "positions": {},
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "live": {
+        "events": {
+          "popup-open": 1,
+          "move": 1,
+          "style": 1,
+          "load": 1,
+          "child-click": 1,
+          "annotation-click": 2,
+          "live-start": 1,
+          "live-drag": 9,
+          "live-end": 1
+        },
+        "positions": {
+          "live": [
+            -122.32798370372784,
+            47.616094734404214
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "annotation": {
+        "events": {
+          "popup-open": 1,
+          "move": 1,
+          "style": 1,
+          "load": 1,
+          "child-click": 1,
+          "annotation-click": 3,
+          "live-start": 1,
+          "live-drag": 9,
+          "live-end": 1,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1
+        },
+        "positions": {
+          "live": [
+            -122.32798370372784,
+            47.616094734404214
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "offsetChild": {
+        "events": {
+          "popup-open": 1,
+          "move": 1,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 1,
+          "live-drag": 9,
+          "live-end": 1,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1
+        },
+        "positions": {
+          "live": [
+            -122.32798370372784,
+            47.616094734404214
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "offsetDrag": {
+        "events": {
+          "popup-open": 1,
+          "move": 1,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "popupChild": {
+        "events": {
+          "popup-open": 1,
+          "move": 1,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1,
+          "popup-child": 1
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "popupPan": {
+        "events": {
+          "popup-open": 1,
+          "move": 66,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1,
+          "popup-child": 1
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.31598958651175,
+          47.609999999964266
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          125.06460116629799,
+          449.5753793410336
+        ]
+      },
+      "popupClose": {
+        "events": {
+          "popup-open": 1,
+          "move": 66,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1,
+          "popup-child": 1,
+          "popup-close": 1
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.31598958651175,
+          47.609999999964266
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          125.06460116629799,
+          449.5753793410336
+        ]
+      },
+      "zoomIn": {
+        "events": {
+          "popup-open": 1,
+          "move": 97,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1,
+          "popup-child": 1,
+          "popup-close": 1
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.31598958651175,
+          47.609999999964266
+        ],
+        "zoom": 12,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          55.12920233259599,
+          579.1507586820672
+        ]
+      },
+      "zoomOut": {
+        "events": {
+          "popup-open": 1,
+          "move": 131,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1,
+          "popup-child": 1,
+          "popup-close": 1
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.31598958651175,
+          47.609999999964266
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          125.06460116629799,
+          449.5753793410336
+        ]
+      },
+      "locate": {
+        "events": {
+          "popup-open": 1,
+          "move": 160,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 1,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.33000000000081,
+          47.620000000002406
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          165.87288860632106,
+          492.78368841297925
+        ]
+      },
+      "sourceAllowed": {
+        "events": {
+          "popup-open": 1,
+          "move": 160,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 2,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1,
+          "source-click": 1
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.33000000000081,
+          47.620000000002406
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": false,
+        "sourcePoint": [
+          165.87288860632106,
+          492.78368841297925
+        ]
+      },
+      "sourceStopped": {
+        "events": {
+          "popup-open": 1,
+          "move": 160,
+          "style": 1,
+          "load": 1,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 2,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1,
+          "source-click": 2
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.33000000000081,
+          47.620000000002406
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": true,
+        "sourcePoint": [
+          165.87288860632106,
+          492.78368841297925
+        ]
+      },
+      "style": {
+        "events": {
+          "popup-open": 1,
+          "move": 160,
+          "style": 2,
+          "load": 2,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 2,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1,
+          "source-click": 2
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.3399999999995,
+          47.609999999994436
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 0,
+        "stopSourcePropagation": true,
+        "sourcePoint": [
+          194.99999999857198,
+          449.57537947135665
+        ]
+      },
+      "remount": {
+        "events": {
+          "popup-open": 2,
+          "move": 161,
+          "style": 3,
+          "load": 3,
+          "child-click": 2,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 2,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1,
+          "source-click": 2
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 1,
+        "stopSourcePropagation": true,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "postRemountChild": {
+        "events": {
+          "popup-open": 2,
+          "move": 161,
+          "style": 3,
+          "load": 3,
+          "child-click": 3,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 2,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1,
+          "source-click": 2
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 1,
+        "stopSourcePropagation": true,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "postRemountSource": {
+        "events": {
+          "popup-open": 2,
+          "move": 161,
+          "style": 3,
+          "load": 3,
+          "child-click": 3,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "map-click": 2,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1,
+          "source-click": 3
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.35070312528632,
+            47.62396283455098
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 1,
+        "stopSourcePropagation": true,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      },
+      "annotationCalibration": {
+        "events": {
+          "popup-open": 2,
+          "move": 161,
+          "style": 3,
+          "load": 3,
+          "child-click": 3,
+          "annotation-click": 3,
+          "live-start": 2,
+          "live-drag": 18,
+          "live-end": 2,
+          "annotation-start": 2,
+          "annotation-end": 2,
+          "map-click": 2,
+          "popup-child": 1,
+          "popup-close": 1,
+          "location": 1,
+          "source-click": 3
+        },
+        "positions": {
+          "live": [
+            -122.31768402121136,
+            47.62164881035977
+          ],
+          "annotation": [
+            -122.37095916756661,
+            47.61455183081685
+          ]
+        },
+        "center": [
+          -122.34000000000125,
+          47.60999999998798
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "properties": {
+              "fixture": "tf07"
+            },
+            "id": 707,
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -122.33999490737915,
+                47.57999970656695
+              ]
+            }
+          }
+        ],
+        "generation": 1,
+        "stopSourcePropagation": true,
+        "sourcePoint": [
+          195.00000000363215,
+          449.575379443417
+        ]
+      }
+    },
+    "tf07Submission": "Final physical Read completed the canonical runner with exit0. The temporary client attempted GET after the runner had closed status transport and received ECONNREFUSED; the saved canonical final report establishes the pass. No readback injected.",
+    "offlineDiagnostic": {
+      "environment": "mapbox-ios",
+      "scope": "offline",
+      "startedAt": "2026-10-15T01:56:42.087Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "93e6944110b4aeba9032439f9626453cc776b16fc6c8ff623d74008990302c86",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "170e1201073b906a587fc56be82da70d3b3e1188b40898151be5bcf84129882d",
+        "examples/shared/native-tf08-screen.tsx": "69fccf45473a28d8b07852aa971c436817bdfbeffa7823184e7009e9f2325cac",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db",
+      "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "nativeLibraries": {
+        "OneMapMapbox.debug.dylib": "5be94f940504312679929c47875023a2d8bd6cac2100f5f4d5ffe9b08d2ada33",
+        "__preview.dylib": "b00aae2b446bc582eaac2a3ccdcba81dd2c355d0ea233ad78e7b87ca07765d4d"
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 1
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-mapbox-ios-1792029435071",
+              "backendId": "tf08-mapbox-ios-1792029435071",
+              "metadata": {
+                "test": "tf08",
+                "backend": "mapbox-native",
+                "fixtureStyle": "http://127.0.0.1:8798/offline-style.json?id=tf08-mapbox-ios-1792029435071"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-mapbox-ios-1792029435071",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "subscriberEventsBeforeDuplicate": 12,
+            "subscriberEventsAfterDuplicate": 12,
+            "resourceRequests": 2
+          }
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-mapbox-ios-1792029435071",
+              "backendId": "tf08-mapbox-ios-1792029435071",
+              "metadata": {
+                "test": "tf08",
+                "backend": "mapbox-native",
+                "fixtureStyle": "http://127.0.0.1:8798/offline-style.json?id=tf08-mapbox-ios-1792029435071"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-mapbox-ios-1792029435071",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "pixels": {
+              "width": 1170,
+              "height": 2238,
+              "red": 0,
+              "blue": 1017,
+              "green": 0,
+              "navy": 959553,
+              "magenta": 1632303
+            },
+            "blockedRequests": 0,
+            "networking": "Mapbox SDK network switch confirmed disconnected; fixture sockets closed; loopback command/Metro transport retained"
+          }
+        },
+        {
+          "name": "offline invalidation preserves subscribed progress",
+          "status": "passed",
+          "observation": {
+            "status": {
+              "id": "tf08-mapbox-ios-1792029435071",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "subscriberEventsBefore": 4,
+            "subscriberEventsAfter": 20
+          }
+        }
+      ],
+      "imageObservations": [
+        {
+          "scenario": "persisted offline pack after cold restart with fixture resources unavailable",
+          "width": 1170,
+          "height": 2238,
+          "red": 0,
+          "blue": 1017,
+          "green": 0,
+          "navy": 959553,
+          "magenta": 1632303
+        }
+      ],
+      "lastRendererObservation": {
+        "loads": 2,
+        "fixes": 0,
+        "errors": 0,
+        "watches": 0,
+        "releases": 0,
+        "center": [
+          0,
+          0
+        ],
+        "zoom": 1,
+        "featureCount": 4,
+        "moving": false,
+        "moveEnds": 3,
+        "moves": [
+          {
+            "origin": "unknown",
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              2.842170943040401e-14,
+              -2.5444437451708134e-14
+            ],
+            "zoom": 1
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 1
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course",
+        "second iOS display density"
+      ],
+      "resourceRequests": 2,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/offline-style.json?id=tf08-mapbox-ios-1792029435071",
+          "available": true
+        },
+        {
+          "path": "/offline-style.json?id=tf08-mapbox-ios-1792029435071",
+          "available": true
+        }
+      ]
+    },
+    "retiredImages": [
+      {
+        "path": "records/evidence/tf07-ponytail-maplibre-ios-before.png",
+        "sha256": "8de46aa1718cfc964b39235cdad481eadd7040e40d068b9abba8845ee50a3053",
+        "reason": "Old failed input screenshots superseded by actual run-bound visual and renderer checks; raw images removed after reconciliation."
+      },
+      {
+        "path": "records/evidence/tf07-ponytail-maplibre-ios-after.png",
+        "sha256": "c1a4574cfcb5fe631aa2f6b40c2c2b00338d3ff12c124cfa421889c6feab6cfa",
+        "reason": "Old failed input screenshots superseded by actual run-bound visual and renderer checks; raw images removed after reconciliation."
+      }
+    ],
+    "mapboxIosFinal": {
+      "environment": "mapbox-ios",
+      "scope": "all",
+      "startedAt": "2026-10-15T01:58:02.772Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "0e1287664f678302b34182d9dba306493b3bc38110a1be1a6408de3c636729be",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "170e1201073b906a587fc56be82da70d3b3e1188b40898151be5bcf84129882d",
+        "examples/shared/native-tf08-screen.tsx": "69fccf45473a28d8b07852aa971c436817bdfbeffa7823184e7009e9f2325cac",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "0cb319def736b629ed5cf672a77a72ed823de6df795bf655f8761f62842405db",
+      "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "nativeLibraries": {
+        "OneMapMapbox.debug.dylib": "5be94f940504312679929c47875023a2d8bd6cac2100f5f4d5ffe9b08d2ada33",
+        "__preview.dylib": "b00aae2b446bc582eaac2a3ccdcba81dd2c355d0ea233ad78e7b87ca07765d4d"
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 1
+          }
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 1,
+            "releases": 0,
+            "center": [
+              -122.32999999999998,
+              47.61999999999999
+            ],
+            "zoom": 12,
+            "featureCount": 3,
+            "moving": false,
+            "moveEnds": 2
+          }
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed",
+          "observation": {
+            "width": 1170,
+            "height": 2238,
+            "red": 5343,
+            "blue": 1017,
+            "green": 0,
+            "navy": 2595978,
+            "magenta": 0,
+            "scope": "backend",
+            "overlayInclusion": "green-host-overlay-excluded"
+          }
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed",
+          "observation": {
+            "explicitRejection": true
+          }
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed",
+          "observation": {
+            "loads": 2,
+            "fixes": 1,
+            "errors": 0,
+            "watches": 2,
+            "releases": 2,
+            "moving": false,
+            "moveEnds": 3,
+            "moves": [
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.34000000000002,
+                  47.60999999999999
+                ],
+                "zoom": 10
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.33005309999999,
+                  47.61994690000001
+                ],
+                "zoom": 11.989
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.32999999999998,
+                  47.61999999999999
+                ],
+                "zoom": 12
+              },
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.34000000000002,
+                  47.60999999999999
+                ],
+                "zoom": 10
+              }
+            ]
+          }
+        },
+        {
+          "name": "native gesture interruption and resume without another watch",
+          "status": "passed",
+          "observation": {
+            "before": {
+              "loads": 4,
+              "fixes": 2,
+              "errors": 0,
+              "watches": 3,
+              "releases": 2,
+              "center": [
+                -122.33,
+                47.61999999999999
+              ],
+              "zoom": 12,
+              "featureCount": 3,
+              "moving": false,
+              "moveEnds": 6
+            },
+            "afterDrag": {
+              "loads": 4,
+              "fixes": 2,
+              "errors": 0,
+              "watches": 3,
+              "releases": 2,
+              "center": [
+                -122.3620666,
+                47.643470100000016
+              ],
+              "zoom": 12,
+              "featureCount": 3,
+              "moving": false,
+              "moveEnds": 7
+            },
+            "afterResume": {
+              "loads": 4,
+              "fixes": 3,
+              "errors": 0,
+              "watches": 3,
+              "releases": 2,
+              "center": [
+                -122.32,
+                47.62999999999999
+              ],
+              "zoom": 12,
+              "featureCount": 3,
+              "moving": false,
+              "moveEnds": 10
+            }
+          }
+        },
+        {
+          "name": "foreground permission boundary",
+          "status": "passed",
+          "observation": {
+            "applicationIntegrationRequired": true
+          }
+        },
+        {
+          "name": "fresh native position from simulator injection",
+          "status": "passed",
+          "observation": {
+            "lngLat": [
+              -122.33,
+              47.62
+            ],
+            "timestamp": 1792029632000,
+            "accuracy": 5,
+            "altitude": 0,
+            "requestedAt": 1792029631130,
+            "completedAt": 1792029632489
+          }
+        },
+        {
+          "name": "independent zero-zoom PNG dimensions and file output",
+          "status": "passed",
+          "observation": {
+            "dataUrl": {
+              "width": 96,
+              "height": 64,
+              "red": 165,
+              "blue": 0,
+              "green": 0,
+              "navy": 4969,
+              "magenta": 0
+            },
+            "file": {
+              "width": 96,
+              "height": 64,
+              "red": 165,
+              "blue": 0,
+              "green": 0,
+              "navy": 4969,
+              "magenta": 0
+            }
+          }
+        },
+        {
+          "name": "invalid snapshot style rejects before the facade deadline",
+          "status": "passed",
+          "observation": {
+            "elapsedMs": 402
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-mapbox-ios-1792029635146",
+              "backendId": "tf08-mapbox-ios-1792029635146",
+              "metadata": {
+                "test": "tf08",
+                "backend": "mapbox-native",
+                "fixtureStyle": "http://127.0.0.1:8798/offline-style.json?id=tf08-mapbox-ios-1792029635146"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-mapbox-ios-1792029635146",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "subscriberEventsBeforeDuplicate": 12,
+            "subscriberEventsAfterDuplicate": 12,
+            "resourceRequests": 2
+          }
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-mapbox-ios-1792029635146",
+              "backendId": "tf08-mapbox-ios-1792029635146",
+              "metadata": {
+                "test": "tf08",
+                "backend": "mapbox-native",
+                "fixtureStyle": "http://127.0.0.1:8798/offline-style.json?id=tf08-mapbox-ios-1792029635146"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-mapbox-ios-1792029635146",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "pixels": {
+              "width": 1170,
+              "height": 2238,
+              "red": 0,
+              "blue": 1017,
+              "green": 0,
+              "navy": 959553,
+              "magenta": 1632303
+            },
+            "blockedRequests": 0,
+            "networking": "Mapbox SDK network switch confirmed disconnected; fixture sockets closed; loopback command/Metro transport retained"
+          }
+        },
+        {
+          "name": "offline invalidation preserves subscribed progress",
+          "status": "passed",
+          "observation": {
+            "status": {
+              "id": "tf08-mapbox-ios-1792029635146",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "subscriberEventsBefore": 4,
+            "subscriberEventsAfter": 20
+          }
+        }
+      ],
+      "imageObservations": [
+        {
+          "scenario": "actual PNG capture and overlay scope",
+          "width": 1170,
+          "height": 2238,
+          "red": 5343,
+          "blue": 1017,
+          "green": 0,
+          "navy": 2595978,
+          "magenta": 0
+        },
+        {
+          "scenario": "independent zero-zoom PNG dimensions and file output",
+          "width": 96,
+          "height": 64,
+          "red": 165,
+          "blue": 0,
+          "green": 0,
+          "navy": 4969,
+          "magenta": 0
+        },
+        {
+          "scenario": "independent zero-zoom PNG dimensions and file output",
+          "width": 96,
+          "height": 64,
+          "red": 165,
+          "blue": 0,
+          "green": 0,
+          "navy": 4969,
+          "magenta": 0
+        },
+        {
+          "scenario": "persisted offline pack after cold restart with fixture resources unavailable",
+          "width": 1170,
+          "height": 2238,
+          "red": 0,
+          "blue": 1017,
+          "green": 0,
+          "navy": 959553,
+          "magenta": 1632303
+        }
+      ],
+      "lastRendererObservation": {
+        "loads": 2,
+        "fixes": 0,
+        "errors": 0,
+        "watches": 0,
+        "releases": 0,
+        "center": [
+          0,
+          0
+        ],
+        "zoom": 1,
+        "featureCount": 4,
+        "moving": false,
+        "moveEnds": 2,
+        "moves": [
+          {
+            "origin": "unknown",
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              2.842170943040401e-14,
+              -2.5444437451708134e-14
+            ],
+            "zoom": 1
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 1
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course",
+        "second iOS display density"
+      ],
+      "resourceRequests": 2,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/invalid-style.json",
+          "available": true
+        },
+        {
+          "path": "/offline-style.json?id=tf08-mapbox-ios-1792029635146",
+          "available": true
+        }
+      ]
+    }
+  },
+  "retention": "Compact run identities, first failures, scoped results, final observations and diagnostic limitations retained here. Owned temporary apps, tools, profiles, caches, raw logs/screenshots and dedicated simulator removed after checks; previous evidence JSON preserved.",
+  "harnessSha256": {
+    "examples/shared/tf07-scene.tsx": "b6dc226baf7ccbc7cab30f9506f4d3fd185b63967ead650369eed968ee4b7db3",
+    "examples/shared/tf08-acceptance-scene.tsx": "170e1201073b906a587fc56be82da70d3b3e1188b40898151be5bcf84129882d",
+    "examples/native-mapbox/App.tsx": "de15b8b186404b91215840a0bce1c0c16d9f7ff6cae0b60ba873006f507dddda",
+    "scripts/tf07-ui-smoke.mjs": "5835abb935cf82a9b5dd0d5c589cff120837438e4f9b67b6d070276ac6b1375a",
+    "scripts/tf08-services-smoke.mjs": "0e1287664f678302b34182d9dba306493b3bc38110a1be1a6408de3c636729be",
+    "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+  },
+  "remaining": [
+    "Original location timeout and one-off SDK offline error causes remain unproven; final affected suites pass without production-library changes.",
+    "Full VoiceOver, physical-device authorization/revocation/course, second iOS display density, and broader TF07 focused scenarios were outside this affected core rerun.",
+    "Working changes and evidence are local and uncommitted; no PR head changed in this follow-up."
+  ],
+  "cleanup": {
+    "dedicatedSimulator": "31FA0161-632C-4EC3-A7EF-2669A13B4C4A shut down and deleted",
+    "ownedListeners": "8181,8797,8798,8799 released; touch driver exited0",
+    "temporaryRoot": "removed",
+    "defaultXcodeResult": "only owned Test-TapDriver-2026.10.14_18-59-39--0700.xcresult selected for removal; older shared cached build/result untouched"
+  }
+}
