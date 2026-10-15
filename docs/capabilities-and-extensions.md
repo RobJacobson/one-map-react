@@ -2,6 +2,8 @@
 
 **Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.
 
+**Current TF08 implementation:** [Location, offline, and capture](tf08-location-offline-capture.md) supersedes the service and snapshot proposals below for the thin facade. Use `adapter.services`/`useMapServices()` and `MapRef.capture`; no retired extension dispatcher or capability registry has been restored. Runtime acceptance remains pending.
+
 one-map-react should expose common behavior through its core API and make additional functionality discoverable through named capabilities. A capability describes a supported contract, including relevant options, rather than merely the existence of a similarly named SDK method.
 
 **Agreed design:** Reusing existing wrappers, optional backend peer dependencies, and strict unsupported-feature handling are accepted decisions. Capability types, the typed `supports` query, diagnostics, and errors were implemented in the retired portable core; per-backend fulfillment and runtime verification remain separate. The archived implementation-status document records that evidence.

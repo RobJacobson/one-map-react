@@ -241,4 +241,9 @@ export {
   TerrainControl as WrapperTerrainControl,
 } from "react-map-gl/maplibre";
 
-export { SelectedWebMap as Map };
+/** Direct wrapper map and map access for selected canvas/container facilities. */
+export {
+  MaplibreMap as WrapperMap,
+  SelectedWebMap as Map,
+  useMap as useWrapperMap,
+};

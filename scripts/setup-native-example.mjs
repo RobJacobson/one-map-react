@@ -10,6 +10,8 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+import { foregroundLocationDeclarations } from "./native-location-permissions.mjs";
+
 const root = resolve(import.meta.dirname, "..");
 
 const examples = {
@@ -356,6 +358,21 @@ for (const [key, { appName, directory }] of Object.entries(selected)) {
     }
 
     adoptSceneLifecycle(exampleRoot, appName);
+    const plistPath = join(exampleRoot, "ios", appName, "Info.plist");
+    const manifestPath = join(
+      exampleRoot,
+      "android",
+      "app",
+      "src",
+      "main",
+      "AndroidManifest.xml"
+    );
+    const declarations = foregroundLocationDeclarations(
+      readFileSync(plistPath, "utf8"),
+      readFileSync(manifestPath, "utf8")
+    );
+    writeFileSync(plistPath, declarations.plist);
+    writeFileSync(manifestPath, declarations.manifest);
     console.log(`Wrote ios/, android/, and Gemfile for ${key}`);
   } finally {
     rmSync(temp, { recursive: true, force: true });

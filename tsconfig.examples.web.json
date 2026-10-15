@@ -17,6 +17,7 @@
   "include": [
     "examples/css-modules.d.ts",
     "examples/shared/route-map.tsx",
+    "examples/shared/tf08-map.tsx",
     "examples/shared/web-lifecycle-app.tsx",
     "examples/shared/web-camera-app.tsx",
     "examples/shared/camera-smoke.ts",

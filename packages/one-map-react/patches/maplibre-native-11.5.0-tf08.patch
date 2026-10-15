@@ -1,0 +1,70 @@
+diff --git a/ios/modules/static-map/MLRNStaticMapModule.mm b/ios/modules/static-map/MLRNStaticMapModule.mm
+--- a/ios/modules/static-map/MLRNStaticMapModule.mm
++++ b/ios/modules/static-map/MLRNStaticMapModule.mm
+@@ -76,6 +76,8 @@
+     mapSnapshotOptions.zoomLevel = options.zoom().value();
+   }
+ 
++  // Dimensions are PNG pixels; override the SDK default screen scale.
++  mapSnapshotOptions.scale = 1.0;
+   mapSnapshotOptions.showsLogo = options.logo().value_or(false);
+ 
+   return mapSnapshotOptions;
+diff --git a/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt b/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt
+--- a/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt
++++ b/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt
+@@ -57,6 +57,7 @@
+                             }
+ 
+                         if (result == null) {
++                            snapshotterMap.remove(snapshotterID)
+                             promise.reject(
+                                 NAME,
+                                 "Could not generate snapshot, please check Android logs for more info.",
+@@ -69,8 +70,8 @@
+                     }
+                 },
+             ) { error ->
+-                Log.w(NAME, error)
+                 snapshotterMap.remove(snapshotterID)
++                promise.reject(NAME, "Could not create static map image", RuntimeException(error))
+             }
+         }
+     }
+@@ -93,13 +94,8 @@
+                 },
+             )
+         }
+-        options.withPixelRatio(
+-            TypedValue.applyDimension(
+-                TypedValue.COMPLEX_UNIT_DIP,
+-                1f,
+-                reactContext.resources.displayMetrics,
+-            ),
+-        )
++        // Dimensions are PNG pixels; display density must not scale the output.
++        options.withPixelRatio(1f)
+ 
+         if (readableMap.hasKey("center")) {
+             val center = GeoJSONUtils.toLatLng(readableMap.getArray("center"))
+diff --git a/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt b/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
+--- a/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
++++ b/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
+@@ -78,6 +78,8 @@
+                     val pack = fromOfflineRegion(offlineRegion)
+                     promise.resolve(pack)
+                     setOfflineRegionObserver(packId, offlineRegion)
++                    // Creation starts the download; observer attachment preserves pause state.
++                    offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+                 }
+ 
+                 override fun onError(error: String) {
+@@ -545,8 +547,6 @@
+                 }
+             },
+         )
+-
+-        region.setDownloadState(OfflineRegion.STATE_ACTIVE)
+     }
+ 
+     private fun makeErrorPayload(

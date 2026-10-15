@@ -259,4 +259,9 @@ export interface WebFullscreenControlProps extends FullscreenControlProps {
 export const FullscreenControl =
   OneFullscreenControl as ComponentType<WebFullscreenControlProps>;
 
-export { SelectedWebMap as Map };
+/** Direct wrapper map and map access for selected canvas/container facilities. */
+export {
+  MapboxMap as WrapperMap,
+  SelectedWebMap as Map,
+  useMap as useWrapperMap,
+};

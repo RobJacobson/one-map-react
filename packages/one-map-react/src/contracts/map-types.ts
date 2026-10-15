@@ -38,6 +38,8 @@ export interface MapLayoutStyle {
  * Props for the shared {@link Map} component.
  */
 export interface MapProps {
+  /** Enable current-map capture at construction; default false, immutable. */
+  readonly captureEnabled?: boolean;
   /** Optional provider-local identity for useMap(id); changing requires remount. */
   readonly id?: string;
   /** Layer ids whose rendered feature hits are included with map clicks. */

@@ -5,7 +5,6 @@ import {
   useImperativeHandle,
   useLayoutEffect,
   useRef,
-  useState,
 } from "react";
 import { createPortal } from "react-dom";
 
@@ -24,8 +23,15 @@ import type {
   PopupProps,
   ScaleControlProps,
 } from "../../contracts/ui-types.js";
-import { useMapSession } from "../../facade/map-context.js";
+import {
+  useMapSession,
+  useOptionalMapSession,
+} from "../../facade/map-context.js";
+import { useLocationOverride } from "../../facade/map-setup.js";
+import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
 import { useStableOptions } from "../../facade/use-stable-options.js";
+import { UserLocation } from "../../facade/user-location.js";
+import { positionFromWrapper } from "../shared/location-values.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import {
   lngLatFromWrapper,
@@ -282,6 +288,7 @@ export const createWebUi = (
       hostProps,
       children,
       getCurrentPosition,
+      locationProvider,
       zoom,
       onGeolocate,
       onError,
@@ -295,30 +302,28 @@ export const createWebUi = (
         "onTrackUserLocationEnd",
       ]),
       position: props.position ?? "top-right",
-      trackUserLocation: props.trackUserLocation ?? false,
-      injectedProvider: getCurrentPosition !== undefined,
     });
     const locate = useActiveCallback(onGeolocate);
     const error = useActiveCallback(onError);
 
-    if (getCurrentPosition) {
-      if (props.trackUserLocation) {
-        throw new Error(
-          "An injected location provider supports one-shot location only."
-        );
-      }
-
-      return (
-        <InjectedGeolocateControl
-          {...props}
-          getCurrentPosition={getCurrentPosition}
-          Control={Control}
-        />
+    const session = useOptionalMapSession();
+    const setupProvider = useLocationOverride();
+    if (
+      props.trackUserLocation &&
+      (session?.cameraControlled || session?.nativeLocationFollowing)
+    ) {
+      throw new Error(
+        "Location follow conflicts with viewState or selected native camera follow."
       );
+    }
+
+    if (getCurrentPosition || locationProvider || setupProvider) {
+      return <InjectedGeolocateControl {...props} Control={Control} />;
     }
 
     return (
       <wrapper.GeolocateControl
+        key={props.trackUserLocation ? "tracking" : "once"}
         {...options}
         {...forwarded}
         position={props.position ?? "top-right"}
@@ -421,74 +426,30 @@ interface WebGeolocationNotice {
 
 const geolocationPosition = (
   event: WebGeolocationNotice
-): GeolocationPosition => ({
-  lngLat: [event.coords.longitude, event.coords.latitude],
-  accuracy: event.coords.accuracy,
-  timestamp: event.timestamp,
-});
+): GeolocationPosition => positionFromWrapper(event, "browser");
 
 /** One-shot injected locations permit deterministic browser/native app behavior. */
 const InjectedGeolocateControl = (
   props: GeolocateControlProps &
     WebUiOptions & {
-      readonly getCurrentPosition: NonNullable<
-        GeolocateControlProps["getCurrentPosition"]
-      >;
       readonly Control: (props: ControlProps & WebUiOptions) => ReactNode;
     }
 ): ReactNode => {
   const session = useMapSession();
-  const [pending, setPending] = useState(false);
-  const pendingRef = useRef(false);
-  const generation = useRef(0);
-  const onGeolocate = useActiveCallback(props.onGeolocate);
-  const onError = useActiveCallback(props.onError);
-  useLayoutEffect(() => {
-    generation.current += 1;
-    return () => {
-      generation.current += 1;
-    };
-  }, []);
-  const locate = async (): Promise<void> => {
-    if (pendingRef.current || !session.ready) return;
-    pendingRef.current = true;
-    setPending(true);
-    const requestGeneration = generation.current;
-    try {
-      const acquired = await props.getCurrentPosition();
-      const position = {
-        ...acquired,
-        lngLat: lngLatFromWrapper(acquired.lngLat),
-      };
-      if (requestGeneration !== generation.current) return;
-      const lngLat = lngLatFromWrapper(position.lngLat);
-      onGeolocate({ ...position, lngLat });
-      if (requestGeneration !== generation.current) return;
-      await session.map.flyTo({ center: lngLat, zoom: props.zoom ?? 14 });
-    } catch (failure) {
-      if (requestGeneration !== generation.current) return;
-      if (props.onError) onError(failure);
-      else throw failure;
-    } finally {
-      if (requestGeneration === generation.current) {
-        pendingRef.current = false;
-        setPending(false);
-      }
-    }
-  };
-
+  const { pending, position, activate } = useGeolocationControl(props, "flyTo");
   return (
-    <props.Control position={props.position} hostProps={props.hostProps}>
-      <button
-        type="button"
-        aria-label="Locate me"
-        disabled={pending || !session.ready}
-        onClick={() => {
-          void locate();
-        }}
-      >
-        Locate me
-      </button>
-    </props.Control>
+    <>
+      <UserLocation position={position} showAccuracyCircle />
+      <props.Control position={props.position} hostProps={props.hostProps}>
+        <button
+          type="button"
+          aria-label="Locate me"
+          disabled={pending || !session.ready}
+          onClick={activate}
+        >
+          Locate me
+        </button>
+      </props.Control>
+    </>
   );
 };

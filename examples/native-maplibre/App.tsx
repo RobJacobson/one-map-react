@@ -1,5 +1,5 @@
 import { type MapRef, MapSetup } from "one-map-react";
-import { adapter } from "one-map-react/maplibre-native";
+import { adapter, WrapperLocationManager } from "one-map-react/maplibre-native";
 import { useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
@@ -9,10 +9,20 @@ import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
+import { NativeTf08Screen } from "../shared/native-tf08-screen.js";
 import { RouteMap } from "../shared/route-map.js";
 import { smokeTarget } from "../shared/smoke-target.js";
 
 const App = () => {
+  if (smokeTarget === "tf08")
+    return (
+      <NativeTf08Screen
+        adapter={adapter}
+        getLocationDiagnostic={() =>
+          WrapperLocationManager.getCurrentPosition()
+        }
+      />
+    );
   if (smokeTarget === "tf07") return <NativeTf07Screen adapter={adapter} />;
   if (smokeTarget === "tf06-lifetimes") {
     return <NativeLifetimesScreen adapter={adapter} />;

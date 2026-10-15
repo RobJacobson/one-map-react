@@ -164,6 +164,15 @@ export interface MapRef
     ClusterQueryMethods,
     FeatureStateMethods {
   /**
+   * Captures an attached rendered map. Rejects on detachment or deadline.
+   * @param options - Explicit scope, output, and optional deadline.
+   * @returns PNG output; requires captureEnabled on the Map.
+   */
+  capture(
+    options: import("./capture-types.js").CaptureOptions
+  ): Promise<import("./capture-types.js").MapCapture>;
+
+  /**
    * Moves the camera without animation.
    *
    * @param options - Partial camera target. A duration other than `0`, or an

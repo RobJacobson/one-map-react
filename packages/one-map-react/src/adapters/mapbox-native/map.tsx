@@ -24,10 +24,12 @@ import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { ControlPosition } from "../../contracts/ui-types.js";
 import { useOptionalMapSession } from "../../facade/map-context.js";
+import type { NativeLocationOptions } from "../../mapbox-native.js";
 import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
+import { useMapCapture } from "../shared/map-capture.js";
 import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
@@ -58,11 +60,15 @@ type RnPressFeature = Parameters<
 export const MapboxNativeMap = forwardRef<
   MapRef,
   MapProps & {
+    locationOptions?: NativeLocationOptions;
     hostProps?: ViewProps;
     options?: Partial<ComponentProps<typeof MapView>>;
   }
 >((props, ref) => {
   const session = useOptionalMapSession();
+  if (props.viewState && props.locationOptions?.followUserLocation)
+    throw new Error("Selected location follow conflicts with viewState.");
+  const capture = useMapCapture(props.captureEnabled);
   const ornaments = useNativeOrnamentPositions();
   const scaleBarPosition =
     props.options?.scaleBarPosition ??
@@ -178,8 +184,24 @@ export const MapboxNativeMap = forwardRef<
   );
 
   const mapHandle = useMemo(
-    () => createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources),
-    [geoJsonSources]
+    () =>
+      createMapboxMapRef(
+        cameraRef,
+        mapViewRef,
+        geoJsonSources,
+        async (options) => {
+          if (options.scope === "renderer" && Platform.OS === "ios")
+            throw new Error(
+              "Renderer-only capture is unavailable through RNMapbox iOS view capture. Use scope backend."
+            );
+          return capture.run(options, async () => {
+            const map = mapViewRef.current;
+            if (!map) throw new Error("Map is not attached.");
+            return map.takeSnap(options.output === "file");
+          });
+        }
+      ),
+    [geoJsonSources, capture]
   );
   // Descendant control effects must retain the attached ref during prop updates.
   useImperativeHandle(ref, () => mapHandle, [mapHandle]);
@@ -213,6 +235,7 @@ export const MapboxNativeMap = forwardRef<
         onLayout={(event) => {
           const { width, height } = event.nativeEvent.layout;
           session?.setNativeLayout(width, height);
+          capture.layout(width, height);
           props.hostProps?.onLayout?.(event);
         }}
         // Common width strings cross the native host dimension boundary here.
@@ -261,7 +284,10 @@ export const MapboxNativeMap = forwardRef<
                 }
               : {})}
             gestureSettings={gestureSettings}
-            onDidFinishRenderingFrameFully={flushFeatureState}
+            onDidFinishRenderingFrameFully={() => {
+              capture.frame();
+              flushFeatureState();
+            }}
             onDidFinishLoadingMap={() => {
               reportLoad();
             }}
@@ -272,7 +298,9 @@ export const MapboxNativeMap = forwardRef<
               reportStyleLoad();
             }}
             onMapLoadingError={(payload: unknown) => {
-              reportError(mapLoadingErrorEvent(payload));
+              const event = mapLoadingErrorEvent(payload);
+              capture.fail(event.error);
+              reportError(event);
             }}
             onCameraChanged={reportChanging}
             onMapIdle={reportSettled}
@@ -304,6 +332,7 @@ export const MapboxNativeMap = forwardRef<
               padding={
                 padding === undefined ? undefined : toRnmapboxPadding(padding)
               }
+              {...props.locationOptions}
               {...(controlled ?? {})}
             />
             {children}

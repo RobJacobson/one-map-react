@@ -19,14 +19,31 @@ interface TouchZoomRotateHandler {
 }
 
 interface StyleLoadTarget {
-  on(type: "style.load" | "load" | "idle", listener: () => void): void;
+  on(
+    type: "style.load" | "load" | "idle" | "render",
+    listener: () => void
+  ): void;
   on(type: "error", listener: (event: WebErrorNotice) => void): void;
-  off(type: "style.load" | "load" | "idle", listener: () => void): void;
+  off(
+    type: "style.load" | "load" | "idle" | "render",
+    listener: () => void
+  ): void;
   off(type: "error", listener: (event: WebErrorNotice) => void): void;
   // Pinned maplibre-gl returns void while no style is loaded; mapbox-gl
   // returns boolean. Callers treat non-true as not loaded.
   isStyleLoaded: () => unknown;
   touchZoomRotate?: TouchZoomRotateHandler;
+  /** Current canvas, used only by opt-in capture. */
+  getCanvas?: () => {
+    readonly width: number;
+    readonly height: number;
+    toDataURL(type: string): string;
+    getContext(type: "webgl2" | "webgl"): {
+      getContextAttributes(): { preserveDrawingBuffer?: boolean } | null;
+    } | null;
+  };
+  /** Capture requires an actual rendered frame; wrapper lifecycle owns these events. */
+  triggerRepaint?: () => void;
 }
 
 interface WebMapHandle {
@@ -106,6 +123,10 @@ interface WebMapProps {
   readonly maxBounds?: readonly [number, number, number, number];
   readonly style?: CSSProperties;
   readonly reuseMaps?: boolean;
+  readonly preserveDrawingBuffer?: boolean;
+  readonly canvasContextAttributes?: {
+    readonly preserveDrawingBuffer: boolean;
+  };
   readonly gl?: ExternalDrawingContext;
   /** Layers included in wrapper pointer feature hits. */
   readonly interactiveLayerIds?: string[];

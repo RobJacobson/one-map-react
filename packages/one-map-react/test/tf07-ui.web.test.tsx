@@ -288,7 +288,13 @@ describe("TF07 web UI delegates", () => {
     );
     const flyTo = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
     const onGeolocate = jest.fn();
-    const session = { ready: true, map: { flyTo } } as unknown as MapSession;
+    const map = { flyTo };
+    const session = {
+      ready: true,
+      map,
+      ref: { current: map },
+      subscribe: () => () => {},
+    } as unknown as MapSession;
     const view = render(
       <MapSessionContext.Provider value={session}>
         <GeolocateControl
@@ -327,5 +333,26 @@ describe("TF07 web UI delegates", () => {
     expect(() =>
       control.rerender(<NavigationControl position="bottom-left" />)
     ).toThrow("creation option");
+  });
+  test("TF08 tracking-mode changes release the old SDK control resource", () => {
+    const release = jest.fn();
+    const ControlWithResource = () => {
+      useEffect(
+        () => () => {
+          release();
+        },
+        []
+      );
+      return null;
+    };
+    const ui = createWebUi({
+      ...wrapper,
+      GeolocateControl: ControlWithResource,
+    });
+    const view = render(<ui.GeolocateControl trackUserLocation />);
+    view.rerender(<ui.GeolocateControl trackUserLocation={false} />);
+    expect(release).toHaveBeenCalledTimes(1);
+    view.unmount();
+    expect(release).toHaveBeenCalledTimes(2);
   });
 });

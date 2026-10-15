@@ -1,0 +1,35 @@
+{
+  "stage": "TF08",
+  "date": "2026-10-14",
+  "baseRevision": "e8be60148c047077f4728d2b3f985400b164e846",
+  "tf07Revision": "27672969004bcfeaf1d931e2a917272991f4f5dd",
+  "findings": [2],
+  "changes": [
+    "Discard initial or refresh status readback when a newer SDK progress event arrived during the asynchronous read.",
+    "Merge the TF07 repeated-tap fix, native annotation host cleanup, and regressions into this stacked branch."
+  ],
+  "regressions": {
+    "beforeFix": "Four delayed-status cases failed: active and complete events on each native backend were overwritten by older 50-percent active status.",
+    "afterFix": "All four cases pass; existing resume, invalidation, subscriber fan-out, failure, and disposal tests also pass."
+  },
+  "routine": {
+    "command": "bun run validate",
+    "status": "passed",
+    "jestTests": 630,
+    "jestSuites": 28,
+    "typeConfigurations": 4,
+    "formatting": "passed",
+    "documentation": "passed",
+    "scriptUnitChecks": "passed",
+    "peerPatchChecks": "passed",
+    "libraryBuild": "passed",
+    "isolatedPackageSelections": 13,
+    "packageSha256": "501e58bafb66441fc82f4269c152eb4f67edd639530ef9f7300a504268201c9b",
+    "execution": "Run outside the sandbox because the process-cleanup unit test needs to inspect its own processes. No renderer acceptance was launched."
+  },
+  "runtimeAcceptance": {
+    "status": "unverified for the changed behavior",
+    "reason": "Only routine checks were requested. No renderer run, native build, installation, or device scenario was launched.",
+    "affectedScope": "Native offline subscription/status ordering on both engines and operating systems, plus the inherited TF07 RNMapbox repeated-tap behavior. Earlier renderer results remain attached to their original artifacts."
+  }
+}

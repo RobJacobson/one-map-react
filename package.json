@@ -16,7 +16,7 @@
     "check:docs": "bun scripts/check-docs.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json && tsc --noEmit -p tsconfig.examples.web.json && tsc --noEmit -p tsconfig.examples.native.json",
     "build": "bun scripts/build.mjs",
-    "test": "jest --runInBand && bun examples/mapbox-token.test.mjs && bun examples/inline-smoke-target.test.mjs && bun scripts/tf06-lifetimes-fixture.test.mjs && node scripts/native-smoke-process.test.mjs && bun scripts/native-smoke-process.test.mjs && bun scripts/tf06-smoke-selection.test.mjs && bun scripts/tf07-smoke-contract.test.mjs",
+    "test": "jest --runInBand && bun examples/mapbox-token.test.mjs && bun examples/inline-smoke-target.test.mjs && bun scripts/tf06-lifetimes-fixture.test.mjs && node scripts/native-smoke-process.test.mjs && bun scripts/native-smoke-process.test.mjs && bun scripts/tf06-smoke-selection.test.mjs && bun scripts/tf07-smoke-contract.test.mjs && bun scripts/tf08-patches.test.mjs && bun scripts/native-location-permissions.test.mjs && node scripts/tf08-image-observations.test.mjs && node scripts/tf08-fused-location-fixture.test.mjs",
     "test:peers": "bun run build && bun scripts/test-peers.mjs",
     "test:package": "bun run build && bun scripts/test-package.mjs",
     "test:example-resolution": "bun run build && bun scripts/test-example-resolution.mjs",
@@ -51,5 +51,9 @@
     "test-renderer": "1.3.0",
     "typescript": "7.0.2",
     "react-native-teleport": "1.2.1"
+  },
+  "patchedDependencies": {
+    "@rnmapbox/maps@10.3.7": "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
+    "@maplibre/maplibre-react-native@11.5.0": "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch"
   }
 }

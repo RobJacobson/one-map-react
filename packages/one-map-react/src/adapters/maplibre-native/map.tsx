@@ -14,6 +14,7 @@ import {
 } from "react";
 import {
   type NativeSyntheticEvent,
+  Platform,
   type StyleProp,
   View,
   type ViewProps,
@@ -25,10 +26,12 @@ import type { MapRef } from "../../contracts/camera-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { ControlPosition } from "../../contracts/ui-types.js";
 import { useOptionalMapSession } from "../../facade/map-context.js";
+import type { NativeLocationOptions } from "../../maplibre-native.js";
 import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
+import { useMapCapture } from "../shared/map-capture.js";
 import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
@@ -61,11 +64,15 @@ type MaplibreRegionEvent = Parameters<
 export const MaplibreNativeMap = forwardRef<
   MapRef,
   MapProps & {
+    locationOptions?: NativeLocationOptions;
     hostProps?: ViewProps;
     options?: Partial<ComponentProps<typeof MaplibreMap>>;
   }
 >((props, ref) => {
   const session = useOptionalMapSession();
+  if (props.viewState && props.locationOptions?.trackUserLocation)
+    throw new Error("Selected location follow conflicts with viewState.");
+  const capture = useMapCapture(props.captureEnabled);
   const ornaments = useNativeOrnamentPositions();
   const {
     mapStyle,
@@ -132,8 +139,27 @@ export const MaplibreNativeMap = forwardRef<
   });
 
   const mapHandle = useMemo(
-    () => createMaplibreMapRef(cameraRef, mapRef, mapLoaded, sources),
-    [sources]
+    () =>
+      createMaplibreMapRef(
+        cameraRef,
+        mapRef,
+        mapLoaded,
+        sources,
+        async (options) => {
+          if (options.scope === "renderer" && Platform.OS === "ios")
+            throw new Error(
+              "Renderer-only capture is unavailable through MapLibre iOS view capture. Use scope backend."
+            );
+          return capture.run(options, async () => {
+            const map = mapRef.current;
+            if (!map) throw new Error("Map is not attached.");
+            return map.createStaticMapImage({
+              output: options.output === "file" ? "file" : "base64",
+            });
+          });
+        }
+      ),
+    [sources, capture]
   );
   // Descendant control effects must retain the attached ref during prop updates.
   useImperativeHandle(ref, () => mapHandle, [mapHandle]);
@@ -185,6 +211,7 @@ export const MaplibreNativeMap = forwardRef<
         onLayout={(event) => {
           const { width, height } = event.nativeEvent.layout;
           session?.setNativeLayout(width, height);
+          capture.layout(width, height);
           props.hostProps?.onLayout?.(event);
         }}
         // Common width strings cross the native host dimension boundary here.
@@ -222,7 +249,10 @@ export const MaplibreNativeMap = forwardRef<
             style={{ flex: 1 }}
             mapStyle={mapStyle}
             {...gestures}
-            onDidFinishRenderingFrameFully={flushFeatureState}
+            onDidFinishRenderingFrameFully={() => {
+              capture.frame();
+              flushFeatureState();
+            }}
             onDidFinishLoadingMap={() => {
               mapLoaded.current = true;
               reportLoad();
@@ -232,6 +262,9 @@ export const MaplibreNativeMap = forwardRef<
               reportStyleLoad();
             }}
             onDidFailLoadingMap={() => {
+              capture.fail(
+                new Error("MapLibre reported a map loading failure.")
+              );
               reportError({});
             }}
             onRegionWillChange={
@@ -271,6 +304,7 @@ export const MaplibreNativeMap = forwardRef<
               padding={
                 padding === undefined ? undefined : normalizePadding(padding)
               }
+              {...props.locationOptions}
               {...(controlled ?? {})}
             />
             {children}

@@ -1,8 +1,8 @@
 import * as Mapbox from "@rnmapbox/maps";
 import { type MapRef, MapSetup } from "one-map-react";
-import { adapter } from "one-map-react/mapbox-native";
+import { adapter, WrapperLocationManager } from "one-map-react/mapbox-native";
 import { useRef } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
@@ -10,6 +10,7 @@ import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
+import { NativeTf08Screen } from "../shared/native-tf08-screen.js";
 import { RouteMap } from "../shared/route-map.js";
 import { smokeTarget } from "../shared/smoke-target.js";
 
@@ -32,7 +33,25 @@ if (!mapboxAccessToken) {
 
 void setAccessToken(mapboxAccessToken);
 
+/** Uses the wrapper's SDK network switch while keeping test transport available. */
+const setNetworkConnected = (connected: boolean): Promise<boolean> =>
+  (
+    NativeModules.RNMBXModule as {
+      setConnected: (connected: boolean) => Promise<boolean>;
+    }
+  ).setConnected(connected);
+
 const App = () => {
+  if (smokeTarget === "tf08")
+    return (
+      <NativeTf08Screen
+        adapter={adapter}
+        getLocationDiagnostic={() =>
+          WrapperLocationManager.getLastKnownLocation()
+        }
+        setNetworkConnected={setNetworkConnected}
+      />
+    );
   if (smokeTarget === "tf07") return <NativeTf07Screen adapter={adapter} />;
   if (smokeTarget === "tf06-lifetimes") {
     return <NativeLifetimesScreen adapter={adapter} />;

@@ -38,6 +38,8 @@ import {
   NativeOverlayContext,
   useMapSession,
 } from "../../facade/map-context.js";
+import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
+import { UserLocation } from "../../facade/user-location.js";
 import { useActiveCallback } from "./use-active-callback.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 
@@ -790,61 +792,21 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
 };
 
 const NativeGeolocateControl: Adapter["GeolocateControl"] = (props) => {
-  const mapSession = useMapSession();
-  const [pending, setPending] = useState(false);
-  const active = useRef(false);
-  const busy = useRef(false);
-  const located = useNativeCallback(props.onGeolocate);
-  const reportError = useNativeCallback(props.onError);
-
-  useLayoutEffect(() => {
-    active.current = true;
-    return () => {
-      active.current = false;
-    };
-  }, []);
-
-  if (!props.getCurrentPosition)
-    throw new Error("Native GeolocateControl requires getCurrentPosition.");
-  if (props.trackUserLocation)
-    throw new Error("Native location tracking belongs to TF08.");
-
-  const locate = async (): Promise<void> => {
-    if (busy.current || !mapSession.ready) return;
-    const provider = props.getCurrentPosition;
-    if (!provider) return;
-    busy.current = true;
-    setPending(true);
-    try {
-      const providedPosition = await provider();
-      if (!active.current) return;
-      const center = lngLatFromWrapper(providedPosition.lngLat);
-      const position = {
-        ...providedPosition,
-        lngLat: lngLatFromWrapper(center),
-      };
-      located(position);
-      const map = mapSession.ref.current;
-      if (!map) throw new Error("Geolocation target map is detached.");
-      await map.easeTo({ center, zoom: props.zoom ?? 14 });
-    } catch (error) {
-      if (active.current) reportError(error);
-    } finally {
-      busy.current = false;
-      if (active.current) setPending(false);
-    }
-  };
-
+  const session = useMapSession();
+  const { pending, position, activate } = useGeolocationControl(props);
   return (
-    <NativeControl position={props.position}>
-      <ControlButton
-        label="Locate me"
-        disabled={pending || !mapSession.ready}
-        onPress={() => void locate()}
-      >
-        ◎
-      </ControlButton>
-    </NativeControl>
+    <>
+      <UserLocation position={position} showAccuracyCircle />
+      <NativeControl position={props.position}>
+        <ControlButton
+          label="Locate me"
+          disabled={pending || !session.ready}
+          onPress={activate}
+        >
+          ◎
+        </ControlButton>
+      </NativeControl>
+    </>
   );
 };
 
