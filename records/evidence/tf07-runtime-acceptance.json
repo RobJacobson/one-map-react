@@ -1,0 +1,2233 @@
+{
+  "recordedDate": "2026-10-12",
+  "stage": "TF07",
+  "status": "acceptance-incomplete",
+  "authorization": "Owner explicitly requested TF07 runtime acceptance tests across all six environments using subagents.",
+  "scope": "Frozen audit-corrected library; core prepared web runner and four native build/install/touch flows. Additional visual and focused gates recorded separately; core web passes alone cannot establish full TF07 acceptance.",
+  "artifact": {
+    "baseRevision": "bea888029a36aa56fab24ee2b977d2bfba467346",
+    "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+    "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+    "packedPackageSha256": "575580c8fd82b9195b583ca69db2e4b45e90c592a6d7acd073a0abab7a224554",
+    "copies": {
+      "web-mapbox": {
+        "path": "/Users/rob/code/mapbox-code/one-map/examples/web-mapbox/node_modules/one-map-react",
+        "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "web-maplibre": {
+        "path": "/Users/rob/code/mapbox-code/one-map/examples/web-maplibre/node_modules/one-map-react",
+        "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "native-mapbox": {
+        "path": "/Users/rob/code/mapbox-code/one-map/examples/native-mapbox/node_modules/one-map-react",
+        "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "native-maplibre": {
+        "path": "/Users/rob/code/mapbox-code/one-map/examples/native-maplibre/node_modules/one-map-react",
+        "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      }
+    },
+    "harnessHashes": {
+      "scripts/tf07-ui-smoke.mjs": "2d95334580ebf81aadb2915dcacdeec0e55149b313ecad364b3106834c6b9de6",
+      "scripts/tf07-smoke-contract.mjs": "194b8d42de4365c4e838509833299229141942153efd8bb1a2bd7076758643ed",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "examples/shared/tf07-scene.tsx": "f0c5dc94c3b0d8a2a94d1d69e8d6017f078d85863c209a8eca841cee72f38ba8",
+      "examples/shared/native-tf07-screen.tsx": "65af52b13499daa254f6fbfe7d838361493431301048c5f1668722cc2cd750a4",
+      "examples/shared/web-tf07-app.tsx": "fcca846cd709f0da95a90d4973b42a4ec95d47e4dc7f096e007bc8e61e423245"
+    },
+    "midRunVerification": {
+      "at": "2026-10-13T04:49:49.434Z",
+      "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+      "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+    },
+    "latestVerification": {
+      "at": "2026-10-13T06:48:51.468600+00:00",
+      "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+      "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "allFourInstalledCopiesMatch": true
+    },
+    "finalVerification": {
+      "at": "2026-10-13T07:57:45.996Z",
+      "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+      "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+      "copies": {
+        "web-mapbox": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+        "web-maplibre": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+        "native-mapbox": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+        "native-maplibre": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "unchanged": true
+    }
+  },
+  "routineCheckpoint": {
+    "validate": "passed in previous turn",
+    "jestSuites": 21,
+    "jestTests": 517,
+    "packedSelections": 13,
+    "selectedPeerConsumers": 4,
+    "exampleResolution": "passed",
+    "sourceMatchesReviewedArtifact": true,
+    "acceptanceHarnessFollowup": {
+      "formatting": "passed final181-file check",
+      "documentation": "passed final29Markdown/30comparison-table check",
+      "contractRegression": "passed finalcheck",
+      "nativeExampleTypeScript": "passed finalcheck",
+      "librarySourceAndDistChanged": false,
+      "review": "Coordinator checked scenario scope, identity/counter provenance, failure classification and no-ai-slop editorial rules.",
+      "reviewedAt": "2026-10-13T08:01:22.194610+00:00"
+    }
+  },
+  "resources": {
+    "webMapbox": {
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "ports": [
+        4187,
+        5187
+      ],
+      "cacheRoot": "/private/tmp/one-map-tf07-acceptance/cache-mapbox",
+      "temporaryRoot": "/private/tmp/one-map-tf07-acceptance/web-mapbox"
+    },
+    "webMaplibre": {
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "ports": [
+        4188,
+        5188
+      ],
+      "cacheRoot": "/private/tmp/one-map-tf07-acceptance/cache-maplibre",
+      "temporaryRoot": "/private/tmp/one-map-tf07-acceptance/web-maplibre"
+    },
+    "native": {
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "ports": [
+        8081,
+        8797
+      ],
+      "sequence": [
+        "mapbox-android",
+        "maplibre-android",
+        "mapbox-ios",
+        "maplibre-ios"
+      ],
+      "androidAvd": "Medium_Phone",
+      "iosUdid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "exclusiveOwner": "/root/native_acceptance",
+      "resumedWorker": {
+        "model": "gpt-6-luna",
+        "reasoning": "medium",
+        "exclusiveOwner": "/root/native_resume",
+        "runtime": "Existing NVM Bun1.4.1/Node24.14.0/npm toolchain",
+        "sameArtifact": true
+      },
+      "isolatedTransport": {
+        "reason": "Default Metro8081 and alternative8091 occupied by unrelated projects; leave them untouched.",
+        "metroPort": 8171,
+        "statusPort": 8797,
+        "temporaryRunnerSha256": "38fc08cd30db3976fc95323aef593dd4978c19e73d0d806b40a7e4cfb447eea8",
+        "sourceHarnessUnchanged": true,
+        "changes": [
+          "Absolute workspace/helper paths for temporary copy",
+          "Host Metro8171, Android reverse device8081 to host8171",
+          "iOS RCT_jsLocation launch argument localhost8171"
+        ],
+        "androidPrerequisite": "Configure only the test app debug_http_host preference to localhost:8081 before launching, preserving the frozen APK."
+      },
+      "currentOwner": "/root/native_final_run",
+      "currentPorts": [
+        8171,
+        8797
+      ],
+      "iosInputDriver": {
+        "tool": "Maestro",
+        "version": "2.11.0",
+        "source": "https://github.com/mobile-dev-inc/Maestro/releases/tag/cli-2.11.0",
+        "archiveSha256": "5384593cb4e7a106489e75a821d157dd43f4e438df6bc308b72e82c685e1283a",
+        "checksumVerified": true,
+        "toolAndCacheTemporary": true,
+        "analyticsDisabledForRuns": true,
+        "reason": "Simulator frontend absent; native XCUITest input needed for touch scenarios.",
+        "driverPortsVerifiedClear": [
+          7001,
+          9999,
+          8701
+        ]
+      },
+      "currentExclusiveOwner": "/root/native_final_run"
+    },
+    "webExtended": {
+      "script": "temporary coordinator-prepared web-extended.mjs",
+      "mapboxPorts": [
+        4197,
+        5197
+      ],
+      "maplibrePorts": [
+        4198,
+        5198
+      ],
+      "scope": [
+        "CSS offset and reset with displaced child hit bounds",
+        "popup child and geographic follow during physical pan",
+        "metric and imperial scale labels",
+        "Injected geolocation provider via actual Locate me press and renderer camera readback",
+        "accessibility button names",
+        "style replacement with feature recovery"
+      ],
+      "remaining": [
+        "Fullscreen not mounted in prepared fixture",
+        "keyboard and assistive-technology operation",
+        "rejected/delayed geolocation provider"
+      ]
+    }
+  },
+  "expectedDurationMinutes": [
+    60,
+    120
+  ],
+  "results": {
+    "mapbox-web": {
+      "status": "failed",
+      "error": "The fixture reported an operation error.\n\n2 !== 0\n",
+      "attempts": [
+        {
+          "number": 1,
+          "command": "bun scripts/tf07-ui-smoke.mjs web mapbox",
+          "execution": "browser-input",
+          "start": "2026-10-13T04:27:11Z",
+          "end": "2026-10-13T04:27:30Z",
+          "exitCode": 1,
+          "result": "failed"
+        }
+      ],
+      "artifact": {
+        "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "scope": "Prepared core TF07 web subset; runner reached its final fixture-error assertion.",
+      "fullTf07Acceptance": false,
+      "worker": {
+        "model": "gpt-6-luna",
+        "reasoning": "low"
+      },
+      "cleanup": "Assigned Vite/debugger ports verified clear by coordinator.",
+      "diagnosis": {
+        "status": "reproduced",
+        "execution": "coordinator browser inspector diagnostic",
+        "cause": "Mapbox dispatches onLoad before the wrapper ref attaches; the TF07 onLoad handler calls jumpTo and gets Map camera is not attached. This occurs on initial load and remount.",
+        "operationErrors": 2,
+        "libraryChanged": false,
+        "diagnosticLimit": "The inspector observes Error construction. Internal React errors and transient inspector readback errors are excluded; it is diagnostic evidence, not a replacement acceptance result."
+      },
+      "extendedAttempts": [
+        {
+          "number": 1,
+          "status": "failed",
+          "execution": "browser-input",
+          "steps": [
+            {
+              "step": "initial",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1,
+                "style": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "offset-touch-bounds",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1,
+                "style": 1,
+                "marker-click": 1,
+                "child-click": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "scale-units",
+              "metric": "2 km",
+              "imperial": "1 mi",
+              "status": "passed"
+            },
+            {
+              "step": "popup-follow",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1,
+                "style": 1,
+                "marker-click": 1,
+                "child-click": 1,
+                "popup-child": 1,
+                "move": 22
+              },
+              "center": [
+                -122.36681387865747,
+                47.61903783697602
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            }
+          ],
+          "error": "Diagnostic observation timed out.",
+          "cause": "Temporary extended harness used the upstream browser geolocation selector; the fixture supplies an injected provider with a custom Locate me button. This selector error does not establish a geolocation product failure.",
+          "unverified": [
+            "geolocation",
+            "accessibility",
+            "style-replacement"
+          ],
+          "coordinatorRetryApproved": true
+        },
+        {
+          "number": 2,
+          "status": "failed",
+          "execution": "browser-input",
+          "steps": [
+            {
+              "step": "initial",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1,
+                "style": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "offset-touch-bounds",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1,
+                "style": 1,
+                "marker-click": 1,
+                "child-click": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "scale-units",
+              "metric": "2 km",
+              "imperial": "1 mi",
+              "status": "passed"
+            },
+            {
+              "step": "popup-follow",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1,
+                "style": 1,
+                "marker-click": 1,
+                "child-click": 1,
+                "popup-child": 1,
+                "move": 15
+              },
+              "center": [
+                -122.36390553559295,
+                47.61803660522287
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            }
+          ],
+          "error": "Diagnostic observation timed out.",
+          "cause": "Temporary coordinator harness emitted an invalid JavaScript selector expression. The bounded observer swallowed that evaluation error and timed out. Not a demonstrated product failure."
+        },
+        {
+          "number": 3,
+          "scope": "Remaining checks only",
+          "status": "failed",
+          "execution": "browser-input",
+          "start": "2026-10-13T04:45:17Z",
+          "end": "2026-10-13T04:45:26Z",
+          "exitCode": 1,
+          "steps": [
+            {
+              "step": "initial",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "geolocation-injected-provider",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1,
+                "location": 1,
+                "move": 5,
+                "style": 1
+              },
+              "center": [
+                -122.32999999999998,
+                47.619999999999976
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "accessibility-button-names",
+              "status": "passed",
+              "buttons": [
+                "remount",
+                "style",
+                "offset",
+                "popup",
+                "units",
+                "Zoom in",
+                "Zoom out",
+                "Reset bearing to north",
+                "Close popup",
+                "Child button",
+                "Locate me",
+                "Child button"
+              ],
+              "remaining": "Keyboard traversal and full assistive-technology operation unverified."
+            },
+            {
+              "step": "style-replacement",
+              "events": {
+                "load": 1,
+                "error": 1,
+                "popup-open": 1,
+                "location": 1,
+                "move": 5,
+                "style": 2
+              },
+              "center": [
+                -122.32999999999998,
+                47.619999999999976
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "remount",
+              "events": {
+                "load": 2,
+                "error": 1,
+                "popup-open": 2,
+                "location": 1,
+                "move": 6,
+                "style": 3
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 1,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            }
+          ],
+          "fixtureErrors": 1,
+          "remaining": [
+            "fullscreen-not-mounted",
+            "keyboard-and-assistive-technology-review",
+            "adverse-geolocation-provider"
+          ],
+          "coordinatorRetryApproved": true
+        }
+      ],
+      "remaining": [
+        "full-assistive-technology-review"
+      ],
+      "visualReview": "Agent and coordinator inspected screenshots. Markers, popup, feature, scale, controls and attribution are visible. The wide live label overlaps the nearby annotation label in this fixture; this visual crowding is not established as adapter clipping.",
+      "focusedControlAttempt": {
+        "number": 1,
+        "start": "2026-10-13T04:49:00Z",
+        "end": "2026-10-13T04:49:15Z",
+        "exitCode": 0,
+        "engine": "mapbox",
+        "status": "passed",
+        "execution": "browser-input",
+        "libraryChanged": false,
+        "steps": [
+          {
+            "scenario": "fullscreen-enter",
+            "status": "passed",
+            "fullscreen": true
+          },
+          {
+            "scenario": "fullscreen-exit",
+            "status": "passed",
+            "fullscreen": false
+          },
+          {
+            "scenario": "rejected-location-provider",
+            "status": "passed",
+            "errors": 1,
+            "locationEvents": 0
+          },
+          {
+            "scenario": "delayed-location-after-unmount",
+            "status": "passed",
+            "counts": {
+              "load": 2,
+              "error": 1,
+              "location": 0
+            }
+          },
+          {
+            "scenario": "keyboard-tab-and-space-zoom",
+            "status": "passed",
+            "focused": "Zoom in",
+            "zoomBefore": 11,
+            "zoomAfter": 11.977266674882946
+          }
+        ],
+        "remaining": [
+          "full-assistive-technology-review"
+        ]
+      }
+    },
+    "maplibre-web": {
+      "status": "passed",
+      "execution": "browser-input",
+      "scope": [
+        "known-feature",
+        "child-click",
+        "live-drag",
+        "annotation-drag",
+        "source-propagation",
+        "navigation",
+        "popup-dismissal",
+        "remount-teardown"
+      ],
+      "observation": {
+        "events": {
+          "popup-open": 3,
+          "load": 2,
+          "move": 27,
+          "style": 2,
+          "marker-click": 1,
+          "child-click": 1,
+          "live-start": 1,
+          "live-drag": 6,
+          "live-end": 1,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "source-click": 2,
+          "map-click": 1,
+          "popup-close": 1
+        },
+        "positions": {
+          "live": [
+            -122.32352050781279,
+            47.604444686584344
+          ],
+          "annotation": [
+            -122.36368927001988,
+            47.604444686584344
+          ]
+        },
+        "center": [
+          -122.34,
+          47.61
+        ],
+        "zoom": 11,
+        "features": [
+          {
+            "id": 707,
+            "properties": {
+              "fixture": "tf07"
+            },
+            "source": "tf07-source",
+            "layer": "tf07-point"
+          }
+        ],
+        "generation": 1,
+        "stopSourcePropagation": true
+      },
+      "remaining": [
+        "full-assistive-technology-review"
+      ],
+      "attempts": [
+        {
+          "number": 1,
+          "command": "bun scripts/tf07-ui-smoke.mjs web maplibre",
+          "execution": "browser-input",
+          "exitCode": 0,
+          "result": "passed"
+        }
+      ],
+      "artifact": {
+        "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "fullTf07Acceptance": false,
+      "worker": {
+        "model": "gpt-6-luna",
+        "reasoning": "low"
+      },
+      "cleanup": "Assigned Vite/debugger ports verified clear by coordinator.",
+      "extendedAttempts": [
+        {
+          "number": 1,
+          "status": "failed",
+          "execution": "browser-input",
+          "steps": [
+            {
+              "step": "initial",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 1,
+                "style": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "offset-touch-bounds",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 1,
+                "style": 1,
+                "marker-click": 1,
+                "child-click": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "scale-units",
+              "metric": "2\u00a0km",
+              "imperial": "1\u00a0mi",
+              "status": "passed"
+            },
+            {
+              "step": "popup-follow",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 18,
+                "style": 1,
+                "marker-click": 1,
+                "child-click": 1,
+                "popup-child": 1
+              },
+              "center": [
+                -122.3627209353715,
+                47.617610695466624
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            }
+          ],
+          "error": "Diagnostic observation timed out.",
+          "cause": "Temporary extended harness used the upstream browser geolocation selector; the fixture supplies an injected provider with a custom Locate me button. This selector error does not establish a geolocation product failure.",
+          "unverified": [
+            "geolocation",
+            "accessibility",
+            "style-replacement"
+          ],
+          "coordinatorRetryApproved": true
+        },
+        {
+          "number": 2,
+          "status": "failed",
+          "execution": "browser-input",
+          "steps": [
+            {
+              "step": "initial",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 1,
+                "style": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "offset-touch-bounds",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 1,
+                "style": 1,
+                "marker-click": 1,
+                "child-click": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "scale-units",
+              "metric": "2\u00a0km",
+              "imperial": "1\u00a0mi",
+              "status": "passed"
+            },
+            {
+              "step": "popup-follow",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 13,
+                "style": 1,
+                "marker-click": 1,
+                "child-click": 1,
+                "popup-child": 1
+              },
+              "center": [
+                -122.36116833385654,
+                47.61708713658879
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            }
+          ],
+          "error": "Diagnostic observation timed out.",
+          "cause": "Temporary coordinator harness emitted an invalid JavaScript selector expression. The bounded observer swallowed that evaluation error and timed out. Not a demonstrated product failure."
+        },
+        {
+          "number": 3,
+          "scope": "Remaining checks only",
+          "status": "passed",
+          "execution": "browser-input",
+          "start": "2026-10-13T04:45:07Z",
+          "end": "2026-10-13T04:45:22Z",
+          "exitCode": 0,
+          "steps": [
+            {
+              "step": "initial",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 1,
+                "style": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "geolocation-injected-provider",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 6,
+                "style": 1,
+                "location": 1
+              },
+              "center": [
+                -122.32999999999998,
+                47.619999999999976
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "accessibility-button-names",
+              "status": "passed",
+              "buttons": [
+                "remount",
+                "style",
+                "offset",
+                "popup",
+                "units",
+                "Zoom in",
+                "Zoom out",
+                "Drag to rotate map, click to reset north",
+                "Close popup",
+                "Child button",
+                "Locate me",
+                "Child button"
+              ],
+              "remaining": "Keyboard traversal and full assistive-technology operation unverified."
+            },
+            {
+              "step": "style-replacement",
+              "events": {
+                "popup-open": 1,
+                "load": 1,
+                "move": 6,
+                "style": 2,
+                "location": 1
+              },
+              "center": [
+                -122.32999999999998,
+                47.619999999999976
+              ],
+              "zoom": 11,
+              "generation": 0,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            },
+            {
+              "step": "remount",
+              "events": {
+                "popup-open": 2,
+                "load": 2,
+                "move": 7,
+                "style": 3,
+                "location": 1
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "generation": 1,
+              "features": [
+                {
+                  "id": 707,
+                  "properties": {
+                    "fixture": "tf07"
+                  },
+                  "source": "tf07-source"
+                }
+              ]
+            }
+          ],
+          "fixtureErrors": 0,
+          "remaining": [
+            "fullscreen-not-mounted",
+            "keyboard-and-assistive-technology-review",
+            "adverse-geolocation-provider"
+          ],
+          "coordinatorRetryApproved": true
+        }
+      ],
+      "visualReview": "Agent inspected initial, offset, imperial, popup-follow, and replacement-style screenshots; markers, popup, scale and custom control were visible.",
+      "focusedControlAttempts": [
+        {
+          "number": 1,
+          "status": "failed",
+          "execution": "browser-input",
+          "start": "2026-10-13T04:48:52Z",
+          "end": "2026-10-13T04:50:03Z",
+          "exitCode": 1,
+          "scenariosObserved": [],
+          "cause": "Temporary focused consumer imported an unused default maplibre-gl export that is absent in pinned ESM MapLibre6.13.0. No scenario began.",
+          "coordinatorAction": "Removed unused import; approved one same-artifact focused consumer retry."
+        },
+        {
+          "number": 2,
+          "status": "passed",
+          "execution": "browser-input",
+          "start": "2026-10-13T04:51:34Z",
+          "end": "2026-10-13T04:51:56Z",
+          "exitCode": 0,
+          "scenarios": [
+            {
+              "name": "fullscreen-enter-exit",
+              "status": "passed"
+            },
+            {
+              "name": "rejected-location-provider",
+              "status": "passed",
+              "errors": 1,
+              "locationEvents": 0
+            },
+            {
+              "name": "delayed-location-after-unmount",
+              "status": "passed",
+              "loadEvents": 2,
+              "errors": 1,
+              "locationEvents": 0
+            },
+            {
+              "name": "keyboard-tab-space-zoom",
+              "status": "passed",
+              "zoomBefore": 11,
+              "zoomAfter": 11.9823
+            }
+          ],
+          "remaining": [
+            "full-assistive-technology-review"
+          ],
+          "provenance": "Completed worker report before interruption; raw temporary output no longer present."
+        }
+      ]
+    },
+    "maplibre-android": {
+      "status": "unverified",
+      "build": {
+        "status": "passed",
+        "duration": "6m50s",
+        "architectures": [
+          "arm64-v8a"
+        ],
+        "apkSha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e"
+      },
+      "previousInstalledBinary": {
+        "status": "verified-by-worker-before-interruption",
+        "sha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e"
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "status": "failed",
+          "phase": "runner-invocation",
+          "cause": "Worker omitted required ANDROID_SERIAL. No launch/scenario began."
+        },
+        {
+          "number": 2,
+          "status": "unverified",
+          "phase": "runtime-flow",
+          "runId": "e06ec98d-d609-4e62-b49b-d7599340afe8",
+          "cause": "Interrupted before a completed operator report. Temporary logs removed externally."
+        }
+      ],
+      "coordinatorAction": "Approved resuming same-artifact flow with fresh run identity and renewed install verification; use existing APK if its digest matches.",
+      "record": "tf07-native-android-maplibre.json",
+      "latestOutcome": "unverified",
+      "currentRun": {
+        "runId": "17942ad5-bb3d-4edc-97b2-34e48c155eb1",
+        "status": "unverified-tooling-failure",
+        "execution": "agent-driven-native-input",
+        "runner": "isolated Metro8171/status8797",
+        "toolchain": "verified NVM Node24.14.0/Bun1.4.1 and platform-tools on PATH",
+        "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+        "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+        "confirmedScenarios": [
+          "finite-camera-readback",
+          "feature-readback-fixture-tf07-with-string-id"
+        ],
+        "remaining": [
+          "live-child-button",
+          "nested-scroll",
+          "live-drag",
+          "annotation-drag",
+          "offset-touch-bounds",
+          "popup-follow-dismissal",
+          "source-propagation",
+          "navigation-location",
+          "style-remount",
+          "host-accessibility",
+          "scale-units"
+        ],
+        "runnerStopped": true,
+        "diagnosis": "The 4GB/SwiftShader run loaded the fixture and produced a successful initial renderer readback (generation 0, finite camera, feature id string \"707\"). A child-button tap was inconclusive after layout shifted; the emulator then exited with bad color buffer handle 151 and a closed network stream. Remaining scenarios are unverified; no further MapLibre Android boot is authorized.",
+        "emulator": {
+          "version": "37.1.11.0",
+          "api": "Android release 17 / SDK_INT 37",
+          "density": 420,
+          "abi": "arm64-v8a",
+          "launch": "-avd TF07_Acceptance -port 5554 -memory 4096 -gpu swiftshader -no-snapshot-save -no-boot-anim",
+          "systemImagePackageApi": "37.1"
+        },
+        "permission": {
+          "name": "android.permission.ACCESS_LOCAL_NETWORK",
+          "granted": true,
+          "method": "actual device tap; Android 17 prompt grouped under Nearby devices"
+        },
+        "verifiedRendererReadback": {
+          "events": {
+            "popup-open": 1,
+            "style": 1,
+            "move": 2,
+            "load": 1
+          },
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11,
+          "feature": {
+            "id": "707",
+            "properties": {
+              "fixture": "tf07"
+            }
+          },
+          "generation": 0,
+          "error": null
+        },
+        "input": {
+          "execution": "actual Android touchscreen input via adb shell input and screenshots/UIAutomator hierarchy",
+          "childButton": "One tap followed by renderer readback showed no child-click; bounds had shifted and the emulator later crashed, so the result is inconclusive rather than a product failure.",
+          "toolbarSwipe": "Attempt reported owned emulator no longer connected."
+        },
+        "finalState": "Owned emulator process exited during acceptance; no devices remained in ADB. Emulator log ended with bad color buffer handle 151 and network stream closed. Runner and owned Metro/status stopped. No further boot approved.",
+        "validatorObservation": "Renderer returned feature.id as string \"707\". Preserved verbatim. Coordinator corrected the judge to accept numeric 707 or string \"707\", matching the documented TF06 Android bridge behavior; the incomplete run remains unverified.",
+        "priorRunContext": {
+          "runId": "11d7205d-c618-490f-a6ad-bf36d99970d0",
+          "firstObservation": "Unexpected Android 17 ACCESS_LOCAL_NETWORK permission prompt (grouped under Nearby devices) appeared before fixture rendering; authorization is required for Metro transport.",
+          "inputAttempts": [
+            "CUA Android Studio launch/bind timed out; no input.",
+            "ADB shell and exec-out input/screenshot commands stopped returning while get-state and emulator console remained responsive.",
+            "Coordinator-approved emulator-console mouse events were sent at the dialog deny and allow coordinates; each command returned OK, but screen change could not be verified."
+          ],
+          "diagnosis": "Permission prompt and unresponsive guest input/screenshot services prevented fixture startup; no scenario began."
+        }
+      },
+      "summary": "Verified installed artifact and initial finite camera/fixture readback; emulator crashed before interaction completion.",
+      "scenarios": {
+        "live-child-button": "unverified",
+        "nested-scroll": "unverified",
+        "live-drag": "unverified",
+        "annotation-drag": "unverified",
+        "offset-touch-bounds": "unverified",
+        "popup-follow-dismissal": "unverified",
+        "source-propagation": "unverified",
+        "navigation-location": "unverified",
+        "style-remount": "unverified",
+        "host-accessibility": "unverified",
+        "scale-units": "unverified"
+      },
+      "fullTf07Acceptance": false
+    },
+    "mapbox-android": {
+      "status": "unverified",
+      "reason": "Owned emulator crashed before installation and runtime.",
+      "build": {
+        "attempt": 4,
+        "status": "passed",
+        "duration": "4m22s",
+        "apkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+        "architectures": [
+          "arm64-v8a"
+        ]
+      },
+      "artifact": {
+        "distSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "record": "tf07-native-android-mapbox.json",
+      "summary": "Build passed; emulator crashed before installation/runtime.",
+      "currentRun": [
+        {
+          "phase": "owned-avd-boot",
+          "result": "unverified-tooling-failure",
+          "detail": "The one approved Mapbox Android boot used the owned TF07_Acceptance AVD with -memory 4096 -gpu swiftshader. Emulator logged bad color buffer handle 151 and showed crash consent; emulator-5554 never appeared in ADB during observation. No install, runner, app launch, or scenario began. The owned emulator process was stopped; no other device was touched."
+        }
+      ],
+      "scenarios": {
+        "finite-camera-feature-readback": "unverified",
+        "live-child-button": "unverified",
+        "nested-scroll": "unverified",
+        "live-drag": "unverified",
+        "annotation-drag": "unverified",
+        "offset-touch-bounds": "unverified",
+        "popup-follow-dismissal": "unverified",
+        "source-propagation": "unverified",
+        "navigation-location": "unverified",
+        "style-remount": "unverified",
+        "host-accessibility": "unverified",
+        "scale-units": "unverified"
+      },
+      "fullTf07Acceptance": false
+    },
+    "mapbox-ios": {
+      "status": "failed-partial",
+      "record": "tf07-native-ios-mapbox.json",
+      "summary": "Installed Teleport-linked artifact verified. Real child isolation, offset placement/reset, popup child/dismissal, source allowed/stopped propagation, zoom/location and final style/remount readback observed across retained run identities. Nested scrolling failed; complete native gate remains unverified.",
+      "artifact": {
+        "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+        "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "builds": [
+        {
+          "attempt": 1,
+          "result": "incomplete-peer-linkage",
+          "detail": "BUILD SUCCEEDED against Pods/Manifest.lock without Teleport. Not installed or launched; excluded from runtime acceptance."
+        },
+        {
+          "attempt": 2,
+          "result": "success",
+          "command": "xcodebuild -workspace ios/OneMapMapbox.xcworkspace -scheme OneMapMapbox -configuration Debug -destination platform=iOS Simulator,id=8B7D7CE4-228E-409F-A156-A597D4E448A5 CODE_SIGNING_ALLOWED=NO build",
+          "log": "/private/tmp/one-map-tf07-acceptance/mapbox-ios-build-teleport.log",
+          "teleport": "1.2.1 present in Podfile.lock, Pods/Manifest.lock, and compiled RNTPortalViewComponentDescriptor target"
+        }
+      ],
+      "binary": {
+        "bundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+        "bundlePath": "/private/tmp/one-map-tf07-acceptance/mapbox-ios-derived-teleport/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+        "executableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+        "debugDylibSha256": "9b25f6e1bef0d0155d20454ab3772f31cf0ecab598896a8869a8201d995e20c8",
+        "installedBundleVerified": true,
+        "installedExecutableAndDylibMatchBuild": true,
+        "teleportSymbolObservedInInstalledDebugDylib": true,
+        "frameworks": [
+          "MapboxCommon",
+          "MapboxCoreMaps",
+          "React",
+          "ReactNativeDependencies",
+          "Turf",
+          "hermesvm"
+        ]
+      },
+      "currentRun": {
+        "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb",
+        "runner": "isolated Metro8171/status8797",
+        "status": "completed-generation1-readback",
+        "execution": "agent-driven Maestro 2.11.0 native iOS taps/swipes; simctl screenshots; corrected SafeAreaView fixture",
+        "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+        "debugDylibSha256": "9b25f6e1bef0d0155d20454ab3772f31cf0ecab598896a8869a8201d995e20c8",
+        "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+        "startup": "Assigned iPhone 18 Pro / iOS 27.0 loaded TF07 fixture; generation0 initial readback succeeded.",
+        "initialReadback": {
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11,
+          "featureId": 707,
+          "featureIdType": "number in actual initial AX readback",
+          "fixture": "tf07",
+          "generation": 0,
+          "stopSourcePropagation": false,
+          "events": {
+            "popup-open": 1,
+            "style": 1,
+            "move": 2,
+            "load": 1
+          }
+        },
+        "finalReadback": {
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11,
+          "featureId": 707,
+          "featureIdType": "number",
+          "featureGeometry": [
+            -122.33999490737915,
+            47.57999970656695
+          ],
+          "fixture": "tf07",
+          "generation": 1,
+          "stopSourcePropagation": true,
+          "events": {
+            "popup-open": 2,
+            "style": 3,
+            "move": 46,
+            "load": 2,
+            "source-click": 1
+          }
+        },
+        "observations": [
+          "Prior run224: live child button tap produced child-click1 without map-click; not repeated in run0ba8.",
+          "Actual tap on visible source feature while source propagation was stopped produced source-click1, no map-click, and final stopSourcePropagation=true.",
+          "Prior run224: zoom11\u219212\u219211 was measured through separate reads. Run0ba8 independently observed zoom11\u219212 during scale diagnosis.",
+          "Style action changed the visible map to the replacement style. Remount completed; final generation1 readback showed style3/load2 and finite camera/feature707.",
+          "An annotation-coordinate swipe panned the map; continuous long-press drag remains unverified because Maestro swipe cannot hold before moving.",
+          "The common scale was absent at initial camera, appeared after camera movement, and remained 1 mi after the bounded physical units tap; units response is inconclusive.",
+          "Nested-scroll failure from prior run224 is preserved separately; corrected gesture panned the map (move76 to94, latitude47.5729864 to47.5692786).",
+          "Multi-touch/cancel, delayed imagery, overlay passthrough, Android two-density offsets, and continuous annotation/marker drag remain unverified."
+        ],
+        "scenarios": {
+          "finite-camera-feature-readback": "passed-generation0-and-final-generation1",
+          "live-child-button": "passed-in-prior-run224",
+          "nested-scroll": "failed-corrected-gesture-panned-map-in-prior-run224",
+          "live-drag": "unverified-driver-cannot-hold-before-drag",
+          "annotation-drag": "unverified-driver-cannot-hold-before-drag",
+          "offset-touch-bounds": "partial-offset-child-hit-and-reset-in-prior-run224;drag-unverified",
+          "popup-follow-dismissal": "partial-child-dismissal-in-prior-run224;follow-and-teardown-unverified",
+          "source-propagation": "stopped-passed;allowed-passed-in-prior-run224",
+          "navigation-location": "passed-in-prior-run224",
+          "scale-units": "initial-scale-absent;bounded-toggle-inconclusive",
+          "style-remount": "passed-visible-style-change-remount-and-generation1-readback",
+          "host-accessibility": "unverified",
+          "multi-touch-cancel": "unverified-driver-limitation"
+        },
+        "screenshots": [
+          "/private/tmp/one-map-tf07-acceptance/mapbox-run4-startup.png",
+          "/private/tmp/one-map-tf07-acceptance/mapbox-run4-source-toggle.png",
+          "/private/tmp/one-map-tf07-acceptance/mapbox-run4-zoom.png",
+          "/private/tmp/one-map-tf07-acceptance/mapbox-run4-units-metric.png",
+          "/private/tmp/one-map-tf07-acceptance/mapbox-run4-style.png",
+          "/private/tmp/one-map-tf07-acceptance/mapbox-run4-after-remount.png",
+          "/private/tmp/one-map-tf07-acceptance/mapbox-run4-final.png"
+        ],
+        "finalHierarchy": "/private/tmp/one-map-tf07-acceptance/mapbox-run4-final-hierarchy.log",
+        "inputDriver": "Maestro CLI 2.11.0 verified wrapper; real native touches and simctl screenshots; final runner endpoints exited after final readback.",
+        "acceptanceStatus": "unverified-full-native-gate",
+        "coordinatorProvenanceReview": "Actual initial AX readback retained numeric707; prior-run scenario evidence explicitly qualified. No earlier counters or manual report are treated as run0ba8 evidence.",
+        "runnerJudgment": "Original final command exit/judgment unavailable; closed ports alone do not prove success. No manual report file was retained. Actual final native AX observation is preserved separately."
+      },
+      "attempts": [
+        {
+          "phase": "runner-start",
+          "result": "failed-before-runtime",
+          "detail": "First sandboxed runner invocation exited at xcrun before Metro/launch; no runtime started."
+        },
+        {
+          "phase": "run-1",
+          "runId": "795791dd-7246-46fe-bfc7-b177fa6d9e17",
+          "result": "startup-observed-input-discovery-failed",
+          "detail": "Elevated runner launched the app and screenshot verified the TF07 scene. First non-elevated Maestro hierarchy call said assigned device was not connected; runner stopped before touch/readback. Escalated Maestro hierarchy later succeeded."
+        },
+        {
+          "phase": "run-2-start",
+          "result": "failed-before-runtime",
+          "detail": "Same-artifact runner found owned Metro child PID 83045 still holding port 8171 after prior stop. Coordinator approved terminating only that owned process; port conflict retained."
+        },
+        {
+          "phase": "run-3-corrected-safe-area",
+          "runId": "224d943a-bf25-40e5-9b3f-8f5352c813ab",
+          "result": "partial-runtime-observation-timeout",
+          "detail": "Actual UI interactions/readbacks above were collected. Runner ended with TF07 observation timed out before style/remount generation1 final read; latest location read was visible in AX, but status POST failed after endpoint expiry."
+        },
+        {
+          "phase": "run-4-safe-area-style-remount",
+          "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb",
+          "result": "completed-generation1-readback",
+          "detail": "Fresh run with corrected SafeAreaView fixture; actual style/remount and final generation1 renderer readback succeeded. Full acceptance remains partial with listed unverified cases and preserved nested-scroll failure."
+        }
+      ],
+      "priorRuns": [
+        {
+          "runId": "224d943a-bf25-40e5-9b3f-8f5352c813ab",
+          "runner": "isolated Metro8171/status8797",
+          "status": "partial-runtime-transport-timeout",
+          "execution": "agent-driven Maestro 2.11.0 native iOS touches and simctl screenshots",
+          "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+          "debugDylibSha256": "9b25f6e1bef0d0155d20454ab3772f31cf0ecab598896a8869a8201d995e20c8",
+          "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+          "startup": "Safe-area corrected TF07 fixture loaded on assigned iPhone 18 Pro simulator; initial generation0 readback succeeded; runner later timed out after its 20-minute observation window.",
+          "verifiedRendererReadback": {
+            "events": {
+              "popup-open": 2,
+              "style": 1,
+              "load": 1,
+              "move": 119,
+              "child-click": 1,
+              "marker-click": 1,
+              "popup-close": 1,
+              "popup-child": 1
+            },
+            "positions": {},
+            "center": [
+              -122.33999999999997,
+              47.569278599999976
+            ],
+            "zoom": 11,
+            "featureId": 707,
+            "fixture": "tf07",
+            "generation": 0,
+            "stopSourcePropagation": false
+          },
+          "inputObservations": [
+            "Initial generation0 readback: finite center[-122.34000000000002,47.60999999999999], zoom11, feature id707 fixture tf07; live child tap incremented child-click1 with no map-click.",
+            "A first attempted nested-scroll group caused map pan and marker-click; coordinator reviewed and approved a corrected in-container gesture. Corrected swipe start x201,y367 within scroll viewport [140,344][261,376] / Scroll two row [140,361][261,378], ending y341; renderer still panned: move76\u219294, center latitude47.5729864\u219247.5692786, marker-click stayed1. Coordinator classified nested-scroll FAILED. Before/after screenshots: /private/tmp/one-map-tf07-acceptance/mapbox-controls.png and /private/tmp/one-map-tf07-acceptance/mapbox-corrected-scroll.png.",
+            "Maestro swipe releases after a short initial press and does not establish a continuous 500ms long-press drag. Live marker drag, annotation drag, multipointer/cancel remain unverified.",
+            "Zoom in tap followed by immediate read changed zoom11\u219212; separate Zoom out tap/read returned zoom12\u219211; center stable and feature707 retained.",
+            "Toolbar popup toggle reopened popup (popup-open2); real popup child tap incremented popup-child1; toolbar unmount left popup-close unchanged at1. Explicit Close popup tap incremented popup-close1. Popup follow remains unverified.",
+            "Offset toolbar changed live marker label/accessibility bounds by approximately(+24,-12) logical points: baseline[140,294][261,311], displaced[164,282][285,299]. Real tap on live child at displaced bounds incremented child-click1\u21922 with no additional map-click. Second offset toggle reset bounds to baseline. Continuous drag at displaced bounds and Android two-density behavior are not established.",
+            "Three `units` toolbar toggles were followed by Read renderer; bottom-left common facade ScaleControl remained visibly `2 km` each time at AX bounds[9,819][85,831]. Screenshots mapbox-units.png, mapbox-units-toggle2.png, mapbox-units-imperial.png. Top-left mile ticks are native ornament, not the common control. Scale unit change did not appear; coordinator diagnosis requested/available.",
+            "Source allowed: tap on visible green source circle incremented source-click0\u21921 and map-click0\u21921. Source stopped attempt used toolbar label tap, but label stayed `Stop source bubbling`, readback stopSourcePropagation remained false, and source-click/map-click both incremented to2; no retry before runner timeout, so stopped propagation remains unverified.",
+            "Locate me actual tap/read changed center to[-122.33,47.61999999999999], kept zoom11, incremented location1. This final UI readback was captured by Maestro hierarchy, but status post failed because the isolated runner had timed out; screenshot shows `TF07 readback transport failed`.",
+            "The active runner exited with `TF07 observation timed out` before generation1; no final style/remount Read renderer was submitted. Style/remount and host accessibility/empty overlay remain unverified."
+          ],
+          "screenshots": [
+            "/private/tmp/one-map-tf07-acceptance/mapbox-after-safearea-child.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-controls.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-corrected-scroll.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-native-controls.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-offset.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-units.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-units-toggle2.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-units-imperial.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-toolbar-scroll.png",
+            "/private/tmp/one-map-tf07-acceptance/mapbox-locate.png"
+          ],
+          "inputDriver": "Maestro CLI 2.11.0; actual native taps/swipes plus simctl screenshots. Runner/status endpoint expired after 20-minute window. No fake callbacks or readback values.",
+          "scenarios": {
+            "finite-camera-feature-readback": "passed-generation0",
+            "live-child-button": "passed-child-click-isolated",
+            "nested-scroll": "failed-corrected-gesture-panned-map",
+            "live-drag": "unverified-driver-cannot-hold-before-drag",
+            "annotation-drag": "unverified",
+            "offset-touch-bounds": "partial-offset-placement-child-hit-reset;drag-unverified",
+            "popup-follow-dismissal": "partial-popup-child-and-dismissal;teardown-no-close;follow-unverified",
+            "source-propagation": "partial-allowed-passed-stopped-unverified-toggle-not-activated",
+            "navigation-location": "passed-native-location1-center-readback-runner-post-expired",
+            "style-remount": "unverified-runner-timeout-before-final",
+            "host-accessibility": "unverified",
+            "scale-units": "failed-common-scale-remained-2-km-after-three-toggles"
+          },
+          "priorRunContext": {
+            "runId": "c52b9d03-bb9d-42aa-ad03-c0909ec016bd",
+            "status": "unverified-fixture-safe-area-block",
+            "detail": "Prior fixture host placed toolbar beneath status bar; root subsequently corrected only test-screen safe-area host. Earlier attempts retained in attempts array."
+          },
+          "latestNativeReadback": {
+            "events": {
+              "popup-open": 2,
+              "style": 1,
+              "load": 1,
+              "move": 156,
+              "child-click": 2,
+              "marker-click": 1,
+              "popup-close": 1,
+              "popup-child": 1,
+              "source-click": 2,
+              "map-click": 2,
+              "location": 1
+            },
+            "positions": {},
+            "center": [
+              -122.33,
+              47.61999999999999
+            ],
+            "zoom": 11,
+            "featureId": 707,
+            "fixture": "tf07",
+            "generation": 0,
+            "stopSourcePropagation": false
+          }
+        }
+      ],
+      "coordinatorReview": {
+        "provenance": "Applied pure native judge after execution to actual final AX renderer observation and coordinator-reviewed outcomes for this exact run; no input, status POST, or new runtime. This does not repair the missing original operator report or certify full acceptance.",
+        "identity": {
+          "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+          "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+          "environment": "mapbox-ios",
+          "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb"
+        },
+        "observation": {
+          "events": {
+            "popup-open": 2,
+            "style": 3,
+            "move": 46,
+            "load": 2,
+            "source-click": 1
+          },
+          "positions": {},
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11,
+          "features": [
+            {
+              "type": "Feature",
+              "id": 707,
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -122.33999490737915,
+                  47.57999970656695
+                ]
+              },
+              "properties": {
+                "fixture": "tf07"
+              }
+            }
+          ],
+          "generation": 1,
+          "stopSourcePropagation": true
+        },
+        "reviewedReport": {
+          "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+          "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+          "environment": "mapbox-ios",
+          "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb",
+          "scenarios": {
+            "live-child-button": "unverified",
+            "nested-scroll": "unverified",
+            "live-drag": "unverified",
+            "annotation-drag": "unverified",
+            "offset-touch-bounds": "unverified",
+            "popup-follow-dismissal": "unverified",
+            "source-propagation": "unverified",
+            "navigation-location": "unverified",
+            "style-remount": "unverified",
+            "host-accessibility": "unverified",
+            "scale-units": "unverified"
+          }
+        },
+        "judgment": {
+          "status": "unverified",
+          "execution": "manual-native-touch",
+          "observed": false,
+          "manualComplete": false,
+          "remaining": [
+            "live-child-button",
+            "nested-scroll",
+            "live-drag",
+            "annotation-drag",
+            "offset-touch-bounds",
+            "popup-follow-dismissal",
+            "source-propagation",
+            "navigation-location",
+            "style-remount",
+            "host-accessibility",
+            "scale-units"
+          ]
+        },
+        "execution": "agent-driven native UI; coordinator reviewed",
+        "fullTf07Acceptance": false
+      },
+      "fullTf07Acceptance": false,
+      "retention": "Temporary build/tool/log/screenshot paths are historical provenance; bulk owned test outputs removed after compact record. Selected scrolling/scale failure images retained in aggregate record."
+    },
+    "maplibre-ios": {
+      "status": "failed-partial",
+      "record": "tf07-native-ios-maplibre.json",
+      "summary": "Verified linked build and installed artifact; actual child/offset/popup/source/camera/location/style/remount observations recorded. Nested scrolling and visible scale-unit update failed. Continuous dragging, multiple pointers, focused scenarios and complete accessibility remain unverified; original runner failed reading absent manual report after real final readback.",
+      "artifact": {
+        "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+        "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+      },
+      "build": {
+        "result": "success",
+        "log": "/private/tmp/one-map-tf07-acceptance/maplibre-ios-build-teleport.log",
+        "teleport": "1.2.1 in Podfile.lock and Pods/Manifest.lock; RNTPortalHostView/RNTPortalView shadow-node targets compiled"
+      },
+      "binary": {
+        "bundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+        "bundlePath": "/private/tmp/one-map-tf07-acceptance/maplibre-ios-derived-teleport/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+        "executableSha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "debugDylibSha256": "b49dd757da494af8394a127d3adf0a34df5822ad03081868253aef9edb98be88",
+        "installedBundleVerified": true,
+        "installedExecutableAndDylibMatchBuild": true
+      },
+      "currentRun": {
+        "runId": "77974398-0adc-48fd-b010-fc433a4dac24",
+        "runner": "isolated Metro8171/status8797",
+        "status": "final-generation1-observation-runner-manual-report-missing",
+        "execution": "agent-driven Maestro 2.11.0 native taps/swipes and simctl screenshots with corrected SafeAreaView fixture",
+        "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "debugDylibSha256": "b49dd757da494af8394a127d3adf0a34df5822ad03081868253aef9edb98be88",
+        "initialReadback": {
+          "center": [
+            -122.3400000000085,
+            47.6099999999991
+          ],
+          "zoom": 11,
+          "featureId": 707,
+          "fixture": "tf07",
+          "generation": 0,
+          "stopSourcePropagation": false,
+          "events": {
+            "popup-open": 1,
+            "style": 1,
+            "move": 1,
+            "load": 1
+          }
+        },
+        "childReadback": {
+          "center": [
+            -122.3400000000085,
+            47.6099999999991
+          ],
+          "zoom": 11,
+          "featureId": 707,
+          "fixture": "tf07",
+          "generation": 0,
+          "stopSourcePropagation": false,
+          "events": {
+            "popup-open": 1,
+            "style": 1,
+            "move": 1,
+            "load": 1,
+            "child-click": 1
+          }
+        },
+        "nestedScroll": {
+          "status": "failed",
+          "input": "native swipe39%,60%\u219239%,56%; logical start\u2248[157,524] on 402x874, visibly over Scroll two row",
+          "readback": {
+            "center": [
+              -122.3399999999772,
+              47.60436752535161
+            ],
+            "zoom": 11,
+            "events": {
+              "move": 23,
+              "child-click": 1
+            },
+            "featureId": 707
+          },
+          "beforeScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-child.png",
+          "afterScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-scroll-after.png"
+        },
+        "inputDriver": "Maestro CLI 2.11.0 verified wrapper; native touches and simctl screenshots; no callbacks/fake readback",
+        "screenshots": [
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-after-remount.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-child.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-controls.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset-reset.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-popup-before-close.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-scroll-after.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-startup.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-style.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-toolbar-right.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-units.png",
+          "/private/tmp/one-map-tf07-acceptance/maplibre-run1-zoom.png"
+        ],
+        "scenarios": {
+          "finite-camera-feature-readback": "passed-generation0-and-final-generation1",
+          "live-child-button": "passed-child-click-isolated",
+          "nested-scroll": "failed-valid-visible-row-gesture-panned-map",
+          "live-drag": "unverified-driver-cannot-hold-before-drag",
+          "annotation-drag": "unverified-driver-cannot-hold-before-drag",
+          "offset-touch-bounds": "partial-offset-child-hit-and-visual-reset;continuous-drag-unverified",
+          "popup-follow-dismissal": "partial-child-close-reopen-and-no-teardown-close;geographic-follow-partial",
+          "source-propagation": "passed-allowed-and-stopped",
+          "navigation-location": "passed-location1-center-readback",
+          "style-remount": "passed-visible-style-change-remount-and-generation1-readback",
+          "host-accessibility": "unverified",
+          "scale-units": "failed-remained-2-km-after-physical-toggle-and-wait",
+          "multi-touch-cancel": "unverified-driver-limitation"
+        },
+        "startup": "Safe-area-corrected TF07 fixture loaded; generation0 readback valid and native app controls/MapLibre attribution visible. Renderer background appeared blank/gray in screenshots while fixture controls and markers rendered.",
+        "finalReadback": {
+          "center": [
+            -122.33999999999926,
+            47.6100000000005
+          ],
+          "zoom": 11,
+          "featureId": 707,
+          "featureGeometry": [
+            -122.33999490737915,
+            47.57999970656695
+          ],
+          "fixture": "tf07",
+          "generation": 1,
+          "stopSourcePropagation": true,
+          "events": {
+            "popup-open": 3,
+            "style": 3,
+            "move": 117,
+            "load": 3,
+            "child-click": 2,
+            "source-click": 2,
+            "map-click": 1,
+            "popup-child": 1,
+            "popup-close": 1,
+            "location": 1
+          },
+          "features": [
+            {
+              "type": "Feature",
+              "id": 707,
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -122.33999490737915,
+                  47.57999970656695
+                ]
+              },
+              "properties": {
+                "fixture": "tf07"
+              }
+            }
+          ]
+        },
+        "runnerJudgment": "The native flow reached generation1 and actual readback was saved. Isolated runner exited nonzero only when reading the configured TF07_MANUAL_REPORT path, which was absent (ENOENT at tf07-ui-native-isolated.mjs:329); compact evidence contains actual native observations, no callbacks/fake values.",
+        "observations": [
+          "Initial generation0 readback: finite center[-122.3400000000085,47.6099999999991], zoom11, numeric feature id707, fixture tf07.",
+          "Tap at39%,57% on visible child produced child-click1 with no map-click. After offset tap at fresh screenshot point48%,53%, child-click advanced to2 with map-click unchanged; offset reset restored the child to the baseline visual position.",
+          "Nested scroll row gesture at39%,60% to39%,56% (logical start\u2248[157,524] on402x874) panned the map: move1\u219223 and latitude47.61\u219247.6043675. Before/after screenshots maplibre-run1-child.png and maplibre-run1-scroll-after.png.",
+          "Source propagation allowed: green source tap produced source-click1 and map-click1. After physical toolbar toggle changed Stop source bubbling\u2192Allow source bubbling, same visible feature tap produced source-click2 while map-click stayed1; stopped propagation passed.",
+          "Zoom-in changed zoom11\u219212. Zoom-out changed zoom to10.954611705474228; later reads retained this exact value. Directional zoom response observed, exact inverse step not established.",
+          "Locate me incremented location1 and read center[-122.3299999999996,47.619999999990725], zoom11.",
+          "Popup child tap incremented popup-child1. Explicit close incremented popup-close1. Toolbar reopened popup-open2; after style/remount final read shows popup-open3 and popup-close still1, so teardown added no close callback. Popup remained visible through pan/zoom screenshots; precise geographic follow remains partial.",
+          "Common scale visibly read2 km after camera movement. One physical units toggle at14%,9%, followed by 5s animation wait and renderer read, still showed2 km; units change failed visibly.",
+          "Replacement style visibly changed the map to pale blue. Remount completed; final generation1 readback confirms style3/load3 and preserves finite camera/feature707. Remount did not increment popup-close.",
+          "Maestro swipe does not establish a continuous long-press before movement; live marker drag, annotation drag, multipointer/cancel remain unverified. Delayed imagery, overlay passthrough, adverse location providers, overlaps/vector hits, and Android two-density offsets were not exercised."
+        ],
+        "finalHierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final-hierarchy.log",
+        "sourcePropagation": {
+          "allowed": {
+            "events": {
+              "source-click": 1,
+              "map-click": 1
+            },
+            "readback": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-source-allowed-hierarchy.log"
+          },
+          "stopped": {
+            "toggleLabelChanged": "Stop source bubbling \u2192 Allow source bubbling",
+            "events": {
+              "source-click": 2,
+              "map-click": 1
+            },
+            "stopSourcePropagation": true,
+            "readback": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-source-stopped-hierarchy.log"
+          }
+        },
+        "cameraControls": {
+          "zoomInReadback": {
+            "zoom": 12,
+            "hierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-zoom-in-hierarchy.log"
+          },
+          "zoomOutReadback": {
+            "zoom": 10.954611705474228,
+            "hierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-zoom-out-hierarchy.log"
+          },
+          "interpretation": "Both directions changed camera; exact inverse step not established; later reads retained10.954611705474228."
+        },
+        "locationReadback": {
+          "center": [
+            -122.3299999999996,
+            47.619999999990725
+          ],
+          "zoom": 11,
+          "locationEvents": 1,
+          "hierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-locate-hierarchy.log"
+        },
+        "scaleUnits": {
+          "visibleBefore": "2 km",
+          "input": "physical units tap14%,9%; waitForAnimationToEnd 5000ms; Read renderer",
+          "visibleAfter": "2 km",
+          "status": "failed-visible-label-unchanged",
+          "screenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-units.png",
+          "hierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-units-hierarchy.log"
+        },
+        "offsetTouch": {
+          "status": "partial-offset-and-reset-observed",
+          "offsetScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset.png",
+          "childTap": "physical point48%,53% at fresh displaced child bounds incremented child-click1\u21922; map-click remained1",
+          "readback": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset-child-hierarchy.log",
+          "resetScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-offset-reset.png",
+          "reset": "visual position returned to baseline; same iOS density only; drag unverified"
+        },
+        "popup": {
+          "childEvent": 1,
+          "dismissalEvent": 1,
+          "reopenedEvent": 2,
+          "finalEvents": {
+            "popup-open": 3,
+            "popup-close": 1,
+            "popup-child": 1
+          },
+          "teardown": "Remount final read did not increment popup-close; prior popup was visible through pan/zoom screenshots, geographic following only partial.",
+          "closeHierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-popup-close-hierarchy.log",
+          "finalHierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final-hierarchy.log"
+        },
+        "styleRemount": {
+          "status": "passed-visible-style-remount-generation1",
+          "styleScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-style.png",
+          "afterRemountScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-after-remount.png",
+          "finalScreenshot": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final.png",
+          "finalHierarchy": "/private/tmp/one-map-tf07-acceptance/maplibre-run1-final-hierarchy.log"
+        },
+        "identityPrinted": {
+          "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+          "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+          "environment": "maplibre-ios",
+          "runId": "77974398-0adc-48fd-b010-fc433a4dac24"
+        }
+      },
+      "coordinatorReview": {
+        "provenance": "Applied pure native judge after execution to actual final AX renderer observation and coordinator-reviewed outcomes for this exact run; no input, status POST, or new runtime. This does not repair the missing original operator report or certify full acceptance.",
+        "identity": {
+          "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+          "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+          "environment": "maplibre-ios",
+          "runId": "77974398-0adc-48fd-b010-fc433a4dac24"
+        },
+        "observation": {
+          "events": {
+            "popup-open": 3,
+            "style": 3,
+            "move": 117,
+            "load": 3,
+            "child-click": 2,
+            "source-click": 2,
+            "map-click": 1,
+            "popup-child": 1,
+            "popup-close": 1,
+            "location": 1
+          },
+          "positions": {},
+          "center": [
+            -122.33999999999926,
+            47.6100000000005
+          ],
+          "zoom": 11,
+          "features": [
+            {
+              "properties": {
+                "fixture": "tf07"
+              },
+              "id": 707,
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -122.33999490737915,
+                  47.57999970656695
+                ]
+              }
+            }
+          ],
+          "generation": 1,
+          "stopSourcePropagation": true
+        },
+        "reviewedReport": {
+          "installedBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+          "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+          "environment": "maplibre-ios",
+          "runId": "77974398-0adc-48fd-b010-fc433a4dac24",
+          "scenarios": {
+            "live-child-button": "passed",
+            "nested-scroll": "failed",
+            "live-drag": "unverified",
+            "annotation-drag": "unverified",
+            "offset-touch-bounds": "unverified",
+            "popup-follow-dismissal": "unverified",
+            "source-propagation": "passed",
+            "navigation-location": "passed",
+            "style-remount": "unverified",
+            "host-accessibility": "unverified",
+            "scale-units": "failed"
+          }
+        },
+        "judgment": {
+          "status": "unverified",
+          "execution": "manual-native-touch",
+          "observed": false,
+          "manualComplete": false,
+          "remaining": [
+            "nested-scroll",
+            "live-drag",
+            "annotation-drag",
+            "offset-touch-bounds",
+            "popup-follow-dismissal",
+            "style-remount",
+            "host-accessibility",
+            "scale-units"
+          ]
+        },
+        "execution": "agent-driven native UI; coordinator reviewed",
+        "fullTf07Acceptance": false
+      },
+      "fullTf07Acceptance": false,
+      "retention": "Temporary build/tool/log/screenshot paths are historical provenance; bulk owned test outputs removed after compact record. Selected scrolling/scale failure images retained in aggregate record."
+    }
+  },
+  "nativePreparation": {
+    "firstFailure": {
+      "environment": "mapbox-android",
+      "phase": "Gradle settings",
+      "cause": "npx not on PATH",
+      "apkProduced": false
+    },
+    "coordinatorAction": "Provided existing NVM Node24.14.0/npm11.11.0 toolchain; approved same-artifact Android build rerun, retaining attempt1.",
+    "devices": {
+      "android": {
+        "avd": "Medium_Phone",
+        "serial": "emulator-5554",
+        "api": 37,
+        "os": "Android17",
+        "density": 420
+      },
+      "ios": {
+        "name": "iPhone18Pro",
+        "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+        "os": "iOS27.0"
+      }
+    },
+    "additionalFailures": [
+      {
+        "environment": "mapbox-android",
+        "attempt": 2,
+        "phase": "x86_64 native linking",
+        "duration": "10m37s",
+        "cause": "Gradle-transformed fbjni, jsi, reactnative x86_64 shared libraries missing at CMake link time.",
+        "apkProduced": false
+      }
+    ],
+    "additionalCoordinatorActions": [
+      "For subsequent Android builds, constrain React Native architectures to the actual arm64-v8a emulator.",
+      "Approved Mapbox Android attempt3 with same frozen artifact and arm64-v8a only after independent MapLibre Android first attempt; retain both earlier failures."
+    ],
+    "deviceRetry": {
+      "reason": "Owned emulator guest input/shell/screenshot became unresponsive before any scene readback; emulator console ACK alone could not establish UI result.",
+      "failedRunId": "11d7205d-c618-490f-a6ad-bf36d99970d0",
+      "result": "unverified-tooling-failure",
+      "retryApproved": true,
+      "ramMiB": 4096,
+      "gpu": "swiftshader",
+      "sameFrozenLibrary": true,
+      "unrelatedDevicesUntouched": true
+    },
+    "iosInputDiscovery": {
+      "firstAttempt": "Maestro hierarchy without escalation failed before input with device not connected.",
+      "diagnosis": "Maestro catches CoreSimulator discovery exceptions and returns no devices. Coordinator invoked its own discovery implementation with scoped escalation and parsed the assigned Booted iOS27 simulator successfully.",
+      "approvedRetry": "Exact hierarchy operation with scoped escalation succeeded and returned native accessibility hierarchy; earlier stopped runtime remains unverified.",
+      "next": "Fresh same-artifact run identity and actual native input after current sequential build."
+    },
+    "iosGestureInputScope": {
+      "tool": "Maestro CLI2.11.0 native XCTest driver",
+      "inspectedSource": "Bundled driver/ios/maestro-driver-iosUITests/Routes/XCTest/EventRecord.swift",
+      "ordinarySwipe": "addSwipeEvent creates touch, waits defaultTapDuration0.1s, moves, then holds for requested duration before lifting.",
+      "liveDrag": "Does not establish required 500ms stationary hold followed by continuous drag. Separate longPressOn and swipe release between commands. Missing events from these sequences cannot establish product failure.",
+      "unverified": [
+        "continuous-live-drag",
+        "multiple-pointer-cancellation",
+        "interrupted-touch-cancellation"
+      ],
+      "productionCallbacksInvokedAsInput": false
+    }
+  },
+  "interruption": {
+    "resumedAt": "2026-10-13T05:04:46.669Z",
+    "temporaryDirectoryMissing": true,
+    "acceptancePortsClear": true,
+    "androidDeviceAbsent": true,
+    "iosBootedDevicesAbsent": true,
+    "sourceAndAllCopiedDistVerifiedUnchanged": true,
+    "nativeFlow": "Previous MapLibre Android flow interrupted before a completed operator report; its runtime result stays unverified.",
+    "deviceRestoration": {
+      "reason": "Assigned AVD definition and SDK command-line tools absent after interruption.",
+      "source": "https://developer.android.com/studio",
+      "download": "https://dl.google.com/android/repository/commandlinetools-mac_arm64-15859902_latest.zip",
+      "sha256": "835b62a26162b229b441d1f6d4680383815a270809eb33522c0d480fa5002c4e",
+      "checksumVerified": true,
+      "installation": "Temporary tool layout; symbolic links to installed system image and emulator; global SDK unchanged.",
+      "availableImage": "system-images;android-37.1;google_apis_playstore_ps16k;arm64-v8a",
+      "previousTargetApi": 37,
+      "resumedTargetApi": "37.1",
+      "ownedAvdName": "TF07_Acceptance",
+      "profileRepair": {
+        "globalSdkChanged": false,
+        "staging": "Small metadata copies and symlinks to installed image; devices.xml extracted from official downloaded CLI sdklib.core.jar.",
+        "devicesXmlSha256": "c5f65445ff22f4667612a50e4f9d378355dbe4acdfe7c760145bc95c8c112db2",
+        "creation": "Owned temporary TF07_Acceptance; corrected Android user home for registration. Partial owned directory cleanup approved after failed creation."
+      }
+    },
+    "secondResume": {
+      "at": "2026-10-13T05:21:04.092Z",
+      "acceptanceProcessesAbsent": true,
+      "mapboxApkAbsent": true,
+      "worker": {
+        "model": "gpt-6-luna",
+        "reasoning": "medium",
+        "exclusiveOwner": "/root/native_finish"
+      },
+      "mapboxBuildAttempt3": "Interrupted before a produced APK; next same-artifact arm64 build approved."
+    }
+  },
+  "versions": {
+    "web-mapbox": {
+      "react": "19.2.3",
+      "react-dom": "19.2.3",
+      "react-map-gl": "8.1.3",
+      "mapbox-gl": "3.32.0"
+    },
+    "web-maplibre": {
+      "react": "19.2.3",
+      "react-dom": "19.2.3",
+      "react-map-gl": "8.1.3",
+      "maplibre-gl": "6.13.0"
+    },
+    "native-mapbox": {
+      "react": "19.2.3",
+      "react-native": "0.87.1",
+      "@rnmapbox/maps": "10.3.7",
+      "react-native-teleport": "1.2.1"
+    },
+    "native-maplibre": {
+      "react": "19.2.3",
+      "react-native": "0.87.1",
+      "@maplibre/maplibre-react-native": "11.5.0",
+      "react-native-teleport": "1.2.1"
+    }
+  },
+  "harnessCorrections": [
+    {
+      "change": "Known fixture707 accepts either numeric707 or Android bridge string\"707\", leaving facade/query results untouched.",
+      "basis": "docs/tf06-queries.md records numeric fixture IDs returned as Android bridge strings and identity comparisons in prior accepted smoke.",
+      "source": "scripts/tf07-smoke-contract.mjs",
+      "previousSha256": "194b8d42de4365c4e838509833299229141942153efd8bb1a2bd7076758643ed",
+      "currentSha256": "610b1daf33b2a14e6065753e9d9889b81d3040c7d195668dc35dda95a64b3586",
+      "test": "scripts/tf07-smoke-contract.test.mjs",
+      "testSha256": "a8da3358ff4ed35a6f33ed55e87ae66a766a5a1a573de1edda612fdd0ec3150b",
+      "routine": "Contract regression and Biome passed; malformed/wrong IDs reject.",
+      "libraryArtifactChanged": false,
+      "priorResultsRetained": true
+    },
+    {
+      "change": "Wrap only the native TF07 test screen in the pinned React Native SafeAreaView so toolbar controls remain below the simulator status bar.",
+      "basis": "Actual iOS screenshot and Maestro input established that Read renderer was obscured at y0 and did not deliver readback; child button did fire.",
+      "source": "examples/shared/native-tf07-screen.tsx",
+      "previousSha256": "65af52b13499daa254f6fbfe7d838361493431301048c5f1668722cc2cd750a4",
+      "currentSha256": "39a236be7f0ed33231f7e56e4e342ff4ea7ac65f37b1bcfbf0b2a029eaf657ee",
+      "routine": "Biome and native example TypeScript passed. Initial invocation used a nonexistent script name before the exact native TypeScript check succeeded.",
+      "libraryArtifactChanged": false,
+      "nativeBinaryChanged": false,
+      "scenarioLogicChanged": false,
+      "priorResultsRetained": true
+    },
+    {
+      "change": "Extend only temporary isolated native runner observation timeout from20 to60min for operator-paced iOS scenarios.",
+      "basis": "Run224d stopped at20min while actual scenario observations were still being gathered; prior timeout retained.",
+      "source": "/private/tmp/one-map-tf07-acceptance/tf07-ui-native-isolated.mjs",
+      "previousSha256": "38fc08cd30db3976fc95323aef593dd4978c19e73d0d806b40a7e4cfb447eea8",
+      "currentSha256": "2a4cc4cbcef0521d19895fab1ad9020b00ddee5f4658d922241f1fe2c137f7a2",
+      "libraryArtifactChanged": false,
+      "nativeBinaryChanged": false,
+      "acceptancePredicatesChanged": false,
+      "originalRunnerChanged": false,
+      "priorResultsRetained": true
+    }
+  ],
+  "runtimeFindings": [
+    {
+      "environment": "mapbox-web",
+      "scenario": "camera-operation-from-onLoad",
+      "status": "failed",
+      "observation": "TF07 scene calls jumpTo from onLoad; callback arrives before map ref is attached, producing Map camera is not attached on initial load and remount.",
+      "source": "examples/shared/tf07-scene.tsx:126",
+      "diagnosis": "Observed lifecycle ordering; production artifact remains frozen."
+    },
+    {
+      "environment": "mapbox-ios",
+      "scenario": "nested-scroll",
+      "status": "failed",
+      "runId": "224d943a-bf25-40e5-9b3f-8f5352c813ab",
+      "input": "Actual Maestro native swipe start50%,42% to50%,39%, duration500ms; screen402x874, start point approximately[201,367].",
+      "targetBounds": {
+        "scrollViewport": "[140,344][261,376]",
+        "visibleSecondRow": "[140,361][261,378]"
+      },
+      "before": {
+        "move": 76,
+        "center": [
+          -122.34000000000002,
+          47.57298640000001
+        ]
+      },
+      "after": {
+        "move": 94,
+        "center": [
+          -122.34,
+          47.5692786
+        ]
+      },
+      "observation": "The corrected input began inside the visible nested ScrollView, but map moved and child rows did not scroll.",
+      "priorAttempt": "Earlier swipe remains ambiguous; this failure is based on corrected start point checked against screenshot and viewport ancestor bounds.",
+      "diagnosis": "Coordinator classified the observed scenario failure; adapter/upstream cause is not yet established.",
+      "retainedScreenshots": {
+        "before": {
+          "path": "tf07-mapbox-ios-nested-scroll-before.png",
+          "sha256": "cdd4f70de131941e53804969b34a7f7bee185890599d88c03332a3f45c49f09b"
+        },
+        "after": {
+          "path": "tf07-mapbox-ios-nested-scroll-after.png",
+          "sha256": "e21586e12f0e10fb1c1edb9d3774264b1618f0e91f34b982fa9036e8f2e61712"
+        }
+      }
+    },
+    {
+      "environment": "maplibre-ios",
+      "scenario": "nested-scroll",
+      "status": "failed",
+      "runId": "77974398-0adc-48fd-b010-fc433a4dac24",
+      "input": "Actual Maestro native swipe start39%,60% to39%,56%, duration500ms on402x874 logical screen; start approximately[157,524].",
+      "target": "Coordinator inspected pre-input screenshot; normalized start is inside visible Scroll two row in nested32pt viewport. Preview image pixels were resized and are not used as original coordinates.",
+      "before": {
+        "move": 1,
+        "center": [
+          -122.34,
+          47.61
+        ]
+      },
+      "after": {
+        "move": 23,
+        "center": [
+          -122.34,
+          47.6043675
+        ]
+      },
+      "observation": "Map moved and child list did not scroll.",
+      "diagnosis": "Observed native interaction failure; underlying adapter/upstream cause remains unestablished.",
+      "retainedScreenshots": {
+        "before": {
+          "path": "tf07-maplibre-ios-nested-scroll-before.png",
+          "sha256": "25df86166f353e84f01bf7d4eeab92ba625ec62f1ad4f83d59d0f0c40e1bd259"
+        },
+        "after": {
+          "path": "tf07-maplibre-ios-nested-scroll-after.png",
+          "sha256": "07565f2f5393d26944075388e6936dcaf2d301b1f2ebca233426c3ea076fa059"
+        }
+      }
+    },
+    {
+      "environment": "maplibre-ios",
+      "scenario": "scale-units",
+      "status": "failed",
+      "runId": "77974398-0adc-48fd-b010-fc433a4dac24",
+      "before": "Common bottom-left scale2km",
+      "input": "Physical units button point14%,9% at current horizontally scrolled toolbar; waited5000ms then real Read renderer.",
+      "after": "Common scale remained2km.",
+      "diagnosis": "Observed scenario failed to update visible units; adapter/fixture/upstream cause remains unestablished.",
+      "retainedScreenshot": {
+        "path": "tf07-maplibre-run1-units.png",
+        "sha256": "dffd384d42526e485387d3b2cd9e46117f85130b6be3db37b84cb24f4ed5df68"
+      }
+    }
+  ],
+  "runtimeObservations": [
+    {
+      "environment": "mapbox-ios",
+      "scenario": "scale-units",
+      "status": "unresolved",
+      "runId": "0ba8f118-7524-4aa2-9793-5a2c93fdd9cb",
+      "observation": "Facade scale absent at initial camera after physical units tap; appeared1mi after camera movement; remained1mi after bounded physical units toggle. Earlier AX text-target attempts are retained as ambiguous input, not definitive unit-state evidence.",
+      "retainedScreenshots": [
+        {
+          "path": "tf07-mapbox-run4-units-unobstructed.png",
+          "sha256": "863587e2cd9e5e4dc70c7409774389b1e298a542a3e024c15eeeea8d80439495"
+        },
+        {
+          "path": "tf07-mapbox-run4-units-metric.png",
+          "sha256": "e4088a9c25ce6bdec59535427cd4dd0000e37df6e123afea93f30a87c9d029d3"
+        }
+      ]
+    }
+  ],
+  "retention": {
+    "at": "2026-10-13T07:59:24.354445+00:00",
+    "removedPaths": [
+      "/private/tmp/one-map-tf07-acceptance",
+      "/Users/rob/code/mapbox-code/one-map/examples/native-mapbox/android/app/build",
+      "/Users/rob/code/mapbox-code/one-map/examples/native-mapbox/android/build",
+      "/Users/rob/code/mapbox-code/one-map/examples/native-mapbox/android/.gradle",
+      "/Users/rob/code/mapbox-code/one-map/examples/native-mapbox/android/app/.cxx",
+      "/Users/rob/code/mapbox-code/one-map/examples/native-maplibre/android/app/build",
+      "/Users/rob/code/mapbox-code/one-map/examples/native-maplibre/android/build",
+      "/Users/rob/code/mapbox-code/one-map/examples/native-maplibre/android/.gradle",
+      "/Users/rob/code/mapbox-code/one-map/examples/native-maplibre/android/app/.cxx"
+    ],
+    "removedAllocatedKiBBeforeCleanup": 9179280,
+    "retained": "Compact JSON provenance/outcomes and seven small screenshots explaining unresolved native scrolling/scale behavior. Temporary paths in historical attempt records are provenance only and have been removed.",
+    "processes": "No owned runner, Metro, status or Maestro/XCTest driver processes/listeners remained at final inspection.",
+    "iosApps": "Both test app bundles uninstalled after binary/install hashes and observations were saved.",
+    "simulator": "Assigned iPhone18Pro iOS27 remains Booted, preserving original state.",
+    "unrelatedResources": "Other projects, servers, devices, global SDK and Gradle caches left untouched."
+  },
+  "executionStatus": "six-environment-attempt-concluded",
+  "concludedAt": "2026-10-13T08:00:12.978747+00:00",
+  "fullTf07Acceptance": false,
+  "allEnvironmentsPassed": false,
+  "remainingRequiredWork": [
+    "Fix Mapbox web load/ref attachment ordering before camera operations from onLoad.",
+    "Fix or substantiate native nested-scroll behavior; valid child-area gestures panned the map in both iOS engines.",
+    "Resolve native scale initial visibility and unit-change behavior; MapLibre visible label did not change and Mapbox behavior remains unresolved.",
+    "Investigate MapLibre iOS zoom-step drift: measured12 to10.954611705474228, rather than claiming exact inversion.",
+    "Restore a stable Android renderer/input environment and finish both Android interaction procedures, including two density settings.",
+    "Verify native continuous long-press drags, multiple-pointer/interrupted-touch cancellation, delayed image refresh, focused overlapping/vector hits and adverse native location providers.",
+    "Verify portal provider updates across multiple maps, resize/orientation, and full assistive-technology behavior."
+  ],
+  "recordConsistency": "Six environment results, frozen library verification, actual per-run native identities/generation1 observations, incomplete native judgment, and retained failure image paths checked."
+}

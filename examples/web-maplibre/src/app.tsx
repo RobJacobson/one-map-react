@@ -12,12 +12,15 @@ import {
   WebQueriesApp,
 } from "../../shared/web-queries-app.js";
 import { WebSourcesApp } from "../../shared/web-sources-app.js";
+import { WebTf07App } from "../../shared/web-tf07-app.js";
 
 const cameraSmoke = new URLSearchParams(window.location.search).get("tf04");
 const sourcesSmoke = new URLSearchParams(window.location.search).get("tf05");
 const queriesSmoke = new URLSearchParams(window.location.search).get("tf06");
 
 export const App = () => {
+  if (new URLSearchParams(window.location.search).get("tf07") === "ui")
+    return <WebTf07App adapter={adapter} />;
   if (cameraSmoke === "corrections" || sourcesSmoke === "corrections") {
     return <WebCorrectionsApp adapter={adapter} probe={<CorrectionProbe />} />;
   }

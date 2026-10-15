@@ -1,0 +1,93 @@
+{
+  "status": "stopped-at-first-readiness-failure",
+  "environment": "mapbox-android",
+  "runId": "00cda308-e7a2-4169-ad8f-c18d3a29ed9d",
+  "execution": "R14 focused control-layout follow-up; no Finish focus",
+  "manualReport": {
+    "path": "/private/tmp/one-map-tf07-rerun/manual-mapbox-android-control-layout-r14.json",
+    "installedBinarySha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+    "scenarios": {
+      "portal-context-state-multiple-maps": "unverified",
+      "resize-orientation": "unverified",
+      "host-accessibility": "unverified",
+      "navigation-constraints": "unverified",
+      "source-passthrough": "unverified",
+      "control-teardown": "unverified"
+    }
+  },
+  "artifact": {
+    "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+    "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+    "packedSha256": "22c0a7e64fcf6c94c4167ce7ef3d148f2843ca93dc71ffcf2a016392b223c0be",
+    "exampleDistSha256": {
+      "web-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "web-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "native-mapbox": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+      "native-maplibre": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49"
+    }
+  },
+  "binary": {
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "package": "com.onemapmapbox",
+    "device": "emulator-5556",
+    "avd": "TF07_Rerun36",
+    "os": "Android 16 / API 36",
+    "screen": "1080x2400 portrait; 2400x1080 landscape",
+    "density": "420 dpi"
+  },
+  "acceptedObservationsBeforeToolingReset": {
+    "initialChildren": "Map A and Map B actual labels were visible; physical child presses updated each child independently and preserved map zoom 11/12.",
+    "theme": "Actual Theme press and Read showed both child labels updated to 1.",
+    "resize": {
+      "result": "short=true; both labels were visibly drawn at their own map bottom-right, inside the corresponding viewport.",
+      "mapAViewport": "[0,408]-[1080,1404]",
+      "mapAChildBounds": "[779,1332]-[1059,1383]",
+      "mapBViewport": "[0,1404]-[1080,2400]",
+      "mapBChildBounds": "[780,2328]-[1059,2379]",
+      "screenshot": "records/evidence/tf07-r14/resized-clear.png"
+    },
+    "orientation": {
+      "result": "Actual landscape and restored portrait retained each map's child text in its own footer; subsequent physical child presses incremented A and B independently.",
+      "landscapeScreenshot": "records/evidence/tf07-r14/landscape-children.png",
+      "portraitScreenshot": "records/evidence/tf07-r14/portrait-children.png"
+    },
+    "attributionA": {
+      "result": "A real tap opened the visible Mapbox attribution dialog.",
+      "screenshot": "records/evidence/tf07-r14/attribution-a.png"
+    }
+  },
+  "readinessFailure": {
+    "result": "After bounded waits and multiple physical Read actions, renderer counts continued to show a-load=1 and no b-load. Map B features were queryable/rendered, but this did not establish the missing load callback. The Map B zoom controls were disabled, so navigation was not tested.",
+    "initialCountsBeforeReset": {
+      "a-load": 1,
+      "Map A-click": 4,
+      "Map A-map-zoom-11": 4,
+      "Map B-click": 4,
+      "Map B-map-zoom-12": 4
+    },
+    "logEvidence": "records/evidence/tf07-r14/logcat.txt contains Mapbox GL/EGL initialization and emulator glDeleteProgram 0x501 warnings; no tile/style/load exception was found in the filtered app log review.",
+    "sourceAfterReset": "After reactivation, an actual standard tap at the fresh Map A overlap point incremented a-map-click=1 but did not increment source-click. Source passthrough remains unverified; this occurred after UI state reset and does not replace the earlier R12/R13 evidence.",
+    "mapBAttribution": "Unverified. The attempted dismissal sequence sent the app to Home before a Map B dialog was captured."
+  },
+  "toolingInterruption": {
+    "result": "Two Back key events were issued while dismissing the Map A attribution dialog; the second moved the app to Home. The app PID remained 11547, but reactivating MainActivity recreated the React screen and reset counts, theme, and short layout. This is recorded as a tooling-induced navigation/state reset, not an app crash.",
+    "afterRecoveryScreenshot": "records/evidence/tf07-r14/after-recovery.png",
+    "homeScreenshot": "records/evidence/tf07-r14/attribution-b-attempt-home.png"
+  },
+  "result": "Stopped before Finish focus after the persistent missing Map B load callback and disabled navigation controls. All six manual fields remain unverified; resize/orientation/child drawing and touch observations above are retained as scoped evidence.",
+  "cleanup": {
+    "runnerStopped": true,
+    "metro8171Stopped": true,
+    "status8797Stopped": true,
+    "fixture8798Stopped": true,
+    "emulatorPreserved": true,
+    "portrait": true,
+    "autorotationRestored": true
+  },
+  "coordinatorReview": {
+    "layout": "Reviewed actual resized-clear, landscape-children and portrait-children pixels. Both updated labels are drawn inside their own map footer; valid resized bounds and independent physical presses preserve child state and A11/B12 context. SDK scale is entirely below Map B Navigation, with SDK logos and attribution visibly separated.",
+    "acceptance": "Full six-field scope remains unverified: persistent missing B load kept navigation disabled, B attribution/source/teardown not established. Preserve original manual results; scoped layout observations accepted only.",
+    "retry": "Coordinator authorized one fresh unchanged-artifact R14 retry. Require physical Read a-load and b-load plus enabled B Navigation within 60 seconds before scenario input; stop if readiness absent. Initial-load listener ordering in pinned native wrapper is an unproven hypothesis."
+  }
+}

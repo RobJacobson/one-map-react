@@ -1,0 +1,33 @@
+{
+  "installedBinarySha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+  "libraryDistSha256": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd",
+  "environment": "mapbox-ios",
+  "runId": "8cebeee7-1922-4ac3-8caa-6aa9e0861750",
+  "scenarios": {
+    "annotation-image-refresh": "passed",
+    "overlap-source-propagation": "passed",
+    "vector-source-hit": "passed",
+    "location-rejected": "passed",
+    "location-delayed-teardown": "passed",
+    "portal-context-state-multiple-maps": "passed",
+    "resize-orientation": "passed",
+    "host-accessibility": "passed",
+    "navigation-constraints": "passed"
+  },
+  "evidence": {
+    "annotation-image-refresh": "focus-orientation-image.png and fresh Read image-load=1,image-refresh=1; blue image visibly rendered",
+    "overlap-source-propagation": "allowed hit: high-click=1,a-map-click=1; stopped hit: high-click=2,a-map-click remains1, stop=true after one settled physical toggle/read",
+    "vector-source-hit": "physical tap at projected Map B vector line: vector-click=1,b-map-click=1; query returned real vector feature records",
+    "location-rejected": "mode=reject,provider-call=1,provider-error=1; no location; finite camera unchanged",
+    "location-delayed-teardown": "mode=delay; Locate disabled while pending; one delayed call, locate removed, Resolve followed by Read showed no late location and unchanged camera",
+    "portal-context-state-multiple-maps": "Map A child presses reported Map A-click=2 and zoom-11=2; Map B child press reported Map B-click=1 and zoom-12=1; theme updated both children independently",
+    "resize-orientation": "landscape screenshot plus AX app surface 874x402; physical Read showed finite cameras and rendered maps/features; portrait restored and AX app surface 402x874",
+    "host-accessibility": "separate labeled Map A/Map B children and labeled Image/Zoom/Locate controls appeared as enabled AX nodes and were physically pressed; full VoiceOver audit out-of-scope/unverified",
+    "navigation-constraints": "Map B plus at zoom13 stayed13; minus changed13->12; second minus stayed12; actual Read after each"
+  },
+  "finalRead": "records/evidence/tf07-mapbox-ios-focused-r8-orientation-final-read.json",
+  "screenshots": {
+    "annotation": "records/evidence/tf07-mapbox-ios-focused-r8-orientation-image.png",
+    "landscape": "records/evidence/tf07-mapbox-ios-focused-r8-orientation-landscape.png"
+  }
+}

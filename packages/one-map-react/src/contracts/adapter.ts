@@ -9,6 +9,17 @@ import type { ImagesProps } from "./images-types.js";
 import type { LayerProps } from "./layer-types.js";
 import type { MapProps } from "./map-types.js";
 import type { SourceProps } from "./source-types.js";
+import type {
+  AttributionControlProps,
+  ControlProps,
+  FullscreenControlProps,
+  GeolocateControlProps,
+  MarkerProps,
+  MarkerRef,
+  NavigationControlProps,
+  PopupProps,
+  ScaleControlProps,
+} from "./ui-types.js";
 
 /** Explicit engine and host selection; native covers both iOS and Android. */
 export type Backend =
@@ -34,4 +45,22 @@ export interface Adapter {
   readonly Layer: ComponentType<LayerProps>;
   /** Style images registered on the enclosing map. */
   readonly Images: ComponentType<ImagesProps>;
+  /** Geographically anchored live view or explicit annotation. */
+  readonly Marker: ForwardRefExoticComponent<
+    MarkerProps & RefAttributes<MarkerRef>
+  >;
+  /** Mounted popup with application-owned dismissal. */
+  readonly Popup: ComponentType<PopupProps>;
+  /** Application UI in a map corner. */
+  readonly Control: ComponentType<ControlProps>;
+  /** Camera buttons and compass. */
+  readonly NavigationControl: ComponentType<NavigationControlProps>;
+  /** Renderer attribution. */
+  readonly AttributionControl: ComponentType<AttributionControlProps>;
+  /** Ground distance scale. */
+  readonly ScaleControl: ComponentType<ScaleControlProps>;
+  /** Location acquisition and camera centering. */
+  readonly GeolocateControl: ComponentType<GeolocateControlProps>;
+  /** Browser fullscreen UI. */
+  readonly FullscreenControl: ComponentType<FullscreenControlProps>;
 }

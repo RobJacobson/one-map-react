@@ -1,0 +1,43 @@
+{
+  "artifact": {
+    "sourceSha256": "c06b2785fef51fd88d2ea218e315e234bd7312d0b51c7d5df528f84042af8c93",
+    "distSha256": "76f0e8831c8226c9c2aaf4554ac509ea8857aac1a234c2f1a07a841ba7271d49",
+    "packedSha256": "85b7b84933fcb6a1b2ac44bf7ec482de04c797fae3fadf289ee95bab9b97d5da",
+    "installedExecutableSha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "installedDebugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3"
+  },
+  "environment": "Mapbox iOS, iPhone 18 Pro simulator, iOS 27, UDID 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+  "fixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+  "runId": "d96647b2-6162-453f-be62-6b98e8a9c6b5",
+  "result": "stopped at first unexpected child-control discrepancy",
+  "execution": "Actual XCTest touch requests, physical Read renderer snapshots, accessibility hierarchy and simulator screenshots; no callback injection",
+  "scenarios": {
+    "portal-context-state-multiple-maps": "failed at initial child availability: Map A tap/read passed; visible Map B child tap/read did not increment Map B-click",
+    "resize-orientation": "unverified",
+    "host-accessibility": "unverified",
+    "navigation-constraints": "unverified",
+    "source-passthrough": "unverified",
+    "control-teardown": "unverified"
+  },
+  "observations": {
+    "initialRead": "Both maps loaded once; finite cameras at zoom 11 and 12; overlapping features 707/708 and two vector features present.",
+    "mapAChild": "Fresh hierarchy showed Map A button frame x302.67..394, y623.67..640.67 pt. Actual tap at (349,632) followed by physical Read produced Map A-click=1 and Map A-map-zoom-11=1; camera unchanged.",
+    "mapBChild": "Fresh original hierarchy showed Map B button frame x303..394, y815..832 pt. Actual tap at (349,823) followed immediately by physical Read left Map B-click absent and Map B label at initial 0. A new read-only hierarchy retained the same visible/enabled bounds. Screenshot confirms the button was visible.",
+    "cleanup": "Stopped the focused runner, force-stopped only the assigned app, and stopped only the owned Metro listener on 8171. Status service is down; the assigned simulator remains booted."
+  },
+  "manualReport": "records/evidence/tf07-r15/manual-mapbox-ios-control-layout-r15.json",
+  "evidence": {
+    "initialScreenshot": "/private/tmp/one-map-tf07-rerun/r15-ios-initial-settled.png",
+    "initialHierarchy": "/private/tmp/one-map-tf07-rerun/r15-ios-initial-hierarchy.json",
+    "mapARead": "records/evidence/tf07-r15/r15-ios-child-a.json",
+    "mapBRead": "records/evidence/tf07-r15/r15-ios-child-b.json",
+    "afterMapBHierarchy": "records/evidence/tf07-r15/r15-ios-after-child-b-hierarchy.json",
+    "afterMapBScreenshot": "records/evidence/tf07-r15/r15-ios-after-child-b.png"
+  },
+  "coordinatorReview": {
+    "status": "first-failure-preserved",
+    "observed": "Root inspected actual screenshot: A initial1 and B initial0 at their own visible footers. Tree-derived B target815\u2013832pt, physical tap349/823 and following Read did not register B callback. Exact cause not established.",
+    "next": "R16 limits explicit Control viewport bounds to Android, whose SDK leaves source view detached. iOS component calls super.mountChildComponentView and retains native host sizing. Fresh six-field iOS follow-up first tests B touch with bounded physical Reads before other inputs.",
+    "routine": "R16fullvalidate546/21, fourtypes, formatting/docs and packed13 passed; installed native executable/dylib unchanged."
+  }
+}

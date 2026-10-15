@@ -1,0 +1,94 @@
+{
+  "status": "incomplete-stopped-infrastructure",
+  "scope": "Android MapLibre core11; acceptance stopped after assigned ADB host daemon failed",
+  "identity": {
+    "environment": "maplibre-android",
+    "runId": "1311e070-ce33-47cd-84a2-cf09bc113cf2",
+    "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+    "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "device": "emulator-5556",
+    "densityDpi": 420,
+    "screen": "1080x2400",
+    "fixture": "canonical core"
+  },
+  "completedScenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-drag": "passed",
+    "annotation-drag": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "finalPhysicalReceipt": 15,
+  "latestRead": {
+    "events": {
+      "popup-open": 1,
+      "style": 1,
+      "move": 82,
+      "load": 1,
+      "child-click": 3,
+      "live-start": 4,
+      "live-drag": 84,
+      "live-end": 2,
+      "annotation-start": 1,
+      "annotation-end": 1,
+      "location": 1
+    },
+    "center": [
+      -122.33,
+      47.62000000000002
+    ],
+    "zoom": 11,
+    "generation": 0,
+    "featureIds": [
+      "707"
+    ]
+  },
+  "lastSuccessfulStep": "Actual geolocate press; location=1, center [-122.33,47.62], zoom11.",
+  "firstFailure": {
+    "category": "host ADB infrastructure",
+    "timeLocal": "2026-10-13 16:48:50",
+    "operation": "Navigation plus tap before input was dispatched",
+    "diagnostic": "ADB 37.0.1 failed to start the server on tcp:5037: could not install *smartsocket* listener: Operation not permitted; ADB server did not ACK. No navigation input was delivered.",
+    "evidence": "/private/tmp/one-map-tf07-rerun/maplibre-android-r16-core-runner.log and adb.501.log"
+  },
+  "evidenceDirectory": "records/evidence/tf07-maplibre-android-r16-core-stopped",
+  "evidenceFiles": [
+    "manual-maplibre-android-r16-core.json",
+    "maplibre-android-r16-initial.png",
+    "maplibre-android-r16-initial-warning-dismissed.png",
+    "maplibre-android-r16-initial-read.json",
+    "maplibre-android-r16-child.json",
+    "maplibre-android-r16-scroll.json",
+    "maplibre-android-r16-pre-scroll-tree.xml",
+    "maplibre-android-r16-post-scroll-tree.xml",
+    "maplibre-android-r16-live-drag.json",
+    "maplibre-android-r16-second-pointer.json",
+    "maplibre-android-r16-pan-recovery.json",
+    "maplibre-android-r16-cancel.json",
+    "maplibre-android-r16-cancel-recovery.json",
+    "maplibre-android-r16-annotation-drag.json",
+    "maplibre-android-r16-offset-set.json",
+    "maplibre-android-r16-offset-set-tree.xml",
+    "maplibre-android-r16-offset-child.json",
+    "maplibre-android-r16-offset-drag.json",
+    "maplibre-android-r16-offset-reset.json",
+    "maplibre-android-r16-offset-reset-tree.xml",
+    "maplibre-android-r16-offset-reset-child.json",
+    "maplibre-android-r16-locate.json"
+  ],
+  "scopeLimit": "Single-pointer drag, multipointer and explicit cancellation passed; active Home/background interruption remains unverified and must pass in the scoped continuation before core acceptance.",
+  "infrastructureReview": {
+    "result": "permission-boundary failure, not guest/app crash",
+    "adb": "Existing server PID56489 already listening on127.0.0.1:5037; no server started or killed. Scoped access reached owned emulator5556.",
+    "device": "Owned qemu PID73259 alive, sys.boot_completed1, guest uptime about20,906 seconds. App PID14575 and activity window token retained. No emulator restart or input during diagnosis.",
+    "correction": "Use scoped native-device/socket access for all remaining ADB calls; preserve unrelated devices and server."
+  }
+}

@@ -3,20 +3,32 @@ import {
   type ComponentProps,
   type ComponentRef,
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
-import type { StyleProp, ViewStyle } from "react-native";
+import {
+  Platform,
+  type StyleProp,
+  View,
+  type ViewProps,
+  type ViewStyle,
+} from "react-native";
+import { PortalHost, PortalProvider } from "react-native-teleport";
 
 import type { MapRef } from "../../contracts/camera-types.js";
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
+import type { ControlPosition } from "../../contracts/ui-types.js";
+import { useOptionalMapSession } from "../../facade/map-context.js";
 import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
+import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import {
@@ -43,7 +55,42 @@ type RnPressFeature = Parameters<
 >[0];
 
 /** Mapbox-native map that renders RNMapbox `MapView` with a `Camera` child. */
-export const MapboxNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
+export const MapboxNativeMap = forwardRef<
+  MapRef,
+  MapProps & {
+    hostProps?: ViewProps;
+    options?: Partial<ComponentProps<typeof MapView>>;
+  }
+>((props, ref) => {
+  const session = useOptionalMapSession();
+  const ornaments = useNativeOrnamentPositions();
+  const scaleBarPosition =
+    props.options?.scaleBarPosition ??
+    (ornaments.managed ? ornaments.position("top-left") : undefined);
+  const scalePositionKey = JSON.stringify([
+    scaleBarPosition,
+    session?.nativeLayout?.width,
+    session?.nativeLayout?.height,
+  ]);
+  const [appliedScalePosition, setAppliedScalePosition] =
+    useState(scalePositionKey);
+  // RNMapbox iOS stores position updates without marking its scale dirty.
+  // Native layout can reset the scale. Separate its hide/restore commits by a
+  // frame so Fabric cannot merge away the enabled setter's dirty notification.
+  const refreshScalePosition =
+    Platform.OS === "ios" &&
+    appliedScalePosition !== scalePositionKey &&
+    props.options?.scaleBarEnabled !== false;
+  useEffect(() => {
+    if (!refreshScalePosition) {
+      setAppliedScalePosition(scalePositionKey);
+      return;
+    }
+    const frame = requestAnimationFrame(() =>
+      setAppliedScalePosition(scalePositionKey)
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [scalePositionKey, refreshScalePosition]);
   const {
     mapStyle,
     initialViewState,
@@ -111,14 +158,31 @@ export const MapboxNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
     touchPitch,
     doubleTapZoom,
   });
+  const selectedGestureSettings = mergeGestureSettings(
+    props.options?.gestureSettings,
+    extraGestureSettings
+  );
+  // Android's scalar zoomEnabled setter also disables both double-tap variants.
+  // A temporary lock needs no synthesized map. Removing it would send null to
+  // the pinned Android setter, which unconditionally reads a ReadableMap.
+  const portableGestureSettings =
+    Platform.OS === "android" &&
+    interactive === false &&
+    selectedGestureSettings === undefined &&
+    doubleTapZoom === undefined
+      ? undefined
+      : gestures.gestureSettings;
   const gestureSettings = mergeGestureSettings(
-    extraGestureSettings,
-    gestures.gestureSettings
+    selectedGestureSettings,
+    portableGestureSettings
   );
 
-  useImperativeHandle(ref, () =>
-    createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources)
+  const mapHandle = useMemo(
+    () => createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources),
+    [geoJsonSources]
   );
+  // Descendant control effects must retain the attached ref during prop updates.
+  useImperativeHandle(ref, () => mapHandle, [mapHandle]);
 
   assertNativeMapOptions(reuseMaps, gl);
   assertNativeDesktopOptions(props);
@@ -143,62 +207,122 @@ export const MapboxNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
     : undefined;
 
   return (
-    <GeoJsonSourceContext.Provider value={geoJsonSources}>
-      <MapView
-        ref={mapViewRef}
-        // MapLayoutStyle.width is any string, not only a native dimension.
-        style={style as StyleProp<ViewStyle>}
-        {...styleProps}
-        {...gestures}
-        gestureSettings={gestureSettings}
-        onDidFinishRenderingFrameFully={flushFeatureState}
-        onDidFinishLoadingMap={() => {
-          reportLoad();
+    <PortalProvider>
+      <View
+        {...props.hostProps}
+        onLayout={(event) => {
+          const { width, height } = event.nativeEvent.layout;
+          session?.setNativeLayout(width, height);
+          props.hostProps?.onLayout?.(event);
         }}
-        onDidFinishLoadingStyle={() => {
-          // Native style diffing can retain source state. Invalidate before
-          // the callback so writes it makes belong to the loaded style.
-          geoJsonSources.featureState.resetStyle();
-          reportStyleLoad();
-        }}
-        onMapLoadingError={(payload: unknown) => {
-          reportError(mapLoadingErrorEvent(payload));
-        }}
-        onCameraChanged={reportChanging}
-        onMapIdle={reportSettled}
-        onPress={
-          onClick
-            ? (feature: RnPressFeature) => {
-                reportClick(clickEventFromRnmapbox(feature));
-              }
-            : undefined
-        }
-        onLongPress={
-          onLongPress
-            ? (feature: RnPressFeature) => {
-                reportLongPress(clickEventFromRnmapbox(feature));
-              }
-            : undefined
-        }
+        // Common width strings cross the native host dimension boundary here.
+        style={[style as StyleProp<ViewStyle>, props.hostProps?.style]}
       >
-        <Camera
-          ref={cameraRef}
-          defaultSettings={toRnmapboxDefaultSettings(frozenViewState)}
-          minZoomLevel={minZoom}
-          maxZoomLevel={maxZoom}
-          maxBounds={
-            maxBounds === undefined
-              ? undefined
-              : toRnmapboxCornerBounds(maxBounds)
-          }
-          padding={
-            padding === undefined ? undefined : toRnmapboxPadding(padding)
-          }
-          {...(controlled ?? {})}
-        />
-        {children}
-      </MapView>
-    </GeoJsonSourceContext.Provider>
+        <GeoJsonSourceContext.Provider value={geoJsonSources}>
+          <MapView
+            {...props.options}
+            logoPosition={
+              props.options?.logoPosition ??
+              (ornaments.managed
+                ? ornaments.position("bottom-left")
+                : undefined)
+            }
+            attributionPosition={
+              session?.ornaments.attribution
+                ? ornaments.position(
+                    session.ornaments.attribution.position as ControlPosition
+                  )
+                : (props.options?.attributionPosition ??
+                  (ornaments.managed
+                    ? ornaments.position("bottom-right")
+                    : undefined))
+            }
+            compassPosition={
+              props.options?.compassPosition ??
+              (ornaments.managed ? ornaments.position("top-right") : undefined)
+            }
+            scaleBarPosition={scaleBarPosition}
+            {...(refreshScalePosition ? { scaleBarEnabled: false } : {})}
+            {...(session?.ornaments.attribution
+              ? {
+                  attributionEnabled: true,
+                }
+              : {})}
+            ref={mapViewRef}
+            style={{ flex: 1 }}
+            {...styleProps}
+            {...gestures}
+            {...(Platform.OS === "android"
+              ? {
+                  // Unlike the other flags, the wrapper has no zoom default.
+                  // Restore its enabled baseline instead of clearing to null.
+                  zoomEnabled:
+                    gestures.zoomEnabled ?? props.options?.zoomEnabled ?? true,
+                }
+              : {})}
+            gestureSettings={gestureSettings}
+            onDidFinishRenderingFrameFully={flushFeatureState}
+            onDidFinishLoadingMap={() => {
+              reportLoad();
+            }}
+            onDidFinishLoadingStyle={() => {
+              // Native style diffing can retain source state. Invalidate before
+              // the callback so writes it makes belong to the loaded style.
+              geoJsonSources.featureState.resetStyle();
+              reportStyleLoad();
+            }}
+            onMapLoadingError={(payload: unknown) => {
+              reportError(mapLoadingErrorEvent(payload));
+            }}
+            onCameraChanged={reportChanging}
+            onMapIdle={reportSettled}
+            onPress={
+              onClick
+                ? (feature: RnPressFeature) => {
+                    reportClick(clickEventFromRnmapbox(feature));
+                  }
+                : undefined
+            }
+            onLongPress={
+              onLongPress
+                ? (feature: RnPressFeature) => {
+                    reportLongPress(clickEventFromRnmapbox(feature));
+                  }
+                : undefined
+            }
+          >
+            <Camera
+              ref={cameraRef}
+              defaultSettings={toRnmapboxDefaultSettings(frozenViewState)}
+              minZoomLevel={minZoom}
+              maxZoomLevel={maxZoom}
+              maxBounds={
+                maxBounds === undefined
+                  ? undefined
+                  : toRnmapboxCornerBounds(maxBounds)
+              }
+              padding={
+                padding === undefined ? undefined : toRnmapboxPadding(padding)
+              }
+              {...(controlled ?? {})}
+            />
+            {children}
+          </MapView>
+        </GeoJsonSourceContext.Provider>
+        {session && (
+          <PortalHost
+            name={session.overlayHostName}
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+            }}
+          />
+        )}
+      </View>
+    </PortalProvider>
   );
 });
 

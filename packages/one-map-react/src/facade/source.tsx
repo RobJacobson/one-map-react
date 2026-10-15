@@ -1,4 +1,7 @@
+import { useLayoutEffect, useRef } from "react";
+
 import type { SourceProps } from "../contracts/source-types.js";
+import { useOptionalMapSession } from "./map-context.js";
 import { useSelectedAdapter } from "./map-setup.js";
 import { useStableOptions } from "./use-stable-options.js";
 
@@ -12,6 +15,19 @@ import { useStableOptions } from "./use-stable-options.js";
  */
 export const Source = (props: SourceProps) => {
   const { Source: AdapterSource } = useSelectedAdapter();
+
+  const session = useOptionalMapSession();
+  const attachment = useRef({}).current;
+  const callback =
+    props.type === "geojson" || props.type === "vector"
+      ? props.onClick
+      : undefined;
+  const registerSource = session?.registerSource;
+  useLayoutEffect(
+    () =>
+      callback ? registerSource?.(props.id, callback, attachment) : undefined,
+    [registerSource, props.id, callback, attachment]
+  );
 
   useStableOptions(`Source "${props.id}"`, sourceCreationOptions(props));
 
@@ -29,10 +45,17 @@ export const Source = (props: SourceProps) => {
  * @returns Options passed to {@link useStableOptions}.
  */
 const sourceCreationOptions = (props: SourceProps): Record<string, unknown> => {
-  const { children: _children, ...rest } = props;
+  const { children: _children, ...options } = props;
+  const rest = { ...options };
+  delete (rest as Record<string, unknown>).hitbox;
 
   if (rest.type === "geojson") {
-    const { data: _data, ...creation } = rest;
+    const { data: _data, onClick: _onClick, ...creation } = rest;
+    return creation;
+  }
+
+  if (rest.type === "vector") {
+    const { onClick: _onClick, ...creation } = rest;
     return creation;
   }
 

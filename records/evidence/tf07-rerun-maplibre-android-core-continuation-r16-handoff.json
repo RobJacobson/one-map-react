@@ -1,0 +1,47 @@
+{
+  "status": "incomplete-handoff",
+  "runId": "0d182a6a-81a4-494a-a1b6-edac07dd29f7",
+  "environment": "maplibre-android",
+  "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "device": "emulator-5556",
+  "manualReportPath": "/private/tmp/one-map-tf07-rerun/manual-maplibre-android-r16-core-continuation-timing2.json",
+  "latestReceipt": "/private/tmp/one-map-tf07-rerun/maplibre-timing2-after-home-read.json",
+  "evidence": {
+    "initialScreenshot": "/private/tmp/one-map-tf07-rerun/maplibre-timing2-initial.png",
+    "initialRead": "/private/tmp/one-map-tf07-rerun/maplibre-timing2-initial-read.json",
+    "interruptedScreenshot": "/private/tmp/one-map-tf07-rerun/tf07-read-receipt.png",
+    "interruptedTree": "/private/tmp/one-map-tf07-rerun/tf07-read-receipt.xml",
+    "handoffScreenshot": "/private/tmp/one-map-tf07-rerun/maplibre-r16-timing2-handoff-current.png",
+    "handoffTree": "/private/tmp/one-map-tf07-rerun/maplibre-r16-timing2-handoff-current.xml"
+  },
+  "observations": {
+    "readiness": "Initial actual Read receipt 1: load=1, generation=0, finite center/zoom, feature707 visible in the query; initial map/app screen and controls present.",
+    "post-interruptionPan": "A real blank-map swipe command was issued immediately before user interruption, but no receipt was obtained; whether it executed or changed camera is unverified.",
+    "otherContinuationFields": {
+      "source-propagation": "unverified",
+      "navigation-location": "unverified",
+      "style-remount": "unverified",
+      "host-accessibility": "unverified",
+      "scale-units": "unverified",
+      "popup-follow-dismissal": "unverified"
+    },
+    "density320": "not run; conditional on the full core continuation passing",
+    "activeInterruptionCancellation": "Physically delivered a 650ms hold then actual touch drag, sent Android Home 1.5 seconds after start in the same scoped device-shell invocation before helper completion, waited for helper exit, reactivated the existing app without force-stop, and verified the same PID 15666. Fresh receipt 2 showed live-start=1, live-drag=3, live-end absent, positions empty, and unchanged camera. Activation and cancellation are observed; the complete active-interruption-recovery gate remains unverified because post-interruption pan and child recovery were not read back."
+  },
+  "cleanup": {
+    "runnerStopped": true,
+    "metro8171Stopped": true,
+    "status8797Stopped": true,
+    "vector8798WasNotRunning": true,
+    "testAppStopped": true,
+    "assignedReversePortsRemoved": [
+      8081,
+      8797
+    ],
+    "androidEmulatorPreserved": "emulator-5556 remains booted and available",
+    "iosSimulator": "left untouched"
+  },
+  "note": "The preceding timing-only run is preserved separately in tf07-rerun-maplibre-android-core-continuation-r16-timing-unverified.json. No acceptance statuses were written for unrun fields.",
+  "scopeLimit": "Active interruption cancellation passed, but recovery was not completed before the user-requested handoff. The full field remains unverified."
+}

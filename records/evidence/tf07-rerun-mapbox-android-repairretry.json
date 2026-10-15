@@ -1,0 +1,139 @@
+{
+  "environment": "mapbox-android",
+  "attempt": 2,
+  "status": "interrupted-by-host-gpu-rendering",
+  "runId": "516830a8-f044-4879-8b11-314a5378e89d",
+  "artifact": {
+    "sourceSha256": "0ca04feef7069502efe019de25919795b9fa2500aa460a874259411f40379991",
+    "libraryDistSha256": "746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2",
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "installedBinaryReuse": true,
+    "package": "com.onemapmapbox"
+  },
+  "device": {
+    "serial": "emulator-5556",
+    "avd": "TF07_Rerun",
+    "androidRelease": "17",
+    "display": "1080x2400 @ 420dpi",
+    "gpu": "host"
+  },
+  "metro": {
+    "port": 8171,
+    "reverse8081To": 8171,
+    "statusPort": 8797,
+    "reverse8797To": 8797
+  },
+  "startupTransport": "The first launch after runner start showed Unable to load script due emulator-default host bypassing reverse forwarding. Following the coordinator-approved app-only developer setting 127.0.0.1:8081 and same-binary relaunch, the fixture loaded.",
+  "inputs": [
+    {
+      "scenario": "live-child-button",
+      "method": "Tf07Touch actual MotionEvent DOWN/120ms stationary/UP",
+      "dexSha256": "63c99f06d79e5f7e2f91e503bdc3bbcc370d477b085b6313d2e21195f5f36a4d",
+      "coordinatesPx": [
+        539,
+        1312
+      ],
+      "boundsPx": [
+        385,
+        1287,
+        693,
+        1338
+      ],
+      "result": "child-click=1; map-click absent"
+    },
+    {
+      "scenario": "nested-scroll",
+      "method": "adb shell input swipe",
+      "coordinatesPx": [
+        [
+          540,
+          1405
+        ],
+        [
+          540,
+          1335
+        ]
+      ],
+      "durationMs": 500,
+      "result": "no visible child scroll in before/fresh screenshots; renderer move 3->4 while center/zoom stayed unchanged; unresolved, not established map pan",
+      "geometry": {
+        "nestedScrollViewBoundsPx": [
+          385,
+          1381,
+          693,
+          1465
+        ],
+        "startPx": [
+          540,
+          1405
+        ],
+        "endPx": [
+          540,
+          1335
+        ],
+        "durationMs": 500
+      }
+    }
+  ],
+  "observation": {
+    "events": {
+      "popup-open": 1,
+      "move": 4,
+      "style": 1,
+      "load": 1,
+      "child-click": 1
+    },
+    "positions": {},
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "features": [
+      {
+        "type": "Feature",
+        "id": "707",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.3399949,
+            47.5799997
+          ]
+        },
+        "properties": {
+          "fixture": "tf07"
+        }
+      }
+    ],
+    "generation": 0,
+    "stopSourcePropagation": false
+  },
+  "manualScenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "unverified",
+    "live-drag": "unverified",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "screenshots": [
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-retry-before.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-scroll-before.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-scroll-after.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-scroll-postfresh.png"
+  ],
+  "graphicsFailure": {
+    "backend": "host GPU (before restart)",
+    "observation": "GPU-drawn background, source point, and annotation disappeared; React Native controls, popup, and live child content remained. Immediate screenshot was transient black with only the default pin; fresh capture at 2 seconds still lacked map-drawn content.",
+    "screenshots": [
+      "/private/tmp/one-map-tf07-rerun/mapbox-android-scroll-after.png",
+      "/private/tmp/one-map-tf07-rerun/mapbox-android-scroll-postfresh.png"
+    ],
+    "nextAction": "Coordinator-approved restart of same AVD/data with -feature -Vulkan; verify on fresh R2 core attempt."
+  }
+}

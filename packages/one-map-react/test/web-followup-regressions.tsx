@@ -58,6 +58,44 @@ export const runWebFollowupRegressions = (
   describe("follow-up query, image, and interaction corrections", () => {
     beforeEach(() => mock.resetWebMapMock());
 
+    test("onLoad camera operations wait for the wrapper handle attachment", async () => {
+      mock.loadBeforeAttachment();
+      const ref = createRef<MapRef>();
+      const failed = jest.fn();
+      const loaded = jest.fn(() => {
+        void ref.current?.jumpTo({ zoom: 12 }).catch(failed);
+      });
+      render(scene({ onLoad: loaded }, undefined, ref));
+      await waitFor(() => expect(mock.jumpTo).toHaveBeenCalledTimes(1));
+      expect(loaded).toHaveBeenCalledTimes(1);
+      expect(failed).not.toHaveBeenCalled();
+    });
+
+    test("equivalent style objects preserve the completion callback and listener", () => {
+      const loaded = jest.fn();
+      const sceneProps = { mapStyle: { ...emptyStyle }, onStyleLoad: loaded };
+      const view = render(scene(sceneProps));
+      const renderer = target();
+      act(() => renderer.emitStyleLoad());
+      expect(loaded).toHaveBeenCalledTimes(1);
+      view.rerender(
+        scene({
+          ...sceneProps,
+          mapStyle: {
+            layers: [...emptyStyle.layers],
+            sources: { ...emptyStyle.sources },
+            version: 8,
+          },
+        })
+      );
+      expect(loaded).toHaveBeenCalledTimes(1);
+      expect(renderer.listenerCount("style.load")).toBe(1);
+      act(() => renderer.emitStyleLoad());
+      expect(loaded).toHaveBeenCalledTimes(2);
+      view.unmount();
+      expect(renderer.listenerCount("style.load")).toBe(0);
+    });
+
     test.each(["absent", "raster", "raster-dem", "image"])(
       "source query rejects %s before dispatch",
       async (type) => {

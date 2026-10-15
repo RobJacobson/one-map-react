@@ -145,5 +145,23 @@
     "date": "2026-10-08",
     "reason": "Use React/React DOM19.2.3 across shared web/native consumers to match selected React Native renderer/template. Published peer ranges alone did not establish React19.3 runtime compatibility.",
     "source": "https://github.com/react-native-community/template/blob/0.87.1/template/package.json"
-  }
+  },
+  "compatibilityPatches": [
+    {
+      "package": "@rnmapbox/maps",
+      "version": "10.3.7",
+      "platform": "android",
+      "patch": {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+        "sha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
+        "originalEmitterSha256": "959d64f25b2eb55108802fe50e1dff43d1aced28b79dc8c47570b0f486339a0c",
+        "installedPatchedEmitterSha256": "310c73d7ccde6d21e2df1b599af9d54ee1cac4329d3285eb530f0adb2e511e34",
+        "change": "Include native view identifier in event cache keys. Remove that view prefix when native view is dropped, preserving upstream teardown. No synthesized lifecycle callbacks.",
+        "installation": "Mapbox example Bun patchedDependencies, offline install; exact byte comparison to reviewed patched emitter passed. Package publication explicitly includes patch.",
+        "consumerRequirement": "Consumer package managers must apply included version-specific patch before native Android build for multiple Mapbox maps; remove when selected wrapper includes per-view throttling.",
+        "record": "tf07-android-mapbox-per-view-event-patch.json"
+      },
+      "acceptance": "Android Mapbox patched APK build/install and fullfocused9 passed; existing singlemap core/density retained by scoped review. SDK version unchanged. Consumer patch required for certified multi-map callback delivery."
+    }
+  ]
 }

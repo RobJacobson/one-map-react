@@ -1,0 +1,124 @@
+{
+  "status": "stopped-at-first-visual-layout-failure",
+  "environment": "mapbox-android",
+  "runId": "82a76aa4-b3c0-47dc-8eff-7f675bfcb362",
+  "execution": "R13 focused control-layout follow-up; no Finish focus",
+  "manualReport": {
+    "installedBinarySha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+    "environment": "mapbox-android",
+    "runId": "82a76aa4-b3c0-47dc-8eff-7f675bfcb362",
+    "scenarios": {
+      "portal-context-state-multiple-maps": "unverified",
+      "resize-orientation": "unverified",
+      "host-accessibility": "unverified",
+      "navigation-constraints": "unverified",
+      "source-passthrough": "unverified",
+      "control-teardown": "unverified"
+    }
+  },
+  "artifact": {
+    "sourceSha256": "a4e8373e1abe39e79435cb72cfef83f24ac312ffdac878718a8c0e45cc3dbc38",
+    "distSha256": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+    "packedSha256": "e07a9298e89f8acef91fdd6e6adc6f34c8749de81c5486ebcafc826acf5e4ec5",
+    "exampleDistSha256": {
+      "web-mapbox": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+      "web-maplibre": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+      "native-mapbox": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a",
+      "native-maplibre": "25e8160f3c0185d225626b572e77627094b7a8e9e50d77974df2ebd074f9597a"
+    }
+  },
+  "binary": {
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "package": "com.onemapmapbox",
+    "device": "emulator-5556",
+    "avd": "TF07_Rerun36",
+    "os": "Android 16 / API 36",
+    "screen": "1080x2400 portrait",
+    "density": "420 dpi"
+  },
+  "actions": [
+    {
+      "step": "initial Read",
+      "theme": "initial",
+      "short": false,
+      "visible": [
+        "Map A initial 0",
+        "Map B initial 0"
+      ],
+      "screenshot": "records/evidence/tf07-mapbox-android-control-layout-r13-initial.png"
+    },
+    {
+      "step": "actual Map A child press + Read",
+      "counts": {
+        "Map A-click": 1,
+        "Map A-map-zoom-11": 1
+      },
+      "aZoom": 11,
+      "visible": [
+        "Map A initial 1",
+        "Map B initial 0"
+      ],
+      "screenshot": "records/evidence/tf07-mapbox-android-control-layout-r13-child-a.png"
+    },
+    {
+      "step": "actual Map B child press + Read",
+      "counts": {
+        "Map A-click": 1,
+        "Map A-map-zoom-11": 1,
+        "Map B-click": 1,
+        "Map B-map-zoom-12": 1
+      },
+      "visible": [
+        "Map A initial 1",
+        "Map B initial 1"
+      ],
+      "screenshot": "records/evidence/tf07-mapbox-android-control-layout-r13-child-b.png"
+    },
+    {
+      "step": "actual Theme update + Read",
+      "theme": "updated",
+      "counts": {
+        "Map A-click": 1,
+        "Map A-map-zoom-11": 1,
+        "Map B-click": 1,
+        "Map B-map-zoom-12": 1
+      },
+      "visible": [
+        "Map A updated 1",
+        "Map B updated 1"
+      ],
+      "screenshot": "records/evidence/tf07-mapbox-android-control-layout-r13-theme.png",
+      "accessibility": "records/evidence/tf07-mapbox-android-control-layout-r13-theme.xml"
+    },
+    {
+      "step": "actual Resize + settled Read",
+      "short": true,
+      "viewports": {
+        "mapA": "[0,408]-[1080,1404]",
+        "mapB": "[0,1404]-[1080,2400]"
+      },
+      "accessibilityLabels": {
+        "mapA": {
+          "text": "Map A updated 1",
+          "bounds": "[779,1664]-[1059,1404]",
+          "valid": false
+        },
+        "mapB": {
+          "text": "Map B updated 1",
+          "bounds": "[780,1996]-[1059,2047]"
+        }
+      },
+      "visualFinding": "Map A child text is absent from the screenshot; Map B child text is drawn at the screen lower-right, well above its own map bottom-right. Fails required per-map layout.",
+      "screenshot": "records/evidence/tf07-mapbox-android-control-layout-r13-resized.png",
+      "accessibility": "records/evidence/tf07-mapbox-android-control-layout-r13-resized.xml"
+    }
+  ],
+  "result": "Stopped at first visual failure after settled Resize state. No landscape transition, additional child press, other gate, or Finish focus was performed.",
+  "cleanup": {
+    "runnerStopped": true,
+    "metroStatusFixturePortsStopped": true,
+    "emulatorPortrait": true,
+    "autorotationRestored": true
+  }
+}

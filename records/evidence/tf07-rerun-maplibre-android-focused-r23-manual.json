@@ -1,0 +1,64 @@
+{
+  "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "environment": "maplibre-android",
+  "runId": "00862b8d-9b67-420f-98a8-0117c9a1541c",
+  "scenarios": {
+    "annotation-image-refresh": "passed",
+    "overlap-source-propagation": "passed",
+    "vector-source-hit": "passed",
+    "location-rejected": "passed",
+    "location-delayed-teardown": "passed",
+    "portal-context-state-multiple-maps": "passed",
+    "resize-orientation": "passed",
+    "host-accessibility": "passed",
+    "navigation-constraints": "passed"
+  },
+  "librarySourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+  "fixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+  "scenarioEvidence": {
+    "annotation-image-refresh": "maplibre-android-r23-focused-image-read.json receipt2: image-load=1, image-refresh=1; physical screenshot shows Image ready and blue bitmap.",
+    "overlap-source-propagation": "r23 receipts3 and5: allowed tap high-click=1/a-map-click=1; stopped tap high-click=2/a-map-click unchanged; features 707/708 queried in fresh reads.",
+    "vector-source-hit": "maplibre-android-r23-focused-vector-read.json receipt6: vector-click=1 and b-map-click=1 after tapping visible Map B line.",
+    "location-rejected": "maplibre-android-r23-focused-location-rejected-read.json receipt7: provider-call=1/provider-error=1; Map A center/zoom unchanged.",
+    "location-delayed-teardown": "r23 delay request/drop/resolve receipts9-11: provider-call=2; locate=false after teardown; no provider-location and camera unchanged.",
+    "portal-context-state-multiple-maps": "r23 context receipts12-16: Theme update preserved separate Map A/Map B child state; updated child taps yielded Map A-click=2/zoom11=2 and Map B-click=2/zoom12=2.",
+    "resize-orientation": "r23 receipt17 short=true; landscape receipt18 rotation=1 with two side-by-side hosts; portrait receipt26 finite and both maps loaded. Screenshot/XML saved for both orientations.",
+    "host-accessibility": "r23 landscape hierarchy shows separate Map A/Map B map hosts, child labels and attribution controls. Native MapLibre Android dialog opened independently on each attribution icon and dismissed with Back; screenshots saved.",
+    "navigation-constraints": "r23 receipt19 plus from12->13; receipt20 plus at max remains13. First minus attempt receipt21 remained13 while warning banner physically covered Zoom out; preserved as obstructed attempt. Dismissed banner via its visible X and confirmed clean landscape screenshot/Zoom out bounds. Fresh unobstructed tap produced receipt22 bZoom12; fresh minus-at-min tap receipt23 remains12. Map A stayed at11 throughout."
+  },
+  "evidence": {
+    "initialRead": "maplibre-android-r23-focused-initial-read.json",
+    "imageRead": "maplibre-android-r23-focused-image-read.json",
+    "overlapAllowedRead": "maplibre-android-r23-focused-overlap-allowed-read.json",
+    "overlapStoppedRead": "maplibre-android-r23-focused-overlap-stopped-read.json",
+    "vectorRead": "maplibre-android-r23-focused-vector-read.json",
+    "locationRejectedRead": "maplibre-android-r23-focused-location-rejected-read.json",
+    "locationDelayedRead": "maplibre-android-r23-focused-resolved-read.json",
+    "contextChildReads": [
+      "maplibre-android-r23-focused-map-a-initial-child-read.json",
+      "maplibre-android-r23-focused-map-b-initial-child-read.json",
+      "maplibre-android-r23-focused-map-a-updated-child-read.json",
+      "maplibre-android-r23-focused-map-b-updated-child-read.json"
+    ],
+    "shortLayoutRead": "maplibre-android-r23-focused-resize-short-read.json",
+    "landscapeRead": "maplibre-android-r23-focused-landscape-read.json",
+    "landscapeScreenshot": "maplibre-android-r23-focused-landscape.png",
+    "portraitRestoredRead": "maplibre-android-r23-focused-portrait-restored-read.json",
+    "portraitRestoredScreenshot": "maplibre-android-r23-focused-portrait-restored.png",
+    "warningObstructedAttempt": "maplibre-android-r23-focused-nav-minus-read.json",
+    "warningBeforeDismissScreenshot": "maplibre-android-r23-focused-pre-dismiss.png",
+    "warningDismissedScreenshot": "maplibre-android-r23-focused-post-dismiss.png",
+    "warningDismissedHierarchy": "maplibre-android-r23-focused-post-dismiss.xml",
+    "navPlusToMax": "maplibre-android-r23-focused-nav-plus-read.json",
+    "navPlusAtMax": "maplibre-android-r23-focused-nav-plus-max-read.json",
+    "navMinusTo12": "maplibre-android-r23-focused-nav-minus-uncovered-read.json",
+    "navMinusAtMin": "maplibre-android-r23-focused-nav-minus-min-uncovered-read.json",
+    "attributionAScreenshot": "maplibre-android-r23-focused-attribution-a.png",
+    "attributionBScreenshot": "maplibre-android-r23-focused-attribution-b.png",
+    "afterAttributionReads": [
+      "maplibre-android-r23-focused-after-attribution-a-read.json",
+      "maplibre-android-r23-focused-after-attribution-b-read.json"
+    ]
+  }
+}

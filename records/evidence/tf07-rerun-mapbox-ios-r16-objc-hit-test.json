@@ -1,0 +1,98 @@
+{
+  "status": "diagnostic-stopped",
+  "identity": {
+    "runId": "ee146ee3-a714-4d9b-9f89-22c8336f7558",
+    "environment": "mapbox-ios",
+    "installedBinarySha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "debugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "distSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "fixtureSha256": "b234928a3772437f514a23fb311f931353ea23406e6de3a3338d13fe4dd53805"
+  },
+  "device": {
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "orientation": "portrait",
+    "state": "booted"
+  },
+  "physicalRead": {
+    "loads": {
+      "b-load": 1,
+      "a-load": 1
+    },
+    "aCamera": {
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11
+    },
+    "bCamera": {
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 12
+    },
+    "overlapFeatureIds": [
+      708,
+      707
+    ],
+    "vectorFeatureIds": [
+      2,
+      1
+    ],
+    "childMeasure": {
+      "a": {
+        "phase": "read-measure",
+        "x": 0,
+        "y": 0,
+        "width": 91.33334350585938,
+        "height": 17,
+        "pageX": 302.6666564941406,
+        "pageY": 623.6666564941406
+      },
+      "b": {
+        "phase": "read-measure",
+        "x": 0,
+        "y": 0,
+        "width": 91,
+        "height": 17,
+        "pageX": 303,
+        "pageY": 814.9999847412109
+      }
+    }
+  },
+  "warningOverlay": {
+    "visible": true,
+    "accessibilityNodeLabel": "!, Open debugger to view warnings.",
+    "accessibilityFrame": {
+      "x": 10,
+      "y": 787.6666870415211,
+      "width": 382,
+      "height": 48
+    },
+    "separateCloseButtonAxNode": false,
+    "visualCloseCenterApproxLogicalPoints": [
+      371,
+      812
+    ],
+    "coversMapBChildCenter": [
+      349,
+      823.5
+    ]
+  },
+  "debugger": {
+    "pid": 94911,
+    "result": "Attached to owned app. Supplied Objective-C helper failed because LLDB evaluates expressions as Objective-C++ and repeats CGPoint deleted-function errors; no hit chain returned. No retry performed.",
+    "log": "tf07-r16-objc/lldb.txt"
+  },
+  "inputsAfterRead": [],
+  "evidence": [
+    "tf07-r16-objc/initial-read.json",
+    "tf07-r16-objc/initial-ax.json",
+    "tf07-r16-objc/initial.png",
+    "tf07-r16-objc/lldb.txt"
+  ],
+  "cleanup": "No B tap sent. Owned runner/status/Metro stopped; app terminated; XCTest driver preserved; assigned simulator left booted portrait."
+}

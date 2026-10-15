@@ -1,0 +1,110 @@
+{
+  "environment": "mapbox-ios",
+  "attempt": 2,
+  "status": "stopped-at-first-live-child-press-failure",
+  "runId": "6bbec4a9-6c93-41fe-97c1-2f09586c32e1",
+  "artifact": {
+    "sourceSha256": "6ef01ed4d479decc338a71b93e62a18d0bd166ba18d1b70b12ca0fd89c79385c",
+    "libraryDistSha256": "c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc",
+    "installedExecutableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+    "installedDebugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "installedBinaryReuse": true,
+    "bundleId": "org.reactjs.native.example.OneMapMapbox"
+  },
+  "device": {
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "model": "iPhone 18 Pro",
+    "os": "iOS 27.0",
+    "screen": "402x874 logical points"
+  },
+  "driver": {
+    "xctestrun": "/private/tmp/one-map-tf07-rerun/derived-maestro-touchdriver/Build/Products/maestro-driver-ios_iphonesimulator27.0-arm64.xctestrun",
+    "httpPort": 22087,
+    "input": "XCTest actual touch route"
+  },
+  "rendererObservation": {
+    "events": {
+      "popup-open": 1,
+      "style": 1,
+      "move": 2,
+      "load": 1
+    },
+    "positions": {},
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "features": [
+      {
+        "properties": {
+          "fixture": "tf07"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.33999490737915,
+            47.57999970656695
+          ]
+        },
+        "type": "Feature",
+        "id": 707
+      }
+    ],
+    "generation": 0,
+    "stopSourcePropagation": false
+  },
+  "readRenderer": {
+    "point": [
+      388,
+      81
+    ],
+    "method": "XCTest touch, 120ms",
+    "httpStatus": 200,
+    "result": "valid initial renderer read: finite camera [-122.34,47.61], zoom 11, feature 707, generation 0 (expected initial mount generation)"
+  },
+  "childPress": {
+    "point": [
+      201,
+      496
+    ],
+    "bounds": [
+      140.3333,
+      487.5,
+      261.6667,
+      504.5
+    ],
+    "method": "XCTest touch, 120ms",
+    "httpStatus": 200,
+    "result": "no child-click callback after actual tap; initial renderer read had succeeded",
+    "outcome": "failed; first actual interaction failure, stopped before nested scroll or later cases"
+  },
+  "manualScenarios": {
+    "live-child-button": "failed",
+    "nested-scroll": "unverified",
+    "live-drag": "unverified",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "notes": [
+    "R3 frozen library source SHA-256 6ef01ed4d479decc338a71b93e62a18d0bd166ba18d1b70b12ca0fd89c79385c; dist SHA-256 c7418f40113753827727f3211ab0827b6ad0cdbe299b22c1b5ee769eab7e99cc. Reused installed iOS executable SHA-256 da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a and debug dylib f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3.",
+    "Initial Read renderer was physically tapped using XCTest at (388,81) and returned a valid finite camera, known feature 707, zoom 11, generation 0. Generation 0 is the initial mount generation and is expected before the final style/remount.",
+    "The live child button was tapped using actual XCTest input at the fresh accessibility-bounds center (201,496), bounds [140.33,487.5,261.67,504.5], duration 120ms. HTTP returned 200, but renderer observation did not increment child-click. This first child interaction failed.",
+    "No nested scroll or later scenario was attempted. The runner subsequently reached its normal wait timeout because the flow was stopped before final style/remount/readback."
+  ],
+  "screenshots": [
+    "/private/tmp/one-map-tf07-rerun/mapbox-ios-core-r3-initial.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-ios-core-r3-after-read.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-ios-core-r3-after-child-attempt.png"
+  ],
+  "hierarchyPaths": [
+    "/private/tmp/one-map-tf07-rerun/mapbox-ios-core-r3-hierarchy-read.json"
+  ],
+  "runnerExit": "The flow was stopped after the first child-press failure; the runner later timed out while waiting for final style/remount generation >=1. This wait timeout reflects the intentionally incomplete run."
+}

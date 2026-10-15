@@ -2,7 +2,7 @@
 
 one-map-react is being built as a thin React facade over RNMapbox, MapLibre React Native, and react-map-gl. Applications choose a backend at setup and use a shared map API, generally following react-map-gl. Full upstream API coverage and map reuse are requirements.
 
-**Current status: TF02 complete. TF03's reuse API is implemented, and its renderer smoke passed. TF04's camera API is implemented, and its renderer smoke passed.** The package renders one GeoJSON line map through four adapters, and the six-environment smoke passed. Mapbox Android opens at longitude 0, latitude 0 because that is pinned `@rnmapbox/maps` 10.3.7 on a cold style cache; the facade passes the same `defaultSettings`. Web `reuseMaps` uses the react-map-gl pool. Native remounts create a new map. Camera commands, gestures, and interaction events are in the package. See [TF03](docs/tf03-reuse.md) and [TF04](docs/tf04-camera.md).
+**Current status: TF02–TF07 are implemented, and the authorized R16 renderer acceptance passed across all six environments for the recorded exercised scope.** TF07 includes markers, explicit static annotations, popups, controls, source clicks, and `useMap`; full VoiceOver and TalkBack audits are outside this checkpoint. Mapbox Android's opening camera retains the pinned `@rnmapbox/maps` 10.3.7 cold-style-cache behavior. Web `reuseMaps` uses the react-map-gl pool; native remounts create a new map. See the [stage plan](docs/stage-plan.md) and [TF07 record](docs/tf07-ui.md) for implementation and acceptance status.
 
 ## Development
 
@@ -48,6 +48,8 @@ The `mapbox` and `maplibre` aliases choose web under the `browser` condition, na
 
 React is a required peer. Host runtimes, wrappers, and SDKs are optional peers so applications install only their chosen backend. Exact versions in the package manifest are candidates from the API research baseline.
 
+Native applications also install `react-native-teleport@1.2.1`. Native controls use its portals to retain nested React providers and child state while drawing above the map. The adapter provides the portal setup. Adding this native peer requires linking and rebuilding the application; TF07 portal drawing and touch acceptance passed for the recorded R16 artifact. See the [control portal decision](docs/decisions/0007-native-control-portals.md) and [TF07 runtime record](docs/tf07-ui.md#runtime-checkpoint).
+
 ## Examples
 
 Web shells in `examples/web-mapbox` and `examples/web-maplibre` need `bun run build` from the repository root, then `bun install` and `bun run dev` in the shell. Native shells in `examples/native-mapbox` and `examples/native-maplibre` commit the JavaScript app and `Gemfile`; build the package, then generate `ios/` and `android/` with `bun scripts/setup-native-example.mjs`. Mapbox shells read `MAPBOX_ACCESS_TOKEN` from the shell or a gitignored `.env` file. Those installs and launches are not part of `validate`. See [examples/README.md](examples/README.md) and the [TF02 record](docs/tf02-shared-map.md).
@@ -56,7 +58,7 @@ Web shells in `examples/web-mapbox` and `examples/web-maplibre` need `bun run bu
 
 Read the [requirements](docs/requirements.md), [stage plan](docs/stage-plan.md), and [testing policy](docs/testing-policy.md). The [documentation index](docs/README.md) links the API research and style guides. The [TF01 record](docs/tf01-foundation.md) describes the reset; the [TF02 record](docs/tf02-shared-map.md) describes the completed shared map.
 
-The `records/` directory preserves historical inventory and evidence plus the compact TF02 checkpoint summary. No historical implementation code is required to develop this project.
+The `records/` directory preserves historical inventory and compact checkpoint evidence. No historical implementation code is required to develop this project.
 
 ## License
 

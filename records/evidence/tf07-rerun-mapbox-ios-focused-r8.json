@@ -1,0 +1,92 @@
+{
+  "artifact": {
+    "sourceSha256": "4d1f002e8fe79dd2140b264c72095e47db6d0fcad8f1059864df17559303619c",
+    "distSha256": "fd0c1c8cd8de2efa87d70c9a68f96b9c943f7350e72112749726b0c4c5b98fbd",
+    "focusedFixtureSha256": "140983ff5921a14c613491e5ddd397eebcd7169cefd928f01da96cfd147ab2a5",
+    "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a"
+  },
+  "environment": "mapbox-ios",
+  "runId": "c94ae0cb-f12f-4e6c-83a1-ddfae0cdfbab",
+  "execution": "Physical XCTest touchscreen actions and actual renderer readbacks; no callback injection.",
+  "runnerResult": "incomplete; stopped after first orientation attempt did not rotate the app surface",
+  "outcomes": {
+    "annotation-image-refresh": {
+      "status": "passed",
+      "evidence": "Physical Image action displayed a blue 40×40 bitmap; actual Read focus reported image-load=1 and image-refresh=1. image-error was absent."
+    },
+    "overlap-source-propagation": {
+      "status": "passed",
+      "evidence": "Physical projected overlap tap reported high-click=1 and a-map-click=1; stopped repeat reported high-click=2 while a-map-click remained1. low-click was absent; actual query contained feature ids708 and707."
+    },
+    "vector-source-hit": {
+      "status": "passed",
+      "evidence": "Physical tap at Map B’s projected vector line reported vector-click=1 and b-map-click=1; actual vector query contained line features."
+    },
+    "location-rejected": {
+      "status": "passed",
+      "evidence": "In reject mode, a physical Locate press reported provider-call=1 and provider-error=1, with no provider-location and camera unchanged at [-122.34,47.61], zoom11."
+    },
+    "location-delayed-teardown": {
+      "status": "passed",
+      "evidence": "Delay mode physically disabled Locate while pending; a second physical tap left provider-call=2. Locate was physically removed, then Resolve was pressed. Readback retained provider-call=2, no provider-location, and unchanged camera."
+    },
+    "portal-context-state-multiple-maps": {
+      "status": "passed",
+      "evidence": "Distinct accessible Map A and Map B controls remained physically pressable. Map A initial0 became initial1; Theme changed labels to updated without losing count. Updated Map A press reported Map A-map-zoom-11; Map B press reported Map B-map-zoom-12. Actual renderer cameras remained A zoom11 and B zoom12."
+    },
+    "resize-orientation": {
+      "status": "failed",
+      "evidence": "Physical Resize changed short=false to short=true; actual Read showed finite A/B cameras and map layout bounds changed. One XCTest POST /setOrientation {orientation: landscapeLeft} returned HTTP200, but after1.2 seconds the original-resolution screen remained portrait and AX app surface remained402×874. No orientation retry was performed. Evidence: /private/tmp/one-map-tf07-rerun/focus-r8-orientation-attempt.png and /private/tmp/one-map-tf07-rerun/focus-r8-orientation-attempt.json."
+    },
+    "host-accessibility": {
+      "status": "unverified",
+      "evidence": "Representative separate Map A/Map B labels and actual child presses were verified as part of the provider/context gate. Further focused host/accessibility checks were not run after the orientation failure."
+    },
+    "navigation-constraints": {
+      "status": "unverified",
+      "evidence": "Not run because the focused sequence stopped at the first unexpected orientation result."
+    }
+  },
+  "lastReadback": {
+    "focusedComplete": false,
+    "counts": {
+      "a-load": 1,
+      "b-load": 1,
+      "image-load": 1,
+      "image-refresh": 1,
+      "high-click": 2,
+      "a-map-click": 1,
+      "vector-click": 1,
+      "b-map-click": 1,
+      "provider-call": 2,
+      "provider-error": 1,
+      "Map A-click": 2,
+      "Map A-map-zoom-11": 2,
+      "Map B-click": 1,
+      "Map B-map-zoom-12": 1
+    },
+    "aCenter": [-122.34000000000002, 47.60999999999999],
+    "aZoom": 11,
+    "bCenter": [-122.34000000000002, 47.60999999999999],
+    "bZoom": 12,
+    "overlapFeatureIds": [708, 707],
+    "vectorFeatureCount": 2,
+    "aError": 0,
+    "bError": 0,
+    "imageError": 0,
+    "providerLocation": 0
+  },
+  "visualEvidence": [
+    "/private/tmp/one-map-tf07-rerun/focus-r8-image.png",
+    "/private/tmp/one-map-tf07-rerun/focus-r8-overlap-read.png",
+    "/private/tmp/one-map-tf07-rerun/focus-r8-warning-dismissed.png",
+    "/private/tmp/one-map-tf07-rerun/focus-r8-resized.png",
+    "/private/tmp/one-map-tf07-rerun/focus-r8-orientation-attempt.png"
+  ],
+  "stoppedProcesses": {
+    "runnerSession": "43678 interrupted after preserving first failure",
+    "metroPort8171": "stopped; port free",
+    "statusPort8797": "stopped; port free",
+    "vectorFixturePort8798": "stopped; port free"
+  }
+}

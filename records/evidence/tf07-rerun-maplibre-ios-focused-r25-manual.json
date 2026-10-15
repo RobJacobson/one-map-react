@@ -1,0 +1,67 @@
+{
+  "installedBinarySha256": "fb869a1de4a7bef36182646338530302b032d4e3ba332be9c3bedb6468e749f5",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "environment": "maplibre-ios",
+  "runId": "104e07e3-1020-4045-8212-5b011a2e4569",
+  "scenarios": {
+    "annotation-image-refresh": "passed",
+    "overlap-source-propagation": "passed",
+    "vector-source-hit": "passed",
+    "location-rejected": "passed",
+    "location-delayed-teardown": "passed",
+    "portal-context-state-multiple-maps": "passed",
+    "resize-orientation": "passed",
+    "host-accessibility": "passed",
+    "navigation-constraints": "passed"
+  },
+  "fixture": "tf07 focused",
+  "fixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+  "librarySourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+  "evidenceDirectory": "/private/tmp/one-map-tf07-rerun",
+  "finalPreFinishReceipt": "/private/tmp/one-map-tf07-rerun/maplibre-ios-r25-focused-final-pre-finish.json",
+  "scenarioEvidence": {
+    "annotation-image-refresh": [
+      "maplibre-ios-r25-focused-image.json"
+    ],
+    "overlap-source-propagation": [
+      "maplibre-ios-r25-focused-overlap-allowed.json",
+      "maplibre-ios-r25-focused-overlap-stop.json",
+      "maplibre-ios-r25-focused-overlap-stopped.json"
+    ],
+    "vector-source-hit": [
+      "maplibre-ios-r25-focused-vector.json"
+    ],
+    "location-rejected": [
+      "maplibre-ios-r25-focused-location-rejected.json"
+    ],
+    "location-delayed-teardown": [
+      "maplibre-ios-r25-focused-delay-mode.json",
+      "maplibre-ios-r25-focused-delay-request.json",
+      "maplibre-ios-r25-focused-drop-locate.json",
+      "maplibre-ios-r25-focused-resolve-after-drop.json"
+    ],
+    "portal-context-state-multiple-maps": [
+      "maplibre-ios-r25-focused-theme.json",
+      "maplibre-ios-r25-focused-map-a-child.json",
+      "maplibre-ios-r25-focused-map-b-child.json",
+      "maplibre-ios-r25-focused-map-a-child-repeat.json",
+      "maplibre-ios-r25-focused-map-b-child-repeat.json"
+    ],
+    "resize-orientation": [
+      "maplibre-ios-r25-focused-landscape.json",
+      "maplibre-ios-r25-focused-portrait-restored.json",
+      "maplibre-ios-r25-focused-resize-short.json"
+    ],
+    "host-accessibility": [
+      "maplibre-ios-r25-focused-accessibility-hierarchy.json",
+      "maplibre-ios-r25-focused-attribution-a-open.png",
+      "maplibre-ios-r25-focused-attribution-b-open.png"
+    ],
+    "navigation-constraints": [
+      "maplibre-ios-r25-focused-nav-plus.json",
+      "maplibre-ios-r25-focused-nav-plus-max.json",
+      "maplibre-ios-r25-focused-nav-minus.json",
+      "maplibre-ios-r25-focused-nav-minus-min.json"
+    ]
+  }
+}

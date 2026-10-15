@@ -1,0 +1,9 @@
+Preserved console excerpt from the first R15 Gradle build attempt (tempSDK36 had no NDK link yet):
+
+* What went wrong:
+A problem occurred evaluating root project 'OneMapMapbox'.
+> Failed to apply plugin 'com.facebook.react.rootproject'.
+   > A problem occurred configuring project ':app'.
+      > NDK not configured. Download it with SDK manager. Preferred NDK version is '28.2.13676358'.
+
+The project itself pins NDK 27.1.12297006 in examples/native-mapbox/android/build.gradle. After the coordinator approved linking the existing read-only global NDK folder into the owned temp SDK36 root, the build succeeded. The original full console output was replaced when the successful retry reused the same log path; this file preserves the exact failure excerpt from the captured tool output.

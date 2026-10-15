@@ -12,14 +12,24 @@ import {
   useMemo,
   useRef,
 } from "react";
-import type { NativeSyntheticEvent, StyleProp, ViewStyle } from "react-native";
+import {
+  type NativeSyntheticEvent,
+  type StyleProp,
+  View,
+  type ViewProps,
+  type ViewStyle,
+} from "react-native";
+import { PortalHost, PortalProvider } from "react-native-teleport";
 
 import type { MapRef } from "../../contracts/camera-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
+import type { ControlPosition } from "../../contracts/ui-types.js";
+import { useOptionalMapSession } from "../../facade/map-context.js";
 import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
+import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding } from "../shared/wrapper-values.js";
@@ -48,7 +58,15 @@ type MaplibreRegionEvent = Parameters<
 >[0];
 
 /** Maplibre-native map that renders MapLibre React Native `Map` with a `Camera` child. */
-export const MaplibreNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
+export const MaplibreNativeMap = forwardRef<
+  MapRef,
+  MapProps & {
+    hostProps?: ViewProps;
+    options?: Partial<ComponentProps<typeof MaplibreMap>>;
+  }
+>((props, ref) => {
+  const session = useOptionalMapSession();
+  const ornaments = useNativeOrnamentPositions();
   const {
     mapStyle,
     initialViewState,
@@ -113,9 +131,12 @@ export const MaplibreNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
     doubleTapZoom,
   });
 
-  useImperativeHandle(ref, () =>
-    createMaplibreMapRef(cameraRef, mapRef, mapLoaded, sources)
+  const mapHandle = useMemo(
+    () => createMaplibreMapRef(cameraRef, mapRef, mapLoaded, sources),
+    [sources]
   );
+  // Descendant control effects must retain the attached ref during prop updates.
+  useImperativeHandle(ref, () => mapHandle, [mapHandle]);
 
   assertNativeMapOptions(reuseMaps, gl);
   assertNativeDesktopOptions(props);
@@ -158,67 +179,117 @@ export const MaplibreNativeMap = forwardRef<MapRef, MapProps>((props, ref) => {
     maxBounds === undefined ? undefined : mutableFlatBounds(maxBounds);
 
   return (
-    <MaplibreSourceContext.Provider value={sources}>
-      <MaplibreMap
-        ref={mapRef}
-        // MapLayoutStyle.width is any string, not only a native dimension.
-        style={style as StyleProp<ViewStyle>}
-        mapStyle={mapStyle}
-        {...gestures}
-        onDidFinishRenderingFrameFully={flushFeatureState}
-        onDidFinishLoadingMap={() => {
-          mapLoaded.current = true;
-          reportLoad();
+    <PortalProvider>
+      <View
+        {...props.hostProps}
+        onLayout={(event) => {
+          const { width, height } = event.nativeEvent.layout;
+          session?.setNativeLayout(width, height);
+          props.hostProps?.onLayout?.(event);
         }}
-        onDidFinishLoadingStyle={() => {
-          sources.featureState.resetStyle();
-          reportStyleLoad();
-        }}
-        onDidFailLoadingMap={() => {
-          reportError({});
-        }}
-        onRegionWillChange={
-          onMoveStart
-            ? (event: MaplibreRegionEvent) => {
-                reportRegion(event, "start");
-              }
-            : undefined
-        }
-        onRegionIsChanging={(event: MaplibreRegionEvent) => {
-          reportRegion(event, "change");
-        }}
-        onRegionDidChange={(event: MaplibreRegionEvent) => {
-          reportRegion(event, "end");
-        }}
-        onPress={
-          onClick
-            ? (event: MaplibrePressEvent) => {
-                reportClick(pressEvent(event.nativeEvent));
-              }
-            : undefined
-        }
-        onLongPress={
-          onLongPress
-            ? (event: MaplibrePressEvent) => {
-                reportLongPress(pressEvent(event.nativeEvent));
-              }
-            : undefined
-        }
+        // Common width strings cross the native host dimension boundary here.
+        style={[style as StyleProp<ViewStyle>, props.hostProps?.style]}
       >
-        <Camera
-          ref={cameraRef}
-          initialViewState={toMaplibreInitialViewState(frozenViewState)}
-          minZoom={minZoom}
-          maxZoom={maxZoom}
-          maxBounds={flatMaxBounds}
-          padding={
-            padding === undefined ? undefined : normalizePadding(padding)
-          }
-          {...(controlled ?? {})}
-        />
-        {children}
-      </MaplibreMap>
-    </MaplibreSourceContext.Provider>
+        <MaplibreSourceContext.Provider value={sources}>
+          <MaplibreMap
+            {...props.options}
+            logoPosition={
+              props.options?.logoPosition ??
+              (ornaments.managed
+                ? ornaments.position("bottom-left")
+                : undefined)
+            }
+            attributionPosition={
+              session?.ornaments.attribution
+                ? ornaments.position(
+                    session.ornaments.attribution.position as ControlPosition
+                  )
+                : (props.options?.attributionPosition ??
+                  (ornaments.managed
+                    ? ornaments.position("bottom-right")
+                    : undefined))
+            }
+            compassPosition={
+              props.options?.compassPosition ??
+              (ornaments.managed ? ornaments.position("top-right") : undefined)
+            }
+            {...(session?.ornaments.attribution
+              ? {
+                  attribution: true,
+                }
+              : {})}
+            ref={mapRef}
+            style={{ flex: 1 }}
+            mapStyle={mapStyle}
+            {...gestures}
+            onDidFinishRenderingFrameFully={flushFeatureState}
+            onDidFinishLoadingMap={() => {
+              mapLoaded.current = true;
+              reportLoad();
+            }}
+            onDidFinishLoadingStyle={() => {
+              sources.featureState.resetStyle();
+              reportStyleLoad();
+            }}
+            onDidFailLoadingMap={() => {
+              reportError({});
+            }}
+            onRegionWillChange={
+              onMoveStart
+                ? (event: MaplibreRegionEvent) => {
+                    reportRegion(event, "start");
+                  }
+                : undefined
+            }
+            onRegionIsChanging={(event: MaplibreRegionEvent) => {
+              reportRegion(event, "change");
+            }}
+            onRegionDidChange={(event: MaplibreRegionEvent) => {
+              reportRegion(event, "end");
+            }}
+            onPress={
+              onClick
+                ? (event: MaplibrePressEvent) => {
+                    reportClick(pressEvent(event.nativeEvent));
+                  }
+                : undefined
+            }
+            onLongPress={
+              onLongPress
+                ? (event: MaplibrePressEvent) => {
+                    reportLongPress(pressEvent(event.nativeEvent));
+                  }
+                : undefined
+            }
+          >
+            <Camera
+              ref={cameraRef}
+              initialViewState={toMaplibreInitialViewState(frozenViewState)}
+              minZoom={minZoom}
+              maxZoom={maxZoom}
+              maxBounds={flatMaxBounds}
+              padding={
+                padding === undefined ? undefined : normalizePadding(padding)
+              }
+              {...(controlled ?? {})}
+            />
+            {children}
+          </MaplibreMap>
+        </MaplibreSourceContext.Provider>
+        {session && (
+          <PortalHost
+            name={session.overlayHostName}
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+            }}
+          />
+        )}
+      </View>
+    </PortalProvider>
   );
 });
 

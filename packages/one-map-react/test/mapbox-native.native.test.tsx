@@ -1,6 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { render, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { createRef, type ReactNode, type Ref } from "react";
+import { Platform, Text } from "react-native";
 
 import {
   emptyStyle,
@@ -19,6 +20,7 @@ import { Layer } from "../src/facade/layer.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Source } from "../src/facade/source.js";
+import { ScaleControl } from "../src/facade/ui.js";
 
 const mockSetCamera = jest.fn();
 const mockGetCenter = jest.fn(async () => [-122.34, 47.61]);
@@ -244,7 +246,12 @@ import {
   VectorSource,
 } from "@rnmapbox/maps";
 
-import { adapter, MapboxGestureSettings } from "../src/mapbox-native.js";
+import {
+  adapter,
+  Control,
+  MapboxGestureSettings,
+  Map as NativeMap,
+} from "../src/mapbox-native.js";
 
 const MapViewMock = MapView as unknown as jest.Mock;
 const LineLayerMock = LineLayer as unknown as jest.Mock;
@@ -308,6 +315,343 @@ const example = (
 );
 
 describe("mapbox-native adapter", () => {
+  test("Android locks and restores gestures through scalar native props", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "android");
+    const scene = (interactive: boolean) => (
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          interactive={interactive}
+        />
+      </MapSetup>
+    );
+    try {
+      const view = await render(scene(false));
+      const locked = lastMapProps<{
+        scrollEnabled: boolean;
+        zoomEnabled: boolean;
+        rotateEnabled: boolean;
+        pitchEnabled: boolean;
+        gestureSettings?: object;
+      }>();
+      expect(locked).toMatchObject({
+        scrollEnabled: false,
+        zoomEnabled: false,
+        rotateEnabled: false,
+        pitchEnabled: false,
+      });
+      expect(locked.gestureSettings).toBeUndefined();
+      await view.rerender(scene(true));
+      const restored = lastMapProps<typeof locked>();
+      expect(restored.scrollEnabled).toBeUndefined();
+      expect(restored.zoomEnabled).toBe(true);
+      expect(restored.rotateEnabled).toBeUndefined();
+      expect(restored.pitchEnabled).toBeUndefined();
+      expect(restored.gestureSettings).toBeUndefined();
+      await view.unmount();
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test.each([false, true])(
+    "Android restores selected zoomEnabled=%s after a gesture lock",
+    async (zoomEnabled) => {
+      const platform = jest.replaceProperty(Platform, "OS", "android");
+      const scene = (interactive: boolean) => (
+        <MapSetup adapter={adapter}>
+          <NativeMap
+            mapStyle={emptyStyle}
+            initialViewState={initialViewState}
+            interactive={interactive}
+            options={{ zoomEnabled }}
+          />
+        </MapSetup>
+      );
+      try {
+        const view = await render(scene(false));
+        expect(lastMapProps<{ zoomEnabled: boolean }>().zoomEnabled).toBe(
+          false
+        );
+        await view.rerender(scene(true));
+        expect(lastMapProps<{ zoomEnabled: boolean }>().zoomEnabled).toBe(
+          zoomEnabled
+        );
+        await view.unmount();
+      } finally {
+        platform.restore();
+      }
+    }
+  );
+
+  test("Android double-tap options cannot override a temporary gesture lock", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "android");
+    const scene = (interactive: boolean) => (
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          interactive={interactive}
+          options={{
+            gestureSettings: {
+              doubleTapToZoomInEnabled: true,
+              doubleTouchToZoomOutEnabled: true,
+              quickZoomEnabled: false,
+            },
+          }}
+        />
+      </MapSetup>
+    );
+    try {
+      const view = await render(scene(false));
+      expect(
+        lastMapProps<{ gestureSettings: object }>().gestureSettings
+      ).toEqual({
+        doubleTapToZoomInEnabled: false,
+        doubleTouchToZoomOutEnabled: false,
+        quickZoomEnabled: false,
+      });
+      await view.rerender(scene(true));
+      expect(
+        lastMapProps<{ gestureSettings: object }>().gestureSettings
+      ).toEqual({
+        doubleTapToZoomInEnabled: true,
+        doubleTouchToZoomOutEnabled: true,
+        quickZoomEnabled: false,
+      });
+      await view.unmount();
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test.each([false, true])(
+    "Android retains an explicit doubleTapZoom=%s map across a gesture lock",
+    async (doubleTapZoom) => {
+      const platform = jest.replaceProperty(Platform, "OS", "android");
+      const scene = (interactive: boolean) => (
+        <MapSetup adapter={adapter}>
+          <NativeMap
+            mapStyle={emptyStyle}
+            initialViewState={initialViewState}
+            interactive={interactive}
+            doubleTapZoom={doubleTapZoom}
+          />
+        </MapSetup>
+      );
+      try {
+        const view = await render(scene(false));
+        expect(
+          lastMapProps<{ gestureSettings: object }>().gestureSettings
+        ).toEqual({
+          doubleTapToZoomInEnabled: false,
+          doubleTouchToZoomOutEnabled: false,
+        });
+        await view.rerender(scene(true));
+        expect(
+          lastMapProps<{ gestureSettings: object }>().gestureSettings
+        ).toEqual({
+          doubleTapToZoomInEnabled: doubleTapZoom,
+          doubleTouchToZoomOutEnabled: doubleTapZoom,
+        });
+        await view.unmount();
+      } finally {
+        platform.restore();
+      }
+    }
+  );
+
+  test.each<["ios" | "android", boolean]>([
+    ["ios", true],
+    ["ios", false],
+    ["android", true],
+  ])(
+    "%s scale position updates retain enabled=%s after native refresh",
+    async (os, enabled) => {
+      const platform = jest.replaceProperty(Platform, "OS", os);
+      const scene = (top: number) => (
+        <MapSetup adapter={adapter}>
+          <NativeMap
+            mapStyle={emptyStyle}
+            initialViewState={initialViewState}
+            options={{
+              scaleBarPosition: { top, left: 8 },
+              scaleBarEnabled: enabled,
+            }}
+          />
+        </MapSetup>
+      );
+      try {
+        const view = await render(scene(8));
+        const before = MapViewMock.mock.calls.length;
+        await view.rerender(scene(56));
+        await waitFor(() =>
+          expect(
+            lastMapProps<{ scaleBarEnabled: boolean }>().scaleBarEnabled
+          ).toBe(enabled)
+        );
+        const commits = MapViewMock.mock.calls.slice(before).map(
+          ([props]) =>
+            props as {
+              scaleBarPosition: object;
+              scaleBarEnabled: boolean;
+            }
+        );
+        expect(commits.length).toBeGreaterThan(0);
+        expect(
+          commits.every(
+            (props) =>
+              JSON.stringify(props.scaleBarPosition) ===
+              JSON.stringify({ top: 56, left: 8 })
+          )
+        ).toBe(true);
+        if (os === "ios" && enabled) {
+          expect(commits[0]?.scaleBarEnabled).toBe(false);
+          expect(commits.at(-1)?.scaleBarEnabled).toBe(true);
+        } else {
+          expect(
+            commits.every((props) => props.scaleBarEnabled === enabled)
+          ).toBe(true);
+        }
+        await view.unmount();
+      } finally {
+        platform.restore();
+      }
+    }
+  );
+
+  test("iOS layout changes reapply unchanged scale margins without remounting", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "ios");
+    try {
+      const view = await render(
+        <MapSetup adapter={adapter}>
+          <NativeMap
+            mapStyle={emptyStyle}
+            initialViewState={initialViewState}
+            hostProps={{ testID: "scale-layout-host" }}
+            options={{
+              scaleBarPosition: { top: 96, left: 8 },
+              scaleBarEnabled: true,
+            }}
+          />
+        </MapSetup>
+      );
+      const before = MapViewMock.mock.calls.length;
+      await fireEvent(view.getByTestId("scale-layout-host"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 0, width: 375, height: 237 } },
+      });
+      await waitFor(() =>
+        expect(
+          lastMapProps<{ scaleBarEnabled: boolean }>().scaleBarEnabled
+        ).toBe(true)
+      );
+      const commits = MapViewMock.mock.calls
+        .slice(before)
+        .map(
+          ([props]) =>
+            props as { scaleBarPosition: object; scaleBarEnabled: boolean }
+        );
+      expect(commits.some((props) => props.scaleBarEnabled === false)).toBe(
+        true
+      );
+      expect(commits.at(-1)?.scaleBarEnabled).toBe(true);
+      expect(
+        commits.every(
+          (props) =>
+            JSON.stringify(props.scaleBarPosition) ===
+            JSON.stringify({ top: 96, left: 8 })
+        )
+      ).toBe(true);
+      await view.unmount();
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test("SDK ornaments stay outside measured native controls and restore after removal", async () => {
+    const explicit = {
+      logoPosition: { top: 3, left: 4 },
+      attributionPosition: { top: 5, right: 6 },
+    };
+    const scene = (controls: boolean, configured = false) => (
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          options={configured ? explicit : undefined}
+        >
+          {controls && (
+            <>
+              <Control
+                position="bottom-left"
+                hostProps={{ testID: "left-control" }}
+              >
+                <Text>Left</Text>
+              </Control>
+              <Control
+                position="bottom-right"
+                hostProps={{ testID: "right-control" }}
+              >
+                <Text>Right</Text>
+              </Control>
+            </>
+          )}
+        </NativeMap>
+      </MapSetup>
+    );
+    const view = await render(scene(true));
+    await fireEvent(view.getByTestId("left-control"), "layout", {
+      nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 26 } },
+    });
+    await fireEvent(view.getByTestId("right-control"), "layout", {
+      nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 40 } },
+    });
+    const props = lastMapProps<{
+      logoPosition: { bottom: number; left: number };
+      attributionPosition: { bottom: number; right: number };
+    }>();
+    expect(props.logoPosition.bottom).toBeGreaterThan(8 + 26);
+    expect(props.attributionPosition.bottom).toBeGreaterThan(8 + 40);
+    await view.rerender(scene(false));
+    const restored = lastMapProps<{
+      logoPosition: object;
+      attributionPosition: object;
+    }>();
+    expect(restored.logoPosition).toEqual({ bottom: 8, left: 8 });
+    expect(restored.attributionPosition).toEqual({ bottom: 8, right: 8 });
+    await view.rerender(scene(true, true));
+    const configured = lastMapProps<{
+      logoPosition: object;
+      attributionPosition: object;
+    }>();
+    expect(configured.logoPosition).toEqual(explicit.logoPosition);
+    expect(configured.attributionPosition).toEqual(
+      explicit.attributionPosition
+    );
+  });
+
+  test("scale initializes at load and changes units without camera movement", async () => {
+    mockGetCoordinateFromView
+      .mockResolvedValueOnce([-122.32, 47.61])
+      .mockResolvedValueOnce([-122.32, 47.61]);
+    const scene = (unit: "metric" | "imperial") => (
+      <MapSetup adapter={adapter}>
+        <OneMap mapStyle={emptyStyle} initialViewState={initialViewState}>
+          <ScaleControl unit={unit} />
+        </OneMap>
+      </MapSetup>
+    );
+    const view = await render(scene("metric"));
+    await act(async () =>
+      view.getByTestId("wrapper-map").props.onDidFinishLoadingMap()
+    );
+    await waitFor(() => expect(view.getByText("1 km")).toBeTruthy());
+    await view.rerender(scene("imperial"));
+    await waitFor(() => expect(view.getByText("2000 ft")).toBeTruthy());
+    expect(view.queryByText("1 km")).toBeNull();
+  });
+
   test("nested ShapeSource injects sourceID onto the line layer", async () => {
     await render(example());
 

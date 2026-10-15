@@ -1,0 +1,66 @@
+{
+  "environment": "MapLibre Android, Android 16 / API 36, emulator-5556, 1080x2400 at 420 dpi",
+  "runId": "00862b8d-9b67-420f-98a8-0117c9a1541c",
+  "runnerResult": "passed",
+  "installedApkSha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "librarySourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "focusedFixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+  "manualReport": "tf07-rerun-maplibre-android-focused-r23-manual.json",
+  "scenarioReview": {
+    "annotation-image-refresh": "passed; receipt2 image-load=1 and image-refresh=1; visible image screenshot preserved",
+    "overlap-source-propagation": "passed; allowed hit and stopped hit counts differ as expected; features707/708 queried",
+    "vector-source-hit": "passed; visible Map B vector hit gave vector-click=1/b-map-click=1",
+    "location-rejected": "passed; provider-call=1/provider-error=1; camera unchanged",
+    "location-delayed-teardown": "passed; delayed request dropped before resolve; no provider-location and camera unchanged",
+    "portal-context-state-multiple-maps": "passed; updated children separately reported Map A zoom11 and Map B zoom12",
+    "resize-orientation": "passed; short=true, landscape rotation=1 with both map hosts, portrait restored and finite read",
+    "host-accessibility": "passed; separate host/child/attribution controls exposed; native attribution dialog opened on each map and dismissed",
+    "navigation-constraints": "passed after uncovering UI obstruction. Plus: 12\u219213 (receipt19), plus at max remains13 (receipt20). First minus receipt21 remained13 because visible RN warning banner covered Zoom out; preserved as obstructed attempt. Dismissed banner X and verified clean screenshot/hierarchy. Uncovered minus receipt22 reached12; minus-at-min receipt23 remained12. Map A stayed11."
+  },
+  "finalRunnerObservation": {
+    "focused": true,
+    "focusedComplete": true,
+    "counts": {
+      "a-load": 1,
+      "b-load": 1,
+      "image-load": 1,
+      "image-refresh": 1,
+      "high-click": 2,
+      "a-map-click": 1,
+      "vector-click": 1,
+      "b-map-click": 1,
+      "provider-call": 2,
+      "provider-error": 1,
+      "Map A-click": 2,
+      "Map A-map-zoom-11": 2,
+      "Map B-click": 2,
+      "Map B-map-zoom-12": 2
+    },
+    "mode": "delay",
+    "theme": "updated",
+    "locate": false,
+    "short": true,
+    "stop": true,
+    "aZoom": 11,
+    "bZoom": 12,
+    "overlapFeatureIds": [
+      "707",
+      "708"
+    ],
+    "vectorFeatureIds": [
+      "2",
+      "1"
+    ]
+  },
+  "evidence": {
+    "initialRead": "Initial fresh renderer read was part of the run-bound physical receipt sequence; details are summarized in the final runner observation.",
+    "sourceObservations": "Identity-bound per-action receipts, XML bounds, and screenshots were reviewed from the task-owned temporary directory; compact scenario outcomes and obstruction history are retained in this record and manual report.",
+    "finalUi": "Runner passed all nine focused scenarios; final observation is embedded above."
+  },
+  "retainedPriorRuns": [
+    "tf07-rerun-maplibre-android-focused-r21-fixture-mismatch.json",
+    "tf07-rerun-maplibre-android-focused-r22-review.json"
+  ],
+  "cleanup": "Runner exited passed. App stopped; emulator restored to portrait, accelerometer rotation enabled, 420 dpi. Core fixture restored and verified SHA-256 290c01e5379c05a1d4058989a3ca434ad432e3094e47b4eab8d48c37824a1874. Assigned ports 8171/8797/8798 had no listeners and assigned adb reverse list was empty. Temporary screenshots, hierarchies, and logs were removed after review."
+}

@@ -1,0 +1,52 @@
+{
+  "artifact": {
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "distSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8"
+  },
+  "environment": "Mapbox iOS, iPhone 18 Pro simulator, iOS 27, UDID 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+  "fixtureSha256": "86521c0a3594d5002ba20756edb62a93b7a321089ec667f376864b75782e8888",
+  "installedExecutableSha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+  "installedDebugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+  "runId": "71b71a66-2544-4431-95cd-12d4cb2cd02a",
+  "result": "diagnostic stopped after one Map B 120 ms press and one Map A comparison press",
+  "execution": "Actual XCTest touchscreen input and physical renderer Reads; fixture diagnostics only observe event phases and native measurement, with no callback invocation",
+  "observations": {
+    "initialRead": "a-load=1 and b-load=1; finite centers and zooms 11/12; overlap features 707/708 and two vector features present.",
+    "initialNativeMeasure": {
+      "mapA": {"x": 0, "y": 0, "width": 91.3333, "height": 17, "pageX": 302.6667, "pageY": 687.6667},
+      "mapB": {"x": 0, "y": 0, "width": 91, "height": 17, "pageX": 303, "pageY": 847}
+    },
+    "mapBInput": {
+      "accessibleFramePoints": {"x": 303, "y": 815, "width": 91, "height": 17},
+      "actualInputPoints": {"x": 349, "y": 823.5, "durationSeconds": 0.12},
+      "result": "No Map B touch-start, press-in, press-out, press, or touch-end and no Map B-click after four physical Reads over five seconds without another child input.",
+      "measuredPageFrame": {"x": 303, "y": 847, "width": 91, "height": 17}
+    },
+    "mapAComparison": {
+      "accessibleFramePoints": {"x": 302.6667, "y": 623.6667, "width": 91.3333, "height": 17},
+      "actualInputPoints": {"x": 349, "y": 632.17, "durationSeconds": 0.12},
+      "events": ["touch-start", "press-in", "press-out", "press", "touch-end"],
+      "pressInMeasure": {"x": 0, "y": 0, "width": 91.3333, "height": 17, "pageX": 302.6667, "pageY": 623.6667},
+      "rendererCounts": {"Map A-click": 1, "Map A-map-zoom-11": 1}
+    },
+    "cleanup": "Stopped the runner, terminated only the assigned app, and stopped only owned Metro/status services. iPhone remains booted; shared XCTest driver remains available."
+  },
+  "manualReport": "/private/tmp/one-map-tf07-rerun/manual-mapbox-ios-r16-touch-trace.json",
+  "evidence": {
+    "initialReadWithTrace": "/private/tmp/one-map-tf07-rerun/r16-trace-initial-read.json",
+    "preBHierarchy": "/private/tmp/one-map-tf07-rerun/r16-trace-pre-b-hierarchy.json",
+    "bTouchResponse": "/private/tmp/one-map-tf07-rerun/r16-trace-b-touch.json",
+    "bReadAfterTap": "/private/tmp/one-map-tf07-rerun/r16-trace-b-read1.json",
+    "bReadsWithoutRetap": [
+      "/private/tmp/one-map-tf07-rerun/r16-trace-b-read2.json",
+      "/private/tmp/one-map-tf07-rerun/r16-trace-b-read3.json",
+      "/private/tmp/one-map-tf07-rerun/r16-trace-b-read4.json"
+    ],
+    "preAHierarchy": "/private/tmp/one-map-tf07-rerun/r16-trace-pre-a-hierarchy.json",
+    "aTouchResponse": "/private/tmp/one-map-tf07-rerun/r16-trace-a-touch.json",
+    "aReadWithTrace": "/private/tmp/one-map-tf07-rerun/r16-trace-a-read.json",
+    "finalHierarchy": "/private/tmp/one-map-tf07-rerun/r16-trace-after-a-hierarchy.json",
+    "finalScreenshot": "/private/tmp/one-map-tf07-rerun/r16-trace-after-a.png"
+  }
+}

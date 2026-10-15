@@ -1,0 +1,16 @@
+{
+  "environment": "MapLibre Android, Android 16 / API 36, emulator-5556, 1080x2400, 420 dpi",
+  "runId": "039aede3-1b34-47e1-a15c-cfb5400a7b55",
+  "result": "incomplete-infrastructure-fixture-mismatch",
+  "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+  "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+  "manualReport": "/private/tmp/one-map-tf07-rerun/manual-maplibre-android-focused-r16-r21.json",
+  "scenarioOutcomes": "all unverified; no focused interactions attempted",
+  "observation": "The runner waited for focusedComplete, but the active Metro bundle showed the generic core NativeTf07Screen. The canonical fixture was not wired to the saved focused screen at launch.",
+  "evidence": {
+    "initialPhysicalRead": "/private/tmp/one-map-tf07-rerun/maplibre-android-r21-focused-initial-read.json",
+    "initialScreenshot": "/private/tmp/one-map-tf07-rerun/tf07-read-receipt.png",
+    "focusedScreenSource": "examples/shared/native-tf07-focused-screen.tmp.tsx"
+  },
+  "cleanup": "Runner interrupted; owned Metro stopped; app force-stopped; assigned reverse mappings removed; emulator restored to 420 dpi; iOS simulator untouched."
+}

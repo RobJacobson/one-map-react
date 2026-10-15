@@ -1,0 +1,56 @@
+{
+  "artifact": {
+    "installedBinarySha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "libraryDistSha256": "003106b20a28a8da0872580484a1a7571964202823a3ae6a4993e9b2c257802b"
+  },
+  "environment": "mapbox-ios",
+  "runId": "cffc57aa-d37e-4b00-8302-7a2201ffff0a",
+  "result": "passed",
+  "execution": "actual XCTest accessibility/touch and renderer readback",
+  "scenarios": {
+    "annotation-image-visibility": "passed",
+    "resize-orientation": "passed",
+    "host-accessibility": "passed",
+    "navigation-constraints": "passed"
+  },
+  "evidence": {
+    "image": "tf07-mapbox-ios-layout-r9-image.png",
+    "landscape": "tf07-mapbox-ios-layout-r9-landscape.png",
+    "portrait": "tf07-mapbox-ios-layout-r9-portrait.png",
+    "finalRendererRead": "tf07-mapbox-ios-layout-r9-final-read.json"
+  },
+  "observations": {
+    "image": "Image ready label and blue bitmap visibly rendered; renderer reported image-load=1 and image-refresh=1.",
+    "orientation": "Actual landscape app frame 874x402, restored portrait 402x874; Resize read short=true.",
+    "scaleLayout": "After resize in landscape, Map B zero label and entire first scale segment were below the full zoom-control block with approximately 12pt clearance; root visually reviewed the screenshot. Logos, attribution controls, and children were separate in both panes.",
+    "attribution": "Map A and Map B attribution dialogs were each opened by physical touch and dismissed with their actual Cancel buttons.",
+    "navigation": "Map B zoom 12\u219213; plus at max remained 13; minus returned to 12; minus at min remained 12. Map A stayed at zoom 11. Actual Map A and Map B child presses incremented their own click and map-zoom readbacks.",
+    "finalRead": "Fresh physical Read focus after closing Map B attribution; both maps loaded, overlap feature 707 present, vector features present, finite cameras, short=true."
+  },
+  "accessibilityScope": "Representative labeled controls were distinct and physically operable. Full VoiceOver audit remains out of scope.",
+  "finalRendererObservation": {
+    "focusedComplete": true,
+    "counts": {
+      "a-load": 1,
+      "b-load": 1,
+      "image-load": 1,
+      "image-refresh": 1,
+      "Map A-click": 1,
+      "Map A-map-zoom-11": 1,
+      "Map B-click": 1,
+      "Map B-map-zoom-12": 1
+    },
+    "aZoom": 11,
+    "bZoom": 12,
+    "short": true,
+    "overlapFeatureIds": [
+      708,
+      707
+    ],
+    "vectorFeatureCount": 2,
+    "finiteCamera": true,
+    "mode": "reject",
+    "theme": "initial",
+    "stop": false
+  }
+}

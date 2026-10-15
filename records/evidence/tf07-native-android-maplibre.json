@@ -1,0 +1,187 @@
+{
+  "artifact": {
+    "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+    "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+  },
+  "environment": {
+    "backend": "maplibre",
+    "platform": "android",
+    "device": "Medium_Phone / emulator-5554",
+    "api": "Android release 17 / SDK_INT 37; owned system-image package metadata 37.1",
+    "abi": "arm64-v8a"
+  },
+  "binary": {
+    "path": "examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+    "installedDigestPreviouslyVerified": true
+  },
+  "status": "unverified",
+  "execution": "agent-driven-native-input",
+  "attempts": [
+    {
+      "runId": "e06ec98d-d609-4e62-b49b-d7599340afe8",
+      "result": "interrupted",
+      "observation": "Reached scene and initial Read renderer on API 37; no identity-bound manual report was completed."
+    },
+    {
+      "result": "blocked",
+      "observation": "Resume could not connect to assigned emulator-5554; ADB showed only unrelated emulator-5580 offline. Assigned Medium_Phone AVD definition is absent from the standard AVD directory."
+    },
+    {
+      "result": "blocked",
+      "observation": "Authorized AVD restoration attempt failed because avdmanager wrote its ini to the default user directory; corrected temporary ANDROID_USER_HOME attempt found a partial AVD directory left by the first attempt. No runtime flow was started."
+    },
+    {
+      "result": "blocked",
+      "observation": "Corrected AVD creation succeeded and API 37 emulator booted at density 420; prebuilt APK hash matched and package installed. Runner then stopped before Metro because port 8081 is occupied by protected unrelated rnmapbox/example Metro PID 45769. No runtime flow started."
+    }
+  ],
+  "scenarios": {
+    "live-child-button": "unverified",
+    "nested-scroll": "unverified",
+    "live-drag": "unverified",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "focusedScenarios": {
+    "delayed-image": "unverified",
+    "overlap-vector": "unverified",
+    "rejected-delayed-location": "unverified",
+    "provider-context": "unverified",
+    "multimap": "unverified",
+    "resize": "unverified"
+  },
+  "resumeInstallCheck": {
+    "status": "installed-verified",
+    "attempt": "current-resume",
+    "device": "emulator-5554",
+    "androidRelease": "17",
+    "density": 420,
+    "abi": "arm64-v8a",
+    "apkSha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+    "installedPackage": "com.onemapmaplibre",
+    "install": "succeeded",
+    "bootObservation": "Initial ADB lookup transiently reported offline; same boot recovered online without restart."
+  },
+  "resumeAttempts": [
+    {
+      "phase": "boot",
+      "result": "transient-offline-recovered",
+      "detail": "The same owned boot reported offline briefly; it recovered online and reached sys.boot_completed=1 without a restart."
+    },
+    {
+      "phase": "app-preference",
+      "result": "initial-command-failed",
+      "detail": "Nested run-as shell quoting did not create the app-local file; corrected by temporary XML push and run-as copy. Verified debug_http_host=127.0.0.1:8081."
+    },
+    {
+      "phase": "runner-invocation",
+      "result": "failed-before-runtime",
+      "detail": "adb was absent from PATH; ANDROID_HOME pointed to the owned SDK but platform-tools was not prepended. No Metro/status server or app launch began."
+    },
+    {
+      "phase": "runtime-startup",
+      "runId": "11d7205d-c618-490f-a6ad-bf36d99970d0",
+      "result": "unverified-awaiting-input",
+      "detail": "Android 17 ACCESS_LOCAL_NETWORK prompt blocked Metro/fixture. ADB guest shell/input and screenshot service stalled; emulator console responded. No renderer readback or scenario result."
+    },
+    {
+      "phase": "runtime-input",
+      "runId": "11d7205d-c618-490f-a6ad-bf36d99970d0",
+      "result": "unverified-tooling-failure",
+      "detail": "Runner and owned emulator stopped after guest shell/input/screenshot services remained unresponsive. Emulator console ACK alone did not establish a UI change; no scenario began."
+    },
+    {
+      "phase": "runtime",
+      "runId": "17942ad5-bb3d-4edc-97b2-34e48c155eb1",
+      "result": "unverified-tooling-failure",
+      "detail": "4GB/SwiftShader retry loaded the fixture and returned finite camera plus feature id string \"707\" in an initial renderer readback. The child tap was inconclusive after bounds shifted; the emulator then exited with bad color buffer handle 151/network stream close. No further boot authorized."
+    }
+  ],
+  "currentRun": {
+    "runId": "17942ad5-bb3d-4edc-97b2-34e48c155eb1",
+    "status": "unverified-tooling-failure",
+    "execution": "agent-driven-native-input",
+    "runner": "isolated Metro8171/status8797",
+    "toolchain": "verified NVM Node24.14.0/Bun1.4.1 and platform-tools on PATH",
+    "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+    "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb",
+    "confirmedScenarios": [
+      "finite-camera-readback",
+      "feature-readback-fixture-tf07-with-string-id"
+    ],
+    "remaining": [
+      "live-child-button",
+      "nested-scroll",
+      "live-drag",
+      "annotation-drag",
+      "offset-touch-bounds",
+      "popup-follow-dismissal",
+      "source-propagation",
+      "navigation-location",
+      "style-remount",
+      "host-accessibility",
+      "scale-units"
+    ],
+    "runnerStopped": true,
+    "diagnosis": "The 4GB/SwiftShader run loaded the fixture and produced a successful initial renderer readback (generation 0, finite camera, feature id string \"707\"). A child-button tap was inconclusive after layout shifted; the emulator then exited with bad color buffer handle 151 and a closed network stream. Remaining scenarios are unverified; no further MapLibre Android boot is authorized.",
+    "emulator": {
+      "version": "37.1.11.0",
+      "api": "Android release 17 / SDK_INT 37",
+      "density": 420,
+      "abi": "arm64-v8a",
+      "launch": "-avd TF07_Acceptance -port 5554 -memory 4096 -gpu swiftshader -no-snapshot-save -no-boot-anim",
+      "systemImagePackageApi": "37.1"
+    },
+    "permission": {
+      "name": "android.permission.ACCESS_LOCAL_NETWORK",
+      "granted": true,
+      "method": "actual device tap; Android 17 prompt grouped under Nearby devices"
+    },
+    "verifiedRendererReadback": {
+      "events": {
+        "popup-open": 1,
+        "style": 1,
+        "move": 2,
+        "load": 1
+      },
+      "center": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "zoom": 11,
+      "feature": {
+        "id": "707",
+        "properties": {
+          "fixture": "tf07"
+        }
+      },
+      "generation": 0,
+      "error": null
+    },
+    "input": {
+      "execution": "actual Android touchscreen input via adb shell input and screenshots/UIAutomator hierarchy",
+      "childButton": "One tap followed by renderer readback showed no child-click; bounds had shifted and the emulator later crashed, so the result is inconclusive rather than a product failure.",
+      "toolbarSwipe": "Attempt reported owned emulator no longer connected."
+    },
+    "finalState": "Owned emulator process exited during acceptance; no devices remained in ADB. Emulator log ended with bad color buffer handle 151 and network stream closed. Runner and owned Metro/status stopped. No further boot approved.",
+    "validatorObservation": "Initial feature.id was string \"707\" and is preserved verbatim. Coordinator corrected judgeNativeUi to accept numeric 707 or string \"707\", matching documented TF06 Android bridge behavior. No incomplete runtime result was promoted to passed.",
+    "priorRunContext": {
+      "runId": "11d7205d-c618-490f-a6ad-bf36d99970d0",
+      "firstObservation": "Unexpected Android 17 ACCESS_LOCAL_NETWORK permission prompt (grouped under Nearby devices) appeared before fixture rendering; authorization is required for Metro transport.",
+      "inputAttempts": [
+        "CUA Android Studio launch/bind timed out; no input.",
+        "ADB shell and exec-out input/screenshot commands stopped returning while get-state and emulator console remained responsive.",
+        "Coordinator-approved emulator-console mouse events were sent at the dialog deny and allow coordinates; each command returned OK, but screen change could not be verified."
+      ],
+      "diagnosis": "Permission prompt and unresponsive guest input/screenshot services prevented fixture startup; no scenario began."
+    }
+  },
+  "retention": "Temporary build/tool/log/screenshot paths are historical provenance; bulk owned test outputs removed after compact record. Selected scrolling/scale failure images retained in aggregate record."
+}

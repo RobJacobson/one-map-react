@@ -1,0 +1,11 @@
+{
+  "installedBinarySha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+  "libraryDistSha256": "1e59b066387d60515c4b747cadced6e008d82a8c3f8f7e4402511408fb74ee83",
+  "environment": "mapbox-android",
+  "runId": "f2a6a83b-e6d9-40aa-9270-8c43e997d1f8",
+  "scenarios": {
+    "offset-placement-reset": "passed",
+    "offset-touch-bounds": "passed",
+    "map-gesture-recovery": "passed"
+  }
+}

@@ -16,11 +16,14 @@ import type {
   SourceProps,
   VectorSourceProps,
 } from "../../contracts/source-types.js";
+import { useOptionalMapSession } from "../../facade/map-context.js";
 import {
   rejectNativeGeoJsonOptions,
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
+import { sourceHitFromMapbox } from "../shared/source-hit.js";
+import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useGeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
 /** Mapbox-native source that dispatches to the matching RNMapbox source. */
@@ -62,6 +65,16 @@ export const MapboxNativeSource = (props: SourceProps) => {
  * @throws When an option is unavailable on the pinned RNMapbox wrapper.
  */
 const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
+  const session = useOptionalMapSession();
+  const press = useActiveCallback(
+    (
+      event: Parameters<
+        NonNullable<ComponentProps<typeof ShapeSource>["onPress"]>
+      >[0]
+    ) => {
+      session?.dispatchSource(props.id, sourceHitFromMapbox(event));
+    }
+  );
   const registry = useGeoJsonSourceRegistry();
   const sourceRef = useRef<ComponentRef<typeof ShapeSource>>(null);
 
@@ -74,7 +87,18 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
   }, [registry, props.id]);
 
   return (
-    <ShapeSource ref={sourceRef} {...toRnmapboxShapeSource(props)}>
+    <ShapeSource
+      ref={sourceRef}
+      {...toRnmapboxShapeSource(props)}
+      hitbox={
+        (
+          props as GeoJsonSourceProps & {
+            hitbox?: { width: number; height: number };
+          }
+        ).hitbox
+      }
+      onPress={props.onClick ? press : undefined}
+    >
       {props.children}
     </ShapeSource>
   );
@@ -82,6 +106,16 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
 
 /** Registers the vector source lifetime for native feature-state reset. */
 const MapboxNativeVectorSource = (props: VectorSourceProps) => {
+  const session = useOptionalMapSession();
+  const press = useActiveCallback(
+    (
+      event: Parameters<
+        NonNullable<ComponentProps<typeof ShapeSource>["onPress"]>
+      >[0]
+    ) => {
+      session?.dispatchSource(props.id, sourceHitFromMapbox(event));
+    }
+  );
   const registry = useGeoJsonSourceRegistry();
 
   useLayoutEffect(
@@ -90,7 +124,17 @@ const MapboxNativeVectorSource = (props: VectorSourceProps) => {
   );
 
   return (
-    <VectorSource {...toRnmapboxVectorSource(props)}>
+    <VectorSource
+      {...toRnmapboxVectorSource(props)}
+      hitbox={
+        (
+          props as VectorSourceProps & {
+            hitbox?: { width: number; height: number };
+          }
+        ).hitbox
+      }
+      onPress={props.onClick ? press : undefined}
+    >
       {props.children}
     </VectorSource>
   );

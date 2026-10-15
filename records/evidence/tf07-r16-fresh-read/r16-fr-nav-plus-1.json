@@ -1,0 +1,221 @@
+{
+  "priorReceipt": {
+    "receiptSequence": 10,
+    "observation": {
+      "focused": true,
+      "focusedComplete": false,
+      "counts": {
+        "b-load": 1,
+        "a-load": 1,
+        "Map A-click": 3,
+        "Map A-map-zoom-11": 3,
+        "Map B-click": 3,
+        "Map B-map-zoom-12": 3
+      },
+      "mode": "reject",
+      "theme": "updated",
+      "locate": true,
+      "short": true,
+      "stop": false,
+      "aCenter": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "aZoom": 11,
+      "bCenter": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "bZoom": 12,
+      "overlap": [
+        {
+          "id": 708,
+          "properties": {
+            "fixture": "tf07-focused"
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -122.33999490737915,
+              47.60999672595196
+            ]
+          },
+          "type": "Feature"
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -122.33999490737915,
+              47.60999672595196
+            ]
+          },
+          "id": 707,
+          "properties": {
+            "fixture": "tf07-focused"
+          }
+        }
+      ],
+      "vector": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                -122.34100341796875,
+                47.605005650662065
+              ],
+              [
+                -122.33499526977539,
+                47.60798588623899
+              ]
+            ]
+          },
+          "properties": {
+            "__oneMapSourceRevision": 0
+          },
+          "id": 2
+        },
+        {
+          "id": 1,
+          "properties": {
+            "__oneMapSourceRevision": 0
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                -122.34100341796875,
+                47.61001119214464
+              ],
+              [
+                -122.33499526977539,
+                47.61299114251972
+              ]
+            ]
+          },
+          "type": "Feature"
+        }
+      ],
+      "overlapPoint": [
+        187.5000000000464,
+        107
+      ],
+      "vectorPoint": [
+        199.15084455856282,
+        94.03856080529103
+      ]
+    }
+  },
+  "readReceipt": 11,
+  "observation": {
+    "focused": true,
+    "focusedComplete": false,
+    "counts": {
+      "b-load": 1,
+      "a-load": 1,
+      "Map A-click": 3,
+      "Map A-map-zoom-11": 3,
+      "Map B-click": 3,
+      "Map B-map-zoom-12": 3
+    },
+    "mode": "reject",
+    "theme": "updated",
+    "locate": true,
+    "short": true,
+    "stop": false,
+    "aCenter": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "aZoom": 11,
+    "bCenter": [
+      -122.33999999999995,
+      47.61000000000006
+    ],
+    "bZoom": 13,
+    "overlap": [
+      {
+        "id": 708,
+        "properties": {
+          "fixture": "tf07-focused"
+        },
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.33999490737915,
+            47.60999672595196
+          ]
+        }
+      },
+      {
+        "id": 707,
+        "properties": {
+          "fixture": "tf07-focused"
+        },
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.33999490737915,
+            47.60999672595196
+          ]
+        }
+      }
+    ],
+    "vector": [
+      {
+        "id": 2,
+        "properties": {
+          "__oneMapSourceRevision": 0
+        },
+        "type": "Feature",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              -122.34100341796875,
+              47.605005650662065
+            ],
+            [
+              -122.33499526977539,
+              47.60798588623899
+            ]
+          ]
+        }
+      },
+      {
+        "id": 1,
+        "properties": {
+          "__oneMapSourceRevision": 0
+        },
+        "type": "Feature",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              -122.34100341796875,
+              47.61001119214464
+            ],
+            [
+              -122.33499526977539,
+              47.61299114251972
+            ]
+          ]
+        }
+      }
+    ],
+    "overlapPoint": [
+      187.5000000000464,
+      107
+    ],
+    "vectorPoint": [
+      210.80168911647573,
+      81.07712161206751
+    ]
+  },
+  "physicalTouchHelper": "{\"appId\":\"org.reactjs.native.example.OneMapMapbox\",\"label\":\"Read focus\",\"frame\":{\"Y\":0,\"Height\":36,\"X\":62,\"Width\":150},\"actualTouch\":[137,18],\"response\":\"\"}\n"
+}

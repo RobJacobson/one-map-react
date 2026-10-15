@@ -14,6 +14,7 @@ const isEnvRead = (node, name) => {
 };
 
 const smokeTarget = () => {
+  if (process.env.ONE_MAP_SMOKE === "tf07") return "tf07";
   if (process.env.ONE_MAP_SMOKE === "tf06-lifetimes") return "tf06-lifetimes";
   if (process.env.ONE_MAP_SMOKE === "tf06") return "tf06";
   if (process.env.ONE_MAP_SMOKE === "tf05") return "tf05";

@@ -1,0 +1,129 @@
+{
+  "environment": "mapbox-android",
+  "attempt": 3,
+  "status": "interrupted-by-host-gpu-rendering",
+  "runId": "003f79c5-52dc-4372-9a3e-342b509f93bd",
+  "artifact": {
+    "sourceSha256": "0ca04feef7069502efe019de25919795b9fa2500aa460a874259411f40379991",
+    "libraryDistSha256": "746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2",
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "installedBinaryReuse": true,
+    "package": "com.onemapmapbox"
+  },
+  "device": {
+    "serial": "emulator-5556",
+    "avd": "TF07_Rerun",
+    "androidRelease": "17",
+    "display": "1080x2400 @ 420dpi",
+    "gpu": "host",
+    "emulatorFlags": [
+      "-feature",
+      "-Vulkan"
+    ],
+    "dataPreservedAcrossRestart": true
+  },
+  "inputs": [
+    {
+      "scenario": "live-child-button",
+      "method": "Tf07Touch actual MotionEvent DOWN/120ms stationary/UP",
+      "dexSha256": "63c99f06d79e5f7e2f91e503bdc3bbcc370d477b085b6313d2e21195f5f36a4d",
+      "coordinatesPx": [
+        539,
+        1312
+      ],
+      "boundsPx": [
+        385,
+        1287,
+        693,
+        1338
+      ],
+      "result": "child-click=1; map-click absent"
+    },
+    {
+      "scenario": "nested-scroll-diagnostic",
+      "method": "Tf07Touch actual OS MotionEvents, continuous drag wholly inside ScrollView viewport",
+      "coordinatesPx": [
+        [
+          539,
+          1448
+        ],
+        [
+          539,
+          1398
+        ]
+      ],
+      "durationMs": 400,
+      "viewportBoundsPx": [
+        385,
+        1381,
+        693,
+        1465
+      ],
+      "result": "move count 3->4; camera unchanged; rows did not visibly move; unverified, not established map pan"
+    }
+  ],
+  "observation": {
+    "events": {
+      "popup-open": 1,
+      "move": 4,
+      "style": 1,
+      "load": 1,
+      "child-click": 1
+    },
+    "positions": {},
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "features": [
+      {
+        "type": "Feature",
+        "id": "707",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.3399949,
+            47.5799997
+          ]
+        },
+        "properties": {
+          "fixture": "tf07"
+        }
+      }
+    ],
+    "generation": 0,
+    "stopSourcePropagation": false
+  },
+  "manualScenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "unverified",
+    "live-drag": "unverified",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "notes": [
+    "Fresh core run after coordinator-approved restart of the same AVD/data with -feature -Vulkan. Installed APK SHA-256 verified as b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6; library dist SHA-256 746544b898b40a6e950055ce1a2f73922e8fdd6d134b6cc65bd445772edf8ed2.",
+    "Visible live child target at physical bounds [385,1287,693,1338] was tapped using actual OS MotionEvents at (539,1312), with 120 ms stationary DOWN then UP. Physical renderer read showed child-click=1 and map-click absent.",
+    "The fresh ScrollView viewport bounds were [385,1381,693,1465]. A real continuous OS drag from (539,1448) to (539,1398), 400 ms, was wholly within the viewport. Renderer move incremented from 3 to 4, while center and zoom remained unchanged; visible rows did not move, so nested-scroll remains unverified.",
+    "After this single gesture the GPU-rendered map background, source point, and annotation disappeared and remained absent in a fresh screenshot 2 seconds later. React Native controls, popup, live child content, and default blue pin remained. This reproduced the host-GPU graphics failure with -feature -Vulkan enabled.",
+    "No later interaction was performed after the graphics failure. Attempt stopped pending coordinator decision on alternate rendering backend."
+  ],
+  "screenshots": [
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-vulkan-start.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-vulkan-scroll-before.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-vulkan-scroll-after.png",
+    "/private/tmp/one-map-tf07-rerun/mapbox-android-vulkan-scroll-after-fresh.png"
+  ],
+  "graphicsFailure": {
+    "backend": "host GPU with -feature -Vulkan",
+    "observation": "After one corrected in-viewport continuous swipe, GPU-rendered map background, source point, and annotation were absent and remained absent in a fresh screenshot at 2 seconds. React Native views, popup, live child, and default pin remained.",
+    "nextAction": "Stop this attempt and wait for coordinator decision on alternate backend; no independent retry."
+  }
+}

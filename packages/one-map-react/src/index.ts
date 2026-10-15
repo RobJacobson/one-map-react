@@ -17,6 +17,7 @@ export type {
   MapErrorEvent,
   MoveEvent,
   MoveOrigin,
+  SourceClickEvent,
 } from "./contracts/event-types.js";
 export type {
   ImageEntry,
@@ -89,8 +90,33 @@ export type {
   VectorSourceProps,
 } from "./contracts/source-types.js";
 export type { MapStyle, StyleDocument } from "./contracts/style-types.js";
+export type {
+  Anchor,
+  AttributionControlProps,
+  ControlPosition,
+  ControlProps,
+  FullscreenControlProps,
+  GeolocateControlProps,
+  GeolocationPosition,
+  MarkerEvent,
+  MarkerProps,
+  MarkerRef,
+  NavigationControlProps,
+  PopupProps,
+  ScaleControlProps,
+} from "./contracts/ui-types.js";
 export { Images } from "./facade/images.js";
 export { Layer } from "./facade/layer.js";
-export { Map } from "./facade/map.js";
+export { Map, useMap } from "./facade/map.js";
 export { MapSetup } from "./facade/map-setup.js";
 export { Source } from "./facade/source.js";
+export {
+  AttributionControl,
+  Control,
+  FullscreenControl,
+  GeolocateControl,
+  Marker,
+  NavigationControl,
+  Popup,
+  ScaleControl,
+} from "./facade/ui.js";

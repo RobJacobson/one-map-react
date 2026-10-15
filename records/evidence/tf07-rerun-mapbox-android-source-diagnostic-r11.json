@@ -1,0 +1,60 @@
+{
+  "artifact": {
+    "installedApkSha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "libraryDistSha256": "413fe28b988888ee294251d050f867a560b4df16aa30ed0b380ec5e99bad5df8"
+  },
+  "environment": "mapbox-android-api36",
+  "runId": "24feceb9-4243-42fe-aded-113e2950dbc8",
+  "result": "failed",
+  "scope": "source-only baseline diagnostic before any drag, annotation, popup, or multitouch interactions",
+  "execution": "actual Android OS MotionEvent, physical renderer Read, screenshots and accessibility hierarchy",
+  "initialRead": {
+    "load": 1,
+    "featureId": 707,
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "sourcePointLogical": [
+      205.5000000000258,
+      514.5753794954453
+    ]
+  },
+  "sourceTap": {
+    "tool": "Tf07Touch via app_process",
+    "mode": "stationary 120ms press",
+    "physicalCoordinates": [
+      539,
+      1730
+    ],
+    "freshProjectedLogicalPoint": [
+      205.5000000000258,
+      514.5753794954453
+    ],
+    "density": 420,
+    "mapBoundsPhysical": [
+      0,
+      379,
+      1080,
+      2400
+    ],
+    "conversion": "projected point \u00d72.625 plus map origin",
+    "screenshotFeatureCenterPhysical": [
+      539,
+      1730
+    ],
+    "result": "post-tap physical Read showed no source-click or map-click increment; camera and feature remained unchanged"
+  },
+  "logs": "Relevant logcat showed app startup and no handleTapInSources/RNMBXSource/RNMBXMapView/ReactNativeJS runtime error around the source tap.",
+  "scenario": "source-propagation failed; diagnostic stopped immediately; no other gates attempted",
+  "evidence": {
+    "initialScreenshot": "tf07-mapbox-android-source-r11-initial.png",
+    "afterTapScreenshot": "tf07-mapbox-android-source-r11-after-tap.png",
+    "initialRead": "tf07-mapbox-android-source-r11-initial-read.json",
+    "afterTapRead": "tf07-mapbox-android-source-r11-after-read.json",
+    "initialHierarchy": "tf07-mapbox-android-source-r11-initial-hierarchy.xml",
+    "relevantLog": "tf07-mapbox-android-source-r11-log.txt"
+  },
+  "cleanup": "Owned runner stopped after first source diagnostic failure; no retry; emulator retained."
+}

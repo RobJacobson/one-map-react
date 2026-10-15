@@ -1,0 +1,51 @@
+{
+  "status": "incomplete-input-method",
+  "scope": "MapLibre Android offsets at 320 dpi; stopped before completing drag/reset scenarios",
+  "identity": {
+    "environment": "maplibre-android",
+    "runId": "7652aa7e-daa5-4f6b-81c2-a7647c632651",
+    "installedBinarySha256": "a1de12aeb151abe0be4f0c0c32dd17b2e4efa4c45c395a2194223740e2b06d2e",
+    "libraryDistSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8",
+    "device": "emulator-5556",
+    "densityDpi": 320,
+    "screen": "1080x2400",
+    "fixture": "canonical core"
+  },
+  "completedObservations": {
+    "offsetPlacement": "Before offset, live child bounds were [425,1312][656,1350]. After setting offset [24,-12] logical units at 320 dpi, bounds were [473,1288][704,1326], a +48 px horizontal and -24 px vertical shift.",
+    "displacedChildHit": "Tap at [588,1307] incremented child-click to 1 with unchanged camera.",
+    "evidence": [
+      "/private/tmp/one-map-tf07-rerun/maplibre-android-r19-offset320-initial-read.json",
+      "/private/tmp/one-map-tf07-rerun/maplibre-android-r19-offset320-set.xml",
+      "/private/tmp/one-map-tf07-rerun/maplibre-android-r19-offset320-set-read.json",
+      "/private/tmp/one-map-tf07-rerun/maplibre-android-r19-offset320-child-read.json",
+      "/private/tmp/one-map-tf07-rerun/maplibre-android-r19-offset320-drag-read.json",
+      "/private/tmp/one-map-tf07-rerun/manual-maplibre-android-r16-offset320-r19.json"
+    ]
+  },
+  "firstUnexpectedOutcome": {
+    "category": "gesture input did not meet the long-press contract",
+    "command": "adb shell input touchscreen swipe 588 1269 648 1287 1800",
+    "diagnostic": "The subsequent physical receipt showed no live-start, live-drag, or live-end and no coordinate proposal. This adb swipe began moving before a verified 500 ms stationary hold, so the required offset drag and gesture recovery were not tested.",
+    "receiptSequence": 4,
+    "latestObservation": "child-click=1, live drag events absent, camera unchanged, feature707 present."
+  },
+  "manualScenarios": {
+    "offset-placement-reset": "unverified",
+    "offset-touch-bounds": "unverified",
+    "map-gesture-recovery": "unverified"
+  },
+  "cleanup": {
+    "runnerStopped": true,
+    "ownedMetroProcessesStopped": true,
+    "assignedReversePortsRemoved": [8081, 8797],
+    "status8171": "clear",
+    "status8797": "clear",
+    "status8798": "clear",
+    "testAppStopped": true,
+    "emulator": "emulator-5556 preserved booted and restored to 420 dpi",
+    "iosSimulator": "untouched"
+  }
+}

@@ -1,0 +1,3867 @@
+{
+  "environment": "mapbox-ios",
+  "runId": "ce05a6b6-353d-421d-bc7b-736c354ee5be",
+  "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+  "librarySourceSha256": "7d819b6ce11b2a5ebcbb20d96f170641d3b58aa0d095a14dd9bb573cb9c2ff92",
+  "libraryDistSha256": "29132434546c068bacd3b064677aae007264ad7884eb96e66c143f012ef0a894",
+  "diagnosticFixtureSha256": "b540001d163f7da0cd3d40fe9b86c8b5c66989e144096ea1077c9c168a57e4d9",
+  "outcome": "targeted-diagnostic-only-not-acceptance",
+  "touchInput": {
+    "logicalStart": [
+      201,
+      479
+    ],
+    "stationaryHoldSeconds": 0.65,
+    "logicalEnd": [
+      260,
+      429
+    ],
+    "moveCount": 20,
+    "physicalReadPerformedAfter": true
+  },
+  "rendererReadback": {
+    "center": [
+      -122.34000000000002,
+      47.60999999999999
+    ],
+    "zoom": 11,
+    "events": {
+      "popup-open": 1,
+      "style": 1,
+      "load": 1,
+      "move": 2
+    },
+    "positions": {},
+    "generation": 0
+  },
+  "touchObservationCount": 41,
+  "phaseCounts": {
+    "end": 1,
+    "move": 38,
+    "negotiation": 1,
+    "start": 1
+  },
+  "first120TouchObservations": [
+    {
+      "phase": "negotiation",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": null,
+      "page": [
+        201,
+        479
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "start",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        201,
+        479
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        201.66666666666666,
+        478.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        202.33333333333331,
+        477.66666666666663
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        203,
+        477
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        203.66666666666666,
+        476.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        204,
+        476
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        205.66666666666666,
+        475
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        207,
+        474
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        208.66666666666666,
+        472.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        210,
+        471
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        211.66666666666666,
+        470
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        213,
+        469
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        214.66666666666666,
+        467.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        216,
+        466
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        217.66666666666666,
+        465
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        219,
+        464
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        220.66666666666666,
+        462.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        222,
+        461
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        225,
+        459
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        228,
+        456
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        229.66666666666666,
+        455
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        232,
+        452.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        233,
+        451
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        234.66666666666666,
+        450
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        236,
+        449
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        237.66666666666666,
+        447.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        239,
+        446
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        242,
+        444
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        243.66666666666666,
+        442.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        245,
+        441
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        246.66666666666666,
+        440
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        248,
+        439
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        251,
+        436
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        252.66666666666666,
+        435
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        254,
+        434
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        255.66666666666666,
+        432.3333333333333
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        257,
+        431
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        258.66666666666663,
+        430
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "move",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        260,
+        429
+      ],
+      "touches": 1,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    },
+    {
+      "phase": "end",
+      "targetType": "object",
+      "currentTargetType": "object",
+      "currentTargetName": "RN:View",
+      "page": [
+        260,
+        429
+      ],
+      "touches": 0,
+      "path": [
+        {
+          "name": "RN:Paragraph",
+          "width": 121,
+          "height": 17,
+          "scrollWidth": 121,
+          "scrollHeight": 17,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": true
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 137,
+          "height": 82,
+          "scrollWidth": 137,
+          "scrollHeight": 82,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:PortalView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:RNMBXMapView",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 673,
+          "scrollWidth": 402,
+          "scrollHeight": 673,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:SafeAreaView",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 908,
+          "currentTarget": false
+        },
+        {
+          "name": "RN:View",
+          "width": 402,
+          "height": 874,
+          "scrollWidth": 402,
+          "scrollHeight": 874,
+          "currentTarget": false
+        }
+      ]
+    }
+  ],
+  "evidence": {
+    "rawObservation": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r5diag-repeat-observation.json",
+    "initialObservation": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r5diag-repeat-initial.json",
+    "initialHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r5diag-repeat-hierarchy1.json",
+    "finalHierarchy": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r5diag-repeat-hierarchy2.json",
+    "screenshot": "/private/tmp/one-map-tf07-rerun/ios-mapbox-r5diag-repeat-after.png",
+    "manualReport": "/private/tmp/one-map-tf07-rerun/manual-mapbox-ios-touchdiag-r5-repeat.json"
+  }
+}

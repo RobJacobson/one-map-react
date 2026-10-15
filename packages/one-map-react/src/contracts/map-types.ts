@@ -38,6 +38,10 @@ export interface MapLayoutStyle {
  * Props for the shared {@link Map} component.
  */
 export interface MapProps {
+  /** Optional provider-local identity for useMap(id); changing requires remount. */
+  readonly id?: string;
+  /** Layer ids whose rendered feature hits are included with map clicks. */
+  readonly interactiveLayerIds?: readonly string[];
   /** Style URL or a local style document. */
   readonly mapStyle: MapStyle;
   /**

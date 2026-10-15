@@ -15,6 +15,7 @@ const cases = [
   ["tf04", "tf04"],
   ["tf05", "tf05"],
   ["tf06", "tf06"],
+  ["tf07", "tf07"],
   ["tf06-lifetimes", "tf06-lifetimes"],
 ];
 
@@ -45,7 +46,7 @@ try {
     }
   }
 
-  console.log("PASS native Babel smoke selection: 6 cases");
+  console.log("PASS native Babel smoke selection: 7 cases");
   process.env.TF06_BASE = "http://192.0.2.1:8798";
   const baseFilename = new URL("./shared/tf06-base.ts", import.meta.url);
   const baseResult = transformSync(readFileSync(baseFilename, "utf8"), {

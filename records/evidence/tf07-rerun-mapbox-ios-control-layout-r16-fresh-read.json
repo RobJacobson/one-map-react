@@ -1,0 +1,136 @@
+{
+  "status": "passed-scoped-followup",
+  "scope": "iOS Mapbox six-field Control follow-up; original core/focused records remain separate",
+  "runId": "06b4c090-bfee-49da-910f-ab169f9c993f",
+  "identity": {
+    "environment": "mapbox-ios",
+    "installedBinarySha256": "f448d879492fc7324396cb95fd95f019b92f688f307d5803c46d9c672281137c",
+    "debugDylibSha256": "f9b641ed417839e64e41614f0791ea68b3c64bd3422ecb585b08acaf8ac4e9a3",
+    "fixtureSha256": "7604e1830ab23cb54ff7ccd28314e45b04aaf09a5817d8b1a9eb5384cc9bf5c9",
+    "sourceSha256": "324b8583217368f65ac643ca717a016cd6099245fc5845a7416a118a16e3cf77",
+    "distSha256": "448ea832a77e02e3fcbe6f1227553c1206c46103107cd1f481827ee4c681e36d",
+    "packedSha256": "28bc47b8bac2f84dbe6566e4de0df661728c980c39677525b02c6ef47fb7d2c8"
+  },
+  "manual": {
+    "portal-context-state-multiple-maps": "passed",
+    "resize-orientation": "passed",
+    "host-accessibility": "passed",
+    "navigation-constraints": "passed",
+    "source-passthrough": "passed",
+    "control-teardown": "passed"
+  },
+  "observed": {
+    "receiptSequence": 26,
+    "focusedComplete": false,
+    "counts": {
+      "b-load": 1,
+      "a-load": 1,
+      "Map A-click": 4,
+      "Map A-map-zoom-11": 4,
+      "Map B-click": 4,
+      "Map B-map-zoom-12": 4,
+      "high-click": 3,
+      "a-map-click": 3,
+      "vector-click": 1,
+      "b-map-click": 1
+    },
+    "stop": false,
+    "locate": false,
+    "theme": "updated",
+    "short": true,
+    "camera": {
+      "aCenter": [
+        -122.34000000000002,
+        47.60999999999999
+      ],
+      "aZoom": 11,
+      "bCenter": [
+        -122.3399999999999,
+        47.61000000000017
+      ],
+      "bZoom": 12
+    },
+    "overlapFeatures": [
+      708,
+      707
+    ],
+    "vectorFeatureIds": [
+      2,
+      1
+    ],
+    "scope": "Final physical Read focus receipt 26, before terminal Finish focus."
+  },
+  "physicalEvidence": {
+    "emptyMapTap": {
+      "pointLogical": [
+        100,
+        340
+      ],
+      "result": "a-map-click 2\u21923; source count unchanged; cameras stable"
+    },
+    "sourceSequence": {
+      "allowed": [
+        "high-click 0\u21921",
+        "a-map-click 0\u21921"
+      ],
+      "stopped": [
+        "high-click 1\u21922",
+        "a-map-click remains1"
+      ],
+      "restored": [
+        "high-click 2\u21923",
+        "a-map-click 1\u21922"
+      ]
+    },
+    "vectorTap": {
+      "result": "vector-click=1, b-map-click=1"
+    },
+    "navigation": {
+      "bZoom": "12\u219213; max remains13; 13\u219212; min remains12",
+      "aZoomRemained": 11
+    },
+    "resizeAndOrientation": "short=true; both labels remain visible at own map footers; actual landscape and restored portrait child presses incremented each map count",
+    "attribution": "both SDK attribution dialogs opened and were dismissed once",
+    "teardown": "Drop locate made locate=false; child labels, zoom controls, logos, scale bars and attribution buttons remained visible"
+  },
+  "runnerResult": {
+    "status": "passed",
+    "execution": "manual-native-focused-touch",
+    "remaining": [],
+    "runId": "06b4c090-bfee-49da-910f-ab169f9c993f",
+    "focusedComplete": true,
+    "completion": "A subsequent physical Finish focus posted focusedComplete=true and completed the runner; its receipt number was not separately retained."
+  },
+  "evidenceDirectory": "records/evidence/tf07-r16-fresh-read",
+  "evidenceFiles": [
+    "manual-mapbox-ios-r16-control-layout-fresh-read.json",
+    "r16-fr-empty-map-hit.json",
+    "r16-fr-drop-locate.json",
+    "r16-fr-final-read.json",
+    "r16-fr-drop-locate.png",
+    "r16-fr-drop-locate-ax.json",
+    "r16-fr-resize.png",
+    "r16-fr-landscape.png",
+    "r16-fr-portrait.png",
+    "r16-fr-attribution-a.png",
+    "r16-fr-attribution-a-closed.png",
+    "r16-fr-attribution-b.png",
+    "r16-fr-attribution-b-closed.png",
+    "r16-fr-source-allowed.json",
+    "r16-fr-source-stopped.json",
+    "r16-fr-source-restored-allowed-hit.json",
+    "r16-fr-vector-hit.json",
+    "r16-fr-nav-plus-1.json",
+    "r16-fr-nav-plus-max.json",
+    "r16-fr-nav-minus-1.json",
+    "r16-fr-nav-minus-min.json"
+  ],
+  "coordinatorReview": {
+    "status": "accepted-six-field-followup",
+    "identity": "Manual six fields, current R16 dist, verified installed executable and run 06b4c090-bfee-49da-910f-ab169f9c993f match.",
+    "pixels": "Root reviewed resized, landscape, restored portrait and Drop Locate screenshots. Both updated labels stay at their own footer, B Navigation is above the complete scale, SDK logos and attribution remain clear.",
+    "touchAndRead": "Fresh receipt sequence proves new physical Reads. Counts A/B 1\u21922\u21923\u21924 and own zoom11/12; B limits12/13 with A11; actual source allowed/stopped/restored and vector plus empty-map passthrough verified.",
+    "attribution": "Both actual SDK dialogs opened/dismissed; root viewed B dialog and verified A dialog accessibility title/actions.",
+    "retainedScope": "Prior core R7, full focused R8 and scale/layout R9 evidence retained under nativeImpactReviewR16. Image was not triggered in this six-field run; Waiting image is the expected fixture state. Full VoiceOver audit is outside representative scope."
+  }
+}

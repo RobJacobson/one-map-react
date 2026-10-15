@@ -1,0 +1,117 @@
+{
+  "artifact": {
+    "sourceSha256": "999a3e4179e8b129909ea47375fd13ca5f474882841b9729006bc15fa5a8b7a1",
+    "distSha256": "1f7c7d1dff905c73bedcd2cd125ef33f8949ec70304a804a1e1f057be2a3db86",
+    "installedBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a"
+  },
+  "environment": "mapbox-ios",
+  "runId": "ec284ea4-8b4b-41d5-b514-61f14c2d681f",
+  "execution": "physical XCTest touchscreen input; live Mapbox renderer reads; no injected callbacks",
+  "originalRunnerResult": {
+    "status": "unverified",
+    "observed": true,
+    "manualComplete": false,
+    "remainingAtExit": [
+      "popup-follow-dismissal",
+      "style-remount",
+      "host-accessibility"
+    ],
+    "reason": "Runner auto-completed on the first generation-1 renderer POST immediately after remount, before post-remount child/source checks could be judged. Original runner output and manual report are retained unchanged.",
+    "runnerObservation": {
+      "generation": 1,
+      "load": 2,
+      "style": 3,
+      "popupOpen": 3,
+      "popupClose": 1,
+      "mapClick": 5,
+      "sourceClick": 3,
+      "childClick": 2,
+      "center": [
+        -122.34,
+        47.61
+      ],
+      "zoom": 11,
+      "stopSourcePropagation": true,
+      "featureId": 707
+    }
+  },
+  "retrospectiveOutcomes": {
+    "live-child-button": {
+      "status": "passed",
+      "evidence": "Physical offset-child, post-style and post-remount child presses incremented child-click without map-click changes. The same-app post-remount check changed child-click 2 to 3 while map-click remained 5. The initial r7-read-child.json contained marker-click rather than child-click and did not establish this gate."
+    },
+    "nested-scroll": {
+      "status": "passed",
+      "evidence": "A 20-point physical swipe wholly inside the 32-point viewport moved rows upward 10 points while the stationary label and renderer camera stayed fixed at [-122.34, 47.61], zoom 11."
+    },
+    "live-drag": {
+      "status": "passed",
+      "evidence": "650 ms stationary hold followed by continuous motion yielded live-start 1, live-drag 41, live-end 1 and a changed live position. Active-drag OS interruption used Settings and returned to the same app PID; readback showed live-start 2, live-drag 75, live-end still 1. Actual second-pointer cancellation yielded live-start 3, live-drag 91, live-end still 1. Separate real map pans changed camera afterward."
+    },
+    "annotation-drag": {
+      "status": "passed",
+      "evidence": "Physical annotation hold/drag produced annotation-start 1 and annotation-end 1, changed its renderer position, and visibly moved the annotation child in r7-annotation.png."
+    },
+    "offset-touch-bounds": {
+      "status": "passed",
+      "evidence": "Enabling offset moved live child bounds by (+24, -12) points; the relocated child remained pressable and a long drag changed its renderer position. Disabling offset moved bounds back by (-24, +12) points."
+    },
+    "popup-follow-dismissal": {
+      "status": "passed",
+      "evidence": "Popup child press emitted popup-child. A real blank-area map pan moved the popup frame about 21 points while camera longitude changed. Its visible X incremented popup-close once; toolbar reopened it; remount left popup-close unchanged at 1. Post-remount read showed popup-open 3 and the popup visibly mounted."
+    },
+    "source-propagation": {
+      "status": "passed",
+      "evidence": "Original-resolution feature-center taps: allowed case incremented source-click and map-click once; stopped case incremented only source-click. After style and remount, additional physical stopped taps incremented source-click while map-click stayed 5."
+    },
+    "navigation-location": {
+      "status": "passed",
+      "evidence": "Physical Locate produced location 1 and renderer center [-122.33, 47.62]. Zoom-in read zoom 12; zoom-out read zoom 11."
+    },
+    "style-remount": {
+      "status": "passed",
+      "evidence": "Physical style action changed style count 1 to 2 while feature 707, marker positions, popup, and child remained. Remount produced generation 1, load 2, style 3 and finite renderer state. Post-remount physical child and stopped-source taps were read with the same installed app/binary; counts rose to child-click 3 and source-click 4 while map-click stayed 5 and popup-close stayed 1."
+    },
+    "host-accessibility": {
+      "status": "failed",
+      "evidence": "The native About this map button was physically opened and closed, and footer logo/facade scale/attribution/custom-control bounds were separated. However, the screenshot still shows the SDK multi-tick scale under the top-left Locate control. Full VoiceOver audit is unverified."
+    },
+    "scale-units": {
+      "status": "passed",
+      "evidence": "Physical units control changed the facade scale from 2 km (76 points wide) to 1 mi (60.7 points wide). Footer logo and facade scale remain separately visible."
+    }
+  },
+  "postRemountReadbackCollector": {
+    "sameInstalledAppProcess": true,
+    "listener": "temporary localhost collector on 8797; no app relaunch",
+    "observations": [
+      "r7-post-remount-reads.jsonl",
+      "r7-post-remount-child-read.json",
+      "r7-post-remount-source-read.json"
+    ],
+    "finalObservation": {
+      "generation": 1,
+      "load": 2,
+      "style": 3,
+      "popupOpen": 3,
+      "popupClose": 1,
+      "mapClick": 5,
+      "sourceClick": 4,
+      "childClick": 3,
+      "center": [
+        -122.34,
+        47.61
+      ],
+      "zoom": 11,
+      "stopSourcePropagation": true,
+      "featureId": 707
+    }
+  },
+  "visualEvidence": [
+    "/private/tmp/one-map-tf07-rerun/r7-no-warning.png",
+    "/private/tmp/one-map-tf07-rerun/r7-about-open.json",
+    "/private/tmp/one-map-tf07-rerun/r7-post-remount.png",
+    "/private/tmp/one-map-tf07-rerun/r7-post-remount-current.png"
+  ],
+  "note": "Retrospective outcomes supplement, and do not replace, the original runner result. The first source tap used a preview-derived y-coordinate and missed; the corrected physical coordinate was derived from original screenshot pixels and produced the documented callback counts. The initial intended child tap reached the marker label; later actual child callbacks establish child isolation, not that initial input."
+}

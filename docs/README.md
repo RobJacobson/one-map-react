@@ -31,3 +31,7 @@ These references retain upstream comparisons, source links, examples, and incomp
 The documents under `decisions/` preserve upstream investigations and the rationale for the retired implementation. Their execution instructions, commands, source paths, and acceptance policies are superseded. Archived implementation documents and source mentioned there are available only in the local backup; public contributors do not need that backup. [Historical records](../records/README.md) retain provenance, not current stage status.
 
 The old architecture, stage specification, testing plan, implementation status, and operational handoffs have been removed. Do not recreate their frameworks merely to match historical tests or proposals.
+
+The [TF07 UI record](tf07-ui.md) describes markers, popups, controls, map access, source activation, and the accepted R16 physical-interaction scope.
+
+The [native control portal decision](decisions/0007-native-control-portals.md) records the optional native dependency that preserves control children’s React context. It applies to the current implementation; native integration acceptance passed for the recorded R16 scope.

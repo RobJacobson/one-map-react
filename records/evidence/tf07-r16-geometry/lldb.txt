@@ -1,0 +1,57 @@
+(lldb) process attach --pid 90886
+Process 90886 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = signal SIGSTOP
+       frame #0: 0x0000000102e7cb70 libsystem_kernel.dylib`mach_msg2_trap + 8
+libsystem_kernel.dylib`mach_msg2_trap:
+->  0x102e7cb70 <+8>: ret    
+
+libsystem_kernel.dylib`macx_swapon:
+    0x102e7cb74 <+0>: mov    x16, #-0x30               ; =-48 
+    0x102e7cb78 <+4>: svc    #0x80
+    0x102e7cb7c <+8>: ret    
+Target 0: (OneMapMapbox) stopped.
+Executable binary set to "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/667B8863-7A38-4817-9515-E9474859428F/OneMapMapbox.app/OneMapMapbox".
+Architecture set to: arm64-apple-ios-simulator.
+(lldb) command source -s 0 '/private/tmp/one-map-tf07-rerun/ios-hit-test-commands.lldb'
+Executing commands in '/private/tmp/one-map-tf07-rerun/ios-hit-test-commands.lldb'.
+(lldb) thread select 1
+(lldb) expression -l objc++ -- @import UIKit
+* thread #1, queue = 'com.apple.main-thread', stop reason = signal SIGSTOP
+       frame #0: 0x0000000102e7cb70 libsystem_kernel.dylib`mach_msg2_trap + 8
+libsystem_kernel.dylib`mach_msg2_trap:
+->  0x102e7cb70 <+8>: ret    
+
+libsystem_kernel.dylib`macx_swapon:
+    0x102e7cb74 <+0>: mov    x16, #-0x30               ; =-48 
+    0x102e7cb78 <+4>: svc    #0x80
+    0x102e7cb7c <+8>: ret    
+(lldb) expression -l objc++ -O -- ({ NSMutableString *out = [NSMutableString new]; NSArray *windows = [[UIApplication sharedApplication] windows]; for (UIWindow *window in windows) { [out appendFormat:@"WINDOW %@ level=%g key=%d hidden=%d alpha=%g\n", window, (double)window.windowLevel, window.isKeyWindow, window.hidden, (double)window.alpha]; for (NSNumber *y in @[@632.17, @823.5]) { CGPoint point = CGPointMake(349.0, y.doubleValue); UIView *hit = [window hitTest:point withEvent:nil]; [out appendFormat:@"POINT %@ HIT %@\n", NSStringFromCGPoint(point), hit]; for (UIView *view = hit; view != nil; view = view.superview) { [out appendFormat:@"  %@ frame=%@ bounds=%@ hidden=%d interaction=%d alpha=%g clips=%d label=%@\n", NSStringFromClass(view.class), NSStringFromCGRect(view.frame), NSStringFromCGRect(view.bounds), view.hidden, view.userInteractionEnabled, (double)view.alpha, view.clipsToBounds, view.accessibilityLabel]; } } } out; })
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ˄                                                             ˄                   ˄                                                                                                                                                                                                               ˄                       ˄       ˄                       ˄
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     │                                                             │                   │                                                                                                                                                                                                               │                       │       │                       ╰─ error: attempt to use a deleted function
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     │                                                             │                   │                                                                                                                                                                                                               │                       │       ╰─ warning: format specifies type 'id' but the argument has type '<dependent type>'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     │                                                             │                   │                                                                                                                                                                                                               │                       ╰─ error: attempt to use a deleted function
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     │                                                             │                   │                                                                                                                                                                                                               ╰─ warning: format specifies type 'id' but the argument has type '<dependent type>'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     │                                                             │                   ╰─ error: no matching constructor for initialization of 'CGPoint'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     │                                                             ╰─ warning: format specifies type 'id' but the argument has type '<dependent type>'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ╰─ error: no matching constructor for initialization of 'CGPoint'
+note: Ran expression as 'Objective C++'.
+note: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/CoreFoundation.framework/Headers/CFCGTypes.h:51:1: candidate constructor (the implicit move constructor) not viable: expects an rvalue for 1st argument
+   51 | CGPoint {
+      | ^~~~~~~
+note: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/CoreFoundation.framework/Headers/CFCGTypes.h:51:1: candidate constructor (the implicit default constructor) not viable: requires 0 arguments, but 1 was provided
+note: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/CoreFoundation.framework/Headers/CFCGTypes.h:51:1: candidate constructor (the implicit move constructor) not viable: expects an rvalue for 1st argument
+   51 | CGPoint {
+      | ^~~~~~~
+note: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/CoreFoundation.framework/Headers/CFCGTypes.h:51:1: candidate constructor (the implicit default constructor) not viable: requires 0 arguments, but 1 was provided
+note: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/CoreFoundation.framework/Headers/CFCGTypes.h:78:13: destructor of 'CGRect' is implicitly deleted because field 'origin' has no destructor
+   78 |     CGPoint origin;
+      |             ^
+note: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/CoreFoundation.framework/Headers/CFCGTypes.h:78:13: destructor of 'CGRect' is implicitly deleted because field 'origin' has no destructor
+   78 |     CGPoint origin;
+      |             ^
+note: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIGeometry.h:158:52: passing argument to parameter 'point' here
+  158 | UIKIT_EXTERN NSString *NSStringFromCGPoint(CGPoint point) API_AVAILABLE(watchos(2.0));
+      |                                                    ^
+note: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIView.h:211:39: passing argument to parameter 'point' here
+  211 | - (nullable UIView *)hitTest:(CGPoint)point withEvent:(nullable UIEvent *)event;   // recursively calls -pointInside:withEvent:. point is in the receiver's coordinate system
+      |                                       ^

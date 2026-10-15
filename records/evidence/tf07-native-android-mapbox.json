@@ -1,0 +1,58 @@
+{
+  "artifact": {
+    "sourceSha256": "40728a6f438398e3b066a4cf8977f2da8c4d33fc90ab75c8890a231796394bc6",
+    "libraryDistSha256": "041dac8fe5808e2c70ae8a361f1852d5d18d920675e91c1acb8817a6998899eb"
+  },
+  "environment": {
+    "backend": "mapbox",
+    "platform": "android",
+    "device": "TF07_Acceptance / emulator-5554",
+    "systemImagePackageApi": "37.1",
+    "abi": "arm64-v8a"
+  },
+  "build": {
+    "attempt": 4,
+    "result": "success",
+    "command": "./gradlew assembleDebug -PreactNativeArchitectures=arm64-v8a",
+    "duration": "4m 22s",
+    "log": "/private/tmp/one-map-tf07-acceptance/mapbox-android-build-attempt4.log"
+  },
+  "binary": {
+    "path": "examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "b7cd6ba76ce0fa249f89225baa4b09d712493bb3ecdd4fa88867bff348ff4bf6",
+    "sizeBytes": 65267134,
+    "installedDigestVerified": false
+  },
+  "status": "unverified",
+  "execution": "agent-driven-native-input",
+  "attempts": [
+    {
+      "phase": "owned-avd-boot",
+      "result": "unverified-tooling-failure",
+      "detail": "The one approved Mapbox Android boot used the owned TF07_Acceptance AVD with -memory 4096 -gpu swiftshader. Emulator logged bad color buffer handle 151 and showed crash consent; emulator-5554 never appeared in ADB during observation. No install, runner, app launch, or scenario began. The owned emulator process was stopped; no other device was touched."
+    }
+  ],
+  "scenarios": {
+    "finite-camera-feature-readback": "unverified",
+    "live-child-button": "unverified",
+    "nested-scroll": "unverified",
+    "live-drag": "unverified",
+    "annotation-drag": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "source-propagation": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "scale-units": "unverified"
+  },
+  "focusedScenarios": {
+    "delayed-image": "unverified",
+    "overlap-vector": "unverified",
+    "rejected-delayed-location": "unverified",
+    "provider-context": "unverified",
+    "multimap": "unverified",
+    "resize": "unverified"
+  },
+  "retention": "Temporary build/tool/log/screenshot paths are historical provenance; bulk owned test outputs removed after compact record. Selected scrolling/scale failure images retained in aggregate record."
+}
