@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import {
   mkdtempSync,
+  mkdirSync,
   readdirSync,
   readFileSync,
   rmSync,
@@ -15,8 +16,17 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
+import {
+  captureInclusion,
+  observeCoveragePixels,
+} from "./tf08-final-observations.mjs";
 import { withFusedLocationFixture } from "./tf08-fused-location-fixture.mjs";
 import { observeFixturePixels } from "./tf08-image-observations.mjs";
+import {
+  assertMissingDatabaseRejection,
+  readAndroidAppFile,
+  unexpectedResetWarnings,
+} from "./tf08-offline-observations.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const startedAt = new Date().toISOString();
@@ -24,10 +34,13 @@ const harnessSha256 = Object.fromEntries(
   [
     "scripts/tf08-services-smoke.mjs",
     "scripts/tf08-image-observations.mjs",
+    "scripts/tf08-offline-observations.mjs",
     "scripts/tf08-fused-location-fixture.mjs",
     "examples/shared/tf08-acceptance-scene.tsx",
     "examples/shared/native-tf08-screen.tsx",
     "examples/shared/web-tf08-app.tsx",
+    "examples/native-mapbox/App.tsx",
+    "examples/native-maplibre/App.tsx",
     "scripts/ios-tap/TapDriverUITests/TapDriver.swift",
   ].map((file) => [
     file,
@@ -38,7 +51,27 @@ const harnessSha256 = Object.fromEntries(
 );
 const [platform, engine] = process.argv.slice(2);
 const scope = process.env.TF08_SCOPE ?? "all";
-assert(["all", "offline"].includes(scope), "Select all or offline scope.");
+assert(
+  [
+    "all",
+    "offline",
+    "pending",
+    "pending-reset",
+    "pending-merge",
+    "pending-repair",
+    "pending-storage",
+    "capture-coverage",
+  ].includes(scope),
+  "Select all, offline, pending, pending-reset, pending-merge, pending-repair, pending-storage or capture-coverage scope."
+);
+if (scope.startsWith("pending")) {
+  assert(platform !== "web", "Pending scope requires a native platform.");
+  assert.equal(
+    process.env.TF08_ISOLATED_SANDBOX,
+    "1",
+    "Pending cache/reset tests require an isolated application sandbox."
+  );
+}
 assert(
   ["web", "ios", "android"].includes(platform),
   "Select web, ios or android."
@@ -81,6 +114,17 @@ let applicationId;
 let nativeLibraries;
 let lastRendererObservation;
 let locationDiagnostic;
+let dataContainer;
+const storageFixturePaths = {};
+const storageManifest =
+  scope === "pending-storage"
+    ? JSON.parse(
+        readFileSync(
+          join(process.env.TF08_STORAGE_FIXTURES ?? "", "manifest.json"),
+          "utf8"
+        )
+      )
+    : undefined;
 const adb = (args, binary = false) =>
   command(
     process.env.TF08_ADB ?? "/Users/rob/Library/Android/sdk/platform-tools/adb",
@@ -120,6 +164,10 @@ const main = async () => {
   await serveFixtures();
   if (platform === "web") await launchWeb();
   else await launchNative();
+  if (scope === "pending-storage") {
+    await storageScenarios();
+    return;
+  }
   await scenario("known renderer feature", async () => {
     await until(async () => {
       const value = await action("read");
@@ -135,6 +183,49 @@ const main = async () => {
     return pickRead(await action("read"));
   });
   if (scenarios.at(-1).status === "passed") {
+    if (scope === "capture-coverage") {
+      await captureCoverageScenarios();
+      return;
+    }
+    if (scope === "pending-repair") {
+      if (engine === "mapbox") {
+        for (const [operation, reason] of [
+          ["ambient-invalidate", "no in-place ambient cache invalidation API"],
+          ["ambient-size", "no legacy ambient cache size API"],
+        ]) {
+          await scenario(
+            `SDK v11 explicitly rejects unavailable ${operation}`,
+            async () => {
+              let message;
+              await assert.rejects(
+                action("named-offline", { operation }),
+                (error) => {
+                  message = error.message;
+                  return message.includes(reason);
+                }
+              );
+              return {
+                availability:
+                  "unavailable in pinned SDK; no working-operation claim",
+                message,
+              };
+            }
+          );
+        }
+        await nativeOfflineScenarios();
+      } else await pendingResetScenario();
+      await pendingMergeScenario();
+      return;
+    }
+    if (scope === "pending-reset" || scope === "pending-merge") {
+      if (scope === "pending-reset") await pendingResetScenario();
+      else await pendingMergeScenario();
+      return;
+    }
+    if (scope === "pending") {
+      await pendingNativeScenarios();
+      return;
+    }
     if (scope === "offline") {
       assert(platform !== "web", "Offline scope requires a native platform.");
       await nativeOfflineScenarios();
@@ -215,6 +306,444 @@ const main = async () => {
     );
     if (platform !== "web") await nativeScenarios();
   }
+};
+
+const pendingNativeScenarios = async () => {
+  await scenario(
+    "independent images at the pending native display density",
+    async () => {
+      const device = await action("device-info");
+      if (platform === "ios")
+        assert.equal(device.scale, 2, "Use a second, 2x iOS display.");
+      const image = await action("snapshot", { width: 128, height: 80 });
+      const pixels = imagePixels(image.uri);
+      assert.equal(pixels.width, 128);
+      assert.equal(pixels.height, 80);
+      assert(pixels.red > 20 && pixels.navy > 1000);
+      const file = await action("snapshot", {
+        width: 128,
+        height: 80,
+        output: "file",
+      });
+      const decoded = imagePixels(await readNativeImage(file.uri));
+      assert.equal(decoded.width, 128);
+      assert.equal(decoded.height, 80);
+      return { device, dataUrl: pixels, file: decoded };
+    }
+  );
+  await scenario(
+    "current-map file capture includes rendered content",
+    async () => {
+      const image = await action("capture", { output: "file" });
+      const pixels = imagePixels(await readNativeImage(image.uri));
+      assert(pixels.width > 0 && pixels.height > 0);
+      assert(pixels.red > 100 && pixels.navy > 1000);
+      assert.equal(pixels.green, 0, "Host marker unexpectedly included.");
+      return pixels;
+    }
+  );
+  for (const operation of [
+    "ambient-invalidate",
+    "ambient-clear",
+    "ambient-size",
+    "tile-limit",
+    "throttle",
+    ...(engine === "mapbox"
+      ? [
+          "quota",
+          "migrate",
+          "legacy-list",
+          "legacy-migrate",
+          "legacy-limit",
+          "legacy-reset",
+        ]
+      : []),
+  ]) {
+    await scenario(`named offline ${operation}`, async () => {
+      const result = await action("named-offline", { operation });
+      assert.deepEqual(
+        result.warnings,
+        [],
+        "Wrapper reported a no-op instead of a native operation."
+      );
+      return {
+        ...result,
+        verification:
+          "public wrapper invocation; no storage/quota readback API",
+      };
+    });
+  }
+  await pendingMergeScenario();
+  if (engine === "mapbox") {
+    await scenario("named legacy offline pack lifecycle", async () => {
+      const invoke = async (operation) => {
+        const result = await action("named-offline", { operation });
+        assert.deepEqual(result.warnings, []);
+        return result.value;
+      };
+      try {
+        assert.equal(await invoke("legacy-create"), "tf08-legacy-pending");
+        await invoke("legacy-pause");
+        const status = await invoke("legacy-status");
+        assert.equal(status.name, "tf08-legacy-pending");
+        await invoke("legacy-resume");
+        await invoke("legacy-invalidate");
+        assert.equal(await invoke("legacy-delete"), null);
+        return {
+          status,
+          completion: "lifecycle acknowledgement; full download not certified",
+        };
+      } finally {
+        await invoke("legacy-delete").catch(() => undefined);
+      }
+    });
+  }
+  await pendingResetScenario();
+};
+
+const pendingMergeScenario = async () => {
+  await scenario("named offline missing merge input rejects", async () => {
+    const started = Date.now();
+    let message;
+    await assert.rejects(
+      action("named-offline", { operation: "merge-missing" }),
+      (error) => {
+        message = error.message;
+        assertMissingDatabaseRejection(message);
+        return true;
+      }
+    );
+    return {
+      message,
+      elapsedMs: Date.now() - started,
+      validDatabaseImport: "not exercised",
+    };
+  });
+};
+
+const storageFixture = (purpose) => {
+  const fixture = storageManifest.fixtures.find((entry) =>
+    entry.file.endsWith(`${engine}-${platform}-${purpose}.db`)
+  );
+  assert(fixture, `Missing ${purpose} database fixture.`);
+  assert.equal(
+    createHash("sha256").update(readFileSync(fixture.file)).digest("hex"),
+    fixture.sha256
+  );
+  return fixture;
+};
+
+const readAppFile = async (path) =>
+  platform === "android"
+    ? readAndroidAppFile(adb, applicationId, path)
+    : readFileSync(join(dataContainer, path));
+
+const copyAppFile = async (fixture, path) => {
+  if (platform === "android") {
+    const upload = `/data/local/tmp/tf08-${randomUUID()}.db`;
+    try {
+      await adb(["push", fixture.file, upload]);
+      await adb([
+        "shell",
+        "run-as",
+        applicationId,
+        "mkdir",
+        "-p",
+        path.slice(0, path.lastIndexOf("/")),
+      ]);
+      await adb(["shell", "run-as", applicationId, "cp", upload, path]);
+    } finally {
+      await adb(["shell", "rm", "-f", upload]);
+    }
+  } else {
+    mkdirSync(join(dataContainer, path, ".."), { recursive: true });
+    writeFileSync(join(dataContainer, path), readFileSync(fixture.file));
+  }
+  assert.equal(
+    createHash("sha256")
+      .update(await readAppFile(path))
+      .digest("hex"),
+    fixture.sha256
+  );
+};
+
+const stageStorageFixtures = async () => {
+  if (platform === "ios")
+    dataContainer = (
+      await command("xcrun", [
+        "simctl",
+        "get_app_container",
+        simulator,
+        applicationId,
+        "data",
+      ])
+    ).trim();
+  const fixture = storageFixture("import");
+  const path =
+    platform === "android"
+      ? "files/tf08-import.db"
+      : "Documents/tf08-import.db";
+  await copyAppFile(fixture, path);
+  storageFixturePaths.import =
+    platform === "android"
+      ? `/data/user/0/${applicationId}/${path}`
+      : join(dataContainer, path);
+  if (engine === "mapbox") {
+    storageFixturePaths.migrationSource =
+      platform === "android"
+        ? "files/mbgl-offline.db"
+        : "Library/Application Support/com.mapbox.examples/.mapbox/cache.db";
+    storageFixturePaths.migrationTarget =
+      platform === "android"
+        ? "files/.mapbox/map_data/map_data.db"
+        : "Library/Application Support/.mapbox/map_data/map_data.db";
+    await assert.rejects(readAppFile(storageFixturePaths.migrationTarget));
+    await copyAppFile(
+      storageFixture("migration"),
+      storageFixturePaths.migrationSource
+    );
+  }
+};
+
+const storageReadback = async (fixture) => {
+  const result = await action("named-offline", { operation: "storage-packs" });
+  assert(
+    result.value.some((pack) => pack.metadata?.name === fixture.identity),
+    JSON.stringify(result)
+  );
+  return result.value;
+};
+
+const renderStoredStyle = async (fixture) => {
+  resourcesAvailable = false;
+  if (engine === "mapbox")
+    assert.equal(await action("network", { connected: false }), false);
+  await configure("storage", fixture.styleURL);
+  await action("camera", { longitude: 0, latitude: 0, zoom: 1 });
+  await until(
+    async () => {
+      const camera = await action("read");
+      return near(camera.center, [0, 0]) && Math.abs(camera.zoom - 1) < 0.1;
+    },
+    10000,
+    "storage fixture camera over its cached zoom-zero raster"
+  );
+  let pixels;
+  await until(
+    async () => {
+      const image = await action("capture");
+      pixels = observeCoveragePixels(
+        PNG.sync.read(Buffer.from(image.uri.split(",")[1], "base64"))
+      );
+      return pixels.yellow > 1000;
+    },
+    30000,
+    "populated database pixels with fixture sockets closed"
+  );
+  return {
+    pixels,
+    view: "center0,0 zoom1; cached source maxzoom0 raster is overzoomed",
+    networking:
+      engine === "mapbox"
+        ? "SDK disconnected and fixture resource sockets closed"
+        : "fixture resource sockets closed",
+  };
+};
+
+const storageScenarios = async () => {
+  if (engine === "mapbox")
+    await scenario(
+      "populated pre-v10 cache migration before map creation",
+      async () => {
+        const fixture = storageFixture("migration");
+        const result = await action("named-offline", { operation: "migrate" });
+        assert.deepEqual(result.warnings, []);
+        await until(
+          async () => {
+            const bytes = await readAppFile(
+              storageFixturePaths.migrationTarget
+            );
+            return (
+              createHash("sha256").update(bytes).digest("hex") ===
+              fixture.sha256
+            );
+          },
+          15000,
+          "migration destination retains populated source bytes"
+        );
+        await assert.rejects(readAppFile(storageFixturePaths.migrationSource));
+        const packs = await storageReadback(fixture);
+        const rendered = await renderStoredStyle(fixture);
+        await restartNative();
+        await storageReadback(fixture);
+        const cold = await renderStoredStyle(fixture);
+        return {
+          fixture,
+          movedBytesVerified: true,
+          packs,
+          rendered,
+          coldRestart: cold,
+        };
+      }
+    );
+  await scenario(
+    "valid populated database import and cold cached rendering",
+    async () => {
+      const fixture = storageFixture("import");
+      const before = await action("named-offline", {
+        operation: "storage-packs",
+      });
+      assert(
+        !before.value.some((pack) => pack.metadata?.name === fixture.identity)
+      );
+      const merged = await action("named-offline", {
+        operation: "merge-valid",
+        path: storageFixturePaths.import,
+      });
+      assert.deepEqual(merged.warnings, []);
+      const packs = await storageReadback(fixture);
+      const rendered = await renderStoredStyle(fixture);
+      await restartNative();
+      await storageReadback(fixture);
+      const cold = await renderStoredStyle(fixture);
+      return { fixture, packs, rendered, coldRestart: cold };
+    }
+  );
+};
+
+const coverageImages = async () => {
+  const image = await action("capture");
+  const exported = PNG.sync.read(
+    Buffer.from(image.uri.split(",")[1], "base64")
+  );
+  assert(
+    observeFixturePixels(exported).red > 20,
+    "Known rendered map point is missing from the coverage PNG."
+  );
+  const liveBytes =
+    platform === "web"
+      ? Buffer.from(
+          (await page.send("Page.captureScreenshot", { format: "png" })).data,
+          "base64"
+        )
+      : platform === "android"
+        ? await adb(["exec-out", "screencap", "-p"], true)
+        : await command("xcrun", [
+            "simctl",
+            "io",
+            simulator,
+            "screenshot",
+            "--type=png",
+            join(temporary, "live.png"),
+          ]).then(() => readFileSync(join(temporary, "live.png")));
+  assert(
+    liveBytes.length > 8 && liveBytes.subarray(1, 4).toString() === "PNG",
+    "The live screenshot did not produce PNG bytes."
+  );
+  return {
+    exported: observeCoveragePixels(exported),
+    live: observeCoveragePixels(PNG.sync.read(liveBytes)),
+    dimensions: { width: exported.width, height: exported.height },
+  };
+};
+
+const captureCoverageScenarios = async () => {
+  await configure("coverage-base");
+  await delay(700);
+  const baseline = await coverageImages();
+  for (const [kind, color] of [
+    ["annotation", "green"],
+    ["popup", "green"],
+    ["ornaments", "bright"],
+    ["puck", "blue"],
+  ]) {
+    await scenario(
+      `backend capture inclusion for visible ${kind}`,
+      async () => {
+        await configure(`coverage-${kind}`);
+        if (kind === "annotation") await action("annotation-refresh");
+        const observe = async () => {
+          let images;
+          await until(
+            async () => {
+              images = await coverageImages();
+              return images.live[color] - baseline.live[color] > 60;
+            },
+            25000,
+            `visible ${kind} before capture classification`
+          );
+          return {
+            ...captureInclusion(baseline, images.live, images.exported, color),
+            images,
+            baseline,
+            scope:
+              "backend; inclusion is recorded per renderer, not assumed identical",
+          };
+        };
+        if (kind === "puck" && engine === "maplibre" && platform === "android")
+          return withFusedLocationFixture(adb, async (inject) => {
+            await inject();
+            return observe();
+          });
+        if (kind === "puck" && platform === "ios")
+          await command("xcrun", [
+            "simctl",
+            "location",
+            simulator,
+            "set",
+            "47.615,-122.34",
+          ]);
+        if (kind === "puck" && platform === "web") {
+          await activateLocation();
+          await action("emit", { longitude: -122.34, latitude: 47.615 });
+        }
+        return observe();
+      }
+    );
+  }
+};
+
+const pendingResetScenario = async () => {
+  await scenario(
+    "named offline reset removes a discoverable test pack",
+    async () => {
+      const id = `tf08-reset-${engine}-${platform}-${Date.now()}`;
+      await action("offline-create", { id });
+      let before;
+      await until(
+        async () => {
+          before = await action("offline-status", { id });
+          return ["inactive", "active", "complete"].includes(
+            before.status.state
+          );
+        },
+        30000,
+        "native test pack status before database reset"
+      );
+      assert.equal(before.pack.id, id);
+      const reset = await action("named-offline", { operation: "reset" });
+      const after = await action("named-offline", { operation: "packs" });
+      assert.equal(after.value, 0);
+      assert.deepEqual(unexpectedResetWarnings(engine, reset.warnings), []);
+      return {
+        id,
+        before: before.status,
+        warnings: reset.warnings,
+        remainingPacks: after.value,
+      };
+    }
+  );
+};
+
+const readNativeImage = async (uri) => {
+  const bytes =
+    platform === "android"
+      ? await adb(
+          ["exec-out", "run-as", applicationId, "cat", fileURLToPath(uri)],
+          true
+        )
+      : readFileSync(fileURLToPath(uri));
+  return `data:image/png;base64,${bytes.toString("base64")}`;
 };
 
 const browserScenarios = async () => {
@@ -547,6 +1076,11 @@ const nativeOfflineScenarios = async () => {
       const pack = await action("offline-create", { id });
       assert.equal(pack.id, id);
       await action("offline-subscribe", { id });
+      await until(
+        async () => !!(await action("offline-status", { id })).status,
+        30000,
+        "native pack registration before pause"
+      );
       await action("offline-pause", { id });
       await action("offline-resume", { id });
       await until(
@@ -582,7 +1116,28 @@ const nativeOfflineScenarios = async () => {
       };
     }
   );
-  const lifecyclePassed = scenarios.at(-1).status === "passed";
+  let lifecyclePassed = scenarios.at(-1).status === "passed";
+  if (lifecyclePassed && scope === "pending-repair") {
+    await scenario(
+      "ambient cache clearing preserves the downloaded offline pack",
+      async () => {
+        const before = await action("offline-status", { id });
+        const cleared = await action("named-offline", {
+          operation: "ambient-clear",
+        });
+        assert.deepEqual(cleared.warnings, []);
+        const after = await action("offline-status", { id });
+        assert.equal(after.pack.id, id);
+        assert.equal(after.status.state, "complete");
+        assert.equal(
+          after.status.completedResourceCount,
+          before.status.completedResourceCount
+        );
+        return { before: before.status, after: after.status };
+      }
+    );
+    lifecyclePassed = scenarios.at(-1).status === "passed";
+  }
   if (lifecyclePassed)
     await scenario(
       "persisted offline pack after cold restart with fixture resources unavailable",
@@ -713,7 +1268,17 @@ const action = async (name, value = {}) => {
 };
 
 const configure = async (mode, mapStyle) => {
-  const before = await action("read").catch(() => ({ loads: 0 }));
+  let before = await action("read").catch(() => undefined);
+  if (!before) {
+    // The storage shell must create its map before it can receive configuration.
+    await action("configure", { mode: "injected" });
+    await until(
+      async () => (await action("read")).loads > 0,
+      90000,
+      "deferred map mount"
+    );
+    before = await action("read");
+  }
   await action("configure", { mode, mapStyle });
   await until(
     async () => (await action("read")).loads > before.loads,
@@ -940,9 +1505,10 @@ const launchNative = async () => {
     expected
   );
   applicationId =
-    platform === "android"
+    process.env.TF08_APPLICATION_ID ??
+    (platform === "android"
       ? `com.onemap${engine}`
-      : `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`;
+      : `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`);
   if (platform === "android") {
     await adb(["install", "-r", binary]);
     const installed = (await adb(["shell", "pm", "path", applicationId]))
@@ -957,6 +1523,13 @@ const launchNative = async () => {
     );
     const prefs = `shared_prefs/${applicationId}_preferences.xml`;
     await adb(["shell", "am", "force-stop", applicationId]);
+    if (scope === "pending-storage") {
+      assert(
+        applicationId.endsWith(".tf08remaining"),
+        "Storage tests require their dedicated Android application ID."
+      );
+      await adb(["shell", "pm", "clear", applicationId]);
+    }
     await adb([
       "shell",
       "run-as",
@@ -1010,6 +1583,19 @@ const launchNative = async () => {
       "android.permission.ACCESS_COARSE_LOCATION",
     ]);
   } else {
+    if (scope === "pending-storage") {
+      assert(
+        process.env.TF08_IOS_UDID &&
+          simulator !== "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+        "Storage tests require a dedicated iOS simulator."
+      );
+      await command("xcrun", [
+        "simctl",
+        "uninstall",
+        simulator,
+        applicationId,
+      ]).catch(() => undefined);
+    }
     await command("xcrun", [
       "simctl",
       "install",
@@ -1057,10 +1643,17 @@ const launchNative = async () => {
       applicationId,
     ]);
   }
+  if (scope === "pending-storage") await stageStorageFixtures();
   metro = start(
     "bun",
     ["run", "start", "--", "--port", String(metroPort), "--reset-cache"],
-    { cwd: shell, env: { ...process.env, ONE_MAP_SMOKE: "tf08" } }
+    {
+      cwd: shell,
+      env: {
+        ...process.env,
+        ONE_MAP_SMOKE: scope === "pending-storage" ? "tf08-storage" : "tf08",
+      },
+    }
   );
   await until(
     async () => (await fetch(`http://127.0.0.1:${metroPort}/status`)).ok,
@@ -1073,7 +1666,18 @@ const restartNative = async () => {
   currentCommand = {};
   if (platform === "android") {
     await adb(["shell", "am", "force-stop", applicationId]);
-    await adb(["shell", "am", "start", "-n", `${applicationId}/.MainActivity`]);
+    const launch = await adb([
+      "shell",
+      "am",
+      "start",
+      "-W",
+      "-n",
+      `${applicationId}/com.onemap${engine}.MainActivity`,
+    ]);
+    assert(
+      !/Error:|Exception/.test(launch),
+      `Android launch failed: ${launch}`
+    );
   } else {
     await command("xcrun", [
       "simctl",
@@ -1366,10 +1970,17 @@ try {
     imageObservations,
     lastRendererObservation,
     locationDiagnostic,
-    remaining: [
-      "physical-device authorization/revocation/course",
-      ...(platform === "ios" ? ["second iOS display density"] : []),
+    remaining:
+      scope === "capture-coverage"
+        ? ["Database import/migration results are recorded separately."]
+        : scope === "pending-storage"
+          ? ["Additional capture results are recorded separately."]
+          : [],
+    excludedByOwner: [
+      "physical-device testing",
+      "RNMapbox ambient invalidation and ambient-size controls",
     ],
+    storageFixtures: storageManifest,
     resourceRequests,
     blockedRequests,
     resourceObservations,

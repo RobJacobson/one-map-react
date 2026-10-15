@@ -1,5 +1,10 @@
 import { type MapRef, MapSetup } from "one-map-react";
-import { adapter, WrapperLocationManager } from "one-map-react/maplibre-native";
+import {
+  adapter,
+  WrapperLocationManager,
+  WrapperOfflineManager,
+  NativeUserLocation,
+} from "one-map-react/maplibre-native";
 import { useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
@@ -13,14 +18,40 @@ import { NativeTf08Screen } from "../shared/native-tf08-screen.js";
 import { RouteMap } from "../shared/route-map.js";
 import { smokeTarget } from "../shared/smoke-target.js";
 
+// Destructive operations are only invoked by the isolated pending acceptance scope.
+const offlineOperations = {
+  "ambient-invalidate": () => WrapperOfflineManager.invalidateAmbientCache(),
+  "ambient-clear": () => WrapperOfflineManager.clearAmbientCache(),
+  "ambient-size": () =>
+    WrapperOfflineManager.setMaximumAmbientCacheSize(16 * 1024 * 1024),
+  "merge-missing": () =>
+    WrapperOfflineManager.mergeOfflineRegions("/tf08-missing.db"),
+  "merge-valid": (value: Record<string, unknown>) =>
+    WrapperOfflineManager.mergeOfflineRegions(String(value.path)),
+  "storage-packs": async () =>
+    (await WrapperOfflineManager.getPacks()).map(
+      (pack: { id: string; metadata: unknown }) => ({
+        id: pack.id,
+        metadata: pack.metadata,
+      })
+    ),
+  "tile-limit": () => WrapperOfflineManager.setTileCountLimit(1000),
+  throttle: () => WrapperOfflineManager.setProgressEventThrottle(300),
+  reset: () => WrapperOfflineManager.resetDatabase(),
+  packs: async () => (await WrapperOfflineManager.getPacks()).length,
+};
+
 const App = () => {
-  if (smokeTarget === "tf08")
+  if (smokeTarget === "tf08" || smokeTarget === "tf08-storage")
     return (
       <NativeTf08Screen
         adapter={adapter}
         getLocationDiagnostic={() =>
           WrapperLocationManager.getCurrentPosition()
         }
+        offlineOperations={offlineOperations}
+        startDetached={smokeTarget === "tf08-storage"}
+        nativePuck={<NativeUserLocation />}
       />
     );
   if (smokeTarget === "tf07") return <NativeTf07Screen adapter={adapter} />;

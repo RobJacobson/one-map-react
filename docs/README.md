@@ -34,6 +34,6 @@ The old architecture, stage specification, testing plan, implementation status, 
 
 The [TF07 UI record](tf07-ui.md) describes markers, popups, controls, map access, source activation, and the accepted R16 physical-interaction scope.
 
-The [TF08 proposal](tf08-proposal.md) reviews the current code and pinned wrappers, proposes location/offline/capture APIs, and defines implementation and verification work. The [TF08 record](tf08-location-offline-capture.md) describes the implemented APIs, repaired native acceptance, and remaining device-only and named-operation checks.
+The [TF08 proposal](tf08-proposal.md) reviews the current code and pinned wrappers, proposes location/offline/capture APIs, and defines implementation and verification work. The [TF08 record](tf08-location-offline-capture.md) describes the implemented APIs and completed acceptance under the owner-approved scope, including populated database imports/migration and capture inclusion.
 
 The [native control portal decision](decisions/0007-native-control-portals.md) records the optional native dependency that preserves control children’s React context. It applies to the current implementation; native integration acceptance passed for the recorded R16 scope.

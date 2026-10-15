@@ -1,6 +1,14 @@
 import * as Mapbox from "@rnmapbox/maps";
 import { type MapRef, MapSetup } from "one-map-react";
-import { adapter, WrapperLocationManager } from "one-map-react/mapbox-native";
+import {
+  adapter,
+  WrapperLocationManager,
+  WrapperOfflineManager,
+  offlineManagerLegacy,
+  TileStore,
+  CustomLocationProvider,
+  LocationPuck,
+} from "one-map-react/mapbox-native";
 import { useRef } from "react";
 import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
 
@@ -41,8 +49,65 @@ const setNetworkConnected = (connected: boolean): Promise<boolean> =>
     }
   ).setConnected(connected);
 
+// Destructive operations are only invoked by the isolated pending acceptance scope.
+const offlineOperations = {
+  "ambient-invalidate": () => WrapperOfflineManager.invalidateAmbientCache(),
+  "ambient-clear": () => WrapperOfflineManager.clearAmbientCache(),
+  "ambient-size": () =>
+    WrapperOfflineManager.setMaximumAmbientCacheSize(16 * 1024 * 1024),
+  "merge-missing": () =>
+    WrapperOfflineManager.mergeOfflineRegions("/tf08-missing.db"),
+  "merge-valid": (value: Record<string, unknown>) =>
+    WrapperOfflineManager.mergeOfflineRegions(String(value.path)),
+  "storage-packs": async () =>
+    (await offlineManagerLegacy.getPacks()).map(
+      (pack: { name: string; metadata: unknown }) => ({
+        name: pack.name,
+        metadata: pack.metadata,
+      })
+    ),
+  migrate: () => WrapperOfflineManager.migrateOfflineCache(),
+  "tile-limit": () => WrapperOfflineManager.setTileCountLimit(1000),
+  throttle: () => WrapperOfflineManager.setProgressEventThrottle(300),
+  reset: () => WrapperOfflineManager.resetDatabase(),
+  packs: async () => (await WrapperOfflineManager.getPacks()).length,
+  quota: async () =>
+    (await TileStore.shared()).setOption("disk-quota", "Maps", 8 * 1024 * 1024),
+  "legacy-list": async () => (await offlineManagerLegacy.getPacks()).length,
+  "legacy-migrate": () => offlineManagerLegacy.migrateOfflineCache(),
+  "legacy-limit": () => offlineManagerLegacy.setTileCountLimit(1000),
+  "legacy-reset": () => offlineManagerLegacy.resetDatabase(),
+  "legacy-create": async () => {
+    await offlineManagerLegacy.createPack({
+      name: "tf08-legacy-pending",
+      styleURL: "http://127.0.0.1:8798/style.json",
+      bounds: [
+        [10, 10],
+        [-10, -10],
+      ],
+      minZoom: 0,
+      maxZoom: 0,
+    });
+    return (await offlineManagerLegacy.getPack("tf08-legacy-pending"))?.name;
+  },
+  "legacy-status": async () =>
+    (await offlineManagerLegacy.getPack("tf08-legacy-pending"))?.status(),
+  "legacy-pause": async () =>
+    (await offlineManagerLegacy.getPack("tf08-legacy-pending"))?.pause(),
+  "legacy-resume": async () =>
+    (await offlineManagerLegacy.getPack("tf08-legacy-pending"))?.resume(),
+  "legacy-invalidate": () =>
+    offlineManagerLegacy.invalidatePack("tf08-legacy-pending"),
+  "legacy-delete": async () => {
+    await offlineManagerLegacy.deletePack("tf08-legacy-pending");
+    return (
+      (await offlineManagerLegacy.getPack("tf08-legacy-pending"))?.name ?? null
+    );
+  },
+};
+
 const App = () => {
-  if (smokeTarget === "tf08")
+  if (smokeTarget === "tf08" || smokeTarget === "tf08-storage")
     return (
       <NativeTf08Screen
         adapter={adapter}
@@ -50,6 +115,14 @@ const App = () => {
           WrapperLocationManager.getLastKnownLocation()
         }
         setNetworkConnected={setNetworkConnected}
+        offlineOperations={offlineOperations}
+        startDetached={smokeTarget === "tf08-storage"}
+        nativePuck={
+          <>
+            <CustomLocationProvider coordinate={[-122.34, 47.615]} />
+            <LocationPuck puckBearingEnabled={false} />
+          </>
+        }
       />
     );
   if (smokeTarget === "tf07") return <NativeTf07Screen adapter={adapter} />;

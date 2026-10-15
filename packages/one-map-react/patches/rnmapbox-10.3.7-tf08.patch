@@ -46,7 +46,7 @@ index b236fdf..ccdf6b9 100644
      fun setAccessToken(accessToken: String?, promise: Promise) {
          mReactContext.runOnUiQueueThread(Runnable {
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
-index ed4eab9..83de94f 100644
+index ed4eab9..d463ff5 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
 @@ -46,6 +46,7 @@ enum class TileRegionPackState(val rawValue: String) {
@@ -207,6 +207,54 @@ index ed4eab9..83de94f 100644
                  "name" to name,
                  "percentage" to progress.toPercentage(),
                  "completedResourceCount" to progress.completedResourceCount,
+@@ -561,6 +594,47 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+ 
+     }
+ 
++    @ReactMethod
++    fun clearAmbientCache(promise: Promise) {
++        UiThreadUtil.runOnUiThread {
++            MapboxMap.clearData { result ->
++                if (result.isError) {
++                    promise.reject("clearAmbientCache", result.error.toString())
++                } else {
++                    UiThreadUtil.runOnUiThread {
++                        tileStore.clearAmbientCache { cleared ->
++                            if (cleared.isError) {
++                                promise.reject("clearAmbientCache", cleared.error.toString())
++                            } else {
++                                promise.resolve(null)
++                            }
++                        }
++                    }
++                }
++            }
++        }
++    }
++
++    @ReactMethod
++    fun mergeOfflineRegions(path: String, promise: Promise) {
++        val file = File(if (path.startsWith("file://")) android.net.Uri.parse(path).path ?: "" else path)
++        if (!file.isFile || !file.canRead()) {
++            promise.reject("invalid_database_path", "Offline database path must point to a readable file.")
++            return
++        }
++
++        UiThreadUtil.runOnUiThread {
++            val manager = getOfflineRegionManager { RNMBXModule.getAccessToken(mReactContext) }
++            manager.mergeOfflineDatabase(file.absolutePath) { result ->
++                if (result.isError) {
++                    promise.reject("mergeOfflineRegions", result.error)
++                } else {
++                    promise.resolve(null)
++                }
++            }
++        }
++    }
++
+     @ReactMethod
+     fun migrateOfflineCache() {
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
 index 771884c..cf96ca3 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
@@ -221,7 +269,7 @@ index 771884c..cf96ca3 100644
          builder.accessToken(getAccessToken(mContext))
          return builder.build()
 diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.m b/ios/RNMBX/Offline/RNMBXOfflineModule.m
-index 1808393..6ace269 100644
+index 1808393..95b1081 100644
 --- a/ios/RNMBX/Offline/RNMBXOfflineModule.m
 +++ b/ios/RNMBX/Offline/RNMBXOfflineModule.m
 @@ -6,6 +6,10 @@
@@ -235,8 +283,17 @@ index 1808393..6ace269 100644
  RCT_EXTERN_METHOD(resumePackDownload:(NSString *)name
                    resolver:(RCTPromiseResolveBlock)resolve
                    rejecter:(RCTPromiseRejectBlock)reject)
+@@ -31,4 +35,7 @@ RCT_EXTERN_METHOD(migrateOfflineCache:(RCTPromiseResolveBlock)resolve reject:(RC
+ 
+ RCT_EXTERN_METHOD(resetDatabase:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+ 
++RCT_EXTERN_METHOD(clearAmbientCache:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
++RCT_EXTERN_METHOD(mergeOfflineRegions:(NSString *)path resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
++
+ @end
+\ No newline at end of file
 diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.swift b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
-index 1253ba1..21ac195 100644
+index 1253ba1..38f0114 100644
 --- a/ios/RNMBX/Offline/RNMBXOfflineModule.swift
 +++ b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
 @@ -14,6 +14,7 @@ extension Date {
@@ -315,7 +372,7 @@ index 1253ba1..21ac195 100644
          pack.cancelables.forEach { $0.cancel() }
          resolver(nil)
        } else {
-@@ -275,6 +296,8 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -275,12 +296,62 @@ class RNMBXOfflineModule: RCTEventEmitter {
          return rejecter("deletePack", "Pack: \(name) has already been deleted", nil)
        }
  
@@ -324,7 +381,61 @@ index 1253ba1..21ac195 100644
        self.tileStore.removeTileRegion(forId: name)
        self.tileRegionPacks[name]!.state = .invalid
        resolver(nil)
-@@ -343,7 +366,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     }
+   }
+   
++  @objc
++  func clearAmbientCache(_ resolve: @escaping RCTPromiseResolveBlock,
++                         rejecter: @escaping RCTPromiseRejectBlock) {
++    DispatchQueue.main.async {
++      MapboxMap.clearData { error in
++        if let error = error {
++          rejecter("clearAmbientCache", error.localizedDescription, error)
++          return
++        }
++        DispatchQueue.main.async {
++          self.tileStore.clearAmbientCache { result in
++            switch result {
++            case .success:
++              resolve(nil)
++            case .failure(let error):
++              rejecter("clearAmbientCache", error.localizedDescription, error)
++            }
++          }
++        }
++      }
++    }
++  }
++
++  @objc
++  func mergeOfflineRegions(_ path: String,
++                           resolver: @escaping RCTPromiseResolveBlock,
++                           rejecter: @escaping RCTPromiseRejectBlock) {
++    let fileURL = path.hasPrefix("file://") ? URL(string: path) : URL(fileURLWithPath: path)
++    var isDirectory: ObjCBool = false
++    guard let fileURL = fileURL, fileURL.isFileURL,
++          FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDirectory),
++          !isDirectory.boolValue, FileManager.default.isReadableFile(atPath: fileURL.path) else {
++      rejecter("invalid_database_path", "Offline database path must point to a readable file.", nil)
++      return
++    }
++
++    DispatchQueue.main.async {
++      self.offlineRegionManager.mergeOfflineDatabase(forPath: fileURL.path) { result in
++        switch result {
++        case .success:
++          resolver(nil)
++        case .failure(let error):
++          rejecter("mergeOfflineRegions", error.localizedDescription, error)
++        }
++      }
++    }
++  }
++
+   @objc
+   func migrateOfflineCache(_ resolve : @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+     // Old and new cache file paths
+@@ -343,7 +414,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
      }
    }
    
@@ -333,7 +444,7 @@ index 1253ba1..21ac195 100644
      let id = pack.name
      let metadata = pack.metadata
      let taskGroup = DispatchGroup()
-@@ -361,9 +384,16 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -361,9 +432,16 @@ class RNMBXOfflineModule: RCTEventEmitter {
        return
      }
        
@@ -351,7 +462,7 @@ index 1253ba1..21ac195 100644
      
      let threadedOfflineManager = OfflineManager()
      taskGroup.enter()
-@@ -371,6 +401,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -371,6 +449,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
        // progress callbacks arrive on SDK background threads; tileRegionPacks
        // is main-thread state (see #4252)
        DispatchQueue.main.async {
@@ -359,7 +470,7 @@ index 1253ba1..21ac195 100644
          self.tileRegionPacks[id]!.state = .active
        }
      } completion: { result in
-@@ -379,6 +410,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -379,6 +458,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
            taskGroup.leave()
          }
  
@@ -367,7 +478,7 @@ index 1253ba1..21ac195 100644
          switch result {
          case let .success(stylePack): break
          case let .failure(error):
-@@ -401,7 +433,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -401,7 +481,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
        geometry: bounds, // RNMBXFeatureUtils.geometryToGeometry(bounds),
        descriptors: descriptors,
        metadata: metadata,
@@ -376,7 +487,7 @@ index 1253ba1..21ac195 100644
        networkRestriction: .none,
        averageBytesPerSecond: nil)
      
-@@ -413,6 +445,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -413,6 +493,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
        // delivered on the "MB TileStore RW" thread; mutating tileRegionPacks
        // here races the main thread and corrupts the dictionary (#4252)
        DispatchQueue.main.async {
@@ -384,7 +495,7 @@ index 1253ba1..21ac195 100644
          lastProgress = progress
          self.tileRegionPacks[id]!.progress = progress
          self.tileRegionPacks[id]!.state = .active
-@@ -423,31 +456,25 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -423,31 +504,25 @@ class RNMBXOfflineModule: RCTEventEmitter {
              defer {
                  taskGroup.leave()
              }
@@ -425,7 +536,7 @@ index 1253ba1..21ac195 100644
      }
  
      self.tileRegionPacks[id]!.cancelables = [task, stylePackTask]
-@@ -516,7 +543,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -516,7 +591,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
            metadata: logged("RNMBXOfflineModule.getPacks metadata is null") { metadata } ?? [:]
          )
          
@@ -434,7 +545,7 @@ index 1253ba1..21ac195 100644
            pack.state = .complete
          }
          
-@@ -605,7 +632,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -605,7 +680,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
      var result : [String:Any?] = [:]
      if let progress = progress {
        result = [
@@ -474,6 +585,45 @@ index 6d6b169..88631b2 100644
    @objc func setAccessToken(
      _ token: String, 
      resolver: RCTPromiseResolveBlock,
+diff --git a/lib/module/modules/offline/offlineManager.js b/lib/module/modules/offline/offlineManager.js
+index b1c8e6a..890a440 100644
+--- a/lib/module/modules/offline/offlineManager.js
++++ b/lib/module/modules/offline/offlineManager.js
+@@ -116,22 +116,20 @@ class OfflineManager {
+    * @return {void}
+    */
+   async invalidateAmbientCache() {
+-    console.warn('RNMapbox: invalidateAmbientCache is not implemented on v10');
++    throw new Error('Maps SDK v11 has no in-place ambient cache invalidation API. Use clearAmbientCache() to evict temporary resources.');
+   }
+ 
+   /**
+    * Erases resources from the ambient cache.
+    * This method clears the cache and decreases the amount of space that map resources take up on the device.
+    *
+-   * @deprecated Not implemented in v10
+-   *
+    * @example
+    * await Mapbox.offlineManager.clearAmbientCache();
+    *
+    * @return {void}
+    */
+   async clearAmbientCache() {
+-    console.warn('RNMapbox: clearAmbientCache is not implemented on v10');
++    await MapboxOfflineManager.clearAmbientCache();
+   }
+ 
+   /**
+@@ -157,8 +155,7 @@ class OfflineManager {
+    * @return {void}
+    */
+   async setMaximumAmbientCacheSize(size) {
+-    await this._initialize();
+-    await MapboxOfflineManager.setMaximumAmbientCacheSize(size);
++    throw new Error('Maps SDK v11 has no legacy ambient cache size API. TileStore disk-quota controls a different store, including offline resources.');
+   }
+ 
+   /**
 diff --git a/lib/module/modules/snapshot/SnapshotOptions.js b/lib/module/modules/snapshot/SnapshotOptions.js
 index ea91cd6..b6fd036 100644
 --- a/lib/module/modules/snapshot/SnapshotOptions.js
@@ -487,6 +637,58 @@ index ea91cd6..b6fd036 100644
      this.width = options.width || 50.0;
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
+diff --git a/lib/typescript/src/modules/offline/offlineManager.d.ts b/lib/typescript/src/modules/offline/offlineManager.d.ts
+index fd0c239..cccc144 100644
+--- a/lib/typescript/src/modules/offline/offlineManager.d.ts
++++ b/lib/typescript/src/modules/offline/offlineManager.d.ts
+@@ -107,8 +107,6 @@ declare class OfflineManager {
+      * Erases resources from the ambient cache.
+      * This method clears the cache and decreases the amount of space that map resources take up on the device.
+      *
+-     * @deprecated Not implemented in v10
+-     *
+      * @example
+      * await Mapbox.offlineManager.clearAmbientCache();
+      *
+diff --git a/src/modules/offline/offlineManager.ts b/src/modules/offline/offlineManager.ts
+index e3d747f..f997923 100644
+--- a/src/modules/offline/offlineManager.ts
++++ b/src/modules/offline/offlineManager.ts
+@@ -191,22 +191,20 @@ class OfflineManager {
+    * @return {void}
+    */
+   async invalidateAmbientCache(): Promise<void> {
+-    console.warn('RNMapbox: invalidateAmbientCache is not implemented on v10');
++    throw new Error('Maps SDK v11 has no in-place ambient cache invalidation API. Use clearAmbientCache() to evict temporary resources.');
+   }
+ 
+   /**
+    * Erases resources from the ambient cache.
+    * This method clears the cache and decreases the amount of space that map resources take up on the device.
+    *
+-   * @deprecated Not implemented in v10
+-   *
+    * @example
+    * await Mapbox.offlineManager.clearAmbientCache();
+    *
+    * @return {void}
+    */
+   async clearAmbientCache(): Promise<void> {
+-    console.warn('RNMapbox: clearAmbientCache is not implemented on v10');
++    await MapboxOfflineManager.clearAmbientCache();
+   }
+ 
+   /**
+@@ -232,8 +230,7 @@ class OfflineManager {
+    * @return {void}
+    */
+   async setMaximumAmbientCacheSize(size: number): Promise<void> {
+-    await this._initialize();
+-    await MapboxOfflineManager.setMaximumAmbientCacheSize(size);
++    throw new Error('Maps SDK v11 has no legacy ambient cache size API. TileStore disk-quota controls a different store, including offline resources.');
+   }
+ 
+   /**
 diff --git a/src/modules/snapshot/SnapshotOptions.ts b/src/modules/snapshot/SnapshotOptions.ts
 index 766dbd8..b9791a0 100644
 --- a/src/modules/snapshot/SnapshotOptions.ts
@@ -500,3 +702,29 @@ index 766dbd8..b9791a0 100644
      this.width = options.width || 50.0;
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
+diff --git a/lib/module/modules/offline/offlineManagerLegacy.js b/lib/module/modules/offline/offlineManagerLegacy.js
+index 5943b63..84cec51 100644
+--- a/lib/module/modules/offline/offlineManagerLegacy.js
++++ b/lib/module/modules/offline/offlineManagerLegacy.js
+@@ -121,7 +121,7 @@ class OfflineManagerLegacy {
+    * @return {Array<OfflinePack>}
+    */
+   async getPacks() {
+-    await this._initialize();
++    await this._initialize(true);
+     return Object.keys(this._offlinePacks).map(name => this._offlinePacks[name]);
+   }
+ 
+diff --git a/src/modules/offline/offlineManagerLegacy.ts b/src/modules/offline/offlineManagerLegacy.ts
+index 523071f..95c3217 100644
+--- a/src/modules/offline/offlineManagerLegacy.ts
++++ b/src/modules/offline/offlineManagerLegacy.ts
+@@ -139,7 +139,7 @@ class OfflineManagerLegacy {
+    * @return {Array<OfflinePack>}
+    */
+   async getPacks(): Promise<OfflinePack[]> {
+-    await this._initialize();
++    await this._initialize(true);
+     return Object.keys(this._offlinePacks).map(
+       (name) => this._offlinePacks[name],
+     ) as OfflinePack[];
