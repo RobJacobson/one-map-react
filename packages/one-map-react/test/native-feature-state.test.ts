@@ -15,13 +15,110 @@ test("the first owned lifetime preserves writes without resetting unrelated back
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   expect(await state.run(route, async () => renderer.get(route))).toEqual({
     external: true,
     selected: true,
   });
   expect(renderer.removals).toEqual([]);
+});
+
+test("whole-state removal forgets cleared targets before style replacement", async () => {
+  const renderer = createRetainedRenderer();
+  const state = new NativeFeatureState(renderer.reset);
+  state.register("routes");
+  for (const id of [1, 2, 3]) {
+    const target = { source: "routes", id };
+    await state.run(
+      target,
+      async () => renderer.set(target, { selected: true }),
+      "write"
+    );
+    await state.run(target, () => renderer.reset(target), "remove");
+  }
+  expect(renderer.removals).toHaveLength(3);
+
+  state.resetStyle();
+  await state.run(route, async () => renderer.get(route));
+  expect(renderer.removals).toHaveLength(3);
+});
+
+test("failed whole-state removal keeps the target for replacement cleanup", async () => {
+  const renderer = createRetainedRenderer();
+  const state = new NativeFeatureState(renderer.reset);
+  state.register("routes");
+  await state.run(
+    route,
+    async () => renderer.set(route, { selected: true }),
+    "write"
+  );
+  const failure = new Error("native removal failed");
+  await expect(
+    state.run(
+      route,
+      async () => {
+        throw failure;
+      },
+      "remove"
+    )
+  ).rejects.toBe(failure);
+
+  state.resetStyle();
+  expect(await state.run(route, async () => renderer.get(route))).toEqual({});
+  expect(renderer.removals).toEqual([route]);
+});
+
+test("a write queued behind whole-state removal remains tracked", async () => {
+  const renderer = createRetainedRenderer();
+  const state = new NativeFeatureState(renderer.reset);
+  state.register("routes");
+  await state.run(
+    route,
+    async () => renderer.set(route, { selected: true }),
+    "write"
+  );
+  const removed = state.run(route, () => renderer.reset(route), "remove");
+  const written = state.run(
+    route,
+    async () => renderer.set(route, { count: 2 }),
+    "write"
+  );
+  await Promise.all([removed, written]);
+
+  state.resetStyle();
+  expect(await state.run(route, async () => renderer.get(route))).toEqual({});
+  expect(renderer.removals).toEqual([route, route]);
+});
+
+test("a superseded removal retains its target for the replacement lifetime", async () => {
+  const renderer = createRetainedRenderer();
+  const state = new NativeFeatureState(renderer.reset);
+  const started = deferred();
+  const finish = deferred();
+  state.register("routes");
+  await state.run(
+    route,
+    async () => renderer.set(route, { selected: true }),
+    "write"
+  );
+  const removed = state.run(
+    route,
+    async () => {
+      started.resolve();
+      await finish.promise;
+      await renderer.reset(route);
+    },
+    "remove"
+  );
+  const rejected = expect(removed).rejects.toThrow("changed during");
+  await started.promise;
+  state.register("routes");
+  finish.resolve();
+  await rejected;
+
+  await state.run(route, async () => renderer.get(route));
+  expect(renderer.removals).toEqual([route, route]);
 });
 
 test("a recreated owned source clears retained renderer state before its first read", async () => {
@@ -31,7 +128,7 @@ test("a recreated owned source clears retained renderer state before its first r
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   detach();
   state.register("routes");
@@ -56,7 +153,7 @@ test("replacement clears every written feature and keeps vector source layers di
     await state.run(
       target,
       async () => renderer.set(target, { selected: true }),
-      true
+      "write"
     );
   }
   state.register("tiles");
@@ -82,7 +179,7 @@ test("reset of one source leaves another source and unowned style state intact",
     await state.run(
       target,
       async () => renderer.set(target, { selected: true }),
-      true
+      "write"
     );
   }
   state.register("routes");
@@ -112,7 +209,7 @@ test("replacement waits for an old write then resets before dispatching the new 
       renderer.set(route, { old: true });
       order.push("old write");
     },
-    true
+    "write"
   );
   const rejectedOldWrite = expect(oldWrite).rejects.toThrow();
   await started.promise;
@@ -124,7 +221,7 @@ test("replacement waits for an old write then resets before dispatching the new 
       expect(renderer.get(route)).toEqual({});
       renderer.set(route, { replacement: true });
     },
-    true
+    "write"
   );
 
   expect(order).toEqual([]);
@@ -146,7 +243,7 @@ test("stale cleanup cannot detach the newer source lifetime", async () => {
   await state.run(
     route,
     async () => renderer.set(route, { current: true }),
-    true
+    "write"
   );
   expect(await state.run(route, async () => renderer.get(route))).toEqual({
     current: true,
@@ -208,7 +305,7 @@ test("a reset failure prevents new dispatch and remains observable until another
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   state.register("routes");
   let dispatched = false;
@@ -241,7 +338,7 @@ test("an ordinary renderer failure does not poison later calls in the same lifet
   await state.run(
     route,
     async () => renderer.set(route, { recovered: true }),
-    true
+    "write"
   );
   expect(await state.run(route, async () => renderer.get(route))).toEqual({
     recovered: true,
@@ -266,7 +363,7 @@ test("a pending operation on one source does not block another source", async ()
   await state.run(
     other,
     async () => renderer.set(other, { ready: true }),
-    true
+    "write"
   );
   expect(await state.run(other, async () => renderer.get(other))).toEqual({
     ready: true,
@@ -291,7 +388,7 @@ test("queued identifier mutation cannot change the renderer cleanup target", asy
   const writing = state.run(
     identifier,
     async () => renderer.set(dispatchedTarget, { selected: true }),
-    true
+    "write"
   );
 
   identifier.source = "other";
@@ -327,7 +424,7 @@ test("replacement during a pending reset cannot erase the newest lifetime's writ
   await state.run(
     route,
     async () => renderer.set(route, { original: true }),
-    true
+    "write"
   );
   state.register("routes");
   const staleRead = state.run(route, async () => renderer.get(route));
@@ -340,7 +437,7 @@ test("replacement during a pending reset cannot erase the newest lifetime's writ
       expect(renderer.get(route)).toEqual({});
       renderer.set(route, { newest: true });
     },
-    true
+    "write"
   );
   finishReset.resolve();
 
@@ -361,7 +458,7 @@ test("style replacement clears whole state from owned and unowned written target
     await state.run(
       target,
       async () => renderer.set(target, { selected: true, count: 2 }),
-      true
+      "write"
     );
   }
   state.resetStyle();
@@ -382,7 +479,7 @@ test("a new style's first write starts after removing all previous state keys", 
   await state.run(
     route,
     async () => renderer.set(route, { old: true, count: 2 }),
-    true
+    "write"
   );
   state.resetStyle();
 
@@ -392,7 +489,7 @@ test("a new style's first write starts after removing all previous state keys", 
       expect(renderer.get(route)).toEqual({});
       renderer.set(route, { fresh: true });
     },
-    true
+    "write"
   );
   expect(await state.run(route, async () => renderer.get(route))).toEqual({
     fresh: true,
@@ -412,7 +509,7 @@ test("a style change waits for an old write and rejects stale completion before 
       await complete.promise;
       renderer.set(route, { old: true });
     },
-    true
+    "write"
   );
   const rejectedWrite = expect(oldWrite).rejects.toThrow();
   await started.promise;
@@ -455,7 +552,7 @@ test("a style epoch cannot make stale source cleanup detach its replacement", as
   await state.run(
     route,
     async () => renderer.set(route, { current: true }),
-    true
+    "write"
   );
   expect(await state.run(route, async () => renderer.get(route))).toEqual({
     current: true,
@@ -474,7 +571,7 @@ test("a later style replacement recovers a failed reset without recreating the s
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   state.resetStyle();
   const read = () => state.run(route, async () => renderer.get(route));
@@ -503,7 +600,7 @@ test("a style change during a pending reset keeps invalidation for the next epoc
   await state.run(
     route,
     async () => renderer.set(route, { original: true }),
-    true
+    "write"
   );
   state.resetStyle();
   const staleRead = state.run(route, async () => renderer.get(route));
@@ -513,7 +610,7 @@ test("a style change during a pending reset keeps invalidation for the next epoc
   const newestWrite = state.run(
     route,
     async () => renderer.set(route, { newest: true }),
-    true
+    "write"
   );
   finishReset.resolve();
 
@@ -540,7 +637,7 @@ test("style reset on a busy source does not delay independent source resets", as
     await state.run(
       target,
       async () => renderer.set(target, { selected: true }),
-      true
+      "write"
     );
   }
   state.resetStyle();
@@ -561,7 +658,7 @@ test("renderer readiness clears remounted state without a caller state operation
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   state.register("routes");
 
@@ -582,7 +679,7 @@ test("renderer readiness clears styled owned and raw sources without facade read
     await state.run(
       target,
       async () => renderer.set(target, { selected: true, count: 2 }),
-      true
+      "write"
     );
   }
   state.resetStyle();
@@ -607,7 +704,7 @@ test("automatic cleanup waits for a pending old write without another state call
       await complete.promise;
       renderer.set(route, { old: true });
     },
-    true
+    "write"
   );
   const rejectedWrite = expect(oldWrite).rejects.toThrow();
   await started.promise;
@@ -637,7 +734,7 @@ test("repeated renderer frames join one pending automatic reset", async () => {
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   state.register("routes");
   const firstFrame = state.flush(() => {});
@@ -671,7 +768,7 @@ test("a newer style's automatic cleanup survives a pending superseded reset", as
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   state.resetStyle();
   const staleFrame = state.flush((error) => errors.push(error));
@@ -704,7 +801,7 @@ test("automatic reset failures report once while other sources clear independent
     await state.run(
       target,
       async () => renderer.set(target, { selected: true }),
-      true
+      "write"
     );
   }
   state.resetStyle();
@@ -733,7 +830,7 @@ test("an automatic failure stays sticky until a later style's readiness retries 
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   state.resetStyle();
   await state.flush((error) => errors.push(error));
@@ -762,7 +859,7 @@ test("detachment cancels an automatic flush without reporting stale errors", asy
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   const detach = state.register("routes");
   const flushing = state.flush((error) => errors.push(error));
@@ -785,7 +882,7 @@ test("automatic cleanup skips detached sources and preserves unwritten initial s
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   state.resetStyle();
   detach();
@@ -803,7 +900,7 @@ test("first owned registration preserves state written through a raw style sourc
   await state.run(
     route,
     async () => renderer.set(route, { selected: true }),
-    true
+    "write"
   );
   state.register("routes", "geojson");
   await state.flush(() => {});
@@ -826,10 +923,10 @@ test.each([
     // The family must come from registration rather than this public identifier.
     const target = { source: "shared", id: 1, sourceLayer: "way" };
     state.register("shared", previous);
-    await state.run(target, async () => undefined, true);
+    await state.run(target, async () => undefined, "write");
     state.register("shared", next);
     await state.flush((error) => errors.push(error));
-    await state.run(target, async () => undefined, true);
+    await state.run(target, async () => undefined, "write");
     expect(removals).toEqual([]);
     state.register("shared", next);
     await state.flush((error) => errors.push(error));
@@ -861,7 +958,7 @@ test.each([
         await complete.promise;
         order.push("old write settled");
       },
-      true
+      "write"
     );
     const oldRejection = expect(oldWrite).rejects.toThrow("changed during");
     await started.promise;
@@ -870,7 +967,7 @@ test.each([
       async () => {
         order.push("queued old write dispatched");
       },
-      true
+      "write"
     );
     const queuedRejection =
       expect(queuedWrite).rejects.toThrow("changed during");
@@ -880,7 +977,7 @@ test.each([
       async () => {
         order.push("new write");
       },
-      true
+      "write"
     );
     expect(order).toEqual([]);
     complete.resolve();
@@ -906,7 +1003,7 @@ test.each(["geojson", "vector"] as const)(
       await state.run(
         target,
         async () => renderer.set(target, { count: index + 2 }),
-        true
+        "write"
       );
     }
 
@@ -918,7 +1015,7 @@ test.each(["geojson", "vector"] as const)(
       await state.run(
         target,
         async () => renderer.set(target, { selected: true, count: 9 }),
-        true
+        "write"
       );
     }
     state.resetStyle();
@@ -932,7 +1029,7 @@ test.each(["geojson", "vector"] as const)(
       await state.run(
         target,
         async () => renderer.set(target, { selected: true }),
-        true
+        "write"
       );
     }
 
@@ -978,7 +1075,7 @@ test("returning vector frames clear retained targets after a partial old write w
       renderer.setForFamily("vector", oldTarget, { count: 2 });
       throw failure;
     },
-    true
+    "write"
   );
   const oldRejection = expect(oldWrite).rejects.toBe(failure);
   await started.promise;
@@ -988,7 +1085,7 @@ test("returning vector frames clear retained targets after a partial old write w
     async () => {
       queuedDispatched = true;
     },
-    true
+    "write"
   );
   const queuedRejection = expect(queuedWrite).rejects.toThrow("changed during");
   renderer.activate("geojson");
@@ -996,7 +1093,7 @@ test("returning vector frames clear retained targets after a partial old write w
   const geojsonWrite = state.run(
     nextTarget,
     async () => renderer.set(nextTarget, { selected: true }),
-    true
+    "write"
   );
   expect(renderer.get(nextTarget)).toEqual({});
   complete.resolve();
@@ -1033,7 +1130,7 @@ test.each(["geojson", "vector"] as const)(
           count: 2,
         });
       },
-      true
+      "write"
     );
     const oldRejection = expect(oldWrite).rejects.toThrow("changed during");
     await started.promise;
@@ -1045,7 +1142,7 @@ test.each(["geojson", "vector"] as const)(
       async () => {
         intermediateDispatched = true;
       },
-      true
+      "write"
     );
     const intermediateRejection =
       expect(intermediateWrite).rejects.toThrow("changed during");
@@ -1072,7 +1169,7 @@ test("raw source adoption preserves tracked targets before later family roundtri
     await state.run(
       target,
       async () => renderer.set(target, { selected: true }),
-      true
+      "write"
     );
   }
   state.register("shared", "vector");
@@ -1092,7 +1189,11 @@ test("a returning family's failed reset remains visible until another lifetime r
   });
   const target = familyTargets("vector")[0];
   state.register("shared", "vector");
-  await state.run(target, async () => renderer.set(target, { count: 2 }), true);
+  await state.run(
+    target,
+    async () => renderer.set(target, { count: 2 }),
+    "write"
+  );
   renderer.activate("geojson");
   state.register("shared", "geojson");
   await state.flush(renderer.reportError);

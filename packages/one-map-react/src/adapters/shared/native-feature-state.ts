@@ -138,13 +138,13 @@ export class NativeFeatureState {
    * Runs a state operation after any prior write and replacement reset.
    * @param identifier - Validated native feature-state target.
    * @param operation - Dispatch using the current wrapper handle.
-   * @param trackWrite - Remember this target before a possibly partial write.
+   * @param change - Track a possibly partial write or forget a successful whole-state removal.
    * @returns The operation result; detachment and reset failures reject.
    */
   run<Result>(
     identifier: FeatureIdentifier,
     operation: () => Promise<Result>,
-    trackWrite = false
+    change?: "write" | "remove"
   ): Promise<Result> {
     // Native bridge arguments are captured when the public call starts. Keep
     // cleanup bound to that same target while earlier operations are pending.
@@ -173,15 +173,17 @@ export class NativeFeatureState {
         }
       }
 
-      if (trackWrite) {
-        source.identifiers.set(
-          JSON.stringify([String(target.id), target.sourceLayer ?? null]),
-          target
-        );
+      const key = JSON.stringify([
+        String(target.id),
+        target.sourceLayer ?? null,
+      ]);
+      if (change === "write") {
+        source.identifiers.set(key, target);
       }
 
       const value = await operation();
       this.assertOwner(target.source, source, owner);
+      if (change === "remove") source.identifiers.delete(key);
       return value;
     });
 

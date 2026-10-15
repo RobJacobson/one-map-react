@@ -203,8 +203,14 @@ interface WebImageMap {
   // eslint-disable-next-line typescript/no-explicit-any -- renderer-specific image union
   addImage: (name: string, image: any, options?: { sdf?: boolean }) => void;
   removeImage: (name: string) => void;
-  on: (type: "styledata" | "style.load", listener: () => void) => void;
-  off: (type: "styledata" | "style.load", listener: () => void) => void;
+  on: (
+    type: "styledata" | "style.load" | "load" | "idle",
+    listener: () => void
+  ) => void;
+  off: (
+    type: "styledata" | "style.load" | "load" | "idle",
+    listener: () => void
+  ) => void;
 }
 
 /**

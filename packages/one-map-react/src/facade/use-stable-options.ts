@@ -36,7 +36,8 @@ export const useStableOptions = (
 
 /**
  * Returns the first key whose value differs between two option objects, or
- * `undefined` when they match. Nested arrays and objects compare by value.
+ * `undefined` when they match. Arrays and plain records compare by value;
+ * class instances retain identity.
  *
  * @param previous - Options captured on the first render.
  * @param next - Options from the current render.
@@ -76,5 +77,8 @@ const optionValueEquals = (left: unknown, right: unknown): boolean => {
   return false;
 };
 
-const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
+const isPlainRecord = (value: unknown): value is Record<string, unknown> => {
+  if (typeof value !== "object" || value === null) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+};

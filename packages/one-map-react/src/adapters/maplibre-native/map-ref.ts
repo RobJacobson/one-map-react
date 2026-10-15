@@ -208,7 +208,7 @@ export const createMaplibreMapRef = (
               )
         );
       },
-      true
+      "write"
     );
   },
   getFeatureState: async (identifier) => {
@@ -231,21 +231,25 @@ export const createMaplibreMapRef = (
     if (sources.require(target.source).kind === "vector")
       toMaplibreVectorFeature(target);
 
-    await sources.featureState.run(target, async () => {
-      const source = sources.require(target.source);
+    await sources.featureState.run(
+      target,
+      async () => {
+        const source = sources.require(target.source);
 
-      await invokeWrapper(
-        source.kind === "geojson"
-          ? source.ref.removeFeatureState(
-              toMaplibreFeatureId(target),
-              ...(key === undefined ? [] : [key])
-            )
-          : source.ref.removeFeatureState(
-              toMaplibreVectorFeature(target),
-              ...(key === undefined ? [] : [key])
-            )
-      );
-    });
+        await invokeWrapper(
+          source.kind === "geojson"
+            ? source.ref.removeFeatureState(
+                toMaplibreFeatureId(target),
+                ...(key === undefined ? [] : [key])
+              )
+            : source.ref.removeFeatureState(
+                toMaplibreVectorFeature(target),
+                ...(key === undefined ? [] : [key])
+              )
+        );
+      },
+      key === undefined ? "remove" : undefined
+    );
   },
   resize: async () => {
     throw nativeResizeError();
