@@ -188,7 +188,7 @@ export const createMapboxMapRef = (
           map.setFeatureState(featureId, mutableState, sourceId, sourceLayerId)
         );
       },
-      true
+      "write"
     );
   },
   getFeatureState: async (identifier) => {
@@ -207,12 +207,16 @@ export const createMapboxMapRef = (
     const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
     const stateKey = toRnmapboxStateKey(key);
 
-    await geoJsonSources.featureState.run(target, async () => {
-      const map = requireMap(mapViewRef.current);
-      await invokeWrapper(
-        map.removeFeatureState(featureId, stateKey, sourceId, sourceLayerId)
-      );
-    });
+    await geoJsonSources.featureState.run(
+      target,
+      async () => {
+        const map = requireMap(mapViewRef.current);
+        await invokeWrapper(
+          map.removeFeatureState(featureId, stateKey, sourceId, sourceLayerId)
+        );
+      },
+      key === undefined ? "remove" : undefined
+    );
   },
   resize: async () => {
     throw nativeResizeError();

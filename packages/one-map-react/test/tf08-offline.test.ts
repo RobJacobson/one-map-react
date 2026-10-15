@@ -175,6 +175,59 @@ describe("TF08 persistent native packs", () => {
     });
     expect(fixture.packs[0].status).toHaveBeenCalledTimes(1);
   });
+  test.each(["mapbox", "maplibre"] as const)(
+    "%s failed deletion preserves existing progress and error subscribers",
+    async (kind) => {
+      const fixture = offlineFixture(kind);
+      const pack = await fixture.service.createPack(options);
+      const progress = vi.fn();
+      const error = vi.fn();
+      const dispose = fixture.service.subscribe(pack.id, progress, error);
+      await settle();
+      const observer = fixture.native.get(pack.backendId);
+      const failure = new Error("storage deletion failed");
+      vi.mocked(fixture.backend.deletePack).mockRejectedValueOnce(failure);
+
+      await expect(fixture.service.deletePack(pack.id)).rejects.toBe(failure);
+      expect(await fixture.service.getPack(pack.id)).toBeDefined();
+      expect(fixture.native.get(pack.backendId)).toBe(observer);
+      await pack.resume();
+      observer?.progress(fixture.packs[0], { state: "active", percentage: 50 });
+      observer?.error(fixture.packs[0], failure);
+      expect(progress).toHaveBeenLastCalledWith({
+        id: pack.id,
+        state: "active",
+        percentage: 50,
+      });
+      expect(error).toHaveBeenCalledWith(failure);
+      dispose();
+      await settle();
+    }
+  );
+
+  test.each(["mapbox", "maplibre"] as const)(
+    "%s successful deletion releases subscribers and suppresses late callbacks",
+    async (kind) => {
+      const fixture = offlineFixture(kind);
+      const pack = await fixture.service.createPack(options);
+      const progress = vi.fn();
+      const error = vi.fn();
+      const dispose = fixture.service.subscribe(pack.id, progress, error);
+      await settle();
+      const observer = fixture.native.get(pack.backendId);
+      progress.mockClear();
+
+      await fixture.service.deletePack(pack.id);
+      observer?.progress(fixture.packs[0], { state: "active" });
+      observer?.error(fixture.packs[0], new Error("late failure"));
+      expect(fixture.native.size).toBe(0);
+      expect(progress).not.toHaveBeenCalled();
+      expect(error).not.toHaveBeenCalled();
+      dispose();
+      await settle();
+    }
+  );
+
   test("subscription reads initial terminal state and shares wrapper callbacks", async () => {
     const fixture = offlineFixture();
     await fixture.service.createPack(options);

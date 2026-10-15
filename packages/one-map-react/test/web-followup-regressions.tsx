@@ -230,6 +230,87 @@ export const runWebFollowupRegressions = (
       expect(target().listenerCount("error")).toBe(1);
     });
 
+    test.each(["styledata", "load", "idle"] as const)(
+      "%s registers initial images after style.load precedes tile readiness",
+      async (event) => {
+        const mounted = render(
+          scene({}, <Images images={{ marker: "https://example.com/m.png" }} />)
+        );
+        const renderer = target();
+        const ready = vi
+          .spyOn(renderer, "isStyleLoaded")
+          .mockReturnValue(false);
+        act(() => renderer.emitStyleLoad());
+        expect(renderer.loadImage).not.toHaveBeenCalled();
+
+        ready.mockReturnValue(true);
+        await act(async () => {
+          if (event === "styledata") renderer.emitStyleData();
+          else if (event === "load") renderer.emitLoad();
+          else renderer.emitIdle();
+        });
+        expect(renderer.hasImage("marker")).toBe(true);
+        expect(renderer.loadImage).toHaveBeenCalledTimes(1);
+        mounted.unmount();
+        expect(renderer.listenerCount()).toBe(0);
+        ready.mockRestore();
+      }
+    );
+
+    test("an image finishing while tiles are pending retries when the map is ready", async () => {
+      const mounted = render(scene({}, <Images images={{}} />));
+      const renderer = target();
+      act(() => renderer.emitStyleLoad());
+      let finish: (image: object) => void = () => {};
+      renderer.loadImage.mockImplementationOnce(
+        (_url, callback) =>
+          new Promise((resolve) => {
+            finish = (image) => {
+              callback?.(null, image);
+              resolve({ data: image });
+            };
+          })
+      );
+      mounted.rerender(
+        scene({}, <Images images={{ marker: "https://example.com/m.png" }} />)
+      );
+      const ready = vi.spyOn(renderer, "isStyleLoaded").mockReturnValue(false);
+      await act(async () => finish({ width: 1, height: 1 }));
+      expect(renderer.hasImage("marker")).toBe(false);
+
+      ready.mockReturnValue(true);
+      await act(async () => renderer.emitIdle());
+      expect(renderer.hasImage("marker")).toBe(true);
+      expect(renderer.loadImage).toHaveBeenCalledTimes(2);
+      ready.mockRestore();
+    });
+
+    test("tile activity and idle do not repeatedly retry failed image loads", async () => {
+      render(
+        scene({}, <Images images={{ marker: "https://example.com/m.png" }} />)
+      );
+      const renderer = target();
+      renderer.loadImage.mockImplementation((_url, callback) => {
+        const failure = new Error("image unavailable");
+        if (callback) {
+          callback(failure);
+          return undefined;
+        }
+        return Promise.reject(failure);
+      });
+
+      await act(async () => renderer.emitStyleLoad());
+      expect(renderer.loadImage).toHaveBeenCalledTimes(1);
+      await act(async () => {
+        renderer.emitStyleData();
+        renderer.emitLoad();
+        renderer.emitIdle();
+        renderer.emitIdle();
+      });
+      expect(renderer.loadImage).toHaveBeenCalledTimes(1);
+      expect(renderer.hasImage("marker")).toBe(false);
+    });
+
     test("entry removal does not wait for full style readiness", async () => {
       const mounted = render(
         scene(

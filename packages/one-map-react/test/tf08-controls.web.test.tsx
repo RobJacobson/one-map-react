@@ -1,5 +1,6 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import {
+  type ComponentType,
   forwardRef,
   type ReactNode,
   StrictMode,
@@ -23,6 +24,7 @@ import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import { useGeolocationControl } from "../src/facade/use-geolocation-control.js";
 import { UserLocation } from "../src/facade/user-location.js";
+import type { WebGeolocateControlProps } from "../src/mapbox-web.js";
 
 const style = { version: 8 as const, sources: {}, layers: [] };
 const camera = { longitude: 1, latitude: 2, zoom: 3, bearing: 0, pitch: 0 };
@@ -89,6 +91,33 @@ const ControlProbe = (props: GeolocateControlProps) => {
 };
 
 describe("TF08 setup and location control lifetime", () => {
+  test("replacing a selected SDK geolocation provider requires a control remount", () => {
+    class Provider {
+      getCurrentPosition(): void {}
+      watchPosition(): number {
+        return 1;
+      }
+      clearWatch(): void {}
+    }
+
+    const delegate = vi.fn(() => null);
+    const GeolocateControl = createWebUi({
+      backend: "mapbox-web",
+      GeolocateControl: delegate,
+    } as unknown as WebWrapper<"mapbox-web">)
+      .GeolocateControl as ComponentType<WebGeolocateControlProps>;
+    const provider = new Provider();
+    const mounted = render(
+      <GeolocateControl options={{ geolocation: provider }} />
+    );
+    mounted.rerender(<GeolocateControl options={{ geolocation: provider }} />);
+    expect(() =>
+      mounted.rerender(
+        <GeolocateControl options={{ geolocation: new Provider() }} />
+      )
+    ).toThrow('GeolocateControl changed the creation option "geolocation"');
+  });
+
   test.each(["mapbox-web", "maplibre-web"] as const)(
     "%s default tracking rejects a controlled camera before SDK delegation",
     (backend) => {

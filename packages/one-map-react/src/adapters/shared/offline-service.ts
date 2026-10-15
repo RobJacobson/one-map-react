@@ -261,11 +261,11 @@ export const createOfflineService = (
       const nativeId = backendId(pack);
       const observer = observers.get(nativeId);
       if (observer) {
-        observer.subscribers.clear();
         await observer.operation.catch(() => {});
       }
-      backend.unobserve(nativeId);
       await backend.deletePack(nativeId);
+      observers.get(nativeId)?.subscribers.clear();
+      backend.unobserve(nativeId);
       observers.delete(nativeId);
     },
     invalidatePack: async (id) => {

@@ -1489,6 +1489,41 @@ describe("maplibre-native queries and feature state", () => {
     );
   });
 
+  test.each(["geojson", "vector"] as const)(
+    "%s forgets whole-state removals but keeps partial removals for style cleanup",
+    async (kind) => {
+      const ref = createRef<MapRef>();
+      await render(kind === "geojson" ? example(ref) : vectorTree(ref));
+      const remove =
+        kind === "geojson"
+          ? mockGeoJsonRemoveFeatureState
+          : mockVectorRemoveFeatureState;
+      const cleared = {
+        source: kind === "geojson" ? "routes" : "tiles",
+        id: 1,
+        ...(kind === "vector" ? { sourceLayer: "way" } : {}),
+      };
+      const partial = { ...cleared, id: 2 };
+      await ref.current?.setFeatureState(cleared, { selected: true });
+      await ref.current?.setFeatureState(partial, { selected: true, count: 1 });
+      await ref.current?.removeFeatureState(cleared);
+      await ref.current?.removeFeatureState(partial, "selected");
+      remove.mockClear();
+
+      await act(async () =>
+        lastMapProps<{
+          onDidFinishLoadingStyle: () => void;
+        }>().onDidFinishLoadingStyle()
+      );
+      await ref.current?.getFeatureState(partial);
+      expect(remove).toHaveBeenCalledTimes(1);
+      expect(remove).toHaveBeenCalledWith({
+        id: 2,
+        ...(kind === "vector" ? { sourceLayer: "way" } : {}),
+      });
+    }
+  );
+
   test("setFeatureState rejects sparse arrays before native dispatch", async () => {
     const ref = createRef<MapRef>();
 

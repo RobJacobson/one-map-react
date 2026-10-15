@@ -49,6 +49,7 @@ export const createWebImages = <
       }
 
       let released = false;
+      let waitingForStyle = false;
       const owned = new Map<string, ImageRegistration>();
       const inFlight = new Map<string, ImageRegistration>();
       const pendingRemovals = new Set<string>();
@@ -102,7 +103,11 @@ export const createWebImages = <
 
             inFlight.delete(name);
 
-            if (released || data == null || !styleReady()) {
+            if (released || data == null) {
+              return;
+            }
+            if (!styleReady()) {
+              waitingForStyle = true;
               return;
             }
 
@@ -171,8 +176,10 @@ export const createWebImages = <
         }
 
         if (!styleReady()) {
+          waitingForStyle = true;
           return;
         }
+        waitingForStyle = false;
         for (const name of pendingRemovals) {
           removeName(name);
         }
@@ -205,10 +212,14 @@ export const createWebImages = <
 
       // styledata restores only images this session added that the style
       // dropped. Failed loads and addImage failures are not owned, so tile
-      // activity does not retry them. style.load syncs the current entries
-      // once the style is loaded, including the first registration.
+      // activity does not retry them. Deferred registration resumes once tiles
+      // are ready, even when style.load preceded them; see web-followup-regressions.tsx.
       const restoreOwned = (): void => {
         if (!styleReady()) {
+          return;
+        }
+        if (waitingForStyle) {
+          sync(imagesRef.current);
           return;
         }
 
@@ -233,12 +244,16 @@ export const createWebImages = <
 
       map.on("styledata", restoreOwned);
       map.on("style.load", restoreAll);
+      map.on("load", restoreOwned);
+      map.on("idle", restoreOwned);
 
       return () => {
         released = true;
         inFlight.clear();
         map.off("styledata", restoreOwned);
         map.off("style.load", restoreAll);
+        map.off("load", restoreOwned);
+        map.off("idle", restoreOwned);
         syncRef.current = () => {};
 
         for (const name of new Set([...owned.keys(), ...pendingRemovals])) {

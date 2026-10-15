@@ -1739,6 +1739,53 @@ describe("mapbox-native queries and feature state", () => {
   });
 
   test.each(["geojson", "vector"] as const)(
+    "%s forgets whole-state removals but keeps partial removals for style cleanup",
+    async (kind) => {
+      const ref = createRef<MapRef>();
+      await render(
+        <MapSetup adapter={adapter}>
+          <OneMap
+            ref={ref}
+            mapStyle={emptyStyle}
+            initialViewState={initialViewState}
+          >
+            {kind === "geojson" ? (
+              <Source id="routes" type="geojson" data={routes} />
+            ) : (
+              <Source id="routes" type="vector" url="mapbox://tiles" />
+            )}
+          </OneMap>
+        </MapSetup>
+      );
+      const cleared = {
+        source: "routes",
+        id: 1,
+        ...(kind === "vector" ? { sourceLayer: "way" } : {}),
+      };
+      const partial = { ...cleared, id: 2 };
+      await ref.current?.setFeatureState(cleared, { selected: true });
+      await ref.current?.setFeatureState(partial, { selected: true, count: 1 });
+      await ref.current?.removeFeatureState(cleared);
+      await ref.current?.removeFeatureState(partial, "selected");
+      mockRemoveFeatureState.mockClear();
+
+      await act(async () =>
+        lastMapProps<{
+          onDidFinishLoadingStyle: () => void;
+        }>().onDidFinishLoadingStyle()
+      );
+      await ref.current?.getFeatureState(partial);
+      expect(mockRemoveFeatureState).toHaveBeenCalledTimes(1);
+      expect(mockRemoveFeatureState).toHaveBeenCalledWith(
+        "2",
+        null,
+        "routes",
+        kind === "vector" ? "way" : null
+      );
+    }
+  );
+
+  test.each(["geojson", "vector"] as const)(
     "%s source can change family without resetting an incompatible old target",
     async (initialKind) => {
       let currentKind = initialKind;

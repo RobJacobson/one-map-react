@@ -170,6 +170,34 @@ describe("source creation option families", () => {
 });
 
 describe("changedOptionKey", () => {
+  test("compares class instances by identity while plain records compare by value", () => {
+    class Provider {
+      #longitude: number;
+
+      constructor(longitude: number) {
+        this.#longitude = longitude;
+      }
+
+      getLongitude(): number {
+        return this.#longitude;
+      }
+    }
+
+    const initial = new Provider(1);
+    const replacement = new Provider(2);
+    expect(initial.getLongitude()).toBe(1);
+    expect(replacement.getLongitude()).toBe(2);
+    expect(
+      changedOptionKey({ provider: initial }, { provider: initial })
+    ).toBeUndefined();
+    expect(
+      changedOptionKey({ provider: initial }, { provider: replacement })
+    ).toBe("provider");
+    expect(
+      changedOptionKey({ nested: Object.create(null) }, { nested: {} })
+    ).toBeUndefined();
+  });
+
   const cases: ReadonlyArray<
     readonly [
       Record<string, unknown>,
