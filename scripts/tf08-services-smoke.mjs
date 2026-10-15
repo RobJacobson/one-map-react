@@ -55,6 +55,7 @@ assert(
 );
 const { PNG } = createRequire(join(runtimeRoot, "package.json"))("pngjs");
 const fixturePort = Number(process.env.TF08_FIXTURE_PORT ?? 8798);
+const metroPort = Number(process.env.TF08_METRO_PORT ?? 8081);
 const shell = join(
   root,
   "examples",
@@ -558,6 +559,7 @@ const nativeOfflineScenarios = async () => {
         before.status.requiredResourceCount > 0,
         "A completed offline pack must contain downloaded resources."
       );
+      assert.equal(before.errors, 0, JSON.stringify(before.errorMessages));
       await assert.rejects(action("offline-duplicate", { id }));
       const result = await action("offline-status", { id });
       assert(
@@ -570,7 +572,7 @@ const nativeOfflineScenarios = async () => {
           (entry) => entry.label === "two" && entry.state === "complete"
         )
       );
-      assert.equal(result.errors, 0);
+      assert.equal(result.errors, 0, JSON.stringify(result.errorMessages));
       return {
         pack: result.pack,
         status: result.status,
@@ -653,7 +655,7 @@ const nativeOfflineScenarios = async () => {
           "post-invalidation SDK completion"
         );
         const result = await action("offline-status", { id });
-        assert.equal(result.errors, 0);
+        assert.equal(result.errors, 0, JSON.stringify(result.errorMessages));
         return {
           status: result.status,
           subscriberEventsBefore: before.progress.length,
@@ -919,13 +921,13 @@ const launchWeb = async () => {
 const launchNative = async () => {
   const metroListeners = await command("lsof", [
     "-nP",
-    "-iTCP:8081",
+    `-iTCP:${metroPort}`,
     "-sTCP:LISTEN",
     "-t",
   ]).catch(() => "");
   assert(
     !metroListeners.trim(),
-    "Metro port 8081 is already owned by another process."
+    `Metro port ${metroPort} is already owned by another process.`
   );
   const binary = process.env.TF08_NATIVE_BINARY;
   const expected = process.env.TF08_NATIVE_SHA256;
@@ -970,7 +972,7 @@ const launchNative = async () => {
       "cat",
       prefs,
     ]).catch(() => "");
-    const setting = '<string name="debug_http_host">127.0.0.1:8081</string>';
+    const setting = `<string name="debug_http_host">127.0.0.1:${metroPort}</string>`;
     let updated = `<map>${setting}</map>`;
     if (existing.includes('name="debug_http_host"')) {
       updated = existing.replace(
@@ -991,7 +993,7 @@ const launchNative = async () => {
       ],
       { input: updated }
     );
-    await adb(["reverse", "tcp:8081", "tcp:8081"]);
+    await adb(["reverse", `tcp:${metroPort}`, `tcp:${metroPort}`]);
     await adb(["reverse", `tcp:${fixturePort}`, `tcp:${fixturePort}`]);
     await adb([
       "shell",
@@ -1057,11 +1059,11 @@ const launchNative = async () => {
   }
   metro = start(
     "bun",
-    ["run", "start", "--", "--port", "8081", "--reset-cache"],
+    ["run", "start", "--", "--port", String(metroPort), "--reset-cache"],
     { cwd: shell, env: { ...process.env, ONE_MAP_SMOKE: "tf08" } }
   );
   await until(
-    async () => (await fetch("http://127.0.0.1:8081/status")).ok,
+    async () => (await fetch(`http://127.0.0.1:${metroPort}/status`)).ok,
     60000
   );
   await restartNative();
@@ -1085,7 +1087,7 @@ const restartNative = async () => {
       simulator,
       applicationId,
       "-RCT_jsLocation",
-      "127.0.0.1:8081",
+      `127.0.0.1:${metroPort}`,
     ]);
   }
 };
@@ -1144,6 +1146,10 @@ const activateLocation = async () => {
           "TapDriver",
           "-destination",
           `platform=iOS Simulator,id=${simulator}`,
+          "-parallel-testing-enabled",
+          "NO",
+          "-collect-test-diagnostics",
+          "never",
           "-only-testing:TapDriverUITests/TapDriver/testDriveTaps",
         ],
         { detached: true, stdio: ["ignore", "pipe", "pipe"] }

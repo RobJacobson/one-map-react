@@ -1,6 +1,6 @@
 import * as Mapbox from "@rnmapbox/maps";
 import { type MapRef, MapSetup } from "one-map-react";
-import { adapter } from "one-map-react/mapbox-native";
+import { adapter, WrapperLocationManager } from "one-map-react/mapbox-native";
 import { useRef } from "react";
 import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
 
@@ -46,6 +46,9 @@ const App = () => {
     return (
       <NativeTf08Screen
         adapter={adapter}
+        getLocationDiagnostic={() =>
+          WrapperLocationManager.getLastKnownLocation()
+        }
         setNetworkConnected={setNetworkConnected}
       />
     );

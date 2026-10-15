@@ -91,7 +91,7 @@ export const Tf08AcceptanceScene = ({
   const lastPosition = useRef<GeolocationPosition | undefined>(undefined);
   const subscriptions = useRef<(() => void)[]>([]);
   const offlineProgress = useRef<Record<string, unknown>[]>([]);
-  const offlineErrors = useRef(0);
+  const offlineErrors = useRef<unknown[]>([]);
   const provider = useMemo<LocationService>(
     () => ({
       requestPermission: async () => ({
@@ -237,8 +237,8 @@ export const Tf08AcceptanceScene = ({
               (status) => {
                 offlineProgress.current.push({ label, ...status });
               },
-              () => {
-                offlineErrors.current += 1;
+              (error) => {
+                offlineErrors.current.push(error);
               }
             )
           );
@@ -255,7 +255,8 @@ export const Tf08AcceptanceScene = ({
           },
           status: await pack.status(),
           progress: [...offlineProgress.current],
-          errors: offlineErrors.current,
+          errors: offlineErrors.current.length,
+          errorMessages: [...offlineErrors.current],
         };
       }
       if (action === "offline-pause") {

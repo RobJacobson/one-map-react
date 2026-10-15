@@ -94,7 +94,8 @@ const runWeb = async (selectedEngine) => {
   try {
     await until(
       async () => (await fetch(`http://127.0.0.1:${port}/`)).ok,
-      30000
+      30000,
+      "web server startup"
     );
     browser = start(
       process.env.TF07_CHROME ??
@@ -109,23 +110,41 @@ const runWeb = async (selectedEngine) => {
       ]
     );
     let target;
-    await until(async () => {
-      const tabs = await (
-        await fetch(`http://127.0.0.1:${port + 1000}/json/list`)
-      ).json();
-      target = tabs.find((tab) => tab.url.includes("tf07=ui"));
-      return !!target?.webSocketDebuggerUrl;
-    }, 20000);
+    await until(
+      async () => {
+        const tabs = await (
+          await fetch(`http://127.0.0.1:${port + 1000}/json/list`)
+        ).json();
+        target = tabs.find((tab) => tab.url.includes("tf07=ui"));
+        return !!target?.webSocketDebuggerUrl;
+      },
+      20000,
+      "browser target discovery"
+    );
     page = await connect(target.webSocketDebuggerUrl);
-    await until(async () => {
-      const observed = await page.evaluate("window.__oneMapTf07?.read()", true);
-      return (
-        observed?.events.load >= 1 &&
-        observed.features.some((feature) => feature.id === 707)
-      );
-    }, 60000);
+    await until(
+      async () => {
+        const observed = await page.evaluate(
+          "window.__oneMapTf07?.read()",
+          true
+        );
+        return (
+          observed?.events.load >= 1 &&
+          observed.features.some((feature) => feature.id === 707)
+        );
+      },
+      60000,
+      "known renderer feature"
+    );
     const read = () => page.evaluate("window.__oneMapTf07.read()", true);
     const before = await read();
+
+    await click(page, '[data-tf07="annotation"]');
+    await click(page, '[data-tf07="annotation"]');
+    await until(
+      async () => (await read()).events["annotation-click"] === 2,
+      5000
+    );
 
     await click(page, '[data-tf07-child="live"]');
     await until(async () => (await read()).events["child-click"] === 1, 5000);
@@ -203,6 +222,7 @@ const runWeb = async (selectedEngine) => {
       scope: [
         "known-feature",
         "child-click",
+        "annotation-repeat-tap",
         "live-drag",
         "annotation-drag",
         "source-propagation",
@@ -226,6 +246,12 @@ const runWeb = async (selectedEngine) => {
       status: "failed",
       error:
         error instanceof Error ? error.message : "Browser interaction failed.",
+      rendererStatus: await page
+        ?.evaluate("document.querySelector('#tf07-status')?.textContent")
+        .catch(() => undefined),
+      observation: await page
+        ?.evaluate("window.__oneMapTf07?.read()", true)
+        .catch(() => undefined),
     };
   } finally {
     page?.close();
@@ -538,13 +564,13 @@ const connect = (url) =>
     });
   });
 
-const until = async (ready, timeout) => {
+const until = async (ready, timeout, description = "required observation") => {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     if (await ready().catch(() => false)) return;
     await new Promise((done) => setTimeout(done, 200));
   }
-  throw new Error("TF07 observation timed out.");
+  throw new Error(`TF07 observation timed out: ${description}.`);
 };
 
 const start = (file, args, options = {}) => {
