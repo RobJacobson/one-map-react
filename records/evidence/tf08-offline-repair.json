@@ -1,0 +1,1436 @@
+{
+  "stage": "TF08",
+  "checkpoint": "Native named offline operation repairs",
+  "authorization": "Fix the TF08 failures and rerun the affected acceptance tests.",
+  "status": "affected-acceptance-passed",
+  "startedAt": "2026-10-15T05:19:06.758Z",
+  "revision": "08702dfe4f6a3e1027a6e37de220dfb8cf36d382",
+  "previousEvidence": "records/evidence/tf08-pending-acceptance.json",
+  "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+  "fixes": [
+    "RNMapbox clearAmbientCache awaits Maps temporary-data clearing and TileStore ambient clearing; persistent offline packs must survive actual disconnected rendering.",
+    "RNMapbox mergeOfflineRegions has native bindings on iOS/Android, validates readable file input and forwards to SDK legacy offline-database merge.",
+    "MapLibre reset clears JavaScript pack/listener caches only after native success, and reloads native pack state. Failed resets preserve cache/listeners.",
+    "MapLibre successful merge invalidates initialized pack cache so imported packs can be enumerated.",
+    "MapLibre iOS rejects missing, unreadable or directory merge paths before entering the SDK.",
+    "MapLibre iOS suspends native packs before reset and waits for native packs reload notification before acknowledging success."
+  ],
+  "sdkBoundaries": {
+    "inPlaceAmbientInvalidation": "Pinned Maps SDK11 has no equivalent that revalidates all ambient resources without eviction; selected method now rejects explicitly, directing callers to clearAmbientCache for eviction.",
+    "ambientCacheSize": "Pinned Maps SDK11 has no legacy ambient-cache-size API; selected method rejects explicitly. TileStore disk-quota covers another store including offline resources, and is not silently substituted.",
+    "basis": [
+      "Inspected SDK11.23.1 MapboxMapsOptions.swift/MapboxMap.swift and SDK offline-region/offline-manager/resource-option/TileStoreOptions interfaces.",
+      "SDK clearData and TileStore.clearAmbientCache exclude persistent regions/style packs; scoped test exercises actual downloaded rendering after clearing."
+    ],
+    "links": [
+      "https://docs.mapbox.com/ios/maps/guides/cache-management/",
+      "https://github.com/mapbox/mapbox-maps-ios/blob/v11.23.1/Sources/MapboxMaps/Foundation/Extensions/Core/OfflineRegionManager.swift"
+    ]
+  },
+  "routine": {
+    "formatAndLint": "passed",
+    "typecheck": "passed four configurations",
+    "webAndUnit": "447 tests passed in23files",
+    "nativeMocked": "208 tests passed in5suites",
+    "peerRegressions": "passed source plus published ESM/CommonJS: reset success/failure, listener cleanup, pack cache reload after merge, cache-clear dispatch/errors and SDK-specific rejections",
+    "peerPatchIntegrity": "passed reverse/forward application and source assertions including native bridge bindings and cache-clear preservation",
+    "scripts": "all routine script checks passed; owned-process cleanup test initially sandboxEPERM, then passed escalated; remaining chain completed",
+    "package": "13 isolated selections passed; packageSHA617f587c52e28c7574418636e4528b6b65cc36b3cd5cfc4ff1344b043a245423",
+    "followup": "Formatting/lint, peer patch reconstruction/native assertions, source/published peer regressions and scope guard passed after native pack-list repair and runner readiness wait.",
+    "finalPackage": "13 isolated selections passed after final native pack-list reload patch; package SHA256 f3dfd2c7d8a6c7367b9415591c89b7451f617e88b3ba32ecfe04d5fb3d33cdbb"
+  },
+  "scope": "Native only: pending-repair scope, Mapbox offline lifecycle/cache clearing/cold offline rendering/invalidation/invalid merge plus explicit SDK limits; MapLibre reset enumeration and invalid merge. Fresh native builds both engines both OSes.",
+  "excluded": "No browser/image rerun: changed peer offline methods and native bindings do not alter web adapters or snapshot/capture paths.",
+  "ownership": "One native worker, sequential builds/runs. Metro8181,fixture8798; dedicated iOS2x simulator and normal API36/4KB emulator5558. Existing devices/data unchanged.",
+  "storage": "Completed: task-only SDK/image/tools, device data, binaries, build outputs and raw logs removed after compact retention.",
+  "initialFilesSha256": {
+    "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch": "c9d360bc88edd1d3e453d563beb6a49f2d605bcc2fc2acaa867973c467e74a35",
+    "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch": "912809c7d05baefc1f1fbe8aaa3aaafaf2cea128419c765019bcd58e8bb3fa89",
+    "scripts/tf08-services-smoke.mjs": "185e54b56da7251d82e81f3d3688ce2dc4b64f2ab6b8aba025a59781397ee3fd",
+    "scripts/tf08-offline-peers.test.mjs": "7d270b3d0ab3dce26ba79191c8a22a4cd60ee0e280c3d19533d9dbf4ba61253f",
+    "scripts/tf08-patches.test.mjs": "30d79e6879317e4d7194f6a119580b94d8c4f0a7981c1b33cad701c377df939d"
+  },
+  "filesSha256": {
+    "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch": "c9d360bc88edd1d3e453d563beb6a49f2d605bcc2fc2acaa867973c467e74a35",
+    "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch": "2113e5cc4a5b30cedc69590992ff115353926f6cc6c3ca5f0e3355e566958980",
+    "scripts/tf08-services-smoke.mjs": "be5b4dc4b6fc56a6821fa4b1fbc7baecd4488f6026bb8201bd64fee58bc1b93e",
+    "scripts/tf08-offline-peers.test.mjs": "7d270b3d0ab3dce26ba79191c8a22a4cd60ee0e280c3d19533d9dbf4ba61253f",
+    "scripts/tf08-patches.test.mjs": "1e90da3249c579e4b4254fbd51ee9db89fb0e33356ad2b8b979e7a4e2d25a6d3"
+  },
+  "attempts": [
+    {
+      "environment": "mapbox-ios",
+      "scope": "pending-repair",
+      "startedAt": "2026-10-15T05:21:40.490Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "185e54b56da7251d82e81f3d3688ce2dc4b64f2ab6b8aba025a59781397ee3fd",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+        "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+        "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+      "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "nativeLibraries": {
+        "OneMapMapbox.debug.dylib": "492c90f7ed4e76f1db9b6a80b414fadf0a28aeba5565bacad3f3b547264aaa93",
+        "__preview.dylib": "b00aae2b446bc582eaac2a3ccdcba81dd2c355d0ea233ad78e7b87ca07765d4d"
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 1
+          }
+        },
+        {
+          "name": "SDK v11 explicitly rejects unavailable ambient-invalidate",
+          "status": "passed",
+          "observation": {
+            "availability": "unavailable in pinned SDK; no working-operation claim",
+            "message": "Maps SDK v11 has no in-place ambient cache invalidation API. Use clearAmbientCache() to evict temporary resources."
+          }
+        },
+        {
+          "name": "SDK v11 explicitly rejects unavailable ambient-size",
+          "status": "passed",
+          "observation": {
+            "availability": "unavailable in pinned SDK; no working-operation claim",
+            "message": "Maps SDK v11 has no legacy ambient cache size API. TileStore disk-quota controls a different store, including offline resources."
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "failed",
+          "error": "Does not exist, could not find groupID for identifier tf08-mapbox-ios-1792041722360, 1",
+          "lastRendererObservation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 1,
+            "moves": [
+              {
+                "origin": "unknown",
+                "center": [
+                  -122.34000000000002,
+                  47.60999999999999
+                ],
+                "zoom": 10
+              }
+            ]
+          }
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "blocked",
+          "reason": "Offline creation/lifecycle prerequisite failed."
+        },
+        {
+          "name": "named offline missing merge input rejects",
+          "status": "passed",
+          "observation": {
+            "message": "Offline database path must point to a readable file.",
+            "elapsedMs": 203,
+            "validDatabaseImport": "not exercised"
+          }
+        }
+      ],
+      "imageObservations": [],
+      "lastRendererObservation": {
+        "loads": 1,
+        "fixes": 0,
+        "errors": 0,
+        "watches": 0,
+        "releases": 0,
+        "center": [
+          -122.34000000000002,
+          47.60999999999999
+        ],
+        "zoom": 10,
+        "featureCount": 1,
+        "moving": false,
+        "moveEnds": 1,
+        "moves": [
+          {
+            "origin": "unknown",
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course",
+        "second iOS display density"
+      ],
+      "resourceRequests": 1,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/offline-style.json?id=tf08-mapbox-ios-1792041722360",
+          "available": true
+        }
+      ]
+    },
+    {
+      "environment": "mapbox-ios",
+      "scope": "pending-repair",
+      "startedAt": "2026-10-15T05:27:29.460Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "be5b4dc4b6fc56a6821fa4b1fbc7baecd4488f6026bb8201bd64fee58bc1b93e",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+        "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+        "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+      "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "nativeLibraries": {
+        "OneMapMapbox.debug.dylib": "492c90f7ed4e76f1db9b6a80b414fadf0a28aeba5565bacad3f3b547264aaa93",
+        "__preview.dylib": "b00aae2b446bc582eaac2a3ccdcba81dd2c355d0ea233ad78e7b87ca07765d4d"
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 1
+          }
+        },
+        {
+          "name": "SDK v11 explicitly rejects unavailable ambient-invalidate",
+          "status": "passed",
+          "observation": {
+            "availability": "unavailable in pinned SDK; no working-operation claim",
+            "message": "Maps SDK v11 has no in-place ambient cache invalidation API. Use clearAmbientCache() to evict temporary resources."
+          }
+        },
+        {
+          "name": "SDK v11 explicitly rejects unavailable ambient-size",
+          "status": "passed",
+          "observation": {
+            "availability": "unavailable in pinned SDK; no working-operation claim",
+            "message": "Maps SDK v11 has no legacy ambient cache size API. TileStore disk-quota controls a different store, including offline resources."
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-mapbox-ios-1792042083498",
+              "backendId": "tf08-mapbox-ios-1792042083498",
+              "metadata": {
+                "test": "tf08",
+                "backend": "mapbox-native",
+                "fixtureStyle": "http://127.0.0.1:8798/offline-style.json?id=tf08-mapbox-ios-1792042083498"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-mapbox-ios-1792042083498",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "subscriberEventsBeforeDuplicate": 12,
+            "subscriberEventsAfterDuplicate": 12,
+            "resourceRequests": 1
+          }
+        },
+        {
+          "name": "ambient cache clearing preserves the downloaded offline pack",
+          "status": "passed",
+          "observation": {
+            "before": {
+              "id": "tf08-mapbox-ios-1792042083498",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "after": {
+              "id": "tf08-mapbox-ios-1792042083498",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            }
+          }
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-mapbox-ios-1792042083498",
+              "backendId": "tf08-mapbox-ios-1792042083498",
+              "metadata": {
+                "test": "tf08",
+                "backend": "mapbox-native",
+                "fixtureStyle": "http://127.0.0.1:8798/offline-style.json?id=tf08-mapbox-ios-1792042083498"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-mapbox-ios-1792042083498",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "pixels": {
+              "width": 750,
+              "height": 1260,
+              "red": 0,
+              "blue": 425,
+              "green": 0,
+              "navy": 303620,
+              "magenta": 629002
+            },
+            "blockedRequests": 0,
+            "networking": "Mapbox SDK network switch confirmed disconnected; fixture sockets closed; loopback command/Metro transport retained"
+          }
+        },
+        {
+          "name": "offline invalidation preserves subscribed progress",
+          "status": "passed",
+          "observation": {
+            "status": {
+              "id": "tf08-mapbox-ios-1792042083498",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "subscriberEventsBefore": 4,
+            "subscriberEventsAfter": 20
+          }
+        },
+        {
+          "name": "named offline missing merge input rejects",
+          "status": "passed",
+          "observation": {
+            "message": "Offline database path must point to a readable file.",
+            "elapsedMs": 404,
+            "validDatabaseImport": "not exercised"
+          }
+        }
+      ],
+      "imageObservations": [
+        {
+          "scenario": "persisted offline pack after cold restart with fixture resources unavailable",
+          "width": 750,
+          "height": 1260,
+          "red": 0,
+          "blue": 425,
+          "green": 0,
+          "navy": 303620,
+          "magenta": 629002
+        }
+      ],
+      "lastRendererObservation": {
+        "loads": 2,
+        "fixes": 0,
+        "errors": 0,
+        "watches": 0,
+        "releases": 0,
+        "center": [
+          0,
+          0
+        ],
+        "zoom": 1,
+        "featureCount": 4,
+        "moving": false,
+        "moveEnds": 2,
+        "moves": [
+          {
+            "origin": "unknown",
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 1
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course",
+        "second iOS display density"
+      ],
+      "resourceRequests": 1,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/offline-style.json?id=tf08-mapbox-ios-1792042083498",
+          "available": true
+        }
+      ]
+    },
+    {
+      "environment": "maplibre-ios",
+      "scope": "pending-repair",
+      "startedAt": "2026-10-15T05:22:19.455Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "185e54b56da7251d82e81f3d3688ce2dc4b64f2ab6b8aba025a59781397ee3fd",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+        "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+        "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+      "nativeBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+      "nativeLibraries": {
+        "OneMapMaplibre.debug.dylib": "6269fc4e56c93ec5cae5785c5a6d7217271f8ebf30520dea37801813be400b79",
+        "__preview.dylib": "18cba1232108938b0ce9083884e375f287814a994639881394f1bca64fd65e8e"
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.33999999999916,
+              47.60999999999396
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 3
+          }
+        },
+        {
+          "name": "named offline reset removes a discoverable test pack",
+          "status": "failed",
+          "error": "Expected values to be strictly equal:\n\n1 !== 0\n",
+          "lastRendererObservation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.33999999999916,
+              47.60999999999396
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 3,
+            "moves": [
+              {
+                "origin": "unknown",
+                "center": [
+                  0,
+                  0
+                ],
+                "zoom": 0.29920801838727884
+              }
+            ]
+          }
+        },
+        {
+          "name": "named offline missing merge input rejects",
+          "status": "passed",
+          "observation": {
+            "message": "Offline database path must point to a readable file.",
+            "elapsedMs": 408,
+            "validDatabaseImport": "not exercised"
+          }
+        }
+      ],
+      "imageObservations": [],
+      "lastRendererObservation": {
+        "loads": 1,
+        "fixes": 0,
+        "errors": 0,
+        "watches": 0,
+        "releases": 0,
+        "center": [
+          -122.33999999999916,
+          47.60999999999396
+        ],
+        "zoom": 10,
+        "featureCount": 1,
+        "moving": false,
+        "moveEnds": 3,
+        "moves": [
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 0.29920801838727884
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course",
+        "second iOS display density"
+      ],
+      "resourceRequests": 5,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/offline-style.json?id=tf08-reset-maplibre-ios-1792041758835",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-ios-1792041758835/1/0/0.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-ios-1792041758835/1/1/0.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-ios-1792041758835/1/1/1.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-ios-1792041758835/1/0/1.png",
+          "available": true
+        }
+      ]
+    },
+    {
+      "environment": "maplibre-ios",
+      "scope": "pending-repair",
+      "startedAt": "2026-10-15T05:29:52.135Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "be5b4dc4b6fc56a6821fa4b1fbc7baecd4488f6026bb8201bd64fee58bc1b93e",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+        "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+        "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+      "nativeBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+      "nativeLibraries": {
+        "OneMapMaplibre.debug.dylib": "43b3bc26e08ba669e4c927df444531937eb5c53c38ce986129a1056141bee3f9",
+        "__preview.dylib": "18cba1232108938b0ce9083884e375f287814a994639881394f1bca64fd65e8e"
+      },
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.33999999999364,
+              47.60999999999796
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 4
+          }
+        },
+        {
+          "name": "named offline reset removes a discoverable test pack",
+          "status": "passed",
+          "observation": {
+            "id": "tf08-reset-maplibre-ios-1792042200435",
+            "before": {
+              "id": "tf08-reset-maplibre-ios-1792042200435",
+              "state": "active",
+              "percentage": 20,
+              "completedResourceCount": 1,
+              "completedResourceSize": 213,
+              "completedTileCount": 0,
+              "completedTileSize": 0,
+              "requiredResourceCount": 5
+            },
+            "warnings": [
+              "MapLibre Native [WARN] [virtual bool mln::MLNCoreLoggingObserver::onRecord(EventSeverity, Event, int64_t, const std::string &)] [event]:Database [code]:-1 [message]:Removing existing incompatible offline database"
+            ],
+            "remainingPacks": 0
+          }
+        },
+        {
+          "name": "named offline missing merge input rejects",
+          "status": "passed",
+          "observation": {
+            "message": "Offline database path must point to a readable file.",
+            "elapsedMs": 403,
+            "validDatabaseImport": "not exercised"
+          }
+        }
+      ],
+      "imageObservations": [],
+      "lastRendererObservation": {
+        "loads": 1,
+        "fixes": 0,
+        "errors": 0,
+        "watches": 0,
+        "releases": 0,
+        "center": [
+          -122.33999999999364,
+          47.60999999999796
+        ],
+        "zoom": 10,
+        "featureCount": 1,
+        "moving": false,
+        "moveEnds": 4,
+        "moves": [
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 0.3442959079158169
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course",
+        "second iOS display density"
+      ],
+      "resourceRequests": 5,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/offline-style.json?id=tf08-reset-maplibre-ios-1792042200435",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-ios-1792042200435/1/0/0.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-ios-1792042200435/1/1/0.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-ios-1792042200435/1/0/1.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-ios-1792042200435/1/1/1.png",
+          "available": true
+        }
+      ]
+    },
+    {
+      "environment": "mapbox-android",
+      "scope": "pending-repair",
+      "startedAt": "2026-10-15T05:32:11.463Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "be5b4dc4b6fc56a6821fa4b1fbc7baecd4488f6026bb8201bd64fee58bc1b93e",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+        "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+        "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+      "nativeBinarySha256": "09fa056452865d66d9af66168cfe831d217655bce255619fce17a628b144d238",
+      "scenarios": [
+        {
+          "name": "acceptance setup",
+          "status": "failed",
+          "error": "listen EPERM: operation not permitted 127.0.0.1:8798"
+        }
+      ],
+      "imageObservations": [],
+      "remaining": [
+        "physical-device authorization/revocation/course"
+      ],
+      "resourceRequests": 0,
+      "blockedRequests": 0,
+      "resourceObservations": []
+    },
+    {
+      "environment": "mapbox-android",
+      "scope": "pending-repair",
+      "startedAt": "2026-10-15T05:32:19.208Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "be5b4dc4b6fc56a6821fa4b1fbc7baecd4488f6026bb8201bd64fee58bc1b93e",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+        "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+        "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+      "nativeBinarySha256": "09fa056452865d66d9af66168cfe831d217655bce255619fce17a628b144d238",
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 3
+          }
+        },
+        {
+          "name": "SDK v11 explicitly rejects unavailable ambient-invalidate",
+          "status": "passed",
+          "observation": {
+            "availability": "unavailable in pinned SDK; no working-operation claim",
+            "message": "Maps SDK v11 has no in-place ambient cache invalidation API. Use clearAmbientCache() to evict temporary resources."
+          }
+        },
+        {
+          "name": "SDK v11 explicitly rejects unavailable ambient-size",
+          "status": "passed",
+          "observation": {
+            "availability": "unavailable in pinned SDK; no working-operation claim",
+            "message": "Maps SDK v11 has no legacy ambient cache size API. TileStore disk-quota controls a different store, including offline resources."
+          }
+        },
+        {
+          "name": "bounded offline create, observe, pause and resume",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-mapbox-android-1792042362832",
+              "backendId": "tf08-mapbox-android-1792042362832",
+              "metadata": {
+                "test": "tf08",
+                "backend": "mapbox-native",
+                "fixtureStyle": "http://127.0.0.1:8798/offline-style.json?id=tf08-mapbox-android-1792042362832"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-mapbox-android-1792042362832",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "subscriberEventsBeforeDuplicate": 14,
+            "subscriberEventsAfterDuplicate": 14,
+            "resourceRequests": 1
+          }
+        },
+        {
+          "name": "ambient cache clearing preserves the downloaded offline pack",
+          "status": "passed",
+          "observation": {
+            "before": {
+              "id": "tf08-mapbox-android-1792042362832",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "after": {
+              "id": "tf08-mapbox-android-1792042362832",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            }
+          }
+        },
+        {
+          "name": "persisted offline pack after cold restart with fixture resources unavailable",
+          "status": "passed",
+          "observation": {
+            "pack": {
+              "id": "tf08-mapbox-android-1792042362832",
+              "backendId": "tf08-mapbox-android-1792042362832",
+              "metadata": {
+                "test": "tf08",
+                "backend": "mapbox-native",
+                "fixtureStyle": "http://127.0.0.1:8798/offline-style.json?id=tf08-mapbox-android-1792042362832"
+              },
+              "bounds": [
+                [
+                  -10,
+                  -10
+                ],
+                [
+                  10,
+                  10
+                ]
+              ]
+            },
+            "status": {
+              "id": "tf08-mapbox-android-1792042362832",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "pixels": {
+              "width": 1080,
+              "height": 2349,
+              "red": 0,
+              "blue": 0,
+              "green": 0,
+              "navy": 1077767,
+              "magenta": 1444948
+            },
+            "blockedRequests": 0,
+            "networking": "Mapbox SDK network switch confirmed disconnected; fixture sockets closed; loopback command/Metro transport retained"
+          }
+        },
+        {
+          "name": "offline invalidation preserves subscribed progress",
+          "status": "passed",
+          "observation": {
+            "status": {
+              "id": "tf08-mapbox-android-1792042362832",
+              "state": "complete",
+              "percentage": 100,
+              "completedResourceCount": 1,
+              "completedResourceSize": 21579921,
+              "requiredResourceCount": 1
+            },
+            "subscriberEventsBefore": 4,
+            "subscriberEventsAfter": 20
+          }
+        },
+        {
+          "name": "named offline missing merge input rejects",
+          "status": "passed",
+          "observation": {
+            "message": "Offline database path must point to a readable file.",
+            "elapsedMs": 201,
+            "validDatabaseImport": "not exercised"
+          }
+        }
+      ],
+      "imageObservations": [
+        {
+          "scenario": "persisted offline pack after cold restart with fixture resources unavailable",
+          "width": 1080,
+          "height": 2349,
+          "red": 0,
+          "blue": 0,
+          "green": 0,
+          "navy": 1077767,
+          "magenta": 1444948
+        }
+      ],
+      "lastRendererObservation": {
+        "loads": 2,
+        "fixes": 0,
+        "errors": 0,
+        "watches": 0,
+        "releases": 0,
+        "center": [
+          0,
+          0
+        ],
+        "zoom": 1,
+        "featureCount": 4,
+        "moving": false,
+        "moveEnds": 1,
+        "moves": [
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 0
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 0.8057438721516189
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.34000000000002,
+              2.5444437451708134e-14
+            ],
+            "zoom": 0.805743872151619
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 0.8057438721516189
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              0,
+              0
+            ],
+            "zoom": 0.805743872151619
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course"
+      ],
+      "resourceRequests": 1,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/offline-style.json?id=tf08-mapbox-android-1792042362832",
+          "available": true
+        }
+      ]
+    },
+    {
+      "environment": "maplibre-android",
+      "scope": "pending-repair",
+      "startedAt": "2026-10-15T05:33:10.768Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "be5b4dc4b6fc56a6821fa4b1fbc7baecd4488f6026bb8201bd64fee58bc1b93e",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+        "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+        "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+      "nativeBinarySha256": "dcb4832cdd22c3176e49f5f7c4266d8101f984c695c21b9c8053772e93eebb",
+      "scenarios": [
+        {
+          "name": "acceptance setup",
+          "status": "failed",
+          "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'dcb4832cdd22c3176e49f545c7e4266d8101f984c695c21b9c8053772e93eebb'\n- 'dcb4832cdd22c3176e49f5f7c4266d8101f984c695c21b9c8053772e93eebb'\n"
+        }
+      ],
+      "imageObservations": [],
+      "remaining": [
+        "physical-device authorization/revocation/course"
+      ],
+      "resourceRequests": 0,
+      "blockedRequests": 0,
+      "resourceObservations": []
+    },
+    {
+      "environment": "maplibre-android",
+      "scope": "pending-repair",
+      "startedAt": "2026-10-15T05:33:22.108Z",
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "be5b4dc4b6fc56a6821fa4b1fbc7baecd4488f6026bb8201bd64fee58bc1b93e",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+        "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+        "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+      "nativeBinarySha256": "dcb4832cdd22c3176e49f545c7e4266d8101f984c695c21b9c8053772e93eebb",
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "fixes": 0,
+            "errors": 0,
+            "watches": 0,
+            "releases": 0,
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10,
+            "featureCount": 1,
+            "moving": false,
+            "moveEnds": 3
+          }
+        },
+        {
+          "name": "named offline reset removes a discoverable test pack",
+          "status": "passed",
+          "observation": {
+            "id": "tf08-reset-maplibre-android-1792042411310",
+            "before": {
+              "id": "tf08-reset-maplibre-android-1792042411310",
+              "state": "active",
+              "percentage": 20,
+              "completedResourceCount": 1,
+              "completedResourceSize": 215,
+              "completedTileCount": 0,
+              "completedTileSize": 0,
+              "requiredResourceCount": 5
+            },
+            "warnings": [
+              "MapLibre Native [WARN] [Mbgl] {DatabaseFileSou}[Database]: Removing existing incompatible offline database"
+            ],
+            "remainingPacks": 0
+          }
+        },
+        {
+          "name": "named offline missing merge input rejects",
+          "status": "passed",
+          "observation": {
+            "message": "Secondary database needs to be located in a readable path.",
+            "elapsedMs": 202,
+            "validDatabaseImport": "not exercised"
+          }
+        }
+      ],
+      "imageObservations": [],
+      "lastRendererObservation": {
+        "loads": 1,
+        "fixes": 0,
+        "errors": 0,
+        "watches": 0,
+        "releases": 0,
+        "center": [
+          -122.34000000000002,
+          47.60999999999999
+        ],
+        "zoom": 10,
+        "featureCount": 1,
+        "moving": false,
+        "moveEnds": 3,
+        "moves": [
+          {
+            "origin": "unknown",
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10
+          },
+          {
+            "origin": "unknown",
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 10
+          }
+        ]
+      },
+      "remaining": [
+        "physical-device authorization/revocation/course"
+      ],
+      "resourceRequests": 5,
+      "blockedRequests": 0,
+      "resourceObservations": [
+        {
+          "path": "/offline-style.json?id=tf08-reset-maplibre-android-1792042411310",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-android-1792042411310/1/1/0.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-android-1792042411310/1/0/0.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-android-1792042411310/1/0/1.png",
+          "available": true
+        },
+        {
+          "path": "/tile/tf08-reset-maplibre-android-1792042411310/1/1/1.png",
+          "available": true
+        }
+      ]
+    }
+  ],
+  "followupDiagnosis": [
+    {
+      "attempt": "mapbox-ios-repair-first",
+      "finding": "The test paused immediately after create before TileStore had registered the new region; the fixture then requested status and received missing groupID. Only one style request had been served.",
+      "change": "Wait for native status readback before pause/resume; readiness is bounded to 30 seconds and download completion remains independently required. Native Mapbox and library artifact unchanged."
+    },
+    {
+      "attempt": "maplibre-ios-repair-first",
+      "finding": "Clearing the wrapper JS cache still reloaded stale SDK native packs. Pinned iOS SDK reset resets disk but does not update its packs property.",
+      "source": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/platform/darwin/src/MLNOfflineStorage.mm",
+      "change": "Suspend native packs before reset; after native success await documented reloadPacks KVO through the existing request queue before acknowledging reset. Native iOS rebuild required; Android source unchanged."
+    }
+  ],
+  "reviewedOutcomes": {
+    "mapbox-ios": {
+      "status": "passed",
+      "workingChecks": 6,
+      "sdkBoundaryRejections": 2,
+      "offlinePack": "1 completed resource, 21,579,921 bytes before and after clearing",
+      "disconnectedRendering": "629,002 magenta pixels after cold restart; SDK network switch false; fixture sockets closed",
+      "invalidMergeRejectionMs": 404
+    },
+    "maplibre-ios": {
+      "status": "passed",
+      "workingChecks": 3,
+      "remainingPacks": 0,
+      "before": "One discoverable active pack, 1/5 required resources downloaded",
+      "invalidMergeRejectionMs": 403
+    },
+    "mapbox-android": {
+      "status": "passed",
+      "workingChecks": 6,
+      "sdkBoundaryRejections": 2,
+      "offlinePack": "1 completed resource, 21,579,921 bytes before and after clearing",
+      "disconnectedRendering": "1,444,948 magenta pixels after cold restart; SDK network switch false; fixture sockets closed",
+      "invalidMergeRejectionMs": 201
+    },
+    "maplibre-android": {
+      "status": "passed",
+      "workingChecks": 3,
+      "remainingPacks": 0,
+      "before": "One discoverable active pack, 1/5 required resources downloaded",
+      "invalidMergeRejectionMs": 202
+    }
+  },
+  "reviewNotes": [
+    "Raw runner reports retain a static remaining list that includes second iOS display density. That density was verified in tf08-pending-acceptance.json and is not reopened by this repair.",
+    "The two Mapbox SDK-specific expected rejections are availability checks, not working-operation passes.",
+    "Native missing-file merge rejection is validated; valid database imports, populated legacy-cache migration and physical-device behavior remain unverified.",
+    "Owner subsequently excluded RNMapbox ambient invalidation and ambient-size controls from TF08. Four historical SDK rejection checks remain regression evidence outside functional acceptance scope.",
+    "Owner subsequently removed physical-device testing from TF08 requirements; historical unverified hardware claims remain unverified but do not block acceptance."
+  ],
+  "workerSummary": {
+    "checkpoint": "TF08 pending repair, affected native acceptance only",
+    "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+    "runnerSha256": "be5b4dc4b6fc56a6821fa4b1fbc7baecd4488f6026bb8201bd64fee58bc1b93e",
+    "nativePatches": {
+      "rnmapbox": "c9d360bc88edd1d3e453d563beb6a49f2d605bcc2fc2acaa867973c467e74a35",
+      "maplibre": "2113e5cc4a5b30cedc69590992ff115353926f6cc6c3ca5f0e3355e566958980"
+    },
+    "ios": {
+      "device": "iPhone SE (3rd generation), dedicated UDID 858F04FC-78B9-4CB3-B47E-34B8A40A9F6E, iOS 27.0 runtime, PixelRatio 2; original iPhone 18 Pro untouched.",
+      "mapboxBuild": {
+        "result": "BUILD SUCCEEDED",
+        "command": "xcodebuild -workspace ios/OneMapMapbox.xcworkspace -scheme OneMapMapbox -configuration Debug -sdk iphonesimulator -destination generic/platform=iOS Simulator -jobs 2 ONLY_ACTIVE_ARCH=YES ARCHS=arm64 EXCLUDED_ARCHS=x86_64 COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGNING_ALLOWED=NO build",
+        "appId": "org.reactjs.native.example.OneMapMapbox",
+        "executableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+        "debugDylibSha256": "492c90f7ed4e76f1db9b6a80b414fadf0a28aeba5565bacad3f3b547264aaa93"
+      },
+      "mapboxInitialRepairReport": {
+        "path": "mapbox-ios-repair-first.json",
+        "result": "Renderer, two expected SDK-boundary errors and merge reject passed; offline create/lifecycle failed because native group ID was missing before tiles; cold restart blocked."
+      },
+      "mapboxRepairRetryReport": {
+        "path": "mapbox-ios-repair-retry.json",
+        "sha256": "88109d6446cb95e0e4b146a3d508d7d9b45d4b5291313060e92ee1a86f7ae335",
+        "result": "8/8 scoped checks passed; created/completed pack 21,579,921 bytes, clear preserved pack, cold restart rendered 629,002 magenta pixels, missing merge rejected in 404 ms."
+      },
+      "maplibreInitialRepairReport": {
+        "path": "maplibre-ios-repair-first.json",
+        "result": "Renderer and merge reject passed; reset returned one stale public pack after native acknowledgement."
+      },
+      "maplibreFinalBuild": {
+        "result": "BUILD SUCCEEDED against final patch",
+        "patchSha256": "2113e5cc4a5b30cedc69590992ff115353926f6cc6c3ca5f0e3355e566958980",
+        "appId": "org.reactjs.native.example.OneMapMaplibre",
+        "executableSha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "debugDylibSha256": "43b3bc26e08ba669e4c927df444531937eb5c53c38ce986129a1056141bee3f9"
+      },
+      "maplibreFinalReport": {
+        "path": "maplibre-ios-repair-final.json",
+        "sha256": "79f19e5026ca88623148d2124cb7af777fe9205367066282c9f50c6a18f59930",
+        "result": "3/3 passed; one discoverable active pack before reset, remainingPacks 0 after reset; exact known incompatible-database warning allowed; missing merge rejected in 403 ms."
+      }
+    },
+    "android": {
+      "sdkRoot": "/private/tmp/tf08-native-api36/sdk",
+      "image": "system-images;android-36;google_apis;arm64-v8a",
+      "imageRevision": 7,
+      "api": 36,
+      "extension": 17,
+      "4kbPages": true,
+      "expandedDu": "4.3G",
+      "systemImgSha256": "a9d4f0b6fd7ef770a18272bfe675df4afbd9bb56f06a865b0ed69332e3081c8c",
+      "archiveUrl": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-36_r07.zip",
+      "archiveBytes": 1872691175,
+      "archiveSha1": "5a99183b6d924da606260e45fd41a3eb8eca6eb7",
+      "avd": "TF08RepairAPI36",
+      "avdHome": "/private/tmp/tf08-native-repair/avd",
+      "serial": "emulator-5558",
+      "deviceProfile": "medium_phone 1080x2400, 420 dpi",
+      "firstBootFailures": [
+        "With 4G configured/partition flag: available 5497MB, required 7372.8MB.",
+        "After verified app/build removal and 2G requested: available 6828MB, required 7372.8MB; emulator normalized data size to 6G. No Android runtime scenario started."
+      ],
+      "buildInitScript": {
+        "path": "tf08-repair.init.gradle",
+        "contents": "allprojects { project -> project.afterEvaluate { if (project.plugins.hasPlugin('com.android.application')) { project.extensions.getByName('android').buildTypes.getByName('debug').applicationIdSuffix = '.tf08repair' } } }"
+      },
+      "mapboxBuild": {
+        "result": "BUILD SUCCESSFUL; warning: Kotlin nullable String type mismatch in RNMBXOfflineModule.kt:672",
+        "apk": "apks/mapbox-tf08repair.apk",
+        "sha256": "09fa056452865d66d9af66168cfe831d217655bce255619fce17a628b144d238",
+        "applicationId": "com.onemapmapbox.tf08repair",
+        "activity": "com.onemapmapbox.MainActivity"
+      },
+      "maplibreBuild": {
+        "result": "BUILD SUCCESSFUL",
+        "apk": "apks/maplibre-tf08repair.apk",
+        "sha256": "dcb4832cdd22c3176e49f545c7e4266d8101f984c695c21b9c8053772e93eebb",
+        "applicationId": "com.onemapmaplibre.tf08repair",
+        "activity": "com.onemapmaplibre.MainActivity"
+      },
+      "liveOsCapture": {
+        "release": "16",
+        "api": 36,
+        "pageSizeBytes": 4096,
+        "device": "emu64a",
+        "fingerprint": "google/sdk_gphone64_arm64/emu64a:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+        "screen": "1080x2400",
+        "densityDpi": 420,
+        "serial": "emulator-5558"
+      },
+      "mapboxRuntime": {
+        "firstAttempt": {
+          "path": "mapbox-android-repair-final.json",
+          "sha256": "f3e0a824fd7875c65b3f7d8273c0ab8fa481f0f50ae23fe90426a8b25b866eea",
+          "result": "No scenarios; acceptance setup failed with sandbox EPERM binding 127.0.0.1:8798."
+        },
+        "finalReport": {
+          "path": "mapbox-android-repair-retry.json",
+          "sha256": "70d6e23a165216486a9051fb69c200b069b4d761eeaa61796dc82488f7c49b28",
+          "result": "8/8 passed; offline cache clear preserved 21,579,921-byte pack; cold disconnected render had 1,444,948 magenta pixels; invalid merge rejected in 201 ms."
+        }
+      },
+      "maplibreRuntime": {
+        "firstAttempt": {
+          "path": "maplibre-android-repair-final.json",
+          "sha256": "b57b5f8af9349b77bbf0f88c3d0f7ebb5bfaf4eccb5621dbf703d842d78fd197",
+          "result": "No scenarios; acceptance setup rejected mistyped expected APK SHA. APK and installed binary were intact."
+        },
+        "finalReport": {
+          "path": "maplibre-android-repair-retry.json",
+          "sha256": "73e73d07e45348f24fb7c051cd3957296ba670736266d629c20b95c8efd62b66",
+          "result": "3/3 passed; reset found active pack and reported remainingPacks 0; exact incompatible-database warning; invalid merge rejected in 202 ms."
+        }
+      }
+    },
+    "reportsToPreserve": [
+      "mapbox-ios-repair-first.json",
+      "mapbox-ios-repair-retry.json",
+      "maplibre-ios-repair-first.json",
+      "maplibre-ios-repair-final.json",
+      "mapbox-android-repair-final.json",
+      "mapbox-android-repair-retry.json",
+      "maplibre-android-repair-final.json",
+      "maplibre-android-repair-retry.json"
+    ],
+    "ownedRoot": "/private/tmp/tf08-native-repair; separate image root /private/tmp/tf08-native-api36",
+    "currentFreeDisk": "14GiB after authorized cleanup; owned emulator5558 stopped/deleted; dedicated SE3 deleted; task roots removed; original emulator5556 and booted iPhone18Pro preserved."
+  },
+  "reportsSha256": {
+    "mapbox-ios-repair-first.json": "d93365f091eb70e4932e7a2a7861eeb7d0a523d510dc1356fe08e016513d5638",
+    "mapbox-ios-repair-retry.json": "88109d6446cb95e0e4b146a3d508d7d9b45d4b5291313060e92ee1a86f7ae335",
+    "maplibre-ios-repair-first.json": "b69f5f26f22733e1f8c249ab73729bc1a0fe23c01a608adde05466f7b1b20c4b",
+    "maplibre-ios-repair-final.json": "79f19e5026ca88623148d2124cb7af777fe9205367066282c9f50c6a18f59930",
+    "mapbox-android-repair-final.json": "f3e0a824fd7875c65b3f7d8273c0ab8fa481f0f50ae23fe90426a8b25b866eea",
+    "mapbox-android-repair-retry.json": "70d6e23a165216486a9051fb69c200b069b4d761eeaa61796dc82488f7c49b28",
+    "maplibre-android-repair-final.json": "b57b5f8af9349b77bbf0f88c3d0f7ebb5bfaf4eccb5621dbf703d842d78fd197",
+    "maplibre-android-repair-retry.json": "73e73d07e45348f24fb7c051cd3957296ba670736266d629c20b95c8efd62b66"
+  },
+  "acceptanceCompletedAt": "2026-10-15T05:34:08.019861+00:00",
+  "totals": {
+    "workingChecksPassed": 18,
+    "sdkAvailabilityRejectionsVerified": 4,
+    "currentScopedChecksFailed": 0,
+    "firstAttemptsPreserved": 4
+  },
+  "buildNotes": "Both engines freshly built on both platforms. Final MapLibre iOS bridge required a second build. Its last patch changes only iOS; Android APK source is unchanged from its verified build.",
+  "temporaryTooling": {
+    "url": "https://dl.google.com/android/repository/commandlinetools-mac_arm64-15859902_latest.zip",
+    "sha256": "835b62a26162b229b441d1f6d4680383815a270809eb33522c0d480fa5002c4e",
+    "version": "23.0",
+    "placement": "Task-owned temporary SDK root only; shared SDK unchanged.",
+    "imageNote": "Standard API36 arm64 revision7 image; shared installed emulator37.1.11. SDK image+tools removed after runtime acceptance."
+  },
+  "stageStatus": "Affected repair acceptance passed. Full TF08 remains open for valid database imports, populated cache migration and additional capture combinations. Physical-device testing and the two owner-excluded RNMapbox cache operations are not acceptance blockers.",
+  "cleanup": {
+    "completedAt": "2026-10-15T05:34:52.185460+00:00",
+    "removed": [
+      "Task emulator5558 and dedicated SE3 simulator",
+      "Temporary APKs/apps, AVD data and registration",
+      "Task-only API36 SDK image and downloaded Android CLI",
+      "Native build outputs, raw logs and compact source reports after evidence retention",
+      "Parent patch reconstruction workspace, helper scripts, SDK inspection archive and validation logs"
+    ],
+    "preserved": [
+      "All eight compact attempt records and hashes in this file",
+      "Earlier evidence files and first failures",
+      "Original emulator5556",
+      "Original iPhone18Pro still booted",
+      "Shared SDK, installed emulator, caches and original applications"
+    ],
+    "ports": "No listeners on8181/8798",
+    "freeDisk": "14GiB, up from6.4GiB before cleanup"
+  },
+  "scopeDecision": {
+    "recordedAt": "2026-10-15T05:41:39.491536+00:00",
+    "authority": "Explicit project-owner instruction in this chat",
+    "instruction": "We can omit them from TF08. These are not necessary.",
+    "excludedOperations": [
+      "RNMapbox WrapperOfflineManager.invalidateAmbientCache()",
+      "RNMapbox WrapperOfflineManager.setMaximumAmbientCacheSize(bytes)"
+    ],
+    "effect": "Excluded from TF08 implementation and functional acceptance requirements; retained explicit rejection checks are regression evidence only and no longer acceptance gates.",
+    "bounds": "RNMapbox only; MapLibre equivalents and other offline operations retain their existing scope. No public method or runtime behavior removed.",
+    "remainingStageGates": [
+      "physical-device authorization/revocation/course and engine compatibility",
+      "valid backend-specific database imports",
+      "populated cache migration",
+      "additional annotation/puck/ornament capture combinations"
+    ]
+  },
+  "physicalDeviceScopeDecision": {
+    "recordedAt": "2026-10-15T05:43:44.222389+00:00",
+    "authority": "Explicit project-owner instruction in this chat",
+    "instruction": "We don't require physical-device testing.",
+    "effect": "Physical-device testing is excluded from required TF08 acceptance. Browser, simulator and emulator results remain the accepted execution targets; no hardware-sensor claims are inferred.",
+    "supersedes": "Physical-device gate in the earlier scopeDecision.remainingStageGates snapshot; raw run reports retain their historical remaining lists."
+  },
+  "currentRequiredAcceptanceGates": [
+    "valid backend-specific database imports",
+    "populated cache migration",
+    "additional annotation/puck/ornament capture combinations"
+  ]
+}

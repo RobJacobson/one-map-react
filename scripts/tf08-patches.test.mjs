@@ -188,6 +188,54 @@ const iosOfflineBridge = readFileSync(
   "utf8"
 );
 assert.match(iosOfflineBridge, /RCT_EXTERN_METHOD\(invalidatePack:/);
+assert.match(iosOfflineBridge, /RCT_EXTERN_METHOD\(clearAmbientCache:/);
+assert.match(iosOfflineBridge, /RCT_EXTERN_METHOD\(mergeOfflineRegions:/);
+for (const [directory, extension, prefix] of [
+  ["ios/RNMBX/Offline", "swift", "func"],
+  ["android/src/main/java/com/rnmapbox/rnmbx/modules", "kt", "fun"],
+]) {
+  const offline = readFileSync(
+    resolve(rnRoot, `${directory}/RNMBXOfflineModule.${extension}`),
+    "utf8"
+  );
+  const clear = nativeSection(
+    offline,
+    `${prefix} clearAmbientCache(`,
+    `${prefix} mergeOfflineRegions(`
+  );
+  assert.match(clear, /MapboxMap\.clearData/);
+  assert.match(clear, /tileStore\.clearAmbientCache/);
+  assert.doesNotMatch(clear, /resetDatabase|removeTileRegion|removeStylePack/);
+  const merge = nativeSection(
+    offline,
+    `${prefix} mergeOfflineRegions(`,
+    `${prefix} migrateOfflineCache(`
+  );
+  assert.match(merge, /invalid_database_path/);
+  assert.match(merge, /mergeOfflineDatabase/);
+}
+const mlIosOffline = readFileSync(
+  resolve(mlRoot, "ios/modules/offline/MLRNOfflineModule.mm"),
+  "utf8"
+);
+const mlMerge = nativeSection(
+  mlIosOffline,
+  "- (void)mergeOfflineRegions:",
+  "- (void)getPacks:"
+);
+assert.match(
+  mlMerge,
+  /fileExistsAtPath:[\s\S]*isReadableFileAtPath:[\s\S]*invalid_database_path[\s\S]*addContentsOfFile:/
+);
+const mlReset = nativeSection(
+  mlIosOffline,
+  "- (void)resetDatabase:",
+  "- (void)getPackStatus:"
+);
+assert.match(
+  mlReset,
+  /\[pack suspend\][\s\S]*resetDatabaseWithCompletionHandler:[\s\S]*reject\(@"resetDatabase"[\s\S]*return;[\s\S]*packRequestQueue addObject:[\s\S]*resolve\(nil\)[\s\S]*\[storage reloadPacks\]/
+);
 for (const file of [
   "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt",
   "ios/RNMBX/RNMBXModule.swift",

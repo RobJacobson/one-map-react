@@ -1,6 +1,20 @@
 import { type Adapter, MapSetup } from "one-map-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { AppState, Platform, SafeAreaView, Text, View } from "react-native";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  AppState,
+  Dimensions,
+  PixelRatio,
+  Platform,
+  SafeAreaView,
+  Text,
+  View,
+} from "react-native";
 
 import {
   type Tf08AcceptanceProbe,
@@ -12,11 +26,20 @@ export const NativeTf08Screen = ({
   adapter,
   getLocationDiagnostic,
   setNetworkConnected,
+  offlineOperations,
+  startDetached = false,
+  nativePuck,
 }: {
   readonly adapter: Adapter;
   readonly getLocationDiagnostic?: () => Promise<unknown>;
   readonly setNetworkConnected?: (connected: boolean) => Promise<boolean>;
+  readonly offlineOperations?: Readonly<
+    Record<string, (value: Record<string, unknown>) => unknown>
+  >;
+  readonly startDetached?: boolean;
+  readonly nativePuck?: ReactNode;
 }) => {
+  const [sceneMounted, setSceneMounted] = useState(!startDetached);
   const probe = useRef<Tf08AcceptanceProbe | null>(null);
   const [status, setStatus] = useState("TF08 awaiting runner");
   const attach = useCallback((value: Tf08AcceptanceProbe | null) => {
@@ -27,7 +50,7 @@ export const NativeTf08Screen = ({
     let busy = false;
     let last = "";
     const poll = async (): Promise<void> => {
-      if (busy || !active || !probe.current) return;
+      if (busy || !active) return;
       busy = true;
       try {
         const request = (await fetch("http://127.0.0.1:8798/command").then(
@@ -49,14 +72,38 @@ export const NativeTf08Screen = ({
         setStatus(`TF08 ${request.action}`);
         let result: unknown;
         try {
+          if (!probe.current && request.action === "configure")
+            setSceneMounted(true);
+          if (
+            !probe.current &&
+            !["configure", "device-info", "named-offline", "network"].includes(
+              request.action
+            )
+          )
+            throw new Error("Acceptance map has not mounted.");
           result = {
             id: request.id,
             environment,
             ok: true,
             value:
-              request.action === "network" && setNetworkConnected
-                ? await setNetworkConnected(request.value?.connected === true)
-                : await probe.current.command(request.action, request.value),
+              request.action === "device-info"
+                ? { scale: PixelRatio.get(), window: Dimensions.get("window") }
+                : request.action === "named-offline"
+                  ? await runOfflineOperation(
+                      offlineOperations,
+                      String(request.value?.operation),
+                      request.value ?? {}
+                    )
+                  : request.action === "network" && setNetworkConnected
+                    ? await setNetworkConnected(
+                        request.value?.connected === true
+                      )
+                    : !probe.current && request.action === "configure"
+                      ? null
+                      : await probe.current?.command(
+                          request.action,
+                          request.value
+                        ),
           };
         } catch (error) {
           result = {
@@ -104,24 +151,63 @@ export const NativeTf08Screen = ({
       active = false;
       clearInterval(timer);
     };
-  }, [adapter.backend, getLocationDiagnostic, setNetworkConnected]);
+  }, [
+    adapter.backend,
+    getLocationDiagnostic,
+    setNetworkConnected,
+    offlineOperations,
+  ]);
   return (
     <MapSetup adapter={adapter}>
       <SafeAreaView style={{ flex: 1 }}>
         <Text testID="tf08-status">{status}</Text>
-        <Tf08AcceptanceScene
-          backend={adapter.backend}
-          services={adapter.services}
-          style={{ flex: 1 }}
-          attach={attach}
-          fixtureUrl="http://127.0.0.1:8798"
-          overlay={
-            <View
-              style={{ width: 40, height: 40, backgroundColor: "#00ff00" }}
-            />
-          }
-        />
+        {sceneMounted && (
+          <Tf08AcceptanceScene
+            backend={adapter.backend}
+            services={adapter.services}
+            style={{ flex: 1 }}
+            attach={attach}
+            fixtureUrl="http://127.0.0.1:8798"
+            nativePuck={nativePuck}
+            overlay={
+              <View
+                style={{ width: 40, height: 40, backgroundColor: "#00ff00" }}
+              />
+            }
+          />
+        )}
       </SafeAreaView>
     </MapSetup>
   );
+};
+
+const runOfflineOperation = async (
+  operations:
+    | Readonly<Record<string, (value: Record<string, unknown>) => unknown>>
+    | undefined,
+  operation: string,
+  input: Record<string, unknown>
+): Promise<unknown> => {
+  if (!operations || !Object.hasOwn(operations, operation))
+    throw new Error("Unknown named offline operation.");
+  const warnings: string[] = [];
+  const warn = console.warn;
+  console.warn = (...values: unknown[]) =>
+    warnings.push(values.map(String).join(" "));
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const value = await Promise.race([
+      Promise.resolve().then(() => operations[operation](input)),
+      new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(
+          () => reject(new Error("Named offline operation timed out.")),
+          10000
+        );
+      }),
+    ]);
+    return { value: value ?? null, warnings };
+  } finally {
+    clearTimeout(timer);
+    console.warn = warn;
+  }
 };

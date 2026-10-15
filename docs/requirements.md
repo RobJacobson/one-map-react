@@ -8,6 +8,10 @@ This document defines the replacement architecture. It supersedes conflicting re
 
 Preserve full coverage of the public APIs of the supported wrapper versions, including forwarded renderer APIs and backend-specific facilities. Cover components, props, events, hooks, methods, source and layer options, and applicable host properties. Coverage can be provided by direct delegation, conversion, a shared component, or a named backend extension. A pending implementation remains pending; it must not become an unsupported feature to make a stage pass.
 
+The owner explicitly excludes RNMapbox's `invalidateAmbientCache()` and `setMaximumAmbientCacheSize(bytes)` from TF08 implementation and acceptance requirements because they are unnecessary for this stage. This exception applies only to these two RNMapbox operations. The remaining cache operations and MapLibre equivalents retain their existing scope. Existing wrapper exports and explicit unsupported errors remain available; this scope decision does not remove public methods.
+
+TF08 acceptance uses browsers, iOS simulators, and Android emulators. The owner does not require physical-device testing, so missing physical-device evidence does not block TF08 acceptance. Simulator and emulator results establish the exercised behavior without certifying physical sensors or device-specific behavior.
+
 The four adapters target Mapbox web, MapLibre web, Mapbox native, and MapLibre native. Each native adapter covers iOS and Android, giving six runtime environments. Both mixed choices must work: Mapbox web with MapLibre native, and MapLibre web with Mapbox native. SDK feature differences remain explicit; full coverage does not claim that every renderer implements every other renderer's features.
 
 Ferryjoy's platform-specific map components illustrate the intended responsibility: rename source props, translate layer properties, adapt camera input and events, and render the selected wrapper. The library generalizes that translation and hides its platform selection from consuming map components. Ferryjoy is an architectural example, not a dependency or the limit of API coverage.

@@ -1,0 +1,2447 @@
+{
+  "stage": "TF08",
+  "status": "acceptance-failed",
+  "authorization": "Run any incomplete acceptance tests for TF08.",
+  "recordedAt": "2026-10-15T04:39:34.660Z",
+  "revision": "08702dfe4f6a3e1027a6e37de220dfb8cf36d382",
+  "scope": "Pending native second iOS display-density images, native current-map file capture, and named offline/cache/tile-store/legacy operations. Completed core/browser suites retain their existing evidence.",
+  "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+  "productionSourceChanges": false,
+  "harnessSha256": {
+    "scripts/tf08-services-smoke.mjs": "f74200cba239c8859bf7f26573beaabbf50e5a3a82f17dfe084b7866a96ef2d1",
+    "scripts/tf08-pending-scope.test.mjs": "bd965a8001a04c3b41817cafd0b1a1706928354f0311ce17972b49970429a3cc",
+    "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+    "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+    "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430"
+  },
+  "routineChecks": {
+    "formatAndLint": "passed after final harness correction; 225 formatted, 209 linted files",
+    "typecheck": "passed; all four configurations",
+    "build": "passed; current source rebuilt and copied to both native consumers",
+    "focusedNative": "passed; 12 tests in two TF08 suites",
+    "pendingScopeGuards": "passed; iOS and Android refuse non-isolated scope; web refuses pending scope",
+    "offlineObservations": "passed; transport timeout and missing-method rejection guards, native file error with null, both SDK warning formats, unexpected warnings preserved",
+    "finalDocumentation": "passed; 31 Markdown files, 32 SDK comparison tables and local links checked; new status reviewed against observed reports and inspected wrapper source",
+    "finalTypecheck": "passed; all four configurations"
+  },
+  "ownership": "One native worker; sequential runtime; Metro8181, fixture8798. Dedicated iPhone SE3 simulator and Android .tf08pending application IDs isolate cache/reset tests.",
+  "unavailable": [
+    {
+      "check": "physical-device authorization/revocation/course and physical engine compatibility",
+      "status": "blocked",
+      "reason": "Only iOS simulator and Android emulator attached; xcrun devicectl and adb inventories checked."
+    }
+  ],
+  "limits": [
+    "Named setters with no public readback establish invocation only; quota enforcement/throttle timing are not inferred.",
+    "A missing-file merge rejection does not establish valid database import; empty-cache migration does not establish populated legacy-cache migration.",
+    "Arbitrary annotations/pucks/ornaments and hardware-heading capture are not established by the point/host-marker fixture."
+  ],
+  "previousEvidence": [
+    "records/evidence/tf08-acceptance-repair.json",
+    "records/evidence/tf07-tf08-ponytail-runtime-followup.json"
+  ],
+  "sourceDiagnosis": {
+    "RNMapbox ambient invalidation/clear": "@rnmapbox/maps 10.3.7 src/modules/offline/offlineManager.ts:193,208 only console.warn and do not invoke native operations.",
+    "RNMapbox ambient size": "offlineManager.ts:234 calls MapboxOfflineManager.setMaximumAmbientCacheSize; no corresponding method exists in the inspected RNMBXOfflineModule Swift/Objective-C/Kotlin bridge.",
+    "RNMapbox region merge": "offlineManager.ts:291 calls MapboxOfflineManager.mergeOfflineRegions; no corresponding method exists in the inspected RNMBXOfflineModule bridge. Missing method is a failure, not a valid missing-file rejection.",
+    "MapLibre stale enumeration after reset": "@maplibre/maplibre-react-native 11.5.0 src/modules/offline/OfflineManager.ts:229 resetDatabase awaits native without clearing offlinePacks/initialized; getPacks:240 returns the cached offlinePacks. iOS corrected reset readback returned 1. This proves stale public enumeration, not failed native disk deletion.",
+    "MapLibre iOS missing-file merge": "ios/modules/offline/MLRNOfflineModule.mm:140 forwards absolute path to MLNOfflineStorage.addContentsOfFile. The isolated missing-file call produced a transport observation timeout. Exact native/SDK stall cause unproven."
+  },
+  "attempts": [
+    {
+      "name": "mapbox-android-first.json",
+      "report": {
+        "environment": "mapbox-android",
+        "scope": "pending",
+        "startedAt": "2026-10-15T04:39:28.344Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "f74200cba239c8859bf7f26573beaabbf50e5a3a82f17dfe084b7866a96ef2d1",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "e1a07c1103d22f7ce6945efc509c9adb47645219d2bf60c04f0beecb4cfa92ae",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2
+            }
+          },
+          {
+            "name": "independent images at the pending native display density",
+            "status": "passed",
+            "observation": {
+              "device": {
+                "scale": 2.625,
+                "window": {
+                  "width": 411.42857142857144,
+                  "height": 914.2857142857143,
+                  "scale": 2.625,
+                  "fontScale": 1
+                }
+              },
+              "dataUrl": {
+                "width": 128,
+                "height": 80,
+                "red": 166,
+                "blue": 0,
+                "green": 0,
+                "navy": 9163,
+                "magenta": 0
+              },
+              "file": {
+                "width": 128,
+                "height": 80,
+                "red": 166,
+                "blue": 0,
+                "green": 0,
+                "navy": 9163,
+                "magenta": 0
+              }
+            }
+          },
+          {
+            "name": "current-map file capture includes rendered content",
+            "status": "passed",
+            "observation": {
+              "width": 1080,
+              "height": 2349,
+              "red": 4088,
+              "blue": 0,
+              "green": 0,
+              "navy": 2532683,
+              "magenta": 0
+            }
+          },
+          {
+            "name": "named offline ambient-invalidate",
+            "status": "failed",
+            "error": "Wrapper reported a no-op instead of a native operation.\n+ actual - expected\n\n+ [\n+   'RNMapbox: invalidateAmbientCache is not implemented on v10'\n+ ]\n- []\n",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0.8057438721516189
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    2.5444437451708134e-14
+                  ],
+                  "zoom": 0.805743872151619
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named offline ambient-clear",
+            "status": "failed",
+            "error": "Wrapper reported a no-op instead of a native operation.\n+ actual - expected\n\n+ [\n+   'RNMapbox: clearAmbientCache is not implemented on v10'\n+ ]\n- []\n",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0.8057438721516189
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    2.5444437451708134e-14
+                  ],
+                  "zoom": 0.805743872151619
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named offline ambient-size",
+            "status": "failed",
+            "error": "undefined is not a function",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0.8057438721516189
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    2.5444437451708134e-14
+                  ],
+                  "zoom": 0.805743872151619
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named offline tile-limit",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline throttle",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline quota",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline migrate",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline legacy-list",
+            "status": "passed",
+            "observation": {
+              "value": 0,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline legacy-migrate",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline legacy-limit",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline legacy-reset",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline missing merge input rejects",
+            "status": "failed",
+            "error": "A missing bridge is not a valid file-input rejection.",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0.8057438721516189
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    2.5444437451708134e-14
+                  ],
+                  "zoom": 0.805743872151619
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named legacy offline pack lifecycle",
+            "status": "passed",
+            "observation": {
+              "status": {
+                "completedTileSize": 0,
+                "completedTileCount": 0,
+                "completedResourceSize": 217,
+                "requiredResourceCount": 1,
+                "completedResourceCount": 1,
+                "percentage": 100,
+                "state": 2,
+                "name": "tf08-legacy-pending"
+              },
+              "completion": "lifecycle acknowledgement; full download not certified"
+            }
+          },
+          {
+            "name": "named offline reset removes a discoverable test pack",
+            "status": "passed",
+            "observation": {
+              "id": "tf08-reset-mapbox-android-1792039181978",
+              "before": {
+                "id": "tf08-reset-mapbox-android-1792039181978",
+                "state": "active",
+                "percentage": 0,
+                "completedResourceCount": 0,
+                "completedResourceSize": 0,
+                "requiredResourceCount": 1
+              },
+              "remainingPacks": 0
+            }
+          }
+        ],
+        "imageObservations": [
+          {
+            "scenario": "independent images at the pending native display density",
+            "width": 128,
+            "height": 80,
+            "red": 166,
+            "blue": 0,
+            "green": 0,
+            "navy": 9163,
+            "magenta": 0
+          },
+          {
+            "scenario": "independent images at the pending native display density",
+            "width": 128,
+            "height": 80,
+            "red": 166,
+            "blue": 0,
+            "green": 0,
+            "navy": 9163,
+            "magenta": 0
+          },
+          {
+            "scenario": "current-map file capture includes rendered content",
+            "width": 1080,
+            "height": 2349,
+            "red": 4088,
+            "blue": 0,
+            "green": 0,
+            "navy": 2532683,
+            "magenta": 0
+          }
+        ],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 2,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                0,
+                0
+              ],
+              "zoom": 0
+            },
+            {
+              "origin": "unknown",
+              "center": [
+                0,
+                0
+              ],
+              "zoom": 0.8057438721516189
+            },
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                2.5444437451708134e-14
+              ],
+              "zoom": 0.805743872151619
+            },
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "valid offline database import and populated legacy-cache migration",
+          "hardware location and additional overlay/puck inclusion combinations"
+        ],
+        "resourceRequests": 2,
+        "blockedRequests": 0,
+        "resourceObservations": [
+          {
+            "path": "/style.json",
+            "available": true
+          },
+          {
+            "path": "/offline-style.json?id=tf08-reset-mapbox-android-1792039181978",
+            "available": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "mapbox-ios2x-first.json",
+      "report": {
+        "environment": "mapbox-ios",
+        "scope": "pending",
+        "startedAt": "2026-10-15T04:40:55.176Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "f74200cba239c8859bf7f26573beaabbf50e5a3a82f17dfe084b7866a96ef2d1",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+        "nativeLibraries": {
+          "OneMapMapbox.debug.dylib": "5be94f940504312679929c47875023a2d8bd6cac2100f5f4d5ffe9b08d2ada33",
+          "__preview.dylib": "b00aae2b446bc582eaac2a3ccdcba81dd2c355d0ea233ad78e7b87ca07765d4d"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2
+            }
+          },
+          {
+            "name": "independent images at the pending native display density",
+            "status": "passed",
+            "observation": {
+              "device": {
+                "scale": 2,
+                "window": {
+                  "fontScale": 1,
+                  "width": 375,
+                  "height": 667,
+                  "scale": 2
+                }
+              },
+              "dataUrl": {
+                "width": 128,
+                "height": 80,
+                "red": 166,
+                "blue": 0,
+                "green": 0,
+                "navy": 9053,
+                "magenta": 0
+              },
+              "file": {
+                "width": 128,
+                "height": 80,
+                "red": 166,
+                "blue": 0,
+                "green": 0,
+                "navy": 9053,
+                "magenta": 0
+              }
+            }
+          },
+          {
+            "name": "current-map file capture includes rendered content",
+            "status": "passed",
+            "observation": {
+              "width": 750,
+              "height": 1260,
+              "red": 2332,
+              "blue": 425,
+              "green": 0,
+              "navy": 934874,
+              "magenta": 0
+            }
+          },
+          {
+            "name": "named offline ambient-invalidate",
+            "status": "failed",
+            "error": "Wrapper reported a no-op instead of a native operation.\n+ actual - expected\n\n+ [\n+   'RNMapbox: invalidateAmbientCache is not implemented on v10'\n+ ]\n- []\n",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named offline ambient-clear",
+            "status": "failed",
+            "error": "Wrapper reported a no-op instead of a native operation.\n+ actual - expected\n\n+ [\n+   'RNMapbox: clearAmbientCache is not implemented on v10'\n+ ]\n- []\n",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named offline ambient-size",
+            "status": "failed",
+            "error": "undefined is not a function",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named offline tile-limit",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline throttle",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline quota",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline migrate",
+            "status": "failed",
+            "error": "“cache.db” couldn’t be moved to “map_data” because an item with the same name already exists.",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named offline legacy-list",
+            "status": "passed",
+            "observation": {
+              "value": 0,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline legacy-migrate",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline legacy-limit",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline legacy-reset",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline missing merge input rejects",
+            "status": "failed",
+            "error": "A missing bridge is not a valid file-input rejection.",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "named legacy offline pack lifecycle",
+            "status": "passed",
+            "observation": {
+              "status": {
+                "percentage": 100,
+                "requiredResourceCount": 1,
+                "completedResourceSize": 217,
+                "completedTileSize": 0,
+                "completedResourceCount": 1,
+                "name": "tf08-legacy-pending",
+                "state": 2,
+                "completedTileCount": 0
+              },
+              "completion": "lifecycle acknowledgement; full download not certified"
+            }
+          },
+          {
+            "name": "named offline reset removes a discoverable test pack",
+            "status": "failed",
+            "error": "Does not exist, could not find groupID for identifier tf08-reset-mapbox-ios-1792039291443, 1",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 2,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          }
+        ],
+        "imageObservations": [
+          {
+            "scenario": "independent images at the pending native display density",
+            "width": 128,
+            "height": 80,
+            "red": 166,
+            "blue": 0,
+            "green": 0,
+            "navy": 9053,
+            "magenta": 0
+          },
+          {
+            "scenario": "independent images at the pending native display density",
+            "width": 128,
+            "height": 80,
+            "red": 166,
+            "blue": 0,
+            "green": 0,
+            "navy": 9053,
+            "magenta": 0
+          },
+          {
+            "scenario": "current-map file capture includes rendered content",
+            "width": 750,
+            "height": 1260,
+            "red": 2332,
+            "blue": 425,
+            "green": 0,
+            "navy": 934874,
+            "magenta": 0
+          }
+        ],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 2,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10
+            },
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "valid offline database import and populated legacy-cache migration",
+          "hardware location and additional overlay/puck inclusion combinations"
+        ],
+        "resourceRequests": 2,
+        "blockedRequests": 0,
+        "resourceObservations": [
+          {
+            "path": "/style.json",
+            "available": true
+          },
+          {
+            "path": "/offline-style.json?id=tf08-reset-mapbox-ios-1792039291443",
+            "available": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "mapbox-ios2x-reset-retry.json",
+      "report": {
+        "environment": "mapbox-ios",
+        "scope": "pending-reset",
+        "startedAt": "2026-10-15T04:48:25.505Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "1847dcf2bdef748de6b0115c9b1d6847f5fc784abe05e7a5a3e4fbe1a6faf2fe",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+        "nativeLibraries": {
+          "OneMapMapbox.debug.dylib": "5be94f940504312679929c47875023a2d8bd6cac2100f5f4d5ffe9b08d2ada33",
+          "__preview.dylib": "b00aae2b446bc582eaac2a3ccdcba81dd2c355d0ea233ad78e7b87ca07765d4d"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 1
+            }
+          },
+          {
+            "name": "named offline reset removes a discoverable test pack",
+            "status": "passed",
+            "observation": {
+              "id": "tf08-reset-mapbox-ios-1792039716807",
+              "before": {
+                "id": "tf08-reset-mapbox-ios-1792039716807",
+                "state": "complete",
+                "percentage": 100,
+                "completedResourceCount": 1,
+                "completedResourceSize": 21579921,
+                "requiredResourceCount": 1
+              },
+              "warnings": [],
+              "remainingPacks": 0
+            }
+          }
+        ],
+        "imageObservations": [],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 1,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "second iOS display density"
+        ],
+        "resourceRequests": 1,
+        "blockedRequests": 0,
+        "resourceObservations": [
+          {
+            "path": "/offline-style.json?id=tf08-reset-mapbox-ios-1792039716807",
+            "available": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "maplibre-android-first.json",
+      "report": {
+        "environment": "maplibre-android",
+        "scope": "pending",
+        "startedAt": "2026-10-15T04:39:57.160Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "f74200cba239c8859bf7f26573beaabbf50e5a3a82f17dfe084b7866a96ef2d1",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "75d1a642dc033070b5b3c6e97c4ac3b21e69083bb659985a472a27a69ec031fb",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3
+            }
+          },
+          {
+            "name": "independent images at the pending native display density",
+            "status": "passed",
+            "observation": {
+              "device": {
+                "scale": 2.625,
+                "window": {
+                  "width": 411.42857142857144,
+                  "height": 914.2857142857143,
+                  "scale": 2.625,
+                  "fontScale": 1
+                }
+              },
+              "dataUrl": {
+                "width": 128,
+                "height": 80,
+                "red": 166,
+                "blue": 0,
+                "green": 0,
+                "navy": 10040,
+                "magenta": 0
+              },
+              "file": {
+                "width": 128,
+                "height": 80,
+                "red": 166,
+                "blue": 0,
+                "green": 0,
+                "navy": 10040,
+                "magenta": 0
+              }
+            }
+          },
+          {
+            "name": "current-map file capture includes rendered content",
+            "status": "passed",
+            "observation": {
+              "width": 1080,
+              "height": 2349,
+              "red": 4082,
+              "blue": 0,
+              "green": 0,
+              "navy": 2525615,
+              "magenta": 0
+            }
+          },
+          {
+            "name": "named offline ambient-invalidate",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline ambient-clear",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline ambient-size",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline tile-limit",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline throttle",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline missing merge input rejects",
+            "status": "passed",
+            "observation": {
+              "message": "Secondary database needs to be located in a readable path.",
+              "validDatabaseImport": "not exercised"
+            }
+          },
+          {
+            "name": "named offline reset removes a discoverable test pack",
+            "status": "failed",
+            "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'MapLibre Native [WARN] [Mbgl] {DatabaseFileSou}[Database]: Removing existing incompatible offline database'\n+ ]\n- []\n",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          }
+        ],
+        "imageObservations": [
+          {
+            "scenario": "independent images at the pending native display density",
+            "width": 128,
+            "height": 80,
+            "red": 166,
+            "blue": 0,
+            "green": 0,
+            "navy": 10040,
+            "magenta": 0
+          },
+          {
+            "scenario": "independent images at the pending native display density",
+            "width": 128,
+            "height": 80,
+            "red": 166,
+            "blue": 0,
+            "green": 0,
+            "navy": 10040,
+            "magenta": 0
+          },
+          {
+            "scenario": "current-map file capture includes rendered content",
+            "width": 1080,
+            "height": 2349,
+            "red": 4082,
+            "blue": 0,
+            "green": 0,
+            "navy": 2525615,
+            "magenta": 0
+          }
+        ],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 3,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10
+            },
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "valid offline database import and populated legacy-cache migration",
+          "hardware location and additional overlay/puck inclusion combinations"
+        ],
+        "resourceRequests": 6,
+        "blockedRequests": 0,
+        "resourceObservations": [
+          {
+            "path": "/style.json",
+            "available": true
+          },
+          {
+            "path": "/offline-style.json?id=tf08-reset-maplibre-android-1792039209229",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-android-1792039209229/1/0/0.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-android-1792039209229/1/1/0.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-android-1792039209229/1/0/1.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-android-1792039209229/1/1/1.png",
+            "available": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "maplibre-android-reset-final.json",
+      "report": {
+        "environment": "maplibre-android",
+        "scope": "pending-reset",
+        "startedAt": "2026-10-15T04:49:08.976Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "3c9df20aba1545e276a90427c3feefecc75b0c7d44b6221b801d76ea39dbef23",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "75d1a642dc033070b5b3c6e97c4ac3b21e69083bb659985a472a27a69ec031fb",
+        "scenarios": [
+          {
+            "name": "acceptance setup",
+            "status": "failed",
+            "error": "adb: device 'emulator-5556' not found\n"
+          }
+        ],
+        "imageObservations": [],
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 0,
+        "blockedRequests": 0,
+        "resourceObservations": []
+      }
+    },
+    {
+      "name": "maplibre-android-reset-retry.json",
+      "report": {
+        "environment": "maplibre-android",
+        "scope": "pending-reset",
+        "startedAt": "2026-10-15T04:44:58.941Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "1847dcf2bdef748de6b0115c9b1d6847f5fc784abe05e7a5a3e4fbe1a6faf2fe",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "75d1a642dc033070b5b3c6e97c4ac3b21e69083bb659985a472a27a69ec031fb",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3
+            }
+          },
+          {
+            "name": "named offline reset removes a discoverable test pack",
+            "status": "failed",
+            "error": "TF08 observation timed out: completed test pack before database reset.",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                },
+                {
+                  "origin": "unknown",
+                  "center": [
+                    -122.34000000000002,
+                    47.60999999999999
+                  ],
+                  "zoom": 10
+                }
+              ]
+            }
+          }
+        ],
+        "imageObservations": [],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 3,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10
+            },
+            {
+              "origin": "unknown",
+              "center": [
+                -122.34000000000002,
+                47.60999999999999
+              ],
+              "zoom": 10
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 5,
+        "blockedRequests": 0,
+        "resourceObservations": [
+          {
+            "path": "/offline-style.json?id=tf08-reset-maplibre-android-1792039506525",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-android-1792039506525/1/0/0.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-android-1792039506525/1/1/0.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-android-1792039506525/1/0/1.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-android-1792039506525/1/1/1.png",
+            "available": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "maplibre-android-reset-verified.json",
+      "report": {
+        "environment": "maplibre-android",
+        "scope": "pending-reset",
+        "startedAt": "2026-10-15T04:55:04.336Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "4afb652ec58917bcf0575f81e7f03de9e762f07368775b6df501ba2dc2a64a45",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "75d1a642dc033070b5b3c6e97c4ac3b21e69083bb659985a472a27a69ec031fb",
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "failed",
+            "error": "TF08 observation timed out: required observation."
+          }
+        ],
+        "imageObservations": [],
+        "remaining": [
+          "physical-device authorization/revocation/course"
+        ],
+        "resourceRequests": 0,
+        "blockedRequests": 0,
+        "resourceObservations": []
+      }
+    },
+    {
+      "name": "maplibre-ios2x-first.json",
+      "report": {
+        "environment": "maplibre-ios",
+        "scope": "pending",
+        "startedAt": "2026-10-15T04:41:51.892Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "f74200cba239c8859bf7f26573beaabbf50e5a3a82f17dfe084b7866a96ef2d1",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "nativeLibraries": {
+          "OneMapMaplibre.debug.dylib": "70c7f7ff3a7dec740a9f3ee73387b9927ef8a195ad59294fe0b68047aee1e34f",
+          "__preview.dylib": "18cba1232108938b0ce9083884e375f287814a994639881394f1bca64fd65e8e"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.33999999999916,
+                47.60999999999396
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3
+            }
+          },
+          {
+            "name": "independent images at the pending native display density",
+            "status": "passed",
+            "observation": {
+              "device": {
+                "scale": 2,
+                "window": {
+                  "fontScale": 1,
+                  "width": 375,
+                  "height": 667,
+                  "scale": 2
+                }
+              },
+              "dataUrl": {
+                "width": 128,
+                "height": 80,
+                "red": 166,
+                "blue": 0,
+                "green": 0,
+                "navy": 10040,
+                "magenta": 0
+              },
+              "file": {
+                "width": 128,
+                "height": 80,
+                "red": 166,
+                "blue": 0,
+                "green": 0,
+                "navy": 10040,
+                "magenta": 0
+              }
+            }
+          },
+          {
+            "name": "current-map file capture includes rendered content",
+            "status": "passed",
+            "observation": {
+              "width": 750,
+              "height": 1260,
+              "red": 2338,
+              "blue": 432,
+              "green": 0,
+              "navy": 938206,
+              "magenta": 0
+            }
+          },
+          {
+            "name": "named offline ambient-invalidate",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline ambient-clear",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline ambient-size",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline tile-limit",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline throttle",
+            "status": "passed",
+            "observation": {
+              "value": null,
+              "warnings": [],
+              "verification": "public wrapper invocation; no storage/quota readback API"
+            }
+          },
+          {
+            "name": "named offline missing merge input rejects",
+            "status": "failed",
+            "error": "A missing bridge is not a valid file-input rejection.",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.33999999999916,
+                47.60999999999396
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0.29920801838727884
+                }
+              ]
+            }
+          },
+          {
+            "name": "named offline reset removes a discoverable test pack",
+            "status": "failed",
+            "error": "TF08 observation timed out: required observation.",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.33999999999916,
+                47.60999999999396
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0.29920801838727884
+                }
+              ]
+            }
+          }
+        ],
+        "imageObservations": [
+          {
+            "scenario": "independent images at the pending native display density",
+            "width": 128,
+            "height": 80,
+            "red": 166,
+            "blue": 0,
+            "green": 0,
+            "navy": 10040,
+            "magenta": 0
+          },
+          {
+            "scenario": "independent images at the pending native display density",
+            "width": 128,
+            "height": 80,
+            "red": 166,
+            "blue": 0,
+            "green": 0,
+            "navy": 10040,
+            "magenta": 0
+          },
+          {
+            "scenario": "current-map file capture includes rendered content",
+            "width": 750,
+            "height": 1260,
+            "red": 2338,
+            "blue": 432,
+            "green": 0,
+            "navy": 938206,
+            "magenta": 0
+          }
+        ],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.33999999999916,
+            47.60999999999396
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 3,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                0,
+                0
+              ],
+              "zoom": 0.29920801838727884
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "valid offline database import and populated legacy-cache migration",
+          "hardware location and additional overlay/puck inclusion combinations"
+        ],
+        "resourceRequests": 1,
+        "blockedRequests": 0,
+        "resourceObservations": [
+          {
+            "path": "/style.json",
+            "available": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "maplibre-ios2x-merge-retry.json",
+      "report": {
+        "environment": "maplibre-ios",
+        "scope": "pending-merge",
+        "startedAt": "2026-10-15T04:49:43.738Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "3c9df20aba1545e276a90427c3feefecc75b0c7d44b6221b801d76ea39dbef23",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "nativeLibraries": {
+          "OneMapMaplibre.debug.dylib": "70c7f7ff3a7dec740a9f3ee73387b9927ef8a195ad59294fe0b68047aee1e34f",
+          "__preview.dylib": "18cba1232108938b0ce9083884e375f287814a994639881394f1bca64fd65e8e"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.33999999999916,
+                47.60999999999396
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3
+            }
+          },
+          {
+            "name": "named offline missing merge input rejects",
+            "status": "passed",
+            "observation": {
+              "message": "TF08 observation timed out: required observation.",
+              "validDatabaseImport": "not exercised"
+            }
+          }
+        ],
+        "imageObservations": [],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.33999999999916,
+            47.60999999999396
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 3,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                0,
+                0
+              ],
+              "zoom": 0.29920801838727884
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "second iOS display density"
+        ],
+        "resourceRequests": 0,
+        "blockedRequests": 0,
+        "resourceObservations": []
+      }
+    },
+    {
+      "name": "maplibre-ios2x-reset-final.json",
+      "report": {
+        "environment": "maplibre-ios",
+        "scope": "pending-reset",
+        "startedAt": "2026-10-15T04:49:19.407Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "3c9df20aba1545e276a90427c3feefecc75b0c7d44b6221b801d76ea39dbef23",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "nativeLibraries": {
+          "OneMapMaplibre.debug.dylib": "70c7f7ff3a7dec740a9f3ee73387b9927ef8a195ad59294fe0b68047aee1e34f",
+          "__preview.dylib": "18cba1232108938b0ce9083884e375f287814a994639881394f1bca64fd65e8e"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.33999999999916,
+                47.60999999999396
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3
+            }
+          },
+          {
+            "name": "named offline reset removes a discoverable test pack",
+            "status": "failed",
+            "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'MapLibre Native [WARN] [virtual bool mln::MLNCoreLoggingObserver::onRecord(EventSeverity, Event, int64_t, const std::string &)] [event]:Database [code]:-1 [message]:Removing existing incompatible offline database'\n+ ]\n- []\n",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.33999999999916,
+                47.60999999999396
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0.29920801838727884
+                }
+              ]
+            }
+          }
+        ],
+        "imageObservations": [],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.33999999999916,
+            47.60999999999396
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 3,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                0,
+                0
+              ],
+              "zoom": 0.29920801838727884
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "second iOS display density"
+        ],
+        "resourceRequests": 5,
+        "blockedRequests": 0,
+        "resourceObservations": [
+          {
+            "path": "/offline-style.json?id=tf08-reset-maplibre-ios-1792039766264",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-ios-1792039766264/1/0/0.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-ios-1792039766264/1/1/0.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-ios-1792039766264/1/0/1.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-ios-1792039766264/1/1/1.png",
+            "available": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "maplibre-ios2x-reset-verified.json",
+      "report": {
+        "environment": "maplibre-ios",
+        "scope": "pending-reset",
+        "startedAt": "2026-10-15T04:51:33.081Z",
+        "harnessSha256": {
+          "scripts/tf08-services-smoke.mjs": "4afb652ec58917bcf0575f81e7f03de9e762f07368775b6df501ba2dc2a64a45",
+          "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+          "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+          "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+          "examples/shared/tf08-acceptance-scene.tsx": "7390a128b32a754be2fdc2de0ffb7234588158580e3b27a805be0698154acd30",
+          "examples/shared/native-tf08-screen.tsx": "75e9c258c2630fc03fb79fd5ae9985f515c58133c167a5558d4972c46ea4fe38",
+          "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+          "examples/native-mapbox/App.tsx": "e39aecbaa269330dc43d13a6f172f633ff7eeaa1e9ded0b05ae5784aac6d94e9",
+          "examples/native-maplibre/App.tsx": "99d18d1b15641b91346318a3afb2eae14f22cbe1c74feaad95e8be884ee77430",
+          "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+        },
+        "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+        "nativeBinarySha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "nativeLibraries": {
+          "OneMapMaplibre.debug.dylib": "70c7f7ff3a7dec740a9f3ee73387b9927ef8a195ad59294fe0b68047aee1e34f",
+          "__preview.dylib": "18cba1232108938b0ce9083884e375f287814a994639881394f1bca64fd65e8e"
+        },
+        "scenarios": [
+          {
+            "name": "known renderer feature",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.33999999999916,
+                47.60999999999396
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3
+            }
+          },
+          {
+            "name": "named offline reset removes a discoverable test pack",
+            "status": "failed",
+            "error": "Expected values to be strictly equal:\n\n1 !== 0\n",
+            "lastRendererObservation": {
+              "loads": 1,
+              "fixes": 0,
+              "errors": 0,
+              "watches": 0,
+              "releases": 0,
+              "center": [
+                -122.33999999999916,
+                47.60999999999396
+              ],
+              "zoom": 10,
+              "featureCount": 1,
+              "moving": false,
+              "moveEnds": 3,
+              "moves": [
+                {
+                  "origin": "unknown",
+                  "center": [
+                    0,
+                    0
+                  ],
+                  "zoom": 0.29920801838727884
+                }
+              ]
+            }
+          }
+        ],
+        "imageObservations": [],
+        "lastRendererObservation": {
+          "loads": 1,
+          "fixes": 0,
+          "errors": 0,
+          "watches": 0,
+          "releases": 0,
+          "center": [
+            -122.33999999999916,
+            47.60999999999396
+          ],
+          "zoom": 10,
+          "featureCount": 1,
+          "moving": false,
+          "moveEnds": 3,
+          "moves": [
+            {
+              "origin": "unknown",
+              "center": [
+                0,
+                0
+              ],
+              "zoom": 0.29920801838727884
+            }
+          ]
+        },
+        "remaining": [
+          "physical-device authorization/revocation/course",
+          "second iOS display density"
+        ],
+        "resourceRequests": 5,
+        "blockedRequests": 0,
+        "resourceObservations": [
+          {
+            "path": "/offline-style.json?id=tf08-reset-maplibre-ios-1792039899875",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-ios-1792039899875/1/0/0.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-ios-1792039899875/1/1/0.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-ios-1792039899875/1/0/1.png",
+            "available": true
+          },
+          {
+            "path": "/tile/tf08-reset-maplibre-ios-1792039899875/1/1/1.png",
+            "available": true
+          }
+        ]
+      }
+    }
+  ],
+  "firstAttemptCounts": [
+    {
+      "environment": "mapbox-android",
+      "passed": 13,
+      "failed": 4
+    },
+    {
+      "environment": "maplibre-android",
+      "passed": 9,
+      "failed": 1
+    },
+    {
+      "environment": "mapbox-ios",
+      "passed": 11,
+      "failed": 6
+    },
+    {
+      "environment": "maplibre-ios",
+      "passed": 8,
+      "failed": 2
+    }
+  ],
+  "followUp": {
+    "runnerSha256": "1847dcf2bdef748de6b0115c9b1d6847f5fc784abe05e7a5a3e4fbe1a6faf2fe",
+    "libraryAndNativeBinariesUnchanged": true,
+    "scope": "MapLibre Android reset, both iOS resets, MapLibre iOS missing-file merge only",
+    "harnessCorrections": [
+      "Do not treat arbitrary null/undefined substrings in an NSError description as missing-method failures; preserve actual rejection text.",
+      "Wait for completed nonempty pack before database reset to avoid querying native persistence during initial creation.",
+      "Allow only the observed MapLibre database-replacement warning; still require zero packs after reset."
+    ],
+    "routine": "Syntax, isolation guards, formatting and lint passed.",
+    "finalRunnerSha256": "4afb652ec58917bcf0575f81e7f03de9e762f07368775b6df501ba2dc2a64a45",
+    "finalObservationHelperSha256": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567",
+    "additionalCorrections": [
+      "A reset test needs a known native pack state, not completed-download certification.",
+      "Match MapLibre database-replacement warning by its exact shared message rather than platform-dependent prefix.",
+      "All transport and named-operation timeouts fail missing-file rejection tests; false-positive recorded result is explicitly invalidated."
+    ]
+  },
+  "reviewedDispositions": {
+    "maplibre-ios2x-merge-retry.json": "Invalid positive: report says passed but observation is TF08 transport timeout. Treat missing-file merge as failed; no native file validation observed. Corrected assertion has regression coverage, operation was not repeated solely to reproduce same deadline.",
+    "maplibre-android-reset-retry.json": "Reset was not invoked: overly strict completed-download prerequisite timed out despite five fixture requests. This does not establish a reset failure.",
+    "maplibre-android-reset-final.json": "Setup-only failure: emulator disconnected. No scenario or reset operation ran.",
+    "maplibre-ios2x-reset-final.json": "Native reset returned expected SDK database-replacement warning. Incorrect platform-specific warning match stopped zero-pack readback; reset result awaited corrected scoped verification.",
+    "mapbox-ios2x-reset-retry.json": "Valid scoped pass: completed nonempty pack observed; native reset returned and public getPacks returned zero. Original group-ID error preserved; exact original phase not independently proven.",
+    "maplibre-ios2x-reset-verified.json": "Valid failure: native reset returned; selected public manager getPacks returned 1 instead of 0. Cache source inspection explains stale public enumeration. Native disk contents were not read back.",
+    "maplibre-android-reset-verified.json": "Unverified reset: additional Android17/API37 emulator failed renderer readiness; no reset invoked. One bounded startup check found no process or clear logged cause. Original Android OS/API not captured live; historical API36 baseline cannot be inferred.",
+    "maplibre-android-first.json": "Native reset returned but warning assertion prevented pack enumeration. Subsequent download-completion and replacement-emulator prerequisites did not establish reset readback. Android reset remains unverified; do not infer iOS runtime failure applies to Android."
+  },
+  "completedAt": "2026-10-15T04:59:06.528Z",
+  "worker": {
+    "task": "TF08 incomplete native acceptance, pending-only",
+    "temporaryRoot": "/private/tmp/one-map-tf08-pending-uT1jCH",
+    "libraryDistSha256": "705fad797bcdf3a6fff6ea24e71cdaf947df0d7a1c485714dcda4bf5c1454956",
+    "latestHarness": {
+      "scripts/tf08-services-smoke.mjs": "4afb652ec58917bcf0575f81e7f03de9e762f07368775b6df501ba2dc2a64a45",
+      "scripts/tf08-offline-observations.mjs": "1e7da328408791740a3b871a404939200288102ff0bb53a4ba6634a20bbba567"
+    },
+    "androidArtifacts": {
+      "mapbox": {
+        "apk": "apks/mapbox-tf08pending.apk",
+        "sha256": "e1a07c1103d22f7ce6945efc509c9adb47645219d2bf60c04f0beecb4cfa92ae",
+        "applicationId": "com.onemapmapbox.tf08pending",
+        "activity": "com.onemapmapbox.MainActivity",
+        "component": "com.onemapmapbox.tf08pending/com.onemapmapbox.MainActivity"
+      },
+      "maplibre": {
+        "apk": "apks/maplibre-tf08pending.apk",
+        "sha256": "75d1a642dc033070b5b3c6e97c4ac3b21e69083bb659985a472a27a69ec031fb",
+        "applicationId": "com.onemapmaplibre.tf08pending",
+        "activity": "com.onemapmaplibre.MainActivity",
+        "component": "com.onemapmaplibre.tf08pending/com.onemapmaplibre.MainActivity"
+      },
+      "buildInitScript": {
+        "path": "tf08-pending.init.gradle",
+        "sha256": "9b86eab122d5f7f8ec56c14462816e85d37f8a8450ec8e497a5da6c0515fab7d",
+        "contents": "allprojects { project -> project.afterEvaluate { if (project.plugins.hasPlugin('com.android.application')) { project.extensions.getByName('android').buildTypes.getByName('debug').applicationIdSuffix = '.tf08pending' } } }"
+      },
+      "buildCommands": [
+        "From examples/native-mapbox/android: ./gradlew --no-daemon :app:assembleDebug -PreactNativeArchitectures=arm64-v8a -I /private/tmp/one-map-tf08-pending-uT1jCH/tf08-pending.init.gradle",
+        "Same command from examples/native-maplibre/android"
+      ],
+      "buildFailuresAndCorrections": [
+        "Initial Gradle wrapper could not write the Gradle lock/cache in ~/.gradle; parent authorized escalated rebuild.",
+        "First escalated attempt had a too-narrow PATH and Gradle could not start npx; restored workspace Node runtime PATH, stopped stale daemon, then built successfully."
+      ]
+    },
+    "iosArtifacts": {
+      "simulator": {
+        "name": "TF08PendingSE3",
+        "udid": "B81311ED-E4A0-4192-85FA-9ED03587CFC1",
+        "device": "iPhone SE (3rd generation)",
+        "runtime": "iOS 27.0",
+        "pixelRatio": 2,
+        "state": "shut down; dedicated simulator only"
+      },
+      "mapbox": {
+        "app": "apps/OneMapMapbox.app",
+        "bundleId": "org.reactjs.native.example.OneMapMapbox",
+        "executableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+        "debugDylibSha256": "5be94f940504312679929c47875023a2d8bd6cac2100f5f4d5ffe9b08d2ada33"
+      },
+      "maplibre": {
+        "app": "apps/OneMapMaplibre.app",
+        "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+        "executableSha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+        "debugDylibSha256": "70c7f7ff3a7dec740a9f3ee73387b9927ef8a195ad59294fe0b68047aee1e34f"
+      },
+      "provenance": "Copied from installed patched wrappers and matched to accepted TF07/TF08 evidence before the pending runs."
+    },
+    "reports": {
+      "mapbox-android-first.json": "13/17; ambient invalidate/clear warning-only stubs, ambient size undefined function, missing-merge rejection assertion failed; reset passed.",
+      "maplibre-android-first.json": "9/10; reset observation rejected SDK housekeeping warning; fixture served four tiles.",
+      "mapbox-ios2x-first.json": "11/17; ambient invalidate/clear/size gaps, migrate fixture lacked cache.db, missing-merge assertion failure, reset had missing group ID.",
+      "maplibre-ios2x-first.json": "8/10; missing-merge assertion failure and reset observation timeout.",
+      "maplibre-android-reset-retry.json": "Timed out waiting for completed-pack precondition; reset not invoked.",
+      "mapbox-ios2x-reset-retry.json": "Passed on clean isolated app sandbox; completed pack reset, public getPacks returned zero.",
+      "maplibre-android-reset-final.json": "Setup failed because old emulator-5556 was absent; no runtime scenario executed.",
+      "maplibre-ios2x-reset-final.json": "Clean isolated sandbox; reset warning was rejected by then-current harness; five fixture resources served.",
+      "maplibre-ios2x-merge-retry.json": "Transport timeout, zero resource requests; harness falsely marked pass. Parent invalidated; no valid merge result.",
+      "maplibre-ios2x-reset-verified.json": "Clean isolated sandbox; reset ran but public getPacks returned one. Parent source diagnosis: wrapper returns cached offlinePacks after reset; does not establish native disk deletion failure.",
+      "maplibre-android-reset-verified.json": "On isolated Android 17/API 37 emulator; known-renderer prerequisite timed out, zero resource requests, reset not invoked. One attempt only."
+    },
+    "androidDevices": {
+      "initialFourRuns": "Used emulator-5556, but live OS/API was not captured; report OS as unverified. Later inventory found that serial was an unrelated Issue4062API35 Android 15 emulator; it was not modified.",
+      "finalIsolatedRun": {
+        "avd": "OneMapTF08Pending37",
+        "avdHome": "/private/tmp/one-map-tf08-pending-uT1jCH/avd",
+        "serial": "emulator-5558",
+        "liveRelease": "17",
+        "liveApi": "37",
+        "device": "emu64a16k",
+        "fingerprint": "google/sdk_gphone16k_arm64/emu64a16k:17/CP31.260623.012/16064790:user/dev-keys",
+        "display": "1080x2400 at 420dpi",
+        "userdataPartitionMB": 4096,
+        "sandboxBeforeRun": "App ID absent; pm clear returned Failed, so suffix-app data was already clean.",
+        "result": "known renderer prerequisite timeout before any fixture request or reset invocation.",
+        "startupDiagnostic": "One bounded read-only pidof/logcat check after timeout found no app process and no matching AndroidRuntime/linker/ReactNativeJS errors in the last 3000 log lines; cause remains unclear, so renderer readiness is unverified."
+      }
+    },
+    "infrastructure": [
+      "First simulator creation used invalid short runtime name; corrected to full com.apple.CoreSimulator.SimRuntime.iOS-27-0.",
+      "Default temporary Android AVD startup required 12,288 MB but only about 10,038 MB was available; relaunched the temporary AVD with a 4,096 MB partition.",
+      "Only installed Android system image used; no image downloaded and existing TF07_Acceptance userdata untouched."
+    ],
+    "ownershipAndCleanup": {
+      "temporaryRootSizeAtSummary": "2.3G (includes 4 GB configured sparse AVD userdata; du-reported size)",
+      "androidBuildOutputSizes": {
+        "mapbox": "933M at examples/native-mapbox/android/app/build",
+        "maplibre": "616M at examples/native-maplibre/android/app/build"
+      },
+      "activeEmulator": "OneMapTF08Pending37 on emulator-5558; owned temporary AVD; leave intact until parent copies evidence and authorizes cleanup.",
+      "sharedAVD": "TF07_Acceptance untouched.",
+      "ports": "8181 Metro and 8798 fixture reserved during native runs.",
+      "cleanup": "No artifacts, reports, AVDs, installed apps, or build outputs deleted."
+    }
+  },
+  "outcomes": {
+    "images": "Passed: 128x80 data-URL/file PNGs at verified iOS2x on both engines; independent images and current-map file capture passed on both initial Android engines too.",
+    "rnmapbox": "Failed: warning-only ambient invalidate/clear, missing ambient-size and merge bindings on both OSes. Reset and bounded legacy lifecycle passed both OSes. iOS migration collision lacks valid populated migration fixture.",
+    "maplibreIos": "Failed: missing-file merge transport timed out; public getPacks returned one after native reset acknowledged. Source retains JavaScript pack cache across reset. Native disk deletion not independently checked.",
+    "maplibreAndroid": "Ambient calls, settings and invalid merge rejection passed; reset enumeration unverified due first warning assertion, overly strict followup download prerequisite and later unavailable/replacement-device readiness."
+  },
+  "remaining": [
+    {
+      "status": "failed",
+      "check": "RNMapbox named ambient/cache-size/region-merge operations on both platforms"
+    },
+    {
+      "status": "failed",
+      "check": "MapLibre iOS public pack list after reset and missing-file merge response"
+    },
+    {
+      "status": "unverified",
+      "check": "MapLibre Android post-reset enumeration; baseline emulator unavailable; replacement API37 renderer did not become ready"
+    },
+    {
+      "status": "blocked",
+      "check": "Physical-device authorization/revocation/course and location-engine compatibility; no physical device attached"
+    },
+    {
+      "status": "unverified",
+      "check": "Valid database import, populated legacy-cache migration, quota enforcement/throttle timing, and additional annotation/puck/ornament capture combinations"
+    }
+  ],
+  "retention": "Compact reports, reviewed dispositions, provenance and source diagnosis retained here. Owned temporary apps, APKs, AVD/simulator and generated app build outputs removed. Prior evidence preserved; no SDK image downloaded.",
+  "cleanup": {
+    "status": "completed",
+    "workerSummaryCapturedBeforeCleanup": true,
+    "removed": [
+      "owned temporary root and API37 emulator/AVD registration",
+      "dedicated iPhone SE3 simulator B81311ED-E4A0-4192-85FA-9ED03587CFC1",
+      "task-owned TF08 suffix app/reverse mapping on remaining emulator",
+      "generated examples/native-mapbox/android/app/build and examples/native-maplibre/android/app/build"
+    ],
+    "listeners": "No owned test service listener remains.",
+    "storage": "Worker verified free space increased from 8.3GiB to14GiB; approximately5.7GiB reclaimed.",
+    "preserved": "Original iOS simulator, pre-existing Android AVD/userdata and emulator5556, shared SDK images/Gradle caches/Pods/dependencies."
+  }
+}

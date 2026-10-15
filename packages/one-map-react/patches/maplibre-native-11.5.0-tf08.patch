@@ -1,19 +1,30 @@
-diff --git a/ios/modules/static-map/MLRNStaticMapModule.mm b/ios/modules/static-map/MLRNStaticMapModule.mm
---- a/ios/modules/static-map/MLRNStaticMapModule.mm
-+++ b/ios/modules/static-map/MLRNStaticMapModule.mm
-@@ -76,6 +76,8 @@
-     mapSnapshotOptions.zoomLevel = options.zoom().value();
-   }
+diff --git a/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt b/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
+index b3ae99a..e9b2138 100644
+--- a/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
++++ b/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
+@@ -78,6 +78,8 @@ class MLRNOfflineModule(
+                     val pack = fromOfflineRegion(offlineRegion)
+                     promise.resolve(pack)
+                     setOfflineRegionObserver(packId, offlineRegion)
++                    // Creation starts the download; observer attachment preserves pause state.
++                    offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+                 }
  
-+  // Dimensions are PNG pixels; override the SDK default screen scale.
-+  mapSnapshotOptions.scale = 1.0;
-   mapSnapshotOptions.showsLogo = options.logo().value_or(false);
+                 override fun onError(error: String) {
+@@ -545,8 +547,6 @@ class MLRNOfflineModule(
+                 }
+             },
+         )
+-
+-        region.setDownloadState(OfflineRegion.STATE_ACTIVE)
+     }
  
-   return mapSnapshotOptions;
+     private fun makeErrorPayload(
 diff --git a/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt b/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt
+index a799a56..c2f8b38 100644
 --- a/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt
 +++ b/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt
-@@ -57,6 +57,7 @@
+@@ -57,6 +57,7 @@ class MLRNStaticMapModule(
                              }
  
                          if (result == null) {
@@ -21,7 +32,7 @@ diff --git a/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMa
                              promise.reject(
                                  NAME,
                                  "Could not generate snapshot, please check Android logs for more info.",
-@@ -69,8 +70,8 @@
+@@ -69,8 +70,8 @@ class MLRNStaticMapModule(
                      }
                  },
              ) { error ->
@@ -31,7 +42,7 @@ diff --git a/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMa
              }
          }
      }
-@@ -93,13 +94,8 @@
+@@ -93,13 +94,8 @@ class MLRNStaticMapModule(
                  },
              )
          }
@@ -47,24 +58,135 @@ diff --git a/android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMa
  
          if (readableMap.hasKey("center")) {
              val center = GeoJSONUtils.toLatLng(readableMap.getArray("center"))
-diff --git a/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt b/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
---- a/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
-+++ b/android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt
-@@ -78,6 +78,8 @@
-                     val pack = fromOfflineRegion(offlineRegion)
-                     promise.resolve(pack)
-                     setOfflineRegionObserver(packId, offlineRegion)
-+                    // Creation starts the download; observer attachment preserves pause state.
-+                    offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
-                 }
- 
-                 override fun onError(error: String) {
-@@ -545,8 +547,6 @@
-                 }
-             },
-         )
--
--        region.setDownloadState(OfflineRegion.STATE_ACTIVE)
+diff --git a/ios/modules/offline/MLRNOfflineModule.mm b/ios/modules/offline/MLRNOfflineModule.mm
+index 456c311..12ff9f2 100644
+--- a/ios/modules/offline/MLRNOfflineModule.mm
++++ b/ios/modules/offline/MLRNOfflineModule.mm
+@@ -158,6 +158,13 @@ static const NSInteger MLRN_MIGRATION_VERSION = 1;
      }
+   }
  
-     private fun makeErrorPayload(
++  BOOL isDirectory = NO;
++  if (![[NSFileManager defaultManager] fileExistsAtPath:absolutePath isDirectory:&isDirectory] ||
++      isDirectory || ![[NSFileManager defaultManager] isReadableFileAtPath:absolutePath]) {
++    reject(@"invalid_database_path", @"Offline database path must point to a readable file.", nil);
++    return;
++  }
++
+   [[MLNOfflineStorage sharedOfflineStorage]
+           addContentsOfFile:absolutePath
+       withCompletionHandler:^(NSURL *fileURL, NSArray<MLNOfflinePack *> *packs, NSError *error) {
+@@ -221,12 +228,20 @@ static const NSInteger MLRN_MIGRATION_VERSION = 1;
+ }
+ 
+ - (void)resetDatabase:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
+-  [[MLNOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError *error) {
++  MLNOfflineStorage *storage = [MLNOfflineStorage sharedOfflineStorage];
++  for (MLNOfflinePack *pack in storage.packs) {
++    [pack suspend];
++  }
++  [storage resetDatabaseWithCompletionHandler:^(NSError *error) {
+     if (error != nil) {
+       reject(@"resetDatabase", error.description, error);
+       return;
+     }
+-    resolve(nil);
++    // SDK reset clears disk but leaves its in-memory pack list unchanged.
++    [self->packRequestQueue addObject:[^(__unused id packs) {
++      resolve(nil);
++    } copy]];
++    [storage reloadPacks];
+   }];
+ }
+ 
+diff --git a/ios/modules/static-map/MLRNStaticMapModule.mm b/ios/modules/static-map/MLRNStaticMapModule.mm
+index f8f4264..79e71f3 100644
+--- a/ios/modules/static-map/MLRNStaticMapModule.mm
++++ b/ios/modules/static-map/MLRNStaticMapModule.mm
+@@ -76,6 +76,8 @@
+     mapSnapshotOptions.zoomLevel = options.zoom().value();
+   }
+ 
++  // Dimensions are PNG pixels; override the SDK default screen scale.
++  mapSnapshotOptions.scale = 1.0;
+   mapSnapshotOptions.showsLogo = options.logo().value_or(false);
+ 
+   return mapSnapshotOptions;
+diff --git a/lib/commonjs/modules/offline/OfflineManager.js b/lib/commonjs/modules/offline/OfflineManager.js
+index 077d343..8648590 100644
+--- a/lib/commonjs/modules/offline/OfflineManager.js
++++ b/lib/commonjs/modules/offline/OfflineManager.js
+@@ -177,6 +177,11 @@ class OfflineManager {
+   async resetDatabase() {
+     await this.initialize();
+     await _NativeOfflineModule.default.resetDatabase();
++    for (const id of Object.keys(this.offlinePacks)) {
++      this.removeListener(id);
++      delete this.offlinePacks[id];
++    }
++    this.initialized = false;
+   }
+ 
+   /**
+@@ -219,7 +224,8 @@ class OfflineManager {
+    */
+   async mergeOfflineRegions(path) {
+     await this.initialize();
+-    return _NativeOfflineModule.default.mergeOfflineRegions(path);
++    await _NativeOfflineModule.default.mergeOfflineRegions(path);
++    this.initialized = false;
+   }
+ 
+   /**
+diff --git a/lib/module/modules/offline/OfflineManager.js b/lib/module/modules/offline/OfflineManager.js
+index 5d84da5..4a33191 100644
+--- a/lib/module/modules/offline/OfflineManager.js
++++ b/lib/module/modules/offline/OfflineManager.js
+@@ -173,6 +173,11 @@ class OfflineManager {
+   async resetDatabase() {
+     await this.initialize();
+     await NativeOfflineModule.resetDatabase();
++    for (const id of Object.keys(this.offlinePacks)) {
++      this.removeListener(id);
++      delete this.offlinePacks[id];
++    }
++    this.initialized = false;
+   }
+ 
+   /**
+@@ -215,7 +220,8 @@ class OfflineManager {
+    */
+   async mergeOfflineRegions(path) {
+     await this.initialize();
+-    return NativeOfflineModule.mergeOfflineRegions(path);
++    await NativeOfflineModule.mergeOfflineRegions(path);
++    this.initialized = false;
+   }
+ 
+   /**
+diff --git a/src/modules/offline/OfflineManager.ts b/src/modules/offline/OfflineManager.ts
+index 19314dd..70c1358 100644
+--- a/src/modules/offline/OfflineManager.ts
++++ b/src/modules/offline/OfflineManager.ts
+@@ -229,6 +229,11 @@ class OfflineManager {
+   async resetDatabase(): Promise<void> {
+     await this.initialize();
+     await NativeOfflineModule.resetDatabase();
++    for (const id of Object.keys(this.offlinePacks)) {
++      this.removeListener(id);
++      delete this.offlinePacks[id];
++    }
++    this.initialized = false;
+   }
+ 
+   /**
+@@ -274,7 +279,8 @@ class OfflineManager {
+    */
+   async mergeOfflineRegions(path: string): Promise<void> {
+     await this.initialize();
+-    return NativeOfflineModule.mergeOfflineRegions(path);
++    await NativeOfflineModule.mergeOfflineRegions(path);
++    this.initialized = false;
+   }
+ 
+   /**

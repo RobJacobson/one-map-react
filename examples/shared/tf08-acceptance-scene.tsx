@@ -9,6 +9,11 @@ import {
   type MapServices,
   type MapStyle,
   Marker,
+  type MarkerRef,
+  Popup,
+  AttributionControl,
+  NavigationControl,
+  ScaleControl,
   Map as OneMap,
   Source,
 } from "one-map-react";
@@ -31,6 +36,7 @@ interface Tf08AcceptanceSceneProps {
   readonly attach: (probe: Tf08AcceptanceProbe | null) => void;
   readonly fixtureUrl: string;
   readonly externalContext?: MapProps["gl"];
+  readonly nativePuck?: ReactNode;
 }
 
 const initialCamera = {
@@ -62,8 +68,10 @@ export const Tf08AcceptanceScene = ({
   attach,
   fixtureUrl,
   externalContext,
+  nativePuck,
 }: Tf08AcceptanceSceneProps) => {
   const mapRef = useRef<MapRef>(null);
+  const annotationRef = useRef<MarkerRef>(null);
   const [generation, setGeneration] = useState(0);
   const [mounted, setMounted] = useState(true);
   const [mode, setMode] = useState("injected");
@@ -170,6 +178,10 @@ export const Tf08AcceptanceScene = ({
           scope: value.scope === "renderer" ? "renderer" : "backend",
           timeoutMs: Number(value.timeoutMs ?? 15000),
         });
+      }
+      if (action === "annotation-refresh") {
+        await annotationRef.current?.refresh();
+        return null;
       }
       if (action === "camera") {
         await requireMap().jumpTo({
@@ -295,6 +307,26 @@ export const Tf08AcceptanceScene = ({
         (mode === "unpreserved" || mode === "retained")
       }
       gl={mode === "external" ? externalContext : undefined}
+      {...(backend.endsWith("native") && mode.startsWith("coverage")
+        ? {
+            options:
+              backend === "mapbox-native"
+                ? {
+                    logoEnabled: mode === "coverage-ornaments",
+                    attributionEnabled: mode === "coverage-ornaments",
+                    compassEnabled: mode === "coverage-ornaments",
+                    compassFadeWhenNorth: false,
+                    scaleBarEnabled: mode === "coverage-ornaments",
+                  }
+                : {
+                    logo: mode === "coverage-ornaments",
+                    attribution: mode === "coverage-ornaments",
+                    compass: mode === "coverage-ornaments",
+                    compassHiddenFacingNorth: false,
+                    scaleBar: mode === "coverage-ornaments",
+                  },
+          }
+        : {})}
       onLoad={() => {
         observations.current.loads += 1;
         void mapRef.current
@@ -364,9 +396,36 @@ export const Tf08AcceptanceScene = ({
           observations.current.errors += 1;
         }}
       />
-      <Marker longitude={-122.35} latitude={47.61}>
-        {overlay}
-      </Marker>
+      {(!mode.startsWith("coverage") || mode === "coverage-annotation") && (
+        <Marker
+          ref={annotationRef}
+          longitude={-122.35}
+          latitude={47.61}
+          renderMode={mode === "coverage-annotation" ? "annotation" : "view"}
+        >
+          {overlay}
+        </Marker>
+      )}
+      {mode === "coverage-popup" && (
+        <Popup
+          longitude={-122.35}
+          latitude={47.61}
+          closeButton={false}
+          closeOnClick={false}
+        >
+          {overlay}
+        </Popup>
+      )}
+      {mode === "coverage-ornaments" && (
+        <>
+          <AttributionControl position="bottom-right" />
+          <ScaleControl position="bottom-left" />
+          {backend.endsWith("web") && (
+            <NavigationControl position="top-right" />
+          )}
+        </>
+      )}
+      {mode === "coverage-puck" && nativePuck}
     </OneMap>
   );
 };
