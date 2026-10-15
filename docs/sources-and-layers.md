@@ -1,5 +1,7 @@
 # Sources and layers
 
+**Current advanced source/layer routes:** See [advanced rendering](tf09-rendering.md) for selected canvas/video/custom and renderer-specific families. Both web engines passed canvas/video/custom output and teardown; all six environments passed hillshade. Other advanced families retain explicit runtime-unverified status.
+
 **Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.
 
 A source supplies map data. A layer selects and draws that data. Keeping them separate lets an application draw one route source with several styles or show the same point source as symbols and circles.

@@ -1,3 +1,5 @@
+import type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
+export type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
 import type { MapView, Camera as WrapperCamera } from "@rnmapbox/maps";
 import type {
   ComponentProps,
@@ -11,13 +13,13 @@ import type {
   NativeControlProps,
   NativePopupProps,
 } from "./adapters/shared/native-ui.js";
-import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
 import type {
   GeoJsonSourceProps,
   SourceProps,
   VectorSourceProps,
 } from "./contracts/source-types.js";
+import type { StyleDocument } from "./contracts/style-types.js";
 import type { MarkerProps, MarkerRef } from "./contracts/ui-types.js";
 import { Map as SharedMap } from "./facade/map.js";
 import { Source as SharedSource } from "./facade/source.js";
@@ -50,7 +52,9 @@ export type NativeLocationOptions = Pick<
   | "onUserTrackingModeChange"
 >;
 
-export interface NativeMapProps extends MapProps {
+export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
+  /** Complete selected style document. */
+  readonly mapStyle: MapProps["mapStyle"] | NativeStyleDocument;
   /** SDK follow facilities; conflicts with authoritative viewState/common follow. */
   readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
@@ -78,7 +82,7 @@ export interface NativeMapProps extends MapProps {
 /** Selected map retaining shared map context and named access. */
 // eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
 export const Map = SharedMap as ForwardRefExoticComponent<
-  NativeMapProps & RefAttributes<MapRef>
+  NativeMapProps & RefAttributes<NativeAdvancedMapRef>
 >;
 
 /** Selected marker content host, including accessibility and layout attributes. */
@@ -126,3 +130,97 @@ export {
   TileStore,
   UserLocation as WrapperUserLocation,
 } from "@rnmapbox/maps";
+
+/** Native advanced style, animation, viewport and app-level facilities. */
+export {
+  Animated,
+  AnimatedCoordinatesArray,
+  AnimatedExtractCoordinateFromArray,
+  AnimatedPoint,
+  AnimatedRouteCoordinatesArray,
+  AnimatedShape,
+  __experimental,
+  Atmosphere,
+  Snow,
+  Rain,
+  Light,
+  Terrain,
+  StyleImport,
+  Models,
+  RasterArraySource,
+  SkyLayer,
+  ModelLayer,
+  RasterParticleLayer,
+  HillshadeLayer,
+  Viewport,
+  Style,
+  Logger,
+  StyleURL,
+  OfflinePackDownloadState,
+  LineJoin,
+  StyleSource,
+  TileServers,
+  setAccessToken,
+  getAccessToken,
+  setWellKnownTileServer,
+  setTelemetryEnabled,
+  setConnected,
+  addCustomHeader,
+  removeCustomHeader,
+} from "@rnmapbox/maps";
+export type {
+  StandardStyleConfig,
+  TerrainLayerStyle,
+  LightLayerStyle,
+  AtmosphereLayerStyle,
+  SkyLayerStyle,
+  ModelLayerStyle,
+  RasterParticleLayerStyle,
+  HillshadeLayerStyle,
+} from "@rnmapbox/maps";
+
+/** Native style roots; sources and layers are validated by the native SDK. */
+export interface NativeStyleDocument extends StyleDocument {
+  /** Style metadata. */
+  readonly metadata?: object;
+  /** Initial map center. */
+  readonly center?: readonly [number, number];
+  /** Initial zoom. */
+  readonly zoom?: number;
+  /** Initial bearing. */
+  readonly bearing?: number;
+  /** Initial pitch. */
+  readonly pitch?: number;
+  /** Glyph URL template. */
+  readonly glyphs?: string;
+  /** Sprite URL. */
+  readonly sprite?: string;
+  /** Terrain definition. */
+  readonly terrain?: import("./contracts/map-types.js").Terrain;
+  /** Legacy light. */
+  readonly light?: import("./contracts/map-types.js").LegacyLight;
+  /** Native projection. */
+  readonly projection?: { readonly name: "mercator" | "globe" };
+  /** Modern light definitions. */
+  readonly lights?: readonly object[];
+  /** Style imports and their configurations. */
+  readonly imports?: readonly object[];
+  /** Model URLs keyed by id. */
+  readonly models?: Readonly<Record<string, string>>;
+  /** Atmosphere properties. */
+  readonly fog?: object;
+  /** Rain properties. */
+  readonly rain?: object;
+  /** Snow properties. */
+  readonly snow?: object;
+  /** Theme properties. */
+  readonly "color-theme"?: object;
+  /** Style configuration schema. */
+  readonly schema?: object;
+  /** Feature sets. */
+  readonly featuresets?: object;
+  /** Indoor sources. */
+  readonly indoor?: object;
+  /** Default property transition. */
+  readonly transition?: import("./contracts/map-types.js").StyleTransition;
+}

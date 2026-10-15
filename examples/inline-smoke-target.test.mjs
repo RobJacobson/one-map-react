@@ -17,6 +17,7 @@ const cases = [
   ["tf06", "tf06"],
   ["tf07", "tf07"],
   ["tf08", "tf08"],
+  ["tf09", "tf09"],
   ["tf08-storage", "tf08-storage"],
   ["tf06-lifetimes", "tf06-lifetimes"],
 ];

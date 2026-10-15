@@ -382,6 +382,7 @@ export interface FillExtrusionLayout {
 
 /** Layer types in the portable set. */
 export type LayerType =
+  | "hillshade"
   | "background"
   | "fill"
   | "line"
@@ -519,6 +520,7 @@ export interface FillExtrusionLayerProps extends SourcedLayerProps {
  * with a new React `key`.
  */
 export type LayerProps =
+  | HillshadeLayerProps
   | BackgroundLayerProps
   | FillLayerProps
   | LineLayerProps
@@ -527,3 +529,37 @@ export type LayerProps =
   | RasterLayerProps
   | HeatmapLayerProps
   | FillExtrusionLayerProps;
+
+/** Portable hillshade paint properties. */
+export interface HillshadePaint {
+  /** Illumination direction in degrees clockwise. */
+  readonly "hillshade-illumination-direction"?: StyleValue<number>;
+  /** Coordinate frame of the illumination. */
+  readonly "hillshade-illumination-anchor"?: StyleValue<AlignmentMap>;
+  /** Shading intensity from zero to one. */
+  readonly "hillshade-exaggeration"?: StyleValue<number>;
+  /** Color of shaded slopes. */
+  readonly "hillshade-shadow-color"?: StyleValue<string>;
+  /** Color of illuminated slopes. */
+  readonly "hillshade-highlight-color"?: StyleValue<string>;
+  /** Color of steep slope accents. */
+  readonly "hillshade-accent-color"?: StyleValue<string>;
+  /** Intensity transition. */
+  readonly "hillshade-exaggeration-transition"?: import("./map-types.js").StyleTransition;
+  /** Shadow transition. */
+  readonly "hillshade-shadow-color-transition"?: import("./map-types.js").StyleTransition;
+  /** Highlight transition. */
+  readonly "hillshade-highlight-color-transition"?: import("./map-types.js").StyleTransition;
+  /** Accent transition. */
+  readonly "hillshade-accent-color-transition"?: import("./map-types.js").StyleTransition;
+}
+
+/** Portable hillshade layer drawing a raster DEM source. */
+export interface HillshadeLayerProps extends SourcedLayerProps {
+  /** Selects hillshade rendering. */
+  readonly type: "hillshade";
+  /** Hillshade paint. */
+  readonly paint?: HillshadePaint;
+  /** Layer visibility. */
+  readonly layout?: BackgroundLayout;
+}

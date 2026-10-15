@@ -4,6 +4,7 @@ import {
   FillExtrusionLayer,
   FillLayer,
   HeatmapLayer,
+  HillshadeLayer,
   LineLayer,
   RasterLayer,
   SymbolLayer,
@@ -25,6 +26,31 @@ import type {
 /** Mapbox-native layer that dispatches to the matching RNMapbox layer. */
 export const MapboxNativeLayer = (props: LayerProps) => {
   switch (props.type) {
+    case "hillshade":
+      return (
+        <HillshadeLayer
+          {...rnmapboxLayerFields(props)}
+          style={definedFields<ComponentProps<typeof HillshadeLayer>["style"]>({
+            hillshadeIlluminationDirection:
+              props.paint?.["hillshade-illumination-direction"],
+            hillshadeIlluminationAnchor:
+              props.paint?.["hillshade-illumination-anchor"],
+            hillshadeExaggeration: props.paint?.["hillshade-exaggeration"],
+            hillshadeShadowColor: props.paint?.["hillshade-shadow-color"],
+            hillshadeHighlightColor: props.paint?.["hillshade-highlight-color"],
+            hillshadeAccentColor: props.paint?.["hillshade-accent-color"],
+            hillshadeExaggerationTransition:
+              props.paint?.["hillshade-exaggeration-transition"],
+            hillshadeShadowColorTransition:
+              props.paint?.["hillshade-shadow-color-transition"],
+            hillshadeHighlightColorTransition:
+              props.paint?.["hillshade-highlight-color-transition"],
+            hillshadeAccentColorTransition:
+              props.paint?.["hillshade-accent-color-transition"],
+            visibility: props.layout?.visibility,
+          })}
+        />
+      );
     case "background":
       return <BackgroundLayer {...toRnmapboxBackgroundLayer(props)} />;
     case "fill":

@@ -41,6 +41,13 @@ import {
 } from "./convert-query.js";
 import type { MaplibreSourceRegistry } from "./source-registry.js";
 
+/** Selected native operations retain the wrapper signatures. */
+export type NativeAdvancedMapRef = MapRef &
+  Pick<
+    ComponentRef<typeof MaplibreMap>,
+    "setSourceVisibility" | "showAttribution" | "getViewState"
+  >;
+
 /**
  * Builds the imperative map handle over MapLibre Native camera and map refs.
  *
@@ -57,7 +64,20 @@ export const createMaplibreMapRef = (
   mapLoaded: { readonly current: boolean },
   sources: MaplibreSourceRegistry,
   capture?: MapRef["capture"]
-): MapRef => ({
+): NativeAdvancedMapRef => ({
+  setSourceVisibility: (
+    ...args: Parameters<ComponentRef<typeof MaplibreMap>["setSourceVisibility"]>
+  ) => requireMap(mapRef.current).setSourceVisibility(...args),
+  showAttribution: (
+    ...args: Parameters<ComponentRef<typeof MaplibreMap>["showAttribution"]>
+  ) => requireMap(mapRef.current).showAttribution(...args),
+  getViewState: (
+    ...args: Parameters<ComponentRef<typeof MaplibreMap>["getViewState"]>
+  ) => requireMap(mapRef.current).getViewState(...args),
+
+  queryTerrainElevation: async () => {
+    throw new Error("queryTerrainElevation is unsupported on MapLibre Native.");
+  },
   capture:
     capture ??
     (async () => {

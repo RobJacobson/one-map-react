@@ -1,0 +1,67 @@
+{
+  "checkpoint": "TF09",
+  "date": "2026-10-15",
+  "scope": "Uncommitted TF09 implementation and connected common/selected adapter paths; pinned upstream sources inspected, not a whole-repository audit.",
+  "skill": "ponytail full and ponytail-review",
+  "implementationAgent": {
+    "model": "gpt-6.1-sol",
+    "reasoningEffort": "medium"
+  },
+  "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+  "findings": [
+    {
+      "issue": "Common optional web fields could replace supplied selected options with undefined; selected projection shapes differ by renderer.",
+      "resolution": "Only supplied common constructor/render fields override options; Mapbox name and MapLibre type shapes are forwarded correctly.",
+      "verification": "Focused web mapping/reset tests and four TypeScript projects."
+    },
+    {
+      "issue": "Terrain inputs needed runtime validation, including sparse coordinate arrays, non-string sources and invalid projection values.",
+      "resolution": "Validate at the common/terrain query boundary with explicit finite coordinate indices.",
+      "verification": "13 focused common validation cases plus query/adapter tests."
+    },
+    {
+      "issue": "Native RNMapbox no-data elevation could crash on iOS or reject as an operational error on Android.",
+      "resolution": "Narrow source/compiled wrapper and Android bridge patch preserves no-data null, zero and actual failures.",
+      "verification": "Executable peer patch regression, native adapter tests, fresh iOS/Android builds; runtime outcomes recorded separately."
+    },
+    {
+      "issue": "Terrain null must disable terrain already present in the native base style.",
+      "resolution": "Use existing RNMapbox Terrain transport with narrow omitted-source disable support; keyed attachment separates enabled and disabled states.",
+      "verification": "Native component mapping/reset tests, peer patch assertions, fresh native builds; renderer gate separate."
+    },
+    {
+      "issue": "Native style declarations must not require web renderer peers.",
+      "resolution": "Use facade-owned structural native style roots and preserve the pinned SDK nested JSON typing boundary; repair upstream NodeNext declaration links.",
+      "verification": "Four isolated packed peer consumers and package selection checks."
+    },
+    {
+      "issue": "Custom source/layer creation inputs and mutable slot updates need explicit supported lifetimes.",
+      "resolution": "Reuse existing stable creation guards for media identity and callback sets; keep coordinates mutable; add one Mapbox slot effect with a generated id when omitted.",
+      "verification": "Focused immutable-input, coordinate forwarding, slot update/reset and retained-ref tests; media runtime gate separate."
+    },
+    {
+      "issue": "Residual inventory review identified missing public debug/property/global access.",
+      "resolution": "Add Mapbox 2D/3D wireframes and supported probe, both selected renderer version getters, and MapLibre cancellation getter/setter. Resolve 106 residual aliases with individual routes or source-backed boundaries.",
+      "verification": "13 selected tests, upstream signature assertions in four isolated peer consumers, all 438 aliases reviewed."
+    }
+  ],
+  "assessment": "No known unresolved implementation finding after the recorded fixes. Runtime acceptance is a separate gate; consult tf09-acceptance.json for current results.",
+  "routineEvidence": "tf09-implementation.json",
+  "coverageEvidence": "tf09-coverage.json",
+  "notChecked": "Upstream renderer internals and every SDK layer/operator/global configuration combination are not independently certified; representative integration and pinned forwarding/types define this checkpoint.",
+  "routineCounts": {
+    "webFiles": 26,
+    "webTests": 485,
+    "nativeFiles": 5,
+    "nativeTests": 210,
+    "typeProjects": 4,
+    "isolatedSelectedPeerConsumers": 4,
+    "packageSelections": 13
+  },
+  "acceptanceReview": {
+    "status": "passed for representative six-environment scope",
+    "scenarios": 34,
+    "evidence": "tf09-acceptance.json",
+    "limitation": "Initial Mapbox Android startup timeout did not reproduce; same patched APK passed on retry."
+  }
+}

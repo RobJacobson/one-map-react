@@ -1,4 +1,4 @@
-import { Camera, type MapState, MapView } from "@rnmapbox/maps";
+import { Camera, Light, Terrain, type MapState, MapView } from "@rnmapbox/maps";
 import {
   type ComponentProps,
   type ComponentRef,
@@ -249,6 +249,7 @@ export const MapboxNativeMap = forwardRef<
         <GeoJsonSourceContext.Provider value={geoJsonSources}>
           <MapView
             {...props.options}
+            projection={props.projection ?? props.options?.projection}
             logoPosition={
               props.options?.logoPosition ??
               (ornaments.managed
@@ -341,6 +342,33 @@ export const MapboxNativeMap = forwardRef<
               {...(controlled ?? {})}
             />
             {children}
+            {props.terrain !== undefined && (
+              <Terrain
+                key={
+                  props.terrain === null
+                    ? "disabled"
+                    : `enabled:${props.terrain.source}`
+                }
+                sourceID={props.terrain?.source}
+                style={{ exaggeration: props.terrain?.exaggeration }}
+              />
+            )}
+            {props.light && (
+              <Light
+                style={{
+                  anchor: props.light.anchor,
+                  color: props.light.color,
+                  intensity: props.light.intensity,
+                  position:
+                    props.light.position === undefined
+                      ? undefined
+                      : [...props.light.position],
+                  colorTransition: props.light["color-transition"],
+                  intensityTransition: props.light["intensity-transition"],
+                  positionTransition: props.light["position-transition"],
+                }}
+              />
+            )}
           </MapView>
         </GeoJsonSourceContext.Provider>
         {session && (

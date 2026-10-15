@@ -1,5 +1,7 @@
 # Maps and camera
 
+**Current advanced map routes:** See [advanced rendering](tf09-rendering.md) for portable terrain/projection/light/elevation and selected constructor options/ref methods. Targeted six-environment acceptance passed for the recorded scope; unexercised selected SDK combinations remain explicit.
+
 **Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.
 
 This reference compares map containers, camera configuration, events, and imperative refs. Camera configuration determines what the map shows; React control determines who owns that state when a user or command changes it.

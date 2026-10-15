@@ -15,6 +15,7 @@ import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
 import { NativeTf08Screen } from "../shared/native-tf08-screen.js";
+import { NativeTf09Screen } from "../shared/native-tf09-screen.js";
 import { RouteMap } from "../shared/route-map.js";
 import { smokeTarget } from "../shared/smoke-target.js";
 
@@ -42,6 +43,7 @@ const offlineOperations = {
 };
 
 const App = () => {
+  if (smokeTarget === "tf09") return <NativeTf09Screen adapter={adapter} />;
   if (smokeTarget === "tf08" || smokeTarget === "tf08-storage")
     return (
       <NativeTf08Screen

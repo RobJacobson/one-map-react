@@ -27,6 +27,47 @@ index e51687f..e3d2b95 100644
      }
  
      companion object {
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+index ce02ddb..e738ddd 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+@@ -1113,7 +1113,7 @@ open class RNMBXMapView(private val mContext: Context, var mManager: RNMBXMapVie
+                 it.putDouble("data", result)
+             }
+         } else {
+-            response.error("no elevation data")
++            response.success { it.putNull("data") }
+         }
+     }
+ 
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
+index 7b6de8a..e234791 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
+@@ -39,6 +39,10 @@ class RNMBXTerrain(context: Context?) : AbstractSourceConsumer(context) {
+     override fun addToMap(mapView: RNMBXMapView) {
+         super.addToMap(mapView)
+         mMap = mapView.getMapboxMap()
++        if (mSourceID == null) {
++            mapView.savedStyle?.removeTerrain()
++            return
++        }
+         val terrain = makeTerrain()
+         mTerrain = terrain
+         addStyles()
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
+index f8b6edb..9b815d3 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
+@@ -25,7 +25,7 @@ class RNMBXTerrainManager : ViewGroupManager<RNMBXTerrain>(),
+ 
+     @ReactProp(name = "sourceID")
+     override fun setSourceID(layer: RNMBXTerrain, sourceID: Dynamic) {
+-        layer.setSourceID(sourceID.asString())
++        layer.setSourceID(if (sourceID.isNull) null else sourceID.asString())
+     }
+ 
+     @ReactProp(name = "reactStyle")
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
 index b236fdf..ccdf6b9 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
@@ -585,6 +626,35 @@ index 6d6b169..88631b2 100644
    @objc func setAccessToken(
      _ token: String, 
      resolver: RCTPromiseResolveBlock,
+diff --git a/ios/RNMBX/RNMBXTerrain.swift b/ios/RNMBX/RNMBXTerrain.swift
+index e3cfdc5..5030e1b 100644
+--- a/ios/RNMBX/RNMBXTerrain.swift
++++ b/ios/RNMBX/RNMBXTerrain.swift
+@@ -17,6 +17,11 @@ public class RNMBXTerrain : RNMBXSingletonLayer, RNMBXMapComponent, RNMBXSourceC
+     self.map = map
+     self.style = style
+     
++    guard sourceID != nil else {
++      style.removeTerrain()
++      return
++    }
++
+     let terrain = self.makeTerrain()
+     self.terrain = terrain
+     addStylesAndUpdate()
+diff --git a/lib/module/components/MapView.js b/lib/module/components/MapView.js
+index 667e5f9..3e99a81 100644
+--- a/lib/module/components/MapView.js
++++ b/lib/module/components/MapView.js
+@@ -343,7 +343,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo
+    */
+   async queryTerrainElevation(coordinate) {
+     const res = await this._runNative('queryTerrainElevation', [coordinate]);
+-    return res.data;
++    return res?.data ?? null;
+   }
+ 
+   /**
 diff --git a/lib/module/modules/offline/offlineManager.js b/lib/module/modules/offline/offlineManager.js
 index b1c8e6a..890a440 100644
 --- a/lib/module/modules/offline/offlineManager.js
@@ -624,6 +694,19 @@ index b1c8e6a..890a440 100644
    }
  
    /**
+diff --git a/lib/module/modules/offline/offlineManagerLegacy.js b/lib/module/modules/offline/offlineManagerLegacy.js
+index 5943b63..84cec51 100644
+--- a/lib/module/modules/offline/offlineManagerLegacy.js
++++ b/lib/module/modules/offline/offlineManagerLegacy.js
+@@ -121,7 +121,7 @@ class OfflineManagerLegacy {
+    * @return {Array<OfflinePack>}
+    */
+   async getPacks() {
+-    await this._initialize();
++    await this._initialize(true);
+     return Object.keys(this._offlinePacks).map(name => this._offlinePacks[name]);
+   }
+ 
 diff --git a/lib/module/modules/snapshot/SnapshotOptions.js b/lib/module/modules/snapshot/SnapshotOptions.js
 index ea91cd6..b6fd036 100644
 --- a/lib/module/modules/snapshot/SnapshotOptions.js
@@ -637,6 +720,82 @@ index ea91cd6..b6fd036 100644
      this.width = options.width || 50.0;
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
+diff --git a/lib/typescript/src/Mapbox.native.d.ts b/lib/typescript/src/Mapbox.native.d.ts
+index 3b8ac93..e252609 100644
+--- a/lib/typescript/src/Mapbox.native.d.ts
++++ b/lib/typescript/src/Mapbox.native.d.ts
+@@ -1,4 +1,4 @@
+-export * from './RNMBXModule';
++export * from './RNMBXModule.js';
+ export { Camera, UserTrackingMode, type CameraPadding, type CameraAnimationMode, type CameraBounds, type CameraStop, } from './components/Camera';
+ export { Atmosphere } from './components/Atmosphere';
+ export { Snow } from './components/Snow';
+diff --git a/lib/typescript/src/RNMBXModule.d.ts b/lib/typescript/src/RNMBXModule.d.ts
+index c2aa2d1..fb14153 100644
+--- a/lib/typescript/src/RNMBXModule.d.ts
++++ b/lib/typescript/src/RNMBXModule.d.ts
+@@ -14,19 +14,30 @@ export declare const StyleURL: {
+     Dark: URL;
+     Satellite: URL;
+     SatelliteStreet: URL;
+-}, OfflinePackDownloadState: {
++};
++export declare const OfflinePackDownloadState: {
+     Inactive: string;
+     Active: string;
+     Complete: string;
+     Unknown?: string;
+-}, LineJoin: {
++};
++export declare const LineJoin: {
+     Bevel: string | number;
+     Round: string | number;
+     Miter: string | number;
+-}, StyleSource: {
++};
++export declare const StyleSource: {
+     DefaultSourceID: string;
+-}, TileServers: {
++};
++export declare const TileServers: {
+     Mapbox: string;
+-}, removeCustomHeader: (headerName: string) => void, setAccessToken: (accessToken: string | null) => Promise<string | null>, setWellKnownTileServer: (tileServer: string) => void, clearData: () => Promise<void>, getAccessToken: () => Promise<string>, setTelemetryEnabled: (telemetryEnabled: boolean) => void, setConnected: (connected: boolean) => void;
++};
++export declare const removeCustomHeader: (headerName: string) => void;
++export declare const setAccessToken: (accessToken: string | null) => Promise<string | null>;
++export declare const setWellKnownTileServer: (tileServer: string) => void;
++export declare const clearData: () => Promise<void>;
++export declare const getAccessToken: () => Promise<string>;
++export declare const setTelemetryEnabled: (telemetryEnabled: boolean) => void;
++export declare const setConnected: (connected: boolean) => void;
+ export { addCustomHeader };
+ //# sourceMappingURL=RNMBXModule.d.ts.map
+\ No newline at end of file
+diff --git a/lib/typescript/src/components/MapView.d.ts b/lib/typescript/src/components/MapView.d.ts
+index d003868..11ce79f 100644
+--- a/lib/typescript/src/components/MapView.d.ts
++++ b/lib/typescript/src/components/MapView.d.ts
+@@ -547,7 +547,7 @@ declare class MapView extends MapView_base {
+      * @param {Position} coordinate - The geographic coordinates `[longitude, latitude]` at which to query elevation.
+      * @return {number} Elevation in meters relative to mean sea-level.
+      */
+-    queryTerrainElevation(coordinate: Position): Promise<number>;
++    queryTerrainElevation(coordinate: Position): Promise<number | null>;
+     /**
+      * Sets the visibility of all the layers referencing the specified `sourceLayerId` and/or `sourceId`
+      *
+diff --git a/lib/typescript/src/index.native.d.ts b/lib/typescript/src/index.native.d.ts
+index e57b0af..d9bd66e 100644
+--- a/lib/typescript/src/index.native.d.ts
++++ b/lib/typescript/src/index.native.d.ts
+@@ -1,4 +1,4 @@
+-export * from './Mapbox.native';
+-import * as Mapbox from './Mapbox.native';
++export * from './Mapbox.native.js';
++import * as Mapbox from './Mapbox.native.js';
+ export default Mapbox;
+ //# sourceMappingURL=index.native.d.ts.map
+\ No newline at end of file
 diff --git a/lib/typescript/src/modules/offline/offlineManager.d.ts b/lib/typescript/src/modules/offline/offlineManager.d.ts
 index fd0c239..cccc144 100644
 --- a/lib/typescript/src/modules/offline/offlineManager.d.ts
@@ -650,6 +809,26 @@ index fd0c239..cccc144 100644
       * @example
       * await Mapbox.offlineManager.clearAmbientCache();
       *
+diff --git a/src/components/MapView.tsx b/src/components/MapView.tsx
+index 44ff5cc..96e4879 100644
+--- a/src/components/MapView.tsx
++++ b/src/components/MapView.tsx
+@@ -916,12 +916,12 @@ class MapView extends NativeBridgeComponent(
+    * @param {Position} coordinate - The geographic coordinates `[longitude, latitude]` at which to query elevation.
+    * @return {number} Elevation in meters relative to mean sea-level.
+    */
+-  async queryTerrainElevation(coordinate: Position): Promise<number> {
+-    const res = await this._runNative<{ data: number }>(
++  async queryTerrainElevation(coordinate: Position): Promise<number | null> {
++    const res = await this._runNative<{ data: number | null } | null>(
+       'queryTerrainElevation',
+       [coordinate],
+     );
+-    return res.data;
++    return res?.data ?? null;
+   }
+ 
+   /**
 diff --git a/src/modules/offline/offlineManager.ts b/src/modules/offline/offlineManager.ts
 index e3d747f..f997923 100644
 --- a/src/modules/offline/offlineManager.ts
@@ -689,32 +868,6 @@ index e3d747f..f997923 100644
    }
  
    /**
-diff --git a/src/modules/snapshot/SnapshotOptions.ts b/src/modules/snapshot/SnapshotOptions.ts
-index 766dbd8..b9791a0 100644
---- a/src/modules/snapshot/SnapshotOptions.ts
-+++ b/src/modules/snapshot/SnapshotOptions.ts
-@@ -40,7 +40,7 @@ class SnapshotOptions {
-     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
-     this.heading = options.heading || 0.0;
-     this.pitch = options.pitch || 0.0;
--    this.zoomLevel = options.zoomLevel || 16.0;
-+    this.zoomLevel = options.zoomLevel ?? 16.0;
-     this.width = options.width || 50.0;
-     this.height = options.height || 50.0;
-     this.writeToDisk = options.writeToDisk || false;
-diff --git a/lib/module/modules/offline/offlineManagerLegacy.js b/lib/module/modules/offline/offlineManagerLegacy.js
-index 5943b63..84cec51 100644
---- a/lib/module/modules/offline/offlineManagerLegacy.js
-+++ b/lib/module/modules/offline/offlineManagerLegacy.js
-@@ -121,7 +121,7 @@ class OfflineManagerLegacy {
-    * @return {Array<OfflinePack>}
-    */
-   async getPacks() {
--    await this._initialize();
-+    await this._initialize(true);
-     return Object.keys(this._offlinePacks).map(name => this._offlinePacks[name]);
-   }
- 
 diff --git a/src/modules/offline/offlineManagerLegacy.ts b/src/modules/offline/offlineManagerLegacy.ts
 index 523071f..95c3217 100644
 --- a/src/modules/offline/offlineManagerLegacy.ts
@@ -728,3 +881,16 @@ index 523071f..95c3217 100644
      return Object.keys(this._offlinePacks).map(
        (name) => this._offlinePacks[name],
      ) as OfflinePack[];
+diff --git a/src/modules/snapshot/SnapshotOptions.ts b/src/modules/snapshot/SnapshotOptions.ts
+index 766dbd8..b9791a0 100644
+--- a/src/modules/snapshot/SnapshotOptions.ts
++++ b/src/modules/snapshot/SnapshotOptions.ts
+@@ -40,7 +40,7 @@ class SnapshotOptions {
+     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
+     this.heading = options.heading || 0.0;
+     this.pitch = options.pitch || 0.0;
+-    this.zoomLevel = options.zoomLevel || 16.0;
++    this.zoomLevel = options.zoomLevel ?? 16.0;
+     this.width = options.width || 50.0;
+     this.height = options.height || 50.0;
+     this.writeToDisk = options.writeToDisk || false;

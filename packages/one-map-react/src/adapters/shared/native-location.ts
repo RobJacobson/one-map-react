@@ -8,8 +8,8 @@ import { createLocationService } from "./create-location-service.js";
 import { positionFromWrapper } from "./location-values.js";
 
 interface NativeLocationManager {
-  addListener(listener: (position: never) => void): void;
-  removeListener(listener: (position: never) => void): void;
+  addListener(listener: (position: unknown) => void): void;
+  removeListener(listener: (position: unknown) => void): void;
 }
 
 /**

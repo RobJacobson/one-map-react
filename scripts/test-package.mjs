@@ -276,7 +276,7 @@ const viewState = {
 };
 const style = { version: 8 as const, sources: {}, layers: [] };
 void (
-  <OneMap mapStyle={style} initialViewState={viewState} />
+  <OneMap mapStyle={style} initialViewState={viewState} terrain={{ source: "dem", exaggeration: 0 }} projection="mercator" light={{ intensity: 0 }} />
 );
 void (
   <OneMap

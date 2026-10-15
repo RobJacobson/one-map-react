@@ -18,6 +18,10 @@ import {
 import { invokeWrapper } from "../shared/invoke-wrapper.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
+  normalizeElevation,
+  validateTerrainCoordinate,
+} from "../shared/terrain-values.js";
+import {
   boundsFromRnmapboxVisible,
   lngLatFromWrapper,
   pointFromWrapper,
@@ -39,6 +43,10 @@ import {
 } from "./convert-query.js";
 import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
+/** Selected native operations retain the wrapper signatures. */
+export type NativeAdvancedMapRef = MapRef &
+  Pick<ComponentRef<typeof MapView>, "setSourceVisibility">;
+
 /**
  * Builds the imperative map handle over RNMapbox camera and map refs.
  *
@@ -52,7 +60,19 @@ export const createMapboxMapRef = (
   mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
   geoJsonSources: GeoJsonSourceRegistry,
   capture?: MapRef["capture"]
-): MapRef => ({
+): NativeAdvancedMapRef => ({
+  setSourceVisibility: (
+    ...args: Parameters<ComponentRef<typeof MapView>["setSourceVisibility"]>
+  ) => requireMap(mapViewRef.current).setSourceVisibility(...args),
+
+  queryTerrainElevation: async (coordinate) => {
+    validateTerrainCoordinate(coordinate);
+    return normalizeElevation(
+      await requireMap(mapViewRef.current).queryTerrainElevation([
+        ...coordinate,
+      ])
+    );
+  },
   capture:
     capture ??
     (async () => {

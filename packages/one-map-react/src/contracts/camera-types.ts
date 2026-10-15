@@ -162,6 +162,15 @@ export interface ZoomToOptions {
 export interface MapRef
   extends FeatureQueryMethods, ClusterQueryMethods, FeatureStateMethods {
   /**
+   * Reads loaded terrain elevation in rendered meters, including the terrain exaggeration.
+   * @param coordinate - Longitude and latitude in degrees.
+   * @returns Rendered elevation or null without terrain. MapLibre may return zero before its DEM tile loads.
+   * @throws RangeError for invalid coordinates; Error for unsupported backends,
+   * missing attachment, or renderer failures.
+   */
+  queryTerrainElevation(coordinate: LngLat): Promise<number | null>;
+
+  /**
    * Captures an attached rendered map. Rejects on detachment or deadline.
    * @param options - Explicit scope, output, and optional deadline.
    * @returns PNG output; requires captureEnabled on the Map.

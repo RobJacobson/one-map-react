@@ -1,5 +1,7 @@
 # Capabilities and extensions
 
+**Current advanced facilities:** See [advanced rendering](tf09-rendering.md) for the implemented selected routes and explicit wrapper/native boundaries; targeted six-environment acceptance passed for the recorded scope.
+
 **Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.
 
 **Current TF08 implementation:** [Location, offline, and capture](tf08-location-offline-capture.md) supersedes the service and snapshot proposals below for the thin facade. Use `adapter.services`/`useMapServices()` and `MapRef.capture`; no retired extension dispatcher or capability registry has been restored. Runtime acceptance remains pending.
