@@ -252,6 +252,7 @@ export const Tf07Scene = ({
         }}
         onError={fail}
       >
+        {/* eslint-disable-next-line react/refs -- markerContent receives an event callback; the callback reads observation refs only when clicked. */}
         {markerContent("live", () => record("child-click"))}
       </Marker>
       <Marker
@@ -284,6 +285,7 @@ export const Tf07Scene = ({
             setPopup(false);
           }}
         >
+          {/* eslint-disable-next-line react/refs -- markerContent receives an event callback; the callback reads observation refs only when clicked. */}
           {markerContent("popup", () => record("popup-child"))}
         </Popup>
       )}

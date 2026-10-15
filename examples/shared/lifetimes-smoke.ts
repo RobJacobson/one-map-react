@@ -5,7 +5,13 @@ import type {
   MapRef,
   MapStyle,
 } from "one-map-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   initialViewState,
@@ -77,8 +83,8 @@ export const useLifetimesSmoke = ({
     sourceRevision: 0,
     mapStyle: queriesStyle,
   });
-  const [status, setStatus] = useState(
-    statusLine(fields.current, "await-load")
+  const [status, setStatus] = useState(() =>
+    statusLine(initialFields(), "await-load")
   );
   const enter = (
     phase: LifetimesPhase,
@@ -100,7 +106,9 @@ export const useLifetimesSmoke = ({
     }
   };
   const enterRef = useRef(enter);
-  enterRef.current = enter;
+  useLayoutEffect(() => {
+    enterRef.current = enter;
+  });
 
   useEffect(() => {
     mounted.current = true;

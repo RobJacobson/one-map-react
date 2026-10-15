@@ -9,3 +9,4 @@ examples/*/ios/
 examples/*/android/
 examples/*/.bundle/
 examples/*/vendor/bundle/
+.vitest/

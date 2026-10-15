@@ -33,6 +33,7 @@ import { useStableOptions } from "../../facade/use-stable-options.js";
 import { UserLocation } from "../../facade/user-location.js";
 import { positionFromWrapper } from "../shared/location-values.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
+import { useFrozenValue } from "../shared/use-frozen-value.js";
 import {
   lngLatFromWrapper,
   pointFromWrapper,
@@ -106,9 +107,9 @@ export const createWebUi = (
       useLayoutEffect(() => {
         coordinate.current = [props.longitude, props.latitude];
       });
-      const defaultAnchor = useRef(
+      const defaultAnchor = useFrozenValue(
         children === undefined || children === null ? "bottom" : "center"
-      ).current;
+      );
       const anchor = props.anchor ?? defaultAnchor;
       useStableOptions("Marker", {
         id,
@@ -173,6 +174,7 @@ export const createWebUi = (
     const handle = useRef<WebPopupHandle | null>(null);
     const anchor = props.anchor ?? "bottom";
     const offset = props.offset ?? [0, 0];
+    const [offsetX, offsetY] = offset;
     useStableOptions("Popup", {
       ...creationOptions(options, ["style", "className"]),
       closeButton: props.closeButton ?? true,
@@ -189,9 +191,9 @@ export const createWebUi = (
       // Remove when the wrapper handles anchor updates independently.
       if (handle.current) {
         handle.current.options.anchor = anchor;
-        handle.current.setOffset(offset);
+        handle.current.setOffset([offsetX, offsetY]);
       }
-    }, [anchor, offset[0], offset[1]]);
+    }, [anchor, offsetX, offsetY]);
 
     return (
       <wrapper.Popup

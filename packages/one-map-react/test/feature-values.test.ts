@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect, test } from "vite-plus/test";
 
 import {
   assertFeatureIdentifier,
@@ -185,6 +185,7 @@ describe("assertFeatureState", () => {
   });
 
   test("rejects an array consisting only of empty slots", () => {
+    // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
     expect(() => assertFeatureState({ values: new Array<number>(1) })).toThrow(
       'Feature state key "values"'
     );
@@ -203,12 +204,14 @@ describe("assertFeatureState", () => {
 
   test("rejects sparse arrays nested inside objects", () => {
     expect(() =>
+      // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
       assertFeatureState({ meta: { values: new Array<number>(1) } })
     ).toThrow('Feature state key "meta"');
   });
 
   test("rejects sparse arrays nested inside arrays", () => {
     expect(() =>
+      // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
       assertFeatureState({ values: [[1], new Array<number>(1)] })
     ).toThrow('Feature state key "values"');
   });

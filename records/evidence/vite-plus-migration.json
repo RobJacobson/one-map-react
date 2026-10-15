@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-14",
+  "toolchain": {
+    "vite-plus": "1.1.0",
+    "vite-plus-core": "1.1.0",
+    "vite": "8.3.3",
+    "rolldown": "1.2.12",
+    "vitest": "5.0.3",
+    "oxlint": "1.87.0",
+    "oxfmt": "0.72.0",
+    "oxlint-tsgolint": "7.0.2003",
+    "tsdown": "0.23.0",
+    "oxc": "0.152.0",
+    "oxc-resolver": "11.24.3"
+  },
+  "runtime": {
+    "node": "24.22.0",
+    "bun": "1.4.1"
+  },
+  "version_selection": "Vite+ 1.2.0 installation was blocked by the existing 86400-second Bun release-age policy. Vite+ 1.1.0 satisfies that policy; it was not disabled.",
+  "artifact": {
+    "package_sha256": "8394fd2cb54aa2d41d259f921822b945a3c45cda275e6c2e3b0bcf5b3aeb0d07",
+    "published_manifest_unchanged": true,
+    "exports_and_peers_unchanged": true
+  },
+  "checks": {
+    "bun run validate": "passed",
+    "bun run test:peers": "passed; four selected peer sets",
+    "bun run test:example-resolution": "passed; isolated Vite+ build",
+    "web_mapbox_build": "passed",
+    "web_maplibre_build": "passed",
+    "frozen_installs": "passed at root and both web examples",
+    "vite_config_typecheck": "passed",
+    "import_group_fixture": "passed; Bun/Node, package, relative",
+    "git_diff_whitespace": "passed",
+    "production_code_review": "passed; parsed syntax trees unchanged apart from import ordering, formatting, and lint directives in ten production files"
+  },
+  "tests": {
+    "vitest": {
+      "files": 23,
+      "passed": 426
+    },
+    "native_jest": {
+      "files": 5,
+      "passed": 204
+    },
+    "package_selections": 13,
+    "standalone_regressions": "all original commands retained and passed"
+  },
+  "compatibility_review": {
+    "clearMocks_false": "removed at root and both projects",
+    "sharedViteServer_false": "removed at root",
+    "extends_false": "removed from both projects",
+    "verification": "Removed each of six settings separately; each run passed all 426 tests with no new skips. No test changes were needed.",
+    "migrator_reviews": "Three vi.fn targets are function components, not constructors. All 23 flagged asynchronous assertions are awaited directly or through Promise.all."
+  },
+  "diagnostics": {
+    "lint_errors": 0,
+    "lint_warnings": 113,
+    "other": "Native Jest act warnings, Bun moduleSuffixes warning, and web bundle-size warnings remain."
+  },
+  "first_full_validation": "Sandboxed run passed Vitest/native Jest, then stopped with EPERM in the local process-cleanup regression. Complete rerun outside the sandbox passed.",
+  "acceptance": "Not run. No real-renderer browser suite, Metro session, simulator, native build, or device flow was launched."
+}

@@ -5,6 +5,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readdirSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -15,6 +16,9 @@ import shellDeps from "../examples/resolve-shell-deps.cjs";
 
 const { shellMetroResolver } = shellDeps;
 const root = resolve(import.meta.dirname, "..");
+const toolchain = JSON.parse(
+  readFileSync(join(root, "package.json"), "utf8")
+).catalog;
 const output = mkdtempSync(join(tmpdir(), "one-map-example-resolve-"));
 
 /** Runs a command and throws when the exit status is nonzero. */
@@ -72,7 +76,11 @@ try {
 
   writeFileSync(
     join(shellRoot, "package.json"),
-    '{"private":true,"type":"module"}\n'
+    JSON.stringify({
+      private: true,
+      type: "module",
+      overrides: { vite: toolchain.vite },
+    })
   );
   run(
     "bun",
@@ -83,7 +91,8 @@ try {
       "react-dom@19.2.3",
       "react-map-gl@8.1.3",
       "maplibre-gl@6.13.0",
-      "vite@7.1.9",
+      `vite@${toolchain.vite}`,
+      `vite-plus@${toolchain["vite-plus"]}`,
       "@vitejs/plugin-react@5.0.4",
     ],
     shellRoot
@@ -116,7 +125,7 @@ createRoot(document.getElementById("root")).render(
     `import path from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig } from "vite-plus";
 import { pinBareImportsToShell } from "../pin-shell-deps.js";
 
 const shellRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -128,7 +137,7 @@ export default defineConfig({
 `
   );
 
-  run("bunx", ["vite", "build"], shellRoot);
+  run("bunx", ["vp", "build"], shellRoot);
   console.log(
     "PASS shared example imports resolve through the shell install; Vite bundled the sibling RouteMap."
   );

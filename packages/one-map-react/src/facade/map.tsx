@@ -49,7 +49,7 @@ export const useMap = (id?: string): MapRef => {
 };
 
 /** Shared map with scoped UI notifications and named map attachment. */
-// biome-ignore lint/suspicious/noShadowRestrictedNames: public Map API
+// eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
 export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
   const { Map: AdapterMap, backend } = useSelectedAdapter();
   const registry = useMapRegistry();
@@ -91,6 +91,7 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
   const propsRef = useRef(props);
   const active = useRef(true);
   const generation = useRef(0);
+  // eslint-disable-next-line react/refs -- The deferred proxy captures the ref; its methods read current only when called after attachment.
   const proxy = useMemo(() => createDeferredMapRef(mapRef), []);
   useImperativeHandle(forwardedRef, () => mapRef.current ?? proxy);
   useLayoutEffect(() => {
@@ -98,15 +99,17 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
   });
   useLayoutEffect(() => {
     active.current = true;
+    const sourceRegistry = sources.current;
+    const eventListeners = listeners.current;
     const unregister =
       props.id === undefined ? undefined : registry.register(props.id, proxy);
     return () => {
       active.current = false;
       generation.current += 1;
       unregister?.();
-      sources.current.clear();
-      listeners.current.click.clear();
-      listeners.current.move.clear();
+      sourceRegistry.clear();
+      eventListeners.click.clear();
+      eventListeners.move.clear();
     };
   }, [props.id, registry, proxy]);
   const emit = useCallback(

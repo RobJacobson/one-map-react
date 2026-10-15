@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect, test } from "vite-plus/test";
 
 import { invokeWrapper } from "../src/adapters/shared/invoke-wrapper.js";
 

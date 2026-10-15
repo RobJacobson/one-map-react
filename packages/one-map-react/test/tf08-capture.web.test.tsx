@@ -1,4 +1,3 @@
-import { describe, expect, jest, test } from "@jest/globals";
 import { act, render } from "@testing-library/react";
 import {
   createRef,
@@ -6,6 +5,7 @@ import {
   type ReactNode,
   useImperativeHandle,
 } from "react";
+import { describe, expect, vi, test } from "vite-plus/test";
 
 import type {
   WebMapHandle,
@@ -27,7 +27,7 @@ const fixture = (backend: "mapbox-web" | "maplibre-web", preserved = true) => {
     getContext: () => ({
       getContextAttributes: () => ({ preserveDrawingBuffer: preserved }),
     }),
-    toDataURL: jest.fn(() => `data:image/png;base64,${png}`),
+    toDataURL: vi.fn(() => `data:image/png;base64,${png}`),
   };
   const renderer = {
     on: (type: string, callback: () => void) => {
@@ -44,6 +44,7 @@ const fixture = (backend: "mapbox-web" | "maplibre-web", preserved = true) => {
   const handle = { getMap: () => renderer } as unknown as WebMapHandle;
   const WrapperMap = forwardRef<WebMapHandle, { children?: ReactNode }>(
     (value, ref) => {
+      // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
       props = value;
       useImperativeHandle(ref, () => handle, []);
       return <div>{value.children}</div>;

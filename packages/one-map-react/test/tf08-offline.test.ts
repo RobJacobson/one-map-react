@@ -1,4 +1,4 @@
-import { describe, expect, jest, test } from "@jest/globals";
+import { describe, expect, vi, test } from "vite-plus/test";
 
 import {
   createOfflineService,
@@ -30,12 +30,12 @@ const offlineFixture = (kind: OfflineBackend["kind"] = "maplibre") => {
       error: (pack: WrapperOfflinePack, value: unknown) => void;
     }
   >();
-  const observe = jest
+  const observe = vi
     .fn<OfflineBackend["observe"]>()
     .mockImplementation(async (id, progress, error) => {
       native.set(id, { progress, error });
     });
-  const unobserve = jest.fn((id: string) => {
+  const unobserve = vi.fn((id: string) => {
     native.delete(id);
   });
   const backend: OfflineBackend = {
@@ -51,13 +51,13 @@ const offlineFixture = (kind: OfflineBackend["kind"] = "maplibre") => {
         name: input.id,
         metadata,
         bounds: kind === "mapbox" ? [-122, 38, -123, 37] : [-123, 37, -122, 38],
-        status: jest
+        status: vi
           .fn<WrapperOfflinePack["status"]>()
           .mockResolvedValue({ state: "complete", percentage: 100 }),
-        pause: jest
+        pause: vi
           .fn<WrapperOfflinePack["pause"]>()
           .mockResolvedValue(undefined),
-        resume: jest
+        resume: vi
           .fn<WrapperOfflinePack["resume"]>()
           .mockResolvedValue(undefined),
       };
@@ -66,10 +66,10 @@ const offlineFixture = (kind: OfflineBackend["kind"] = "maplibre") => {
     },
     observe,
     unobserve,
-    deletePack: jest
+    deletePack: vi
       .fn<OfflineBackend["deletePack"]>()
       .mockResolvedValue(undefined),
-    invalidatePack: jest
+    invalidatePack: vi
       .fn<OfflineBackend["invalidatePack"]>()
       .mockResolvedValue(undefined),
   };
@@ -97,9 +97,8 @@ describe("TF08 persistent native packs", () => {
         })),
       };
       const create = fixture.backend.create;
-      jest
-        .spyOn(fixture.backend, "create")
-        .mockImplementationOnce(async (...args) => {
+      vi.spyOn(fixture.backend, "create").mockImplementationOnce(
+        async (...args) => {
           const pack = await create(...args);
           const native = {
             ...pack,
@@ -108,7 +107,8 @@ describe("TF08 persistent native packs", () => {
           };
           fixture.packs.splice(0, 1, native);
           return native;
-        });
+        }
+      );
 
       const created = await fixture.service.createPack(options);
       expect(created.bounds).toEqual(options.bounds);
@@ -178,10 +178,10 @@ describe("TF08 persistent native packs", () => {
   test("subscription reads initial terminal state and shares wrapper callbacks", async () => {
     const fixture = offlineFixture();
     await fixture.service.createPack(options);
-    const one = jest.fn();
-    const two = jest.fn();
-    const releaseOne = fixture.service.subscribe("ferry", one, jest.fn());
-    const releaseTwo = fixture.service.subscribe("ferry", two, jest.fn());
+    const one = vi.fn();
+    const two = vi.fn();
+    const releaseOne = fixture.service.subscribe("ferry", one, vi.fn());
+    const releaseTwo = fixture.service.subscribe("ferry", two, vi.fn());
     await settle();
     expect(one).toHaveBeenCalledWith(
       expect.objectContaining({ state: "complete" })
@@ -215,14 +215,14 @@ describe("TF08 persistent native packs", () => {
       const pack = await fixture.service.createPack(options);
       const nativePack = fixture.packs[0];
       let finishReadback: (value: unknown) => void = () => {};
-      jest.mocked(nativePack.status).mockImplementationOnce(
+      vi.mocked(nativePack.status).mockImplementationOnce(
         () =>
           new Promise((resolve) => {
             finishReadback = resolve;
           })
       );
-      const progress = jest.fn();
-      const error = jest.fn();
+      const progress = vi.fn();
+      const error = vi.fn();
       const dispose = fixture.service.subscribe(pack.id, progress, error);
       await settle();
 
@@ -249,8 +249,8 @@ describe("TF08 persistent native packs", () => {
     async (kind) => {
       const fixture = offlineFixture(kind);
       const pack = await fixture.service.createPack(options);
-      const progress = jest.fn();
-      const error = jest.fn();
+      const progress = vi.fn();
+      const error = vi.fn();
       const dispose = fixture.service.subscribe("ferry", progress, error);
       await settle();
 
@@ -287,13 +287,13 @@ describe("TF08 persistent native packs", () => {
     async (operation) => {
       const fixture = offlineFixture();
       const pack = await fixture.service.createPack(options);
-      const progress = jest.fn();
-      const error = jest.fn();
+      const progress = vi.fn();
+      const error = vi.fn();
       const dispose = fixture.service.subscribe("ferry", progress, error);
       await settle();
       const nativePack = fixture.packs[0];
       let finishReadback: (value: unknown) => void = () => {};
-      jest.mocked(nativePack.status).mockImplementationOnce(
+      vi.mocked(nativePack.status).mockImplementationOnce(
         () =>
           new Promise((resolve) => {
             finishReadback = resolve;
@@ -332,17 +332,15 @@ describe("TF08 persistent native packs", () => {
     const fixture = offlineFixture();
     const create = fixture.backend.create;
     const failure = new Error("post-create observer failure");
-    jest
-      .spyOn(fixture.backend, "create")
-      .mockImplementation(async (...args) => {
-        const pack = await create(...args);
-        if (!pack.id) throw new Error("Fixture pack has no native identity.");
-        fixture.native.set(pack.id, {
-          progress: args[2],
-          error: args[3],
-        });
-        throw failure;
+    vi.spyOn(fixture.backend, "create").mockImplementation(async (...args) => {
+      const pack = await create(...args);
+      if (!pack.id) throw new Error("Fixture pack has no native identity.");
+      fixture.native.set(pack.id, {
+        progress: args[2],
+        error: args[3],
       });
+      throw failure;
+    });
 
     await expect(fixture.service.createPack(options)).rejects.toBe(failure);
     expect(fixture.native.size).toBe(0);
@@ -354,7 +352,7 @@ describe("TF08 persistent native packs", () => {
   test("disposing before asynchronous setup retains no native observer", async () => {
     const fixture = offlineFixture();
     await fixture.service.createPack(options);
-    const dispose = fixture.service.subscribe("ferry", jest.fn(), jest.fn());
+    const dispose = fixture.service.subscribe("ferry", vi.fn(), vi.fn());
     dispose();
     await settle();
     expect(fixture.observe).not.toHaveBeenCalled();
@@ -362,7 +360,7 @@ describe("TF08 persistent native packs", () => {
   test("resume reattaches a completed observer before native dispatch", async () => {
     const fixture = offlineFixture();
     const pack = await fixture.service.createPack(options);
-    const dispose = fixture.service.subscribe("ferry", jest.fn(), jest.fn());
+    const dispose = fixture.service.subscribe("ferry", vi.fn(), vi.fn());
     await settle();
     fixture.native
       .get("generated")
@@ -386,9 +384,9 @@ describe("TF08 persistent native packs", () => {
     expect(
       (await fixture.service.getPack("backend:imported"))?.metadata
     ).toEqual({ external: true });
-    jest
-      .spyOn(fixture.backend, "getPacks")
-      .mockRejectedValue(new Error("database failure"));
+    vi.spyOn(fixture.backend, "getPacks").mockRejectedValue(
+      new Error("database failure")
+    );
     await expect(fixture.service.getPack("missing")).rejects.toThrow(
       "database failure"
     );

@@ -7,4 +7,5 @@ import { useRef } from "react";
  * @returns The first `value`.
  */
 export const useFrozenValue = <Value>(value: Value): Value =>
+  // eslint-disable-next-line react/refs -- Creation inputs deliberately retain their first value for this component lifetime.
   useRef(value).current;

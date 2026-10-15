@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect, test } from "vite-plus/test";
 
 import { toRnmapboxGestures } from "../src/adapters/mapbox-native/convert-gestures.js";
 import { toMaplibreGestures } from "../src/adapters/maplibre-native/convert-gestures.js";

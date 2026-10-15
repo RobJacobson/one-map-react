@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, jest, test } from "@jest/globals";
+import { afterEach, describe, expect, vi, test } from "vite-plus/test";
 
 import {
   normalizeImage,
@@ -19,7 +19,7 @@ const options: CaptureOptions = {
   timeoutMs: 50,
 };
 afterEach(() => {
-  jest.useRealTimers();
+  vi.useRealTimers();
 });
 
 describe("TF08 map images", () => {
@@ -76,7 +76,7 @@ describe("TF08 map images", () => {
   test("capture waits for both an observed frame and measured size", async () => {
     const gate = new MapCaptureGate();
     gate.activate(true);
-    const snapshot = jest.fn<() => Promise<string>>().mockResolvedValue(png);
+    const snapshot = vi.fn<() => Promise<string>>().mockResolvedValue(png);
     const result = gate.run(options, snapshot);
     gate.frame();
     await Promise.resolve();
@@ -115,7 +115,7 @@ describe("TF08 map images", () => {
     await late;
   });
   test("capture disabled, missing readiness, and backend export errors stay failures", async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const gate = new MapCaptureGate();
     gate.activate(false);
     await expect(gate.run(options, async () => png)).rejects.toThrow(
@@ -124,7 +124,7 @@ describe("TF08 map images", () => {
     gate.activate(true);
     const timed = gate.run(options, async () => png);
     const rejected = expect(timed).rejects.toThrow("timed out");
-    jest.advanceTimersByTime(50);
+    vi.advanceTimersByTime(50);
     await rejected;
     gate.layout(30, 40);
     gate.frame();
@@ -136,11 +136,11 @@ describe("TF08 map images", () => {
     gate.dispose();
   });
   test("independent-image deadline bounds a stalled SDK without claiming cancellation", async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const result = withImageDeadline(new Promise(() => {}), 20);
     const rejected = expect(result).rejects.toThrow("timed out");
-    jest.advanceTimersByTime(20);
+    vi.advanceTimersByTime(20);
     await rejected;
-    expect(jest.getTimerCount()).toBe(0);
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

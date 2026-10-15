@@ -1,4 +1,4 @@
-import { expect, test } from "@jest/globals";
+import { expect, test } from "vite-plus/test";
 
 import { NativeFeatureState } from "../src/adapters/shared/native-feature-state.js";
 import type {

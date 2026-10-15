@@ -1,4 +1,3 @@
-import { jest } from "@jest/globals";
 import {
   Children,
   cloneElement,
@@ -11,6 +10,8 @@ import {
   useLayoutEffect,
   useState,
 } from "react";
+import type { Mock } from "vite-plus/test";
+import { vi } from "vite-plus/test";
 
 interface PooledMap {
   readonly id: string;
@@ -49,19 +50,19 @@ interface MapHandle {
 
 /** Cluster methods the mock GeoJSON source exposes. */
 export interface ClusterSourceMock {
-  readonly getClusterExpansionZoom: jest.Mock<
+  readonly getClusterExpansionZoom: Mock<
     (
       clusterId: number,
       callback?: (error: unknown, zoom: number) => void
     ) => unknown
   >;
-  readonly getClusterChildren: jest.Mock<
+  readonly getClusterChildren: Mock<
     (
       clusterId: number,
       callback?: (error: unknown, features: readonly object[]) => void
     ) => unknown
   >;
-  readonly getClusterLeaves: jest.Mock<
+  readonly getClusterLeaves: Mock<
     (
       clusterId: number,
       limit: number,
@@ -97,11 +98,11 @@ export interface StyleLoadTarget {
   emitError: (error: unknown) => void;
   clearImages: () => void;
   hasImage: (name: string) => boolean;
-  addImage: jest.Mock<
+  addImage: Mock<
     (name: string, image: unknown, options?: { sdf?: boolean }) => void
   >;
-  removeImage: jest.Mock<(name: string) => void>;
-  loadImage: jest.Mock<
+  removeImage: Mock<(name: string) => void>;
+  loadImage: Mock<
     (
       url: string,
       callback?: (error: unknown, image?: unknown) => void
@@ -137,44 +138,44 @@ interface WebMapMockProps extends HandlerProps {
  * @returns The mocked Map, Source, and Layer plus pool controls.
  */
 export const createWebMapMock = () => {
-  const flyTo = jest.fn(() => ({ id: "map" }));
-  const jumpTo = jest.fn();
-  const easeTo = jest.fn();
-  const fitBounds = jest.fn();
-  const zoomTo = jest.fn();
-  const stop = jest.fn();
-  const resize = jest.fn();
-  const getCenter = jest.fn(() => ({ lng: -122.34, lat: 47.61 }));
-  const getZoom = jest.fn(() => 11);
-  const getBearing = jest.fn(() => 4);
-  const getPitch = jest.fn(() => 1);
-  const getPadding = jest.fn(() => ({
+  const flyTo = vi.fn(() => ({ id: "map" }));
+  const jumpTo = vi.fn();
+  const easeTo = vi.fn();
+  const fitBounds = vi.fn();
+  const zoomTo = vi.fn();
+  const stop = vi.fn();
+  const resize = vi.fn();
+  const getCenter = vi.fn(() => ({ lng: -122.34, lat: 47.61 }));
+  const getZoom = vi.fn(() => 11);
+  const getBearing = vi.fn(() => 4);
+  const getPitch = vi.fn(() => 1);
+  const getPadding = vi.fn(() => ({
     top: 1,
     right: 2,
     bottom: 3,
     left: 4,
   }));
-  const getBounds = jest.fn(() => ({
+  const getBounds = vi.fn(() => ({
     getWest: () => 170,
     getSouth: () => -10,
     getEast: () => -170,
     getNorth: () => 10,
   }));
-  const getMinZoom = jest.fn(() => 2);
-  const getMaxZoom = jest.fn(() => 18);
-  const getMaxBounds = jest.fn(() => null);
-  const project = jest.fn(() => ({ x: 12, y: 34 }));
-  const unproject = jest.fn(() => ({ lng: -122.34, lat: 47.61 }));
+  const getMinZoom = vi.fn(() => 2);
+  const getMaxZoom = vi.fn(() => 18);
+  const getMaxBounds = vi.fn(() => null);
+  const project = vi.fn(() => ({ x: 12, y: 34 }));
+  const unproject = vi.fn(() => ({ lng: -122.34, lat: 47.61 }));
   const queriedFeatures = [
     { type: "Feature", id: 1, properties: { kind: "route" } },
     { type: "Feature", id: 1, properties: { kind: "route" } },
   ];
-  const queryRenderedFeatures = jest.fn(() => queriedFeatures);
-  const querySourceFeatures = jest.fn(() => queriedFeatures.slice(0, 1));
+  const queryRenderedFeatures = vi.fn(() => queriedFeatures);
+  const querySourceFeatures = vi.fn(() => queriedFeatures.slice(0, 1));
   const clusterSource: ClusterSourceMock = {
     // Mapbox GL reports through a trailing callback; call it so the
     // mapbox-web adapter's promise resolves.
-    getClusterExpansionZoom: jest.fn(
+    getClusterExpansionZoom: vi.fn(
       (
         _clusterId: number,
         callback?: (error: unknown, zoom: number) => void
@@ -184,7 +185,7 @@ export const createWebMapMock = () => {
         return undefined;
       }
     ),
-    getClusterChildren: jest.fn(
+    getClusterChildren: vi.fn(
       (
         _clusterId: number,
         callback?: (error: unknown, features: readonly object[]) => void
@@ -194,7 +195,7 @@ export const createWebMapMock = () => {
         return undefined;
       }
     ),
-    getClusterLeaves: jest.fn(
+    getClusterLeaves: vi.fn(
       (
         _clusterId: number,
         _limit: number,
@@ -211,19 +212,19 @@ export const createWebMapMock = () => {
     ),
   };
   const sources = new Map<string, unknown>();
-  const getSource = jest.fn((id: string) => sources.get(id));
+  const getSource = vi.fn((id: string) => sources.get(id));
   const layers = new Map<string, object>();
-  const getLayer = jest.fn((id: string) => layers.get(id));
-  const setFeatureState = jest.fn();
+  const getLayer = vi.fn((id: string) => layers.get(id));
+  const setFeatureState = vi.fn();
   const featureState = new Map<string, Record<string, unknown>>();
-  const getFeatureState = jest.fn(
+  const getFeatureState = vi.fn(
     (target: { source?: string; id?: string | number }) => {
       const key = `${target?.source}/${target?.id}`;
 
       return featureState.get(key) ?? {};
     }
   );
-  const removeFeatureState = jest.fn(
+  const removeFeatureState = vi.fn(
     (target: { source?: string; id?: string | number }, key?: string) => {
       const stateKey = `${target?.source}/${target?.id}`;
       const current = featureState.get(stateKey);
@@ -240,8 +241,8 @@ export const createWebMapMock = () => {
       delete current[key];
     }
   );
-  const disableRotation = jest.fn();
-  const enableRotation = jest.fn();
+  const disableRotation = vi.fn();
+  const enableRotation = vi.fn();
   let saved: PooledMap | null = null;
   let serial = 0;
   let currentStyleTarget: StyleLoadTarget | null = null;
@@ -289,7 +290,7 @@ export const createWebMapMock = () => {
     Layer.mockClear();
   };
 
-  const WrapperMap = jest.fn(
+  const WrapperMap = vi.fn(
     ({
       children,
       ref,
@@ -399,7 +400,7 @@ export const createWebMapMock = () => {
     }
   );
 
-  const Source = jest.fn(
+  const Source = vi.fn(
     ({
       id,
       type,
@@ -428,7 +429,7 @@ export const createWebMapMock = () => {
     }
   );
 
-  const Layer = jest.fn(({ id }: { readonly id: string }) => {
+  const Layer = vi.fn(({ id }: { readonly id: string }) => {
     useEffect(() => {
       const entry = { id };
       layers.set(id, entry);
@@ -446,6 +447,14 @@ export const createWebMapMock = () => {
   });
 
   return {
+    Marker: undefined,
+    Popup: undefined,
+    NavigationControl: undefined,
+    AttributionControl: undefined,
+    ScaleControl: undefined,
+    GeolocateControl: undefined,
+    FullscreenControl: undefined,
+    useControl: undefined,
     Map: WrapperMap,
     Source,
     Layer,
@@ -512,6 +521,7 @@ const createStyleTarget = (
   const emit = (type: string) => {
     loaded = true;
 
+    // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
     for (const listener of [...listenersFor(type)]) {
       listener({});
     }
@@ -536,11 +546,13 @@ const createStyleTarget = (
     // styledata fires during ordinary style activity, so it does not mark
     // the style loaded the way the completion events do.
     emitStyleData: () => {
+      // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
       for (const listener of [...listenersFor("styledata")]) {
         listener({});
       }
     },
     emitError: (error) => {
+      // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
       for (const listener of [...listenersFor("error")]) {
         listener({ error });
       }
@@ -549,15 +561,15 @@ const createStyleTarget = (
       images.clear();
     },
     hasImage: (name) => images.has(name),
-    addImage: jest.fn((name: string, image: unknown) => {
+    addImage: vi.fn((name: string, image: unknown) => {
       images.set(name, image);
     }),
-    removeImage: jest.fn((name: string) => {
+    removeImage: vi.fn((name: string) => {
       images.delete(name);
     }),
     // Mapbox GL loads through a callback and MapLibre GL through a promise;
     // this one double serves both calling conventions.
-    loadImage: jest.fn(
+    loadImage: vi.fn(
       (url: string, callback?: (error: unknown, image?: unknown) => void) => {
         const image = { url, width: 1, height: 1 };
 

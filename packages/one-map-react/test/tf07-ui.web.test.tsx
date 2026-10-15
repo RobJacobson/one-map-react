@@ -1,11 +1,3 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  jest,
-  test,
-} from "@jest/globals";
 import { act, fireEvent, render } from "@testing-library/react";
 import {
   createRef,
@@ -15,6 +7,14 @@ import {
   useMemo,
   useRef,
 } from "react";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  vi,
+  test,
+} from "vite-plus/test";
 
 import type {
   WebCustomControl,
@@ -31,8 +31,8 @@ import {
 const markerProps: WebForwardedProps[] = [];
 const popupProps: WebForwardedProps[] = [];
 const controlProps: WebForwardedProps[] = [];
-const popupHandle = { options: { anchor: "bottom" }, setOffset: jest.fn() };
-const markerHandle = { setLngLat: jest.fn() };
+const popupHandle = { options: { anchor: "bottom" }, setOffset: vi.fn() };
+const markerHandle = { setLngLat: vi.fn() };
 const MarkerMock = forwardRef((props: WebForwardedProps, ref) => {
   useImperativeHandle(ref, () => markerHandle, []);
   markerProps.push(props);
@@ -43,8 +43,9 @@ const PopupMock = forwardRef((props: WebForwardedProps, ref) => {
   useImperativeHandle(ref, () => popupHandle, []);
   const initialProps = useRef(props);
   useEffect(() => {
-    (initialProps.current.onOpen as () => void)?.();
-    return () => (initialProps.current.onClose as () => void)?.();
+    const mountedProps = initialProps.current;
+    (mountedProps.onOpen as () => void)?.();
+    return () => (mountedProps.onClose as () => void)?.();
   }, []);
   return <div>{props.children}</div>;
 });
@@ -86,7 +87,7 @@ beforeEach(() => {
   markerHandle.setLngLat.mockClear();
 });
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 const latest = (calls: WebForwardedProps[]): WebForwardedProps => {
@@ -100,7 +101,7 @@ const notify = (props: WebForwardedProps, key: string, event: object): void => {
 
 describe("TF07 web UI delegates", () => {
   test("normalizes marker drag proposals, resets omitted offset, and refreshes without work", async () => {
-    const onDrag = jest.fn();
+    const onDrag = vi.fn();
     const ref = createRef<MarkerRef>();
     const view = render(
       <Marker
@@ -145,9 +146,9 @@ describe("TF07 web UI delegates", () => {
   });
 
   test("keeps nested marker buttons interactive and prevents marker activation bubbling", () => {
-    const childClick = jest.fn();
-    const markerClick = jest.fn();
-    const stopPropagation = jest.fn();
+    const childClick = vi.fn();
+    const markerClick = vi.fn();
+    const stopPropagation = vi.fn();
     const view = render(
       <Marker longitude={5} latitude={6} onClick={markerClick}>
         <button type="button" onClick={childClick}>
@@ -167,8 +168,8 @@ describe("TF07 web UI delegates", () => {
   });
 
   test("updates marker callbacks and ignores stale notifications after unmount", () => {
-    const first = jest.fn();
-    const second = jest.fn();
+    const first = vi.fn();
+    const second = vi.fn();
     const view = render(<Marker longitude={5} latitude={6} onClick={first} />);
     const staleProps = latest(markerProps);
     view.rerender(<Marker longitude={5} latitude={6} onClick={second} />);
@@ -200,6 +201,13 @@ describe("TF07 web UI delegates", () => {
     );
     expect(popupHandle.options.anchor).toBe("top");
     expect(popupHandle.setOffset).toHaveBeenLastCalledWith([2, 3]);
+    const updates = popupHandle.setOffset.mock.calls.length;
+    view.rerender(
+      <Popup longitude={5} latitude={6} anchor="top" offset={[2, 3]}>
+        Content
+      </Popup>
+    );
+    expect(popupHandle.setOffset).toHaveBeenCalledTimes(updates);
     view.rerender(
       <Popup longitude={5} latitude={6} anchor="top">
         Content
@@ -209,9 +217,9 @@ describe("TF07 web UI delegates", () => {
   });
 
   test("popup dismissal calls current callback while teardown emits no close", () => {
-    const onOpen = jest.fn();
-    const first = jest.fn();
-    const second = jest.fn();
+    const onOpen = vi.fn();
+    const first = vi.fn();
+    const second = vi.fn();
     const view = render(
       <Popup longitude={5} latitude={6} onOpen={onOpen} onClose={first} />
     );
@@ -225,7 +233,7 @@ describe("TF07 web UI delegates", () => {
   });
 
   test("custom control registers a host with live children and releases it", () => {
-    const click = jest.fn();
+    const click = vi.fn();
     const view = render(
       <Control>
         <button type="button" onClick={click}>
@@ -258,8 +266,8 @@ describe("TF07 web UI delegates", () => {
 
   test("uses browser geolocation and strips the native provider and zoom", () => {
     const provider =
-      jest.fn<() => Promise<{ lngLat: readonly [number, number] }>>();
-    const onGeolocate = jest.fn();
+      vi.fn<() => Promise<{ lngLat: readonly [number, number] }>>();
+    const onGeolocate = vi.fn();
     render(<GeolocateControl zoom={9} onGeolocate={onGeolocate} />);
     const props = latest(controlProps);
     expect(props.getCurrentPosition).toBeUndefined();
@@ -280,14 +288,14 @@ describe("TF07 web UI delegates", () => {
     let resolvePosition: (value: {
       lngLat: readonly [number, number];
     }) => void = () => {};
-    const provider = jest.fn(
+    const provider = vi.fn(
       () =>
         new Promise<{ lngLat: readonly [number, number] }>((resolve) => {
           resolvePosition = resolve;
         })
     );
-    const flyTo = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
-    const onGeolocate = jest.fn();
+    const flyTo = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
+    const onGeolocate = vi.fn();
     const map = { flyTo };
     const session = {
       ready: true,
@@ -322,7 +330,7 @@ describe("TF07 web UI delegates", () => {
   });
 
   test("rejects changes to marker and control creation options", () => {
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const marker = render(
       <Marker longitude={5} latitude={6} anchor="bottom" />
     );
@@ -335,7 +343,7 @@ describe("TF07 web UI delegates", () => {
     ).toThrow("creation option");
   });
   test("TF08 tracking-mode changes release the old SDK control resource", () => {
-    const release = jest.fn();
+    const release = vi.fn();
     const ControlWithResource = () => {
       useEffect(
         () => () => {

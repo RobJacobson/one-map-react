@@ -17,6 +17,7 @@ export const useNativeOrnamentPositions = () => {
     if (overlays.length > 0) previouslyManaged.current = true;
   }, [overlays.length]);
   return {
+    // eslint-disable-next-line react/refs -- Native ornaments stay managed after the last control is removed; this latch deliberately preserves that history.
     managed: overlays.length > 0 || previouslyManaged.current,
     position: (corner: ControlPosition) =>
       nativeOrnamentPosition(corner, overlays),

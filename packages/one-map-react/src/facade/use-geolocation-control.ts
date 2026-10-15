@@ -60,7 +60,6 @@ export const useGeolocationControl = (
   }, []);
   // Provider, mode, and attachment changes retire acquisition even though
   // cleanup itself does not read those inputs.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: these inputs define the request lifetime
   useLayoutEffect(() => {
     const owner = request.current;
     owner.generation += 1;
@@ -71,6 +70,7 @@ export const useGeolocationControl = (
     owner.following = false;
     owner.latest = undefined;
     owner.dispatching = false;
+    // eslint-disable-next-line react/set-state-in-effect -- Provider, mode or attachment changes must clear control-owned pending/location UI before paint.
     setPending(false);
     setPosition(undefined);
   }, [
@@ -80,13 +80,14 @@ export const useGeolocationControl = (
     session.ready,
     session.ref,
   ]);
+  const subscribe = session.subscribe;
   useLayoutEffect(
     () =>
-      session.subscribe("move", (event) => {
+      subscribe("move", (event) => {
         if ("origin" in event && event.origin === "user")
           request.current.following = false;
       }),
-    [session.subscribe]
+    [subscribe]
   );
 
   if (

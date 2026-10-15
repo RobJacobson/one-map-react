@@ -1,5 +1,5 @@
 import type { ClickEvent, LngLat, MapRef, ViewState } from "one-map-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /**
  * North end of the Seattle fixture, away from the opening camera.
@@ -86,8 +86,8 @@ export const useCameraSmoke = ({
   const zoomBaseline = useRef<number | null>(null);
   const [phase, setPhase] = useState<SmokePhase>("await-load");
   const [locked, setLocked] = useState<ViewState | undefined>(undefined);
-  const [status, setStatus] = useState(
-    statusLine(fields.current, "await-load")
+  const [status, setStatus] = useState(() =>
+    statusLine(initialFields(doubleTap), "await-load")
   );
 
   const publish = () => {
@@ -105,14 +105,16 @@ export const useCameraSmoke = ({
     }
   };
 
-  const enterRef = useRef<(next: SmokePhase) => void>(() => {});
   const enter = (next: SmokePhase) => {
     phaseRef.current = next;
     setPhase(next);
     publish();
   };
 
-  enterRef.current = enter;
+  const enterRef = useRef(enter);
+  useLayoutEffect(() => {
+    enterRef.current = enter;
+  });
 
   const onLoad = () => {
     if (phaseRef.current !== "await-load") {

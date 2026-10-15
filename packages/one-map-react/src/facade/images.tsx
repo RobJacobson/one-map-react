@@ -1,6 +1,6 @@
 import type { ImagesProps } from "../contracts/images-types.js";
-import { useMapEnclosure } from "./map.js";
 import { useSelectedAdapter } from "./map-setup.js";
+import { useMapEnclosure } from "./map.js";
 
 /**
  * Shared style images that render through the selected adapter.

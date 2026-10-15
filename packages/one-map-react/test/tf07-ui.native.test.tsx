@@ -54,6 +54,7 @@ jest.mock("@rnmapbox/maps", () => {
             testID: "mapbox-annotation",
             onPress: () => {
               // RNMapbox 10.3.7 toggles selection on repeated taps on both OSes.
+              // eslint-disable-next-line react/immutability -- This mock useRef tracks SDK selection toggled by a press; the untyped require hides the ref from analysis.
               selected.current = !selected.current;
               const event = {
                 type: "Feature" as const,
@@ -1305,8 +1306,9 @@ describe("TF07 native UI composition", () => {
   test("injected location centers once and pending work is ignored after teardown", async () => {
     const fixture = sessionFixture();
     const located = jest.fn();
-    let finish: (position: { lngLat: readonly [number, number] }) => void =
-      () => undefined;
+    let finish: (position: {
+      lngLat: readonly [number, number];
+    }) => void = () => undefined;
     const provider = jest.fn(
       () =>
         new Promise<{ lngLat: readonly [number, number] }>((resolve) => {

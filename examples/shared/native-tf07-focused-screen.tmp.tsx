@@ -170,6 +170,7 @@ export const NativeTf07Screen = ({ adapter }: FocusProps) => {
           }}
         >
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {/* eslint-disable react/refs -- This list stores press handlers; map refs are read only when a button is pressed. */}
             {(
               [
                 ["Read focus", () => void read()],
@@ -197,6 +198,7 @@ export const NativeTf07Screen = ({ adapter }: FocusProps) => {
                 <Button title={title} onPress={onPress} />
               </View>
             ))}
+            {/* eslint-enable react/refs */}
           </View>
           <Text style={{ height: 48 }} numberOfLines={2}>
             {status}; provider {mode}; theme {theme}

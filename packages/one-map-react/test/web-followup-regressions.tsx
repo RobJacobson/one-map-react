@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { act, render, waitFor } from "@testing-library/react";
 import { createRef, type ReactNode } from "react";
+import { beforeEach, describe, expect, vi, test } from "vite-plus/test";
 
 import {
   emptyStyle,
@@ -12,8 +12,8 @@ import type { MapRef } from "../src/contracts/camera-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
 import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
-import { Map as OneMap } from "../src/facade/map.js";
 import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
 import {
   type createWebMapMock,
@@ -61,8 +61,8 @@ export const runWebFollowupRegressions = (
     test("onLoad camera operations wait for the wrapper handle attachment", async () => {
       mock.loadBeforeAttachment();
       const ref = createRef<MapRef>();
-      const failed = jest.fn();
-      const loaded = jest.fn(() => {
+      const failed = vi.fn();
+      const loaded = vi.fn(() => {
         void ref.current?.jumpTo({ zoom: 12 }).catch(failed);
       });
       render(scene({ onLoad: loaded }, undefined, ref));
@@ -72,7 +72,7 @@ export const runWebFollowupRegressions = (
     });
 
     test("equivalent style objects preserve the completion callback and listener", () => {
-      const loaded = jest.fn();
+      const loaded = vi.fn();
       const sceneProps = { mapStyle: { ...emptyStyle }, onStyleLoad: loaded };
       const view = render(scene(sceneProps));
       const renderer = target();
@@ -164,7 +164,7 @@ export const runWebFollowupRegressions = (
     test.each(["rendered", "source"] as const)(
       "%s query rejects emitted errors and keeps the map callback",
       async (kind) => {
-        const onError = jest.fn();
+        const onError = vi.fn();
         const ref = createRef<MapRef>();
         render(scene({ onError }, undefined, ref));
         const renderer = target();
@@ -240,9 +240,7 @@ export const runWebFollowupRegressions = (
       const renderer = target();
       act(() => renderer.emitStyleLoad());
       await waitFor(() => expect(renderer.hasImage("marker")).toBe(true));
-      const ready = jest
-        .spyOn(renderer, "isStyleLoaded")
-        .mockReturnValue(false);
+      const ready = vi.spyOn(renderer, "isStyleLoaded").mockReturnValue(false);
       mounted.rerender(scene({}, <Images images={{}} />));
       expect(renderer.hasImage("marker")).toBe(false);
       ready.mockRestore();
@@ -258,9 +256,7 @@ export const runWebFollowupRegressions = (
       const renderer = target();
       act(() => renderer.emitStyleLoad());
       await waitFor(() => expect(renderer.hasImage("marker")).toBe(true));
-      const ready = jest
-        .spyOn(renderer, "isStyleLoaded")
-        .mockReturnValue(false);
+      const ready = vi.spyOn(renderer, "isStyleLoaded").mockReturnValue(false);
       mounted.unmount();
       expect(renderer.hasImage("marker")).toBe(false);
       expect(renderer.listenerCount("style.load")).toBe(0);
@@ -307,7 +303,7 @@ export const runWebFollowupRegressions = (
       const renderer = target();
       act(() => renderer.emitStyleLoad());
       await waitFor(() => expect(renderer.hasImage("marker")).toBe(true));
-      const imageMethods = jest
+      const imageMethods = vi
         .spyOn(renderer, "hasImage")
         .mockImplementation(() => {
           throw new Error("no style");
@@ -340,9 +336,7 @@ export const runWebFollowupRegressions = (
           <Images images={{ delayed: "https://example.com/delayed.png" }} />
         )
       );
-      const ready = jest
-        .spyOn(renderer, "isStyleLoaded")
-        .mockReturnValue(false);
+      const ready = vi.spyOn(renderer, "isStyleLoaded").mockReturnValue(false);
       mounted.unmount();
       ready.mockReturnValue(true);
       render(scene({ reuseMaps: true }, <Images images={{}} />));

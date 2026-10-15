@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, expect, jest, test } from "@jest/globals";
 import { act, renderHook } from "@testing-library/react";
 import { isValidElement, useLayoutEffect } from "react";
+import { afterEach, beforeEach, expect, vi, test } from "vite-plus/test";
 
 import { LifetimesMap } from "../../../examples/shared/lifetimes-map.js";
 import { useLifetimesSmoke } from "../../../examples/shared/lifetimes-smoke.js";
@@ -42,8 +42,8 @@ const fixture = (stringIds = false) => {
       properties: { __oneMapSourceRevision: revision },
       geometry: null,
     }));
-  const queryRenderedFeatures = jest.fn(async () => features(renderedRevision));
-  const querySourceFeatures = jest.fn(
+  const queryRenderedFeatures = vi.fn(async () => features(renderedRevision));
+  const querySourceFeatures = vi.fn(
     async (_source: string, options?: { sourceLayer?: string }) => {
       record("querySourceFeatures");
       if (
@@ -56,17 +56,17 @@ const fixture = (stringIds = false) => {
       return features(sourceRevision);
     }
   );
-  const setFeatureState = jest.fn(
+  const setFeatureState = vi.fn(
     async (target: FeatureIdentifier, state: FeatureState) => {
       record("setFeatureState", target);
       states.set(key(target), { ...states.get(key(target)), ...state });
     }
   );
-  const getFeatureState = jest.fn(async (target: FeatureIdentifier) => {
+  const getFeatureState = vi.fn(async (target: FeatureIdentifier) => {
     record("getFeatureState", target);
     return states.get(key(target)) ?? {};
   });
-  const removeFeatureState = jest.fn(
+  const removeFeatureState = vi.fn(
     async (target: FeatureIdentifier, property?: string) => {
       record("removeFeatureState", target);
       if (property === undefined) states.delete(key(target));
@@ -79,9 +79,9 @@ const fixture = (stringIds = false) => {
   );
   // This partial handle exercises only the smoke's documented map operations.
   const map = {
-    jumpTo: jest.fn(async () => undefined),
-    getCenter: jest.fn(async () => [-122.34, 47.61]),
-    getZoom: jest.fn(async () => 11),
+    jumpTo: vi.fn(async () => undefined),
+    getCenter: vi.fn(async () => [-122.34, 47.61]),
+    getZoom: vi.fn(async () => 11),
     queryRenderedFeatures,
     querySourceFeatures,
     setFeatureState,
@@ -117,18 +117,18 @@ const fixture = (stringIds = false) => {
 };
 
 beforeEach(() => {
-  jest.useFakeTimers();
-  jest.spyOn(console, "log").mockImplementation(() => {});
+  vi.useFakeTimers();
+  vi.spyOn(console, "log").mockImplementation(() => {});
 });
 
 afterEach(() => {
-  jest.useRealTimers();
-  jest.restoreAllMocks();
+  vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 const tick = (milliseconds: number) =>
   act(async () => {
-    await jest.advanceTimersByTimeAsync(milliseconds);
+    await vi.advanceTimersByTimeAsync(milliseconds);
   });
 
 const drive = async (hook: { result: { current: { phase: string } } }) => {
@@ -147,12 +147,13 @@ test.each([false, true])(
     const retainedBeforeTransition: number[] = [];
     const hook = renderHook(() => {
       const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+      const { sourceRevision, family, phase, onStyleLoad } = smoke;
       useLayoutEffect(() => {
-        if (smoke.sourceRevision === 0 || smoke.phase === "done") return;
+        if (sourceRevision === 0 || phase === "done") return;
         retainedBeforeTransition.push(renderer.states.size);
-        renderer.commit(smoke.sourceRevision, smoke.family, false, smoke.phase);
-        if (smoke.phase === "style") smoke.onStyleLoad();
-      }, [smoke.sourceRevision, smoke.family, smoke.phase, smoke.onStyleLoad]);
+        renderer.commit(sourceRevision, family, false, phase);
+        if (phase === "style") onStyleLoad();
+      }, [sourceRevision, family, phase, onStyleLoad]);
       return smoke;
     });
     act(() => hook.result.current.onLoad());
@@ -194,15 +195,16 @@ test("render generation gates source and state dispatch while native attachment 
   const renderer = fixture();
   const hook = renderHook(() => {
     const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+    const { sourceRevision, family, phase, onStyleLoad } = smoke;
     useLayoutEffect(() => {
-      if (smoke.sourceRevision === 0 || smoke.phase === "done") return;
+      if (sourceRevision === 0 || phase === "done") return;
       renderer.detach();
       const timer = setTimeout(() => {
-        renderer.commit(smoke.sourceRevision, smoke.family, false, smoke.phase);
-        if (smoke.phase === "style") smoke.onStyleLoad();
+        renderer.commit(sourceRevision, family, false, phase);
+        if (phase === "style") onStyleLoad();
       }, 500);
       return () => clearTimeout(timer);
-    }, [smoke.sourceRevision, smoke.family, smoke.phase, smoke.onStyleLoad]);
+    }, [sourceRevision, family, phase, onStyleLoad]);
     return smoke;
   });
   act(() => hook.result.current.onLoad());
@@ -224,24 +226,19 @@ test.each(["remount", "style", "to-geojson", "to-vector", "final-remount"])(
     const renderer = fixture();
     const hook = renderHook(() => {
       const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+      const { sourceRevision, family, phase, onStyleLoad } = smoke;
       useLayoutEffect(() => {
-        if (smoke.sourceRevision === 0 || smoke.phase === "done") return;
-        renderer.commit(
-          smoke.sourceRevision,
-          smoke.family,
-          smoke.phase === retainPhase,
-          smoke.phase
-        );
+        if (sourceRevision === 0 || phase === "done") return;
+        renderer.commit(sourceRevision, family, phase === retainPhase, phase);
         // Family namespaces differ. Simulate an erroneously retained destination
         // namespace as well, so an old count key alone must fail whole removal.
-        if (smoke.phase === retainPhase) {
-          renderer.states.set(
-            smoke.family === "geojson" ? "geojson/1" : "routes/1",
-            { count: 2 }
-          );
+        if (phase === retainPhase) {
+          renderer.states.set(family === "geojson" ? "geojson/1" : "routes/1", {
+            count: 2,
+          });
         }
-        if (smoke.phase === "style") smoke.onStyleLoad();
-      }, [smoke.sourceRevision, smoke.family, smoke.phase, smoke.onStyleLoad]);
+        if (phase === "style") onStyleLoad();
+      }, [sourceRevision, family, phase, onStyleLoad]);
       return smoke;
     });
     act(() => hook.result.current.onLoad());
@@ -349,26 +346,21 @@ test("style replacement preserves the vector source key, revision and tile URL",
       sourceRevision: smoke.sourceRevision,
     });
     const source = mapElement.props.children;
+    const { sourceRevision, family, phase, onStyleLoad } = smoke;
     useLayoutEffect(() => {
       if (!isValidElement<{ tiles?: readonly string[] }>(source))
         throw new Error("Lifetime scene has no Source element.");
       inputs.push({
-        phase: smoke.phase,
-        family: smoke.family,
-        revision: smoke.sourceRevision,
+        phase: phase,
+        family: family,
+        revision: sourceRevision,
         key: source.key,
         tiles: source.props.tiles,
       });
-      if (smoke.sourceRevision === 0 || smoke.phase === "done") return;
-      renderer.commit(smoke.sourceRevision, smoke.family, false, smoke.phase);
-      if (smoke.phase === "style") smoke.onStyleLoad();
-    }, [
-      source,
-      smoke.sourceRevision,
-      smoke.family,
-      smoke.phase,
-      smoke.onStyleLoad,
-    ]);
+      if (sourceRevision === 0 || phase === "done") return;
+      renderer.commit(sourceRevision, family, false, phase);
+      if (phase === "style") onStyleLoad();
+    }, [source, sourceRevision, family, phase, onStyleLoad]);
     return smoke;
   });
   act(() => hook.result.current.onLoad());

@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-14",
+  "scope": "Review of the uncommitted Vite+ migration; no runtime feature changes.",
+  "warning_counts": {
+    "before": 113,
+    "after": 98,
+    "errors_after": 0
+  },
+  "original_breakdown": {
+    "eslint(no-unused-vars)": 13,
+    "react(globals)": 8,
+    "react(immutability)": 1,
+    "react(refs)": 50,
+    "react(set-state-in-effect)": 3,
+    "react(use-memo)": 1,
+    "react-hooks(exhaustive-deps)": 23,
+    "unicorn(no-new-array)": 7,
+    "unicorn(no-useless-spread)": 7
+  },
+  "remaining_breakdown": {
+    "react(globals)": 8,
+    "react(immutability)": 1,
+    "react(refs)": 50,
+    "react(set-state-in-effect)": 3,
+    "react(use-memo)": 1,
+    "react-hooks(exhaustive-deps)": 21,
+    "unicorn(no-new-array)": 7,
+    "unicorn(no-useless-spread)": 7
+  },
+  "fixed": [
+    "Restored error checks for loose equality (preserving null comparisons), non-arrow function expressions (preserving named/generator/this/arguments exceptions), and shadowed language globals. Oxlint built-in rules did not fully reproduce those Biome checks.",
+    "Restored the three intentional public Map binding exceptions under the new global-shadow rule.",
+    "Set ignoreRestSiblings for no-unused-vars: all 13 warnings are intentional prop omission before forwarding the rest. Unused imports are still reported.",
+    "Moved the two ineffective converted hook suppressions to their dependency arrays without changing either array or effect.",
+    "Corrected the stale Biome reference in the coding style guide."
+  ],
+  "retained": {
+    "react_compiler": {
+      "count": 63,
+      "assessment": "New diagnostics on existing patterns, including initial-value refs and test observation mocks. No React Compiler adoption or behavior-changing ref rewrite was performed."
+    },
+    "hook_dependencies": {
+      "count": 21,
+      "assessment": "Existing hook code: 14 missing dependency reports, two computed dependency expressions, and five cleanup ref reads. Adding whole context objects or capturing different refs can change effect lifetimes; left visible for a separate behavior review."
+    },
+    "array_style": {
+      "count": 14,
+      "assessment": "Seven sparse-array validation fixtures must retain holes. Seven copied iterable loops snapshot listeners/subscriptions before callbacks can mutate them; removing the spread can change dispatch."
+    }
+  },
+  "regression_test": "node scripts/lint-policy.test.mjs; 11 fixture files exercise rejected and permitted code, unused imports, prop omission, and hook dependency checking.",
+  "validation": {
+    "bun run validate": "passed; 426 Vitest tests, 204 native Jest tests, all standalone regressions including lint policy, four TypeScript checks, docs, formatting/lint, library build and 13 packed-package selections",
+    "focused_final_checks": "passed after the class-binding deduplication and property-name edge cases were added to the lint regression test",
+    "source_comparison": "Parsed production statements match HEAD excluding imports, formatting and lint directives. Published package manifest, exports and peers match HEAD.",
+    "lint_config_typecheck": "passed",
+    "git_diff_whitespace": "passed"
+  },
+  "artifact_sha256": "8394fd2cb54aa2d41d259f921822b945a3c45cda275e6c2e3b0bcf5b3aeb0d07",
+  "acceptance": "Not run; no real-renderer browser, Metro, simulator, native build, or device flow. Changes affect tooling and lint directives only."
+}

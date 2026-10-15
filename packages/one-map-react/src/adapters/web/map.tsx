@@ -199,7 +199,6 @@ export const createWebMap = <
       // never emits style.load still reports once the current style is
       // loaded. The listener is facade-owned, so logical unmount removes
       // it even when reuseMaps keeps the renderer.
-      // biome-ignore lint/correctness/useExhaustiveDependencies: style content changes rearm missed-load observation after in-place diffs.
       useLayoutEffect(() => {
         if (!styleMap) {
           return;
@@ -269,6 +268,7 @@ export const createWebMap = <
 
       const hadPadding = useRef(false);
       const paddingValue =
+        // eslint-disable-next-line react/refs -- Previous committed padding requires one explicit zero reset when removed; keep that SDK transition.
         padding === undefined && !hadPadding.current
           ? undefined
           : normalizePadding(padding ?? 0);

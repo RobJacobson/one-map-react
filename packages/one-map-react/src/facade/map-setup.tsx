@@ -42,8 +42,9 @@ export const MapSetup = ({
   locationProvider,
   children,
 }: MapSetupProps) => {
-  const registry = useMemo(createRegistry, []);
+  const registry = useMemo(() => createRegistry(), []);
   const initialProvider = useRef(locationProvider);
+  // eslint-disable-next-line react/refs -- Provider identity is a creation contract; replacement must fail during render and require a keyed remount.
   if (initialProvider.current !== locationProvider)
     throw new Error(
       "MapSetup locationProvider changed. Remount with a new key."
@@ -198,6 +199,7 @@ const scopeServices = (services: MapServices, override?: LocationService) => {
       for (const reject of pending)
         reject(new Error("MapSetup detached during location acquisition."));
       pending.clear();
+      // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
       for (const release of [...subscriptions]) release();
     },
   };

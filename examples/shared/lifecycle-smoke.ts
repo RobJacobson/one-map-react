@@ -1,5 +1,5 @@
 import type { MapErrorEvent, MapRef, MoveEvent } from "one-map-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 interface LifecycleSmokeOptions {
   readonly mapRef: { readonly current: MapRef | null };
@@ -83,8 +83,10 @@ export const useLifecycleSmoke = ({
     publish();
   };
 
-  beginFailureRef.current = beginFailure;
-  publishRef.current = publish;
+  useLayoutEffect(() => {
+    beginFailureRef.current = beginFailure;
+    publishRef.current = publish;
+  });
 
   const flyNorth = () => {
     void mapRef.current

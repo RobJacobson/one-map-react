@@ -41,6 +41,7 @@ import {
 import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
 import { UserLocation } from "../../facade/user-location.js";
 import { useActiveCallback } from "./use-active-callback.js";
+import { useFrozenValue } from "./use-frozen-value.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 
 /** Selected native marker host presentation. */
@@ -150,6 +151,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const coordinate = lngLatFromWrapper([props.longitude, props.latitude]);
       const offset = pointFromWrapper(props.offset ?? [0, 0]);
       const mapSession = useMapSession();
+      const { requestGestureLock } = mapSession;
       const generatedId = useId();
       const annotationRef = useRef<MarkerRef>(null);
       const [dragCoordinate, setDragCoordinate] = useState<LngLat | null>(null);
@@ -158,7 +160,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         props.longitude,
         props.latitude,
       ]);
-      const initial = useRef({
+      const initial = useFrozenValue({
         id: props.id ?? generatedId,
         anchor:
           props.anchor ??
@@ -166,7 +168,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
             ? "bottom"
             : "center"),
         renderMode: props.renderMode ?? "view",
-      }).current;
+      });
       const click = useNativeCallback(props.onClick);
       const dragStart = useNativeCallback(props.onDragStart);
       const drag = useNativeCallback(props.onDrag);
@@ -187,8 +189,8 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       }, []);
 
       const releaseInteraction = useCallback((): void => {
-        if (active.current) mapSession.requestGestureLock(false);
-      }, [mapSession.requestGestureLock]);
+        if (active.current) requestGestureLock(false);
+      }, [requestGestureLock]);
 
       const cancel = useCallback((): void => {
         clearTimer();
@@ -206,6 +208,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       useLayoutEffect(() => cancel, [cancel]);
 
       useLayoutEffect(() => {
+        // eslint-disable-next-line react/set-state-in-effect -- Revoking draggable must cancel the active gesture and clear its visual offset before paint.
         if (!props.draggable) cancel();
       }, [props.draggable, cancel]);
 
@@ -414,7 +417,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
             onStartShouldSetResponder={(event) =>
               Boolean(
                 responders.onStartShouldSetResponder?.(event) ||
-                  props.hostProps?.onStartShouldSetResponder?.(event)
+                props.hostProps?.onStartShouldSetResponder?.(event)
               )
             }
             onResponderGrant={(event) => {
@@ -461,14 +464,15 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     const coordinate = lngLatFromWrapper([props.longitude, props.latitude]);
     const offset = pointFromWrapper(props.offset ?? [0, 0]);
     const mapSession = useMapSession();
+    const { subscribe } = mapSession;
     const id = useId();
     const close = useNativeCallback(props.onClose);
     const open = useNativeCallback(props.onOpen);
-    const initial = useRef({
+    const initial = useFrozenValue({
       closeOnClick: props.closeOnClick ?? true,
       closeOnMove: props.closeOnMove ?? false,
       closeButton: props.closeButton ?? true,
-    }).current;
+    });
     const dismissed = useRef(false);
     const requestClose = useCallback((): void => {
       if (dismissed.current) return;
@@ -480,17 +484,17 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       dismissed.current = false;
       open();
       const removeClick = initial.closeOnClick
-        ? mapSession.subscribe("click", requestClose)
+        ? subscribe("click", requestClose)
         : undefined;
       const removeMove = initial.closeOnMove
-        ? mapSession.subscribe("move", requestClose)
+        ? subscribe("move", requestClose)
         : undefined;
       return () => {
         removeClick?.();
         removeMove?.();
       };
     }, [
-      mapSession.subscribe,
+      subscribe,
       initial.closeOnClick,
       initial.closeOnMove,
       open,
@@ -557,9 +561,10 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
 
 const NativeControl = (props: NativeControlProps): ReactElement => {
   const mapSession = useMapSession();
+  const { setOverlay } = mapSession;
   const overlays = useContext(NativeOverlayContext);
   const id = useId();
-  const position = useRef(props.position ?? "top-right").current;
+  const position = useFrozenValue(props.position ?? "top-right");
   const index = overlays.findIndex((overlay) => overlay.id === id);
   const neighbors = position.startsWith("top")
     ? overlays.slice(0, Math.max(0, index))
@@ -569,9 +574,9 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
     .reduce((offset, overlay) => offset + overlay.height + 8, 8);
 
   useLayoutEffect(() => {
-    mapSession.setOverlay(id, position);
-    return () => mapSession.setOverlay(id, null);
-  }, [mapSession.setOverlay, id, position]);
+    setOverlay(id, position);
+    return () => setOverlay(id, null);
+  }, [setOverlay, id, position]);
 
   // Teleport moves native views only. Rendering children here preserves
   // application providers, local state, and effects in the original React tree.
@@ -694,11 +699,12 @@ const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
 
 const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
   const mapSession = useMapSession();
-  const position = useRef(props.position ?? "bottom-right").current;
+  const { setOrnament } = mapSession;
+  const position = useFrozenValue(props.position ?? "bottom-right");
   useLayoutEffect(() => {
-    mapSession.setOrnament("attribution", { position });
-    return () => mapSession.setOrnament("attribution", null);
-  }, [mapSession.setOrnament, position]);
+    setOrnament("attribution", { position });
+    return () => setOrnament("attribution", null);
+  }, [setOrnament, position]);
   if (props.compact === false) {
     throw new Error(
       "Native AttributionControl does not support expanded attribution."
@@ -718,12 +724,12 @@ const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
 };
 
 const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
-  const mapSession = useMapSession();
+  const { ref: mapRef, ready, viewState, subscribe } = useMapSession();
   const [scale, setScale] = useState<{
     readonly width: number;
     readonly text: string;
   } | null>(null);
-  const maxWidth = useRef(props.maxWidth ?? 100).current;
+  const maxWidth = useFrozenValue(props.maxWidth ?? 100);
   const reportError = useNativeCallback(props.onError);
   const unit = props.unit ?? "metric";
   if (!Number.isFinite(maxWidth) || maxWidth <= 0)
@@ -734,15 +740,12 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
     let active = true;
     let request = 0;
     const updateScale = async (): Promise<void> => {
-      const map = mapSession.ref.current;
-      if (!map || !mapSession.ready) return;
+      const map = mapRef.current;
+      if (!map || !ready) return;
       const sequence = ++request;
       try {
-        const center = mapSession.viewState
-          ? ([
-              mapSession.viewState.longitude,
-              mapSession.viewState.latitude,
-            ] as const)
+        const center = viewState
+          ? ([viewState.longitude, viewState.latitude] as const)
           : await map.getCenter();
         const origin = await map.project(center);
         const end = await map.unproject([origin[0] + maxWidth, origin[1]]);
@@ -758,20 +761,12 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
       }
     };
     void updateScale();
-    const remove = mapSession.subscribe("move", () => void updateScale());
+    const remove = subscribe("move", () => void updateScale());
     return () => {
       active = false;
       remove();
     };
-  }, [
-    mapSession.ready,
-    mapSession.subscribe,
-    mapSession.ref,
-    mapSession.viewState,
-    maxWidth,
-    unit,
-    reportError,
-  ]);
+  }, [ready, subscribe, mapRef, viewState, maxWidth, unit, reportError]);
 
   if (!scale) return null;
   return (
@@ -943,4 +938,4 @@ const nativeMaxWidth = (width: number | string | undefined): number => {
 /** Keeps callback identity stable while committed callback ownership stays current. */
 const useNativeCallback = <Args extends unknown[]>(
   callback: ((...args: Args) => void) | undefined
-): ((...args: Args) => void) => useRef(useActiveCallback(callback)).current;
+): ((...args: Args) => void) => useFrozenValue(useActiveCallback(callback));
