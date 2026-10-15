@@ -8,14 +8,16 @@ TF08 implements location/offline/capture APIs. Its native acceptance failures ar
 
 ## Development
 
-Use Bun 1.4.1 and Node.js 24 (verified with 24.14.0). The build uses TypeScript 7.0.2 and formatting uses Biome 2.5.15. Wrapper packages are root development dependencies so the library typechecks against real declarations; they remain optional peers of the published package.
+Use Bun 1.4.1 and Node.js 24.11 or newer on the 24.x line, or Node.js 26 or newer. Vite+ 1.1.0 supplies formatting, linting, unit/web tests, web example builds, and the unbundled library build. TypeScript 7.0.2 checks the four explicit library, test, web-example, and native-example configurations. Wrapper packages are root development dependencies so the library typechecks against real declarations; they remain optional peers of the published package.
 
 ```sh
 bun install --frozen-lockfile
 bun run validate
 ```
 
-`validate` checks formatting, documentation links, types, Jest Testing Library mounts and conversion tests, the library build, and packed-package selection without installing wrapper peers into consumers. `bun run test:peers` is the checkpoint isolation check that installs one selected peer set into OS-temp consumers; it is not part of `validate`. Neither command launches a browser, Metro session, simulator, or native build. `bun run pack` builds an archive in `artifacts/`.
+`validate` checks formatting, documentation links, types, Vitest unit/web tests, native Jest Testing Library mounts, standalone regression scripts, the library build, and packed-package selection without installing wrapper peers into consumers. `bun run test:peers` is the checkpoint isolation check that installs one selected peer set into OS-temp consumers; it is not part of `validate`. Neither command launches a browser, Metro session, simulator, or native build. `bun run pack` builds an archive in `artifacts/`.
+
+Run `bun run test` or `vp run test` for the complete test chain; `vp test run` runs only unit/web Vitest tests, and `bun run test:native` runs native Jest tests. `vp check` runs formatting and linting; the separate `typecheck` script remains part of `validate` so all four TypeScript configurations are checked.
 
 ## Selecting a backend
 

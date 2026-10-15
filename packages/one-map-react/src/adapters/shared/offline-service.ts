@@ -112,6 +112,7 @@ export const createOfflineService = (
   };
   const emit = (observer: PackObserver, raw: unknown): void => {
     const next = status(observer.pack, raw);
+    // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
     for (const listener of [...observer.subscribers]) listener.progress(next);
   };
   const refresh = async (pack: WrapperOfflinePack): Promise<void> => {
@@ -145,6 +146,7 @@ export const createOfflineService = (
               },
               (_pack, failure) => {
                 if (observer.attachment !== attachment) return;
+                // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
                 for (const listener of [...observer.subscribers])
                   listener.error(failure);
               }

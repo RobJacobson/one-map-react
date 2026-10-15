@@ -1,4 +1,3 @@
-import { describe, expect, jest, test } from "@jest/globals";
 import { act, render } from "@testing-library/react";
 import {
   forwardRef,
@@ -6,15 +5,16 @@ import {
   StrictMode,
   useImperativeHandle,
 } from "react";
+import { describe, expect, vi, test } from "vite-plus/test";
 
 import type { Adapter } from "../src/contracts/adapter.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { ClickEvent } from "../src/contracts/event-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
 import type { GeoJsonFeature } from "../src/contracts/source-types.js";
-import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { type MapSession, useMapSession } from "../src/facade/map-context.js";
 import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
 
 const hit: ClickEvent = { lngLat: [1, 2], point: [3, 4] };
@@ -23,7 +23,7 @@ const style = { version: 8 as const, sources: {}, layers: [] };
 
 const createFixture = () => {
   let mapProps: MapProps | undefined;
-  const query = jest.fn<MapRef["queryRenderedFeatures"]>();
+  const query = vi.fn<MapRef["queryRenderedFeatures"]>();
   const features: (GeoJsonFeature & { source: string })[] = [
     {
       type: "Feature",
@@ -35,9 +35,10 @@ const createFixture = () => {
   query.mockResolvedValue(features);
   const map = {
     queryRenderedFeatures: query,
-    getZoom: jest.fn<MapRef["getZoom"]>().mockResolvedValue(3),
+    getZoom: vi.fn<MapRef["getZoom"]>().mockResolvedValue(3),
   } as unknown as MapRef;
   const FakeMap = forwardRef<MapRef, MapProps>((props, ref) => {
+    // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
     mapProps = props;
     useImperativeHandle(ref, () => map, []);
     return <div>{props.children}</div>;
@@ -46,9 +47,9 @@ const createFixture = () => {
     backend: "mapbox-web",
     services: {
       location: {
-        requestPermission: jest.fn(),
-        getCurrentPosition: jest.fn(),
-        watchPosition: jest.fn(),
+        requestPermission: vi.fn(),
+        getCurrentPosition: vi.fn(),
+        watchPosition: vi.fn(),
       },
     },
     Map: FakeMap,
@@ -89,11 +90,11 @@ describe("TF07 map-local UI lifetime", () => {
 
   test("source propagation stops map callback and permits mutable callbacks in StrictMode", async () => {
     const fixture = createFixture();
-    const mapClick = jest.fn();
-    const initial = jest.fn((event: { stopPropagation: () => void }) =>
+    const mapClick = vi.fn();
+    const initial = vi.fn((event: { stopPropagation: () => void }) =>
       event.stopPropagation()
     );
-    const updated = jest.fn();
+    const updated = vi.fn();
     const tree = (onClick: typeof initial | typeof updated) => (
       <StrictMode>
         <MapSetup adapter={fixture.adapter}>
@@ -128,8 +129,8 @@ describe("TF07 map-local UI lifetime", () => {
           resolve = done;
         })
     );
-    const sourceClick = jest.fn();
-    const mapClick = jest.fn();
+    const sourceClick = vi.fn();
+    const mapClick = vi.fn();
     const rendered = render(
       <MapSetup adapter={fixture.adapter}>
         <OneMap mapStyle={style} initialViewState={camera} onClick={mapClick}>
@@ -161,8 +162,8 @@ describe("TF07 map-local UI lifetime", () => {
     const fixture = createFixture();
     const error = new Error("query failed");
     fixture.query.mockRejectedValue(error);
-    const report = jest.fn();
-    const mapClick = jest.fn();
+    const report = vi.fn();
+    const mapClick = vi.fn();
     render(
       <MapSetup adapter={fixture.adapter}>
         <OneMap
@@ -186,9 +187,9 @@ describe("TF07 map-local UI lifetime", () => {
   });
   test("only the topmost registered source activates independently of map layer filtering", async () => {
     const fixture = createFixture();
-    const top = jest.fn();
-    const lower = jest.fn();
-    const mapClick = jest.fn();
+    const top = vi.fn();
+    const lower = vi.fn();
+    const mapClick = vi.fn();
     const features = [
       {
         type: "Feature" as const,
@@ -234,6 +235,7 @@ describe("TF07 map-local UI lifetime", () => {
     const fixture = createFixture();
     let named: MapRef | undefined;
     const NamedProbe = () => {
+      // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
       named = useMap("named");
       return null;
     };
@@ -259,9 +261,9 @@ describe("TF07 map-local UI lifetime", () => {
           resolve = done;
         })
     );
-    const original = jest.fn();
-    const replacement = jest.fn();
-    const mapClick = jest.fn();
+    const original = vi.fn();
+    const replacement = vi.fn();
+    const mapClick = vi.fn();
     const tree = (generation: number) => (
       <MapSetup adapter={fixture.adapter}>
         <OneMap mapStyle={style} initialViewState={camera} onClick={mapClick}>
@@ -301,8 +303,8 @@ describe("TF07 map-local UI lifetime", () => {
           resolve = done;
         })
     );
-    const original = jest.fn();
-    const updated = jest.fn();
+    const original = vi.fn();
+    const updated = vi.fn();
     const tree = (onClick: typeof original) => (
       <MapSetup adapter={fixture.adapter}>
         <OneMap mapStyle={style} initialViewState={camera}>
@@ -339,6 +341,7 @@ describe("TF07 map-local UI lifetime", () => {
     };
     let session: MapSession | undefined;
     const SessionProbe = () => {
+      // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
       session = useMapSession();
       return null;
     };
@@ -349,8 +352,8 @@ describe("TF07 map-local UI lifetime", () => {
           resolve = done;
         })
     );
-    const mapClick = jest.fn();
-    const sourceClick = jest.fn();
+    const mapClick = vi.fn();
+    const sourceClick = vi.fn();
     const tree = (generation: number) => (
       <MapSetup adapter={nativeAdapter}>
         <OneMap

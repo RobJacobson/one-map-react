@@ -1,4 +1,3 @@
-import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render } from "@testing-library/react";
 import {
   forwardRef,
@@ -7,6 +6,7 @@ import {
   useImperativeHandle,
   useLayoutEffect,
 } from "react";
+import { describe, expect, vi, test } from "vite-plus/test";
 
 import type { WebWrapper } from "../src/adapters/web/contracts.js";
 import { createWebUi } from "../src/adapters/web/ui.js";
@@ -18,9 +18,9 @@ import type {
   GeolocateControlProps,
   GeolocationPosition,
 } from "../src/contracts/ui-types.js";
-import { Map as OneMap } from "../src/facade/map.js";
 import { useMapServices } from "../src/facade/map-services.js";
 import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap } from "../src/facade/map.js";
 import { useGeolocationControl } from "../src/facade/use-geolocation-control.js";
 import { UserLocation } from "../src/facade/user-location.js";
 
@@ -30,15 +30,15 @@ const fixture = () => {
   let props: MapProps | undefined;
   let receive: (position: GeolocationPosition) => void = () => {};
   let failure: (error: unknown) => void = () => {};
-  const release = jest.fn();
+  const release = vi.fn();
   const location: LocationService = {
-    requestPermission: jest
+    requestPermission: vi
       .fn<LocationService["requestPermission"]>()
       .mockResolvedValue({ status: "granted", accuracy: "unknown" }),
-    getCurrentPosition: jest
+    getCurrentPosition: vi
       .fn<LocationService["getCurrentPosition"]>()
       .mockResolvedValue({ lngLat: [7, 8], timestamp: Date.now() }),
-    watchPosition: jest
+    watchPosition: vi
       .fn<LocationService["watchPosition"]>()
       .mockImplementation((position, error) => {
         receive = position;
@@ -46,18 +46,18 @@ const fixture = () => {
         return release;
       }),
   };
-  const easeTo = jest.fn<MapRef["easeTo"]>().mockResolvedValue(undefined);
+  const easeTo = vi.fn<MapRef["easeTo"]>().mockResolvedValue(undefined);
   const map = { easeTo } as unknown as MapRef;
   const FakeMap = forwardRef<MapRef, MapProps>((value, ref) => {
     props = value;
     useImperativeHandle(ref, () => map, []);
-    // biome-ignore lint/correctness/useExhaustiveDependencies: the mock emits load once per attachment
     useLayoutEffect(() => {
       value.onLoad?.();
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- the mock emits load once per attachment
     }, []);
     return <div>{value.children}</div>;
   });
-  const source = jest.fn(({ children }: { children?: ReactNode }) => (
+  const source = vi.fn(({ children }: { children?: ReactNode }) => (
     <>{children}</>
   ));
   const adapter = {
@@ -93,7 +93,7 @@ describe("TF08 setup and location control lifetime", () => {
     "%s default tracking rejects a controlled camera before SDK delegation",
     (backend) => {
       const selected = fixture();
-      const delegate = jest.fn(() => null);
+      const delegate = vi.fn(() => null);
       const { GeolocateControl } = createWebUi({
         backend,
         GeolocateControl: delegate,
@@ -129,6 +129,7 @@ describe("TF08 setup and location control lifetime", () => {
     const selected = fixture();
     let services: MapServices | undefined;
     const Probe = () => {
+      // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
       services = useMapServices();
       return null;
     };
@@ -203,7 +204,7 @@ describe("TF08 setup and location control lifetime", () => {
     "resumed camera errors are suppressed after %s replacement",
     async (replacement) => {
       const selected = fixture();
-      const onError = jest.fn();
+      const onError = vi.fn();
       let rejectCamera: (error: Error) => void = () => {};
       const tree = (
         provider: LocationService,
@@ -251,7 +252,7 @@ describe("TF08 setup and location control lifetime", () => {
 
   test("a current resumed camera failure releases tracking and permits a fresh retry", async () => {
     const selected = fixture();
-    const onError = jest.fn();
+    const onError = vi.fn();
     const view = render(
       <MapSetup adapter={selected.adapter}>
         <OneMap mapStyle={style} initialViewState={camera}>
@@ -288,7 +289,7 @@ describe("TF08 setup and location control lifetime", () => {
           rejectCamera = reject;
         })
     );
-    const onError = jest.fn();
+    const onError = vi.fn();
     const view = render(
       <MapSetup adapter={selected.adapter}>
         <OneMap mapStyle={style} initialViewState={camera}>
@@ -312,7 +313,7 @@ describe("TF08 setup and location control lifetime", () => {
 
   test("terminal errors release tracking and go to the current error callback", () => {
     const selected = fixture();
-    const onError = jest.fn();
+    const onError = vi.fn();
     const view = render(
       <MapSetup adapter={selected.adapter}>
         <OneMap mapStyle={style} initialViewState={camera}>
@@ -330,12 +331,13 @@ describe("TF08 setup and location control lifetime", () => {
     const selected = fixture();
     let services: MapServices | undefined;
     const Probe = () => {
+      // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
       services = useMapServices();
       return null;
     };
     const provider = {
       ...selected.location,
-      getCurrentPosition: jest
+      getCurrentPosition: vi
         .fn<LocationService["getCurrentPosition"]>()
         .mockImplementation(() => new Promise(() => {})),
     };
@@ -363,9 +365,9 @@ describe("TF08 setup and location control lifetime", () => {
   });
   test("unmounting only the control aborts its owned one-shot acquisition", async () => {
     const selected = fixture();
-    jest
-      .mocked(selected.location.getCurrentPosition)
-      .mockImplementation(() => new Promise(() => {}));
+    vi.mocked(selected.location.getCurrentPosition).mockImplementation(
+      () => new Promise(() => {})
+    );
     const tree = (control: boolean) => (
       <MapSetup adapter={selected.adapter}>
         <OneMap mapStyle={style} initialViewState={camera}>
@@ -375,7 +377,7 @@ describe("TF08 setup and location control lifetime", () => {
     );
     const view = render(tree(true));
     await act(async () => fireEvent.click(view.getByRole("button")));
-    const signal = jest.mocked(selected.location.getCurrentPosition).mock
+    const signal = vi.mocked(selected.location.getCurrentPosition).mock
       .calls[0][0]?.signal;
     expect(signal?.aborted).toBe(false);
     view.rerender(tree(false));
@@ -385,6 +387,7 @@ describe("TF08 setup and location control lifetime", () => {
     const selected = fixture();
     let services: MapServices | undefined;
     const Probe = () => {
+      // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
       services = useMapServices();
       return null;
     };
@@ -393,8 +396,8 @@ describe("TF08 setup and location control lifetime", () => {
         <Probe />
       </MapSetup>
     );
-    const update = jest.fn();
-    const dispose = services?.location.watchPosition(update, jest.fn());
+    const update = vi.fn();
+    const dispose = services?.location.watchPosition(update, vi.fn());
     dispose?.();
     selected.receive({ lngLat: [1, 2] });
     expect(update).not.toHaveBeenCalled();
@@ -414,16 +417,17 @@ describe("TF08 setup and location control lifetime", () => {
       let services: MapServices | undefined;
       let receive: (position: GeolocationPosition) => void = () => {};
       let fail: (error: unknown) => void = () => {};
-      jest
-        .mocked(selected.location.watchPosition)
-        .mockImplementation((position, error) => {
+      vi.mocked(selected.location.watchPosition).mockImplementation(
+        (position, error) => {
           receive = position;
           fail = error;
           if (callback === "position") position({ lngLat: [7, 8] });
           else error(new Error("synchronous provider failure"));
           return selected.release;
-        });
+        }
+      );
       const Probe = () => {
+        // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
         services = useMapServices();
         return null;
       };
@@ -432,8 +436,8 @@ describe("TF08 setup and location control lifetime", () => {
           <Probe />
         </MapSetup>
       );
-      const onPosition = jest.fn(() => view.unmount());
-      const onError = jest.fn(() => view.unmount());
+      const onPosition = vi.fn(() => view.unmount());
+      const onError = vi.fn(() => view.unmount());
       let dispose: (() => void) | undefined;
 
       act(() => {

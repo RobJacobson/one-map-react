@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { render, waitFor } from "@testing-library/react";
 import { createRef, type ReactNode, type Ref, StrictMode } from "react";
+import type { Mock } from "vite-plus/test";
+import { beforeEach, describe, expect, vi, test } from "vite-plus/test";
 
 import {
   emptyStyle,
@@ -16,14 +17,14 @@ import type {
 } from "../src/contracts/map-types.js";
 import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
-import { Map as OneMap } from "../src/facade/map.js";
 import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
 import type { createWebMapMock } from "./create-web-map-mock.js";
 import { runWebFollowupRegressions } from "./web-followup-regressions.js";
 
-jest.mock("react-map-gl/maplibre", () => {
-  const { createWebMapMock } = require("./create-web-map-mock.js");
+vi.mock("react-map-gl/maplibre", async () => {
+  const { createWebMapMock } = await import("./create-web-map-mock.js");
 
   return createWebMapMock();
 });
@@ -38,9 +39,9 @@ import { adapter } from "../src/maplibre-web.js";
 
 type WebMapMockModule = ReturnType<typeof createWebMapMock>;
 
-const MapMock = MaplibreMap as unknown as jest.Mock;
-const LayerMock = MaplibreLayer as unknown as jest.Mock;
-const SourceMock = MaplibreSource as unknown as jest.Mock;
+const MapMock = MaplibreMap as unknown as Mock;
+const LayerMock = MaplibreLayer as unknown as Mock;
+const SourceMock = MaplibreSource as unknown as Mock;
 const {
   resetWebMapMock,
   enableRotation,
@@ -55,7 +56,7 @@ const {
   getFeatureState: mockGetFeatureState,
   removeFeatureState: mockRemoveFeatureState,
   registerMockSource,
-} = jest.requireMock("react-map-gl/maplibre") as WebMapMockModule;
+} = (await vi.importMock("react-map-gl/maplibre")) as WebMapMockModule;
 
 const example = (
   ref?: Ref<MapRef>,
@@ -141,7 +142,7 @@ describe("maplibre-web adapter", () => {
   });
 
   test("onMove receives converted camera fields and stops after unmount", () => {
-    const onMove = jest.fn();
+    const onMove = vi.fn();
     const rendered = render(example(undefined, onMove));
     const lastCall = MapMock.mock.calls.at(-1);
 
@@ -274,9 +275,9 @@ describe("maplibre-web adapter", () => {
   });
 
   test("load, error, and resize callbacks stop after unmount", () => {
-    const onLoad = jest.fn();
-    const onError = jest.fn();
-    const onResize = jest.fn();
+    const onLoad = vi.fn();
+    const onError = vi.fn();
+    const onResize = vi.fn();
     const rendered = render(
       example(undefined, undefined, { onLoad, onError, onResize })
     );
@@ -307,7 +308,7 @@ describe("maplibre-web adapter", () => {
   });
 
   test("style.load reaches onStyleLoad and is removed on unmount", () => {
-    const onStyleLoad = jest.fn();
+    const onStyleLoad = vi.fn();
     const rendered = render(example(undefined, undefined, { onStyleLoad }));
     const styleTarget = getStyleTarget();
 
@@ -328,7 +329,7 @@ describe("maplibre-web adapter", () => {
   });
 
   test("a missed style.load is reported when the map load finds the style loaded", () => {
-    const onStyleLoad = jest.fn();
+    const onStyleLoad = vi.fn();
 
     render(example(undefined, undefined, { onStyleLoad }));
     const styleTarget = getStyleTarget();
@@ -352,7 +353,7 @@ describe("maplibre-web adapter", () => {
   });
 
   test("a mapStyle replacement reports onStyleLoad when the style is already loaded", () => {
-    const onStyleLoad = jest.fn();
+    const onStyleLoad = vi.fn();
     const rendered = render(example(undefined, undefined, { onStyleLoad }));
     const styleTarget = getStyleTarget();
 
@@ -375,7 +376,7 @@ describe("maplibre-web adapter", () => {
   });
 
   test("a reused map reports onStyleLoad when idle finds the style loaded", () => {
-    const onStyleLoad = jest.fn();
+    const onStyleLoad = vi.fn();
 
     render(example(undefined, undefined, { onStyleLoad }));
     const styleTarget = getStyleTarget();
@@ -390,7 +391,7 @@ describe("maplibre-web adapter", () => {
   });
 
   test("StrictMode replay leaves the current load callback active", () => {
-    const onLoad = jest.fn();
+    const onLoad = vi.fn();
 
     const rendered = render(
       <StrictMode>
@@ -410,14 +411,14 @@ describe("maplibre-web adapter", () => {
   });
 
   test("a reused mount calls the new onLoad", () => {
-    const firstLoad = jest.fn();
+    const firstLoad = vi.fn();
     const first = render(
       example(undefined, undefined, { onLoad: firstLoad, reuseMaps: true })
     );
 
     first.unmount();
 
-    const secondLoad = jest.fn();
+    const secondLoad = vi.fn();
 
     render(
       example(undefined, undefined, { onLoad: secondLoad, reuseMaps: true })
@@ -431,7 +432,7 @@ describe("maplibre-web adapter", () => {
   });
 
   test("a reused loaded map reports the new onStyleLoad and keeps one listener", () => {
-    const firstStyleLoad = jest.fn();
+    const firstStyleLoad = vi.fn();
     const first = render(
       example(undefined, undefined, {
         onStyleLoad: firstStyleLoad,
@@ -453,7 +454,7 @@ describe("maplibre-web adapter", () => {
 
     expect(styleTarget.listenerCount()).toBe(0);
 
-    const secondStyleLoad = jest.fn();
+    const secondStyleLoad = vi.fn();
 
     render(
       example(undefined, undefined, {
@@ -475,8 +476,8 @@ describe("maplibre-web adapter", () => {
   });
 
   test("StrictMode uses the load callback from the latest render", () => {
-    const firstLoad = jest.fn();
-    const secondLoad = jest.fn();
+    const firstLoad = vi.fn();
+    const secondLoad = vi.fn();
     const rendered = render(
       <StrictMode>
         {example(undefined, undefined, { onLoad: firstLoad, reuseMaps: true })}
@@ -792,9 +793,9 @@ describe("maplibre-web images", () => {
 
 // MapLibre GL cluster sources return promises rather than callbacks.
 const maplibreClusterSource = {
-  getClusterExpansionZoom: jest.fn(async () => 13),
-  getClusterChildren: jest.fn(async () => [{ type: "Feature", id: 11 }]),
-  getClusterLeaves: jest.fn(async () => [
+  getClusterExpansionZoom: vi.fn(async () => 13),
+  getClusterChildren: vi.fn(async () => [{ type: "Feature", id: 11 }]),
+  getClusterLeaves: vi.fn(async () => [
     { type: "Feature", id: 21 },
     { type: "Feature", id: 22 },
   ]),
@@ -900,6 +901,7 @@ describe("maplibre-web queries and feature state", () => {
     await expect(
       ref.current?.setFeatureState(
         { source: "routes", id: "route-1" },
+        // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
         { meta: { values: new Array<number>(1) } }
       )
     ).rejects.toThrow('Feature state key "meta"');
@@ -1073,7 +1075,7 @@ describe("web correction regressions", () => {
     rendered.rerender(
       tree(<Images images={{ delayed: "https://example.com/replaced.png" }} />)
     );
-    const ready = jest.spyOn(target, "isStyleLoaded").mockReturnValue(false);
+    const ready = vi.spyOn(target, "isStyleLoaded").mockReturnValue(false);
     rendered.rerender(tree(<Images images={{}} />));
     ready.mockReturnValue(true);
     finish({ width: 1, height: 1, data: new Uint8Array(4) });
@@ -1094,7 +1096,7 @@ test("registered image removals retry when image methods are unavailable", async
   if (!target) throw new Error("missing mock map");
   target.emitStyleLoad();
   await waitFor(() => expect(target.hasImage("marker")).toBe(true));
-  const ready = jest.spyOn(target, "isStyleLoaded").mockReturnValue(false);
+  const ready = vi.spyOn(target, "isStyleLoaded").mockReturnValue(false);
   target.removeImage.mockImplementationOnce(() => {
     throw new Error("Style image methods unavailable.");
   });
@@ -1108,7 +1110,7 @@ test("registered image removals retry when image methods are unavailable", async
 
 runWebFollowupRegressions(
   adapter,
-  jest.requireMock("react-map-gl/maplibre") as WebMapMockModule
+  (await vi.importMock("react-map-gl/maplibre")) as WebMapMockModule
 );
 
 test("a removed and re-added image ignores the earlier load of the same URL", async () => {

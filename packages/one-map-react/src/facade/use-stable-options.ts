@@ -23,6 +23,7 @@ export const useStableOptions = (
     return;
   }
 
+  // eslint-disable-next-line react/refs -- Compare against immutable creation inputs during render to reject unsupported resource replacement.
   const changed = changedOptionKey(initial.current, options);
 
   if (changed !== undefined) {

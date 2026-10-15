@@ -1,14 +1,14 @@
-import { describe, expect, test } from "@jest/globals";
 import { render } from "@testing-library/react";
 import type { ReactNode } from "react";
+import { describe, expect, vi, test } from "vite-plus/test";
 
 import {
   emptyStyle,
   initialViewState,
   routes,
 } from "../../../tests/fixtures/map-fixture.js";
-import { Map as OneMap } from "../src/facade/map.js";
 import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
 import {
   changedOptionKey,
@@ -16,8 +16,8 @@ import {
 } from "../src/facade/use-stable-options.js";
 import { adapter } from "../src/mapbox-web.js";
 
-jest.mock("react-map-gl/mapbox", () => {
-  const { createWebMapMock } = require("./create-web-map-mock.js");
+vi.mock("react-map-gl/mapbox", async () => {
+  const { createWebMapMock } = await import("./create-web-map-mock.js");
 
   return createWebMapMock();
 });

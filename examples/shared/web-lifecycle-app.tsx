@@ -73,6 +73,7 @@ export const WebLifecycleApp = ({ adapter }: WebLifecycleAppProps) => {
 
     if (mode === "gl" && contexts?.error) {
       advanced.current = true;
+      // eslint-disable-next-line react/set-state-in-effect -- The acceptance harness records an unavailable GL context before advancing its scripted lifecycle.
       setReport((current) => ({
         ...current,
         context: "unavailable",

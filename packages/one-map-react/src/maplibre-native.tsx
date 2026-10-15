@@ -69,7 +69,7 @@ export interface NativeMapProps extends MapProps {
   >;
 }
 /** Selected map retaining shared map context and named access. */
-// biome-ignore lint/suspicious/noShadowRestrictedNames: public Map API
+// eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
 export const Map = SharedMap as ForwardRefExoticComponent<
   NativeMapProps & RefAttributes<MapRef>
 >;

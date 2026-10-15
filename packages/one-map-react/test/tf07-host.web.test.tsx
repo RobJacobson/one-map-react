@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render } from "@testing-library/react";
 import { forwardRef, useImperativeHandle } from "react";
+import { afterEach, beforeEach, expect, vi, test } from "vite-plus/test";
 
 import {
   emptyStyle,
@@ -12,8 +12,8 @@ import type { ClickEvent } from "../src/contracts/event-types.js";
 
 const calls: WebMapProps[] = [];
 const styleTarget = {
-  on: jest.fn(),
-  off: jest.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
   isStyleLoaded: () => true,
 };
 const mapHandle = { getMap: () => styleTarget };
@@ -36,12 +36,12 @@ beforeEach(() => {
   calls.length = 0;
 });
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 test("forwards DOM attributes and full CSS to an actual map host while the renderer fills it", () => {
-  const onHostClick = jest.fn();
-  const onMapClick = jest.fn<(event: ClickEvent) => void>();
+  const onHostClick = vi.fn();
+  const onMapClick = vi.fn<(event: ClickEvent) => void>();
   const view = render(
     <WebMap
       mapStyle={emptyStyle}
@@ -91,8 +91,8 @@ test("forwards DOM attributes and full CSS to an actual map host while the rende
 });
 
 test("updates host attributes and styles without leaking DOM callbacks to renderer callbacks", () => {
-  const first = jest.fn();
-  const second = jest.fn();
+  const first = vi.fn();
+  const second = vi.fn();
   const view = render(
     <WebMap
       mapStyle={emptyStyle}

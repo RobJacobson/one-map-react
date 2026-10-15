@@ -25,7 +25,6 @@ export const NativeMarkerOverlay = (
   const latitude = props.lngLat[1];
 
   // Viewport dimensions change projection even when the camera is unchanged.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: actual native layout invalidates screen coordinates.
   useEffect(() => {
     let active = true;
     let request = 0;
@@ -49,6 +48,7 @@ export const NativeMarkerOverlay = (
       active = false;
       remove();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- actual native layout invalidates screen coordinates.
   }, [
     session.ref,
     session.ready,

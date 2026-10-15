@@ -89,6 +89,7 @@ export const MapboxNativeMap = forwardRef<
     props.options?.scaleBarEnabled !== false;
   useEffect(() => {
     if (!refreshScalePosition) {
+      // eslint-disable-next-line react/set-state-in-effect -- Keep the RNMapbox iOS scale hide/restore commits separate; synchronizing this key preserves the native dirty notification.
       setAppliedScalePosition(scalePositionKey);
       return;
     }
@@ -129,6 +130,7 @@ export const MapboxNativeMap = forwardRef<
   const sawMove = useRef(false);
   const geoJsonSources = useMemo(
     () =>
+      // eslint-disable-next-line react/refs -- The registry stores a reset callback; it reads the map ref only when a source resets.
       new GeoJsonSourceRegistry((target) =>
         resetMapboxFeatureState(mapViewRef, target)
       ),
@@ -186,9 +188,12 @@ export const MapboxNativeMap = forwardRef<
   const mapHandle = useMemo(
     () =>
       createMapboxMapRef(
+        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         cameraRef,
+        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapViewRef,
         geoJsonSources,
+        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         async (options) => {
           if (options.scope === "renderer" && Platform.OS === "ios")
             throw new Error(

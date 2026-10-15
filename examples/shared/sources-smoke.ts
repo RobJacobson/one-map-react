@@ -1,5 +1,5 @@
 import type { GeoJsonFeatureCollection, MapStyle } from "one-map-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
   emptyStyle,
@@ -78,8 +78,8 @@ export const useSourcesSmoke = ({
   const [routeData, setRouteData] = useState<GeoJsonFeatureCollection>(routes);
   const [lineColor, setLineColor] = useState<string | undefined>("#2563eb");
   const [showTransient, setShowTransient] = useState(true);
-  const [status, setStatus] = useState(
-    statusLine(fields.current, "await-load")
+  const [status, setStatus] = useState(() =>
+    statusLine(initialFields(), "await-load")
   );
 
   const publish = () => {
@@ -97,14 +97,16 @@ export const useSourcesSmoke = ({
     }
   };
 
-  const enterRef = useRef<(next: SourcesPhase) => void>(() => {});
   const enter = (next: SourcesPhase) => {
     phaseRef.current = next;
     setPhase(next);
     publish();
   };
 
-  enterRef.current = enter;
+  const enterRef = useRef(enter);
+  useLayoutEffect(() => {
+    enterRef.current = enter;
+  });
 
   const onLoad = () => {
     if (phaseRef.current !== "await-load") {

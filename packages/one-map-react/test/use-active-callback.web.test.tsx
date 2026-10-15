@@ -1,4 +1,3 @@
-import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import {
   type ReactElement,
@@ -9,11 +8,12 @@ import {
   useRef,
   useState,
 } from "react";
+import { describe, expect, vi, test } from "vite-plus/test";
 
 import { useActiveCallback } from "../src/adapters/shared/use-active-callback.js";
 
-const committed = jest.fn();
-const pending = jest.fn();
+const committed = vi.fn();
+const pending = vi.fn();
 
 const MapProbe = ({ onMove }: { onMove: () => void }): ReactElement => {
   const reportMove = useActiveCallback(onMove);
@@ -109,7 +109,7 @@ describe("useActiveCallback", () => {
   });
 
   test("ignores a retained callback from a parent layout effect after unmount", () => {
-    const onMove = jest.fn();
+    const onMove = vi.fn();
     const view = render(<LayoutParent onMove={onMove} showMap />);
 
     expect(onMove).toHaveBeenCalledTimes(1);

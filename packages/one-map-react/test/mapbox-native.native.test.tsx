@@ -17,8 +17,8 @@ import type {
 } from "../src/contracts/map-types.js";
 import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
-import { Map as OneMap } from "../src/facade/map.js";
 import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
 import { ScaleControl } from "../src/facade/ui.js";
 
@@ -2216,6 +2216,7 @@ describe("mapbox-native queries and feature state", () => {
     await expect(
       ref.current?.setFeatureState(
         { source: "routes", id: 9 },
+        // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
         { meta: { values: new Array<number>(1) } }
       )
     ).rejects.toThrow('Feature state key "meta"');

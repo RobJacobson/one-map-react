@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, jest, test } from "@jest/globals";
+import { afterEach, describe, expect, vi, test } from "vite-plus/test";
 
 import {
   createLocationService,
@@ -12,8 +12,8 @@ import type { GeolocationPosition } from "../src/contracts/ui-types.js";
 
 const locationFixture = () => {
   const listeners = new Set<(position: GeolocationPosition) => void>();
-  const release = jest.fn();
-  const permission = jest
+  const release = vi.fn();
+  const permission = vi
     .fn<LocationUpdates["requestPermission"]>()
     .mockResolvedValue({ status: "granted", accuracy: "unknown" });
   let interrupt: () => void = () => {};
@@ -35,13 +35,14 @@ const locationFixture = () => {
     permission,
     interrupt: () => interrupt(),
     emit: (position: GeolocationPosition) => {
+      // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
       for (const listener of [...listeners]) listener(position);
     },
   };
 };
 
 afterEach(() => {
-  jest.useRealTimers();
+  vi.useRealTimers();
 });
 
 describe("TF08 foreground location", () => {
@@ -56,7 +57,7 @@ describe("TF08 foreground location", () => {
     expect(fixture.listeners.size).toBe(0);
   });
   test("fresh acquisition ignores old and timestamp-less cache and releases its listener", async () => {
-    jest.useFakeTimers().setSystemTime(10000);
+    vi.useFakeTimers().setSystemTime(10000);
     const fixture = locationFixture();
     const result = fixture.service.getCurrentPosition();
     fixture.emit({ lngLat: [1, 2], timestamp: 9000 });
@@ -68,29 +69,29 @@ describe("TF08 foreground location", () => {
     expect(fixture.release).toHaveBeenCalledTimes(1);
   });
   test("allows explicitly bounded cache age", async () => {
-    jest.useFakeTimers().setSystemTime(10000);
+    vi.useFakeTimers().setSystemTime(10000);
     const fixture = locationFixture();
     const result = fixture.service.getCurrentPosition({ maximumAgeMs: 2000 });
     fixture.emit({ lngLat: [1, 2], timestamp: 9000 });
     await expect(result).resolves.toMatchObject({ timestamp: 9000 });
   });
   test("timeout rejects and cannot deliver a late fix", async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const fixture = locationFixture();
     const result = fixture.service.getCurrentPosition({ timeoutMs: 20 });
     const failure = expect(result).rejects.toThrow("timed out");
-    jest.advanceTimersByTime(20);
+    vi.advanceTimersByTime(20);
     await failure;
     expect(fixture.listeners.size).toBe(0);
   });
   test("individual watch disposal preserves another subscriber and suppresses retained callbacks", () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const fixture = locationFixture();
-    const one = jest.fn();
-    const two = jest.fn();
-    const releaseOne = fixture.service.watchPosition(one, jest.fn());
+    const one = vi.fn();
+    const two = vi.fn();
+    const releaseOne = fixture.service.watchPosition(one, vi.fn());
     const stale = [...fixture.listeners][0];
-    const releaseTwo = fixture.service.watchPosition(two, jest.fn());
+    const releaseTwo = fixture.service.watchPosition(two, vi.fn());
     releaseOne();
     releaseOne();
     stale({ lngLat: [1, 2], timestamp: Date.now() });
@@ -112,7 +113,7 @@ describe("TF08 foreground location", () => {
     expect(fixture.listeners.size).toBe(0);
   });
   test("a synchronous cache callback cannot leak a one-shot subscription", async () => {
-    const release = jest.fn();
+    const release = vi.fn();
     const service = createLocationService({
       requestPermission: async () => ({
         status: "unknown",
@@ -141,7 +142,7 @@ describe("TF08 foreground location", () => {
     (timeoutMs) => {
       const fixture = locationFixture();
       expect(() =>
-        fixture.service.watchPosition(jest.fn(), jest.fn(), { timeoutMs })
+        fixture.service.watchPosition(vi.fn(), vi.fn(), { timeoutMs })
       ).toThrow("timing");
       expect(fixture.listeners.size).toBe(0);
     }

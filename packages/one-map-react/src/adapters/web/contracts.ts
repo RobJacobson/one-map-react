@@ -200,7 +200,7 @@ interface WebImageMap {
   hasImage: (name: string) => boolean;
   // Each renderer declares its own image union; this boundary accepts any
   // decoded image a renderer-specific loadWebImage produced.
-  // biome-ignore lint/suspicious/noExplicitAny: renderer-specific image union
+  // eslint-disable-next-line typescript/no-explicit-any -- renderer-specific image union
   addImage: (name: string, image: any, options?: { sdf?: boolean }) => void;
   removeImage: (name: string) => void;
   on: (type: "styledata" | "style.load", listener: () => void) => void;

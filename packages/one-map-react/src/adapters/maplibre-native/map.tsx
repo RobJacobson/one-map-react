@@ -141,10 +141,14 @@ export const MaplibreNativeMap = forwardRef<
   const mapHandle = useMemo(
     () =>
       createMaplibreMapRef(
+        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         cameraRef,
+        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapRef,
+        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapLoaded,
         sources,
+        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         async (options) => {
           if (options.scope === "renderer" && Platform.OS === "ios")
             throw new Error(

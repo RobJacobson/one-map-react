@@ -65,11 +65,11 @@ const createMapIdentity = (id: string) => ({ id });
 - Short names such as `id`, `ref`, `map`, and `props` are acceptable in a small scope with one clear referent. Single-letter loop indices are acceptable for index arithmetic. Avoid abbreviations that require a reader to decode project terminology.
 - Use `camelCase` for values and functions and `PascalCase` for types, classes, and React components. Preserve required upstream and native API spellings.
 - Use kebab-case operation filenames. Prefer `validate-`, `normalize-`, `create-`, and `use-` prefixes when they describe the operation.
-- Do not shadow restricted global names. Alias the facade's `Map` import to `OneMap` in application examples and other scopes where Biome requires it.
+- Do not shadow restricted global names. Alias the facade's `Map` import to `OneMap` in application examples and other scopes where lint rules require it.
 
 ## Formatting and logical separation
 
-- Use the repository's Biome configuration for supported files: two spaces, an 80-column target, double quotes, semicolons, and the configured trailing commas. Do not hand-format against the formatter.
+- Use the repository's Vite+ formatting configuration in `vite.config.ts` for supported files: two spaces, an 80-column target, double quotes, semicolons, and the configured trailing commas. Do not hand-format against the formatter.
 - Put one blank line between top-level declarations, type declarations, and class methods. Consecutive re-exports or constants forming one obvious group may stay together.
 - Inside a function, separate distinct phases with one blank line: input validation, derived values, state transitions, external effects, and result construction. Keep a state assignment and its directly related notification together.
 - Separate independent hooks and effects with a blank line. Group related state and refs; separate different ownership or lifecycle concerns.
@@ -85,7 +85,7 @@ const createMapIdentity = (id: string) => ({ id });
 - Group shared portable contracts by domain, such as geometry, camera, features, capabilities, events, map refs, and adapters. Keep renderer SDK imports outside these contracts, including type-only imports. React host compatibility is a separate boundary.
 - Extract a dedicated contract module when multiple implementations depend on it and colocating it would create a dependency cycle or mix unrelated responsibilities. Name it for the domain, such as `camera-types.ts` or `lifecycle-contracts.ts`, rather than creating another miscellaneous `types.ts`.
 - Keep implementation-only types unexported. Export an internal type from its owning module only when another implementation module needs it. That export does not require a package-level re-export.
-- Use `import type` and `export type` for type-only dependencies, following Biome's organization rules. Import from the owning module within a domain; a consumer outside that domain may use its explicit index. Retain the project's `.js` specifiers for TypeScript modules.
+- Use `import type` and `export type` for type-only dependencies, following the configured import organization. Import from the owning module within a domain; a consumer outside that domain may use its explicit index. Retain the project's `.js` specifiers for TypeScript modules.
 - Use interfaces for named object contracts that benefit from extension; use type aliases for unions, tuples, mapped types, and compositions. Do not change equivalent declarations solely to enforce one syntax everywhere.
 - Accept `unknown` at untrusted runtime boundaries and narrow or validate it. Do not introduce `any`, non-null assertions, or casts to bypass unresolved lifecycle or backend contract questions. Explain necessary casts at the boundary.
 - Reuse the owning type instead of copying its declaration into another module. Avoid a broad shared utility module that couples unrelated domains.
@@ -155,7 +155,7 @@ For example, this historical map-selection hook illustrates documentation of sel
 - Acceptance tests can take over an hour. Agents must obtain explicit user permission before running them and defer them until implementation, structural/comment review, and applicable routine checks are complete, with no known substantive changes remaining. Follow the [acceptance timing policy](testing-policy.md#acceptance-timing-and-user-permission); implementation requests and acceptance criteria alone are not permission. This includes scoped real-renderer runs and native acceptance builds, not just the full matrix.
 - Native bridge or lifecycle changes require affected native builds and runtime scenarios before renewing runtime acceptance, subject to the timing and permission rule above. Mocked tests establish JavaScript behavior only. Keep implementation and runtime evidence separate. Select reruns by affected behavior; a changed artifact hash alone does not invalidate unaffected behavior or authorize another full run. Until the user authorizes acceptance, report the runtime gate as unverified or awaiting permission rather than running it automatically.
 - Review public examples against current exports and implemented behavior. Label excerpts with omitted setup or pending functionality; do not add fictional declarations to make them compile.
-- The existing Biome and documentation checks enforce only part of this guide. Contributors and agents must review naming, spacing, architecture, comments, and public documentation manually until dedicated checks exist.
+- The existing Vite+ and documentation checks enforce only part of this guide. Contributors and agents must review naming, spacing, architecture, comments, and public documentation manually until dedicated checks exist.
 
 ## Changes and commits
 

@@ -1,5 +1,5 @@
 import type { GeoJsonFeature, MapRef, MapStyle } from "one-map-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
   clusteredPoints,
@@ -95,8 +95,8 @@ export const useQueriesSmoke = ({
       mapStyle: queriesStyle,
       sourceRevision: 0,
     });
-  const [status, setStatus] = useState(
-    statusLine(fields.current, "await-load")
+  const [status, setStatus] = useState(() =>
+    statusLine(initialFields(), "await-load")
   );
   const publish = () => {
     if (!mounted.current) return;
@@ -122,7 +122,9 @@ export const useQueriesSmoke = ({
     publish();
   };
   const enterRef = useRef(enter);
-  enterRef.current = enter;
+  useLayoutEffect(() => {
+    enterRef.current = enter;
+  });
 
   useEffect(() => {
     mounted.current = true;

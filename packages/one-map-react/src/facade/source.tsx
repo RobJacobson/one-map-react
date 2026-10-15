@@ -17,6 +17,7 @@ export const Source = (props: SourceProps) => {
   const { Source: AdapterSource } = useSelectedAdapter();
 
   const session = useOptionalMapSession();
+  // eslint-disable-next-line react/refs -- This never-mutated object is a source attachment identity, not reactive render data.
   const attachment = useRef({}).current;
   const callback =
     props.type === "geojson" || props.type === "vector"

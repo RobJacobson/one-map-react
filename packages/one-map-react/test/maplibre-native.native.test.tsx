@@ -18,8 +18,8 @@ import type {
 import type { FeatureState } from "../src/contracts/query-types.js";
 import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
-import { Map as OneMap } from "../src/facade/map.js";
 import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
 import { ScaleControl } from "../src/facade/ui.js";
 
@@ -1497,6 +1497,7 @@ describe("maplibre-native queries and feature state", () => {
     await expect(
       ref.current?.setFeatureState(
         { source: "routes", id: "route-1" },
+        // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
         { meta: { values: new Array<number>(1) } }
       )
     ).rejects.toThrow('Feature state key "meta"');

@@ -1,6 +1,12 @@
-import { afterEach, beforeEach, expect, jest, test } from "@jest/globals";
-import { act, renderHook } from "@testing-library/react";
-import { useLayoutEffect } from "react";
+import { act, fireEvent, render, renderHook } from "@testing-library/react";
+import {
+  startTransition,
+  Suspense,
+  use,
+  useLayoutEffect,
+  useState,
+} from "react";
+import { afterEach, beforeEach, expect, vi, test } from "vite-plus/test";
 
 import { useQueriesSmoke } from "../../../examples/shared/queries-smoke.js";
 import {
@@ -24,8 +30,8 @@ const scene = (removalReads = 2, stringIds = false) => {
     geometry: null,
   });
   const leaves = [route(1), route(2)];
-  const project = jest.fn(async () => [600, 400]);
-  const queryRenderedFeatures = jest.fn(
+  const project = vi.fn(async () => [600, 400]);
+  const queryRenderedFeatures = vi.fn(
     async (
       target?: readonly number[],
       options?: { layers?: readonly string[]; filter?: unknown }
@@ -43,11 +49,11 @@ const scene = (removalReads = 2, stringIds = false) => {
         : [route(1, renderedRevision), route(2, renderedRevision)];
     }
   );
-  const querySourceFeatures = jest.fn(
+  const querySourceFeatures = vi.fn(
     async (_id: string, options?: { filter?: unknown }) =>
       options?.filter ? [route(1)] : [route(1), route(2)]
   );
-  const getFeatureState = jest.fn(async () => {
+  const getFeatureState = vi.fn(async () => {
     if (remaining > 0) {
       remaining -= 1;
       if (remaining === 0) {
@@ -60,34 +66,34 @@ const scene = (removalReads = 2, stringIds = false) => {
     }
     return state;
   });
-  const removeFeatureState = jest.fn(
+  const removeFeatureState = vi.fn(
     async (_identifier: object, key?: string) => {
       remaining = removalReads;
       removeWhole = key === undefined;
     }
   );
-  const setFeatureState = jest.fn(
+  const setFeatureState = vi.fn(
     async (_identifier: object, value: FeatureState) => {
       state = { ...state, ...value };
     }
   );
   // These partial handles exercise only the smoke's public operations.
   const map = {
-    jumpTo: jest.fn(async () => undefined),
-    getCenter: jest.fn(async () => [-122.34, 47.61]),
-    getZoom: jest.fn(async () => 11),
+    jumpTo: vi.fn(async () => undefined),
+    getCenter: vi.fn(async () => [-122.34, 47.61]),
+    getZoom: vi.fn(async () => 11),
     project,
     queryRenderedFeatures,
     querySourceFeatures,
     getFeatureState,
     setFeatureState,
     removeFeatureState,
-    getClusterExpansionZoom: jest.fn(async () => 13),
-    getClusterLeaves: jest.fn(
+    getClusterExpansionZoom: vi.fn(async () => 13),
+    getClusterLeaves: vi.fn(
       async (_id: string, _cluster: number, limit: number, offset: number) =>
         leaves.slice(offset, offset + limit)
     ),
-    getClusterChildren: jest.fn(async () => leaves),
+    getClusterChildren: vi.fn(async () => leaves),
   } as unknown as MapRef;
   const mapRef = { current: map };
   return {
@@ -119,16 +125,16 @@ const scene = (removalReads = 2, stringIds = false) => {
 };
 
 beforeEach(() => {
-  jest.useFakeTimers();
-  jest.spyOn(console, "log").mockImplementation(() => {});
+  vi.useFakeTimers();
+  vi.spyOn(console, "log").mockImplementation(() => {});
 });
 afterEach(() => {
-  jest.useRealTimers();
-  jest.restoreAllMocks();
+  vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 const tick = (ms: number) =>
   act(async () => {
-    await jest.advanceTimersByTimeAsync(ms);
+    await vi.advanceTimersByTimeAsync(ms);
   });
 
 test("query dispatch is single-flight and late completion after unmount is ignored", async () => {
@@ -164,12 +170,13 @@ test.each([false, true])(
         if (smoke.sourceRevision > 0)
           fixture.commitSourceRevision(smoke.sourceRevision);
       }, [smoke.sourceRevision]);
+      const { mapStyle, onStyleLoad } = smoke;
       useLayoutEffect(() => {
-        if (smoke.mapStyle === replacementStyle) {
+        if (mapStyle === replacementStyle) {
           fixture.clearState();
-          smoke.onStyleLoad();
+          onStyleLoad();
         }
-      }, [smoke.mapStyle, smoke.onStyleLoad]);
+      }, [mapStyle, onStyleLoad]);
       return smoke;
     });
     act(() => hook.result.current.onLoad());
@@ -228,12 +235,13 @@ test("recreation waits for the loaded source generation before reading state", a
       }, 300);
       return () => clearTimeout(timer);
     }, [smoke.sourceRevision]);
+    const { mapStyle, onStyleLoad } = smoke;
     useLayoutEffect(() => {
-      if (smoke.mapStyle === replacementStyle) {
+      if (mapStyle === replacementStyle) {
         fixture.clearState();
-        smoke.onStyleLoad();
+        onStyleLoad();
       }
-    }, [smoke.mapStyle, smoke.onStyleLoad]);
+    }, [mapStyle, onStyleLoad]);
     return smoke;
   });
   act(() => hook.result.current.onLoad());
@@ -322,12 +330,13 @@ test("an attaching native source tag is not queried before its generation render
       }, 300);
       return () => clearTimeout(timer);
     }, [smoke.sourceRevision]);
+    const { mapStyle, onStyleLoad } = smoke;
     useLayoutEffect(() => {
-      if (smoke.mapStyle === replacementStyle) {
+      if (mapStyle === replacementStyle) {
         fixture.clearState();
-        smoke.onStyleLoad();
+        onStyleLoad();
       }
-    }, [smoke.mapStyle, smoke.onStyleLoad]);
+    }, [mapStyle, onStyleLoad]);
     return smoke;
   });
   act(() => hook.result.current.onLoad());
@@ -444,4 +453,50 @@ test("pending removal reads do not overlap and cleanup ignores their completion"
     resolve({ count: 2 });
   });
   expect(fixture.removeFeatureState).toHaveBeenCalledTimes(1);
+});
+
+test("a suspended render cannot redirect a committed smoke callback to a new status URL", async () => {
+  vi.useRealTimers();
+  const post = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response());
+  const wait = new Promise<void>(() => {});
+  const mapRef = { current: null };
+  const Probe = ({ pending }: { pending: boolean }) => {
+    const smoke = useQueriesSmoke({
+      mapRef,
+      statusUrl: pending ? "/pending" : "/committed",
+    });
+    if (pending) use(wait);
+    return (
+      <button
+        type="button"
+        onClick={() => smoke.onError({ error: new Error("probe") })}
+      >
+        report error
+      </button>
+    );
+  };
+  const Harness = () => {
+    const [pending, setPending] = useState(false);
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => startTransition(() => setPending(true))}
+        >
+          suspend
+        </button>
+        <Suspense fallback={null}>
+          <Probe pending={pending} />
+        </Suspense>
+      </>
+    );
+  };
+  const view = render(<Harness />);
+  await act(async () => fireEvent.click(view.getByText("suspend")));
+  fireEvent.click(view.getByText("report error"));
+  expect(post).toHaveBeenCalledTimes(1);
+  expect(post).toHaveBeenCalledWith(
+    "/committed",
+    expect.objectContaining({ method: "POST" })
+  );
 });

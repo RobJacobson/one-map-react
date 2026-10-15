@@ -1,6 +1,6 @@
 # MapLibre web example
 
-Vite shell around the shared Seattle route map, using `one-map-react/maplibre-web`. From the repository root, `bun run build` writes the package `dist/` this shell imports.
+Vite+ shell around the shared Seattle route map, using `one-map-react/maplibre-web`. From the repository root, `bun run build` writes the package `dist/` this shell imports.
 
 ```sh
 bun install

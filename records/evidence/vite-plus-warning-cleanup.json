@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-14",
+  "scope": "Remaining Vite+ warning review on the uncommitted hybrid migration. Native tests remain on Jest.",
+  "base_commit": "71a643f003367b1293621ab420dd8257b52d8193",
+  "lint": {
+    "before": 98,
+    "before_by_rule": {
+      "react(globals)": 8,
+      "react(immutability)": 1,
+      "react(refs)": 50,
+      "react(set-state-in-effect)": 3,
+      "react(use-memo)": 1,
+      "react-hooks(exhaustive-deps)": 21,
+      "unicorn(no-new-array)": 7,
+      "unicorn(no-useless-spread)": 7
+    },
+    "additional_exposed_during_review": {
+      "react(refs)": 3,
+      "react(set-state-in-effect)": 1
+    },
+    "warnings_after": 0,
+    "errors_after": 0,
+    "unused_disable_directives_after": 0,
+    "configuration": "No lint rules disabled or severities reduced."
+  },
+  "changes": [
+    "Publish smoke callback replacements in layout effects instead of during render. Preserve first-mount callbacks and initial status values; abandoned renders cannot redirect committed callbacks.",
+    "Resolve all 21 dependency warnings using the same individual method/value dependencies, scalar popup offsets, and cleanup snapshots of effect-owned resources. Whole session objects were not added to dependency lists.",
+    "Reuse the existing useFrozenValue hook for immutable creation options and stable native callback identity. Explain the deliberate first-value ref in that hook.",
+    "Inline the MapSetup useMemo factory without changing registry lifetime.",
+    "Explain intentional sparse validation arrays, listener snapshots, test observation captures, deferred map handles, creation-contract checks, native ornament history, and effect-driven UI resets at the affected statements.",
+    "Remove two unused dependency directives that also hid four React diagnostics; replace them with precise padding-reset and location-reset explanations."
+  ],
+  "regressions": {
+    "suspended_smoke_callback": "New mocked React test passes; restoring the old render-time assignment fails by posting to /pending instead of /committed.",
+    "popup_offsets": "Extended the existing test to confirm a fresh equal-valued offset array does not cause another SDK offset update."
+  },
+  "validation": {
+    "bun run validate": "Passed on final source: formatting/lint, documentation structure, all four TypeScript projects, 427 Vitest tests across 23 suites, 204 native Jest tests across five suites, standalone regressions, library build, and 13 packed-package selections.",
+    "strict_lint_directives": "Passed with --report-unused-disable-directives --deny-warnings.",
+    "behavior_review": "22 comment-only files retain equivalent executable AST, including JSX text. Other edits preserve creation values, dependency identities, cleanup ownership, and SDK reset timing.",
+    "public_surface": "Published package manifest, exports and peer dependencies exactly match HEAD; declaration graph and all 13 package selections pass.",
+    "git_diff_check": "Passed.",
+    "sandbox_retry": "Initial sandboxed validation reached the existing owned-process cleanup test and failed with spawn EPERM. The authorized unsandboxed routine validation passed; no renderer or device work was launched.",
+    "existing_tool_notice": "Bun still reports that moduleSuffixes is unsupported in its own transpiler; all four TypeScript checks and package resolution tests pass."
+  },
+  "artifact_sha256": "49cbc0b1fb3920468fd1a5adb545bd5a6372d51be704ab3dafebcf86844343f0",
+  "acceptance": "Not run. Real-renderer browser, Metro, simulator, native build/install, and device acceptance remain outside this routine validation scope."
+}

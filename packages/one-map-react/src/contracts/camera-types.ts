@@ -160,9 +160,7 @@ export interface ZoomToOptions {
  * {@link FeatureStateMethods}.
  */
 export interface MapRef
-  extends FeatureQueryMethods,
-    ClusterQueryMethods,
-    FeatureStateMethods {
+  extends FeatureQueryMethods, ClusterQueryMethods, FeatureStateMethods {
   /**
    * Captures an attached rendered map. Rejects on detachment or deadline.
    * @param options - Explicit scope, output, and optional deadline.

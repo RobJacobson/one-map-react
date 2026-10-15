@@ -273,10 +273,11 @@ export const Tf08AcceptanceScene = ({
       }
       throw new Error("Unknown acceptance action.");
     };
+    const ownedSubscriptions = subscriptions.current;
     attach({ command });
     return () => {
       attach(null);
-      for (const release of subscriptions.current.splice(0)) release();
+      for (const release of ownedSubscriptions.splice(0)) release();
     };
   }, [attach, backend, fixtureUrl, services]);
 

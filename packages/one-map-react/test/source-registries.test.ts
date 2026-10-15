@@ -1,4 +1,4 @@
-import { expect, test } from "@jest/globals";
+import { expect, test } from "vite-plus/test";
 
 import { GeoJsonSourceRegistry } from "../src/adapters/mapbox-native/geojson-source-registry.js";
 import { MaplibreSourceRegistry } from "../src/adapters/maplibre-native/source-registry.js";
