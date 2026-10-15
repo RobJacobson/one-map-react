@@ -11,6 +11,10 @@ import {
 import { invokeWrapper } from "../shared/invoke-wrapper.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
+  normalizeElevation,
+  validateTerrainCoordinate,
+} from "../shared/terrain-values.js";
+import {
   assertBounds,
   boundsFromGeographic,
   lngLatFromWrapper,
@@ -44,6 +48,18 @@ export const createWebMapRef = (
   wrapper: WebWrapper<Extract<Backend, "mapbox-web" | "maplibre-web">>,
   capture?: MapRef["capture"]
 ): MapRef => ({
+  ...wrapper.createAdvancedMethods?.(() => requireWebMap(mapRef.current)),
+  queryTerrainElevation: async (coordinate) => {
+    validateTerrainCoordinate(coordinate);
+    const map = requireWebMap(mapRef.current);
+    if (!map.queryTerrainElevation)
+      throw new Error("queryTerrainElevation is unsupported by this renderer.");
+    return normalizeElevation(
+      runWebQuery(map, () =>
+        map.queryTerrainElevation?.(coordinate, { exaggerated: true })
+      )
+    );
+  },
   capture:
     capture ??
     (async () => {

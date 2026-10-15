@@ -138,6 +138,7 @@ interface WebMapMockProps extends HandlerProps {
  * @returns The mocked Map, Source, and Layer plus pool controls.
  */
 export const createWebMapMock = () => {
+  const selectedMethods: Record<string, (...args: unknown[]) => unknown> = {};
   const flyTo = vi.fn(() => ({ id: "map" }));
   const jumpTo = vi.fn();
   const easeTo = vi.fn();
@@ -357,6 +358,7 @@ export const createWebMapMock = () => {
       useImperativeHandle(
         attached ? ref : undefined,
         () => ({
+          ...selectedMethods,
           flyTo,
           jumpTo,
           easeTo,
@@ -430,7 +432,7 @@ export const createWebMapMock = () => {
   );
 
   const Layer = vi.fn(({ id }: { readonly id: string }) => {
-    useEffect(() => {
+    useLayoutEffect(() => {
       const entry = { id };
       layers.set(id, entry);
       return () => {
@@ -442,7 +444,11 @@ export const createWebMapMock = () => {
 
   const useMap = () => ({
     current: currentStyleTarget
-      ? { getMap: () => currentStyleTarget }
+      ? {
+          getMap: () => currentStyleTarget,
+          getLayer,
+          setSlot: (...args: unknown[]) => selectedMethods.setSlot?.(...args),
+        }
       : undefined,
   });
 
@@ -469,6 +475,7 @@ export const createWebMapMock = () => {
     getCenter,
     disableRotation,
     enableRotation,
+    selectedMethods,
     resetWebMapMock,
     loadBeforeAttachment: () => {
       loadBeforeAttachment = true;

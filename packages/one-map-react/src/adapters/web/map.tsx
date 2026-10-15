@@ -44,6 +44,11 @@ export const createWebMap = <
   const WebMap = forwardRef<
     MapRef,
     MapProps & {
+      options?: Omit<
+        import("./contracts.js").WebMapProps,
+        "initialViewState" | "mapStyle"
+      > &
+        Readonly<Record<string, unknown>>;
       hostProps?: Omit<
         HTMLAttributes<HTMLDivElement>,
         "children" | "dangerouslySetInnerHTML"
@@ -53,6 +58,10 @@ export const createWebMap = <
     (
       {
         mapStyle,
+        terrain,
+        projection,
+        light,
+        options,
         captureEnabled = false,
         interactiveLayerIds,
         hostProps,
@@ -299,6 +308,20 @@ export const createWebMap = <
           }}
         >
           <wrapper.Map
+            {...options}
+            {...(terrain === undefined && options?.terrain === undefined
+              ? {}
+              : {
+                  terrain: terrain === undefined ? options?.terrain : terrain,
+                })}
+            projection={
+              projection === undefined
+                ? options?.projection
+                : wrapper.backend === "mapbox-web"
+                  ? { name: projection }
+                  : { type: projection }
+            }
+            light={light ?? options?.light}
             ref={setMapHandle}
             interactiveLayerIds={
               interactiveLayerIds === undefined
@@ -309,19 +332,26 @@ export const createWebMap = <
             initialViewState={initialCamera}
             viewState={controlledCamera}
             padding={paddingValue}
-            minZoom={minZoom}
-            maxZoom={maxZoom}
+            minZoom={minZoom ?? options?.minZoom}
+            maxZoom={maxZoom ?? options?.maxZoom}
             maxBounds={
-              maxBounds === undefined ? undefined : toFlatBounds(maxBounds)
+              maxBounds === undefined
+                ? options?.maxBounds
+                : toFlatBounds(maxBounds)
             }
             style={{ width: "100%", height: "100%" }}
             {...(captureEnabled
               ? wrapper.backend === "mapbox-web"
                 ? { preserveDrawingBuffer: true }
-                : { canvasContextAttributes: { preserveDrawingBuffer: true } }
+                : {
+                    canvasContextAttributes: {
+                      ...options?.canvasContextAttributes,
+                      preserveDrawingBuffer: true,
+                    },
+                  }
               : {})}
-            reuseMaps={reuseMaps}
-            gl={gl}
+            reuseMaps={reuseMaps ?? options?.reuseMaps}
+            gl={gl ?? options?.gl}
             {...toWebGestureProps({
               interactive,
               dragPan,

@@ -1,4 +1,11 @@
+import type { MapRef } from "one-map-react";
+import {
+  Source as AdvancedSource,
+  Layer as AdvancedLayer,
+  type WebMapRef,
+} from "one-map-react/mapbox-web";
 import { adapter } from "one-map-react/mapbox-web";
+import { useEffect } from "react";
 import { useMap } from "react-map-gl/mapbox";
 
 import { WebCameraApp } from "../../shared/web-camera-app.js";
@@ -14,12 +21,23 @@ import {
 import { WebSourcesApp } from "../../shared/web-sources-app.js";
 import { WebTf07App } from "../../shared/web-tf07-app.js";
 import { WebTf08App } from "../../shared/web-tf08-app.js";
+import { WebTf09App } from "../../shared/web-tf09-app.js";
+import type { Tf09Media } from "../../shared/web-tf09-media.js";
 
 const cameraSmoke = new URLSearchParams(window.location.search).get("tf04");
 const sourcesSmoke = new URLSearchParams(window.location.search).get("tf05");
 const queriesSmoke = new URLSearchParams(window.location.search).get("tf06");
 
 export const App = () => {
+  if (new URLSearchParams(window.location.search).get("tf09") === "rendering")
+    return (
+      <WebTf09App
+        adapter={adapter}
+        probe={<RenderingProbe />}
+        renderMedia={renderMedia}
+        named={namedRendering}
+      />
+    );
   if (new URLSearchParams(window.location.search).get("tf08") === "services")
     return <WebTf08App adapter={adapter} />;
   if (new URLSearchParams(window.location.search).get("tf07") === "ui")
@@ -50,5 +68,86 @@ const CorrectionProbe = () => {
 
 const QueriesProbe = () => {
   useWebQueriesProbe(useMap().current?.getMap());
+  return null;
+};
+
+const renderMedia = ({ canvas, urls, coordinates, custom }: Tf09Media) => (
+  <>
+    <AdvancedSource
+      id="canvas"
+      type="canvas"
+      canvas={canvas}
+      animate={false}
+      coordinates={coordinates}
+    >
+      <AdvancedLayer
+        id="canvas-layer"
+        type="raster"
+        paint={{ "raster-opacity": 1 }}
+      />
+    </AdvancedSource>
+    <AdvancedSource
+      id="video"
+      type="video"
+      urls={urls}
+      coordinates={
+        coordinates.map(([longitude, latitude]) => [
+          longitude,
+          latitude - 25,
+        ]) as Tf09Media["coordinates"]
+      }
+    >
+      <AdvancedLayer id="video-layer" type="raster" />
+    </AdvancedSource>
+    <AdvancedLayer id="custom" type="custom" renderingMode="2d" {...custom} />
+  </>
+);
+
+const namedRendering = (map: MapRef) => {
+  const selected = map as WebMapRef;
+  selected.setRain({ density: 0 });
+  selected.setSnow({ density: 0 });
+  selected.setScaleFactor(1.2);
+  return {
+    rain: selected.getRain(),
+    snow: selected.getSnow(),
+    scale: selected.getScaleFactor(),
+  };
+};
+
+const RenderingProbe = () => {
+  const map = useMap().current;
+  useEffect(() => {
+    if (!map) return;
+    window.__oneMapTf09Inspect = () => ({
+      canvas: !!map.getSource("canvas"),
+      video: !!map.getSource("video"),
+      videoState: (() => {
+        const video = (
+          map.getSource("video") as
+            | { getVideo?: () => HTMLVideoElement }
+            | undefined
+        )?.getVideo?.();
+        return video
+          ? {
+              readyState: video.readyState,
+              paused: video.paused,
+              time: video.currentTime,
+              width: video.videoWidth,
+              height: video.videoHeight,
+              error: video.error?.message,
+            }
+          : undefined;
+      })(),
+      custom: !!map.getLayer("custom"),
+      canvasCoordinates: map.getSource("canvas")?.serialize(),
+      terrain: map.getTerrain(),
+      projection: map.getProjection(),
+      light: map.getLight(),
+    });
+    return () => {
+      delete window.__oneMapTf09Inspect;
+    };
+  }, [map]);
   return null;
 };

@@ -70,6 +70,10 @@ export const MaplibreNativeMap = forwardRef<
   }
 >((props, ref) => {
   const session = useOptionalMapSession();
+  if (props.terrain != null)
+    throw new Error("Terrain is unsupported on MapLibre Native.");
+  if (props.projection === "globe")
+    throw new Error("Globe projection is unsupported on MapLibre Native.");
   if (props.viewState && props.locationOptions?.trackUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
   const capture = useMapCapture(props.captureEnabled);
@@ -224,6 +228,16 @@ export const MaplibreNativeMap = forwardRef<
         <MaplibreSourceContext.Provider value={sources}>
           <MaplibreMap
             {...props.options}
+            light={
+              props.light
+                ? {
+                    ...props.light,
+                    position: props.light.position
+                      ? [...props.light.position]
+                      : undefined,
+                  }
+                : props.options?.light
+            }
             logoPosition={
               props.options?.logoPosition ??
               (ornaments.managed
@@ -251,7 +265,9 @@ export const MaplibreNativeMap = forwardRef<
               : {})}
             ref={mapRef}
             style={{ flex: 1 }}
-            mapStyle={mapStyle}
+            mapStyle={
+              mapStyle as ComponentProps<typeof MaplibreMap>["mapStyle"]
+            }
             {...gestures}
             onDidFinishRenderingFrameFully={() => {
               capture.frame();

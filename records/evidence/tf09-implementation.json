@@ -1,0 +1,180 @@
+{
+  "checkpoint": "TF09 implementation handoff",
+  "createdAt": "2026-10-15T07:55:51.180968+00:00",
+  "baseRevision": "c3579d473fc2e916def12702681adce0651567bc",
+  "workingTree": "uncommitted; no commits created",
+  "artifact": {
+    "distDigestAlgorithm": "SHA-256 of recursively sorted (localeCompare) dist relative paths with leading slash, then file bytes, matching scripts/tf09-rendering-smoke.mjs",
+    "distSha256": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+    "frozenForCoordinatorAudit": true
+  },
+  "routine": [
+    {
+      "command": "bun run validate",
+      "result": "passed",
+      "scope": "format/lint clean; docs32 files/34 comparison tables; four TypeScript projects; web/unit26files/481tests; native5files/210tests; routine script self-checks; build; package13 selections",
+      "artifactNote": "Preceded the final four explicit Mapbox raster-value/FOV forwards and acceptance-only barrier edits. Those have focused checks below; native/common behavior unaffected."
+    },
+    {
+      "command": "bun run typecheck",
+      "result": "passed",
+      "scope": "All four projects after final selected version/cancellation/wireframe and pure Mapbox support-probe additions."
+    },
+    {
+      "command": "bun x vp test run packages/one-map-react/test/tf09-selected.web.test.tsx",
+      "result": "passed",
+      "scope": "13 tests after final selected API additions; named forwarding, synchronous retained-ref detach errors, media identity and mutable slots with generated id."
+    },
+    {
+      "command": "bun run test:peers",
+      "result": "passed",
+      "scope": "Final frozen built artifact: four isolated selected entries; typed native globals, canvas/custom, maxCanvasSize, constructor options, named version/cancellation and Mapbox supported(false):boolean signature; unused peers absent."
+    },
+    {
+      "command": "bun run test:example-resolution",
+      "result": "passed",
+      "scope": "Shared example imports resolve through shell installation; Vite bundles sibling RouteMap; no renderer acceptance"
+    },
+    {
+      "command": "bun run check",
+      "result": "passed",
+      "scope": "Final production/docs/consumer assertions:240 formatted;224 linted; no warnings/errors. Coverage/provenance JSON writes followed separately."
+    },
+    {
+      "command": "node scripts/tf09-rendering-fixture.test.mjs && node --check scripts/tf09-rendering-smoke.mjs && node scripts/tf09-peer-patches.test.mjs",
+      "result": "passed",
+      "scope": "Final local DEM encoding, harness required observations/syntax, actual shipped query method null/zero/error execution and native source transport assertions"
+    },
+    {
+      "command": "bun x vp test run",
+      "result": "passed",
+      "scope": "Final production changes:26 web files/485 tests; no renderer acceptance."
+    },
+    {
+      "command": "bun run check:docs",
+      "result": "passed",
+      "scope": "Final rendering API documentation:32 files/34 tables; structural check only."
+    }
+  ],
+  "priorFailures": [
+    {
+      "failure": "Sandbox spawn EPERM in owned-process cleanup self-test and Bun temporary/cache writes",
+      "resolution": "Coordinator reran Node/Bun owned-process checks elevated; final validate and packed checks ran with required temporary/cache access and passed"
+    },
+    {
+      "failure": "Native smoke selector did not inline tf09 in Babel",
+      "resolution": "Added tf09 to existing Babel selector and retained10case self-check; validate passed"
+    },
+    {
+      "failure": "Isolated peer checks exposed any leakage and NodeNext native public declaration paths; initial patch formatting rejected by Bun",
+      "resolution": "Used named wrapper MapProps, repaired public native declaration barrel/inheritance/global const declarations, corrected real conversion types, canonicalized shipped patches; isolated typed consumers now pass"
+    },
+    {
+      "failure": "Mapbox hardware-support probe consumer assertion initially used an options object; pinned signature accepts an optional boolean.",
+      "resolution": "Preserved upstream boolean signature through the pure supported export and corrected isolated consumer assertion; final packed peers passed."
+    }
+  ],
+  "warnings": [
+    "Bun existing moduleSuffixes unsupported notice remains in routine scripts",
+    "Existing native tests emit React act warnings; all210 assertions passed"
+  ],
+  "nativePeerDeltaVsHead": {
+    "@rnmapbox/maps": [
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+        "sha256": "3bade8922b05f7dc44cd370387acdec8492eed0ee0e903e85e5a8f9f3166cf54",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt",
+        "sha256": "4c480e8fd45af183330c7fc1e9d8b6195c8bac1803a69d8723142f854c03c781",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt",
+        "sha256": "fe53f618db8b762f8df77e94a3e66108f0c265d769b8763aa8143220866d7ad1",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXTerrain.swift",
+        "sha256": "bff90e3198ff793d41f5659bb6a5ca2bd7b8ddefa274d6b39ebd3a2e973993b5",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "lib/module/components/MapView.js",
+        "sha256": "b25ad86758a247c4a329971cbe4a200cbda2b217534c2e6d34d8c5f8a7a73732",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "lib/typescript/src/Mapbox.native.d.ts",
+        "sha256": "e6e3e9376dbb468e22297d98b266def9e75c02ee3c06f3d0baada9ed59f726a0",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/RNMBXModule.d.ts",
+        "sha256": "b2c11d8f42963d8aeafe74ef522cb5472dc1f94e3a9822ed65924e229f73e875",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/components/MapView.d.ts",
+        "sha256": "bd3dd0212d091587a54a0317bc47ff2cfc60f260a741d4b75b73e269bc6ee748",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/index.native.d.ts",
+        "sha256": "c649d68d1374deb1e1f1c5917dfa2e47309429fa03389078a5fecc43849b3367",
+        "kind": "declaration"
+      },
+      {
+        "path": "src/components/MapView.tsx",
+        "sha256": "dc8bf35680f0a1d99d515988baf0c31ceaa5bc02756b0c1b2a8fdafa64fc5016",
+        "kind": "runtime-source-or-module"
+      }
+    ],
+    "@maplibre/maplibre-react-native": [
+      {
+        "path": "lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts",
+        "sha256": "57c74577f369fed142989b805a5bce1b179a3b7355ecd086a52d261b4024cac8",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/module/components/sources/vector-source/VectorSource.d.ts",
+        "sha256": "7da90c85c534968ed4e1629e0ef86c7099c515f7c249a8bc7c6cad9d318f5916",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/module/index.d.ts",
+        "sha256": "af6bf21835f6ce5593630333f3c340df64df4a48f7ca980dc8546de68de5f9ed",
+        "kind": "declaration"
+      }
+    ]
+  },
+  "acceptance": {
+    "result": "not run by implementation agent",
+    "harness": "scripts/tf09-rendering-smoke.mjs",
+    "instructions": "docs/tf09-rendering.md",
+    "nativeMapbox": "Fresh iOS/Android builds required: terrain disable/no-data native source changes",
+    "nativeMaplibre": "TF09 delta is declarations only; coordinator may use verified existing binary with new JS if independently proven unchanged",
+    "consumerCopies": "Root peers refreshed; examples are separate copied packages/peer installations. Coordinator must synchronize frozen dist and patch-matched native wrapper before builds/runs. No example peer installation or binary refreshed here.",
+    "estimatedDuration": "2-5 minutes per browser;3-8 minutes per installed native environment;20-60 minutes per fresh native build, estimates only"
+  },
+  "coverageReview": {
+    "record": "records/evidence/tf09-coverage.json",
+    "status": "routes implemented; runtime unverified; TF09 open",
+    "S49Aliases": 438,
+    "exactCanonicalAliases": 332,
+    "aggregateOrPropertyCasesNeedingCoordinatorDisposition": 0,
+    "note": "All106 formerly unbound S49 rows now carry exact member routes or source-backed SDK implementation/private dispositions without invented canonical IDs. Review exposed and resolved version/cancellation/wireframe/support-probe gaps. Native RNMapbox nested structural style typing remains the approved pinned-wrapper boundary; runtime acceptance is independent and open.",
+    "individuallyResolvedAggregateOrPropertyCases": 106,
+    "outstandingImplementationGaps": 0
+  },
+  "updatedAt": "2026-10-15T08:07:34.377333+00:00",
+  "nativePatchProvenance": "The offlineManagerLegacy getPacks _initialize(true) source/compiled patch hunks already exist identically in HEAD. Canonical patch ordering moved the compiled hunk; it is not a TF09 behavior change and is correctly absent from nativePeerDeltaVsHead. That list compares reconstructed HEAD-patched peers against the final peers, rather than textual patch hunk position.",
+  "coordinatorClosure": {
+    "status": "TF09 complete for recorded representative scope",
+    "audit": "tf09-audit.json",
+    "acceptance": "tf09-acceptance.json",
+    "nativePreparation": "tf09-native-preparation.json",
+    "note": "Historical handoff fields above preserve what the implementation agent ran. Coordinator acceptance subsequently passed all six environments; unexercised combinations and first Android startup timeout remain explicit."
+  }
+}

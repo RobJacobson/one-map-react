@@ -38,6 +38,13 @@ export interface MapLayoutStyle {
  * Props for the shared {@link Map} component.
  */
 export interface MapProps {
+  /** Terrain override; null disables terrain. Omission leaves SDK style semantics. */
+  readonly terrain?: Terrain | null;
+  /** Selected projection. MapLibre Native supports mercator only. */
+  readonly projection?: "mercator" | "globe";
+  /** Legacy extrusion light; omission follows selected SDK reset semantics. */
+  readonly light?: LegacyLight;
+
   /** Enable current-map capture at construction; default false, immutable. */
   readonly captureEnabled?: boolean;
   /** Optional provider-local identity for useMap(id); changing requires remount. */
@@ -313,4 +320,38 @@ export interface GestureSelection {
   readonly clickTolerance?: number;
   /** Page URL hash camera. Web only. */
   readonly hash?: boolean | string;
+}
+
+/** Portable terrain using a mounted raster DEM source. */
+export interface Terrain {
+  /** Raster DEM source id. */
+  readonly source: string;
+  /** Numeric elevation multiplier, including zero. */
+  readonly exaggeration?: number;
+}
+
+/** Duration and delay in milliseconds for a style property change. */
+export interface StyleTransition {
+  /** Transition duration in milliseconds. */
+  readonly duration?: number;
+  /** Transition delay in milliseconds. */
+  readonly delay?: number;
+}
+
+/** Legacy light shared by the four selected renderer paths. */
+export interface LegacyLight {
+  /** Light coordinate frame. */
+  readonly anchor?: "map" | "viewport";
+  /** Light tint. */
+  readonly color?: string;
+  /** Light intensity from zero to one. */
+  readonly intensity?: number;
+  /** Spherical radius, azimuth, and polar angle in degrees. */
+  readonly position?: readonly [number, number, number];
+  /** Color transition. */
+  readonly "color-transition"?: StyleTransition;
+  /** Intensity transition. */
+  readonly "intensity-transition"?: StyleTransition;
+  /** Position transition. */
+  readonly "position-transition"?: StyleTransition;
 }

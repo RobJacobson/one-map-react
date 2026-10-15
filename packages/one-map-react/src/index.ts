@@ -53,6 +53,8 @@ export type {
   HeatmapLayerProps,
   HeatmapLayout,
   HeatmapPaint,
+  HillshadePaint,
+  HillshadeLayerProps,
   LayerProps,
   LayerType,
   LineLayerProps,
@@ -77,6 +79,9 @@ export type {
   UserLocationProps,
 } from "./contracts/location-types.js";
 export type {
+  LegacyLight,
+  StyleTransition,
+  Terrain,
   ExternalDrawingContext,
   MapLayoutStyle,
   MapProps,

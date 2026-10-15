@@ -2178,3 +2178,48 @@ test("native fitBounds maxZoom rejects before camera dispatch", async () => {
   ).rejects.toThrow("pinned native camera wrapper");
   expect(mockFitBounds).not.toHaveBeenCalled();
 });
+
+test("MapLibre Native forwards legacy light and rejects unsupported terrain/globe/elevation", async () => {
+  const ref = createRef<MapRef>();
+  const mounted = await render(
+    <MapSetup adapter={adapter}>
+      <OneMap
+        ref={ref}
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        projection="mercator"
+        light={{ intensity: 0, position: [1, 2, 3] }}
+      >
+        <Layer
+          id="shade"
+          type="hillshade"
+          paint={{ "hillshade-exaggeration": 0 }}
+        />
+      </OneMap>
+    </MapSetup>
+  );
+  expect(lastMapProps<{ light: object }>().light).toMatchObject({
+    intensity: 0,
+    position: [1, 2, 3],
+  });
+  await expect(ref.current?.queryTerrainElevation([0, 0])).rejects.toThrow(
+    "unsupported"
+  );
+  await mounted.unmount();
+  for (const props of [
+    { terrain: { source: "dem" } },
+    { projection: "globe" as const },
+  ]) {
+    await expect(
+      render(
+        <MapSetup adapter={adapter}>
+          <OneMap
+            mapStyle={emptyStyle}
+            initialViewState={initialViewState}
+            {...props}
+          />
+        </MapSetup>
+      )
+    ).rejects.toThrow("unsupported");
+  }
+});

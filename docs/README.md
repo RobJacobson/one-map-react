@@ -1,5 +1,7 @@
 # one-map-react documentation
 
+The [advanced rendering record](tf09-rendering.md) describes portable terrain/projection/light/hillshade, selected advanced facilities, typed options, wrapper boundaries and the targeted acceptance procedure. Targeted acceptance passed in all six environments; the record preserves scope and earlier attempts.
+
 one-map-react is being built as a thin facade over RNMapbox, MapLibre React Native, and react-map-gl. Full API coverage, mixed backend selection, and map reuse remain requirements. TF01 established the package and selection foundation. TF02 is complete. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03's reuse and lifecycle API is implemented, and its renderer smoke passed. TF04's camera, gesture, and interaction API is implemented. Its renderer smoke passed.
 
 ## Current direction

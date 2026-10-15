@@ -1,7 +1,7 @@
-import * as Mapbox from "@rnmapbox/maps";
 import { type MapRef, MapSetup } from "one-map-react";
 import {
   adapter,
+  setAccessToken,
   WrapperLocationManager,
   WrapperOfflineManager,
   offlineManagerLegacy,
@@ -19,14 +19,9 @@ import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
 import { NativeTf08Screen } from "../shared/native-tf08-screen.js";
+import { NativeTf09Screen } from "../shared/native-tf09-screen.js";
 import { RouteMap } from "../shared/route-map.js";
 import { smokeTarget } from "../shared/smoke-target.js";
-
-// Mapbox.native.d.ts hides setAccessToken inside a combined const export.
-// The runtime module still provides it.
-const { setAccessToken } = Mapbox as typeof Mapbox & {
-  setAccessToken: (accessToken: string | null) => Promise<string | null>;
-};
 
 // Babel inlines the public token from the shell or a .env file.
 declare const process: {
@@ -107,6 +102,7 @@ const offlineOperations = {
 };
 
 const App = () => {
+  if (smokeTarget === "tf09") return <NativeTf09Screen adapter={adapter} />;
   if (smokeTarget === "tf08" || smokeTarget === "tf08-storage")
     return (
       <NativeTf08Screen

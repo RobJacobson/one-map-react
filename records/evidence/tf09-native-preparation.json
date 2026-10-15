@@ -1,0 +1,472 @@
+{
+  "checkpoint": "TF09 native acceptance preparation and runtime attempts",
+  "date": "2026-10-15",
+  "artifactSha256": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+  "artifactCopies": "Root dist and all four example dist trees matched this digest at runtime preflight.",
+  "nativePeerDeltaFiles": {
+    "@rnmapbox/maps": [
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+        "sha256": "3bade8922b05f7dc44cd370387acdec8492eed0ee0e903e85e5a8f9f3166cf54",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt",
+        "sha256": "4c480e8fd45af183330c7fc1e9d8b6195c8bac1803a69d8723142f854c03c781",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt",
+        "sha256": "fe53f618db8b762f8df77e94a3e66108f0c265d769b8763aa8143220866d7ad1",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXTerrain.swift",
+        "sha256": "bff90e3198ff793d41f5659bb6a5ca2bd7b8ddefa274d6b39ebd3a2e973993b5",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "lib/module/components/MapView.js",
+        "sha256": "b25ad86758a247c4a329971cbe4a200cbda2b217534c2e6d34d8c5f8a7a73732",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "lib/typescript/src/Mapbox.native.d.ts",
+        "sha256": "e6e3e9376dbb468e22297d98b266def9e75c02ee3c06f3d0baada9ed59f726a0",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/RNMBXModule.d.ts",
+        "sha256": "b2c11d8f42963d8aeafe74ef522cb5472dc1f94e3a9822ed65924e229f73e875",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/components/MapView.d.ts",
+        "sha256": "bd3dd0212d091587a54a0317bc47ff2cfc60f260a741d4b75b73e269bc6ee748",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/index.native.d.ts",
+        "sha256": "c649d68d1374deb1e1f1c5917dfa2e47309429fa03389078a5fecc43849b3367",
+        "kind": "declaration"
+      },
+      {
+        "path": "src/components/MapView.tsx",
+        "sha256": "dc8bf35680f0a1d99d515988baf0c31ceaa5bc02756b0c1b2a8fdafa64fc5016",
+        "kind": "runtime-source-or-module"
+      }
+    ],
+    "@maplibre/maplibre-react-native": [
+      {
+        "path": "lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts",
+        "sha256": "57c74577f369fed142989b805a5bce1b179a3b7355ecd086a52d261b4024cac8",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/module/components/sources/vector-source/VectorSource.d.ts",
+        "sha256": "7da90c85c534968ed4e1629e0ef86c7099c515f7c249a8bc7c6cad9d318f5916",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/module/index.d.ts",
+        "sha256": "af6bf21835f6ce5593630333f3c340df64df4a48f7ca980dc8546de68de5f9ed",
+        "kind": "declaration"
+      }
+    ]
+  },
+  "nativePeerVerification": {
+    "status": "passed",
+    "method": "Coordinator refreshed and SHA256 checked all 10 RNMapbox and 3 MapLibre delta files in the native examples against root; full src, lib/module, ios, and android/src trees had zero mismatches.",
+    "runtimeHarnessGuard": "The native harness checks each selected peer delta file SHA256 before starting fixture port 8798."
+  },
+  "devices": {
+    "ios": {
+      "device": "iPhone 18 Pro",
+      "runtime": "iOS 27.0",
+      "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "booted": true
+    },
+    "android": {
+      "avd": "TF07_Acceptance",
+      "serial": "emulator-5554",
+      "emulator": "37.1.11",
+      "release": "17",
+      "api": 37,
+      "abi": "arm64-v8a",
+      "pageSizeBytes": 16384,
+      "display": "1080x2400",
+      "density": 420,
+      "systemImage": "google_apis_playstore_ps16k/arm64-v8a"
+    }
+  },
+  "buildTools": {
+    "xcode": "27.0 (27A266a)",
+    "gradle": "9.4.1",
+    "androidBuildTools": "36.0.0",
+    "runtimeNodeModules": "/Users/rob/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules"
+  },
+  "buildAndInstall": {
+    "ios": {
+      "command": "xcodebuild -quiet -workspace examples/native-mapbox/ios/OneMapMapbox.xcworkspace -scheme OneMapMapbox -configuration Debug -destination id=8B7D7CE4-228E-409F-A156-A597D4E448A5 -derivedDataPath <temporary> CODE_SIGNING_ALLOWED=NO -jobs 2 build",
+      "mapboxInitialStalePatch": {
+        "build": "passed",
+        "install": "passed",
+        "identity": {
+          "bundle": "org.reactjs.native.example.OneMapMapbox",
+          "executableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+          "debugDylibSha256": "a79669aa6a7f9edd1d14170f7bfd4ed08b8619a5034726811df88f041914d705"
+        },
+        "status": "superseded; example peer was stale"
+      },
+      "mapboxPatched": {
+        "build": "passed",
+        "install": "passed",
+        "identity": {
+          "bundle": "org.reactjs.native.example.OneMapMapbox",
+          "executableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+          "debugDylibSha256": "852bc41699ee657f29f1ced0c37ae241442a330d2175d9e2cfb5ac13d0348888"
+        }
+      },
+      "maplibre": {
+        "build": "passed",
+        "install": "passed",
+        "identity": {
+          "bundle": "org.reactjs.native.example.OneMapMaplibre",
+          "executableSha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+          "debugDylibSha256": "4e7d244d33a4e162bde40d3f2128a885d2ee348e2e0955ddc5aeecad0e8c6af7"
+        },
+        "nativeRebuild": "not required; refreshed MapLibre delta is declaration-only"
+      }
+    },
+    "android": {
+      "command": "./gradlew --no-daemon --max-workers=2 --console=plain :app:assembleDebug -PreactNativeArchitectures=arm64-v8a -I /private/tmp/one-map-tf09-acceptance/tf09.gradle (debug applicationIdSuffix .tf09)",
+      "mapboxInitialStalePatch": {
+        "build": "passed",
+        "install": "passed",
+        "applicationId": "com.onemapmapbox.tf09",
+        "apkSha256": "c646542eec2e3c244c1e5f9140e6f6c6c21f1442d84e88c03bd7c8a653af7857",
+        "status": "superseded; example peer was stale"
+      },
+      "mapboxPatched": {
+        "build": "passed",
+        "install": "passed",
+        "applicationId": "com.onemapmapbox.tf09",
+        "apkSha256": "f255fbb99841f2741369303e974e728c7d934bd5ba9746c3e92f2f5d0b30ddab",
+        "installedBaseApkHashMatched": true
+      },
+      "maplibre": {
+        "build": "passed",
+        "install": "passed",
+        "applicationId": "com.onemapmaplibre.tf09",
+        "apkSha256": "dc8594b865403d9849adcb8ad7542dff5e61a0c292a7767d3c25f17ead3c9c3b",
+        "installedBaseApkHashMatched": true,
+        "nativeRebuild": "not required; refreshed MapLibre delta is declaration-only"
+      }
+    }
+  },
+  "runtimeAttempts": [
+    {
+      "attempt": "mapbox-ios-first",
+      "status": "failed; invalid stale peer build superseded",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/mapbox-ios-first.json",
+        "sha256": "9891ce8c4dede7005cdf11530411c5d59656a7a13156502f7fb4c06f84543bff"
+      },
+      "firstOutcome": "known rendered feature and initial no-data: TypeError Cannot read property data of undefined",
+      "identity": "stale-build"
+    },
+    {
+      "attempt": "mapbox-ios-patched-retry",
+      "status": "failed",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/mapbox-ios-patched-retry.json",
+        "sha256": "e8b28162370a456abee862bbeca0ecc38668b35d00fb62b4844fd185ef1288dc"
+      },
+      "passedScenarios": 3,
+      "failedScenario": "hillshade draws the fixture's slope patch",
+      "failure": "Rendering observation timed out.",
+      "identity": "patched Mapbox iOS"
+    },
+    {
+      "attempt": "mapbox-ios-hillshade-diagnostic",
+      "status": "failed diagnostic; coordinator diagnosis pending",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/mapbox-ios-hillshade-diagnostic.json",
+        "sha256": "6e404a243db9903464e23df3634129c13e35bb9e29eb1783b1c7f35e2e084b7a"
+      },
+      "passedScenarios": 3,
+      "diagnostic": "Hillshade baseline not flat: blue=0/3162132, corner=30,49,75,255.",
+      "identity": "patched Mapbox iOS"
+    },
+    {
+      "attempt": "mapbox-ios-color-retry",
+      "status": "passed",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/mapbox-ios-color-retry.json",
+        "sha256": "9ac0811bd4d85250da6da546e5a6c2081aaa3248a361fc176ba044d63cfa03ea"
+      },
+      "passedScenarios": 6,
+      "scenarioCount": 6,
+      "identity": "bundle=org.reactjs.native.example.OneMapMapbox;exec=da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a;debugDylib=852bc41699ee657f29f1ced0c37ae241442a330d2175d9e2cfb5ac13d0348888;sim=iPhone18Pro-iOS27.0-8B7D7CE4-228E-409F-A156-A597D4E448A5;patches=10-files-verified"
+    },
+    {
+      "attempt": "mapbox-android-first",
+      "status": "failed",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/mapbox-android-first.json",
+        "sha256": "73a39fb547ec3ee2d9bd18e661636304efc1f6c593db6798e3af1f7a1707523e"
+      },
+      "passedScenarios": 0,
+      "scenarioCount": 1,
+      "identity": "applicationId=com.onemapmapbox.tf09;apk=copied-installed-sha256:f255fbb99841f2741369303e974e728c7d934bd5ba9746c3e92f2f5d0b30ddab;avd=TF07_Acceptance;serial=emulator-5554;android17-api37;pageSize=16384;abi=arm64-v8a;patches=10-files-verified",
+      "failedScenario": "known rendered feature and initial no-data",
+      "failure": "Error: Rendering observation timed out."
+    }
+  ],
+  "runtimeProgress": {
+    "mapboxIos": "passed 6/6 on the color-corrected retry; previous stale-peer attempt and baseline-threshold diagnostic remain preserved",
+    "mapboxAndroid": "passed 6/6 on the initial-state diagnostic retry; earlier startup timeout did not reproduce",
+    "maplibreIos": "passed 3/3",
+    "maplibreAndroid": "passed 3/3"
+  },
+  "cleanup": {
+    "verifiedIosDerivedDataRemoved": true,
+    "verifiedAndroidAppBuildAndCxxRemoved": true,
+    "freeDiskAfterMapboxBuildCleanup": "7.5GiB",
+    "fixturePort8798Released": true,
+    "metroPort8081Released": true,
+    "emulatorStillBooted": false,
+    "androidTf09PackagesRemoved": true,
+    "androidDeviceStateRestoredToNoDevices": true,
+    "temporaryAcceptanceAndRestorationOutputsRemoved": true,
+    "freeDiskAfterFinalCleanup": "7.8GiB",
+    "iosSimulatorStillBooted": true,
+    "iosAppsRestoredAfterAccidentalUninstall": true,
+    "iosAppSandboxDataRestored": false,
+    "iosAppSandboxDataNote": "The pre-existing app containers were removed by uninstall. No container backup was available, so prior app preferences, cache, and offline test data were not restored."
+  },
+  "iosRestoration": {
+    "reason": "Reinstalled both pre-existing default example apps after accidental uninstall during authorized TF09 cleanup.",
+    "simulator": "iPhone 18 Pro; iOS 27.0; 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "builds": "Fresh Debug simulator builds from unchanged patched example sources; temporary DerivedData removed after install verification.",
+    "mapbox": {
+      "bundle": "org.reactjs.native.example.OneMapMapbox",
+      "executableSha256": "da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a",
+      "debugDylibSha256": "1d70912832288a9a2d979dbd47685c18d06b6d25f53380d139f894e537a88598"
+    },
+    "maplibre": {
+      "bundle": "org.reactjs.native.example.OneMapMaplibre",
+      "executableSha256": "bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63",
+      "debugDylibSha256": "a902519c9180dcca369e63fdf347a70368ab5ebfedbd2bea240ce421483fecde"
+    },
+    "acceptanceIdentityRelationship": "These are restoration build identities, distinct from the app binaries exercised by the TF09 passing acceptance reports above."
+  },
+  "finalRuntimeResults": [
+    {
+      "environment": "mapbox-ios",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/mapbox-ios-color-retry.json",
+        "sha256": "9ac0811bd4d85250da6da546e5a6c2081aaa3248a361fc176ba044d63cfa03ea"
+      },
+      "nativeIdentity": "bundle=org.reactjs.native.example.OneMapMapbox;exec=da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a;debugDylib=852bc41699ee657f29f1ced0c37ae241442a330d2175d9e2cfb5ac13d0348888;sim=iPhone18Pro-iOS27.0-8B7D7CE4-228E-409F-A156-A597D4E448A5;patches=10-files-verified",
+      "passed": 6,
+      "total": 6,
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 235363
+          }
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 2327357,
+            "projectionReadback": "native pixel comparison"
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1206,
+            "height": 2622,
+            "orangePixels": 3884
+          }
+        }
+      ]
+    },
+    {
+      "environment": "mapbox-android",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/mapbox-android-initial-diagnostic.json",
+        "sha256": "ed441710cb74c655b3d99ca1076f179652ba02911db49b6cb63a03ac2f433304"
+      },
+      "nativeIdentity": "applicationId=com.onemapmapbox.tf09;apk=copied-installed-sha256:f255fbb99841f2741369303e974e728c7d934bd5ba9746c3e92f2f5d0b30ddab;avd=TF07_Acceptance;serial=emulator-5554;android17-api37;pageSize=16384;abi=arm64-v8a;patches=10-files-verified",
+      "passed": 6,
+      "total": 6,
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              "9009"
+            ],
+            "elevation": null
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 5614
+          }
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 1897076,
+            "projectionReadback": "native pixel comparison"
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1080,
+            "height": 2400,
+            "orangePixels": 2992
+          }
+        }
+      ]
+    },
+    {
+      "environment": "maplibre-ios",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/maplibre-ios-first.json",
+        "sha256": "2a00baf9674ac3a1db4d492b20125a0f32006ba0a465a6d938fc3942c3e186d4"
+      },
+      "nativeIdentity": "bundle=org.reactjs.native.example.OneMapMaplibre;exec=bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63;debugDylib=4e7d244d33a4e162bde40d3f2128a885d2ee348e2e0955ddc5aeecad0e8c6af7;sim=iPhone18Pro-iOS27.0-8B7D7CE4-228E-409F-A156-A597D4E448A5;patches=3-files-declaration-only",
+      "passed": 3,
+      "total": 3,
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null,
+            "unsupported": "Error: queryTerrainElevation is unsupported on MapLibre Native."
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 342818
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1206,
+            "height": 2622,
+            "orangePixels": 3900
+          }
+        }
+      ]
+    },
+    {
+      "environment": "maplibre-android",
+      "report": {
+        "path": "/private/tmp/one-map-tf09-acceptance/maplibre-android-first.json",
+        "sha256": "b22bcad38fe049282828c596a6cb4d526395d5ad46ad9a7ed20831d8184a0f8e"
+      },
+      "nativeIdentity": "applicationId=com.onemapmaplibre.tf09;apk=copied-installed-sha256:dc8594b865403d9849adcb8ad7542dff5e61a0c292a7767d3c25f17ead3c9c3b;avd=TF07_Acceptance;serial=emulator-5554;android17-api37;pageSize=16384;abi=arm64-v8a;patches=3-files-declaration-only",
+      "passed": 3,
+      "total": 3,
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              "9009"
+            ],
+            "elevation": null,
+            "unsupported": "Error: queryTerrainElevation is unsupported on MapLibre Native."
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 320266
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1080,
+            "height": 2400,
+            "orangePixels": 2976
+          }
+        }
+      ]
+    }
+  ],
+  "harnessSha256": "f2898c6f9504ff0c7641bca4de1fbcedc61fb3ff76e69fb85ab26aa7f68d837c",
+  "runtimeStatus": "All four authorized native environments reviewed and passed for the representative scope; first Android startup timeout remains an unreproduced flake."
+}

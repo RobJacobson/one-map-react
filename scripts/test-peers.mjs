@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import {
+  copyFileSync,
+  mkdtempSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -117,8 +123,31 @@ const checkPeerConsumer = async (archive, entry, packages) => {
   const consumer = mkdtempSync(join(output, `${entry}-`));
   writeFileSync(
     join(consumer, "package.json"),
-    '{"private":true,"type":"module"}\n'
+    JSON.stringify({
+      private: true,
+      type: "module",
+      ...(entry.endsWith("native")
+        ? {
+            patchedDependencies: {
+              [entry === "mapbox-native"
+                ? "@rnmapbox/maps@10.3.7"
+                : "@maplibre/maplibre-react-native@11.5.0"]: "./peer.patch",
+            },
+          }
+        : {}),
+    })
   );
+  if (entry.endsWith("native"))
+    copyFileSync(
+      join(
+        root,
+        "packages/one-map-react/patches",
+        entry === "mapbox-native"
+          ? "rnmapbox-10.3.7-tf08.patch"
+          : "maplibre-native-11.5.0-tf08.patch"
+      ),
+      join(consumer, "peer.patch")
+    );
   run("bun", ["add", archive, ...packages], consumer);
 
   const names = installedNames(consumer);
@@ -134,6 +163,34 @@ const checkPeerConsumer = async (archive, entry, packages) => {
     );
   }
 
+  const selectedAssertions = entry.endsWith("web")
+    ? `
+import { Map as SelectedMap, Source as SelectedSource, Layer as SelectedLayer, type WebMapRef } from "one-map-react/${entry}";
+${entry === "mapbox-web" ? 'import { supported } from "one-map-react/mapbox-web"; const browserSupported: boolean = supported(false); void browserSupported;' : ""}
+declare const selectedRef: WebMapRef;
+const selectedVersion: string = selectedRef.getVersion(); void selectedVersion;
+void <SelectedMap mapStyle={style} initialViewState={viewState} options={{ transformRequest: (url) => ({ url }), ${entry === "maplibre-web" ? "maxCanvasSize: [4096, 4096]," : "language: 'en', worldview: 'US',"} }} />;
+void <SelectedSource id="canvas" type="canvas" canvas={"canvas-id"} coordinates={[[0,1],[1,1],[1,0],[0,0]]} />;
+void <SelectedLayer id="custom" type="custom" render={() => undefined} />;
+${entry === "mapbox-web" ? "selectedRef.setRain({ density: 0 }); selectedRef.setLanguage('en'); selectedRef.getIndoorTileOptions('source', '');" : "selectedRef.setGlobalStateProperty('fixture', 1); selectedRef.refreshTiles('source'); selectedRef.setCancelPendingTileRequestsWhileZooming(false); const cancellation: boolean = selectedRef.getCancelPendingTileRequestsWhileZooming(); void cancellation;"}
+`
+    : entry === "mapbox-native"
+      ? `
+import { Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef } from "one-map-react/mapbox-native";
+void Terrain; void Light; void Models; void RasterArraySource; void Viewport;
+setTelemetryEnabled(false);
+// @ts-expect-error Selected native settings preserve their boolean input.
+setTelemetryEnabled(42);
+declare const selectedRef: NativeAdvancedMapRef;
+selectedRef.setSourceVisibility(false, 'source');
+`
+      : `
+import { Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer } from "one-map-react/maplibre-native";
+void Animated; void SelectedLayer; void TransformRequestManager;
+NetworkManager.setConnected(false);
+// @ts-expect-error Selected native settings preserve their boolean input.
+NetworkManager.setConnected(42);
+`;
   writeFileSync(
     join(consumer, "consumer.tsx"),
     `import { Map as OneMap, MapSetup, Source, Layer } from "one-map-react";
@@ -153,6 +210,7 @@ const viewState = {
   pitch: 0,
 };
 const style = { version: 8 as const, sources: {}, layers: [] };
+${selectedAssertions}
 void (
   <OneMap mapStyle={style} initialViewState={viewState} />
 );
@@ -184,7 +242,11 @@ void (
       files: ["consumer.tsx"],
     })
   );
-  run(compiler, ["-p", "tsconfig.json"], consumer);
+  try {
+    run(compiler, ["-p", "tsconfig.json"], consumer);
+  } catch (error) {
+    throw new Error(`${entry}: ${error.message}`);
+  }
 
   if (entry.endsWith("web")) {
     writeFileSync(

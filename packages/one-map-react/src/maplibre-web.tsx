@@ -12,6 +12,7 @@ import {
   Layer as MaplibreLayer,
   Map as MaplibreMap,
   type MapRef as MaplibreMapRef,
+  type MapProps as SelectedWrapperMapProps,
   Marker as MaplibreMarker,
   NavigationControl as MaplibreNavigationControl,
   Popup as MaplibrePopup,
@@ -51,6 +52,7 @@ import {
   Popup as OnePopup,
   ScaleControl as OneScaleControl,
 } from "./facade/ui.js";
+import { useStableOptions } from "./facade/use-stable-options.js";
 
 type WebControlHook = WebWrapper<"maplibre-web">["useControl"];
 
@@ -75,6 +77,127 @@ interface MaplibreClusterCaller {
 export const adapter: Adapter & { readonly backend: "maplibre-web" } =
   createWebAdapter({
     backend: "maplibre-web",
+    createAdvancedMethods: (getHandle) => ({
+      getCancelPendingTileRequestsWhileZooming: (): boolean =>
+        (getHandle() as unknown as MaplibreMapRef).getMap()
+          .cancelPendingTileRequestsWhileZooming,
+      setCancelPendingTileRequestsWhileZooming: (value: boolean): void => {
+        (
+          getHandle() as unknown as MaplibreMapRef
+        ).getMap().cancelPendingTileRequestsWhileZooming = value;
+      },
+      getVersion: (): string =>
+        (getHandle() as unknown as MaplibreMapRef).getMap().version,
+      getCanvasSource: (id: string): import("maplibre-gl").CanvasSource => {
+        const source = (getHandle() as unknown as MaplibreMapRef).getSource(id);
+        if (!source || source.type !== "canvas")
+          throw new Error(`Source "${id}" is not an attached CanvasSource.`);
+        return source as import("maplibre-gl").CanvasSource;
+      },
+      getVideoSource: (id: string): import("maplibre-gl").VideoSource => {
+        const source = (getHandle() as unknown as MaplibreMapRef).getSource(id);
+        if (!source || source.type !== "video")
+          throw new Error(`Source "${id}" is not an attached VideoSource.`);
+        return source as import("maplibre-gl").VideoSource;
+      },
+      setDebugOptions: (options: Partial<WebDebugOptions>) => {
+        const map = (getHandle() as unknown as MaplibreMapRef).getMap();
+        Object.assign(map, options);
+      },
+      getDebugOptions: (): WebDebugOptions => {
+        const map = (getHandle() as unknown as MaplibreMapRef).getMap();
+        return {
+          showCollisionBoxes: map.showCollisionBoxes,
+          showTileBoundaries: map.showTileBoundaries,
+          showOverdrawInspector: map.showOverdrawInspector,
+          showPadding: map.showPadding,
+          vertices: map.vertices,
+          repaint: map.repaint,
+        };
+      },
+      getCameraTargetElevation: (
+        ...args: Parameters<MaplibreMapRef["getCameraTargetElevation"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).getCameraTargetElevation(
+          ...args
+        ),
+      getCenterElevation: (
+        ...args: Parameters<MaplibreMapRef["getCenterElevation"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).getCenterElevation(...args),
+      getStyleUrl: (...args: Parameters<MaplibreMapRef["getStyleUrl"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getStyleUrl(...args),
+      redraw: (...args: Parameters<MaplibreMapRef["redraw"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).redraw(...args),
+      setCenterElevation: (
+        ...args: Parameters<MaplibreMapRef["setCenterElevation"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).setCenterElevation(...args),
+      setTransformConstrain: (
+        ...args: Parameters<MaplibreMapRef["setTransformConstrain"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).setTransformConstrain(
+          ...args
+        ),
+      setSky: (...args: Parameters<MaplibreMapRef["setSky"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).setSky(...args),
+      getSky: (...args: Parameters<MaplibreMapRef["getSky"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getSky(...args),
+      getTerrain: (...args: Parameters<MaplibreMapRef["getTerrain"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getTerrain(...args),
+      getProjection: (...args: Parameters<MaplibreMapRef["getProjection"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getProjection(...args),
+      getLight: (...args: Parameters<MaplibreMapRef["getLight"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getLight(...args),
+      setGlobalStateProperty: (
+        ...args: Parameters<MaplibreMapRef["setGlobalStateProperty"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).setGlobalStateProperty(
+          ...args
+        ),
+      getGlobalState: (...args: Parameters<MaplibreMapRef["getGlobalState"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getGlobalState(...args),
+      refreshTiles: (...args: Parameters<MaplibreMapRef["refreshTiles"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).refreshTiles(...args),
+      setSourceTileLodParams: (
+        ...args: Parameters<MaplibreMapRef["setSourceTileLodParams"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).setSourceTileLodParams(
+          ...args
+        ),
+      setGlyphs: (...args: Parameters<MaplibreMapRef["setGlyphs"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).setGlyphs(...args),
+      getGlyphs: (...args: Parameters<MaplibreMapRef["getGlyphs"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getGlyphs(...args),
+      setFontFaces: (...args: Parameters<MaplibreMapRef["setFontFaces"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).setFontFaces(...args),
+      getFontFaces: (...args: Parameters<MaplibreMapRef["getFontFaces"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getFontFaces(...args),
+      setTransformRequest: (
+        ...args: Parameters<MaplibreMapRef["setTransformRequest"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).setTransformRequest(...args),
+      getPixelRatio: (...args: Parameters<MaplibreMapRef["getPixelRatio"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getPixelRatio(...args),
+      setPixelRatio: (...args: Parameters<MaplibreMapRef["setPixelRatio"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).setPixelRatio(...args),
+      getVerticalFieldOfView: (
+        ...args: Parameters<MaplibreMapRef["getVerticalFieldOfView"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).getVerticalFieldOfView(
+          ...args
+        ),
+      setVerticalFieldOfView: (
+        ...args: Parameters<MaplibreMapRef["setVerticalFieldOfView"]>
+      ) =>
+        (getHandle() as unknown as MaplibreMapRef).setVerticalFieldOfView(
+          ...args
+        ),
+      getRoll: (...args: Parameters<MaplibreMapRef["getRoll"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).getRoll(...args),
+      setRoll: (...args: Parameters<MaplibreMapRef["setRoll"]>) =>
+        (getHandle() as unknown as MaplibreMapRef).setRoll(...args),
+    }),
     Map: MaplibreMap,
     Source: MaplibreSource as ComponentType<WebForwardedProps>,
     Layer: MaplibreLayer as ComponentType<WebForwardedProps>,
@@ -126,8 +249,80 @@ export {
   useControl,
 };
 
+/** Selected advanced methods retain the pinned wrapper's signatures. */
+export type WebMapRef = MapRef & {
+  /**
+   * Reads whether obsolete loading tiles are cancelled while zooming in.
+   * @returns The attached SDK's current cancellation setting.
+   */
+  readonly getCancelPendingTileRequestsWhileZooming: () => boolean;
+  /**
+   * Updates whether obsolete loading tiles are cancelled while zooming in.
+   * @param value - True cancels previous zoom levels' pending requests.
+   */
+  readonly setCancelPendingTileRequestsWhileZooming: (value: boolean) => void;
+  /**
+   * Reads the attached renderer's pinned SDK version.
+   * @returns SDK version string; throws when detached.
+   */
+  readonly getVersion: () => string;
+  /** Reads the attached CanvasSource with its named media/model operations. */
+  readonly getCanvasSource: (id: string) => import("maplibre-gl").CanvasSource;
+  /** Reads the attached VideoSource with its named media/model operations. */
+  readonly getVideoSource: (id: string) => import("maplibre-gl").VideoSource;
+
+  /** Updates selected renderer diagnostics; settings follow SDK lifetime. */
+  readonly setDebugOptions: (options: Partial<WebDebugOptions>) => void;
+  /** Reads renderer diagnostics. */
+  readonly getDebugOptions: () => WebDebugOptions;
+} & Pick<
+    MaplibreMapRef,
+    | "setSky"
+    | "getSky"
+    | "getTerrain"
+    | "getProjection"
+    | "getLight"
+    | "setGlobalStateProperty"
+    | "getGlobalState"
+    | "refreshTiles"
+    | "setSourceTileLodParams"
+    | "setGlyphs"
+    | "getGlyphs"
+    | "setFontFaces"
+    | "getFontFaces"
+    | "setTransformRequest"
+    | "getPixelRatio"
+    | "setPixelRatio"
+    | "getVerticalFieldOfView"
+    | "setVerticalFieldOfView"
+    | "getRoll"
+    | "setRoll"
+    | "getCameraTargetElevation"
+    | "getCenterElevation"
+    | "getStyleUrl"
+    | "redraw"
+    | "setCenterElevation"
+    | "setTransformConstrain"
+  >;
+
 /** Map props with DOM presentation forwarded to the map container. */
-export interface WebMapProps extends MapProps {
+export interface WebMapProps extends Omit<MapProps, "mapStyle"> {
+  /** Complete selected style document, including renderer extensions. */
+  readonly mapStyle: string | import("maplibre-gl").StyleSpecification;
+  /** Selected wrapper options and events; common supplied values take precedence. Constructor-only fields require a fresh map and are retained by reuseMaps. */
+  readonly options?: Omit<
+    SelectedWrapperMapProps,
+    | "children"
+    | "ref"
+    | "mapStyle"
+    | "initialViewState"
+    | "viewState"
+    | "style"
+    | "interactiveLayerIds"
+    | "padding"
+    | Extract<keyof MapProps, `on${string}`>
+  >;
+
   /** Outer map-host attributes and CSS; facade owns nested children. */
   readonly hostProps?: Omit<
     HTMLAttributes<HTMLDivElement>,
@@ -136,7 +331,7 @@ export interface WebMapProps extends MapProps {
 }
 /** Map with selected DOM host attributes. */
 const SelectedWebMap = OneMap as ForwardRefExoticComponent<
-  WebMapProps & RefAttributes<MapRef>
+  WebMapProps & RefAttributes<WebMapRef>
 >;
 
 /** Marker props with selected wrapper options and DOM content attributes. */
@@ -247,3 +442,80 @@ export {
   SelectedWebMap as Map,
   useMap as useWrapperMap,
 };
+
+/** Complete selected layer families, including custom callbacks, ordering and renderer expressions. */
+export const Layer = (props: ComponentProps<typeof MaplibreLayer>) => {
+  useStableOptions(
+    `Selected layer "${props.id}"`,
+    props.type === "custom"
+      ? { ...props }
+      : {
+          id: props.id,
+          type: props.type,
+          source: "source" in props ? props.source : undefined,
+          sourceLayer:
+            "source-layer" in props ? props["source-layer"] : undefined,
+        }
+  );
+  return <MaplibreLayer {...props} />;
+};
+
+/** Selected source types with media lifetime owned by the application. */
+export type WebSourceProps =
+  | ComponentProps<typeof MaplibreSource>
+  | (import("maplibre-gl").CanvasSourceSpecification & {
+      readonly id?: string;
+      readonly children?: import("react").ReactNode;
+    });
+
+/** Source delegated to the wrapper; replace media identity/URLs with a new key. */
+export const Source = (props: WebSourceProps) => {
+  const creation: Record<string, unknown> = { id: props.id, type: props.type };
+  if (props.type === "canvas") {
+    creation.canvas = props.canvas;
+    creation.animate = props.animate;
+  }
+  if (props.type === "video") creation.urls = props.urls;
+  useStableOptions(`Selected source "${props.id}"`, creation);
+  return (
+    <MaplibreSource {...(props as ComponentProps<typeof MaplibreSource>)} />
+  );
+};
+
+/** Selected SDK types for style documents and advanced callback implementations. */
+export type {
+  StyleSpecification,
+  SourceSpecification,
+  LayerSpecification,
+  CustomLayerInterface,
+  CanvasSourceSpecification,
+  VideoSourceSpecification,
+  MapOptions,
+} from "maplibre-gl";
+
+/** Explicit SDK worker/protocol configuration; importing starts no work. */
+export {
+  setWorkerCount,
+  getWorkerCount,
+  setWorkerUrl,
+  getWorkerUrl,
+  setMaxParallelImageRequests,
+  getMaxParallelImageRequests,
+  setRTLTextPlugin,
+  getRTLTextPluginStatus,
+  addProtocol,
+  removeProtocol,
+  prewarm,
+  clearPrewarmedResources,
+} from "maplibre-gl";
+
+/** Renderer diagnostic properties, with SDK defaults and units. */
+export type WebDebugOptions = Pick<
+  ReturnType<MaplibreMapRef["getMap"]>,
+  | "showCollisionBoxes"
+  | "showTileBoundaries"
+  | "showOverdrawInspector"
+  | "showPadding"
+  | "vertices"
+  | "repaint"
+>;

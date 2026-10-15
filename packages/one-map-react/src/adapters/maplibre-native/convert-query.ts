@@ -1,3 +1,5 @@
+import type { FilterSpecification } from "@maplibre/maplibre-react-native";
+
 import type { Point } from "../../contracts/camera-types.js";
 import type { FilterExpression } from "../../contracts/layer-types.js";
 import type {
@@ -19,7 +21,8 @@ import { isScreenBounds } from "../shared/feature-values.js";
  */
 export const toMaplibreFilter = (
   filter: FilterExpression | undefined
-): unknown[] | undefined => (filter === undefined ? undefined : [...filter]);
+): FilterSpecification | undefined =>
+  filter === undefined ? undefined : ([...filter] as FilterSpecification);
 
 /**
  * Converts common rendered-query options into wrapper options.
@@ -78,7 +81,7 @@ export const toMaplibreQueryTarget = (
  */
 export const toMaplibreSourceQueryOptions = (
   options?: QuerySourceFeaturesOptions
-): { sourceLayer: string; filter?: unknown[] } => {
+): { sourceLayer: string; filter?: FilterSpecification } => {
   if (options?.sourceLayer === undefined) {
     throw new Error(
       "querySourceFeatures needs sourceLayer on maplibre-native. The pinned vector wrapper requires it."

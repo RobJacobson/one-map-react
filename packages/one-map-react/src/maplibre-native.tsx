@@ -1,3 +1,5 @@
+import type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
+export type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
 import type {
   Map as MaplibreMap,
   Camera as WrapperCamera,
@@ -14,7 +16,6 @@ import type {
   NativeControlProps,
   NativePopupProps,
 } from "./adapters/shared/native-ui.js";
-import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
 import type {
   GeoJsonSourceProps,
@@ -43,7 +44,11 @@ export type NativeLocationOptions = Pick<
   "trackUserLocation" | "onTrackUserLocationChange"
 >;
 
-export interface NativeMapProps extends MapProps {
+export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
+  /** Complete selected style document. */
+  readonly mapStyle:
+    | MapProps["mapStyle"]
+    | import("@maplibre/maplibre-react-native").StyleSpecification;
   /** SDK follow facilities; conflicts with authoritative viewState/common follow. */
   readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
@@ -71,7 +76,7 @@ export interface NativeMapProps extends MapProps {
 /** Selected map retaining shared map context and named access. */
 // eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
 export const Map = SharedMap as ForwardRefExoticComponent<
-  NativeMapProps & RefAttributes<MapRef>
+  NativeMapProps & RefAttributes<NativeAdvancedMapRef>
 >;
 
 /** Selected marker content host, including accessibility and layout attributes. */
@@ -116,4 +121,26 @@ export {
   StaticMapImageManager as WrapperStaticMapImageManager,
   UserLocation as WrapperUserLocation,
   useCurrentPosition as useWrapperCurrentPosition,
+} from "@maplibre/maplibre-react-native";
+
+/** Native animation, logging, networking and request transformation facilities. */
+export {
+  Animated,
+  LogManager,
+  NetworkManager,
+  TransformRequestManager,
+  Layer,
+} from "@maplibre/maplibre-react-native";
+export type {
+  MapLibrePluginProps,
+  StyleSpecification,
+  LightSpecification,
+  SkySpecification,
+  ProjectionSpecification,
+  ColorReliefLayerSpecification,
+  HillshadeLayerSpecification,
+  TransformOptions,
+  UrlTransformOptions,
+  UrlSearchParamOptions,
+  HeaderOptions,
 } from "@maplibre/maplibre-react-native";

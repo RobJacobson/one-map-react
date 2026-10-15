@@ -1,0 +1,999 @@
+{
+  "checkpoint": "TF09",
+  "date": "2026-10-15",
+  "status": "passed for the recorded representative six-environment scope",
+  "currentArtifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+  "authorization": "User explicitly requested implementation, Ponytail audit/fixes, then acceptance; applicable routine checks and review completed before execution.",
+  "models": {
+    "implementation": "gpt-6.1-sol / medium",
+    "webSmoke": "gpt-6-luna / low",
+    "nativeSmoke": "gpt-6-luna / medium",
+    "diagnosis": "coordinator"
+  },
+  "resources": "Single native worker owns builds/devices/Metro. Web first, then native; fixture8798 serialized. Browser Vite/debugger ports4291/5291 and4292/5292.",
+  "harness": "scripts/tf09-rendering-smoke.mjs",
+  "baseline": "../version-baseline.json",
+  "host": {
+    "macOS": "26.6.2 (25G83)",
+    "Xcode": "27.0 (27A266a)",
+    "browser": "Google Chrome155.0.8059.41 headless"
+  },
+  "priorFailuresAndRepairs": [
+    {
+      "attempts": [
+        "mapbox-android-first"
+      ],
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "finding": "Initial known-feature/load observation timed out on Android17 first launch. ACCESS_LOCAL_NETWORK and foreground location were granted during setup. Exact timeout cause is unestablished.",
+      "repair": "Added observation-only camera zoom and detailed initial state assertions. Same patched APK/library passed6/6 on retry; no library fix applied. Preserve as unreproduced startup flake, not a proven repaired product bug."
+    },
+    {
+      "attempts": [
+        "mapbox-ios-patched-retry",
+        "mapbox-ios-hillshade-diagnostic"
+      ],
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "finding": "Terrain scenarios passed; flat hillshade baseline incorrectly required browser sRGB bytes. The iOS opaque snapshot background was30/49/75 rather than23/50/77.",
+      "repair": "Widen only iOS background-color tolerance from3 to12; keep95%flat baseline and independent insertion/removal changed-pixel thresholds. Browser/Android color thresholds unchanged."
+    },
+    {
+      "attempts": [
+        "mapbox-ios-first"
+      ],
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "finding": "Native examples retained stale TF08 peer copies; initial iOS build omitted TF09 native patches and Metro loaded the old no-data implementation. The binary was installed correctly but was built from the wrong peer source.",
+      "repair": "Coordinator refreshed10 RNMapbox and3 MapLibre delta files, verified their recorded hashes plus full src/lib/module/ios/android/src tree equality against root. Added native harness peer-file hash preflight; rebuilt/reinstalled Mapbox iOS/Android. MapLibre runtime sources are unchanged, so its earlier fresh binaries remain valid."
+    },
+    {
+      "attempts": [
+        "mapbox-web-first",
+        "mapbox-web-retry1"
+      ],
+      "artifact": "fc7309c1169aa021927c5061a529c011a04e1b23b109bf7a8388b31fee615ed3",
+      "finding": "First media capture occurred immediately after insertion. Bounded polling separated canvas/custom drawing from the absent video output; success report also referenced undefined blue.",
+      "repair": "Poll actual independent blue/green/magenta pixels and report counts; define blue count."
+    },
+    {
+      "attempts": [
+        "mapbox-web-video-diagnostic"
+      ],
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "finding": "Video fixture had metadata only (readyState1,time0,width64,height64); the canvas was painted only before captureStream.",
+      "repair": "Repaint the green canvas during the existing bounded recording window, then stop the interval and repaint the separate canvas source blue."
+    },
+    {
+      "attempts": [
+        "mapbox-web-recording-retry"
+      ],
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "finding": "All media/hillshade/projection checks passed; final known-feature capture ran once immediately after projection reset.",
+      "repair": "Use bounded pixel observation for the final feature, reusing PNG decode/count helpers. Record globe readback before resetting projection."
+    }
+  ],
+  "artifactImpact": "Changes after the first frozen artifact add selected web version/debug/cancellation/support-probe routes; native bridge code unchanged. Fresh native builds include the TF09 terrain peer patch. Example/harness repairs do not change library bytes.",
+  "attempts": [
+    {
+      "attempt": "mapbox-android-first",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "android",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "nativeIdentity": "applicationId=com.onemapmapbox.tf09;apk=copied-installed-sha256:f255fbb99841f2741369303e974e728c7d934bd5ba9746c3e92f2f5d0b30ddab;avd=TF07_Acceptance;serial=emulator-5554;android17-api37;pageSize=16384;abi=arm64-v8a;patches=10-files-verified",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "failed",
+          "error": "Error: Rendering observation timed out."
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-android-initial-diagnostic",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "android",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "nativeIdentity": "applicationId=com.onemapmapbox.tf09;apk=copied-installed-sha256:f255fbb99841f2741369303e974e728c7d934bd5ba9746c3e92f2f5d0b30ddab;avd=TF07_Acceptance;serial=emulator-5554;android17-api37;pageSize=16384;abi=arm64-v8a;patches=10-files-verified",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              "9009"
+            ],
+            "elevation": null
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 5614
+          }
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 1897076,
+            "projectionReadback": "native pixel comparison"
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1080,
+            "height": 2400,
+            "orangePixels": 2992
+          }
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-ios-color-retry",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "ios",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "nativeIdentity": "bundle=org.reactjs.native.example.OneMapMapbox;exec=da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a;debugDylib=852bc41699ee657f29f1ced0c37ae241442a330d2175d9e2cfb5ac13d0348888;sim=iPhone18Pro-iOS27.0-8B7D7CE4-228E-409F-A156-A597D4E448A5;patches=10-files-verified",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 235363
+          }
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 2327357,
+            "projectionReadback": "native pixel comparison"
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1206,
+            "height": 2622,
+            "orangePixels": 3884
+          }
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-ios-first",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "ios",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "nativeIdentity": "bundle=org.reactjs.native.example.OneMapMapbox;exec=da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a;debugDylib=a79669aa6a7f9edd1d14170f7bfd4ed08b8619a5034726811df88f041914d705;sim=iPhone18Pro-iOS27.0-8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "failed",
+          "error": "Error: TypeError: Cannot read property 'data' of undefined"
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-ios-hillshade-diagnostic",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "ios",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "nativeIdentity": "bundle=org.reactjs.native.example.OneMapMapbox;exec=da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a;debugDylib=852bc41699ee657f29f1ced0c37ae241442a330d2175d9e2cfb5ac13d0348888;sim=iPhone18Pro-iOS27.0-8B7D7CE4-228E-409F-A156-A597D4E448A5;patches=10-files-verified",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "failed",
+          "error": "AssertionError [ERR_ASSERTION]: Hillshade baseline not flat: blue=0/3162132, corner=30,49,75,255."
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-ios-patched-retry",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "ios",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "nativeIdentity": "bundle=org.reactjs.native.example.OneMapMapbox;exec=da2c0040d587024b3c27fa0b0641cff42ac56006cf7d0d1f717f366521dae21a;debugDylib=852bc41699ee657f29f1ced0c37ae241442a330d2175d9e2cfb5ac13d0348888;sim=iPhone18Pro-iOS27.0-8B7D7CE4-228E-409F-A156-A597D4E448A5;patches=verified",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "failed",
+          "error": "Error: Rendering observation timed out."
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-web-first",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "web",
+      "engine": "mapbox",
+      "artifact": "fc7309c1169aa021927c5061a529c011a04e1b23b109bf7a8388b31fee615ed3",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed",
+          "observation": {
+            "rain": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "droplet-size",
+              "distortion-strength"
+            ],
+            "snow": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "flake-size"
+            ],
+            "scale": 1.2
+          }
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "failed",
+          "error": "AssertionError [ERR_ASSERTION]: Media/custom output not independently observed."
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-web-recording-retry",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "web",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null,
+            "light": {
+              "anchor": "map",
+              "color": "#ffffff",
+              "intensity": 0.5,
+              "position": [
+                1.15,
+                210,
+                30
+              ]
+            }
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed",
+          "observation": {
+            "rain": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "droplet-size",
+              "distortion-strength"
+            ],
+            "snow": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "flake-size"
+            ],
+            "scale": 1.2
+          }
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "passed",
+          "observation": {
+            "canvasBluePixels": 5504,
+            "videoGreenPixels": 6844,
+            "magentaPixels": 576,
+            "callbacks": {
+              "added": 1,
+              "removed": 1,
+              "frames": 25,
+              "ready": true
+            }
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 440
+          }
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 852190,
+            "projectionReadback": {
+              "name": "mercator",
+              "center": [
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "failed",
+          "error": "AssertionError [ERR_ASSERTION]: Known feature was not observed in renderer output."
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-web-render-retry",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "web",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null,
+            "light": {
+              "anchor": "map",
+              "color": "#ffffff",
+              "intensity": 0.5,
+              "position": [
+                1.15,
+                210,
+                30
+              ]
+            }
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed",
+          "observation": {
+            "rain": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "droplet-size",
+              "distortion-strength"
+            ],
+            "snow": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "flake-size"
+            ],
+            "scale": 1.2
+          }
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "passed",
+          "observation": {
+            "canvasBluePixels": 5504,
+            "videoGreenPixels": 6844,
+            "magentaPixels": 576,
+            "callbacks": {
+              "added": 1,
+              "removed": 1,
+              "frames": 45,
+              "ready": true
+            }
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 440
+          }
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 852190,
+            "projectionReadback": {
+              "name": "globe",
+              "center": [
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1280,
+            "height": 713,
+            "orangePixels": 402
+          }
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-web-retry1",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "web",
+      "engine": "mapbox",
+      "artifact": "fc7309c1169aa021927c5061a529c011a04e1b23b109bf7a8388b31fee615ed3",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed",
+          "observation": {
+            "rain": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "droplet-size",
+              "distortion-strength"
+            ],
+            "snow": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "flake-size"
+            ],
+            "scale": 1.2
+          }
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "failed",
+          "error": "AssertionError [ERR_ASSERTION]: Media/custom output missing: canvas=5504, video=0, custom=576."
+        }
+      ]
+    },
+    {
+      "attempt": "mapbox-web-video-diagnostic",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "web",
+      "engine": "mapbox",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null,
+            "light": {
+              "anchor": "map",
+              "color": "#ffffff",
+              "intensity": 0.5,
+              "position": [
+                1.15,
+                210,
+                30
+              ]
+            }
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000
+          }
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed",
+          "observation": {
+            "rain": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "droplet-size",
+              "distortion-strength"
+            ],
+            "snow": [
+              "density",
+              "intensity",
+              "color",
+              "opacity",
+              "vignette",
+              "vignette-color",
+              "center-thinning",
+              "direction",
+              "flake-size"
+            ],
+            "scale": 1.2
+          }
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "failed",
+          "error": "AssertionError [ERR_ASSERTION]: Media/custom output missing: canvas=5504, video=0, custom=576; state={\"readyState\":1,\"paused\":false,\"time\":0,\"width\":64,\"height\":64}."
+        }
+      ]
+    },
+    {
+      "attempt": "maplibre-android-first",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "android",
+      "engine": "maplibre",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "nativeIdentity": "applicationId=com.onemapmaplibre.tf09;apk=copied-installed-sha256:dc8594b865403d9849adcb8ad7542dff5e61a0c292a7767d3c25f17ead3c9c3b;avd=TF07_Acceptance;serial=emulator-5554;android17-api37;pageSize=16384;abi=arm64-v8a;patches=3-files-declaration-only",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              "9009"
+            ],
+            "elevation": null,
+            "unsupported": "Error: queryTerrainElevation is unsupported on MapLibre Native."
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 320266
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1080,
+            "height": 2400,
+            "orangePixels": 2976
+          }
+        }
+      ]
+    },
+    {
+      "attempt": "maplibre-ios-first",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "ios",
+      "engine": "maplibre",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "nativeIdentity": "bundle=org.reactjs.native.example.OneMapMaplibre;exec=bba7ee365924cd541afbb746248dade135a33f915bb385391f69ccec5f92cc63;debugDylib=4e7d244d33a4e162bde40d3f2128a885d2ee348e2e0955ddc5aeecad0e8c6af7;sim=iPhone18Pro-iOS27.0-8B7D7CE4-228E-409F-A156-A597D4E448A5;patches=3-files-declaration-only",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null,
+            "unsupported": "Error: queryTerrainElevation is unsupported on MapLibre Native."
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 342818
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1206,
+            "height": 2622,
+            "orangePixels": 3900
+          }
+        }
+      ]
+    },
+    {
+      "attempt": "maplibre-web-first",
+      "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+      "platform": "web",
+      "engine": "maplibre",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "outcomes": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed",
+          "observation": {
+            "loads": 1,
+            "featureIds": [
+              9009
+            ],
+            "elevation": null,
+            "light": {
+              "anchor": "map",
+              "color": "#ffffff",
+              "intensity": 0.5,
+              "position": [
+                1.15,
+                210,
+                30
+              ]
+            }
+          }
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000.0000000000036,
+            "expectedMeters": 2000
+          }
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed",
+          "observation": {
+            "elevation": 2000.0000000000036
+          }
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed",
+          "observation": {
+            "globalState": [
+              "rendering-fixture"
+            ],
+            "sky": [
+              "sky-color"
+            ]
+          }
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "passed",
+          "observation": {
+            "canvasBluePixels": 5504,
+            "videoGreenPixels": 6844,
+            "magentaPixels": 576,
+            "callbacks": {
+              "added": 1,
+              "removed": 1,
+              "frames": 20,
+              "ready": true
+            }
+          }
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 4430
+          }
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed",
+          "observation": {
+            "changedPixels": 879270,
+            "projectionReadback": {
+              "type": "globe"
+            }
+          }
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed",
+          "observation": {
+            "width": 1280,
+            "height": 713,
+            "orangePixels": 402
+          }
+        }
+      ]
+    }
+  ],
+  "outsideRuntimeScope": "Every advanced SDK operator/layer/global/build option combination is not independently exercised. Routine type/forwarding evidence covers unchanged delegates; representative real-renderer scenarios cover translated rendering semantics. Owner excludes physical devices and the two RNMapbox TF08 cache operations.",
+  "retention": "All raw attempts were aggregated into this record; task reports/APKs/build copies were then removed. Task Android apps/emulator and Metro/forwarding were removed/stopped. Existing booted iOS simulator remains booted with both example apps reinstalled.",
+  "finalResults": [
+    {
+      "environment": "mapbox-web",
+      "attempt": "mapbox-web-render-retry",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "scenarios": 8,
+      "passed": true
+    },
+    {
+      "environment": "maplibre-web",
+      "attempt": "maplibre-web-first",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "scenarios": 8,
+      "passed": true
+    },
+    {
+      "environment": "mapbox-ios",
+      "attempt": "mapbox-ios-color-retry",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "scenarios": 6,
+      "passed": true
+    },
+    {
+      "environment": "mapbox-android",
+      "attempt": "mapbox-android-initial-diagnostic",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "scenarios": 6,
+      "passed": true
+    },
+    {
+      "environment": "maplibre-ios",
+      "attempt": "maplibre-ios-first",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "scenarios": 3,
+      "passed": true
+    },
+    {
+      "environment": "maplibre-android",
+      "attempt": "maplibre-android-first",
+      "artifact": "37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b",
+      "scenarios": 3,
+      "passed": true
+    }
+  ],
+  "nativePreparation": "tf09-native-preparation.json",
+  "acceptanceLimitation": "One initial Mapbox Android startup observation timed out and did not reproduce on the same patched APK. Its passing retry and original timeout are retained; the precise first-launch cause remains unestablished.",
+  "coordinatorFinalChecks": [
+    "Frozen root and all four example dist digests match",
+    "Six final environments/34 scenario results present",
+    "Formatting/lint and documentation structure pass",
+    "Final DEM fixture and executable peer boundary regressions pass",
+    "No library or native peer source changes after the final acceptance artifact freeze; later observation-only example/harness changes and their impact are recorded"
+  ],
+  "cleanupIncident": {
+    "event": "Worker mistakenly uninstalled both pre-existing default iOS example apps during cleanup despite leave-installed instruction.",
+    "correction": "Both rebuilt from unchanged patched sources, reinstalled and independently verified. Restoration identities recorded separately in tf09-native-preparation.json; acceptance remains attached to binaries actually tested.",
+    "impact": "No prior app-container backup existed. Uninstall-erased app preferences, SDK caches and offline test data were not recovered. Restored app binaries were not runtime-retested.",
+    "finalState": "No task Metro/fixture/emulator processes or listeners8081/8798; Android task packages absent/no connected Android device; pre-existing iOS simulator left booted; final free disk7.8GiB."
+  }
+}

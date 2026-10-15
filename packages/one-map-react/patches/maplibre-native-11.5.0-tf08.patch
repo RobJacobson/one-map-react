@@ -164,6 +164,110 @@ index 5d84da5..4a33191 100644
    }
  
    /**
+diff --git a/lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts b/lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts
+index fa223d9..2ec7003 100644
+--- a/lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts
++++ b/lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts
+@@ -4,7 +4,7 @@ import { type ReactNativeElement } from "react-native";
+ import GeoJSONSourceNativeComponent from "./GeoJSONSourceNativeComponent";
+ import { type BaseProps } from "../../../types/BaseProps";
+ import type { FeatureState } from "../../../types/FeatureState";
+-import type { PressableSourceProps } from "../../../types/PressableSourceProps";
++import type { PressableSourceProps } from "../../../types/PressableSourceProps.js";
+ export type NativeGeoJSONSourceRef = Component<ComponentProps<typeof GeoJSONSourceNativeComponent>> & ReactNativeElement;
+ export interface GeoJSONSourceRef {
+     /**
+diff --git a/lib/typescript/module/components/sources/vector-source/VectorSource.d.ts b/lib/typescript/module/components/sources/vector-source/VectorSource.d.ts
+index 3111419..cd7cdb7 100644
+--- a/lib/typescript/module/components/sources/vector-source/VectorSource.d.ts
++++ b/lib/typescript/module/components/sources/vector-source/VectorSource.d.ts
+@@ -2,7 +2,7 @@ import type { FilterSpecification } from "@maplibre/maplibre-gl-style-spec";
+ import { type ReactNode, type Ref } from "react";
+ import { type BaseProps } from "../../../types/BaseProps";
+ import type { FeatureState } from "../../../types/FeatureState";
+-import type { PressableSourceProps } from "../../../types/PressableSourceProps";
++import type { PressableSourceProps } from "../../../types/PressableSourceProps.js";
+ export interface VectorSourceRef {
+     /**
+      * Returns all features that match the query parameters regardless of whether
+diff --git a/lib/typescript/module/index.d.ts b/lib/typescript/module/index.d.ts
+index e9b2b56..510fc48 100644
+--- a/lib/typescript/module/index.d.ts
++++ b/lib/typescript/module/index.d.ts
+@@ -1,37 +1,37 @@
+-export { type CameraOptions, type CameraEasing, type CameraAnimationOptions, type CameraCenterOptions, type CameraBoundsOptions, type CameraCenterStop, type CameraBoundsStop, type CameraStop, type InitialViewState, type TrackUserLocation, type TrackUserLocationChangeEvent, type CameraRef, type CameraProps, Camera, } from "./components/camera/Camera";
+-export { type ViewState, type ViewStateChangeEvent, type MapRef, type MapProps, Map, } from "./components/map/Map";
+-export { type ViewAnnotationEvent, type NativeViewAnnotationRef, type ViewAnnotationRef, type ViewAnnotationProps, ViewAnnotation, } from "./components/annotations/view-annotation/ViewAnnotation";
+-export { type LayerAnnotationProps, LayerAnnotation, } from "./components/annotations/LayerAnnotation";
+-export { type CalloutProps, Callout, } from "./components/annotations/callout/Callout";
+-export { UserLocation } from "./components/user-location/UserLocation";
+-export { NativeUserLocation } from "./components/user-location/NativeUserLocation";
+-export { useCurrentPosition } from "./hooks/useCurrentPosition";
+-export { type ImageSourceProps, ImageSource, } from "./components/sources/image-source/ImageSource";
+-export { type GeoJSONSourceRef, type GeoJSONSourceProps, GeoJSONSource, } from "./components/sources/geojson-source/GeoJSONSource";
+-export { type RasterSourceProps, RasterSource, } from "./components/sources/raster-source/RasterSource";
+-export { type RasterDEMSourceProps, RasterDEMSource, } from "./components/sources/raster-dem-source/RasterDEMSource";
+-export { type VectorSourceRef, type VectorSourceProps, VectorSource, } from "./components/sources/vector-source/VectorSource";
+-export type { FeatureState, FeatureStateValue } from "./types/FeatureState";
+-export { Layer, type LayerProps, type SourceLayerProps, type FillLayerProps, type LineLayerProps, type SymbolLayerProps, type CircleLayerProps, type HeatmapLayerProps, type FillExtrusionLayerProps, type RasterLayerProps, type BackgroundLayerProps, } from "./components/layer/Layer";
++export { type CameraOptions, type CameraEasing, type CameraAnimationOptions, type CameraCenterOptions, type CameraBoundsOptions, type CameraCenterStop, type CameraBoundsStop, type CameraStop, type InitialViewState, type TrackUserLocation, type TrackUserLocationChangeEvent, type CameraRef, type CameraProps, Camera, } from "./components/camera/Camera.js";
++export { type ViewState, type ViewStateChangeEvent, type MapRef, type MapProps, Map, } from "./components/map/Map.js";
++export { type ViewAnnotationEvent, type NativeViewAnnotationRef, type ViewAnnotationRef, type ViewAnnotationProps, ViewAnnotation, } from "./components/annotations/view-annotation/ViewAnnotation.js";
++export { type LayerAnnotationProps, LayerAnnotation, } from "./components/annotations/LayerAnnotation.js";
++export { type CalloutProps, Callout, } from "./components/annotations/callout/Callout.js";
++export { UserLocation } from "./components/user-location/UserLocation.js";
++export { NativeUserLocation } from "./components/user-location/NativeUserLocation.js";
++export { useCurrentPosition } from "./hooks/useCurrentPosition.js";
++export { type ImageSourceProps, ImageSource, } from "./components/sources/image-source/ImageSource.js";
++export { type GeoJSONSourceRef, type GeoJSONSourceProps, GeoJSONSource, } from "./components/sources/geojson-source/GeoJSONSource.js";
++export { type RasterSourceProps, RasterSource, } from "./components/sources/raster-source/RasterSource.js";
++export { type RasterDEMSourceProps, RasterDEMSource, } from "./components/sources/raster-dem-source/RasterDEMSource.js";
++export { type VectorSourceRef, type VectorSourceProps, VectorSource, } from "./components/sources/vector-source/VectorSource.js";
++export type { FeatureState, FeatureStateValue } from "./types/FeatureState.js";
++export { Layer, type LayerProps, type SourceLayerProps, type FillLayerProps, type LineLayerProps, type SymbolLayerProps, type CircleLayerProps, type HeatmapLayerProps, type FillExtrusionLayerProps, type RasterLayerProps, type BackgroundLayerProps, } from "./components/layer/Layer.js";
+ export type { LayerSpecification, BackgroundLayerSpecification, CircleLayerSpecification, ColorReliefLayerSpecification, FillLayerSpecification, FillExtrusionLayerSpecification, HeatmapLayerSpecification, HillshadeLayerSpecification, LineLayerSpecification, RasterLayerSpecification, SymbolLayerSpecification, SourceSpecification, GeoJSONSourceSpecification, ImageSourceSpecification, RasterSourceSpecification, RasterDEMSourceSpecification, VectorSourceSpecification, VideoSourceSpecification, FilterSpecification, StyleSpecification, SkySpecification, LightSpecification, TerrainSpecification, ProjectionSpecification, } from "@maplibre/maplibre-gl-style-spec";
+-export { type ImageSourceWithSdf, type ImageEntry, type ImagesProps, Images, } from "./components/images/Images";
+-export { type NativeMarkerRef, type MarkerEvent, type MarkerProps, type MarkerRef, Marker, } from "./components/annotations/marker/Marker";
+-export { LocationManager, type GeolocationPosition, } from "./modules/location/LocationManager";
+-export { LogManager, type LogLevel } from "./modules/log/LogManager";
+-export { NetworkManager } from "./modules/network/NetworkManager";
+-export { OfflineManager, type OfflinePackCreateOptions, type OfflinePackDownloadState, type OfflinePackError, type OfflinePackProgressListener, type OfflinePackErrorListener, } from "./modules/offline/OfflineManager";
+-export { OfflinePack, type OfflinePackStatus, } from "./modules/offline/OfflinePack";
+-export { StaticMapImageManager, type StaticMapOptions, type StaticMapCenterOptions, type StaticMapBoundsOptions, type StaticMapCreateOptions, } from "./modules/static-map/StaticMapManager";
+-export { TransformRequestManager, type TransformOptions, type UrlTransformOptions, type UrlSearchParamOptions, type HeaderOptions, } from "./modules/transform-request/TransformRequestManager";
+-export type { Anchor } from "./types/Anchor";
+-export type { LngLat } from "./types/LngLat";
+-export type { LngLatBounds } from "./types/LngLatBounds";
+-export type { FillLayerStyle, LineLayerStyle, SymbolLayerStyle, CircleLayerStyle, ColorReliefLayerStyle, HeatmapLayerStyle, FillExtrusionLayerStyle, RasterLayerStyle, HillshadeLayerStyle, BackgroundLayerStyle, LightLayerStyle, Expression, } from "./types/MapLibreRNStyles";
+-export type { PixelPoint } from "./types/PixelPoint";
+-export type { PixelPointBounds } from "./types/PixelPointBounds";
+-export type { PressEvent } from "./types/PressEvent";
+-export type { PressEventWithFeatures } from "./types/PressEventWithFeatures";
+-export type { ViewPadding } from "./types/ViewPadding";
+-export { Animated } from "./utils/animated/Animated";
+-export type { MapLibrePluginProps } from "./plugin/MapLibrePluginProps";
++export { type ImageSourceWithSdf, type ImageEntry, type ImagesProps, Images, } from "./components/images/Images.js";
++export { type NativeMarkerRef, type MarkerEvent, type MarkerProps, type MarkerRef, Marker, } from "./components/annotations/marker/Marker.js";
++export { LocationManager, type GeolocationPosition, } from "./modules/location/LocationManager.js";
++export { LogManager, type LogLevel } from "./modules/log/LogManager.js";
++export { NetworkManager } from "./modules/network/NetworkManager.js";
++export { OfflineManager, type OfflinePackCreateOptions, type OfflinePackDownloadState, type OfflinePackError, type OfflinePackProgressListener, type OfflinePackErrorListener, } from "./modules/offline/OfflineManager.js";
++export { OfflinePack, type OfflinePackStatus, } from "./modules/offline/OfflinePack.js";
++export { StaticMapImageManager, type StaticMapOptions, type StaticMapCenterOptions, type StaticMapBoundsOptions, type StaticMapCreateOptions, } from "./modules/static-map/StaticMapManager.js";
++export { TransformRequestManager, type TransformOptions, type UrlTransformOptions, type UrlSearchParamOptions, type HeaderOptions, } from "./modules/transform-request/TransformRequestManager.js";
++export type { Anchor } from "./types/Anchor.js";
++export type { LngLat } from "./types/LngLat.js";
++export type { LngLatBounds } from "./types/LngLatBounds.js";
++export type { FillLayerStyle, LineLayerStyle, SymbolLayerStyle, CircleLayerStyle, ColorReliefLayerStyle, HeatmapLayerStyle, FillExtrusionLayerStyle, RasterLayerStyle, HillshadeLayerStyle, BackgroundLayerStyle, LightLayerStyle, Expression, } from "./types/MapLibreRNStyles.js";
++export type { PixelPoint } from "./types/PixelPoint.js";
++export type { PixelPointBounds } from "./types/PixelPointBounds.js";
++export type { PressEvent } from "./types/PressEvent.js";
++export type { PressEventWithFeatures } from "./types/PressEventWithFeatures.js";
++export type { ViewPadding } from "./types/ViewPadding.js";
++export { Animated } from "./utils/animated/Animated.js";
++export type { MapLibrePluginProps } from "./plugin/MapLibrePluginProps.js";
+ //# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
 diff --git a/src/modules/offline/OfflineManager.ts b/src/modules/offline/OfflineManager.ts
 index 19314dd..70c1358 100644
 --- a/src/modules/offline/OfflineManager.ts

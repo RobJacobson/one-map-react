@@ -24,6 +24,9 @@ import { ScaleControl } from "../src/facade/ui.js";
 
 const mockSetCamera = jest.fn();
 const mockGetCenter = jest.fn(async () => [-122.34, 47.61]);
+const mockTerrainElevation = jest.fn<() => Promise<number | null>>(
+  async () => 0
+);
 const mockGetZoom = jest.fn(async () => 11);
 const mockGetVisibleBounds = jest.fn(async () => [
   [-122.2, 47.7],
@@ -179,6 +182,7 @@ jest.mock("@rnmapbox/maps", () => {
 
         React.useImperativeHandle(ref, () => ({
           getCenter: mockGetCenter,
+          queryTerrainElevation: mockTerrainElevation,
           getZoom: mockGetZoom,
           getVisibleBounds: mockGetVisibleBounds,
           getPointInView: mockGetPointInView,
@@ -215,6 +219,9 @@ jest.mock("@rnmapbox/maps", () => {
     RasterSource: sourceComponent("RasterSource"),
     RasterDemSource: sourceComponent("RasterDemSource"),
     ImageSource: sourceComponent("ImageSource"),
+    Terrain: layerComponent("Terrain"),
+    Light: layerComponent("Light"),
+    HillshadeLayer: layerComponent("HillshadeLayer"),
     BackgroundLayer: layerComponent("BackgroundLayer"),
     FillLayer: layerComponent("FillLayer"),
     LineLayer: layerComponent("LineLayer"),
@@ -244,6 +251,11 @@ import {
   ShapeSource,
   SymbolLayer,
   VectorSource,
+} from "@rnmapbox/maps";
+import {
+  Terrain as RnTerrain,
+  Light as RnLight,
+  HillshadeLayer as RnHillshade,
 } from "@rnmapbox/maps";
 
 import {
@@ -2348,3 +2360,77 @@ test("native fitBounds maxZoom rejects before camera dispatch", async () => {
   ).rejects.toThrow("pinned native camera wrapper");
   expect(mockSetCamera).not.toHaveBeenCalled();
 });
+
+test("terrain/light/projection and hillshade use native public components, including zero and explicit disable", async () => {
+  const ref = createRef<MapRef>();
+  const mounted = await render(
+    <MapSetup adapter={adapter}>
+      <OneMap
+        ref={ref}
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        terrain={null}
+        projection="globe"
+        light={{
+          intensity: 0,
+          position: [1, 2, 3],
+          "intensity-transition": { duration: 0 },
+        }}
+      >
+        <Layer
+          id="shade"
+          type="hillshade"
+          paint={{
+            "hillshade-exaggeration": 0,
+            "hillshade-shadow-color": "#000000",
+          }}
+        />
+      </OneMap>
+    </MapSetup>
+  );
+  expect(lastRenderingProps(RnTerrain).sourceID).toBeUndefined();
+  expect(lastRenderingProps(RnLight).style).toMatchObject({
+    intensity: 0,
+    position: [1, 2, 3],
+    intensityTransition: { duration: 0 },
+  });
+  expect(lastRenderingProps(RnHillshade).style).toMatchObject({
+    hillshadeExaggeration: 0,
+    hillshadeShadowColor: "#000000",
+  });
+  expect(lastMapProps<{ projection: string }>().projection).toBe("globe");
+  await expect(ref.current?.queryTerrainElevation([0, 0])).resolves.toBe(0);
+  mockTerrainElevation.mockResolvedValueOnce(null);
+  await expect(ref.current?.queryTerrainElevation([0, 0])).resolves.toBeNull();
+  mockTerrainElevation.mockRejectedValueOnce(new Error("bridge failure"));
+  await expect(ref.current?.queryTerrainElevation([0, 0])).rejects.toThrow(
+    "bridge failure"
+  );
+  await mounted.rerender(
+    <MapSetup adapter={adapter}>
+      <OneMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        terrain={{ source: "disabled", exaggeration: 0 }}
+      />
+    </MapSetup>
+  );
+  expect(lastRenderingProps(RnTerrain)).toMatchObject({
+    sourceID: "disabled",
+    style: { exaggeration: 0 },
+  });
+  await mounted.rerender(
+    <MapSetup adapter={adapter}>
+      <OneMap
+        mapStyle={replacementStyle}
+        initialViewState={initialViewState}
+        terrain={null}
+      />
+    </MapSetup>
+  );
+  expect(lastRenderingProps(RnTerrain).sourceID).toBeUndefined();
+  await mounted.unmount();
+});
+
+const lastRenderingProps = (component: unknown): Record<string, unknown> =>
+  (component as jest.Mock).mock.calls.at(-1)?.[0] as Record<string, unknown>;

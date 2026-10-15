@@ -1,0 +1,90 @@
+# Advanced rendering and selected facilities
+
+The portable rendering API lives in [map-types.ts](../packages/one-map-react/src/contracts/map-types.ts), [layer-types.ts](../packages/one-map-react/src/contracts/layer-types.ts), and [camera-types.ts](../packages/one-map-react/src/contracts/camera-types.ts). Selected entries add their pinned wrapper's advanced sources, layers, options, native components and named ref methods. Implementation, Ponytail review/fixes, routine checks and targeted acceptance are complete for the recorded TF09 scope. The [coverage reconciliation](../records/evidence/tf09-coverage.json) distinguishes implemented routes, wrapper boundaries and remaining runtime-unverified SDK combinations. The [audit](../records/evidence/tf09-audit.json) and [acceptance evidence](../records/evidence/tf09-acceptance.json) preserve fixes, artifact identity and earlier failed attempts.
+
+## Portable rendering
+
+`Map.terrain` accepts `{ source, exaggeration? }`, where `source` names a mounted raster DEM source and exaggeration is a finite nonnegative number. Zero is preserved. Pass `null` to disable terrain explicitly, including terrain supplied by a base style. Omission leaves the selected SDK's style semantics; it does not restore a previously overridden terrain definition. `Map.projection` accepts `mercator` or `globe`. `Map.light` accepts legacy extrusion lighting: anchor, color, intensity, spherical position, and compatible color/intensity/position transitions in milliseconds. Common `Layer` accepts `hillshade` with its portable paint and visibility fields.
+
+| RNMapbox | MapLibre React Native | react-map-gl | Proposed one-map-react API |
+| --- | --- | --- | --- |
+| `Terrain`, `Light`, `MapView.projection` | `Map.light`; Mercator projection | `Map.terrain`, `Map.light`, selected projection shape | Implemented `Map.terrain`, `light`, `projection`. MapLibre Native rejects terrain and globe. |
+| `MapView.queryTerrainElevation` | No native terrain API | `MapRef.queryTerrainElevation` | Implemented promise returning rendered meters or null. |
+| `HillshadeLayer` | `Layer type="hillshade"` | `Layer type="hillshade"` | Implemented portable `Layer type="hillshade"`. |
+
+`MapRef.queryTerrainElevation([longitude, latitude])` returns a promise of meters, including the active terrain exaggeration. A loaded elevation of zero remains zero. A missing terrain returns null. Mapbox also returns null for unavailable elevation data. Pinned MapLibre GL JS returns zero when its DEM tile is not yet available, so zero alone does not establish that a DEM tile loaded; the facade preserves this SDK boundary. Invalid coordinates reject with `RangeError`; unavailable MapLibre Native terrain, missing attachment and operational SDK failures reject with descriptive errors. [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#queryterrainelevation) and [Mapbox iOS](https://docs.mapbox.com/ios/maps/api/11.7.0-rc.1/documentation/mapboxmaps/mapboxmap/elevation%28at%3A%29) document exaggerated elevations. The Mapbox web adapter explicitly requests exaggerated output. The native peer patch normalizes actual no-data results without catching bridge or renderer failures.
+
+```tsx
+import { Layer, Map as OneMap, Source } from "one-map-react";
+
+<OneMap
+  mapStyle={style}
+  initialViewState={camera}
+  terrain={{ source: "dem", exaggeration: 1.5 }}
+  projection="mercator"
+  light={{ anchor: "map", intensity: 0.5 }}
+>
+  <Source id="dem" type="raster-dem" tiles={demTiles} tileSize={256}>
+    <Layer id="shade" type="hillshade" />
+  </Source>
+</OneMap>;
+```
+
+For equivalent selected composition, RNMapbox renders `<Terrain sourceID="dem" style={{ exaggeration: 1.5 }} />` and `<Light style={{ intensity: 0.5 }} />` inside its map. MapLibre Native uses its public map `light` prop and hillshade layer but rejects portable terrain/globe. react-map-gl receives `terrain={{ source: "dem", exaggeration: 1.5 }}`, `light={{ intensity: 0.5 }}`, and a projection object: Mapbox uses `{ name: "mercator" }`; MapLibre uses `{ type: "mercator" }`.
+
+Removing a native RNMapbox light component does not restore a prior light. Clearing web light fields follows the selected wrapper/SDK behavior; use an explicit light object for the desired state. Style replacement uses the existing wrappers' reset and recreation behavior. There is no facade-owned style restoration registry. [RNMapbox Terrain](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/ios/RNMBX/RNMBXTerrain.swift) and [Light](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/ios/RNMBX/RNMBXLight.swift) own their native lifetimes. The shipped patch extends an omitted Terrain sourceID to mean explicit disable, using that existing component transport.
+
+MapLibre Native exporting `TerrainSpecification` and `ProjectionSpecification` does not establish native renderer support. The [terrain specification SDK support table](https://maplibre.org/maplibre-style-spec/terrain/) lists native iOS/Android as unsupported; the inspected native Map component has no terrain/projection prop or elevation query. Its selected style types preserve upstream declarations, while the portable API fails unsupported requests.
+
+## Selected web options, source and layer lifetime
+
+Import `Map`, `Source`, `Layer`, and `WebMapRef` from the selected `one-map-react/mapbox-web` or `one-map-react/maplibre-web` entry. `Map.options` uses the wrapper's named `MapProps` contract, including localization/language/worldview, local fonts/glyphs, request transformation, workers, context attributes, sizing, scheduling, diagnostics and remaining wrapper events. Common/facade-owned callbacks are excluded so selected callbacks cannot be silently discarded. Supplied common fields take precedence; omitted common rendering/constructor fields preserve their selected option values. Capture forces a preserved buffer while retaining other MapLibre context attributes.
+
+Selected Mapbox `supported(failIfMajorPerformanceCaveat?)` exposes the pinned browser/GPU probe. Pinned MapLibre6.13 has no equivalent exported probe; its wrapper `MapLib.supported` member is only an optional injected-module compatibility field. `Map.options.mapLib` forwards a caller-supplied module or promise to the existing wrapper.
+
+Constructor-only options apply when the wrapper constructs a renderer. Changing them needs a fresh map; `reuseMaps` retains the existing renderer's construction settings and external drawing context. Mutable wrapper settings retain their own behavior. Mapbox language/worldview additionally have named setters/getters on selected refs because the wrapper does not reconcile them as mutable map props. Global SDK settings are explicit `rendererSettings` on Mapbox and named worker, RTL-plugin, protocol and warmup functions on MapLibre. Importing these exports does not start workers or mutate settings; invoke/assign them before constructing maps where required by the SDK.
+
+Selected web `Source` delegates to react-map-gl's existing Source lifecycle. It accepts renderer-specific source specifications, including canvas/video and Mapbox model/raster-array sources. The MapLibre canvas addition is a narrow typed boundary: the pinned wrapper passes those fields to `map.addSource` even though its SourceProps union omits canvas. Canvas identity/animate and video URLs are attachment inputs; changing them requires a new React key. Coordinates remain mutable. Application code owns media elements, blob URLs and GPU resources. Named `getCanvasSource`, `getVideoSource` and Mapbox `getModelSource` validate the attached source family and preserve its documented source controls, including media play/pause/readback and model updates.
+
+Selected ordinary sources retain upstream selected-wrapper update semantics. They do not inherit every portable Source creation guard. The wrapper dispatches only the last changed key for non-GeoJSON/image source updates, so avoid combining unrelated source mutations in one render; coordinates are the sole mutable media field exposed by this facade guard. Portable `Source` retains its existing fixed creation contract.
+
+Selected web `Layer` accepts the selected SDK's complete layer union, including custom GPU callbacks and renderer-specific sky/model/raster-particle/clip/building layers where declared. Paint, layout, filters, transitions and removal/reset remain wrapper-owned. Creation identity and source association require remount. Custom props, including callback sets, are fixed for attachment because the pinned wrapper skips their updates; replace the key to change them. The selected Mapbox layer adds one focused slot-update effect through the wrapper's named map access, because react-map-gl 8.1.3 does not reconcile the mutable slot field. Style recreation still uses the wrapper lifecycle.
+
+Web `mapStyle` accepts the selected SDK's full `StyleSpecification`, including imports/configuration/schema, models, modern lights, fog/rain/snow, projection and renderer-specific roots. MapLibre Native similarly retains its published `StyleSpecification`. RNMapbox publishes a string map style and structural JSON rather than a complete JSON style schema. Its selected `NativeStyleDocument` names root fields and preserves structural source/layer objects for SDK validation; nested style typing is weaker than web. It imports no web renderer peer and does not copy an independent schema.
+
+## Named selected facilities
+
+Mapbox web refs expose rain/snow, modern lights, imports/configuration/schema/themes, featureset descriptors, indoor tile readback, model registries, slots, glyph URLs, language/worldview, scale factor, near clip offset and rendering readbacks through explicit forwarded methods. MapLibre web refs expose sky, global state, projection/terrain/light readbacks, terrain target/center elevation, tile refresh/LOD, font faces/glyphs, request transformation, transform constraints, pixel ratio, field of view, roll and redraw. These methods retain upstream argument and return types, including synchronous return values/errors; retained selected refs throw synchronously after detachment. Both selected web refs expose `getVersion()` backed by the attached SDK instance. MapLibre also exposes `getCancelPendingTileRequestsWhileZooming()` and `setCancelPendingTileRequestsWhileZooming(boolean)` for mutable tile cancellation; its constructor option remains available. `setDebugOptions`/`getDebugOptions` include Mapbox 2D/3D layer wireframes and cover named SDK debug properties rather than pretending the wrapper ref forwards property setters.
+
+These selected methods have SDK lifetime and reset semantics. Do not have React props and imperative setters compete for one property. Style-owned setters intentionally omitted by react-map-gl remain owned by React: use props/style documents and Source/Layer for those fields. The facade does not reintroduce destructive map removal or a general raw-method dispatcher. `WrapperMap` and `useWrapperMap` remain available for direct wrapper composition, but raw access alone is not counted as implementation coverage.
+
+RNMapbox selected exports explicitly include Atmosphere, Rain, Snow, Light, Terrain, StyleImport, Models, RasterArraySource, SkyLayer, ModelLayer, RasterParticleLayer, HillshadeLayer, Viewport, Animated and coordinate/shape animation classes, experimental shape animators, Style, Logger, constants, credentials, connectivity, custom headers and telemetry functions. MapLibre Native selected exports explicitly include Animated, Layer, LogManager, NetworkManager, TransformRequestManager and their public options/types. Native selected refs preserve remaining source-visibility, attribution and full-view-state facilities where their wrappers expose them. Merely importing selected entries starts no location acquisition, download or global configuration change.
+
+Native SDK selection, credentials for SDK downloads, iOS linking, Android lifecycle/render surface, preferred frame rate and Expo build plugin options remain the application's build configuration. Use the pinned peers' public build paths: `@rnmapbox/maps/app.plugin.js` with RNMapbox Podfile/Gradle settings, or `@maplibre/maplibre-react-native/app.plugin.js` and its exported `MapLibrePluginProps`. Runtime map settings use the selected `Map.options`; build-time plugin settings are not map props. Internal bridge delegates, tile-worker methods and renderer buffers remain upstream implementation details with source-backed dispositions in the coverage record.
+
+## Routine verification and acceptance
+
+Run `bun run validate`, `bun run test:peers`, `bun run test:example-resolution`, and `node scripts/tf09-rendering-fixture.test.mjs` for routine checks. The targeted harness is acceptance, so run it only in the authorized scope after freezing the library and verifying copied example dependencies. The existing peer patch path is retained: [rnmapbox-10.3.7-tf08.patch](../packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch) now also contains the narrow terrain no-data/disable and NodeNext declaration-export repairs. The MapLibre peer patch repairs the public ESM declaration barrel and pressable-source inheritance links so selected declarations keep their actual types in NodeNext consumers. Refresh the root and native Mapbox example lockfiles/installations before building. Verify both source and compiled wrapper files match; root node_modules edits do not reach the separately installed example peer.
+
+[The harness](../scripts/tf09-rendering-smoke.mjs) uses fixture port 8798, isolated web server/debugger ports 4291/5291 (Mapbox) and 4292/5292 (MapLibre), temporary browser profiles/caches, local 1000-meter DEM tiles with a slope patch, and application-owned local media. Run web engines sequentially because they share the fixture port. Native runs use the existing Metro/native build scripts with `ONE_MAP_SMOKE=tf09`; keep one owner for Metro, simulator/emulator and installations. The harness does not build/install native applications; the coordinator must independently verify the installed binary and pass that identity.
+
+```sh
+TF09_LIBRARY_SHA256=<frozen-dist-digest> \
+TF09_RUNTIME_NODE_MODULES=<bundled-node-modules> \
+TF09_OUTPUT=/tmp/tf09-mapbox-web.json \
+bun scripts/tf09-rendering-smoke.mjs web mapbox
+```
+
+Use the same command with `web maplibre`, `ios mapbox`, `android mapbox`, `ios maplibre`, or `android maplibre`, and a distinct output path. Native commands additionally require `TF09_NATIVE_IDENTITY=<independently-verified-binary-hash-and-installation>`. Forward Android port 8798 to the host and launch the fresh application with Metro on its assigned port. The frozen digest hashes sorted dist file paths relative to the dist root followed by file bytes, matching the harness's `digest` function. The coordinator's preflight must compare that digest with each copied example package before running acceptance.
+
+Estimated execution is 2-5 minutes per browser and 3-8 minutes per already installed native environment, excluding native builds, which can take 20-60 minutes each. These are estimates, not measured results. The harness checks known rendered features, terrain no-data/elevation/clear, delayed DEM attachment, style replacement, projection readback/output, hillshade output changes, captured pixels, selected browser canvas/video/custom insertion/update/teardown, and representative named facilities. It does not certify every SDK layer/operator, global option, service or user-owned GPU implementation; applicable unexercised families remain explicitly unverified. Physical-device testing and the two owner-excluded RNMapbox cache operations retain their TF08 exclusions.
+
+## Recorded acceptance
+
+The frozen library artifact `37a9d0c5fe08c85cc29eab8fc2fe82a001697c2d2d375c2141594059a50a3c3b` passed 34 representative scenarios: eight on each browser engine, six on each Mapbox native OS target and three on each MapLibre native OS target. Native MapLibre scenarios verify its unsupported elevation outcome, hillshade and known-feature capture. The [native preparation record](../records/evidence/tf09-native-preparation.json) identifies fresh builds, verified installations and matched peer files. All four native builds passed; both web engines used Chrome 155.0.8059.41, native iOS used iPhone 18 Pro/iOS 27.0, and Android used the TF07_Acceptance emulator on Android 17/API 37 with 16KB pages.
+
+Routine checks passed: 485 web tests, 210 native tests, four TypeScript projects, formatting/lint, documentation checks, library/package selections and four isolated selected-peer consumers. The [implementation evidence](../records/evidence/tf09-implementation.json) distinguishes full validation from focused checks after the final web-only additions.
+
+Earlier attempts exposed test fixture timing, metadata-only video, iOS capture color differences and stale installed peer files; the evidence retains their failures and repairs. Native preflight now rejects peer files that differ from the reviewed hashes before starting the fixture. One initial Mapbox Android startup observation timed out and did not reproduce on the same patched APK; its cause remains unestablished. Other advanced SDK operator, model/layer, localization, global configuration and build-option combinations retain their stated routine evidence without independent runtime certification. Physical devices remain excluded under the owner's agreed scope.
+
+Cleanup mistakenly removed the pre-existing iOS example apps. Both were rebuilt and reinstalled from unchanged sources; their restoration identities are separate from the acceptance-tested identities. No prior container backup was available, so previous app preferences, SDK caches and offline test data were not recovered. The native preparation record preserves this incident and final cleanup state.

@@ -72,6 +72,10 @@ interface WebMapHandle {
   setFeatureState: (target: object, state: object) => unknown;
   getFeatureState: (target: object) => unknown;
   removeFeatureState: (target: object, key?: string) => unknown;
+  queryTerrainElevation?: (
+    coordinate: LngLat,
+    options?: { exaggerated: boolean }
+  ) => unknown;
   getMap: () => StyleLoadTarget;
 }
 
@@ -114,6 +118,12 @@ interface WebViewState extends ViewState {
 }
 
 interface WebMapProps {
+  readonly terrain?: MapProps["terrain"];
+  readonly projection?:
+    | { readonly type: "mercator" | "globe" }
+    | { readonly name: "mercator" | "globe" };
+  readonly light?: MapProps["light"];
+
   readonly mapStyle: MapProps["mapStyle"];
   readonly initialViewState: WebViewState;
   readonly viewState?: WebViewState;
@@ -225,6 +235,7 @@ interface WebWrapper<
   Name extends Extract<Backend, "mapbox-web" | "maplibre-web">,
 > {
   readonly backend: Name;
+  readonly createAdvancedMethods?: (getHandle: () => WebMapHandle) => object;
   readonly Map: ComponentType<WebMapProps>;
   readonly Source: ComponentType<WebForwardedProps>;
   readonly Layer: ComponentType<WebForwardedProps>;
