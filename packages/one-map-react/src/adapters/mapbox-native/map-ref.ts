@@ -53,13 +53,16 @@ export type NativeAdvancedMapRef = MapRef &
  * @param cameraRef - Ref to the RNMapbox `Camera` child.
  * @param mapViewRef - Ref to the RNMapbox `MapView`.
  * @param geoJsonSources - Registry of mounted GeoJSON source refs.
+ * @param capture - Existing map-capture operation.
+ * @param onCameraCommand - Notifies controlled-camera ownership before public command dispatch.
  * @returns The common map ref.
  */
 export const createMapboxMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
   geoJsonSources: GeoJsonSourceRegistry,
-  capture?: MapRef["capture"]
+  capture?: MapRef["capture"],
+  onCameraCommand?: () => void
 ): NativeAdvancedMapRef => ({
   setSourceVisibility: (
     ...args: Parameters<ComponentRef<typeof MapView>["setSourceVisibility"]>
@@ -82,21 +85,25 @@ export const createMapboxMapRef = (
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current);
 
+    onCameraCommand?.();
     await invokeWrapper(camera.setCamera(toRnmapboxStop(options, "none")));
   },
   easeTo: async (options) => {
     const camera = requireCamera(cameraRef.current);
 
+    onCameraCommand?.();
     await invokeWrapper(camera.setCamera(toRnmapboxStop(options, "easeTo")));
   },
   flyTo: async (options) => {
     const camera = requireCamera(cameraRef.current);
 
+    onCameraCommand?.();
     await invokeWrapper(camera.setCamera(toRnmapboxFlyToStop(options)));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current);
 
+    onCameraCommand?.();
     await invokeWrapper(
       camera.setCamera(toRnmapboxFitBoundsStop(bounds, options))
     );
@@ -104,6 +111,7 @@ export const createMapboxMapRef = (
   zoomTo: async (zoom, options) => {
     const camera = requireCamera(cameraRef.current);
 
+    onCameraCommand?.();
     await invokeWrapper(camera.setCamera(toRnmapboxZoomStop(zoom, options)));
   },
   stop: async () => {

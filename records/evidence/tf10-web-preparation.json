@@ -1,0 +1,84 @@
+{
+  "minimum": {
+    "root": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-acceptance-_ianc8wh/minimum",
+    "shells": {
+      "mapbox": {
+        "peers": {
+          "react": "19.2.3",
+          "react-dom": "19.2.3",
+          "react-map-gl": "8.1.3",
+          "mapbox-gl": "3.32.0"
+        },
+        "distDigest": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+        "lockfileSha256": "1a54191dd5bd7c1e5037e5289de874564930e2dce2cc3ad89e5551f54f033faf",
+        "packageManifestSha256": "8541178bcbc4107d3f23f0363f5f073606576bd0c99b8ba545c2ea53a3c70e6a"
+      },
+      "maplibre": {
+        "peers": {
+          "react": "19.2.3",
+          "react-dom": "19.2.3",
+          "react-map-gl": "8.1.3",
+          "maplibre-gl": "6.13.0"
+        },
+        "distDigest": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+        "lockfileSha256": "5402c3df8b816ae92bf9f2b69645ef2b9639692ae7acccc1cc4aafa7fad34fac",
+        "packageManifestSha256": "e5c50d6543643ac5bdfa917aeb4f5afbb878c02808d91515117fbfe9977b8860"
+      }
+    },
+    "harnessSha256": {
+      "scripts/tf04-camera-smoke.mjs": "fd32fd8101ba0d455a83acc9787aa04da8f369b1d5c7327ebef2bc31f3cb2152",
+      "scripts/tf05-sources-smoke.mjs": "82c1b6456ef93a1d960b40bd942125392fd1fa7ed06827aa0f2c1cd299de51ad",
+      "scripts/tf06-queries-smoke.mjs": "3f076746f8b7c12785d612e903dbae1517826b953f5081285f03cffaba81dc6b",
+      "scripts/tf07-ui-smoke.mjs": "325e22d662a98143ca791831d58a2c8eadce0d744365a735c27a31821cd3a908",
+      "scripts/tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+      "scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+      "examples/web-mapbox/src/app.tsx": "4aca52f1b16d78b1d4a8102616030785697f9ceb7959205c7d714c28bc4df4b1",
+      "examples/web-maplibre/src/app.tsx": "14b36fc4f4a42c62cf64f88e4d9bdc3a4d6b67cb05022c62b36d75a500227523",
+      "examples/shared/tf09-scene.tsx": "92e10adbfb40430b8a53484eae737d8463fc4e30483267a6912b2446a52a72ee"
+    },
+    "identitySelection": "TF04/05/06 defaults and overrides, TF07 per-engine/platform overrides tested by expression evaluation without runner import",
+    "publicMapboxTokenPresent": true,
+    "nativeStatus": "configuration only; no installs, dependency resolution or builds"
+  },
+  "newest": {
+    "root": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-acceptance-_ianc8wh/newest",
+    "shells": {
+      "mapbox": {
+        "peers": {
+          "react": "19.3.1",
+          "react-dom": "19.3.1",
+          "react-map-gl": "8.1.3",
+          "mapbox-gl": "3.33.0"
+        },
+        "distDigest": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+        "lockfileSha256": "594bd403d78af00eae6c1bdae3b97f599e4eeea8e638e4b4721dadfb8c8f3247",
+        "packageManifestSha256": "edda26d08edaea363bf3afcd3ea0a5887188988ce281f6c3af92f1e76b8d09a8"
+      },
+      "maplibre": {
+        "peers": {
+          "react": "19.3.1",
+          "react-dom": "19.3.1",
+          "react-map-gl": "8.1.3",
+          "maplibre-gl": "6.14.0"
+        },
+        "distDigest": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+        "lockfileSha256": "75ffb26e6d2a959b233c03649684bc4d9b5307fa712d2443b0fbdd047d136970",
+        "packageManifestSha256": "00e65de0cea32de7904c00910e8185867027152504ad1d46592f334d04fe0950"
+      }
+    },
+    "harnessSha256": {
+      "scripts/tf04-camera-smoke.mjs": "fd32fd8101ba0d455a83acc9787aa04da8f369b1d5c7327ebef2bc31f3cb2152",
+      "scripts/tf05-sources-smoke.mjs": "82c1b6456ef93a1d960b40bd942125392fd1fa7ed06827aa0f2c1cd299de51ad",
+      "scripts/tf06-queries-smoke.mjs": "3f076746f8b7c12785d612e903dbae1517826b953f5081285f03cffaba81dc6b",
+      "scripts/tf07-ui-smoke.mjs": "325e22d662a98143ca791831d58a2c8eadce0d744365a735c27a31821cd3a908",
+      "scripts/tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+      "scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+      "examples/web-mapbox/src/app.tsx": "4aca52f1b16d78b1d4a8102616030785697f9ceb7959205c7d714c28bc4df4b1",
+      "examples/web-maplibre/src/app.tsx": "14b36fc4f4a42c62cf64f88e4d9bdc3a4d6b67cb05022c62b36d75a500227523",
+      "examples/shared/tf09-scene.tsx": "92e10adbfb40430b8a53484eae737d8463fc4e30483267a6912b2446a52a72ee"
+    },
+    "identitySelection": "TF04/05/06 defaults and overrides, TF07 per-engine/platform overrides tested by expression evaluation without runner import",
+    "publicMapboxTokenPresent": true,
+    "nativeStatus": "configuration only; no installs, dependency resolution or builds"
+  }
+}

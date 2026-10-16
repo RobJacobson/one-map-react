@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
 import { validatePosition } from "../adapters/shared/location-values.js";
+import { useOptionalNativeMapPresentation } from "../adapters/shared/native-map-presentation.js";
 import { useActiveCallback } from "../adapters/shared/use-active-callback.js";
 import type {
   GeolocateControlProps,
@@ -28,6 +29,7 @@ export const useGeolocationControl = (
   cameraMethod: "easeTo" | "flyTo" = "easeTo"
 ) => {
   const session = useMapSession();
+  const presentation = useOptionalNativeMapPresentation();
   const services = useOptionalSetupServices();
   const provider = props.locationProvider ?? services?.location;
   const [failure, setFailure] = useState<Error>();
@@ -92,7 +94,7 @@ export const useGeolocationControl = (
 
   if (
     props.trackUserLocation &&
-    (session.cameraControlled || session.nativeLocationFollowing)
+    (session.cameraControlled || presentation?.nativeLocationFollowing)
   )
     throw new Error(
       "Location follow conflicts with viewState or selected native camera follow."

@@ -12,9 +12,15 @@ Read these documents in order:
 2. [Stage plan](stage-plan.md): TF01–TF10, with a working shared map before expanding coverage.
 3. [Testing policy](testing-policy.md): tests selected by changed behavior, runtime permission, and compact evidence.
 
+The [TF10 implementation plan](tf10-proposal.md) defines coverage closure, expanded peer ranges, public documentation, packed consumers, and the release candidate acceptance gates. The [TF10 release record](tf10-release.md) tracks the candidate and current gates. Publication remains a separate action.
+
 The [TF01 record](tf01-foundation.md) describes backup verification, removal, and foundation checks. The [TF02 record](tf02-shared-map.md) describes the completed shared map and its architecture trace. The [TF02 handoff](tf02-handoff.md) remains the original stage brief. The [Android camera handoff](tf02-android-camera-handoff.md) records why the Mapbox Android opening camera matches the pinned wrapper. The [TF03 record](tf03-reuse.md) describes the completed reuse and lifecycle stage. The [TF04 record](tf04-camera.md) describes the camera, gesture, and interaction implementation. The TF04 renderer smoke passed. Historical S04 acceptance does not certify this replacement.
 
 ## Contributor guidance
+
+The [facade simplification audit handoff](facade-simplification-handoff.md) briefs a fresh agent on verifying the refactor and independently finding further consolidation opportunities. Runtime acceptance requires separate permission.
+
+The [example workspace checkpoint](examples-workspace.md) describes the new Expo/Vite workspace, development commands, acceptance-scenario migration inventory, and the pending native coexistence gate.
 
 The [native fitBounds.maxZoom memo](native-fitbounds-maxzoom-memo.md) records the current native rejection and the deferred proposal for upstream support in RNMapbox and MapLibre React Native.
 
@@ -28,7 +34,7 @@ These references retain upstream comparisons, source links, examples, and incomp
 - [Sources and layers](sources-and-layers.md): source families, layer fields, expressions, updates, queries, and feature state.
 - [Markers and controls](markers-and-controls.md): interactive content, annotations, dragging, popups, and controls.
 - [Capabilities and extensions](capabilities-and-extensions.md): backend facilities, location, offline storage, snapshots, and limitations.
-- [API inventory](api-coverage.md): completeness checklist and versioned input records. Old stage assignments and verification cells remain historical.
+- [API inventory](api-coverage.md): completeness checklist and versioned input records. Historical stage assignments remain provenance; current TF10 dispositions and runtime verification are separate.
 
 The documents under `decisions/` preserve upstream investigations and the rationale for the retired implementation. Their execution instructions, commands, source paths, and acceptance policies are superseded. Archived implementation documents and source mentioned there are available only in the local backup; public contributors do not need that backup. [Historical records](../records/README.md) retain provenance, not current stage status.
 

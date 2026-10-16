@@ -56,6 +56,8 @@ export type NativeAdvancedMapRef = MapRef &
  * @param mapLoaded - Ref tracking `onDidFinishLoadingMap`, after which the
  * camera applies imperative stops.
  * @param sources - Registry of mounted GeoJSON and vector source refs.
+ * @param capture - Existing map-capture operation.
+ * @param onCameraCommand - Notifies controlled-camera ownership before public command dispatch.
  * @returns The common map ref.
  */
 export const createMaplibreMapRef = (
@@ -63,7 +65,8 @@ export const createMaplibreMapRef = (
   mapRef: { readonly current: ComponentRef<typeof MaplibreMap> | null },
   mapLoaded: { readonly current: boolean },
   sources: MaplibreSourceRegistry,
-  capture?: MapRef["capture"]
+  capture?: MapRef["capture"],
+  onCameraCommand?: () => void
 ): NativeAdvancedMapRef => ({
   setSourceVisibility: (
     ...args: Parameters<ComponentRef<typeof MaplibreMap>["setSourceVisibility"]>
@@ -87,21 +90,25 @@ export const createMaplibreMapRef = (
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
+    onCameraCommand?.();
     await invokeWrapper(camera.jumpTo(toMaplibreCommand(options)));
   },
   easeTo: async (options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
+    onCameraCommand?.();
     await invokeWrapper(camera.easeTo(toMaplibreCommand(options)));
   },
   flyTo: async (options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
+    onCameraCommand?.();
     await invokeWrapper(camera.flyTo(toMaplibreFlyToOptions(options)));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
+    onCameraCommand?.();
     await invokeWrapper(
       camera.fitBounds(
         mutableFlatBounds(bounds),
@@ -112,6 +119,7 @@ export const createMaplibreMapRef = (
   zoomTo: async (zoom, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
+    onCameraCommand?.();
     await invokeWrapper(
       camera.zoomTo(zoom, options ? toMaplibreCommand(options) : undefined)
     );

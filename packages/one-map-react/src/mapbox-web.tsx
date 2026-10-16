@@ -29,6 +29,7 @@ import {
   createWebAdapter,
   type WebForwardedProps,
 } from "./adapters/web/create-adapter.js";
+import { createWebMethodForwarders } from "./adapters/web/method-forwarders.js";
 import type { Adapter } from "./contracts/adapter.js";
 import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
@@ -90,169 +91,190 @@ interface MapboxClusterCaller {
 export const adapter: Adapter & { readonly backend: "mapbox-web" } =
   createWebAdapter({
     backend: "mapbox-web",
-    createAdvancedMethods: (getHandle) => ({
-      getVersion: (): string =>
-        (getHandle() as unknown as MapboxMapRef).getMap().version,
-      queryRasterValue: (
-        ...args: Parameters<MapboxMapRef["queryRasterValue"]>
-      ) => (getHandle() as unknown as MapboxMapRef).queryRasterValue(...args),
-      getVerticalFieldOfView: (
-        ...args: Parameters<MapboxMapRef["getVerticalFieldOfView"]>
-      ) =>
-        (getHandle() as unknown as MapboxMapRef).getVerticalFieldOfView(
-          ...args
-        ),
-      setVerticalFieldOfView: (
-        ...args: Parameters<MapboxMapRef["setVerticalFieldOfView"]>
-      ) =>
-        (getHandle() as unknown as MapboxMapRef).setVerticalFieldOfView(
-          ...args
-        ),
-      getHorizontalFieldOfView: (
-        ...args: Parameters<MapboxMapRef["getHorizontalFieldOfView"]>
-      ) =>
-        (getHandle() as unknown as MapboxMapRef).getHorizontalFieldOfView(
-          ...args
-        ),
-      getFeaturesetDescriptors: (
-        ...args: Parameters<MapboxMapRef["getFeaturesetDescriptors"]>
-      ) =>
-        (getHandle() as unknown as MapboxMapRef).getFeaturesetDescriptors(
-          ...args
-        ),
-      getIndoorTileOptions: (
-        ...args: Parameters<MapboxMapRef["getIndoorTileOptions"]>
-      ) =>
-        (getHandle() as unknown as MapboxMapRef).getIndoorTileOptions(...args),
-      getLanguage: (...args: Parameters<MapboxMapRef["getLanguage"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getLanguage(...args),
-      setLanguage: (...args: Parameters<MapboxMapRef["setLanguage"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setLanguage(...args),
-      getWorldview: (...args: Parameters<MapboxMapRef["getWorldview"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getWorldview(...args),
-      setWorldview: (...args: Parameters<MapboxMapRef["setWorldview"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setWorldview(...args),
-      getScaleFactor: (...args: Parameters<MapboxMapRef["getScaleFactor"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getScaleFactor(...args),
-      setScaleFactor: (...args: Parameters<MapboxMapRef["setScaleFactor"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setScaleFactor(...args),
-      getCanvasSource: (id: string): import("mapbox-gl").CanvasSource => {
-        const source = (getHandle() as unknown as MapboxMapRef).getSource(id);
-        if (!source || source.type !== "canvas")
-          throw new Error(`Source "${id}" is not an attached CanvasSource.`);
-        return source as import("mapbox-gl").CanvasSource;
-      },
-      getVideoSource: (id: string): import("mapbox-gl").VideoSource => {
-        const source = (getHandle() as unknown as MapboxMapRef).getSource(id);
-        if (!source || source.type !== "video")
-          throw new Error(`Source "${id}" is not an attached VideoSource.`);
-        return source as import("mapbox-gl").VideoSource;
-      },
-      getModelSource: (id: string): import("mapbox-gl").ModelSource => {
-        const source = (getHandle() as unknown as MapboxMapRef).getSource(id);
-        if (!source || source.type !== "model")
-          throw new Error(`Source "${id}" is not an attached ModelSource.`);
-        return source as import("mapbox-gl").ModelSource;
-      },
-      setDebugOptions: (options: Partial<WebDebugOptions>) => {
-        const map = (getHandle() as unknown as MapboxMapRef).getMap();
-        Object.assign(map, options);
-      },
-      getDebugOptions: (): WebDebugOptions => {
-        const map = (getHandle() as unknown as MapboxMapRef).getMap();
-        return {
-          showCollisionBoxes: map.showCollisionBoxes,
-          showTileBoundaries: map.showTileBoundaries,
-          showOverdrawInspector: map.showOverdrawInspector,
-          showTerrainWireframe: map.showTerrainWireframe,
-          showLayers2DWireframe: map.showLayers2DWireframe,
-          showLayers3DWireframe: map.showLayers3DWireframe,
-          showElevationIdDebug: map.showElevationIdDebug,
-          showPadding: map.showPadding,
-          vertices: map.vertices,
-          repaint: map.repaint,
-          showParseStatus: map.showParseStatus,
-          showTileAABBs: map.showTileAABBs,
-        };
-      },
-      getGlyphsUrl: (...args: Parameters<MapboxMapRef["getGlyphsUrl"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getGlyphsUrl(...args),
-      getNearClipOffset: (
-        ...args: Parameters<MapboxMapRef["getNearClipOffset"]>
-      ) => (getHandle() as unknown as MapboxMapRef).getNearClipOffset(...args),
-      getSchema: (...args: Parameters<MapboxMapRef["getSchema"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getSchema(...args),
-      getSlot: (...args: Parameters<MapboxMapRef["getSlot"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getSlot(...args),
-      getSlots: (...args: Parameters<MapboxMapRef["getSlots"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getSlots(...args),
-      listModels: (...args: Parameters<MapboxMapRef["listModels"]>) =>
-        (getHandle() as unknown as MapboxMapRef).listModels(...args),
-      setGlyphsUrl: (...args: Parameters<MapboxMapRef["setGlyphsUrl"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setGlyphsUrl(...args),
-      setNearClipOffset: (
-        ...args: Parameters<MapboxMapRef["setNearClipOffset"]>
-      ) => (getHandle() as unknown as MapboxMapRef).setNearClipOffset(...args),
-      setSchema: (...args: Parameters<MapboxMapRef["setSchema"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setSchema(...args),
-      setSlot: (...args: Parameters<MapboxMapRef["setSlot"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setSlot(...args),
-      setRain: (...args: Parameters<MapboxMapRef["setRain"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setRain(...args),
-      getRain: (...args: Parameters<MapboxMapRef["getRain"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getRain(...args),
-      setSnow: (...args: Parameters<MapboxMapRef["setSnow"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setSnow(...args),
-      getSnow: (...args: Parameters<MapboxMapRef["getSnow"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getSnow(...args),
-      setLights: (...args: Parameters<MapboxMapRef["setLights"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setLights(...args),
-      getLights: (...args: Parameters<MapboxMapRef["getLights"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getLights(...args),
-      getFog: (...args: Parameters<MapboxMapRef["getFog"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getFog(...args),
-      getTerrain: (...args: Parameters<MapboxMapRef["getTerrain"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getTerrain(...args),
-      getProjection: (...args: Parameters<MapboxMapRef["getProjection"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getProjection(...args),
-      getLight: (...args: Parameters<MapboxMapRef["getLight"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getLight(...args),
-      addImport: (...args: Parameters<MapboxMapRef["addImport"]>) =>
-        (getHandle() as unknown as MapboxMapRef).addImport(...args),
-      updateImport: (...args: Parameters<MapboxMapRef["updateImport"]>) =>
-        (getHandle() as unknown as MapboxMapRef).updateImport(...args),
-      removeImport: (...args: Parameters<MapboxMapRef["removeImport"]>) =>
-        (getHandle() as unknown as MapboxMapRef).removeImport(...args),
-      moveImport: (...args: Parameters<MapboxMapRef["moveImport"]>) =>
-        (getHandle() as unknown as MapboxMapRef).moveImport(...args),
-      setImportColorTheme: (
-        ...args: Parameters<MapboxMapRef["setImportColorTheme"]>
-      ) =>
-        (getHandle() as unknown as MapboxMapRef).setImportColorTheme(...args),
-      setColorTheme: (...args: Parameters<MapboxMapRef["setColorTheme"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setColorTheme(...args),
-      setConfig: (...args: Parameters<MapboxMapRef["setConfig"]>) =>
-        (getHandle() as unknown as MapboxMapRef).setConfig(...args),
-      getConfig: (...args: Parameters<MapboxMapRef["getConfig"]>) =>
-        (getHandle() as unknown as MapboxMapRef).getConfig(...args),
-      setConfigProperty: (
-        ...args: Parameters<MapboxMapRef["setConfigProperty"]>
-      ) => (getHandle() as unknown as MapboxMapRef).setConfigProperty(...args),
-      getConfigProperty: (
-        ...args: Parameters<MapboxMapRef["getConfigProperty"]>
-      ) => (getHandle() as unknown as MapboxMapRef).getConfigProperty(...args),
-      addInteraction: (...args: Parameters<MapboxMapRef["addInteraction"]>) =>
-        (getHandle() as unknown as MapboxMapRef).addInteraction(...args),
-      removeInteraction: (
-        ...args: Parameters<MapboxMapRef["removeInteraction"]>
-      ) => (getHandle() as unknown as MapboxMapRef).removeInteraction(...args),
-      addModel: (...args: Parameters<MapboxMapRef["addModel"]>) =>
-        (getHandle() as unknown as MapboxMapRef).addModel(...args),
-      removeModel: (...args: Parameters<MapboxMapRef["removeModel"]>) =>
-        (getHandle() as unknown as MapboxMapRef).removeModel(...args),
-      hasModel: (...args: Parameters<MapboxMapRef["hasModel"]>) =>
-        (getHandle() as unknown as MapboxMapRef).hasModel(...args),
-    }),
+    createAdvancedMethods: (getHandle) => {
+      const selectedHandle = () => getHandle() as unknown as MapboxMapRef;
+      return {
+        ...createWebMethodForwarders(selectedHandle, [
+          "on",
+          "off",
+          "once",
+          "addControl",
+          "removeControl",
+          "hasControl",
+          "getSource",
+          "getLayer",
+          "getCanvas",
+          "getCanvasContainer",
+          "getContainer",
+          "getStyle",
+          "loaded",
+          "isStyleLoaded",
+          "areTilesLoaded",
+          "triggerRepaint",
+          "getVerticalFieldOfView",
+          "setVerticalFieldOfView",
+          "getTerrain",
+          "getProjection",
+          "getLight",
+        ]),
+        fire: ((...args: Parameters<MapboxMapInstance["fire"]>) =>
+          selectedHandle()
+            .getMap()
+            .fire(...args)) as MapboxMapInstance["fire"],
+        getGestureHandler: <Name extends keyof WebGestureHandlers>(
+          name: Name
+        ): WebGestureHandlers[Name] => {
+          const map = selectedHandle().getMap();
+          const handlers = {
+            boxZoom: map.boxZoom,
+            doubleClickZoom: map.doubleClickZoom,
+            dragPan: map.dragPan,
+            dragRotate: map.dragRotate,
+            keyboard: map.keyboard,
+            scrollZoom: map.scrollZoom,
+            touchPitch: map.touchPitch,
+            touchZoomRotate: map.touchZoomRotate,
+          };
+          if (!Object.hasOwn(handlers, name))
+            throw new RangeError(`Unknown gesture handler: ${name}`);
+          return handlers[name];
+        },
+        getVersion: (): string => selectedHandle().getMap().version,
+        queryRasterValue: (
+          ...args: Parameters<MapboxMapRef["queryRasterValue"]>
+        ) => selectedHandle().queryRasterValue(...args),
+        getHorizontalFieldOfView: (
+          ...args: Parameters<MapboxMapRef["getHorizontalFieldOfView"]>
+        ) => selectedHandle().getHorizontalFieldOfView(...args),
+        getFeaturesetDescriptors: (
+          ...args: Parameters<MapboxMapRef["getFeaturesetDescriptors"]>
+        ) => selectedHandle().getFeaturesetDescriptors(...args),
+        getIndoorTileOptions: (
+          ...args: Parameters<MapboxMapRef["getIndoorTileOptions"]>
+        ) => selectedHandle().getIndoorTileOptions(...args),
+        getLanguage: (...args: Parameters<MapboxMapRef["getLanguage"]>) =>
+          selectedHandle().getLanguage(...args),
+        setLanguage: (...args: Parameters<MapboxMapRef["setLanguage"]>) =>
+          selectedHandle().setLanguage(...args),
+        getWorldview: (...args: Parameters<MapboxMapRef["getWorldview"]>) =>
+          selectedHandle().getWorldview(...args),
+        setWorldview: (...args: Parameters<MapboxMapRef["setWorldview"]>) =>
+          selectedHandle().setWorldview(...args),
+        getScaleFactor: (...args: Parameters<MapboxMapRef["getScaleFactor"]>) =>
+          selectedHandle().getScaleFactor(...args),
+        setScaleFactor: (...args: Parameters<MapboxMapRef["setScaleFactor"]>) =>
+          selectedHandle().setScaleFactor(...args),
+        getCanvasSource: (id: string): import("mapbox-gl").CanvasSource => {
+          const source = selectedHandle().getSource(id);
+          if (!source || source.type !== "canvas")
+            throw new Error(`Source "${id}" is not an attached CanvasSource.`);
+          return source as import("mapbox-gl").CanvasSource;
+        },
+        getVideoSource: (id: string): import("mapbox-gl").VideoSource => {
+          const source = selectedHandle().getSource(id);
+          if (!source || source.type !== "video")
+            throw new Error(`Source "${id}" is not an attached VideoSource.`);
+          return source as import("mapbox-gl").VideoSource;
+        },
+        getModelSource: (id: string): import("mapbox-gl").ModelSource => {
+          const source = selectedHandle().getSource(id);
+          if (!source || source.type !== "model")
+            throw new Error(`Source "${id}" is not an attached ModelSource.`);
+          return source as import("mapbox-gl").ModelSource;
+        },
+        setDebugOptions: (options: Partial<WebDebugOptions>) => {
+          const map = selectedHandle().getMap();
+          Object.assign(map, options);
+        },
+        getDebugOptions: (): WebDebugOptions => {
+          const map = selectedHandle().getMap();
+          return {
+            showCollisionBoxes: map.showCollisionBoxes,
+            showTileBoundaries: map.showTileBoundaries,
+            showOverdrawInspector: map.showOverdrawInspector,
+            showTerrainWireframe: map.showTerrainWireframe,
+            showLayers2DWireframe: map.showLayers2DWireframe,
+            showLayers3DWireframe: map.showLayers3DWireframe,
+            showElevationIdDebug: map.showElevationIdDebug,
+            showPadding: map.showPadding,
+            vertices: map.vertices,
+            repaint: map.repaint,
+            showParseStatus: map.showParseStatus,
+            showTileAABBs: map.showTileAABBs,
+          };
+        },
+        getGlyphsUrl: (...args: Parameters<MapboxMapRef["getGlyphsUrl"]>) =>
+          selectedHandle().getGlyphsUrl(...args),
+        getNearClipOffset: (
+          ...args: Parameters<MapboxMapRef["getNearClipOffset"]>
+        ) => selectedHandle().getNearClipOffset(...args),
+        getSchema: (...args: Parameters<MapboxMapRef["getSchema"]>) =>
+          selectedHandle().getSchema(...args),
+        getSlot: (...args: Parameters<MapboxMapRef["getSlot"]>) =>
+          selectedHandle().getSlot(...args),
+        getSlots: (...args: Parameters<MapboxMapRef["getSlots"]>) =>
+          selectedHandle().getSlots(...args),
+        listModels: (...args: Parameters<MapboxMapRef["listModels"]>) =>
+          selectedHandle().listModels(...args),
+        setGlyphsUrl: (...args: Parameters<MapboxMapRef["setGlyphsUrl"]>) =>
+          selectedHandle().setGlyphsUrl(...args),
+        setNearClipOffset: (
+          ...args: Parameters<MapboxMapRef["setNearClipOffset"]>
+        ) => selectedHandle().setNearClipOffset(...args),
+        setSchema: (...args: Parameters<MapboxMapRef["setSchema"]>) =>
+          selectedHandle().setSchema(...args),
+        setSlot: (...args: Parameters<MapboxMapRef["setSlot"]>) =>
+          selectedHandle().setSlot(...args),
+        setRain: (...args: Parameters<MapboxMapRef["setRain"]>) =>
+          selectedHandle().setRain(...args),
+        getRain: (...args: Parameters<MapboxMapRef["getRain"]>) =>
+          selectedHandle().getRain(...args),
+        setSnow: (...args: Parameters<MapboxMapRef["setSnow"]>) =>
+          selectedHandle().setSnow(...args),
+        getSnow: (...args: Parameters<MapboxMapRef["getSnow"]>) =>
+          selectedHandle().getSnow(...args),
+        setLights: (...args: Parameters<MapboxMapRef["setLights"]>) =>
+          selectedHandle().setLights(...args),
+        getLights: (...args: Parameters<MapboxMapRef["getLights"]>) =>
+          selectedHandle().getLights(...args),
+        getFog: (...args: Parameters<MapboxMapRef["getFog"]>) =>
+          selectedHandle().getFog(...args),
+        addImport: (...args: Parameters<MapboxMapRef["addImport"]>) =>
+          selectedHandle().addImport(...args),
+        updateImport: (...args: Parameters<MapboxMapRef["updateImport"]>) =>
+          selectedHandle().updateImport(...args),
+        removeImport: (...args: Parameters<MapboxMapRef["removeImport"]>) =>
+          selectedHandle().removeImport(...args),
+        moveImport: (...args: Parameters<MapboxMapRef["moveImport"]>) =>
+          selectedHandle().moveImport(...args),
+        setImportColorTheme: (
+          ...args: Parameters<MapboxMapRef["setImportColorTheme"]>
+        ) => selectedHandle().setImportColorTheme(...args),
+        setColorTheme: (...args: Parameters<MapboxMapRef["setColorTheme"]>) =>
+          selectedHandle().setColorTheme(...args),
+        setConfig: (...args: Parameters<MapboxMapRef["setConfig"]>) =>
+          selectedHandle().setConfig(...args),
+        getConfig: (...args: Parameters<MapboxMapRef["getConfig"]>) =>
+          selectedHandle().getConfig(...args),
+        setConfigProperty: (
+          ...args: Parameters<MapboxMapRef["setConfigProperty"]>
+        ) => selectedHandle().setConfigProperty(...args),
+        getConfigProperty: (
+          ...args: Parameters<MapboxMapRef["getConfigProperty"]>
+        ) => selectedHandle().getConfigProperty(...args),
+        addInteraction: (...args: Parameters<MapboxMapRef["addInteraction"]>) =>
+          selectedHandle().addInteraction(...args),
+        removeInteraction: (
+          ...args: Parameters<MapboxMapRef["removeInteraction"]>
+        ) => selectedHandle().removeInteraction(...args),
+        addModel: (...args: Parameters<MapboxMapRef["addModel"]>) =>
+          selectedHandle().addModel(...args),
+        removeModel: (...args: Parameters<MapboxMapRef["removeModel"]>) =>
+          selectedHandle().removeModel(...args),
+        hasModel: (...args: Parameters<MapboxMapRef["hasModel"]>) =>
+          selectedHandle().hasModel(...args),
+      };
+    },
     Map: MapboxMap,
     Source: MapboxSource as ComponentType<WebForwardedProps>,
     Layer: MapboxLayer as ComponentType<WebForwardedProps>,
@@ -325,6 +347,17 @@ export {
 
 /** Selected advanced methods retain the pinned wrapper's signatures. */
 export type WebMapRef = MapRef & {
+  /** Public SDK event producer for plugins; dispatch is synchronous and follows SDK event semantics. */
+  readonly fire: MapboxMapInstance["fire"];
+  /**
+   * Selects an attached renderer's public gesture controls and independent state readback.
+   * @param name - SDK gesture handler name.
+   * @returns The renderer-owned public handler; use only while this map remains mounted.
+   * @throws For an unknown handler name or a detached map.
+   */
+  readonly getGestureHandler: <Name extends keyof WebGestureHandlers>(
+    name: Name
+  ) => WebGestureHandlers[Name];
   /**
    * Reads the attached renderer's pinned SDK version.
    * @returns SDK version string; throws when detached.
@@ -343,6 +376,22 @@ export type WebMapRef = MapRef & {
   readonly getDebugOptions: () => WebDebugOptions;
 } & Pick<
     MapboxMapRef,
+    | "on"
+    | "off"
+    | "once"
+    | "addControl"
+    | "removeControl"
+    | "hasControl"
+    | "getSource"
+    | "getLayer"
+    | "getCanvas"
+    | "getCanvasContainer"
+    | "getContainer"
+    | "getStyle"
+    | "loaded"
+    | "isStyleLoaded"
+    | "areTilesLoaded"
+    | "triggerRepaint"
     | "queryRasterValue"
     | "getVerticalFieldOfView"
     | "setVerticalFieldOfView"
@@ -585,6 +634,10 @@ export const {
   setRTLTextPlugin,
   getRTLTextPluginStatus,
   IndoorControl,
+  LngLat,
+  LngLatBounds,
+  MercatorCoordinate,
+  Point,
 } = MapboxRenderer as unknown as (typeof import("mapbox-gl"))["default"];
 
 /** Renderer diagnostic properties, with SDK defaults and units. */
@@ -614,3 +667,43 @@ export const rendererSettings: Pick<
   | "accessToken"
   | "baseApiUrl"
 > = MapboxRenderer as unknown as (typeof import("mapbox-gl"))["default"];
+
+/** Public gesture controls/readbacks; renderer input dispatch and frame hooks stay private. */
+export type WebGestureHandlers = {
+  readonly [
+    Name in
+      | "boxZoom"
+      | "doubleClickZoom"
+      | "dragPan"
+      | "dragRotate"
+      | "keyboard"
+      | "scrollZoom"
+      | "touchPitch"
+      | "touchZoomRotate"
+  ]: Pick<
+    MapboxMapInstance[Name],
+    Extract<
+      keyof MapboxMapInstance[Name],
+      | "enable"
+      | "disable"
+      | "isEnabled"
+      | "isActive"
+      | "isZooming"
+      | "enableRotation"
+      | "disableRotation"
+      | "setZoomRate"
+      | "setWheelZoomRate"
+    >
+  >;
+};
+
+/** Geographic coordinate instance supplied by the selected SDK constructor. */
+export type LngLat = InstanceType<typeof LngLat>;
+/** Geographic bounds instance supplied by the selected SDK constructor. */
+export type LngLatBounds = InstanceType<typeof LngLatBounds>;
+/** Mercator coordinate instance supplied by the selected SDK constructor. */
+export type MercatorCoordinate = InstanceType<typeof MercatorCoordinate>;
+/** Screen point instance supplied by the selected SDK constructor. */
+export type Point = InstanceType<typeof Point>;
+/** Indoor control instance supplied by the selected SDK constructor. */
+export type IndoorControl = InstanceType<typeof IndoorControl>;

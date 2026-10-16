@@ -4,9 +4,16 @@ import {
   type ReactNode,
   StrictMode,
   useImperativeHandle,
+  useContext,
 } from "react";
 import { describe, expect, vi, test } from "vite-plus/test";
 
+import {
+  NativeCameraContext,
+  NativeOverlayContext,
+  useNativeMapPresentation,
+  withNativeMapPresentation,
+} from "../src/adapters/shared/native-map-presentation.js";
 import type { Adapter } from "../src/contracts/adapter.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { ClickEvent } from "../src/contracts/event-types.js";
@@ -385,4 +392,157 @@ describe("TF07 map-local UI lifetime", () => {
     expect(sourceClick).toHaveBeenCalledTimes(1);
     expect(mapClick).not.toHaveBeenCalled();
   });
+});
+
+test("camera movement and controlled camera updates preserve map-access consumers", async () => {
+  const fixture = createFixture();
+  const observed = vi.fn();
+  const AccessProbe = () => {
+    observed(useMapSession());
+    return null;
+  };
+  const children = <AccessProbe />;
+  const tree = (zoom: number) => (
+    <MapSetup adapter={fixture.adapter}>
+      <OneMap
+        mapStyle={style}
+        initialViewState={camera}
+        viewState={{ ...camera, zoom }}
+      >
+        {children}
+      </OneMap>
+    </MapSetup>
+  );
+  const mounted = render(tree(3));
+  const session = observed.mock.calls.at(-1)?.[0];
+  const renders = observed.mock.calls.length;
+  await act(async () =>
+    fixture
+      .props()
+      ?.onMove?.({ viewState: { ...camera, zoom: 4 }, origin: "user" })
+  );
+  expect(observed).toHaveBeenCalledTimes(renders);
+  mounted.rerender(tree(5));
+  expect(observed).toHaveBeenCalledTimes(renders);
+  expect(observed.mock.calls.at(-1)?.[0]).toBe(session);
+});
+
+test("native camera observations and controls leave unrelated contexts unchanged", async () => {
+  const fixture = createFixture();
+  const adapter = {
+    ...fixture.adapter,
+    backend: "mapbox-native" as const,
+    Map: withNativeMapPresentation(fixture.adapter.Map),
+  };
+  const access = vi.fn();
+  const presentation = vi.fn();
+  const cameraChanged = vi.fn();
+  const Access = () => {
+    access(useMapSession());
+    return null;
+  };
+  const Presentation = () => {
+    presentation(useNativeMapPresentation());
+    return null;
+  };
+  const Camera = () => {
+    cameraChanged(useContext(NativeCameraContext));
+    return null;
+  };
+  const children = (
+    <>
+      <Access />
+      <Presentation />
+      <Camera />
+    </>
+  );
+  const tree = (zoom?: number) => (
+    <MapSetup adapter={adapter}>
+      <OneMap
+        mapStyle={style}
+        initialViewState={camera}
+        viewState={zoom === undefined ? undefined : { ...camera, zoom }}
+      >
+        {children}
+      </OneMap>
+    </MapSetup>
+  );
+  const mounted = render(tree());
+  const accessRenders = access.mock.calls.length;
+  const presentationRenders = presentation.mock.calls.length;
+  await act(async () =>
+    fixture
+      .props()
+      ?.onMove?.({ viewState: { ...camera, zoom: 7 }, origin: "user" })
+  );
+  expect(cameraChanged.mock.calls.at(-1)?.[0].zoom).toBe(7);
+  expect(access).toHaveBeenCalledTimes(accessRenders);
+  expect(presentation).toHaveBeenCalledTimes(presentationRenders);
+  mounted.rerender(tree(8));
+  const controlledAccessRenders = access.mock.calls.length;
+  const controlledPresentationRenders = presentation.mock.calls.length;
+  mounted.rerender(tree(9));
+  expect(cameraChanged.mock.calls.at(-1)?.[0].zoom).toBe(9);
+  expect(access).toHaveBeenCalledTimes(controlledAccessRenders);
+  expect(presentation).toHaveBeenCalledTimes(controlledPresentationRenders);
+  mounted.unmount();
+});
+
+test("native presentation retains layout, overlay order, ornaments and gesture ownership", async () => {
+  const fixture = createFixture();
+  const adapter = {
+    ...fixture.adapter,
+    backend: "mapbox-native" as const,
+    Map: withNativeMapPresentation(fixture.adapter.Map),
+  };
+  const observe = vi.fn();
+  const Probe = () => {
+    observe(useNativeMapPresentation(), useContext(NativeOverlayContext));
+    return null;
+  };
+  const mounted = render(
+    <MapSetup adapter={adapter}>
+      <OneMap mapStyle={style} initialViewState={camera}>
+        <Probe />
+      </OneMap>
+    </MapSetup>
+  );
+  const initial = observe.mock.calls.at(-1)?.[0];
+  await act(async () => {
+    initial.setNativeLayout(400, 300);
+    initial.setOverlay("first", "top-right", 20);
+    initial.setOverlay("second", "top-right", 30);
+    initial.setOrnament("compass", { position: "top-left" });
+    initial.requestGestureLock(true);
+  });
+  const updated = observe.mock.calls.at(-1)?.[0];
+  expect(updated).toMatchObject({
+    nativeLayout: { width: 400, height: 300 },
+    gestureLocked: true,
+    ornaments: { compass: { position: "top-left" } },
+  });
+  expect(updated.setOverlay).toBe(initial.setOverlay);
+  expect(updated.setNativeLayout).toBe(initial.setNativeLayout);
+  expect(
+    observe.mock.calls.at(-1)?.[1].map((overlay: { id: string }) => overlay.id)
+  ).toEqual(["first", "second"]);
+  const renders = observe.mock.calls.length;
+  await act(async () => {
+    updated.setNativeLayout(400, 300);
+    updated.setOverlay("first", "top-right", 20);
+  });
+  expect(observe).toHaveBeenCalledTimes(renders);
+  await act(async () => {
+    updated.setOverlay("first", null);
+    updated.setOrnament("compass", null);
+    updated.requestGestureLock(false);
+  });
+  expect(
+    observe.mock.calls.at(-1)?.[1].map((overlay: { id: string }) => overlay.id)
+  ).toEqual(["second"]);
+  expect(observe.mock.calls.at(-1)?.[0]).toMatchObject({
+    gestureLocked: false,
+    ornaments: {},
+  });
+  mounted.unmount();
 });

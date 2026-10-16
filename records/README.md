@@ -1,6 +1,10 @@
-# Historical API research and evidence
+# API research and evidence
 
-The JSON records in this directory were produced for the implementation retired during TF01. They remain useful for upstream API inventory, versioned sources, discovered incompatibilities, and provenance. Their stage assignments, implementation mappings, artifact hashes, and runtime results apply to that implementation only.
+[support-matrix.json](support-matrix.json) and [evidence/tf10-release.json](evidence/tf10-release.json) own current candidate versions, patch paths, routine checks and open release gates. The reconciled api-coverage.json separates current dispositions from runtime verification. [TF10 native style sources](evidence/tf10-native-style-sources.json) preserves compact exact-tag source identities for native unsupported boundaries.
+
+The [facade simplification evidence](evidence/facade-simplification.json) records the compiler configuration, unchanged public contracts, routine outcomes, frozen archive, and proposed acceptance scope. Renderer acceptance for that archive remains unrun and requires separate permission.
+
+Earlier JSON records in this directory were produced for the implementation retired during TF01. They remain useful for upstream API inventory, versioned sources, discovered incompatibilities, and provenance. Their stage assignments, implementation mappings, artifact hashes, and runtime results apply to that implementation only.
 
 `api-coverage.json` and `inventory-inputs/` supply the completeness checklist for the replacement. Reconcile their mappings as each new feature is implemented; do not rebuild the old stage-ledger tooling. `version-baseline.json` and `tooling-baseline.json` record historical versions, not the current supported development or renderer matrix. `stage-status.json` and `evidence/` preserve historical outcomes; they are not active gates.
 

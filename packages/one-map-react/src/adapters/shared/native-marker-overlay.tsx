@@ -4,6 +4,7 @@ import { Portal } from "react-native-teleport";
 
 import type { Point } from "../../contracts/camera-types.js";
 import { useMapSession } from "../../facade/map-context.js";
+import { useNativeMapPresentation } from "./native-map-presentation.js";
 import type { NativeMarkerHostProps } from "./native-ui.js";
 import { useActiveCallback } from "./use-active-callback.js";
 
@@ -15,6 +16,7 @@ export const NativeMarkerOverlay = (
   props: NativeMarkerHostProps
 ): ReactElement => {
   const session = useMapSession();
+  const presentation = useNativeMapPresentation();
   const name = useId();
   const [point, setPoint] = useState<Point | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -53,7 +55,7 @@ export const NativeMarkerOverlay = (
     session.ref,
     session.ready,
     session.subscribe,
-    session.nativeLayout,
+    presentation.nativeLayout,
     longitude,
     latitude,
     reportError,
@@ -72,7 +74,7 @@ export const NativeMarkerOverlay = (
   return (
     <Portal
       name={name}
-      hostName={session.overlayHostName}
+      hostName={presentation.overlayHostName}
       style={{ position: "absolute", top: 0, left: 0 }}
     >
       <View

@@ -1,0 +1,31 @@
+{
+  "root": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01",
+  "androidShell": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01/android/examples/native-mapbox",
+  "status": "JavaScript consumer/candidate patch verified; native SDK resolution/build/install not run",
+  "actualVersions": {
+    "@rnmapbox/maps": "10.3.7",
+    "one-map-react": "0.1.0-rc.2",
+    "react": "19.2.3",
+    "react-native": "0.87.1",
+    "react-native-teleport": "1.2.1",
+    "@babel/core": "7.29.7",
+    "@babel/preset-env": "7.29.7",
+    "@babel/runtime": "7.29.10",
+    "@react-native-community/cli": "20.2.0",
+    "@react-native-community/cli-platform-android": "20.2.0",
+    "@react-native-community/cli-platform-ios": "20.2.0",
+    "@react-native/babel-preset": "0.87.1",
+    "@react-native/metro-config": "0.87.1"
+  },
+  "lockfileSha256": "1b292d112b49b540aea95827b8fc7b17b75f76e55483425a8005aee1d8e9bbaa",
+  "packageManifestSha256": "0a47fbdabe5eb562d3ab9bde61e52bac565a7412a4fce3a75de79ce166894659",
+  "candidateSha256": "9d28992c19a791c0af66bc0efb6ee3844747b66d1a8680f5da8647c8c70d150c",
+  "packageBytes": "all195 installed files equal frozen archive",
+  "patchSha256": "118090860852b786a6681287f52ae3af1af8e0657a7c1853936204afb287a6d4",
+  "patchReverseCheck": "passed all25 repaired files",
+  "appId": "com.onemapmapbox.tf10rc2minimum.tf08remaining",
+  "activity": "com.onemapmapbox.MainActivity",
+  "gradle": "2workers,nonparallel,noDaemon,2GiBheap/512MiBmetaspace,arm64-v8a",
+  "diskAfterInstall": "9.6GiB available fromdf",
+  "nextShell": "MapLibre source/config only; dependency installation held for serial phase resource policy"
+}

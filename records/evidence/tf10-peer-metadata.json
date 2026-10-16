@@ -1,0 +1,316 @@
+{
+  "inspectedAt": "2026-10-15",
+  "source": "https://registry.npmjs.org/",
+  "scope": "All stable releases admitted by proposed same-major ranges, inspected primary package metadata. Package peer declarations do not establish renderer compatibility. Native React remains matched to embedded Fabric19.2.3.",
+  "packages": [
+    {
+      "name": "react",
+      "minimum": "19.2.3",
+      "releases": [
+        {
+          "version": "19.2.3",
+          "peerDependencies": {},
+          "publishedAt": "2025-12-11T22:55:28.598Z",
+          "integrity": "sha512-Ku/hhYbVjOQnXDZFv2+RibmLFGwFdeeKHFcOTlrt7xplBnya5OGn/hIRDsqDiSUcfORsDC7MPxwork8jBwsIWA==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.2.3.tgz"
+        },
+        {
+          "version": "19.2.4",
+          "peerDependencies": {},
+          "publishedAt": "2026-01-26T18:23:10.244Z",
+          "integrity": "sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.2.4.tgz"
+        },
+        {
+          "version": "19.2.5",
+          "peerDependencies": {},
+          "publishedAt": "2026-04-08T18:39:24.455Z",
+          "integrity": "sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.2.5.tgz"
+        },
+        {
+          "version": "19.2.6",
+          "peerDependencies": {},
+          "publishedAt": "2026-05-06T16:16:47.653Z",
+          "integrity": "sha512-sfWGGfavi0xr8Pg0sVsyHMAOziVYKgPLNrS7ig+ivMNb3wbCBw3KxtflsGBAwD3gYQlE/AEZsTLgToRrSCjb0Q==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.2.6.tgz"
+        },
+        {
+          "version": "19.2.7",
+          "peerDependencies": {},
+          "publishedAt": "2026-06-01T18:00:48.323Z",
+          "integrity": "sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.2.7.tgz"
+        },
+        {
+          "version": "19.2.8",
+          "peerDependencies": {},
+          "publishedAt": "2026-07-21T15:41:28.716Z",
+          "integrity": "sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.2.8.tgz"
+        },
+        {
+          "version": "19.2.9",
+          "peerDependencies": {},
+          "publishedAt": "2026-10-14T16:54:43.794Z",
+          "integrity": "sha512-RuLdAokXv3sRmZa2/N8QH0KmTBIgDKC+buRUikGqow31+mGSGidLCX2o4XFq8OV+xBFWfhM9DVgTq1PPHADH4w==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.2.9.tgz"
+        },
+        {
+          "version": "19.3.0",
+          "peerDependencies": {},
+          "publishedAt": "2026-09-09T17:21:30.071Z",
+          "integrity": "sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.3.0.tgz"
+        },
+        {
+          "version": "19.3.1",
+          "peerDependencies": {},
+          "publishedAt": "2026-10-14T16:47:15.290Z",
+          "integrity": "sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==",
+          "tarball": "https://registry.npmjs.org/react/-/react-19.3.1.tgz"
+        }
+      ]
+    },
+    {
+      "name": "react-dom",
+      "minimum": "19.2.3",
+      "releases": [
+        {
+          "version": "19.2.3",
+          "peerDependencies": {
+            "react": "^19.2.3"
+          },
+          "publishedAt": "2025-12-11T22:55:37.826Z",
+          "integrity": "sha512-yELu4WmLPw5Mr/lmeEpox5rw3RETacE++JgHqQzd2dg+YbJuat3jH4ingc+WPZhxaoFzdv9y33G+F7Nl5O0GBg==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.3.tgz"
+        },
+        {
+          "version": "19.2.4",
+          "peerDependencies": {
+            "react": "^19.2.4"
+          },
+          "publishedAt": "2026-01-26T18:23:18.598Z",
+          "integrity": "sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.4.tgz"
+        },
+        {
+          "version": "19.2.5",
+          "peerDependencies": {
+            "react": "^19.2.5"
+          },
+          "publishedAt": "2026-04-08T18:39:31.423Z",
+          "integrity": "sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.5.tgz"
+        },
+        {
+          "version": "19.2.6",
+          "peerDependencies": {
+            "react": "^19.2.6"
+          },
+          "publishedAt": "2026-05-06T16:16:56.080Z",
+          "integrity": "sha512-0prMI+hvBbPjsWnxDLxlCGyM8PN6UuWjEUCYmZhO67xIV9Xasa/r/vDnq+Xyq4Lo27g8QSbO5YzARu0D1Sps3g==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.6.tgz"
+        },
+        {
+          "version": "19.2.7",
+          "peerDependencies": {
+            "react": "^19.2.7"
+          },
+          "publishedAt": "2026-06-01T18:01:02.438Z",
+          "integrity": "sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.7.tgz"
+        },
+        {
+          "version": "19.2.8",
+          "peerDependencies": {
+            "react": "^19.2.8"
+          },
+          "publishedAt": "2026-07-21T15:41:41.267Z",
+          "integrity": "sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.8.tgz"
+        },
+        {
+          "version": "19.2.9",
+          "peerDependencies": {
+            "react": "^19.2.9"
+          },
+          "publishedAt": "2026-10-14T16:49:51.523Z",
+          "integrity": "sha512-YceU74W21fXEHszKBLj16MY0CmvpFKOs60iVrIyW/cCgOPsZJNaB6GVJEtIUqt6AG6EjzKLui5lPRrxAeS328Q==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.9.tgz"
+        },
+        {
+          "version": "19.3.0",
+          "peerDependencies": {
+            "react": "^19.3.0"
+          },
+          "publishedAt": "2026-09-09T17:17:39.744Z",
+          "integrity": "sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.3.0.tgz"
+        },
+        {
+          "version": "19.3.1",
+          "peerDependencies": {
+            "react": "^19.3.1"
+          },
+          "publishedAt": "2026-10-14T16:49:10.081Z",
+          "integrity": "sha512-Y0bARz53lhEC1NMCASs0/j+faB/zqt3R8hpvg1e8+61ZVJ4UL0UdC4cBbXfZMcIuhrfgeILTLe+ZeBCavQPtKQ==",
+          "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.3.1.tgz"
+        }
+      ]
+    },
+    {
+      "name": "react-native",
+      "minimum": "0.87.1",
+      "releases": [
+        {
+          "version": "0.87.1",
+          "peerDependencies": {
+            "react": "^19.2.3",
+            "@types/react": "^19.1.1"
+          },
+          "publishedAt": "2026-08-26T15:36:54.923Z",
+          "integrity": "sha512-DJKG6ANoD7BtrE4z9DewiSD7/RxCX73lK5Pu49aUr85P3333Dm2roTiP0rRjQNDZdVizHSOmstWfwF/o9EjCRA==",
+          "tarball": "https://registry.npmjs.org/react-native/-/react-native-0.87.1.tgz"
+        }
+      ]
+    },
+    {
+      "name": "react-map-gl",
+      "minimum": "8.1.3",
+      "releases": [
+        {
+          "version": "8.1.3",
+          "peerDependencies": {
+            "react": ">=16.3.0",
+            "mapbox-gl": ">=1.13.0",
+            "react-dom": ">=16.3.0",
+            "maplibre-gl": ">=1.13.0"
+          },
+          "publishedAt": "2026-09-02T21:41:05.196Z",
+          "integrity": "sha512-i8ExMBodZ5waBlnnXhPHfubf1mSQrzVBKsp9LUSWIAQjOuUhI4Dv962rzE2QfI7n5oywunldQlxcW1Mjy8rp7w==",
+          "tarball": "https://registry.npmjs.org/react-map-gl/-/react-map-gl-8.1.3.tgz"
+        }
+      ]
+    },
+    {
+      "name": "mapbox-gl",
+      "minimum": "3.32.0",
+      "releases": [
+        {
+          "version": "3.32.0",
+          "peerDependencies": {},
+          "publishedAt": "2026-09-29T13:53:04.576Z",
+          "integrity": "sha512-+P4qrlyejQYLyz1Bfzoe+d5Ff5vAghH54RNHm1q2VeAZqkSjQ5e1XlovQoSHlf4xqpRJtJG58kn8nkLwPMQung==",
+          "tarball": "https://registry.npmjs.org/mapbox-gl/-/mapbox-gl-3.32.0.tgz"
+        },
+        {
+          "version": "3.33.0",
+          "peerDependencies": {},
+          "publishedAt": "2026-10-13T13:13:12.616Z",
+          "integrity": "sha512-2HpIrVedccHedolZyMVG/7FXdpgmsLTENgEDsX71x3/gKDGfYMf1FCRY0prntknkn/JXcraUKXlBTv7vkr0EXg==",
+          "tarball": "https://registry.npmjs.org/mapbox-gl/-/mapbox-gl-3.33.0.tgz"
+        }
+      ]
+    },
+    {
+      "name": "maplibre-gl",
+      "minimum": "6.13.0",
+      "releases": [
+        {
+          "version": "6.13.0",
+          "peerDependencies": {},
+          "publishedAt": "2026-10-06T19:55:16.665Z",
+          "integrity": "sha512-ELXk4h+xl0URFQEnVbAN6MGn61P6jq4amUWHiskLVsvHCaKdf1Zq6G8UNOD0AQ3UaXoL5ECc8ovz8yqYEBGPKw==",
+          "tarball": "https://registry.npmjs.org/maplibre-gl/-/maplibre-gl-6.13.0.tgz"
+        },
+        {
+          "version": "6.14.0",
+          "peerDependencies": {},
+          "publishedAt": "2026-10-11T14:34:38.733Z",
+          "integrity": "sha512-L7U9y9TyPJ3P/JJbW+eH+A3FzdPq+3fnZFqqeCwf/S6cRGganHwVI5b/C8/zOYzreUzsloDPZVVaMQA94wOt4A==",
+          "tarball": "https://registry.npmjs.org/maplibre-gl/-/maplibre-gl-6.14.0.tgz"
+        }
+      ]
+    },
+    {
+      "name": "@rnmapbox/maps",
+      "minimum": "10.3.7",
+      "releases": [
+        {
+          "version": "10.3.7",
+          "peerDependencies": {
+            "expo": ">=47.0.0",
+            "react": ">=17.0.0",
+            "mapbox-gl": "^2.9.0",
+            "react-dom": ">= 17.0.0",
+            "react-native": ">=0.79"
+          },
+          "publishedAt": "2026-10-05T10:21:05.668Z",
+          "integrity": "sha512-ICZIEi+Hp8aX6RsdUQK1PGK9qJ2L5g4YiFT1SUTQ023m5O/VcC/Ys0GKcd5/ABL8onvci3n4uZ8PbjXM1Vs6FA==",
+          "tarball": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.7.tgz"
+        },
+        {
+          "version": "10.3.8",
+          "peerDependencies": {
+            "expo": ">=47.0.0",
+            "react": ">=17.0.0",
+            "mapbox-gl": "^2.9.0",
+            "react-dom": ">= 17.0.0",
+            "react-native": ">=0.79"
+          },
+          "publishedAt": "2026-10-12T04:48:26.407Z",
+          "integrity": "sha512-NtDF0/89syZJ7cXf0DNpB6a6/HqQpwgCUCjpkuLhqLTcgV9ID4zITxJaKzp8N0oxaRXXTf5vTVLlc+ScAZOUSg==",
+          "tarball": "https://registry.npmjs.org/@rnmapbox/maps/-/maps-10.3.8.tgz"
+        }
+      ]
+    },
+    {
+      "name": "@maplibre/maplibre-react-native",
+      "minimum": "11.5.0",
+      "releases": [
+        {
+          "version": "11.5.0",
+          "peerDependencies": {
+            "expo": ">=54.0.0",
+            "react": ">=19.1.0",
+            "@types/react": ">=19.1.0",
+            "react-native": ">=0.80.0",
+            "@types/geojson": "^7946.0.0"
+          },
+          "publishedAt": "2026-10-04T19:02:55.822Z",
+          "integrity": "sha512-O+iDUY+nrPjT5CHCIwOheJDzKpFhUmQ4Rn9x4mYud4MubVTo5y82nxTII3LVIlbzP1L1fYqFfh4+Umr7UmYFOw==",
+          "tarball": "https://registry.npmjs.org/@maplibre/maplibre-react-native/-/maplibre-react-native-11.5.0.tgz"
+        }
+      ]
+    },
+    {
+      "name": "react-native-teleport",
+      "minimum": "1.2.1",
+      "releases": [
+        {
+          "version": "1.2.1",
+          "peerDependencies": {
+            "react": "*",
+            "react-dom": "*",
+            "react-native": "*"
+          },
+          "publishedAt": "2026-09-03T17:29:09.095Z",
+          "integrity": "sha512-vvYMnb/JrPBKbBEym03TWafxL23c2/MDz7zvVciFNJLKZAQ4f5QWJNBO4BgjfMHgeExl9g3X7/Zp7GYH9h7RDA==",
+          "tarball": "https://registry.npmjs.org/react-native-teleport/-/react-native-teleport-1.2.1.tgz"
+        },
+        {
+          "version": "1.2.2",
+          "peerDependencies": {
+            "react": "*",
+            "react-dom": "*",
+            "react-native": "*"
+          },
+          "publishedAt": "2026-09-10T12:03:32.242Z",
+          "integrity": "sha512-ot9G+y7VyvHE9kij4q82IcVikAlL+bgmzKn1O8BdtTgOsrfxQhfQ6I4vJJQla491CbRSHLqwRno8jOwYJocXyA==",
+          "tarball": "https://registry.npmjs.org/react-native-teleport/-/react-native-teleport-1.2.2.tgz"
+        }
+      ]
+    }
+  ]
+}

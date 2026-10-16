@@ -1,4 +1,4 @@
-import { render, waitFor } from "@testing-library/react";
+import { act, render, waitFor } from "@testing-library/react";
 import { createRef, type ReactNode, type Ref, StrictMode } from "react";
 import type { Mock } from "vite-plus/test";
 import { beforeEach, describe, expect, vi, test } from "vite-plus/test";
@@ -35,7 +35,7 @@ import {
   Source as MaplibreSource,
 } from "react-map-gl/maplibre";
 
-import { adapter } from "../src/maplibre-web.js";
+import { adapter, Map as SelectedMap } from "../src/maplibre-web.js";
 
 type WebMapMockModule = ReturnType<typeof createWebMapMock>;
 
@@ -56,6 +56,7 @@ const {
   getFeatureState: mockGetFeatureState,
   removeFeatureState: mockRemoveFeatureState,
   registerMockSource,
+  enableControlledSizeFeedback,
 } = (await vi.importMock("react-map-gl/maplibre")) as WebMapMockModule;
 
 const example = (
@@ -1159,11 +1160,97 @@ test("controlled web padding receives a zero reset", () => {
   );
   expect(MapMock.mock.calls.at(-1)?.[0]).toEqual(
     expect.objectContaining({
-      viewState: {
-        ...initialViewState,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
-      },
+      ...initialViewState,
+      viewState: undefined,
       padding: { top: 0, bottom: 0, left: 0, right: 0 },
     })
   );
+});
+
+test("portable controlled camera settles repeated MapLibre resize/move feedback without suppressing movement", () => {
+  resetWebMapMock();
+  enableControlledSizeFeedback();
+  const onMove = vi.fn();
+  const onResize = vi.fn();
+  const target = {
+    longitude: 12,
+    latitude: 34,
+    zoom: 5,
+    bearing: 60,
+    pitch: 20,
+  };
+  const mounted = render(
+    example(undefined, onMove, {
+      viewState: target,
+      padding: { left: 30 },
+      onResize,
+    })
+  );
+  expect(mockResize).not.toHaveBeenCalled();
+  expect(lastMapProps()).toMatchObject({
+    ...target,
+    viewState: undefined,
+    padding: { top: 0, bottom: 0, left: 30, right: 0 },
+  });
+  for (let report = 0; report < 5; report += 1) {
+    act(() => {
+      lastMapProps<{ onResize: () => void }>().onResize();
+      lastMapProps<{ onMove: (event: object) => void }>().onMove({
+        viewState: { ...target },
+        originalEvent: {},
+      });
+    });
+  }
+  expect(onMove).toHaveBeenCalledTimes(5);
+  expect(onResize).toHaveBeenCalledTimes(5);
+  expect(mockResize).not.toHaveBeenCalled();
+  const next = {
+    ...target,
+    longitude: 13,
+    latitude: 35,
+    zoom: 6,
+    bearing: 70,
+    pitch: 25,
+  };
+  mounted.rerender(example(undefined, onMove, { viewState: next }));
+  expect(lastMapProps()).toMatchObject({
+    ...next,
+    viewState: undefined,
+    padding: { top: 0, bottom: 0, left: 0, right: 0 },
+  });
+  mounted.rerender(example(undefined, onMove));
+  expect(lastMapProps()).toMatchObject({
+    longitude: undefined,
+    latitude: undefined,
+    zoom: undefined,
+    bearing: undefined,
+    pitch: undefined,
+    viewState: undefined,
+    padding: undefined,
+  });
+  expect(mockResize).not.toHaveBeenCalled();
+  mounted.unmount();
+});
+
+test("common MapLibre control overrides selected camera options and releases back to them", () => {
+  resetWebMapMock();
+  enableControlledSizeFeedback();
+  const selected = { longitude: 1, latitude: 2, zoom: 3, bearing: 4, pitch: 5 };
+  const target = { longitude: 0, latitude: 0, zoom: 0, bearing: 0, pitch: 0 };
+  const tree = (controlled: boolean) => (
+    <MapSetup adapter={adapter}>
+      <SelectedMap
+        mapStyle={{ version: 8, sources: {}, layers: [] }}
+        initialViewState={initialViewState}
+        options={selected}
+        viewState={controlled ? target : undefined}
+      />
+    </MapSetup>
+  );
+  const mounted = render(tree(true));
+  expect(lastMapProps()).toMatchObject({ ...target, viewState: undefined });
+  mounted.rerender(tree(false));
+  expect(lastMapProps()).toMatchObject({ ...selected, viewState: undefined });
+  expect(mockResize).not.toHaveBeenCalled();
+  mounted.unmount();
 });

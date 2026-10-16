@@ -1,0 +1,37 @@
+{
+  "checkpoint": "TF10 rc.2 repair audit",
+  "status": "routine audit passed; changed-artifact renderer acceptance requires authorization",
+  "artifact": {
+    "path": "artifacts/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "9d28992c19a791c0af66bc0efb6ee3844747b66d1a8680f5da8647c8c70d150c",
+    "bytes": 147845,
+    "regularFiles": 195,
+    "coordinatorVerifiedAgainstCurrentPackage": true
+  },
+  "problem": "Real rc.1 MapLibre web camera acceptance found a resize/movement/render loop. Portable nested viewState lacks the dimensions expected by react-map-gl 8.1.3 size control.",
+  "review": [
+    "Independently inspected the installed wrapper size predicate and its supported top-level controlled camera path.",
+    "Reviewed the shared adapter change, its callers and internal wrapper props declaration. MapLibre receives the five camera fields at top level; Mapbox retains its previous nested path.",
+    "Common state preserves zero values, overrides selected camera options while controlled, and releases back to selected options. Existing normalized padding and movement callbacks remain intact.",
+    "The bounded regression failed against the original path with nine resize iterations, then passed with the repair. The coordinator independently reran both new regression cases successfully.",
+    "Compared both archives: only README, package version, dist/adapters/web/map.js and its internal contracts.d.ts differ. Native package files are byte-identical.",
+    "Independently verified the rc.2 checksum, manifest version and every archived package file against the current package."
+  ],
+  "reportedRoutineResults": {
+    "validation": "553 Vitest tests, 212 Jest tests, standalone regressions, types, docs, inventory, lint, build and package checks passed.",
+    "frozenConsumers": "16 selected/mixed consumers, 26 package selections and four web example builds passed against rc.2 at exact minimum/newest tuples.",
+    "evidence": "records/evidence/tf10-rc2.json"
+  },
+  "acceptancePlan": {
+    "order": ["web", "android", "ios"],
+    "concurrency": "One runtime worker and one engine/version build at a time; low native build parallelism.",
+    "storage": "User has freed space. Check available storage before each build and remove only test-owned generated build outputs between runs.",
+    "worker": "GPT-6 Luna High, with coordinator diagnosis and final review."
+  },
+  "limitations": [
+    "Rc.1 failure and passes remain attached to rc.1; no rc.2 runtime result is claimed.",
+    "Native SDK resolution, linked binaries and controlled-camera gestures remain unverified.",
+    "Physical devices and the two named cache operations remain owner-excluded."
+  ],
+  "verdict": "Repair is concrete and ready for authorized acceptance. Publication remains unauthorized."
+}

@@ -1,0 +1,27 @@
+{
+  "candidateSha256": "bf92a760f06da72ff4614b98b44cc4b1d7da8495c5527498250d744bf66d25ab",
+  "scope": "First minimum TF04 camera acceptance attempt",
+  "results": {
+    "mapbox-web": {
+      "status": "passed",
+      "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+      "fields": {
+        "fit": "ok",
+        "click": "hit",
+        "clickAt": "-122.32000,47.64002",
+        "stop": "stayed",
+        "held": "1",
+        "doubletap": "skip",
+        "center": "-122.32000,47.64000",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      }
+    },
+    "maplibre-web": {
+      "status": "failed",
+      "error": "MapLibre web did not finish",
+      "log": "stead. Note that this option may be set by a plugin. Set VITE_DEPRECATION_TRACE=1 to see where it is called.\n\n  VITE+ v1.1.0  \n\n  \u279c  Local:   http://127.0.0.1:4174/\n10:42:08 AM [vite+] (client) [Unhandled error] Error: Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.\n > getRootForUpdatedFiber node_modules/react-dom/cjs/react-dom-client.development.js:4624:11\n > enqueueConcurrentHookUpdate node_modules/react-dom/cjs/react-dom-client.development.js:4584:14\n > dispatchSetStateInternal node_modules/react-dom/cjs/react-dom-client.development.js:9167:18\n > dispatchSetState node_modules/react-dom/cjs/react-dom-client.development.js:9127:7\n > Object.onMove node_modules/one-map-react/dist/facade/map.js:244:6\n > node_modules/one-map-react/dist/adapters/shared/use-active-callback.js:28:35\n > node_modules/one-map-react/dist/adapters/web/map.js:239:2\n > Maplibre._onCameraEvent node_modules/@vis.gl/react-maplibre/dist/maplibre/maplibre.js:103:17\n > UP.fire node_modules/maplibre-gl/src/util/evented.ts:173:26\n > UP.resize node_modules/maplibre-gl/src/ui/map.ts:1606:18\n\n10:42:08 AM [vite+] (client) [console.warn] An error occurred in the <ForwardRef(_Map)> component.\n\nConsider adding an error boundary to your tree to customize error handling behavior.\nVisit https://react.dev/link/error-boundaries to learn more about error boundaries.\n\n"
+    }
+  }
+}

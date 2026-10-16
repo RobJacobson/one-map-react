@@ -8,6 +8,7 @@
     "node": "^24.11.0 || >=26.0.0"
   },
   "workspaces": [
+    "apps/*",
     "packages/*"
   ],
   "scripts": {
@@ -15,23 +16,31 @@
     "format": "vp fmt",
     "check:docs": "bun scripts/check-docs.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json && tsc --noEmit -p tsconfig.examples.web.json && tsc --noEmit -p tsconfig.examples.native.json",
-    "build": "vp pack",
-    "test": "vp test run && bun run test:native && bun examples/mapbox-token.test.mjs && bun examples/inline-smoke-target.test.mjs && bun scripts/tf06-lifetimes-fixture.test.mjs && node scripts/native-smoke-process.test.mjs && bun scripts/native-smoke-process.test.mjs && bun scripts/tf06-smoke-selection.test.mjs && bun scripts/tf07-smoke-contract.test.mjs && bun scripts/tf08-patches.test.mjs && bun scripts/native-location-permissions.test.mjs && node scripts/tf08-image-observations.test.mjs && node scripts/tf08-final-observations.test.mjs && node scripts/tf08-pending-scope.test.mjs && node scripts/tf08-offline-observations.test.mjs && node scripts/tf08-offline-peers.test.mjs && node scripts/tf08-fused-location-fixture.test.mjs && node scripts/lint-policy.test.mjs && node scripts/tf09-rendering-fixture.test.mjs && node scripts/tf09-peer-patches.test.mjs",
+    "build": "vp -C packages/one-map-react pack && vp -C packages/example-map pack",
+    "test": "vp test run && bun run test:native && bun examples/mapbox-token.test.mjs && bun examples/inline-smoke-target.test.mjs && bun scripts/tf06-lifetimes-fixture.test.mjs && node scripts/native-smoke-process.test.mjs && bun scripts/native-smoke-process.test.mjs && bun scripts/tf06-smoke-selection.test.mjs && bun scripts/tf07-smoke-contract.test.mjs && bun scripts/tf08-patches.test.mjs && bun scripts/native-location-permissions.test.mjs && node scripts/tf08-image-observations.test.mjs && node scripts/tf08-final-observations.test.mjs && node scripts/tf08-pending-scope.test.mjs && node scripts/tf08-offline-observations.test.mjs && node scripts/tf08-offline-peers.test.mjs && node scripts/tf08-fused-location-fixture.test.mjs && node scripts/lint-policy.test.mjs && node scripts/tf09-rendering-fixture.test.mjs && node scripts/tf09-peer-patches.test.mjs && bun scripts/check-inventory.test.mjs && bun scripts/package-check-options.test.mjs && bun scripts/native-mapbox-version.test.mjs && node scripts/example-config.test.mjs",
     "test:peers": "bun run build && bun scripts/test-peers.mjs",
     "test:package": "bun run build && bun scripts/test-package.mjs",
     "test:example-resolution": "bun run build && bun scripts/test-example-resolution.mjs",
-    "validate": "bun run check && bun run check:docs && bun run typecheck && bun run test && bun run test:package",
+    "validate": "bun run check && bun run check:docs && bun run check:inventory && bun run typecheck && bun run test && bun run test:package",
     "pack": "bun run build && mkdir -p artifacts && cd packages/one-map-react && bun pm pack --destination ../../artifacts --ignore-scripts",
-    "test:native": "jest --runInBand"
+    "test:native": "jest --runInBand",
+    "check:inventory": "bun scripts/check-inventory.mjs",
+    "dev:web": "bun run build && bun run --parallel --filter one-map-react --filter @one-map/example-map --filter @one-map/web dev",
+    "dev:expo": "bun run build && bun run --parallel --filter one-map-react --filter @one-map/example-map --filter @one-map/expo dev",
+    "build:web": "bun run build && vp -C apps/web build",
+    "build:expo:web": "bun run build && bun run --filter @one-map/expo build:web",
+    "typecheck:apps": "tsc --noEmit -p packages/example-map/tsconfig.test.json && tsc --noEmit -p apps/web/tsconfig.json && tsc --noEmit -p apps/expo/tsconfig.json",
+    "verify:example-checkpoint": "node scripts/verify-example-checkpoint.mjs",
+    "test:compiled": "bun run build && vp test run --config vite.compiled.config.ts && jest --config jest.compiled.config.cjs --runInBand && node scripts/react-compiler.test.mjs"
   },
   "devDependencies": {
     "@babel/core": "7.25.2",
     "@babel/runtime": "7.25.0",
     "@jest/globals": "29.7.0",
     "@maplibre/maplibre-react-native": "11.5.0",
-    "@react-native/babel-preset": "0.87.1",
-    "@react-native/jest-preset": "0.87.1",
-    "@rnmapbox/maps": "10.3.7",
+    "@react-native/babel-preset": "0.86.3",
+    "@react-native/jest-preset": "0.86.3",
+    "@rnmapbox/maps": "10.3.8",
     "@testing-library/react": "16.3.3",
     "@testing-library/react-native": "14.1.0",
     "@types/geojson": "7946.0.16",
@@ -46,22 +55,26 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-map-gl": "8.1.3",
-    "react-native": "0.87.1",
+    "react-native": "0.86.3",
     "react-native-teleport": "1.2.1",
     "test-renderer": "1.3.0",
     "typescript": "7.0.2",
     "vite": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "@types/node": "26.6.5",
+    "babel-plugin-react-compiler": "1.0.0"
   },
   "patchedDependencies": {
     "@rnmapbox/maps@10.3.7": "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
-    "@maplibre/maplibre-react-native@11.5.0": "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch"
+    "@maplibre/maplibre-react-native@11.5.0": "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch",
+    "@rnmapbox/maps@10.3.8": "packages/one-map-react/patches/rnmapbox-10.3.8.patch"
   },
   "catalog": {
     "vite": "npm:@voidzero-dev/vite-plus-core@1.1.0",
     "vite-plus": "1.1.0"
   },
   "overrides": {
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "@expo/cli": "57.0.25"
   }
 }

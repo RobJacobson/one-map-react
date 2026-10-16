@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import type { MapRef } from "../../contracts/camera-types.js";
 import type { CaptureOptions } from "../../contracts/capture-types.js";
@@ -111,7 +111,7 @@ export class MapCaptureGate {
 
 /** Adds only capture-owned readiness and teardown to a wrapper map. */
 export const useMapCapture = (enabled = false): MapCaptureGate => {
-  const gate = useMemo(() => new MapCaptureGate(), []);
+  const [gate] = useState(() => new MapCaptureGate());
   useLayoutEffect(() => {
     gate.activate(enabled);
     return () => gate.dispose();

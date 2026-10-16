@@ -1,0 +1,225 @@
+{
+  "scope": "Primary exact native SDK parser and generated property-registry source inspection. This substantiates input transport or explicit unsupported boundaries; no renderer acceptance claimed.",
+  "sources": [
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/background_layer.cpp",
+      "sha256": "497946d324218d16114f52d7456f63dcea4be884c2714497d7c68bf594b8416a"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/circle_layer.cpp",
+      "sha256": "f88a33fb03644d7b887eed711194b443a8758feecda42d493f311a028ca720b2"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/color_relief_layer.cpp",
+      "sha256": "a015dbcb3af90a4e07cd06a7f3201dcc58901b5529df217f1b199c80f0f5e734"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/expression/compound_expression.cpp",
+      "sha256": "e5fa3343f0c61621a41b06231f9203cea3d9f2913fc4ebc2039a562bfc5e5bce"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/expression/expression.cpp",
+      "sha256": "57e6510384477410356fcb12f6d8684d5518424604108753d2c31eaac2cb2549"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/fill_extrusion_layer.cpp",
+      "sha256": "f9b3a7a305ec1ce419d9f732e0a8f7706170989efcc14c3d918efe7725c16835"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/fill_layer.cpp",
+      "sha256": "86590b28e58faea87d7220b0d9cec3bf609829ceb0c338a29d7541a29006a7e9"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/expression/format_expression.cpp",
+      "sha256": "bb19680b4109227806fabe8e86cbe48479347c9b8fea29bd29aa43e49763508e"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/conversion/geojson_options.cpp",
+      "sha256": "ceb3e6e0845d39193d426544dc4b45ccf62fdd431b18d53f18ebe3700c2fbcbb"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/heatmap_layer.cpp",
+      "sha256": "b255627b6c01e902edee7ac07ba6c4804771c7b9de2304a8f94f3d66a8bbb8b3"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/hillshade_layer.cpp",
+      "sha256": "9611ff4617a4098082e78b319b106d62ffa252e9469ddde0781634cbb6aa7f76"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/expression/interpolate.cpp",
+      "sha256": "993da9668a424c9812e237f04b3dedfb35ada6ace4a562a50d869430eb690f80"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/expression/is_expression.cpp",
+      "sha256": "19ebe4c44fd55f38464d2d044d44bcd28e8c00effd7fd790baf3944424ba73df"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/line_layer.cpp",
+      "sha256": "648c966228b13e6a290eba1a39a572f8c8676531b44374d776a39e499a5e8267"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/expression/number_format.cpp",
+      "sha256": "9ce1f0cafdb4af1889fd7e061e660374814a5452dc8f518957b0e723870f9c86"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/parser.cpp",
+      "sha256": "b8bb04fb8ea249171c8c0cdd30866830682dc2eb1b7634fe584bed88ec63c32b"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/expression/parsing_context.cpp",
+      "sha256": "82faf80ee691d2f1fd67b84e4538f94bb5b481bccac71d97f55d75deea82aae5"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/raster_layer.cpp",
+      "sha256": "c9518c836afe45f64a2d8b1adf2f520edb6b6c86d43f80cc707f8a3949d5a36d"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/conversion/source.cpp",
+      "sha256": "c04c16afa5f48d64ec13dc83e69b1150a8463fdeffa26c4194c9def0e70b278a"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/conversion/source_options.cpp",
+      "sha256": "013338b20a9a97d256d8953a0dced7308e005f1243c563d1ed4879f6fb96ae49"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/layers/symbol_layer.cpp",
+      "sha256": "7bda1f77ab8fc2cc6c34a6832acd0f20638351612b074d47f9a1778ef6c27c99"
+    },
+    {
+      "tag": "android-v13.6.1",
+      "url": "https://github.com/maplibre/maplibre-native/blob/android-v13.6.1/src/mln/style/conversion/tileset.cpp",
+      "sha256": "a1bc3e7a199fab80be98a546d0655fffcb85e93c5166099251b940321cd57578"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/background_layer.cpp",
+      "sha256": "497946d324218d16114f52d7456f63dcea4be884c2714497d7c68bf594b8416a"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/circle_layer.cpp",
+      "sha256": "f88a33fb03644d7b887eed711194b443a8758feecda42d493f311a028ca720b2"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/color_relief_layer.cpp",
+      "sha256": "a015dbcb3af90a4e07cd06a7f3201dcc58901b5529df217f1b199c80f0f5e734"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/expression/compound_expression.cpp",
+      "sha256": "e5fa3343f0c61621a41b06231f9203cea3d9f2913fc4ebc2039a562bfc5e5bce"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/expression/expression.cpp",
+      "sha256": "57e6510384477410356fcb12f6d8684d5518424604108753d2c31eaac2cb2549"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/fill_extrusion_layer.cpp",
+      "sha256": "f9b3a7a305ec1ce419d9f732e0a8f7706170989efcc14c3d918efe7725c16835"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/fill_layer.cpp",
+      "sha256": "86590b28e58faea87d7220b0d9cec3bf609829ceb0c338a29d7541a29006a7e9"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/expression/format_expression.cpp",
+      "sha256": "bb19680b4109227806fabe8e86cbe48479347c9b8fea29bd29aa43e49763508e"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/conversion/geojson_options.cpp",
+      "sha256": "ceb3e6e0845d39193d426544dc4b45ccf62fdd431b18d53f18ebe3700c2fbcbb"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/heatmap_layer.cpp",
+      "sha256": "b255627b6c01e902edee7ac07ba6c4804771c7b9de2304a8f94f3d66a8bbb8b3"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/hillshade_layer.cpp",
+      "sha256": "9611ff4617a4098082e78b319b106d62ffa252e9469ddde0781634cbb6aa7f76"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/expression/interpolate.cpp",
+      "sha256": "993da9668a424c9812e237f04b3dedfb35ada6ace4a562a50d869430eb690f80"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/expression/is_expression.cpp",
+      "sha256": "19ebe4c44fd55f38464d2d044d44bcd28e8c00effd7fd790baf3944424ba73df"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/line_layer.cpp",
+      "sha256": "648c966228b13e6a290eba1a39a572f8c8676531b44374d776a39e499a5e8267"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/expression/number_format.cpp",
+      "sha256": "9ce1f0cafdb4af1889fd7e061e660374814a5452dc8f518957b0e723870f9c86"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/parser.cpp",
+      "sha256": "b8bb04fb8ea249171c8c0cdd30866830682dc2eb1b7634fe584bed88ec63c32b"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/expression/parsing_context.cpp",
+      "sha256": "42b7e942796be0e43383ba2c4bf8e7dbc98b3c3466fe20bcf8fd4ac108626ebc"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/raster_layer.cpp",
+      "sha256": "c9518c836afe45f64a2d8b1adf2f520edb6b6c86d43f80cc707f8a3949d5a36d"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/conversion/source.cpp",
+      "sha256": "c04c16afa5f48d64ec13dc83e69b1150a8463fdeffa26c4194c9def0e70b278a"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/conversion/source_options.cpp",
+      "sha256": "013338b20a9a97d256d8953a0dced7308e005f1243c563d1ed4879f6fb96ae49"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/layers/symbol_layer.cpp",
+      "sha256": "7bda1f77ab8fc2cc6c34a6832acd0f20638351612b074d47f9a1778ef6c27c99"
+    },
+    {
+      "tag": "ios-v6.31.0",
+      "url": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/style/conversion/tileset.cpp",
+      "sha256": "a1bc3e7a199fab80be98a546d0655fffcb85e93c5166099251b940321cd57578"
+    }
+  ]
+}

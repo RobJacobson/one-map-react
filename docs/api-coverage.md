@@ -1,12 +1,14 @@
 # API coverage
 
+TF10 reconciles12,151 entries to current source/test/evidence paths.12,149 have an implemented route or substantiated composition/internal/unsupported boundary; the two owner-excluded RNMapbox cache operations remain pending. All current candidate runtime cells remain unverified. Counts include schema fields, host fields, types and aliases, not independent rendering guarantees. The [release record](tf10-release.md) and [support matrix](../records/support-matrix.json) define current scope.
+
 **Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.
 
 The [versioned inventory](../records/api-coverage.json) records upstream fields and operations separately from implementation and runtime verification. Baselines are frozen in [version-baseline.json](../records/version-baseline.json). Support expectations are proposals until the owning stage supplies evidence; pending work is not an SDK limitation.
 
 TF08 reconciles 541 entries to implemented common or named APIs, with runtime verification explicitly unverified. The four adjacent canvas-source/advanced-sizing entries are implemented through selected web Source and Map.options routes; their scoped reconciliation and per-family runtime status are recorded in [TF09 coverage](../records/evidence/tf09-coverage.json) and the [advanced rendering reference](tf09-rendering.md). The [TF08 record](tf08-location-offline-capture.md) and [evidence](../records/evidence/tf08-implementation.json) define the counted scope; entry counts include fields, types, and aliases rather than independent compatibility claims.
 
-12131 entries are assigned to stages. The inventory notes in JSON preserve research gaps and follow-up investigations. This count measures inventoried APIs, not implemented compatibility.
+The baseline 12,131 entries remain assigned to their historical stages; 20 endpoint additions bring the current inventory to 12,151 entries. The inventory notes in JSON preserve research gaps and follow-up investigations. This count measures inventoried APIs, not implemented compatibility.
 
 | Stage | Assigned entries |
 | --- | --- |

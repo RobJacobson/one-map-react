@@ -68,6 +68,181 @@ describe.each([
     delete mock.selectedMethods[name];
   });
 
+  test.each([
+    ["on", ["idle", (): void => undefined]],
+    ["off", ["idle", (): void => undefined]],
+    ["once", ["idle"]],
+    [
+      "addControl",
+      [
+        {
+          onAdd: (): HTMLElement => document.createElement("div"),
+          onRemove: (): void => undefined,
+        },
+        "top-left",
+      ],
+    ],
+    ["removeControl", [{}]],
+    ["hasControl", [{}]],
+    ["getCanvas", []],
+    ["getCanvasContainer", []],
+    ["getContainer", []],
+    ["getStyle", []],
+    ["loaded", []],
+    ["isStyleLoaded", []],
+    ["areTilesLoaded", []],
+    ["triggerRepaint", []],
+  ] as const)(
+    "%s preserves arguments, synchronous results, failures and detachment",
+    (method, args) => {
+      const mock = wrapper as unknown as MockModule;
+      mock.resetWebMapMock();
+      const result = { method };
+      const operation = vi.fn(() => result);
+      mock.selectedMethods[method] = operation;
+      const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
+      const mounted = render(
+        <MapSetup adapter={entry.adapter}>
+          <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
+        </MapSetup>
+      );
+      const selected = ref.current;
+      if (!selected) throw new Error("No selected map ref.");
+      const call = () => Reflect.apply(selected[method], selected, args);
+      expect(call()).toBe(result);
+      expect(operation).toHaveBeenCalledWith(...args);
+      const failure = new Error("wrapper operation failed");
+      operation.mockImplementationOnce(() => {
+        throw failure;
+      });
+      expect(call).toThrow(failure);
+      mounted.unmount();
+      expect(call).toThrow("not attached");
+      delete mock.selectedMethods[method];
+    }
+  );
+
+  test("selected handler settings keep keyboard panning separate and forward SDK rates", () => {
+    const mock = wrapper as unknown as MockModule;
+    mock.resetWebMapMock();
+    const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
+    const mounted = render(
+      <MapSetup adapter={entry.adapter}>
+        <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
+      </MapSetup>
+    );
+    const renderer = mock.getStyleTarget();
+    if (!renderer || !ref.current) throw new Error("Missing renderer.");
+    const selected = ref.current;
+    const setZoomRate = vi.fn();
+    const setWheelZoomRate = vi.fn();
+    const enableRotation = vi.fn();
+    const disableRotation = vi.fn();
+    const isEnabled = vi.fn(() => true);
+    const isActive = vi.fn(() => false);
+    Object.assign(renderer, {
+      scrollZoom: { setZoomRate, setWheelZoomRate, isEnabled, isActive },
+      keyboard: { enableRotation, disableRotation },
+    });
+    selected.getGestureHandler("scrollZoom").setZoomRate(1 / 100);
+    selected.getGestureHandler("scrollZoom").setWheelZoomRate(1 / 600);
+    selected.getGestureHandler("keyboard").disableRotation();
+    selected.getGestureHandler("keyboard").enableRotation();
+    expect(selected.getGestureHandler("scrollZoom").isEnabled()).toBe(true);
+    expect(selected.getGestureHandler("scrollZoom").isActive()).toBe(false);
+    expect(isEnabled).toHaveBeenCalledTimes(1);
+    expect(isActive).toHaveBeenCalledTimes(1);
+    expect(() =>
+      Reflect.apply(selected.getGestureHandler, selected, ["unknown"])
+    ).toThrow("Unknown gesture handler");
+    expect(setZoomRate).toHaveBeenCalledWith(1 / 100);
+    expect(setWheelZoomRate).toHaveBeenCalledWith(1 / 600);
+    expect(disableRotation).toHaveBeenCalledTimes(1);
+    expect(enableRotation).toHaveBeenCalledTimes(1);
+    const retained = ref.current;
+    const failure = new Error("SDK rate failure");
+    setZoomRate.mockImplementationOnce(() => {
+      throw failure;
+    });
+    expect(() =>
+      retained.getGestureHandler("scrollZoom").setZoomRate(0)
+    ).toThrow(failure);
+    mounted.unmount();
+    expect(() =>
+      retained.getGestureHandler("scrollZoom").setWheelZoomRate(0)
+    ).toThrow("not attached");
+    expect(() => retained.getGestureHandler("keyboard")).toThrow(
+      "not attached"
+    );
+  });
+
+  test("plugin event production dispatches through the named SDK route with errors and detach checks", () => {
+    const mock = wrapper as unknown as MockModule;
+    mock.resetWebMapMock();
+    const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
+    const mounted = render(
+      <MapSetup adapter={entry.adapter}>
+        <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
+      </MapSetup>
+    );
+    const renderer = mock.getStyleTarget();
+    const selected = ref.current;
+    if (!renderer || !selected) throw new Error("Missing renderer.");
+    const result = { dispatched: true };
+    const fire = vi.fn(() => result);
+    Object.assign(renderer, { fire });
+    const data = { plugin: "example" };
+    expect(Reflect.apply(selected.fire, selected, ["plugin-event", data])).toBe(
+      result
+    );
+    expect(fire).toHaveBeenCalledWith("plugin-event", data);
+    const failure = new Error("plugin event failure");
+    fire.mockImplementationOnce(() => {
+      throw failure;
+    });
+    expect(() =>
+      Reflect.apply(selected.fire, selected, ["plugin-event", data])
+    ).toThrow(failure);
+    mounted.unmount();
+    expect(() =>
+      Reflect.apply(selected.fire, selected, ["plugin-event", data])
+    ).toThrow("not attached");
+  });
+
+  if (entry === maplibre) {
+    test("public MapLibre event-parent routing preserves arguments, result and attachment", () => {
+      const mock = wrapper as unknown as MockModule;
+      mock.resetWebMapMock();
+      const ref = createRef<maplibre.WebMapRef>();
+      const mounted = render(
+        <MapSetup adapter={maplibre.adapter}>
+          <maplibre.Map ref={ref} mapStyle={style} initialViewState={camera} />
+        </MapSetup>
+      );
+      const renderer = mock.getStyleTarget();
+      const selected = ref.current;
+      if (!renderer || !selected) throw new Error("Missing renderer.");
+      const result = { parented: true };
+      const parent = null;
+      const data = { plugin: "example" };
+      const setEventedParent = vi.fn(() => result);
+      Object.assign(renderer, { setEventedParent });
+      expect(
+        Reflect.apply(selected.setEventedParent, selected, [parent, data])
+      ).toBe(result);
+      expect(setEventedParent).toHaveBeenCalledWith(parent, data);
+      const failure = new Error("event-parent failure");
+      setEventedParent.mockImplementationOnce(() => {
+        throw failure;
+      });
+      expect(() => selected.setEventedParent(parent, data)).toThrow(failure);
+      mounted.unmount();
+      expect(() => selected.setEventedParent(parent, data)).toThrow(
+        "not attached"
+      );
+    });
+  }
+
   test("canvas coordinates are mutable, canvas identity requires remount, and teardown stays with wrapper", () => {
     const mock = wrapper as unknown as MockModule;
     const canvas = document.createElement("canvas");

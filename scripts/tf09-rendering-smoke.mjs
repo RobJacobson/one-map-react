@@ -306,7 +306,8 @@ try {
         : "@maplibre/maplibre-react-native";
     const evidence = JSON.parse(
       readFileSync(
-        join(root, "records/evidence/tf09-implementation.json"),
+        process.env.TF09_PEER_EVIDENCE ??
+          join(root, "records/evidence/tf09-implementation.json"),
         "utf8"
       )
     );
@@ -394,6 +395,18 @@ try {
   if (platform === "web") {
     await scenario("named selected renderer facilities", async () => {
       const result = await action("named");
+      assert.deepEqual(result.tf10.dragPan, {
+        before: true,
+        disabled: false,
+        restored: true,
+      });
+      for (const field of ["source", "layer", "canvas", "styleLayer"])
+        assert.equal(result.tf10[field], true, `TF10 selected ${field}`);
+      assert.equal(
+        result.tf10.eventCalls,
+        1,
+        "TF10 on/fire/off removes its listener"
+      );
       if (engine === "mapbox") {
         assert.equal(result.scale, 1.2);
         assert(result.rain);

@@ -64,9 +64,9 @@ export interface MapProps {
    *
    * When this is set, it replaces later changes from `initialViewState`.
    * Web adapters forward it to react-map-gl. Native adapters write it onto
-   * the camera child. That write is not the strict `controlledCamera`
-   * capability: a rejected native move is unverified until a renderer check
-   * shows the displayed camera return to this value.
+   * the camera child and reconcile rejected proposals after application callbacks
+   * commit. Native renderer acceptance remains unverified; the strict
+   * `controlledCamera` capability stays unavailable until that check passes.
    */
   readonly viewState?: ViewState;
   /** Lowest zoom the camera may use. */

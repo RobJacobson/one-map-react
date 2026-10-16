@@ -117,7 +117,7 @@ interface WebViewState extends ViewState {
   readonly padding?: Required<Padding>;
 }
 
-interface WebMapProps {
+interface WebMapProps extends Partial<ViewState> {
   readonly terrain?: MapProps["terrain"];
   readonly projection?:
     | { readonly type: "mercator" | "globe" }

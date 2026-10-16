@@ -15,6 +15,13 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  packageCheckOptions,
+  selectedVersions,
+} from "./package-check-options.mjs";
+
+const options = packageCheckOptions();
+const evidence = [];
 const root = resolve(import.meta.dirname, "..");
 const output = mkdtempSync(join(tmpdir(), "one-map-tf02-"));
 const compiler = join(root, "node_modules/.bin/tsc");
@@ -133,16 +140,19 @@ const walkDeclarations = (file, seen = new Set()) => {
 
 const main = async () => {
   try {
-    run(
-      "bun",
-      ["pm", "pack", "--destination", output, "--ignore-scripts"],
-      join(root, "packages/one-map-react")
-    );
-    const archives = readdirSync(output).filter((name) =>
-      name.endsWith(".tgz")
-    );
-    assert.equal(archives.length, 1);
-    const archive = join(output, archives[0]);
+    let archive = options.archive;
+    if (!archive) {
+      run(
+        "bun",
+        ["pm", "pack", "--destination", output, "--ignore-scripts"],
+        join(root, "packages/one-map-react")
+      );
+      const archives = readdirSync(output).filter((name) =>
+        name.endsWith(".tgz")
+      );
+      assert.equal(archives.length, 1);
+      archive = join(output, archives[0]);
+    }
     const files = run("tar", ["-tzf", archive], output).split("\n");
     assert(files.includes("package/LICENSE"));
     assert(files.includes("package/README.md"));
@@ -153,10 +163,11 @@ const main = async () => {
     );
     assert(files.includes("package/patches/rnmapbox-10.3.7-tf08.patch"));
     assert(files.includes("package/patches/maplibre-native-11.5.0-tf08.patch"));
+    assert(files.includes("package/patches/rnmapbox-10.3.8.patch"));
     for (const file of files) {
       assert.match(
         file,
-        /^package\/(?:dist\/.+|patches\/(?:rnmapbox-10\.3\.7-(?:per-view-events|tf08)|maplibre-native-11\.5\.0-tf08)\.patch|package.json|README.md|LICENSE)$/
+        /^package\/(?:dist\/.+|patches\/(?:rnmapbox-10\.3\.(?:7-(?:per-view-events|tf08)|8)|maplibre-native-11\.5\.0-tf08)\.patch|package.json|README.md|LICENSE)$/
       );
     }
 
@@ -174,6 +185,11 @@ const main = async () => {
       "SCOPE: packed publication, common entry without backend types, and selected-entry file resolution; no wrapper installs, Metro, or native builds."
     );
   } finally {
+    if (options.evidence)
+      writeFileSync(
+        options.evidence,
+        JSON.stringify({ checks: evidence }, null, 2) + "\n"
+      );
     rmSync(output, { recursive: true, force: true });
   }
 };
@@ -198,6 +214,21 @@ const checkConsumer = async (archive, scenario) => {
     join(consumer, "package.json"),
     '{"private":true,"type":"module"}\n'
   );
+
+  if (Object.keys(options.versions).length) {
+    run(
+      "bun",
+      [
+        "add",
+        archive,
+        ...selectedVersions(
+          ["react@19.2.3", "@types/react@19.2.18"],
+          options.versions
+        ),
+      ],
+      consumer
+    );
+  }
 
   if (scenario.name === "common") {
     walkDeclarations(join(installed, "dist/index.d.ts"));
@@ -313,9 +344,33 @@ const invalid: Adapter = { backend: "automatic" };
   const installedPackages = readdirSync(join(consumer, "node_modules"));
   assert.deepEqual(installedPackages.sort(), [
     "@types",
+    ...(Object.keys(options.versions).length ? ["csstype"] : []),
     "one-map-react",
     "react",
   ]);
+  evidence.push({
+    scenario: scenario.name,
+    archiveSha256: createHash("sha256")
+      .update(readFileSync(archive))
+      .digest("hex"),
+    react: JSON.parse(
+      readFileSync(join(consumer, "node_modules/react/package.json"), "utf8")
+    ).version,
+    reactTypes: JSON.parse(
+      readFileSync(
+        join(consumer, "node_modules/@types/react/package.json"),
+        "utf8"
+      )
+    ).version,
+    lockfileSha256: existsSync(join(consumer, "bun.lock"))
+      ? createHash("sha256")
+          .update(readFileSync(join(consumer, "bun.lock")))
+          .digest("hex")
+      : null,
+    status: "passed",
+    scope:
+      "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers",
+  });
 };
 
 await main();

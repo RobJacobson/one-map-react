@@ -101,26 +101,15 @@ export default defineConfig({
       "typescript/no-non-null-assertion": "error",
     },
   },
-  pack: {
-    entry: [
-      "packages/one-map-react/src/**/*.ts",
-      "packages/one-map-react/src/**/*.tsx",
-    ],
-    outDir: "packages/one-map-react/dist",
-    unbundle: true,
-    dts: { tsconfig: "tsconfig.build.json" },
-    tsconfig: "tsconfig.build.json",
-    format: ["esm"],
-    deps: { neverBundle: true },
-    exports: false,
-    outExtensions: () => ({ js: ".js", dts: ".d.ts" }),
-  },
   test: {
     projects: [
       {
         test: {
           name: "unit",
-          include: ["packages/one-map-react/test/**/*.test.ts"],
+          include: [
+            "packages/one-map-react/test/**/*.test.ts",
+            "packages/example-map/test/**/*.test.ts",
+          ],
           environment: "node",
         },
       },
@@ -140,7 +129,10 @@ export default defineConfig({
         },
         test: {
           name: "web",
-          include: ["packages/one-map-react/test/**/*.web.test.tsx"],
+          include: [
+            "packages/one-map-react/test/**/*.web.test.tsx",
+            "packages/example-map/test/**/*.web.test.tsx",
+          ],
           environment: "jsdom",
           setupFiles: ["./packages/one-map-react/test/setup-web.ts"],
         },

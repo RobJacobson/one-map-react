@@ -22,11 +22,22 @@ import type {
   WebWrapper,
 } from "../src/adapters/web/contracts.js";
 import { createWebUi } from "../src/adapters/web/ui.js";
+import type { Adapter } from "../src/contracts/adapter.js";
+import type { MapProps } from "../src/contracts/map-types.js";
 import type { MarkerRef } from "../src/contracts/ui-types.js";
 import {
   type MapSession,
   MapSessionContext,
 } from "../src/facade/map-context.js";
+import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap } from "../src/facade/map.js";
+import {
+  Marker as SharedMarker,
+  Popup as SharedPopup,
+  NavigationControl as SharedNavigationControl,
+  ScaleControl as SharedScaleControl,
+  Control as SharedControl,
+} from "../src/facade/ui.js";
 
 const markerProps: WebForwardedProps[] = [];
 const popupProps: WebForwardedProps[] = [];
@@ -363,4 +374,61 @@ describe("TF07 web UI delegates", () => {
     view.unmount();
     expect(release).toHaveBeenCalledTimes(2);
   });
+});
+
+const UIMap = forwardRef<never, MapProps>((props, _ref) => (
+  <div>{props.children}</div>
+));
+const sharedUiAdapter = {
+  backend: "mapbox-web",
+  services: { location: {} },
+  Map: UIMap,
+  ...createWebUi(wrapper),
+} as unknown as Adapter;
+
+test("shared UI accepts effective creation defaults in both directions", () => {
+  const tree = (explicit: boolean) => (
+    <MapSetup adapter={sharedUiAdapter}>
+      <OneMap
+        mapStyle={{ version: 8, sources: {}, layers: [] }}
+        initialViewState={{
+          longitude: 0,
+          latitude: 0,
+          zoom: 1,
+          bearing: 0,
+          pitch: 0,
+        }}
+      >
+        <SharedMarker
+          longitude={0}
+          latitude={0}
+          anchor={explicit ? "bottom" : undefined}
+          renderMode={explicit ? "view" : undefined}
+        />
+        <SharedPopup
+          longitude={0}
+          latitude={0}
+          closeButton={explicit ? true : undefined}
+          closeOnClick={explicit ? true : undefined}
+          closeOnMove={explicit ? false : undefined}
+          focusAfterOpen={explicit ? true : undefined}
+        />
+        <SharedNavigationControl
+          position={explicit ? "top-right" : undefined}
+          showZoom={explicit ? true : undefined}
+          showCompass={explicit ? true : undefined}
+          visualizePitch={explicit ? false : undefined}
+        />
+        <SharedScaleControl
+          position={explicit ? "top-right" : undefined}
+          maxWidth={explicit ? 100 : undefined}
+        />
+        <SharedControl position={explicit ? "top-right" : undefined} />
+      </OneMap>
+    </MapSetup>
+  );
+  const mounted = render(tree(false));
+  expect(() => mounted.rerender(tree(true))).not.toThrow();
+  expect(() => mounted.rerender(tree(false))).not.toThrow();
+  mounted.unmount();
 });

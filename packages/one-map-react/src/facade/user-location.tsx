@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { useId } from "react";
 
 import { validatePosition } from "../adapters/shared/location-values.js";
 import type { UserLocationProps } from "../contracts/location-types.js";
@@ -13,10 +13,7 @@ export const UserLocation = ({
   onPress,
 }: UserLocationProps) => {
   const id = `one-map-location-${useId()}`;
-  const data = useMemo(
-    () => locationGeometry(position, showAccuracyCircle),
-    [position, showAccuracyCircle]
-  );
+  const data = locationGeometry(position, showAccuracyCircle);
   if (!position) return null;
   return (
     <Source id={id} type="geojson" data={data} onClick={onPress}>

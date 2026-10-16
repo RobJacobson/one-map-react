@@ -3,6 +3,7 @@ import {
   Map as OneMap,
   type MapLayoutStyle,
   type MapRef,
+  type ViewState,
   Source,
 } from "one-map-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -44,6 +45,23 @@ export const Tf09Scene = ({
   readonly named?: (map: MapRef) => unknown;
 }) => {
   const ref = useRef<MapRef>(null);
+  const [controlled, setControlled] = useState<ViewState | undefined>(
+    undefined
+  );
+  const [clamped, setClamped] = useState(false);
+  const committedClamp = useRef(false);
+  const acceptProposals = useRef(false);
+  const cameraObservations = useRef<{
+    moves: number;
+    ends: number;
+    origin: string;
+    viewState?: ViewState;
+  }>({ moves: 0, ends: 0, origin: "unknown" });
+  const controlledTarget = useRef(controlled);
+  useEffect(() => {
+    controlledTarget.current = controlled;
+    committedClamp.current = clamped;
+  }, [controlled, clamped]);
   const [enabled, setEnabled] = useState(false);
   const [dem, setDem] = useState(false);
   const [shade, setShade] = useState(true);
@@ -60,6 +78,13 @@ export const Tf09Scene = ({
   useEffect(() => {
     attach({
       command: async (action, value = {}) => {
+        if (action === "controlled-camera") {
+          acceptProposals.current = value.accept === true;
+          setControlled(value.enabled === false ? undefined : camera);
+          setClamped(value.enabled !== false && value.clamp === true);
+          cameraObservations.current = { moves: 0, ends: 0, origin: "unknown" };
+          return true;
+        }
         if (action === "configure") {
           setDem(value.dem === true);
           setShade(value.shade !== false);
@@ -73,6 +98,18 @@ export const Tf09Scene = ({
         }
         const map = ref.current;
         if (!map) throw new Error("Map is not attached.");
+        if (action === "camera-command") {
+          await map.jumpTo({ center: [10, 10], zoom: 3, bearing: 0, pitch: 0 });
+          return true;
+        }
+        if (action === "camera-read")
+          return {
+            ...cameraObservations.current,
+            controlled: controlledTarget.current,
+            clamp: committedClamp.current,
+            center: await map.getCenter(),
+            zoom: await map.getZoom(),
+          };
         if (action === "projection-view") {
           await map.jumpTo({ center: [0, 0], zoom: 0, pitch: 0 });
           setDem(false);
@@ -115,6 +152,20 @@ export const Tf09Scene = ({
       ref={ref}
       mapStyle={{ ...baseStyle, name: `rendering-${revision}` }}
       initialViewState={camera}
+      viewState={controlled}
+      minZoom={clamped ? 3 : undefined}
+      onMove={(event) => {
+        cameraObservations.current.moves += 1;
+        cameraObservations.current.origin = event.origin;
+        cameraObservations.current.viewState = event.viewState;
+        if (acceptProposals.current) setControlled(event.viewState);
+      }}
+      onMoveEnd={(event) => {
+        cameraObservations.current.ends += 1;
+        cameraObservations.current.origin = event.origin;
+        cameraObservations.current.viewState = event.viewState;
+        if (acceptProposals.current) setControlled(event.viewState);
+      }}
       captureEnabled
       style={style}
       projection={projection}

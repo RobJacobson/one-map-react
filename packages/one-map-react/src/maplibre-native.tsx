@@ -1,11 +1,19 @@
+import { forwardRef } from "react";
+
 import type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
+import {
+  assertMaplibreLayerStyle,
+  assertMaplibreStyleRoots,
+} from "./adapters/maplibre-native/style-roots.js";
 export type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
-import type {
+import {
   Map as MaplibreMap,
-  Camera as WrapperCamera,
+  Layer as MaplibreLayer,
 } from "@maplibre/maplibre-react-native";
+import type { Camera as WrapperCamera } from "@maplibre/maplibre-react-native";
 import type {
   ComponentProps,
+  ComponentRef,
   ComponentType,
   ForwardRefExoticComponent,
   RefAttributes,
@@ -129,7 +137,6 @@ export {
   LogManager,
   NetworkManager,
   TransformRequestManager,
-  Layer,
 } from "@maplibre/maplibre-react-native";
 export type {
   MapLibrePluginProps,
@@ -144,3 +151,31 @@ export type {
   UrlSearchParamOptions,
   HeaderOptions,
 } from "@maplibre/maplibre-react-native";
+
+/** Complete wrapper composition for selected props and imperative refs. Use WrapperCamera inside WrapperMap, which owns its camera context. */
+export {
+  Camera as WrapperCamera,
+  GeoJSONSource as WrapperGeoJSONSource,
+  VectorSource as WrapperVectorSource,
+  RasterSource as WrapperRasterSource,
+  RasterDEMSource as WrapperRasterDEMSource,
+  ImageSource as WrapperImageSource,
+  Images as WrapperImages,
+  Marker as WrapperMarker,
+  OfflinePack as WrapperOfflinePack,
+} from "@maplibre/maplibre-react-native";
+
+/** Selected wrapper map with explicit native SDK style-root boundaries. */
+export const WrapperMap = forwardRef<
+  ComponentRef<typeof MaplibreMap>,
+  ComponentProps<typeof MaplibreMap>
+>((props, ref) => {
+  assertMaplibreStyleRoots(props.mapStyle);
+  return <MaplibreMap {...props} ref={ref} />;
+});
+
+/** Selected complete wrapper layer with explicit pinned-native expression boundaries. */
+export const Layer = (props: ComponentProps<typeof MaplibreLayer>) => {
+  assertMaplibreLayerStyle(props);
+  return <MaplibreLayer {...props} />;
+};

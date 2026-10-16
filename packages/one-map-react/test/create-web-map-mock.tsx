@@ -125,6 +125,17 @@ interface WebMapMockProps extends HandlerProps {
   readonly gl?: { readonly drawingBufferWidth: number };
   readonly onError?: (event: ErrorNotice) => void;
   readonly onLoad?: () => void;
+  readonly onResize?: () => void;
+  readonly viewState?: { readonly width?: number; readonly height?: number };
+  readonly onMove?: (event: {
+    viewState: {
+      longitude: number;
+      latitude: number;
+      zoom: number;
+      bearing: number;
+      pitch: number;
+    };
+  }) => void;
 }
 
 /**
@@ -248,12 +259,16 @@ export const createWebMapMock = () => {
   let serial = 0;
   let currentStyleTarget: StyleLoadTarget | null = null;
   let loadBeforeAttachment = false;
+  let controlledSizeFeedback = false;
+  let feedbackReports = 0;
 
   const resetWebMapMock = (): void => {
     saved = null;
     serial = 0;
     currentStyleTarget = null;
     loadBeforeAttachment = false;
+    controlledSizeFeedback = false;
+    feedbackReports = 0;
     flyTo.mockClear();
     jumpTo.mockClear();
     easeTo.mockClear();
@@ -334,6 +349,30 @@ export const createWebMapMock = () => {
 
       useLayoutEffect(() => {
         record.styleTarget.applyHandlerProps(handlerProps);
+      });
+
+      useLayoutEffect(() => {
+        const viewState = handlerProps.viewState;
+        // Exact react-maplibre 8.1.3 size predicate. Bound feedback to keep a
+        // regression failure readable instead of throwing React's depth limit.
+        if (
+          controlledSizeFeedback &&
+          viewState &&
+          (viewState.width !== 400 || viewState.height !== 300)
+        ) {
+          resize();
+          handlerProps.onResize?.();
+          if (feedbackReports++ < 8)
+            handlerProps.onMove?.({
+              viewState: {
+                longitude: -122.34,
+                latitude: 47.61,
+                zoom: 11,
+                bearing: 0,
+                pitch: 0,
+              },
+            });
+        }
       });
 
       useLayoutEffect(() => {
@@ -477,6 +516,9 @@ export const createWebMapMock = () => {
     enableRotation,
     selectedMethods,
     resetWebMapMock,
+    enableControlledSizeFeedback: () => {
+      controlledSizeFeedback = true;
+    },
     loadBeforeAttachment: () => {
       loadBeforeAttachment = true;
     },
