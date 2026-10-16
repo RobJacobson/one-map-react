@@ -116,6 +116,48 @@ export const adapter: Adapter & { readonly backend: "mapbox-web" } =
           "getTerrain",
           "getProjection",
           "getLight",
+          "getLanguage",
+          "setLanguage",
+          "getWorldview",
+          "setWorldview",
+          "getScaleFactor",
+          "setScaleFactor",
+          "getGlyphsUrl",
+          "getSchema",
+          "getSlot",
+          "getSlots",
+          "listModels",
+          "setGlyphsUrl",
+          "setSchema",
+          "setSlot",
+          "setRain",
+          "getRain",
+          "setSnow",
+          "getSnow",
+          "setLights",
+          "getLights",
+          "getFog",
+          "addImport",
+          "updateImport",
+          "removeImport",
+          "moveImport",
+          "setColorTheme",
+          "setConfig",
+          "getConfig",
+          "addInteraction",
+          "addModel",
+          "removeModel",
+          "hasModel",
+          "queryRasterValue",
+          "getHorizontalFieldOfView",
+          "getFeaturesetDescriptors",
+          "getIndoorTileOptions",
+          "getNearClipOffset",
+          "setNearClipOffset",
+          "setImportColorTheme",
+          "setConfigProperty",
+          "getConfigProperty",
+          "removeInteraction",
         ]),
         fire: ((...args: Parameters<MapboxMapInstance["fire"]>) =>
           selectedHandle()
@@ -140,30 +182,6 @@ export const adapter: Adapter & { readonly backend: "mapbox-web" } =
           return handlers[name];
         },
         getVersion: (): string => selectedHandle().getMap().version,
-        queryRasterValue: (
-          ...args: Parameters<MapboxMapRef["queryRasterValue"]>
-        ) => selectedHandle().queryRasterValue(...args),
-        getHorizontalFieldOfView: (
-          ...args: Parameters<MapboxMapRef["getHorizontalFieldOfView"]>
-        ) => selectedHandle().getHorizontalFieldOfView(...args),
-        getFeaturesetDescriptors: (
-          ...args: Parameters<MapboxMapRef["getFeaturesetDescriptors"]>
-        ) => selectedHandle().getFeaturesetDescriptors(...args),
-        getIndoorTileOptions: (
-          ...args: Parameters<MapboxMapRef["getIndoorTileOptions"]>
-        ) => selectedHandle().getIndoorTileOptions(...args),
-        getLanguage: (...args: Parameters<MapboxMapRef["getLanguage"]>) =>
-          selectedHandle().getLanguage(...args),
-        setLanguage: (...args: Parameters<MapboxMapRef["setLanguage"]>) =>
-          selectedHandle().setLanguage(...args),
-        getWorldview: (...args: Parameters<MapboxMapRef["getWorldview"]>) =>
-          selectedHandle().getWorldview(...args),
-        setWorldview: (...args: Parameters<MapboxMapRef["setWorldview"]>) =>
-          selectedHandle().setWorldview(...args),
-        getScaleFactor: (...args: Parameters<MapboxMapRef["getScaleFactor"]>) =>
-          selectedHandle().getScaleFactor(...args),
-        setScaleFactor: (...args: Parameters<MapboxMapRef["setScaleFactor"]>) =>
-          selectedHandle().setScaleFactor(...args),
         getCanvasSource: (id: string): import("mapbox-gl").CanvasSource => {
           const source = selectedHandle().getSource(id);
           if (!source || source.type !== "canvas")
@@ -203,81 +221,11 @@ export const adapter: Adapter & { readonly backend: "mapbox-web" } =
             showTileAABBs: map.showTileAABBs,
           };
         },
-        getGlyphsUrl: (...args: Parameters<MapboxMapRef["getGlyphsUrl"]>) =>
-          selectedHandle().getGlyphsUrl(...args),
-        getNearClipOffset: (
-          ...args: Parameters<MapboxMapRef["getNearClipOffset"]>
-        ) => selectedHandle().getNearClipOffset(...args),
-        getSchema: (...args: Parameters<MapboxMapRef["getSchema"]>) =>
-          selectedHandle().getSchema(...args),
-        getSlot: (...args: Parameters<MapboxMapRef["getSlot"]>) =>
-          selectedHandle().getSlot(...args),
-        getSlots: (...args: Parameters<MapboxMapRef["getSlots"]>) =>
-          selectedHandle().getSlots(...args),
-        listModels: (...args: Parameters<MapboxMapRef["listModels"]>) =>
-          selectedHandle().listModels(...args),
-        setGlyphsUrl: (...args: Parameters<MapboxMapRef["setGlyphsUrl"]>) =>
-          selectedHandle().setGlyphsUrl(...args),
-        setNearClipOffset: (
-          ...args: Parameters<MapboxMapRef["setNearClipOffset"]>
-        ) => selectedHandle().setNearClipOffset(...args),
-        setSchema: (...args: Parameters<MapboxMapRef["setSchema"]>) =>
-          selectedHandle().setSchema(...args),
-        setSlot: (...args: Parameters<MapboxMapRef["setSlot"]>) =>
-          selectedHandle().setSlot(...args),
-        setRain: (...args: Parameters<MapboxMapRef["setRain"]>) =>
-          selectedHandle().setRain(...args),
-        getRain: (...args: Parameters<MapboxMapRef["getRain"]>) =>
-          selectedHandle().getRain(...args),
-        setSnow: (...args: Parameters<MapboxMapRef["setSnow"]>) =>
-          selectedHandle().setSnow(...args),
-        getSnow: (...args: Parameters<MapboxMapRef["getSnow"]>) =>
-          selectedHandle().getSnow(...args),
-        setLights: (...args: Parameters<MapboxMapRef["setLights"]>) =>
-          selectedHandle().setLights(...args),
-        getLights: (...args: Parameters<MapboxMapRef["getLights"]>) =>
-          selectedHandle().getLights(...args),
-        getFog: (...args: Parameters<MapboxMapRef["getFog"]>) =>
-          selectedHandle().getFog(...args),
-        addImport: (...args: Parameters<MapboxMapRef["addImport"]>) =>
-          selectedHandle().addImport(...args),
-        updateImport: (...args: Parameters<MapboxMapRef["updateImport"]>) =>
-          selectedHandle().updateImport(...args),
-        removeImport: (...args: Parameters<MapboxMapRef["removeImport"]>) =>
-          selectedHandle().removeImport(...args),
-        moveImport: (...args: Parameters<MapboxMapRef["moveImport"]>) =>
-          selectedHandle().moveImport(...args),
-        setImportColorTheme: (
-          ...args: Parameters<MapboxMapRef["setImportColorTheme"]>
-        ) => selectedHandle().setImportColorTheme(...args),
-        setColorTheme: (...args: Parameters<MapboxMapRef["setColorTheme"]>) =>
-          selectedHandle().setColorTheme(...args),
-        setConfig: (...args: Parameters<MapboxMapRef["setConfig"]>) =>
-          selectedHandle().setConfig(...args),
-        getConfig: (...args: Parameters<MapboxMapRef["getConfig"]>) =>
-          selectedHandle().getConfig(...args),
-        setConfigProperty: (
-          ...args: Parameters<MapboxMapRef["setConfigProperty"]>
-        ) => selectedHandle().setConfigProperty(...args),
-        getConfigProperty: (
-          ...args: Parameters<MapboxMapRef["getConfigProperty"]>
-        ) => selectedHandle().getConfigProperty(...args),
-        addInteraction: (...args: Parameters<MapboxMapRef["addInteraction"]>) =>
-          selectedHandle().addInteraction(...args),
-        removeInteraction: (
-          ...args: Parameters<MapboxMapRef["removeInteraction"]>
-        ) => selectedHandle().removeInteraction(...args),
-        addModel: (...args: Parameters<MapboxMapRef["addModel"]>) =>
-          selectedHandle().addModel(...args),
-        removeModel: (...args: Parameters<MapboxMapRef["removeModel"]>) =>
-          selectedHandle().removeModel(...args),
-        hasModel: (...args: Parameters<MapboxMapRef["hasModel"]>) =>
-          selectedHandle().hasModel(...args),
       };
     },
     Map: MapboxMap,
     Source: MapboxSource as ComponentType<WebForwardedProps>,
-    Layer: MapboxLayer as ComponentType<WebForwardedProps>,
+    Layer: MapboxLayer as Adapter["Layer"],
     Marker: MapboxMarker as unknown as ComponentType<WebForwardedProps>,
     Popup: MapboxPopup as unknown as ComponentType<WebForwardedProps>,
     NavigationControl:

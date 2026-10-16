@@ -68,6 +68,35 @@ describe.each([
     delete mock.selectedMethods[name];
   });
 
+  test("additional delegates forward arguments and preserve promise identity", () => {
+    const mock = wrapper as unknown as MockModule;
+    mock.resetWebMapMock();
+    const method = _engine === "mapbox" ? "setLanguage" : "setTransformRequest";
+    const argument =
+      _engine === "mapbox" ? "en" : () => ({ url: "fixture://tiles" });
+    const result = Promise.resolve({ accepted: true });
+    const operation = vi.fn(() => result);
+    mock.selectedMethods[method] = operation;
+    const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
+    const mounted = render(
+      <MapSetup adapter={entry.adapter}>
+        <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
+      </MapSetup>
+    );
+    const selected = ref.current;
+    if (!selected) throw new Error("No selected map ref.");
+    const call = () => Reflect.apply(selected[method], selected, [argument]);
+    expect(call()).toBe(result);
+    expect(operation).toHaveBeenCalledWith(argument);
+    operation.mockImplementationOnce(() => {
+      throw new Error("SDK failure");
+    });
+    expect(call).toThrow("SDK failure");
+    mounted.unmount();
+    expect(call).toThrow("not attached");
+    delete mock.selectedMethods[method];
+  });
+
   test.each([
     ["on", ["idle", (): void => undefined]],
     ["off", ["idle", (): void => undefined]],

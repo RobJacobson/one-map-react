@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-16",
+  "checkpoint": "Independent facade simplification audit",
+  "commit": "30ef288379f6074bfa156a2dab19bc1dfb0a8bd5",
+  "parent": "ba029a50c339c9efb00f7543792e0ce31a0a5ec0",
+  "branch": "codex/simplify-facade-react-compiler",
+  "initialWorkingTree": "clean",
+  "verdict": "Fix the two creation-validation regressions before claiming behavior preservation. Ownership is clearer, but further consolidation is warranted.",
+  "scope": {
+    "kind": "Historical audit evidence",
+    "audience": "Library owner and contributors",
+    "purpose": "Assess behavior preservation, compiler output and smaller implementations before further production changes",
+    "reviewed": "Selection, common map attachment and interactions, native presentation and UI, selected web methods, camera conversions, source/layer translation, registries, location, capture, offline services, contracts, packaging and compiled-test resolution",
+    "reference": "/Users/rob/code/ferryjoy/ferryjoy-app/src/components/map",
+    "nonGoals": "Production fixes, public API changes, dependency changes, publication and renderer acceptance",
+    "comparisonLimit": "The parent also differs by pre-existing release and example-workspace work. The refactor's starting uncommitted tree is unavailable, so its exact declaration comparison cannot be reproduced.",
+    "apiReview": "Portable contract declarations and the Adapter interface match the parent apart from viewState documentation. Selected entries add exports and methods and include release-related wrapper guards. These are separate from the refactor's compatibility claim."
+  },
+  "artifact": {
+    "path": "/private/tmp/one-map-simplification-artifact/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "a5e68fb7a708632bb871059d6bb675f54ee957f917ab52bdce9a563d163f9ac0",
+    "verification": "Independent SHA-256 verification. All 194 archived dist files match the independently rebuilt local dist byte for byte. No replacement archive was needed."
+  },
+  "findings": [
+    {
+      "id": 1,
+      "priority": "P2",
+      "title": "Native markers accept removal of a nondefault anchor",
+      "location": "packages/one-map-react/src/adapters/shared/native-ui.tsx:177",
+      "reproduction": "Mount a native UI Marker without children with anchor=top, then rerender with anchor omitted. The expected creation-change error is absent; rendering retains initial.anchor=top.",
+      "cause": "The comparison uses the initial effective anchor as the omission default, including an explicitly supplied nondefault value.",
+      "correction": "Freeze the content-dependent default independently of the explicit anchor, as web UI already does. Compare props.anchor against that default, then retain the initial effective creation value.",
+      "evidence": "A temporary test using the existing native UI fixture expected the remount error. It failed against both source and compiled modules because rerender resolved successfully.",
+      "requiredRegression": "Check top-to-omission rejection with and without custom content, both directions of equivalent-default updates, and default stability after children change."
+    },
+    {
+      "id": 2,
+      "priority": "P2",
+      "title": "Custom adapters lose shared UI creation validation",
+      "location": "packages/one-map-react/src/facade/ui.tsx:18",
+      "reproduction": "Supply a custom Adapter whose Marker forwards to its implementation without its own creation guard. Rerender shared Marker from anchor=top to anchor=bottom. The shared facade no longer throws.",
+      "cause": "Creation guards were removed from every facade UI component and added only to built-in implementations. The exported Adapter interface and portable creation-input contracts did not change.",
+      "correction": "Retain facade enforcement of portable creation invariants for existing adapters, accepting equivalent defaults. Keep backend-specific option checks and differing defaults with their adapters.",
+      "evidence": "A temporary custom-adapter component test expected the remount error. It failed against source and compiled modules because rerender did not throw. The parent facade/ui.tsx enforced this explicit anchor change.",
+      "requiredRegression": "Use a custom Adapter through MapSetup and shared UI, without internal native presentation contexts. Check genuine creation changes and equivalent-default updates."
+    }
+  ],
+  "simplificationRecommendations": [
+    {
+      "priority": 1,
+      "location": "packages/one-map-react/src/adapters/web/layers.tsx:12",
+      "proposal": "Assign the selected wrapper Layer directly in createWebAdapter and delete createWebLayer's pass-through component and module.",
+      "preserve": "Shared Layer creation checks, wrapper source injection, selected props and updates",
+      "verification": "Types, existing source/layer component regressions, build and packed declarations. No upstream behavior investigation is needed for this identical prop delegate.",
+      "size": "The current module is 18 lines; boundary typing and reference updates reduce the net deletion."
+    },
+    {
+      "priority": 2,
+      "location": "packages/one-map-react/src/adapters/shared/native-ui.tsx:479",
+      "proposal": "Let the existing creation-validation hook return its frozen normalized value. Use that value where UI currently freezes and validates the same configuration separately.",
+      "remove": "Duplicate native Popup option objects and redundant UI creation snapshots in Marker, Control, AttributionControl and ScaleControl where semantics match",
+      "preserve": "One creation lifetime, backend defaults, frozen content-dependent marker defaults and remount errors",
+      "verification": "Resolve findings 1 and 2 first. Check omission/reset transitions and Strict Mode against source and compiled UI tests. Changes affecting native placement remain subject to the renderer permission policy."
+    },
+    {
+      "priority": 3,
+      "location": "packages/one-map-react/src/mapbox-web.tsx:143",
+      "proposal": "Use the existing typed forwarding helper for the remaining unchanged selectedHandle method delegates. Keep engine-specific name lists beside their selected entries.",
+      "remove": "Repeated rest-argument functions such as getLanguage/setLanguage and MapLibre getStyleUrl/redraw",
+      "preserve": "Selected SDK overloads, current handle lookup, receiver, synchronous failures and exact return values",
+      "verification": "Existing forwarder test plus representative selected-entry assertions, types and emitted declarations. Keep getMap-based operations, source-kind validation and actual conversions explicit."
+    },
+    {
+      "priority": 4,
+      "location": "records/api-coverage.json:194",
+      "proposal": "Store repeated current support and evidence profiles once, retaining per-entry identities and exceptions. Generate any expanded comparison only when needed.",
+      "measured": "The committed file is 43,398,494 bytes for 12,151 entries. There are 86 unique support objects and two unique evidenceReferences arrays; 12,149 entries share one evidenceReferences value.",
+      "preserve": "All inventory IDs, applicability, unresolved exceptions, original upstream research and artifact-specific historical outcomes",
+      "verification": "Compare expansion of a compact representation with every current entry and run inventory checks. This is a separate data-schema change and needs no renderer execution."
+    }
+  ],
+  "architectureAssessment": {
+    "judgment": "Separating native presentation and camera observations improves ownership and limits context updates. Moving click orchestration into a hook mostly relocates the same operation. The checkpoint does not establish broad code consolidation.",
+    "supportingMeasurement": "The parent map.tsx and map-context.tsx total 473 lines. Those files plus the new interaction hook and native presentation module total 594 lines. Line count supports the ownership review but is not an acceptance target.",
+    "retain": "Strict web re-querying, source attachment guards, native source registries, feature-state ordering, capture deadlines, active callback guards and portal ancestry each serve demonstrated public behavior or wrapper differences.",
+    "avoid": "A universal native map-ref or lifecycle framework would obscure different readiness, query and feature-state APIs. Remove identical delegates and duplicate snapshots before attempting deeper native sharing."
+  },
+  "compiler": {
+    "version": "1.0.0",
+    "target": "19",
+    "verifiedComponents": ["Map", "WebMap", "UserLocation", "NativePresentationProvider", "NativeCameraProvider"],
+    "evidence": "Component-location compiler assertions passed. Direct emitted-body inspection found compiler memo-cache calls in all five targets. Rebuilt modules match the frozen archive.",
+    "runtime": "react/compiler-runtime; library-only pre-transform; no consumer compiler configuration or extra runtime package",
+    "skipDiagnostics": 17,
+    "skipInterpretation": "Diagnostics concern ref-dependent ownership or unsupported compiler syntax. Seventeen diagnostics do not mean seventeen distinct skipped functions. Map attachment, interactions, native maps/markers/UI, image registration and geolocation still include skipped code; retain their semantic stabilization.",
+    "testResolution": "Web test imports from ../src resolve to dist, including internal contexts; native mapping precedes the extensionless source mapping. The two new failing probes also reproduce against compiled modules.",
+    "coverageLimit": "Compiled web tests include *.web.test.tsx, excluding pure *.test.ts unit tests and example-map tests. Native tests use wrapper/host mocks and establish no native rendering behavior."
+  },
+  "personallyRun": [
+    { "command": "bun run test:compiled", "result": "passed", "compiledWebTests": 363, "mockedNativeTests": 214 },
+    { "command": "./node_modules/.bin/vp test run", "result": "passed", "sourceTests": 570 },
+    { "command": "bun run typecheck", "result": "passed", "projects": 4 },
+    { "command": "bun run typecheck:apps", "result": "passed after library build" },
+    { "command": "bun scripts/test-package.mjs --archive /private/tmp/one-map-simplification-artifact/one-map-react-0.1.0-rc.2.tgz", "result": "passed", "selections": 13 },
+    { "command": "bun run check", "result": "passed" },
+    { "command": "bun run check:docs", "result": "passed" },
+    { "command": "bun run check:inventory", "result": "passed", "entries": 12151 },
+    { "command": "Temporary native marker and custom-adapter regression probes against source and dist", "result": "Each probe failed in both configurations, demonstrating findings 1 and 2. Temporary test files were removed." }
+  ],
+  "firstAttemptNotes": [
+    "The first app typecheck ran while the library build was still pending and failed to resolve workspace declarations. This audit sequencing error was corrected by waiting for the build; the same app typecheck then passed.",
+    "Compiled native fixtures retain existing act warnings. Bun reports its moduleSuffixes warning, and the packer reports experimental TypeScript API support. These warnings were not suppressed."
+  ],
+  "notRun": [
+    "The full validate aggregate and standalone script regressions",
+    "Fresh peer-install and example-resolution checks; their earlier results remain attached to the original evidence",
+    "Browser renderer acceptance, Metro transport, native generation/build/install, canonical native flows and example-app SDK coexistence"
+  ],
+  "acceptance": "Unverified. No renderer execution was authorized or attempted. Correctness findings remain before a new acceptance request is appropriate.",
+  "changes": "Audit evidence and its index only. No production changes, retained test changes or commit.",
+  "retention": "Temporary probes and audit-owned raw logs removed after compact outcomes were recorded. The pre-existing frozen archive was preserved."
+}

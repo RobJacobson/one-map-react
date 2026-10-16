@@ -4,9 +4,15 @@
 
 The [facade simplification evidence](evidence/facade-simplification.json) records the compiler configuration, unchanged public contracts, routine outcomes, frozen archive, and proposed acceptance scope. Renderer acceptance for that archive remains unrun and requires separate permission.
 
+The [independent simplification audit](evidence/facade-simplification-audit.json) records two creation-validation regressions, reproduced routine checks, compiler output verification and prioritized consolidation recommendations.
+
+The [creation-validation repair evidence](evidence/facade-simplification-repair.json) records the corrected behavior, consolidation, lossless inventory migration and routine checks against the repaired archive. Renderer acceptance remains unverified; no commit or publication is recorded.
+
 Earlier JSON records in this directory were produced for the implementation retired during TF01. They remain useful for upstream API inventory, versioned sources, discovered incompatibilities, and provenance. Their stage assignments, implementation mappings, artifact hashes, and runtime results apply to that implementation only.
 
 `api-coverage.json` and `inventory-inputs/` supply the completeness checklist for the replacement. Reconcile their mappings as each new feature is implemented; do not rebuild the old stage-ledger tooling. `version-baseline.json` and `tooling-baseline.json` record historical versions, not the current supported development or renderer matrix. `stage-status.json` and `evidence/` preserve historical outcomes; they are not active gates.
+
+The inventory uses schema version 2 to share repeated support and evidence profiles. [inventory-format.mjs](../scripts/inventory-format.mjs) provides lossless expansion to schema version 1 and deterministic compaction; [the coverage reference](../docs/api-coverage.md) describes editing and validation. This storage format does not change any entry's coverage or runtime status.
 
 Current direction and status live in the [requirements](../docs/requirements.md), [stage plan](../docs/stage-plan.md), [TF01 record](../docs/tf01-foundation.md), and [TF02 record](../docs/tf02-shared-map.md). Compact TF02 checkpoint evidence is [evidence/tf02-shared-map.json](evidence/tf02-shared-map.json). The [testing policy](../docs/testing-policy.md) governs new evidence and acceptance runs.
 

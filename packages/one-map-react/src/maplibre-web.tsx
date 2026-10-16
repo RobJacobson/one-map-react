@@ -103,6 +103,27 @@ export const adapter: Adapter & { readonly backend: "maplibre-web" } =
           "getTerrain",
           "getProjection",
           "getLight",
+          "getStyleUrl",
+          "redraw",
+          "setSky",
+          "getSky",
+          "refreshTiles",
+          "setGlyphs",
+          "getGlyphs",
+          "setFontFaces",
+          "getFontFaces",
+          "getPixelRatio",
+          "setPixelRatio",
+          "getRoll",
+          "setRoll",
+          "getCameraTargetElevation",
+          "getCenterElevation",
+          "setCenterElevation",
+          "setTransformConstrain",
+          "setGlobalStateProperty",
+          "getGlobalState",
+          "setSourceTileLodParams",
+          "setTransformRequest",
         ]),
         setEventedParent: (
           ...args: Parameters<MaplibreMapInstance["setEventedParent"]>
@@ -167,61 +188,11 @@ export const adapter: Adapter & { readonly backend: "maplibre-web" } =
             repaint: map.repaint,
           };
         },
-        getCameraTargetElevation: (
-          ...args: Parameters<MaplibreMapRef["getCameraTargetElevation"]>
-        ) => selectedHandle().getCameraTargetElevation(...args),
-        getCenterElevation: (
-          ...args: Parameters<MaplibreMapRef["getCenterElevation"]>
-        ) => selectedHandle().getCenterElevation(...args),
-        getStyleUrl: (...args: Parameters<MaplibreMapRef["getStyleUrl"]>) =>
-          selectedHandle().getStyleUrl(...args),
-        redraw: (...args: Parameters<MaplibreMapRef["redraw"]>) =>
-          selectedHandle().redraw(...args),
-        setCenterElevation: (
-          ...args: Parameters<MaplibreMapRef["setCenterElevation"]>
-        ) => selectedHandle().setCenterElevation(...args),
-        setTransformConstrain: (
-          ...args: Parameters<MaplibreMapRef["setTransformConstrain"]>
-        ) => selectedHandle().setTransformConstrain(...args),
-        setSky: (...args: Parameters<MaplibreMapRef["setSky"]>) =>
-          selectedHandle().setSky(...args),
-        getSky: (...args: Parameters<MaplibreMapRef["getSky"]>) =>
-          selectedHandle().getSky(...args),
-        setGlobalStateProperty: (
-          ...args: Parameters<MaplibreMapRef["setGlobalStateProperty"]>
-        ) => selectedHandle().setGlobalStateProperty(...args),
-        getGlobalState: (
-          ...args: Parameters<MaplibreMapRef["getGlobalState"]>
-        ) => selectedHandle().getGlobalState(...args),
-        refreshTiles: (...args: Parameters<MaplibreMapRef["refreshTiles"]>) =>
-          selectedHandle().refreshTiles(...args),
-        setSourceTileLodParams: (
-          ...args: Parameters<MaplibreMapRef["setSourceTileLodParams"]>
-        ) => selectedHandle().setSourceTileLodParams(...args),
-        setGlyphs: (...args: Parameters<MaplibreMapRef["setGlyphs"]>) =>
-          selectedHandle().setGlyphs(...args),
-        getGlyphs: (...args: Parameters<MaplibreMapRef["getGlyphs"]>) =>
-          selectedHandle().getGlyphs(...args),
-        setFontFaces: (...args: Parameters<MaplibreMapRef["setFontFaces"]>) =>
-          selectedHandle().setFontFaces(...args),
-        getFontFaces: (...args: Parameters<MaplibreMapRef["getFontFaces"]>) =>
-          selectedHandle().getFontFaces(...args),
-        setTransformRequest: (
-          ...args: Parameters<MaplibreMapRef["setTransformRequest"]>
-        ) => selectedHandle().setTransformRequest(...args),
-        getPixelRatio: (...args: Parameters<MaplibreMapRef["getPixelRatio"]>) =>
-          selectedHandle().getPixelRatio(...args),
-        setPixelRatio: (...args: Parameters<MaplibreMapRef["setPixelRatio"]>) =>
-          selectedHandle().setPixelRatio(...args),
-        getRoll: (...args: Parameters<MaplibreMapRef["getRoll"]>) =>
-          selectedHandle().getRoll(...args),
-        setRoll: (...args: Parameters<MaplibreMapRef["setRoll"]>) =>
-          selectedHandle().setRoll(...args),
       };
     },
     Map: MaplibreMap,
     Source: MaplibreSource as ComponentType<WebForwardedProps>,
-    Layer: MaplibreLayer as ComponentType<WebForwardedProps>,
+    Layer: MaplibreLayer as Adapter["Layer"],
     Marker: MaplibreMarker as unknown as ComponentType<WebForwardedProps>,
     Popup: MaplibrePopup as unknown as ComponentType<WebForwardedProps>,
     NavigationControl:

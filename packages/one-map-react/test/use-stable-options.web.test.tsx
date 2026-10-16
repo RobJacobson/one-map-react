@@ -1,5 +1,5 @@
-import { render } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { render, renderHook } from "@testing-library/react";
+import { type ReactNode, StrictMode } from "react";
 import { describe, expect, vi, test } from "vite-plus/test";
 
 import {
@@ -33,6 +33,22 @@ const Probe = ({
 };
 
 describe("useStableOptions", () => {
+  test("returns its original validated value across equivalent renders", () => {
+    const original = { position: "top-right", nested: { enabled: true } };
+    const mounted = renderHook(
+      ({ options }) => useStableOptions("fixture", options),
+      {
+        initialProps: { options: original },
+        wrapper: StrictMode,
+      }
+    );
+    expect(mounted.result.current).toBe(original);
+    mounted.rerender({ options: { ...original, nested: { enabled: true } } });
+    expect(mounted.result.current).toBe(original);
+    expect(() =>
+      mounted.rerender({ options: { ...original, nested: { enabled: false } } })
+    ).toThrow('creation option "nested"');
+  });
   test("accepts unchanged options across rerenders", () => {
     const rendered = render(
       <Probe options={{ id: "routes", cluster: true }} />

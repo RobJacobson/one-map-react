@@ -1,7 +1,6 @@
 import type { Adapter, Backend } from "../../contracts/adapter.js";
 import type { WebWrapper } from "./contracts.js";
 import { createWebImages } from "./images.js";
-import { createWebLayer } from "./layers.js";
 import { browserLocation } from "./location.js";
 import { createWebMap } from "./map.js";
 import { createWebSource } from "./sources.js";
@@ -28,7 +27,7 @@ export const createWebAdapter = <
     services: { location: browserLocation },
     Map: WebMap,
     Source: createWebSource(wrapper),
-    Layer: createWebLayer(wrapper),
+    Layer: wrapper.Layer,
     Images: WebImages,
     ...createWebUi(wrapper),
   };

@@ -1,6 +1,6 @@
 import type { ComponentType, CSSProperties, ReactNode, Ref } from "react";
 
-import type { Backend } from "../../contracts/adapter.js";
+import type { Adapter, Backend } from "../../contracts/adapter.js";
 import type {
   Bounds,
   LngLat,
@@ -238,7 +238,7 @@ interface WebWrapper<
   readonly createAdvancedMethods?: (getHandle: () => WebMapHandle) => object;
   readonly Map: ComponentType<WebMapProps>;
   readonly Source: ComponentType<WebForwardedProps>;
-  readonly Layer: ComponentType<WebForwardedProps>;
+  readonly Layer: Adapter["Layer"];
   /** Live marker delegated to the selected wrapper. */
   readonly Marker: ComponentType<WebForwardedProps>;
   /** Standalone popup delegated to the selected wrapper. */

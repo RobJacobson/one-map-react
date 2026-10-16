@@ -1,0 +1,269 @@
+import { render } from "@testing-library/react";
+import { forwardRef, type ReactNode, StrictMode } from "react";
+import { describe, expect, test } from "vite-plus/test";
+
+import type { Adapter, Backend } from "../src/contracts/adapter.js";
+import type { MapRef } from "../src/contracts/camera-types.js";
+import type { MapProps } from "../src/contracts/map-types.js";
+import { MapSetup } from "../src/facade/map-setup.js";
+import { Map as OneMap } from "../src/facade/map.js";
+import {
+  AttributionControl,
+  Control,
+  FullscreenControl,
+  GeolocateControl,
+  Marker,
+  NavigationControl,
+  Popup,
+  ScaleControl,
+} from "../src/facade/ui.js";
+
+const camera = { longitude: 0, latitude: 0, zoom: 1, bearing: 0, pitch: 0 };
+const style = { version: 8 as const, sources: {}, layers: [] };
+const FakeMap = forwardRef<MapRef, MapProps>(({ children }, _ref) => (
+  <>{children}</>
+));
+const Empty = () => null;
+const fakeAdapter = (backend: Backend): Adapter => ({
+  backend,
+  Map: FakeMap,
+  Source: Empty,
+  Layer: Empty,
+  Images: Empty,
+  Marker: forwardRef((_props, _ref) => null),
+  Popup: Empty,
+  Control: Empty,
+  NavigationControl: Empty,
+  AttributionControl: Empty,
+  ScaleControl: Empty,
+  GeolocateControl: Empty,
+  FullscreenControl: Empty,
+  services: {
+    location: {
+      requestPermission: async () => ({
+        status: "granted",
+        accuracy: "unknown",
+      }),
+      getCurrentPosition: async () => ({ lngLat: [0, 0] }),
+      watchPosition: () => () => undefined,
+    },
+  },
+});
+
+const genuineChanges = [
+  [
+    "Marker",
+    (changed: boolean) => (
+      <Marker longitude={0} latitude={0} anchor={changed ? "bottom" : "top"} />
+    ),
+  ],
+  [
+    "Marker id",
+    (changed: boolean) => (
+      <Marker longitude={0} latitude={0} id={changed ? "other" : "original"} />
+    ),
+  ],
+  [
+    "Marker mode",
+    (changed: boolean) => (
+      <Marker
+        longitude={0}
+        latitude={0}
+        renderMode={changed ? "annotation" : "view"}
+      />
+    ),
+  ],
+  [
+    "Popup",
+    (changed: boolean) => (
+      <Popup longitude={0} latitude={0} closeButton={!changed} />
+    ),
+  ],
+  [
+    "Popup click",
+    (changed: boolean) => (
+      <Popup longitude={0} latitude={0} closeOnClick={!changed} />
+    ),
+  ],
+  [
+    "Popup move",
+    (changed: boolean) => (
+      <Popup longitude={0} latitude={0} closeOnMove={changed} />
+    ),
+  ],
+  [
+    "Popup focus",
+    (changed: boolean) => (
+      <Popup longitude={0} latitude={0} focusAfterOpen={!changed} />
+    ),
+  ],
+  [
+    "Control",
+    (changed: boolean) => (
+      <Control position={changed ? "bottom-left" : "top-right"} />
+    ),
+  ],
+  [
+    "NavigationControl",
+    (changed: boolean) => <NavigationControl showZoom={!changed} />,
+  ],
+  [
+    "NavigationControl position",
+    (changed: boolean) => (
+      <NavigationControl position={changed ? "bottom-left" : "top-right"} />
+    ),
+  ],
+  [
+    "NavigationControl compass",
+    (changed: boolean) => <NavigationControl showCompass={!changed} />,
+  ],
+  [
+    "NavigationControl pitch",
+    (changed: boolean) => <NavigationControl visualizePitch={changed} />,
+  ],
+  [
+    "AttributionControl",
+    (changed: boolean) => (
+      <AttributionControl customAttribution={changed ? "other" : "original"} />
+    ),
+  ],
+  [
+    "AttributionControl position",
+    (changed: boolean) => (
+      <AttributionControl position={changed ? "top-left" : "bottom-right"} />
+    ),
+  ],
+  [
+    "AttributionControl compact",
+    (changed: boolean) => <AttributionControl compact={!changed} />,
+  ],
+  [
+    "ScaleControl",
+    (changed: boolean) => <ScaleControl maxWidth={changed ? 200 : 100} />,
+  ],
+  [
+    "ScaleControl position",
+    (changed: boolean) => (
+      <ScaleControl position={changed ? "top-left" : "bottom-left"} />
+    ),
+  ],
+  [
+    "GeolocateControl",
+    (changed: boolean) => (
+      <GeolocateControl position={changed ? "bottom-left" : "top-right"} />
+    ),
+  ],
+  [
+    "FullscreenControl",
+    (changed: boolean) => (
+      <FullscreenControl position={changed ? "bottom-left" : "top-right"} />
+    ),
+  ],
+] as const;
+
+describe.each<Backend>([
+  "mapbox-web",
+  "maplibre-web",
+  "mapbox-native",
+  "maplibre-native",
+])("%s custom adapter creation contracts", (backend) => {
+  const adapter = fakeAdapter(backend);
+  const tree = (children: ReactNode) => (
+    <StrictMode>
+      <MapSetup adapter={adapter}>
+        <OneMap mapStyle={style} initialViewState={camera}>
+          {children}
+        </OneMap>
+      </MapSetup>
+    </StrictMode>
+  );
+
+  test.each(genuineChanges)(
+    "%s rejects a genuine creation change",
+    (name, component) => {
+      const mounted = render(tree(component(false)));
+      expect(() => mounted.rerender(tree(component(true)))).toThrow(
+        `${name.split(" ")[0]} changed the creation option`
+      );
+    }
+  );
+
+  test("equivalent defaults work in both directions, and mutable fields remain mutable", () => {
+    const native = backend.endsWith("native");
+    const controls = (explicit: boolean) => (
+      <>
+        <Marker
+          longitude={explicit ? 1 : 0}
+          latitude={0}
+          anchor={explicit ? "bottom" : undefined}
+          renderMode={explicit ? "view" : undefined}
+        />
+        <Popup
+          longitude={0}
+          latitude={explicit ? 1 : 0}
+          closeButton={explicit ? true : undefined}
+          closeOnClick={explicit ? true : undefined}
+          closeOnMove={explicit ? false : undefined}
+          focusAfterOpen={!native && explicit ? true : undefined}
+        />
+        <Control position={explicit ? "top-right" : undefined}>
+          {explicit ? "updated" : "original"}
+        </Control>
+        <NavigationControl
+          position={explicit ? "top-right" : undefined}
+          showZoom={explicit ? true : undefined}
+          showCompass={explicit ? true : undefined}
+          visualizePitch={explicit ? false : undefined}
+        />
+        <AttributionControl
+          position={
+            explicit ? (native ? "bottom-right" : "top-right") : undefined
+          }
+          compact={native && explicit ? true : undefined}
+        />
+        <ScaleControl
+          position={
+            explicit ? (native ? "bottom-left" : "top-right") : undefined
+          }
+          maxWidth={explicit ? 100 : undefined}
+          unit={explicit ? "imperial" : "metric"}
+        />
+        <GeolocateControl
+          position={explicit ? "top-right" : undefined}
+          zoom={explicit ? 10 : 14}
+        />
+        <FullscreenControl position={explicit ? "top-right" : undefined} />
+      </>
+    );
+    const mounted = render(tree(controls(false)));
+    mounted.rerender(tree(controls(true)));
+    mounted.rerender(tree(controls(false)));
+  });
+
+  test("marker content changes retain the original default", () => {
+    const mounted = render(tree(<Marker longitude={0} latitude={0} />));
+    mounted.rerender(
+      tree(
+        <Marker longitude={0} latitude={0}>
+          custom
+        </Marker>
+      )
+    );
+    mounted.rerender(
+      tree(
+        <Marker longitude={0} latitude={0} anchor="bottom">
+          custom
+        </Marker>
+      )
+    );
+    expect(() =>
+      mounted.rerender(
+        tree(
+          <Marker longitude={0} latitude={0} anchor="center">
+            custom
+          </Marker>
+        )
+      )
+    ).toThrow('creation option "anchor"');
+  });
+});

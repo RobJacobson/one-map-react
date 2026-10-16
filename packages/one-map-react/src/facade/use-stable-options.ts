@@ -10,18 +10,16 @@ import { useRef } from "react";
  *
  * @param owner - Description of the owned resource, such as `Source "routes"`.
  * @param options - Creation options captured for this render.
+ * @returns The original options, retained across equivalent renders.
  * @throws When an option value differs from the first render.
  */
-export const useStableOptions = (
+export const useStableOptions = <
+  Options extends Readonly<Record<string, unknown>>,
+>(
   owner: string,
-  options: Readonly<Record<string, unknown>>
-): void => {
-  const initial = useRef<Readonly<Record<string, unknown>> | null>(null);
-
-  if (initial.current === null) {
-    initial.current = options;
-    return;
-  }
+  options: Options
+): Options => {
+  const initial = useRef(options);
 
   // eslint-disable-next-line react/refs -- Compare against immutable creation inputs during render to reject unsupported resource replacement.
   const changed = changedOptionKey(initial.current, options);
@@ -32,6 +30,9 @@ export const useStableOptions = (
         "Remount it with a new React key to recreate the resource."
     );
   }
+
+  // eslint-disable-next-line react/refs -- Return the same immutable creation snapshot used for validation.
+  return initial.current;
 };
 
 /**

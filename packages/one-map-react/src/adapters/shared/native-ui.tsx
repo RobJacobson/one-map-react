@@ -163,18 +163,14 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         props.longitude,
         props.latitude,
       ]);
-      const initial = useFrozenValue({
-        id: props.id ?? generatedId,
-        anchor:
-          props.anchor ??
-          (props.children === undefined || props.children === null
-            ? "bottom"
-            : "center"),
-        renderMode: props.renderMode ?? "view",
-      });
-      useStableOptions("Marker", {
+      const defaultAnchor = useFrozenValue(
+        props.children === undefined || props.children === null
+          ? "bottom"
+          : "center"
+      );
+      const initial = useStableOptions("Marker", {
         id: props.id,
-        anchor: props.anchor ?? initial.anchor,
+        anchor: props.anchor ?? defaultAnchor,
         renderMode: props.renderMode ?? "view",
       });
       const click = useNativeCallback(props.onClick);
@@ -401,7 +397,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         <Host
           key={isAnnotation ? annotationRevision : "view"}
           ref={annotationRef}
-          id={initial.id}
+          id={initial.id ?? generatedId}
           lngLat={[markerCoordinate[0], markerCoordinate[1]]}
           anchor={initial.anchor}
           offset={offset}
@@ -476,12 +472,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     const id = useId();
     const close = useNativeCallback(props.onClose);
     const open = useNativeCallback(props.onOpen);
-    const initial = useFrozenValue({
-      closeOnClick: props.closeOnClick ?? true,
-      closeOnMove: props.closeOnMove ?? false,
-      closeButton: props.closeButton ?? true,
-    });
-    useStableOptions("Popup", {
+    const initial = useStableOptions("Popup", {
       closeOnClick: props.closeOnClick ?? true,
       closeOnMove: props.closeOnMove ?? false,
       closeButton: props.closeButton ?? true,
@@ -577,8 +568,9 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
   const { setOverlay } = presentation;
   const overlays = useContext(NativeOverlayContext);
   const id = useId();
-  useStableOptions("Control", { position: props.position ?? "top-right" });
-  const position = useFrozenValue(props.position ?? "top-right");
+  const { position } = useStableOptions("Control", {
+    position: props.position ?? "top-right",
+  });
   const index = overlays.findIndex((overlay) => overlay.id === id);
   const neighbors = position.startsWith("top")
     ? overlays.slice(0, Math.max(0, index))
@@ -720,12 +712,11 @@ const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
 
 const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
   const { setOrnament } = useNativeMapPresentation();
-  useStableOptions("AttributionControl", {
+  const { position } = useStableOptions("AttributionControl", {
     position: props.position ?? "bottom-right",
     compact: props.compact ?? true,
     customAttribution: props.customAttribution,
   });
-  const position = useFrozenValue(props.position ?? "bottom-right");
   useLayoutEffect(() => {
     setOrnament("attribution", { position });
     return () => setOrnament("attribution", null);
@@ -755,11 +746,10 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
     readonly width: number;
     readonly text: string;
   } | null>(null);
-  useStableOptions("ScaleControl", {
+  const { maxWidth } = useStableOptions("ScaleControl", {
     position: props.position ?? "bottom-left",
     maxWidth: props.maxWidth ?? 100,
   });
-  const maxWidth = useFrozenValue(props.maxWidth ?? 100);
   const reportError = useNativeCallback(props.onError);
   const unit = props.unit ?? "metric";
   if (!Number.isFinite(maxWidth) || maxWidth <= 0)

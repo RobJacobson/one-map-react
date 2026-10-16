@@ -1417,3 +1417,61 @@ test("native creation validation continues rejecting genuine changes", async () 
     'NavigationControl changed the creation option "showZoom"'
   );
 });
+
+test.each([false, true])(
+  "removing a nondefault native marker anchor requires remount (custom content: %s)",
+  async (custom) => {
+    const fixture = sessionFixture();
+    const tree = (anchor?: "top") => (
+      <FixtureSessionProvider value={fixture.session}>
+        <ui.Marker longitude={10} latitude={20} anchor={anchor}>
+          {custom ? <Text>custom</Text> : undefined}
+        </ui.Marker>
+      </FixtureSessionProvider>
+    );
+    const mounted = await render(tree("top"));
+    await expect(mounted.rerender(tree())).rejects.toThrow(
+      'Marker changed the creation option "anchor"'
+    );
+  }
+);
+
+test("native marker defaults stay frozen when content changes", async () => {
+  const fixture = sessionFixture();
+  const tree = (custom: boolean, anchor?: "bottom" | "center") => (
+    <FixtureSessionProvider value={fixture.session}>
+      <ui.Marker longitude={10} latitude={20} anchor={anchor}>
+        {custom ? <Text>custom</Text> : undefined}
+      </ui.Marker>
+    </FixtureSessionProvider>
+  );
+  const mounted = await render(tree(false));
+  await mounted.rerender(tree(true));
+  await mounted.rerender(tree(true, "bottom"));
+  await mounted.rerender(tree(true));
+  await expect(mounted.rerender(tree(true, "center"))).rejects.toThrow(
+    'creation option "anchor"'
+  );
+});
+
+test.each([false, true])(
+  "native marker effective defaults work when initially explicit (custom content: %s)",
+  async (custom) => {
+    const fixture = sessionFixture();
+    const tree = (explicit: boolean) => (
+      <FixtureSessionProvider value={fixture.session}>
+        <ui.Marker
+          longitude={10}
+          latitude={20}
+          anchor={explicit ? (custom ? "center" : "bottom") : undefined}
+        >
+          {custom ? <Text>custom</Text> : undefined}
+        </ui.Marker>
+      </FixtureSessionProvider>
+    );
+    const mounted = await render(tree(true));
+    await mounted.rerender(tree(false));
+    await mounted.rerender(tree(true));
+    await mounted.unmount();
+  }
+);

@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { expandInventory } from "./inventory-format.mjs";
+
 const ownerExceptions = new Set([
   "rnmapbox:rnmapbox.offlineManager.OfflineManager.invalidateAmbientCache",
   "rnmapbox:rnmapbox.offlineManager.OfflineManager.setMaximumAmbientCacheSize",
@@ -9,6 +11,11 @@ const ownerExceptions = new Set([
 
 /** Checks current coverage identities, alias resolution, local targets and unresolved applicable work. */
 export const checkInventory = (inventory, root) => {
+  try {
+    inventory = expandInventory(inventory);
+  } catch (error) {
+    return [error.message];
+  }
   const failures = [];
   const entries = new Map();
   const fail = (entry, reason) => failures.push(`${entry.id}: ${reason}`);
