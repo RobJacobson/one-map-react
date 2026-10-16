@@ -1,12 +1,14 @@
 # TF10 coverage and release implementation plan
 
+> Historical plan: the per-entry JSON inventory and its tooling are superseded by the [grouped coverage checklist](api-coverage.md). Preserve the original plan and counts as provenance; use the checklist for current coverage work.
+
 TF10 should produce a verified release candidate, its public documentation, and compact release evidence. Publication is a separate action. Expand peer ranges within the current majors, retaining the existing versions as the minimum supported baseline. Complete inventory reconciliation before freezing the candidate so missing features remain visible and can be fixed before acceptance.
 
 The [requirements](requirements.md), [stage plan](stage-plan.md), and [testing policy](testing-policy.md) govern this work. TF09 is complete for its recorded scope in [advanced rendering](tf09-rendering.md). This proposal defines implementation work; it does not renew earlier runtime results for a release candidate.
 
 ## Coverage closure
 
-The current [inventory](../records/api-coverage.json) contains 12,131 entries: 1,261 marked implemented and 10,870 marked pending. These are ledger states, not a count of missing features. TF09 records many implemented families separately in [its coverage evidence](../records/evidence/tf09-coverage.json), while some existing inventory references still point to retired tests. Reconcile the current code and evidence into the inventory before estimating the remaining implementation work.
+The current [inventory](https://github.com/RobJacobson/one-map-react/blob/ba029a50c339c9efb00f7543792e0ce31a0a5ec0/records/api-coverage.json) contains 12,131 entries: 1,261 marked implemented and 10,870 marked pending. These are ledger states, not a count of missing features. TF09 records many implemented families separately in [its coverage evidence](../records/evidence/tf09-coverage.json), while some existing inventory references still point to retired tests. Reconcile the current code and evidence into the inventory before estimating the remaining implementation work.
 
 1. Review entries by owning behavior: selection and host forwarding; lifecycle and camera; sources, layers, images and expressions; queries and feature state; UI and interactions; services; advanced rendering and selected facilities. Preserve inventory IDs and upstream provenance. Use existing TF01-TF09 records to locate implementations, then inspect the actual exports, callers, tests, and pinned peer sources. Historical implementation or verification flags do not establish current support.
 2. Give every applicable entry a current common API, named selected API, documented composition, substantiated unsupported boundary, or internal-only disposition. Record owner-approved exclusions and deferrals separately. Group unchanged fields under their actual forwarding path and representative tests; resolve aliases to their canonical operation. Raw SDK access, a compatible type, or a capability flag cannot close a missing operation.

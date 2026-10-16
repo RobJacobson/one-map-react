@@ -11,6 +11,7 @@ Read these documents in order:
 1. [Requirements](requirements.md): scope, delegation, ownership, public API, and compatibility rules.
 2. [Stage plan](stage-plan.md): TF01–TF10, with a working shared map before expanding coverage.
 3. [Testing policy](testing-policy.md): tests selected by changed behavior, runtime permission, and compact evidence.
+4. [API coverage checklist](api-coverage.md): current grouped contracts, source/test routes, meaningful exceptions, and open gates.
 
 The [TF10 implementation plan](tf10-proposal.md) defines coverage closure, expanded peer ranges, public documentation, packed consumers, and the release candidate acceptance gates. The [TF10 release record](tf10-release.md) tracks the candidate and current gates. Publication remains a separate action.
 
@@ -34,7 +35,7 @@ These references retain upstream comparisons, source links, examples, and incomp
 - [Sources and layers](sources-and-layers.md): source families, layer fields, expressions, updates, queries, and feature state.
 - [Markers and controls](markers-and-controls.md): interactive content, annotations, dragging, popups, and controls.
 - [Capabilities and extensions](capabilities-and-extensions.md): backend facilities, location, offline storage, snapshots, and limitations.
-- [API inventory](api-coverage.md): completeness checklist and versioned input records. Historical stage assignments remain provenance; current TF10 dispositions and runtime verification are separate.
+- [Frozen API research](../records/README.md): individual upstream fields, source links, versioned inputs and historical outcomes. Current coverage lives in the grouped checklist above.
 
 The documents under `decisions/` preserve upstream investigations and the rationale for the retired implementation. Their execution instructions, commands, source paths, and acceptance policies are superseded. Archived implementation documents and source mentioned there are available only in the local backup; public contributors do not need that backup. [Historical records](../records/README.md) retain provenance, not current stage status.
 

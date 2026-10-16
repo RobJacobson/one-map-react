@@ -64,13 +64,13 @@ Unsupported requests must fail clearly unless a documented fallback preserves th
 
 ## Full coverage without duplicate implementation
 
-Retain the upstream inventory as a completeness checklist. Map every applicable entry to a common operation, named extension, composition, genuine unsupported boundary, or an internal-only disposition with a reason. Backend-specific features remain scheduled work. Raw SDK access alone does not complete a feature assigned to a common or named API.
+Maintain the [grouped Markdown checklist](api-coverage.md) as the active coverage record. Account for every applicable public API through a bounded group of unchanged forwarded fields or an explicit contract/exception row, with a common operation, named extension, composition, genuine unsupported boundary, or internal-only disposition and reason. Preserve the frozen upstream research for detailed names, signatures, and source links. Backend-specific features remain scheduled work. Raw SDK access alone does not complete a feature assigned to a common or named API.
 
 Group unchanged forwarded fields under the forwarding implementation and its tests. Use explicit entries for conversions and exceptions. Coverage of a field does not require a separate implementation function, test case, decision document, or runtime acceptance run for that field.
 
 Check wrapper omissions against supported extension paths and underlying SDK capabilities before declaring a limitation. An omission may require a targeted extension; it does not authorize building a general replacement binding. Unresolved feasibility stays visible and prevents claiming that feature complete.
 
-The old inventory IDs and upstream links remain useful. Their old stage assignments, mapping proposals, and verification cells are historical. Reconcile them to this plan during implementation without regenerating a large ledger merely to rename stages. Release completeness still requires every applicable entry to be accounted for.
+The frozen research IDs and upstream links remain useful. Their old stage assignments, mapping proposals, and verification cells are historical. Review changes against the grouped checklist during implementation and peer upgrades; do not maintain a parallel per-field status ledger. Release completeness still requires every applicable public API to be accounted for, with unresolved work visible.
 
 ## Simplicity and contribution
 
