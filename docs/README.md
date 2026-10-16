@@ -35,7 +35,7 @@ These references retain upstream comparisons, source links, examples, and incomp
 - [Sources and layers](sources-and-layers.md): source families, layer fields, expressions, updates, queries, and feature state.
 - [Markers and controls](markers-and-controls.md): interactive content, annotations, dragging, popups, and controls.
 - [Capabilities and extensions](capabilities-and-extensions.md): backend facilities, location, offline storage, snapshots, and limitations.
-- [Frozen API research](../records/README.md): individual upstream fields, source links, versioned inputs and historical outcomes. Current coverage lives in the grouped checklist above.
+- [Upstream research notes](upstream-research.md): versioned primary-source citations, declaration caveats, platform differences and historical findings. Current coverage lives only in the grouped checklist above.
 
 The documents under `decisions/` preserve upstream investigations and the rationale for the retired implementation. Their execution instructions, commands, source paths, and acceptance policies are superseded. Archived implementation documents and source mentioned there are available only in the local backup; public contributors do not need that backup. [Historical records](../records/README.md) retain provenance, not current stage status.
 

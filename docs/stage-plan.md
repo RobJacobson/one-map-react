@@ -10,7 +10,7 @@ TF09 implementation, review/fixes, routine checks and targeted six-environment a
 
 Each stage implements the relevant common API and named extensions through the applicable adapters, documents material differences, adds focused tests, and updates a compact coverage summary. A stage is complete when its stated behavior is implemented and the required checks have passed. Missing runtime evidence is reported separately and leaves a required acceptance gate open. No current historical result certifies replacement code.
 
-Use the [grouped coverage checklist](api-coverage.md) and frozen upstream research to prevent omissions. Group unchanged fields by the actual forwarding or translation contract; preserve specific exceptions and open gates. Passing an early example does not complete all APIs in its feature family. Expand coverage in the later stages rather than requiring all constructor, host, or advanced rendering fields before a useful map exists.
+Use the [grouped coverage checklist](api-coverage.md) and [cited upstream sources](upstream-research.md) to prevent omissions. Group unchanged fields by the actual forwarding or translation contract; preserve specific exceptions and open gates. Passing an early example does not complete all APIs in its feature family. Expand coverage in the later stages rather than requiring all constructor, host, or advanced rendering fields before a useful map exists.
 
 Finish implementation and routine checks before proposing acceptance. Scope runtime tests to the affected behavior and environments; obtain permission under the testing policy. Do not run the six-environment suite after every stage by default. A shared lifecycle change may justify all six environments; a local property mapping usually does not.
 
