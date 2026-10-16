@@ -8,6 +8,10 @@ The [independent simplification audit](evidence/facade-simplification-audit.json
 
 The [creation-validation repair evidence](evidence/facade-simplification-repair.json) records the corrected behavior, consolidation, lossless inventory migration and routine checks against the repaired archive. Renderer acceptance remains unverified; no commit or publication is recorded.
 
+The [follow-up simplification audit](evidence/facade-simplification-followup-audit.json) records a missing common native symbol-layout exception in the checklist, reproduced duplicate scale queries, further consolidation recommendations, compiler review and independently repeated routine checks.
+
+The [facade consolidation evidence](evidence/facade-simplification-consolidation.json) records the checklist correction, six implemented simplifications, preserved public declarations and frozen-package routine checks. Its `finalCleanup` entry records removal of the redundant web style-load callback ref, the refreshed archive and repeated package checks. Renderer acceptance remains unverified.
+
 Records produced for the implementation retired during TF01 remain useful for upstream API inventory, versioned sources, discovered incompatibilities, and provenance. Their stage assignments, implementation mappings, artifact hashes, and runtime results apply to that implementation only.
 
 The [upstream research notes](../docs/upstream-research.md) preserve useful versioned findings, primary-source citations and declaration caveats in Markdown. The [snapshot retirement record](evidence/inventory-research-retirement.md) records removal of the raw inventory inputs and their Git recovery identities. The grouped checklist is the sole coverage record. Use upstream declarations for API details; do not recreate per-field status files. `version-baseline.json` and `tooling-baseline.json` record historical versions, not the current supported development or renderer matrix. `stage-status.json` and `evidence/` preserve historical outcomes; they are not active gates.

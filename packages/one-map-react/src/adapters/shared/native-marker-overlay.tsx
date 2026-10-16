@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect, useId, useRef, useState } from "react";
+import { type ReactElement, useEffect, useId, useState } from "react";
 import { View } from "react-native";
 import { Portal } from "react-native-teleport";
 
@@ -20,9 +20,7 @@ export const NativeMarkerOverlay = (
   const name = useId();
   const [point, setPoint] = useState<Point | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
-  const reportError = useRef(
-    useActiveCallback(props.onProjectionError)
-  ).current;
+  const reportError = useActiveCallback(props.onProjectionError);
   const longitude = props.lngLat[0];
   const latitude = props.lngLat[1];
 

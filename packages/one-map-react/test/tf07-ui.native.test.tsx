@@ -23,6 +23,7 @@ import {
   NativeOverlayContext,
   type NativeMapPresentation,
   type NativeOverlay,
+  withNativeMapPresentation,
 } from "../src/adapters/shared/native-map-presentation.js";
 import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
 import {
@@ -36,6 +37,7 @@ import type {
   ViewState,
 } from "../src/contracts/camera-types.js";
 import type { ClickEvent, MoveEvent } from "../src/contracts/event-types.js";
+import type { MapProps } from "../src/contracts/map-types.js";
 import type { ControlPosition, MarkerRef } from "../src/contracts/ui-types.js";
 import {
   type MapSession,
@@ -54,7 +56,13 @@ const FixtureSessionProvider = ({
 }) => (
   <MapSessionContext.Provider value={value}>
     <NativeMapPresentationContext.Provider value={value}>
-      <NativeCameraContext.Provider value={value.viewState}>
+      <NativeCameraContext.Provider
+        value={
+          value.viewState
+            ? { viewState: value.viewState, observedViewState: value.viewState }
+            : null
+        }
+      >
         {children}
       </NativeCameraContext.Provider>
     </NativeMapPresentationContext.Provider>
@@ -170,11 +178,11 @@ const sessionFixture = () => {
     viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
     gestureLocked: false,
     overlayHostName: "fixture-control-host",
-    ornaments: {},
+    attributionPosition: undefined,
     requestGestureLock: lock,
     setNativeLayout: jest.fn(),
     setOverlay: jest.fn(),
-    setOrnament: jest.fn(),
+    setAttributionPosition: jest.fn(),
     subscribe: (event, callback) => {
       listeners[event].add(callback);
       return () => {
@@ -189,6 +197,145 @@ const sessionFixture = () => {
   };
   return { session, project, unproject, easeTo, lock };
 };
+
+const scaleCamera: ViewState = {
+  longitude: 10,
+  latitude: 20,
+  zoom: 4,
+  bearing: 0,
+  pitch: 0,
+};
+const ScaleMap = withNativeMapPresentation(
+  forwardRef<MapRef, MapProps>((props, _ref) => <View>{props.children}</View>)
+);
+
+test("scale observes each movement once, including unchanged controlled targets", async () => {
+  const fixture = sessionFixture();
+  fixture.unproject.mockResolvedValue([10.01, 20]);
+  const reportError = jest.fn();
+  const tree = (
+    ready: boolean,
+    viewState?: ViewState,
+    unit: "metric" | "imperial" | "nautical" = "metric"
+  ) => (
+    <MapSessionContext.Provider value={{ ...fixture.session, ready }}>
+      <ScaleMap
+        mapStyle={{ version: 8, sources: {}, layers: [] }}
+        initialViewState={scaleCamera}
+        viewState={viewState}
+      >
+        <ui.ScaleControl unit={unit} onError={reportError} />
+      </ScaleMap>
+    </MapSessionContext.Provider>
+  );
+  const mounted = await render(tree(false));
+  expect(fixture.project).not.toHaveBeenCalled();
+  await mounted.rerender(tree(true));
+  await waitFor(() => expect(mounted.getByText("1 km")).toBeTruthy());
+  expect(fixture.project).toHaveBeenCalledTimes(1);
+  expect(fixture.unproject).toHaveBeenCalledTimes(1);
+  fixture.project.mockClear();
+  fixture.unproject.mockClear();
+  await act(async () =>
+    fixture.session.emit("move", {
+      viewState: { ...scaleCamera, zoom: 5 },
+      origin: "user",
+    })
+  );
+  expect(fixture.project).toHaveBeenCalledTimes(1);
+  expect(fixture.unproject).toHaveBeenCalledTimes(1);
+
+  const controlled = { ...scaleCamera, zoom: 6 };
+  await mounted.rerender(tree(true, controlled));
+  fixture.project.mockClear();
+  fixture.unproject.mockClear();
+  await act(async () =>
+    fixture.session.emit("move", {
+      viewState: { ...scaleCamera, longitude: 11, zoom: 7 },
+      origin: "user",
+    })
+  );
+  expect(fixture.project).toHaveBeenCalledTimes(1);
+  expect(fixture.project).toHaveBeenCalledWith([10, 20]);
+  expect(fixture.unproject).toHaveBeenCalledTimes(1);
+  await mounted.rerender(tree(true, { ...controlled, zoom: 8 }));
+  expect(fixture.project).toHaveBeenCalledTimes(2);
+  await mounted.rerender(tree(true, controlled, "imperial"));
+  await waitFor(() => expect(mounted.getByText("2000 ft")).toBeTruthy());
+  await mounted.rerender(tree(true, controlled, "nautical"));
+  await waitFor(() => expect(mounted.getByText("0.5 nm")).toBeTruthy());
+  expect(reportError).not.toHaveBeenCalled();
+  await mounted.unmount();
+});
+
+test.each(["resolve", "reject"])(
+  "scale ignores stale %s results and reports only current failures",
+  async (settlement) => {
+    const fixture = sessionFixture();
+    let resolveOld: ((value: readonly [number, number]) => void) | undefined;
+    let rejectOld: ((error: Error) => void) | undefined;
+    fixture.unproject
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve, reject) => {
+            resolveOld = resolve;
+            rejectOld = reject;
+          })
+      )
+      .mockResolvedValue([10.01, 20]);
+    const reportError = jest.fn();
+    const mounted = await render(
+      <MapSessionContext.Provider value={fixture.session}>
+        <ScaleMap
+          mapStyle={{ version: 8, sources: {}, layers: [] }}
+          initialViewState={scaleCamera}
+        >
+          <ui.ScaleControl onError={reportError} />
+        </ScaleMap>
+      </MapSessionContext.Provider>
+    );
+    await waitFor(() => expect(fixture.unproject).toHaveBeenCalledTimes(1));
+    await act(async () =>
+      fixture.session.emit("move", {
+        viewState: { ...scaleCamera, zoom: 5 },
+        origin: "user",
+      })
+    );
+    await waitFor(() => expect(mounted.getByText("1 km")).toBeTruthy());
+    await act(async () => {
+      if (settlement === "resolve") resolveOld?.([10.0001, 20]);
+      else rejectOld?.(new Error("superseded scale"));
+    });
+    expect(mounted.getByText("1 km")).toBeTruthy();
+    expect(reportError).not.toHaveBeenCalled();
+    const failure = new Error("current scale");
+    fixture.unproject.mockRejectedValueOnce(failure);
+    await act(async () =>
+      fixture.session.emit("move", {
+        viewState: { ...scaleCamera, zoom: 6 },
+        origin: "user",
+      })
+    );
+    expect(reportError).toHaveBeenCalledWith(failure);
+    expect(mounted.queryByText("1 km")).toBeNull();
+    let rejectDetached: ((error: Error) => void) | undefined;
+    fixture.project.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectDetached = reject;
+        })
+    );
+    await act(async () =>
+      fixture.session.emit("move", {
+        viewState: { ...scaleCamera, zoom: 7 },
+        origin: "user",
+      })
+    );
+    await mounted.unmount();
+    await act(async () => rejectDetached?.(new Error("detached scale")));
+    expect(reportError).toHaveBeenCalledTimes(1);
+  }
+);
 
 const touch = (x: number, y: number, count = 1) => ({
   nativeEvent: {

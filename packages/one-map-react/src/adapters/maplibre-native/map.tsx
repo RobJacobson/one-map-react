@@ -24,7 +24,6 @@ import { PortalHost, PortalProvider } from "react-native-teleport";
 
 import type { MapRef } from "../../contracts/camera-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
-import type { ControlPosition } from "../../contracts/ui-types.js";
 import type { NativeLocationOptions } from "../../maplibre-native.js";
 import {
   assertNativeDesktopOptions,
@@ -270,10 +269,8 @@ const MaplibreNativeMapImplementation = forwardRef<
                 : undefined)
             }
             attributionPosition={
-              session?.ornaments.attribution
-                ? ornaments.position(
-                    session.ornaments.attribution.position as ControlPosition
-                  )
+              session.attributionPosition
+                ? ornaments.position(session.attributionPosition)
                 : (props.options?.attributionPosition ??
                   (ornaments.managed
                     ? ornaments.position("bottom-right")
@@ -283,7 +280,7 @@ const MaplibreNativeMapImplementation = forwardRef<
               props.options?.compassPosition ??
               (ornaments.managed ? ornaments.position("top-right") : undefined)
             }
-            {...(session?.ornaments.attribution
+            {...(session.attributionPosition
               ? {
                   attribution: true,
                 }

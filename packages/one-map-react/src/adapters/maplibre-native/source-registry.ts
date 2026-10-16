@@ -5,7 +5,6 @@ import type {
 import type { ComponentRef } from "react";
 import { createContext, useContext } from "react";
 
-import { invokeWrapper } from "../shared/invoke-wrapper.js";
 import { NativeFeatureState } from "../shared/native-feature-state.js";
 import {
   toMaplibreFeatureId,
@@ -48,11 +47,9 @@ export class MaplibreSourceRegistry {
   readonly featureState = new NativeFeatureState(async (identifier) => {
     const source = this.require(identifier.source);
 
-    await invokeWrapper(
-      source.kind === "geojson"
-        ? source.ref.removeFeatureState(toMaplibreFeatureId(identifier))
-        : source.ref.removeFeatureState(toMaplibreVectorFeature(identifier))
-    );
+    await (source.kind === "geojson"
+      ? source.ref.removeFeatureState(toMaplibreFeatureId(identifier))
+      : source.ref.removeFeatureState(toMaplibreVectorFeature(identifier)));
   });
 
   /**

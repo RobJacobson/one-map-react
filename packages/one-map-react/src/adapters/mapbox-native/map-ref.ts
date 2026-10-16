@@ -15,7 +15,6 @@ import {
   featuresFromWrapper,
   mutableFeatureState,
 } from "../shared/feature-values.js";
-import { invokeWrapper } from "../shared/invoke-wrapper.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
   normalizeElevation,
@@ -86,33 +85,31 @@ export const createMapboxMapRef = (
     const camera = requireCamera(cameraRef.current);
 
     onCameraCommand?.();
-    await invokeWrapper(camera.setCamera(toRnmapboxStop(options, "none")));
+    await camera.setCamera(toRnmapboxStop(options, "none"));
   },
   easeTo: async (options) => {
     const camera = requireCamera(cameraRef.current);
 
     onCameraCommand?.();
-    await invokeWrapper(camera.setCamera(toRnmapboxStop(options, "easeTo")));
+    await camera.setCamera(toRnmapboxStop(options, "easeTo"));
   },
   flyTo: async (options) => {
     const camera = requireCamera(cameraRef.current);
 
     onCameraCommand?.();
-    await invokeWrapper(camera.setCamera(toRnmapboxFlyToStop(options)));
+    await camera.setCamera(toRnmapboxFlyToStop(options));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current);
 
     onCameraCommand?.();
-    await invokeWrapper(
-      camera.setCamera(toRnmapboxFitBoundsStop(bounds, options))
-    );
+    await camera.setCamera(toRnmapboxFitBoundsStop(bounds, options));
   },
   zoomTo: async (zoom, options) => {
     const camera = requireCamera(cameraRef.current);
 
     onCameraCommand?.();
-    await invokeWrapper(camera.setCamera(toRnmapboxZoomStop(zoom, options)));
+    await camera.setCamera(toRnmapboxZoomStop(zoom, options));
   },
   stop: async () => {
     throw nativeStopError();
@@ -212,8 +209,11 @@ export const createMapboxMapRef = (
       target,
       async () => {
         const map = requireMap(mapViewRef.current);
-        await invokeWrapper(
-          map.setFeatureState(featureId, mutableState, sourceId, sourceLayerId)
+        await map.setFeatureState(
+          featureId,
+          mutableState,
+          sourceId,
+          sourceLayerId
         );
       },
       "write"
@@ -239,8 +239,11 @@ export const createMapboxMapRef = (
       target,
       async () => {
         const map = requireMap(mapViewRef.current);
-        await invokeWrapper(
-          map.removeFeatureState(featureId, stateKey, sourceId, sourceLayerId)
+        await map.removeFeatureState(
+          featureId,
+          stateKey,
+          sourceId,
+          sourceLayerId
         );
       },
       key === undefined ? "remove" : undefined
@@ -263,9 +266,7 @@ export const resetMapboxFeatureState = async (
   const map = requireMap(mapViewRef.current);
   const [featureId, sourceId, sourceLayerId] =
     toRnmapboxFeatureArgs(identifier);
-  await invokeWrapper(
-    map.removeFeatureState(featureId, null, sourceId, sourceLayerId)
-  );
+  await map.removeFeatureState(featureId, null, sourceId, sourceLayerId);
 };
 
 /**

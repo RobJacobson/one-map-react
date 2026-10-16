@@ -446,7 +446,7 @@ test("native camera observations and controls leave unrelated contexts unchanged
     return null;
   };
   const Camera = () => {
-    cameraChanged(useContext(NativeCameraContext));
+    cameraChanged(useContext(NativeCameraContext)?.viewState);
     return null;
   };
   const children = (
@@ -488,7 +488,7 @@ test("native camera observations and controls leave unrelated contexts unchanged
   mounted.unmount();
 });
 
-test("native presentation retains layout, overlay order, ornaments and gesture ownership", async () => {
+test("native presentation retains layout, overlay order, attribution and gesture ownership", async () => {
   const fixture = createFixture();
   const adapter = {
     ...fixture.adapter,
@@ -512,14 +512,14 @@ test("native presentation retains layout, overlay order, ornaments and gesture o
     initial.setNativeLayout(400, 300);
     initial.setOverlay("first", "top-right", 20);
     initial.setOverlay("second", "top-right", 30);
-    initial.setOrnament("compass", { position: "top-left" });
+    initial.setAttributionPosition("top-left");
     initial.requestGestureLock(true);
   });
   const updated = observe.mock.calls.at(-1)?.[0];
   expect(updated).toMatchObject({
     nativeLayout: { width: 400, height: 300 },
     gestureLocked: true,
-    ornaments: { compass: { position: "top-left" } },
+    attributionPosition: "top-left",
   });
   expect(updated.setOverlay).toBe(initial.setOverlay);
   expect(updated.setNativeLayout).toBe(initial.setNativeLayout);
@@ -534,7 +534,7 @@ test("native presentation retains layout, overlay order, ornaments and gesture o
   expect(observe).toHaveBeenCalledTimes(renders);
   await act(async () => {
     updated.setOverlay("first", null);
-    updated.setOrnament("compass", null);
+    updated.setAttributionPosition(undefined);
     updated.requestGestureLock(false);
   });
   expect(
@@ -542,7 +542,7 @@ test("native presentation retains layout, overlay order, ornaments and gesture o
   ).toEqual(["second"]);
   expect(observe.mock.calls.at(-1)?.[0]).toMatchObject({
     gestureLocked: false,
-    ornaments: {},
+    attributionPosition: undefined,
   });
   mounted.unmount();
 });

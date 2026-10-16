@@ -17,7 +17,6 @@ import {
   featuresFromWrapper,
   mutableFeatureState,
 } from "../shared/feature-values.js";
-import { invokeWrapper } from "../shared/invoke-wrapper.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
   boundsFromFlat,
@@ -91,38 +90,34 @@ export const createMaplibreMapRef = (
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
     onCameraCommand?.();
-    await invokeWrapper(camera.jumpTo(toMaplibreCommand(options)));
+    await camera.jumpTo(toMaplibreCommand(options));
   },
   easeTo: async (options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
     onCameraCommand?.();
-    await invokeWrapper(camera.easeTo(toMaplibreCommand(options)));
+    await camera.easeTo(toMaplibreCommand(options));
   },
   flyTo: async (options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
     onCameraCommand?.();
-    await invokeWrapper(camera.flyTo(toMaplibreFlyToOptions(options)));
+    await camera.flyTo(toMaplibreFlyToOptions(options));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
     onCameraCommand?.();
-    await invokeWrapper(
-      camera.fitBounds(
-        mutableFlatBounds(bounds),
-        toMaplibreFitBoundsOptions(options)
-      )
+    await camera.fitBounds(
+      mutableFlatBounds(bounds),
+      toMaplibreFitBoundsOptions(options)
     );
   },
   zoomTo: async (zoom, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
     onCameraCommand?.();
-    await invokeWrapper(
-      camera.zoomTo(zoom, options ? toMaplibreCommand(options) : undefined)
-    );
+    await camera.zoomTo(zoom, options ? toMaplibreCommand(options) : undefined);
   },
   stop: async () => {
     throw nativeStopError();
@@ -224,17 +219,15 @@ export const createMaplibreMapRef = (
       async () => {
         const source = sources.require(target.source);
 
-        await invokeWrapper(
-          source.kind === "geojson"
-            ? source.ref.setFeatureState(
-                toMaplibreFeatureId(target),
-                mutableState
-              )
-            : source.ref.setFeatureState(
-                toMaplibreVectorFeature(target),
-                mutableState
-              )
-        );
+        await (source.kind === "geojson"
+          ? source.ref.setFeatureState(
+              toMaplibreFeatureId(target),
+              mutableState
+            )
+          : source.ref.setFeatureState(
+              toMaplibreVectorFeature(target),
+              mutableState
+            ));
       },
       "write"
     );
@@ -264,17 +257,15 @@ export const createMaplibreMapRef = (
       async () => {
         const source = sources.require(target.source);
 
-        await invokeWrapper(
-          source.kind === "geojson"
-            ? source.ref.removeFeatureState(
-                toMaplibreFeatureId(target),
-                ...(key === undefined ? [] : [key])
-              )
-            : source.ref.removeFeatureState(
-                toMaplibreVectorFeature(target),
-                ...(key === undefined ? [] : [key])
-              )
-        );
+        await (source.kind === "geojson"
+          ? source.ref.removeFeatureState(
+              toMaplibreFeatureId(target),
+              ...(key === undefined ? [] : [key])
+            )
+          : source.ref.removeFeatureState(
+              toMaplibreVectorFeature(target),
+              ...(key === undefined ? [] : [key])
+            ));
       },
       key === undefined ? "remove" : undefined
     );

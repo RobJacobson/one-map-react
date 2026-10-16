@@ -17,9 +17,6 @@ import type { MapProps } from "../../contracts/map-types.js";
 import type { ControlPosition } from "../../contracts/ui-types.js";
 import { useOptionalMapSession } from "../../facade/map-context.js";
 
-/** Renderer ornaments requested by mounted native controls. */
-export type OrnamentName = "attribution" | "compass" | "scale" | "logo";
-
 /** Native control placement; children retain their original React ancestry. */
 export interface NativeOverlay {
   readonly id: string;
@@ -33,15 +30,12 @@ export interface NativeMapPresentation {
   readonly overlayHostName: string;
   readonly nativeLocationFollowing: boolean;
   readonly nativeLayout?: { readonly width: number; readonly height: number };
-  readonly ornaments: Partial<
-    Record<OrnamentName, Readonly<Record<string, unknown>>>
-  >;
+  /** Placement requested by the mounted attribution control. */
+  readonly attributionPosition: ControlPosition | undefined;
   requestGestureLock(locked: boolean): void;
   setNativeLayout(width: number, height: number): void;
-  setOrnament(
-    name: OrnamentName,
-    options: Readonly<Record<string, unknown>> | null
-  ): void;
+  /** Clears the control override with undefined, restoring selected SDK options. */
+  setAttributionPosition(position: ControlPosition | undefined): void;
   setOverlay(
     id: string,
     position: ControlPosition | null,
@@ -52,7 +46,18 @@ export interface NativeMapPresentation {
 export const NativeMapPresentationContext =
   createContext<NativeMapPresentation | null>(null);
 export const NativeOverlayContext = createContext<readonly NativeOverlay[]>([]);
-export const NativeCameraContext = createContext<ViewState | null>(null);
+
+/** Effective camera configuration and movement observed from the native wrapper. */
+interface NativeCameraState {
+  /** Authoritative target when controlled, otherwise the observed camera. */
+  readonly viewState: ViewState;
+  /** Invalidates scale projection even when the controlled target stays unchanged. */
+  readonly observedViewState: ViewState;
+}
+
+export const NativeCameraContext = createContext<NativeCameraState | null>(
+  null
+);
 
 /** Keeps native layout and camera updates out of the common map-access context. */
 export const withNativeMapPresentation = <Props extends MapProps>(
@@ -92,30 +97,18 @@ const NativePresentationProvider = ({
   const [gestureLocked, requestGestureLock] = useState(false);
   const [nativeLayout, storeNativeLayout] =
     useState<NativeMapPresentation["nativeLayout"]>();
-  const [ornaments, setOrnaments] = useState<
-    NativeMapPresentation["ornaments"]
-  >({});
+  const [attributionPosition, setAttributionPosition] =
+    useState<ControlPosition>();
   const [overlays, setOverlays] = useState<ReadonlyMap<string, NativeOverlay>>(
     () => new Map()
   );
-  const [{ setNativeLayout, setOrnament, setOverlay }] = useState(() => ({
+  const [{ setNativeLayout, setOverlay }] = useState(() => ({
     setNativeLayout: (width: number, height: number): void => {
       storeNativeLayout((previous) =>
         previous?.width === width && previous.height === height
           ? previous
           : { width, height }
       );
-    },
-    setOrnament: (
-      name: OrnamentName,
-      options: Readonly<Record<string, unknown>> | null
-    ) => {
-      setOrnaments((current) => {
-        const next = { ...current };
-        if (options === null) delete next[name];
-        else next[name] = options;
-        return next;
-      });
     },
     setOverlay: (
       id: string,
@@ -142,9 +135,9 @@ const NativePresentationProvider = ({
       overlayHostName,
       nativeLocationFollowing: following,
       nativeLayout,
-      ornaments,
+      attributionPosition,
       setNativeLayout,
-      setOrnament,
+      setAttributionPosition,
       setOverlay,
     }),
     [
@@ -152,9 +145,9 @@ const NativePresentationProvider = ({
       overlayHostName,
       following,
       nativeLayout,
-      ornaments,
+      attributionPosition,
       setNativeLayout,
-      setOrnament,
+      setAttributionPosition,
       setOverlay,
     ]
   );
@@ -187,8 +180,12 @@ const NativeCameraProvider = ({
       }),
     [subscribe]
   );
+  const camera = useMemo(
+    () => ({ viewState: controlled ?? observed, observedViewState: observed }),
+    [controlled, observed]
+  );
   return (
-    <NativeCameraContext.Provider value={controlled ?? observed}>
+    <NativeCameraContext.Provider value={camera}>
       {children}
     </NativeCameraContext.Provider>
   );

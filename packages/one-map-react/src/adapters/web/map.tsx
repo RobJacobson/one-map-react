@@ -150,7 +150,6 @@ export const createWebMap = <
       const reportStyleLoad = useActiveCallback(onStyleLoad);
       const reportError = useActiveCallback(onError);
       const reportResize = useActiveCallback(onResize);
-      const reportStyleLoadRef = useRef(reportStyleLoad);
       const setMapHandle = useCallback((handle: WebMapHandle | null) => {
         mapRef.current = handle;
         const next = handle?.getMap() ?? null;
@@ -193,10 +192,6 @@ export const createWebMap = <
         []
       );
 
-      useLayoutEffect(() => {
-        reportStyleLoadRef.current = reportStyleLoad;
-      });
-
       // style.load is style completion. react-map-gl onStyleData is activity
       // and is not this callback. A fresh map can finish style.load before
       // this commit, while isStyleLoaded() is still false; the map load that
@@ -215,7 +210,7 @@ export const createWebMap = <
         let sawStyleLoad = false;
         const onStyleLoadEvent = () => {
           sawStyleLoad = true;
-          reportStyleLoadRef.current();
+          reportStyleLoad();
         };
         const reportMissedStyleLoad = () => {
           if (sawStyleLoad || !styleMap.isStyleLoaded()) {
@@ -223,14 +218,14 @@ export const createWebMap = <
           }
 
           sawStyleLoad = true;
-          reportStyleLoadRef.current();
+          reportStyleLoad();
         };
 
         styleMap.on("style.load", onStyleLoadEvent);
 
         if (styleMap.isStyleLoaded()) {
           sawStyleLoad = true;
-          reportStyleLoadRef.current();
+          reportStyleLoad();
         } else {
           styleMap.on("load", reportMissedStyleLoad);
           styleMap.on("idle", reportMissedStyleLoad);
@@ -241,7 +236,7 @@ export const createWebMap = <
           styleMap.off("load", reportMissedStyleLoad);
           styleMap.off("idle", reportMissedStyleLoad);
         };
-      }, [styleMap, styleKey]);
+      }, [styleMap, styleKey, reportStyleLoad]);
 
       // Pinch zoom and rotation are one handler. Disabling the handler would
       // also disable zoom, so rotation is turned off on the handler itself.

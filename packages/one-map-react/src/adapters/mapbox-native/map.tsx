@@ -21,7 +21,6 @@ import { PortalHost, PortalProvider } from "react-native-teleport";
 import type { MapRef } from "../../contracts/camera-types.js";
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
-import type { ControlPosition } from "../../contracts/ui-types.js";
 import type { NativeLocationOptions } from "../../mapbox-native.js";
 import {
   assertNativeDesktopOptions,
@@ -282,10 +281,8 @@ const MapboxNativeMapImplementation = forwardRef<
                 : undefined)
             }
             attributionPosition={
-              session?.ornaments.attribution
-                ? ornaments.position(
-                    session.ornaments.attribution.position as ControlPosition
-                  )
+              session.attributionPosition
+                ? ornaments.position(session.attributionPosition)
                 : (props.options?.attributionPosition ??
                   (ornaments.managed
                     ? ornaments.position("bottom-right")
@@ -297,7 +294,7 @@ const MapboxNativeMapImplementation = forwardRef<
             }
             scaleBarPosition={scaleBarPosition}
             {...(refreshScalePosition ? { scaleBarEnabled: false } : {})}
-            {...(session?.ornaments.attribution
+            {...(session.attributionPosition
               ? {
                   attributionEnabled: true,
                 }

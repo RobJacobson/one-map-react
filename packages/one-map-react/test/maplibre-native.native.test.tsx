@@ -21,7 +21,7 @@ import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
-import { ScaleControl } from "../src/facade/ui.js";
+import { AttributionControl, ScaleControl } from "../src/facade/ui.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
 const mockJumpTo = jest.fn(() => Promise.resolve());
@@ -347,6 +347,39 @@ const vectorTree = (ref?: Ref<MapRef>) => (
 );
 
 describe("maplibre-native adapter", () => {
+  test("attribution control restores selected position and disabled state after removal", async () => {
+    const options = {
+      attributionPosition: { top: 5, right: 6 },
+      attribution: false,
+    };
+    const scene = (mounted: boolean, position?: "top-left") => (
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          options={options}
+        >
+          {mounted && <AttributionControl position={position} />}
+        </NativeMap>
+      </MapSetup>
+    );
+    const view = await render(scene(false));
+    expect(lastMapProps()).toMatchObject(options);
+    await view.rerender(scene(true));
+    expect(lastMapProps()).toMatchObject({
+      attributionPosition: { bottom: 8, right: 8 },
+      attribution: true,
+    });
+    await view.rerender(scene(false));
+    expect(lastMapProps()).toMatchObject(options);
+    await view.rerender(scene(true, "top-left"));
+    expect(lastMapProps()).toMatchObject({
+      attributionPosition: { top: 8, left: 8 },
+      attribution: true,
+    });
+    await view.unmount();
+  });
+
   test("SDK ornaments stay outside measured native controls and restore after removal", async () => {
     const explicit = {
       logoPosition: { top: 3, left: 4 },

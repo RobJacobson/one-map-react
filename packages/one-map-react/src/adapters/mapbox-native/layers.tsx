@@ -11,17 +11,7 @@ import {
 } from "@rnmapbox/maps";
 import type { ComponentProps } from "react";
 
-import type {
-  BackgroundLayerProps,
-  CircleLayerProps,
-  FillExtrusionLayerProps,
-  FillLayerProps,
-  HeatmapLayerProps,
-  LayerProps,
-  LineLayerProps,
-  RasterLayerProps,
-  SymbolLayerProps,
-} from "../../contracts/layer-types.js";
+import type { LayerProps } from "../../contracts/layer-types.js";
 
 /** Mapbox-native layer that dispatches to the matching RNMapbox layer. */
 export const MapboxNativeLayer = (props: LayerProps) => {
@@ -30,70 +20,283 @@ export const MapboxNativeLayer = (props: LayerProps) => {
       return (
         <HillshadeLayer
           {...rnmapboxLayerFields(props)}
-          style={definedFields<ComponentProps<typeof HillshadeLayer>["style"]>({
-            hillshadeIlluminationDirection:
-              props.paint?.["hillshade-illumination-direction"],
-            hillshadeIlluminationAnchor:
-              props.paint?.["hillshade-illumination-anchor"],
-            hillshadeExaggeration: props.paint?.["hillshade-exaggeration"],
-            hillshadeShadowColor: props.paint?.["hillshade-shadow-color"],
-            hillshadeHighlightColor: props.paint?.["hillshade-highlight-color"],
-            hillshadeAccentColor: props.paint?.["hillshade-accent-color"],
-            hillshadeExaggerationTransition:
-              props.paint?.["hillshade-exaggeration-transition"],
-            hillshadeShadowColorTransition:
-              props.paint?.["hillshade-shadow-color-transition"],
-            hillshadeHighlightColorTransition:
-              props.paint?.["hillshade-highlight-color-transition"],
-            hillshadeAccentColorTransition:
-              props.paint?.["hillshade-accent-color-transition"],
-            visibility: props.layout?.visibility,
-          })}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof HillshadeLayer>["style"]
+          >(props)}
         />
       );
     case "background":
-      return <BackgroundLayer {...toRnmapboxBackgroundLayer(props)} />;
+      return (
+        <BackgroundLayer
+          {...rnmapboxLayerFields(props)}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof BackgroundLayer>["style"]
+          >(props)}
+        />
+      );
     case "fill":
-      return <FillLayer {...toRnmapboxFillLayer(props)} />;
+      return (
+        <FillLayer
+          {...rnmapboxLayerFields(props)}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof FillLayer>["style"]
+          >(props)}
+        />
+      );
     case "line":
-      return <LineLayer {...toRnmapboxLineLayer(props)} />;
+      return (
+        <LineLayer
+          {...rnmapboxLayerFields(props)}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof LineLayer>["style"]
+          >(props)}
+        />
+      );
     case "circle":
-      return <CircleLayer {...toRnmapboxCircleLayer(props)} />;
+      return (
+        <CircleLayer
+          {...rnmapboxLayerFields(props)}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof CircleLayer>["style"]
+          >(props)}
+        />
+      );
     case "symbol":
-      return <SymbolLayer {...toRnmapboxSymbolLayer(props)} />;
+      return (
+        <SymbolLayer
+          {...rnmapboxLayerFields(props)}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof SymbolLayer>["style"]
+          >(props)}
+        />
+      );
     case "raster":
-      return <RasterLayer {...toRnmapboxRasterLayer(props)} />;
+      return (
+        <RasterLayer
+          {...rnmapboxLayerFields(props)}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof RasterLayer>["style"]
+          >(props)}
+        />
+      );
     case "heatmap":
-      return <HeatmapLayer {...toRnmapboxHeatmapLayer(props)} />;
+      return (
+        <HeatmapLayer
+          {...rnmapboxLayerFields(props)}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof HeatmapLayer>["style"]
+          >(props)}
+        />
+      );
     case "fill-extrusion":
-      return <FillExtrusionLayer {...toRnmapboxFillExtrusionLayer(props)} />;
+      return (
+        <FillExtrusionLayer
+          {...rnmapboxLayerFields(props)}
+          style={toRnmapboxLayerStyle<
+            ComponentProps<typeof FillExtrusionLayer>["style"]
+          >(props)}
+        />
+      );
   }
 };
 
-/**
- * Drops unset style fields and crosses into a wrapper layer style type.
- *
- * Values are portable style-spec constants and expressions. The wrapper's
- * `Value` unions carry narrower expression tuples than the facade's
- * `readonly unknown[]`, so the copy into the wrapper type is unchecked here
- * and each renderer validates the values it receives. Unset fields are
- * omitted so the wrapper only sees keys the application provided.
- *
- * @param fields - CamelCase style fields from the portable paint and layout.
- * @returns The set fields as the target layer's style object.
- */
-const definedFields = <Style extends object>(
-  fields: Readonly<Record<string, unknown>>
+// Keep the existing portable field boundary; selected wrapper styles remain separate.
+const styleKeys: Record<
+  LayerProps["type"],
+  { readonly paint: readonly string[]; readonly layout: readonly string[] }
+> = {
+  hillshade: {
+    paint: [
+      "hillshade-illumination-direction",
+      "hillshade-illumination-anchor",
+      "hillshade-exaggeration",
+      "hillshade-shadow-color",
+      "hillshade-highlight-color",
+      "hillshade-accent-color",
+      "hillshade-exaggeration-transition",
+      "hillshade-shadow-color-transition",
+      "hillshade-highlight-color-transition",
+      "hillshade-accent-color-transition",
+    ],
+    layout: ["visibility"],
+  },
+  background: {
+    paint: ["background-color", "background-opacity", "background-pattern"],
+    layout: ["visibility"],
+  },
+  fill: {
+    paint: [
+      "fill-antialias",
+      "fill-color",
+      "fill-opacity",
+      "fill-outline-color",
+      "fill-pattern",
+      "fill-translate",
+      "fill-translate-anchor",
+    ],
+    layout: ["fill-sort-key", "visibility"],
+  },
+  line: {
+    paint: [
+      "line-blur",
+      "line-color",
+      "line-dasharray",
+      "line-gap-width",
+      "line-gradient",
+      "line-offset",
+      "line-opacity",
+      "line-pattern",
+      "line-translate",
+      "line-translate-anchor",
+      "line-width",
+    ],
+    layout: [
+      "line-cap",
+      "line-join",
+      "line-miter-limit",
+      "line-round-limit",
+      "line-sort-key",
+      "visibility",
+    ],
+  },
+  circle: {
+    paint: [
+      "circle-blur",
+      "circle-color",
+      "circle-opacity",
+      "circle-pitch-scale",
+      "circle-pitch-alignment",
+      "circle-radius",
+      "circle-stroke-color",
+      "circle-stroke-opacity",
+      "circle-stroke-width",
+      "circle-translate",
+      "circle-translate-anchor",
+    ],
+    layout: ["circle-sort-key", "visibility"],
+  },
+  symbol: {
+    paint: [
+      "icon-color",
+      "icon-halo-blur",
+      "icon-halo-color",
+      "icon-halo-width",
+      "icon-opacity",
+      "icon-translate",
+      "icon-translate-anchor",
+      "text-color",
+      "text-halo-blur",
+      "text-halo-color",
+      "text-halo-width",
+      "text-opacity",
+      "text-translate",
+      "text-translate-anchor",
+    ],
+    layout: [
+      "symbol-placement",
+      "symbol-spacing",
+      "symbol-avoid-edges",
+      "symbol-sort-key",
+      "symbol-z-order",
+      "icon-allow-overlap",
+      "icon-ignore-placement",
+      "icon-optional",
+      "icon-rotation-alignment",
+      "icon-size",
+      "icon-text-fit",
+      "icon-text-fit-padding",
+      "icon-image",
+      "icon-rotate",
+      "icon-padding",
+      "icon-keep-upright",
+      "icon-offset",
+      "icon-anchor",
+      "icon-pitch-alignment",
+      "text-pitch-alignment",
+      "text-rotation-alignment",
+      "text-field",
+      "text-font",
+      "text-size",
+      "text-max-width",
+      "text-line-height",
+      "text-letter-spacing",
+      "text-justify",
+      "text-radial-offset",
+      "text-variable-anchor",
+      "text-anchor",
+      "text-max-angle",
+      "text-writing-mode",
+      "text-rotate",
+      "text-padding",
+      "text-keep-upright",
+      "text-transform",
+      "text-offset",
+      "text-allow-overlap",
+      "text-ignore-placement",
+      "text-optional",
+      "visibility",
+    ],
+  },
+  raster: {
+    paint: [
+      "raster-opacity",
+      "raster-hue-rotate",
+      "raster-brightness-min",
+      "raster-brightness-max",
+      "raster-saturation",
+      "raster-contrast",
+      "raster-resampling",
+      "raster-fade-duration",
+    ],
+    layout: ["visibility"],
+  },
+  heatmap: {
+    paint: [
+      "heatmap-radius",
+      "heatmap-weight",
+      "heatmap-intensity",
+      "heatmap-color",
+      "heatmap-opacity",
+    ],
+    layout: ["visibility"],
+  },
+  "fill-extrusion": {
+    paint: [
+      "fill-extrusion-opacity",
+      "fill-extrusion-color",
+      "fill-extrusion-translate",
+      "fill-extrusion-translate-anchor",
+      "fill-extrusion-pattern",
+      "fill-extrusion-height",
+      "fill-extrusion-base",
+      "fill-extrusion-vertical-gradient",
+    ],
+    layout: ["visibility"],
+  },
+};
+
+/** Converts accepted style fields without copying or interpreting expression values. */
+const toRnmapboxLayerStyle = <Style extends object>(
+  props: LayerProps
 ): Style => {
   const style: Record<string, unknown> = {};
-
-  for (const [key, value] of Object.entries(fields)) {
-    if (value !== undefined) {
-      style[key] = value;
+  for (const family of ["paint", "layout"] as const) {
+    // Portable interfaces lack an index signature; only the accepted keys are read.
+    const fields = props[family] as
+      | Readonly<Record<string, unknown>>
+      | undefined;
+    for (const key of styleKeys[props.type][family]) {
+      const value = fields?.[key];
+      if (value !== undefined)
+        style[
+          key.replace(/-([a-z])/g, (_match, letter: string) =>
+            letter.toUpperCase()
+          )
+        ] = value;
     }
   }
-
-  return style as unknown as Style;
+  // The wrapper's mutable expression unions are narrower; values remain renderer-validated.
+  return style as Style;
 };
 
 /** Portable layer fields every RNMapbox layer converter reads. */
@@ -122,246 +325,4 @@ const rnmapboxLayerFields = (props: PortableLayerFields) => ({
   belowLayerID: props.beforeId,
   filter: props.filter,
   sourceLayerID: props["source-layer"],
-});
-
-/**
- * Converts common background layer props into `BackgroundLayer` props.
- *
- * @param props - Common background layer props.
- * @returns Wrapper-level fields plus a camelCase background style.
- */
-const toRnmapboxBackgroundLayer = (
-  props: BackgroundLayerProps
-): ComponentProps<typeof BackgroundLayer> => ({
-  ...rnmapboxLayerFields(props),
-  style: definedFields<ComponentProps<typeof BackgroundLayer>["style"]>({
-    backgroundColor: props.paint?.["background-color"],
-    backgroundOpacity: props.paint?.["background-opacity"],
-    backgroundPattern: props.paint?.["background-pattern"],
-    visibility: props.layout?.visibility,
-  }),
-});
-
-/**
- * Converts common fill layer props into `FillLayer` props.
- *
- * @param props - Common fill layer props.
- * @returns Wrapper-level fields plus a camelCase fill style.
- */
-const toRnmapboxFillLayer = (
-  props: FillLayerProps
-): ComponentProps<typeof FillLayer> => ({
-  ...rnmapboxLayerFields(props),
-  style: definedFields<ComponentProps<typeof FillLayer>["style"]>({
-    fillAntialias: props.paint?.["fill-antialias"],
-    fillColor: props.paint?.["fill-color"],
-    fillOpacity: props.paint?.["fill-opacity"],
-    fillOutlineColor: props.paint?.["fill-outline-color"],
-    fillPattern: props.paint?.["fill-pattern"],
-    fillTranslate: props.paint?.["fill-translate"],
-    fillTranslateAnchor: props.paint?.["fill-translate-anchor"],
-    fillSortKey: props.layout?.["fill-sort-key"],
-    visibility: props.layout?.visibility,
-  }),
-});
-
-/**
- * Converts common line layer props into `LineLayer` props.
- *
- * @param props - Common line layer props.
- * @returns Wrapper-level fields plus a camelCase line style.
- */
-const toRnmapboxLineLayer = (
-  props: LineLayerProps
-): ComponentProps<typeof LineLayer> => ({
-  ...rnmapboxLayerFields(props),
-  style: definedFields<ComponentProps<typeof LineLayer>["style"]>({
-    lineBlur: props.paint?.["line-blur"],
-    lineColor: props.paint?.["line-color"],
-    lineDasharray: props.paint?.["line-dasharray"],
-    lineGapWidth: props.paint?.["line-gap-width"],
-    lineGradient: props.paint?.["line-gradient"],
-    lineOffset: props.paint?.["line-offset"],
-    lineOpacity: props.paint?.["line-opacity"],
-    linePattern: props.paint?.["line-pattern"],
-    lineTranslate: props.paint?.["line-translate"],
-    lineTranslateAnchor: props.paint?.["line-translate-anchor"],
-    lineWidth: props.paint?.["line-width"],
-    lineCap: props.layout?.["line-cap"],
-    lineJoin: props.layout?.["line-join"],
-    lineMiterLimit: props.layout?.["line-miter-limit"],
-    lineRoundLimit: props.layout?.["line-round-limit"],
-    lineSortKey: props.layout?.["line-sort-key"],
-    visibility: props.layout?.visibility,
-  }),
-});
-
-/**
- * Converts common circle layer props into `CircleLayer` props.
- *
- * @param props - Common circle layer props.
- * @returns Wrapper-level fields plus a camelCase circle style.
- */
-const toRnmapboxCircleLayer = (
-  props: CircleLayerProps
-): ComponentProps<typeof CircleLayer> => ({
-  ...rnmapboxLayerFields(props),
-  style: definedFields<ComponentProps<typeof CircleLayer>["style"]>({
-    circleBlur: props.paint?.["circle-blur"],
-    circleColor: props.paint?.["circle-color"],
-    circleOpacity: props.paint?.["circle-opacity"],
-    circlePitchScale: props.paint?.["circle-pitch-scale"],
-    circlePitchAlignment: props.paint?.["circle-pitch-alignment"],
-    circleRadius: props.paint?.["circle-radius"],
-    circleStrokeColor: props.paint?.["circle-stroke-color"],
-    circleStrokeOpacity: props.paint?.["circle-stroke-opacity"],
-    circleStrokeWidth: props.paint?.["circle-stroke-width"],
-    circleTranslate: props.paint?.["circle-translate"],
-    circleTranslateAnchor: props.paint?.["circle-translate-anchor"],
-    circleSortKey: props.layout?.["circle-sort-key"],
-    visibility: props.layout?.visibility,
-  }),
-});
-
-/**
- * Converts common symbol layer props into `SymbolLayer` props.
- *
- * The gated `icon-overlap`, `text-overlap`, and
- * `text-variable-anchor-offset` layout keys are rejected by the shared
- * `Layer` before this converter runs; they have no camelCase entry here.
- *
- * @param props - Common symbol layer props.
- * @returns Wrapper-level fields plus a camelCase symbol style.
- */
-const toRnmapboxSymbolLayer = (
-  props: SymbolLayerProps
-): ComponentProps<typeof SymbolLayer> => ({
-  ...rnmapboxLayerFields(props),
-  style: definedFields<ComponentProps<typeof SymbolLayer>["style"]>({
-    iconColor: props.paint?.["icon-color"],
-    iconHaloBlur: props.paint?.["icon-halo-blur"],
-    iconHaloColor: props.paint?.["icon-halo-color"],
-    iconHaloWidth: props.paint?.["icon-halo-width"],
-    iconOpacity: props.paint?.["icon-opacity"],
-    iconTranslate: props.paint?.["icon-translate"],
-    iconTranslateAnchor: props.paint?.["icon-translate-anchor"],
-    textColor: props.paint?.["text-color"],
-    textHaloBlur: props.paint?.["text-halo-blur"],
-    textHaloColor: props.paint?.["text-halo-color"],
-    textHaloWidth: props.paint?.["text-halo-width"],
-    textOpacity: props.paint?.["text-opacity"],
-    textTranslate: props.paint?.["text-translate"],
-    textTranslateAnchor: props.paint?.["text-translate-anchor"],
-    symbolPlacement: props.layout?.["symbol-placement"],
-    symbolSpacing: props.layout?.["symbol-spacing"],
-    symbolAvoidEdges: props.layout?.["symbol-avoid-edges"],
-    symbolSortKey: props.layout?.["symbol-sort-key"],
-    symbolZOrder: props.layout?.["symbol-z-order"],
-    iconAllowOverlap: props.layout?.["icon-allow-overlap"],
-    iconIgnorePlacement: props.layout?.["icon-ignore-placement"],
-    iconOptional: props.layout?.["icon-optional"],
-    iconRotationAlignment: props.layout?.["icon-rotation-alignment"],
-    iconSize: props.layout?.["icon-size"],
-    iconTextFit: props.layout?.["icon-text-fit"],
-    iconTextFitPadding: props.layout?.["icon-text-fit-padding"],
-    iconImage: props.layout?.["icon-image"],
-    iconRotate: props.layout?.["icon-rotate"],
-    iconPadding: props.layout?.["icon-padding"],
-    iconKeepUpright: props.layout?.["icon-keep-upright"],
-    iconOffset: props.layout?.["icon-offset"],
-    iconAnchor: props.layout?.["icon-anchor"],
-    iconPitchAlignment: props.layout?.["icon-pitch-alignment"],
-    textPitchAlignment: props.layout?.["text-pitch-alignment"],
-    textRotationAlignment: props.layout?.["text-rotation-alignment"],
-    textField: props.layout?.["text-field"],
-    textFont: props.layout?.["text-font"],
-    textSize: props.layout?.["text-size"],
-    textMaxWidth: props.layout?.["text-max-width"],
-    textLineHeight: props.layout?.["text-line-height"],
-    textLetterSpacing: props.layout?.["text-letter-spacing"],
-    textJustify: props.layout?.["text-justify"],
-    textRadialOffset: props.layout?.["text-radial-offset"],
-    textVariableAnchor: props.layout?.["text-variable-anchor"],
-    textAnchor: props.layout?.["text-anchor"],
-    textMaxAngle: props.layout?.["text-max-angle"],
-    textWritingMode: props.layout?.["text-writing-mode"],
-    textRotate: props.layout?.["text-rotate"],
-    textPadding: props.layout?.["text-padding"],
-    textKeepUpright: props.layout?.["text-keep-upright"],
-    textTransform: props.layout?.["text-transform"],
-    textOffset: props.layout?.["text-offset"],
-    textAllowOverlap: props.layout?.["text-allow-overlap"],
-    textIgnorePlacement: props.layout?.["text-ignore-placement"],
-    textOptional: props.layout?.["text-optional"],
-    visibility: props.layout?.visibility,
-  }),
-});
-
-/**
- * Converts common raster layer props into `RasterLayer` props.
- *
- * @param props - Common raster layer props.
- * @returns Wrapper-level fields plus a camelCase raster style.
- */
-const toRnmapboxRasterLayer = (
-  props: RasterLayerProps
-): ComponentProps<typeof RasterLayer> => ({
-  ...rnmapboxLayerFields(props),
-  style: definedFields<ComponentProps<typeof RasterLayer>["style"]>({
-    rasterOpacity: props.paint?.["raster-opacity"],
-    rasterHueRotate: props.paint?.["raster-hue-rotate"],
-    rasterBrightnessMin: props.paint?.["raster-brightness-min"],
-    rasterBrightnessMax: props.paint?.["raster-brightness-max"],
-    rasterSaturation: props.paint?.["raster-saturation"],
-    rasterContrast: props.paint?.["raster-contrast"],
-    rasterResampling: props.paint?.["raster-resampling"],
-    rasterFadeDuration: props.paint?.["raster-fade-duration"],
-    visibility: props.layout?.visibility,
-  }),
-});
-
-/**
- * Converts common heatmap layer props into `HeatmapLayer` props.
- *
- * @param props - Common heatmap layer props.
- * @returns Wrapper-level fields plus a camelCase heatmap style.
- */
-const toRnmapboxHeatmapLayer = (
-  props: HeatmapLayerProps
-): ComponentProps<typeof HeatmapLayer> => ({
-  ...rnmapboxLayerFields(props),
-  style: definedFields<ComponentProps<typeof HeatmapLayer>["style"]>({
-    heatmapRadius: props.paint?.["heatmap-radius"],
-    heatmapWeight: props.paint?.["heatmap-weight"],
-    heatmapIntensity: props.paint?.["heatmap-intensity"],
-    heatmapColor: props.paint?.["heatmap-color"],
-    heatmapOpacity: props.paint?.["heatmap-opacity"],
-    visibility: props.layout?.visibility,
-  }),
-});
-
-/**
- * Converts common fill-extrusion layer props into `FillExtrusionLayer`
- * props.
- *
- * @param props - Common fill-extrusion layer props.
- * @returns Wrapper-level fields plus a camelCase fill-extrusion style.
- */
-const toRnmapboxFillExtrusionLayer = (
-  props: FillExtrusionLayerProps
-): ComponentProps<typeof FillExtrusionLayer> => ({
-  ...rnmapboxLayerFields(props),
-  style: definedFields<ComponentProps<typeof FillExtrusionLayer>["style"]>({
-    fillExtrusionOpacity: props.paint?.["fill-extrusion-opacity"],
-    fillExtrusionColor: props.paint?.["fill-extrusion-color"],
-    fillExtrusionTranslate: props.paint?.["fill-extrusion-translate"],
-    fillExtrusionTranslateAnchor:
-      props.paint?.["fill-extrusion-translate-anchor"],
-    fillExtrusionPattern: props.paint?.["fill-extrusion-pattern"],
-    fillExtrusionHeight: props.paint?.["fill-extrusion-height"],
-    fillExtrusionBase: props.paint?.["fill-extrusion-base"],
-    fillExtrusionVerticalGradient:
-      props.paint?.["fill-extrusion-vertical-gradient"],
-    visibility: props.layout?.visibility,
-  }),
 });
