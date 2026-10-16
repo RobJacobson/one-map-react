@@ -19,8 +19,6 @@ The [TF01 record](tf01-foundation.md) describes backup verification, removal, an
 
 ## Contributor guidance
 
-The [facade simplification audit handoff](facade-simplification-handoff.md) briefs a fresh agent on verifying the refactor and independently finding further consolidation opportunities. Runtime acceptance requires separate permission.
-
 The [example workspace checkpoint](examples-workspace.md) describes the new Expo/Vite workspace, development commands, acceptance-scenario migration inventory, and the pending native coexistence gate.
 
 The [native fitBounds.maxZoom memo](native-fitbounds-maxzoom-memo.md) records the current native rejection and the deferred proposal for upstream support in RNMapbox and MapLibre React Native.
