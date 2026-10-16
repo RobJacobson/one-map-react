@@ -6,7 +6,6 @@ import {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -22,17 +21,20 @@ import { PortalHost, PortalProvider } from "react-native-teleport";
 import type { MapRef } from "../../contracts/camera-types.js";
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
-import type { ControlPosition } from "../../contracts/ui-types.js";
-import { useOptionalMapSession } from "../../facade/map-context.js";
 import type { NativeLocationOptions } from "../../mapbox-native.js";
 import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
 import { useMapCapture } from "../shared/map-capture.js";
+import {
+  useNativeMapPresentation,
+  withNativeMapPresentation,
+} from "../shared/native-map-presentation.js";
 import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
+import { useNativeControlledCamera } from "../shared/use-native-controlled-camera.js";
 import {
   toRnmapboxControlledCamera,
   toRnmapboxCornerBounds,
@@ -49,6 +51,7 @@ import {
   GeoJsonSourceRegistry,
 } from "./geojson-source-registry.js";
 import { useMapboxGestureSettings } from "./gesture-settings.js";
+import { assertLabelLocalization } from "./label-localization.js";
 import { createMapboxMapRef, resetMapboxFeatureState } from "./map-ref.js";
 import { mergeGestureSettings, toRnmapboxStyleProps } from "./style-props.js";
 
@@ -57,7 +60,7 @@ type RnPressFeature = Parameters<
 >[0];
 
 /** Mapbox-native map that renders RNMapbox `MapView` with a `Camera` child. */
-export const MapboxNativeMap = forwardRef<
+const MapboxNativeMapImplementation = forwardRef<
   MapRef,
   MapProps & {
     locationOptions?: NativeLocationOptions;
@@ -65,7 +68,8 @@ export const MapboxNativeMap = forwardRef<
     options?: Partial<ComponentProps<typeof MapView>>;
   }
 >((props, ref) => {
-  const session = useOptionalMapSession();
+  assertLabelLocalization(props.options?.localizeLabels);
+  const session = useNativeMapPresentation();
   if (props.viewState && props.locationOptions?.followUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
   const capture = useMapCapture(props.captureEnabled);
@@ -117,7 +121,7 @@ export const MapboxNativeMap = forwardRef<
     onError,
     reuseMaps,
     gl,
-    interactive,
+    interactive: requestedInteractive,
     dragPan,
     touchZoom,
     touchRotate,
@@ -125,16 +129,17 @@ export const MapboxNativeMap = forwardRef<
     doubleTapZoom,
     children,
   } = props;
+  const interactive = session.gestureLocked ? false : requestedInteractive;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
   const mapViewRef = useRef<ComponentRef<typeof MapView>>(null);
   const sawMove = useRef(false);
-  const geoJsonSources = useMemo(
+  const [geoJsonSources] = useState(
+    // eslint-disable-next-line react/refs -- The registry retains its reset callback without invoking it during initialization.
     () =>
       // eslint-disable-next-line react/refs -- The registry stores a reset callback; it reads the map ref only when a source resets.
       new GeoJsonSourceRegistry((target) =>
         resetMapboxFeatureState(mapViewRef, target)
-      ),
-    []
+      )
   );
   const frozenViewState = useFrozenValue(initialViewState);
   const extraGestureSettings = useMapboxGestureSettings();
@@ -185,7 +190,9 @@ export const MapboxNativeMap = forwardRef<
     portableGestureSettings
   );
 
-  const mapHandle = useMemo(
+  const cameraCommandObserver = useRef<(() => void) | undefined>(undefined);
+  const [mapHandle] = useState(
+    // eslint-disable-next-line react/refs -- This lazy initializer only captures refs; commands dereference them after attachment.
     () =>
       createMapboxMapRef(
         // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
@@ -204,10 +211,24 @@ export const MapboxNativeMap = forwardRef<
             if (!map) throw new Error("Map is not attached.");
             return map.takeSnap(options.output === "file");
           });
-        }
-      ),
-    [geoJsonSources, capture]
+        },
+        // eslint-disable-next-line react/refs -- Factory captures this callback; only later imperative camera commands read the committed observer.
+        () => cameraCommandObserver.current?.()
+      )
   );
+  const controlledCamera = useNativeControlledCamera(
+    viewState,
+    mapHandle.jumpTo,
+    () => mapViewRef.current !== null,
+    (error) => reportError({ error })
+  );
+  const onCameraCommand = controlledCamera.onCommand;
+  useLayoutEffect(() => {
+    cameraCommandObserver.current = onCameraCommand;
+    return () => {
+      cameraCommandObserver.current = undefined;
+    };
+  }, [onCameraCommand]);
   // Descendant control effects must retain the attached ref during prop updates.
   useImperativeHandle(ref, () => mapHandle, [mapHandle]);
 
@@ -216,7 +237,9 @@ export const MapboxNativeMap = forwardRef<
 
   const reportChanging = (state: MapState) => {
     sawMove.current = true;
-    reportMove(moveFromState(state));
+    const event = moveFromState(state);
+    reportMove(event);
+    controlledCamera.onMove(event);
   };
   const reportSettled = (state: MapState) => {
     const event = moveFromState(state);
@@ -227,6 +250,7 @@ export const MapboxNativeMap = forwardRef<
     }
 
     reportMoveEnd(event);
+    controlledCamera.onMove(event);
     reportIdle();
   };
   const controlled = viewState
@@ -257,10 +281,8 @@ export const MapboxNativeMap = forwardRef<
                 : undefined)
             }
             attributionPosition={
-              session?.ornaments.attribution
-                ? ornaments.position(
-                    session.ornaments.attribution.position as ControlPosition
-                  )
+              session.attributionPosition
+                ? ornaments.position(session.attributionPosition)
                 : (props.options?.attributionPosition ??
                   (ornaments.managed
                     ? ornaments.position("bottom-right")
@@ -272,7 +294,7 @@ export const MapboxNativeMap = forwardRef<
             }
             scaleBarPosition={scaleBarPosition}
             {...(refreshScalePosition ? { scaleBarEnabled: false } : {})}
-            {...(session?.ornaments.attribution
+            {...(session.attributionPosition
               ? {
                   attributionEnabled: true,
                 }
@@ -295,6 +317,7 @@ export const MapboxNativeMap = forwardRef<
               flushFeatureState();
             }}
             onDidFinishLoadingMap={() => {
+              controlledCamera.onLoad();
               reportLoad();
             }}
             onDidFinishLoadingStyle={() => {
@@ -420,3 +443,8 @@ const mapLoadingErrorEvent = (payload: unknown): MapErrorEvent => {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
+
+/** Selected native map with adapter-owned presentation. */
+export const MapboxNativeMap = withNativeMapPresentation(
+  MapboxNativeMapImplementation
+);

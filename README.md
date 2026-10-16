@@ -1,10 +1,12 @@
 # one-map-react
 
+The new Expo/Vite example workspace is at its minimal checkpoint. See [workspace setup and migration status](docs/examples-workspace.md). Native coexistence acceptance and migration of the legacy scenarios are pending.
+
 one-map-react is being built as a thin React facade over RNMapbox, MapLibre React Native, and react-map-gl. Applications choose a backend at setup and use a shared map API, generally following react-map-gl. Full upstream API coverage and map reuse are requirements.
 
-**Current status: TF02–TF07 are implemented, and the authorized R16 renderer acceptance passed across all six environments for the recorded exercised scope.** TF07 includes markers, explicit static annotations, popups, controls, source clicks, and `useMap`; full VoiceOver and TalkBack audits are outside this checkpoint. Mapbox Android's opening camera retains the pinned `@rnmapbox/maps` 10.3.7 cold-style-cache behavior. Web `reuseMaps` uses the react-map-gl pool; native remounts create a new map. See the [stage plan](docs/stage-plan.md) and [TF07 record](docs/tf07-ui.md) for implementation and acceptance status.
+TF10 prepares the expanded peer ranges, reconciled inventory and package candidate. Its [release record](docs/tf10-release.md) distinguishes routine checks from the still-open renderer/native acceptance gates. The [package README](packages/one-map-react/README.md) contains installation, shared map, selected extensions and native patch instructions. Exact current host versions and patch identities live in [the support matrix](records/support-matrix.json).
 
-TF08 implements location/offline/capture APIs. Its native acceptance failures are repaired and the affected reruns passed on both engines and platforms. See [the TF08 record](docs/tf08-location-offline-capture.md) for the exercised scope and remaining work.
+TF02–TF09 historical acceptance remains valid only for its recorded artifacts and exercised scope. It does not certify this candidate. Native Mapbox Maps SDK 11.23.1 is now pinned exactly on both platforms; RNMapbox wrapper10.3.x is a separate version.
 
 ## Development
 
@@ -15,9 +17,17 @@ bun install --frozen-lockfile
 bun run validate
 ```
 
-`validate` checks formatting, documentation links, types, Vitest unit/web tests, native Jest Testing Library mounts, standalone regression scripts, the library build, and packed-package selection without installing wrapper peers into consumers. `bun run test:peers` is the checkpoint isolation check that installs one selected peer set into OS-temp consumers; it is not part of `validate`. Neither command launches a browser, Metro session, simulator, or native build. `bun run pack` builds an archive in `artifacts/`.
+`validate` checks formatting, documentation links, inventory consistency, types, Vitest unit/web tests, native Jest Testing Library mounts, standalone regression scripts, the library build, and packed-package selection without installing wrapper peers into consumers. `bun run test:peers` is the checkpoint isolation check that installs one selected peer set into OS-temp consumers; it is not part of `validate`. Neither command launches a browser, Metro session, simulator, or native build. `bun run pack` builds an archive in `artifacts/`.
 
 Run `bun run test` or `vp run test` for the complete test chain; `vp test run` runs only unit/web Vitest tests, and `bun run test:native` runs native Jest tests. `vp check` runs formatting and linting; the separate `typecheck` script remains part of `validate` so all four TypeScript configurations are checked.
+
+## Library ownership and compilation
+
+The [common map](packages/one-map-react/src/facade/map.tsx) owns map access, attachment, and common notifications. [Source interactions](packages/one-map-react/src/facade/use-map-interactions.ts) own hit queries, propagation, and pending-result cleanup. Each native adapter provides its own [presentation context](packages/one-map-react/src/adapters/shared/native-map-presentation.tsx) for gestures, layout, ornaments, and overlays. Camera observations have a separate context so movement does not invalidate map-access consumers.
+
+The library build runs React Compiler 1.0.0 on original source before TypeScript and JSX lowering. It targets React 19 and ships compiled ESM with the existing declarations and optional-peer boundaries. Consumers need no compiler configuration or additional runtime package. The build reports skipped functions; lifecycle guards and stabilization remain explicit where the compiler cannot optimize them. Context memoization also preserves isolation when tests load uncompiled source.
+
+`bun run test:compiled` builds the package and runs the web and mocked native regressions against emitted modules, followed by component-specific compiler checks. It is a routine check and launches no real renderer. Source regressions remain under `bun run test`. Renderer acceptance requires separate authorization under the [testing policy](docs/testing-policy.md#acceptance-timing-and-user-permission).
 
 ## Selecting a backend
 

@@ -310,10 +310,7 @@ export const createWebUi = (
 
     const session = useOptionalMapSession();
     const setupProvider = useLocationOverride();
-    if (
-      props.trackUserLocation &&
-      (session?.cameraControlled || session?.nativeLocationFollowing)
-    ) {
+    if (props.trackUserLocation && session?.cameraControlled) {
       throw new Error(
         "Location follow conflicts with viewState or selected native camera follow."
       );

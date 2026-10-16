@@ -1,6 +1,13 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from "@testing-library/react";
 import {
   type ReactElement,
+  StrictMode,
   Suspense,
   startTransition,
   use,
@@ -93,6 +100,26 @@ const LayoutParent = ({
 };
 
 describe("useActiveCallback", () => {
+  test("keeps identity across callback replacement and StrictMode replay, then ignores teardown", () => {
+    const initial = vi.fn<(value: number) => void>();
+    const replacement = vi.fn<(value: number) => void>();
+    const view = renderHook(({ callback }) => useActiveCallback(callback), {
+      initialProps: { callback: initial },
+      wrapper: StrictMode,
+    });
+    const retained = view.result.current;
+    retained(1);
+    expect(initial).toHaveBeenCalledWith(1);
+    view.rerender({ callback: replacement });
+    expect(view.result.current).toBe(retained);
+    retained(2);
+    expect(replacement).toHaveBeenCalledWith(2);
+    expect(initial).toHaveBeenCalledTimes(1);
+    view.unmount();
+    retained(3);
+    expect(replacement).toHaveBeenCalledTimes(1);
+  });
+
   test("does not expose an uncommitted callback to a retained map", async () => {
     render(<Harness />);
     fireEvent.click(screen.getByText("move"));

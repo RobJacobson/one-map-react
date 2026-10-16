@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
-  copyFileSync,
+  cpSync,
+  mkdirSync,
   mkdtempSync,
+  readFileSync,
   readdirSync,
   rmSync,
   writeFileSync,
@@ -10,6 +13,16 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+import { installConsumerPatch } from "./consumer-peer-patches.mjs";
+import {
+  packageCheckOptions,
+  selectedVersions,
+} from "./package-check-options.mjs";
+
+const options = packageCheckOptions();
+const evidence = [];
+const sha256 = (file) =>
+  createHash("sha256").update(readFileSync(file)).digest("hex");
 const root = resolve(import.meta.dirname, "..");
 const output = mkdtempSync(join(tmpdir(), "one-map-peers-"));
 const compiler = join(root, "node_modules/.bin/tsc");
@@ -96,25 +109,59 @@ const installedNames = (consumer) => {
 
 const main = async () => {
   try {
-    run(
-      "bun",
-      ["pm", "pack", "--destination", output, "--ignore-scripts"],
-      join(root, "packages/one-map-react")
-    );
-    const archives = readdirSync(output).filter((name) =>
-      name.endsWith(".tgz")
-    );
-    assert.equal(archives.length, 1);
-    const archive = join(output, archives[0]);
+    let archive = options.archive;
+    if (!archive) {
+      run(
+        "bun",
+        ["pm", "pack", "--destination", output, "--ignore-scripts"],
+        join(root, "packages/one-map-react")
+      );
+      const archives = readdirSync(output).filter((name) =>
+        name.endsWith(".tgz")
+      );
+      assert.equal(archives.length, 1);
+      archive = join(output, archives[0]);
+    }
 
     for (const [entry, packages] of Object.entries(peers)) {
-      await checkPeerConsumer(archive, entry, packages);
+      await checkPeerConsumer(
+        archive,
+        entry,
+        selectedVersions(packages, options.versions, entry)
+      );
+    }
+
+    for (const pair of [
+      ["mapbox-web", "maplibre-native"],
+      ["maplibre-web", "mapbox-native"],
+    ]) {
+      const [webEntry, nativeEntry] = pair;
+      const packages = new Map();
+      for (const entry of [webEntry, nativeEntry]) {
+        for (const specifier of selectedVersions(
+          peers[entry],
+          options.versions,
+          entry
+        )) {
+          packages.set(
+            specifier.slice(0, specifier.lastIndexOf("@")),
+            specifier
+          );
+        }
+      }
+      for (const entry of pair)
+        await checkPeerConsumer(archive, entry, [...packages.values()]);
     }
 
     console.log(
       "PASS packed selected-peer consumers: each explicit entry typechecks with only its peers."
     );
   } finally {
+    if (options.evidence)
+      writeFileSync(
+        options.evidence,
+        JSON.stringify({ checks: evidence }, null, 2) + "\n"
+      );
     rmSync(output, { recursive: true, force: true });
   }
 };
@@ -126,29 +173,15 @@ const checkPeerConsumer = async (archive, entry, packages) => {
     JSON.stringify({
       private: true,
       type: "module",
-      ...(entry.endsWith("native")
-        ? {
-            patchedDependencies: {
-              [entry === "mapbox-native"
-                ? "@rnmapbox/maps@10.3.7"
-                : "@maplibre/maplibre-react-native@11.5.0"]: "./peer.patch",
-            },
-          }
-        : {}),
     })
   );
-  if (entry.endsWith("native"))
-    copyFileSync(
-      join(
-        root,
-        "packages/one-map-react/patches",
-        entry === "mapbox-native"
-          ? "rnmapbox-10.3.7-tf08.patch"
-          : "maplibre-native-11.5.0-tf08.patch"
-      ),
-      join(consumer, "peer.patch")
-    );
   run("bun", ["add", archive, ...packages], consumer);
+
+  for (const peer of ["@rnmapbox/maps", "@maplibre/maplibre-react-native"]) {
+    if (packages.some((specifier) => specifier.startsWith(`${peer}@`))) {
+      installConsumerPatch(consumer, peer, run);
+    }
+  }
 
   const names = installedNames(consumer);
   assert.ok(names.has("one-map-react"));
@@ -166,7 +199,7 @@ const checkPeerConsumer = async (archive, entry, packages) => {
   const selectedAssertions = entry.endsWith("web")
     ? `
 import { Map as SelectedMap, Source as SelectedSource, Layer as SelectedLayer, type WebMapRef } from "one-map-react/${entry}";
-${entry === "mapbox-web" ? 'import { supported } from "one-map-react/mapbox-web"; const browserSupported: boolean = supported(false); void browserSupported;' : ""}
+${entry === "mapbox-web" ? 'import { supported, LngLat, LngLatBounds, MercatorCoordinate, Point, IndoorControl } from "one-map-react/mapbox-web"; const browserSupported: boolean = supported(false); const coordinate: LngLat = new LngLat(0, 0); const bounds: LngLatBounds = new LngLatBounds([0,0], [1,1]); const mercator: MercatorCoordinate = new MercatorCoordinate(0,0,0); const pixel: Point = new Point(0,0); const indoor: IndoorControl = new IndoorControl(); void coordinate; void bounds; void mercator; void pixel; void indoor; void browserSupported;' : ""}
 declare const selectedRef: WebMapRef;
 const selectedVersion: string = selectedRef.getVersion(); void selectedVersion;
 void <SelectedMap mapStyle={style} initialViewState={viewState} options={{ transformRequest: (url) => ({ url }), ${entry === "maplibre-web" ? "maxCanvasSize: [4096, 4096]," : "language: 'en', worldview: 'US',"} }} />;
@@ -176,7 +209,8 @@ ${entry === "mapbox-web" ? "selectedRef.setRain({ density: 0 }); selectedRef.set
 `
     : entry === "mapbox-native"
       ? `
-import { Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef } from "one-map-react/mapbox-native";
+import { WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef } from "one-map-react/mapbox-native";
+void <WrapperMapView styleJSON={JSON.stringify(style)}><WrapperCamera zoomLevel={0} /><WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} /></WrapperMapView>;
 void Terrain; void Light; void Models; void RasterArraySource; void Viewport;
 setTelemetryEnabled(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
@@ -185,7 +219,8 @@ declare const selectedRef: NativeAdvancedMapRef;
 selectedRef.setSourceVisibility(false, 'source');
 `
       : `
-import { Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer } from "one-map-react/maplibre-native";
+import { WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer } from "one-map-react/maplibre-native";
+void <WrapperMap mapStyle={style}><WrapperCamera initialViewState={{center: [0,0], zoom: 0}} /><WrapperGeoJSONSource id="selected" data={{ type: "FeatureCollection", features: [] }} /></WrapperMap>;
 void Animated; void SelectedLayer; void TransformRequestManager;
 NetworkManager.setConnected(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
@@ -257,6 +292,49 @@ console.log(adapter.backend);
     );
     assert.equal(run("node", [join(consumer, "runtime.mjs")], consumer), entry);
   }
+  const patchedFiles = {};
+  for (const peer of ["@rnmapbox/maps", "@maplibre/maplibre-react-native"]) {
+    if (!packages.some((specifier) => specifier.startsWith(`${peer}@`)))
+      continue;
+    const patch = readFileSync(join(consumer, "peer.patch"), "utf8");
+    for (const match of patch.matchAll(/^diff --git a\/(.+) b\//gm)) {
+      patchedFiles[`${peer}/${match[1]}`] = sha256(
+        join(consumer, "node_modules", peer, match[1])
+      );
+    }
+  }
+  let retainedLockfile;
+  if (options.evidence) {
+    const lockRoot = `${options.evidence}.locks`;
+    mkdirSync(lockRoot, { recursive: true });
+    retainedLockfile = join(lockRoot, `${evidence.length}-${entry}.bun.lock`);
+    cpSync(join(consumer, "bun.lock"), retainedLockfile);
+  }
+  evidence.push({
+    entry,
+    packages,
+    resolvedPeers: Object.fromEntries(
+      packages.map((specifier) => {
+        const name = specifier.slice(0, specifier.lastIndexOf("@"));
+        return [
+          name,
+          JSON.parse(
+            readFileSync(
+              join(consumer, "node_modules", name, "package.json"),
+              "utf8"
+            )
+          ).version,
+        ];
+      })
+    ),
+    archiveSha256: sha256(archive),
+    lockfileSha256: sha256(join(consumer, "bun.lock")),
+    retainedLockfile,
+    patchedFiles,
+    status: "passed",
+    scope:
+      "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+  });
 };
 
 await main();

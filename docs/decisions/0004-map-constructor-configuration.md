@@ -6,7 +6,7 @@
 
 ## Research basis
 
-Inspected on 2026-10-08 against RNMapbox 10.3.7, MapLibre React Native 11.5.0, react-map-gl 8.1.3, Mapbox GL JS 3.32.0, and MapLibre GL JS 6.13.0. Exact source revisions and compatible React hosts are in [the baseline](../../records/version-baseline.json). The [coverage inventory](../../records/api-coverage.json) assigns each upstream field and operation independently of this decision.
+Inspected on 2026-10-08 against RNMapbox 10.3.7, MapLibre React Native 11.5.0, react-map-gl 8.1.3, Mapbox GL JS 3.32.0, and MapLibre GL JS 6.13.0. Exact source revisions and compatible React hosts are in [the baseline](../../records/version-baseline.json). The [coverage inventory](https://github.com/RobJacobson/one-map-react/blob/cb12433fd9f1a68ef8a8fcf5eaf65e34a0c69e39/records/api-coverage.json) assigns each upstream field and operation independently of this decision.
 
 ## Constructor ownership
 

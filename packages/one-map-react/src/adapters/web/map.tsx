@@ -4,13 +4,12 @@ import {
   useCallback,
   useImperativeHandle,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 
 import type { Backend } from "../../contracts/adapter.js";
-import type { MapRef } from "../../contracts/camera-types.js";
+import type { MapRef, Padding } from "../../contracts/camera-types.js";
 import type { ClickEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { MapStyle } from "../../contracts/style-types.js";
@@ -122,7 +121,7 @@ export const createWebMap = <
       const mapRef = useRef<WebMapHandle | null>(null);
       const capture = useMapCapture(captureEnabled);
       const [styleMap, setStyleMap] = useState<StyleLoadTarget | null>(null);
-      const styleKey = useMemo(() => styleContentKey(mapStyle), [mapStyle]);
+      const styleKey = styleContentKey(mapStyle);
       const frozenViewState = useFrozenValue(initialViewState);
       const reportMove = useActiveCallback(onMove);
       const reportMoveStart = useActiveCallback(onMoveStart);
@@ -151,7 +150,6 @@ export const createWebMap = <
       const reportStyleLoad = useActiveCallback(onStyleLoad);
       const reportError = useActiveCallback(onError);
       const reportResize = useActiveCallback(onResize);
-      const reportStyleLoadRef = useRef(reportStyleLoad);
       const setMapHandle = useCallback((handle: WebMapHandle | null) => {
         mapRef.current = handle;
         const next = handle?.getMap() ?? null;
@@ -194,10 +192,6 @@ export const createWebMap = <
         []
       );
 
-      useLayoutEffect(() => {
-        reportStyleLoadRef.current = reportStyleLoad;
-      });
-
       // style.load is style completion. react-map-gl onStyleData is activity
       // and is not this callback. A fresh map can finish style.load before
       // this commit, while isStyleLoaded() is still false; the map load that
@@ -216,7 +210,7 @@ export const createWebMap = <
         let sawStyleLoad = false;
         const onStyleLoadEvent = () => {
           sawStyleLoad = true;
-          reportStyleLoadRef.current();
+          reportStyleLoad();
         };
         const reportMissedStyleLoad = () => {
           if (sawStyleLoad || !styleMap.isStyleLoaded()) {
@@ -224,14 +218,14 @@ export const createWebMap = <
           }
 
           sawStyleLoad = true;
-          reportStyleLoadRef.current();
+          reportStyleLoad();
         };
 
         styleMap.on("style.load", onStyleLoadEvent);
 
         if (styleMap.isStyleLoaded()) {
           sawStyleLoad = true;
-          reportStyleLoadRef.current();
+          reportStyleLoad();
         } else {
           styleMap.on("load", reportMissedStyleLoad);
           styleMap.on("idle", reportMissedStyleLoad);
@@ -242,7 +236,7 @@ export const createWebMap = <
           styleMap.off("load", reportMissedStyleLoad);
           styleMap.off("idle", reportMissedStyleLoad);
         };
-      }, [styleMap, styleKey]);
+      }, [styleMap, styleKey, reportStyleLoad]);
 
       // Pinch zoom and rotation are one handler. Disabling the handler would
       // also disable zoom, so rotation is turned off on the handler itself.
@@ -275,15 +269,7 @@ export const createWebMap = <
       }, [styleMap, captureEnabled, capture]);
       assertWebLongPress(onLongPress);
 
-      const hadPadding = useRef(false);
-      const paddingValue =
-        // eslint-disable-next-line react/refs -- Previous committed padding requires one explicit zero reset when removed; keep that SDK transition.
-        padding === undefined && !hadPadding.current
-          ? undefined
-          : normalizePadding(padding ?? 0);
-      useLayoutEffect(() => {
-        hadPadding.current = padding !== undefined;
-      }, [padding]);
+      const paddingValue = useWebPadding(padding);
       const initialCamera = {
         ...toWebInitialViewState(frozenViewState),
         ...(paddingValue === undefined ? {} : { padding: paddingValue }),
@@ -330,7 +316,20 @@ export const createWebMap = <
             }
             mapStyle={mapStyle}
             initialViewState={initialCamera}
-            viewState={controlledCamera}
+            // MapLibre nested viewState also controls canvas size. Portable camera
+            // fields use top-level props to leave dimensions uncontrolled.
+            {...(wrapper.backend === "maplibre-web"
+              ? {
+                  longitude: controlledCamera?.longitude ?? options?.longitude,
+                  latitude: controlledCamera?.latitude ?? options?.latitude,
+                  zoom: controlledCamera?.zoom ?? options?.zoom,
+                  bearing: controlledCamera?.bearing ?? options?.bearing,
+                  pitch: controlledCamera?.pitch ?? options?.pitch,
+                }
+              : {})}
+            viewState={
+              wrapper.backend === "mapbox-web" ? controlledCamera : undefined
+            }
             padding={paddingValue}
             minZoom={minZoom ?? options?.minZoom}
             maxZoom={maxZoom ?? options?.maxZoom}
@@ -416,6 +415,20 @@ export const createWebMap = <
   );
 
   return WebMap;
+};
+
+/** Preserves initial omission and sends one explicit reset after clearing padding. */
+const useWebPadding = (padding: Padding | undefined) => {
+  const hadPadding = useRef(false);
+  const paddingValue =
+    // eslint-disable-next-line react/refs -- Previous committed padding requires one explicit zero reset when removed; keep that SDK transition.
+    padding === undefined && !hadPadding.current
+      ? undefined
+      : normalizePadding(padding ?? 0);
+  useLayoutEffect(() => {
+    hadPadding.current = padding !== undefined;
+  }, [padding]);
+  return paddingValue;
 };
 
 /** Content equality keeps equivalent inline styles from rearming completion. */

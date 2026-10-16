@@ -8,7 +8,6 @@ import {
   featuresFromWrapper,
   mutableFeatureState,
 } from "../shared/feature-values.js";
-import { invokeWrapper } from "../shared/invoke-wrapper.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
   normalizeElevation,
@@ -69,34 +68,32 @@ export const createWebMapRef = (
     rejectJumpTiming(options);
     const map = requireWebMap(mapRef.current);
 
-    await invokeWrapper(map.jumpTo(toWebCommandOptions(options)));
+    await map.jumpTo(toWebCommandOptions(options));
   },
   easeTo: async (options) => {
     const map = requireWebMap(mapRef.current);
 
-    await invokeWrapper(map.easeTo(toWebCommandOptions(options)));
+    await map.easeTo(toWebCommandOptions(options));
   },
   flyTo: async (options) => {
     const map = requireWebMap(mapRef.current);
 
-    await invokeWrapper(map.flyTo(toWebFlyToOptions(options)));
+    await map.flyTo(toWebFlyToOptions(options));
   },
   fitBounds: async (bounds, options) => {
     const map = requireWebMap(mapRef.current);
 
-    await invokeWrapper(
-      map.fitBounds(assertBounds(bounds), toWebFitBoundsOptions(options))
-    );
+    await map.fitBounds(assertBounds(bounds), toWebFitBoundsOptions(options));
   },
   zoomTo: async (zoom, options) => {
     const map = requireWebMap(mapRef.current);
 
-    await invokeWrapper(map.zoomTo(zoom, toWebZoomToOptions(options)));
+    await map.zoomTo(zoom, toWebZoomToOptions(options));
   },
   stop: async () => {
     const map = requireWebMap(mapRef.current);
 
-    await invokeWrapper(map.stop());
+    await map.stop();
   },
   getCenter: async () => {
     const map = requireWebMap(mapRef.current);
@@ -165,7 +162,7 @@ export const createWebMapRef = (
       throw missingMapError();
     }
 
-    await invokeWrapper(map.resize());
+    await map.resize();
   },
   queryRenderedFeatures: async (target, options) => {
     const map = requireWebMap(mapRef.current);
@@ -275,9 +272,7 @@ export const createWebMapRef = (
       assertFeatureIdentifier(identifier)
     );
 
-    await invokeWrapper(
-      map.setFeatureState(target, mutableFeatureState(state))
-    );
+    await map.setFeatureState(target, mutableFeatureState(state));
   },
   getFeatureState: async (identifier) => {
     const map = requireWebMap(mapRef.current);
@@ -299,7 +294,7 @@ export const createWebMapRef = (
       assertFeatureIdentifier(identifier)
     );
 
-    await invokeWrapper(map.removeFeatureState(target, key));
+    await map.removeFeatureState(target, key);
   },
 });
 

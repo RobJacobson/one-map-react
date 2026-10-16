@@ -1,5 +1,7 @@
 # TF08 proposed implementation
 
+> Historical plan: the per-entry JSON inventory and its tooling are superseded by the [grouped coverage checklist](api-coverage.md). Preserve the original plan and counts as provenance; use the checklist for current coverage work.
+
 **Proposed API and implementation plan.** TF08 should add foreground location services, explicit location display and following, persistent native offline packs, current-map capture, and independent native snapshots. Extend the existing facade and selected adapters, retain wrapper ownership, and keep device services independent of a mounted map. This proposal does not mark TF08 implemented or accepted.
 
 The review covers first-party source at `2fcdddf`, RNMapbox 10.3.7, MapLibre React Native 11.5.0, react-map-gl 8.1.3, Mapbox GL JS 3.32.0, and MapLibre GL JS 6.13.0. Upstream observations below come from the installed sources at the [recorded baseline](../records/version-baseline.json). The [requirements](requirements.md), [stage plan](stage-plan.md), [coding guide](coding-style.md), and [testing policy](testing-policy.md) govern implementation. The older [capabilities research](capabilities-and-extensions.md) supplies inventory references; its retired `MapRef.extensions`, capability framework, and provider examples do not define the current implementation.

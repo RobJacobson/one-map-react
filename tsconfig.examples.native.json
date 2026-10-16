@@ -23,6 +23,7 @@
     "examples/shared/smoke-target.ts",
     "examples/shared/native-camera-screen.tsx",
     "examples/native-mapbox/App.tsx",
-    "examples/native-maplibre/App.tsx"
+    "examples/native-maplibre/App.tsx",
+    "examples/mixed/**/setup.native.ts"
   ]
 }

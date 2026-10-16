@@ -2,9 +2,12 @@ import { Layer as MaplibreLayer } from "@maplibre/maplibre-react-native";
 import type { ComponentProps } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
+import { assertMaplibreLayerStyle } from "./style-roots.js";
 
 /** Maplibre-native layer that forwards portable fields to the wrapper layer. */
 export const MaplibreNativeLayer = (props: LayerProps) => {
+  assertMaplibreLayerStyle(props);
+
   const wrapperProps = {
     id: props.id,
     type: props.type,

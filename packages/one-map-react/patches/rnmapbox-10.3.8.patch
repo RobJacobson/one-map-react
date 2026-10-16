@@ -1,0 +1,897 @@
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
+index e51687f..e3d2b95 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
+@@ -56,6 +56,13 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac
+         }
+     }
+ 
++    override fun onDropViewInstance(view: T) {
++        // Retired view identifiers must not accumulate in the manager cache.
++        val prefix = "${view.id}-"
++        mRateLimitedEvents.keys.removeAll { it.startsWith(prefix) }
++        super.onDropViewInstance(view)
++    }
++
+     override fun addEventEmitters(context: ThemedReactContext, view: T) {
+         mEventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(context, view.id)
+     }
+@@ -76,7 +83,9 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac
+     }
+ 
+     private fun getEventCacheKey(event: IEvent): String {
+-        return String.format("%s-%s", event.key, event.type)
++        // A manager serves multiple maps. Throttle each native view separately
++        // so one map cannot suppress another map's load, source or input event.
++        return String.format("%s-%s-%s", event.iD, event.key, event.type)
+     }
+ 
+     companion object {
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+index 91243df..1c0c906 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+@@ -1140,7 +1140,7 @@ open class RNMBXMapView(private val mContext: Context, var mManager: RNMBXMapVie
+                 it.putDouble("data", result)
+             }
+         } else {
+-            response.error("no elevation data")
++            response.success { it.putNull("data") }
+         }
+     }
+ 
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
+index 7b6de8a..e234791 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
+@@ -39,6 +39,10 @@ class RNMBXTerrain(context: Context?) : AbstractSourceConsumer(context) {
+     override fun addToMap(mapView: RNMBXMapView) {
+         super.addToMap(mapView)
+         mMap = mapView.getMapboxMap()
++        if (mSourceID == null) {
++            mapView.savedStyle?.removeTerrain()
++            return
++        }
+         val terrain = makeTerrain()
+         mTerrain = terrain
+         addStyles()
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
+index f8b6edb..9b815d3 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
+@@ -25,7 +25,7 @@ class RNMBXTerrainManager : ViewGroupManager<RNMBXTerrain>(),
+ 
+     @ReactProp(name = "sourceID")
+     override fun setSourceID(layer: RNMBXTerrain, sourceID: Dynamic) {
+-        layer.setSourceID(sourceID.asString())
++        layer.setSourceID(if (sourceID.isNull) null else sourceID.asString())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
+index 17f3f62..ef13333 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
+@@ -181,6 +181,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon
+         }
+     }
+ 
++    @ReactMethod
++    fun setConnected(connected: Boolean, promise: Promise) {
++        val offlineSwitch = OfflineSwitch.getInstance()
++        offlineSwitch.setMapboxStackConnected(connected)
++        promise.resolve(offlineSwitch.isMapboxStackConnected)
++    }
++
+     @ReactMethod
+     fun setAccessToken(accessToken: String?, promise: Promise) {
+         mReactContext.runOnUiQueueThread(Runnable {
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
+index ed4eab9..d463ff5 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
+@@ -46,6 +46,7 @@ enum class TileRegionPackState(val rawValue: String) {
+     UNKNOWN("unknown")
+ }
+ class TileRegionPack(var name: String, var state: TileRegionPackState = TileRegionPackState.UNKNOWN, var progress: TileRegionLoadProgress? = null, var metadata: JSONObject) {
++    @Volatile var generation = 0
+     var cancelable: Cancelable? = null
+     var loadOptions: TileRegionLoadOptions? = null
+ 
+@@ -105,6 +106,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+     ) {
+     var tileRegionPacks = HashMap<String, TileRegionPack>()
+     private var mProgressEventThrottle = 300.0
++    private var nextLoadGeneration = 0
+ 
+ 
+     val tileStore: TileStore by lazy {
+@@ -180,13 +182,15 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                 val region = it
+                 tileStore.getTileRegionMetadata(name) { expected ->
+                     expected.value?.also {
+-                        val pack = TileRegionPack(
+-                            name= name,
+-                            progress= toProgress(region),
+-                            metadata= toJSONObjectSupportingLegacyMetadata(it) ?: JSONObject()
++                        // Status readback must preserve the live pack's cancellation handle.
++                        promise.resolve(
++                            _makeRegionStatusPayload(
++                                name,
++                                toProgress(region),
++                                tileRegionPacks[name]?.state ?: TileRegionPackState.UNKNOWN,
++                                toJSONObjectSupportingLegacyMetadata(it) ?: JSONObject()
++                            )
+                         )
+-                        tileRegionPacks[name] = pack
+-                        promise.resolve(_makeRegionStatusPayload(pack))
+                     } ?: run {
+                         promise.reject(LOG_TAG, expected.error!!.message)
+                     }
+@@ -197,11 +201,25 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+         }
+     }
+ 
++    @ReactMethod
++    fun invalidatePack(name: String, promise: Promise) {
++        val pack = tileRegionPacks[name]
++        if (pack != null) {
++            startLoading(pack, acceptExpired = false).map { null }.toPromise(promise, "invalidatePack")
++        } else {
++            promise.reject("invalidatePack", "Unknown offline pack: $name")
++        }
++    }
++
+     @ReactMethod
+     fun resumePackDownload(name: String, promise: Promise) {
+         val pack = tileRegionPacks[name]
+         if (pack != null) {
+-            startLoading(pack).map { null }.toPromise(promise,"resumePackDownload")
++            if (pack.state == TileRegionPackState.ACTIVE) {
++                promise.resolve(null)
++            } else {
++                startLoading(pack).map { null }.toPromise(promise,"resumePackDownload")
++            }
+         } else {
+             promise.reject("resumePackDownload", "Unknown offline pack: $name")
+         }
+@@ -212,11 +230,13 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+         val pack = tileRegionPacks[name]
+         if (pack != null) {
+             if (pack.cancelable != null) {
++                pack.generation += 1
++                pack.state = TileRegionPackState.INACTIVE
+                 pack.cancelable?.cancel()
+                 pack.cancelable = null
+                 promise.resolve(null)
+             } else {
+-                promise.reject("resumeRegionDownload", "Offline pack: $name already cancelled")
++                promise.resolve(null)
+             }
+         } else {
+             promise.reject("resumeRegionDownload", "Unknown offline region")
+@@ -245,6 +265,9 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+             return
+         }
+ 
++        pack.generation += 1
++        pack.cancelable?.cancel()
++        pack.cancelable = null
+         tileStore.removeTileRegion(name, object: TileRegionCallback {
+             override fun run(expected: Expected<TileRegionError, TileRegion>) {
+                 expected.value.also {
+@@ -275,7 +298,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+     }
+     // endregion
+ 
+-    fun startLoading(pack: TileRegionPack): Result<Unit> {
++    fun startLoading(pack: TileRegionPack, acceptExpired: Boolean = true): Result<Unit> {
+         try {
+             val id = pack.name
+             val bounds = pack.bounds
+@@ -286,7 +309,14 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                 ?: return Result.failure(IllegalArgumentException("startLoading failed as there is no styleURI in pack"))
+             val metadata = pack.metadata
+                 ?: return Result.failure(IllegalArgumentException("startLoading failed as there is no metadata in pack"))
++            // Retire callbacks from a paused or replaced load before refreshing.
++            pack.generation = ++nextLoadGeneration
++            val generation = pack.generation
++            pack.cancelable?.cancel()
++            pack.state = TileRegionPackState.ACTIVE
++            pack.progress = null
+             val stylePackOptions = StylePackLoadOptions.Builder()
++                .acceptExpired(acceptExpired)
+                 .glyphsRasterizationMode(GlyphsRasterizationMode.IDEOGRAPHS_RASTERIZED_LOCALLY)
+                 .metadata(metadata.toMapboxValue())
+                 .build()
+@@ -301,7 +331,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                 .geometry(bounds)
+                 .descriptors(descriptors)
+                 .metadata(metadata.toMapboxValue())
+-                .acceptExpired(true)
++                .acceptExpired(acceptExpired)
+                 .networkRestriction(NetworkRestriction.NONE)
+                 .averageBytesPerSecond(null)
+                 .build()
+@@ -309,6 +339,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+             val task = this.tileStore.loadTileRegion(
+                 id, loadOptions,
+                 { progress ->
++                    if (tileRegionPacks[id]?.generation != generation) return@loadTileRegion
+                     lastProgress = progress
+                     tileRegionPacks[id]!!.progress = progress
+                     tileRegionPacks[id]!!.state = TileRegionPackState.ACTIVE
+@@ -316,6 +347,8 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                     offlinePackProgressDidChange(progress, metadata, TileRegionPackState.ACTIVE)
+                 },
+                 { expected ->
++                    if (tileRegionPacks[id]?.generation != generation) return@loadTileRegion
++                    pack.cancelable = null
+                     expected.value?.also {
+                         val progress = lastProgress
+                         if (progress != null) {
+@@ -399,7 +432,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+                         metadata= metadataJSON ?: JSONObject()
+                     )
+ 
+-                    if (region.hasCompleted()) {
++                    if (pack.state == TileRegionPackState.UNKNOWN && region.hasCompleted()) {
+                         pack.state = TileRegionPackState.COMPLETE
+                     }
+                     tileRegionPacks[region.id] = pack
+@@ -467,7 +500,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+         var result = Arguments.createMap()
+         if (progress != null) {
+             result = writableMapOf(
+-                "state" to (if (progress.hasCompleted()) TileRegionPackState.COMPLETE.rawValue else state.rawValue),
++                "state" to (if (state == TileRegionPackState.UNKNOWN && progress.hasCompleted()) TileRegionPackState.COMPLETE.rawValue else state.rawValue),
+                 "name" to name,
+                 "percentage" to progress.toPercentage(),
+                 "completedResourceCount" to progress.completedResourceCount,
+@@ -561,6 +594,47 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+ 
+     }
+ 
++    @ReactMethod
++    fun clearAmbientCache(promise: Promise) {
++        UiThreadUtil.runOnUiThread {
++            MapboxMap.clearData { result ->
++                if (result.isError) {
++                    promise.reject("clearAmbientCache", result.error.toString())
++                } else {
++                    UiThreadUtil.runOnUiThread {
++                        tileStore.clearAmbientCache { cleared ->
++                            if (cleared.isError) {
++                                promise.reject("clearAmbientCache", cleared.error.toString())
++                            } else {
++                                promise.resolve(null)
++                            }
++                        }
++                    }
++                }
++            }
++        }
++    }
++
++    @ReactMethod
++    fun mergeOfflineRegions(path: String, promise: Promise) {
++        val file = File(if (path.startsWith("file://")) android.net.Uri.parse(path).path ?: "" else path)
++        if (!file.isFile || !file.canRead()) {
++            promise.reject("invalid_database_path", "Offline database path must point to a readable file.")
++            return
++        }
++
++        UiThreadUtil.runOnUiThread {
++            val manager = getOfflineRegionManager { RNMBXModule.getAccessToken(mReactContext) }
++            manager.mergeOfflineDatabase(file.absolutePath) { result ->
++                if (result.isError) {
++                    promise.reject("mergeOfflineRegions", result.error)
++                } else {
++                    promise.resolve(null)
++                }
++            }
++        }
++    }
++
+     @ReactMethod
+     fun migrateOfflineCache() {
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
+index 771884c..cf96ca3 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
+@@ -139,7 +139,7 @@ class RNMBXSnapshotModule(private val mContext: ReactApplicationContext) :
+             )
+         )
+         builder.pixelRatio(
+-            java.lang.Float.valueOf(mContext.resources.displayMetrics.density).toInt().toFloat()
++            1.0f // Snapshot width/height are requested PNG pixels, independent of density.
+         )
+         builder.accessToken(getAccessToken(mContext))
+         return builder.build()
+diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.m b/ios/RNMBX/Offline/RNMBXOfflineModule.m
+index 1808393..95b1081 100644
+--- a/ios/RNMBX/Offline/RNMBXOfflineModule.m
++++ b/ios/RNMBX/Offline/RNMBXOfflineModule.m
+@@ -6,6 +6,10 @@
+ RCT_EXTERN_METHOD(getPacks:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+ RCT_EXTERN_METHOD(createPack:(NSDictionary *) options resolver: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+ 
++RCT_EXTERN_METHOD(invalidatePack:(NSString *)name
++                  resolver:(RCTPromiseResolveBlock)resolve
++                  rejecter:(RCTPromiseRejectBlock)reject)
++
+ RCT_EXTERN_METHOD(resumePackDownload:(NSString *)name
+                   resolver:(RCTPromiseResolveBlock)resolve
+                   rejecter:(RCTPromiseRejectBlock)reject)
+@@ -31,4 +35,7 @@ RCT_EXTERN_METHOD(migrateOfflineCache:(RCTPromiseResolveBlock)resolve reject:(RC
+ 
+ RCT_EXTERN_METHOD(resetDatabase:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+ 
++RCT_EXTERN_METHOD(clearAmbientCache:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
++RCT_EXTERN_METHOD(mergeOfflineRegions:(NSString *)path resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
++
+ @end
+\ No newline at end of file
+diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.swift b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
+index 1253ba1..38f0114 100644
+--- a/ios/RNMBX/Offline/RNMBXOfflineModule.swift
++++ b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
+@@ -14,6 +14,7 @@ extension Date {
+ @objc(RNMBXOfflineModule)
+ class RNMBXOfflineModule: RCTEventEmitter {
+   var hasListeners = false
++  var nextLoadGeneration = 0
+   
+   static let RNMapboxInfoMetadataKey = "_rnmapbox"
+ 
+@@ -98,6 +99,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     }
+ 
+     var name: String
++    var generation = 0
+     var cancelables: [Cancelable] = []
+     var progress : TileRegionLoadProgress? = nil
+     var state : State = .inactive
+@@ -208,13 +210,15 @@ class RNMBXOfflineModule: RCTEventEmitter {
+             DispatchQueue.main.async {
+               switch result {
+               case .success(let metadata):
+-                let pack = TileRegionPack(
+-                  name: name,
+-                  progress: self.toProgress(region: region),
+-                  metadata: logged("RNMBXOfflineModule.getPackStatus") { metadata as? [String:Any] } ?? [:]
++                // Status readback must preserve the live pack's cancellation handles.
++                resolver(
++                  self._makeRegionStatusPayload(
++                    name,
++                    progress: self.toProgress(region: region),
++                    state: self.tileRegionPacks[name]?.state ?? .unknown,
++                    metadata: logged("RNMBXOfflineModule.getPackStatus") { metadata as? [String:Any] } ?? [:]
++                  )
+                 )
+-                self.tileRegionPacks[name] = pack
+-                resolver(self._makeRegionStatusPayload(pack: pack))
+               case .failure(let error):
+                 Logger.log(level:.error, message: "Unable to fetch metadata for \(name)")
+                 rejecter("RNMBXOfflineModule.getPackStatus", error.localizedDescription, error)
+@@ -229,12 +233,26 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     }
+   }
+   
++  @objc
++  func invalidatePack(_ name: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
++    DispatchQueue.main.async {
++      guard let pack = self.tileRegionPacks[name] else {
++        rejecter("invalidatePack", "Unknown offline pack: \(name)", nil)
++        return
++      }
++      self.startLoading(pack: pack, acceptExpired: false)
++      resolver(nil)
++    }
++  }
++
+   @objc
+   func resumePackDownload(_ name: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock)
+   {
+     DispatchQueue.main.async {
+       if let pack = self.tileRegionPacks[name] {
+-        self.startLoading(pack: pack)
++        if pack.state != .active {
++          self.startLoading(pack: pack)
++        }
+         resolver(nil)
+       } else {
+         rejecter("resumePackDownload", "Unknown offline pack: \(name)", nil)
+@@ -247,6 +265,9 @@ class RNMBXOfflineModule: RCTEventEmitter {
+   {
+     DispatchQueue.main.async {
+       if let pack = self.tileRegionPacks[name] {
++        self.tileRegionPacks[name]!.generation += 1
++        self.tileRegionPacks[name]!.state = pack.state == .complete ? .complete : .inactive
++        self.tileRegionPacks[name]!.cancelables = []
+         pack.cancelables.forEach { $0.cancel() }
+         resolver(nil)
+       } else {
+@@ -275,12 +296,62 @@ class RNMBXOfflineModule: RCTEventEmitter {
+         return rejecter("deletePack", "Pack: \(name) has already been deleted", nil)
+       }
+ 
++      self.tileRegionPacks[name]!.generation += 1
++      pack.cancelables.forEach { $0.cancel() }
+       self.tileStore.removeTileRegion(forId: name)
+       self.tileRegionPacks[name]!.state = .invalid
+       resolver(nil)
+     }
+   }
+   
++  @objc
++  func clearAmbientCache(_ resolve: @escaping RCTPromiseResolveBlock,
++                         rejecter: @escaping RCTPromiseRejectBlock) {
++    DispatchQueue.main.async {
++      MapboxMap.clearData { error in
++        if let error = error {
++          rejecter("clearAmbientCache", error.localizedDescription, error)
++          return
++        }
++        DispatchQueue.main.async {
++          self.tileStore.clearAmbientCache { result in
++            switch result {
++            case .success:
++              resolve(nil)
++            case .failure(let error):
++              rejecter("clearAmbientCache", error.localizedDescription, error)
++            }
++          }
++        }
++      }
++    }
++  }
++
++  @objc
++  func mergeOfflineRegions(_ path: String,
++                           resolver: @escaping RCTPromiseResolveBlock,
++                           rejecter: @escaping RCTPromiseRejectBlock) {
++    let fileURL = path.hasPrefix("file://") ? URL(string: path) : URL(fileURLWithPath: path)
++    var isDirectory: ObjCBool = false
++    guard let fileURL = fileURL, fileURL.isFileURL,
++          FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDirectory),
++          !isDirectory.boolValue, FileManager.default.isReadableFile(atPath: fileURL.path) else {
++      rejecter("invalid_database_path", "Offline database path must point to a readable file.", nil)
++      return
++    }
++
++    DispatchQueue.main.async {
++      self.offlineRegionManager.mergeOfflineDatabase(forPath: fileURL.path) { result in
++        switch result {
++        case .success:
++          resolver(nil)
++        case .failure(let error):
++          rejecter("mergeOfflineRegions", error.localizedDescription, error)
++        }
++      }
++    }
++  }
++
+   @objc
+   func migrateOfflineCache(_ resolve : @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+     // Old and new cache file paths
+@@ -343,7 +414,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     }
+   }
+   
+-  func startLoading(pack: TileRegionPack) {
++  func startLoading(pack: TileRegionPack, acceptExpired: Bool = true) {
+     let id = pack.name
+     let metadata = pack.metadata
+     let taskGroup = DispatchGroup()
+@@ -361,9 +432,16 @@ class RNMBXOfflineModule: RCTEventEmitter {
+       return
+     }
+       
++    // Retired callbacks must not complete or fail a replacement load.
++    nextLoadGeneration += 1
++    self.tileRegionPacks[id]!.generation = nextLoadGeneration
++    let generation = nextLoadGeneration
++    pack.cancelables.forEach { $0.cancel() }
++    self.tileRegionPacks[id]!.state = .active
++    self.tileRegionPacks[id]!.progress = nil
+     var downloadError = false
+     
+-    let stylePackLoadOptions = StylePackLoadOptions(glyphsRasterizationMode: .ideographsRasterizedLocally, metadata: pack.metadata)!
++    let stylePackLoadOptions = StylePackLoadOptions(glyphsRasterizationMode: .ideographsRasterizedLocally, metadata: pack.metadata, acceptExpired: acceptExpired)!
+     
+     let threadedOfflineManager = OfflineManager()
+     taskGroup.enter()
+@@ -371,6 +449,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+       // progress callbacks arrive on SDK background threads; tileRegionPacks
+       // is main-thread state (see #4252)
+       DispatchQueue.main.async {
++        guard self.tileRegionPacks[id]?.generation == generation else { return }
+         self.tileRegionPacks[id]!.state = .active
+       }
+     } completion: { result in
+@@ -379,6 +458,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+           taskGroup.leave()
+         }
+ 
++        guard self.tileRegionPacks[id]?.generation == generation else { return }
+         switch result {
+         case let .success(stylePack): break
+         case let .failure(error):
+@@ -401,7 +481,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+       geometry: bounds, // RNMBXFeatureUtils.geometryToGeometry(bounds),
+       descriptors: descriptors,
+       metadata: metadata,
+-      acceptExpired: true,
++      acceptExpired: acceptExpired,
+       networkRestriction: .none,
+       averageBytesPerSecond: nil)
+     
+@@ -413,6 +493,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+       // delivered on the "MB TileStore RW" thread; mutating tileRegionPacks
+       // here races the main thread and corrupts the dictionary (#4252)
+       DispatchQueue.main.async {
++        guard self.tileRegionPacks[id]?.generation == generation else { return }
+         lastProgress = progress
+         self.tileRegionPacks[id]!.progress = progress
+         self.tileRegionPacks[id]!.state = .active
+@@ -423,31 +504,25 @@ class RNMBXOfflineModule: RCTEventEmitter {
+             defer {
+                 taskGroup.leave()
+             }
++            guard self.tileRegionPacks[id]?.generation == generation else { return }
+             switch result {
+-            case .success(let _):
+-                if let progess = lastProgress {
+-                    self.offlinePackProgressDidChange(progress: progess, metadata: metadata, state: .complete)
+-                } else {
+-                    Logger.log(level: .warn,
+-                               message: "RNMBXOfflineModule: startLoading: tile region completed, but got no progress information")
+-                }
+-                self.tileRegionPacks[id]!.state = .complete
++            case .success: break
+             case .failure(let error):
+-                Logger.log(level: .warn,
+-                           message: "RNMBXOfflineModule: startLoading: error loading tile region: " + error.localizedDescription)
+-                
+-                self.tileRegionPacks[id]!.state = .inactive
++                downloadError = true
+                 self.offlinePackDidReceiveError(name: id, error: error)
+             }
+         }
+     }
+ 
+     taskGroup.notify(queue: .main) {
++      defer { withExtendedLifetime(threadedOfflineManager) {} }
++      guard self.tileRegionPacks[id]?.generation == generation else { return }
+       self.tileRegionPacks[id]!.cancelables = []
+       self.tileRegionPacks[id]!.state = downloadError ? .inactive : .complete
+-      // the style pack load and the tileset descriptor are tied to this
+-      // manager; it must outlive the in-flight work (#4252)
+-      withExtendedLifetime(threadedOfflineManager) {}
++      if !downloadError, let progress = lastProgress {
++        self.offlinePackProgressDidChange(progress: progress, metadata: metadata, state: .complete)
++      }
++
+     }
+ 
+     self.tileRegionPacks[id]!.cancelables = [task, stylePackTask]
+@@ -516,7 +591,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+           metadata: logged("RNMBXOfflineModule.getPacks metadata is null") { metadata } ?? [:]
+         )
+         
+-        if ((region.hasCompleted())) {
++        if pack.state == .unknown && region.hasCompleted() {
+           pack.state = .complete
+         }
+         
+@@ -605,7 +680,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+     var result : [String:Any?] = [:]
+     if let progress = progress {
+       result = [
+-        "state": (progress.hasCompleted()) ? State.complete.rawValue : state.rawValue,
++        "state": (state == .unknown && progress.hasCompleted()) ? State.complete.rawValue : state.rawValue,
+         "name": name,
+         "percentage": progress.toPercentage(),
+         "completedResourceCount": progress.completedResourceCount,
+diff --git a/ios/RNMBX/RNMBXModule.m b/ios/RNMBX/RNMBXModule.m
+index 61978cd..737f3cd 100644
+--- a/ios/RNMBX/RNMBXModule.m
++++ b/ios/RNMBX/RNMBXModule.m
+@@ -2,6 +2,8 @@
+ 
+ @interface RCT_EXTERN_MODULE(RNMBXModule, NSObject)
+ 
++RCT_EXTERN_METHOD(setConnected:(BOOL)connected resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
++
+ RCT_EXTERN_METHOD(setAccessToken:(NSString *)accessToken resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+ 
+ RCT_EXTERN_METHOD(addCustomHeader:(NSString *)headerName forHeaderValue:(NSString *) headerValue)
+diff --git a/ios/RNMBX/RNMBXModule.swift b/ios/RNMBX/RNMBXModule.swift
+index 25f3eff..9434cc4 100644
+--- a/ios/RNMBX/RNMBXModule.swift
++++ b/ios/RNMBX/RNMBXModule.swift
+@@ -86,6 +86,13 @@ class RNMBXModule : NSObject {
+       return true
+   }
+ 
++  @objc func setConnected(_ connected: Bool,
++                          resolver: RCTPromiseResolveBlock,
++                          rejecter: RCTPromiseRejectBlock) {
++    OfflineSwitch.shared.isMapboxStackConnected = connected
++    resolver(OfflineSwitch.shared.isMapboxStackConnected)
++  }
++
+   @objc func setAccessToken(
+     _ token: String, 
+     resolver: RCTPromiseResolveBlock,
+diff --git a/ios/RNMBX/RNMBXTerrain.swift b/ios/RNMBX/RNMBXTerrain.swift
+index e3cfdc5..5030e1b 100644
+--- a/ios/RNMBX/RNMBXTerrain.swift
++++ b/ios/RNMBX/RNMBXTerrain.swift
+@@ -17,6 +17,11 @@ public class RNMBXTerrain : RNMBXSingletonLayer, RNMBXMapComponent, RNMBXSourceC
+     self.map = map
+     self.style = style
+     
++    guard sourceID != nil else {
++      style.removeTerrain()
++      return
++    }
++
+     let terrain = self.makeTerrain()
+     self.terrain = terrain
+     addStylesAndUpdate()
+diff --git a/lib/module/components/MapView.js b/lib/module/components/MapView.js
+index 57797d1..a78263d 100644
+--- a/lib/module/components/MapView.js
++++ b/lib/module/components/MapView.js
+@@ -345,7 +345,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo
+    */
+   async queryTerrainElevation(coordinate) {
+     const res = await this._runNative('queryTerrainElevation', [coordinate]);
+-    return res.data;
++    return res?.data ?? null;
+   }
+ 
+   /**
+diff --git a/lib/module/modules/offline/offlineManager.js b/lib/module/modules/offline/offlineManager.js
+index b1c8e6a..890a440 100644
+--- a/lib/module/modules/offline/offlineManager.js
++++ b/lib/module/modules/offline/offlineManager.js
+@@ -116,22 +116,20 @@ class OfflineManager {
+    * @return {void}
+    */
+   async invalidateAmbientCache() {
+-    console.warn('RNMapbox: invalidateAmbientCache is not implemented on v10');
++    throw new Error('Maps SDK v11 has no in-place ambient cache invalidation API. Use clearAmbientCache() to evict temporary resources.');
+   }
+ 
+   /**
+    * Erases resources from the ambient cache.
+    * This method clears the cache and decreases the amount of space that map resources take up on the device.
+    *
+-   * @deprecated Not implemented in v10
+-   *
+    * @example
+    * await Mapbox.offlineManager.clearAmbientCache();
+    *
+    * @return {void}
+    */
+   async clearAmbientCache() {
+-    console.warn('RNMapbox: clearAmbientCache is not implemented on v10');
++    await MapboxOfflineManager.clearAmbientCache();
+   }
+ 
+   /**
+@@ -157,8 +155,7 @@ class OfflineManager {
+    * @return {void}
+    */
+   async setMaximumAmbientCacheSize(size) {
+-    await this._initialize();
+-    await MapboxOfflineManager.setMaximumAmbientCacheSize(size);
++    throw new Error('Maps SDK v11 has no legacy ambient cache size API. TileStore disk-quota controls a different store, including offline resources.');
+   }
+ 
+   /**
+diff --git a/lib/module/modules/offline/offlineManagerLegacy.js b/lib/module/modules/offline/offlineManagerLegacy.js
+index 5943b63..84cec51 100644
+--- a/lib/module/modules/offline/offlineManagerLegacy.js
++++ b/lib/module/modules/offline/offlineManagerLegacy.js
+@@ -121,7 +121,7 @@ class OfflineManagerLegacy {
+    * @return {Array<OfflinePack>}
+    */
+   async getPacks() {
+-    await this._initialize();
++    await this._initialize(true);
+     return Object.keys(this._offlinePacks).map(name => this._offlinePacks[name]);
+   }
+ 
+diff --git a/lib/module/modules/snapshot/SnapshotOptions.js b/lib/module/modules/snapshot/SnapshotOptions.js
+index ea91cd6..b6fd036 100644
+--- a/lib/module/modules/snapshot/SnapshotOptions.js
++++ b/lib/module/modules/snapshot/SnapshotOptions.js
+@@ -12,7 +12,7 @@ class SnapshotOptions {
+     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
+     this.heading = options.heading || 0.0;
+     this.pitch = options.pitch || 0.0;
+-    this.zoomLevel = options.zoomLevel || 16.0;
++    this.zoomLevel = options.zoomLevel ?? 16.0;
+     this.width = options.width || 50.0;
+     this.height = options.height || 50.0;
+     this.writeToDisk = options.writeToDisk || false;
+diff --git a/lib/typescript/src/Mapbox.native.d.ts b/lib/typescript/src/Mapbox.native.d.ts
+index 9bffceb..a53f5c0 100644
+--- a/lib/typescript/src/Mapbox.native.d.ts
++++ b/lib/typescript/src/Mapbox.native.d.ts
+@@ -1,4 +1,4 @@
+-export * from './RNMBXModule';
++export * from './RNMBXModule.js';
+ export { Camera, UserTrackingMode, type CameraPadding, type CameraAnimationMode, type CameraBounds, type CameraStop, } from './components/Camera';
+ export { Atmosphere } from './components/Atmosphere';
+ export { Snow } from './components/Snow';
+diff --git a/lib/typescript/src/RNMBXModule.d.ts b/lib/typescript/src/RNMBXModule.d.ts
+index 5e8079d..d838720 100644
+--- a/lib/typescript/src/RNMBXModule.d.ts
++++ b/lib/typescript/src/RNMBXModule.d.ts
+@@ -14,19 +14,31 @@ export declare const StyleURL: {
+     Dark: URL;
+     Satellite: URL;
+     SatelliteStreet: URL;
+-}, OfflinePackDownloadState: {
++};
++export declare const OfflinePackDownloadState: {
+     Inactive: string;
+     Active: string;
+     Complete: string;
+     Unknown?: string;
+-}, LineJoin: {
++};
++export declare const LineJoin: {
+     Bevel: string | number;
+     Round: string | number;
+     Miter: string | number;
+-}, StyleSource: {
++};
++export declare const StyleSource: {
+     DefaultSourceID: string;
+-}, TileServers: {
++};
++export declare const TileServers: {
+     Mapbox: string;
+-}, removeCustomHeader: (headerName: string) => void, setAccessToken: (accessToken: string | null) => Promise<string | null>, setWellKnownTileServer: (tileServer: string) => void, clearData: () => Promise<void>, getAccessToken: () => Promise<string>, setTelemetryEnabled: (telemetryEnabled: boolean) => void, setConnected: (connected: boolean) => void, setLanguage: (language: string | string[] | null) => Promise<void>;
++};
++export declare const removeCustomHeader: (headerName: string) => void;
++export declare const setAccessToken: (accessToken: string | null) => Promise<string | null>;
++export declare const setWellKnownTileServer: (tileServer: string) => void;
++export declare const clearData: () => Promise<void>;
++export declare const getAccessToken: () => Promise<string>;
++export declare const setTelemetryEnabled: (telemetryEnabled: boolean) => void;
++export declare const setConnected: (connected: boolean) => void;
++export declare const setLanguage: (language: string | string[] | null) => Promise<void>;
+ export { addCustomHeader };
+ //# sourceMappingURL=RNMBXModule.d.ts.map
+\ No newline at end of file
+diff --git a/lib/typescript/src/components/MapView.d.ts b/lib/typescript/src/components/MapView.d.ts
+index 9f1b137..d7dd260 100644
+--- a/lib/typescript/src/components/MapView.d.ts
++++ b/lib/typescript/src/components/MapView.d.ts
+@@ -556,7 +556,7 @@ declare class MapView extends MapView_base {
+      * @param {Position} coordinate - The geographic coordinates `[longitude, latitude]` at which to query elevation.
+      * @return {number} Elevation in meters relative to mean sea-level.
+      */
+-    queryTerrainElevation(coordinate: Position): Promise<number>;
++    queryTerrainElevation(coordinate: Position): Promise<number | null>;
+     /**
+      * Sets the visibility of all the layers referencing the specified `sourceLayerId` and/or `sourceId`
+      *
+diff --git a/lib/typescript/src/index.native.d.ts b/lib/typescript/src/index.native.d.ts
+index e57b0af..d9bd66e 100644
+--- a/lib/typescript/src/index.native.d.ts
++++ b/lib/typescript/src/index.native.d.ts
+@@ -1,4 +1,4 @@
+-export * from './Mapbox.native';
+-import * as Mapbox from './Mapbox.native';
++export * from './Mapbox.native.js';
++import * as Mapbox from './Mapbox.native.js';
+ export default Mapbox;
+ //# sourceMappingURL=index.native.d.ts.map
+\ No newline at end of file
+diff --git a/lib/typescript/src/modules/offline/offlineManager.d.ts b/lib/typescript/src/modules/offline/offlineManager.d.ts
+index fd0c239..cccc144 100644
+--- a/lib/typescript/src/modules/offline/offlineManager.d.ts
++++ b/lib/typescript/src/modules/offline/offlineManager.d.ts
+@@ -107,8 +107,6 @@ declare class OfflineManager {
+      * Erases resources from the ambient cache.
+      * This method clears the cache and decreases the amount of space that map resources take up on the device.
+      *
+-     * @deprecated Not implemented in v10
+-     *
+      * @example
+      * await Mapbox.offlineManager.clearAmbientCache();
+      *
+diff --git a/src/components/MapView.tsx b/src/components/MapView.tsx
+index d742f19..e776b47 100644
+--- a/src/components/MapView.tsx
++++ b/src/components/MapView.tsx
+@@ -926,12 +926,12 @@ class MapView extends NativeBridgeComponent(
+    * @param {Position} coordinate - The geographic coordinates `[longitude, latitude]` at which to query elevation.
+    * @return {number} Elevation in meters relative to mean sea-level.
+    */
+-  async queryTerrainElevation(coordinate: Position): Promise<number> {
+-    const res = await this._runNative<{ data: number }>(
++  async queryTerrainElevation(coordinate: Position): Promise<number | null> {
++    const res = await this._runNative<{ data: number | null } | null>(
+       'queryTerrainElevation',
+       [coordinate],
+     );
+-    return res.data;
++    return res?.data ?? null;
+   }
+ 
+   /**
+diff --git a/src/modules/offline/offlineManager.ts b/src/modules/offline/offlineManager.ts
+index e3d747f..f997923 100644
+--- a/src/modules/offline/offlineManager.ts
++++ b/src/modules/offline/offlineManager.ts
+@@ -191,22 +191,20 @@ class OfflineManager {
+    * @return {void}
+    */
+   async invalidateAmbientCache(): Promise<void> {
+-    console.warn('RNMapbox: invalidateAmbientCache is not implemented on v10');
++    throw new Error('Maps SDK v11 has no in-place ambient cache invalidation API. Use clearAmbientCache() to evict temporary resources.');
+   }
+ 
+   /**
+    * Erases resources from the ambient cache.
+    * This method clears the cache and decreases the amount of space that map resources take up on the device.
+    *
+-   * @deprecated Not implemented in v10
+-   *
+    * @example
+    * await Mapbox.offlineManager.clearAmbientCache();
+    *
+    * @return {void}
+    */
+   async clearAmbientCache(): Promise<void> {
+-    console.warn('RNMapbox: clearAmbientCache is not implemented on v10');
++    await MapboxOfflineManager.clearAmbientCache();
+   }
+ 
+   /**
+@@ -232,8 +230,7 @@ class OfflineManager {
+    * @return {void}
+    */
+   async setMaximumAmbientCacheSize(size: number): Promise<void> {
+-    await this._initialize();
+-    await MapboxOfflineManager.setMaximumAmbientCacheSize(size);
++    throw new Error('Maps SDK v11 has no legacy ambient cache size API. TileStore disk-quota controls a different store, including offline resources.');
+   }
+ 
+   /**
+diff --git a/src/modules/offline/offlineManagerLegacy.ts b/src/modules/offline/offlineManagerLegacy.ts
+index 523071f..95c3217 100644
+--- a/src/modules/offline/offlineManagerLegacy.ts
++++ b/src/modules/offline/offlineManagerLegacy.ts
+@@ -139,7 +139,7 @@ class OfflineManagerLegacy {
+    * @return {Array<OfflinePack>}
+    */
+   async getPacks(): Promise<OfflinePack[]> {
+-    await this._initialize();
++    await this._initialize(true);
+     return Object.keys(this._offlinePacks).map(
+       (name) => this._offlinePacks[name],
+     ) as OfflinePack[];
+diff --git a/src/modules/snapshot/SnapshotOptions.ts b/src/modules/snapshot/SnapshotOptions.ts
+index 766dbd8..b9791a0 100644
+--- a/src/modules/snapshot/SnapshotOptions.ts
++++ b/src/modules/snapshot/SnapshotOptions.ts
+@@ -40,7 +40,7 @@ class SnapshotOptions {
+     this.styleURL = options.styleURL || MapboxGL.StyleURL.Street;
+     this.heading = options.heading || 0.0;
+     this.pitch = options.pitch || 0.0;
+-    this.zoomLevel = options.zoomLevel || 16.0;
++    this.zoomLevel = options.zoomLevel ?? 16.0;
+     this.width = options.width || 50.0;
+     this.height = options.height || 50.0;
+     this.writeToDisk = options.writeToDisk || false;

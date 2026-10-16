@@ -17,21 +17,57 @@ import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { mapboxNativeUI } from "../src/adapters/mapbox-native/ui.js";
 import { maplibreNativeUI } from "../src/adapters/maplibre-native/ui.js";
+import {
+  NativeCameraContext,
+  NativeMapPresentationContext,
+  NativeOverlayContext,
+  type NativeMapPresentation,
+  type NativeOverlay,
+  withNativeMapPresentation,
+} from "../src/adapters/shared/native-map-presentation.js";
 import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
 import {
   createNativeUI,
   type NativeMarkerHostProps,
   type NativeMarkerProps,
 } from "../src/adapters/shared/native-ui.js";
-import type { MapRef, Point } from "../src/contracts/camera-types.js";
+import type {
+  MapRef,
+  Point,
+  ViewState,
+} from "../src/contracts/camera-types.js";
 import type { ClickEvent, MoveEvent } from "../src/contracts/event-types.js";
+import type { MapProps } from "../src/contracts/map-types.js";
 import type { ControlPosition, MarkerRef } from "../src/contracts/ui-types.js";
 import {
   type MapSession,
   MapSessionContext,
-  type NativeOverlay,
-  NativeOverlayContext,
 } from "../src/facade/map-context.js";
+
+type FixtureSession = MapSession &
+  NativeMapPresentation & { readonly viewState: ViewState | null };
+
+const FixtureSessionProvider = ({
+  value,
+  children,
+}: {
+  readonly value: FixtureSession;
+  readonly children: ReactNode;
+}) => (
+  <MapSessionContext.Provider value={value}>
+    <NativeMapPresentationContext.Provider value={value}>
+      <NativeCameraContext.Provider
+        value={
+          value.viewState
+            ? { viewState: value.viewState, observedViewState: value.viewState }
+            : null
+        }
+      >
+        {children}
+      </NativeCameraContext.Provider>
+    </NativeMapPresentationContext.Provider>
+  </MapSessionContext.Provider>
+);
 
 const refresh = jest.fn(async () => undefined);
 
@@ -134,18 +170,19 @@ const sessionFixture = () => {
   };
   // The fixture exercises UI operations only; absent MapRef methods deliberately fail.
   const map = { project, unproject, easeTo } as unknown as MapRef;
-  const session: MapSession = {
+  const session: FixtureSession = {
+    nativeLocationFollowing: false,
     ref: { current: map },
     map,
     ready: true,
     viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
     gestureLocked: false,
     overlayHostName: "fixture-control-host",
-    ornaments: {},
+    attributionPosition: undefined,
     requestGestureLock: lock,
     setNativeLayout: jest.fn(),
     setOverlay: jest.fn(),
-    setOrnament: jest.fn(),
+    setAttributionPosition: jest.fn(),
     subscribe: (event, callback) => {
       listeners[event].add(callback);
       return () => {
@@ -160,6 +197,145 @@ const sessionFixture = () => {
   };
   return { session, project, unproject, easeTo, lock };
 };
+
+const scaleCamera: ViewState = {
+  longitude: 10,
+  latitude: 20,
+  zoom: 4,
+  bearing: 0,
+  pitch: 0,
+};
+const ScaleMap = withNativeMapPresentation(
+  forwardRef<MapRef, MapProps>((props, _ref) => <View>{props.children}</View>)
+);
+
+test("scale observes each movement once, including unchanged controlled targets", async () => {
+  const fixture = sessionFixture();
+  fixture.unproject.mockResolvedValue([10.01, 20]);
+  const reportError = jest.fn();
+  const tree = (
+    ready: boolean,
+    viewState?: ViewState,
+    unit: "metric" | "imperial" | "nautical" = "metric"
+  ) => (
+    <MapSessionContext.Provider value={{ ...fixture.session, ready }}>
+      <ScaleMap
+        mapStyle={{ version: 8, sources: {}, layers: [] }}
+        initialViewState={scaleCamera}
+        viewState={viewState}
+      >
+        <ui.ScaleControl unit={unit} onError={reportError} />
+      </ScaleMap>
+    </MapSessionContext.Provider>
+  );
+  const mounted = await render(tree(false));
+  expect(fixture.project).not.toHaveBeenCalled();
+  await mounted.rerender(tree(true));
+  await waitFor(() => expect(mounted.getByText("1 km")).toBeTruthy());
+  expect(fixture.project).toHaveBeenCalledTimes(1);
+  expect(fixture.unproject).toHaveBeenCalledTimes(1);
+  fixture.project.mockClear();
+  fixture.unproject.mockClear();
+  await act(async () =>
+    fixture.session.emit("move", {
+      viewState: { ...scaleCamera, zoom: 5 },
+      origin: "user",
+    })
+  );
+  expect(fixture.project).toHaveBeenCalledTimes(1);
+  expect(fixture.unproject).toHaveBeenCalledTimes(1);
+
+  const controlled = { ...scaleCamera, zoom: 6 };
+  await mounted.rerender(tree(true, controlled));
+  fixture.project.mockClear();
+  fixture.unproject.mockClear();
+  await act(async () =>
+    fixture.session.emit("move", {
+      viewState: { ...scaleCamera, longitude: 11, zoom: 7 },
+      origin: "user",
+    })
+  );
+  expect(fixture.project).toHaveBeenCalledTimes(1);
+  expect(fixture.project).toHaveBeenCalledWith([10, 20]);
+  expect(fixture.unproject).toHaveBeenCalledTimes(1);
+  await mounted.rerender(tree(true, { ...controlled, zoom: 8 }));
+  expect(fixture.project).toHaveBeenCalledTimes(2);
+  await mounted.rerender(tree(true, controlled, "imperial"));
+  await waitFor(() => expect(mounted.getByText("2000 ft")).toBeTruthy());
+  await mounted.rerender(tree(true, controlled, "nautical"));
+  await waitFor(() => expect(mounted.getByText("0.5 nm")).toBeTruthy());
+  expect(reportError).not.toHaveBeenCalled();
+  await mounted.unmount();
+});
+
+test.each(["resolve", "reject"])(
+  "scale ignores stale %s results and reports only current failures",
+  async (settlement) => {
+    const fixture = sessionFixture();
+    let resolveOld: ((value: readonly [number, number]) => void) | undefined;
+    let rejectOld: ((error: Error) => void) | undefined;
+    fixture.unproject
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve, reject) => {
+            resolveOld = resolve;
+            rejectOld = reject;
+          })
+      )
+      .mockResolvedValue([10.01, 20]);
+    const reportError = jest.fn();
+    const mounted = await render(
+      <MapSessionContext.Provider value={fixture.session}>
+        <ScaleMap
+          mapStyle={{ version: 8, sources: {}, layers: [] }}
+          initialViewState={scaleCamera}
+        >
+          <ui.ScaleControl onError={reportError} />
+        </ScaleMap>
+      </MapSessionContext.Provider>
+    );
+    await waitFor(() => expect(fixture.unproject).toHaveBeenCalledTimes(1));
+    await act(async () =>
+      fixture.session.emit("move", {
+        viewState: { ...scaleCamera, zoom: 5 },
+        origin: "user",
+      })
+    );
+    await waitFor(() => expect(mounted.getByText("1 km")).toBeTruthy());
+    await act(async () => {
+      if (settlement === "resolve") resolveOld?.([10.0001, 20]);
+      else rejectOld?.(new Error("superseded scale"));
+    });
+    expect(mounted.getByText("1 km")).toBeTruthy();
+    expect(reportError).not.toHaveBeenCalled();
+    const failure = new Error("current scale");
+    fixture.unproject.mockRejectedValueOnce(failure);
+    await act(async () =>
+      fixture.session.emit("move", {
+        viewState: { ...scaleCamera, zoom: 6 },
+        origin: "user",
+      })
+    );
+    expect(reportError).toHaveBeenCalledWith(failure);
+    expect(mounted.queryByText("1 km")).toBeNull();
+    let rejectDetached: ((error: Error) => void) | undefined;
+    fixture.project.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectDetached = reject;
+        })
+    );
+    await act(async () =>
+      fixture.session.emit("move", {
+        viewState: { ...scaleCamera, zoom: 7 },
+        origin: "user",
+      })
+    );
+    await mounted.unmount();
+    await act(async () => rejectDetached?.(new Error("detached scale")));
+    expect(reportError).toHaveBeenCalledTimes(1);
+  }
+);
 
 const touch = (x: number, y: number, count = 1) => ({
   nativeEvent: {
@@ -197,7 +373,7 @@ const nativeTouch = async (
 };
 
 const NativeOverlayHost = (props: {
-  readonly session: MapSession;
+  readonly session: FixtureSession;
   readonly children: ReactNode;
 }) => {
   const [overlays, setOverlays] = useState<ReadonlyMap<string, NativeOverlay>>(
@@ -226,11 +402,11 @@ const NativeOverlayHost = (props: {
     [props.session]
   );
   return (
-    <MapSessionContext.Provider value={session}>
+    <FixtureSessionProvider value={session}>
       <NativeOverlayContext.Provider value={[...overlays.values()]}>
         {props.children}
       </NativeOverlayContext.Provider>
-    </MapSessionContext.Provider>
+    </FixtureSessionProvider>
   );
 };
 
@@ -246,7 +422,7 @@ describe("TF07 native UI composition", () => {
       offset: Point,
       layout?: { width: number; height: number }
     ) => (
-      <MapSessionContext.Provider
+      <FixtureSessionProvider
         value={{ ...fixture.session, nativeLayout: layout }}
       >
         <NativeMarkerOverlay
@@ -257,7 +433,7 @@ describe("TF07 native UI composition", () => {
         >
           <Text>Content</Text>
         </NativeMarkerOverlay>
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const view = await render(scene([24, -12]));
     const host = () => view.getByTestId("native-marker-overlay");
@@ -316,7 +492,7 @@ describe("TF07 native UI composition", () => {
     );
     const error = jest.fn();
     const scene = (longitude: number) => (
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <NativeMarkerOverlay
           id="stale"
           lngLat={[longitude, 20]}
@@ -326,7 +502,7 @@ describe("TF07 native UI composition", () => {
         >
           <Text>Content</Text>
         </NativeMarkerOverlay>
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const view = await render(scene(10));
     await view.rerender(scene(11));
@@ -510,20 +686,20 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     await expect(
       render(
-        <MapSessionContext.Provider value={fixture.session}>
+        <FixtureSessionProvider value={fixture.session}>
           <ui.Marker longitude={Number.NaN} latitude={20} />
-        </MapSessionContext.Provider>
+        </FixtureSessionProvider>
       )
     ).rejects.toThrow("coordinate");
     await expect(
       render(
-        <MapSessionContext.Provider value={fixture.session}>
+        <FixtureSessionProvider value={fixture.session}>
           <ui.Marker
             longitude={10}
             latitude={20}
             offset={[Number.POSITIVE_INFINITY, 0]}
           />
-        </MapSessionContext.Provider>
+        </FixtureSessionProvider>
       )
     ).rejects.toThrow("map point");
   });
@@ -573,7 +749,7 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const touched = jest.fn();
     const popup = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Popup
           longitude={10}
           latitude={20}
@@ -585,7 +761,7 @@ describe("TF07 native UI composition", () => {
             },
           }}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     expect(
       StyleSheet.flatten(popup.getByTestId("bubble").props.style)
@@ -622,16 +798,16 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     await expect(
       render(
-        <MapSessionContext.Provider value={fixture.session}>
+        <FixtureSessionProvider value={fixture.session}>
           <ui.Popup longitude={10} latitude={20} focusAfterOpen />
-        </MapSessionContext.Provider>
+        </FixtureSessionProvider>
       )
     ).rejects.toThrow("focusAfterOpen");
     await expect(
       render(
-        <MapSessionContext.Provider value={fixture.session}>
+        <FixtureSessionProvider value={fixture.session}>
           <ui.AttributionControl compact={false} />
-        </MapSessionContext.Provider>
+        </FixtureSessionProvider>
       )
     ).rejects.toThrow("expanded attribution");
   });
@@ -684,11 +860,11 @@ describe("TF07 native UI composition", () => {
   test("child scroll handoff keeps SDK gestures unchanged", async () => {
     const fixture = sessionFixture();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker longitude={10} latitude={20} draggable>
           <View testID="child-scroll" />
         </ui.Marker>
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const child = view.getByTestId("child-scroll");
     await nativeTouch(child, "touchStart", touch(5, 8));
@@ -705,7 +881,7 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const started = jest.fn();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
@@ -715,7 +891,7 @@ describe("TF07 native UI composition", () => {
         >
           <Text>Label</Text>
         </ui.Marker>
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const page = {
       clientHeight: 874,
@@ -758,7 +934,7 @@ describe("TF07 native UI composition", () => {
       const clicked = jest.fn();
       const started = jest.fn();
       const view = await render(
-        <MapSessionContext.Provider value={fixture.session}>
+        <FixtureSessionProvider value={fixture.session}>
           <ui.Marker
             longitude={10}
             latitude={20}
@@ -769,7 +945,7 @@ describe("TF07 native UI composition", () => {
           >
             <Text>Child rows</Text>
           </ui.Marker>
-        </MapSessionContext.Provider>
+        </FixtureSessionProvider>
       );
       const host = {
         clientHeight: 82,
@@ -813,7 +989,7 @@ describe("TF07 native UI composition", () => {
       const fixture = sessionFixture();
       const pressed = jest.fn();
       const view = await render(
-        <MapSessionContext.Provider value={fixture.session}>
+        <FixtureSessionProvider value={fixture.session}>
           <ui.Marker
             longitude={10}
             latitude={20}
@@ -824,7 +1000,7 @@ describe("TF07 native UI composition", () => {
               <Text>Child</Text>
             </Pressable>
           </ui.Marker>
-        </MapSessionContext.Provider>
+        </FixtureSessionProvider>
       );
       const child = view.getByTestId("android-child");
       await nativeTouch(child, "touchStart", touch(5, 8));
@@ -846,11 +1022,11 @@ describe("TF07 native UI composition", () => {
     async (ending) => {
       const fixture = sessionFixture();
       const view = await render(
-        <MapSessionContext.Provider value={fixture.session}>
+        <FixtureSessionProvider value={fixture.session}>
           <ui.Marker longitude={10} latitude={20} draggable>
             <View testID="child" />
           </ui.Marker>
-        </MapSessionContext.Provider>
+        </FixtureSessionProvider>
       );
       const child = view.getByTestId("child");
       await nativeTouch(child, "touchStart", touch(1, 2));
@@ -872,7 +1048,7 @@ describe("TF07 native UI composition", () => {
         const dragged = jest.fn();
         const ref = createRef<MarkerRef>();
         const view = await render(
-          <MapSessionContext.Provider value={fixture.session}>
+          <FixtureSessionProvider value={fixture.session}>
             <mapboxNativeUI.Marker
               ref={ref}
               longitude={10}
@@ -882,7 +1058,7 @@ describe("TF07 native UI composition", () => {
               onClick={clicked}
               onDragEnd={dragged}
             />
-          </MapSessionContext.Provider>
+          </FixtureSessionProvider>
         );
         await fireEvent.press(view.getByTestId("mapbox-annotation"));
         await fireEvent.press(view.getByTestId("mapbox-annotation"));
@@ -922,14 +1098,14 @@ describe("TF07 native UI composition", () => {
       stopPropagation,
     };
     const marker = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <maplibreNativeUI.Marker
           longitude={10}
           latitude={20}
           onClick={clicked}
           {...{ hostProps: { testID: "live-content" } }}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const content = marker.getByTestId("live-content");
     await beginTouch(content, touch(5, 8));
@@ -938,14 +1114,14 @@ describe("TF07 native UI composition", () => {
     expect(clicked).toHaveBeenCalledTimes(1);
     await marker.unmount();
     const annotation = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <maplibreNativeUI.Marker
           longitude={10}
           latitude={20}
           renderMode="annotation"
           onClick={clicked}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     await fireEvent(
       annotation.getByTestId("maplibre-annotation"),
@@ -960,9 +1136,9 @@ describe("TF07 native UI composition", () => {
     });
     await annotation.unmount();
     const popup = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <maplibreNativeUI.Popup longitude={10} latitude={20} onClose={closed} />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     await fireEvent.press(popup.getByLabelText("Close popup"));
     expect(closed).toHaveBeenCalledTimes(1);
@@ -982,9 +1158,9 @@ describe("TF07 native UI composition", () => {
       onDragEnd: ended,
     };
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker {...markerProps} />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const marker = view.getByTestId("content");
     await beginTouch(marker, touch(5, 8));
@@ -1014,14 +1190,14 @@ describe("TF07 native UI composition", () => {
     jest.useFakeTimers();
     const fixture = sessionFixture();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
           draggable
           {...{ hostProps: { testID: "content" } }}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const marker = view.getByTestId("content");
     await beginTouch(marker, touch(0, 0));
@@ -1050,7 +1226,7 @@ describe("TF07 native UI composition", () => {
     );
     const started = jest.fn();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
@@ -1058,7 +1234,7 @@ describe("TF07 native UI composition", () => {
           onDragStart={started}
           {...{ hostProps: { testID: "content" } }}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     await beginTouch(view.getByTestId("content"), touch(0, 0));
     await act(async () => {
@@ -1077,7 +1253,7 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const proposal = jest.fn();
     const marker = (longitude: number, latitude: number) => (
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={longitude}
           latitude={latitude}
@@ -1085,7 +1261,7 @@ describe("TF07 native UI composition", () => {
           onDrag={proposal}
           {...{ hostProps: { testID: "content" } }}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const view = await render(marker(10, 20));
     await beginTouch(view.getByTestId("content"), touch(0, 0));
@@ -1104,7 +1280,7 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const proposal = jest.fn();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
@@ -1112,7 +1288,7 @@ describe("TF07 native UI composition", () => {
           onDrag={proposal}
           {...{ hostProps: { testID: "content" } }}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     await beginTouch(view.getByTestId("content"), touch(0, 0));
     await act(async () => {
@@ -1156,7 +1332,7 @@ describe("TF07 native UI composition", () => {
     const failed = jest.fn();
     const ended = jest.fn();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
@@ -1165,7 +1341,7 @@ describe("TF07 native UI composition", () => {
           onDragEnd={ended}
           {...{ hostProps: { testID: "content" } }}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const marker = view.getByTestId("content");
     await beginTouch(marker, touch(0, 0));
@@ -1196,7 +1372,7 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const failed = jest.fn();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
@@ -1204,7 +1380,7 @@ describe("TF07 native UI composition", () => {
           onError={failed}
           {...{ hostProps: { testID: "content" } }}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const marker = view.getByTestId("content");
     await beginTouch(marker, touch(0, 0));
@@ -1222,22 +1398,22 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const ref = createRef<MarkerRef>();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
           ref={ref}
           renderMode="annotation"
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     await ref.current?.refresh();
     expect(refresh).toHaveBeenCalledTimes(1);
     await view.unmount();
     await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker longitude={10} latitude={20} ref={ref} />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     await ref.current?.refresh();
     expect(refresh).toHaveBeenCalledTimes(1);
@@ -1247,7 +1423,7 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const ended = jest.fn();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
@@ -1255,7 +1431,7 @@ describe("TF07 native UI composition", () => {
           draggable
           onDragEnd={ended}
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     const originalHost = view.getByTestId("native-marker").props.nativeID;
     await fireEvent(view.getByTestId("native-marker"), "annotationDragEnd", {
@@ -1272,7 +1448,7 @@ describe("TF07 native UI composition", () => {
     const closed = jest.fn();
     const opened = jest.fn();
     const view = await render(
-      <MapSessionContext.Provider value={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <ui.Popup
           longitude={10}
           latitude={20}
@@ -1280,7 +1456,7 @@ describe("TF07 native UI composition", () => {
           onOpen={opened}
           closeOnMove
         />
-      </MapSessionContext.Provider>
+      </FixtureSessionProvider>
     );
     expect(opened).toHaveBeenCalledTimes(1);
     await act(async () => {
@@ -1340,3 +1516,109 @@ describe("TF07 native UI composition", () => {
     expect(located).toHaveBeenCalledTimes(1);
   });
 });
+
+test("native creation defaults compare by their effective values", async () => {
+  const fixture = sessionFixture();
+  const tree = (explicit: boolean) => (
+    <FixtureSessionProvider value={fixture.session}>
+      <ui.Marker
+        longitude={10}
+        latitude={20}
+        anchor={explicit ? "bottom" : undefined}
+        renderMode={explicit ? "view" : undefined}
+      />
+      <ui.Popup
+        longitude={10}
+        latitude={20}
+        closeButton={explicit ? true : undefined}
+        closeOnClick={explicit ? true : undefined}
+        closeOnMove={explicit ? false : undefined}
+      />
+      <ui.NavigationControl
+        position={explicit ? "top-right" : undefined}
+        showZoom={explicit ? true : undefined}
+        showCompass={explicit ? true : undefined}
+        visualizePitch={explicit ? false : undefined}
+      />
+      <ui.ScaleControl
+        position={explicit ? "bottom-left" : undefined}
+        maxWidth={explicit ? 100 : undefined}
+      />
+    </FixtureSessionProvider>
+  );
+  const mounted = await render(tree(false));
+  await mounted.rerender(tree(true));
+  await mounted.rerender(tree(false));
+  await mounted.unmount();
+});
+
+test("native creation validation continues rejecting genuine changes", async () => {
+  const fixture = sessionFixture();
+  const tree = (showZoom: boolean) => (
+    <FixtureSessionProvider value={fixture.session}>
+      <ui.NavigationControl showZoom={showZoom} />
+    </FixtureSessionProvider>
+  );
+  const mounted = await render(tree(true));
+  await expect(mounted.rerender(tree(false))).rejects.toThrow(
+    'NavigationControl changed the creation option "showZoom"'
+  );
+});
+
+test.each([false, true])(
+  "removing a nondefault native marker anchor requires remount (custom content: %s)",
+  async (custom) => {
+    const fixture = sessionFixture();
+    const tree = (anchor?: "top") => (
+      <FixtureSessionProvider value={fixture.session}>
+        <ui.Marker longitude={10} latitude={20} anchor={anchor}>
+          {custom ? <Text>custom</Text> : undefined}
+        </ui.Marker>
+      </FixtureSessionProvider>
+    );
+    const mounted = await render(tree("top"));
+    await expect(mounted.rerender(tree())).rejects.toThrow(
+      'Marker changed the creation option "anchor"'
+    );
+  }
+);
+
+test("native marker defaults stay frozen when content changes", async () => {
+  const fixture = sessionFixture();
+  const tree = (custom: boolean, anchor?: "bottom" | "center") => (
+    <FixtureSessionProvider value={fixture.session}>
+      <ui.Marker longitude={10} latitude={20} anchor={anchor}>
+        {custom ? <Text>custom</Text> : undefined}
+      </ui.Marker>
+    </FixtureSessionProvider>
+  );
+  const mounted = await render(tree(false));
+  await mounted.rerender(tree(true));
+  await mounted.rerender(tree(true, "bottom"));
+  await mounted.rerender(tree(true));
+  await expect(mounted.rerender(tree(true, "center"))).rejects.toThrow(
+    'creation option "anchor"'
+  );
+});
+
+test.each([false, true])(
+  "native marker effective defaults work when initially explicit (custom content: %s)",
+  async (custom) => {
+    const fixture = sessionFixture();
+    const tree = (explicit: boolean) => (
+      <FixtureSessionProvider value={fixture.session}>
+        <ui.Marker
+          longitude={10}
+          latitude={20}
+          anchor={explicit ? (custom ? "center" : "bottom") : undefined}
+        >
+          {custom ? <Text>custom</Text> : undefined}
+        </ui.Marker>
+      </FixtureSessionProvider>
+    );
+    const mounted = await render(tree(true));
+    await mounted.rerender(tree(false));
+    await mounted.rerender(tree(true));
+    await mounted.unmount();
+  }
+);

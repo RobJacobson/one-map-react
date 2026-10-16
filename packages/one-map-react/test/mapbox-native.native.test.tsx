@@ -20,7 +20,7 @@ import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
-import { ScaleControl } from "../src/facade/ui.js";
+import { AttributionControl, ScaleControl } from "../src/facade/ui.js";
 
 const mockSetCamera = jest.fn();
 const mockGetCenter = jest.fn(async () => [-122.34, 47.61]);
@@ -579,6 +579,39 @@ describe("mapbox-native adapter", () => {
     } finally {
       platform.restore();
     }
+  });
+
+  test("attribution control restores selected position and disabled state after removal", async () => {
+    const options = {
+      attributionPosition: { top: 5, right: 6 },
+      attributionEnabled: false,
+    };
+    const scene = (mounted: boolean, position?: "top-left") => (
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          options={options}
+        >
+          {mounted && <AttributionControl position={position} />}
+        </NativeMap>
+      </MapSetup>
+    );
+    const view = await render(scene(false));
+    expect(lastMapProps()).toMatchObject(options);
+    await view.rerender(scene(true));
+    expect(lastMapProps()).toMatchObject({
+      attributionPosition: { bottom: 8, right: 8 },
+      attributionEnabled: true,
+    });
+    await view.rerender(scene(false));
+    expect(lastMapProps()).toMatchObject(options);
+    await view.rerender(scene(true, "top-left"));
+    expect(lastMapProps()).toMatchObject({
+      attributionPosition: { top: 8, left: 8 },
+      attributionEnabled: true,
+    });
+    await view.unmount();
   });
 
   test("SDK ornaments stay outside measured native controls and restore after removal", async () => {
@@ -1483,6 +1516,41 @@ describe("mapbox-native layers", () => {
       );
     }
   );
+
+  test("line conversion retains expression identity and ignores fields outside their accepted family", async () => {
+    const color = ["get", "color"] as const;
+    const paint = {
+      "line-color": color,
+      "line-width": 0,
+      visibility: "none",
+      unknown: true,
+    };
+    const layout = { "line-cap": "round" as const, "line-opacity": 0 };
+    const scene = (removed: boolean) =>
+      tree(
+        <Source id="routes" type="geojson" data={routes}>
+          <Layer
+            id="line"
+            type="line"
+            paint={removed ? { "line-color": undefined } : paint}
+            layout={removed ? undefined : layout}
+          />
+        </Source>
+      );
+    const view = await render(scene(false));
+    const current = LineLayerMock.mock.calls.at(-1)?.[0] as {
+      style: Record<string, unknown>;
+    };
+    expect(current.style).toEqual({
+      lineColor: color,
+      lineWidth: 0,
+      lineCap: "round",
+    });
+    expect(current.style.lineColor).toBe(color);
+    await view.rerender(scene(true));
+    expect(LineLayerMock.mock.calls.at(-1)?.[0]).toMatchObject({ style: {} });
+    await view.unmount();
+  });
 
   test("a symbol layer converts layout and paint together", async () => {
     const symbolMock = layerMocks.symbol;

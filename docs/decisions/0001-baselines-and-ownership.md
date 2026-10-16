@@ -26,4 +26,4 @@ Playwright 1.64.0 uses its installed Chromium 156.0.8078.4 build. Maestro [CLI 2
 
 ## Evidence
 
-The three inventories under records/inventory-inputs record pinned source paths and additional version findings. Native build identities, resolved dependency locks, and real-device evidence remain required before compatibility certification.
+The three [historical inventories](https://github.com/RobJacobson/one-map-react/tree/241816e73eb12a38a4b4b729757986500eb2a950/records/inventory-inputs) record pinned source paths and additional version findings. Native build identities, resolved dependency locks, and real-device evidence remain required before compatibility certification.

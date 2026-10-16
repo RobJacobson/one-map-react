@@ -34,12 +34,15 @@ import type {
   PopupProps,
   ScaleControlProps,
 } from "../../contracts/ui-types.js";
-import {
-  NativeOverlayContext,
-  useMapSession,
-} from "../../facade/map-context.js";
+import { useMapSession } from "../../facade/map-context.js";
 import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
+import { useStableOptions } from "../../facade/use-stable-options.js";
 import { UserLocation } from "../../facade/user-location.js";
+import {
+  NativeCameraContext,
+  NativeOverlayContext,
+  useNativeMapPresentation,
+} from "./native-map-presentation.js";
 import { useActiveCallback } from "./use-active-callback.js";
 import { useFrozenValue } from "./use-frozen-value.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
@@ -74,10 +77,6 @@ export interface NativeMarkerHostProps {
   readonly offset: Point;
   /** Annotation dragging; live dragging is owned by the composition. */
   readonly draggable?: boolean;
-  /** Keep popup bubbles visible beside nearby markers. */
-  readonly allowOverlap?: boolean;
-  /** Retain JS gestures inside a draggable live view. */
-  readonly stopGesturePropagation?: boolean;
   /** Activation callback. */
   readonly onClick?: (event: MarkerEvent) => void;
   /** Annotation drag start. */
@@ -151,7 +150,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const coordinate = lngLatFromWrapper([props.longitude, props.latitude]);
       const offset = pointFromWrapper(props.offset ?? [0, 0]);
       const mapSession = useMapSession();
-      const { requestGestureLock } = mapSession;
+      const { requestGestureLock } = useNativeMapPresentation();
       const generatedId = useId();
       const annotationRef = useRef<MarkerRef>(null);
       const [dragCoordinate, setDragCoordinate] = useState<LngLat | null>(null);
@@ -160,20 +159,21 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         props.longitude,
         props.latitude,
       ]);
-      const initial = useFrozenValue({
-        id: props.id ?? generatedId,
-        anchor:
-          props.anchor ??
-          (props.children === undefined || props.children === null
-            ? "bottom"
-            : "center"),
+      const defaultAnchor = useFrozenValue(
+        props.children === undefined || props.children === null
+          ? "bottom"
+          : "center"
+      );
+      const initial = useStableOptions("Marker", {
+        id: props.id,
+        anchor: props.anchor ?? defaultAnchor,
         renderMode: props.renderMode ?? "view",
       });
-      const click = useNativeCallback(props.onClick);
-      const dragStart = useNativeCallback(props.onDragStart);
-      const drag = useNativeCallback(props.onDrag);
-      const dragEnd = useNativeCallback(props.onDragEnd);
-      const reportError = useNativeCallback(props.onError);
+      const click = useActiveCallback(props.onClick);
+      const dragStart = useActiveCallback(props.onDragStart);
+      const drag = useActiveCallback(props.onDrag);
+      const dragEnd = useActiveCallback(props.onDragEnd);
+      const reportError = useActiveCallback(props.onError);
       const gesture = useRef<DragState | null>(null);
       const generation = useRef(0);
       const requestSequence = useRef(0);
@@ -289,7 +289,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         const currentGeneration = ++generation.current;
         const lngLat: LngLat = [props.longitude, props.latitude];
         active.current = true;
-        mapSession.requestGestureLock(true);
+        requestGestureLock(true);
 
         try {
           const mapOrigin = await map.project(lngLat);
@@ -393,12 +393,11 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         <Host
           key={isAnnotation ? annotationRevision : "view"}
           ref={annotationRef}
-          id={initial.id}
+          id={initial.id ?? generatedId}
           lngLat={[markerCoordinate[0], markerCoordinate[1]]}
           anchor={initial.anchor}
           offset={offset}
           draggable={isAnnotation && props.draggable}
-          stopGesturePropagation={!isAnnotation && props.draggable}
           onProjectionError={reportError}
           onClick={isAnnotation ? markerClick : undefined}
           onDragStart={dragStart}
@@ -466,9 +465,9 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     const mapSession = useMapSession();
     const { subscribe } = mapSession;
     const id = useId();
-    const close = useNativeCallback(props.onClose);
-    const open = useNativeCallback(props.onOpen);
-    const initial = useFrozenValue({
+    const close = useActiveCallback(props.onClose);
+    const open = useActiveCallback(props.onOpen);
+    const initial = useStableOptions("Popup", {
       closeOnClick: props.closeOnClick ?? true,
       closeOnMove: props.closeOnMove ?? false,
       closeButton: props.closeButton ?? true,
@@ -511,7 +510,6 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         lngLat={coordinate}
         anchor={props.anchor ?? "bottom"}
         offset={offset}
-        allowOverlap
       >
         <View
           {...props.hostProps}
@@ -560,11 +558,13 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
 };
 
 const NativeControl = (props: NativeControlProps): ReactElement => {
-  const mapSession = useMapSession();
-  const { setOverlay } = mapSession;
+  const presentation = useNativeMapPresentation();
+  const { setOverlay } = presentation;
   const overlays = useContext(NativeOverlayContext);
   const id = useId();
-  const position = useFrozenValue(props.position ?? "top-right");
+  const { position } = useStableOptions("Control", {
+    position: props.position ?? "top-right",
+  });
   const index = overlays.findIndex((overlay) => overlay.id === id);
   const neighbors = position.startsWith("top")
     ? overlays.slice(0, Math.max(0, index))
@@ -583,21 +583,21 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
   return (
     <Portal
       name={id}
-      hostName={mapSession.overlayHostName}
+      hostName={presentation.overlayHostName}
       style={{
         position: "absolute",
         top: 0,
         left: 0,
         // Android SDK parents leave the source portal detached, so native host
         // notifications may not refresh its constraints. iOS keeps host sizing.
-        ...(Platform.OS === "android" ? mapSession.nativeLayout : undefined),
+        ...(Platform.OS === "android" ? presentation.nativeLayout : undefined),
       }}
     >
       <View
         {...props.hostProps}
         pointerEvents="box-none"
         onLayout={(event) => {
-          mapSession.setOverlay(id, position, event.nativeEvent.layout.height);
+          setOverlay(id, position, event.nativeEvent.layout.height);
           props.hostProps?.onLayout?.(event);
         }}
         style={[
@@ -618,8 +618,15 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
 };
 
 const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
+  useStableOptions("NavigationControl", {
+    position: props.position ?? "top-right",
+    showZoom: props.showZoom ?? true,
+    showCompass: props.showCompass ?? true,
+    visualizePitch: props.visualizePitch ?? false,
+  });
+  const viewState = useContext(NativeCameraContext)?.viewState;
   const mapSession = useMapSession();
-  const reportError = useNativeCallback(props.onError);
+  const reportError = useActiveCallback(props.onError);
   const navigate = async (change: number): Promise<void> => {
     const map = mapSession.ref.current;
     if (!map || !mapSession.ready) return;
@@ -678,11 +685,11 @@ const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
             <Text
               style={{
                 transform: [
-                  { rotate: `${-(mapSession.viewState?.bearing ?? 0)}deg` },
+                  { rotate: `${-(viewState?.bearing ?? 0)}deg` },
                   ...(props.visualizePitch
                     ? [
                         { perspective: 400 },
-                        { rotateX: `${mapSession.viewState?.pitch ?? 0}deg` },
+                        { rotateX: `${viewState?.pitch ?? 0}deg` },
                       ]
                     : []),
                 ],
@@ -698,13 +705,16 @@ const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
 };
 
 const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
-  const mapSession = useMapSession();
-  const { setOrnament } = mapSession;
-  const position = useFrozenValue(props.position ?? "bottom-right");
+  const { setAttributionPosition } = useNativeMapPresentation();
+  const { position } = useStableOptions("AttributionControl", {
+    position: props.position ?? "bottom-right",
+    compact: props.compact ?? true,
+    customAttribution: props.customAttribution,
+  });
   useLayoutEffect(() => {
-    setOrnament("attribution", { position });
-    return () => setOrnament("attribution", null);
-  }, [setOrnament, position]);
+    setAttributionPosition(position);
+    return () => setAttributionPosition(undefined);
+  }, [setAttributionPosition, position]);
   if (props.compact === false) {
     throw new Error(
       "Native AttributionControl does not support expanded attribution."
@@ -724,13 +734,17 @@ const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
 };
 
 const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
-  const { ref: mapRef, ready, viewState, subscribe } = useMapSession();
+  const { ref: mapRef, ready } = useMapSession();
+  const camera = useContext(NativeCameraContext);
   const [scale, setScale] = useState<{
     readonly width: number;
     readonly text: string;
   } | null>(null);
-  const maxWidth = useFrozenValue(props.maxWidth ?? 100);
-  const reportError = useNativeCallback(props.onError);
+  const { maxWidth } = useStableOptions("ScaleControl", {
+    position: props.position ?? "bottom-left",
+    maxWidth: props.maxWidth ?? 100,
+  });
+  const reportError = useActiveCallback(props.onError);
   const unit = props.unit ?? "metric";
   if (!Number.isFinite(maxWidth) || maxWidth <= 0)
     throw new Error("ScaleControl maxWidth must be positive and finite.");
@@ -738,35 +752,31 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
   // Wrapper imperative handles attach after descendant layout effects.
   useEffect(() => {
     let active = true;
-    let request = 0;
     const updateScale = async (): Promise<void> => {
       const map = mapRef.current;
       if (!map || !ready) return;
-      const sequence = ++request;
       try {
-        const center = viewState
-          ? ([viewState.longitude, viewState.latitude] as const)
+        const center = camera
+          ? ([camera.viewState.longitude, camera.viewState.latitude] as const)
           : await map.getCenter();
         const origin = await map.project(center);
         const end = await map.unproject([origin[0] + maxWidth, origin[1]]);
         const meters = groundDistance(center, end);
-        if (active && sequence === request && meters > 0) {
+        if (active && meters > 0) {
           setScale(scaleDisplay(meters, maxWidth, unit));
         }
       } catch (error) {
-        if (active && sequence === request) {
+        if (active) {
           setScale(null);
           reportError(error);
         }
       }
     };
     void updateScale();
-    const remove = subscribe("move", () => void updateScale());
     return () => {
       active = false;
-      remove();
     };
-  }, [ready, subscribe, mapRef, viewState, maxWidth, unit, reportError]);
+  }, [ready, mapRef, camera, maxWidth, unit, reportError]);
 
   if (!scale) return null;
   return (
@@ -934,8 +944,3 @@ const nativeMaxWidth = (width: number | string | undefined): number => {
     return nativeMaxWidth(Number.parseFloat(width));
   throw new Error("Native Popup maxWidth requires a number or a pixel width.");
 };
-
-/** Keeps callback identity stable while committed callback ownership stays current. */
-const useNativeCallback = <Args extends unknown[]>(
-  callback: ((...args: Args) => void) | undefined
-): ((...args: Args) => void) => useFrozenValue(useActiveCallback(callback));

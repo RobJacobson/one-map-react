@@ -89,6 +89,15 @@ describe("TF08 browser capture delegation", () => {
         scope: "renderer",
       });
       expect(selected.canvas.toDataURL).not.toHaveBeenCalled();
+      view.rerender(
+        <selected.MapComponent
+          ref={ref}
+          mapStyle={style}
+          initialViewState={camera}
+          captureEnabled
+          onMove={() => {}}
+        />
+      );
       act(selected.frame);
       await expect(result).resolves.toMatchObject({
         scope: "renderer",

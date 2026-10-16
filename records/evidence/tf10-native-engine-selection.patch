@@ -1,0 +1,167 @@
+--- core/tf04-camera-smoke.mjs
++++ isolated/tf04-camera-smoke.mjs
+@@ -8,6 +8,8 @@
+   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+ const root = new URL("..", import.meta.url).pathname;
+ const group = process.argv[2] ?? "web";
++const nativeEngine = process.env.TF04_ENGINE ?? "both";
++if (!["both", "mapbox", "maplibre"].includes(nativeEngine)) throw new Error("Use both, mapbox or maplibre for TF04_ENGINE.");
+ const corrections = process.argv[3] === "corrections";
+ if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
+   throw new Error("The corrections scope requires: web corrections.");
+@@ -222,36 +224,44 @@
+ }
+ 
+ if (group === "android" || group === "all") {
+-  results["mapbox-android"] = await runNative({
+-    directory: "native-mapbox",
+-    platform: "android",
+-    applicationId: process.env.TF04_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
+-    doubleTap: false,
+-  });
+-  results["maplibre-android"] = await runNative({
+-    directory: "native-maplibre",
+-    platform: "android",
+-    applicationId: process.env.TF04_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
+-    doubleTap: true,
+-  });
++  if (nativeEngine === "both" || nativeEngine === "mapbox") {
++    results["mapbox-android"] = await runNative({
++      directory: "native-mapbox",
++      platform: "android",
++      applicationId: process.env.TF04_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
++      doubleTap: false,
++    });
++  }
++  if (nativeEngine === "both" || nativeEngine === "maplibre") {
++    results["maplibre-android"] = await runNative({
++      directory: "native-maplibre",
++      platform: "android",
++      applicationId: process.env.TF04_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
++      doubleTap: true,
++    });
++  }
+ }
+ 
+ if (group === "ios" || group === "all") {
+   const tapDriver = await startIosTapDriver();
+ 
+   try {
+-    results["mapbox-ios"] = await runNative({
+-      directory: "native-mapbox",
+-      platform: "ios",
+-      applicationId: process.env.TF04_MAPBOX_IOS_ID ?? "org.reactjs.native.example.OneMapMapbox",
+-      doubleTap: false,
+-    });
+-    results["maplibre-ios"] = await runNative({
+-      directory: "native-maplibre",
+-      platform: "ios",
+-      applicationId: process.env.TF04_MAPLIBRE_IOS_ID ?? "org.reactjs.native.example.OneMapMaplibre",
+-      doubleTap: true,
+-    });
++    if (nativeEngine === "both" || nativeEngine === "mapbox") {
++      results["mapbox-ios"] = await runNative({
++        directory: "native-mapbox",
++        platform: "ios",
++        applicationId: process.env.TF04_MAPBOX_IOS_ID ?? "org.reactjs.native.example.OneMapMapbox",
++        doubleTap: false,
++      });
++    }
++    if (nativeEngine === "both" || nativeEngine === "maplibre") {
++      results["maplibre-ios"] = await runNative({
++        directory: "native-maplibre",
++        platform: "ios",
++        applicationId: process.env.TF04_MAPLIBRE_IOS_ID ?? "org.reactjs.native.example.OneMapMaplibre",
++        doubleTap: true,
++      });
++    }
+   } finally {
+     tapDriver.kill("SIGTERM");
+   }
+--- core/tf05-sources-smoke.mjs
++++ isolated/tf05-sources-smoke.mjs
+@@ -9,6 +9,8 @@
+   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+ const root = new URL("..", import.meta.url).pathname;
+ const group = process.argv[2] ?? "web";
++const nativeEngine = process.env.TF05_ENGINE ?? "both";
++if (!["both", "mapbox", "maplibre"].includes(nativeEngine)) throw new Error("Use both, mapbox or maplibre for TF05_ENGINE.");
+ const corrections = process.argv[3] === "corrections";
+ if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
+   throw new Error("The corrections scope requires: web corrections.");
+@@ -37,29 +39,37 @@
+     }
+ 
+     if (group === "android" || group === "all") {
+-      results["mapbox-android"] = await runNative({
+-        directory: "native-mapbox",
+-        platform: "android",
+-        applicationId: process.env.TF05_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
+-      });
+-      results["maplibre-android"] = await runNative({
+-        directory: "native-maplibre",
+-        platform: "android",
+-        applicationId: process.env.TF05_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
+-      });
++      if (nativeEngine === "both" || nativeEngine === "mapbox") {
++        results["mapbox-android"] = await runNative({
++          directory: "native-mapbox",
++          platform: "android",
++          applicationId: process.env.TF05_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
++        });
++      }
++      if (nativeEngine === "both" || nativeEngine === "maplibre") {
++        results["maplibre-android"] = await runNative({
++          directory: "native-maplibre",
++          platform: "android",
++          applicationId: process.env.TF05_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
++        });
++      }
+     }
+ 
+     if (group === "ios" || group === "all") {
+-      results["mapbox-ios"] = await runNative({
+-        directory: "native-mapbox",
+-        platform: "ios",
+-        applicationId: process.env.TF05_MAPBOX_IOS_ID ?? "org.reactjs.native.example.OneMapMapbox",
+-      });
+-      results["maplibre-ios"] = await runNative({
+-        directory: "native-maplibre",
+-        platform: "ios",
+-        applicationId: process.env.TF05_MAPLIBRE_IOS_ID ?? "org.reactjs.native.example.OneMapMaplibre",
+-      });
++      if (nativeEngine === "both" || nativeEngine === "mapbox") {
++        results["mapbox-ios"] = await runNative({
++          directory: "native-mapbox",
++          platform: "ios",
++          applicationId: process.env.TF05_MAPBOX_IOS_ID ?? "org.reactjs.native.example.OneMapMapbox",
++        });
++      }
++      if (nativeEngine === "both" || nativeEngine === "maplibre") {
++        results["maplibre-ios"] = await runNative({
++          directory: "native-maplibre",
++          platform: "ios",
++          applicationId: process.env.TF05_MAPLIBRE_IOS_ID ?? "org.reactjs.native.example.OneMapMaplibre",
++        });
++      }
+     }
+   } finally {
+     await fixture.close();
+--- core/tf06-smoke-selection.mjs
++++ isolated/tf06-smoke-selection.mjs
+@@ -1,14 +1,12 @@
+ /**
+  * Selects native engines so scoped retries can release build outputs between runs.
+  * @param {string} scope - TF06 query or lifetime scope.
+- * @param {string} selection - Both engines or one lifetime engine.
++ * @param {string} selection - Both engines or one native engine.
+  * @returns {string[]} The native engines to execute sequentially.
+  */
+ export const selectNativeEngines = (scope, selection = "both") => {
+   if (!["both", "mapbox", "maplibre"].includes(selection))
+     throw new Error("Use both, mapbox, or maplibre for the native engine.");
+-  if (scope !== "lifetimes" && selection !== "both")
+-    throw new Error("Single-engine selection requires the lifetime scope.");
+   return selection === "both" ? ["mapbox", "maplibre"] : [selection];
+ };
+ 

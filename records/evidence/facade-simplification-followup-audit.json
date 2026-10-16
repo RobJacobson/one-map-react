@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-16",
+  "checkpoint": "Independent audit of facade repairs and coverage simplification",
+  "head": "0b401aaf2d3d85e5cb5640d8f3b5848a6f265440",
+  "branch": "codex/simplify-facade-react-compiler",
+  "startingWorkingTree": "Only docs/facade-simplification-handoff.md was modified. That owner change was preserved.",
+  "verdict": "No new runtime correctness regression was established in the reviewed paths. The sole coverage checklist omits a common native symbol-layout exception. Further code consolidation is justified.",
+  "scope": {
+    "kind": "Historical audit evidence",
+    "audience": "Library owner and contributors",
+    "purpose": "Choose the next focused simplifications from current code and reproduced routine evidence",
+    "nonGoals": "Implementation, public API changes, feature removal, dependency upgrades, consumer compiler configuration, acceptance execution and commits",
+    "assumedLoad": "Interactive React applications with repeated movement, source replacement, markers, controls and asynchronous native operations",
+    "reviewed": "Shared selection, map attachment, interactions, sources/layers, UI guards, native presentation, both native maps/refs/registries, selected web entries, camera reconciliation, location, capture, offline ownership, compiler/build/test resolution, package exports, examples and coverage/research migration",
+    "reference": "/Users/rob/code/ferryjoy/ferryjoy-app/src/components/map",
+    "limits": "Operation-focused review, not a line-by-line certification of every file or a fresh enumeration of every upstream API. External primary-source pages were not re-fetched. Native renderer, portal and gesture behavior was not executed."
+  },
+  "correctnessFindings": [
+    {
+      "id": 1,
+      "priority": "P2",
+      "kind": "Coverage documentation omission",
+      "location": "docs/api-coverage.md:93",
+      "implementation": "packages/one-map-react/src/facade/layer.tsx:49",
+      "problem": "The common Layer rejects icon-overlap, text-overlap and text-variable-anchor-offset on both native backends. The checklist enumerates the first two only for MapLibre and never names text-variable-anchor-offset.",
+      "consequence": "The sole coverage record hides an implemented common restriction and its RNMapbox applicability. A checked broad forwarding row does not make that restriction visible.",
+      "evidence": "Six temporary component assertions passed against source and compiled output: all three keys reject on mapbox-native and maplibre-native before the adapter Layer renders.",
+      "smallestCorrection": "Document the common native symbol-layout gate in the existing exception section, including all three keys, both backends and the shared guard. Distinguish common rejection from selected style-document routes.",
+      "boundary": "This finding establishes existing facade rejection. It does not establish an underlying SDK limitation or justify removing the gate without investigation.",
+      "verification": "Documentation links and review of the shared guard are sufficient for the documentation correction. No renderer execution is needed."
+    }
+  ],
+  "simplificationRecommendations": [
+    {
+      "id": 2,
+      "priorityOrder": 1,
+      "location": "packages/one-map-react/src/adapters/shared/invoke-wrapper.ts:11",
+      "proposal": "Replace await invokeWrapper(value) with await value at its callers, then delete the helper and its helper-only tests.",
+      "maintenanceCost": "The helper adds an asynchronous boundary to standard await behavior. Every production caller already awaits its result and discards the wrapper value.",
+      "remove": "The 13-line helper, its 23-line test file, four imports and redundant call nesting across web/native refs and MapLibre source reset",
+      "preserve": "Promise<void> public methods, synchronous throws, rejected promises, dispatch acknowledgement and all actual conversions",
+      "verification": "Existing camera/state adapter regressions against source and dist, including void/value/promise returns and failures. Do not assert the incidental extra microtask.",
+      "executionClass": "Local deletion supported by language semantics; no upstream investigation needed"
+    },
+    {
+      "id": 3,
+      "priorityOrder": 2,
+      "location": "packages/one-map-react/src/adapters/shared/native-ui.tsx:81",
+      "proposal": "Delete allowOverlap and stopGesturePropagation from NativeMarkerHostProps and their two composition call sites.",
+      "maintenanceCost": "These internal props describe collision/gesture behavior that none of the current marker or annotation hosts reads. Both live hosts are NativeMarkerOverlay.",
+      "evidence": "A repository search found only their internal declarations and writes. Raw selected wrapper facilities remain separately exported and are outside this deletion.",
+      "preserve": "The live overlay, existing drag lock, annotation behavior, popup stacking and selected raw wrapper props",
+      "verification": "Types and existing native UI component regressions",
+      "executionClass": "Dead internal inputs; no renderer behavior change or upstream investigation needed"
+    },
+    {
+      "id": 4,
+      "priorityOrder": 3,
+      "location": "packages/one-map-react/src/adapters/shared/native-map-presentation.tsx:21",
+      "proposal": "Replace the generic ornament dictionary/setter with a typed optional attribution position and its setter.",
+      "maintenanceCost": "Attribution is the only production writer and reader. Compass, scale and logo registry variants exist only in types or an internal fixture assertion. Both native maps cast an unknown position back to ControlPosition.",
+      "remove": "OrnamentName, generic records, generic copy/delete logic, the custom setter closure and attribution position casts",
+      "preserve": "Attribution enable/restore, bottom-right default, explicit placement, selected SDK options and measured offsets around controls",
+      "verification": "Update both map implementations and fixtures together. Check attribution mount/unmount and selected-option restoration with existing component tests.",
+      "executionClass": "Narrow existing internal state without changing the placement algorithm; renderer verification remains governed by the testing policy"
+    },
+    {
+      "id": 5,
+      "priorityOrder": 4,
+      "location": "packages/one-map-react/src/adapters/shared/native-ui.tsx:784",
+      "relatedLocation": "packages/one-map-react/src/adapters/shared/native-map-presentation.tsx:185",
+      "proposal": "Give native scale calculation one camera observation path through NativeCameraContext instead of also subscribing directly to movement.",
+      "maintenanceCost": "Every ordinary observed move starts an old-context scale request through the subscription and another request when the camera context updates. Supersession guards discard results but do not prevent both bridge calls.",
+      "evidence": "A temporary test used the actual withNativeMapPresentation provider, the existing mocked native scale and session fixture, and one emitted move. Source and compiled runs each observed two project and two unproject calls after clearing the initial read.",
+      "classification": "Demonstrated duplicate work, not a demonstrated incorrect scale value or measured end-user latency regression",
+      "preserve": "Initial readiness, controlled camera updates, unit changes, maximum width, genuine projection errors and cancellation of late results",
+      "verification": "Keep a focused one-move bridge-call regression and existing displayed-distance/failure tests. Check controlled updates without move events. A renderer timing claim requires separate authorized native checks.",
+      "executionClass": "Lifecycle consolidation requiring focused behavior checks"
+    },
+    {
+      "id": 6,
+      "priorityOrder": 5,
+      "location": "packages/one-map-react/src/adapters/mapbox-native/layers.tsx:133",
+      "proposal": "Use one local kebab-case-to-camelCase style conversion with the existing explicit layer component selection and common wrapper fields.",
+      "maintenanceCost": "The adapter manually repeats mechanical paint/layout translation across layer families. New portable fields require another assignment despite having the same spelling rule.",
+      "evidence": "An AST assertion inspected all 134 existing paint/layout assignments. Every output name exactly matches camel-casing the source key, with no spelling exceptions.",
+      "remove": "The per-family paint/layout property inventories and repetitive converter bodies",
+      "preserve": "The accepted portable field boundary, omission/reset behavior, expression structure, source injection, filters, zoom ranges, beforeId and explicit unsupported gates",
+      "verification": "Compare every currently accepted field and removed/undefined field with the existing conversion. Keep adapter reset/style-replacement regressions and investigate wrapper treatment of unknown fields before broadening transport.",
+      "caution": "Do not substitute RNMapbox Style wholesale: its component selection and ordering/default handling are different. This proposal changes only the spelling conversion.",
+      "executionClass": "Larger reduction requiring conversion-equivalence evidence and separately authorized affected native acceptance"
+    },
+    {
+      "id": 7,
+      "priorityOrder": 6,
+      "location": "packages/one-map-react/src/adapters/shared/use-active-callback.ts:15",
+      "relatedLocations": [
+        "packages/one-map-react/src/adapters/shared/native-ui.tsx:959",
+        "packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx:23"
+      ],
+      "proposal": "Make callback identity a documented guarantee of useActiveCallback with one explicit stable callback, then remove the callers' extra freezing wrappers.",
+      "maintenanceCost": "The source hook returns a fresh function while several lifecycle consumers retain the first wrapper themselves. The compiled hook currently caches that function, so identity behavior differs between source and emitted modules.",
+      "remove": "useNativeCallback and its repeated caller-side freeze operation, plus the overlay's retained callback ref where the strengthened helper provides the same guarantee",
+      "preserve": "Commit-time callback replacement, suspended-render isolation, Strict Mode reactivation and suppression after unmount",
+      "verification": "Add one identity/committed-callback regression to the existing callback tests, then run source and compiled lifecycle/UI suites. Keep the active and committed refs.",
+      "executionClass": "Semantic stabilization consolidation; do not rely on compiler cache retention for resource ownership"
+    }
+  ],
+  "behaviorAndApiReview": {
+    "initialRefactor": "The original audit's two regressions are not current findings: shared guards and the independent marker-content default are restored. Context separation improves movement isolation. Moving interaction code to a hook primarily relocates the same orchestration.",
+    "repair": "Current source/compiled regressions cover custom adapters for all backend names, genuine creation changes, equivalent defaults in both directions, frozen marker-content defaults and native popup focus rejection.",
+    "forwarding": "An AST comparison against 30ef288 verified every one of the 42 additional Mapbox and 21 additional MapLibre forwarders previously returned the same selectedHandle method with unchanged rest arguments. The helper preserves the receiver and current-handle lookup. Existing tests cover return/promise identity, throws, detachment and replacement.",
+    "publicDeclarations": "All five public entry declarations and 13 contract declarations are byte-identical to the initial audited archive. The repaired archive's dist matches the current independent build.",
+    "comparisonLimit": "The exact uncommitted pre-refactor baseline is unavailable. Against ba029a5, portable contracts and Adapter differ only by viewState documentation, but selected entries and package metadata include pre-existing release/workspace work. Do not attribute that entire diff to this refactor.",
+    "selection": "The packed common import, declaration graph, explicit entries, conditional aliases and both mixed choices passed the isolated selection checks. Native peer linking and Metro transport were not executed.",
+    "ownershipToRetain": "Source attachment identities, strict failed-query reporting, native source registries, feature-state journals/ordering, capture deadlines, callback teardown guards and portal ancestry each protect a concrete behavior. Different native readiness and ref/query APIs do not justify a universal native dispatcher."
+  },
+  "architecture": {
+    "judgment": "Ownership and movement isolation are clearer, but the library has not become broadly smaller. The next gains come from deleting redundant adapters around language behavior, narrowing unused generic state and removing duplicate observations.",
+    "measurement": "At ba029a5, map.tsx plus map-context.tsx total 473 lines. Current versions plus use-map-interactions.ts and native-map-presentation.tsx total 594 lines. These counts describe ownership movement, not the whole refactor or its pre-existing changes.",
+    "traceReview": "Source/layer paths retain shared creation checks and selected wrapper injection. Camera paths convert to backend-owned camera operations. Web clicks query then dispatch the top registered source and common map notification; native source callbacks use the common dispatch boundary. Live markers project into portals and own drag locks; controls consume low-frequency presentation and separate camera observations. Selected web methods resolve the current wrapper handle.",
+    "referenceAssessment": "Ferryjoy confirms that source/style/camera translation can be direct. Its smaller feature set does not replace this library's selected API, asynchronous source queries, capture, offline and UI lifecycle requirements.",
+    "leanLowerBound": "36 helper/test lines and zero dependencies can be removed before counting caller edits. Larger savings from the other recommendations were not implemented or measured."
+  },
+  "compiler": {
+    "target": "19",
+    "runtime": "react/compiler-runtime",
+    "verifiedTargets": ["Map", "WebMap", "UserLocation", "NativePresentationProvider", "NativeCameraProvider"],
+    "verification": "The component-location assertions pass. Direct inspection of emitted target bodies confirms compiler memo-cache calls. The library-only pre-transform reads original TS/TSX, preserves source maps, emits unbundled ESM/declarations and does not catch transform exceptions.",
+    "diagnostics": 17,
+    "skipSummary": "Diagnostics remain visible for ref-dependent map attachment, native maps, frozen creation values, sources, overlays, ornament history, image registration, UI, interactions, geolocation and controlled-camera syntax. Multiple diagnostics can belong to one function. Retain semantic stabilization in skipped paths.",
+    "testResolution": "The web resolver maps ../src imports from test modules to dist. The native mapper resolves those dist imports before the generic extensionless mapper. Temporary probes also passed through the compiled configurations.",
+    "coverageLimit": "Compiled web includes *.web.test.tsx, excluding ordinary *.test.ts units and example tests. Native tests mock hosts/wrappers and do not establish rendering, portal transport or gestures."
+  },
+  "coverageAndResearch": {
+    "judgment": "Keep the grouped checklist and curated research. Their manual ownership and peer-upgrade review are proportionate to a thin facade. Correct finding 1 without rebuilding a field ledger or parser.",
+    "review": "Reviewed all 38 retired baseline notes and the endpoint note through Git, the current checklist/research digest, and migration/retirement records. Useful versioned findings and citations survive; obsolete stage cells need not be copied.",
+    "endpointCheck": "Installed RNMapbox 10.3.8 declarations confirm the digest's language function, structured loading-error and model groups. No new endpoint renderer support is claimed.",
+    "limits": "The historical assignment of 133 evidence bundles is review provenance, not an exhaustive proof of upstream API coverage. No new missing public API was established in the reviewed routes beyond the explicit checklist omission.",
+    "openWork": "Native fit caps, strict controlled-camera acceptance, the two owner-excluded cache operations, physical-device/accessibility scope, repaired-artifact release acceptance and workspace coexistence remain separate visible gates.",
+    "history": "Production code is unchanged after cb12433. The later commits remove inventory tooling/data and update documentation. Existing historical evidence was not rewritten."
+  },
+  "artifact": {
+    "path": "/private/tmp/one-map-facade-repair-artifact/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "75d3d4ae43f120712574500061cc4d2a7e00bf77ee18be538030cea4cd9a2c93",
+    "archivedDistFiles": 192,
+    "currentBuildMismatches": 0,
+    "initialDeclarationComparisonArchive": "/private/tmp/one-map-simplification-artifact/one-map-react-0.1.0-rc.2.tgz"
+  },
+  "personallyRun": [
+    { "command": "bun run test:compiled", "result": "passed", "webTests": 450, "mockedNativeTests": 219, "compilerAssertions": "passed" },
+    { "command": "./node_modules/.bin/vp test run", "result": "passed", "sourceTests": 657, "files": 34 },
+    { "command": "bun run test:native", "result": "passed", "mockedNativeTests": 219 },
+    { "command": "bun run typecheck", "result": "passed", "projects": 4 },
+    { "command": "bun run typecheck:apps", "result": "passed_after_build" },
+    { "command": "bun scripts/test-package.mjs --archive /private/tmp/one-map-facade-repair-artifact/one-map-react-0.1.0-rc.2.tgz", "result": "passed", "selections": 13 },
+    { "command": "bun run check:docs", "result": "passed", "documents": 37, "comparisonTables": 34 },
+    { "command": "Temporary native scale probe through source and compiled Jest configurations", "result": "passed", "observation": "Each configuration reproduced duplicate projection and unprojection for one observed move." },
+    { "command": "Temporary shared native layout probes through source and compiled Vite configurations", "result": "passed", "checksPerConfiguration": 6 },
+    { "command": "AST assertions for consolidated selected delegates and mechanical native layer spelling", "result": "passed" },
+    { "command": "Archive SHA-256, archived dist/current build and public declaration byte comparisons", "result": "passed" },
+    { "command": "git diff --check", "result": "passed" }
+  ],
+  "notRun": [
+    "Full validate aggregate, formatting/lint and standalone script fixtures; no production or script changes were made",
+    "Fresh peer endpoint installs and example-resolution suites; their previous results remain historical, with an identical library artifact verified here",
+    "Real browser renderers, native builds/installations, mixed Metro transport and canonical acceptance flows; the handoff explicitly does not authorize them",
+    "Physical-device and full VoiceOver/TalkBack audits"
+  ],
+  "diagnostics": "Existing native fixture act warnings, Bun moduleSuffixes warnings and experimental TypeScript build-API warnings remained visible.",
+  "retention": "Temporary probe files and raw audit logs were removed after recording compact results. Pre-existing archives, dependencies and build outputs were preserved.",
+  "changes": "Added this audit record and its records index link only. No production changes, coverage decisions, commits or acceptance runs."
+}

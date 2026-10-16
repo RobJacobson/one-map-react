@@ -1,0 +1,159 @@
+{
+  "date": "2026-10-16",
+  "checkpoint": "Facade simplification and React Compiler",
+  "status": "routine_passed_acceptance_not_run",
+  "artifact": {
+    "path": "/private/tmp/one-map-simplification-artifact/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "a5e68fb7a708632bb871059d6bb675f54ee957f917ab52bdce9a563d163f9ac0",
+    "bytes": 167137,
+    "distSha256": "a2b8cd436138b7d62a99e4116ee321a0624dc6918eb1660f17454c6e20704271",
+    "sourceSha256": "7fdf3f5dafb8313efce0937998c1666347f0ea0216ff54a79dfa0d3db100160c"
+  },
+  "changes": [
+    "Shared Map delegates source hit acquisition, propagation, subscriptions and stale-result cleanup to one interaction owner.",
+    "Native adapters own presentation state and separate camera observations from map-access context.",
+    "UI creation checks accept equivalent effective defaults while preserving backend defaults and unsupported errors.",
+    "Twenty-one unchanged web methods share current-handle forwarding; selected signatures and synchronous failures remain intact.",
+    "Library compilation targets React 19 before syntax lowering; lifetime resources use lazy state. Context and lifecycle stabilization remain explicit."
+  ],
+  "publicApi": {
+    "portableContractFilesUnchanged": 13,
+    "entryExportNamesAndExplicitTypesUnchanged": 5,
+    "comparisonBaseline": "Starting working tree, including its pre-existing uncommitted changes",
+    "adapterInterface": "unchanged",
+    "approvedBehaviorCorrection": "Omitted and equivalent explicit UI creation defaults compare equally"
+  },
+  "checks": [
+    {
+      "command": "bun run validate",
+      "status": "passed",
+      "unitAndWebTests": 570,
+      "mockedNativeTests": 214,
+      "packageSelections": 13,
+      "includes": "Clean formatting/lint, documentation, inventory, four TypeScript projects, standalone regressions, builds and packed consumers"
+    },
+    {
+      "command": "bun run test:compiled",
+      "status": "passed",
+      "webTests": 363,
+      "mockedNativeTests": 214,
+      "includes": "Emitted-module regressions and component-specific compiler assertions"
+    },
+    {
+      "command": "bun run typecheck:apps",
+      "status": "passed"
+    },
+    {
+      "command": "bun scripts/test-package.mjs --archive /private/tmp/one-map-simplification-artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "packageSelections": 13
+    },
+    {
+      "command": "bun scripts/test-peers.mjs --archive /private/tmp/one-map-simplification-artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "consumers": 8,
+      "scope": "Selected and mixed peer installs, declarations, web runtime imports, shipped native patch checks; no native linking or renderer"
+    },
+    {
+      "command": "bun scripts/test-example-resolution.mjs --archive /private/tmp/one-map-simplification-artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "webBundles": 2,
+      "scope": "Frozen package isolation, web bundles and native module resolution; no running Metro or renderer"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ],
+  "compiler": {
+    "version": "1.0.0",
+    "target": "19",
+    "verifiedComponents": [
+      "Map",
+      "WebMap",
+      "UserLocation",
+      "NativePresentationProvider",
+      "NativeCameraProvider"
+    ],
+    "reportedSkipDiagnostics": [
+      "adapters/mapbox-native/map.tsx:71: Cannot access refs during render",
+      "adapters/maplibre-native/map.tsx:76: Cannot access refs during render",
+      "adapters/shared/native-marker-overlay.tsx:15: React Compiler has skipped optimizing this component because one or more React ESLint rules were disabled",
+      "adapters/shared/native-ornament-position.ts:13: Cannot access refs during render",
+      "adapters/shared/native-ui.tsx:153: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+      "adapters/shared/native-ui.tsx:634: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+      "adapters/shared/native-ui.tsx:751: (BuildHIR::lowerExpression) Handle UpdateExpression to variables captured within lambdas.",
+      "adapters/shared/use-frozen-value.ts:9: Cannot access refs during render",
+      "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerExpression) Handle ||= operators in AssignmentExpression",
+      "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause",
+      "adapters/web/images.tsx:38: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+      "adapters/web/map.tsx:426: Cannot access refs during render",
+      "facade/map.tsx:123: Cannot access refs during render",
+      "facade/source.tsx:16: Cannot access refs during render",
+      "facade/use-geolocation-control.ts:27: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause",
+      "facade/use-map-interactions.ts:14: (BuildHIR::lowerStatement) Support ThrowStatement inside of try/catch",
+      "facade/use-stable-options.ts:15: Cannot access refs during render"
+    ]
+  },
+  "notes": [
+    "The first aggregate routine run encountered sandbox EPERM during synthetic process-group cleanup. The inspected routine chain passed with process permissions. No renderer was launched.",
+    "A development compiler probe read stale emitted output before rebuilding; the final compiled suite passed against rebuilt output.",
+    "Native mocked tests report act warnings from directly invoked fixture callbacks. Bun reports its existing moduleSuffixes limitation; the TypeScript projects pass.",
+    "The intermediate archive 7b26337286905c9325008ef4e9b2b2011ae4a3d2ae6f8ea81cde7e8cf56e5a2a passed peer and example checks before the final delegate cleanup. The final archive listed above was independently checked again."
+  ],
+  "acceptance": {
+    "status": "not_run_requires_user_permission",
+    "policy": "docs/testing-policy.md#acceptance-timing-and-user-permission",
+    "proposal": {
+      "artifactSha256": "a5e68fb7a708632bb871059d6bb675f54ee957f917ab52bdce9a563d163f9ac0",
+      "scope": "Representative lifecycle/camera, source/image, query/lifetime, UI/gesture, location/capture/service and selected-rendering regressions at the minimum supported peer tuple; not expanded endpoint release certification",
+      "environments": [
+        "Mapbox web / Chrome",
+        "MapLibre web / Chrome",
+        "Mapbox native / iOS simulator",
+        "MapLibre native / iOS simulator",
+        "Mapbox native / Android emulator",
+        "MapLibre native / Android emulator"
+      ],
+      "expectedDuration": "Estimated 4–8 hours including native preparation, builds/installations and operator-paced UI checks; native build conditions can extend it",
+      "commands": [
+        "bun scripts/tf04-camera-smoke.mjs web",
+        "bun scripts/tf05-sources-smoke.mjs web",
+        "bun scripts/tf06-queries-smoke.mjs web queries",
+        "bun scripts/tf04-camera-smoke.mjs web corrections",
+        "bun scripts/tf05-sources-smoke.mjs web corrections",
+        "bun scripts/tf07-ui-smoke.mjs web both",
+        "bun scripts/tf08-services-smoke.mjs web mapbox",
+        "bun scripts/tf09-rendering-smoke.mjs web mapbox",
+        "bun scripts/tf08-services-smoke.mjs web maplibre",
+        "bun scripts/tf09-rendering-smoke.mjs web maplibre",
+        "bun scripts/tf04-camera-smoke.mjs ios",
+        "bun scripts/tf05-sources-smoke.mjs ios",
+        "bun scripts/tf06-queries-smoke.mjs ios queries",
+        "bun scripts/tf06-queries-smoke.mjs ios lifetimes both",
+        "bun scripts/tf07-ui-smoke.mjs ios mapbox",
+        "bun scripts/tf07-ui-smoke.mjs ios maplibre",
+        "bun scripts/tf08-services-smoke.mjs ios mapbox",
+        "bun scripts/tf09-rendering-smoke.mjs ios mapbox",
+        "bun scripts/tf08-services-smoke.mjs ios maplibre",
+        "bun scripts/tf09-rendering-smoke.mjs ios maplibre",
+        "bun scripts/tf04-camera-smoke.mjs android",
+        "bun scripts/tf05-sources-smoke.mjs android",
+        "bun scripts/tf06-queries-smoke.mjs android queries",
+        "bun scripts/tf06-queries-smoke.mjs android lifetimes both",
+        "bun scripts/tf07-ui-smoke.mjs android mapbox",
+        "bun scripts/tf07-ui-smoke.mjs android maplibre",
+        "bun scripts/tf08-services-smoke.mjs android mapbox",
+        "bun scripts/tf09-rendering-smoke.mjs android mapbox",
+        "bun scripts/tf08-services-smoke.mjs android maplibre",
+        "bun scripts/tf09-rendering-smoke.mjs android maplibre"
+      ],
+      "preparation": "Use isolated acceptance copies populated from this archive. Native setup-native-example preparation, dependency resolution, builds and installation require the same explicit acceptance permission. Verify linked SDKs and installed binary identities before runtime scripts. Preserve existing application data.",
+      "environment": "Use the independently verified final dist digest as TF08_LIBRARY_SHA256 and TF09_LIBRARY_SHA256, unique temporary TF08_OUTPUT/TF09_OUTPUT files, and a coordinator-resolved PNG runtime path. Set TF07_NATIVE_BINARY_SHA256 and TF09_NATIVE_IDENTITY from the installed build, explicit simulator/Android assignments, and identity-bound native UI reports before their runs.",
+      "resources": "Serialize the proposed commands and native work to avoid shared fixture ports, Metro, build directories, installations and device contention. Approved smoke workers report first attempts without production edits or independent retries.",
+      "exclusions": "No physical devices, excluded RNMapbox ambient-cache operations, full screen-reader audit, publication or commit. Changed artifacts and out-of-scope retries require renewed permission."
+    }
+  },
+  "commit": "not_created",
+  "retention": "Only this compact provenance summary is retained in records; raw routine logs and intermediate snapshots are temporary."
+}

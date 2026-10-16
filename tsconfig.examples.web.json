@@ -23,6 +23,7 @@
     "examples/shared/camera-smoke.ts",
     "examples/web-mapbox/src/**/*.tsx",
     "examples/web-mapbox/env.d.ts",
-    "examples/web-maplibre/src/**/*.tsx"
+    "examples/web-maplibre/src/**/*.tsx",
+    "examples/mixed/**/setup.ts"
   ]
 }

@@ -10,3 +10,7 @@ examples/*/android/
 examples/*/.bundle/
 examples/*/vendor/bundle/
 .vitest/
+
+apps/expo/ios/
+apps/expo/android/
+apps/expo/.expo/

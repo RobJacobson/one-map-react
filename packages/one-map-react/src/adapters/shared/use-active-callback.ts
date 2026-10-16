@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 
 /**
  * Returns a function that calls `callback` only while the component is mounted.
@@ -10,7 +10,7 @@ import { useLayoutEffect, useRef } from "react";
  * removed.
  *
  * @param callback - Latest user callback, which may be omitted.
- * @returns A stable-lifetime wrapper that ignores calls after unmount.
+ * @returns A stable function that reads the committed callback and ignores calls after unmount.
  */
 export const useActiveCallback = <Args extends unknown[]>(
   callback: ((...args: Args) => void) | undefined
@@ -30,9 +30,9 @@ export const useActiveCallback = <Args extends unknown[]>(
     };
   }, []);
 
-  return (...args: Args) => {
+  return useCallback((...args: Args) => {
     if (active.current) {
       callbackRef.current?.(...args);
     }
-  };
+  }, []);
 };

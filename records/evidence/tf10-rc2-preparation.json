@@ -1,0 +1,150 @@
+{
+  "archiveSha256": "9d28992c19a791c0af66bc0efb6ee3844747b66d1a8680f5da8647c8c70d150c",
+  "web": {
+    "web-minimum": {
+      "root": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01/web-minimum",
+      "consumers": {
+        "mapbox": {
+          "actualPeers": {
+            "mapbox-gl": "3.32.0",
+            "one-map-react": "0.1.0-rc.2",
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "react-map-gl": "8.1.3"
+          },
+          "lockfileSha256": "bd435386933340e1eaddb1e90665a4093d72b095453092d2c1ba659ce41226e7",
+          "packageManifestSha256": "d5a925b3840799b930fdfdf2b4d4f18e3bed459bfe4d90d90bbddf22cc8b7d2d",
+          "installedCandidateFiles": "all195 match unchanged rc.2 archive",
+          "tf09DistDigest": "6683d5712aba1df4db8028bac96c48b54422f39a35e1fd668739c09af46879c8"
+        },
+        "maplibre": {
+          "actualPeers": {
+            "maplibre-gl": "6.13.0",
+            "one-map-react": "0.1.0-rc.2",
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "react-map-gl": "8.1.3"
+          },
+          "lockfileSha256": "2e06893a89c822a83ca4cecd6c017d3363e87a0dc58407c0d97eecb29349464e",
+          "packageManifestSha256": "e3db5d90f5e8dd734a6531fb4887874c0bb1ec159487e87431b66b9db471a104",
+          "installedCandidateFiles": "all195 match unchanged rc.2 archive",
+          "tf09DistDigest": "6683d5712aba1df4db8028bac96c48b54422f39a35e1fd668739c09af46879c8"
+        }
+      },
+      "harnessSha256": {
+        "scripts/tf04-camera-smoke.mjs": "fd32fd8101ba0d455a83acc9787aa04da8f369b1d5c7327ebef2bc31f3cb2152",
+        "scripts/tf05-sources-smoke.mjs": "82c1b6456ef93a1d960b40bd942125392fd1fa7ed06827aa0f2c1cd299de51ad",
+        "scripts/tf06-queries-smoke.mjs": "3f076746f8b7c12785d612e903dbae1517826b953f5081285f03cffaba81dc6b",
+        "scripts/tf07-ui-smoke.mjs": "15ff57c216082b0e00197358db6335823e2238139087411916296602aa85571c",
+        "scripts/tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+        "scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+        "examples/web-mapbox/src/app.tsx": "4aca52f1b16d78b1d4a8102616030785697f9ceb7959205c7d714c28bc4df4b1",
+        "examples/web-maplibre/src/app.tsx": "14b36fc4f4a42c62cf64f88e4d9bdc3a4d6b67cb05022c62b36d75a500227523",
+        "examples/shared/tf09-scene.tsx": "92e10adbfb40430b8a53484eae737d8463fc4e30483267a6912b2446a52a72ee",
+        "examples/shared/tf07-focused-web-mapbox.tmp.tsx": "6a110f4de094d14048e2ba5889265f78ed079299f4c6ce9aa92940e5aa65c32e",
+        "examples/shared/tf07-focused-web-maplibre.tmp.tsx": "4caedbf5f4bd4a5b752df66a0c025bd43a2d9e606ce85068e6e3db024c80eec5"
+      },
+      "uiExtensionDiff": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01/web-minimum/tf07-extended.diff",
+      "uiExtensionDiffSha256": "fd373bd6f56d8620de7025a63e7e19210a9f8f9f1aa4fff3e012f9fe981937ce",
+      "uiExecution": "not run; TF07_EXTENDED_WEB=1 is opt-in; original9 cases preserved,6 extra per-observation checks. Geolocation/full accessibility remain separately scoped.",
+      "fixtureRoutineChecks": "all4 web production builds passed; copied focused TSX parsed/transpiled with externals; copied runner node--check and scope selection self-check passed",
+      "native": "not installed in this web tree"
+    },
+    "web-newest": {
+      "root": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01/web-newest",
+      "consumers": {
+        "mapbox": {
+          "actualPeers": {
+            "mapbox-gl": "3.33.0",
+            "one-map-react": "0.1.0-rc.2",
+            "react": "19.3.1",
+            "react-dom": "19.3.1",
+            "react-map-gl": "8.1.3"
+          },
+          "lockfileSha256": "b897cc252a0fb9a568f80dcec9cba9548f35c1a9c9a6387d3b0ae9d0c06a97da",
+          "packageManifestSha256": "7f3f0430a9ad3e0b8bb3219c5c874dc33b82cc02a8ea1f95bc5f65cf95c53edd",
+          "installedCandidateFiles": "all195 match unchanged rc.2 archive",
+          "tf09DistDigest": "6683d5712aba1df4db8028bac96c48b54422f39a35e1fd668739c09af46879c8"
+        },
+        "maplibre": {
+          "actualPeers": {
+            "maplibre-gl": "6.14.0",
+            "one-map-react": "0.1.0-rc.2",
+            "react": "19.3.1",
+            "react-dom": "19.3.1",
+            "react-map-gl": "8.1.3"
+          },
+          "lockfileSha256": "7d9ad036999f2d441aa05767162c01bf4b5b3ff4cca58bca2cc03f952269027c",
+          "packageManifestSha256": "4cc8d7a3387a24366ace13b12cb1428b8623346cd93bf66b68874730e6641f32",
+          "installedCandidateFiles": "all195 match unchanged rc.2 archive",
+          "tf09DistDigest": "6683d5712aba1df4db8028bac96c48b54422f39a35e1fd668739c09af46879c8"
+        }
+      },
+      "harnessSha256": {
+        "scripts/tf04-camera-smoke.mjs": "fd32fd8101ba0d455a83acc9787aa04da8f369b1d5c7327ebef2bc31f3cb2152",
+        "scripts/tf05-sources-smoke.mjs": "82c1b6456ef93a1d960b40bd942125392fd1fa7ed06827aa0f2c1cd299de51ad",
+        "scripts/tf06-queries-smoke.mjs": "3f076746f8b7c12785d612e903dbae1517826b953f5081285f03cffaba81dc6b",
+        "scripts/tf07-ui-smoke.mjs": "15ff57c216082b0e00197358db6335823e2238139087411916296602aa85571c",
+        "scripts/tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+        "scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+        "examples/web-mapbox/src/app.tsx": "4aca52f1b16d78b1d4a8102616030785697f9ceb7959205c7d714c28bc4df4b1",
+        "examples/web-maplibre/src/app.tsx": "14b36fc4f4a42c62cf64f88e4d9bdc3a4d6b67cb05022c62b36d75a500227523",
+        "examples/shared/tf09-scene.tsx": "92e10adbfb40430b8a53484eae737d8463fc4e30483267a6912b2446a52a72ee",
+        "examples/shared/tf07-focused-web-mapbox.tmp.tsx": "6a110f4de094d14048e2ba5889265f78ed079299f4c6ce9aa92940e5aa65c32e",
+        "examples/shared/tf07-focused-web-maplibre.tmp.tsx": "4caedbf5f4bd4a5b752df66a0c025bd43a2d9e606ce85068e6e3db024c80eec5"
+      },
+      "uiExtensionDiff": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01/web-newest/tf07-extended.diff",
+      "uiExtensionDiffSha256": "fd373bd6f56d8620de7025a63e7e19210a9f8f9f1aa4fff3e012f9fe981937ce",
+      "uiExecution": "not run; TF07_EXTENDED_WEB=1 is opt-in; original9 cases preserved,6 extra per-observation checks. Geolocation/full accessibility remain separately scoped.",
+      "fixtureRoutineChecks": "all4 web production builds passed; copied focused TSX parsed/transpiled with externals; copied runner node--check and scope selection self-check passed",
+      "native": "not installed in this web tree"
+    }
+  },
+  "android": {
+    "root": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01",
+    "androidShell": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01/android/examples/native-mapbox",
+    "status": "JavaScript consumer/candidate patch verified; native SDK resolution/build/install not run",
+    "actualVersions": {
+      "@rnmapbox/maps": "10.3.7",
+      "one-map-react": "0.1.0-rc.2",
+      "react": "19.2.3",
+      "react-native": "0.87.1",
+      "react-native-teleport": "1.2.1",
+      "@babel/core": "7.29.7",
+      "@babel/preset-env": "7.29.7",
+      "@babel/runtime": "7.29.10",
+      "@react-native-community/cli": "20.2.0",
+      "@react-native-community/cli-platform-android": "20.2.0",
+      "@react-native-community/cli-platform-ios": "20.2.0",
+      "@react-native/babel-preset": "0.87.1",
+      "@react-native/metro-config": "0.87.1",
+      "react-dom": "19.2.3"
+    },
+    "lockfileSha256": "1b292d112b49b540aea95827b8fc7b17b75f76e55483425a8005aee1d8e9bbaa",
+    "packageManifestSha256": "0a47fbdabe5eb562d3ab9bde61e52bac565a7412a4fce3a75de79ce166894659",
+    "candidateSha256": "9d28992c19a791c0af66bc0efb6ee3844747b66d1a8680f5da8647c8c70d150c",
+    "packageBytes": "all195 installed files equal frozen archive",
+    "patchSha256": "118090860852b786a6681287f52ae3af1af8e0657a7c1853936204afb287a6d4",
+    "patchReverseCheck": "passed all25 repaired files",
+    "appId": "com.onemapmapbox.tf10rc2minimum.tf08remaining",
+    "activity": "com.onemapmapbox.MainActivity",
+    "gradle": "2workers,nonparallel,noDaemon,2GiBheap/512MiBmetaspace,arm64-v8a",
+    "diskAfterInstall": "9.6GiB available fromdf",
+    "nextShell": "MapLibre source/config only; dependency installation held for serial phase resource policy",
+    "nativeEngineSelection": {
+      "diff": "/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-rc2-acceptance-p9usea01/android/native-engine-filters.diff",
+      "diffSha256": "5b184eabb80aae17a4f7366188354b38cbf5817404ece69a015973f3c0d37aac",
+      "tests": "node --check copied TF04/05; actual native Android selection branches evaluated with stub runNative for both/mapbox/maplibre and isolated IDs; invalid env rejected; copied TF06 pure selection tests passed including queries single-engine",
+      "harnessSha256": {
+        "tf04-camera-smoke.mjs": "b2737346dbc54dd5c76e3851c438e87d45983f444efb55d97df0b877852c2f87",
+        "tf05-sources-smoke.mjs": "b408079c1ecf7d071fd0554e1c6eb6f3a5a9326f8c93bd55d37be57e9cac2e24",
+        "tf06-queries-smoke.mjs": "3f076746f8b7c12785d612e903dbae1517826b953f5081285f03cffaba81dc6b",
+        "tf06-smoke-selection.mjs": "27bf59597e6ca49cef0529911c7dc3d22c84805408f98c4d879f9582234afad2",
+        "tf07-ui-smoke.mjs": "325e22d662a98143ca791831d58a2c8eadce0d744365a735c27a31821cd3a908",
+        "tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+        "tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696"
+      }
+    }
+  },
+  "resourceOrder": "WEB thenANDROID thenIOS; one engine/version build at a time; no runtime from preparation agent"
+}

@@ -1,0 +1,150 @@
+{
+  "candidateSha256": "bf92a760f06da72ff4614b98b44cc4b1d7da8495c5527498250d744bf66d25ab",
+  "scope": "Patched source/lib/native file identities from isolated frozen candidate consumers, not linked binary identity. Used by TF09_PEER_EVIDENCE for authorized future endpoint acceptance.",
+  "nativePeerDeltaVsHead": {
+    "@rnmapbox/maps": [
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt",
+        "sha256": "310c73d7ccde6d21e2df1b599af9d54ee1cac4329d3285eb530f0adb2e511e34"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+        "sha256": "5b58b59dfc9a83c36a713e75696e85c534ead113f919c2826d815d1db7f3efc0"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt",
+        "sha256": "4c480e8fd45af183330c7fc1e9d8b6195c8bac1803a69d8723142f854c03c781"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt",
+        "sha256": "fe53f618db8b762f8df77e94a3e66108f0c265d769b8763aa8143220866d7ad1"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt",
+        "sha256": "68e2229819d9976d9889170bf8a7b67e0c00772650d52527ba095b5101f603ed"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt",
+        "sha256": "9365295d3f648654820e9f8ca7fc498077f3a1f954fca5487ba7b75d56dc9e03"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt",
+        "sha256": "cdb62d5ac659591f8960430b21dcd519804a37f4d36b7ee42c40f136145d9cfa"
+      },
+      {
+        "path": "ios/RNMBX/Offline/RNMBXOfflineModule.m",
+        "sha256": "748a715bc4f8c072b2817bd32dbf54cd4e60feb56fd28309adce9439c94f7d74"
+      },
+      {
+        "path": "ios/RNMBX/Offline/RNMBXOfflineModule.swift",
+        "sha256": "38d5a657db2841af845cd972912063d2e942c4ebd9aa5a1e3e82ccdf75dcafed"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXModule.m",
+        "sha256": "0f7f81a9fd23832c45bdb63e2e2213a04224cec73eef9584869d6e72e3cd9cfd"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXModule.swift",
+        "sha256": "2a879349c853dd4d57d2e74fa7fbc4d16f3546d6770b3153b8d016466bb59619"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXTerrain.swift",
+        "sha256": "bff90e3198ff793d41f5659bb6a5ca2bd7b8ddefa274d6b39ebd3a2e973993b5"
+      },
+      {
+        "path": "lib/module/components/MapView.js",
+        "sha256": "9d271f9e73d5aa1e8baab6c1fae9d341f65aa782027344edf2487a1104655749"
+      },
+      {
+        "path": "lib/module/modules/offline/offlineManager.js",
+        "sha256": "f2ae28372a9fa88abd64f87eb91aec1a30f63a00da84bb99273eda2ec1180e91"
+      },
+      {
+        "path": "lib/module/modules/offline/offlineManagerLegacy.js",
+        "sha256": "225edc51f8cdf56f3898df93899864c88cc351cf569cf749646e03883eb42a6d"
+      },
+      {
+        "path": "lib/module/modules/snapshot/SnapshotOptions.js",
+        "sha256": "d8f3b962fb118c329c1762aca8ac8861bd32ce55649abe0e6c91299d4a1e615e"
+      },
+      {
+        "path": "lib/typescript/src/Mapbox.native.d.ts",
+        "sha256": "eacd1f9f59e1f1f5e0fa2d0ed0b3b1c459af23b288d3e0ba0b6a1bb398d50357"
+      },
+      {
+        "path": "lib/typescript/src/RNMBXModule.d.ts",
+        "sha256": "7605787145e10ad5ff4b1ec9791c29f514f0e143cb17a379fd7e56b38a832f3f"
+      },
+      {
+        "path": "lib/typescript/src/components/MapView.d.ts",
+        "sha256": "bb2f0eeaa8ed5530b581d173b585fc6431fb3bfa95d5f48aaf1f8d22b1f0bc2d"
+      },
+      {
+        "path": "lib/typescript/src/index.native.d.ts",
+        "sha256": "c649d68d1374deb1e1f1c5917dfa2e47309429fa03389078a5fecc43849b3367"
+      },
+      {
+        "path": "lib/typescript/src/modules/offline/offlineManager.d.ts",
+        "sha256": "d3e196f732b8552043ba571609ccd979d0a777ed4dc80ea1dfbff8c1d4630110"
+      },
+      {
+        "path": "src/components/MapView.tsx",
+        "sha256": "22f716402bd2a4bd6c23babd969ca5e87188e99dd48d92a895e77ecb8b516879"
+      },
+      {
+        "path": "src/modules/offline/offlineManager.ts",
+        "sha256": "4abcfdac45cbb2128b77e9f7a90298bcfa91b628061e4d4c8d76d4834432d83c"
+      },
+      {
+        "path": "src/modules/offline/offlineManagerLegacy.ts",
+        "sha256": "6c460e2fe55c60a75d3059d7967acfa7d2171058ad36b3a0b92f8c37be18bf4b"
+      },
+      {
+        "path": "src/modules/snapshot/SnapshotOptions.ts",
+        "sha256": "aea851f69e831b075fab237ef17da8455facfe5115dc088011d3bfe933eded80"
+      }
+    ],
+    "@maplibre/maplibre-react-native": [
+      {
+        "path": "android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt",
+        "sha256": "b5b1c67044e1b7f9bba27d98dc86667e2a066a8ddaca1ee91d58f411f1daff78"
+      },
+      {
+        "path": "android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt",
+        "sha256": "6a65962a72c06b6175809ef9f7773b45cb63eb404304a004362901c6c6974ccd"
+      },
+      {
+        "path": "ios/modules/offline/MLRNOfflineModule.mm",
+        "sha256": "70404ed06ce8e9d7f854cd197606a6898355f53d6efa00094c83220a9ba41ab3"
+      },
+      {
+        "path": "ios/modules/static-map/MLRNStaticMapModule.mm",
+        "sha256": "3e460567839e887d4ac0124562fe87fe59200737de46c9a14a26c7b485a4478b"
+      },
+      {
+        "path": "lib/commonjs/modules/offline/OfflineManager.js",
+        "sha256": "5df4d57b7db6a757593c125befa94cdb7d67922ae7b1f6e6f416a54187b945da"
+      },
+      {
+        "path": "lib/module/modules/offline/OfflineManager.js",
+        "sha256": "1a5c565f7935752b86f6347ea54bb09a68bc75cb20d541f4a64b088f0692ad80"
+      },
+      {
+        "path": "lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts",
+        "sha256": "57c74577f369fed142989b805a5bce1b179a3b7355ecd086a52d261b4024cac8"
+      },
+      {
+        "path": "lib/typescript/module/components/sources/vector-source/VectorSource.d.ts",
+        "sha256": "7da90c85c534968ed4e1629e0ef86c7099c515f7c249a8bc7c6cad9d318f5916"
+      },
+      {
+        "path": "lib/typescript/module/index.d.ts",
+        "sha256": "af6bf21835f6ce5593630333f3c340df64df4a48f7ca980dc8546de68de5f9ed"
+      },
+      {
+        "path": "src/modules/offline/OfflineManager.ts",
+        "sha256": "063fec04deea367ce0e31469d7ebf75ebae7c2bd41e4a1d3a5848869f987447d"
+      }
+    ]
+  }
+}

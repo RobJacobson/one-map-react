@@ -11,6 +11,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 import { foregroundLocationDeclarations } from "./native-location-permissions.mjs";
+import { pinNativeMapboxVersion } from "./native-mapbox-version.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 
@@ -328,6 +329,14 @@ for (const [key, { appName, directory }] of Object.entries(selected)) {
 
     if (key === "native-mapbox") {
       addMapboxMavenRepo(exampleRoot);
+      const podfilePath = join(exampleRoot, "ios", "Podfile");
+      const buildGradlePath = join(exampleRoot, "android", "build.gradle");
+      const pinned = pinNativeMapboxVersion(
+        readFileSync(podfilePath, "utf8"),
+        readFileSync(buildGradlePath, "utf8")
+      );
+      writeFileSync(podfilePath, pinned.podfile);
+      writeFileSync(buildGradlePath, pinned.buildGradle);
     }
 
     if (key === "native-maplibre") {

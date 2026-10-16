@@ -1,0 +1,112 @@
+--- core/tf07-ui-smoke.mjs
++++ opt-in/tf07-ui-smoke.mjs
+@@ -90,6 +90,7 @@
+   );
+   let browser;
+   let page;
++  const extendedObservations = [];
+ 
+   try {
+     await until(
+@@ -216,9 +217,86 @@
+       "The fixture reported an operation error."
+     );
+ 
++    if (process.env.TF07_EXTENDED_WEB === "1") {
++      const observe = async (name, run) => {
++        try { extendedObservations.push({ name, status: "passed", observation: await run() }); }
++        catch (error) { extendedObservations.push({ name, status: "failed", error: String(error) }); throw error; }
++      };
++      const rect = (selector) => page.evaluate(`(() => { const e=document.querySelector(${JSON.stringify(selector)}); if(!e) throw new Error('Missing observation target'); const r=e.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height}; })()`);
++      await observe("offset-touch-bounds", async () => {
++        const before = await rect('[data-tf07="live"]');
++        await click(page, '[data-tf07-action="offset"]');
++        await until(async () => { const current=await rect('[data-tf07="live"]'); return Math.abs(current.x-before.x-24)<1 && Math.abs(current.y-before.y+12)<1; }, 5000, "marker offset24/-12");
++        const events = await read();
++        await click(page, '[data-tf07-child="live"]');
++        await until(async () => (await read()).events["child-click"] === (events.events["child-click"] ?? 0)+1, 5000, "offset child hit");
++        assert.equal((await read()).events["map-click"] ?? 0, events.events["map-click"] ?? 0);
++        const shifted = await rect('[data-tf07="live"]');
++        await click(page, '[data-tf07-action="offset"]');
++        await until(async () => { const current=await rect('[data-tf07="live"]'); return Math.abs(current.x-before.x)<1 && Math.abs(current.y-before.y)<1; }, 5000, "marker offset reset");
++        return { before, shifted, reset: await rect('[data-tf07="live"]') };
++      });
++      await observe("popup-follow", async () => {
++        const childBefore = await read();
++        await click(page, '[data-tf07-child="popup"]');
++        await until(async () => (await read()).events["popup-child"] === (childBefore.events["popup-child"] ?? 0)+1, 5000, "popup child hit");
++        const before = await read();
++        const popupBefore = await rect('.mapboxgl-popup, .maplibregl-popup');
++        const point = await page.evaluate(`(() => { const r=document.querySelector('#tf07-map-host').getBoundingClientRect(); for(const [fx,fy] of [[.72,.75],[.5,.85],[.85,.5]]) { const x=r.x+r.width*fx,y=r.y+r.height*fy; if(document.elementFromPoint(x,y)?.tagName==='CANVAS') return [x,y]; } throw new Error('No empty canvas input target'); })()`);
++        const [x,y]=point;
++        await page.send("Input.dispatchMouseEvent", { type:"mousePressed", x,y,button:"left",buttons:1,clickCount:1 });
++        for(let step=1;step<=6;step+=1) await page.send("Input.dispatchMouseEvent", {type:"mouseMoved",x:x+step*8,y:y+step*4,buttons:1});
++        await page.send("Input.dispatchMouseEvent", {type:"mouseReleased",x:x+48,y:y+24,button:"left",clickCount:1});
++        await until(async () => { const current=await read(),r=await rect('.mapboxgl-popup, .maplibregl-popup'); return Math.abs(current.center[0]-before.center[0])>0.0001 && Math.hypot(r.x-popupBefore.x,r.y-popupBefore.y)>2; }, 10000, "popup follows physical pan");
++        const after = await read();
++        assert.equal(after.events["popup-close"],before.events["popup-close"]);
++        return { centerBefore:before.center,centerAfter:after.center,popupBefore,popupAfter:await rect('.mapboxgl-popup, .maplibregl-popup') };
++      });
++      await observe("scale-units", async () => {
++        const text=()=>page.evaluate("document.querySelector('.mapboxgl-ctrl-scale, .maplibregl-ctrl-scale')?.textContent?.trim()");
++        await until(async()=>/(?:km|m)$/.test(await text()),5000,"metric scale label");
++        const metric=await text();
++        await click(page,'[data-tf07-action="units"]');
++        await until(async()=>/(?:mi|ft)$/.test(await text()),5000,"imperial scale label");
++        const imperial=await text(); assert.notEqual(metric,imperial);
++        await click(page,'[data-tf07-action="units"]');
++        await until(async()=>/(?:km|m)$/.test(await text()),5000,"metric scale reset");
++        return {metric,imperial,reset:await text()};
++      });
++      await observe("style-replacement", async () => {
++        const before=await read();
++        await click(page,'[data-tf07-action="style"]');
++        await until(async()=>{const current=await read();return current.events.style>(before.events.style??0)&&current.features.some(feature=>feature.id===707);},20000,"replacement style and known feature");
++        await click(page,'[data-tf07-child="live"]');
++        await until(async()=>(await read()).events["child-click"]===(before.events["child-click"]??0)+1,5000,"child after style replacement");
++        return {before:before.events,after:(await read()).events};
++      });
++      await observe("control-accessible-names", async () => {
++        const names=await page.evaluate("Array.from(document.querySelectorAll('button')).map(e=>({tag:e.tagName,name:(e.getAttribute('aria-label')||e.title||e.textContent||'').trim(),disabled:e.disabled}))");
++        for(const required of ['Zoom in','Zoom out','Locate me','Close popup','Child button']) assert(names.some(value=>value.name===required),`Missing accessible button name: ${required}`);
++        return {buttons:names,scope:"ordinary DOM button semantics/names only; full assistive-technology audit unverified"};
++      });
++      await observe("fullscreen", async () => {
++        try {
++          await page.evaluate(`import(${JSON.stringify(`/@fs${join(root,"examples/shared",`tf07-focused-web-${selectedEngine}.tmp.tsx`)}`)})`,true);
++          await until(async()=>(await page.evaluate("window.__tf07Focused?.read()",true))?.load>=1,20000,"existing focused module loaded");
++          await click(page,'#tf07-focused button[title="Enter fullscreen"], #tf07-focused button[aria-label="Enter fullscreen"]');
++          await until(()=>page.evaluate("!!document.fullscreenElement"),5000,"physical fullscreen enter");
++          await click(page,'#tf07-focused button[title="Exit fullscreen"], #tf07-focused button[aria-label="Exit fullscreen"]');
++          await until(async()=>!(await page.evaluate("!!document.fullscreenElement")),5000,"physical fullscreen exit");
++          return {entered:true,exited:true};
++        } finally {
++          await page.evaluate("document.fullscreenElement ? document.exitFullscreen() : undefined",true).catch(()=>undefined);
++          await page.evaluate("window.__tf07Focused?.dispose(); delete window.__tf07Focused;").catch(()=>undefined);
++        }
++      });
++    }
++
+     return {
+       status: "passed",
+       execution: "browser-input",
++      extendedObservations,
++      extendedScope: process.env.TF07_EXTENDED_WEB === "1" ? "executed representative extra UI observations" : "not requested",
+       scope: [
+         "known-feature",
+         "child-click",
+@@ -239,11 +317,13 @@
+         "accessibility",
+         "style-replacement",
+         "fullscreen",
+-      ],
++      ].filter(name => !extendedObservations.some(row => row.status === "passed" && row.name === name)),
++      accessibilityScope: extendedObservations.some(row=>row.name==="control-accessible-names"&&row.status==="passed") ? "ordinary DOM metadata passed; full assistive-technology audit unverified" : "not exercised",
+     };
+   } catch (error) {
+     return {
+       status: "failed",
++      extendedObservations,
+       error:
+         error instanceof Error ? error.message : "Browser interaction failed.",
+       rendererStatus: await page

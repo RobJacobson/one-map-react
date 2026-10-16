@@ -1,124 +1,115 @@
-# API coverage
+# API coverage checklist
 
-**Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.
+This is the sole coverage record for the thin facade. Each row covers an application contract or a group of unchanged forwarded fields. The owning code and representative tests define the route. [Upstream research notes](upstream-research.md) preserve useful versioned findings and primary-source citations; consult upstream declarations for individual API signatures and defaults.
 
-The [versioned inventory](../records/api-coverage.json) records upstream fields and operations separately from implementation and runtime verification. Baselines are frozen in [version-baseline.json](../records/version-baseline.json). Support expectations are proposals until the owning stage supplies evidence; pending work is not an SDK limitation.
+A checked row means its implementation route or substantiated boundary has been reviewed. It does **not** mean renderer acceptance passed. An unchecked row identifies unfinished work or an open verification gate, including owner exclusions. Full API coverage remains required under the [requirements](requirements.md#full-coverage-without-duplicate-implementation). Common APIs, named selected APIs, composition, explicit rejection, and internal implementation details have different responsibilities; raw SDK access alone cannot complete another row.
 
-TF08 reconciles 541 entries to implemented common or named APIs, with runtime verification explicitly unverified. The four adjacent canvas-source/advanced-sizing entries are implemented through selected web Source and Map.options routes; their scoped reconciliation and per-family runtime status are recorded in [TF09 coverage](../records/evidence/tf09-coverage.json) and the [advanced rendering reference](tf09-rendering.md). The [TF08 record](tf08-location-offline-capture.md) and [evidence](../records/evidence/tf08-implementation.json) define the counted scope; entry counts include fields, types, and aliases rather than independent compatibility claims.
+The [support matrix](../records/support-matrix.json) owns current versions and patches. The [release record](tf10-release.md) owns release gates. The [audit](../records/evidence/facade-simplification-audit.json) and [repair evidence](../records/evidence/facade-simplification-repair.json) retain their original findings and routine outcomes. The repaired candidate's renderer behavior remains unverified. Earlier acceptance applies only to the scenarios and artifacts in its original records.
 
-12131 entries are assigned to stages. The inventory notes in JSON preserve research gaps and follow-up investigations. This count measures inventoried APIs, not implemented compatibility.
+## Selection, hosts, and shared behavior
 
-| Stage | Assigned entries |
-| --- | --- |
-| S00.ref-shapes | 31 |
-| S01 | 2 |
-| S02 | 312 |
-| S03 | 8 |
-| S04 | 2215 |
-| S04.generated-host | 294 |
-| S05 | 843 |
-| S06a | 353 |
-| S06a.interactions | 4 |
-| S06a.legacy-event-delivery | 4 |
-| S06b | 121 |
-| S07 | 582 |
-| S08 | 2341 |
-| S08-source-visibility | 1 |
-| S08.font-resources | 10 |
-| S09 | 49 |
-| S10a | 117 |
-| S10b | 15 |
-| S11 | 42 |
-| S12 | 7 |
-| S12.url-camera-state | 6 |
-| S13a | 341 |
-| S13b | 22 |
-| S14 | 198 |
-| S14-layer-annotation | 10 |
-| S14.annotation-manager | 16 |
-| S15 | 355 |
-| S16 | 93 |
-| S17 | 80 |
-| S18 | 130 |
-| S19 | 134 |
-| S20 | 115 |
-| S21 | 117 |
-| S22.model | 17 |
-| S22.raster-array | 40 |
-| S23 | 134 |
-| S23.iconsets | 6 |
-| S24 | 68 |
-| S25 | 13 |
-| S25.covering-tiles | 2 |
-| S26 | 184 |
-| S27 | 46 |
-| S28 | 46 |
-| S29 | 32 |
-| S30 | 52 |
-| S31 | 67 |
-| S32 | 23 |
-| S33 | 165 |
-| S34 | 134 |
-| S35 | 6 |
-| S35-maplibre-cache | 6 |
-| S36 | 18 |
-| S37 | 74 |
-| S38 | 95 |
-| S39 | 59 |
-| S40 | 15 |
-| S40-maplibre-light | 15 |
-| S40.ambient | 2 |
-| S40.directional | 7 |
-| S40.flat | 4 |
-| S40.legacy | 44 |
-| S41 | 22 |
-| S41-sky | 9 |
-| S41.fog | 36 |
-| S41.sky | 46 |
-| S42a | 46 |
-| S42b | 38 |
-| S43-color-relief | 10 |
-| S43-global-state | 7 |
-| S43-hillshade | 25 |
-| S43.building | 29 |
-| S43.clip | 26 |
-| S43.color-relief | 4 |
-| S43.hillshade | 18 |
-| S43.model | 123 |
-| S43.raster-particle | 57 |
-| S43.sky | 27 |
-| S44 | 54 |
-| S45 | 121 |
-| S45.featuresets | 16 |
-| S45.indoor | 7 |
-| S46-maplibre-animation | 139 |
-| S46.animated-coordinates | 150 |
-| S46.camera-gesture-observer | 12 |
-| S46.shape-animators | 21 |
-| S46.viewport | 43 |
-| S47 | 107 |
-| S47.tile-refresh | 2 |
-| S48a | 54 |
-| S48a.renderer-diagnostics | 9 |
-| S48a.wrapper-warnings | 4 |
-| S48b | 3 |
-| S48c | 2 |
-| S48c.render-scheduling | 5 |
-| S48d-maplibre-build-config | 15 |
-| S48d.android-lifecycle | 1 |
-| S48d.cache | 3 |
-| S48d.connectivity | 2 |
-| S48d.constants | 24 |
-| S48d.credentials | 4 |
-| S48d.expo-plugin | 6 |
-| S48d.label-localization | 4 |
-| S48d.native-dependencies | 3 |
-| S48d.native-implementation | 1 |
-| S48d.native-sdk-download | 1 |
-| S48d.native-sdk-linkage | 2 |
-| S48d.native-sdk-version | 1 |
-| S48d.reduced-motion | 3 |
-| S48d.rtl-plugin | 2 |
-| S48d.telemetry | 2 |
-| S48d.tile-server | 5 |
-| S49a | 438 |
+| Review | Coverage boundary | Route and representative checks |
+| --- | --- | --- |
+| [x] `selection` | Common import safety, MapSetup, adapter selection, map IDs/useMap registry, explicit entry paths, platform aliases, and mixed engine selection. React component metadata adds no independent map operation. | [Setup](../packages/one-map-react/src/facade/map-setup.tsx), [registry](../packages/one-map-react/src/facade/map-context.tsx), [registry tests](../packages/one-map-react/test/tf07-map-context.web.test.tsx), [packed selection](../scripts/test-package.mjs). ESM is the consumer contract; CommonJS builds and server-rendered maps are outside it. Common imports must remain renderer safe. |
+| [x] `web-host` | All inherited DOM host props and CSS fields on Map and UI hosts, with browser semantics. | [Web map](../packages/one-map-react/src/adapters/web/map.tsx), [host tests](../packages/one-map-react/test/tf07-host.web.test.tsx). Forwarding does not certify every browser or accessibility effect. |
+| [x] `native-host` | Inherited ViewProps, host styles, native handles, and ornament placement types on both native engines. | [Native presentation](../packages/one-map-react/src/adapters/shared/native-map-presentation.tsx), [UI tests](../packages/one-map-react/test/tf07-ui.native.test.tsx), [native peer types](../scripts/test-peers.mjs). TV, accessibility, animation, and device semantics remain host owned. |
+| [x] `lifecycle` | Map creation, load/style/move/error callbacks, logical detachment, unmount/remount, stale callbacks and async results, and Strict Mode cleanup. Web reuseMaps is delegated; native reuseMaps=true rejects. | [Facade Map](../packages/one-map-react/src/facade/map.tsx), [web map](../packages/one-map-react/src/adapters/web/map.tsx), [native option guards](../packages/one-map-react/src/adapters/native-map-options.ts), [lifetime tests](../packages/one-map-react/test/lifetimes-smoke.web.test.tsx). |
+| [x] `common-camera` | Shared center/zoom/bearing/pitch, bounds, padding, events, commands, projections, and promise-based MapRef operations. Selected SDK signatures remain distinct from normalized common results. | [Camera contract](../packages/one-map-react/src/contracts/camera-types.ts), [web ref](../packages/one-map-react/src/adapters/web/map-ref.ts), [camera conversions](../packages/one-map-react/test/convert-camera.test.ts), both [Mapbox](../packages/one-map-react/test/mapbox-native.native.test.tsx) and [MapLibre](../packages/one-map-react/test/maplibre-native.native.test.tsx) adapter tests. See native exceptions below. |
+| [x] `sources-layers` | Five portable source families, eight portable layer types, source injection, creation-only fields, mutable/reset values, style replacement, clustering options, and registered images. A source supplies map data; a layer supplies drawing rules. | [Shared Source](../packages/one-map-react/src/facade/source.tsx), [Layer](../packages/one-map-react/src/facade/layer.tsx), [sources record](tf05-sources.md), [source lifetime tests](../packages/one-map-react/test/source-registries.test.ts). Advanced selected families are covered below. |
+| [x] `queries-state` | Rendered/source/cluster queries, feature state, result conversion, source registries, source removal and replacement, interactiveLayerIds, and source press handling. | [Query record](tf06-queries.md), [feature-state implementation](../packages/one-map-react/src/adapters/shared/native-feature-state.ts), [feature-state tests](../packages/one-map-react/test/native-feature-state.test.ts), [query tests](../packages/one-map-react/test/queries-smoke.web.test.tsx). Native loaded-tile queries and GeoJSON getData retain distinct meanings. |
+| [x] `shared-ui` | Marker, Popup, Control, NavigationControl, AttributionControl, ScaleControl, GeolocateControl and FullscreenControl; mutable presentation, dragging, activation, map access, and cleanup. Shared creation guards also apply to custom adapters. | [Shared UI](../packages/one-map-react/src/facade/ui.tsx), [native UI](../packages/one-map-react/src/adapters/shared/native-ui.tsx), [creation regressions](../packages/one-map-react/test/ui-creation.web.test.tsx), [web](../packages/one-map-react/test/tf07-ui.web.test.tsx) and [native](../packages/one-map-react/test/tf07-ui.native.test.tsx) UI tests. Defaults and unsupported requests are explicit below. |
+| [x] `advanced-common` | Portable terrain, projection, light, and hillshade contracts, capability checks, and explicit selected advanced inputs. | [Rendering record](tf09-rendering.md), [rendering tests](../packages/one-map-react/test/tf09-rendering.web.test.tsx), [validation tests](../packages/one-map-react/test/tf09-validation.web.test.tsx). Renderer support depends on the selected SDK and exact style values. |
+
+## Selected web contracts
+
+Rows in this section apply to both selected web engines unless named otherwise. The [Mapbox entry](../packages/one-map-react/src/mapbox-web.tsx) and [MapLibre entry](../packages/one-map-react/src/maplibre-web.tsx) own the actual exports. [Selected forwarding tests](../packages/one-map-react/test/tf09-selected.web.test.tsx) cover current handles, arguments, receiver binding, synchronous results/errors and detachment; [peer checks](../scripts/test-peers.mjs) check installed endpoint declarations.
+
+| Review | Coverage boundary | Route and representative checks |
+| --- | --- | --- |
+| [x] `web-map` | WrapperMap's complete selected constructor/options/callback props. Map.options supplies typed selected constructor values through common Map; shared lifecycle and camera conversions remain separate. | [Web map](../packages/one-map-react/src/adapters/web/map.tsx), [Mapbox adapter tests](../packages/one-map-react/test/mapbox-web.web.test.tsx), [MapLibre adapter tests](../packages/one-map-react/test/maplibre-web.web.test.tsx). |
+| [x] `web-style` | Complete selected style roots, sources, layer paint/layout/filter fields, expressions and schema defaults. Schema metadata and operator vocabulary describe transported values, not independent resources. | [Web map](../packages/one-map-react/src/adapters/web/map.tsx), [sources](../packages/one-map-react/src/adapters/web/sources.tsx), [layer validation](../packages/one-map-react/src/facade/layer.tsx), [rendering tests](../packages/one-map-react/test/tf09-rendering.web.test.tsx). SDK validation owns unchanged values. |
+| [x] `web-values` | Named geometry constructors and instance types, event payloads, query results, custom-layer callbacks, images, camera/control inputs, and other concrete public argument/result types. | Selected entry exports and [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). Passing a concrete type through an actual operation does not certify renderer internals or hardware. |
+| [x] `web-ui` | WrapperMarker, WrapperPopup, named control components, useControl and useWrapperMap, with full selected props and imperative refs. SDK add/remove and setters compose through React ownership. | [Web UI](../packages/one-map-react/src/adapters/web/ui.tsx), [UI tests](../packages/one-map-react/test/tf07-ui.web.test.tsx). Instance storage is not a portable resource. |
+| [x] `web-ref-owners` | Common MapRef, selected WebMapRef, and raw WrapperMap refs have separate typed owners. | [Web ref](../packages/one-map-react/src/adapters/web/map-ref.ts), selected entry declarations and [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). An SDK instance type does not promise every instance field on a wrapper ref. |
+| [x] `web-selected-refs` | Named dynamic subscriptions, add/remove/hasControl, source/layer/style/DOM readbacks, loading state and repaint operations; other declared selected methods retain their selected signatures. | Selected entry method lists, [forwarding helper](../packages/one-map-react/src/adapters/web/method-forwarders.ts), [forwarding regressions](../packages/one-map-react/test/method-forwarders.test.ts), [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). Retained facade refs reject after detachment and follow replacement handles. |
+| [x] `web-wrapper-refs` | Upstream createRef's public, non-underscore functions through WrapperMap/useWrapperMap. | Selected entry wrapper exports and [adapter tests](../packages/one-map-react/test/mapbox-web.web.test.tsx). Selected synchronous SDK behavior is distinct from common promise semantics. |
+| [x] `web-resource-ownership` | Destructive or React-owned SDK setters omitted by upstream createRef use component props and mount/unmount instead. | [Web map](../packages/one-map-react/src/adapters/web/map.tsx), [sources](../packages/one-map-react/src/adapters/web/sources.tsx), [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). No duplicate raw owner is claimed. |
+| [x] `web-events` | Public fire and MapLibre setEventedParent preserve plugin event production and parent routing. | Selected entry methods and [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). Mapbox's private event machinery is excluded. |
+| [x] `web-gestures` | Gesture props and common enable/disable conversions; getGestureHandler exposes typed public state/tuning on borrowed SDK handlers. | [Gesture conversion](../packages/one-map-react/src/adapters/web/convert-gestures.ts), [gesture tests](../packages/one-map-react/test/convert-gestures.test.ts), [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). Borrowed handles retain upstream lifetime; internal DOM dispatch/reset/render-frame methods are not facade operations. MapLibre cooperativeGestures and cancelPendingTileRequestsWhileZooming have explicit routes. |
+| [x] `web-sources` | getSource, typed getCanvasSource/getVideoSource, media controls and independent readbacks. | Selected entry source-kind checks, [source implementation](../packages/one-map-react/src/adapters/web/sources.tsx), [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). Returned SDK sources are borrowed; React-owned data/configuration changes use Source props. |
+| [x] `web-debug` | Explicit debug property setters/readbacks, including repaint, rather than unbound fields on the wrapper ref. | Selected entry getDebugOptions/setDebugOptions and [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). |
+| [x] `web-version` | getVersion reads the SDK instance.version synchronously. | Selected entry explicit getter and [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). Nonfunction SDK fields are not copied by createRef. |
+| [x] `web-injection` | Typed Map.options.mapLib injection and SDK-owned component constructors. MapLibre maplibreLogo uses its constructor option or selected LogoControl composition. | [Web map](../packages/one-map-react/src/adapters/web/map.tsx), selected entry types and [peer checks](../scripts/test-peers.mjs). |
+| [x] `web-probe` | Mapbox supported is the selected browser/GPU probe, invoked only when called. MapLibre GL JS 6.13 has no exported supported function; optional injected mapLib.supported is only a structural wrapper field. | Selected entry exports, [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). No fabricated MapLibre hardware probe. |
+| [x] `web-offset` | Mapbox GL JS 3.33 addControl position/offset options and ControlOffset values retain the installed peer signature; 3.32 retains its own signature. | [Endpoint research](upstream-research.md#later-endpoint-declarations), [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx), [peer checks](../scripts/test-peers.mjs). |
+| [x] `web-global-state` | MapLibre GL JS 6.14 initial globalState uses Map.options/WrapperMap. Replacement uses React mapStyle, onStyleLoad and per-key setGlobalStateProperty, with null reset. | [MapLibre entry](../packages/one-map-react/src/maplibre-web.tsx), [endpoint research](upstream-research.md#later-endpoint-declarations), [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). No facade setStyle is advertised; endpoint runtime remains unverified. |
+| [x] `web-baseline` | Historical /mapbox-legacy names resolve conceptually through the selected Mapbox 3 route. Mapbox GL JS 1/2 compatibility is outside this release baseline. | [Web research notes](upstream-research.md#web-declarations), [support matrix](../records/support-matrix.json). This is a version boundary, not an SDK feature limitation or a new legacy export. |
+| [x] `web-escape` | Wrapper getMap is an explicit SDK escape hatch. | Selected entry wrapper exports and [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). Subsequent arbitrary SDK operations do not establish facade coverage. |
+| [x] `web-internals` | SDK Style/Transform/Painter/HandlerManager/Terrain managers, private event helpers, source workers, tile loading, GPU/media buffers, computed projection transforms, and instance storage remain renderer owned. | [Web research](upstream-research.md#web-declarations), selected entry public methods and [selected tests](../packages/one-map-react/test/tf09-selected.web.test.tsx). Style/source/layer inputs, named readbacks and custom-layer callbacks are the application routes. Declaration-only fields are not claimed as forwarded properties. |
+
+## Selected native contracts
+
+The [Mapbox entry](../packages/one-map-react/src/mapbox-native.tsx) and [MapLibre entry](../packages/one-map-react/src/maplibre-native.tsx) own explicit exports. Their named components retain upstream props and refs; common Map does not own their camera tree. The exact native SDK source identities behind style boundaries are in the [native style research](../records/evidence/tf10-native-style-sources.json).
+
+| Review | Coverage boundary | Route and representative checks |
+| --- | --- | --- |
+| [x] `mb-components` | RNMapbox public annotation, camera, source, layer, image and other selected components. WrapperCamera belongs under WrapperMapView, independently of common Map. | [Mapbox entry](../packages/one-map-react/src/mapbox-native.tsx), [adapter tests](../packages/one-map-react/test/mapbox-native.native.test.tsx), [peer checks](../scripts/test-peers.mjs). |
+| [x] `ml-components` | MapLibre public Callout, annotation, source, module/class exports and selected component/ref operations. WrapperCamera belongs under WrapperMap, independently of common Map. | [MapLibre entry](../packages/one-map-react/src/maplibre-native.tsx), [adapter tests](../packages/one-map-react/test/maplibre-native.native.test.tsx), [peer checks](../scripts/test-peers.mjs). |
+| [x] `native-camera` | Selected raw stop/initial-state/options and movement payloads retain wrapper semantics; common camera commands and events convert separately. | Both selected entry types, [camera tests](../packages/one-map-react/test/convert-camera.test.ts), [controlled-state regressions](../packages/one-map-react/test/native-controlled-camera.web.test.tsx). Forwarded Camera props do not prove controlled gesture rejection. |
+| [x] `native-values` | Concrete geometry, bounds, point, query and callback payload aliases pass through their actual component/service operations. | Both native entry exports, [wrapper value tests](../packages/one-map-react/test/wrapper-values.test.ts), [peer checks](../scripts/test-peers.mjs). Types are not independent renderer operations. |
+| [x] `mb-animation` | RNMapbox constants, geometry, selected public types, Animated classes/functions and experimental shape animators retain their actual exports. | [Mapbox entry](../packages/one-map-react/src/mapbox-native.tsx), [adapter tests](../packages/one-map-react/test/mapbox-native.native.test.tsx), [peer checks](../scripts/test-peers.mjs). Native linking and hardware behavior require separate evidence. |
+| [x] `ml-values` | MapLibre concrete component/Layer/service inputs and payloads, including selected native animation and public types. | [MapLibre entry](../packages/one-map-react/src/maplibre-native.tsx), [adapter tests](../packages/one-map-react/test/maplibre-native.native.test.tsx), [peer checks](../scripts/test-peers.mjs). Recursive GeoJSON/ReactNode and opaque animation internals use their public value/handle contract. |
+| [x] `mb-layers` | RNMapbox generated paint/layout/style fields and expression vocabulary use selected layer/style transport. Full style documents use Map style configuration, not the wrapper Style component that ignores other roots. | [Mapbox layers](../packages/one-map-react/src/adapters/mapbox-native/layers.tsx), [style conversion](../packages/one-map-react/src/adapters/mapbox-native/style-props.ts), [adapter tests](../packages/one-map-react/test/mapbox-native.native.test.tsx). SDK validation and drawing remain upstream. |
+| [x] `ml-layers` | MapLibre selected Layer paint/layout, legacy native style fields and expression values reach the selected layer. | [MapLibre layers](../packages/one-map-react/src/adapters/maplibre-native/layers.tsx), [style guards](../packages/one-map-react/src/adapters/maplibre-native/style-roots.ts), [style tests](../packages/one-map-react/test/native-style-roots.test.ts). Exceptions are enumerated below. |
+| [x] `ml-style` | Parsed MapLibre native style roots/source fields/operators follow exact SDK parser/property registries. | [Style guards](../packages/one-map-react/src/adapters/maplibre-native/style-roots.ts), [source hashes](../records/evidence/tf10-native-style-sources.json), [style tests](../packages/one-map-react/test/native-style-roots.test.ts). Rejected values, native parser errors and font build dependencies are distinguished below. |
+| [x] `mb-model` | RNMapbox 10.3.8 LocationPuck.model, including uri, scale, rotation and opacity, uses the selected component. It is absent from 10.3.7. | [Mapbox entry](../packages/one-map-react/src/mapbox-native.tsx), [endpoint research](upstream-research.md#later-endpoint-declarations), [peer checks](../scripts/test-peers.mjs). Model rendering remains unverified. |
+| [x] `mb-errors` | RNMapbox 10.3.8 onMapLoadingError's structured error/sourceId/tileId/type callback payload retains its selected declaration. | [Mapbox entry](../packages/one-map-react/src/mapbox-native.tsx), [endpoint research](upstream-research.md#later-endpoint-declarations), [peer checks](../scripts/test-peers.mjs). No unconditional named type export absent from the minimum peer. |
+| [x] `mb-language` | RNMapbox 10.3.8 normalizeLanguageTag/setLanguage and label localization are feature detected. Unavailable minimum-peer requests reject explicitly, including supplied localizeLabels=false. | [Language guards](../packages/one-map-react/src/adapters/mapbox-native/label-localization.ts), [language tests](../packages/one-map-react/test/tf10-language.native.test.tsx), [peer checks](../scripts/test-peers.mjs). |
+| [x] `mb-build` | RNMapbox public plugin, Podfile, Gradle, SDK version, build configuration and dependency settings remain application owned. | [Package setup](../packages/one-map-react/README.md), [version guard](../scripts/native-mapbox-version.mjs), [version tests](../scripts/native-mapbox-version.test.mjs). Current SDK requirement is exactly 11.23.1 on both platforms; historical wrapper iOS defaults were a range. Configuration is not linked-build evidence. |
+| [x] `ml-build` | MapLibre public plugin, SPM and build settings retain their selected types. SDK overrides, repositories and location engine selection remain application responsibilities. | [Package setup](../packages/one-map-react/README.md), [native research](upstream-research.md#maplibre-native-findings), [peer checks](../scripts/test-peers.mjs). Current recorded defaults are iOS 6.31.0 and Android 13.6.1; Android source minSdk 24 takes precedence over older getting-started text. |
+| [x] `native-internals` | React lifecycle/storage, bridge envelopes, private annotation/source/service methods, abstract inheritance and internal location/offline/snapshot machinery have no separate facade operation. | [RNMapbox](upstream-research.md#rnmapbox-native-findings) and [MapLibre](upstream-research.md#maplibre-native-findings) research, both selected entry export lists and [peer checks](../scripts/test-peers.mjs). Arbitrary native SDK APIs not exposed by these wrappers are outside the wrapper inventory. |
+
+## Location, offline storage, and capture
+
+| Review | Coverage boundary | Route and representative checks |
+| --- | --- | --- |
+| [x] `web-location` | Default SDK geolocation, explicit provider override, selected GeolocateControl payloads, follow behavior and common UserLocation. | [UserLocation](../packages/one-map-react/src/facade/user-location.tsx), [web controls tests](../packages/one-map-react/test/tf08-controls.web.test.tsx). Selected controls preserve backend semantics; shared service results convert separately. |
+| [x] `native-location` | Common location service/UserLocation, supplied positions, selected pucks, WrapperLocationManager and useWrapperCurrentPosition. Subscription and permission lifetimes remain explicit. | [Native location](../packages/one-map-react/src/adapters/shared/native-location.ts), [location tests](../packages/one-map-react/test/tf08-location.native.test.tsx), [service tests](../packages/one-map-react/test/tf08-services.native.test.tsx). Mounting/importing must not silently start tracking. Provider/build and permission exceptions remain below. |
+| [x] `native-offline` | Common offline pack identity/bounds/status/events/subscriptions and selected manager, cache, import/migration operations exposed by the wrappers. | [Offline service](../packages/one-map-react/src/adapters/shared/offline-service.ts), [offline tests](../packages/one-map-react/test/tf08-offline.test.ts), [service tests](../packages/one-map-react/test/tf08-services.native.test.tsx), [scoped acceptance record](tf08-location-offline-capture.md). Legacy/deprecated declarations are not proof of current SDK success. Two excluded methods remain unchecked below. |
+| [x] `capture` | Map capture and selected static snapshots, camera/style/output normalization, image transport, deadlines and teardown. | [Map capture](../packages/one-map-react/src/adapters/shared/map-capture.ts), [image output](../packages/one-map-react/src/adapters/shared/image-output.ts), [web capture tests](../packages/one-map-react/test/tf08-capture.web.test.tsx), [image tests](../packages/one-map-react/test/tf08-image.test.ts), [native service tests](../packages/one-map-react/test/tf08-services.native.test.tsx). Native peer patches are required; renderer-only versus composed UI inclusion is scope dependent. |
+
+## Exceptions and open gates
+
+These rows retain behavior that must not disappear inside a broad forwarding claim. A checked rejection records implemented behavior, not permission to stop investigating a future supported route. The historical research notes preserve upstream findings and investigation limits; stage assignments and pending cells there describe their original implementation, not current status.
+
+| Review | Exception | Boundary and evidence |
+| --- | --- | --- |
+| [x] `native-options` | Native reuse, external web drawing contexts, desktop gestures/pointer callbacks, resize and stop. | [Option guards](../packages/one-map-react/src/adapters/native-map-options.ts) reject requested unsupported values, including explicit false for desktop options. Native host styles own size; the facade does not simulate camera cancellation by dispatching another command. Backend getters without wrapper support fail explicitly. |
+| [ ] `native-fit-cap` | Native fitBounds.maxZoom, including supplied zero, remains rejected and owner deferred. | [Investigation memo](native-fitbounds-maxzoom-memo.md), [camera conversion tests](../packages/one-map-react/test/convert-camera.test.ts). Do not label this implemented support. Native custom easing also lacks a portable callback transport; see the camera contract. |
+| [ ] `native-controlled` | Native viewState writes camera props and reconciles rejected proposals; controlledCamera capability remains unadvertised. | [Controlled-state implementation](../packages/one-map-react/src/adapters/shared/use-native-controlled-camera.ts), [regressions](../packages/one-map-react/test/native-controlled-camera.web.test.tsx), [release gates](tf10-release.md). Real gesture rejection/clamping acceptance is still required. |
+| [x] `android-opening-camera` | RNMapbox 10.3.7 cold-cache opening camera keeps latitude at zero on Android. | [Android camera handoff](tf02-android-camera-handoff.md). This is a pinned peer limitation; remove it only after the upstream fix is present and verified. |
+| [x] `native-source-options` | Common native GeoJSON generateId/promoteId and raster-dem scheme are rejected when supplied. | [Shared source gates](../packages/one-map-react/src/adapters/native-source-gates.ts), both native source implementations and adapter tests. RNMapbox also rejects common GeoJSON clusterMinPoints and raster-dem encoding/attribution. Unsupported requests cannot silently drop fields. RNMapbox selected RasterArraySource bounds/tileSize may need TileJSON composition on iOS. |
+| [x] `ml-style-roots` | MapLibre native explicit terrain, sky and state roots reject; projection must be Mercator. | [Style guards](../packages/one-map-react/src/adapters/maplibre-native/style-roots.ts), [primary source record](../records/evidence/tf10-native-style-sources.json). Style URLs delegate to the SDK; the facade cannot inspect their downloaded content. |
+| [x] `native-symbol-layout` | Shared Layer rejects icon-overlap, text-overlap and text-variable-anchor-offset on both native backends. | [Shared guard](../packages/one-map-react/src/facade/layer.tsx), [guard regressions](../packages/one-map-react/test/native-symbol-layout.web.test.tsx). These common-component restrictions do not establish SDK limitations or change selected wrapper/style-document routes. |
+| [x] `ml-style-properties` | MapLibre native rejects resampling on the audited color-relief/hillshade/raster paths, fill-layer-opacity, line-layer-opacity, icon-overlap and text-overlap, including legacy spelling equivalents. | [Layer guards](../packages/one-map-react/src/adapters/maplibre-native/style-roots.ts). Legacy rasterResampling and basic iconAllowOverlap/textAllowOverlap remain valid routes. |
+| [x] `ml-style-sources` | MapLibre native rejects video sources, volatile, GeoJSON attribution/filter/generateId/promoteId, vector promoteId and raster-dem redFactor/greenFactor/blueFactor/baseShift. Custom raster-dem encoding is SDK invalid. | [Style/source guards](../packages/one-map-react/src/adapters/maplibre-native/style-roots.ts), [sources](../packages/one-map-react/src/adapters/maplibre-native/sources.tsx), [style tests](../packages/one-map-react/test/native-style-roots.test.ts). Named selected style transport does not bypass SDK boundaries. |
+| [x] `ml-expressions` | MapLibre native format.vertical-align and number-format.unit reject before dispatch. global-state, interpolate-hcl and interpolate-lab retain native parser errors. Font faces depend on the native HarfBuzz build. | [Expression guards](../packages/one-map-react/src/adapters/maplibre-native/style-roots.ts), [primary source record](../records/evidence/tf10-native-style-sources.json). Literal arrays, match labels and GeoJSON properties remain data; there is no facade expression evaluator. |
+| [x] `ui-creation` | Creation options stay frozen with equivalent defaults normalized. Each marker freezes its content-dependent default independently of explicit anchor and later child changes. | [Shared guards](../packages/one-map-react/src/facade/ui.tsx), [stable options](../packages/one-map-react/src/facade/use-stable-options.ts), [regressions](../packages/one-map-react/test/ui-creation.web.test.tsx). Removing an initially nondefault top anchor throws, with or without custom children. |
+| [x] `ui-defaults` | Ordinary controls default top-right; native attribution bottom-right and compact; native scale bottom-left. Web attribution retains its automatic compact default. | [Native UI](../packages/one-map-react/src/adapters/shared/native-ui.tsx), [web UI](../packages/one-map-react/src/adapters/web/ui.tsx), [placement tests](../packages/one-map-react/test/tf07-ui.native.test.tsx). |
+| [x] `native-popup-controls` | Native explicit popup focusAfterOpen requests fail, maxWidth must be a positive number/pixel width, and fullscreen requires the browser API. | [Native UI](../packages/one-map-react/src/adapters/shared/native-ui.tsx), [UI tests](../packages/one-map-react/test/tf07-ui.native.test.tsx). Native AttributionControl compact=false rejects expanded attribution; scale maxWidth must be positive and finite; see [UI scope](tf07-ui.md). |
+| [x] `native-platform-ui` | Selected MapLibre live Marker.selected is iOS only; Android ViewAnnotation children are bitmaps; iOS Callout needs title. Android scaleBarPosition supports top-left only; androidView is Android only. | [Native research](upstream-research.md#maplibre-native-findings). These selected wrapper differences do not change common UI's separate overlay/composition contract. RNMapbox MarkerView stopGesturePropagation is Android only. |
+| [x] `native-platform-camera` | Selected MapLibre Android touchZoom=false also disables double-tap zoom variants; frame scheduling and NativeUserLocation course differ across OS targets. Camera.triggerKey in historical RNMapbox declarations was documented unimplemented. | Both native [research notes](upstream-research.md). Selected wrapper semantics do not prove common controlled-camera or interaction acceptance. |
+| [x] `location-permissions` | Permissions/providers stay application controlled. RNMapbox iOS uses the application permission provider; MapLibre's default Android engine is unsuitable for emulator location, while the google engine changes dependencies. | [Location record](tf08-location-offline-capture.md), [permission tests](../scripts/native-location-permissions.test.mjs), [location tests](../packages/one-map-react/test/tf08-location.native.test.tsx). SDK download credentials, runtime map tokens and tile-provider credentials remain distinct. |
+| [x] `capture-scope` | Native capture may include renderer content without React overlays; requests outside the selected capture scope fail or require another backend. Snapshot/map file and data output differ by backend. Browser offline and independent snapshot services are absent; native file output is temporary. RNMapbox iOS hierarchy capture rejects strict renderer scope. | [Capture scope](tf08-location-offline-capture.md), [required patches](../packages/one-map-react/README.md), [capture tests](../packages/one-map-react/test/tf08-capture.web.test.tsx). Deadline and stale-result guards remain required. |
+| [ ] `cache-exclusions` | RNMapbox offlineManager.invalidateAmbientCache and offlineManager.setMaximumAmbientCacheSize remain owner excluded and pending. | [Owner scope](requirements.md#purpose-and-scope), [offline evidence](../records/evidence/tf08-implementation.json). No completed-support or runtime-success claim. |
+| [ ] `physical-devices` | Physical-device testing is owner excluded. Full VoiceOver and TalkBack audits remain outside the recorded UI checkpoint. | [Owner scope](requirements.md#purpose-and-scope), [UI record](tf07-ui.md). Host typing and representative simulator/emulator tests do not certify these effects. |
+| [ ] `release-runtime` | Current repaired candidate acceptance, expanded peer endpoints, exact linked native SDK identities, and native model rendering remain unverified. | [Release record](tf10-release.md), [repair evidence](../records/evidence/facade-simplification-repair.json). Separate permission is required before browser renderers, Metro transport, native builds/installations or acceptance flows. |
+| [ ] `workspace-runtime` | Example workspace native coexistence remains a separate pending gate. | [Workspace checkpoint](examples-workspace.md). Routine example resolution/build/type checks do not establish actual renderer transport or coexistence. |
+
+## Maintaining this checklist
+
+When a public API changes, find its owning row and inspect the supported peer's actual export, declaration and wrapper call. Unchanged fields stay grouped under that route. Add or split a row when conversion, lifecycle, version support, error behavior or an exception needs separate review. Preserve representative source/test links and explicitly mark unfinished work; do not add a row for each inherited host field, schema token or alias. Duplicate MapInstance/MapRef views of one operation belong to the same contract.
+
+For a peer upgrade, compare the new exports, declarations, style schema and release notes with the [cited upstream sources](upstream-research.md) and [support matrix](../records/support-matrix.json). Review changed fields against the owning rows and add meaningful exceptions before claiming completeness. Keep useful findings and citations in the research notes; keep all coverage decisions and open work in this checklist. This manual review replaces neither tests nor release acceptance; documentation checks only validate structure and links.
+
+Historical evidence may mention the retired JSON inventory or its checker. Those paths describe their original commits and artifacts. The [retired ledger at the last inventory commit](https://github.com/RobJacobson/one-map-react/blob/cb12433fd9f1a68ef8a8fcf5eaf65e34a0c69e39/records/api-coverage.json) remains available through Git. The [checklist migration evidence](../records/evidence/coverage-checklist-migration.json) records research preservation, coverage grouping, storage savings and routine verification; it is a checkpoint record, not another active inventory.

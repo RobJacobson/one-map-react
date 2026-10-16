@@ -103,11 +103,46 @@ const renderMedia = ({ canvas, urls, coordinates, custom }: Tf09Media) => (
   </>
 );
 
-const namedRendering = (map: MapRef) => {
+/** Exercises selected rendering and TF10 ref paths against the actual attached map. */
+export const namedRendering = (map: MapRef) => {
   const selected = map as WebMapRef;
+  const handler = selected.getGestureHandler("dragPan");
+  const before = handler.isEnabled();
+  let disabled;
+  try {
+    handler.disable();
+    disabled = handler.isEnabled();
+  } finally {
+    if (before) handler.enable();
+  }
+  let eventCalls = 0;
+  const listener = () => {
+    eventCalls += 1;
+  };
+  Reflect.apply(selected.on, selected, ["tf10-probe", listener]);
+  try {
+    Reflect.apply(selected.fire, selected, ["tf10-probe"]);
+  } finally {
+    Reflect.apply(selected.off, selected, ["tf10-probe", listener]);
+  }
+  Reflect.apply(selected.fire, selected, ["tf10-probe"]);
+  const tf10 = {
+    dragPan: { before, disabled, restored: handler.isEnabled() },
+    source: !!selected.getSource("point"),
+    layer: !!selected.getLayer("known"),
+    canvas: selected.getCanvas().tagName === "CANVAS",
+    styleLayer: selected
+      .getStyle()
+      .layers.some((layer) => layer.id === "known"),
+    eventCalls,
+  };
   selected.setGlobalStateProperty("rendering-fixture", 9009);
   selected.setSky({ "sky-color": "#112233" });
-  return { globalState: selected.getGlobalState(), sky: selected.getSky() };
+  return {
+    tf10,
+    globalState: selected.getGlobalState(),
+    sky: selected.getSky(),
+  };
 };
 
 const RenderingProbe = () => {

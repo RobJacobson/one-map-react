@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 
+import { useFrozenValue } from "../adapters/shared/use-frozen-value.js";
 import type {
   AttributionControlProps,
   ControlProps,
@@ -19,10 +20,15 @@ import { useStableOptions } from "./use-stable-options.js";
 export const Marker = forwardRef<MarkerRef, MarkerProps>((props, ref) => {
   useMapSession();
   const { Marker: Implementation } = useSelectedAdapter();
+  const defaultAnchor = useFrozenValue(
+    props.children === undefined || props.children === null
+      ? "bottom"
+      : "center"
+  );
   useStableOptions("Marker", {
     id: props.id,
-    anchor: props.anchor,
-    renderMode: props.renderMode,
+    anchor: props.anchor ?? defaultAnchor,
+    renderMode: props.renderMode ?? "view",
   });
   return <Implementation {...props} ref={ref} />;
 });
@@ -30,12 +36,14 @@ export const Marker = forwardRef<MarkerRef, MarkerProps>((props, ref) => {
 /** Mount controls visibility; teardown does not request dismissal. */
 export const Popup = (props: PopupProps) => {
   useMapSession();
-  const { Popup: Implementation } = useSelectedAdapter();
+  const { Popup: Implementation, backend } = useSelectedAdapter();
   useStableOptions("Popup", {
-    closeButton: props.closeButton,
-    closeOnClick: props.closeOnClick,
-    closeOnMove: props.closeOnMove,
-    focusAfterOpen: props.focusAfterOpen,
+    closeButton: props.closeButton ?? true,
+    closeOnClick: props.closeOnClick ?? true,
+    closeOnMove: props.closeOnMove ?? false,
+    focusAfterOpen: backend.endsWith("native")
+      ? props.focusAfterOpen
+      : (props.focusAfterOpen ?? true),
   });
   return <Implementation {...props} />;
 };
@@ -44,7 +52,7 @@ export const Popup = (props: PopupProps) => {
 export const Control = (props: ControlProps) => {
   useMapSession();
   const { Control: Implementation } = useSelectedAdapter();
-  useStableOptions("Control", { position: props.position });
+  useStableOptions("Control", { position: props.position ?? "top-right" });
   return <Implementation {...props} />;
 };
 
@@ -53,10 +61,10 @@ export const NavigationControl = (props: NavigationControlProps) => {
   useMapSession();
   const { NavigationControl: Implementation } = useSelectedAdapter();
   useStableOptions("NavigationControl", {
-    position: props.position,
-    showZoom: props.showZoom,
-    showCompass: props.showCompass,
-    visualizePitch: props.visualizePitch,
+    position: props.position ?? "top-right",
+    showZoom: props.showZoom ?? true,
+    showCompass: props.showCompass ?? true,
+    visualizePitch: props.visualizePitch ?? false,
   });
   return <Implementation {...props} />;
 };
@@ -64,10 +72,11 @@ export const NavigationControl = (props: NavigationControlProps) => {
 /** Delegates attribution to the selected renderer. */
 export const AttributionControl = (props: AttributionControlProps) => {
   useMapSession();
-  const { AttributionControl: Implementation } = useSelectedAdapter();
+  const { AttributionControl: Implementation, backend } = useSelectedAdapter();
+  const native = backend.endsWith("native");
   useStableOptions("AttributionControl", {
-    position: props.position,
-    compact: props.compact,
+    position: props.position ?? (native ? "bottom-right" : "top-right"),
+    compact: native ? (props.compact ?? true) : props.compact,
     customAttribution: props.customAttribution,
   });
   return <Implementation {...props} />;
@@ -76,10 +85,12 @@ export const AttributionControl = (props: AttributionControlProps) => {
 /** Displays projected ground distance in the requested units. */
 export const ScaleControl = (props: ScaleControlProps) => {
   useMapSession();
-  const { ScaleControl: Implementation } = useSelectedAdapter();
+  const { ScaleControl: Implementation, backend } = useSelectedAdapter();
   useStableOptions("ScaleControl", {
-    position: props.position,
-    maxWidth: props.maxWidth,
+    position:
+      props.position ??
+      (backend.endsWith("native") ? "bottom-left" : "top-right"),
+    maxWidth: props.maxWidth ?? 100,
   });
   return <Implementation {...props} />;
 };
@@ -89,7 +100,7 @@ export const GeolocateControl = (props: GeolocateControlProps) => {
   useMapSession();
   const { GeolocateControl: Implementation } = useSelectedAdapter();
   useStableOptions("GeolocateControl", {
-    position: props.position,
+    position: props.position ?? "top-right",
   });
   return <Implementation {...props} />;
 };
@@ -98,6 +109,8 @@ export const GeolocateControl = (props: GeolocateControlProps) => {
 export const FullscreenControl = (props: FullscreenControlProps) => {
   useMapSession();
   const { FullscreenControl: Implementation } = useSelectedAdapter();
-  useStableOptions("FullscreenControl", { position: props.position });
+  useStableOptions("FullscreenControl", {
+    position: props.position ?? "top-right",
+  });
   return <Implementation {...props} />;
 };

@@ -1,0 +1,1406 @@
+{
+  "checkpoint": "TF10",
+  "status": "rc.1 web execution complete with one confirmed MapLibre controlled-camera failure; rc.2 routine audit complete, changed-artifact authorization pending",
+  "authorization": {
+    "receivedAt": "2026-10-15T17:36:26Z",
+    "userInstruction": "Run them using a subagent. Would a slimmer model like GPT-6.0 Luna High be acceptable?",
+    "scope": "The previously proposed six-environment minimum/newest renderer, native linking/build/install and applicable service acceptance matrix, estimated 4\u201310 hours. No publication."
+  },
+  "artifact": {
+    "path": "artifacts/one-map-react-0.1.0-rc.1.tgz",
+    "sha256": "bf92a760f06da72ff4614b98b44cc4b1d7da8495c5527498250d744bf66d25ab",
+    "coordinatorVerified": true
+  },
+  "roles": {
+    "coordinator": "parent agent: artifact verification, diagnosis and acceptance review",
+    "preparation": "tf10_implementation: GPT-6.1 Sol Medium, isolated consumer preparation only",
+    "execution": "tf10_acceptance: GPT-6 Luna High, user-selected reasoning level"
+  },
+  "resources": {
+    "owner": "tf10_acceptance",
+    "execution": "serialized",
+    "fixturePort": 8798,
+    "webPorts": [
+      4291,
+      4292
+    ],
+    "debuggerPorts": [
+      5291,
+      5292
+    ],
+    "metroPort": 8081,
+    "native": "Exclusive simulator/emulator, build directory and installation ownership. Preserve pre-existing applications and data."
+  },
+  "preflight": {
+    "availableDiskGiB": 9.9,
+    "storage": "User freed space and requested separated platform execution. Prepare/run one engine and version at a time, cap native build parallelism, and remove only test-owned generated outputs."
+  },
+  "results": [
+    {
+      "versionSet": "minimum",
+      "environment": "mapbox-web",
+      "scope": "TF09 rendering and representative TF10 selected ref operations",
+      "attempt": 1,
+      "status": "passed",
+      "harnessSha256": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+      "libraryDistSha256": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+      "scenarios": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed"
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed"
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed"
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed"
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "passed"
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed"
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed"
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed"
+        }
+      ],
+      "selectedRefObservation": {
+        "dragPan": {
+          "before": true,
+          "disabled": false,
+          "restored": true
+        },
+        "source": true,
+        "layer": true,
+        "canvas": true,
+        "styleLayer": true,
+        "eventCalls": 1
+      },
+      "review": "Coordinator inspected actual rendered-feature, pixels, SDK readbacks, gesture state and event listener results."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "maplibre-web",
+      "scope": "TF09 rendering and representative TF10 selected ref operations",
+      "attempt": 1,
+      "status": "passed",
+      "harnessSha256": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+      "libraryDistSha256": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+      "scenarios": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed"
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed"
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed"
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed"
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "passed"
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed"
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed"
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed"
+        }
+      ],
+      "selectedRefObservation": {
+        "dragPan": {
+          "before": true,
+          "disabled": false,
+          "restored": true
+        },
+        "source": true,
+        "layer": true,
+        "canvas": true,
+        "styleLayer": true,
+        "eventCalls": 1
+      },
+      "review": "Coordinator inspected real renderer outcomes and new TF10 readbacks."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "mapbox-web",
+      "scope": "TF04 camera",
+      "attempt": 1,
+      "status": "passed",
+      "observation": {
+        "fit": "ok",
+        "click": "hit",
+        "stop": "stayed",
+        "held": "1"
+      },
+      "harnessSha256": "fd32fd8101ba0d455a83acc9787aa04da8f369b1d5c7327ebef2bc31f3cb2152"
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "maplibre-web",
+      "scope": "TF04 camera",
+      "attempt": 1,
+      "status": "failed",
+      "error": "React Maximum update depth exceeded, from MapLibre resize -> onMove -> facade setCamera -> wrapper setProps -> resize.",
+      "harnessSha256": "fd32fd8101ba0d455a83acc9787aa04da8f369b1d5c7327ebef2bc31f3cb2152",
+      "diagnosis": "Portable nested viewState omits width/height. react-map-gl MapLibre _updateSize compares those absent fields with canvas size and invokes resize on each render. The facade records the resulting camera event and renders again.",
+      "processOutcome": "Runner emitted final JSON but remained alive; worker terminated only its owned process group after preserving evidence.",
+      "recordCorrection": "Initial reported original-source harness hash was stale; actual executed isolated copy hash verified above. Native-only ID overrides have no effect on this web code path."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "mapbox-web",
+      "scope": "TF04 gesture/padding corrections",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "padding update/reset",
+        "double tap zoom",
+        "rotation reset with pinch disabled",
+        "rotation release/reuse",
+        "master disables all eight handlers",
+        "disabled physical double click",
+        "explicit/default gesture restoration",
+        "interaction settings on renderer reuse"
+      ],
+      "mode": "real automation",
+      "harnessSha256": "fd32fd8101ba0d455a83acc9787aa04da8f369b1d5c7327ebef2bc31f3cb2152",
+      "processOutcome": "Complete passing JSON followed by coordinator-authorized SIGTERM of owned process group after shutdown grace period."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "maplibre-web",
+      "scope": "TF04 gesture/padding corrections",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "padding update/reset",
+        "double tap zoom",
+        "rotation reset with pinch disabled",
+        "rotation release/reuse",
+        "master disables all eight handlers",
+        "disabled physical double click",
+        "explicit/default gesture restoration",
+        "interaction settings on renderer reuse"
+      ],
+      "mode": "real automation",
+      "harnessSha256": "fd32fd8101ba0d455a83acc9787aa04da8f369b1d5c7327ebef2bc31f3cb2152",
+      "processOutcome": "Complete passing JSON followed by coordinator-authorized SIGTERM of owned process group after shutdown grace period."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "mapbox-web",
+      "scope": "TF05 source and layer lifecycle",
+      "attempt": 1,
+      "status": "passed",
+      "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "fields": {
+        "mounted": "1",
+        "reset": "ok",
+        "data": "updated",
+        "style": "rebuilt",
+        "removed": "clean",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "harnessSha256": "82c1b6456ef93a1d960b40bd942125392fd1fa7ed06827aa0f2c1cd299de51ad",
+      "processOutcome": "Runner reported passing scenarios; owned post-report cleanup tracked by execution worker."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "maplibre-web",
+      "scope": "TF05 source and layer lifecycle",
+      "attempt": 1,
+      "status": "passed",
+      "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "fields": {
+        "mounted": "1",
+        "reset": "ok",
+        "data": "updated",
+        "style": "rebuilt",
+        "removed": "clean",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "harnessSha256": "82c1b6456ef93a1d960b40bd942125392fd1fa7ed06827aa0f2c1cd299de51ad",
+      "processOutcome": "Runner reported passing scenarios; owned post-report cleanup tracked by execution worker."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "mapbox-web",
+      "scope": "TF05 asynchronous image cleanup",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "pending image removal during style loading",
+        "owned image removal during same-style loading",
+        "owned image absence after renderer reuse",
+        "late image load cannot register after session release/reuse"
+      ],
+      "mode": "real automation",
+      "harnessSha256": "82c1b6456ef93a1d960b40bd942125392fd1fa7ed06827aa0f2c1cd299de51ad",
+      "review": "Coordinator inspected complete emitted scenario results; process cleanup is recorded separately by worker."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "maplibre-web",
+      "scope": "TF05 asynchronous image cleanup",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "pending image removal during style loading",
+        "owned image removal during same-style loading",
+        "owned image absence after renderer reuse",
+        "late image load cannot register after session release/reuse"
+      ],
+      "mode": "real automation",
+      "harnessSha256": "82c1b6456ef93a1d960b40bd942125392fd1fa7ed06827aa0f2c1cd299de51ad",
+      "review": "Coordinator inspected complete emitted scenario results; process cleanup is recorded separately by worker."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "mapbox-web",
+      "scope": "TF06 queries, clusters and feature state",
+      "attempt": 1,
+      "status": "passed",
+      "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+      "fields": {
+        "loaded": "1",
+        "point": "ok",
+        "bounds": "ok",
+        "viewport": "ok",
+        "empty": "ok",
+        "source": "ok",
+        "cluster-zoom": "ok",
+        "leaves": "ok",
+        "children": "ok",
+        "set-state": "ok",
+        "get-state": "ok",
+        "remove-state": "ok",
+        "filters": "ok",
+        "pagination": "ok",
+        "whole-state": "ok",
+        "recreated-state": "cleared",
+        "cleared-state": "cleared",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "corrections": {
+        "missing-source": "ok",
+        "unsupported-source": "ok",
+        "vector-layer-omitted": "ok",
+        "vector-layer-0": "ok",
+        "vector-layer-3": "ok",
+        "missing-rendered-layer": "ok",
+        "omitted-layers": "ok",
+        "empty-layers": "ok",
+        "rendered-emitted-error": "ok",
+        "source-emitted-error": "ok",
+        "empty-result": "ok",
+        "subsequent-query": "ok",
+        "listener-cleanup": "ok"
+      },
+      "harnessSha256": "3f076746f8b7c12785d612e903dbae1517826b953f5081285f03cffaba81dc6b",
+      "review": "Coordinator inspected complete emitted scenario results; process cleanup is recorded separately by worker."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "maplibre-web",
+      "scope": "TF06 queries, clusters and feature state",
+      "attempt": 1,
+      "status": "passed",
+      "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+      "fields": {
+        "loaded": "1",
+        "point": "ok",
+        "bounds": "ok",
+        "viewport": "ok",
+        "empty": "ok",
+        "source": "ok",
+        "cluster-zoom": "ok",
+        "leaves": "ok",
+        "children": "ok",
+        "set-state": "ok",
+        "get-state": "ok",
+        "remove-state": "ok",
+        "filters": "ok",
+        "pagination": "ok",
+        "whole-state": "ok",
+        "recreated-state": "cleared",
+        "cleared-state": "cleared",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "corrections": {
+        "missing-source": "ok",
+        "unsupported-source": "ok",
+        "vector-layer-omitted": "ok",
+        "vector-layer-0": "ok",
+        "vector-layer-3": "ok",
+        "missing-rendered-layer": "ok",
+        "omitted-layers": "ok",
+        "empty-layers": "ok",
+        "rendered-emitted-error": "ok",
+        "source-emitted-error": "ok",
+        "empty-result": "ok",
+        "subsequent-query": "ok",
+        "listener-cleanup": "ok"
+      },
+      "harnessSha256": "3f076746f8b7c12785d612e903dbae1517826b953f5081285f03cffaba81dc6b",
+      "review": "Coordinator inspected complete emitted scenario results; process cleanup is recorded separately by worker."
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "mapbox-web",
+      "scope": "TF07 browser interaction",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "known-feature",
+        "child-click",
+        "annotation-repeat-tap",
+        "live-drag",
+        "annotation-drag",
+        "source-propagation",
+        "navigation",
+        "popup-dismissal",
+        "remount-teardown"
+      ],
+      "observation": {
+        "events": {
+          "popup-open": 3,
+          "load": 2,
+          "annotation-click": 2,
+          "marker-click": 1,
+          "child-click": 1,
+          "live-start": 1,
+          "live-drag": 6,
+          "style": 2,
+          "live-end": 1,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "source-click": 2,
+          "map-click": 1,
+          "move": 26,
+          "popup-close": 1
+        },
+        "positions": {
+          "live": [
+            -122.32352050781279,
+            47.60444468658437
+          ],
+          "annotation": [
+            -122.36368927001988,
+            47.60444468658437
+          ]
+        },
+        "center": [
+          -122.34,
+          47.61
+        ],
+        "zoom": 11,
+        "generation": 1,
+        "stopSourcePropagation": true
+      },
+      "featureIds": [
+        707
+      ],
+      "remainingUnverified": [
+        "offset-touch-bounds",
+        "popup-follow",
+        "scale-units",
+        "geolocation",
+        "accessibility",
+        "style-replacement",
+        "fullscreen"
+      ],
+      "rawResultSha256": "a1507812e197ba19fb115f952d793aca61fb63c02e2b9da0ef7a5c4c373c5628"
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "maplibre-web",
+      "scope": "TF07 browser interaction",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "known-feature",
+        "child-click",
+        "annotation-repeat-tap",
+        "live-drag",
+        "annotation-drag",
+        "source-propagation",
+        "navigation",
+        "popup-dismissal",
+        "remount-teardown"
+      ],
+      "observation": {
+        "events": {
+          "popup-open": 3,
+          "load": 2,
+          "move": 27,
+          "style": 2,
+          "annotation-click": 2,
+          "marker-click": 1,
+          "child-click": 1,
+          "live-start": 1,
+          "live-drag": 6,
+          "live-end": 1,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "source-click": 2,
+          "map-click": 1,
+          "popup-close": 1
+        },
+        "positions": {
+          "live": [
+            -122.32352050781279,
+            47.604444686584344
+          ],
+          "annotation": [
+            -122.36368927001988,
+            47.604444686584344
+          ]
+        },
+        "center": [
+          -122.34,
+          47.61
+        ],
+        "zoom": 11,
+        "generation": 1,
+        "stopSourcePropagation": true
+      },
+      "featureIds": [
+        707
+      ],
+      "remainingUnverified": [
+        "offset-touch-bounds",
+        "popup-follow",
+        "scale-units",
+        "geolocation",
+        "accessibility",
+        "style-replacement",
+        "fullscreen"
+      ],
+      "rawResultSha256": "a1507812e197ba19fb115f952d793aca61fb63c02e2b9da0ef7a5c4c373c5628"
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "mapbox-web",
+      "scope": "TF08 location and capture",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed"
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed"
+        },
+        {
+          "name": "gesture interruption and resume without another watch",
+          "status": "passed"
+        },
+        {
+          "name": "browser geolocation success after activation",
+          "status": "passed"
+        },
+        {
+          "name": "browser permission denial reaches the control error callback",
+          "status": "passed"
+        },
+        {
+          "name": "retained incompatible drawing buffer rejects capture",
+          "status": "passed"
+        },
+        {
+          "name": "external incompatible drawing buffer rejects capture",
+          "status": "passed"
+        },
+        {
+          "name": "canvas export failure propagates",
+          "status": "passed"
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed"
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed"
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed"
+        }
+      ],
+      "libraryDistSha256": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+      "remaining": [],
+      "imageObservations": [
+        {
+          "scenario": "actual PNG capture and overlay scope",
+          "width": 1280,
+          "height": 713,
+          "red": 560,
+          "blue": 0,
+          "green": 0,
+          "navy": 912029,
+          "magenta": 0
+        },
+        {
+          "scenario": "strict renderer capture scope",
+          "width": 1280,
+          "height": 713,
+          "red": 560,
+          "blue": 0,
+          "green": 0,
+          "navy": 912029,
+          "magenta": 0
+        }
+      ],
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "f98f912fb47f56a778b1659387cf261f6d43e467d9f8aa76952cc86707c54863",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "b01cd08522a2d7f41477711a8c22b83b1dfc026b6b667e28293cf31aeb2b4e58",
+        "examples/shared/native-tf08-screen.tsx": "af1aa460426aedd5d7b9efdc5311d3bd0632966bba391b02dbd7ce90c7dbc022",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "371a818a87a1883492e43395c55b801fe815ea4e032483b2ef4db1612da3826c",
+        "examples/native-maplibre/App.tsx": "ea4d1102e1e858fee8db62dc45db7bd0e65a801216ff41cbe8fa10a52c620844",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "rawResultSha256": "0f0a2995447112fca922f14367e8b4bcd71b0151f356ddf2e2bc3225b1891589"
+    },
+    {
+      "versionSet": "minimum",
+      "environment": "maplibre-web",
+      "scope": "TF08 location and capture",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed"
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed"
+        },
+        {
+          "name": "gesture interruption and resume without another watch",
+          "status": "passed"
+        },
+        {
+          "name": "browser geolocation success after activation",
+          "status": "passed"
+        },
+        {
+          "name": "browser permission denial reaches the control error callback",
+          "status": "passed"
+        },
+        {
+          "name": "retained incompatible drawing buffer rejects capture",
+          "status": "passed"
+        },
+        {
+          "name": "external incompatible drawing buffer rejects capture",
+          "status": "passed"
+        },
+        {
+          "name": "canvas export failure propagates",
+          "status": "passed"
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed"
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed"
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed"
+        }
+      ],
+      "libraryDistSha256": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+      "remaining": [],
+      "imageObservations": [
+        {
+          "scenario": "actual PNG capture and overlay scope",
+          "width": 1280,
+          "height": 713,
+          "red": 560,
+          "blue": 0,
+          "green": 0,
+          "navy": 912029,
+          "magenta": 0
+        },
+        {
+          "scenario": "strict renderer capture scope",
+          "width": 1280,
+          "height": 713,
+          "red": 560,
+          "blue": 0,
+          "green": 0,
+          "navy": 912029,
+          "magenta": 0
+        }
+      ],
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "f98f912fb47f56a778b1659387cf261f6d43e467d9f8aa76952cc86707c54863",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "b01cd08522a2d7f41477711a8c22b83b1dfc026b6b667e28293cf31aeb2b4e58",
+        "examples/shared/native-tf08-screen.tsx": "af1aa460426aedd5d7b9efdc5311d3bd0632966bba391b02dbd7ce90c7dbc022",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "371a818a87a1883492e43395c55b801fe815ea4e032483b2ef4db1612da3826c",
+        "examples/native-maplibre/App.tsx": "ea4d1102e1e858fee8db62dc45db7bd0e65a801216ff41cbe8fa10a52c620844",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "rawResultSha256": "bec000ac89cb6ede97122fbb93df75b830ca25e448499b3547baf74adcabb48f"
+    },
+    {
+      "versionSet": "newest",
+      "environment": "mapbox-web",
+      "scope": "TF09 rendering and representative TF10 selected ref operations",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed"
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed"
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed"
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed"
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "passed"
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed"
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed"
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed"
+        }
+      ],
+      "libraryDistSha256": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+      "selectedRefObservation": {
+        "dragPan": {
+          "before": true,
+          "disabled": false,
+          "restored": true
+        },
+        "source": true,
+        "layer": true,
+        "canvas": true,
+        "styleLayer": true,
+        "eventCalls": 1
+      },
+      "rawResultSha256": "a036a1cc5112b50983a0a54c4a2d252beedb9ec17e038e23dd8abbca23cf8cdb"
+    },
+    {
+      "versionSet": "newest",
+      "environment": "maplibre-web",
+      "scope": "TF09 rendering and representative TF10 selected ref operations",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        {
+          "name": "known rendered feature and initial no-data",
+          "status": "passed"
+        },
+        {
+          "name": "terrain enabled before delayed DEM attachment",
+          "status": "passed"
+        },
+        {
+          "name": "explicit terrain clear and projection change",
+          "status": "passed"
+        },
+        {
+          "name": "named selected renderer facilities",
+          "status": "passed"
+        },
+        {
+          "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          "status": "passed"
+        },
+        {
+          "name": "hillshade draws the fixture's slope patch",
+          "status": "passed"
+        },
+        {
+          "name": "globe projection has independently different viewport output",
+          "status": "passed"
+        },
+        {
+          "name": "rendered output contains the known orange feature",
+          "status": "passed"
+        }
+      ],
+      "libraryDistSha256": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+      "selectedRefObservation": {
+        "dragPan": {
+          "before": true,
+          "disabled": false,
+          "restored": true
+        },
+        "source": true,
+        "layer": true,
+        "canvas": true,
+        "styleLayer": true,
+        "eventCalls": 1
+      },
+      "rawResultSha256": "9a6937e80997aa20479e45023c4ed5dd6ab76c9781ed3b696852821f4d73773f"
+    },
+    {
+      "versionSet": "newest",
+      "environment": "mapbox-web",
+      "scope": "TF04 gesture/padding corrections",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "padding update/reset",
+        "double tap zoom",
+        "rotation reset with pinch disabled",
+        "rotation release/reuse",
+        "master disables all eight handlers",
+        "disabled physical double click",
+        "explicit/default gesture restoration",
+        "interaction settings on renderer reuse"
+      ],
+      "mode": "real automation",
+      "rawResultSha256": "a46c6dba4ad02c5bd80701f9f1f6eb972c190123f3d1bf91f1fc45ceec5861fd",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "maplibre-web",
+      "scope": "TF04 gesture/padding corrections",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "padding update/reset",
+        "double tap zoom",
+        "rotation reset with pinch disabled",
+        "rotation release/reuse",
+        "master disables all eight handlers",
+        "disabled physical double click",
+        "explicit/default gesture restoration",
+        "interaction settings on renderer reuse"
+      ],
+      "mode": "real automation",
+      "rawResultSha256": "a46c6dba4ad02c5bd80701f9f1f6eb972c190123f3d1bf91f1fc45ceec5861fd",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "mapbox-web",
+      "scope": "TF05 source and layer lifecycle",
+      "attempt": 1,
+      "status": "passed",
+      "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "fields": {
+        "mounted": "1",
+        "reset": "ok",
+        "data": "updated",
+        "style": "rebuilt",
+        "removed": "clean",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "rawResultSha256": "faa0057b1705925dc8264c21c2d3d39a628a26a109f07ab99dc3447829bfa6ad",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "maplibre-web",
+      "scope": "TF05 source and layer lifecycle",
+      "attempt": 1,
+      "status": "passed",
+      "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "fields": {
+        "mounted": "1",
+        "reset": "ok",
+        "data": "updated",
+        "style": "rebuilt",
+        "removed": "clean",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "rawResultSha256": "faa0057b1705925dc8264c21c2d3d39a628a26a109f07ab99dc3447829bfa6ad",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "mapbox-web",
+      "scope": "TF05 asynchronous image cleanup",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "pending image removal during style loading",
+        "owned image removal during same-style loading",
+        "owned image absence after renderer reuse",
+        "late image load cannot register after session release/reuse"
+      ],
+      "mode": "real automation",
+      "rawResultSha256": "edc49ea31991dd1af28c9c8de7ba0471c04b463dae2bc4d686630ca9c625a29a",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "maplibre-web",
+      "scope": "TF05 asynchronous image cleanup",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "pending image removal during style loading",
+        "owned image removal during same-style loading",
+        "owned image absence after renderer reuse",
+        "late image load cannot register after session release/reuse"
+      ],
+      "mode": "real automation",
+      "rawResultSha256": "edc49ea31991dd1af28c9c8de7ba0471c04b463dae2bc4d686630ca9c625a29a",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "mapbox-web",
+      "scope": "TF06 queries, clusters and feature state",
+      "attempt": 1,
+      "status": "passed",
+      "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+      "fields": {
+        "loaded": "1",
+        "point": "ok",
+        "bounds": "ok",
+        "viewport": "ok",
+        "empty": "ok",
+        "source": "ok",
+        "cluster-zoom": "ok",
+        "leaves": "ok",
+        "children": "ok",
+        "set-state": "ok",
+        "get-state": "ok",
+        "remove-state": "ok",
+        "filters": "ok",
+        "pagination": "ok",
+        "whole-state": "ok",
+        "recreated-state": "cleared",
+        "cleared-state": "cleared",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "corrections": {
+        "missing-source": "ok",
+        "unsupported-source": "ok",
+        "vector-layer-omitted": "ok",
+        "vector-layer-0": "ok",
+        "vector-layer-3": "ok",
+        "missing-rendered-layer": "ok",
+        "omitted-layers": "ok",
+        "empty-layers": "ok",
+        "rendered-emitted-error": "ok",
+        "source-emitted-error": "ok",
+        "empty-result": "ok",
+        "subsequent-query": "ok",
+        "listener-cleanup": "ok"
+      },
+      "rawResultSha256": "f0be0510149072cf5cc9bbb5f6e3c6278bc7f39f7020e50f7041ecc92b203332",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "maplibre-web",
+      "scope": "TF06 queries, clusters and feature state",
+      "attempt": 1,
+      "status": "passed",
+      "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=cleared cleared-state=cleared error=none note=none phase=done done=1",
+      "fields": {
+        "loaded": "1",
+        "point": "ok",
+        "bounds": "ok",
+        "viewport": "ok",
+        "empty": "ok",
+        "source": "ok",
+        "cluster-zoom": "ok",
+        "leaves": "ok",
+        "children": "ok",
+        "set-state": "ok",
+        "get-state": "ok",
+        "remove-state": "ok",
+        "filters": "ok",
+        "pagination": "ok",
+        "whole-state": "ok",
+        "recreated-state": "cleared",
+        "cleared-state": "cleared",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "corrections": {
+        "missing-source": "ok",
+        "unsupported-source": "ok",
+        "vector-layer-omitted": "ok",
+        "vector-layer-0": "ok",
+        "vector-layer-3": "ok",
+        "missing-rendered-layer": "ok",
+        "omitted-layers": "ok",
+        "empty-layers": "ok",
+        "rendered-emitted-error": "ok",
+        "source-emitted-error": "ok",
+        "empty-result": "ok",
+        "subsequent-query": "ok",
+        "listener-cleanup": "ok"
+      },
+      "rawResultSha256": "f0be0510149072cf5cc9bbb5f6e3c6278bc7f39f7020e50f7041ecc92b203332",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "mapbox-web",
+      "scope": "TF07 browser interaction",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "known-feature",
+        "child-click",
+        "annotation-repeat-tap",
+        "live-drag",
+        "annotation-drag",
+        "source-propagation",
+        "navigation",
+        "popup-dismissal",
+        "remount-teardown"
+      ],
+      "observation": {
+        "events": {
+          "popup-open": 3,
+          "load": 2,
+          "annotation-click": 2,
+          "marker-click": 1,
+          "child-click": 1,
+          "live-start": 1,
+          "live-drag": 6,
+          "style": 2,
+          "live-end": 1,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "source-click": 2,
+          "map-click": 1,
+          "move": 26,
+          "popup-close": 1
+        },
+        "positions": {
+          "live": [
+            -122.32352050781279,
+            47.60444468658437
+          ],
+          "annotation": [
+            -122.36368927001988,
+            47.60444468658437
+          ]
+        },
+        "center": [
+          -122.34,
+          47.61
+        ],
+        "zoom": 11,
+        "generation": 1,
+        "stopSourcePropagation": true
+      },
+      "featureIds": [
+        707
+      ],
+      "remainingUnverified": [
+        "offset-touch-bounds",
+        "popup-follow",
+        "scale-units",
+        "geolocation",
+        "accessibility",
+        "style-replacement",
+        "fullscreen"
+      ],
+      "rawResultSha256": "a1507812e197ba19fb115f952d793aca61fb63c02e2b9da0ef7a5c4c373c5628",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "maplibre-web",
+      "scope": "TF07 browser interaction",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        "known-feature",
+        "child-click",
+        "annotation-repeat-tap",
+        "live-drag",
+        "annotation-drag",
+        "source-propagation",
+        "navigation",
+        "popup-dismissal",
+        "remount-teardown"
+      ],
+      "observation": {
+        "events": {
+          "popup-open": 3,
+          "load": 2,
+          "move": 27,
+          "style": 2,
+          "annotation-click": 2,
+          "marker-click": 1,
+          "child-click": 1,
+          "live-start": 1,
+          "live-drag": 6,
+          "live-end": 1,
+          "annotation-start": 1,
+          "annotation-end": 1,
+          "source-click": 2,
+          "map-click": 1,
+          "popup-close": 1
+        },
+        "positions": {
+          "live": [
+            -122.32352050781279,
+            47.604444686584344
+          ],
+          "annotation": [
+            -122.36368927001988,
+            47.604444686584344
+          ]
+        },
+        "center": [
+          -122.34,
+          47.61
+        ],
+        "zoom": 11,
+        "generation": 1,
+        "stopSourcePropagation": true
+      },
+      "featureIds": [
+        707
+      ],
+      "remainingUnverified": [
+        "offset-touch-bounds",
+        "popup-follow",
+        "scale-units",
+        "geolocation",
+        "accessibility",
+        "style-replacement",
+        "fullscreen"
+      ],
+      "rawResultSha256": "a1507812e197ba19fb115f952d793aca61fb63c02e2b9da0ef7a5c4c373c5628",
+      "review": "Coordinator inspected emitted scenario results; process outcomes retained in worker evidence."
+    },
+    {
+      "versionSet": "newest",
+      "environment": "mapbox-web",
+      "scope": "TF08 location and capture",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed"
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed"
+        },
+        {
+          "name": "gesture interruption and resume without another watch",
+          "status": "passed"
+        },
+        {
+          "name": "browser geolocation success after activation",
+          "status": "passed"
+        },
+        {
+          "name": "browser permission denial reaches the control error callback",
+          "status": "passed"
+        },
+        {
+          "name": "retained incompatible drawing buffer rejects capture",
+          "status": "passed"
+        },
+        {
+          "name": "external incompatible drawing buffer rejects capture",
+          "status": "passed"
+        },
+        {
+          "name": "canvas export failure propagates",
+          "status": "passed"
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed"
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed"
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed"
+        }
+      ],
+      "libraryDistSha256": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+      "remaining": [],
+      "imageObservations": [
+        {
+          "scenario": "actual PNG capture and overlay scope",
+          "width": 1280,
+          "height": 713,
+          "red": 560,
+          "blue": 0,
+          "green": 0,
+          "navy": 912029,
+          "magenta": 0
+        },
+        {
+          "scenario": "strict renderer capture scope",
+          "width": 1280,
+          "height": 713,
+          "red": 560,
+          "blue": 0,
+          "green": 0,
+          "navy": 912029,
+          "magenta": 0
+        }
+      ],
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "f98f912fb47f56a778b1659387cf261f6d43e467d9f8aa76952cc86707c54863",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "b01cd08522a2d7f41477711a8c22b83b1dfc026b6b667e28293cf31aeb2b4e58",
+        "examples/shared/native-tf08-screen.tsx": "af1aa460426aedd5d7b9efdc5311d3bd0632966bba391b02dbd7ce90c7dbc022",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "371a818a87a1883492e43395c55b801fe815ea4e032483b2ef4db1612da3826c",
+        "examples/native-maplibre/App.tsx": "ea4d1102e1e858fee8db62dc45db7bd0e65a801216ff41cbe8fa10a52c620844",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "rawResultSha256": "0dfbdccb70b83554a1595316f6c8987a32fe7dc4751852ba37d534830619a147"
+    },
+    {
+      "versionSet": "newest",
+      "environment": "maplibre-web",
+      "scope": "TF08 location and capture",
+      "attempt": 1,
+      "status": "passed",
+      "scenarios": [
+        {
+          "name": "known renderer feature",
+          "status": "passed"
+        },
+        {
+          "name": "injected location display and following",
+          "status": "passed"
+        },
+        {
+          "name": "gesture interruption and resume without another watch",
+          "status": "passed"
+        },
+        {
+          "name": "browser geolocation success after activation",
+          "status": "passed"
+        },
+        {
+          "name": "browser permission denial reaches the control error callback",
+          "status": "passed"
+        },
+        {
+          "name": "retained incompatible drawing buffer rejects capture",
+          "status": "passed"
+        },
+        {
+          "name": "external incompatible drawing buffer rejects capture",
+          "status": "passed"
+        },
+        {
+          "name": "canvas export failure propagates",
+          "status": "passed"
+        },
+        {
+          "name": "actual PNG capture and overlay scope",
+          "status": "passed"
+        },
+        {
+          "name": "strict renderer capture scope",
+          "status": "passed"
+        },
+        {
+          "name": "detach releases tracking and suppresses late fixes",
+          "status": "passed"
+        }
+      ],
+      "libraryDistSha256": "ef2c8f6a316c56c2e9d012ec8d39436f958588b4e330921cd6af52482ffb7f99",
+      "remaining": [],
+      "imageObservations": [
+        {
+          "scenario": "actual PNG capture and overlay scope",
+          "width": 1280,
+          "height": 713,
+          "red": 560,
+          "blue": 0,
+          "green": 0,
+          "navy": 912029,
+          "magenta": 0
+        },
+        {
+          "scenario": "strict renderer capture scope",
+          "width": 1280,
+          "height": 713,
+          "red": 560,
+          "blue": 0,
+          "green": 0,
+          "navy": 912029,
+          "magenta": 0
+        }
+      ],
+      "harnessSha256": {
+        "scripts/tf08-services-smoke.mjs": "ada73ec6d1e105c4ac5ce7e9b62d69e426b6faa0f94513028fef85c1318b8810",
+        "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+        "scripts/tf08-offline-observations.mjs": "f98f912fb47f56a778b1659387cf261f6d43e467d9f8aa76952cc86707c54863",
+        "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+        "examples/shared/tf08-acceptance-scene.tsx": "b01cd08522a2d7f41477711a8c22b83b1dfc026b6b667e28293cf31aeb2b4e58",
+        "examples/shared/native-tf08-screen.tsx": "af1aa460426aedd5d7b9efdc5311d3bd0632966bba391b02dbd7ce90c7dbc022",
+        "examples/shared/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+        "examples/native-mapbox/App.tsx": "371a818a87a1883492e43395c55b801fe815ea4e032483b2ef4db1612da3826c",
+        "examples/native-maplibre/App.tsx": "ea4d1102e1e858fee8db62dc45db7bd0e65a801216ff41cbe8fa10a52c620844",
+        "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+      },
+      "rawResultSha256": "5fff71164b70be2b31e299b3e28f72a7e63d80fa21b61524ec758f64762f8214"
+    }
+  ],
+  "publication": "not authorized",
+  "preparedConsumers": {
+    "root": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-tf10-acceptance-_ianc8wh",
+    "minimum": {
+      "react": "19.2.3",
+      "react-dom": "19.2.3",
+      "react-map-gl": "8.1.3",
+      "mapbox-gl": "3.32.0",
+      "maplibre-gl": "6.13.0"
+    },
+    "newest": {
+      "react": "19.3.1",
+      "react-dom": "19.3.1",
+      "react-map-gl": "8.1.3",
+      "mapbox-gl": "3.33.0",
+      "maplibre-gl": "6.14.0"
+    },
+    "coordinatorVerification": "Independently checked installed peer versions and every dist file against the frozen candidate."
+  },
+  "preparationEvidence": "records/evidence/tf10-web-preparation.json",
+  "modelChoice": {
+    "model": "gpt-6-luna",
+    "reasoning": "high",
+    "reason": "User requested a slimmer execution model with high reasoning; stronger coordinator retains preparation verification, diagnosis and acceptance review.",
+    "officialConfigurationSource": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+  },
+  "deliberatelySkipped": [
+    {
+      "versionSet": "newest",
+      "scope": "TF04 normal web camera",
+      "reason": "Same react-map-gl 8.1.3 controlled-size path as the confirmed minimum failure; defer changed-artifact acceptance until the repair is reviewed."
+    }
+  ],
+  "platformOrder": [
+    "web",
+    "android",
+    "ios"
+  ],
+  "nextCandidate": {
+    "path": "artifacts/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "9d28992c19a791c0af66bc0efb6ee3844747b66d1a8680f5da8647c8c70d150c",
+    "audit": "records/evidence/tf10-rc2-audit.json",
+    "acceptance": "Awaiting changed-artifact authorization; no rc.2 renderer execution."
+  },
+  "workerEvidence": "records/evidence/tf10-acceptance-worker.json",
+  "androidPreparation": {
+    "evidence": "records/evidence/tf10-android-preparation.json",
+    "coordinatorVerification": "All195 installed candidate files matched rc.2 archive; SDK version setting, isolated applicationId and original namespace verified; low-resource Gradle settings inspected.",
+    "nativeResolutionBuildInstall": "not run"
+  },
+  "rc1CommandSummary": {
+    "entries": 20,
+    "passed": 18,
+    "failed": 1,
+    "skipped": 1,
+    "interpretation": "A command group may include both engines and multiple scenarios. These counts are not a per-field compatibility certification. TF07 input scope and its remaining observations are recorded separately."
+  },
+  "rc2PreparationEvidence": "records/evidence/tf10-rc2-preparation.json",
+  "temporaryHarnessOverlays": [
+    "records/evidence/tf10-ui-extension.patch",
+    "records/evidence/tf10-native-engine-selection.patch"
+  ],
+  "firstCameraFailureEvidence": "records/evidence/tf10-rc1-camera-failure.json",
+  "retention": {
+    "kept": "Both small candidate archives, compact outcomes/provenance, exact failure and temporary harness diffs.",
+    "rc1ConsumerCleanup": "Complete rc.1 temporary consumer/source trees are no longer needed after finished runs; rc.2 prepared trees retained pending authorization.",
+    "userApplications": "No application uninstalled or reset; no native build/install has run."
+  }
+}

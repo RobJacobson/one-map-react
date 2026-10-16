@@ -7,6 +7,7 @@ import {
   readFileSync,
   rmSync,
 } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { runInNewContext } from "node:vm";
@@ -16,6 +17,7 @@ import { transformSync } from "@babel/core";
 const root = resolve(import.meta.dirname, "..");
 const rnRoot = resolve(root, "node_modules/@rnmapbox/maps");
 const mlRoot = resolve(root, "node_modules/@maplibre/maplibre-react-native");
+const requireHelper = createRequire(import.meta.url);
 
 // Helpers precede the eager checks so their const bindings are initialized.
 /** Extracts one native operation so assertions cannot match unrelated methods. */
@@ -74,6 +76,7 @@ const exports = {};
 runInNewContext(compiled, {
   exports,
   require: (name) => {
+    if (name.startsWith("@babel/runtime/helpers/")) return requireHelper(name);
     if (name === "react-native")
       return {
         NativeModules: {
@@ -278,7 +281,19 @@ const resume = nativeSection(
 );
 assert.match(resume, /setDownloadState\(OfflineRegion\.STATE_ACTIVE\)/);
 
-verifyPeerPatch(rnRoot, "rnmapbox-10.3.7-tf08.patch");
+const rnVersion = JSON.parse(
+  readFileSync(join(rnRoot, "package.json"), "utf8")
+).version;
+assert(
+  ["10.3.7", "10.3.8"].includes(rnVersion),
+  "Unknown RNMapbox patch version."
+);
+verifyPeerPatch(
+  rnRoot,
+  rnVersion === "10.3.8"
+    ? "rnmapbox-10.3.8.patch"
+    : "rnmapbox-10.3.7-tf08.patch"
+);
 verifyPeerPatch(mlRoot, "maplibre-native-11.5.0-tf08.patch");
 console.log(
   "PASS TF08 peer patches: clean application round trips, RNMapbox zero-zoom constructor execution, and native source assertions for image cleanup/scale and offline download ownership."

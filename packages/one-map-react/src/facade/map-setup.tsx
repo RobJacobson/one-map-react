@@ -4,7 +4,7 @@ import {
   useContext,
   useLayoutEffect,
   useMemo,
-  useRef,
+  useState,
   useSyncExternalStore,
 } from "react";
 
@@ -42,10 +42,9 @@ export const MapSetup = ({
   locationProvider,
   children,
 }: MapSetupProps) => {
-  const registry = useMemo(() => createRegistry(), []);
-  const initialProvider = useRef(locationProvider);
-  // eslint-disable-next-line react/refs -- Provider identity is a creation contract; replacement must fail during render and require a keyed remount.
-  if (initialProvider.current !== locationProvider)
+  const [registry] = useState(createRegistry);
+  const [initialProvider] = useState(() => locationProvider);
+  if (initialProvider !== locationProvider)
     throw new Error(
       "MapSetup locationProvider changed. Remount with a new key."
     );

@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "moduleSuffixes": [""],
+    "lib": ["ES2022", "DOM"],
+    "types": ["vite/client"]
+  },
+  "include": ["src/**/*.tsx", "src/**/*.ts"]
+}

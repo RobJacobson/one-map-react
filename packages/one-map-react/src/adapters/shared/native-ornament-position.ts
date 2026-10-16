@@ -4,7 +4,7 @@ import type { ControlPosition } from "../../contracts/ui-types.js";
 import {
   type NativeOverlay,
   NativeOverlayContext,
-} from "../../facade/map-context.js";
+} from "./native-map-presentation.js";
 
 /**
  * Coordinates SDK defaults with native control bounds and restores removed rows.

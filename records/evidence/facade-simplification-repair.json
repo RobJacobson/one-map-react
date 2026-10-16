@@ -1,0 +1,301 @@
+{
+  "date": "2026-10-16",
+  "checkpoint": "Facade creation-validation repair and consolidation",
+  "status": "routine_passed_acceptance_not_run",
+  "baseCommit": "30ef288379f6074bfa156a2dab19bc1dfb0a8bd5",
+  "commit": "not_created",
+  "changes": [
+    "Restore normalized portable UI creation guards for custom adapters while retaining built-in and selected-option validation.",
+    "Freeze content-dependent native marker defaults independently from explicit anchors; removing a nondefault anchor requires remount.",
+    "Return the retained generic creation snapshot and remove duplicate native UI snapshots.",
+    "Delegate web Layer directly and remove its passthrough module; type the internal wrapper boundary as Adapter.Layer.",
+    "Consolidate 42 Mapbox and 21 MapLibre additional unchanged method delegates using the existing typed helper.",
+    "Compress support and evidence profiles without changing inventory values; preserve independently editable expanded entries."
+  ],
+  "artifact": {
+    "path": "/private/tmp/one-map-facade-repair-artifact/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "75d3d4ae43f120712574500061cc4d2a7e00bf77ee18be538030cea4cd9a2c93",
+    "bytes": 166609,
+    "distFiles": 192,
+    "archivedDistMatchesFinalBuild": true,
+    "sourceSha256": "aa1db635107866c1feb641f8cf938e45abb4bf0de8685c88dbd6cc14a5d3fade",
+    "distSha256": "2bdeb8e886802ed5cb887de9d7f84e4bf64af074a9aaf09d2e56b572aec824e3",
+    "digestMethod": "SHA-256 of sorted compact JSON mapping package-relative filenames to file SHA-256; source and dist maps computed separately."
+  },
+  "publicApi": {
+    "publicEntryDeclarationsByteIdentical": [
+      "index",
+      "mapbox-web",
+      "maplibre-web",
+      "mapbox-native",
+      "maplibre-native"
+    ],
+    "contractDeclarationsByteIdentical": 13,
+    "comparisonArchiveSha256": "a5e68fb7a708632bb871059d6bb675f54ee957f917ab52bdce9a563d163f9ac0",
+    "newPublicApis": false,
+    "adapterInterfaceChanged": false
+  },
+  "regressions": {
+    "beforeFix": "The initial source regression run failed 37 shared UI/creation-snapshot expectations; both native nondefault-anchor-removal cases failed.",
+    "afterFix": "Source and compiled suites pass with custom adapters for all four backend names, creation fields for every shared UI component, equivalent defaults, mutable fields, native anchor removal, initial explicit defaults and content changes.",
+    "preserved": "Native placement defaults and strict popup focus errors; source/layer injection and updates; method arguments, receivers, return and promise identity, operational failures, current-handle replacement and detachment."
+  },
+  "inventory": {
+    "originalSha256": "18e5e744dcccff555b71de86b1db674631acf16df8ec3319ce2c525dfa17bb41",
+    "originalBytes": 43398494,
+    "compactSha256": "018996b47cd588316859dc42f2c7b4cd71408a3f4f52fe03108e13d86d53fbb2",
+    "compactBytes": 23724820,
+    "expandedSha256": "16b34524eba05a4e9ea73c985bcf79641fcef4d3c28c22eae7bef90e45cbd962",
+    "entries": 12151,
+    "supportProfiles": 86,
+    "evidenceProfiles": 2,
+    "roundTrip": "deepEqual passed for the complete inventory, including metadata and entry order",
+    "schemaVersion": 2,
+    "savedBytes": 19673674,
+    "savedPercent": 45.33,
+    "comparison": "The expanded on-disk inventory deep-equals git show HEAD:records/api-coverage.json, including all metadata, every entry and array order. Expanded byte identity differs because object-key insertion order changes.",
+    "editingIsolation": "Regression tests verify editing an expanded support/evidence value cannot change another entry or the compact input, and compact profiles do not mutate their source inventory."
+  },
+  "checks": [
+    {
+      "command": "bun run validate",
+      "status": "passed",
+      "sourceTests": 657,
+      "mockedNativeTests": 219,
+      "packageSelections": 13,
+      "includes": "Formatting/lint, docs, inventory, four TypeScript projects, source and mocked-native tests, standalone regressions, builds and package checks."
+    },
+    {
+      "command": "bun run test:compiled",
+      "status": "passed",
+      "compiledWebTests": 450,
+      "mockedNativeTests": 219,
+      "compilerAssertions": "passed"
+    },
+    {
+      "command": "bun run typecheck:apps",
+      "status": "passed_after_build"
+    },
+    {
+      "command": "bun scripts/test-package.mjs --archive /private/tmp/one-map-facade-repair-artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "selections": 13
+    },
+    {
+      "command": "bun scripts/test-peers.mjs --archive /private/tmp/one-map-facade-repair-artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "consumers": 8,
+      "scope": "Selected and mixed peers, declarations, web imports and shipped native patch checks; no native linking."
+    },
+    {
+      "command": "bun scripts/test-example-resolution.mjs --archive /private/tmp/one-map-facade-repair-artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "webBundles": 2,
+      "scope": "Selected web bundles and static native resolution; no browser renderer or running Metro."
+    },
+    {
+      "command": "node scripts/check-inventory.test.mjs",
+      "status": "passed",
+      "scope": "Legacy/schema-1 reading, schema-2 round trips, deterministic hashes, invalid/missing/ambiguous profiles, nonmutation and independent editing."
+    },
+    {
+      "command": "Full on-disk inventory expansion versus committed baseline",
+      "status": "passed"
+    },
+    {
+      "command": "Public entry and contract declarations versus audited archive; archived dist versus final build",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ],
+  "peerProvenance": [
+    {
+      "entry": "mapbox-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "lockfileSha256": "efb422889936fc10c08bdf7a433535b860b0762e74392a1a5478c603488b108d",
+      "status": "passed"
+    },
+    {
+      "entry": "maplibre-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "lockfileSha256": "8836a44101aa798fc5a2c6babda15f15aee2b7affedc6b44b2a259d7000003b7",
+      "status": "passed"
+    },
+    {
+      "entry": "mapbox-native",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "lockfileSha256": "3bcacfb75e2560a147aa3d1c1a5b647254f9c4a08d926b67e11c2368de2f3a0f",
+      "status": "passed"
+    },
+    {
+      "entry": "maplibre-native",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "lockfileSha256": "d5f7a8266b90708bfb8d5750169848e5d293f22712984e42e3249affdb244362",
+      "status": "passed"
+    },
+    {
+      "entry": "mapbox-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "lockfileSha256": "bf8cf8bebf9873299963f00ab47430d7524c283c5e81150d7392d441bb273a82",
+      "status": "passed"
+    },
+    {
+      "entry": "maplibre-native",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "lockfileSha256": "bf8cf8bebf9873299963f00ab47430d7524c283c5e81150d7392d441bb273a82",
+      "status": "passed"
+    },
+    {
+      "entry": "maplibre-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "lockfileSha256": "991df0257e77717726085cdbbb69408d08f8b0b7ad7b878e1c7d24a6b62ac7e9",
+      "status": "passed"
+    },
+    {
+      "entry": "mapbox-native",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "lockfileSha256": "991df0257e77717726085cdbbb69408d08f8b0b7ad7b878e1c7d24a6b62ac7e9",
+      "status": "passed"
+    }
+  ],
+  "exampleProvenance": [
+    {
+      "shell": "mapbox-web",
+      "peers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "lockfileSha256": "195a83fde6c1b856ba375baf12a5f02172dd898950093da4fa632fa692a0c265",
+      "status": "passed"
+    },
+    {
+      "shell": "maplibre-web",
+      "peers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "lockfileSha256": "dbefdb8c31ef6e248316b42c59872ba96f8387bc25092b877d8569cadd53660a",
+      "status": "passed"
+    }
+  ],
+  "compiler": {
+    "version": "1.0.0",
+    "target": "19",
+    "verifiedComponents": [
+      "Map",
+      "WebMap",
+      "UserLocation",
+      "NativePresentationProvider",
+      "NativeCameraProvider"
+    ],
+    "reportedSkipDiagnostics": [
+      "adapters/mapbox-native/map.tsx:71: Cannot access refs during render",
+      "adapters/maplibre-native/map.tsx:76: Cannot access refs during render",
+      "adapters/shared/native-marker-overlay.tsx:15: React Compiler has skipped optimizing this component because one or more React ESLint rules were disabled",
+      "adapters/shared/native-ornament-position.ts:13: Cannot access refs during render",
+      "adapters/shared/native-ui.tsx:153: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+      "adapters/shared/native-ui.tsx:626: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+      "adapters/shared/native-ui.tsx:742: (BuildHIR::lowerExpression) Handle UpdateExpression to variables captured within lambdas.",
+      "adapters/shared/use-frozen-value.ts:9: Cannot access refs during render",
+      "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerExpression) Handle ||= operators in AssignmentExpression",
+      "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause",
+      "adapters/web/images.tsx:38: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+      "adapters/web/map.tsx:426: Cannot access refs during render",
+      "facade/map.tsx:123: Cannot access refs during render",
+      "facade/source.tsx:16: Cannot access refs during render",
+      "facade/use-geolocation-control.ts:27: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause",
+      "facade/use-map-interactions.ts:14: (BuildHIR::lowerStatement) Support ThrowStatement inside of try/catch",
+      "facade/use-stable-options.ts:16: Cannot access refs during render"
+    ],
+    "interpretation": "The same 17 visible diagnostic categories remain, with shifted native UI and generic-hook line numbers. They are not a count of distinct skipped functions. Existing lifecycle stabilization remains."
+  },
+  "firstAttemptNotes": [
+    "The first routine aggregate stopped at sandbox EPERM in synthetic owned-process cleanup after source/native tests passed. Authorized process-permission runs passed; no renderer was launched.",
+    "The first peer and example checks stopped at Bun tempdir EPERM before dependency installation. Authorized disposable-install runs passed against the identical archive.",
+    "Direct Layer delegation initially exposed an internal record-props type mismatch. The wrapper contract now uses Adapter.Layer, and all TypeScript projects pass.",
+    "An early declaration comparison ran during a clean rebuild and saw absent output. Final declaration comparisons ran after completion and passed.",
+    "Existing native fixture act warnings, Bun moduleSuffixes warnings and experimental TypeScript packer warnings remain visible."
+  ],
+  "auditPreserved": {
+    "path": "records/evidence/facade-simplification-audit.json",
+    "sha256": "52e4f0dc0f73688cad6807e902250864e95393d1fd680c07e7a3de40abb4a125"
+  },
+  "acceptance": {
+    "status": "not_run",
+    "reason": "The owner explicitly excluded acceptance. No real browser renderer, running Metro, native generation/build/install, native UI flow or SDK coexistence was run.",
+    "runtimeVerification": "unverified"
+  },
+  "retention": "Keep this compact outcome/provenance record and the small frozen archive. Disposable consumers are removed by their runners; audit/repair-owned raw logs and redundant lockfiles are removed. Existing historical evidence and the previous audit archive are preserved."
+}

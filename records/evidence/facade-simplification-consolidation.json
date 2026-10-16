@@ -1,0 +1,432 @@
+{
+  "date": "2026-10-16",
+  "checkpoint": "Facade consolidation with public declarations preserved",
+  "baseCommit": "0b401aaf2d3d85e5cb5640d8f3b5848a6f265440",
+  "status": "routine_passed_acceptance_not_run",
+  "scope": {
+    "kind": "Historical implementation evidence",
+    "audience": "Library owner and contributors",
+    "purpose": "Review the completed consolidation and frozen-package routine results",
+    "nonGoals": "Acceptance execution, native linking, dependency changes, publication and commits",
+    "preservedWorkingTree": "Existing handoff, records index and follow-up audit changes were preserved."
+  },
+  "changes": [
+    "Document all three shared native symbol-layout rejections and distinguish selected style routes from SDK limitations.",
+    "Delete invokeWrapper and its helper-only tests; await wrapper results directly, preserving conditional-expression grouping.",
+    "Delete unused internal marker collision/gesture inputs while retaining raw selected wrapper facilities.",
+    "Replace the unused generic ornament registry with typed attribution state and update both native maps and fixtures.",
+    "Give useActiveCallback stable identity with useCallback, retaining committed callback replacement and teardown guards; remove native caller-side freezing.",
+    "Use the existing native camera owner for effective and observed state, with one scale request per effect and no duplicate movement subscription.",
+    "Replace per-family RNMapbox style assignment bodies with accepted-field lists and one spelling converter; retain explicit wrapper selection, omission and reset behavior."
+  ],
+  "publicApi": {
+    "publicEntryDeclarationsByteIdentical": 5,
+    "contractDeclarationsByteIdentical": 13,
+    "comparisonArchiveSha256": "75d3d4ae43f120712574500061cc4d2a7e00bf77ee18be538030cea4cd9a2c93",
+    "packageManifestByteIdentical": true,
+    "exportsPeersAndDependenciesChanged": false,
+    "internalTypeChanges": "Native presentation carries attributionPosition/setAttributionPosition; camera context carries effective and observed ViewState. No public entry exposes these internal contexts."
+  },
+  "regressions": {
+    "sharedNativeLayout": "All three keys reject through common Layer on both native backends, six cases in source and compiled suites.",
+    "callbacks": "Stable identity across replacement and StrictMode replay; latest committed callback, suspended-render isolation and teardown remain covered.",
+    "scale": "One project/unproject pair per observed move, including unchanged controlled targets; controlled prop updates, readiness, metric/imperial/nautical units, stale success/rejection, current failure and unmount suppression pass.",
+    "attribution": "Both native adapter fixtures check default/explicit control placement and restoration of selected placement and disabled state after removal; existing measured-overlay placement tests pass.",
+    "layers": "Expression identity, zero values, ignored unknown/wrong-family fields and omitted/reset style values pass in the native adapter suite.",
+    "layerComparison": {
+      "assignments": 134,
+      "comparisons": 822,
+      "layerTypes": 9,
+      "passed": true
+    },
+    "comparisonMethod": "Temporary evaluation of the pre-change and replacement Layer components with mocked wrapper identities. Compared every original field with undefined, zero, false, null and an expression, wrong-family inputs and combined styles. Temporary tooling is not part of the package."
+  },
+  "checks": [
+    {
+      "command": "bun run validate",
+      "status": "passed",
+      "sourceTests": 660,
+      "sourceFiles": 34,
+      "mockedNativeTests": 225,
+      "packageSelections": 13,
+      "scope": "Formatting/lint, docs, four TypeScript projects, source/native mock tests, standalone routine fixtures, builds and isolated package resolution. Aggregate inspected; no acceptance runner."
+    },
+    {
+      "command": "bun run test:compiled",
+      "status": "passed",
+      "compiledWebTests": 457,
+      "compiledWebFiles": 19,
+      "mockedNativeTests": 225,
+      "compilerAssertions": "passed"
+    },
+    {
+      "command": "bun run typecheck:apps",
+      "status": "passed_after_build"
+    },
+    {
+      "command": "bun scripts/test-package.mjs --archive /private/tmp/one-map-consolidation-work/artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "selections": 13
+    },
+    {
+      "command": "bun scripts/test-peers.mjs --archive /private/tmp/one-map-consolidation-work/artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "consumers": 8,
+      "scope": "Isolated declarations, selected web imports, optional peers and patch application; no native linking or rendering."
+    },
+    {
+      "command": "bun scripts/test-example-resolution.mjs --archive /private/tmp/one-map-consolidation-work/artifact/one-map-react-0.1.0-rc.2.tgz",
+      "status": "passed",
+      "webBundles": 2,
+      "scope": "Selected web bundles and static native resolution; no browser execution or Metro process."
+    },
+    {
+      "command": "Frozen archive/current dist and public declaration byte comparisons",
+      "status": "passed"
+    },
+    {
+      "command": "Structural/comment review, documentation check and git diff --check",
+      "status": "passed"
+    }
+  ],
+  "artifact": {
+    "archive": "/private/tmp/one-map-consolidation-work/artifact/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "0a1ce37bd655633f543d323d1a056636b56a819a4d0ebab06260494fc7b0f300",
+    "bytes": 164926,
+    "distFiles": 190,
+    "publicDeclarationsCompared": 18,
+    "publicDeclarationMismatches": [],
+    "packageManifestIdentical": true,
+    "sourceSha256": "8659a12e8eed4b471ff3fbf976826aa4f0e40167536f52c0c3a639b82773b4af",
+    "sourceDigestMethod": "SHA-256 of sorted compact JSON mapping source-relative filenames to file SHA-256 values.",
+    "preExistingArchivesPreserved": true
+  },
+  "compiler": {
+    "target": "19",
+    "runtime": "react/compiler-runtime",
+    "verifiedTargets": [
+      "Map",
+      "WebMap",
+      "UserLocation",
+      "NativePresentationProvider",
+      "NativeCameraProvider"
+    ],
+    "diagnostics": 17,
+    "diagnosticReview": "Visible diagnostics still concern ref/lifecycle paths and unsupported syntax. Native scale retains a try/catch diagnostic instead of its former captured request-counter diagnostic. Diagnostic counts are not distinct skipped-function counts.",
+    "consumerConfigurationAdded": false
+  },
+  "firstAttemptNotes": [
+    "An early typecheck caught precedence loss when unwrapping await around conditional native feature-state calls. Parentheses were restored before routine source/native verification.",
+    "The temporary equivalence comparator initially could not resolve a transitive Babel plugin from the workspace root. It used the already-installed React Native preset dependency context; no dependency was added.",
+    "The first validate aggregate passed formatting, docs, types and source/native tests, then hit spawn EPERM in the synthetic owned-process cleanup fixture. The unchanged routine suite passed with process access. A read-only check found no matching synthetic test groups left running.",
+    "Initial frozen peer/example checks could not write Bun temporary files under the sandbox. The same frozen archive and commands passed with temporary-directory/cache access.",
+    "Final validate was repeated after internal TSDoc additions; its package hash matches the independently frozen archive."
+  ],
+  "diagnostics": "Native fixture act warnings, Bun moduleSuffixes warnings and experimental TypeScript build-API warnings remain visible and unsuppressed.",
+  "measurements": {
+    "productionLinesAdded": 375,
+    "productionLinesRemoved": 469,
+    "netProductionLinesRemoved": 94,
+    "method": "git diff --numstat -- packages/one-map-react/src against baseCommit; includes implementation comments and formatting.",
+    "dependenciesAdded": 0,
+    "checklistRows": 69
+  },
+  "peerProvenance": [
+    {
+      "entry": "mapbox-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "lockfileSha256": "543cb5cdb057e9472e5e93e383db4cbfc4cf9af1c6c76b041a993cfc3f616362"
+    },
+    {
+      "entry": "maplibre-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "lockfileSha256": "fb8a6e8d427845fe150b6e74175da996b428028b5266eb493c74d50fb3796fe5"
+    },
+    {
+      "entry": "mapbox-native",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "lockfileSha256": "b188f40733babe21367f9e1e628d4438742c8191ffef7d7050db0db274008d79"
+    },
+    {
+      "entry": "maplibre-native",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "lockfileSha256": "f225a6fb208b15859dd38bf49d442527051375beb250c528ef57b8e5ee218149"
+    },
+    {
+      "entry": "mapbox-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "lockfileSha256": "e487a07060865cc906f1c0da98be6496dd182d39e9f287b29277ef2df347a613"
+    },
+    {
+      "entry": "maplibre-native",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "lockfileSha256": "e487a07060865cc906f1c0da98be6496dd182d39e9f287b29277ef2df347a613"
+    },
+    {
+      "entry": "maplibre-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "lockfileSha256": "7c489a2b439f508204c94eae985e306a49401d58b97256f1958c944c1d0800f0"
+    },
+    {
+      "entry": "mapbox-native",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "lockfileSha256": "7c489a2b439f508204c94eae985e306a49401d58b97256f1958c944c1d0800f0"
+    }
+  ],
+  "exampleProvenance": [
+    {
+      "shell": "mapbox-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "lockfileSha256": "6a172b584e7bdcda477c63d936041ac3be5f7b84a3fa99d6793f8cacf3de0d8e"
+    },
+    {
+      "shell": "maplibre-web",
+      "resolvedPeers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "lockfileSha256": "d6e27b165efa26b3902c9bbe239afe87500c0f12e75e678107c6770a24408b5f"
+    }
+  ],
+  "acceptance": {
+    "status": "not_run",
+    "reason": "The owner authorizes routine checks only. Renderer behavior for this new artifact remains unverified.",
+    "notRun": [
+      "Browser renderer acceptance",
+      "Mixed Metro renderer transport",
+      "Native generation/build/install or canonical runtime flows",
+      "Physical-device and full accessibility audits"
+    ],
+    "separateGate": "Example workspace native coexistence remains separate."
+  },
+  "retention": "Disposable consumers are removed by the check scripts. Temporary comparison tooling, source backup, raw logs, raw peer evidence and retained lockfile copies were removed after recording these results. Only the small current archive is retained temporarily for review; pre-existing archives and shared dependencies were preserved.",
+  "commit": "Not requested; changes remain uncommitted.",
+  "latestCheckpoint": "finalCleanup",
+  "finalCleanup": {
+    "date": "2026-10-16",
+    "status": "routine_passed_acceptance_not_run",
+    "change": "Remove the redundant web style-load callback ref and its update effect. Call the stable useActiveCallback result directly and include it in the listener effect dependencies.",
+    "history": "The earlier checks, artifact, measurements and provenance above remain attached to the pre-cleanup archive. This entry owns the final source and refreshed package results.",
+    "artifact": {
+      "archive": "/private/tmp/one-map-consolidation-final/artifact/one-map-react-0.1.0-rc.2.tgz",
+      "sha256": "f05f0d9b9573707b8e291ae136be85e1f1b0ce8c74499d907d2ffe22802328d0",
+      "bytes": 164896,
+      "distFiles": 190,
+      "currentDistMatches": true,
+      "changedArchiveFilesSinceConsolidation": [
+        "dist/adapters/web/map.js"
+      ],
+      "publicEntryDeclarationsByteIdentical": 5,
+      "contractDeclarationsByteIdentical": 13,
+      "comparisonArchiveSha256": "75d3d4ae43f120712574500061cc4d2a7e00bf77ee18be538030cea4cd9a2c93",
+      "packageManifestIdentical": true,
+      "sourceSha256": "55922cc12042f641596889012207bd76b57e51486a4a0e87dd1ef3cb7cbac2df",
+      "sourceDigestMethod": "SHA-256 of sorted compact JSON mapping source-relative filenames to file SHA-256 values."
+    },
+    "checks": [
+      {
+        "command": "bun run build",
+        "status": "passed",
+        "scope": "Library and example package builds only; no acceptance."
+      },
+      {
+        "command": "node scripts/react-compiler.test.mjs",
+        "status": "passed",
+        "verifiedTargets": [
+          "Map",
+          "WebMap",
+          "UserLocation",
+          "NativePresentationProvider",
+          "NativeCameraProvider"
+        ]
+      },
+      {
+        "command": "bun scripts/test-package.mjs --archive /private/tmp/one-map-consolidation-final/artifact/one-map-react-0.1.0-rc.2.tgz",
+        "status": "passed",
+        "selections": 13
+      },
+      {
+        "command": "bun scripts/test-peers.mjs --archive /private/tmp/one-map-consolidation-final/artifact/one-map-react-0.1.0-rc.2.tgz",
+        "status": "passed",
+        "consumers": 8,
+        "scope": "Disposable installs, declarations, selected web imports and shipped patch verification; no native linking or renderer."
+      },
+      {
+        "command": "bun scripts/test-example-resolution.mjs --archive /private/tmp/one-map-consolidation-final/artifact/one-map-react-0.1.0-rc.2.tgz",
+        "status": "passed",
+        "webBundles": 2,
+        "scope": "Disposable web builds, selected engine isolation and static resolver configuration; no browser execution or Metro process."
+      },
+      {
+        "command": "Archive/current dist and pre-consolidation public declaration byte comparisons",
+        "status": "passed",
+        "scope": "190 archived dist files match the build, all five entry declarations and 13 contract declarations match the verified pre-consolidation archive, and package.json is unchanged."
+      },
+      {
+        "command": "bun run check; bun run check:docs; git diff --check",
+        "status": "passed",
+        "scope": "Formatting/lint, documentation structure and local links, and whitespace review after the record/index update."
+      }
+    ],
+    "cleanupVerificationBeforeRefresh": {
+      "scope": "Run after the callback cleanup, before this archive refresh. Production source is unchanged since these passes. Full validate and full source/native suites above were not repeated for this web-only deletion.",
+      "focusedSourceTests": 189,
+      "focusedCompiledTests": 189,
+      "filesPerConfiguration": 3,
+      "suites": [
+        "mapbox-web.web.test.tsx",
+        "maplibre-web.web.test.tsx",
+        "use-active-callback.web.test.tsx"
+      ],
+      "coverage": "Style completion/fallbacks, replacement, reuse, listener teardown, stable callback identity, latest committed callbacks, suspended renders and StrictMode.",
+      "otherPassed": [
+        "bun run check",
+        "bun run typecheck",
+        "bun run build",
+        "node scripts/react-compiler.test.mjs",
+        "git diff --check"
+      ]
+    },
+    "peerProvenance": {
+      "resolvedVersionsMatchInitialCheckpoint": true,
+      "versionSource": "peerProvenance above, in the same entry order",
+      "consumers": [
+        {
+          "entry": "mapbox-web",
+          "lockfileSha256": "69f46276673c39f3ff209d347b564878817b6a0c28149a975bb2bb16df5cfe56"
+        },
+        {
+          "entry": "maplibre-web",
+          "lockfileSha256": "d3e00475b9a8d35e63bcb98371519a08ab3f711a53b2dd2245700c2fa5e439e8"
+        },
+        {
+          "entry": "mapbox-native",
+          "lockfileSha256": "3f8811c59685d66b6d504a7737182ea7396db05d22a21b0067fbf5ca22291a4a"
+        },
+        {
+          "entry": "maplibre-native",
+          "lockfileSha256": "618b727bba9b07e303ff014a395ed462f0e552a510cea11cad7fa7e842bd77de"
+        },
+        {
+          "entry": "mapbox-web",
+          "lockfileSha256": "4ab890fb65b89813cfa7d105208316203580061f2c5bb18db928ad0aa4d04655"
+        },
+        {
+          "entry": "maplibre-native",
+          "lockfileSha256": "4ab890fb65b89813cfa7d105208316203580061f2c5bb18db928ad0aa4d04655"
+        },
+        {
+          "entry": "maplibre-web",
+          "lockfileSha256": "2d576e600788dc4e8bbfde67d8136e8416e3ea2c2f2ee20010919f46e021ebb7"
+        },
+        {
+          "entry": "mapbox-native",
+          "lockfileSha256": "2d576e600788dc4e8bbfde67d8136e8416e3ea2c2f2ee20010919f46e021ebb7"
+        }
+      ]
+    },
+    "exampleProvenance": {
+      "resolvedVersionsMatchInitialCheckpoint": true,
+      "versionSource": "exampleProvenance above, in the same shell order",
+      "shells": [
+        {
+          "shell": "mapbox-web",
+          "lockfileSha256": "e7ac5d59b929b8db2a73328575c28f883ff1bbcc2397ae908bdff2d2e987f6c0"
+        },
+        {
+          "shell": "maplibre-web",
+          "lockfileSha256": "7bee12cc86db13192b198b9b5459b01783e5e6474480786d9dfb2f357e8aecef"
+        }
+      ]
+    },
+    "firstAttemptNotes": [
+      "Peer and example checks initially stopped before testing the archive because Bun could not write to its temporary directory (EPERM). The unchanged commands and archive passed with temporary-directory/cache access. No tests or warnings were weakened."
+    ],
+    "diagnostics": "The build retains the same 17 React Compiler diagnostics and experimental TypeScript API warnings. Bun moduleSuffixes warnings remain visible in the package checks.",
+    "measurements": {
+      "productionLinesAdded": 379,
+      "productionLinesRemoved": 478,
+      "netProductionLinesRemoved": 99,
+      "method": "git diff --numstat -- packages/one-map-react/src against baseCommit; includes implementation comments and formatting.",
+      "dependenciesAdded": 0
+    },
+    "acceptance": {
+      "status": "not_run",
+      "reason": "The owner authorizes routine package checks only. Renderer behavior remains unverified for this refreshed archive."
+    },
+    "retention": "Raw logs, raw check evidence and copied lockfiles were removed after recording these results. Disposable consumers were removed by the scripts. The refreshed archive is retained temporarily for review; earlier archives and historical results remain intact.",
+    "commit": "Not requested; changes remain uncommitted."
+  }
+}

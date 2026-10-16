@@ -1,0 +1,68 @@
+{
+  "checkpoint": "TF10",
+  "auditedAt": "2026-10-15",
+  "implementer": {
+    "agent": "/root/tf10_implementation",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium"
+  },
+  "reviewer": "parent agent, independent source and artifact review",
+  "status": "routine implementation audit complete; renderer release gate remains open",
+  "artifact": {
+    "path": "artifacts/one-map-react-0.1.0-rc.1.tgz",
+    "bytes": 147755,
+    "sha256": "bf92a760f06da72ff4614b98b44cc4b1d7da8495c5527498250d744bf66d25ab",
+    "regularFiles": 195,
+    "matchesCurrentPackageFiles": true
+  },
+  "independentChecks": [
+    "Current inventory and validator regression fixtures passed: 12,151 entries, with two narrow owner exclusions pending.",
+    "All 12,131 baseline IDs remain; upstream provenance fields are unchanged. Twenty entries describe newly admitted peer APIs.",
+    "Exact peer-version option fixtures and native Mapbox SDK pin fixtures passed.",
+    "77 focused tests passed across native controlled-camera reconciliation, native style boundaries, selected web operations and the release camera probe protocol.",
+    "Archive manifest, optional peer ranges, allowed file list and all current package bytes matched the frozen artifact.",
+    "Whitespace validation passed."
+  ],
+  "sourceReview": [
+    "Reviewed both native map integrations and camera command factories, the shared reconciliation hook, current callback lifetimes and error handling.",
+    "Reviewed selected web forwarding, public gesture controls, geometry value/type exports, native wrapper composition and version-aware language operations.",
+    "Reviewed native style guards against exact SDK source evidence, keeping unsupported parser errors upstream and excluding literal/data payloads from expression traversal.",
+    "Reviewed inventory reconciliation by owning API families and sampled dispositions; this is not an independent execution test for every inventory row.",
+    "Reviewed frozen consumer scripts, installed-package patch provenance, host version selection, example configuration and package documentation."
+  ],
+  "confirmedIssuesCorrected": [
+    "Kept the native React 19.2.3 / React Native 0.87.1 renderer tuple separate from the newest web host.",
+    "Installed exact version patches from the candidate and verified repaired source, compiled, declaration and native files.",
+    "Replaced unsupported gesture-readback claims with actual typed handler state access, and preserved geometry constructors as both values and instance types.",
+    "Corrected style-schema root mappings, public Evented forwarding and inventory path validation.",
+    "Covered clamped camera feedback, coalesced user proposals, Strict Mode cleanup, new public camera commands and pending correction acknowledgments.",
+    "Repaired consumer evidence handling and missing filesystem imports; preserved first-attempt failures in the release evidence.",
+    "Added a fixture-only minZoom clamp and committed readback so the documented clamped-camera acceptance case can be exercised without changing the package."
+  ],
+  "nativeMapbox": {
+    "npmWrapper": "10.3.7 minimum; 10.3.8 endpoint",
+    "mapsSdk": "11.23.1 exactly on iOS and Android",
+    "configurationVerified": true,
+    "linkedSdkIdentityVerified": false
+  },
+  "remainingGates": [
+    "Separate permission is required by AGENTS.md and docs/testing-policy.md before real-renderer browser runs, mixed Metro transport, native acceptance builds/installations and service flows.",
+    "The exact SDK resolution, native binaries and renderer behavior have not been verified for this candidate.",
+    "Strict native controlledCamera remains unavailable pending renderer acceptance."
+  ],
+  "releaseEvidence": "records/evidence/tf10-release.json",
+  "supportMatrix": "records/support-matrix.json",
+  "notPerformed": [
+    "Real-renderer or native acceptance",
+    "Physical-device testing",
+    "Publication, tagging or commits"
+  ],
+  "verdict": "No unresolved issue found in the reviewed routine implementation. The candidate is prepared for acceptance; it is not yet verified as ready to publish.",
+  "postAuditAcceptanceFinding": {
+    "status": "confirmed; repair under routine verification",
+    "environment": "maplibre-web controlled camera",
+    "finding": "Real acceptance found a render loop caused by forwarding portable camera state into the wrapper size-control object.",
+    "evidence": "records/evidence/tf10-acceptance.json",
+    "effect": "The initial routine audit does not establish renderer correctness; rc.1 is not releasable."
+  }
+}

@@ -1,0 +1,524 @@
+{
+  "checkpoint": "Grouped Markdown coverage checklist",
+  "baseCommit": "cb12433fd9f1a68ef8a8fcf5eaf65e34a0c69e39",
+  "scope": "Coverage documentation and removal of redundant inventory tooling; no library, public API, or renderer changes.",
+  "retiredInventory": {
+    "path": "records/api-coverage.json",
+    "bytes": 23724820,
+    "sha256": "018996b47cd588316859dc42f2c7b4cd71408a3f4f52fe03108e13d86d53fbb2",
+    "entries": 12151,
+    "distinctSourceTestEvidenceBundles": 133,
+    "canonicalAliases": 64,
+    "retrieval": "https://github.com/RobJacobson/one-map-react/blob/cb12433fd9f1a68ef8a8fcf5eaf65e34a0c69e39/records/api-coverage.json"
+  },
+  "research": [
+    {
+      "path": "records/inventory-inputs/web.json",
+      "entries": 7379,
+      "sha256": "4539afdec244fc205b59cc6f1a964de8780050acdf86b90a549d74f2cc1eb5b2"
+    },
+    {
+      "path": "records/inventory-inputs/rnmapbox.json",
+      "entries": 2799,
+      "sha256": "dc427abb2414c0104c40b969b728791aad3258cd5fb3344c59075659889ddcc0"
+    },
+    {
+      "path": "records/inventory-inputs/maplibre-native.json",
+      "entries": 1953,
+      "sha256": "0360ccc973027b35f373c50cbd20efe84cbbc4781a0bcf4defc062e38c03057a"
+    }
+  ],
+  "researchVerification": "All upstream research fields on the 12,131 original entries and all 38 input notes matched the frozen input records exactly before removal. The 20 endpoint additions and remaining reconciliation note are preserved in inventory-inputs/release-additions.json.",
+  "history": "Existing evidence records, raw input snapshots, audit and repair records remain unchanged. Historical paths and verification apply to their original commits/artifacts. Canonical aliases identify duplicate views of the same operation, not extra API tasks.",
+  "routineChecks": {
+    "validate": {
+      "status": "passed",
+      "commandsInspected": true,
+      "scope": "Formatting/lint, documentation structure/links, four TypeScript projects, source unit/component tests, mocked native tests, script fixtures, library builds/declarations, isolated packed package selection. No acceptance runner in the command chain.",
+      "sourceTests": 657,
+      "sourceTestFiles": 34,
+      "mockedNativeTests": 219,
+      "mockedNativeSuites": 6,
+      "packageSelections": 13
+    },
+    "typecheckApps": {
+      "command": "bun run typecheck:apps",
+      "status": "passed",
+      "scope": "Shared example tests, Vite application and Expo application TypeScript only, after library build."
+    },
+    "documentationFinal": {
+      "command": "bun run check:docs",
+      "status": "passed",
+      "documents": 36,
+      "sdkComparisonTables": 34
+    },
+    "diffWhitespace": {
+      "command": "git diff --check",
+      "status": "passed"
+    },
+    "sandboxAttempt": {
+      "status": "blocked_then_passed_with_required_process_access",
+      "failure": "The initial routine validation reached synthetic process-cleanup tests and hit spawn EPERM while checking process groups. The full unchanged validation command passed outside the sandbox. No production or lifecycle code changed."
+    },
+    "diagnostics": {
+      "reactCompiler": 17,
+      "status": "Existing diagnostics retained. No compiler or lifecycle edits. Bun moduleSuffixes and experimental TypeScript build-API warnings also remain."
+    },
+    "notRepeated": "Compiled suites, peer endpoint installs and example-resolution checks were not repeated: library code, public declarations, peers, examples and build configuration are unchanged. The routine package hash matches the previously repaired artifact."
+  },
+  "acceptance": "Not run. Candidate renderer behavior remains unverified; earlier outcomes apply only to recorded artifacts.",
+  "commit": "Not requested for this checkpoint; changes remain uncommitted.",
+  "groupingReview": {
+    "method": "Reviewed every distinct source/test/evidence bundle and assigned it to a named checklist contract. Specific exceptions remain separate checklist rows. This grouping does not convert historical field statuses into renderer certification.",
+    "reviewedBundles": 133,
+    "accountedHistoricalEntries": 12151,
+    "checklistRows": 68,
+    "checkedRoutesOrBoundaries": 62,
+    "uncheckedWorkOrGates": [
+      "native-fit-cap",
+      "native-controlled",
+      "cache-exclusions",
+      "physical-devices",
+      "release-runtime",
+      "workspace-runtime"
+    ],
+    "assignments": [
+      {
+        "contract": "selection",
+        "reviewedBundleNumbers": [
+          65,
+          66,
+          107,
+          108
+        ],
+        "historicalEntries": 8
+      },
+      {
+        "contract": "web-host",
+        "reviewedBundleNumbers": [
+          50,
+          92
+        ],
+        "historicalEntries": 1714
+      },
+      {
+        "contract": "native-host",
+        "reviewedBundleNumbers": [
+          4,
+          5,
+          22
+        ],
+        "historicalEntries": 532
+      },
+      {
+        "contract": "common-camera",
+        "reviewedBundleNumbers": [
+          56,
+          100
+        ],
+        "historicalEntries": 144
+      },
+      {
+        "contract": "web-map",
+        "reviewedBundleNumbers": [
+          45
+        ],
+        "historicalEntries": 262
+      },
+      {
+        "contract": "web-style",
+        "reviewedBundleNumbers": [
+          44,
+          48,
+          85,
+          86,
+          88,
+          93,
+          94,
+          132,
+          133
+        ],
+        "historicalEntries": 2108
+      },
+      {
+        "contract": "web-values",
+        "reviewedBundleNumbers": [
+          46,
+          79,
+          89,
+          123
+        ],
+        "historicalEntries": 810
+      },
+      {
+        "contract": "web-ui",
+        "reviewedBundleNumbers": [
+          43,
+          80,
+          87,
+          124
+        ],
+        "historicalEntries": 665
+      },
+      {
+        "contract": "web-ref-owners",
+        "reviewedBundleNumbers": [
+          51,
+          95
+        ],
+        "historicalEntries": 6
+      },
+      {
+        "contract": "web-selected-refs",
+        "reviewedBundleNumbers": [
+          52,
+          96
+        ],
+        "historicalEntries": 96
+      },
+      {
+        "contract": "web-wrapper-refs",
+        "reviewedBundleNumbers": [
+          53,
+          97
+        ],
+        "historicalEntries": 513
+      },
+      {
+        "contract": "web-resource-ownership",
+        "reviewedBundleNumbers": [
+          54,
+          98
+        ],
+        "historicalEntries": 78
+      },
+      {
+        "contract": "web-events",
+        "reviewedBundleNumbers": [
+          57,
+          101
+        ],
+        "historicalEntries": 9
+      },
+      {
+        "contract": "web-gestures",
+        "reviewedBundleNumbers": [
+          67,
+          68,
+          69,
+          70,
+          72,
+          75,
+          76,
+          77,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          116,
+          119,
+          121,
+          122,
+          125,
+          126
+        ],
+        "historicalEntries": 63
+      },
+      {
+        "contract": "web-sources",
+        "reviewedBundleNumbers": [
+          81,
+          127
+        ],
+        "historicalEntries": 148
+      },
+      {
+        "contract": "web-debug",
+        "reviewedBundleNumbers": [
+          74,
+          118
+        ],
+        "historicalEntries": 18
+      },
+      {
+        "contract": "web-version",
+        "reviewedBundleNumbers": [
+          62,
+          103
+        ],
+        "historicalEntries": 6
+      },
+      {
+        "contract": "web-injection",
+        "reviewedBundleNumbers": [
+          63,
+          104,
+          106
+        ],
+        "historicalEntries": 26
+      },
+      {
+        "contract": "web-probe",
+        "reviewedBundleNumbers": [
+          64,
+          105
+        ],
+        "historicalEntries": 2
+      },
+      {
+        "contract": "web-offset",
+        "reviewedBundleNumbers": [
+          78
+        ],
+        "historicalEntries": 6
+      },
+      {
+        "contract": "web-global-state",
+        "reviewedBundleNumbers": [
+          130,
+          131
+        ],
+        "historicalEntries": 2
+      },
+      {
+        "contract": "web-baseline",
+        "reviewedBundleNumbers": [
+          47,
+          90
+        ],
+        "historicalEntries": 2
+      },
+      {
+        "contract": "web-escape",
+        "reviewedBundleNumbers": [
+          71,
+          115
+        ],
+        "historicalEntries": 2
+      },
+      {
+        "contract": "web-internals",
+        "reviewedBundleNumbers": [
+          55,
+          58,
+          59,
+          60,
+          61,
+          73,
+          82,
+          83,
+          99,
+          102,
+          117,
+          120,
+          128
+        ],
+        "historicalEntries": 574
+      },
+      {
+        "contract": "mb-components",
+        "reviewedBundleNumbers": [
+          20
+        ],
+        "historicalEntries": 714
+      },
+      {
+        "contract": "ml-components",
+        "reviewedBundleNumbers": [
+          2,
+          6
+        ],
+        "historicalEntries": 689
+      },
+      {
+        "contract": "native-camera",
+        "reviewedBundleNumbers": [
+          7
+        ],
+        "historicalEntries": 59
+      },
+      {
+        "contract": "native-values",
+        "reviewedBundleNumbers": [
+          9,
+          34
+        ],
+        "historicalEntries": 13
+      },
+      {
+        "contract": "mb-animation",
+        "reviewedBundleNumbers": [
+          19,
+          26,
+          36
+        ],
+        "historicalEntries": 344
+      },
+      {
+        "contract": "ml-values",
+        "reviewedBundleNumbers": [
+          1
+        ],
+        "historicalEntries": 76
+      },
+      {
+        "contract": "mb-layers",
+        "reviewedBundleNumbers": [
+          27
+        ],
+        "historicalEntries": 678
+      },
+      {
+        "contract": "ml-layers",
+        "reviewedBundleNumbers": [
+          3
+        ],
+        "historicalEntries": 372
+      },
+      {
+        "contract": "ml-style",
+        "reviewedBundleNumbers": [
+          13,
+          15,
+          16,
+          17
+        ],
+        "historicalEntries": 347
+      },
+      {
+        "contract": "mb-model",
+        "reviewedBundleNumbers": [
+          24
+        ],
+        "historicalEntries": 5
+      },
+      {
+        "contract": "mb-errors",
+        "reviewedBundleNumbers": [
+          25
+        ],
+        "historicalEntries": 5
+      },
+      {
+        "contract": "mb-language",
+        "reviewedBundleNumbers": [
+          37
+        ],
+        "historicalEntries": 2
+      },
+      {
+        "contract": "mb-build",
+        "reviewedBundleNumbers": [
+          41,
+          42
+        ],
+        "historicalEntries": 17
+      },
+      {
+        "contract": "ml-build",
+        "reviewedBundleNumbers": [
+          10
+        ],
+        "historicalEntries": 15
+      },
+      {
+        "contract": "native-internals",
+        "reviewedBundleNumbers": [
+          18,
+          21,
+          23,
+          29,
+          31,
+          33,
+          35,
+          39
+        ],
+        "historicalEntries": 589
+      },
+      {
+        "contract": "web-location",
+        "reviewedBundleNumbers": [
+          49,
+          84,
+          91,
+          129
+        ],
+        "historicalEntries": 125
+      },
+      {
+        "contract": "native-location",
+        "reviewedBundleNumbers": [
+          8,
+          11,
+          32,
+          38
+        ],
+        "historicalEntries": 93
+      },
+      {
+        "contract": "native-offline",
+        "reviewedBundleNumbers": [
+          12,
+          28
+        ],
+        "historicalEntries": 140
+      },
+      {
+        "contract": "capture",
+        "reviewedBundleNumbers": [
+          14,
+          30
+        ],
+        "historicalEntries": 72
+      },
+      {
+        "contract": "cache-exclusions",
+        "reviewedBundleNumbers": [
+          40
+        ],
+        "historicalEntries": 2
+      }
+    ],
+    "bundleOrder": "First occurrence in the expanded retired ledger entry order, grouped by exact implementationScope, testReferences and evidenceReferences. Bundle numbers are checkpoint provenance only, not ongoing identifiers."
+  },
+  "removedTooling": {
+    "paths": [
+      "scripts/check-inventory.mjs",
+      "scripts/check-inventory.test.mjs",
+      "scripts/inventory-format.mjs"
+    ],
+    "lines": 493,
+    "integration": "Removed check:inventory and its validate/test invocations; no replacement parser or per-entry ledger."
+  },
+  "storage": {
+    "removedLedgerAndToolingBytes": 23740439,
+    "activeChecklistBytes": 35031,
+    "researchSupplementBytes": 17848,
+    "scope": "Tracked working-tree bytes, not historical Git objects. Final net change includes indexes, banners and this evidence record.",
+    "baselineAffectedFilesBytes": 23860924,
+    "finalAffectedFilesBytes": 184802,
+    "netWorkingTreeBytesRemoved": 23676122,
+    "activeChecklistReductionPercent": 99.85
+  },
+  "checklistSha256": "5ccb4fcb2050cddb5e39fde9be63c672782513459582e9580bb9e7bacc551f52",
+  "researchSupplementSha256": "830bcad55ba2c0dd9b6d6279bd6699686773cc9ae67ca6bc3484248da866460e",
+  "date": "2026-10-16",
+  "status": "routine_passed_acceptance_not_run",
+  "package": {
+    "sha256": "75d3d4ae43f120712574500061cc4d2a7e00bf77ee18be538030cea4cd9a2c93",
+    "matchesRepairEvidence": true,
+    "scope": "Archive generated by test:package from the routine build; 13 isolated package selections passed. No native linking or renderer claims.",
+    "retention": "Package check removes its generated archive and temporary consumers in finally; the existing repair evidence/artifact are unchanged."
+  },
+  "review": [
+    "All 133 original source/test/evidence bundles assigned to checklist contracts; 12,151 historical IDs accounted for once in the temporary migration check.",
+    "Individual research fields and input notes compared before deletion; the three original snapshots, native style source research, audit and repair evidence remain byte-identical to HEAD.",
+    "Meaningful version, style/parser, option, UI/default, lifetime, borrowed-handle and owner-excluded boundaries remain explicit. Full coverage requirements are retained.",
+    "Historical plans are labeled for their superseded inventory mechanism; old JSON/tooling references remain historical and recoverable through the pinned commit.",
+    "Removed checker-only tests and command integrations; all runtime regression tests are retained. No replacement parser, framework or dual live ledger.",
+    "Structure, local links, ownership/status wording, and changed command chains reviewed. All tracked changes are documentation, research, evidence, or redundant tooling removal."
+  ],
+  "retention": "Temporary migration scripts, per-entry intermediate data and raw routine logs removed after retaining compact outcomes. No existing historical evidence or frozen research snapshot removed."
+}
