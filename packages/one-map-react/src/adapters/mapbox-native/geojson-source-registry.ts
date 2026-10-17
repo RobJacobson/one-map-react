@@ -8,7 +8,6 @@ import { NativeFeatureState } from "../shared/native-feature-state.js";
 /**
  * Registry of mounted RNMapbox GeoJSON source refs, keyed by facade id.
  *
- * @remarks
  * Cluster methods dispatch through the `ShapeSource` ref, so the map
  * component owns this registry and each mounted GeoJSON source registers
  * its ref. A ref registered under an id that a newer source already
@@ -19,8 +18,6 @@ export class GeoJsonSourceRegistry {
   readonly featureState: NativeFeatureState;
 
   /**
-   * Creates the map-owned source registry and its feature-state reset owner.
-   *
    * @param reset - Whole-state removal through the current map wrapper.
    */
   constructor(reset: (identifier: FeatureIdentifier) => Promise<void>) {
@@ -77,7 +74,6 @@ export class GeoJsonSourceRegistry {
 /**
  * Context carrying the enclosing map's GeoJSON source registry.
  *
- * @remarks
  * `null` means no map provides the registry; sources then skip
  * registration rather than failing the render.
  */

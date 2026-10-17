@@ -28,7 +28,6 @@ export const toRnmapboxDefaultSettings = (viewState: ViewState) => ({
 /**
  * Converts a controlled view into RNMapbox camera props.
  *
- * @remarks
  * `animationMode` is `none` so the update does not use Android's default
  * ease or iOS's default flight. This writes the React camera onto the
  * wrapper. It does not by itself prove that an unaccepted gesture returns.
@@ -78,7 +77,6 @@ export const toRnmapboxPadding = (padding?: PaddingOrNumber) => {
 /**
  * Converts a camera command into an RNMapbox stop.
  *
- * @remarks
  * Explicit animationMode avoids Android's default ease for flight commands.
  *
  * @param options - Partial camera target.
@@ -113,7 +111,6 @@ export const toRnmapboxStop = (
 /**
  * Converts `fitBounds` into an RNMapbox ease stop.
  *
- * @remarks
  * The wrapper's own `fitBounds` also eases. Building the stop here keeps
  * `animationMode` explicit.
  *
@@ -151,7 +148,6 @@ export const toRnmapboxFitBoundsStop = (
 /**
  * Converts `zoomTo` into an RNMapbox stop.
  *
- * @remarks
  * Duration `0` uses `animationMode: "none"`. Any other duration, including an
  * omitted duration, uses `easeTo`. The wrapper's `zoomTo` helper uses flight,
  * which is not this command.

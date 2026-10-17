@@ -11,7 +11,6 @@ export const initialCamera: ViewState = {
 
 /**
  * Reads the public camera, retaining observed orientation where getters are unavailable.
- *
  * @param map - Current map attachment.
  * @param backend - Selected adapter's backend.
  * @param observed - Latest normalized movement event.
@@ -42,7 +41,6 @@ export const readCamera = async (
 
 /**
  * Compares camera readback with wrap equivalence and native coordinate precision.
- *
  * @param actual - Renderer readback.
  * @param expected - Requested camera.
  * @returns Whether every camera field is within the example's handoff tolerance.

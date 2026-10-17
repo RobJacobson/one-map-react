@@ -81,7 +81,6 @@ export const MaplibreNativeSource = (props: SourceProps) => {
 /**
  * GeoJSON source that registers its ref for cluster and state queries.
  *
- * @remarks
  * The registry only exists inside a maplibre-native Map; a source rendered
  * elsewhere still renders but does not register.
  *

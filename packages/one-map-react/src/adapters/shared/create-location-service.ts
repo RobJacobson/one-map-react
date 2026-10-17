@@ -18,7 +18,6 @@ export interface LocationUpdates {
 
 /**
  * Adds bounded initial acquisition and stale-callback suppression to public providers.
- *
  * @param updates - Backend subscriptions and explicit permission operation.
  * @returns A foreground service with individually disposable subscriptions.
  */

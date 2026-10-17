@@ -64,10 +64,7 @@ interface LifetimeFields {
 
 /**
  * Observes vector feature-state namespaces across keyed source lifetimes and
- * both family changes.
- *
- * @remarks
- * Writes stay present before every transition; only the
+ * both family changes. Writes stay present before every transition; only the
  * initial operation checks explicitly remove state. Generation-bearing tiles
  * establish attachment before any ref-based source query or state operation.
  */

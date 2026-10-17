@@ -1,6 +1,5 @@
 /**
  * Accepts only a public runtime token before it can enter a client bundle.
- *
  * @param value - Environment value; whitespace is ignored.
  * @returns Trimmed public token or an empty string when unset.
  * @throws When a supplied value is not a public Mapbox token.

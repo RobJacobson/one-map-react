@@ -84,7 +84,6 @@ const location = { lngLat: [-122.33, 47.62] as LngLat, accuracy: 12 };
 /**
  * Shared local-style scene for TF07 interaction acceptance.
  *
- * @remarks
  * Both hosts provide their own child UI. The probe records events and reads
  * the renderer; it does not dispatch callbacks or certify visual behavior.
  */

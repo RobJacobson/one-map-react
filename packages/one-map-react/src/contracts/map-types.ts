@@ -7,7 +7,6 @@ import type { MapStyle } from "./style-types.js";
 /**
  * Drawing context forwarded to a web map's `gl` option.
  *
- * @remarks
  * The fields are the ones react-map-gl installs at construction. This type
  * does not import a browser or Mapbox type. A reused map keeps the context
  * from the construction that created it.
@@ -24,7 +23,6 @@ export interface ExternalDrawingContext {
 /**
  * Host layout for the map container in this example.
  *
- * @remarks
  * Web shells pass width and height. Native shells pass `flex`.
  */
 export interface MapLayoutStyle {
@@ -58,14 +56,12 @@ export interface MapProps {
   /**
    * Camera applied on first mount only.
    *
-   * @remarks
    * A later change does not move the camera. Use `viewState` or a command.
    */
   readonly initialViewState: ViewState;
   /**
    * Camera owned by React.
    *
-   * @remarks
    * When this is set, it replaces later changes from `initialViewState`.
    * Web adapters forward it to react-map-gl. Native adapters write it onto
    * the camera child and reconcile rejected proposals after application callbacks
@@ -80,7 +76,6 @@ export interface MapProps {
   /**
    * Limit on where the camera center may pan.
    *
-   * @remarks
    * The order is southwest then northeast. A west value greater than east
    * crosses the antimeridian.
    */
@@ -96,7 +91,6 @@ export interface MapProps {
   /**
    * When true, a web remount may adopt a renderer the wrapper kept.
    *
-   * @remarks
    * Native adapters reject `true` because those wrappers have no reuse
    * facility. Omitted and `false` remount a new native map.
    */
@@ -104,7 +98,6 @@ export interface MapProps {
   /**
    * Web-only drawing context passed to react-map-gl at construction.
    *
-   * @remarks
    * Native adapters reject a provided context. Reuse does not move a later
    * context onto a map that was already constructed.
    */
@@ -112,7 +105,6 @@ export interface MapProps {
   /**
    * Turns interaction on or off.
    *
-   * @remarks
    * `false` forces every web handler and the portable native gesture flags
    * off, even when an individual flag is true. Web updates are mutable;
    * clearing the override restores explicit flags or wrapper defaults.
@@ -126,7 +118,6 @@ export interface MapProps {
   /**
    * Enables rotation from the pinch handler.
    *
-   * @remarks
    * Web pinch zoom and rotation are one handler. When zoom stays on and this
    * is `false`, the adapter leaves zoom enabled and disables rotation on that
    * handler. Clearing this override or unmounting restores rotation without
@@ -138,7 +129,6 @@ export interface MapProps {
   /**
    * Enables a double-tap zoom.
    *
-   * @remarks
    * MapLibre also receives this as `doubleTapHoldZoom`. iOS keeps that
    * recognizer independent of pinch zoom. Android SDK 13.6.1 still requires
    * zoom gestures, so this does not restore a double tap while `touchZoom`
@@ -150,14 +140,12 @@ export interface MapProps {
   /**
    * Enables the mouse wheel or trackpad zoom.
    *
-   * @remarks
    * Native adapters throw when this is set. There is no native wheel.
    */
   readonly scrollZoom?: boolean;
   /**
    * Enables double-click zoom.
    *
-   * @remarks
    * Native adapters throw when this is set. On web this shares the
    * double-tap handler and must agree with a supplied `doubleTapZoom`.
    */
@@ -165,42 +153,36 @@ export interface MapProps {
   /**
    * Enables right-drag rotation.
    *
-   * @remarks
    * Native adapters throw when this is set.
    */
   readonly dragRotate?: boolean;
   /**
    * Enables shift-drag box zoom.
    *
-   * @remarks
    * Native adapters throw when this is set.
    */
   readonly boxZoom?: boolean;
   /**
    * Enables keyboard camera controls.
    *
-   * @remarks
    * Native adapters throw when this is set.
    */
   readonly keyboard?: boolean;
   /**
    * Requires a modifier key before wheel zoom.
    *
-   * @remarks
    * Native adapters throw when this is set.
    */
   readonly cooperativeGestures?: boolean;
   /**
    * Pixel distance that still counts as a click.
    *
-   * @remarks
    * This is a web constructor option. Native adapters throw when it is set.
    */
   readonly clickTolerance?: number;
   /**
    * Reads and writes the camera in the page URL hash.
    *
-   * @remarks
    * Native adapters throw when this is set. A string is the hash parameter
    * name react-map-gl accepts.
    */
@@ -210,7 +192,6 @@ export interface MapProps {
   /**
    * Called when a camera movement starts.
    *
-   * @remarks
    * Web uses `movestart`. MapLibre Native uses `onRegionWillChange`.
    * RNMapbox has no separate start event, so this is not called there.
    */
@@ -218,7 +199,6 @@ export interface MapProps {
   /**
    * Called when the camera settles.
    *
-   * @remarks
    * This is not map idleness. Web uses `moveend`. RNMapbox uses `onMapIdle`
    * for this settled camera and also calls `onIdle`. MapLibre Native uses
    * `onRegionDidChange`.
@@ -227,7 +207,6 @@ export interface MapProps {
   /**
    * Called when the map reports that it is idle.
    *
-   * @remarks
    * Web uses `idle`. RNMapbox uses `onMapIdle`. MapLibre Native has no idle
    * callback, so this is not called there. The first native settle can also
    * call `onMove` once when the map never sent a changing event.
@@ -238,14 +217,12 @@ export interface MapProps {
   /**
    * Called for a second click in place.
    *
-   * @remarks
    * Native adapters throw when this is set.
    */
   readonly onDblClick?: (event: ClickEvent) => void;
   /**
    * Called for a long press.
    *
-   * @remarks
    * Native adapters forward it. Web throws, because react-map-gl has no
    * long-press callback and this package does not add a browser recognizer.
    */
@@ -285,14 +262,12 @@ export interface MapProps {
   /**
    * Called when the wrapper reports that the map has loaded.
    *
-   * @remarks
    * This does not mean every later tile or source has loaded.
    */
   readonly onLoad?: () => void;
   /**
    * Called when the map reports that a style finished loading.
    *
-   * @remarks
    * Web listens for the map's `style.load` event. If that event already
    * finished and `isStyleLoaded()` is still false, the following map
    * `load` reports this once when the style is loaded. A reused web map
@@ -306,7 +281,6 @@ export interface MapProps {
   /**
    * Called when a web map reports a resize.
    *
-   * @remarks
    * Native adapters do not call this. Native size follows the host `style`.
    */
   readonly onResize?: () => void;

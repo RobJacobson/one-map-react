@@ -211,7 +211,6 @@ export interface RasterDemSourceProps extends SourceBaseProps {
 /**
  * Georeferenced image source options shared by every adapter.
  *
- * @remarks
  * `url` and `coordinates` may be updated without remounting. Bundled native
  * asset handles are host-specific and remain named native extension work.
  */
@@ -227,7 +226,6 @@ export interface ImageSourceProps extends SourceBaseProps {
 /**
  * Props for the shared {@link Source}, discriminated by `type`.
  *
- * @remarks
  * `id`, `type`, and every option except GeoJSON `data` and image
  * `url`/`coordinates` are creation inputs: changing them throws and requires
  * remounting the source with a new React `key`.

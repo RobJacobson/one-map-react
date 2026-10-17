@@ -10,7 +10,6 @@ import type {
 /**
  * Converts a query filter into MapLibre React Native's filter value.
  *
- * @remarks
  * The wrapper forwards the filter to the native module without
  * interpretation. The facade's readonly expression is copied.
  *

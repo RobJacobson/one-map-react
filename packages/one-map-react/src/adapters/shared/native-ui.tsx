@@ -168,7 +168,6 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const markerClick = (event: MarkerEvent): void => {
         props.onClick?.(event);
         // RNMapbox 10.3.7 toggles selection on taps; reset until it exposes per-tap events.
-        // See ../../../test/tf07-ui.native.test.tsx consecutive annotation taps.
         if (options.backend === "mapbox-native") {
           setAnnotationRevision((revision) => revision + 1);
         }
@@ -191,8 +190,6 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
             dragEnd(event);
             // Native annotation wrappers retain a dragged coordinate when the
             // unchanged controlled prop is rejected; reattachment reapplies it.
-            // See ../../../test/tf07-ui.native.test.tsx annotation drag rejection.
-            // Remove when RNMapbox and MapLibre wrappers reapply unchanged coordinates.
             if (isAnnotation) setAnnotationRevision((revision) => revision + 1);
           }}
         >
@@ -368,8 +365,6 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
         left: 0,
         // Android SDK parents leave the source portal detached, so native host
         // notifications may not refresh its constraints. iOS keeps host sizing.
-        // See ../../../test/tf07-ui.native.test.tsx native control host sizing.
-        // Remove when Android SDK parents propagate layout to detached source portals.
         ...(Platform.OS === "android" ? presentation.nativeLayout : undefined),
       }}
     >

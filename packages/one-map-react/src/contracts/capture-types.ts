@@ -36,9 +36,9 @@ export interface MapCapture extends MapImage {
 export type StaticMapImageOptions = {
   /** Style URL; use named SDK facilities for backend style-object support. */
   readonly mapStyle: string;
-  /** Requested PNG width in pixels; must be a positive safe integer. */
+  /** Requested PNG width in pixels. */
   readonly width: number;
-  /** Requested PNG height in pixels; must be a positive safe integer. */
+  /** Requested PNG height in pixels. */
   readonly height: number;
   /** PNG data URL or native temporary file. */
   readonly output: ImageOutput;
@@ -74,18 +74,9 @@ export type StaticMapImageOptions = {
 /** Independent native rendering without a mounted map. */
 export interface StaticMapImageService {
   /**
-   * Renders the supplied style and camera.
-   *
-   * @remarks
-   * The deadline bounds the returned promise without cancelling SDK work.
-   * This service is independent of mounted maps; their detachment does not
-   * cancel the snapshot.
-   *
+   * Renders the supplied style and camera. Deadline does not cancel the SDK.
    * @param options - Style, camera, dimensions, and output.
    * @returns PNG output after rendering completes.
-   * @throws When style, camera, dimensions, output, or deadline inputs are
-   * invalid, the SDK fails or exceeds the deadline, or returned PNG output
-   * is malformed or has dimensions different from those requested.
    */
   create(options: StaticMapImageOptions): Promise<MapImage>;
 }

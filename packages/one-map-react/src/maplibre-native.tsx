@@ -45,13 +45,13 @@ export type {
   NativePopupProps,
 } from "./adapters/shared/native-ui.js";
 
+/** Selected native map with typed renderer facilities and host attributes. */
 /** Selected SDK location follow options, applied to the existing camera. */
 export type NativeLocationOptions = Pick<
   ComponentProps<typeof WrapperCamera>,
   "trackUserLocation" | "onTrackUserLocationChange"
 >;
 
-/** Selected native map with typed renderer facilities and host attributes. */
 export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
   /** Complete selected style document. */
   readonly mapStyle:
@@ -101,22 +101,10 @@ export const Marker = SharedMarker as ForwardRefExoticComponent<
 export type NativeSourceProps =
   | Exclude<SourceProps, GeoJsonSourceProps | VectorSourceProps>
   | ((GeoJsonSourceProps | VectorSourceProps) & {
-      /**
-       * Source-layer press padding; updates without remounting.
-       *
-       * @remarks
-       * Initial omission uses 22 units per side, a 44 by 44 hitbox. Values
-       * are logical map-view units: iOS points and Android density-independent
-       * pixels. Later clearing follows the selected wrapper's reset behavior.
-       */
       readonly hitbox?: {
-        /** Distance above the press. */
         top: number;
-        /** Distance to the right of the press. */
         right: number;
-        /** Distance below the press. */
         bottom: number;
-        /** Distance to the left of the press. */
         left: number;
       };
     });

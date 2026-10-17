@@ -19,7 +19,6 @@ const sameCamera = (left: ViewState, right: ViewState): boolean => {
 
 /**
  * Reconciles native camera proposals after application callbacks commit their controlled state.
- *
  * @param viewState - Latest React-owned target, or undefined to release control.
  * @param jumpTo - Existing adapter camera dispatch path.
  * @param ready - Whether the wrapper can currently apply an imperative camera target.

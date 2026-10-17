@@ -14,7 +14,6 @@ import {
 /**
  * A registered MapLibre React Native source ref.
  *
- * @remarks
  * GeoJSON refs carry cluster and feature-state methods plus `getData`;
  * vector refs carry `querySourceFeatures` and feature-state methods that
  * require a `sourceLayer`.
@@ -32,7 +31,6 @@ export type MaplibreNativeSourceRef =
 /**
  * Registry of mounted MapLibre React Native source refs, keyed by facade id.
  *
- * @remarks
  * The map component owns this registry; each mounted GeoJSON or vector
  * source registers its ref so source-scoped map methods can dispatch
  * through it. A ref registered under an id that a newer source already
@@ -121,7 +119,6 @@ export class MaplibreSourceRegistry {
 /**
  * Context carrying the enclosing map's source registry.
  *
- * @remarks
  * `null` means no map provides the registry; sources then skip
  * registration rather than failing the render.
  */

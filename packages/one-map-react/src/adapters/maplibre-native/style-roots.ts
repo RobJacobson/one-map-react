@@ -1,6 +1,5 @@
 /**
  * Rejects formatting modifiers silently ignored by the pinned native parser.
- *
  * @param value - A layer/style expression or object of expressions.
  * @throws For silently ignored formatting modifiers. Unsupported operators retain native parser errors.
  */
@@ -57,7 +56,6 @@ interface NativeLayerValues {
 
 /**
  * Checks layer fields against the pinned native property registry and expression parser.
- *
  * @param layer - Public layer values, including legacy native style fields.
  * @throws For unsupported fields or expressions that native would ignore.
  */
@@ -90,7 +88,6 @@ export const assertMaplibreLayerStyle = (layer: NativeLayerValues): void => {
 
 /**
  * Rejects explicit style roots ignored by the pinned native SDK parser.
- *
  * @param input - Selected style document, JSON string, or URL delegated to the wrapper.
  * @throws For unsupported explicit terrain/sky/global-state or non-Mercator projection.
  */

@@ -1,7 +1,6 @@
 /**
  * Error thrown when a camera command has no call the wrapper will apply.
  *
- * @remarks
  * The camera or map ref is missing, or MapLibre Native has not reported style
  * load. Before that load, `setStop` can resolve after the native map drops the
  * stop.

@@ -27,7 +27,6 @@ export const toMaplibreViewState = (viewState: ViewState) => ({
 /**
  * Converts a command into MapLibre Native camera fields.
  *
- * @remarks
  * Named methods add their own easing. This object does not include an easing
  * function.
  *
@@ -53,7 +52,6 @@ export const toMaplibreCommand = (options: CameraCommandOptions) => {
 /**
  * Converts fit options into MapLibre Native `fitBounds` options.
  *
- * @remarks
  * The wrapper's `fitBounds` selects flight when easing is omitted.
  *
  * @param options - Fit options.

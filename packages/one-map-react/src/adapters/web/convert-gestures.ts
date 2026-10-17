@@ -3,7 +3,6 @@ import type { GestureSelection } from "../../contracts/map-types.js";
 /**
  * Maps portable gestures onto react-map-gl handler props.
  *
- * @remarks
  * Pinch zoom and rotation are `touchZoomRotate`. When zoom stays enabled and
  * `touchRotate` is false, the result keeps that handler on so the adapter can
  * disable rotation without disabling zoom.

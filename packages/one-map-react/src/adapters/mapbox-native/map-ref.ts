@@ -204,7 +204,6 @@ export const createMapboxMapRef = (
 
 /**
  * Removes the whole state of a previously written target after source remount.
- *
  * @param mapViewRef - Current native map ref.
  * @param identifier - Validated native feature-state target.
  */

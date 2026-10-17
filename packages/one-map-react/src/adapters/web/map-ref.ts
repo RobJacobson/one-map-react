@@ -40,19 +40,6 @@ import {
   toWebSourceQueryOptions,
 } from "./convert-query.js";
 
-/**
- * Builds common and selected commands over the current logical web attachment.
- *
- * @remarks
- * The owner retains this handle; each invocation reads mapRef rather than
- * retaining an old renderer. Detached calls reject through common async
- * methods or throw through synchronous selected methods.
- *
- * @param mapRef - Ref cleared by the logical map owner on teardown.
- * @param wrapper - Selected wrapper conversions and advanced method delegates.
- * @param capture - Map-owned capture operation, absent when not configured.
- * @returns The facade handle with common and selected wrapper operations.
- */
 export const createWebMapRef = (
   mapRef: {
     readonly current: WebMapHandle | null;
@@ -316,7 +303,6 @@ export const createWebMapRef = (
 /**
  * Captures synchronous renderer error events for one web operation.
  *
- * @remarks
  * Both pinned web renderers can emit errors instead of throwing.
  * The listener only spans the synchronous call, leaving later unrelated
  * errors and the existing map error callback with their normal lifetimes.
@@ -398,7 +384,6 @@ const missingMapError = (): Error => new Error("Map is not attached.");
 
 /**
  * Checks a loaded source before feature-state dispatch.
- *
  * @param map - Attached wrapper handle.
  * @param identifier - Validated feature identifier.
  * @returns A wrapper target for a supported source family.

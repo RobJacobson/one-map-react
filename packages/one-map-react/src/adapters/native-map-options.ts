@@ -44,7 +44,6 @@ export const nativeResizeError = (): Error =>
 /**
  * Error for `stop()` on a native map.
  *
- * @remarks
  * The pinned native cameras have no cancel method. The facade does not
  * invent one by sending another camera update.
  *
@@ -96,7 +95,6 @@ const nativeRejectedNames = [
 /**
  * Rejects desktop interaction options and pointer callbacks.
  *
- * @remarks
  * Undefined means the caller did not request the option. `false` is still a
  * request and is rejected.
  *

@@ -1,6 +1,5 @@
 /**
  * Adds foreground declarations to generated example shells without overwriting app text.
- *
  * @param {string} plist - Generated iOS Info.plist XML.
  * @param {string} manifest - Generated Android manifest XML.
  * @returns {{plist: string, manifest: string}} Updated platform declarations.

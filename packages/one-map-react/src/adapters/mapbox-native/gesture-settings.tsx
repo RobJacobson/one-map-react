@@ -9,7 +9,6 @@ import {
 /**
  * RNMapbox touch-gesture settings.
  *
- * @remarks
  * This is the wrapper's `gestureSettings` object. It is not a common map prop.
  * Supply it with {@link MapboxGestureSettings} around a mapbox-native map.
  */
@@ -24,7 +23,6 @@ const MapboxGestureSettingsContext = createContext<GestureSettings | undefined>(
 /**
  * Supplies RNMapbox `gestureSettings` to the mapbox-native map inside it.
  *
- * @remarks
  * Common `doubleTapZoom` overwrites the double-tap fields from `settings`.
  * Another adapter does not read this context.
  *

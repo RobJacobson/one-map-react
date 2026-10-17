@@ -44,7 +44,6 @@ export const isScreenBounds = (target: QueryTarget): target is ScreenBounds =>
 /**
  * Converts screen corners into RNMapbox's `[top, left, bottom, right]` rect.
  *
- * @remarks
  * RNMapbox documents the rect as `[minY, minX, maxY, maxX]`, which is the
  * common top-left/bottom-right corner order with each corner flattened.
  *
@@ -61,7 +60,6 @@ export const toRnmapboxRect = (bounds: ScreenBounds): number[] => [
 /**
  * Normalizes a wrapper query result into a feature array.
  *
- * @remarks
  * Wrappers return a feature collection (native), a feature array (web),
  * or an Android string payload that is already JSON. An empty array is a
  * successful empty result; `undefined` or a malformed payload is a failure.
@@ -148,7 +146,6 @@ export const assertFeatureIdentifier = (
 /**
  * Validates feature state before dispatch.
  *
- * @remarks
  * The portable contract excludes `null`, `undefined`, and non-finite numbers
  * so every backend stores the same shape: MapLibre wrappers drop `null` keys
  * rather than storing them, and `undefined` never crosses a native bridge.
@@ -190,7 +187,6 @@ export const featureStateFromWrapper = (value: unknown): FeatureState => {
 /**
  * Wraps a mutable copy of feature state for the wrapper call.
  *
- * @remarks
  * Readonly facade values cross into the wrappers' mutable record types;
  * values are not modified. Nested values are copied before native queueing.
  *

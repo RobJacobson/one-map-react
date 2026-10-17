@@ -5,7 +5,6 @@ declare const process: {
 /**
  * Selects the native example sequence.
  *
- * @remarks
  * Metro inlines this from `ONE_MAP_SMOKE` while it builds the bundle.
  * Unset and any other value keep the TF03 lifecycle sequence.
  */

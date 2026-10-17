@@ -5,7 +5,6 @@ declare const process: {
 /**
  * Fixture server base for the native TF05 smoke.
  *
- * @remarks
  * Babel inlines `TF05_BASE` while Metro builds the bundle. Android emulators
  * reach the Mac through `10.0.2.2`; the iOS simulator shares the host
  * loopback, which is the default.

@@ -21,7 +21,6 @@ interface SourceState {
 /**
  * Resets facade-written native state when a source or style is replaced.
  *
- * @remarks
  * Native wrappers can adopt a same-id source during rapid replacement. Keep
  * only written identifiers, and order replacement cleanup after pending writes
  * and before new state operations. Style changes also reset facade-written
@@ -34,8 +33,6 @@ export class NativeFeatureState {
   private readonly resets = new Set<SourceState>();
 
   /**
-   * Creates source-lifetime ordering over the current map reset operation.
-   *
    * @param reset - Removes an identifier's whole state on the current source.
    */
   constructor(
@@ -44,7 +41,6 @@ export class NativeFeatureState {
 
   /**
    * Starts an owned source lifetime without dispatching to an attaching view.
-   *
    * @param sourceId - Facade source id.
    * @param scope - Actual source family; returning families reset their prior written targets.
    * @returns Cleanup that cannot release a replacement lifetime.
@@ -88,7 +84,6 @@ export class NativeFeatureState {
   /**
    * Invalidates operations after a committed style change.
    *
-   * @remarks
    * Pending old writes settle before the next operation resets their targets.
    * New epochs also retry failed resets without detaching mounted sources.
    */
@@ -101,7 +96,6 @@ export class NativeFeatureState {
   /**
    * Clears pending state after the renderer confirms source attachment.
    *
-   * @remarks
    * Each source uses its existing operation queue. Repeated frame callbacks
    * share the active flush, and failures cannot block another source's reset.
    * A superseded automatic flush is canceled without reporting an error;
@@ -149,7 +143,6 @@ export class NativeFeatureState {
 
   /**
    * Runs a state operation after any prior write and replacement reset.
-   *
    * @param identifier - Validated native feature-state target.
    * @param operation - Dispatch using the current wrapper handle.
    * @param change - Track a possibly partial write or forget a successful whole-state removal.

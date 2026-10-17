@@ -82,7 +82,6 @@ interface WebMapHandle {
 /**
  * Cluster methods on a web GeoJSON source.
  *
- * @remarks
  * Mapbox GL reports results through a trailing callback while MapLibre GL
  * returns promises, so both entries see one rest-argument signature and
  * normalize the result through {@link WebWrapper.callWebCluster}.
@@ -185,7 +184,6 @@ interface WebMapProps extends Partial<ViewState> {
 /**
  * Props at the react-map-gl source and layer boundary.
  *
- * @remarks
  * The facade converts common props before forwarding, so the wrapper's
  * fields stay opaque here. react-map-gl accepts every style-spec source
  * and layer field; the index signature covers that surface without
@@ -269,7 +267,6 @@ interface WebWrapper<
   /**
    * Invokes a cluster method on a web GeoJSON source.
    *
-   * @remarks
    * Mapbox GL takes a trailing callback; MapLibre GL returns a promise. The
    * shared surface passes the source and forwarded arguments and adopts the
    * renderer's own result channel.

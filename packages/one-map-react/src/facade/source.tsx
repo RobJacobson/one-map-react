@@ -8,7 +8,6 @@ import { useStableOptions } from "./use-stable-options.js";
 /**
  * Shared source that renders the selected adapter's source component.
  *
- * @remarks
  * Source creation inputs are stable for the component's lifetime; changing
  * one throws and requires remounting with a new React `key`.
  *
@@ -39,7 +38,6 @@ export const Source = (props: SourceProps) => {
 /**
  * Captures the creation inputs of a source for change detection.
  *
- * @remarks
  * Excludes the options that may change between renders (`data` for GeoJSON,
  * `url` and `coordinates` for images) and `children`, so only stable
  * creation options are compared between renders.

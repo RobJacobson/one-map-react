@@ -2,7 +2,6 @@ import * as Rnmapbox from "@rnmapbox/maps";
 
 /**
  * Rejects the SDK-v10-only wrapper prop when the installed wrapper cannot localize v11 labels.
- *
  * @param value - Supplied wrapper localizeLabels option, including an explicit false from JavaScript.
  * @throws When a supplied option would silently do nothing on RNMapbox 10.3.7.
  */

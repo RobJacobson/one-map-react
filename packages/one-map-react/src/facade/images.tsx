@@ -5,7 +5,6 @@ import { useMapEnclosure } from "./map.js";
 /**
  * Shared style images that render through the selected adapter.
  *
- * @remarks
  * Renders inside {@link Map}; registration waits for style readiness,
  * entries are removed on unmount, and owned entries are re-registered after
  * the style is replaced.

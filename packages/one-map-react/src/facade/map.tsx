@@ -148,14 +148,6 @@ const useMapAttachment = (
   return { mapRef, proxy };
 };
 
-/**
- * Resolves each retained command against the owner's current attachment.
- *
- * @remarks
- * Excluding then prevents promise resolution from treating this command proxy
- * as a thenable. Calls before attachment or after teardown reject instead of
- * retaining the previous renderer.
- */
 const createDeferredMapRef = (ref: { current: MapRef | null }): MapRef =>
   new Proxy({} as MapRef, {
     get: (_target, key: keyof MapRef | "then") => {

@@ -41,7 +41,6 @@ export const useActiveCallbacks = <Callbacks extends CallbackRecord>(
 /**
  * Returns a function that calls `callback` only while the component is mounted.
  *
- * @remarks
  * The live callback is stored during commit so an uncommitted render, including
  * a suspended transition, cannot replace the handler on a still-visible map.
  * Mount and unmount update the guard in a layout effect, so a parent layout

@@ -46,6 +46,7 @@ export type {
   NativePopupProps,
 } from "./adapters/shared/native-ui.js";
 
+/** Selected native map with typed renderer facilities and host attributes. */
 /** Selected SDK location follow options, applied to the existing camera. */
 export type NativeLocationOptions = Pick<
   ComponentProps<typeof WrapperCamera>,
@@ -57,7 +58,6 @@ export type NativeLocationOptions = Pick<
   | "onUserTrackingModeChange"
 >;
 
-/** Selected native map with typed renderer facilities and host attributes. */
 export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
   /** Complete selected style document. */
   readonly mapStyle: MapProps["mapStyle"] | NativeStyleDocument;
@@ -105,20 +105,7 @@ export const Marker = SharedMarker as ForwardRefExoticComponent<
 export type NativeSourceProps =
   | Exclude<SourceProps, GeoJsonSourceProps | VectorSourceProps>
   | ((GeoJsonSourceProps | VectorSourceProps) & {
-      /**
-       * Source-layer press region; updates without remounting.
-       *
-       * @remarks
-       * Initial omission uses RNMapbox's 44 by 44 hitbox. Dimensions use
-       * iOS points and Android screen pixels; later clearing follows the
-       * selected wrapper's reset behavior.
-       */
-      readonly hitbox?: {
-        /** Full hit-region width, centered on the press. */
-        width: number;
-        /** Full hit-region height, centered on the press. */
-        height: number;
-      };
+      readonly hitbox?: { width: number; height: number };
     });
 /** Selected source with mutable activation hitbox. */
 export const Source = SharedSource as ComponentType<NativeSourceProps>;
@@ -271,7 +258,6 @@ export {
 
 /**
  * Sets app-wide Mapbox label languages through RNMapbox 10.3.8 or newer.
- *
  * @param language - Unmodified language tag, ordered tags, or null for the SDK default.
  * @returns Resolves when the wrapper acknowledges the change.
  * @throws When the installed wrapper predates this operation, or the SDK rejects it.
@@ -290,7 +276,6 @@ export const setLanguage = async (
 
 /**
  * Normalizes a Mapbox language tag using the installed wrapper's optional helper.
- *
  * @param tag - BCP-47 language tag to normalize; setLanguage itself never rewrites it.
  * @returns The wrapper-normalized tag, including its Chinese-script handling.
  * @throws When the installed wrapper predates this helper.

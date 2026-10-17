@@ -24,7 +24,6 @@ export const nativeUiReportReady = (manual, identity) =>
 
 /**
  * Checks native observations without treating callback logs as visual proof.
- *
  * @param {object} observation - Readback posted by the actual native fixture.
  * @param {object | undefined} manual - Operator outcomes tied to this build.
  * @param {object} identity - Verified binary, library, environment, and run identity.

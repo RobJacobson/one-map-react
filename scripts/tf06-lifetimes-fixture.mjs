@@ -20,7 +20,6 @@ const routes = [
 
 /**
  * Serves deterministic, generation-tagged MVTs for the native TF06 scope.
- *
  * @param {number} port - Dedicated local fixture port.
  * @returns {Promise<{ close: () => Promise<void>, requests: object[] }>}
  * The owned server and compact requested-generation provenance.
@@ -68,7 +67,6 @@ export const startLifetimesFixture = async (port = 8798) => {
 
 /**
  * Encodes real lines in two independent vector source layers using MVT 2.1.
- *
  * @param {number} revision - Replacement-source generation carried as a property.
  * @param {number} z - XYZ tile zoom.
  * @param {number} x - XYZ column.

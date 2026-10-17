@@ -301,7 +301,6 @@ export type WebMapRef = MapRef & {
   readonly fire: MapboxMapInstance["fire"];
   /**
    * Selects an attached renderer's public gesture controls and independent state readback.
-   *
    * @param name - SDK gesture handler name.
    * @returns The renderer-owned public handler; use only while this map remains mounted.
    * @throws For an unknown handler name or a detached map.
@@ -311,52 +310,19 @@ export type WebMapRef = MapRef & {
   ) => WebGestureHandlers[Name];
   /**
    * Reads the attached renderer's pinned SDK version.
-   *
-   * @returns SDK version string.
-   * @throws When the map is detached.
+   * @returns SDK version string; throws when detached.
    */
   readonly getVersion: () => string;
-  /**
-   * Reads an attached CanvasSource.
-   *
-   * @param id - Source id in the attached style.
-   * @returns The renderer-owned source; use only while it remains attached.
-   * @throws When the map is detached, the source is absent, or its type is
-   * not canvas.
-   */
+  /** Reads the attached CanvasSource with its named media/model operations. */
   readonly getCanvasSource: (id: string) => import("mapbox-gl").CanvasSource;
-  /**
-   * Reads an attached VideoSource.
-   *
-   * @param id - Source id in the attached style.
-   * @returns The renderer-owned source; use only while it remains attached.
-   * @throws When the map is detached, the source is absent, or its type is
-   * not video.
-   */
+  /** Reads the attached VideoSource with its named media/model operations. */
   readonly getVideoSource: (id: string) => import("mapbox-gl").VideoSource;
-  /**
-   * Reads an attached ModelSource.
-   *
-   * @param id - Source id in the attached style.
-   * @returns The renderer-owned source; use only while it remains attached.
-   * @throws When the map is detached, the source is absent, or its type is
-   * not model.
-   */
+  /** Reads the attached ModelSource with its named media/model operations. */
   readonly getModelSource: (id: string) => import("mapbox-gl").ModelSource;
 
-  /**
-   * Updates selected renderer diagnostics; settings follow SDK lifetime.
-   *
-   * @param options - Diagnostic fields to assign; omitted fields are retained.
-   * @throws When the map is detached or the renderer rejects an assignment.
-   */
+  /** Updates selected renderer diagnostics; settings follow SDK lifetime. */
   readonly setDebugOptions: (options: Partial<WebDebugOptions>) => void;
-  /**
-   * Reads renderer diagnostics.
-   *
-   * @returns Current diagnostic settings on the attached renderer.
-   * @throws When the map is detached or a renderer property read fails.
-   */
+  /** Reads renderer diagnostics. */
   readonly getDebugOptions: () => WebDebugOptions;
 } & Pick<MapboxMapRef, (typeof forwardedMethodNames)[number]>;
 
@@ -501,8 +467,6 @@ export const Layer = (props: ComponentProps<typeof MapboxLayer>) => {
   useLayoutEffect(() => {
     if (props.type !== "custom" && map?.getLayer(id)) {
       // react-map-gl 8.1.3 updates paint/layout/order but omits mutable slots.
-      // See ../test/tf09-selected.web.test.tsx slot update/reset coverage.
-      // Remove when the wrapper applies slot changes and resets itself.
       map.setSlot(id, slot);
     }
   }, [map, id, props.type, slot]);

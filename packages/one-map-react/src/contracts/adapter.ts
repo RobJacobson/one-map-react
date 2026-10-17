@@ -44,7 +44,6 @@ export type Backend =
 /**
  * Backend selection and the map components that implement it.
  *
- * @remarks
  * Application setup passes this value to {@link MapSetup}. Shared map code
  * reads it from context and does not import a wrapper.
  */

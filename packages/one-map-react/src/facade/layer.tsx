@@ -5,7 +5,6 @@ import { useStableOptions } from "./use-stable-options.js";
 /**
  * Shared layer that renders the selected adapter's layer component.
  *
- * @remarks
  * Remains the direct child of the wrapper source so injected `source` or
  * `sourceID` reaches the wrapper layer. Paint, layout, filter, zoom range,
  * and `beforeId` may change between renders; `id`, `type`,

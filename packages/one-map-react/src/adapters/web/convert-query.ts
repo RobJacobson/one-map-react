@@ -43,7 +43,6 @@ export const toWebSourceQueryOptions = (
 /**
  * Converts a common feature identifier into the web target object.
  *
- * @remarks
  * The readonly identifier crosses into the renderer's mutable object type;
  * values are not modified.
  *

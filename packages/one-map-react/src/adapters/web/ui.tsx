@@ -191,7 +191,6 @@ export const createWebUi = (
     useLayoutEffect(() => {
       // react-map-gl 8.1.3 updates options.anchor only when offset changes.
       // Apply the SDK's public offset setter so anchor-only updates reposition.
-      // See ../../../test/tf07-ui.web.test.tsx popup anchor-only coverage.
       // Remove when the wrapper handles anchor updates independently.
       if (handle.current) {
         handle.current.options.anchor = anchor;

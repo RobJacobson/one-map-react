@@ -60,7 +60,6 @@ const identityKey = "oneMapReactOffline";
 
 /**
  * Normalizes persistent pack identity and shares one wrapper observer per pack.
- *
  * @param backend - Selected public wrapper operations.
  * @returns Native download service, independent of map attachment.
  */
