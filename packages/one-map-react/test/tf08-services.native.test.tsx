@@ -4,6 +4,7 @@ import {
   StaticMapImageManager,
 } from "@maplibre/maplibre-react-native";
 import { offlineManager, snapshotManager } from "@rnmapbox/maps";
+import { waitFor } from "@testing-library/react-native";
 
 import { mapboxNativeServices } from "../src/adapters/mapbox-native/services.js";
 import { maplibreNativeServices } from "../src/adapters/maplibre-native/services.js";
@@ -14,6 +15,7 @@ jest.mock("@rnmapbox/maps", () => ({
     createPack: jest.fn(),
     getPack: jest.fn(),
     getPacks: jest.fn(),
+    subscribe: jest.fn(),
     unsubscribe: jest.fn(),
   },
   snapshotManager: { takeSnap: jest.fn() },
@@ -155,6 +157,131 @@ describe("TF08 native wrapper forwarding", () => {
       expect.any(Function)
     );
     expect(offlineManager.unsubscribe).toHaveBeenCalledWith("route");
+  });
+  test("RNMapbox creation failure preserves a subscriber attached after persistence", async () => {
+    // Only public pack reads are mocked; the wrapper's numeric state declaration is stale.
+    const pack = {
+      name: "persisted",
+      metadata: {
+        oneMapReactOffline: { version: 1, id: "persisted" },
+        user: {},
+      },
+      bounds: [3, 4, 1, 2],
+      status: async () => ({ state: "active", percentage: 25 }),
+    } as unknown as NonNullable<
+      Awaited<ReturnType<typeof offlineManager.getPack>>
+    >;
+    jest.mocked(offlineManager.getPacks).mockResolvedValue([]);
+    jest.mocked(offlineManager.getPack).mockResolvedValue(undefined);
+    let finishCreation = () => {};
+    jest.mocked(offlineManager.createPack).mockImplementationOnce(() => {
+      jest.mocked(offlineManager.getPacks).mockResolvedValue([pack]);
+      return new Promise<void>((resolve) => {
+        finishCreation = resolve;
+      });
+    });
+    let progress: Parameters<typeof offlineManager.subscribe>[1];
+    jest
+      .mocked(offlineManager.subscribe)
+      .mockImplementation(async (_id: string, listener: typeof progress) => {
+        progress = listener;
+      });
+    jest.mocked(offlineManager.unsubscribe).mockImplementation(() => {
+      progress = undefined;
+    });
+    const creating = mapboxNativeServices.offline?.createPack({
+      id: "persisted",
+      mapStyle: image.mapStyle,
+      bounds: [
+        [1, 2],
+        [3, 4],
+      ],
+      minZoom: 0,
+      maxZoom: 2,
+    });
+    const failed = expect(creating).rejects.toThrow("discoverable");
+    await waitFor(() => expect(offlineManager.createPack).toHaveBeenCalled());
+    const onProgress = jest.fn();
+    const release = mapboxNativeServices.offline?.subscribe(
+      "persisted",
+      onProgress,
+      jest.fn()
+    );
+    try {
+      await waitFor(() => expect(onProgress).toHaveBeenCalled());
+      finishCreation();
+      await failed;
+      expect(offlineManager.unsubscribe).not.toHaveBeenCalled();
+      progress?.(pack, { ...(await pack.status()), percentage: 50 });
+      expect(onProgress).toHaveBeenLastCalledWith(
+        expect.objectContaining({ percentage: 50 })
+      );
+    } finally {
+      release?.();
+      await waitFor(() =>
+        expect(offlineManager.unsubscribe).toHaveBeenCalledWith("persisted")
+      );
+    }
+  });
+
+  test("RNMapbox name collisions preserve imported pack progress", async () => {
+    const pack = {
+      name: "ferry",
+      metadata: {},
+      bounds: [3, 4, 1, 2],
+      status: async () => ({ state: 1, percentage: 25 }),
+    } as NonNullable<Awaited<ReturnType<typeof offlineManager.getPack>>>;
+    jest.mocked(offlineManager.getPacks).mockResolvedValue([pack]);
+    jest.mocked(offlineManager.getPack).mockResolvedValue(pack);
+    jest
+      .mocked(offlineManager.createPack)
+      .mockRejectedValue(new Error("Offline pack already exists."));
+    let progress: Parameters<typeof offlineManager.subscribe>[1];
+    jest
+      .mocked(offlineManager.subscribe)
+      .mockImplementation(async (_id: string, listener: typeof progress) => {
+        progress = listener;
+      });
+    jest.mocked(offlineManager.unsubscribe).mockImplementation(() => {
+      progress = undefined;
+    });
+    const onProgress = jest.fn();
+    const onError = jest.fn();
+    const dispose = mapboxNativeServices.offline?.subscribe(
+      "backend:ferry",
+      onProgress,
+      onError
+    );
+    try {
+      await waitFor(() =>
+        expect(onProgress).toHaveBeenCalledWith(
+          expect.objectContaining({ id: "backend:ferry", percentage: 25 })
+        )
+      );
+      await expect(
+        mapboxNativeServices.offline?.createPack({
+          id: "ferry",
+          mapStyle: image.mapStyle,
+          bounds: [
+            [1, 2],
+            [3, 4],
+          ],
+          minZoom: 0,
+          maxZoom: 2,
+        })
+      ).rejects.toThrow("already exists");
+      progress?.(pack, { ...(await pack.status()), percentage: 50 });
+      expect(onProgress).toHaveBeenLastCalledWith(
+        expect.objectContaining({ id: "backend:ferry", percentage: 50 })
+      );
+      expect(onError).not.toHaveBeenCalled();
+      expect(offlineManager.unsubscribe).not.toHaveBeenCalled();
+    } finally {
+      dispose?.();
+      await waitFor(() =>
+        expect(offlineManager.unsubscribe).toHaveBeenCalledWith("ferry")
+      );
+    }
   });
   test("MapLibre offline creation uses flat bounds and persistent identity metadata", async () => {
     jest.mocked(OfflineManager.getPacks).mockResolvedValue([]);

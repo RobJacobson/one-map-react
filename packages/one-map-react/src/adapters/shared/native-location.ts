@@ -58,7 +58,7 @@ export const createNativeLocation = (
         accuracy: "unknown",
       };
     },
-    subscribe: (success, failure, interrupted) => {
+    subscribe: (success, failure, interrupted, acquiring) => {
       const selected = manager();
       let listening = false;
       let active = true;
@@ -85,6 +85,7 @@ export const createNativeLocation = (
       };
       const attach = (): void => {
         if (!active || listening) return;
+        acquiring();
         listening = true;
         selected.addListener(listener);
       };

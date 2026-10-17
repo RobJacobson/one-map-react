@@ -35,15 +35,14 @@ import {
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
 import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
-import { useActiveCallback } from "../shared/use-active-callback.js";
+import {
+  useActiveCallback,
+  useActiveCallbacks,
+} from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { useNativeControlledCamera } from "../shared/use-native-controlled-camera.js";
 import { normalizePadding } from "../shared/wrapper-values.js";
-import {
-  mutableFlatBounds,
-  toMaplibreControlledCamera,
-  toMaplibreInitialViewState,
-} from "./convert-camera.js";
+import { mutableFlatBounds, toMaplibreViewState } from "./convert-camera.js";
 import { toMaplibreGestures } from "./convert-gestures.js";
 import {
   clickEventFromMaplibreNative,
@@ -128,17 +127,15 @@ const MaplibreNativeMapImplementation = forwardRef<
     }
   }, [sources, styleKey]);
   const frozenViewState = useFrozenValue(initialViewState);
-  const reportMove = useActiveCallback(onMove);
-  const reportMoveStart = useActiveCallback(onMoveStart);
-  const reportMoveEnd = useActiveCallback(onMoveEnd);
-  const reportClick = useActiveCallback(onClick);
-  const reportLongPress = useActiveCallback(onLongPress);
-  const reportLoad = useActiveCallback(onLoad);
-  const reportStyleLoad = useActiveCallback(onStyleLoad);
-  const reportError = useActiveCallback(onError);
-  const flushFeatureState = useActiveCallback(() => {
-    void sources.featureState.flush((error) => reportError({ error }));
-  });
+  // One settled native event can report several callbacks; an earlier one may unmount the map.
+  const report = useActiveCallbacks({ onMove, onMoveEnd });
+  // Feature-state resets finish after the native frame callback returns.
+  const reportFeatureStateError = useActiveCallback((error: unknown) =>
+    onError?.({ error })
+  );
+  const flushFeatureState = (): void => {
+    void sources.featureState.flush(reportFeatureStateError);
+  };
   const gestures = toMaplibreGestures({
     interactive,
     dragPan,
@@ -182,7 +179,7 @@ const MaplibreNativeMapImplementation = forwardRef<
     viewState,
     mapHandle.jumpTo,
     () => mapLoaded.current,
-    (error) => reportError({ error })
+    (error) => onError?.({ error })
   );
   const onCameraCommand = controlledCamera.onCommand;
   useLayoutEffect(() => {
@@ -211,28 +208,26 @@ const MaplibreNativeMapImplementation = forwardRef<
     );
 
     if (phase === "start") {
-      reportMoveStart(move);
+      onMoveStart?.(move);
       return;
     }
 
     if (phase === "change") {
       sawMove.current = true;
-      reportMove(move);
+      report.onMove(move);
       controlledCamera.onMove(move);
       return;
     }
 
     if (!sawMove.current) {
       sawMove.current = true;
-      reportMove(move);
+      report.onMove(move);
     }
 
-    reportMoveEnd(move);
+    report.onMoveEnd(move);
     controlledCamera.onMove(move);
   };
-  const controlled = viewState
-    ? toMaplibreControlledCamera(viewState)
-    : undefined;
+  const controlled = viewState ? toMaplibreViewState(viewState) : undefined;
   const flatMaxBounds =
     maxBounds === undefined ? undefined : mutableFlatBounds(maxBounds);
 
@@ -298,17 +293,17 @@ const MaplibreNativeMapImplementation = forwardRef<
             onDidFinishLoadingMap={() => {
               mapLoaded.current = true;
               controlledCamera.onLoad();
-              reportLoad();
+              onLoad?.();
             }}
             onDidFinishLoadingStyle={() => {
               sources.featureState.resetStyle();
-              reportStyleLoad();
+              onStyleLoad?.();
             }}
             onDidFailLoadingMap={() => {
               capture.fail(
                 new Error("MapLibre reported a map loading failure.")
               );
-              reportError({});
+              onError?.({});
             }}
             onRegionWillChange={
               onMoveStart
@@ -326,21 +321,21 @@ const MaplibreNativeMapImplementation = forwardRef<
             onPress={
               onClick
                 ? (event: MaplibrePressEvent) => {
-                    reportClick(pressEvent(event.nativeEvent));
+                    onClick?.(pressEvent(event.nativeEvent));
                   }
                 : undefined
             }
             onLongPress={
               onLongPress
                 ? (event: MaplibrePressEvent) => {
-                    reportLongPress(pressEvent(event.nativeEvent));
+                    onLongPress?.(pressEvent(event.nativeEvent));
                   }
                 : undefined
             }
           >
             <Camera
               ref={cameraRef}
-              initialViewState={toMaplibreInitialViewState(frozenViewState)}
+              initialViewState={toMaplibreViewState(frozenViewState)}
               minZoom={minZoom}
               maxZoom={maxZoom}
               maxBounds={flatMaxBounds}

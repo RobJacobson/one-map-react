@@ -1,0 +1,280 @@
+{
+  "scope": "Audit every useActiveCallback/useActiveCallbacks owner and adjacent facade lifetime checks against installed wrapper source; routine verification only.",
+  "baseRevision": "8cb29c0f11f9a101c39833b06ff81b0d5d93e74b",
+  "versions": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-map-gl": "8.1.3",
+    "@rnmapbox/maps": "10.3.8",
+    "@maplibre/maplibre-react-native": "11.5.0",
+    "react-native": "0.86.3",
+    "babel-plugin-react-compiler": "1.0.0"
+  },
+  "guardHookCallSites": {
+    "before": 36,
+    "after": 15,
+    "definition": "Calls in library source, excluding the guard helper itself; includes both removal and grouping, not 21 eliminated behaviors."
+  },
+  "wrapperSources": {
+    "web": "@vis.gl/react-mapbox and @vis.gl/react-maplibre 8.1.3: src/components/map.tsx, marker.ts, popup.ts, geolocate-control.ts; src/mapbox/mapbox.ts and src/maplibre/maplibre.ts.",
+    "mapboxNative": "@rnmapbox/maps 10.3.8: src/components/MapView.tsx, ShapeSource.tsx, VectorSource.tsx, PointAnnotation.tsx.",
+    "maplibreNative": "@maplibre/maplibre-react-native 11.5.0: src/components/map/Map.tsx, sources/geojson-source/GeoJSONSource.tsx, sources/vector-source/VectorSource.tsx, annotations/view-annotation/ViewAnnotation.tsx.",
+    "nativeDispatch": "react-native 0.86.3: Libraries/Renderer/implementations/ReactFabric-dev.js getListener reads current host props.",
+    "mapboxMinimum": "Cached @rnmapbox/maps 10.3.7 src/components/MapView.tsx, PointAnnotation.tsx, ShapeSource.tsx and VectorSource.tsx also use the inspected class this.props dispatch pattern."
+  },
+  "decisions": [
+    {
+      "site": "adapters/web/map.tsx",
+      "callbacks": "All report handlers",
+      "decision": "keep one record",
+      "reason": "recycle() retains renderer listeners and this.props after logical unmount. Async map-library initialization also has an unguarded rejection callback. Wrapper layout updates already handle ordinary prop replacement, but do not retire those paths."
+    },
+    {
+      "site": "adapters/web/ui.tsx Marker",
+      "callbacks": [
+        "onClick",
+        "onDragStart",
+        "onDrag",
+        "onDragEnd",
+        "onError"
+      ],
+      "decision": "keep, group into one record",
+      "reason": "Both wrappers mutate thisRef.current.props during render. SDK callbacks can read a suspended render before commit. Normal removal does not address that gap; the facade error callback shares the same converted-event path."
+    },
+    {
+      "site": "adapters/web/ui.tsx Popup",
+      "callbacks": [
+        "onOpen",
+        "onClose"
+      ],
+      "decision": "keep, group into one record",
+      "reason": "Both wrappers mutate thisRef.current.props during render while open. They already detach close before removal; the retained guard is for committed-callback isolation, not duplicated normal teardown."
+    },
+    {
+      "site": "adapters/web/ui.tsx GeolocateControl",
+      "callbacks": [
+        "onGeolocate",
+        "onError"
+      ],
+      "decision": "keep, group into one record",
+      "reason": "Both wrappers mutate their props ref during render. The guard prevents an SDK result from reaching uncommitted application callbacks."
+    },
+    {
+      "site": "adapters/mapbox-native/map.tsx",
+      "callbacks": "All report handlers",
+      "decision": "keep one record; remove outer flushFeatureState guard",
+      "reason": "RNMapbox class event methods read mutable this.props. A suspended class update can expose uncommitted callbacks. report.onError already protects asynchronous feature-state reset errors, so guarding the synchronous frame entry duplicates it."
+    },
+    {
+      "site": "adapters/maplibre-native/map.tsx",
+      "callbacks": [
+        "onMove",
+        "onMoveEnd"
+      ],
+      "decision": "keep one record",
+      "reason": "Facade reportRegion may deliver onMove and onMoveEnd from one native event. An earlier application callback may synchronously detach the map before the next delivery."
+    },
+    {
+      "site": "adapters/maplibre-native/map.tsx",
+      "callbacks": [
+        "onMoveStart",
+        "onClick",
+        "onLongPress",
+        "onLoad",
+        "onStyleLoad",
+        "onError"
+      ],
+      "decision": "remove general record guards",
+      "reason": "The functional wrapper forwards current handlers to Fabric native host props, with no JavaScript callback registry or deferred event dispatch. Facade click-query lifetimes remain guarded in useMapInteractions."
+    },
+    {
+      "site": "adapters/maplibre-native/map.tsx",
+      "callbacks": "flushFeatureState and its asynchronous error callback",
+      "decision": "remove guarded synchronous entry; retain one guarded error reporter",
+      "reason": "The native frame handler starts facade-owned asynchronous resets. Only their eventual error report needs the guard."
+    },
+    {
+      "site": "adapters/mapbox-native/sources.tsx and adapters/maplibre-native/sources.tsx",
+      "callbacks": "GeoJSON and vector press, four sites",
+      "decision": "remove",
+      "reason": "Native event delivery is wrapper-owned. These closures only normalize and dispatch a stable source id through a stable map-session dispatcher. Application source callbacks are stored by the shared Source during layout commit; asynchronous hit-query ownership remains in useMapInteractions, including replacement and unmount checks."
+    },
+    {
+      "site": "adapters/shared/native-map-presentation.tsx",
+      "callbacks": [
+        "onMove",
+        "onMoveEnd"
+      ],
+      "decision": "remove guard record; keep useMemo for renderer isolation",
+      "reason": "Adapters already own their required event guards. This provider synchronously observes those notifications and owns no delayed event source."
+    },
+    {
+      "site": "adapters/shared/native-ui.tsx NativeMarker and adapters/mapbox-native/ui.tsx MapboxAnnotationHost",
+      "callbacks": "onClick",
+      "decision": "remove shared guard; keep guard only on RNMapbox annotation selection",
+      "reason": "Live touches and MapLibre annotations use current native host handlers. RNMapbox PointAnnotation instead reads class this.props; the annotation-local guard also covers the composed marker selection handler."
+    },
+    {
+      "site": "adapters/shared/native-ui.tsx NativeMarker",
+      "callbacks": [
+        "onDragStart",
+        "onDrag",
+        "onDragEnd",
+        "onError"
+      ],
+      "decision": "keep, group into one record",
+      "reason": "Facade-owned long-press timers and project/unproject promises can complete after callback props change. Generation/sequence checks retire stale gesture work; the record supplies current committed handlers and teardown protection."
+    },
+    {
+      "site": "adapters/shared/native-ui.tsx NativePopup",
+      "callbacks": "onClose",
+      "decision": "keep",
+      "reason": "The facade map subscription retains requestClose across callback updates; the same function is also a native button handler, so useEffectEvent is not a replacement for this shared entry."
+    },
+    {
+      "site": "adapters/shared/native-ui.tsx NativePopup",
+      "callbacks": "onOpen",
+      "decision": "replace guard with useEffectEvent",
+      "reason": "Open is invoked only by the mounting layout effect; React supplies current committed callback access without a separate mounted guard."
+    },
+    {
+      "site": "adapters/shared/native-ui.tsx NativeNavigationControl",
+      "callbacks": "onError",
+      "decision": "keep",
+      "reason": "Facade getZoom, zoomTo and easeTo promises can reject after the control unmounts."
+    },
+    {
+      "site": "adapters/shared/native-ui.tsx NativeScaleControl",
+      "callbacks": "onError",
+      "decision": "keep",
+      "reason": "The effect active flag retires superseded work, but its passive cleanup may run after layout unmount and promise settlement. The layout-owned callback guard suppresses errors in that gap."
+    },
+    {
+      "site": "adapters/shared/native-marker-overlay.tsx",
+      "callbacks": "onProjectionError",
+      "decision": "replace guard with useEffectEvent",
+      "reason": "The projection effect retires superseded work with its active flag. The parent NativeMarker error reporter retains its layout-owned callback guard for unmount protection."
+    },
+    {
+      "site": "adapters/shared/use-native-controlled-camera.ts",
+      "callbacks": [
+        "reportError",
+        "reconcile",
+        "onMove"
+      ],
+      "decision": "keep",
+      "reason": "Camera acknowledgments may reject after unmount; a scheduled frame needs the latest committed target; an application onMove may detach the map before the adapter calls its movement observer."
+    },
+    {
+      "site": "adapters/shared/use-native-controlled-camera.ts",
+      "callbacks": [
+        "schedule",
+        "onCommand"
+      ],
+      "decision": "replace guards with useCallback",
+      "reason": "schedule is entered through current native callbacks or guarded movement and its frame is canceled on cleanup. onCommand only updates a ref; native adapter cleanup clears the command observer. Neither needs a separate latest-props or mounted guard."
+    },
+    {
+      "site": "facade/use-geolocation-control.ts",
+      "callbacks": [
+        "onGeolocate",
+        "onError"
+      ],
+      "decision": "remove",
+      "reason": "The current ref stores committed props. Request active and generation checks reject detached/provider-replaced work; retirement also rechecks active after abort and release, which can synchronously unmount the control."
+    }
+  ],
+  "otherLifetimeChecks": [
+    {
+      "sites": [
+        "facade/use-map-interactions.ts",
+        "facade/map-setup.tsx"
+      ],
+      "decision": "keep",
+      "reason": "Facade-owned query promises, independent subscriptions and application-provided location services require logical attachment, generation and disposal checks."
+    },
+    {
+      "sites": [
+        "adapters/shared/create-location-service.ts",
+        "adapters/shared/native-location.ts",
+        "adapters/shared/offline-service.ts"
+      ],
+      "decision": "keep",
+      "reason": "Facade acquisition deadlines, app-state listener ownership, asynchronous observer attachment and per-subscriber disposal are not supplied by wrapper singleton services."
+    },
+    {
+      "sites": [
+        "adapters/shared/map-capture.ts",
+        "adapters/shared/native-feature-state.ts",
+        "adapters/web/images.tsx"
+      ],
+      "decision": "keep",
+      "reason": "Pending captures, serialized feature-state operations and image loads outlive their initiating call and need explicit facade resource ownership."
+    },
+    {
+      "sites": [
+        "adapters/shared/native-ui.tsx gesture generation/sequence and popup dismissed",
+        "adapters/shared/native-ui.tsx scale effect active",
+        "adapters/shared/native-marker-overlay.tsx projection effect active"
+      ],
+      "decision": "keep",
+      "reason": "These checks retire specific facade gesture/effect work or deduplicate popup dismissal; they do not duplicate wrapper event dispatch."
+    }
+  ],
+  "regression": "test/wrapper-callbacks.web.test.tsx imports actual installed web wrapper source. Fake SDK drag delivery exposes pending callbacks without the facade, and committed callbacks with it, on both engines. No renderer is instantiated.",
+  "checks": {
+    "bun run validate": {
+      "result": "passed",
+      "unitAndWebTests": 703,
+      "mockedNativeTests": 229,
+      "packedSelections": 13,
+      "lint": "No warnings or errors on final bun run check; initial run flagged the regression spy forwarding original effect dependencies, now narrowly annotated.",
+      "execution": "Local process permissions enabled only to support routine process-cleanup self-tests."
+    },
+    "bun run test:compiled": {
+      "result": "passed",
+      "webTests": 499,
+      "mockedNativeTests": 229,
+      "compilerAssertions": "passed",
+      "compilerDiagnostics": "17 reported compiler skips; explicit lifetime and memoization behavior remains in those functions."
+    },
+    "bun run typecheck:apps": {
+      "result": "passed"
+    },
+    "git diff --check": {
+      "result": "passed"
+    }
+  },
+  "earlierAttempts": [
+    "Focused native run failed the old MapLibre test that manually invoked detached native props; it now checks current mounted forwarding. Remaining late-result and teardown regressions were preserved.",
+    "Initial real-wrapper regression setup attempted to mock React context across an externalized bundle; replaced with the actual source context provider.",
+    "First validate attempt passed 701 unit/web and 228 mocked native tests, then failed the process-cleanup self-test because the sandbox blocked process inspection. That self-test passed separately with local process permissions."
+  ],
+  "acceptance": {
+    "result": "not_run",
+    "reason": "Explicitly excluded by the user; browser/native rendering, drawing and device timing remain unverified for this artifact."
+  },
+  "retention": "Only this compact audit record and regression tests are retained; no raw logs or generated consumers are required.",
+  "validatedPackageSha256": "548d6258cc27f6e3ae763533bde734d6f09215b3db683a1433e5f7cc231204c4",
+  "reviewedDiffSha256": "cdffd8ef66043ad202b89f07788401544016db7bdaaf82fab14a8d0dd5018144",
+  "review": "Traced each retained helper call to a concrete wrapper storage/reuse path or facade-owned pending operation. Public exports and runtime peers are unchanged. NativeMapPresentation retains stable callback memoization without its duplicate lifetime guard.",
+  "previousVerification": {
+    "validatedPackageSha256": "aaeff39962f3f4d03f5d485711be8ebcc19835e5665d81860bfc3e01d1e5e542",
+    "reviewedDiffSha256": "c57545fbe247f450491c87414a5b07074559133bfb3de3155e381821bd6606c6",
+    "outcome": "Routine checks passed before the subsequent Ponytail review reproduced two cleanup regressions; both are corrected and covered below."
+  },
+  "regressionCorrections": [
+    {
+      "site": "adapters/shared/native-ui.tsx NativeScaleControl",
+      "fix": "Restore the existing useActiveCallback error guard.",
+      "test": "test/tf07-ui.native.test.tsx defers passive cleanup until after layout unmount and rejects the pending projection.",
+      "verification": "Failed before the fix; passed against source and compiled package after the fix."
+    },
+    {
+      "site": "facade/use-geolocation-control.ts retireRequest",
+      "fix": "Recheck request.active after provider cleanup before updating state or reporting failure.",
+      "test": "test/tf08-controls.web.test.tsx covers synchronous unmount from both abort listeners and watch release.",
+      "verification": "Both cases failed before the fix; passed against source and compiled package after the fix."
+    }
+  ]
+}

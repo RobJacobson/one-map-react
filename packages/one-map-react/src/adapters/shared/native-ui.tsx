@@ -7,6 +7,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useId,
   useImperativeHandle,
   useLayoutEffect,
@@ -24,7 +25,7 @@ import {
 import { Portal } from "react-native-teleport";
 
 import type { Adapter } from "../../contracts/adapter.js";
-import type { LngLat, Point } from "../../contracts/camera-types.js";
+import type { LngLat, MapRef, Point } from "../../contracts/camera-types.js";
 import type {
   Anchor,
   ControlProps,
@@ -42,7 +43,10 @@ import {
   NativeOverlayContext,
   useNativeMapPresentation,
 } from "./native-map-presentation.js";
-import { useActiveCallback } from "./use-active-callback.js";
+import {
+  useActiveCallback,
+  useActiveCallbacks,
+} from "./use-active-callback.js";
 import { useFrozenValue } from "./use-frozen-value.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 
@@ -166,11 +170,18 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const markerId = props.id ?? generatedId;
       const anchor = props.anchor ?? defaultAnchor;
       const isAnnotation = props.renderMode === "annotation";
-      const click = useActiveCallback(props.onClick);
-      const dragStart = useActiveCallback(props.onDragStart);
-      const drag = useActiveCallback(props.onDrag);
-      const dragEnd = useActiveCallback(props.onDragEnd);
-      const reportError = useActiveCallback(props.onError);
+      // Long-press timers and projection promises need current committed drag handlers.
+      const {
+        onDragStart: dragStart,
+        onDrag: drag,
+        onDragEnd: dragEnd,
+        onError: reportError,
+      } = useActiveCallbacks({
+        onDragStart: props.onDragStart,
+        onDrag: props.onDrag,
+        onDragEnd: props.onDragEnd,
+        onError: props.onError,
+      });
       const gesture = useRef<DragState | null>(null);
       const generation = useRef(0);
       const requestSequence = useRef(0);
@@ -342,7 +353,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
           return;
         }
         if (startingPoint.current) {
-          click({ lngLat: [props.longitude, props.latitude] });
+          props.onClick?.({ lngLat: [props.longitude, props.latitude] });
         }
         cancel();
       };
@@ -350,7 +361,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const Host = isAnnotation ? options.Annotation : options.Marker;
       const markerCoordinate = dragCoordinate ?? coordinate;
       const markerClick = (event: MarkerEvent): void => {
-        click(event);
+        props.onClick?.(event);
         // RNMapbox 10.3.7 toggles selection on taps; reset until it exposes per-tap events.
         if (options.backend === "mapbox-native") {
           setAnnotationRevision((revision) => revision + 1);
@@ -461,8 +472,9 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     const mapSession = useMapSession();
     const { subscribe } = mapSession;
     const id = useId();
+    // The facade's map subscription retains requestClose across prop updates.
     const close = useActiveCallback(props.onClose);
-    const open = useActiveCallback(props.onOpen);
+    const open = useEffectEvent(() => props.onOpen?.());
     const closeOnClick = props.closeOnClick ?? true;
     const closeOnMove = props.closeOnMove ?? false;
     const closeButton = props.closeButton ?? true;
@@ -486,7 +498,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         removeClick?.();
         removeMove?.();
       };
-    }, [subscribe, closeOnClick, closeOnMove, open, requestClose]);
+    }, [subscribe, closeOnClick, closeOnMove, requestClose]);
 
     if (props.focusAfterOpen !== undefined) {
       throw new Error("Native Popup does not support browser focusAfterOpen.");
@@ -606,33 +618,82 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
 const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
   const viewState = useContext(NativeCameraContext)?.viewState;
   const mapSession = useMapSession();
-  const reportError = useActiveCallback(props.onError);
+  const requestSequence = useRef(0);
+
+  useLayoutEffect(
+    () => () => {
+      requestSequence.current += 1;
+    },
+    [mapSession.ref, mapSession.ready]
+  );
+
+  const subscribe = mapSession.subscribe;
+
+  useLayoutEffect(
+    () =>
+      subscribe("move", (event) => {
+        if ("origin" in event && event.origin === "user")
+          requestSequence.current += 1;
+      }),
+    [subscribe]
+  );
+
+  // Readbacks and failures belong to the latest navigation intent and attachment.
+  const reportError = useActiveCallback(
+    (map: MapRef, sequence: number, error: unknown) => {
+      if (
+        sequence === requestSequence.current &&
+        mapSession.ref.current === map &&
+        mapSession.ready
+      ) {
+        props.onError?.(error);
+      }
+    }
+  );
+  const applyZoom = useActiveCallback(
+    (map: MapRef, zoom: number, sequence: number) => {
+      if (
+        sequence !== requestSequence.current ||
+        mapSession.ref.current !== map ||
+        !mapSession.ready
+      ) {
+        return;
+      }
+      void map
+        .zoomTo(
+          Math.max(
+            mapSession.minZoom ?? 0,
+            Math.min(mapSession.maxZoom ?? 24, zoom)
+          )
+        )
+        .catch((error) => reportError(map, sequence, error));
+    }
+  );
   const navigate = async (change: number): Promise<void> => {
     const map = mapSession.ref.current;
     if (!map || !mapSession.ready) return;
+    const sequence = ++requestSequence.current;
+
     try {
       // Region-change snapshots can precede the settled renderer zoom.
       const zoom = await map.getZoom();
-      await map.zoomTo(
-        Math.max(
-          mapSession.minZoom ?? 0,
-          Math.min(mapSession.maxZoom ?? 24, zoom + change)
-        )
-      );
+      applyZoom(map, zoom + change, sequence);
     } catch (error) {
-      reportError(error);
+      reportError(map, sequence, error);
     }
   };
   const resetNorth = async (): Promise<void> => {
     const map = mapSession.ref.current;
     if (!map || !mapSession.ready) return;
+    const sequence = ++requestSequence.current;
+
     try {
       await map.easeTo({
         bearing: 0,
         ...(props.visualizePitch ? { pitch: 0 } : {}),
       });
     } catch (error) {
-      reportError(error);
+      reportError(map, sequence, error);
     }
   };
   return (
@@ -717,6 +778,7 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
     readonly text: string;
   } | null>(null);
   const maxWidth = props.maxWidth ?? 100;
+  // Passive effect cleanup can run after layout unmount and promise settlement.
   const reportError = useActiveCallback(props.onError);
   const unit = props.unit ?? "metric";
   if (!Number.isFinite(maxWidth) || maxWidth <= 0)

@@ -19,7 +19,10 @@ export const mapboxNativeServices: MapServices = {
   offline: createOfflineService({
     kind: "mapbox",
     getPacks: () => offlineManager.getPacks(),
-    create: async (options, metadata, progress, error) => {
+    create: async (options, metadata, progress, error, releaseUnobserved) => {
+      // Imported packs can own this native name under a different facade id.
+      if (await offlineManager.getPack(options.id))
+        throw new Error("Offline pack name already exists.");
       try {
         await offlineManager.createPack(
           {
@@ -38,7 +41,8 @@ export const mapboxNativeServices: MapServices = {
           throw new Error("RNMapbox created no discoverable offline pack.");
         return pack;
       } catch (failure) {
-        offlineManager.unsubscribe(options.id);
+        // A facade subscriber may already have adopted the persisted pack.
+        releaseUnobserved(options.id);
         throw failure;
       }
     },

@@ -68,7 +68,12 @@ const offlineFixture = (kind: OfflineBackend["kind"] = "maplibre") => {
     unobserve,
     deletePack: vi
       .fn<OfflineBackend["deletePack"]>()
-      .mockResolvedValue(undefined),
+      .mockImplementation(async (id) => {
+        const index = packs.findIndex((pack) =>
+          kind === "mapbox" ? pack.name === id : pack.id === id
+        );
+        if (index >= 0) packs.splice(index, 1);
+      }),
     invalidatePack: vi
       .fn<OfflineBackend["invalidatePack"]>()
       .mockResolvedValue(undefined),
@@ -84,6 +89,133 @@ const offlineFixture = (kind: OfflineBackend["kind"] = "maplibre") => {
 };
 
 describe("TF08 persistent native packs", () => {
+  test.each(["mapbox", "maplibre"] as const)(
+    "%s late cleanup cannot detach a recreated pack with the same backend identity",
+    async (kind) => {
+      const fixture = offlineFixture(kind);
+      const pack = await fixture.service.createPack(options);
+      const releaseOld = fixture.service.subscribe(pack.id, vi.fn(), vi.fn());
+      await settle();
+      await fixture.service.deletePack(pack.id);
+      const replacement = await fixture.service.createPack(options);
+      expect(replacement.backendId).toBe(pack.backendId);
+      const progress = vi.fn();
+      const error = vi.fn();
+      const releaseNew = fixture.service.subscribe(pack.id, progress, error);
+      await settle();
+      const current = fixture.native.get(pack.backendId);
+      expect(current).toBeDefined();
+
+      releaseOld();
+      await settle();
+      expect(fixture.native.get(pack.backendId)).toBe(current);
+      current?.progress(fixture.packs[0], { state: "active", percentage: 50 });
+      const failure = new Error("replacement download failed");
+      current?.error(fixture.packs[0], failure);
+      expect(progress).toHaveBeenLastCalledWith({
+        id: pack.id,
+        state: "active",
+        percentage: 50,
+      });
+      expect(error).toHaveBeenCalledWith(failure);
+      releaseNew();
+      await settle();
+      expect(fixture.native.size).toBe(0);
+    }
+  );
+
+  test.each(
+    (
+      [
+        { kind: "mapbox", outcome: "resolve" },
+        { kind: "mapbox", outcome: "reject" },
+        { kind: "maplibre", outcome: "resolve" },
+        { kind: "maplibre", outcome: "reject" },
+      ] as const
+    ).flatMap((scenario) =>
+      (["attachment", "status"] as const).map((phase) => ({
+        ...scenario,
+        phase,
+      }))
+    )
+  )(
+    "$kind retired $phase and queued refresh cannot affect a replacement after $outcome",
+    async ({ kind, outcome, phase }) => {
+      const fixture = offlineFixture(kind);
+      const pack = await fixture.service.createPack(options);
+      const oldError = vi.fn();
+      const releases = [fixture.service.subscribe(pack.id, vi.fn(), oldError)];
+      await settle();
+      if (phase === "attachment") {
+        fixture.native.get(pack.backendId)?.progress(fixture.packs[0], {
+          state: "complete",
+        });
+      }
+      let finishDeletion = () => {};
+      const remove = fixture.backend.deletePack;
+      vi.mocked(fixture.backend.deletePack).mockImplementationOnce(
+        (id) =>
+          new Promise<void>((resolve) => {
+            finishDeletion = () => {
+              void remove(id).then(resolve);
+            };
+          })
+      );
+      const deleting = fixture.service.deletePack(pack.id);
+      await settle();
+      let finishRefresh = (_failure?: Error) => {};
+      if (phase === "attachment") {
+        fixture.observe.mockImplementationOnce((id, progress, error) => {
+          fixture.native.set(id, { progress, error });
+          return new Promise<void>((resolve, reject) => {
+            finishRefresh = (failure) =>
+              failure ? reject(failure) : resolve();
+          });
+        });
+      } else {
+        vi.mocked(fixture.packs[0].status).mockImplementationOnce(
+          () =>
+            new Promise((resolve, reject) => {
+              finishRefresh = (failure) =>
+                failure
+                  ? reject(failure)
+                  : resolve({ state: "active", percentage: 10 });
+            })
+        );
+      }
+      releases.push(fixture.service.subscribe(pack.id, vi.fn(), oldError));
+      await settle();
+      releases.push(fixture.service.subscribe(pack.id, vi.fn(), oldError));
+      await settle();
+      finishDeletion();
+      await deleting;
+      await fixture.service.createPack(options);
+      const progress = vi.fn();
+      const releaseNew = fixture.service.subscribe(pack.id, progress, vi.fn());
+      await settle();
+      const current = fixture.native.get(pack.backendId);
+      expect(current).toBeDefined();
+
+      finishRefresh(
+        outcome === "reject" ? new Error("retired refresh") : undefined
+      );
+      await settle();
+      for (const release of releases) release();
+      await settle();
+      expect(fixture.native.get(pack.backendId)).toBe(current);
+      expect(oldError).not.toHaveBeenCalled();
+      current?.progress(fixture.packs[0], { state: "active", percentage: 75 });
+      expect(progress).toHaveBeenLastCalledWith({
+        id: pack.id,
+        state: "active",
+        percentage: 75,
+      });
+      releaseNew();
+      await settle();
+      expect(fixture.native.size).toBe(0);
+    }
+  );
+
   test.each(["serialized", "object"] as const)(
     "RNMapbox normalizes %s creation bounds and preserves them after lookup",
     async (format) => {
@@ -255,6 +387,88 @@ describe("TF08 persistent native packs", () => {
     expect(one).toHaveBeenCalledTimes(count);
     expect(fixture.native.size).toBe(0);
     expect(fixture.packs[0].pause).not.toHaveBeenCalled();
+  });
+  test.each(["mapbox", "maplibre"] as const)(
+    "%s a new subscriber's failed status read preserves existing progress observation",
+    async (kind) => {
+      const fixture = offlineFixture(kind);
+      const pack = await fixture.service.createPack(options);
+      vi.mocked(fixture.packs[0].status).mockResolvedValue({
+        state: "active",
+        percentage: 10,
+      });
+      const firstProgress = vi.fn();
+      const firstError = vi.fn();
+      const releaseFirst = fixture.service.subscribe(
+        pack.id,
+        firstProgress,
+        firstError
+      );
+      await settle();
+      const failure = new Error("temporary status failure");
+      vi.mocked(fixture.packs[0].status).mockRejectedValueOnce(failure);
+      const secondProgress = vi.fn();
+      const secondError = vi.fn();
+      const releaseSecond = fixture.service.subscribe(
+        pack.id,
+        secondProgress,
+        secondError
+      );
+      await settle();
+
+      expect(secondError).toHaveBeenCalledWith(failure);
+      expect(firstError).not.toHaveBeenCalled();
+      fixture.native.get(pack.backendId)?.progress(fixture.packs[0], {
+        state: "active",
+        percentage: 50,
+      });
+      for (const progress of [firstProgress, secondProgress]) {
+        expect(progress).toHaveBeenLastCalledWith({
+          id: pack.id,
+          state: "active",
+          percentage: 50,
+        });
+      }
+      releaseFirst();
+      releaseSecond();
+      await settle();
+      expect(fixture.native.size).toBe(0);
+    }
+  );
+  test("failed observer attachment releases a partially installed listener and permits recovery", async () => {
+    const fixture = offlineFixture();
+    const pack = await fixture.service.createPack(options);
+    const failure = new Error("observer attachment failed");
+    fixture.observe.mockImplementationOnce(async (id, progress, error) => {
+      fixture.native.set(id, { progress, error });
+      throw failure;
+    });
+    const error = vi.fn();
+    const releaseFailed = fixture.service.subscribe(pack.id, vi.fn(), error);
+    await settle();
+    expect(error).toHaveBeenCalledWith(failure);
+    expect(fixture.native.size).toBe(0);
+
+    const progress = vi.fn();
+    const releaseRecovered = fixture.service.subscribe(
+      pack.id,
+      progress,
+      vi.fn()
+    );
+    await settle();
+    fixture.native.get(pack.backendId)?.progress(fixture.packs[0], {
+      state: "active",
+      percentage: 50,
+    });
+    expect(progress).toHaveBeenLastCalledWith({
+      id: pack.id,
+      state: "active",
+      percentage: 50,
+    });
+    releaseFailed();
+    releaseRecovered();
+    await settle();
+    expect(fixture.native.size).toBe(0);
   });
   test.each([
     { kind: "mapbox", state: "active", percentage: 75 },
@@ -451,6 +665,32 @@ describe("TF08 persistent native packs", () => {
     await expect(fixture.service.getPacks()).rejects.toThrow(
       "Duplicate persisted"
     );
+  });
+  test.each(["root", "object", "array"])(
+    "rejects a sparse metadata array nested in %s before creating a pack",
+    async (nesting) => {
+      const fixture = offlineFixture();
+      const values = [1, 2, 3];
+      delete values[1];
+      const metadata = {
+        values:
+          nesting === "object"
+            ? { nested: values }
+            : nesting === "array"
+              ? [values]
+              : values,
+      };
+      await expect(
+        fixture.service.createPack({ ...options, metadata })
+      ).rejects.toThrow("JSON");
+      expect(fixture.packs).toHaveLength(0);
+    }
+  );
+  test("preserves dense JSON metadata arrays including explicit null", async () => {
+    const fixture = offlineFixture();
+    const metadata = { values: [null, 0, false, { nested: ["route"] }] };
+    const pack = await fixture.service.createPack({ ...options, metadata });
+    expect(pack.metadata).toEqual(metadata);
   });
   test.each([
     { minZoom: -1 },

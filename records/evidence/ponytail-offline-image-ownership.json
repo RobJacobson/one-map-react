@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-17",
+  "scope": "Repair offline subscription and web image cleanup ownership; trace the same stale-owner and synchronous-callback patterns through affected adapters, callers and cleanup paths.",
+  "baseRevision": "054dff599011cce70d7e72115151dbd64d036ad7",
+  "reviewedDiffSha256": "842e47ecc4f577e40bc2cde3f818d2e14443d7b88689e2dd15934d61d05c6066",
+  "diffCommand": "git diff --binary -- docs packages/one-map-react",
+  "validatedPackageSha256": "e25e0a3da6e2fbbf681e12362581eb7bdc2e95b3440a4da881ccf007674168d1",
+  "findings": [
+    {
+      "finding": "Disposing an old offline subscription can detach a replacement pack with the same backend identity.",
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "affectedPaths": [
+        "Shared offline service used by both native adapters",
+        "Queued attachment, status readback and subscription disposal",
+        "RNMapbox creation-failure cleanup after a persisted pack gains a subscriber"
+      ],
+      "change": "Only the current observer can detach listeners or deliver asynchronous refresh results. Creation cleanup checks whether a facade observer has adopted the persisted pack, including RNMapbox failures before the shared service receives the pack.",
+      "evidence": "Ten shared regressions cover both backend kinds, late disposal, queued refreshes, and attachment/status success and failure after recreation. One native adapter regression covers persistence followed by subscription and creation failure. Replacement progress and final disposal are asserted. Existing deletion-failure, duplicate-creation, completion and retry tests pass."
+    },
+    {
+      "finding": "Synchronous image callbacks can unmount or replace entries before registration records ownership, leaking an image or allowing stale cleanup.",
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "affectedPaths": [
+        "Shared web Images used by Mapbox and MapLibre",
+        "Registration, entry replacement, style restoration and logical unmount/reuse",
+        "Partial registration failures and replacement styles during cleanup"
+      ],
+      "change": "Record ownership before addImage, publish pending registration before removeImage, and stop superseded synchronization. Cleanup removes only its remaining owned names and keeps style invalidation active until removals finish. Registration failures cannot affect a replacement owner.",
+      "evidence": "Fourteen regressions cover entry/component/map removal, props replacement during removal, style replacement during cleanup, retired registration failure and partially installed images across both web adapters. Two additional controls preserve credential-safe error reporting when image inspection fails. The shared renderer mock now emits synchronous styledata from image add/remove methods.",
+      "boundaryReview": "Inspected installed Mapbox GL 3.32.0 and MapLibre GL 6.13.0 image methods and react-map-gl 8.1.3 event forwarding. Both web renderers emit styledata synchronously. Native image components delegate registration and cleanup to SDK wrappers; they do not use this ownership implementation."
+    }
+  ],
+  "patternReview": [
+    "Traced every shared offline unobserve path and both backend implementations: creation, attachment, progress/error delivery, status readback, resume/invalidation refresh, deletion and final disposal.",
+    "Traced all first-party web addImage/removeImage calls, both loader conventions, pending loads/removals, URL/sdf replacement, styledata/style.load/load/idle restoration, and unmount/reuse.",
+    "Checked neighboring map/source registries, native feature-state queues, scoped location subscription cleanup and native location listener setup for the same ownership ordering. Their existing identity/generation or listener-state guards required no changes in this review.",
+    "Reviewed production and test changes for error handling, stale completion, resource release and unnecessary abstraction. Public exports, dependency versions and renderer acceptance rules are unchanged."
+  ],
+  "regressions": {
+    "beforeFixes": "All 25 bug regressions failed against the unchanged production files from baseRevision: 24 shared offline/web cases plus one native adapter case. Modified production files were restored afterward. The two additional error-reporting controls are not counted as reproduced bugs.",
+    "afterFixes": "All 27 added cases pass. Web cases also pass against compiled output; the native adapter case passes in source and compiled mocked-native suites. Shared offline unit cases run against source.",
+    "setupCorrection": "The first type check rejected implicit callback parameter types in the new native adapter test. Explicit types corrected the fixture without configuration changes."
+  },
+  "checks": {
+    "bun run check": "passed",
+    "bun run check:docs": "passed",
+    "bun run typecheck": "passed",
+    "bun run typecheck:apps": "passed",
+    "testScriptSubcommands": {
+      "result": "passed",
+      "execution": "Every package.json scripts.test command ran. The aggregate stopped at the sandbox-restricted process-cleanup test; both Node and Bun variants then passed with local process permission, and all remaining standalone commands passed separately. No renderer launched.",
+      "unitAndWebTests": 792,
+      "mockedNativeTests": 236
+    },
+    "bun run test:compiled": {
+      "result": "passed",
+      "webTests": 556,
+      "mockedNativeTests": 236,
+      "libraryBuilds": "passed",
+      "compilerAssertions": "passed"
+    },
+    "bun scripts/test-package.mjs": {
+      "result": "passed",
+      "isolatedSelections": 13
+    },
+    "git diff --check": "passed",
+    "manualReview": "Completed for the affected workflows and neighboring ownership patterns listed above, including regression assertions, comments and implementation documentation."
+  },
+  "diagnostics": "Nonblocking Bun moduleSuffixes and experimental TypeScript API warnings remain. React Compiler reports 17 optimization diagnostics, matching the previous recorded count. The web Images diagnostic now reports the captured revision increment; emitted runtime tests and compiler assertions pass. These checks do not establish renderer acceptance.",
+  "outstanding": [
+    "Renderer acceptance for these corrections remains explicitly deferred: image lifecycle on both web engines and native offline lifecycle on both engines/platforms. Existing acceptance records apply only to their recorded artifacts."
+  ],
+  "outsideScope": [
+    "A fresh whole-repository audit or proof that no other defects exist",
+    "Real browsers, native builds, simulators, emulators and physical devices",
+    "Fresh selected-peer installs and Metro transport; public exports, dependencies and linking are unchanged"
+  ],
+  "retention": "Package-check consumers and temporary archive cleaned themselves up. No retained raw logs, screenshots, acceptance workspaces or native application artifacts were created."
+}

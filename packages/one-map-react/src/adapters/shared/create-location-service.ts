@@ -5,12 +5,13 @@ import type {
 import type { GeolocationPosition } from "../../contracts/ui-types.js";
 import { locationOptions, validatePosition } from "./location-values.js";
 
-/** Internal acquisition boundary; subscribe may report a cached fix synchronously. */
+/** Internal acquisition boundary; acquiring precedes initial or resumed cached fixes. */
 export interface LocationUpdates {
   readonly subscribe: (
     position: (position: GeolocationPosition) => void,
     error: (error: unknown) => void,
-    interrupted: () => void
+    interrupted: () => void,
+    acquiring: () => void
   ) => () => void;
   readonly requestPermission: LocationService["requestPermission"];
 }
@@ -30,7 +31,7 @@ export const createLocationService = (
     once = false
   ) => {
     const { timeoutMs, maximumAgeMs } = locationOptions(options);
-    const started = Date.now();
+    let started = Date.now();
     let active = true;
     let release: (() => void) | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -68,8 +69,8 @@ export const createLocationService = (
             fail(error);
             return;
           }
-          // A timestamp-less cached fix cannot establish freshness. Providers must
-          // supply a measured timestamp for the common fresh-position contract.
+          // Cache age is relative to acquisition, so bridge delivery delay cannot
+          // turn a newly measured fix into a forbidden cached fix.
           if (
             position.timestamp === undefined ||
             position.timestamp < started - maximumAgeMs
@@ -82,6 +83,9 @@ export const createLocationService = (
         () => {
           if (once)
             fail(new Error("Foreground location acquisition interrupted."));
+        },
+        () => {
+          started = Date.now();
         }
       );
       if (!active) release();

@@ -17,13 +17,16 @@ import {
 } from "react";
 import { describe, expect, vi, test } from "vite-plus/test";
 
-import { useActiveCallback } from "../src/adapters/shared/use-active-callback.js";
+import {
+  useActiveCallback,
+  useActiveCallbacks,
+} from "../src/adapters/shared/use-active-callback.js";
 
 const committed = vi.fn();
 const pending = vi.fn();
 
 const MapProbe = ({ onMove }: { onMove: () => void }): ReactElement => {
-  const reportMove = useActiveCallback(onMove);
+  const { onMove: reportMove } = useActiveCallbacks({ onMove });
 
   return (
     <button type="button" onClick={() => reportMove()}>
@@ -70,7 +73,7 @@ const RetainedProbe = ({
   onMove: () => void;
   retain: (report: () => void) => void;
 }): ReactElement => {
-  const reportMove = useActiveCallback(onMove);
+  const { onMove: reportMove } = useActiveCallbacks({ onMove });
   retain(reportMove);
 
   return <div data-testid="map" />;
@@ -99,7 +102,7 @@ const LayoutParent = ({
   ) : null;
 };
 
-describe("useActiveCallback", () => {
+describe("committed callback guards", () => {
   test("keeps identity across callback replacement and StrictMode replay, then ignores teardown", () => {
     const initial = vi.fn<(value: number) => void>();
     const replacement = vi.fn<(value: number) => void>();
@@ -146,5 +149,62 @@ describe("useActiveCallback", () => {
 
     expect(screen.queryByTestId("map")).toBeNull();
     expect(onMove).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("useActiveCallbacks", () => {
+  test("retains typed handlers across replacement, optional callbacks and StrictMode replay", () => {
+    const initial = vi.fn<(value: number) => void>();
+    const replacement = vi.fn<(value: number) => void>();
+    const loaded = vi.fn<() => void>();
+    const callbacks: {
+      onMove: ((value: number) => void) | undefined;
+      onLoad: (() => void) | undefined;
+    } = { onMove: initial, onLoad: undefined };
+    const view = renderHook((props) => useActiveCallbacks(props), {
+      initialProps: callbacks,
+      wrapper: StrictMode,
+    });
+    const retained = view.result.current;
+    retained.onMove(1);
+    retained.onLoad();
+    expect(initial).toHaveBeenCalledWith(1);
+
+    view.rerender({ onMove: replacement, onLoad: loaded });
+    expect(view.result.current).toBe(retained);
+    retained.onMove(2);
+    retained.onLoad();
+    expect(replacement).toHaveBeenCalledWith(2);
+    expect(loaded).toHaveBeenCalledTimes(1);
+    expect(initial).toHaveBeenCalledTimes(1);
+
+    view.rerender({ onMove: undefined, onLoad: undefined });
+    retained.onMove(3);
+    retained.onLoad();
+    expect(replacement).toHaveBeenCalledTimes(1);
+    expect(loaded).toHaveBeenCalledTimes(1);
+
+    view.rerender({ onMove: replacement, onLoad: loaded });
+    view.unmount();
+    retained.onMove(4);
+    retained.onLoad();
+    expect(replacement).toHaveBeenCalledTimes(1);
+    expect(loaded).toHaveBeenCalledTimes(1);
+  });
+
+  test("teardown in one callback suppresses the next retained handler", () => {
+    const later = vi.fn();
+    const view = renderHook(() =>
+      useActiveCallbacks({
+        onMove: () => view.unmount(),
+        onLoad: later,
+      })
+    );
+    const retained = view.result.current;
+    act(() => {
+      retained.onMove();
+      retained.onLoad();
+    });
+    expect(later).not.toHaveBeenCalled();
   });
 });

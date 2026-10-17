@@ -503,6 +503,41 @@ export const runWebFollowupRegressions = (
       }
     );
 
+    test.each([
+      "setFeatureState",
+      "getFeatureState",
+      "removeFeatureState",
+    ] as const)(
+      "%s rejects emitted errors and keeps the map callback",
+      async (method) => {
+        const onError = vi.fn();
+        const ref = createRef<MapRef>();
+        render(scene({ onError }, undefined, ref));
+        const renderer = target();
+        const error = new Error(
+          "GeoJSON sources cannot have a sourceLayer parameter."
+        );
+        mock[method].mockImplementationOnce(() => {
+          renderer.emitError(error);
+          return {};
+        });
+        const identifier = { source: "routes", sourceLayer: "roads", id: 1 };
+        const pending =
+          method === "setFeatureState"
+            ? ref.current?.setFeatureState(identifier, { selected: true })
+            : ref.current?.[method](identifier);
+        await expect(pending).rejects.toBe(error);
+        expect(onError).toHaveBeenCalledWith({ error });
+        expect(renderer.listenerCount("error")).toBe(1);
+        await expect(
+          ref.current?.setFeatureState(
+            { source: "routes", id: 1 },
+            { selected: true }
+          )
+        ).resolves.toBeUndefined();
+      }
+    );
+
     test("a malformed result rejects without leaking an error listener", async () => {
       const ref = createRef<MapRef>();
       render(scene({}, undefined, ref));
@@ -514,6 +549,170 @@ export const runWebFollowupRegressions = (
         ref.current?.queryRenderedFeatures(undefined)
       ).rejects.toThrow("returned no result");
       expect(target().listenerCount("error")).toBe(1);
+    });
+
+    test.each(["entry", "component", "map"] as const)(
+      "synchronous %s removal during image registration releases the installed image",
+      async (removal) => {
+        const mounted = render(
+          scene(
+            { reuseMaps: true },
+            <Images images={{ marker: "https://example.com/m.png" }} />
+          )
+        );
+        const renderer = target();
+        const remove = () => {
+          renderer.off("styledata", remove);
+          flushSync(() => {
+            if (removal === "map") mounted.unmount();
+            else
+              mounted.rerender(
+                scene(
+                  { reuseMaps: true },
+                  removal === "entry" ? <Images images={{}} /> : undefined
+                )
+              );
+          });
+        };
+        renderer.on("styledata", remove);
+        await act(async () => renderer.emitStyleLoad());
+        expect(renderer.hasImage("marker")).toBe(false);
+        if (removal !== "map") mounted.unmount();
+        expect(renderer.listenerCount("styledata")).toBe(0);
+        expect(renderer.listenerCount("style.load")).toBe(0);
+      }
+    );
+
+    test("replacement during image removal retires the entire old synchronization", async () => {
+      const mounted = render(
+        scene(
+          {},
+          <Images
+            images={{
+              marker: "https://example.com/old.png",
+              obsolete: "https://example.com/obsolete.png",
+            }}
+          />
+        )
+      );
+      const renderer = target();
+      renderer.addImage("marker", { sprite: true });
+      const replace = () => {
+        renderer.off("styledata", replace);
+        flushSync(() =>
+          mounted.rerender(
+            scene(
+              {},
+              <Images images={{ marker: "https://example.com/new.png" }} />
+            )
+          )
+        );
+      };
+      renderer.on("styledata", replace);
+      await act(async () => renderer.emitStyleLoad());
+      expect(renderer.addImage).toHaveBeenLastCalledWith(
+        "marker",
+        {
+          url: "https://example.com/new.png",
+          width: 1,
+          height: 1,
+        },
+        {}
+      );
+      expect(renderer.hasImage("obsolete")).toBe(false);
+      expect(renderer.loadImage).toHaveBeenCalledTimes(1);
+      mounted.unmount();
+      expect(renderer.hasImage("marker")).toBe(false);
+    });
+
+    test("cleanup callbacks cannot remove replacement-style images", async () => {
+      const mounted = render(
+        scene(
+          {},
+          <Images
+            images={{
+              first: "https://example.com/first.png",
+              second: "https://example.com/second.png",
+            }}
+          />
+        )
+      );
+      const renderer = target();
+      await act(async () => renderer.emitStyleLoad());
+      const replaceStyle = () => {
+        renderer.off("styledata", replaceStyle);
+        renderer.clearImages();
+        renderer.addImage("second", { sprite: "replacement" });
+        renderer.emitStyleLoad();
+      };
+      renderer.on("styledata", replaceStyle);
+      mounted.unmount();
+      expect(renderer.hasImage("second")).toBe(true);
+      expect(renderer.listenerCount("styledata")).toBe(0);
+      expect(renderer.listenerCount("style.load")).toBe(0);
+    });
+
+    test("a retired image registration failure cannot remove or report against its replacement", async () => {
+      const onError = vi.fn();
+      const mounted = render(
+        scene(
+          { onError },
+          <Images images={{ marker: "https://example.com/old.png" }} />
+        )
+      );
+      const renderer = target();
+      const addImage = renderer.addImage.getMockImplementation();
+      renderer.addImage.mockImplementationOnce((...args) => {
+        addImage?.(...args);
+        throw new Error("retired style callback failed");
+      });
+      const replace = () => {
+        renderer.off("styledata", replace);
+        flushSync(() =>
+          mounted.rerender(
+            scene(
+              { onError },
+              <Images images={{ marker: "https://example.com/new.png" }} />
+            )
+          )
+        );
+      };
+      renderer.on("styledata", replace);
+      await act(async () => renderer.emitStyleLoad());
+      expect(renderer.addImage).toHaveBeenLastCalledWith(
+        "marker",
+        {
+          url: "https://example.com/new.png",
+          width: 1,
+          height: 1,
+        },
+        {}
+      );
+      expect(onError).not.toHaveBeenCalled();
+      mounted.unmount();
+      expect(renderer.hasImage("marker")).toBe(false);
+    });
+
+    test("an image installed before registration throws is removed without activity retries", async () => {
+      const onError = vi.fn();
+      const mounted = render(
+        scene(
+          { onError },
+          <Images images={{ marker: "https://example.com/m.png" }} />
+        )
+      );
+      const renderer = target();
+      const addImage = renderer.addImage.getMockImplementation();
+      renderer.addImage.mockImplementationOnce((...args) => {
+        addImage?.(...args);
+        throw new Error("style event handler failed");
+      });
+      await act(async () => renderer.emitStyleLoad());
+      expect(renderer.hasImage("marker")).toBe(false);
+      expect(onError).toHaveBeenCalledTimes(1);
+      await act(async () => renderer.emitStyleData());
+      expect(renderer.loadImage).toHaveBeenCalledTimes(1);
+      mounted.unmount();
     });
 
     test.each(["styledata", "load", "idle"] as const)(
@@ -543,6 +742,149 @@ export const runWebFollowupRegressions = (
       }
     );
 
+    test.each([true, false])(
+      "style replacement restores a custom image over a same-name sprite with tiles ready=%s",
+      async (tilesReady) => {
+        const entry = {
+          marker: { url: "https://example.com/custom.png", sdf: true },
+        };
+        const mounted = render(scene({}, <Images images={entry} />));
+        const renderer = target();
+        await act(async () => renderer.emitStyleLoad());
+        expect(renderer.hasImage("marker")).toBe(true);
+
+        renderer.clearImages();
+        renderer.addImage("marker", { sprite: "replacement" });
+        renderer.addImage("style-only", { sprite: "unrelated" });
+        renderer.addImage.mockClear();
+        const ready = vi
+          .spyOn(renderer, "isStyleLoaded")
+          .mockReturnValue(tilesReady);
+        await act(async () => renderer.emitStyleLoad());
+        if (!tilesReady) {
+          expect(renderer.addImage).not.toHaveBeenCalled();
+          ready.mockReturnValue(true);
+          await act(async () => renderer.emitIdle());
+        }
+        expect(renderer.addImage).toHaveBeenCalledExactlyOnceWith(
+          "marker",
+          { url: entry.marker.url, width: 1, height: 1 },
+          { sdf: true }
+        );
+        mounted.rerender(scene({}, <Images images={{ ...entry }} />));
+        expect(renderer.loadImage).toHaveBeenCalledTimes(2);
+        mounted.unmount();
+        expect(renderer.hasImage("marker")).toBe(false);
+        expect(renderer.hasImage("style-only")).toBe(true);
+        expect(renderer.listenerCount("style.load")).toBe(0);
+        ready.mockRestore();
+      }
+    );
+
+    test.each(["resolve", "reject"] as const)(
+      "style replacement retires a pending image load that later completes with %s",
+      async (outcome) => {
+        const onError = vi.fn();
+        const mounted = render(
+          scene(
+            { onError },
+            <Images images={{ marker: "https://example.com/custom.png" }} />
+          )
+        );
+        const renderer = target();
+        let finishOld: (error: unknown, image?: object) => void = () => {};
+        renderer.loadImage.mockImplementationOnce((_url, callback) => {
+          if (callback) {
+            finishOld = callback;
+            return undefined;
+          }
+          return new Promise((resolve, reject) => {
+            finishOld = (error, image) => {
+              if (error) reject(error);
+              else resolve({ data: image });
+            };
+          });
+        });
+        await act(async () => renderer.emitStyleLoad());
+        renderer.clearImages();
+        renderer.addImage("marker", { sprite: "replacement" });
+        renderer.addImage.mockClear();
+        await act(async () => renderer.emitStyleLoad());
+        expect(renderer.addImage).toHaveBeenCalledExactlyOnceWith(
+          "marker",
+          { url: "https://example.com/custom.png", width: 1, height: 1 },
+          {}
+        );
+        await act(async () => {
+          finishOld(
+            outcome === "reject" ? new Error("Retired image load") : null,
+            { stale: true }
+          );
+        });
+        expect(renderer.addImage).toHaveBeenCalledTimes(1);
+        expect(onError).not.toHaveBeenCalled();
+        mounted.unmount();
+        expect(renderer.hasImage("marker")).toBe(false);
+      }
+    );
+
+    test("unmount before replacement style readiness leaves its same-name sprite alone", async () => {
+      const mounted = render(
+        scene(
+          {},
+          <Images images={{ marker: "https://example.com/custom.png" }} />
+        )
+      );
+      const renderer = target();
+      await act(async () => renderer.emitStyleLoad());
+      renderer.clearImages();
+      renderer.addImage("marker", { sprite: "replacement" });
+      const ready = vi.spyOn(renderer, "isStyleLoaded").mockReturnValue(false);
+      act(() => renderer.emitStyleLoad());
+      mounted.unmount();
+      expect(renderer.hasImage("marker")).toBe(true);
+      expect(renderer.listenerCount("style.load")).toBe(0);
+      ready.mockRestore();
+    });
+
+    if (adapter.backend === "maplibre-web") {
+      test("a sprite changed by an in-place style diff restores colliding custom images", async () => {
+        const mounted = render(
+          scene(
+            {},
+            <Images images={{ marker: "https://example.com/custom.png" }} />
+          )
+        );
+        const renderer = target();
+        let spriteUrl = "https://example.com/first-sprite";
+        renderer.getSprite = () => [{ id: "default", url: spriteUrl }];
+        await act(async () => renderer.emitStyleLoad());
+        expect(renderer.loadImage).toHaveBeenCalledTimes(1);
+        await act(async () => renderer.emitStyleData());
+        expect(renderer.loadImage).toHaveBeenCalledTimes(1);
+
+        spriteUrl = "https://example.com/replacement-sprite";
+        const ready = vi
+          .spyOn(renderer, "isStyleLoaded")
+          .mockReturnValue(false);
+        act(() => renderer.emitStyleData());
+        renderer.addImage("marker", { sprite: "replacement" });
+        renderer.addImage.mockClear();
+        ready.mockReturnValue(true);
+        await act(async () => renderer.emitStyleData());
+        expect(renderer.addImage).toHaveBeenCalledExactlyOnceWith(
+          "marker",
+          { url: "https://example.com/custom.png", width: 1, height: 1 },
+          {}
+        );
+        await act(async () => renderer.emitStyleData());
+        expect(renderer.loadImage).toHaveBeenCalledTimes(2);
+        mounted.unmount();
+        expect(renderer.hasImage("marker")).toBe(false);
+        ready.mockRestore();
+      });
+    }
+
     test("an image finishing while tiles are pending retries when the map is ready", async () => {
       const mounted = render(scene({}, <Images images={{}} />));
       const renderer = target();
@@ -571,31 +913,101 @@ export const runWebFollowupRegressions = (
       ready.mockRestore();
     });
 
-    test("tile activity and idle do not repeatedly retry failed image loads", async () => {
-      render(
-        scene({}, <Images images={{ marker: "https://example.com/m.png" }} />)
-      );
-      const renderer = target();
-      renderer.loadImage.mockImplementation((_url, callback) => {
-        const failure = new Error("image unavailable");
-        if (callback) {
-          callback(failure);
-          return undefined;
+    test.each(["load", "registration", "inspection", "empty"] as const)(
+      "%s image failures report a credential-safe map error without retrying on tile activity",
+      async (failure) => {
+        const onError = vi.fn();
+        render(
+          scene(
+            { onError },
+            <Images
+              images={{ marker: "https://example.com/m.png?token=secret" }}
+            />
+          )
+        );
+        const renderer = target();
+        const error = new Error("https://example.com/m.png?token=secret");
+        if (failure === "inspection") {
+          const loadImage = renderer.loadImage.getMockImplementation();
+          renderer.loadImage.mockImplementation((...args) => {
+            const result = loadImage?.(...args);
+            vi.spyOn(renderer, "hasImage").mockImplementationOnce(() => {
+              throw error;
+            });
+            return result;
+          });
+        } else if (failure === "registration") {
+          renderer.addImage.mockImplementation(() => {
+            throw error;
+          });
+        } else {
+          renderer.loadImage.mockImplementation((_url, callback) => {
+            if (callback) {
+              callback(failure === "load" ? error : null);
+              return undefined;
+            }
+            return failure === "load"
+              ? Promise.reject(error)
+              : Promise.resolve({ data: undefined });
+          });
         }
-        return Promise.reject(failure);
-      });
 
-      await act(async () => renderer.emitStyleLoad());
-      expect(renderer.loadImage).toHaveBeenCalledTimes(1);
-      await act(async () => {
-        renderer.emitStyleData();
-        renderer.emitLoad();
-        renderer.emitIdle();
-        renderer.emitIdle();
-      });
-      expect(renderer.loadImage).toHaveBeenCalledTimes(1);
-      expect(renderer.hasImage("marker")).toBe(false);
-    });
+        await act(async () => renderer.emitStyleLoad());
+        expect(onError).toHaveBeenCalledTimes(1);
+        const reported = onError.mock.calls[0]?.[0].error as Error;
+        expect(reported.message).toBe("Style image registration failed.");
+        expect(reported.cause).toBeUndefined();
+
+        await act(async () => {
+          renderer.emitStyleData();
+          renderer.emitLoad();
+          renderer.emitIdle();
+          renderer.emitIdle();
+        });
+        expect(renderer.loadImage).toHaveBeenCalledTimes(1);
+        expect(onError).toHaveBeenCalledTimes(1);
+        expect(renderer.hasImage("marker")).toBe(false);
+      }
+    );
+
+    test.each(["removed", "replaced", "unmounted"] as const)(
+      "%s image loads cannot report late failures to the current map",
+      async (retirement) => {
+        const onError = vi.fn();
+        const content = (images: Record<string, string>) =>
+          scene({ onError, reuseMaps: true }, <Images images={images} />);
+        const mounted = render(
+          content({ marker: "https://example.com/old.png" })
+        );
+        const renderer = target();
+        let rejectLoad: (error: Error) => void = () => {};
+        renderer.loadImage.mockImplementationOnce((_url, callback) => {
+          if (callback) {
+            rejectLoad = callback;
+            return undefined;
+          }
+          return new Promise((_resolve, reject) => {
+            rejectLoad = reject;
+          });
+        });
+        await act(async () => renderer.emitStyleLoad());
+        if (retirement === "unmounted") {
+          mounted.unmount();
+          render(content({}));
+        } else {
+          mounted.rerender(
+            content(
+              retirement === "removed"
+                ? {}
+                : { marker: "https://example.com/new.png" }
+            )
+          );
+        }
+
+        await act(async () => rejectLoad(new Error("late failure")));
+        expect(onError).not.toHaveBeenCalled();
+      }
+    );
 
     test("entry removal does not wait for full style readiness", async () => {
       const mounted = render(

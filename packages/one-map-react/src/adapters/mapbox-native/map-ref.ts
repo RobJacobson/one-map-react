@@ -22,13 +22,13 @@ import {
 } from "../shared/terrain-values.js";
 import {
   boundsFromRnmapboxVisible,
+  finiteNumber,
   lngLatFromWrapper,
   pointFromWrapper,
   rejectJumpTiming,
 } from "../shared/wrapper-values.js";
 import {
   toRnmapboxFitBoundsStop,
-  toRnmapboxFlyToStop,
   toRnmapboxStop,
   toRnmapboxZoomStop,
 } from "./convert-camera.js";
@@ -97,7 +97,7 @@ export const createMapboxMapRef = (
     const camera = requireCamera(cameraRef.current);
 
     onCameraCommand?.();
-    await camera.setCamera(toRnmapboxFlyToStop(options));
+    await camera.setCamera(toRnmapboxStop(options, "flyTo"));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current);
@@ -117,7 +117,7 @@ export const createMapboxMapRef = (
   getCenter: async () =>
     lngLatFromWrapper(await requireMap(mapViewRef.current).getCenter()),
   getZoom: async () =>
-    finiteNumber(await requireMap(mapViewRef.current).getZoom()),
+    finiteNumber(await requireMap(mapViewRef.current).getZoom(), "Map zoom"),
   getBearing: async () => {
     throw unavailableMapMethodError("getBearing", "mapbox-native");
   },
@@ -177,7 +177,7 @@ export const createMapboxMapRef = (
       toRnmapboxClusterFeature(clusterId)
     );
 
-    return clusterZoom(zoom);
+    return finiteNumber(zoom, "Cluster expansion zoom");
   },
   getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
     const source = geoJsonSources.require(sourceId);
@@ -269,21 +269,6 @@ export const resetMapboxFeatureState = async (
   await map.removeFeatureState(featureId, null, sourceId, sourceLayerId);
 };
 
-/**
- * Reads a cluster expansion zoom from the wrapper.
- *
- * @param value - Wrapper zoom value.
- * @returns The zoom as a finite number.
- * @throws When the wrapper returned a non-finite value.
- */
-const clusterZoom = (value: unknown): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error("Cluster expansion zoom must be a finite number.");
-  }
-
-  return value;
-};
-
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null
 ): NonNullable<ComponentRef<typeof Camera>> => {
@@ -302,14 +287,6 @@ const requireMap = (
   }
 
   return map;
-};
-
-const finiteNumber = (value: unknown): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error("Map zoom must be a finite number.");
-  }
-
-  return value;
 };
 
 const mutablePair = (value: LngLat | Point): number[] => [value[0], value[1]];

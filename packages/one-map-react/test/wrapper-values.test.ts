@@ -5,11 +5,22 @@ import {
   boundsFromFlat,
   boundsFromGeographic,
   boundsFromRnmapboxVisible,
+  finiteNumber,
   normalizePadding,
   toFlatBounds,
 } from "../src/adapters/shared/wrapper-values.js";
 
 describe("camera conversion", () => {
+  test("numeric wrapper results stay finite numbers without coercion", () => {
+    expect(finiteNumber(0, "Map zoom")).toBe(0);
+    expect(finiteNumber(-2.5, "Map zoom")).toBe(-2.5);
+    for (const value of [NaN, Infinity, -Infinity, "3", null, undefined]) {
+      expect(() => finiteNumber(value, "Cluster expansion zoom")).toThrow(
+        "Cluster expansion zoom must be a finite number."
+      );
+    }
+  });
+
   test("padding fills missing sides and a single number fills every side", () => {
     expect(normalizePadding({ top: 4 })).toEqual({
       top: 4,

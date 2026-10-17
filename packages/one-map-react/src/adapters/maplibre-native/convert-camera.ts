@@ -2,7 +2,6 @@ import type {
   Bounds,
   CameraCommandOptions,
   FitBoundsOptions,
-  FlyToOptions,
   LngLat,
   ViewState,
 } from "../../contracts/camera-types.js";
@@ -13,43 +12,17 @@ import {
 } from "../shared/wrapper-values.js";
 
 /**
- * Converts a controlled view into MapLibre Native camera props.
- *
- * These props are written beside `initialViewState`. Whether an unaccepted
- * gesture returns to them is unverified.
+ * Converts initial or controlled camera fields into MapLibre Native props.
  *
  * @param viewState - Camera supplied by React.
  * @returns MapLibre center, zoom, bearing, and pitch.
  */
-export const toMaplibreControlledCamera = (viewState: ViewState) => ({
+export const toMaplibreViewState = (viewState: ViewState) => ({
   center: [viewState.longitude, viewState.latitude] as LngLat,
   zoom: viewState.zoom,
   bearing: viewState.bearing,
   pitch: viewState.pitch,
 });
-
-/**
- * Converts shared camera fields into MapLibre Native `Camera.initialViewState`.
- *
- * @param viewState - Shared camera fields.
- * @returns MapLibre Native center, zoom, bearing, and pitch.
- */
-export const toMaplibreInitialViewState = (viewState: ViewState) => ({
-  center: [viewState.longitude, viewState.latitude] as LngLat,
-  zoom: viewState.zoom,
-  bearing: viewState.bearing,
-  pitch: viewState.pitch,
-});
-
-/**
- * Converts a shared flight into MapLibre Native `Camera.flyTo` arguments.
- *
- * @param options - Shared flight.
- * @returns MapLibre center, camera fields, and duration that were provided.
- * @throws When `easing` is a function. The wrapper's `flyTo` selects flight.
- */
-export const toMaplibreFlyToOptions = (options: FlyToOptions) =>
-  toMaplibreCommand(options);
 
 /**
  * Converts a command into MapLibre Native camera fields.

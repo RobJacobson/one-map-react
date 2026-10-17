@@ -26,7 +26,8 @@ export interface OfflineBackend {
     options: OfflinePackOptions,
     metadata: Record<string, unknown>,
     progress: (pack: WrapperOfflinePack, status: unknown) => void,
-    error: (pack: WrapperOfflinePack, error: unknown) => void
+    error: (pack: WrapperOfflinePack, error: unknown) => void,
+    releaseUnobserved: (id: string) => void
   ) => Promise<WrapperOfflinePack>;
   readonly observe: (
     id: string,
@@ -110,6 +111,9 @@ export const createOfflineService = (
       ...measurements,
     };
   };
+  const releaseUnobserved = (id: string): void => {
+    if (!observers.has(id)) backend.unobserve(id);
+  };
   const emit = (observer: PackObserver, raw: unknown): void => {
     const next = status(observer.pack, raw);
     // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
@@ -119,22 +123,25 @@ export const createOfflineService = (
     const id = backendId(pack);
     const observer = observers.get(id);
     if (!observer) return;
+    const isCurrent = (): boolean => observers.get(id) === observer;
     observer.operation = observer.operation
       .catch(() => {})
       .then(async () => {
+        if (!isCurrent()) return;
         if (!observer.subscribers.size) {
           backend.unobserve(id);
           return;
         }
-        try {
-          if (!observer.attached) {
-            const attachment = {};
-            observer.attachment = attachment;
-            observer.attached = true;
+        if (!observer.attached) {
+          const attachment = {};
+          observer.attachment = attachment;
+          observer.attached = true;
+          try {
             await backend.observe(
               id,
               (_pack, raw) => {
                 if (
+                  !isCurrent() ||
                   observer.attachment !== attachment ||
                   !observer.subscribers.size
                 )
@@ -145,33 +152,39 @@ export const createOfflineService = (
                 emit(observer, raw);
               },
               (_pack, failure) => {
-                if (observer.attachment !== attachment) return;
+                if (!isCurrent() || observer.attachment !== attachment) return;
                 // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
                 for (const listener of [...observer.subscribers])
                   listener.error(failure);
               }
             );
-          }
-          if (!observer.subscribers.size) {
+          } catch (failure) {
+            if (!isCurrent()) return;
             observer.attachment = undefined;
             observer.attached = false;
             backend.unobserve(id);
-            return;
+            throw failure;
           }
-          const progressRevision = observer.progressRevision;
-          const raw = await pack.status();
-          if (
-            observer.subscribers.size &&
-            observer.progressRevision === progressRevision
-          ) {
-            emit(observer, raw);
-          }
-        } catch (failure) {
+        }
+        if (!isCurrent()) return;
+        if (!observer.subscribers.size) {
           observer.attachment = undefined;
           observer.attached = false;
           backend.unobserve(id);
-          throw failure;
+          return;
         }
+        const progressRevision = observer.progressRevision;
+        const raw = await pack.status();
+        if (
+          isCurrent() &&
+          observer.subscribers.size &&
+          observer.progressRevision === progressRevision
+        ) {
+          emit(observer, raw);
+        }
+      })
+      .catch((failure) => {
+        if (isCurrent()) throw failure;
       });
     await observer.operation;
   };
@@ -230,7 +243,8 @@ export const createOfflineService = (
           options,
           metadata,
           () => {},
-          () => {}
+          () => {},
+          releaseUnobserved
         );
         return wrap(created);
       } catch (failure) {
@@ -240,15 +254,12 @@ export const createOfflineService = (
         if (creationStarted) {
           const persisted =
             created ?? (await find(options.id).catch(() => undefined));
-          if (persisted && !observers.has(backendId(persisted))) {
-            backend.unobserve(backendId(persisted));
-          }
+          if (persisted) releaseUnobserved(backendId(persisted));
         }
         throw failure;
       } finally {
         creating.delete(options.id);
-        if (created && !observers.has(backendId(created)))
-          backend.unobserve(backendId(created));
+        if (created) releaseUnobserved(backendId(created));
       }
     },
     getPack: async (id) => {
@@ -319,10 +330,14 @@ export const createOfflineService = (
           retired.operation = retired.operation
             .catch(() => {})
             .then(() => {
-              if (retired.subscribers.size === 0) {
-                const id = backendId(retired.pack);
+              const id = backendId(retired.pack);
+              // Deletion can recreate this backend id before an old disposer runs.
+              if (
+                observers.get(id) === retired &&
+                retired.subscribers.size === 0
+              ) {
+                observers.delete(id);
                 backend.unobserve(id);
-                if (observers.get(id) === retired) observers.delete(id);
               }
             });
         }
@@ -413,6 +428,8 @@ const validateJsonValue = (value: unknown, ancestors: Set<object>): void => {
   if (Object.getOwnPropertySymbols(value).length)
     throw new Error("Offline metadata cannot contain symbol keys.");
   ancestors.add(value);
+  if (Array.isArray(value) && value.includes(undefined))
+    throw new Error("Offline metadata must contain acyclic JSON values.");
   for (const child of Object.values(value)) validateJsonValue(child, ancestors);
   ancestors.delete(value);
 };

@@ -25,6 +25,8 @@ interface SourceState {
  * only written identifiers, and order replacement cleanup after pending writes
  * and before new state operations. Style changes also reset facade-written
  * targets in unowned style sources. State values remain owned by the renderer.
+ * Empty detached records are forgotten after their queues settle; later calls
+ * for those ids use the selected adapter's normal source validation.
  */
 export class NativeFeatureState {
   private readonly sources = new Map<string, SourceState>();
@@ -74,6 +76,7 @@ export class NativeFeatureState {
       if (source.registration === registration) {
         source.registration = undefined;
         this.resets.delete(source);
+        this.reclaim(sourceId, source);
       }
     };
   }
@@ -198,8 +201,29 @@ export class NativeFeatureState {
       () => undefined,
       () => undefined
     );
+    this.reclaim(target.source, source);
 
     return result;
+  }
+
+  /** Forgets empty retired lifetimes only after their latest queue settles. */
+  private reclaim(sourceId: string, source: SourceState): void {
+    if (source.registration) return;
+    const pending = source.pending;
+    void pending.then(() => {
+      if (
+        this.sources.get(sourceId) !== source ||
+        source.pending !== pending ||
+        source.registration ||
+        source.owner.failed ||
+        [...source.journals.values()].some((journal) => journal.size > 0)
+      ) {
+        return;
+      }
+
+      this.sources.delete(sourceId);
+      this.resets.delete(source);
+    });
   }
 
   /** Replaces a lifetime's reset work without scanning historical sources per frame. */

@@ -23,7 +23,6 @@ import {
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
 import { sourceHitFromMapbox } from "../shared/source-hit.js";
-import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useGeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
 /** Mapbox-native source that dispatches to the matching RNMapbox source. */
@@ -66,15 +65,13 @@ export const MapboxNativeSource = (props: SourceProps) => {
  */
 const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
   const session = useOptionalMapSession();
-  const press = useActiveCallback(
-    (
-      event: Parameters<
-        NonNullable<ComponentProps<typeof ShapeSource>["onPress"]>
-      >[0]
-    ) => {
-      session?.dispatchSource(props.id, sourceHitFromMapbox(event));
-    }
-  );
+  const press = (
+    event: Parameters<
+      NonNullable<ComponentProps<typeof ShapeSource>["onPress"]>
+    >[0]
+  ): void => {
+    session?.dispatchSource(props.id, sourceHitFromMapbox(event));
+  };
   const registry = useGeoJsonSourceRegistry();
   const sourceRef = useRef<ComponentRef<typeof ShapeSource>>(null);
 
@@ -107,15 +104,13 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
 /** Registers the vector source lifetime for native feature-state reset. */
 const MapboxNativeVectorSource = (props: VectorSourceProps) => {
   const session = useOptionalMapSession();
-  const press = useActiveCallback(
-    (
-      event: Parameters<
-        NonNullable<ComponentProps<typeof ShapeSource>["onPress"]>
-      >[0]
-    ) => {
-      session?.dispatchSource(props.id, sourceHitFromMapbox(event));
-    }
-  );
+  const press = (
+    event: Parameters<
+      NonNullable<ComponentProps<typeof ShapeSource>["onPress"]>
+    >[0]
+  ): void => {
+    session?.dispatchSource(props.id, sourceHitFromMapbox(event));
+  };
   const registry = useGeoJsonSourceRegistry();
 
   useLayoutEffect(

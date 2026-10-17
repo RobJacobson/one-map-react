@@ -198,8 +198,11 @@ export interface FeatureStateMethods {
    * Native adapters clear facade-written targets after a fully rendered frame
    * or before the replacement source's first state operation, ordered after
    * pending prior writes. Automatic reset failures reach the map error callback.
-   * Operations against a detached or replaced source reject; reset failures
-   * reject subsequent state calls until another source lifetime or style begins.
+   * Pending operations against a detached or replaced source reject. Empty
+   * retired native records are forgotten after their queues settle; later calls
+   * for those ids use the selected adapter's normal source validation. Written
+   * family journals remain until cleanup succeeds. Reset failures reject later
+   * state calls until another source lifetime or style begins.
    *
    * @param identifier - Source, feature id, and optional vector source layer.
    * @param state - JSON values merged onto the feature's state.

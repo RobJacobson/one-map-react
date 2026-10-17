@@ -170,34 +170,73 @@ describe("TF08 native public location boundaries", () => {
       configurable: true,
     });
   });
-  test("backgrounding removes only the facade listener and foregrounding restores it", () => {
-    const previousState = AppState.currentState;
-    Object.defineProperty(AppState, "currentState", {
-      value: "active",
-      configurable: true,
-    });
-    let change: (value: AppStateStatus) => void = () => {};
-    const removeAppState = jest.fn();
-    jest
-      .spyOn(AppState, "addEventListener")
-      .mockImplementation((_type, listener) => {
-        change = listener;
-        return { remove: removeAppState };
+  test.each(["mapbox", "maplibre"] as const)(
+    "%s foreground reattachment rejects stale cache and allows delayed fresh fixes",
+    (backend) => {
+      jest.useFakeTimers().setSystemTime(10000);
+      const previousState = AppState.currentState;
+      const previousPlatform = Platform.OS;
+      Object.defineProperty(AppState, "currentState", {
+        value: "active",
+        configurable: true,
       });
-    const manager = { addListener: jest.fn(), removeListener: jest.fn() };
-    const service = createNativeLocation(() => manager, "mapbox");
-    const release = service.watchPosition(jest.fn(), jest.fn());
-    const listener = manager.addListener.mock.calls[0][0];
-    change("background");
-    expect(manager.removeListener).toHaveBeenCalledWith(listener);
-    change("active");
-    expect(manager.addListener).toHaveBeenCalledTimes(2);
-    release();
-    expect(removeAppState).toHaveBeenCalledTimes(1);
-    expect(manager.removeListener).toHaveBeenCalledTimes(2);
-    Object.defineProperty(AppState, "currentState", {
-      value: previousState,
-      configurable: true,
-    });
-  });
+      Object.defineProperty(Platform, "OS", {
+        value: "android",
+        configurable: true,
+      });
+      let change: (value: AppStateStatus) => void = () => {};
+      const removeAppState = jest.fn();
+      jest
+        .spyOn(AppState, "addEventListener")
+        .mockImplementation((_type, listener) => {
+          change = listener;
+          return { remove: removeAppState };
+        });
+      let timestamp = 10000;
+      const payload = () => ({
+        coords: { longitude: 7, latitude: 8 },
+        timestamp,
+      });
+      const manager = {
+        addListener: jest.fn((listener: NativePayloadListener) =>
+          listener(payload())
+        ),
+        removeListener: jest.fn(),
+      };
+      const service = createNativeLocation(() => manager, backend);
+      const position = jest.fn();
+      const error = jest.fn();
+      const release = service.watchPosition(position, error);
+      const listener = manager.addListener.mock.calls[0][0];
+      try {
+        change("background");
+        expect(manager.removeListener).toHaveBeenCalledWith(listener);
+        jest.setSystemTime(60000);
+        timestamp = 20000;
+        change("active");
+        expect(manager.addListener).toHaveBeenCalledTimes(2);
+        expect(position).toHaveBeenCalledTimes(1);
+        jest.setSystemTime(60006);
+        timestamp = 60005;
+        listener(payload());
+        expect(position).toHaveBeenCalledTimes(2);
+        expect(position).toHaveBeenLastCalledWith(
+          expect.objectContaining({ timestamp: 60005 })
+        );
+        expect(error).not.toHaveBeenCalled();
+      } finally {
+        release();
+        Object.defineProperty(AppState, "currentState", {
+          value: previousState,
+          configurable: true,
+        });
+        Object.defineProperty(Platform, "OS", {
+          value: previousPlatform,
+          configurable: true,
+        });
+      }
+      expect(removeAppState).toHaveBeenCalledTimes(1);
+      expect(manager.removeListener).toHaveBeenCalledTimes(2);
+    }
+  );
 });

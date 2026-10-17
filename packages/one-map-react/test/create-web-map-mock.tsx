@@ -89,6 +89,7 @@ type ErrorNotice = { readonly error?: unknown };
 type HandlerProps = Partial<Record<WebHandlerName, boolean>>;
 
 export interface StyleLoadTarget {
+  fire: (type: "error", event: ErrorNotice) => void;
   on: (type: string, listener: (event: ErrorNotice) => void) => void;
   off: (type: string, listener: (event: ErrorNotice) => void) => void;
   emitStyleLoad: () => void;
@@ -97,6 +98,7 @@ export interface StyleLoadTarget {
   emitStyleData: () => void;
   emitError: (error: unknown) => void;
   clearImages: () => void;
+  getSprite?: () => { id: string; url: string }[];
   hasImage: (name: string) => boolean;
   addImage: Mock<
     (name: string, image: unknown, options?: { sdf?: boolean }) => void
@@ -570,7 +572,7 @@ const createStyleTarget = (
     return created;
   };
   const emit = (type: string) => {
-    loaded = true;
+    if (type !== "styledata") loaded = true;
 
     // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
     for (const listener of [...listenersFor(type)]) {
@@ -581,6 +583,10 @@ const createStyleTarget = (
   return {
     on: (type, listener) => {
       listenersFor(type).add(listener);
+    },
+    fire: (type, event) => {
+      // eslint-disable-next-line unicorn/no-useless-spread -- Error handlers can remove subscriptions during delivery.
+      for (const listener of [...listenersFor(type)]) listener(event);
     },
     off: (type, listener) => {
       listeners.get(type)?.delete(listener);
@@ -596,12 +602,7 @@ const createStyleTarget = (
     },
     // styledata fires during ordinary style activity, so it does not mark
     // the style loaded the way the completion events do.
-    emitStyleData: () => {
-      // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
-      for (const listener of [...listenersFor("styledata")]) {
-        listener({});
-      }
-    },
+    emitStyleData: () => emit("styledata"),
     emitError: (error) => {
       // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
       for (const listener of [...listenersFor("error")]) {
@@ -614,9 +615,11 @@ const createStyleTarget = (
     hasImage: (name) => images.has(name),
     addImage: vi.fn((name: string, image: unknown) => {
       images.set(name, image);
+      emit("styledata");
     }),
     removeImage: vi.fn((name: string) => {
       images.delete(name);
+      emit("styledata");
     }),
     // Mapbox GL loads through a callback and MapLibre GL through a promise;
     // this one double serves both calling conventions.

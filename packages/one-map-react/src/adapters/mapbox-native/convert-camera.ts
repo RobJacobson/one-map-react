@@ -2,7 +2,6 @@ import type {
   Bounds,
   CameraCommandOptions,
   FitBoundsOptions,
-  FlyToOptions,
   LngLat,
   ViewState,
   ZoomToOptions,
@@ -76,19 +75,9 @@ export const toRnmapboxPadding = (padding?: PaddingOrNumber) => {
 };
 
 /**
- * Converts a shared flight into RNMapbox `setCamera` with an explicit fly mode.
- *
- * RNMapbox's `flyTo` helper omits `animationMode`, and Android then defaults
- * to ease. This object sets `animationMode: "flyTo"`.
- *
- * @param options - Shared flight.
- * @returns An RNMapbox camera stop.
- */
-export const toRnmapboxFlyToStop = (options: FlyToOptions) =>
-  toRnmapboxStop(options, "flyTo");
-
-/**
  * Converts a camera command into an RNMapbox stop.
+ *
+ * Explicit animationMode avoids Android's default ease for flight commands.
  *
  * @param options - Partial camera target.
  * @param animationMode - Explicit RNMapbox movement. `none` is a jump.

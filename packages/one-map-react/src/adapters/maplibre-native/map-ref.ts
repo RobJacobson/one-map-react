@@ -16,10 +16,12 @@ import {
   featureStateFromWrapper,
   featuresFromWrapper,
   mutableFeatureState,
+  toQueryGeometry,
 } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
   boundsFromFlat,
+  finiteNumber,
   lngLatFromWrapper,
   pointFromWrapper,
   rejectJumpTiming,
@@ -28,12 +30,10 @@ import {
   mutableFlatBounds,
   toMaplibreCommand,
   toMaplibreFitBoundsOptions,
-  toMaplibreFlyToOptions,
 } from "./convert-camera.js";
 import {
   toMaplibreFeatureId,
   toMaplibreFilter,
-  toMaplibreQueryTarget,
   toMaplibreRenderedQueryOptions,
   toMaplibreSourceQueryOptions,
   toMaplibreVectorFeature,
@@ -102,7 +102,7 @@ export const createMaplibreMapRef = (
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
     onCameraCommand?.();
-    await camera.flyTo(toMaplibreFlyToOptions(options));
+    await camera.flyTo(toMaplibreCommand(options));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
@@ -124,11 +124,21 @@ export const createMaplibreMapRef = (
   },
   getCenter: async () =>
     lngLatFromWrapper(await requireMap(mapRef.current).getCenter()),
-  getZoom: async () => finiteNumber(await requireMap(mapRef.current).getZoom()),
+  getZoom: async () =>
+    finiteNumber(
+      await requireMap(mapRef.current).getZoom(),
+      "Map camera value"
+    ),
   getBearing: async () =>
-    finiteNumber(await requireMap(mapRef.current).getBearing()),
+    finiteNumber(
+      await requireMap(mapRef.current).getBearing(),
+      "Map camera value"
+    ),
   getPitch: async () =>
-    finiteNumber(await requireMap(mapRef.current).getPitch()),
+    finiteNumber(
+      await requireMap(mapRef.current).getPitch(),
+      "Map camera value"
+    ),
   getPadding: async () => {
     throw unavailableMapMethodError("getPadding", "maplibre-native");
   },
@@ -153,7 +163,7 @@ export const createMaplibreMapRef = (
     ),
   queryRenderedFeatures: async (target, options) => {
     const map = requireMap(mapRef.current);
-    const queryTarget = toMaplibreQueryTarget(target);
+    const queryTarget = toQueryGeometry(target);
     const queryOptions = toMaplibreRenderedQueryOptions(options);
 
     const features =
@@ -189,7 +199,7 @@ export const createMaplibreMapRef = (
     const source = sources.requireGeoJson(sourceId);
     const zoom = await source.getClusterExpansionZoom(clusterId);
 
-    return clusterZoom(zoom);
+    return finiteNumber(zoom, "Cluster expansion zoom");
   },
   getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
     const source = sources.requireGeoJson(sourceId);
@@ -275,21 +285,6 @@ export const createMaplibreMapRef = (
   },
 });
 
-/**
- * Reads a cluster expansion zoom from the wrapper.
- *
- * @param value - Wrapper zoom value.
- * @returns The zoom as a finite number.
- * @throws When the wrapper returned a non-finite value.
- */
-const clusterZoom = (value: unknown): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error("Cluster expansion zoom must be a finite number.");
-  }
-
-  return value;
-};
-
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null,
   mapLoaded: boolean
@@ -309,12 +304,4 @@ const requireMap = (
   }
 
   return map;
-};
-
-const finiteNumber = (value: unknown): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error("Map camera value must be a finite number.");
-  }
-
-  return value;
 };

@@ -1,7 +1,6 @@
 import type { Feature, Point as GeoJsonPoint } from "geojson";
 
 import type { Point } from "../../contracts/camera-types.js";
-import type { FilterExpression } from "../../contracts/layer-types.js";
 import type {
   FeatureIdentifier,
   QueryRenderedFeaturesOptions,
@@ -9,30 +8,6 @@ import type {
   ScreenBounds,
 } from "../../contracts/query-types.js";
 import { isScreenBounds, toRnmapboxRect } from "../shared/feature-values.js";
-
-/**
- * Converts a query filter into RNMapbox's mutable filter array.
- *
- * RNMapbox passes the filter to `getFilter`, which forwards nonempty
- * arrays structurally. The facade's readonly expression is copied without
- * interpretation.
- *
- * @param filter - Filter expression, when the caller passed one.
- * @returns A mutable array for the wrapper call.
- */
-export const toRnmapboxFilter = (
-  filter: FilterExpression | undefined
-): unknown[] | undefined => (filter === undefined ? undefined : [...filter]);
-
-/**
- * Converts layer ids into RNMapbox's mutable id array.
- *
- * @param layers - Style layer ids, when the caller passed any.
- * @returns A mutable array for the wrapper call.
- */
-export const toRnmapboxLayerIds = (
-  layers: readonly string[] | undefined
-): string[] | undefined => layers?.map((id) => id);
 
 /**
  * Selects the RNMapbox rendered-query call for a target.

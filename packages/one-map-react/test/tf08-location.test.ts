@@ -17,11 +17,13 @@ const locationFixture = () => {
     .fn<LocationUpdates["requestPermission"]>()
     .mockResolvedValue({ status: "granted", accuracy: "unknown" });
   let interrupt: () => void = () => {};
+  let acquire: () => void = () => {};
   const service = createLocationService({
     requestPermission: permission,
-    subscribe: (position, _error, interrupted) => {
+    subscribe: (position, _error, interrupted, acquiring) => {
       listeners.add(position);
       interrupt = interrupted;
+      acquire = acquiring;
       return () => {
         listeners.delete(position);
         release();
@@ -34,6 +36,7 @@ const locationFixture = () => {
     release,
     permission,
     interrupt: () => interrupt(),
+    acquire: () => acquire(),
     emit: (position: GeolocationPosition) => {
       // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
       for (const listener of [...listeners]) listener(position);
@@ -74,6 +77,59 @@ describe("TF08 foreground location", () => {
     const result = fixture.service.getCurrentPosition({ maximumAgeMs: 2000 });
     fixture.emit({ lngLat: [1, 2], timestamp: 9000 });
     await expect(result).resolves.toMatchObject({ timestamp: 9000 });
+  });
+  test.each([0, 2000])(
+    "a resumed watch checks cached fixes against its %i ms cache limit",
+    (maximumAgeMs) => {
+      vi.useFakeTimers().setSystemTime(10000);
+      const fixture = locationFixture();
+      const position = vi.fn();
+      const error = vi.fn();
+      const dispose = fixture.service.watchPosition(position, error, {
+        maximumAgeMs,
+      });
+      fixture.emit({ lngLat: [1, 2], timestamp: 10000 });
+      vi.setSystemTime(60000);
+      fixture.acquire();
+      fixture.emit({ lngLat: [3, 4], timestamp: 20000 });
+      fixture.emit({ lngLat: [3, 4], timestamp: 60000 - maximumAgeMs - 1 });
+      vi.setSystemTime(60010);
+      fixture.emit({ lngLat: [5, 6], timestamp: 60000 - maximumAgeMs });
+      expect(position.mock.calls.map(([value]) => value.lngLat)).toEqual([
+        [1, 2],
+        [5, 6],
+      ]);
+      expect(error).not.toHaveBeenCalled();
+      dispose();
+    }
+  );
+  test("a fresh one-shot measurement allows asynchronous delivery", async () => {
+    vi.useFakeTimers().setSystemTime(10000);
+    const fixture = locationFixture();
+    const result = fixture.service.getCurrentPosition();
+    vi.setSystemTime(10006);
+    fixture.emit({ lngLat: [3, 4], timestamp: 10005 });
+    expect(fixture.listeners.size).toBe(0);
+    await expect(result).resolves.toMatchObject({ timestamp: 10005 });
+    expect(vi.getTimerCount()).toBe(0);
+  });
+  test("an uninterrupted watch allows delivery delay without accepting fixes predating acquisition", () => {
+    vi.useFakeTimers().setSystemTime(10000);
+    const fixture = locationFixture();
+    const position = vi.fn();
+    const error = vi.fn();
+    const dispose = fixture.service.watchPosition(position, error);
+    vi.setSystemTime(10006);
+    fixture.emit({ lngLat: [1, 2], timestamp: 9999 });
+    fixture.emit({ lngLat: [3, 4], timestamp: 10005 });
+    vi.setSystemTime(60006);
+    fixture.emit({ lngLat: [5, 6], timestamp: 60005 });
+    expect(position.mock.calls.map(([value]) => value.timestamp)).toEqual([
+      10005, 60005,
+    ]);
+    expect(error).not.toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
+    dispose();
   });
   test("timeout rejects and cannot deliver a late fix", async () => {
     vi.useFakeTimers();

@@ -1,0 +1,44 @@
+{
+  "scope": "Five Ponytail findings: direct native camera observations, grouped callback guards, single forwarding inventories, layer dispatch table, and single style encoding.",
+  "baseRevision": "89ed692d4ef3c2a2b7a1bbf976169b5526627b07",
+  "reviewedDiffSha256": "2343d01a93043757a73ea27f9a2e390aca60e060012f32b2bfd775a6f2442a14",
+  "validatedPackageSha256": "b750f48483ca7dc3faeb6e3679bcbc20a1d2eed45878bcd805a7f63d617f6408",
+  "checks": {
+    "bun run validate": {
+      "result": "passed",
+      "unitAndWebTests": 699,
+      "mockedNativeTests": 228,
+      "packedSelections": 13
+    },
+    "bun run typecheck:apps": {
+      "result": "passed"
+    },
+    "bun run test:compiled": {
+      "result": "passed",
+      "webTests": 495,
+      "mockedNativeTests": 228,
+      "compilerAssertions": "passed"
+    },
+    "forwardingInventoryComparison": {
+      "result": "passed",
+      "mapboxMethods": 63,
+      "maplibreMethods": 42,
+      "orderPreserved": true
+    }
+  },
+  "earlierValidationAttempts": [
+    {
+      "result": "failed",
+      "reason": "Sandbox blocked process inspection in the routine process-cleanup self-test; rerun with local process permissions."
+    },
+    {
+      "result": "failed",
+      "reason": "An unawaited test-fixture act call caused cascading MapLibre test failures; fixed the load helper and awaited every caller."
+    }
+  ],
+  "acceptance": {
+    "result": "not_run",
+    "reason": "Explicitly excluded by the owner. Real-renderer drawing, timing, and interactions remain unverified for this change."
+  },
+  "retention": "Temporary audit tests and raw logs removed; package consumers clean themselves up."
+}

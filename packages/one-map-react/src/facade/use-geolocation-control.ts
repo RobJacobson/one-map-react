@@ -2,7 +2,6 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 import { validatePosition } from "../adapters/shared/location-values.js";
 import { useOptionalNativeMapPresentation } from "../adapters/shared/native-map-presentation.js";
-import { useActiveCallback } from "../adapters/shared/use-active-callback.js";
 import type {
   GeolocateControlProps,
   GeolocationPosition,
@@ -43,8 +42,6 @@ export const useGeolocationControl = (
     dispatching: false,
   });
   const current = useRef({ props, session });
-  const located = useActiveCallback(props.onGeolocate);
-  const report = useActiveCallback(props.onError);
 
   useLayoutEffect(() => {
     current.current = { props, session };
@@ -112,7 +109,7 @@ export const useGeolocationControl = (
     );
 
   const reportFailure = (error: unknown): void => {
-    if (current.current.props.onError) report(error);
+    if (current.current.props.onError) current.current.props.onError(error);
     else
       setFailure(
         error instanceof Error ? error : new Error("Location control failed.")
@@ -132,6 +129,8 @@ export const useGeolocationControl = (
     owner.dispatching = false;
     owner.release?.();
     owner.release = undefined;
+    // Provider cleanup can synchronously unmount this control.
+    if (!owner.active) return;
     setPending(false);
     reportFailure(error);
   };
@@ -151,6 +150,7 @@ export const useGeolocationControl = (
     owner.pending = true;
     setPending(true);
     const generation = ++owner.generation;
+    owner.dispatching = false;
     const controller = new AbortController();
     owner.abort = controller;
     const fail = (error: unknown): void => retireRequest(error, generation);
@@ -172,7 +172,7 @@ export const useGeolocationControl = (
       owner.latest = validated;
       setPending(false);
       if (current.current.props.trackUserLocation) setPosition(validated);
-      located(validated);
+      current.current.props.onGeolocate?.(validated);
       if (!owner.active || generation !== owner.generation) return;
       if (owner.following) void center(validated, generation).catch(fail);
     };
@@ -186,13 +186,13 @@ export const useGeolocationControl = (
       return;
     }
     if (!provider) return;
-    if (!current.current.props.trackUserLocation) {
-      void provider
-        .getCurrentPosition({ signal: controller.signal })
-        .then(receive, fail);
-      return;
-    }
     try {
+      if (!current.current.props.trackUserLocation) {
+        void provider
+          .getCurrentPosition({ signal: controller.signal })
+          .then(receive, fail);
+        return;
+      }
       const release = provider.watchPosition(receive, fail, {
         signal: controller.signal,
       });

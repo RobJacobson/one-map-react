@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { createRef, type ReactNode, type Ref } from "react";
+import { createRef, type ReactNode, type Ref, useContext } from "react";
 import { Text } from "react-native";
 
 import {
@@ -9,6 +9,8 @@ import {
   replacementStyle,
   routes,
 } from "../../../tests/fixtures/map-fixture.js";
+import { NativeCameraContext } from "../src/adapters/shared/native-map-presentation.js";
+import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
 import type {
@@ -282,7 +284,7 @@ const drawingContext = (): ExternalDrawingContext => ({
   drawingBufferHeight: 1,
 });
 
-const finishMapLoad = (): void => {
+const finishMapLoad = async (): Promise<void> => {
   const lastCall = MapMock.mock.calls.at(-1);
 
   if (!lastCall) {
@@ -297,7 +299,7 @@ const finishMapLoad = (): void => {
     throw new Error("Map did not receive onDidFinishLoadingMap");
   }
 
-  onDidFinishLoadingMap();
+  await act(async () => onDidFinishLoadingMap());
 };
 
 const finishRenderingFrame = async (): Promise<void> => {
@@ -494,7 +496,7 @@ describe("maplibre-native adapter", () => {
     const ref = createRef<MapRef>();
 
     await render(example(ref));
-    finishMapLoad();
+    await finishMapLoad();
     await ref.current?.flyTo({
       center: [-122.34, 47.61],
       duration: 1000,
@@ -511,7 +513,7 @@ describe("maplibre-native adapter", () => {
     const ref = createRef<MapRef>();
 
     await render(example(ref));
-    finishMapLoad();
+    await finishMapLoad();
 
     await expect(
       ref.current?.flyTo({ center: [-122.34, 47.61], duration: 1000 })
@@ -531,14 +533,16 @@ describe("maplibre-native adapter", () => {
       lastCall[0] as { onRegionIsChanging: (event: object) => void }
     ).onRegionIsChanging;
 
-    onRegionIsChanging({
-      nativeEvent: {
-        center: [-122.34, 47.61],
-        zoom: 11,
-        bearing: 0,
-        pitch: 0,
-        userInteraction: true,
-      },
+    await act(async () => {
+      onRegionIsChanging({
+        nativeEvent: {
+          center: [-122.34, 47.61],
+          zoom: 11,
+          bearing: 0,
+          pitch: 0,
+          userInteraction: true,
+        },
+      });
     });
 
     expect(onMove).toHaveBeenCalledWith({
@@ -550,14 +554,16 @@ describe("maplibre-native adapter", () => {
       lastCall[0] as { onRegionDidChange: (event: object) => void }
     ).onRegionDidChange;
 
-    onRegionDidChange({
-      nativeEvent: {
-        center: [-122.32, 47.64],
-        zoom: 11,
-        bearing: 0,
-        pitch: 0,
-        userInteraction: false,
-      },
+    await act(async () => {
+      onRegionDidChange({
+        nativeEvent: {
+          center: [-122.32, 47.64],
+          zoom: 11,
+          bearing: 0,
+          pitch: 0,
+          userInteraction: false,
+        },
+      });
     });
 
     expect(onMove).toHaveBeenCalledTimes(1);
@@ -567,23 +573,27 @@ describe("maplibre-native adapter", () => {
     });
 
     await rendered.unmount();
-    onRegionIsChanging({
-      nativeEvent: {
-        center: [-122.3, 47.6],
-        zoom: 12,
-        bearing: 0,
-        pitch: 0,
-        userInteraction: true,
-      },
+    await act(async () => {
+      onRegionIsChanging({
+        nativeEvent: {
+          center: [-122.3, 47.6],
+          zoom: 12,
+          bearing: 0,
+          pitch: 0,
+          userInteraction: true,
+        },
+      });
     });
-    onRegionDidChange({
-      nativeEvent: {
-        center: [-122.3, 47.6],
-        zoom: 12,
-        bearing: 0,
-        pitch: 0,
-        userInteraction: false,
-      },
+    await act(async () => {
+      onRegionDidChange({
+        nativeEvent: {
+          center: [-122.3, 47.6],
+          zoom: 12,
+          bearing: 0,
+          pitch: 0,
+          userInteraction: false,
+        },
+      });
     });
 
     expect(onMove).toHaveBeenCalledTimes(1);
@@ -635,7 +645,7 @@ describe("maplibre-native adapter", () => {
     );
   });
 
-  test("load, style, and error callbacks map to the wrapper and stop after unmount", async () => {
+  test("load, style, and error callbacks forward the current render", async () => {
     const onLoad = jest.fn();
     const onStyleLoad = jest.fn();
     const onError = jest.fn();
@@ -648,7 +658,7 @@ describe("maplibre-native adapter", () => {
       onDidFailLoadingMap: () => void;
     }>();
 
-    props.onDidFinishLoadingMap();
+    await act(async () => props.onDidFinishLoadingMap());
     props.onDidFinishLoadingStyle();
     props.onDidFailLoadingMap();
 
@@ -656,14 +666,27 @@ describe("maplibre-native adapter", () => {
     expect(onStyleLoad).toHaveBeenCalledTimes(1);
     expect(onError).toHaveBeenCalledWith({});
 
-    await rendered.unmount();
-    props.onDidFinishLoadingMap();
-    props.onDidFinishLoadingStyle();
-    props.onDidFailLoadingMap();
+    const nextLoad = jest.fn();
+    const nextStyleLoad = jest.fn();
+    const nextError = jest.fn();
+    await rendered.rerender(
+      example(undefined, undefined, {
+        onLoad: nextLoad,
+        onStyleLoad: nextStyleLoad,
+        onError: nextError,
+      })
+    );
+    const current = lastMapProps<typeof props>();
+    await act(async () => current.onDidFinishLoadingMap());
+    current.onDidFinishLoadingStyle();
+    current.onDidFailLoadingMap();
 
     expect(onLoad).toHaveBeenCalledTimes(1);
     expect(onStyleLoad).toHaveBeenCalledTimes(1);
     expect(onError).toHaveBeenCalledTimes(1);
+    expect(nextLoad).toHaveBeenCalledTimes(1);
+    expect(nextStyleLoad).toHaveBeenCalledTimes(1);
+    expect(nextError).toHaveBeenCalledWith({});
   });
 
   test("a style update is passed to the wrapper", async () => {
@@ -692,7 +715,7 @@ describe("maplibre-native adapter", () => {
     );
     expect(mockJumpTo).not.toHaveBeenCalled();
 
-    finishMapLoad();
+    await finishMapLoad();
     await ref.current?.jumpTo({ zoom: 8 });
     await ref.current?.fitBounds(
       [
@@ -712,7 +735,7 @@ describe("maplibre-native adapter", () => {
     const ref = createRef<MapRef>();
 
     await render(example(ref));
-    finishMapLoad();
+    await finishMapLoad();
 
     await expect(
       ref.current?.flyTo({
@@ -795,14 +818,16 @@ describe("maplibre-native adapter", () => {
       onRegionDidChange: (event: object) => void;
     }>();
 
-    props.onRegionDidChange({
-      nativeEvent: {
-        center: [-122.34, 47.61],
-        zoom: 11,
-        bearing: 0,
-        pitch: 0,
-        userInteraction: false,
-      },
+    await act(async () => {
+      props.onRegionDidChange({
+        nativeEvent: {
+          center: [-122.34, 47.61],
+          zoom: 11,
+          bearing: 0,
+          pitch: 0,
+          userInteraction: false,
+        },
+      });
     });
 
     expect(onMove).toHaveBeenCalledTimes(1);
@@ -2198,7 +2223,7 @@ describe("maplibre-native queries and feature state", () => {
 test("native fitBounds maxZoom rejects before camera dispatch", async () => {
   const ref = createRef<MapRef>();
   await render(example(ref));
-  finishMapLoad();
+  await finishMapLoad();
   mockFitBounds.mockClear();
   await expect(
     ref.current?.fitBounds(
@@ -2255,4 +2280,70 @@ test("MapLibre Native forwards legacy light and rejects unsupported terrain/glob
       )
     ).rejects.toThrow("unsupported");
   }
+});
+
+test("settled camera updates controls and live overlays without another public move", async () => {
+  const observe = jest.fn();
+  const onMove = jest.fn();
+  const onMoveEnd = jest.fn();
+  const Probe = () => {
+    observe(useContext(NativeCameraContext)?.viewState.bearing);
+    return null;
+  };
+  const view = await render(
+    <MapSetup adapter={adapter}>
+      <OneMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        onMove={onMove}
+        onMoveEnd={onMoveEnd}
+      >
+        <Probe />
+        <NativeMarkerOverlay
+          id="settled"
+          lngLat={[1, 2]}
+          anchor="top-left"
+          offset={[0, 0]}
+        >
+          <Text>Final position</Text>
+        </NativeMarkerOverlay>
+      </OneMap>
+    </MapSetup>
+  );
+  const events = lastMapProps<{
+    onDidFinishLoadingMap: () => void;
+    onRegionIsChanging: (event: object) => void;
+    onRegionDidChange: (event: object) => void;
+  }>();
+  const payload = (bearing: number) => ({
+    nativeEvent: {
+      center: [1, 2],
+      zoom: 3,
+      bearing,
+      pitch: 0,
+      userInteraction: false,
+    },
+  });
+  await act(async () => events.onDidFinishLoadingMap());
+  mockProject.mockResolvedValueOnce([40, 50]);
+  await act(async () => events.onRegionIsChanging(payload(40)));
+  expect(observe.mock.calls.at(-1)?.[0]).toBe(40);
+  await waitFor(() =>
+    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(40)
+  );
+  mockProject.mockResolvedValueOnce([60, 70]);
+  await act(async () => events.onRegionDidChange(payload(0)));
+  expect(observe.mock.calls.at(-1)?.[0]).toBe(0);
+  await waitFor(() =>
+    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(60)
+  );
+  expect(onMove).toHaveBeenCalledTimes(1);
+  expect(onMoveEnd).toHaveBeenCalledTimes(1);
+  await view.unmount();
+  await act(async () => {
+    events.onRegionIsChanging(payload(80));
+    events.onRegionDidChange(payload(90));
+  });
+  expect(onMove).toHaveBeenCalledTimes(1);
+  expect(onMoveEnd).toHaveBeenCalledTimes(1);
 });

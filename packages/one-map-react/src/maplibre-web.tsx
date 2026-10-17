@@ -72,6 +72,51 @@ interface MaplibreClusterCaller {
   ) => Promise<readonly object[]>;
 }
 
+const forwardedMethodNames = [
+  "on",
+  "off",
+  "once",
+  "addControl",
+  "removeControl",
+  "hasControl",
+  "getSource",
+  "getLayer",
+  "getCanvas",
+  "getCanvasContainer",
+  "getContainer",
+  "getStyle",
+  "loaded",
+  "isStyleLoaded",
+  "areTilesLoaded",
+  "triggerRepaint",
+  "getVerticalFieldOfView",
+  "setVerticalFieldOfView",
+  "getTerrain",
+  "getProjection",
+  "getLight",
+  "getStyleUrl",
+  "redraw",
+  "setSky",
+  "getSky",
+  "refreshTiles",
+  "setGlyphs",
+  "getGlyphs",
+  "setFontFaces",
+  "getFontFaces",
+  "getPixelRatio",
+  "setPixelRatio",
+  "getRoll",
+  "setRoll",
+  "getCameraTargetElevation",
+  "getCenterElevation",
+  "setCenterElevation",
+  "setTransformConstrain",
+  "setGlobalStateProperty",
+  "getGlobalState",
+  "setSourceTileLodParams",
+  "setTransformRequest",
+] as const satisfies readonly (keyof MaplibreMapRef)[];
+
 // The react-map-gl components accept the full style-spec surface; the facade
 // converts props before they reach this boundary.
 /** Selects maplibre-web and supplies react-map-gl MapLibre components. */
@@ -81,50 +126,7 @@ export const adapter: Adapter & { readonly backend: "maplibre-web" } =
     createAdvancedMethods: (getHandle) => {
       const selectedHandle = () => getHandle() as unknown as MaplibreMapRef;
       return {
-        ...createWebMethodForwarders(selectedHandle, [
-          "on",
-          "off",
-          "once",
-          "addControl",
-          "removeControl",
-          "hasControl",
-          "getSource",
-          "getLayer",
-          "getCanvas",
-          "getCanvasContainer",
-          "getContainer",
-          "getStyle",
-          "loaded",
-          "isStyleLoaded",
-          "areTilesLoaded",
-          "triggerRepaint",
-          "getVerticalFieldOfView",
-          "setVerticalFieldOfView",
-          "getTerrain",
-          "getProjection",
-          "getLight",
-          "getStyleUrl",
-          "redraw",
-          "setSky",
-          "getSky",
-          "refreshTiles",
-          "setGlyphs",
-          "getGlyphs",
-          "setFontFaces",
-          "getFontFaces",
-          "getPixelRatio",
-          "setPixelRatio",
-          "getRoll",
-          "setRoll",
-          "getCameraTargetElevation",
-          "getCenterElevation",
-          "setCenterElevation",
-          "setTransformConstrain",
-          "setGlobalStateProperty",
-          "getGlobalState",
-          "setSourceTileLodParams",
-          "setTransformRequest",
-        ]),
+        ...createWebMethodForwarders(selectedHandle, forwardedMethodNames),
         setEventedParent: (
           ...args: Parameters<MaplibreMapInstance["setEventedParent"]>
         ) =>
@@ -280,51 +282,7 @@ export type WebMapRef = MapRef & {
   readonly setDebugOptions: (options: Partial<WebDebugOptions>) => void;
   /** Reads renderer diagnostics. */
   readonly getDebugOptions: () => WebDebugOptions;
-} & Pick<
-    MaplibreMapRef,
-    | "on"
-    | "off"
-    | "once"
-    | "addControl"
-    | "removeControl"
-    | "hasControl"
-    | "getSource"
-    | "getLayer"
-    | "getCanvas"
-    | "getCanvasContainer"
-    | "getContainer"
-    | "getStyle"
-    | "loaded"
-    | "isStyleLoaded"
-    | "areTilesLoaded"
-    | "triggerRepaint"
-    | "setSky"
-    | "getSky"
-    | "getTerrain"
-    | "getProjection"
-    | "getLight"
-    | "setGlobalStateProperty"
-    | "getGlobalState"
-    | "refreshTiles"
-    | "setSourceTileLodParams"
-    | "setGlyphs"
-    | "getGlyphs"
-    | "setFontFaces"
-    | "getFontFaces"
-    | "setTransformRequest"
-    | "getPixelRatio"
-    | "setPixelRatio"
-    | "getVerticalFieldOfView"
-    | "setVerticalFieldOfView"
-    | "getRoll"
-    | "setRoll"
-    | "getCameraTargetElevation"
-    | "getCenterElevation"
-    | "getStyleUrl"
-    | "redraw"
-    | "setCenterElevation"
-    | "setTransformConstrain"
-  >;
+} & Pick<MaplibreMapRef, (typeof forwardedMethodNames)[number]>;
 
 /** Map props with DOM presentation forwarded to the map container. */
 export interface WebMapProps extends Omit<MapProps, "mapStyle"> {

@@ -1,0 +1,229 @@
+{
+  "date": "2026-10-17",
+  "baseRevision": "b92f75ebd9d570f17e20ec6df615cf3e43f11b5b",
+  "scope": "Source audit findings 1-5; finding 6 intentionally unchanged at owner request.",
+  "decisions": [
+    "Newest native navigation activation wins; user movement and attachment changes retire pending work.",
+    "Forget retired source IDs when queues settle and all family journals are empty; retain no tombstones. Later requests use normal selected-adapter source validation.",
+    "Keep the resize error helper and its exact error message."
+  ],
+  "findings": [
+    {
+      "id": 1,
+      "change": "Promise-safe common map reference proxy",
+      "paths": [
+        "Enclosing and named map references on all four adapters"
+      ],
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "verification": [
+        "Source and compiled enclosing/named promise and async-return regressions",
+        "Forwarding and detached-command assertions"
+      ]
+    },
+    {
+      "id": 2,
+      "change": "Clear the inactive RNMapbox style field; preserve style epoch detection",
+      "paths": [
+        "Mapbox native style conversion and Map"
+      ],
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "verification": [
+        "Source and compiled RNMapbox document/URL precedence and replacement regressions",
+        "Existing style and feature-state epoch tests"
+      ]
+    },
+    {
+      "id": 3,
+      "change": "Guard native navigation readbacks and errors with the current request sequence",
+      "paths": [
+        "Shared native navigation for both adapters, zoom, compass, movement, replacement and teardown"
+      ],
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "verification": [
+        "Source and compiled navigation tests for both native adapter factories",
+        "Reordered results, stale read/command failures, compass, user movement, map replacement, readiness cycling, unmount and current failures"
+      ]
+    },
+    {
+      "id": 4,
+      "change": "Reclaim empty retired records after current queue settlement",
+      "paths": [
+        "Shared NativeFeatureState, both native registries, GeoJSON/vector lifetimes and raw-style calls"
+      ],
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "verification": [
+        "Shared NativeFeatureState unit and registry tests",
+        "10000 unwritten lifetimes for each adapter/family path return retained record count to zero",
+        "Queued completion/rejection, stale cleanup, raw-style reuse, whole removal, inactive written journals and failed reset retry",
+        "Existing source and compiled native feature-state lifecycle regressions"
+      ]
+    },
+    {
+      "id": 5,
+      "change": "Derive GestureSelection from MapProps without changing its field types",
+      "paths": [
+        "Common gesture type and all three gesture converters"
+      ],
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "verification": [
+        "Type equivalence assertion and all four type-check projects",
+        "Gesture converter tests, generated declarations and 13 packed selections"
+      ]
+    },
+    {
+      "id": 6,
+      "change": "Retain the resize error helper",
+      "implementation": "intentionally unchanged by owner",
+      "routineVerification": "existing resize tests included in validation"
+    }
+  ],
+  "regressionsBeforeFixes": {
+    "production": "Unchanged production files from baseRevision; tests added before edits.",
+    "unitWeb": {
+      "command": "bunx vp test run packages/one-map-react/test/tf07-map-context.web.test.tsx packages/one-map-react/test/source-registries.test.ts packages/one-map-react/test/native-feature-state.test.ts packages/one-map-react/test/convert-gestures.test.ts",
+      "failed": 16,
+      "passed": 70
+    },
+    "mockedNative": {
+      "command": "bunx jest --runInBand --runTestsByPath packages/one-map-react/test/mapbox-native.native.test.tsx packages/one-map-react/test/tf07-ui.native.test.tsx",
+      "failed": 24,
+      "passed": 149
+    },
+    "typeSimplification": "The added type-equivalence assertion passes before and after; no structural-failure assertion is used."
+  },
+  "checks": [
+    {
+      "command": "bun run validate",
+      "attempt": 1,
+      "result": "failed",
+      "reason": "Sandbox EPERM in the routine synthetic process-cleanup fixture; ps spawning/group signaling was restricted. Formatting/lint, docs, source/example/app types, 809 unit/web tests and 268 mocked-native tests had passed before interruption."
+    },
+    {
+      "command": "bun run validate",
+      "attempt": 2,
+      "result": "passed",
+      "environment": "Authorized routine validation outside the filesystem/process sandbox",
+      "unitWebTests": 809,
+      "mockedNativeTests": 268,
+      "packedSelections": 13,
+      "scope": "Formatting/lint, docs, source/test/example/app types, unit/web/mocked native and static fixture checks, library builds, packed common runtime/declarations/selection. No renderer execution."
+    },
+    {
+      "command": "bunx vp test run --config vite.compiled.config.ts",
+      "result": "passed",
+      "tests": 560,
+      "files": 21,
+      "scope": "Emitted web modules under jsdom and wrapper mocks."
+    },
+    {
+      "command": "bunx jest --config jest.compiled.config.cjs --runInBand",
+      "result": "passed",
+      "tests": 268,
+      "suites": 6,
+      "scope": "Emitted native modules under mocked wrappers."
+    },
+    {
+      "command": "node scripts/react-compiler.test.mjs",
+      "result": "passed",
+      "scope": "Compiler transformation, emitted runtime and selected component compilation."
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "rendererAcceptance": {
+    "status": "deferred",
+    "reason": "Owner explicitly deferred real-renderer execution; no browser renderer, Metro, native build, installation or device flow was run."
+  },
+  "retention": "Raw logs removed after final verification. Existing package-check finally cleanup removed generated consumers and temporary archives. Normal library build outputs remain available.",
+  "reviewedDiffSha256": "52f4be0ddb2658cebd110a275a0151745a89174e117c4034900e0fe9c646b778",
+  "diffCommand": "git diff --binary -- docs packages/one-map-react",
+  "validatedPackageSha256": "a4a1de58c1ed521e1b2d3fc9079227855773384e37eac56264fc33409a0f8453",
+  "sourceTreeSha256": "ceb0fe3f1169c08958cca263962b81a09b5a950025c25ea383949d159cb6916d",
+  "sourceTreeHashMethod": "SHA-256 of sorted src-relative UTF-8 paths, NUL, file bytes, NUL.",
+  "regressionsAfterFixes": {
+    "focusedUnitWeb": {
+      "tests": 87,
+      "files": 4,
+      "result": "passed"
+    },
+    "focusedMockedNative": {
+      "tests": 175,
+      "suites": 2,
+      "result": "passed"
+    },
+    "additionalControls": "Includes current compass failure and retained failed-reset controls added during review."
+  },
+  "toolingDiagnostics": [
+    "Build succeeded with 17 retained React Compiler diagnostics, matching the pre-change audit count.",
+    "Existing Bun moduleSuffixes and experimental TypeScript 7 API warnings remain."
+  ],
+  "review": [
+    "Traced shared map proxies through enclosing/named access, attachment, async transfer, retained commands and detachment across the common adapter boundary.",
+    "Reviewed RNMapbox style prop spread, opposite-field clearing and style-key feature-state invalidation; other adapters already override their single style field.",
+    "Reviewed every native navigation readback and error path. Current request/map/readiness guards share the existing active callback ownership. Lifecycle cleanup and user movement retire requests; dispatched SDK animations are not canceled.",
+    "Reviewed reclaim scheduling from unregister and operation queues for both registries and both source families. Entry identity, queue identity, registration, reset failures and every family journal gate deletion. No historical-ID tombstones are retained.",
+    "Reviewed neighboring feature-state reset/flush and adoption paths, marker projection/drag sequencing, geolocation coalescing, scoped source interactions, images and offline ownership guards for the same stale-work patterns. No additional changes were required for this fix scope.",
+    "Reviewed surgical lifecycle prose against implementation and tests; prior renderer acceptance records remain attached to their original artifacts."
+  ],
+  "resizeHelperVerification": "The complete web/map-ref.ts file is byte-identical to baseRevision; existing resize tests pass in source and compiled web suites.",
+  "remainingVerification": [
+    "Renderer acceptance for the changed native navigation, Mapbox style selection and native source reclamation remains deferred; routine checks do not certify renderer readiness.",
+    "No live service, Metro transport, native build/installation or physical-device run was performed."
+  ],
+  "commitCreated": false,
+  "finalDiffReview": {
+    "date": "2026-10-17",
+    "result": "No additional correctness, lifecycle-race or unnecessary-complexity findings confirmed. No production or test edits were needed during this review.",
+    "scope": [
+      "All 15 changed tracked files, added regressions and lifecycle prose; enclosing/named proxy attachment and registry consumers.",
+      "RNMapbox style conversion, prop precedence and style epochs; sibling web and MapLibre style forwarding.",
+      "Native navigation reads and commands, committed callback ownership, movement subscription, readiness, replacement, unmount and current errors for both adapters.",
+      "Native feature-state registration, queues, automatic flushes, failed reset retention, raw-style adoption, same-ID replacement and both family journals through both registries and map-ref dispatch paths.",
+      "Gesture contract ownership, converters and packed declarations. Reviewed load includes overlapping camera requests and repeated source lifetimes, with the existing 10000-ID regressions."
+    ],
+    "reviewedDiffSha256": "52f4be0ddb2658cebd110a275a0151745a89174e117c4034900e0fe9c646b778",
+    "sourceTreeSha256": "ceb0fe3f1169c08958cca263962b81a09b5a950025c25ea383949d159cb6916d",
+    "checks": [
+      {
+        "command": "bun run validate",
+        "result": "passed",
+        "unitWebTests": 809,
+        "mockedNativeTests": 268,
+        "packedSelections": 13,
+        "packageSha256": "a4a1de58c1ed521e1b2d3fc9079227855773384e37eac56264fc33409a0f8453",
+        "environment": "Authorized routine validation outside the process sandbox; no renderer execution."
+      },
+      {
+        "command": "bunx vp test run --config vite.compiled.config.ts",
+        "result": "passed",
+        "tests": 560,
+        "files": 21
+      },
+      {
+        "command": "bunx jest --config jest.compiled.config.cjs --runInBand",
+        "result": "passed",
+        "tests": 268,
+        "suites": 6
+      },
+      {
+        "command": "node scripts/react-compiler.test.mjs",
+        "result": "passed"
+      },
+      {
+        "command": "git diff --check",
+        "result": "passed"
+      }
+    ],
+    "accounting": "Findings 1-5 remain fixed and routine-verified by the checks above and their named regression suites. Finding 6 remains intentionally unchanged; the complete resize implementation is byte-identical to HEAD.",
+    "limits": "This was a final-diff and connected-path review, not a new exhaustive audit of every unaffected module. Real-renderer acceptance, Metro transport, native builds/installations, live services and physical devices remain unverified and deferred. Routine passes do not establish renderer readiness.",
+    "retention": "Temporary rerun logs removed after verification; packed-consumer cleanup remains owned by the package-check finally block.",
+    "commitCreated": false
+  }
+}

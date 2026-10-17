@@ -15,6 +15,7 @@ import {
   createNativeUI,
   type NativeMarkerHostProps,
 } from "../shared/native-ui.js";
+import { useActiveCallback } from "../shared/use-active-callback.js";
 import {
   lngLatFromWrapper,
   pointFromWrapper,
@@ -44,6 +45,8 @@ type AnnotationEvent = Parameters<
 
 const MapboxAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
   (props, ref): ReactElement => {
+    // PointAnnotation's class handler reads props even during a suspended render.
+    const click = useActiveCallback(props.onClick);
     const annotationRef =
       useRef<InstanceType<typeof Mapbox.PointAnnotation>>(null);
     const [size, setSize] = useState({ width: 0, height: 0 });
@@ -116,9 +119,7 @@ const MapboxAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
         coordinate={[props.lngLat[0], props.lngLat[1]]}
         anchor={anchor}
         draggable={props.draggable}
-        onSelected={(event: AnnotationEvent) =>
-          props.onClick?.(normalize(event))
-        }
+        onSelected={(event: AnnotationEvent) => click(normalize(event))}
         onDragStart={(event: AnnotationEvent) =>
           props.onDragStart?.(normalize(event))
         }

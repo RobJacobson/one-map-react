@@ -1,0 +1,59 @@
+{
+  "checkpoint": "Four Ponytail audit fixes",
+  "date": "2026-10-16",
+  "baseRevision": "b96b2fcfd9a49664275500c56df2a90cf0da7027",
+  "sourceSha256": {
+    "packages/example-map/src/use-example-map.ts": "36506746cc913ea71839aa9fcb16f126a3b7c9c41dd0777c4594ae245da890d8",
+    "packages/example-map/test/use-example-map.web.test.tsx": "998521cc7a6718be77f2ffbaaf002a5c02df41273a7611ffdd8b6c7a6b0d478b",
+    "packages/one-map-react/src/adapters/mapbox-native/layers.tsx": "291782b2a59473b853ea6d7afa1181072c71ee8a266e6e13326d3b6644b83275",
+    "packages/one-map-react/src/adapters/web/contracts.ts": "b7fcdfae4ef569fb643ef82c3eb6d031d7eed756b7a92ae97a643baa930c22c7",
+    "packages/one-map-react/src/adapters/web/images.tsx": "7217ad5e678580b2aeaed39e12a895814bcb4c304ef565cda6a7d48448a51b26",
+    "packages/one-map-react/src/contracts/images-types.ts": "4ba45e63f70ee40955a819ff47b06b60c11c15309fca2ada53ce971b7c30b144",
+    "packages/one-map-react/src/facade/map.tsx": "f9402733234f845b38ba875024ee066b5729982b008883fb169f243b0b771210",
+    "packages/one-map-react/src/facade/use-map-interactions.ts": "7bede4225404447998a2763479ecc26e3a803772c4cf86ba4834f7598d2c2baa",
+    "packages/one-map-react/test/create-web-map-mock.tsx": "09e36eb46a4ce480d744327f7673ebf472dafcd35453b2187c025f5902c0413f",
+    "packages/one-map-react/test/mapbox-native.native.test.tsx": "b119779204ccba7fb5ea3629cc29c1c143a1c63ab7f6593187d0a82dc773cc42",
+    "packages/one-map-react/test/tf07-map-context.web.test.tsx": "2b2a067ede43b212b27484d764946d58eec9c5a1302689bd407fa0c8aa5fc206",
+    "packages/one-map-react/test/web-followup-regressions.tsx": "2613c61ed9dd8530edae6b152928d0aebe47dfff2103054371b598cd915b631d"
+  },
+  "packageSha256": "bc218037b54f1c0c6f614673312019df54502060159b63c6d1a71654f18094f8",
+  "scope": [
+    "Movement delivery stops after subscriber-triggered map teardown.",
+    "Example map loading has a ten-second deadline, retry, and late-load suppression.",
+    "Web image failures report credential-safe map errors without changing style-load retries.",
+    "RNMapbox style conversion delegates property validation and preserves expression identity and resets."
+  ],
+  "routineChecks": {
+    "formatLintDocsAndAllTypes": "passed",
+    "sourceUnitAndWeb": {
+      "files": 36,
+      "tests": 741,
+      "result": "passed"
+    },
+    "sourceMockedNative": {
+      "suites": 6,
+      "tests": 230,
+      "result": "passed"
+    },
+    "standaloneRegressions": "passed",
+    "libraryAndExampleBuilds": "passed",
+    "compiledWeb": {
+      "files": 21,
+      "tests": 516,
+      "result": "passed"
+    },
+    "compiledMockedNative": {
+      "suites": 6,
+      "tests": 230,
+      "result": "passed"
+    },
+    "compilerChecks": "passed",
+    "packedSelections": {
+      "cases": 13,
+      "result": "passed"
+    }
+  },
+  "executionNote": "The sandboxed validate command stopped at the process-cleanup regression with spawn EPERM. That regression passed outside the sandbox under Node and Bun. Remaining routine regressions and packed checks passed separately; validate was not rerun as one command.",
+  "acceptance": "Not run, as explicitly requested. Mocked checks do not establish renderer acceptance.",
+  "retention": "Temporary audit logs removed; no generated consumers or new test dependencies retained."
+}

@@ -7,6 +7,7 @@ import {
   featureStateFromWrapper,
   featuresFromWrapper,
   mutableFeatureState,
+  toQueryGeometry,
 } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
@@ -16,6 +17,7 @@ import {
 import {
   assertBounds,
   boundsFromGeographic,
+  finiteNumber,
   lngLatFromWrapper,
   paddingFromWrapper,
   pointFromWrapper,
@@ -30,12 +32,10 @@ import type {
 import {
   toWebCommandOptions,
   toWebFitBoundsOptions,
-  toWebFlyToOptions,
   toWebZoomToOptions,
 } from "./convert-camera.js";
 import {
   toWebFeatureTarget,
-  toWebQueryGeometry,
   toWebRenderedQueryOptions,
   toWebSourceQueryOptions,
 } from "./convert-query.js";
@@ -54,7 +54,7 @@ export const createWebMapRef = (
     if (!map.queryTerrainElevation)
       throw new Error("queryTerrainElevation is unsupported by this renderer.");
     return normalizeElevation(
-      runWebQuery(map, () =>
+      runWebOperation(map, () =>
         map.queryTerrainElevation?.(coordinate, { exaggerated: true })
       )
     );
@@ -78,7 +78,7 @@ export const createWebMapRef = (
   flyTo: async (options) => {
     const map = requireWebMap(mapRef.current);
 
-    await map.flyTo(toWebFlyToOptions(options));
+    await map.flyTo(toWebCommandOptions(options));
   },
   fitBounds: async (bounds, options) => {
     const map = requireWebMap(mapRef.current);
@@ -103,17 +103,17 @@ export const createWebMapRef = (
   getZoom: async () => {
     const map = requireWebMap(mapRef.current);
 
-    return finiteNumber(await map.getZoom(), "zoom");
+    return finiteNumber(await map.getZoom(), "Map zoom");
   },
   getBearing: async () => {
     const map = requireWebMap(mapRef.current);
 
-    return finiteNumber(await map.getBearing(), "bearing");
+    return finiteNumber(await map.getBearing(), "Map bearing");
   },
   getPitch: async () => {
     const map = requireWebMap(mapRef.current);
 
-    return finiteNumber(await map.getPitch(), "pitch");
+    return finiteNumber(await map.getPitch(), "Map pitch");
   },
   getPadding: async () => {
     const map = requireWebMap(mapRef.current);
@@ -128,12 +128,12 @@ export const createWebMapRef = (
   getMinZoom: async () => {
     const map = requireWebMap(mapRef.current);
 
-    return finiteNumber(await map.getMinZoom(), "min zoom");
+    return finiteNumber(await map.getMinZoom(), "Map min zoom");
   },
   getMaxZoom: async () => {
     const map = requireWebMap(mapRef.current);
 
-    return finiteNumber(await map.getMaxZoom(), "max zoom");
+    return finiteNumber(await map.getMaxZoom(), "Map max zoom");
   },
   getMaxBounds: async () => {
     const map = requireWebMap(mapRef.current);
@@ -168,7 +168,7 @@ export const createWebMapRef = (
     const map = requireWebMap(mapRef.current);
 
     return featuresFromWrapper(
-      runWebQuery(map, () => {
+      runWebOperation(map, () => {
         for (const id of options?.layers ?? []) {
           if (map.getLayer(id) == null) {
             throw new Error(
@@ -178,7 +178,7 @@ export const createWebMapRef = (
         }
 
         return map.queryRenderedFeatures(
-          toWebQueryGeometry(target),
+          toQueryGeometry(target),
           toWebRenderedQueryOptions(options)
         );
       }),
@@ -189,7 +189,7 @@ export const createWebMapRef = (
     const map = requireWebMap(mapRef.current);
 
     return featuresFromWrapper(
-      runWebQuery(map, () => {
+      runWebOperation(map, () => {
         const source = map.getSource(sourceId);
 
         if (source == null) {
@@ -235,7 +235,7 @@ export const createWebMapRef = (
       await wrapper.callWebCluster(source, "getClusterExpansionZoom", [
         clusterId,
       ]),
-      "cluster expansion zoom"
+      "Map cluster expansion zoom"
     );
   },
   getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
@@ -272,7 +272,9 @@ export const createWebMapRef = (
       assertFeatureIdentifier(identifier)
     );
 
-    await map.setFeatureState(target, mutableFeatureState(state));
+    await runWebOperation(map, () =>
+      map.setFeatureState(target, mutableFeatureState(state))
+    );
   },
   getFeatureState: async (identifier) => {
     const map = requireWebMap(mapRef.current);
@@ -281,7 +283,7 @@ export const createWebMapRef = (
       assertFeatureIdentifier(identifier)
     );
 
-    const state = await map.getFeatureState(target);
+    const state = await runWebOperation(map, () => map.getFeatureState(target));
     if (state == null) {
       throw new Error("getFeatureState returned no result.");
     }
@@ -294,40 +296,46 @@ export const createWebMapRef = (
       assertFeatureIdentifier(identifier)
     );
 
-    await map.removeFeatureState(target, key);
+    await runWebOperation(map, () => map.removeFeatureState(target, key));
   },
 });
 
 /**
- * Captures synchronous renderer error events for one web query.
+ * Captures synchronous renderer error events for one web operation.
  *
- * Both pinned web renderers can emit an error and return an empty array.
+ * Both pinned web renderers can emit errors instead of throwing.
  * The listener only spans the synchronous call, leaving later unrelated
  * errors and the existing map error callback with their normal lifetimes.
  *
  * @param map - Attached wrapper handle.
- * @param query - Query dispatch and target checks.
+ * @param operation - Renderer dispatch and target checks.
  * @returns The renderer result when no error was reported.
- * @throws The first reported error or a directly thrown query failure.
+ * @throws The first reported error or a directly thrown failure.
  */
-const runWebQuery = (map: WebMapHandle, query: () => unknown): unknown => {
+const runWebOperation = (
+  map: WebMapHandle,
+  operation: () => unknown
+): unknown => {
   const renderer = map.getMap();
   let failed = false;
-  let queryError: unknown;
+  let operationError: unknown;
   const reportError = (event: WebErrorNotice): void => {
     if (!failed) {
       failed = true;
-      queryError = event.error;
+      operationError = event.error;
     }
   };
 
   renderer.on("error", reportError);
 
   try {
-    const result = query();
+    const result = operation();
 
     if (failed) {
-      throw queryError ?? new Error("The renderer reported a query failure.");
+      throw (
+        operationError ??
+        new Error("The renderer reported an operation failure.")
+      );
     }
 
     return result;
@@ -365,14 +373,6 @@ const requireClusterSource = (
   }
 
   return source as WebClusterSource;
-};
-
-const finiteNumber = (value: unknown, name: string): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error(`Map ${name} must be a finite number.`);
-  }
-
-  return value;
 };
 
 /**

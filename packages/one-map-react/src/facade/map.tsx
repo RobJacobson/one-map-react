@@ -24,16 +24,29 @@ import { useStableOptions } from "./use-stable-options.js";
 export const useMapEnclosure = (): boolean =>
   useContext(MapSessionContext) !== null;
 
-/** Returns the enclosing ref or a named map under the same MapSetup. */
-export const useMap = (id?: string): MapRef => {
+/**
+ * Returns the enclosing common map ref.
+ *
+ * @returns A stable ref to the enclosing Map.
+ * @throws When MapSetup or the enclosing Map is missing.
+ */
+export function useMap(): MapRef;
+/**
+ * Reads a named map under the same MapSetup and follows its attachment.
+ *
+ * @param id - Map ID, or undefined to read the enclosing Map.
+ * @returns The map ref, or undefined while a named map is not attached.
+ * @throws When MapSetup is missing, or id is omitted outside a Map.
+ */
+export function useMap(id: string | undefined): MapRef | undefined;
+// Overloads keep enclosing access required and named access optional without casts.
+export function useMap(id?: string): MapRef | undefined {
   const session = useContext(MapSessionContext);
   const named = useNamedMap(id);
-  const map = id === undefined ? session?.map : named;
-  if (map) return map;
-  if (id !== undefined)
-    throw new Error(`Map "${id}" is not registered in this MapSetup.`);
+  if (id !== undefined) return named;
+  if (session) return session.map;
   throw new Error("useMap() must render inside Map.");
-};
+}
 
 /** Shared map with scoped UI notifications and named map attachment. */
 // eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
@@ -67,7 +80,7 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
   });
   const { mapRef, proxy } = useMapAttachment(props.id, forwardedRef);
   const [ready, setReady] = useState(false);
-  const { emit, subscribe, registerSource, dispatchSource, click } =
+  const { move, subscribe, registerSource, dispatchSource, click } =
     useMapInteractions(props, backend, mapRef);
 
   const cameraControlled = props.viewState !== undefined;
@@ -104,10 +117,7 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
           setReady(true);
           props.onLoad?.();
         }}
-        onMove={(event) => {
-          emit("move", event);
-          props.onMove?.(event);
-        }}
+        onMove={move}
         onClick={(event) => {
           void click(event);
         }}
@@ -135,12 +145,13 @@ const useMapAttachment = (
 
 const createDeferredMapRef = (ref: { current: MapRef | null }): MapRef =>
   new Proxy({} as MapRef, {
-    get:
-      (_target, key: keyof MapRef) =>
-      (...args: unknown[]) => {
+    get: (_target, key: keyof MapRef | "then") => {
+      if (key === "then") return undefined;
+      return (...args: unknown[]) => {
         const map = ref.current;
         if (!map) return Promise.reject(new Error("Map is not attached."));
         const method = map[key] as (...args: unknown[]) => unknown;
         return method(...args);
-      },
+      };
+    },
   });

@@ -15,7 +15,6 @@ import type {
   ControlProps,
   FullscreenControlProps,
   GeolocateControlProps,
-  GeolocationPosition,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
@@ -32,7 +31,7 @@ import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
 import { useStableOptions } from "../../facade/use-stable-options.js";
 import { UserLocation } from "../../facade/user-location.js";
 import { positionFromWrapper } from "../shared/location-values.js";
-import { useActiveCallback } from "../shared/use-active-callback.js";
+import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import {
   lngLatFromWrapper,
@@ -123,11 +122,20 @@ export const createWebUi = (
         ])
       );
       useImperativeHandle(ref, () => ({ refresh: async () => {} }), []);
-      const click = useActiveCallback(onClick);
-      const dragStart = useActiveCallback(onDragStart);
-      const drag = useActiveCallback(onDrag);
-      const dragEnd = useActiveCallback(onDragEnd);
-      const error = useActiveCallback(onError);
+      // react-map-gl writes its callback ref during render, before a Suspense commit.
+      const {
+        onClick: click,
+        onDragStart: dragStart,
+        onDrag: drag,
+        onDragEnd: dragEnd,
+        onError: error,
+      } = useActiveCallbacks({
+        onClick,
+        onDragStart,
+        onDrag,
+        onDragEnd,
+        onError,
+      });
       const notify =
         (callback: (event: MarkerEvent) => void) =>
         (event: WebMarkerNotice): void => {
@@ -174,8 +182,11 @@ export const createWebUi = (
     const offset = props.offset ?? [0, 0];
     const [offsetX, offsetY] = offset;
     useStableOptions("Popup", creationOptions(options, ["style", "className"]));
-    const open = useActiveCallback(onOpen);
-    const close = useActiveCallback(onClose);
+    // react-map-gl writes its callback ref during render, before a Suspense commit.
+    const { onOpen: open, onClose: close } = useActiveCallbacks({
+      onOpen,
+      onClose,
+    });
 
     useLayoutEffect(() => {
       // react-map-gl 8.1.3 updates options.anchor only when offset changes.
@@ -282,8 +293,11 @@ export const createWebUi = (
         "onTrackUserLocationEnd",
       ])
     );
-    const locate = useActiveCallback(onGeolocate);
-    const error = useActiveCallback(onError);
+    // react-map-gl writes its callback ref during render, before a Suspense commit.
+    const { onGeolocate: locate, onError: error } = useActiveCallbacks({
+      onGeolocate,
+      onError,
+    });
 
     const session = useOptionalMapSession();
     const setupProvider = useLocationOverride();
@@ -303,8 +317,8 @@ export const createWebUi = (
         {...options}
         {...forwarded}
         position={props.position ?? "top-right"}
-        onGeolocate={(event: WebGeolocationNotice) =>
-          locate(geolocationPosition(event))
+        onGeolocate={(event: unknown) =>
+          locate(positionFromWrapper(event, "browser"))
         }
         onError={error}
       />
@@ -387,19 +401,6 @@ const createControlHost = (): WebCustomControl => {
 
   return { element, onAdd: () => element, onRemove: () => element.remove() };
 };
-
-interface WebGeolocationNotice {
-  readonly coords: {
-    readonly longitude: number;
-    readonly latitude: number;
-    readonly accuracy?: number;
-  };
-  readonly timestamp?: number;
-}
-
-const geolocationPosition = (
-  event: WebGeolocationNotice
-): GeolocationPosition => positionFromWrapper(event, "browser");
 
 /** One-shot injected locations permit deterministic browser/native app behavior. */
 const InjectedGeolocateControl = (

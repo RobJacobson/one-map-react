@@ -19,7 +19,6 @@ import {
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
 import { sourceHitFromMaplibre } from "../shared/source-hit.js";
-import { useActiveCallback } from "../shared/use-active-callback.js";
 import { useMaplibreSourceRegistry } from "./source-registry.js";
 
 /** Maplibre-native source that dispatches to the matching MapLibre source. */
@@ -90,19 +89,14 @@ export const MaplibreNativeSource = (props: SourceProps) => {
  */
 const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
   const session = useOptionalMapSession();
-  const press = useActiveCallback(
-    (
-      event: Parameters<
-        NonNullable<ComponentProps<typeof GeoJSONSource>["onPress"]>
-      >[0]
-    ) => {
-      event.stopPropagation();
-      session?.dispatchSource(
-        props.id,
-        sourceHitFromMaplibre(event.nativeEvent)
-      );
-    }
-  );
+  const press = (
+    event: Parameters<
+      NonNullable<ComponentProps<typeof GeoJSONSource>["onPress"]>
+    >[0]
+  ): void => {
+    event.stopPropagation();
+    session?.dispatchSource(props.id, sourceHitFromMaplibre(event.nativeEvent));
+  };
   const registry = useMaplibreSourceRegistry();
   const sourceRef = useRef<ComponentRef<typeof GeoJSONSource>>(null);
 
@@ -168,19 +162,14 @@ const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
  */
 const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
   const session = useOptionalMapSession();
-  const press = useActiveCallback(
-    (
-      event: Parameters<
-        NonNullable<ComponentProps<typeof GeoJSONSource>["onPress"]>
-      >[0]
-    ) => {
-      event.stopPropagation();
-      session?.dispatchSource(
-        props.id,
-        sourceHitFromMaplibre(event.nativeEvent)
-      );
-    }
-  );
+  const press = (
+    event: Parameters<
+      NonNullable<ComponentProps<typeof GeoJSONSource>["onPress"]>
+    >[0]
+  ): void => {
+    event.stopPropagation();
+    session?.dispatchSource(props.id, sourceHitFromMaplibre(event.nativeEvent));
+  };
   const registry = useMaplibreSourceRegistry();
   const sourceRef = useRef<ComponentRef<typeof VectorSource>>(null);
 

@@ -28,7 +28,7 @@ const MapRegistryContext = createContext<MapRegistry | null>(null);
 
 /** Props for the selected backend and its map tree. */
 export interface MapSetupProps {
-  /** Adapter imported from the selected backend entry. */
+  /** Adapter imported from the selected backend entry; changing it requires a new setup key. */
   readonly adapter: Adapter;
   /** Explicit app permission/acquisition provider; changing it requires a new setup key. */
   readonly locationProvider?: LocationService;
@@ -43,7 +43,10 @@ export const MapSetup = ({
   children,
 }: MapSetupProps) => {
   const [registry] = useState(createRegistry);
+  const [initialAdapter] = useState(() => adapter);
   const [initialProvider] = useState(() => locationProvider);
+  if (initialAdapter !== adapter)
+    throw new Error("MapSetup adapter changed. Remount with a new key.");
   if (initialProvider !== locationProvider)
     throw new Error(
       "MapSetup locationProvider changed. Remount with a new key."

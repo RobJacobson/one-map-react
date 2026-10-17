@@ -1,12 +1,21 @@
-import { type ReactElement, useEffect, useId, useState } from "react";
+import {
+  type ReactElement,
+  useContext,
+  useEffect,
+  useEffectEvent,
+  useId,
+  useState,
+} from "react";
 import { View } from "react-native";
 import { Portal } from "react-native-teleport";
 
 import type { Point } from "../../contracts/camera-types.js";
 import { useMapSession } from "../../facade/map-context.js";
-import { useNativeMapPresentation } from "./native-map-presentation.js";
+import {
+  NativeCameraContext,
+  useNativeMapPresentation,
+} from "./native-map-presentation.js";
 import type { NativeMarkerHostProps } from "./native-ui.js";
-import { useActiveCallback } from "./use-active-callback.js";
 
 /**
  * Projects live children into the map's native overlay, outside SDK recognizers.
@@ -17,46 +26,44 @@ export const NativeMarkerOverlay = (
 ): ReactElement => {
   const session = useMapSession();
   const presentation = useNativeMapPresentation();
+  const observed = useContext(NativeCameraContext)?.observedViewState;
   const name = useId();
   const [point, setPoint] = useState<Point | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
-  const reportError = useActiveCallback(props.onProjectionError);
+  const reportError = useEffectEvent((error: unknown) =>
+    props.onProjectionError?.(error)
+  );
   const longitude = props.lngLat[0];
   const latitude = props.lngLat[1];
 
   // Viewport dimensions change projection even when the camera is unchanged.
   useEffect(() => {
     let active = true;
-    let request = 0;
     const project = async (): Promise<void> => {
       const map = session.ref.current;
       if (!map || !session.ready) return;
-      const sequence = ++request;
       try {
         const next = await map.project([longitude, latitude]);
-        if (active && sequence === request) setPoint(next);
+        if (active) setPoint(next);
       } catch (error) {
-        if (active && sequence === request) {
+        if (active) {
           setPoint(null);
           reportError(error);
         }
       }
     };
     void project();
-    const remove = session.subscribe("move", () => void project());
     return () => {
       active = false;
-      remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- actual native layout invalidates screen coordinates.
   }, [
     session.ref,
     session.ready,
-    session.subscribe,
+    observed,
     presentation.nativeLayout,
     longitude,
     latitude,
-    reportError,
   ]);
 
   const horizontal = props.anchor.includes("left")

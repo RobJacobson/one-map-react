@@ -50,9 +50,17 @@ export const createWebImages = <
 
       let released = false;
       let waitingForStyle = false;
+      let revision = 0;
       const owned = new Map<string, ImageRegistration>();
       const inFlight = new Map<string, ImageRegistration>();
       const pendingRemovals = new Set<string>();
+
+      const reportFailure = (): void => {
+        if (!released)
+          map.fire("error", {
+            error: new Error("Style image registration failed."),
+          });
+      };
 
       // Wait for style completion before starting registration. Image removal
       // remains available during loading on both pinned renderers; an absent
@@ -64,6 +72,15 @@ export const createWebImages = <
           return false;
         }
       };
+
+      const readSpriteKey = (): string | undefined => {
+        try {
+          return JSON.stringify(map.getSprite?.());
+        } catch {
+          return undefined;
+        }
+      };
+      let spriteKey = readSpriteKey();
 
       const register = (name: string, fields: ImageRegistration): void => {
         if (released || inFlight.has(name) || !styleReady()) {
@@ -82,18 +99,19 @@ export const createWebImages = <
           return;
         }
 
+        // Image methods emit synchronous style events that can replace this request.
+        inFlight.set(name, fields);
         if (present) {
+          owned.delete(name);
           try {
             map.removeImage(name);
           } catch {
-            owned.delete(name);
+            if (inFlight.get(name) === fields) inFlight.delete(name);
             return;
           }
-
-          owned.delete(name);
         }
 
-        inFlight.set(name, fields);
+        if (released || inFlight.get(name) !== fields) return;
 
         void wrapper.loadWebImage(map, fields.url).then(
           (data) => {
@@ -103,7 +121,9 @@ export const createWebImages = <
 
             inFlight.delete(name);
 
-            if (released || data == null) {
+            if (released) return;
+            if (data == null) {
+              reportFailure();
               return;
             }
             if (!styleReady()) {
@@ -111,19 +131,25 @@ export const createWebImages = <
               return;
             }
 
+            const registrationRevision = revision;
             try {
               if (map.hasImage(name)) {
                 return;
               }
 
+              // Cleanup must own the image before addImage can call application code.
+              owned.set(name, fields);
               map.addImage(
                 name,
                 data,
                 fields.sdf === undefined ? {} : { sdf: fields.sdf }
               );
-              owned.set(name, fields);
             } catch {
-              // addImage failed. The image stays unregistered so style.load retries.
+              if (released || revision !== registrationRevision) return;
+              if (owned.get(name) === fields) {
+                removeName(name);
+              }
+              if (revision === registrationRevision) reportFailure();
             }
           },
           () => {
@@ -132,6 +158,7 @@ export const createWebImages = <
             }
 
             inFlight.delete(name);
+            reportFailure();
           }
         );
       };
@@ -152,6 +179,10 @@ export const createWebImages = <
       };
 
       const sync = (next: ImagesProps["images"]): void => {
+        if (released) return;
+        const currentRevision = ++revision;
+        const isCurrent = (): boolean =>
+          !released && revision === currentRevision;
         const nextNames = new Set(Object.keys(next));
 
         for (const name of new Set([
@@ -159,6 +190,7 @@ export const createWebImages = <
           ...inFlight.keys(),
           ...pendingRemovals,
         ])) {
+          if (!isCurrent()) return;
           if (!nextNames.has(name)) {
             removeName(name);
           }
@@ -166,6 +198,7 @@ export const createWebImages = <
 
         // Cancel replaced loads even when renderer image methods are unavailable.
         for (const [name, entry] of Object.entries(next)) {
+          if (!isCurrent()) return;
           const current = owned.get(name) ?? inFlight.get(name);
           if (
             current &&
@@ -175,16 +208,19 @@ export const createWebImages = <
           }
         }
 
+        if (!isCurrent()) return;
         if (!styleReady()) {
           waitingForStyle = true;
           return;
         }
         waitingForStyle = false;
         for (const name of pendingRemovals) {
+          if (!isCurrent()) return;
           removeName(name);
         }
 
         for (const [name, entry] of Object.entries(next)) {
+          if (!isCurrent()) return;
           const fields = imageRegistration(entry);
           const current = owned.get(name) ?? inFlight.get(name);
           let present = false;
@@ -203,18 +239,23 @@ export const createWebImages = <
             removeName(name);
           }
 
-          register(name, fields);
+          if (isCurrent()) register(name, fields);
         }
       };
 
       syncRef.current = sync;
       sync(imagesRef.current);
 
-      // styledata restores only images this session added that the style
+      // Ordinary styledata restores only images this session added that the style
       // dropped. Failed loads and addImage failures are not owned, so tile
       // activity does not retry them. Deferred registration resumes once tiles
       // are ready, even when style.load preceded them; see web-followup-regressions.tsx.
       const restoreOwned = (): void => {
+        if (readSpriteKey() !== spriteKey) {
+          restoreAll();
+          return;
+        }
+        if (released) return;
         if (!styleReady()) {
           return;
         }
@@ -223,8 +264,9 @@ export const createWebImages = <
           return;
         }
 
-        for (const [name, fields] of owned) {
-          if (inFlight.has(name)) {
+        // eslint-disable-next-line unicorn/no-useless-spread -- Image callbacks can replace entries during restoration.
+        for (const [name, fields] of [...owned]) {
+          if (owned.get(name) !== fields || inFlight.has(name)) {
             continue;
           }
 
@@ -239,6 +281,14 @@ export const createWebImages = <
       };
 
       const restoreAll = (): void => {
+        // A replacement style can contain a different sprite under the same name.
+        owned.clear();
+        inFlight.clear();
+        spriteKey = readSpriteKey();
+        if (released) {
+          pendingRemovals.clear();
+          return;
+        }
         sync(imagesRef.current);
       };
 
@@ -250,13 +300,12 @@ export const createWebImages = <
       return () => {
         released = true;
         inFlight.clear();
-        map.off("styledata", restoreOwned);
-        map.off("style.load", restoreAll);
-        map.off("load", restoreOwned);
-        map.off("idle", restoreOwned);
         syncRef.current = () => {};
 
         for (const name of new Set([...owned.keys(), ...pendingRemovals])) {
+          if (!owned.has(name) && !pendingRemovals.has(name)) continue;
+          owned.delete(name);
+          pendingRemovals.delete(name);
           try {
             if (map.hasImage(name)) {
               map.removeImage(name);
@@ -266,6 +315,11 @@ export const createWebImages = <
           }
         }
 
+        // Removal callbacks can replace the style; keep ownership invalidation until cleanup ends.
+        map.off("styledata", restoreOwned);
+        map.off("style.load", restoreAll);
+        map.off("load", restoreOwned);
+        map.off("idle", restoreOwned);
         owned.clear();
         pendingRemovals.clear();
       };

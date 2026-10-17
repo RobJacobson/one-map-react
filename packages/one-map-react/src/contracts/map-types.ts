@@ -291,36 +291,23 @@ export interface MapProps {
 /**
  * Portable gesture flags and the web-only options that share their props.
  */
-export interface GestureSelection {
-  /** Turns interaction off when `false`. */
-  readonly interactive?: boolean;
-  /** One-finger pan. */
-  readonly dragPan?: boolean;
-  /** Pinch zoom. */
-  readonly touchZoom?: boolean;
-  /** Rotation on the pinch handler. */
-  readonly touchRotate?: boolean;
-  /** Pitch gesture. */
-  readonly touchPitch?: boolean;
-  /** Double-tap zoom. */
-  readonly doubleTapZoom?: boolean;
-  /** Wheel zoom. Web only. */
-  readonly scrollZoom?: boolean;
-  /** Double-click zoom. Web only. */
-  readonly doubleClickZoom?: boolean;
-  /** Right-drag rotation. Web only. */
-  readonly dragRotate?: boolean;
-  /** Shift-drag box zoom. Web only. */
-  readonly boxZoom?: boolean;
-  /** Keyboard camera controls. Web only. */
-  readonly keyboard?: boolean;
-  /** Modifier required before wheel zoom. Web only. */
-  readonly cooperativeGestures?: boolean;
-  /** Click distance in pixels. Web only. */
-  readonly clickTolerance?: number;
-  /** Page URL hash camera. Web only. */
-  readonly hash?: boolean | string;
-}
+export type GestureSelection = Pick<
+  MapProps,
+  | "interactive"
+  | "dragPan"
+  | "touchZoom"
+  | "touchRotate"
+  | "touchPitch"
+  | "doubleTapZoom"
+  | "scrollZoom"
+  | "doubleClickZoom"
+  | "dragRotate"
+  | "boxZoom"
+  | "keyboard"
+  | "cooperativeGestures"
+  | "clickTolerance"
+  | "hash"
+>;
 
 /** Portable terrain using a mounted raster DEM source. */
 export interface Terrain {

@@ -6,7 +6,7 @@ import {
   useImperativeHandle,
   useContext,
 } from "react";
-import { describe, expect, vi, test } from "vite-plus/test";
+import { describe, expect, expectTypeOf, vi, test } from "vite-plus/test";
 
 import {
   NativeCameraContext,
@@ -75,7 +75,72 @@ const Probe = ({ capture }: { capture: (map: MapRef) => void }) => {
   return null;
 };
 
+test.each(
+  (["enclosing", "named"] as const).flatMap((access) =>
+    (["promise", "async return"] as const).map((transport) => ({
+      access,
+      transport,
+    }))
+  )
+)(
+  "$access map references survive $transport and retain command forwarding",
+  async ({ access, transport }) => {
+    const fixture = createFixture();
+    const flyTo = vi.fn<MapRef["flyTo"]>().mockResolvedValue(undefined);
+    fixture.map.flyTo = flyTo;
+    let observed: MapRef | undefined;
+    const Capture = () => {
+      // eslint-disable-next-line react/globals -- Test readback captures the map reference returned by the public hook.
+      observed = useMap(access === "named" ? "promise-map" : undefined);
+      return null;
+    };
+    const view = render(
+      <MapSetup adapter={fixture.adapter}>
+        <OneMap id="promise-map" mapStyle={style} initialViewState={camera}>
+          <Capture />
+        </OneMap>
+      </MapSetup>
+    );
+    if (!observed) throw new Error("Map reference was not attached.");
+    const retained = observed;
+    const returning = async () => retained;
+    const transferred =
+      transport === "promise" ? Promise.resolve(retained) : returning();
+    await expect(transferred).resolves.toBe(retained);
+    const command = { center: [7, 8] as const, zoom: 9, duration: 0 };
+    await retained.flyTo(command);
+    expect(flyTo).toHaveBeenCalledWith(command);
+    view.unmount();
+    await expect(Promise.resolve(retained)).resolves.toBe(retained);
+    await expect(retained.flyTo(command)).rejects.toThrow("not attached");
+  }
+);
+
 describe("TF07 map-local UI lifetime", () => {
+  test("move subscriber teardown suppresses the map callback and retained movement handler", () => {
+    const fixture = createFixture();
+    const onMove = vi.fn();
+    let session: MapSession | undefined;
+    const SessionProbe = () => {
+      // eslint-disable-next-line react/globals -- Test readback captures the committed map session.
+      session = useMapSession();
+      return null;
+    };
+    const mounted = render(
+      <MapSetup adapter={fixture.adapter}>
+        <OneMap mapStyle={style} initialViewState={camera} onMove={onMove}>
+          <SessionProbe />
+        </OneMap>
+      </MapSetup>
+    );
+    const move = fixture.props()?.onMove;
+    session?.subscribe("move", () => mounted.unmount());
+
+    act(() => move?.({ viewState: camera, origin: "user" }));
+    act(() => move?.({ viewState: camera, origin: "user" }));
+    expect(onMove).not.toHaveBeenCalled();
+  });
+
   test("enclosing useMap forwards commands after attachment and rejects after teardown", async () => {
     const fixture = createFixture();
     let observed: MapRef | undefined;
@@ -238,26 +303,99 @@ describe("TF07 map-local UI lifetime", () => {
     expect(mapClick).toHaveBeenCalledWith({ ...hit, features: [] });
   });
 
-  test("named maps register after mount and release captured commands after teardown", async () => {
+  test("named consumers can mount with their map and observe removal and reattachment", async () => {
     const fixture = createFixture();
     let named: MapRef | undefined;
     const NamedProbe = () => {
+      const map = useMap("named");
+      expectTypeOf(map).toEqualTypeOf<MapRef | undefined>();
       // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
-      named = useMap("named");
+      named = map;
       return null;
     };
-    const tree = (probe: boolean) => (
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap id="named" mapStyle={style} initialViewState={camera} />
-        {probe && <NamedProbe />}
+    const tree = (attached: boolean) => (
+      <StrictMode>
+        <MapSetup adapter={fixture.adapter}>
+          <NamedProbe />
+          {attached && (
+            <OneMap id="named" mapStyle={style} initialViewState={camera} />
+          )}
+        </MapSetup>
+      </StrictMode>
+    );
+    const rendered = render(tree(true));
+    await expect(named?.getZoom()).resolves.toBe(3);
+    const detached = named;
+    rendered.rerender(tree(false));
+    expect(named).toBeUndefined();
+    await expect(detached?.getZoom()).rejects.toThrow("not attached");
+    rendered.rerender(tree(true));
+    expect(named).not.toBe(detached);
+    await expect(named?.getZoom()).resolves.toBe(3);
+    rendered.unmount();
+    await expect(named?.getZoom()).rejects.toThrow("not attached");
+  });
+
+  test("changing the adapter requires a new MapSetup key", () => {
+    const first = createFixture();
+    const second = createFixture();
+    const tree = (adapter: Adapter) => (
+      <MapSetup adapter={adapter}>
+        <OneMap mapStyle={style} initialViewState={camera} />
+      </MapSetup>
+    );
+    const rendered = render(tree(first.adapter));
+    expect(() => rendered.rerender(tree(second.adapter))).toThrow(
+      "MapSetup adapter changed. Remount with a new key."
+    );
+  });
+
+  test("keyed adapter replacement resets readiness and discards pending hits", async () => {
+    const first = createFixture();
+    const second = createFixture();
+    let resolve: ((features: readonly GeoJsonFeature[]) => void) | undefined;
+    first.query.mockImplementation(
+      () =>
+        new Promise((done) => {
+          resolve = done;
+        })
+    );
+    const firstClick = vi.fn();
+    const secondClick = vi.fn();
+    const observed = vi.fn<(session: MapSession) => void>();
+    const SessionProbe = () => {
+      observed(useMapSession());
+      return null;
+    };
+    const tree = (replacement: boolean) => (
+      <MapSetup
+        key={replacement ? "second" : "first"}
+        adapter={replacement ? second.adapter : first.adapter}
+      >
+        <OneMap
+          mapStyle={style}
+          initialViewState={camera}
+          interactiveLayerIds={["places"]}
+          onClick={replacement ? secondClick : firstClick}
+        >
+          <SessionProbe />
+        </OneMap>
       </MapSetup>
     );
     const rendered = render(tree(false));
+    act(() => first.props()?.onLoad?.());
+    expect(observed.mock.calls.at(-1)?.[0].ready).toBe(true);
+    await first.click();
+    expect(first.query).toHaveBeenCalledTimes(1);
     rendered.rerender(tree(true));
-    await expect(named?.getZoom()).resolves.toBe(3);
-    rendered.rerender(tree(false));
-    rendered.unmount();
-    await expect(named?.getZoom()).rejects.toThrow("not attached");
+    expect(observed.mock.calls.at(-1)?.[0].ready).toBe(false);
+    await act(async () => resolve?.([]));
+    expect(firstClick).not.toHaveBeenCalled();
+    expect(secondClick).not.toHaveBeenCalled();
+    act(() => second.props()?.onLoad?.());
+    expect(observed.mock.calls.at(-1)?.[0].ready).toBe(true);
+    await second.click();
+    expect(secondClick).toHaveBeenCalledTimes(1);
   });
   test("a pending hit cannot activate a keyed replacement Source with the same id", async () => {
     const fixture = createFixture();
@@ -429,10 +567,15 @@ test("camera movement and controlled camera updates preserve map-access consumer
 
 test("native camera observations and controls leave unrelated contexts unchanged", async () => {
   const fixture = createFixture();
+  const rendererRendered = vi.fn();
+  const ObservedMap = forwardRef<MapRef, MapProps>((props, ref) => {
+    rendererRendered();
+    return <fixture.adapter.Map {...props} ref={ref} />;
+  });
   const adapter = {
     ...fixture.adapter,
     backend: "mapbox-native" as const,
-    Map: withNativeMapPresentation(fixture.adapter.Map),
+    Map: withNativeMapPresentation(ObservedMap),
   };
   const access = vi.fn();
   const presentation = vi.fn();
@@ -470,6 +613,7 @@ test("native camera observations and controls leave unrelated contexts unchanged
   const mounted = render(tree());
   const accessRenders = access.mock.calls.length;
   const presentationRenders = presentation.mock.calls.length;
+  const rendererRenders = rendererRendered.mock.calls.length;
   await act(async () =>
     fixture
       .props()
@@ -478,6 +622,16 @@ test("native camera observations and controls leave unrelated contexts unchanged
   expect(cameraChanged.mock.calls.at(-1)?.[0].zoom).toBe(7);
   expect(access).toHaveBeenCalledTimes(accessRenders);
   expect(presentation).toHaveBeenCalledTimes(presentationRenders);
+  expect(rendererRendered).toHaveBeenCalledTimes(rendererRenders);
+  await act(async () =>
+    fixture
+      .props()
+      ?.onMoveEnd?.({ viewState: { ...camera, zoom: 6 }, origin: "unknown" })
+  );
+  expect(cameraChanged.mock.calls.at(-1)?.[0].zoom).toBe(6);
+  expect(access).toHaveBeenCalledTimes(accessRenders);
+  expect(presentation).toHaveBeenCalledTimes(presentationRenders);
+  expect(rendererRendered).toHaveBeenCalledTimes(rendererRenders);
   mounted.rerender(tree(8));
   const controlledAccessRenders = access.mock.calls.length;
   const controlledPresentationRenders = presentation.mock.calls.length;
