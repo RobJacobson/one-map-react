@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 /**
  * North end of the Seattle fixture, away from the opening camera.
  *
+ * @remarks
  * The opening camera is latitude 47.61. A fitted center inside this box
  * shows that `fitBounds` moved the map.
  */
@@ -31,12 +32,14 @@ interface CameraSmokeOptions {
   /**
    * Watch a double tap after pinch zoom is turned off.
    *
+   * @remarks
    * MapLibre Native is the case that needs this. Other shells leave it false.
    */
   readonly doubleTap: boolean;
   /**
    * Where the native runner reads the status line.
    *
+   * @remarks
    * The iOS simulator posts here because its Metro log does not carry
    * `console.log`. Android keeps using logcat.
    */
@@ -69,6 +72,7 @@ interface SmokeFields {
 /**
  * Drives the TF04 camera smoke: fit, click, stop, then a rejected move.
  *
+ * @remarks
  * The page records what the renderer did. Web `stop` is a cancel. Native
  * `stop` is expected to reject. `held` is whether an unaccepted jump stayed
  * at the fitted camera. MapLibre can then wait for a double tap while pinch

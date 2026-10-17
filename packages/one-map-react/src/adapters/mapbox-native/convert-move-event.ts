@@ -39,6 +39,7 @@ export const moveEventFromRnmapbox = (
 /**
  * Builds a click from an RNMapbox press feature.
  *
+ * @remarks
  * The payload is a GeoJSON point. Screen position is `screenPointX` and
  * `screenPointY` on `properties`. The feature itself is not copied into
  * `features`.

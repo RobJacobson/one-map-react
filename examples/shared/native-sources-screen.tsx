@@ -13,6 +13,7 @@ interface NativeSourcesScreenProps {
 /**
  * Native example shell for the TF05 sources smoke.
  *
+ * @remarks
  * The status line is the result. iOS posts it to the runner's status port;
  * Android reads it from logcat.
  */

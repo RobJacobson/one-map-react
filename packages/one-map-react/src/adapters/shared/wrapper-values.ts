@@ -105,6 +105,7 @@ export const boundsFromFlat = (flat: readonly number[]): Bounds => {
 /**
  * Reads RNMapbox `getVisibleBounds()`.
  *
+ * @remarks
  * The pinned wrapper documents the pair as northeast, then southwest:
  * `[[rightLon, topLat], [leftLon, bottomLat]]`. This does not sort a
  * two-element array that lacks that documented order.
@@ -131,6 +132,7 @@ export const boundsFromRnmapboxVisible = (
 /**
  * Reads a web bounds object or a flat tuple.
  *
+ * @remarks
  * A two-element array is rejected. RNMapbox's northeast-then-southwest pair
  * uses {@link boundsFromRnmapboxVisible} instead of this function.
  *

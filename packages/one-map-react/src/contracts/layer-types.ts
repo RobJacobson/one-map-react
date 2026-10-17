@@ -1,6 +1,7 @@
 /**
  * Style-spec expression preserved structurally by the facade.
  *
+ * @remarks
  * The facade does not validate operator support; each renderer validates the
  * expressions it receives. A common expression is not a promise that every
  * backend implements every operator.
@@ -513,6 +514,7 @@ export interface FillExtrusionLayerProps extends SourcedLayerProps {
 /**
  * Props for the shared {@link Layer}, discriminated by `type`.
  *
+ * @remarks
  * Paint, layout, filter, zoom range, and `beforeId` may change between
  * renders. A removed paint or layout key resets to the style default. `id`,
  * `type`, `"source-layer"`, and an injected `source` or `sourceID` are

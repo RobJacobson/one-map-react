@@ -35,6 +35,7 @@ interface SmokeCounts {
 /**
  * Drives the native TF03 smoke: load, fly, remount, then a bad style.
  *
+ * @remarks
  * Remount is expected to create a new map. The failure step records the
  * `onError` payload when the wrapper delivers one. Mapbox Android's pinned
  * wrapper does not deliver that callback, so this sequence ends on a timeout

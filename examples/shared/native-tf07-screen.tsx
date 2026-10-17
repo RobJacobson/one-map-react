@@ -17,6 +17,7 @@ import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
 /**
  * Native TF07 touch fixture, selected by `ONE_MAP_SMOKE=tf07`.
  *
+ * @remarks
  * Operators perform the documented touch flow and use Read renderer to
  * inspect actual camera/features. A status label alone is not a pass.
  */

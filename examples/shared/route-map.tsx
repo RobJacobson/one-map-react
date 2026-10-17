@@ -38,6 +38,7 @@ interface RouteMapProps {
 /**
  * Shared Seattle route map used by the web and native example shells.
  *
+ * @remarks
  * Shells own remount, fly-to, tokens, host layout, and the smoke controls.
  * The default map does not opt into reuse.
  */

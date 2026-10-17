@@ -41,6 +41,7 @@ interface SmokeReport {
 /**
  * Web example shell with the TF03 reuse and external-context smoke.
  *
+ * @remarks
  * `?tf03=reuse&auto=1` remounts once after the style loads and records
  * whether the canvas node survived. `?tf03=gl&auto=1` constructs a map
  * with one drawing context, then remounts with another. The reused map

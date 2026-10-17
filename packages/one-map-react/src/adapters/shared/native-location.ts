@@ -14,6 +14,7 @@ interface NativeLocationManager {
 
 /**
  * Adapts the wrappers' singleton subscriptions without globally stopping sensors.
+ *
  * @param manager - Selected public manager, read lazily for peer isolation.
  * @param backend - Payload conversion owner.
  * @param requestIos - Public iOS permission request, absent on RNMapbox.

@@ -11,6 +11,7 @@ interface WebCameraAppProps {
 /**
  * Web example shell for the TF04 camera smoke.
  *
+ * @remarks
  * Open `/?tf04=camera`. The page fits the north end of the route, clicks
  * the canvas center, cancels a flight, then tries to jump away from a
  * controlled `viewState`.

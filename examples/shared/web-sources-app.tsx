@@ -14,6 +14,7 @@ const fixtureBase = "http://127.0.0.1:8798";
 /**
  * Web example shell for the TF05 sources smoke.
  *
+ * @remarks
  * Open `/?tf05=sources`. The page mounts every source family, removes a
  * paint key, updates GeoJSON data, replaces the style, then removes the
  * vector and image sources.

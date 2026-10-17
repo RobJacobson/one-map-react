@@ -1,5 +1,6 @@
 /**
  * Stops an owned detached process group, including children of an exited parent.
+ *
  * @param {import("node:child_process").ChildProcess} child - Owned group leader.
  * @returns {Promise<void>} Resolves after parent exit or bounded termination.
  */

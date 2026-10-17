@@ -12,6 +12,7 @@ export type LngLat = readonly [number, number];
 /**
  * A point in the map view, as `[x, y]`.
  *
+ * @remarks
  * Web values are CSS pixels. Native values are layout points. Adapters do
  * not apply a second pixel-density conversion.
  */
@@ -20,6 +21,7 @@ export type Point = readonly [number, number];
 /**
  * Southwest then northeast corners.
  *
+ * @remarks
  * The order is `[[west, south], [east, north]]`. A west value greater than
  * east is a span across the antimeridian, so converters do not sort the
  * numbers.
@@ -29,6 +31,7 @@ export type Bounds = readonly [LngLat, LngLat];
 /**
  * Camera padding in logical map-view units.
  *
+ * @remarks
  * Missing sides become `0` when a converter builds a wrapper padding value.
  */
 export interface Padding {
@@ -83,6 +86,7 @@ export interface CameraCommandOptions {
   /**
    * Animation duration in milliseconds.
    *
+   * @remarks
    * Omitted duration leaves the selected wrapper's duration for that command.
    * `jumpTo` rejects a duration other than `0`.
    */
@@ -90,6 +94,7 @@ export interface CameraCommandOptions {
   /**
    * Easing function.
    *
+   * @remarks
    * Web commands forward it. Native commands reject it. The command name
    * selects native movement instead.
    */
@@ -99,6 +104,7 @@ export interface CameraCommandOptions {
 /**
  * Arguments for {@link MapRef.flyTo}.
  *
+ * @remarks
  * `center` stays required. `duration` is optional so an omitted duration can
  * use the wrapper default while `flyTo({ center, duration })` still works.
  */
@@ -122,12 +128,14 @@ export interface FitBoundsOptions {
   /**
    * Easing function.
    *
+   * @remarks
    * Web forwards it. Native rejects it.
    */
   readonly easing?: CameraEasing;
   /**
    * Highest zoom the fit may use on web.
    *
+   * @remarks
    * Native adapters reject a supplied value because the pinned React
    * wrappers do not expose a fit-specific cap. Native cap coverage is pending.
    */
@@ -143,6 +151,7 @@ export interface ZoomToOptions {
   /**
    * Easing function.
    *
+   * @remarks
    * Web forwards it. Native rejects it.
    */
   readonly easing?: CameraEasing;
@@ -151,6 +160,7 @@ export interface ZoomToOptions {
 /**
  * Imperative handle returned by {@link Map}.
  *
+ * @remarks
  * Command promises adopt the wrapper call. Fulfillment means the wrapper
  * accepted the call. It does not mean the animation finished or a frame
  * was painted. A missing camera or map ref rejects before the wrapper call.
@@ -163,6 +173,7 @@ export interface MapRef
   extends FeatureQueryMethods, ClusterQueryMethods, FeatureStateMethods {
   /**
    * Reads loaded terrain elevation in rendered meters, including the terrain exaggeration.
+   *
    * @param coordinate - Longitude and latitude in degrees.
    * @returns Rendered elevation or null without terrain. MapLibre may return zero before its DEM tile loads.
    * @throws RangeError for invalid coordinates; Error for unsupported backends,
@@ -172,8 +183,12 @@ export interface MapRef
 
   /**
    * Captures an attached rendered map. Rejects on detachment or deadline.
+   *
    * @param options - Explicit scope, output, and optional deadline.
-   * @returns PNG output; requires captureEnabled on the Map.
+   * @returns PNG output after a rendered frame and snapshot completion.
+   * @throws When options are invalid, capture is disabled, the map detaches,
+   * the deadline expires, the requested scope/output is unsupported, or the
+   * renderer fails or returns invalid PNG output.
    */
   capture(
     options: import("./capture-types.js").CaptureOptions
@@ -186,7 +201,7 @@ export interface MapRef
    * easing function, is rejected.
    * @returns A promise that adopts the wrapper call.
    * @throws When the camera or map ref is missing, MapLibre Native has not
-   * reported style load, or `options` asks for animation.
+   * reported map load, or `options` asks for animation.
    */
   jumpTo: (options: CameraCommandOptions) => Promise<void>;
   /**
@@ -195,7 +210,7 @@ export interface MapRef
    * @param options - Partial camera target and optional duration.
    * @returns A promise that adopts the wrapper call.
    * @throws When the camera or map ref is missing, MapLibre Native has not
-   * reported style load, or a native caller passes `easing`.
+   * reported map load, or a native caller passes `easing`.
    */
   easeTo: (options: CameraCommandOptions) => Promise<void>;
   /**
@@ -204,10 +219,10 @@ export interface MapRef
    * @param options - Center, optional camera fields, and optional duration.
    * @returns A promise that adopts the wrapper call. RNMapbox resolves after
    * synchronous `setCamera` with `animationMode: "flyTo"`. MapLibre Native
-   * awaits `setStop` after style load. Web resolves after `flyTo` returns
-   * the map instance.
+   * awaits the wrapper `flyTo` call after map load. Web resolves after
+   * `flyTo` returns the map instance.
    * @throws When the camera or map ref is missing, MapLibre Native has not
-   * reported style load, or a native caller passes `easing`.
+   * reported map load, or a native caller passes `easing`.
    */
   flyTo: (options: FlyToOptions) => Promise<void>;
   /**
@@ -217,7 +232,7 @@ export interface MapRef
    * @param options - Padding, duration, bearing, pitch, easing, and max zoom.
    * @returns A promise that adopts the wrapper call.
    * @throws When the bounds are not two coordinate pairs, the camera or map
-   * ref is missing, MapLibre Native has not reported style load, or a native
+   * ref is missing, MapLibre Native has not reported map load, or a native
    * caller passes `easing`.
    */
   fitBounds: (bounds: Bounds, options?: FitBoundsOptions) => Promise<void>;
@@ -228,7 +243,7 @@ export interface MapRef
    * @param options - Duration and easing. Duration `0` is a jump.
    * @returns A promise that adopts the wrapper call.
    * @throws When the camera or map ref is missing, MapLibre Native has not
-   * reported style load, or a native caller passes `easing`.
+   * reported map load, or a native caller passes `easing`.
    */
   zoomTo: (zoom: number, options?: ZoomToOptions) => Promise<void>;
   /**

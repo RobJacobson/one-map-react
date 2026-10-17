@@ -251,6 +251,7 @@ export type WebMapRef = MapRef & {
   readonly fire: MaplibreMapInstance["fire"];
   /**
    * Selects an attached renderer's public gesture controls and independent state readback.
+   *
    * @param name - SDK gesture handler name.
    * @returns The renderer-owned public handler; use only while this map remains mounted.
    * @throws For an unknown handler name or a detached map.
@@ -260,27 +261,57 @@ export type WebMapRef = MapRef & {
   ) => WebGestureHandlers[Name];
   /**
    * Reads whether obsolete loading tiles are cancelled while zooming in.
+   *
    * @returns The attached SDK's current cancellation setting.
+   * @throws When the map is detached.
    */
   readonly getCancelPendingTileRequestsWhileZooming: () => boolean;
   /**
    * Updates whether obsolete loading tiles are cancelled while zooming in.
+   *
    * @param value - True cancels previous zoom levels' pending requests.
+   * @throws When the map is detached.
    */
   readonly setCancelPendingTileRequestsWhileZooming: (value: boolean) => void;
   /**
    * Reads the attached renderer's pinned SDK version.
-   * @returns SDK version string; throws when detached.
+   *
+   * @returns SDK version string.
+   * @throws When the map is detached.
    */
   readonly getVersion: () => string;
-  /** Reads the attached CanvasSource with its named media/model operations. */
+  /**
+   * Reads an attached CanvasSource.
+   *
+   * @param id - Source id in the attached style.
+   * @returns The renderer-owned source; use only while it remains attached.
+   * @throws When the map is detached, the source is absent, or its type is
+   * not canvas.
+   */
   readonly getCanvasSource: (id: string) => import("maplibre-gl").CanvasSource;
-  /** Reads the attached VideoSource with its named media/model operations. */
+  /**
+   * Reads an attached VideoSource.
+   *
+   * @param id - Source id in the attached style.
+   * @returns The renderer-owned source; use only while it remains attached.
+   * @throws When the map is detached, the source is absent, or its type is
+   * not video.
+   */
   readonly getVideoSource: (id: string) => import("maplibre-gl").VideoSource;
 
-  /** Updates selected renderer diagnostics; settings follow SDK lifetime. */
+  /**
+   * Updates selected renderer diagnostics; settings follow SDK lifetime.
+   *
+   * @param options - Diagnostic fields to assign; omitted fields are retained.
+   * @throws When the map is detached or the renderer rejects an assignment.
+   */
   readonly setDebugOptions: (options: Partial<WebDebugOptions>) => void;
-  /** Reads renderer diagnostics. */
+  /**
+   * Reads renderer diagnostics.
+   *
+   * @returns Current diagnostic settings on the attached renderer.
+   * @throws When the map is detached or a renderer property read fails.
+   */
   readonly getDebugOptions: () => WebDebugOptions;
 } & Pick<MaplibreMapRef, (typeof forwardedMethodNames)[number]>;
 
@@ -443,7 +474,9 @@ export const Layer = (props: ComponentProps<typeof MaplibreLayer>) => {
 export type WebSourceProps =
   | ComponentProps<typeof MaplibreSource>
   | (import("maplibre-gl").CanvasSourceSpecification & {
+      /** Stable source identity; changing it requires a new source key. */
       readonly id?: string;
+      /** Layers rendered against this source by the selected wrapper. */
       readonly children?: import("react").ReactNode;
     });
 

@@ -14,6 +14,7 @@ interface NativeCameraScreenProps {
 /**
  * Native example shell for the TF04 camera smoke.
  *
+ * @remarks
  * The status line is the result. A runner taps the map while `click` is
  * waiting, and double-taps when `doubletap` is waiting.
  */

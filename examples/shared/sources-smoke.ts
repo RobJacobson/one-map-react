@@ -19,6 +19,7 @@ interface SourcesSmokeOptions {
   /**
    * Where the native runner reads the status line.
    *
+   * @remarks
    * The iOS simulator posts here because its Metro log does not carry
    * `console.log`. Android keeps using logcat.
    */
@@ -60,6 +61,7 @@ const updatedRoutes: GeoJsonFeatureCollection = {
  * update GeoJSON data, replace the style, then remove the vector and image
  * sources.
  *
+ * @remarks
  * Each mutation is a React state swap the renderer must accept. A conversion
  * or renderer failure reports through `onError` or stalls the phase timer,
  * which the runner reads as a timeout. Image and child-layer rebuild after

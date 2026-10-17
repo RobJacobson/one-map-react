@@ -28,6 +28,7 @@ const cameraSmoke = new URLSearchParams(window.location.search).get("tf04");
 const sourcesSmoke = new URLSearchParams(window.location.search).get("tf05");
 const queriesSmoke = new URLSearchParams(window.location.search).get("tf06");
 
+/** Renders the selected smoke scenario or the default shared map example. */
 export const App = () => {
   if (new URLSearchParams(window.location.search).get("tf09") === "rendering")
     return (

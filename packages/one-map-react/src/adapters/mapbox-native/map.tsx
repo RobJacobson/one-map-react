@@ -166,7 +166,9 @@ const MapboxNativeMapImplementation = forwardRef<
   );
   // Android's scalar zoomEnabled setter also disables both double-tap variants.
   // A temporary lock needs no synthesized map. Removing it would send null to
-  // the pinned Android setter, which unconditionally reads a ReadableMap.
+  // the pinned RNMapbox Android setter, which unconditionally reads a ReadableMap.
+  // See ../../../test/mapbox-native.native.test.tsx temporary gesture-lock cases.
+  // Remove when RNMapbox clears gestureSettings safely and restores both tap flags.
   const portableGestureSettings =
     Platform.OS === "android" &&
     interactive === false &&
@@ -412,6 +414,7 @@ const moveFromState = (state: MapState): MoveEvent =>
 /**
  * Copies the error string RNMapbox passes at runtime.
  *
+ * @remarks
  * The public callback type takes no argument. iOS still delivers
  * `{ error, tileId?, sourceId? }`. Android registers that listener through
  * the pinned v11 compat `MapboxMap.subscribe`, whose body is empty, so a

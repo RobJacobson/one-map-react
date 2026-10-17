@@ -5,6 +5,7 @@ import type { ImagesProps } from "../../contracts/images-types.js";
 /**
  * Converts common image entries into MapLibre Native `Images` entries.
  *
+ * @remarks
  * MapLibre Native resolves object entries through React Native's
  * `Image.resolveAssetSource`, which only accepts a native asset ID or an
  * `{ uri }` object; a bare URL string resolves to `null` and throws during

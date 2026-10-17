@@ -2,8 +2,11 @@ import { Map as OneMap, MapSetup, type MapLayoutStyle } from "one-map-react";
 
 import type { useExampleMap } from "./use-example-map.js";
 
+/** Inputs for the shared map rendered by either application shell. */
 interface ExampleMapProps {
+  /** Engine selection, attachment camera, and callbacks owned by useExampleMap. */
   readonly model: ReturnType<typeof useExampleMap>;
+  /** Container dimensions supplied by the web or native application shell. */
   readonly style: MapLayoutStyle;
 }
 

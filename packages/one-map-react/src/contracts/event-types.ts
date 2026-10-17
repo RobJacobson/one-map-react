@@ -3,6 +3,7 @@ import type { LngLat, Point, ViewState } from "./camera-types.js";
 /**
  * Who initiated a camera movement, when the wrapper can say.
  *
+ * @remarks
  * `unknown` is used when the wrapper does not distinguish user movement from
  * programmatic movement. Adapters do not invent `programmatic`.
  */
@@ -11,6 +12,7 @@ export type MoveOrigin = "user" | "programmatic" | "unknown";
 /**
  * Normalized camera-movement notification.
  *
+ * @remarks
  * `onMove` is a changing camera. `onMoveStart` is the start, when the wrapper
  * has one. `onMoveEnd` is the settled camera. None of these is map idleness.
  */
@@ -24,6 +26,7 @@ export interface MoveEvent {
 /**
  * A press or pointer hit on the map.
  *
+ * @remarks
  * Mouse, wheel, touch, double-click, and context-menu callbacks on web use
  * this same shape. `features` is omitted when the wrapper did not include any.
  */
@@ -39,6 +42,7 @@ export interface ClickEvent {
 /**
  * Failure reported by the map wrapper.
  *
+ * @remarks
  * Web adapters copy the wrapper's `error` value. Mapbox native copies the
  * error string when iOS `onMapLoadingError` includes one. Android's pinned
  * `@rnmapbox/maps` 10.3.7 does not deliver that callback. MapLibre native

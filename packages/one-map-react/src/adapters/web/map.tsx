@@ -428,6 +428,7 @@ const bindPointer = (
 /**
  * Rejects a long-press callback on web.
  *
+ * @remarks
  * react-map-gl has no long-press event. A browser recognizer would be new
  * gesture behavior, so the prop fails instead of being ignored.
  *

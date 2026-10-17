@@ -15,6 +15,8 @@ export const useMapboxScalePosition = (
   // RNMapbox iOS stores position updates without marking its scale dirty.
   // Native layout can reset the scale. Separate its hide/restore commits by a
   // frame so Fabric cannot merge away the enabled setter's dirty notification.
+  // See ../../../test/mapbox-native.native.test.tsx scale position/layout cases.
+  // Remove when RNMapbox iOS dirties the scale after position and layout changes.
   const refreshScalePosition =
     Platform.OS === "ios" &&
     appliedScalePosition !== scalePositionKey &&

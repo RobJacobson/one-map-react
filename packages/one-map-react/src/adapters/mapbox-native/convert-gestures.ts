@@ -3,6 +3,7 @@ import type { GestureSelection } from "../../contracts/map-types.js";
 /**
  * Maps portable gestures onto RNMapbox map props.
  *
+ * @remarks
  * `interactive: false` forces every flag off. `dragPan` becomes
  * `scrollEnabled`. Double-tap sets both the zoom-in and two-finger zoom-out
  * entries so the requested double-tap intent is explicit.

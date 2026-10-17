@@ -26,6 +26,7 @@ interface Attachment {
 
 /**
  * Bounds map loading and camera handoff outside the keyed map tree, rejecting stale callbacks.
+ *
  * @param adapters - Platform-specific adapters imported through public package entries.
  * @param mapboxEnabled - Whether a public Mapbox token is configured.
  * @returns Shared map callbacks and engine controls for either application shell.

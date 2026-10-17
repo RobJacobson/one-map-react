@@ -56,6 +56,7 @@ export const MapboxNativeSource = (props: SourceProps) => {
 /**
  * GeoJSON source that registers its `ShapeSource` ref for cluster queries.
  *
+ * @remarks
  * The registry only exists inside a mapbox-native Map; a source rendered
  * elsewhere still renders but does not register.
  *
@@ -248,6 +249,7 @@ const toRnmapboxRasterDemSource = (
 /**
  * Converts common image source props into RNMapbox `ImageSource` props.
  *
+ * @remarks
  * The readonly corner pairs are copied into the mutable tuple the wrapper
  * declares.
  *

@@ -1,5 +1,6 @@
 /**
  * Selects native engines so scoped retries can release build outputs between runs.
+ *
  * @param {string} scope - TF06 query or lifetime scope.
  * @param {string} selection - Both engines or one lifetime engine.
  * @returns {string[]} The native engines to execute sequentially.
@@ -14,6 +15,7 @@ export const selectNativeEngines = (scope, selection = "both") => {
 
 /**
  * Restricts lifetime builds/installations to the assigned Android device and ABI.
+ *
  * @param {string} scope - Selected TF06 scope.
  * @param {string | undefined} serial - Explicitly assigned Android device.
  * @returns {string[]} React Native build/run arguments.
@@ -28,6 +30,7 @@ export const androidSmokeArgs = (scope, serial) => {
 
 /**
  * Checks a reused native binary against the coordinator's accepted baseline.
+ *
  * @param {string} scope - Only the added lifetime scope supports binary reuse.
  * @param {string} expected - Accepted executable SHA-256.
  * @param {string} actual - Installed executable SHA-256.

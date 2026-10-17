@@ -1,5 +1,7 @@
 /**
  * Runs native location acquisition against an OS mock fused provider on Android.
+ *
+ * @remarks
  * The pinned default MapLibre engine subscribes to fused; emulator GNSS console
  * input does not enter that idle provider. Restore both shell permission and the
  * original system provider even when acquisition fails.

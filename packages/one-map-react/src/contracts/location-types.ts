@@ -16,12 +16,14 @@ export interface LocationAbortSignal {
   readonly aborted: boolean;
   /**
    * Registers cancellation without starting acquisition.
+   *
    * @param type - Cancellation event name.
    * @param listener - Callback released by the acquisition owner.
    */
   addEventListener(type: "abort", listener: () => void): void;
   /**
    * Removes an owned cancellation listener.
+   *
    * @param type - Cancellation event name.
    * @param listener - Previously registered callback.
    */
@@ -42,21 +44,38 @@ export interface LocationOptions {
 export interface LocationService {
   /**
    * Requests foreground permission. Unsupported permission APIs reject.
+   *
    * @returns Observed authorization, including unknown precision.
+   * @throws When permission acquisition is unavailable or the provider fails.
+   * RNMapbox iOS requires an application locationProvider for this operation.
    */
   requestPermission(): Promise<LocationPermission>;
   /**
    * Acquires a position or rejects on failure, interruption, or timeout.
+   *
    * @param options - Freshness and deadline.
    * @returns A measured position with normalized units.
+   * @throws When timing options are invalid, acquisition is unavailable,
+   * permission or provider acquisition fails, a position is malformed, the
+   * initial deadline expires, acquisition is interrupted or cancelled, or
+   * the owning MapSetup detaches before resolution.
    */
   getCurrentPosition(options?: LocationOptions): Promise<GeolocationPosition>;
   /**
    * Starts explicit foreground updates; no update follows disposal.
+   *
+   * @remarks
+   * Acquisition, malformed-position, initial-timeout, and cancellation failures
+   * reach onError and end the built-in watch. Backgrounding releases the native
+   * subscription; foreground reattachment resumes acquisition. Disposing the
+   * owning MapSetup releases its watches without reporting a new position.
+   *
    * @param onPosition - Measured fixes, including the initial fix.
    * @param onError - Observable failures; initial deadline failure ends the watch.
    * @param options - Freshness and initial deadline.
    * @returns Idempotent disposal, safe during asynchronous setup.
+   * @throws When timing options are invalid or an application locationProvider
+   * throws during setup. Built-in subscription failures use onError.
    */
   watchPosition(
     onPosition: (position: GeolocationPosition) => void,

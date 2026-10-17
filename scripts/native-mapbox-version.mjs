@@ -3,6 +3,7 @@ export const nativeMapboxSdkVersion = "11.23.1";
 
 /**
  * Pins native SDK resolution through the wrapper's public Podfile/Gradle settings.
+ *
  * @param {string} podfile - Generated iOS Podfile.
  * @param {string} buildGradle - Generated root Android build.gradle.
  * @returns {{podfile: string, buildGradle: string}} Configurations with exact SDK pins.

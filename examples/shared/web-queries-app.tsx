@@ -34,6 +34,7 @@ export const useWebQueriesProbe = (map: object | undefined): void => {
 /**
  * Web example shell for the TF06 queries smoke.
  *
+ * @remarks
  * Open `/?tf06=queries`. The page runs rendered point, bounds, and
  * viewport queries, an empty off-screen query, a source query, cluster
  * expansion, leaves, and children, then feature-state set/get/remove and

@@ -12,6 +12,7 @@ import { isScreenBounds, toRnmapboxRect } from "../shared/feature-values.js";
 /**
  * Selects the RNMapbox rendered-query call for a target.
  *
+ * @remarks
  * RNMapbox splits rendered queries by geometry: a point queries
  * `queryRenderedFeaturesAtPoint`, a rect queries
  * `queryRenderedFeaturesInRect` with `[top, left, bottom, right]`, and the
@@ -87,6 +88,7 @@ export const toRnmapboxFeatureArgs = (
 /**
  * Reads the state key argument for RNMapbox `removeFeatureState`.
  *
+ * @remarks
  * The wrapper takes `null` to remove the whole state.
  *
  * @param key - State key to remove, when the caller passed one.
@@ -97,6 +99,7 @@ export const toRnmapboxStateKey = (key: string | undefined): string | null =>
 
 /**
  * Wraps a numeric cluster id in the Point feature RNMapbox expects.
+ *
  * @param clusterId - Renderer cluster id.
  * @returns A cluster feature for the three ShapeSource cluster methods.
  */

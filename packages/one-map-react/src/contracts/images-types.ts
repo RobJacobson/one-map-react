@@ -14,6 +14,7 @@ export interface UrlImage {
 /**
  * One registered image: a URL string or a {@link UrlImage} with options.
  *
+ * @remarks
  * Bundled native asset handles are host-specific and remain named native
  * extension work; URL entries are the portable core.
  */
@@ -25,8 +26,10 @@ export type ImageEntry = string | UrlImage;
 export interface ImagesProps {
   /**
    * Images registered on the enclosing map's style, keyed by the name symbol
-   * layers reference in `icon-image` and pattern properties. Entries may
-   * change between renders; removed entries are unregistered. Web cleanup
+   * layers reference in `icon-image` and pattern properties.
+   *
+   * @remarks
+   * Entries may change between renders; removed entries are unregistered. Web cleanup
    * attempts removal during style loading and on logical unmount, including
    * when the wrapper retains a reusable renderer. An absent or destroyed
    * style is guarded; late image loads cannot register after release.

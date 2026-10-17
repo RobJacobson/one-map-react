@@ -20,6 +20,7 @@ interface QueriesSmokeOptions {
   /**
    * Where the native runner reads the status line.
    *
+   * @remarks
    * The iOS simulator posts here because its Metro log does not carry
    * `console.log`. Android keeps using logcat.
    */
@@ -74,6 +75,7 @@ interface SmokeFields {
  * set/get/remove through a `feature-state` paint expression, followed by
  * source recreation and style replacement clearing feature state.
  *
+ * @remarks
  * Known-feature assertions stay independent of pixel rendering: each query
  * checks the ids the fixture pins, which survive SDK tile encoding.
  * Android GeoJSON bridges stringify numeric ids, so smoke comparisons use

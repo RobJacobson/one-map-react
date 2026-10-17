@@ -143,6 +143,7 @@ interface WebMapMockProps extends HandlerProps {
 /**
  * Builds a react-map-gl Map mock with a one-slot reuse pool.
  *
+ * @remarks
  * A remount with `reuseMaps` keeps the previous map id, the drawing-context
  * width captured at construction, and the style target. A later `gl` prop is
  * forwarded and does not replace that width. `isStyleLoaded()` stays with the

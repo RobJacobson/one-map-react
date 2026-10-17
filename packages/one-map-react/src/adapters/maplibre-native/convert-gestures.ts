@@ -3,6 +3,7 @@ import type { GestureSelection } from "../../contracts/map-types.js";
 /**
  * Maps portable gestures onto MapLibre Native map props.
  *
+ * @remarks
  * `doubleTapZoom` and `doubleTapHoldZoom` are passed together, including
  * beside `touchZoom: false`. iOS enables that recognizer on its own. Android
  * SDK 13.6.1 still requires zoom gestures, so a double tap does not zoom

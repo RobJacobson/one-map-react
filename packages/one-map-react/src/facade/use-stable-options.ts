@@ -3,6 +3,7 @@ import { useRef } from "react";
 /**
  * Throws when a creation option of an owned resource changes between renders.
  *
+ * @remarks
  * Sources and layers own renderer resources whose creation inputs cannot be
  * updated in place on every adapter. The first render's values win for the
  * component's lifetime; a later change fails instead of silently applying on
