@@ -152,3 +152,33 @@ test("custom forwarding proxies retain common queries", async () => {
     layers: ["route-line"],
   });
 });
+
+test.each(["source", "layers"] as const)(
+  "detached %s hit queries report one failure without delivering clicks",
+  async (query) => {
+    const onError = vi.fn();
+    const onClick = vi.fn();
+    const sourceClick = vi.fn();
+    const mounted = renderHook(() =>
+      useMapInteractions(
+        {
+          ...props,
+          onError,
+          onClick,
+          interactiveLayerIds: query === "layers" ? ["route-line"] : undefined,
+        },
+        "mapbox-web",
+        { current: null }
+      )
+    );
+    if (query === "source")
+      mounted.result.current.registerSource("routes", sourceClick, {});
+
+    await act(async () => mounted.result.current.click(event));
+    expect(onError).toHaveBeenCalledExactlyOnceWith({
+      error: new Error("Map is not attached."),
+    });
+    expect(onClick).not.toHaveBeenCalled();
+    expect(sourceClick).not.toHaveBeenCalled();
+  }
+);

@@ -1,0 +1,69 @@
+{
+  "scope": "Three optional React Compiler snapshot cleanups; deferred diagnostics unchanged.",
+  "baseCommit": "3ad159c890324249d082e99f7cd348846a994827",
+  "files": {
+    "packages/one-map-react/src/adapters/shared/use-frozen-value.ts": "a9080ca2fbe798d7b20371368fb248cdd4e3996a6644feecc93b43b58147b49d",
+    "packages/one-map-react/src/facade/source.tsx": "db73047b10937bc0560b64d6d1e98a5ba008d9edd4381ae91c76d686b573fddc",
+    "packages/one-map-react/src/facade/use-stable-options.ts": "cc6550c2ca81ee4c77b88a51a1180c8949e26b92963284565c96564a436dffa8",
+    "scripts/react-compiler.test.mjs": "20811cbf1b17480883696edfc1bc2e92ead774e74679850d19f201bc0d48655c",
+    "packages/one-map-react/test/use-frozen-value.web.test.tsx": "8f521fecb7d90a3f4face987ef9a7b8d4ed264e8551f00c7e604d951b8a356ac"
+  },
+  "changes": [
+    "Capture the first useFrozenValue input with lazy state, including function-valued and undefined inputs.",
+    "Retain Source attachment identity with lazy state for the component lifetime.",
+    "Capture useStableOptions creation inputs with lazy state; retain existing comparison and error behavior."
+  ],
+  "verification": {
+    "compilerRegression": "Source, useStableOptions, and useFrozenValue skipped before and compile after; explicit assertions cover their transforms and emitted runtime.",
+    "diagnostics": {
+      "before": 14,
+      "after": 11,
+      "remainingGroups": [
+        "adapters/mapbox-native/map.tsx:70: Cannot access refs during render",
+        "adapters/maplibre-native/map.tsx:74: Cannot access refs during render",
+        "adapters/shared/native-ui.tsx:395: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+        "adapters/shared/native-ui.tsx:550: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+        "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerExpression) Handle ||= operators in AssignmentExpression",
+        "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause",
+        "adapters/shared/use-native-marker-drag.ts:15: Support value blocks (conditional, logical, optional chaining, etc) within a try/catch statement",
+        "adapters/web/images.tsx:38: (BuildHIR::lowerExpression) Handle UpdateExpression to variables captured within lambdas.",
+        "facade/map.tsx:135: Cannot access refs during render",
+        "facade/use-geolocation-control.ts:26: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause",
+        "facade/use-map-interactions.ts:14: (BuildHIR::lowerStatement) Support ThrowStatement inside of try/catch"
+      ],
+      "comparison": "All remaining groups match the base revision, including both native UI functions."
+    },
+    "passed": [
+      "bun run check",
+      "bun run check:docs",
+      "bun run typecheck",
+      "bun run typecheck:apps",
+      "git diff --check"
+    ],
+    "sourceTests": {
+      "command": "node_modules/.bin/vp test run",
+      "files": 37,
+      "tests": 815
+    },
+    "nativeMockTests": {
+      "command": "node_modules/.bin/jest --runInBand",
+      "suites": 6,
+      "tests": 268
+    },
+    "compiledTests": {
+      "command": "bun run test:compiled",
+      "build": "passed",
+      "webFiles": 22,
+      "webTests": 566,
+      "nativeSuites": 6,
+      "nativeTests": 268,
+      "compilerAssertions": "passed"
+    },
+    "behaviors": "Function-valued inputs are never invoked, first values survive rerenders and reset on remount, initially undefined values stay frozen, equivalent creation options retain the original snapshot, changed creation options throw, and pending source callbacks follow the same attachment while replacements retire old queries."
+  },
+  "limitations": [
+    "Renderer acceptance, native builds, and device installations were not run, as requested. Mocked checks do not renew renderer acceptance.",
+    "Existing TypeScript experimental build-API and Bun moduleSuffixes warnings remain."
+  ],
+  "git": "Task changes left uncommitted."
+}

@@ -64,18 +64,12 @@ export const useNativeControlledCamera = (
     // retry only for a new React target or another user proposal, not its feedback.
     if (!proposedByUser && correctedTarget.current === targetKey) return;
     correctedTarget.current = targetKey;
-    dispatchingCorrection.current = true;
-    try {
-      void jumpTo({
-        center: [viewState.longitude, viewState.latitude],
-        zoom: viewState.zoom,
-        bearing: viewState.bearing,
-        pitch: viewState.pitch,
-        duration: 0,
-      }).catch(reportError);
-    } finally {
-      dispatchingCorrection.current = false;
-    }
+    dispatchCameraCorrection(
+      dispatchingCorrection,
+      jumpTo,
+      viewState,
+      reportError
+    );
   });
   const schedule = useCallback(() => {
     if (frame.current !== undefined) return;
@@ -87,7 +81,9 @@ export const useNativeControlledCamera = (
   // The app's onMove can unmount the map before the adapter reaches this observer.
   const onMove = useActiveCallback((event: MoveEvent) => {
     observed.current = event;
-    userProposal.current ||= event.origin === "user";
+    if (!userProposal.current) {
+      userProposal.current = event.origin === "user";
+    }
     schedule();
   });
 
@@ -106,4 +102,25 @@ export const useNativeControlledCamera = (
   }, []);
 
   return { onMove, onLoad: schedule, onCommand };
+};
+
+/** Keeps command notification scoped to synchronous dispatch, including thrown failures. */
+const dispatchCameraCorrection = (
+  dispatchingCorrection: { current: boolean },
+  jumpTo: MapRef["jumpTo"],
+  viewState: ViewState,
+  reportError: (error: unknown) => void
+): void => {
+  dispatchingCorrection.current = true;
+  try {
+    void jumpTo({
+      center: [viewState.longitude, viewState.latitude],
+      zoom: viewState.zoom,
+      bearing: viewState.bearing,
+      pitch: viewState.pitch,
+      duration: 0,
+    }).catch(reportError);
+  } finally {
+    dispatchingCorrection.current = false;
+  }
 };

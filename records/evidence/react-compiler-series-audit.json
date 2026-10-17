@@ -1,0 +1,113 @@
+{
+  "scope": "Full React Compiler cleanup series, including its final native-map deferral record.",
+  "conclusion": "No behavior regressions found in the reviewed source and routine mocked verification scope.",
+  "observedAt": "2026-10-17",
+  "provenance": {
+    "baseRevision": "b0670d45a504b263f4b6a4e86437ee0d3743ebc4",
+    "reviewedRevision": "0ed0211afbf82c931f15bccc1df0c7bc7f00726a",
+    "reviewedTree": "9471d4f5efac31e6866101561c89bf2a366f5f8a",
+    "originalSeries": [
+      {
+        "revision": "3ad159c890324249d082e99f7cd348846a994827",
+        "subject": "fix: resolve three React Compiler optimization diagnostics"
+      },
+      {
+        "revision": "38cdd8accfa6a43f144ad397fd2d429fe99f52ea",
+        "subject": "refactor: make immutable snapshots compatible with React Compiler"
+      },
+      {
+        "revision": "3249ecd361743ca3c50051b3c407f8460b138543",
+        "subject": "refactor: resolve five React Compiler syntax diagnostics"
+      },
+      {
+        "revision": "e61b869a34063d24d0069339ce915e31f92934f7",
+        "subject": "refactor: resolve optional React Compiler camera diagnostic"
+      },
+      {
+        "revision": "5cc785cd1776e60247151a853675cd7b684a9174",
+        "subject": "refactor: resolve three React Compiler lifecycle diagnostics"
+      },
+      {
+        "revision": "0ed0211afbf82c931f15bccc1df0c7bc7f00726a",
+        "subject": "docs: record native-map React Compiler deferral"
+      }
+    ],
+    "sourceHashes": {
+      "packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx": "7d2b7316b977c0e6dd9672f25a711ea85c1a8c8f8ee4b23b4fc8b28cc5478f70",
+      "packages/one-map-react/src/adapters/shared/native-ornament-position.ts": "e60af44c712be2119e9c13aa7358addbc98a5847736e00db05754370ed3ff7f1",
+      "packages/one-map-react/src/adapters/shared/native-ui.tsx": "910395a7ab32db8ba8496113abe063488ef910cbf9adf8d570f72ce06165bf2e",
+      "packages/one-map-react/src/adapters/shared/use-frozen-value.ts": "a9080ca2fbe798d7b20371368fb248cdd4e3996a6644feecc93b43b58147b49d",
+      "packages/one-map-react/src/adapters/shared/use-native-controlled-camera.ts": "88818f97f0077cb5129e9c3c7298a1f4a19389cdd17da2a3ea68a90a226e8c0f",
+      "packages/one-map-react/src/adapters/shared/use-native-marker-drag.ts": "18727cb38a2e56c368df26fd175711baf844725daf9e93f5dff553ae9470f502",
+      "packages/one-map-react/src/adapters/web/images.tsx": "289015b065150798b455da5f5d2216efa1efd1fef8690aa52684debf71a5f4a1",
+      "packages/one-map-react/src/adapters/web/map.tsx": "656d00228f36965e73dc34c91b672059fa663d608c429ae2f12c30427d5dc378",
+      "packages/one-map-react/src/facade/map.tsx": "672ff7951ed2f215be3a9d5ad0d8a9205c0ca89aabcdbf478877175ab0f849c0",
+      "packages/one-map-react/src/facade/source.tsx": "db73047b10937bc0560b64d6d1e98a5ba008d9edd4381ae91c76d686b573fddc",
+      "packages/one-map-react/src/facade/use-geolocation-control.ts": "2ba2cfb89d54755f143d479f2e2209daf7ab80d3eb9bcbac9bd7b1db73f43a46",
+      "packages/one-map-react/src/facade/use-map-interactions.ts": "37ba118ba333af8fa706877543b9dab7bdcb06321f6ec11d6337b1494c994cd8",
+      "packages/one-map-react/src/facade/use-stable-options.ts": "cc6550c2ca81ee4c77b88a51a1180c8949e26b92963284565c96564a436dffa8"
+    },
+    "squash": "The original series is consolidated into the commit containing this record. Earlier evidence remains historical; its intermediate revision IDs refer to pre-squash history. Final source hashes identify the implementation preserved in the consolidated commit."
+  },
+  "inspectedBehavior": [
+    "Frozen first values, including functions and undefined; creation-option validation; source attachment identity across rerenders and replacement.",
+    "Web padding omission, zero reset, repeated removal, remount and suspended rendering; native ornament management history and selected SDK overrides.",
+    "Deferred proxy identity, promise assimilation, command forwarding, detachment and replacement attachments.",
+    "Native camera synchronous dispatch ownership, reentrant command notification, pending acknowledgements, feedback-loop guards and teardown.",
+    "Geolocation watch acquisition/release, synchronous callbacks, overlapping camera requests, committed inputs, generation changes, cancellation, retry and stale completion.",
+    "Image revision and registration ownership, sprite receiver binding, sdf omission/false, replacement, reentrant callbacks and cleanup.",
+    "Marker projection and drag result ordering; navigation errors and replacement; scale readback and teardown; source/map click query ordering and failure propagation."
+  ],
+  "verification": {
+    "auditCodeChanges": "None. The audit compared the combined series with its base and inspected connected callers and tests.",
+    "passed": [
+      "bun run check",
+      "bun run check:docs",
+      "bun run typecheck",
+      "bun run typecheck:apps",
+      "git diff --check"
+    ],
+    "sourceTests": {
+      "command": "node_modules/.bin/vp test run",
+      "files": 37,
+      "tests": 823
+    },
+    "nativeMockTests": {
+      "command": "node_modules/.bin/jest --runInBand",
+      "suites": 6,
+      "tests": 272
+    },
+    "compiledTests": {
+      "command": "bun run test:compiled",
+      "build": "passed",
+      "webFiles": 22,
+      "webTests": 574,
+      "nativeSuites": 6,
+      "nativeTests": 272,
+      "compilerAssertions": "passed"
+    },
+    "additionalProbe": {
+      "method": "Extracted the actual baseline and current padding/ornament hooks in memory and ran them with React and jsdom. No repository test files were added.",
+      "result": "Abandoned transitions did not latch ornament management or consume padding resets. Committed updates and remount outcomes agreed between the baseline and current hooks."
+    },
+    "diagnosticDisposition": {
+      "before": 17,
+      "after": 2,
+      "remaining": "Both native-map ref-capture groups remain intentionally deferred.",
+      "decisionRecord": "records/evidence/react-compiler-native-deferral.json"
+    },
+    "warnings": "Existing TypeScript experimental build-API and Bun moduleSuffixes warnings remain. The isolated hook probe used the experimental Node stripTypeScriptTypes API."
+  },
+  "incrementalEvidence": [
+    "records/evidence/react-compiler-diagnostics-fixes.json",
+    "records/evidence/react-compiler-snapshot-cleanups.json",
+    "records/evidence/react-compiler-syntax-cleanups.json",
+    "records/evidence/react-compiler-camera-assignment-cleanup.json",
+    "records/evidence/react-compiler-lifecycle-cleanups.json"
+  ],
+  "limitations": [
+    "No renderer acceptance, real-renderer smoke tests, native builds or installations ran during the audit. Runtime acceptance is not renewed.",
+    "No performance benchmark ran; fewer diagnostics do not establish a measured performance gain.",
+    "The review and mocked tests found no regression in the inspected paths; they do not prove all runtime behavior equivalent."
+  ]
+}

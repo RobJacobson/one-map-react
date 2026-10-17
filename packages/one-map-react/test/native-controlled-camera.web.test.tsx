@@ -87,6 +87,39 @@ test("clamped command feedback cannot create a correction loop; each new gesture
   mounted.unmount();
 });
 
+test("a latched user proposal skips later origins until the scheduled frame consumes it", async () => {
+  const jumpTo = vi.fn(async () => undefined);
+  const mounted = renderHook(() =>
+    useNativeControlledCamera(target, jumpTo, () => true, vi.fn())
+  );
+  const origin = vi.fn(() => "unknown");
+  const feedback = Object.defineProperty(
+    event({ ...target, zoom: 3 }, false),
+    "origin",
+    {
+      get: origin,
+    }
+  );
+
+  act(() => {
+    mounted.result.current.onMove(event({ ...target, zoom: 2 }));
+    mounted.result.current.onMove(feedback);
+    mounted.result.current.onMove(feedback);
+  });
+  expect(origin).not.toHaveBeenCalled();
+  expect(frames.size).toBe(1);
+  await flush();
+  expect(jumpTo).toHaveBeenCalledTimes(1);
+
+  act(() => mounted.result.current.onMove(feedback));
+  expect(origin).toHaveBeenCalledTimes(1);
+  await flush();
+  expect(jumpTo).toHaveBeenCalledTimes(1);
+  act(() => mounted.result.current.onMove(event({ ...target, zoom: 4 })));
+  await flush();
+  expect(jumpTo).toHaveBeenCalledTimes(2);
+});
+
 test("wrapped coordinates and native precision are equivalent; late callbacks and errors are attachment-scoped", async () => {
   const failure = new Error("native camera failure");
   const jumpTo = vi.fn(async () => {
@@ -171,6 +204,35 @@ test("load readiness defers correction and a pending operational failure cannot 
     reject(new Error("late camera failure"));
   });
   expect(onError).not.toHaveBeenCalled();
+});
+
+test("a synchronous correction failure releases dispatch ownership for the next public command", async () => {
+  const failure = new Error("Synchronous camera failure");
+  let notifyCommand = () => {};
+  const jumpTo = vi
+    .fn(async () => undefined)
+    .mockImplementationOnce(() => {
+      notifyCommand();
+      throw failure;
+    });
+  const onError = vi.fn();
+  const mounted = renderHook(() =>
+    useNativeControlledCamera(target, jumpTo, () => true, onError)
+  );
+  notifyCommand = mounted.result.current.onCommand;
+  act(() =>
+    mounted.result.current.onMove(event({ ...target, zoom: 2 }, false))
+  );
+  await expect(flush()).rejects.toBe(failure);
+  expect(onError).not.toHaveBeenCalled();
+
+  act(() => {
+    mounted.result.current.onCommand();
+    mounted.result.current.onMove(event({ ...target, zoom: 2 }, false));
+  });
+  await flush();
+  expect(jumpTo).toHaveBeenCalledTimes(2);
+  mounted.unmount();
 });
 
 test("fresh public commands restore other axes after SDK clamping, including while a correction acknowledgment is pending", async () => {

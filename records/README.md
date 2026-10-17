@@ -1,5 +1,9 @@
 # API research and evidence
 
+The [React Compiler series audit](evidence/react-compiler-series-audit.json) records the combined behavior review, routine verification results, limitations, and original commit provenance for the consolidated cleanup.
+
+The [native-map compiler deferral record](evidence/react-compiler-native-deferral.json) explains the retained ref-capture diagnostics, inspected alternatives, and conditions for reopening the decision.
+
 [support-matrix.json](support-matrix.json) and [evidence/tf10-release.json](evidence/tf10-release.json) own current candidate versions, patch paths, routine checks and open release gates. The [grouped Markdown checklist](../docs/api-coverage.md) owns current coverage contracts, exceptions and open work, separately from runtime verification. [TF10 native style sources](evidence/tf10-native-style-sources.json) preserves compact exact-tag source identities for native unsupported boundaries.
 
 The [facade simplification evidence](evidence/facade-simplification.json) records the compiler configuration, unchanged public contracts, routine outcomes, frozen archive, and proposed acceptance scope. Renderer acceptance for that archive remains unrun and requires separate permission.

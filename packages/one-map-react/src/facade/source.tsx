@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import type { SourceProps } from "../contracts/source-types.js";
 import { useOptionalMapSession } from "./map-context.js";
@@ -17,8 +17,7 @@ export const Source = (props: SourceProps) => {
   const { Source: AdapterSource } = useSelectedAdapter();
 
   const session = useOptionalMapSession();
-  // eslint-disable-next-line react/refs -- This never-mutated object is a source attachment identity, not reactive render data.
-  const attachment = useRef({}).current;
+  const [attachment] = useState(() => ({}));
   const callback =
     props.type === "geojson" || props.type === "vector"
       ? props.onClick

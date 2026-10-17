@@ -685,7 +685,14 @@ describe("mapbox-native adapter", () => {
         </NativeMap>
       </MapSetup>
     );
-    const view = await render(scene(true));
+    const view = await render(scene(false));
+    expect(
+      lastMapProps<{ logoPosition?: object }>().logoPosition
+    ).toBeUndefined();
+    expect(
+      lastMapProps<{ attributionPosition?: object }>().attributionPosition
+    ).toBeUndefined();
+    await view.rerender(scene(true));
     await fireEvent(view.getByTestId("left-control"), "layout", {
       nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 26 } },
     });
@@ -714,6 +721,12 @@ describe("mapbox-native adapter", () => {
     expect(configured.attributionPosition).toEqual(
       explicit.attributionPosition
     );
+    await view.rerender(scene(false));
+    expect(lastMapProps<{ logoPosition: object }>().logoPosition).toEqual({
+      bottom: 8,
+      left: 8,
+    });
+    await view.unmount();
   });
 
   test("scale initializes at load and changes units without camera movement", async () => {
