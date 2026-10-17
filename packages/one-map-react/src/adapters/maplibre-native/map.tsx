@@ -74,12 +74,7 @@ const MaplibreNativeMapImplementation = forwardRef<
 >((props, ref) => {
   assertMaplibreStyleRoots(props.mapStyle);
   const session = useNativeMapPresentation();
-  if (props.terrain != null)
-    throw new Error("Terrain is unsupported on MapLibre Native.");
-  if (props.projection === "globe")
-    throw new Error("Globe projection is unsupported on MapLibre Native.");
-  if (props.viewState && props.locationOptions?.trackUserLocation)
-    throw new Error("Selected location follow conflicts with viewState.");
+  validateMaplibreMapOptions(props);
   const capture = useMapCapture(props.captureEnabled);
   const ornaments = useNativeOrnamentPositions();
   const {
@@ -364,6 +359,18 @@ const MaplibreNativeMapImplementation = forwardRef<
     </PortalProvider>
   );
 });
+
+/** Rejects portable requests the selected MapLibre native map cannot honor. */
+const validateMaplibreMapOptions = (
+  props: MapProps & { readonly locationOptions?: NativeLocationOptions }
+): void => {
+  if (props.terrain != null)
+    throw new Error("Terrain is unsupported on MapLibre Native.");
+  if (props.projection === "globe")
+    throw new Error("Globe projection is unsupported on MapLibre Native.");
+  if (props.viewState && props.locationOptions?.trackUserLocation)
+    throw new Error("Selected location follow conflicts with viewState.");
+};
 
 const pressEvent = (nativeEvent: {
   readonly lngLat: readonly [number, number];

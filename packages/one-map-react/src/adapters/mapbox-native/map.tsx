@@ -3,7 +3,6 @@ import {
   type ComponentProps,
   type ComponentRef,
   forwardRef,
-  useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
@@ -54,6 +53,7 @@ import { useMapboxGestureSettings } from "./gesture-settings.js";
 import { assertLabelLocalization } from "./label-localization.js";
 import { createMapboxMapRef, resetMapboxFeatureState } from "./map-ref.js";
 import { mergeGestureSettings, toRnmapboxStyleProps } from "./style-props.js";
+import { useMapboxScalePosition } from "./use-mapbox-scale-position.js";
 
 type RnPressFeature = Parameters<
   NonNullable<ComponentProps<typeof MapView>["onPress"]>
@@ -77,31 +77,12 @@ const MapboxNativeMapImplementation = forwardRef<
   const scaleBarPosition =
     props.options?.scaleBarPosition ??
     (ornaments.managed ? ornaments.position("top-left") : undefined);
-  const scalePositionKey = JSON.stringify([
+  const refreshScalePosition = useMapboxScalePosition(
     scaleBarPosition,
-    session?.nativeLayout?.width,
-    session?.nativeLayout?.height,
-  ]);
-  const [appliedScalePosition, setAppliedScalePosition] =
-    useState(scalePositionKey);
-  // RNMapbox iOS stores position updates without marking its scale dirty.
-  // Native layout can reset the scale. Separate its hide/restore commits by a
-  // frame so Fabric cannot merge away the enabled setter's dirty notification.
-  const refreshScalePosition =
-    Platform.OS === "ios" &&
-    appliedScalePosition !== scalePositionKey &&
-    props.options?.scaleBarEnabled !== false;
-  useEffect(() => {
-    if (!refreshScalePosition) {
-      // eslint-disable-next-line react/set-state-in-effect -- Keep the RNMapbox iOS scale hide/restore commits separate; synchronizing this key preserves the native dirty notification.
-      setAppliedScalePosition(scalePositionKey);
-      return;
-    }
-    const frame = requestAnimationFrame(() =>
-      setAppliedScalePosition(scalePositionKey)
-    );
-    return () => cancelAnimationFrame(frame);
-  }, [scalePositionKey, refreshScalePosition]);
+    session.nativeLayout?.width,
+    session.nativeLayout?.height,
+    props.options?.scaleBarEnabled
+  );
   const {
     mapStyle,
     initialViewState,

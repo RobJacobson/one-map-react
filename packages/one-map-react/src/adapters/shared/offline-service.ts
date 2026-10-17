@@ -68,59 +68,16 @@ export const createOfflineService = (
 ): OfflineService => {
   const observers = new Map<string, PackObserver>();
   const creating = new Set<string>();
-  const backendId = (pack: WrapperOfflinePack): string => {
-    const value = backend.kind === "mapbox" ? pack.name : pack.id;
-    if (!value) throw new Error("Offline pack has no backend identity.");
-    return value;
-  };
-  const identity = (pack: WrapperOfflinePack): string => {
-    const metadata = objectValue(pack.metadata);
-    const facade = objectValue(metadata[identityKey]);
-    return facade.version === 1 && typeof facade.id === "string"
-      ? facade.id
-      : `backend:${backendId(pack)}`;
-  };
-  const status = (
-    pack: WrapperOfflinePack,
-    raw: unknown
-  ): OfflinePackStatus => {
-    if (!raw || typeof raw !== "object" || Array.isArray(raw))
-      throw new Error("Offline status returned no result.");
-    const value = objectValue(raw);
-    const measurements = Object.fromEntries(
-      [
-        "percentage",
-        "completedResourceCount",
-        "completedResourceSize",
-        "completedTileCount",
-        "completedTileSize",
-        "requiredResourceCount",
-      ].flatMap((key) => {
-        const measurement = value[key];
-        return typeof measurement === "number" &&
-          Number.isFinite(measurement) &&
-          measurement >= 0 &&
-          (key !== "percentage" || measurement <= 100)
-          ? [[key, measurement]]
-          : [];
-      })
-    );
-    return {
-      id: identity(pack),
-      state: backend.state(value.state),
-      ...measurements,
-    };
-  };
   const releaseUnobserved = (id: string): void => {
     if (!observers.has(id)) backend.unobserve(id);
   };
   const emit = (observer: PackObserver, raw: unknown): void => {
-    const next = status(observer.pack, raw);
+    const next = status(observer.pack, raw, backend);
     // eslint-disable-next-line unicorn/no-useless-spread -- Snapshot subscriptions before callbacks can add or remove listeners during delivery.
     for (const listener of [...observer.subscribers]) listener.progress(next);
   };
   const refresh = async (pack: WrapperOfflinePack): Promise<void> => {
-    const id = backendId(pack);
+    const id = backendId(pack, backend.kind);
     const observer = observers.get(id);
     if (!observer) return;
     const isCurrent = (): boolean => observers.get(id) === observer;
@@ -146,7 +103,7 @@ export const createOfflineService = (
                   !observer.subscribers.size
                 )
                   return;
-                if (status(pack, raw).state === "complete")
+                if (status(pack, raw, backend).state === "complete")
                   observer.attached = false;
                 observer.progressRevision += 1;
                 emit(observer, raw);
@@ -192,11 +149,11 @@ export const createOfflineService = (
     const metadata = objectValue(pack.metadata);
     const facade = objectValue(metadata[identityKey]);
     return {
-      id: identity(pack),
-      backendId: backendId(pack),
+      id: identity(pack, backend.kind),
+      backendId: backendId(pack, backend.kind),
       metadata: facade.version === 1 ? objectValue(metadata.user) : metadata,
       bounds: offlineBounds(pack.bounds, backend.kind),
-      status: async () => status(pack, await pack.status()),
+      status: async () => status(pack, await pack.status(), backend),
       pause: () => pack.pause(),
       resume: async () => {
         await refresh(pack);
@@ -209,7 +166,7 @@ export const createOfflineService = (
   };
   const packs = async (): Promise<readonly WrapperOfflinePack[]> => {
     const result = await backend.getPacks();
-    const ids = result.map(identity);
+    const ids = result.map((pack) => identity(pack, backend.kind));
     if (new Set(ids).size !== ids.length)
       throw new Error(
         "Duplicate persisted offline identities require reconciliation."
@@ -217,7 +174,7 @@ export const createOfflineService = (
     return result;
   };
   const find = async (id: string): Promise<WrapperOfflinePack | undefined> =>
-    (await packs()).find((pack) => identity(pack) === id);
+    (await packs()).find((pack) => identity(pack, backend.kind) === id);
   const requirePack = async (id: string): Promise<WrapperOfflinePack> => {
     const pack = await find(id);
     if (!pack) throw new Error("Offline pack was not found.");
@@ -254,12 +211,12 @@ export const createOfflineService = (
         if (creationStarted) {
           const persisted =
             created ?? (await find(options.id).catch(() => undefined));
-          if (persisted) releaseUnobserved(backendId(persisted));
+          if (persisted) releaseUnobserved(backendId(persisted, backend.kind));
         }
         throw failure;
       } finally {
         creating.delete(options.id);
-        if (created) releaseUnobserved(backendId(created));
+        if (created) releaseUnobserved(backendId(created, backend.kind));
       }
     },
     getPack: async (id) => {
@@ -269,7 +226,7 @@ export const createOfflineService = (
     getPacks: async () => (await packs()).map(wrap),
     deletePack: async (id) => {
       const pack = await requirePack(id);
-      const nativeId = backendId(pack);
+      const nativeId = backendId(pack, backend.kind);
       const observer = observers.get(nativeId);
       if (observer) {
         await observer.operation.catch(() => {});
@@ -282,7 +239,7 @@ export const createOfflineService = (
     invalidatePack: async (id) => {
       const pack = await requirePack(id);
       await refresh(pack);
-      await backend.invalidatePack(backendId(pack));
+      await backend.invalidatePack(backendId(pack, backend.kind));
       // Invalidation has the same completion race as resume.
       await refresh(pack);
     },
@@ -300,7 +257,7 @@ export const createOfflineService = (
       void requirePack(id)
         .then(async (pack) => {
           if (!active) return;
-          const nativeId = backendId(pack);
+          const nativeId = backendId(pack, backend.kind);
           observer = observers.get(nativeId);
           if (!observer) {
             observer = {
@@ -330,7 +287,7 @@ export const createOfflineService = (
           retired.operation = retired.operation
             .catch(() => {})
             .then(() => {
-              const id = backendId(retired.pack);
+              const id = backendId(retired.pack, backend.kind);
               // Deletion can recreate this backend id before an old disposer runs.
               if (
                 observers.get(id) === retired &&
@@ -344,6 +301,59 @@ export const createOfflineService = (
       };
     },
   };
+};
+
+const status = (
+  pack: WrapperOfflinePack,
+  raw: unknown,
+  backend: OfflineBackend
+): OfflinePackStatus => {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw))
+    throw new Error("Offline status returned no result.");
+  const value = objectValue(raw);
+  const measurements = Object.fromEntries(
+    [
+      "percentage",
+      "completedResourceCount",
+      "completedResourceSize",
+      "completedTileCount",
+      "completedTileSize",
+      "requiredResourceCount",
+    ].flatMap((key) => {
+      const measurement = value[key];
+      return typeof measurement === "number" &&
+        Number.isFinite(measurement) &&
+        measurement >= 0 &&
+        (key !== "percentage" || measurement <= 100)
+        ? [[key, measurement]]
+        : [];
+    })
+  );
+  return {
+    id: identity(pack, backend.kind),
+    state: backend.state(value.state),
+    ...measurements,
+  };
+};
+
+const identity = (
+  pack: WrapperOfflinePack,
+  kind: OfflineBackend["kind"]
+): string => {
+  const metadata = objectValue(pack.metadata);
+  const facade = objectValue(metadata[identityKey]);
+  return facade.version === 1 && typeof facade.id === "string"
+    ? facade.id
+    : `backend:${backendId(pack, kind)}`;
+};
+
+const backendId = (
+  pack: WrapperOfflinePack,
+  kind: OfflineBackend["kind"]
+): string => {
+  const value = kind === "mapbox" ? pack.name : pack.id;
+  if (!value) throw new Error("Offline pack has no backend identity.");
+  return value;
 };
 
 /** Validates region/identity and rejects unserializable application metadata. */

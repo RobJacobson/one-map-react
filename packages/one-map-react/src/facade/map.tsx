@@ -52,27 +52,7 @@ export function useMap(id?: string): MapRef | undefined {
 // eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
 export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
   const { Map: AdapterMap, backend } = useSelectedAdapter();
-  if (
-    props.projection !== undefined &&
-    props.projection !== "mercator" &&
-    props.projection !== "globe"
-  ) {
-    throw new RangeError("Projection must be mercator or globe.");
-  }
-
-  if (
-    props.terrain !== undefined &&
-    props.terrain !== null &&
-    (typeof props.terrain.source !== "string" ||
-      props.terrain.source.trim() === "" ||
-      (props.terrain.exaggeration !== undefined &&
-        (!Number.isFinite(props.terrain.exaggeration) ||
-          props.terrain.exaggeration < 0)))
-  ) {
-    throw new RangeError(
-      "Terrain requires a nonempty source and finite nonnegative exaggeration."
-    );
-  }
+  validateMapOptions(props);
 
   useStableOptions("Map", {
     id: props.id,
@@ -125,6 +105,31 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
     </MapSessionContext.Provider>
   );
 });
+
+/** Validates portable projection and terrain inputs before adapter rendering. */
+const validateMapOptions = (props: MapProps): void => {
+  if (
+    props.projection !== undefined &&
+    props.projection !== "mercator" &&
+    props.projection !== "globe"
+  ) {
+    throw new RangeError("Projection must be mercator or globe.");
+  }
+
+  if (
+    props.terrain !== undefined &&
+    props.terrain !== null &&
+    (typeof props.terrain.source !== "string" ||
+      props.terrain.source.trim() === "" ||
+      (props.terrain.exaggeration !== undefined &&
+        (!Number.isFinite(props.terrain.exaggeration) ||
+          props.terrain.exaggeration < 0)))
+  ) {
+    throw new RangeError(
+      "Terrain requires a nonempty source and finite nonnegative exaggeration."
+    );
+  }
+};
 
 /** Owns the attached ref, its retained proxy, and named registration. */
 const useMapAttachment = (

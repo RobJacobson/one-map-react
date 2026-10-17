@@ -8,13 +8,7 @@ import {
   nativeStopError,
   unavailableMapMethodError,
 } from "../native-map-options.js";
-import {
-  assertFeatureIdentifier,
-  assertFeatureState,
-  featureStateFromWrapper,
-  featuresFromWrapper,
-  mutableFeatureState,
-} from "../shared/feature-values.js";
+import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
   normalizeElevation,
@@ -38,8 +32,8 @@ import {
   toRnmapboxQueryRect,
   toRnmapboxRenderedQueryArgs,
   toRnmapboxSourceQueryArgs,
-  toRnmapboxStateKey,
 } from "./convert-query.js";
+import { createMapboxFeatureStateMethods } from "./feature-state-methods.js";
 import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
 /** Selected native operations retain the wrapper signatures. */
@@ -199,56 +193,10 @@ export const createMapboxMapRef = (
       "getClusterChildren"
     );
   },
-  setFeatureState: async (identifier, state) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
-    assertFeatureState(state);
-    const mutableState = mutableFeatureState(state);
-
-    await geoJsonSources.featureState.run(
-      target,
-      async () => {
-        const map = requireMap(mapViewRef.current);
-        await map.setFeatureState(
-          featureId,
-          mutableState,
-          sourceId,
-          sourceLayerId
-        );
-      },
-      "write"
-    );
-  },
-  getFeatureState: async (identifier) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
-
-    return geoJsonSources.featureState.run(target, async () => {
-      const map = requireMap(mapViewRef.current);
-      return featureStateFromWrapper(
-        await map.getFeatureState(featureId, sourceId, sourceLayerId)
-      );
-    });
-  },
-  removeFeatureState: async (identifier, key) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
-    const stateKey = toRnmapboxStateKey(key);
-
-    await geoJsonSources.featureState.run(
-      target,
-      async () => {
-        const map = requireMap(mapViewRef.current);
-        await map.removeFeatureState(
-          featureId,
-          stateKey,
-          sourceId,
-          sourceLayerId
-        );
-      },
-      key === undefined ? "remove" : undefined
-    );
-  },
+  ...createMapboxFeatureStateMethods(
+    () => requireMap(mapViewRef.current),
+    geoJsonSources
+  ),
   resize: async () => {
     throw nativeResizeError();
   },

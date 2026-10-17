@@ -11,11 +11,7 @@ import {
   unavailableMapMethodError,
 } from "../native-map-options.js";
 import {
-  assertFeatureIdentifier,
-  assertFeatureState,
-  featureStateFromWrapper,
   featuresFromWrapper,
-  mutableFeatureState,
   toQueryGeometry,
 } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
@@ -32,12 +28,11 @@ import {
   toMaplibreFitBoundsOptions,
 } from "./convert-camera.js";
 import {
-  toMaplibreFeatureId,
   toMaplibreFilter,
   toMaplibreRenderedQueryOptions,
   toMaplibreSourceQueryOptions,
-  toMaplibreVectorFeature,
 } from "./convert-query.js";
+import { createMaplibreFeatureStateMethods } from "./feature-state-methods.js";
 import type { MaplibreSourceRegistry } from "./source-registry.js";
 
 /** Selected native operations retain the wrapper signatures. */
@@ -217,69 +212,7 @@ export const createMaplibreMapRef = (
       "getClusterChildren"
     );
   },
-  setFeatureState: async (identifier, state) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
-    assertFeatureState(state);
-    const mutableState = mutableFeatureState(state);
-    if (sources.require(target.source).kind === "vector")
-      toMaplibreVectorFeature(target);
-
-    await sources.featureState.run(
-      target,
-      async () => {
-        const source = sources.require(target.source);
-
-        await (source.kind === "geojson"
-          ? source.ref.setFeatureState(
-              toMaplibreFeatureId(target),
-              mutableState
-            )
-          : source.ref.setFeatureState(
-              toMaplibreVectorFeature(target),
-              mutableState
-            ));
-      },
-      "write"
-    );
-  },
-  getFeatureState: async (identifier) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
-    if (sources.require(target.source).kind === "vector")
-      toMaplibreVectorFeature(target);
-
-    return sources.featureState.run(target, async () => {
-      const source = sources.require(target.source);
-
-      return featureStateFromWrapper(
-        await (source.kind === "geojson"
-          ? source.ref.getFeatureState(toMaplibreFeatureId(target))
-          : source.ref.getFeatureState(toMaplibreVectorFeature(target)))
-      );
-    });
-  },
-  removeFeatureState: async (identifier, key) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
-    if (sources.require(target.source).kind === "vector")
-      toMaplibreVectorFeature(target);
-
-    await sources.featureState.run(
-      target,
-      async () => {
-        const source = sources.require(target.source);
-
-        await (source.kind === "geojson"
-          ? source.ref.removeFeatureState(
-              toMaplibreFeatureId(target),
-              ...(key === undefined ? [] : [key])
-            )
-          : source.ref.removeFeatureState(
-              toMaplibreVectorFeature(target),
-              ...(key === undefined ? [] : [key])
-            ));
-      },
-      key === undefined ? "remove" : undefined
-    );
-  },
+  ...createMaplibreFeatureStateMethods(sources),
   resize: async () => {
     throw nativeResizeError();
   },
