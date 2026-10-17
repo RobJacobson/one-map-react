@@ -56,28 +56,18 @@ export class MaplibreSourceRegistry {
    * Records the source ref mounted under an id.
    *
    * @param id - Facade source id.
-   * @param entry - Mounted source entry or getter for its current wrapper ref.
-   * @param kind - Actual source family, required for a live getter.
+   * @param read - Getter for the current wrapper ref.
+   * @param kind - Actual source family.
    * @returns Cleanup bound to this registration.
    */
   register(
     id: string,
-    entry:
-      | MaplibreNativeSourceRef
-      | (() => MaplibreNativeSourceRef | undefined),
-    kind?: MaplibreNativeSourceRef["kind"]
+    read: () => MaplibreNativeSourceRef | undefined,
+    kind: MaplibreNativeSourceRef["kind"]
   ): () => void {
-    const scope = typeof entry === "function" ? kind : entry.kind;
-    if (!scope) {
-      throw new Error(
-        "A live source registration needs its native source family."
-      );
-    }
-    const owner = {
-      read: typeof entry === "function" ? entry : () => entry,
-    };
+    const owner = { read };
     this.refs.set(id, owner);
-    const releaseState = this.featureState.register(id, scope);
+    const releaseState = this.featureState.register(id, kind);
 
     return () => {
       if (this.refs.get(id) === owner) {

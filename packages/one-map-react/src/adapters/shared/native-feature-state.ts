@@ -28,6 +28,7 @@ interface SourceState {
  */
 export class NativeFeatureState {
   private readonly sources = new Map<string, SourceState>();
+  private readonly resets = new Set<SourceState>();
 
   /**
    * @param reset - Removes an identifier's whole state on the current source.
@@ -65,16 +66,14 @@ export class NativeFeatureState {
     source.scope = scope;
     source.owned = true;
     source.registration = registration;
-    source.owner = {
-      reset: source.identifiers.size > 0,
-      failed: false,
-    };
+    this.resetOwner(source);
 
     return () => {
       // A style epoch invalidates operations but leaves this registration's
       // cleanup valid until a new source instance replaces it.
       if (source.registration === registration) {
         source.registration = undefined;
+        this.resets.delete(source);
       }
     };
   }
@@ -87,10 +86,7 @@ export class NativeFeatureState {
    */
   resetStyle(): void {
     for (const source of this.sources.values()) {
-      source.owner = {
-        reset: source.identifiers.size > 0,
-        failed: false,
-      };
+      this.resetOwner(source);
     }
   }
 
@@ -108,24 +104,32 @@ export class NativeFeatureState {
   flush(reportError: (error: unknown) => void): Promise<void> {
     const pending: Promise<void>[] = [];
 
-    for (const source of this.sources.values()) {
+    // eslint-disable-next-line unicorn/no-useless-spread -- Error callbacks may replace a source or style during delivery.
+    for (const source of [...this.resets]) {
       const owner = source.owner;
-      if (source.owned && !source.registration) continue;
 
       if (owner.failed) {
         this.reportResetError(source, owner, owner.error, reportError);
+        if (source.owner === owner) this.resets.delete(source);
         continue;
       }
 
-      if (!owner.reset) continue;
+      if (!owner.reset && !owner.flush) {
+        this.resets.delete(source);
+        continue;
+      }
 
       if (!owner.flush) {
         const target = source.identifiers.values().next().value;
         if (!target) continue;
 
-        owner.flush = this.run(target, async () => {}).catch((error) => {
-          this.reportResetError(source, owner, error, reportError);
-        });
+        owner.flush = this.run(target, async () => {})
+          .catch((error) => {
+            this.reportResetError(source, owner, error, reportError);
+          })
+          .finally(() => {
+            if (source.owner === owner) this.resets.delete(source);
+          });
       }
 
       pending.push(owner.flush);
@@ -166,6 +170,7 @@ export class NativeFeatureState {
           this.assertOwner(target.source, source, owner);
           source.identifiers.clear();
           owner.reset = false;
+          if (!owner.flush) this.resets.delete(source);
         } catch (error) {
           owner.failed = true;
           owner.error = error;
@@ -195,6 +200,17 @@ export class NativeFeatureState {
     );
 
     return result;
+  }
+
+  /** Replaces a lifetime's reset work without scanning historical sources per frame. */
+  private resetOwner(source: SourceState): void {
+    source.owner = {
+      reset: source.identifiers.size > 0,
+      failed: false,
+    };
+    if (source.owner.reset && (!source.owned || source.registration))
+      this.resets.add(source);
+    else this.resets.delete(source);
   }
 
   private source(sourceId: string): SourceState {

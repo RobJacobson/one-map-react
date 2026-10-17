@@ -111,19 +111,17 @@ export const createWebUi = (
         children === undefined || children === null ? "bottom" : "center"
       );
       const anchor = props.anchor ?? defaultAnchor;
-      useStableOptions("Marker", {
-        id,
-        anchor,
-        renderMode: renderMode ?? "view",
-        ...creationOptions(options, [
+      useStableOptions(
+        "Marker",
+        creationOptions(options, [
           "style",
           "className",
           "rotation",
           "rotationAlignment",
           "pitchAlignment",
           "popup",
-        ]),
-      });
+        ])
+      );
       useImperativeHandle(ref, () => ({ refresh: async () => {} }), []);
       const click = useActiveCallback(onClick);
       const dragStart = useActiveCallback(onDragStart);
@@ -175,13 +173,7 @@ export const createWebUi = (
     const anchor = props.anchor ?? "bottom";
     const offset = props.offset ?? [0, 0];
     const [offsetX, offsetY] = offset;
-    useStableOptions("Popup", {
-      ...creationOptions(options, ["style", "className"]),
-      closeButton: props.closeButton ?? true,
-      closeOnClick: props.closeOnClick ?? true,
-      closeOnMove: props.closeOnMove ?? false,
-      focusAfterOpen: props.focusAfterOpen ?? true,
-    });
+    useStableOptions("Popup", creationOptions(options, ["style", "className"]));
     const open = useActiveCallback(onOpen);
     const close = useActiveCallback(onClose);
 
@@ -216,7 +208,6 @@ export const createWebUi = (
   };
 
   const Control = (props: ControlProps & WebUiOptions) => {
-    useStableOptions("Control", { position: props.position ?? "top-right" });
     const control = wrapper.useControl(createControlHost, {
       position: props.position ?? "top-right",
     });
@@ -229,13 +220,7 @@ export const createWebUi = (
 
   const NavigationControl = (props: NavigationControlProps & WebUiOptions) => {
     const { options, hostProps, onError, children, ...forwarded } = props;
-    useStableOptions("NavigationControl", {
-      ...creationOptions(options, ["style"]),
-      position: props.position ?? "top-right",
-      showZoom: props.showZoom ?? true,
-      showCompass: props.showCompass ?? true,
-      visualizePitch: props.visualizePitch ?? false,
-    });
+    useStableOptions("NavigationControl", creationOptions(options, ["style"]));
 
     return (
       <wrapper.NavigationControl
@@ -250,11 +235,7 @@ export const createWebUi = (
     props: AttributionControlProps & WebUiOptions
   ) => {
     const { options, hostProps, children, ...forwarded } = props;
-    useStableOptions("AttributionControl", {
-      ...creationOptions(options, ["style"]),
-      ...forwarded,
-      position: props.position ?? "top-right",
-    });
+    useStableOptions("AttributionControl", creationOptions(options, ["style"]));
 
     return (
       <wrapper.AttributionControl
@@ -267,11 +248,7 @@ export const createWebUi = (
 
   const ScaleControl = (props: ScaleControlProps & WebUiOptions) => {
     const { options, hostProps, onError, children, ...forwarded } = props;
-    useStableOptions("ScaleControl", {
-      ...creationOptions(options, ["style"]),
-      position: props.position ?? "top-right",
-      maxWidth: props.maxWidth ?? 100,
-    });
+    useStableOptions("ScaleControl", creationOptions(options, ["style"]));
 
     return (
       <wrapper.ScaleControl
@@ -296,15 +273,15 @@ export const createWebUi = (
       onError,
       ...forwarded
     } = props;
-    useStableOptions("GeolocateControl", {
-      ...creationOptions(options, [
+    useStableOptions(
+      "GeolocateControl",
+      creationOptions(options, [
         "style",
         "onOutOfMaxBounds",
         "onTrackUserLocationStart",
         "onTrackUserLocationEnd",
-      ]),
-      position: props.position ?? "top-right",
-    });
+      ])
+    );
     const locate = useActiveCallback(onGeolocate);
     const error = useActiveCallback(onError);
 
@@ -336,10 +313,7 @@ export const createWebUi = (
 
   const FullscreenControl = (props: FullscreenControlProps & WebUiOptions) => {
     const { options, hostProps, children, ...forwarded } = props;
-    useStableOptions("FullscreenControl", {
-      ...creationOptions(options, ["style"]),
-      position: props.position ?? "top-right",
-    });
+    useStableOptions("FullscreenControl", creationOptions(options, ["style"]));
 
     return (
       <wrapper.FullscreenControl

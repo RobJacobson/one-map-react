@@ -20,7 +20,6 @@ export interface MapSession {
     event: "click" | "move",
     listener: (event: ClickEvent | MoveEvent) => void
   ): () => void;
-  emit(event: "click" | "move", payload: ClickEvent | MoveEvent): void;
   registerSource(
     id: string,
     callback: (event: SourceClickEvent) => void,

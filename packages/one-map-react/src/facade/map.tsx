@@ -32,8 +32,7 @@ export const useMap = (id?: string): MapRef => {
   if (map) return map;
   if (id !== undefined)
     throw new Error(`Map "${id}" is not registered in this MapSetup.`);
-  if (!session) throw new Error("useMap() must render inside Map.");
-  return createDeferredMapRef(session.ref);
+  throw new Error("useMap() must render inside Map.");
 };
 
 /** Shared map with scoped UI notifications and named map attachment. */
@@ -80,7 +79,6 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
       cameraControlled,
       minZoom: props.minZoom,
       maxZoom: props.maxZoom,
-      emit,
       subscribe,
       registerSource,
       dispatchSource,
@@ -92,7 +90,6 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
       cameraControlled,
       props.minZoom,
       props.maxZoom,
-      emit,
       subscribe,
       registerSource,
       dispatchSource,

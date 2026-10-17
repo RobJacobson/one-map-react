@@ -15,10 +15,11 @@ export const useMapInteractions = (
   props: MapProps,
   backend: Backend,
   mapRef: { readonly current: MapRef | null }
-): Pick<
-  MapSession,
-  "emit" | "subscribe" | "registerSource" | "dispatchSource"
-> & {
+): Pick<MapSession, "subscribe" | "registerSource" | "dispatchSource"> & {
+  readonly emit: (
+    event: "click" | "move",
+    payload: ClickEvent | MoveEvent
+  ) => void;
   readonly click: (event: ClickEvent) => Promise<void>;
 } => {
   const listeners = useRef({
@@ -54,7 +55,8 @@ export const useMapInteractions = (
   }, []);
   const emit = useCallback(
     (event: "click" | "move", payload: ClickEvent | MoveEvent) => {
-      for (const listener of listeners.current[event]) listener(payload);
+      // eslint-disable-next-line unicorn/no-useless-spread -- Callbacks may change subscriptions during delivery.
+      for (const listener of [...listeners.current[event]]) listener(payload);
     },
     []
   );
@@ -131,9 +133,16 @@ export const useMapInteractions = (
       event: "click" | "move",
       listener: (event: ClickEvent | MoveEvent) => void
     ) => {
-      listeners.current[event].add(listener);
+      let listening = true;
+      const started = generation.current;
+      const registered = (payload: ClickEvent | MoveEvent): void => {
+        if (listening && active.current && generation.current === started)
+          listener(payload);
+      };
+      listeners.current[event].add(registered);
       return () => {
-        listeners.current[event].delete(listener);
+        listening = false;
+        listeners.current[event].delete(registered);
       };
     },
     []
@@ -154,6 +163,7 @@ export const useMapInteractions = (
           features: await map.queryRenderedFeatures(event.point),
         };
       }
+      // SDK filtering owns ordering and featureset semantics, beyond layer IDs.
       if (propsRef.current.interactiveLayerIds) hit = await queryHit(event);
     } catch (error) {
       if (active.current && generation.current === currentGeneration)

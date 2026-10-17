@@ -31,6 +31,7 @@ import {
   type NativeMarkerHostProps,
   type NativeMarkerProps,
 } from "../src/adapters/shared/native-ui.js";
+import type { Adapter } from "../src/contracts/adapter.js";
 import type {
   MapRef,
   Point,
@@ -43,6 +44,13 @@ import {
   type MapSession,
   MapSessionContext,
 } from "../src/facade/map-context.js";
+import { MapSetup } from "../src/facade/map-setup.js";
+import {
+  Marker as SharedMarker,
+  Popup as SharedPopup,
+  NavigationControl as SharedNavigationControl,
+  ScaleControl as SharedScaleControl,
+} from "../src/facade/ui.js";
 
 type FixtureSession = MapSession &
   NativeMapPresentation & { readonly viewState: ViewState | null };
@@ -189,13 +197,16 @@ const sessionFixture = () => {
         listeners[event].delete(callback);
       };
     },
-    emit: (event, payload) => {
-      for (const callback of listeners[event]) callback(payload);
-    },
     registerSource: () => () => undefined,
     dispatchSource: () => undefined,
   };
-  return { session, project, unproject, easeTo, lock };
+  const emit = (
+    event: "click" | "move",
+    payload: ClickEvent | MoveEvent
+  ): void => {
+    for (const callback of listeners[event]) callback(payload);
+  };
+  return { session, project, unproject, easeTo, lock, emit };
 };
 
 const scaleCamera: ViewState = {
@@ -237,7 +248,7 @@ test("scale observes each movement once, including unchanged controlled targets"
   fixture.project.mockClear();
   fixture.unproject.mockClear();
   await act(async () =>
-    fixture.session.emit("move", {
+    fixture.emit("move", {
       viewState: { ...scaleCamera, zoom: 5 },
       origin: "user",
     })
@@ -250,7 +261,7 @@ test("scale observes each movement once, including unchanged controlled targets"
   fixture.project.mockClear();
   fixture.unproject.mockClear();
   await act(async () =>
-    fixture.session.emit("move", {
+    fixture.emit("move", {
       viewState: { ...scaleCamera, longitude: 11, zoom: 7 },
       origin: "user",
     })
@@ -296,7 +307,7 @@ test.each(["resolve", "reject"])(
     );
     await waitFor(() => expect(fixture.unproject).toHaveBeenCalledTimes(1));
     await act(async () =>
-      fixture.session.emit("move", {
+      fixture.emit("move", {
         viewState: { ...scaleCamera, zoom: 5 },
         origin: "user",
       })
@@ -311,7 +322,7 @@ test.each(["resolve", "reject"])(
     const failure = new Error("current scale");
     fixture.unproject.mockRejectedValueOnce(failure);
     await act(async () =>
-      fixture.session.emit("move", {
+      fixture.emit("move", {
         viewState: { ...scaleCamera, zoom: 6 },
         origin: "user",
       })
@@ -326,7 +337,7 @@ test.each(["resolve", "reject"])(
         })
     );
     await act(async () =>
-      fixture.session.emit("move", {
+      fixture.emit("move", {
         viewState: { ...scaleCamera, zoom: 7 },
         origin: "user",
       })
@@ -454,7 +465,7 @@ describe("TF07 native UI composition", () => {
     });
     fixture.project.mockResolvedValue([150, 260]);
     await act(async () =>
-      fixture.session.emit("move", {
+      fixture.emit("move", {
         viewState: {
           longitude: 0,
           latitude: 0,
@@ -1460,7 +1471,7 @@ describe("TF07 native UI composition", () => {
     );
     expect(opened).toHaveBeenCalledTimes(1);
     await act(async () => {
-      fixture.session.emit("move", {
+      fixture.emit("move", {
         viewState: {
           longitude: 10,
           latitude: 20,
@@ -1472,7 +1483,7 @@ describe("TF07 native UI composition", () => {
       });
     });
     await act(async () => {
-      fixture.session.emit("click", { lngLat: [10, 20], point: [0, 0] });
+      fixture.emit("click", { lngLat: [10, 20], point: [0, 0] });
     });
     expect(closed).toHaveBeenCalledTimes(1);
     await view.unmount();
@@ -1517,34 +1528,51 @@ describe("TF07 native UI composition", () => {
   });
 });
 
+const creationAdapter = {
+  backend: "mapbox-native",
+  services: { location: {} },
+  ...ui,
+} as unknown as Adapter;
+const CreationSessionProvider = ({
+  value,
+  children,
+}: {
+  readonly value: FixtureSession;
+  readonly children: ReactNode;
+}) => (
+  <MapSetup adapter={creationAdapter}>
+    <FixtureSessionProvider value={value}>{children}</FixtureSessionProvider>
+  </MapSetup>
+);
+
 test("native creation defaults compare by their effective values", async () => {
   const fixture = sessionFixture();
   const tree = (explicit: boolean) => (
-    <FixtureSessionProvider value={fixture.session}>
-      <ui.Marker
+    <CreationSessionProvider value={fixture.session}>
+      <SharedMarker
         longitude={10}
         latitude={20}
         anchor={explicit ? "bottom" : undefined}
         renderMode={explicit ? "view" : undefined}
       />
-      <ui.Popup
+      <SharedPopup
         longitude={10}
         latitude={20}
         closeButton={explicit ? true : undefined}
         closeOnClick={explicit ? true : undefined}
         closeOnMove={explicit ? false : undefined}
       />
-      <ui.NavigationControl
+      <SharedNavigationControl
         position={explicit ? "top-right" : undefined}
         showZoom={explicit ? true : undefined}
         showCompass={explicit ? true : undefined}
         visualizePitch={explicit ? false : undefined}
       />
-      <ui.ScaleControl
+      <SharedScaleControl
         position={explicit ? "bottom-left" : undefined}
         maxWidth={explicit ? 100 : undefined}
       />
-    </FixtureSessionProvider>
+    </CreationSessionProvider>
   );
   const mounted = await render(tree(false));
   await mounted.rerender(tree(true));
@@ -1555,9 +1583,9 @@ test("native creation defaults compare by their effective values", async () => {
 test("native creation validation continues rejecting genuine changes", async () => {
   const fixture = sessionFixture();
   const tree = (showZoom: boolean) => (
-    <FixtureSessionProvider value={fixture.session}>
-      <ui.NavigationControl showZoom={showZoom} />
-    </FixtureSessionProvider>
+    <CreationSessionProvider value={fixture.session}>
+      <SharedNavigationControl showZoom={showZoom} />
+    </CreationSessionProvider>
   );
   const mounted = await render(tree(true));
   await expect(mounted.rerender(tree(false))).rejects.toThrow(
@@ -1570,11 +1598,11 @@ test.each([false, true])(
   async (custom) => {
     const fixture = sessionFixture();
     const tree = (anchor?: "top") => (
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker longitude={10} latitude={20} anchor={anchor}>
+      <CreationSessionProvider value={fixture.session}>
+        <SharedMarker longitude={10} latitude={20} anchor={anchor}>
           {custom ? <Text>custom</Text> : undefined}
-        </ui.Marker>
-      </FixtureSessionProvider>
+        </SharedMarker>
+      </CreationSessionProvider>
     );
     const mounted = await render(tree("top"));
     await expect(mounted.rerender(tree())).rejects.toThrow(
@@ -1586,11 +1614,11 @@ test.each([false, true])(
 test("native marker defaults stay frozen when content changes", async () => {
   const fixture = sessionFixture();
   const tree = (custom: boolean, anchor?: "bottom" | "center") => (
-    <FixtureSessionProvider value={fixture.session}>
-      <ui.Marker longitude={10} latitude={20} anchor={anchor}>
+    <CreationSessionProvider value={fixture.session}>
+      <SharedMarker longitude={10} latitude={20} anchor={anchor}>
         {custom ? <Text>custom</Text> : undefined}
-      </ui.Marker>
-    </FixtureSessionProvider>
+      </SharedMarker>
+    </CreationSessionProvider>
   );
   const mounted = await render(tree(false));
   await mounted.rerender(tree(true));
@@ -1606,15 +1634,15 @@ test.each([false, true])(
   async (custom) => {
     const fixture = sessionFixture();
     const tree = (explicit: boolean) => (
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker
+      <CreationSessionProvider value={fixture.session}>
+        <SharedMarker
           longitude={10}
           latitude={20}
           anchor={explicit ? (custom ? "center" : "bottom") : undefined}
         >
           {custom ? <Text>custom</Text> : undefined}
-        </ui.Marker>
-      </FixtureSessionProvider>
+        </SharedMarker>
+      </CreationSessionProvider>
     );
     const mounted = await render(tree(true));
     await mounted.rerender(tree(false));
