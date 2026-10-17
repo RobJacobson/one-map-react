@@ -30,6 +30,8 @@ export interface ImagesProps {
    * attempts removal during style loading and on logical unmount, including
    * when the wrapper retains a reusable renderer. An absent or destroyed
    * style is guarded; late image loads cannot register after release.
+   * Web download and registration failures report a credential-safe Map.onError;
+   * failed entries retry on the next style load.
    */
   readonly images: Readonly<Record<string, ImageEntry>>;
 }

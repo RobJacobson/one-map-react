@@ -7,15 +7,14 @@ import {
   type RefAttributes,
   useContext,
   useId,
-  useLayoutEffect,
   useMemo,
   useState,
 } from "react";
 
 import type { MapRef, ViewState } from "../../contracts/camera-types.js";
+import type { MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { ControlPosition } from "../../contracts/ui-types.js";
-import { useOptionalMapSession } from "../../facade/map-context.js";
 
 /** Native control placement; children retain their original React ancestry. */
 export interface NativeOverlay {
@@ -51,7 +50,7 @@ export const NativeOverlayContext = createContext<readonly NativeOverlay[]>([]);
 interface NativeCameraState {
   /** Authoritative target when controlled, otherwise the observed camera. */
   readonly viewState: ViewState;
-  /** Invalidates scale projection even when the controlled target stays unchanged. */
+  /** Invalidates control and overlay projection when the controlled target stays unchanged. */
   readonly observedViewState: ViewState;
 }
 
@@ -68,8 +67,12 @@ export const withNativeMapPresentation = <Props extends MapProps>(
       <NativeCameraProvider
         initial={props.initialViewState}
         controlled={props.viewState}
+        onMove={props.onMove}
+        onMoveEnd={props.onMoveEnd}
       >
-        <Implementation {...(props as Props)} ref={ref} />
+        {(callbacks) => (
+          <Implementation {...(props as Props)} {...callbacks} ref={ref} />
+        )}
       </NativeCameraProvider>
     </NativePresentationProvider>
   ));
@@ -164,29 +167,41 @@ const NativePresentationProvider = ({
 const NativeCameraProvider = ({
   initial,
   controlled,
+  onMove,
+  onMoveEnd,
   children,
 }: {
   readonly initial: ViewState;
   readonly controlled?: ViewState;
-  readonly children: ReactNode;
+  readonly onMove?: MapProps["onMove"];
+  readonly onMoveEnd?: MapProps["onMoveEnd"];
+  readonly children: (
+    callbacks: Required<Pick<MapProps, "onMove" | "onMoveEnd">>
+  ) => ReactNode;
 }) => {
-  const session = useOptionalMapSession();
-  const subscribe = session?.subscribe;
   const [observed, setObserved] = useState(initial);
-  useLayoutEffect(
-    () =>
-      subscribe?.("move", (event) => {
-        if ("viewState" in event) setObserved(event.viewState);
-      }),
-    [subscribe]
+  const callbacks = useMemo(
+    () => ({
+      onMove: (event: MoveEvent) => {
+        setObserved(event.viewState);
+        onMove?.(event);
+      },
+      onMoveEnd: (event: MoveEvent) => {
+        setObserved(event.viewState);
+        onMoveEnd?.(event);
+      },
+    }),
+    [onMove, onMoveEnd]
   );
+  // Observations update camera consumers without recreating the renderer child.
+  const content = useMemo(() => children(callbacks), [children, callbacks]);
   const camera = useMemo(
     () => ({ viewState: controlled ?? observed, observedViewState: observed }),
     [controlled, observed]
   );
   return (
     <NativeCameraContext.Provider value={camera}>
-      {children}
+      {content}
     </NativeCameraContext.Provider>
   );
 };

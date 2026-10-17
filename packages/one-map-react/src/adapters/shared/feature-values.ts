@@ -12,6 +12,27 @@ import type { GeoJsonFeature } from "../../contracts/source-types.js";
 export type QueryTarget = Point | ScreenBounds | undefined;
 
 /**
+ * Copies logical screen coordinates for web and MapLibre Native queries.
+ *
+ * @param target - Point, screen bounds, or undefined for the viewport.
+ * @returns Mutable coordinate arrays, preserving an omitted viewport target.
+ */
+export const toQueryGeometry = (target: QueryTarget): unknown => {
+  if (target === undefined) {
+    return undefined;
+  }
+
+  if (!isScreenBounds(target)) {
+    return [target[0], target[1]];
+  }
+
+  return [
+    [target[0][0], target[0][1]],
+    [target[1][0], target[1][1]],
+  ];
+};
+
+/**
  * Detects whether a query target is a screen rectangle.
  *
  * @param target - Query target from the common method.

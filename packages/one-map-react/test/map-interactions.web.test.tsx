@@ -66,6 +66,55 @@ test("unmount during delivery suppresses the rest of the snapshot and retained p
   expect(later).not.toHaveBeenCalled();
 });
 
+test.each(["mapbox-web", "mapbox-native", "maplibre-native"] as const)(
+  "%s source unmount suppresses subsequent map click delivery",
+  async (backend) => {
+    const mapClick = vi.fn();
+    const query = vi.fn<MapRef["queryRenderedFeatures"]>().mockResolvedValue([
+      {
+        type: "Feature",
+        source: "routes",
+        geometry: { type: "Point", coordinates: [1, 2] },
+      },
+    ]);
+    const map = { queryRenderedFeatures: query } as unknown as MapRef;
+    const mounted = renderHook(() =>
+      useMapInteractions({ ...props, onClick: mapClick }, backend, {
+        current: map,
+      })
+    );
+    const interactions = mounted.result.current;
+    interactions.registerSource("routes", () => mounted.unmount(), {});
+
+    await act(async () => {
+      if (backend === "mapbox-web") await interactions.click(event);
+      else interactions.dispatchSource("routes", event);
+    });
+    expect(mapClick).not.toHaveBeenCalled();
+  }
+);
+
+test.each(["map", "source"] as const)(
+  "%s click subscriber unmount suppresses the map callback",
+  async (origin) => {
+    const mapClick = vi.fn();
+    const mounted = renderHook(() =>
+      useMapInteractions({ ...props, onClick: mapClick }, "mapbox-native", {
+        current: null,
+      })
+    );
+    const interactions = mounted.result.current;
+    interactions.registerSource("routes", () => {}, {});
+    interactions.subscribe("click", () => mounted.unmount());
+
+    await act(async () => {
+      if (origin === "map") await interactions.click(event);
+      else interactions.dispatchSource("routes", event);
+    });
+    expect(mapClick).not.toHaveBeenCalled();
+  }
+);
+
 test("duplicate callbacks have independently disposable registrations", () => {
   const mounted = mountInteractions();
   const interactions = mounted.result.current;

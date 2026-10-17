@@ -3,7 +3,6 @@ import {
   type ComponentProps,
   type ComponentRef,
   forwardRef,
-  useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
@@ -32,7 +31,7 @@ import {
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
 import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
-import { useActiveCallback } from "../shared/use-active-callback.js";
+import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { useNativeControlledCamera } from "../shared/use-native-controlled-camera.js";
 import {
@@ -54,6 +53,7 @@ import { useMapboxGestureSettings } from "./gesture-settings.js";
 import { assertLabelLocalization } from "./label-localization.js";
 import { createMapboxMapRef, resetMapboxFeatureState } from "./map-ref.js";
 import { mergeGestureSettings, toRnmapboxStyleProps } from "./style-props.js";
+import { useMapboxScalePosition } from "./use-mapbox-scale-position.js";
 
 type RnPressFeature = Parameters<
   NonNullable<ComponentProps<typeof MapView>["onPress"]>
@@ -77,31 +77,12 @@ const MapboxNativeMapImplementation = forwardRef<
   const scaleBarPosition =
     props.options?.scaleBarPosition ??
     (ornaments.managed ? ornaments.position("top-left") : undefined);
-  const scalePositionKey = JSON.stringify([
+  const refreshScalePosition = useMapboxScalePosition(
     scaleBarPosition,
-    session?.nativeLayout?.width,
-    session?.nativeLayout?.height,
-  ]);
-  const [appliedScalePosition, setAppliedScalePosition] =
-    useState(scalePositionKey);
-  // RNMapbox iOS stores position updates without marking its scale dirty.
-  // Native layout can reset the scale. Separate its hide/restore commits by a
-  // frame so Fabric cannot merge away the enabled setter's dirty notification.
-  const refreshScalePosition =
-    Platform.OS === "ios" &&
-    appliedScalePosition !== scalePositionKey &&
-    props.options?.scaleBarEnabled !== false;
-  useEffect(() => {
-    if (!refreshScalePosition) {
-      // eslint-disable-next-line react/set-state-in-effect -- Keep the RNMapbox iOS scale hide/restore commits separate; synchronizing this key preserves the native dirty notification.
-      setAppliedScalePosition(scalePositionKey);
-      return;
-    }
-    const frame = requestAnimationFrame(() =>
-      setAppliedScalePosition(scalePositionKey)
-    );
-    return () => cancelAnimationFrame(frame);
-  }, [scalePositionKey, refreshScalePosition]);
+    session.nativeLayout?.width,
+    session.nativeLayout?.height,
+    props.options?.scaleBarEnabled
+  );
   const {
     mapStyle,
     initialViewState,
@@ -143,19 +124,27 @@ const MapboxNativeMapImplementation = forwardRef<
   );
   const frozenViewState = useFrozenValue(initialViewState);
   const extraGestureSettings = useMapboxGestureSettings();
-  const reportMove = useActiveCallback(onMove);
-  const reportMoveEnd = useActiveCallback(onMoveEnd);
-  const reportIdle = useActiveCallback(onIdle);
-  const reportClick = useActiveCallback(onClick);
-  const reportLongPress = useActiveCallback(onLongPress);
-  const reportLoad = useActiveCallback(onLoad);
-  const reportStyleLoad = useActiveCallback(onStyleLoad);
-  const reportError = useActiveCallback(onError);
-  const flushFeatureState = useActiveCallback(() => {
-    void geoJsonSources.featureState.flush((error) => reportError({ error }));
+  // RNMapbox class event handlers read this.props, including props from a suspended render.
+  const report = useActiveCallbacks({
+    onMove,
+    onMoveEnd,
+    onIdle,
+    onClick,
+    onLongPress,
+    onLoad,
+    onStyleLoad,
+    onError,
   });
+  const flushFeatureState = (): void => {
+    void geoJsonSources.featureState.flush((error) =>
+      report.onError({ error })
+    );
+  };
   const styleProps = toRnmapboxStyleProps(mapStyle);
-  const styleKey = JSON.stringify(styleProps);
+  const styleKey =
+    styleProps.styleJSON !== undefined
+      ? `json:${styleProps.styleJSON}`
+      : `url:${styleProps.styleURL}`;
   const previousStyle = useRef(styleKey);
   useLayoutEffect(() => {
     if (previousStyle.current !== styleKey) {
@@ -220,7 +209,7 @@ const MapboxNativeMapImplementation = forwardRef<
     viewState,
     mapHandle.jumpTo,
     () => mapViewRef.current !== null,
-    (error) => reportError({ error })
+    (error) => report.onError({ error })
   );
   const onCameraCommand = controlledCamera.onCommand;
   useLayoutEffect(() => {
@@ -238,7 +227,7 @@ const MapboxNativeMapImplementation = forwardRef<
   const reportChanging = (state: MapState) => {
     sawMove.current = true;
     const event = moveFromState(state);
-    reportMove(event);
+    report.onMove(event);
     controlledCamera.onMove(event);
   };
   const reportSettled = (state: MapState) => {
@@ -246,12 +235,12 @@ const MapboxNativeMapImplementation = forwardRef<
 
     if (!sawMove.current) {
       sawMove.current = true;
-      reportMove(event);
+      report.onMove(event);
     }
 
-    reportMoveEnd(event);
+    report.onMoveEnd(event);
     controlledCamera.onMove(event);
-    reportIdle();
+    report.onIdle();
   };
   const controlled = viewState
     ? toRnmapboxControlledCamera(viewState)
@@ -318,32 +307,32 @@ const MapboxNativeMapImplementation = forwardRef<
             }}
             onDidFinishLoadingMap={() => {
               controlledCamera.onLoad();
-              reportLoad();
+              report.onLoad();
             }}
             onDidFinishLoadingStyle={() => {
               // Native style diffing can retain source state. Invalidate before
               // the callback so writes it makes belong to the loaded style.
               geoJsonSources.featureState.resetStyle();
-              reportStyleLoad();
+              report.onStyleLoad();
             }}
             onMapLoadingError={(payload: unknown) => {
               const event = mapLoadingErrorEvent(payload);
               capture.fail(event.error);
-              reportError(event);
+              report.onError(event);
             }}
             onCameraChanged={reportChanging}
             onMapIdle={reportSettled}
             onPress={
               onClick
                 ? (feature: RnPressFeature) => {
-                    reportClick(clickEventFromRnmapbox(feature));
+                    report.onClick(clickEventFromRnmapbox(feature));
                   }
                 : undefined
             }
             onLongPress={
               onLongPress
                 ? (feature: RnPressFeature) => {
-                    reportLongPress(clickEventFromRnmapbox(feature));
+                    report.onLongPress(clickEventFromRnmapbox(feature));
                   }
                 : undefined
             }

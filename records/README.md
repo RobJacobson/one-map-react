@@ -12,6 +12,12 @@ The [follow-up simplification audit](evidence/facade-simplification-followup-aud
 
 The [facade consolidation evidence](evidence/facade-simplification-consolidation.json) records the checklist correction, six implemented simplifications, preserved public declarations and frozen-package routine checks. Its `finalCleanup` entry records removal of the redundant web style-load callback ref, the refreshed archive and repeated package checks. Renderer acceptance remains unverified.
 
+The [Ponytail lifecycle repair evidence](evidence/ponytail-lifecycle-repairs.json) records the named-map, adapter-change and native navigation fixes, camera helper simplification, regression results and routine package checks. Renderer acceptance remains deferred.
+
+The [Ponytail location and image repair evidence](evidence/ponytail-location-image-repairs.json) accounts for overlapping location requests, image restoration after style and sprite replacement, and removal of the redundant browser location wrapper. It records failing regressions, passing routine checks and the deferred renderer acceptance gate.
+
+The [offline and image ownership repair evidence](evidence/ponytail-offline-image-ownership.json) records replacement-safe subscription cleanup, synchronous image callback handling, regression coverage and routine verification. Renderer acceptance remains deferred.
+
 Records produced for the implementation retired during TF01 remain useful for upstream API inventory, versioned sources, discovered incompatibilities, and provenance. Their stage assignments, implementation mappings, artifact hashes, and runtime results apply to that implementation only.
 
 The [upstream research notes](../docs/upstream-research.md) preserve useful versioned findings, primary-source citations and declaration caveats in Markdown. The [snapshot retirement record](evidence/inventory-research-retirement.md) records removal of the raw inventory inputs and their Git recovery identities. The grouped checklist is the sole coverage record. Use upstream declarations for API details; do not recreate per-field status files. `version-baseline.json` and `tooling-baseline.json` record historical versions, not the current supported development or renderer matrix. `stage-status.json` and `evidence/` preserve historical outcomes; they are not active gates.

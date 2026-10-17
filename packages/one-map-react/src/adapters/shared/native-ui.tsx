@@ -7,24 +7,18 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useId,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
-import {
-  type GestureResponderEvent,
-  Platform,
-  Pressable,
-  Text,
-  View,
-  type ViewProps,
-} from "react-native";
+import { Platform, Pressable, Text, View, type ViewProps } from "react-native";
 import { Portal } from "react-native-teleport";
 
 import type { Adapter } from "../../contracts/adapter.js";
-import type { LngLat, Point } from "../../contracts/camera-types.js";
+import type { LngLat, MapRef, Point } from "../../contracts/camera-types.js";
 import type {
   Anchor,
   ControlProps,
@@ -42,8 +36,12 @@ import {
   NativeOverlayContext,
   useNativeMapPresentation,
 } from "./native-map-presentation.js";
-import { useActiveCallback } from "./use-active-callback.js";
+import {
+  useActiveCallback,
+  useActiveCallbacks,
+} from "./use-active-callback.js";
 import { useFrozenValue } from "./use-frozen-value.js";
+import { useNativeMarkerDrag } from "./use-native-marker-drag.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 
 /** Selected native marker host presentation. */
@@ -114,29 +112,6 @@ type NativeUI = Pick<
   | "FullscreenControl"
 >;
 
-interface DragState {
-  readonly generation: number;
-  readonly pageOrigin: Point;
-  readonly mapOrigin: Point;
-  readonly lngLat: LngLat;
-}
-
-/** Leaves touches inside overflowing child content with its native scroll host. */
-const startsInScrollableChild = (event: GestureResponderEvent): boolean => {
-  const target = event.target;
-  if (!target || typeof target !== "object") return false;
-  let node: typeof target.parentElement = target;
-  while (node && node !== event.currentTarget) {
-    if (
-      (node.clientHeight > 0 && node.scrollHeight > node.clientHeight) ||
-      (node.clientWidth > 0 && node.scrollWidth > node.clientWidth)
-    )
-      return true;
-    node = node.parentElement;
-  }
-  return false;
-};
-
 /**
  * Composes native markers, popup bubbles, and corner controls.
  *
@@ -148,16 +123,9 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     (props, ref) => {
       const coordinate = lngLatFromWrapper([props.longitude, props.latitude]);
       const offset = pointFromWrapper(props.offset ?? [0, 0]);
-      const mapSession = useMapSession();
-      const { requestGestureLock } = useNativeMapPresentation();
       const generatedId = useId();
       const annotationRef = useRef<MarkerRef>(null);
-      const [dragCoordinate, setDragCoordinate] = useState<LngLat | null>(null);
       const [annotationRevision, setAnnotationRevision] = useState(0);
-      const previousCoordinate = useRef<LngLat>([
-        props.longitude,
-        props.latitude,
-      ]);
       const defaultAnchor = useFrozenValue(
         props.children === undefined || props.children === null
           ? "bottom"
@@ -166,66 +134,24 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const markerId = props.id ?? generatedId;
       const anchor = props.anchor ?? defaultAnchor;
       const isAnnotation = props.renderMode === "annotation";
-      const click = useActiveCallback(props.onClick);
-      const dragStart = useActiveCallback(props.onDragStart);
-      const drag = useActiveCallback(props.onDrag);
-      const dragEnd = useActiveCallback(props.onDragEnd);
-      const reportError = useActiveCallback(props.onError);
-      const gesture = useRef<DragState | null>(null);
-      const generation = useRef(0);
-      const requestSequence = useRef(0);
-      const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-      const active = useRef(false);
-      const eligibleTouch = useRef(false);
-      const startingPoint = useRef<Point | null>(null);
-      const lastPoint = useRef<Point | null>(null);
-
-      const clearTimer = useCallback((): void => {
-        if (timer.current !== null) clearTimeout(timer.current);
-        timer.current = null;
-      }, []);
-
-      const releaseInteraction = useCallback((): void => {
-        if (active.current) requestGestureLock(false);
-      }, [requestGestureLock]);
-
-      const cancel = useCallback((): void => {
-        clearTimer();
-        generation.current += 1;
-        requestSequence.current += 1;
-        gesture.current = null;
-        startingPoint.current = null;
-        lastPoint.current = null;
-        eligibleTouch.current = false;
-        releaseInteraction();
-        active.current = false;
-        setDragCoordinate(null);
-      }, [clearTimer, releaseInteraction]);
-
-      useLayoutEffect(() => cancel, [cancel]);
-
-      useLayoutEffect(() => {
-        // eslint-disable-next-line react/set-state-in-effect -- Revoking draggable must cancel the active gesture and clear its visual offset before paint.
-        if (!props.draggable) cancel();
-      }, [props.draggable, cancel]);
-
-      useLayoutEffect(() => {
-        const coordinate: LngLat = [props.longitude, props.latitude];
-        const changed =
-          previousCoordinate.current[0] !== coordinate[0] ||
-          previousCoordinate.current[1] !== coordinate[1];
-        previousCoordinate.current = coordinate;
-        const proposal = gesture.current?.lngLat;
-        // Application echoes of the latest proposal keep the gesture alive.
-        if (
-          changed &&
-          active.current &&
-          (!proposal ||
-            proposal[0] !== coordinate[0] ||
-            proposal[1] !== coordinate[1])
-        )
-          cancel();
-      }, [props.longitude, props.latitude, cancel]);
+      // Long-press timers and projection promises need current committed drag handlers.
+      const {
+        onDragStart: dragStart,
+        onDrag: drag,
+        onDragEnd: dragEnd,
+        onError: reportError,
+      } = useActiveCallbacks({
+        onDragStart: props.onDragStart,
+        onDrag: props.onDrag,
+        onDragEnd: props.onDragEnd,
+        onError: props.onError,
+      });
+      const { dragCoordinate, responders } = useNativeMarkerDrag(props, {
+        onDragStart: dragStart,
+        onDrag: drag,
+        onDragEnd: dragEnd,
+        onError: reportError,
+      });
 
       useImperativeHandle(ref, () => ({
         refresh: async () => {
@@ -237,153 +163,15 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         },
       }));
 
-      const updateDrag = async (
-        pagePoint: Point,
-        ending: boolean
-      ): Promise<void> => {
-        const currentGesture = gesture.current;
-        const map = mapSession.ref.current;
-        if (!currentGesture || !map) return;
-        const sequence = ++requestSequence.current;
-        const point: Point = [
-          currentGesture.mapOrigin[0] +
-            pagePoint[0] -
-            currentGesture.pageOrigin[0],
-          currentGesture.mapOrigin[1] +
-            pagePoint[1] -
-            currentGesture.pageOrigin[1],
-        ];
-
-        try {
-          const lngLat = await map.unproject(point);
-          if (
-            generation.current !== currentGesture.generation ||
-            sequence !== requestSequence.current
-          )
-            return;
-          gesture.current = { ...currentGesture, lngLat };
-          setDragCoordinate(lngLat);
-          if (ending) {
-            dragEnd({ lngLat, point });
-            cancel();
-          } else {
-            drag({ lngLat, point });
-          }
-        } catch (error) {
-          if (
-            generation.current !== currentGesture.generation ||
-            sequence !== requestSequence.current
-          )
-            return;
-          cancel();
-          reportError(error);
-        }
-      };
-
-      const startDrag = async (pageOrigin: Point): Promise<void> => {
-        const map = mapSession.ref.current;
-        if (!map || !props.draggable || !mapSession.ready) return;
-        const currentGeneration = ++generation.current;
-        const lngLat: LngLat = [props.longitude, props.latitude];
-        active.current = true;
-        requestGestureLock(true);
-
-        try {
-          const mapOrigin = await map.project(lngLat);
-          if (generation.current !== currentGeneration) return;
-          gesture.current = {
-            generation: currentGeneration,
-            pageOrigin,
-            mapOrigin,
-            lngLat,
-          };
-          dragStart({ lngLat, point: mapOrigin });
-          const latest = lastPoint.current;
-          if (latest) await updateDrag(latest, false);
-        } catch (error) {
-          if (generation.current !== currentGeneration) return;
-          cancel();
-          reportError(error);
-        }
-      };
-
-      const grant = (event: GestureResponderEvent): void => {
-        clearTimer();
-        const point = pagePoint(event);
-        startingPoint.current = point;
-        lastPoint.current = point;
-        if (props.draggable) {
-          timer.current = setTimeout(() => void startDrag(point), 500);
-        }
-      };
-
-      const move = (event: GestureResponderEvent): void => {
-        if (event.nativeEvent.touches.length !== 1) {
-          cancel();
-          return;
-        }
-        const point = pagePoint(event);
-        lastPoint.current = point;
-        if (active.current) {
-          void updateDrag(point, false);
-        } else if (
-          startingPoint.current &&
-          distance(point, startingPoint.current) > 8
-        ) {
-          cancel();
-        }
-      };
-
-      const release = (event: GestureResponderEvent): void => {
-        clearTimer();
-        if (active.current) {
-          if (gesture.current) void updateDrag(pagePoint(event), true);
-          else cancel();
-          return;
-        }
-        if (startingPoint.current) {
-          click({ lngLat: [props.longitude, props.latitude] });
-        }
-        cancel();
-      };
-
       const Host = isAnnotation ? options.Annotation : options.Marker;
       const markerCoordinate = dragCoordinate ?? coordinate;
       const markerClick = (event: MarkerEvent): void => {
-        click(event);
+        props.onClick?.(event);
         // RNMapbox 10.3.7 toggles selection on taps; reset until it exposes per-tap events.
         if (options.backend === "mapbox-native") {
           setAnnotationRevision((revision) => revision + 1);
         }
       };
-      const responders: ViewProps = isAnnotation
-        ? {}
-        : {
-            // Observe the bubble negotiation without claiming a JS responder:
-            // Fabric blocks native scrolling below a responder ancestor.
-            // A button that claims the touch prevents this negotiation reaching us.
-            onStartShouldSetResponder: (event) => {
-              if (!event) return false;
-              eligibleTouch.current = event.nativeEvent.touches.length === 1;
-              return false;
-            },
-            onResponderTerminate: () => cancel(),
-            onResponderTerminationRequest: () => !active.current,
-            onTouchStart: (event) => {
-              if (event.nativeEvent.touches.length > 1) cancel();
-              else if (eligibleTouch.current) {
-                eligibleTouch.current = false;
-                // Negotiation has no currentTarget; ordinary touch dispatch does.
-                // Bound native DOM traversal to this marker, not its page layout.
-                if (!startsInScrollableChild(event)) grant(event);
-              }
-            },
-            onTouchMove: move,
-            onTouchEnd: (event) => {
-              if (event.nativeEvent.touches.length === 0) release(event);
-            },
-            onTouchCancel: () => cancel(),
-          };
 
       return (
         <Host
@@ -461,8 +249,9 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     const mapSession = useMapSession();
     const { subscribe } = mapSession;
     const id = useId();
+    // The facade's map subscription retains requestClose across prop updates.
     const close = useActiveCallback(props.onClose);
-    const open = useActiveCallback(props.onOpen);
+    const open = useEffectEvent(() => props.onOpen?.());
     const closeOnClick = props.closeOnClick ?? true;
     const closeOnMove = props.closeOnMove ?? false;
     const closeButton = props.closeButton ?? true;
@@ -486,7 +275,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         removeClick?.();
         removeMove?.();
       };
-    }, [subscribe, closeOnClick, closeOnMove, open, requestClose]);
+    }, [subscribe, closeOnClick, closeOnMove, requestClose]);
 
     if (props.focusAfterOpen !== undefined) {
       throw new Error("Native Popup does not support browser focusAfterOpen.");
@@ -606,33 +395,82 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
 const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
   const viewState = useContext(NativeCameraContext)?.viewState;
   const mapSession = useMapSession();
-  const reportError = useActiveCallback(props.onError);
+  const requestSequence = useRef(0);
+
+  useLayoutEffect(
+    () => () => {
+      requestSequence.current += 1;
+    },
+    [mapSession.ref, mapSession.ready]
+  );
+
+  const subscribe = mapSession.subscribe;
+
+  useLayoutEffect(
+    () =>
+      subscribe("move", (event) => {
+        if ("origin" in event && event.origin === "user")
+          requestSequence.current += 1;
+      }),
+    [subscribe]
+  );
+
+  // Readbacks and failures belong to the latest navigation intent and attachment.
+  const reportError = useActiveCallback(
+    (map: MapRef, sequence: number, error: unknown) => {
+      if (
+        sequence === requestSequence.current &&
+        mapSession.ref.current === map &&
+        mapSession.ready
+      ) {
+        props.onError?.(error);
+      }
+    }
+  );
+  const applyZoom = useActiveCallback(
+    (map: MapRef, zoom: number, sequence: number) => {
+      if (
+        sequence !== requestSequence.current ||
+        mapSession.ref.current !== map ||
+        !mapSession.ready
+      ) {
+        return;
+      }
+      void map
+        .zoomTo(
+          Math.max(
+            mapSession.minZoom ?? 0,
+            Math.min(mapSession.maxZoom ?? 24, zoom)
+          )
+        )
+        .catch((error) => reportError(map, sequence, error));
+    }
+  );
   const navigate = async (change: number): Promise<void> => {
     const map = mapSession.ref.current;
     if (!map || !mapSession.ready) return;
+    const sequence = ++requestSequence.current;
+
     try {
       // Region-change snapshots can precede the settled renderer zoom.
       const zoom = await map.getZoom();
-      await map.zoomTo(
-        Math.max(
-          mapSession.minZoom ?? 0,
-          Math.min(mapSession.maxZoom ?? 24, zoom + change)
-        )
-      );
+      applyZoom(map, zoom + change, sequence);
     } catch (error) {
-      reportError(error);
+      reportError(map, sequence, error);
     }
   };
   const resetNorth = async (): Promise<void> => {
     const map = mapSession.ref.current;
     if (!map || !mapSession.ready) return;
+    const sequence = ++requestSequence.current;
+
     try {
       await map.easeTo({
         bearing: 0,
         ...(props.visualizePitch ? { pitch: 0 } : {}),
       });
     } catch (error) {
-      reportError(error);
+      reportError(map, sequence, error);
     }
   };
   return (
@@ -717,6 +555,7 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
     readonly text: string;
   } | null>(null);
   const maxWidth = props.maxWidth ?? 100;
+  // Passive effect cleanup can run after layout unmount and promise settlement.
   const reportError = useActiveCallback(props.onError);
   const unit = props.unit ?? "metric";
   if (!Number.isFinite(maxWidth) || maxWidth <= 0)
@@ -854,14 +693,6 @@ const DefaultPin = (): ReactElement => (
     </View>
   </View>
 );
-
-const pagePoint = (event: GestureResponderEvent): Point => [
-  event.nativeEvent.pageX,
-  event.nativeEvent.pageY,
-];
-
-const distance = (first: Point, second: Point): number =>
-  Math.hypot(first[0] - second[0], first[1] - second[1]);
 
 const groundDistance = (first: LngLat, second: LngLat): number => {
   const radians = Math.PI / 180;

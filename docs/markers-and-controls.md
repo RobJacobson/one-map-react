@@ -14,7 +14,7 @@ Markers place content at a geographic position. Their appearance can be similar 
 
 `Popup` follows mutable position, anchor, offset, width, children, and callbacks. Dismissal and focus options are creation inputs. Native popups compose live anchored content and an accessible close button; unmount never calls `onClose`. `Control` positions host content in a corner, and standard native controls use the common camera methods. TF08 adds default native acquisition, streaming provider overrides, explicit permission services, location display, and following; one-shot `getCurrentPosition` injection remains supported. Web without an explicit provider retains SDK delegation. See [the TF08 record](tf08-location-offline-capture.md) for implemented behavior and pending acceptance. Browser fullscreen keeps browser semantics and native requests fail explicitly. Native popups reject an explicit `focusAfterOpen`; native attribution uses the platform icon and rejects `compact={false}` instead of ignoring expanded presentation.
 
-GeoJSON and vector `Source.onClick` callbacks receive source feature hits and `stopPropagation()`. Map clicks include rendered features from `interactiveLayerIds`; failed queries report `onError`, and pending queries are discarded on unmount. Source callbacks and selected native hitboxes are mutable. Web source activation selects the topmost registered source independently from map `interactiveLayerIds`. Pending hits cannot activate a keyed replacement source; callback updates on the same source remain current. `Map.id` is a creation input. `useMap()` returns an enclosing common ref and `useMap(id)` resolves a named map in the same `MapSetup`; missing context, duplicate IDs, and missing named maps fail explicitly. Commands still reject when the underlying map is not attached or ready.
+GeoJSON and vector `Source.onClick` callbacks receive source feature hits and `stopPropagation()`. Map clicks include rendered features from `interactiveLayerIds`; failed queries report `onError`, and pending queries are discarded on unmount. Source callbacks and selected native hitboxes are mutable. Web source activation selects the topmost registered source independently from map `interactiveLayerIds`. Pending hits cannot activate a keyed replacement source; callback updates on the same source remain current. `Map.id` is a creation input. `useMap()` returns an enclosing common ref and `useMap(id)` resolves a named map in the same `MapSetup`, following the [map-access lifecycle](tf07-ui.md#common-behavior). Commands still reject when the underlying map is not attached or ready.
 
 ## Research basis
 
@@ -305,7 +305,7 @@ The [pinned Mapbox popup wrapper][web-mapbox-popup] assigns `popup.options.ancho
 | [Corner/margin ornament positions; scale-bar units declared][rn-map] | [Corner/margin positions; Android scale bar restricted to top-left][ml-map] | [Control corner strings; ScaleControl `unit`/`maxWidth` updates][web-scale] | Validate placement/unit combinations; unsupported placement cannot silently become another corner. |
 | [No corresponding wrapper control update lifecycle][rn-index] | [No corresponding wrapper control update lifecycle][ml-index] | [`useControl` creates/adds/removes once; NavigationControl options are construction-only][web-navigation] | A typed web-control extension must define updates, remount boundaries, ownership and cleanup. |
 
-The implemented `MapSetup` selects an adapter and owns a map registry. `useMap()` resolves the enclosing map; `useMap(id)` resolves a named map in that provider. react-map-gl's `MapProvider` groups wrapper map instances, and `useMap()` returns an ID-indexed collection with a `current` entry; it is not the common hook's singular-ref signature. A missing named map or a hook outside the required context throws an explicit configuration error; a ref that exists before renderer readiness still rejects commands with a readiness error. The shared ownership rules are in [the portable contract decision](decisions/0002-portable-contracts.md#public-values-and-ownership).
+The implemented `MapSetup` selects an adapter and owns a map registry. `useMap()` resolves the enclosing map; `useMap(id)` resolves a named map in that provider. react-map-gl's `MapProvider` groups wrapper map instances, and `useMap()` returns an ID-indexed collection with a `current` entry; it is not the common hook's singular-ref signature. Named lookup returns `undefined` while the map is absent, but access outside the required context still throws. A ref that exists before renderer readiness still rejects commands with a readiness error. The [map-access lifecycle](tf07-ui.md#common-behavior) describes the current contract.
 
 **Proposed API:** Use common corner positions such as `top-right` for simple controls; native ornament adapters would convert a corner and margin into native position objects. MapLibre React Native declares that Android scale bars support only the top-left corner, so a requested bottom/right placement needs a validated composition or an explicit unsupported decision. Navigation UI may compose the common camera handle with native buttons; browser fullscreen requires browser facilities. The native wrappers do not declare a GL JS `IControl` host. [Mapbox][mb-sdk-control] and [MapLibre][ml-sdk-control] define controls around DOM elements, so a native adapter needs native UI composition rather than attaching those browser instances. **Open question:** Verify control target-map ownership, command readiness, changing options/position, subscription cleanup and attribution presentation. Required attribution cannot be hidden as an unsupported-feature fallback.
 
@@ -371,13 +371,14 @@ one-map-react already declares `useMap(id)` and the promise-returning camera han
 import { useMap } from "one-map-react";
 import { Button } from "react-native";
 
-// Mount after Map id="ferry-map" registers in the same MapSetup.
+// Inside a React component under the same MapSetup as Map id="ferry-map".
 const map = useMap("ferry-map");
 
 <Button
   title="Zoom to 13"
+  disabled={!map}
   onPress={() => {
-    void map.zoomTo(13, { duration: 0 }).catch(console.error);
+    void map?.zoomTo(13, { duration: 0 }).catch(console.error);
   }}
 />;
 ```

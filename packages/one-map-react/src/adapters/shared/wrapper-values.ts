@@ -8,6 +8,22 @@ import type {
 } from "../../contracts/camera-types.js";
 
 /**
+ * Reads a finite numeric wrapper result without coercion.
+ *
+ * @param value - Wrapper result.
+ * @param name - Description used in validation errors.
+ * @returns The unchanged finite number.
+ * @throws When the wrapper returned a non-finite or nonnumeric value.
+ */
+export const finiteNumber = (value: unknown, name: string): number => {
+  if (!isFiniteNumber(value)) {
+    throw new Error(`${name} must be a finite number.`);
+  }
+
+  return value;
+};
+
+/**
  * Fills omitted padding sides with zero.
  *
  * @param padding - Partial padding, one number for every side, or omitted.

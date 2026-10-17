@@ -11,15 +11,13 @@ import {
   unavailableMapMethodError,
 } from "../native-map-options.js";
 import {
-  assertFeatureIdentifier,
-  assertFeatureState,
-  featureStateFromWrapper,
   featuresFromWrapper,
-  mutableFeatureState,
+  toQueryGeometry,
 } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
   boundsFromFlat,
+  finiteNumber,
   lngLatFromWrapper,
   pointFromWrapper,
   rejectJumpTiming,
@@ -28,16 +26,13 @@ import {
   mutableFlatBounds,
   toMaplibreCommand,
   toMaplibreFitBoundsOptions,
-  toMaplibreFlyToOptions,
 } from "./convert-camera.js";
 import {
-  toMaplibreFeatureId,
   toMaplibreFilter,
-  toMaplibreQueryTarget,
   toMaplibreRenderedQueryOptions,
   toMaplibreSourceQueryOptions,
-  toMaplibreVectorFeature,
 } from "./convert-query.js";
+import { createMaplibreFeatureStateMethods } from "./feature-state-methods.js";
 import type { MaplibreSourceRegistry } from "./source-registry.js";
 
 /** Selected native operations retain the wrapper signatures. */
@@ -102,7 +97,7 @@ export const createMaplibreMapRef = (
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
     onCameraCommand?.();
-    await camera.flyTo(toMaplibreFlyToOptions(options));
+    await camera.flyTo(toMaplibreCommand(options));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
@@ -124,11 +119,21 @@ export const createMaplibreMapRef = (
   },
   getCenter: async () =>
     lngLatFromWrapper(await requireMap(mapRef.current).getCenter()),
-  getZoom: async () => finiteNumber(await requireMap(mapRef.current).getZoom()),
+  getZoom: async () =>
+    finiteNumber(
+      await requireMap(mapRef.current).getZoom(),
+      "Map camera value"
+    ),
   getBearing: async () =>
-    finiteNumber(await requireMap(mapRef.current).getBearing()),
+    finiteNumber(
+      await requireMap(mapRef.current).getBearing(),
+      "Map camera value"
+    ),
   getPitch: async () =>
-    finiteNumber(await requireMap(mapRef.current).getPitch()),
+    finiteNumber(
+      await requireMap(mapRef.current).getPitch(),
+      "Map camera value"
+    ),
   getPadding: async () => {
     throw unavailableMapMethodError("getPadding", "maplibre-native");
   },
@@ -153,7 +158,7 @@ export const createMaplibreMapRef = (
     ),
   queryRenderedFeatures: async (target, options) => {
     const map = requireMap(mapRef.current);
-    const queryTarget = toMaplibreQueryTarget(target);
+    const queryTarget = toQueryGeometry(target);
     const queryOptions = toMaplibreRenderedQueryOptions(options);
 
     const features =
@@ -189,7 +194,7 @@ export const createMaplibreMapRef = (
     const source = sources.requireGeoJson(sourceId);
     const zoom = await source.getClusterExpansionZoom(clusterId);
 
-    return clusterZoom(zoom);
+    return finiteNumber(zoom, "Cluster expansion zoom");
   },
   getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
     const source = sources.requireGeoJson(sourceId);
@@ -207,88 +212,11 @@ export const createMaplibreMapRef = (
       "getClusterChildren"
     );
   },
-  setFeatureState: async (identifier, state) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
-    assertFeatureState(state);
-    const mutableState = mutableFeatureState(state);
-    if (sources.require(target.source).kind === "vector")
-      toMaplibreVectorFeature(target);
-
-    await sources.featureState.run(
-      target,
-      async () => {
-        const source = sources.require(target.source);
-
-        await (source.kind === "geojson"
-          ? source.ref.setFeatureState(
-              toMaplibreFeatureId(target),
-              mutableState
-            )
-          : source.ref.setFeatureState(
-              toMaplibreVectorFeature(target),
-              mutableState
-            ));
-      },
-      "write"
-    );
-  },
-  getFeatureState: async (identifier) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
-    if (sources.require(target.source).kind === "vector")
-      toMaplibreVectorFeature(target);
-
-    return sources.featureState.run(target, async () => {
-      const source = sources.require(target.source);
-
-      return featureStateFromWrapper(
-        await (source.kind === "geojson"
-          ? source.ref.getFeatureState(toMaplibreFeatureId(target))
-          : source.ref.getFeatureState(toMaplibreVectorFeature(target)))
-      );
-    });
-  },
-  removeFeatureState: async (identifier, key) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
-    if (sources.require(target.source).kind === "vector")
-      toMaplibreVectorFeature(target);
-
-    await sources.featureState.run(
-      target,
-      async () => {
-        const source = sources.require(target.source);
-
-        await (source.kind === "geojson"
-          ? source.ref.removeFeatureState(
-              toMaplibreFeatureId(target),
-              ...(key === undefined ? [] : [key])
-            )
-          : source.ref.removeFeatureState(
-              toMaplibreVectorFeature(target),
-              ...(key === undefined ? [] : [key])
-            ));
-      },
-      key === undefined ? "remove" : undefined
-    );
-  },
+  ...createMaplibreFeatureStateMethods(sources),
   resize: async () => {
     throw nativeResizeError();
   },
 });
-
-/**
- * Reads a cluster expansion zoom from the wrapper.
- *
- * @param value - Wrapper zoom value.
- * @returns The zoom as a finite number.
- * @throws When the wrapper returned a non-finite value.
- */
-const clusterZoom = (value: unknown): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error("Cluster expansion zoom must be a finite number.");
-  }
-
-  return value;
-};
 
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null,
@@ -309,12 +237,4 @@ const requireMap = (
   }
 
   return map;
-};
-
-const finiteNumber = (value: unknown): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error("Map camera value must be a finite number.");
-  }
-
-  return value;
 };

@@ -15,3 +15,15 @@ Prefer subagents for approved smoke-test execution. Use GPT-6 Luna (`gpt-6-luna`
 Keep test storage temporary. The owner requires minimal retention: preserve compact outcome and provenance summaries under `records/evidence`, and keep raw logs or screenshots only when essential to an active investigation. Remove generated consumers, dependencies, build caches, old app binaries, duplicate downloaded tools, and raw log archives when a checkpoint finishes or is abandoned. Historical outcomes must remain accurately recorded, but permanent evidence must not require multi-gigabyte test workspaces. See [retention policy](docs/testing-policy.md#storage-and-tooling).
 
 When a commit is requested, use a one-line Conventional Commit subject followed by a blank line and a bullet-point summary of the major improvements and changes. Do not commit merely because files have been edited.
+
+## Audit and fix completion standard
+
+Audit requests authorize investigation and reporting; change code only when fixes are requested. Keep code as simple as possible while preserving the full intended behavior.
+
+- Map important workflows, state transitions, and resource ownership across callers and adapters. Check overlapping operations, stale results, replacement, cancellation, failure, and teardown against the intended contract.
+- Prioritize concrete correctness and contract failures over minor cleanup. Do not stop at a finding quota or invent issues to fill one.
+- For fixes, address the root cause across every affected path and search for the same failure pattern elsewhere. Make the smallest complete change, add regression tests that fail before the fix and pass afterward, review for new failure modes, and run applicable routine checks.
+- Before claiming completion, account for every finding and affected path. Distinguish fixed and verified (name the checks), implemented but unverified, outstanding work, and areas outside the review scope.
+- State any gap between requested scope and inspected or tested behavior. Never silently narrow scope or present partial progress as completion. Distinguish reported findings fixed, checks passed, and system readiness; passing checks support only the behavior they cover.
+
+The renderer acceptance permission and timing rules above still apply. Required but deferred acceptance remains an explicit open verification gate.

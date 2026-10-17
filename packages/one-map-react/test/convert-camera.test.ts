@@ -3,17 +3,15 @@ import { describe, expect, test } from "vite-plus/test";
 import {
   toRnmapboxCornerBounds,
   toRnmapboxDefaultSettings,
-  toRnmapboxFlyToStop,
   toRnmapboxStop,
   toRnmapboxZoomStop,
 } from "../src/adapters/mapbox-native/convert-camera.js";
 import {
-  toMaplibreFlyToOptions,
-  toMaplibreInitialViewState,
+  toMaplibreCommand,
+  toMaplibreViewState,
 } from "../src/adapters/maplibre-native/convert-camera.js";
 import {
   toWebCommandOptions,
-  toWebFlyToOptions,
   toWebInitialViewState,
 } from "../src/adapters/web/convert-camera.js";
 import type { FlyToOptions, ViewState } from "../src/contracts/camera-types.js";
@@ -45,8 +43,8 @@ describe("camera conversion", () => {
     });
   });
 
-  test("MapLibre Native initial view state uses a center tuple", () => {
-    expect(toMaplibreInitialViewState(viewState)).toEqual({
+  test("MapLibre Native initial and controlled views use a center tuple", () => {
+    expect(toMaplibreViewState(viewState)).toEqual({
       center: [-122.34, 47.61],
       zoom: 11,
       bearing: 0,
@@ -55,14 +53,14 @@ describe("camera conversion", () => {
   });
 
   test("web flyTo passes center and duration", () => {
-    expect(toWebFlyToOptions(flight)).toEqual({
+    expect(toWebCommandOptions(flight)).toEqual({
       center: [-122.34, 47.61],
       duration: 1000,
     });
   });
 
   test("RNMapbox flyTo stop sets animationMode flyTo", () => {
-    expect(toRnmapboxFlyToStop(flight)).toEqual({
+    expect(toRnmapboxStop(flight, "flyTo")).toEqual({
       type: "CameraStop",
       centerCoordinate: [-122.34, 47.61],
       animationDuration: 1000,
@@ -71,7 +69,7 @@ describe("camera conversion", () => {
   });
 
   test("MapLibre Native flyTo passes center and duration", () => {
-    expect(toMaplibreFlyToOptions(flight)).toEqual({
+    expect(toMaplibreCommand(flight)).toEqual({
       center: [-122.34, 47.61],
       duration: 1000,
     });

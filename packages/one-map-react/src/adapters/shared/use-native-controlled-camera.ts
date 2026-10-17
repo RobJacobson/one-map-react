@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 
 import type { MapRef, ViewState } from "../../contracts/camera-types.js";
 import type { MoveEvent } from "../../contracts/event-types.js";
@@ -36,6 +36,7 @@ export const useNativeControlledCamera = (
   const userProposal = useRef(false);
   const dispatchingCorrection = useRef(false);
   const correctedTarget = useRef<string | undefined>(undefined);
+  // Native camera acknowledgments may reject after the map unmounts.
   const reportError = useActiveCallback(onError);
   const targetKey = viewState ? JSON.stringify(viewState) : undefined;
 
@@ -49,6 +50,7 @@ export const useNativeControlledCamera = (
     }
   }, [targetKey]);
 
+  // An already scheduled frame must read the target from the latest commit.
   const reconcile = useActiveCallback(() => {
     const proposal = observed.current;
     if (!viewState || !proposal || !ready()) return;
@@ -75,13 +77,14 @@ export const useNativeControlledCamera = (
       dispatchingCorrection.current = false;
     }
   });
-  const schedule = useActiveCallback(() => {
+  const schedule = useCallback(() => {
     if (frame.current !== undefined) return;
     frame.current = requestAnimationFrame(() => {
       frame.current = undefined;
       reconcile();
     });
-  });
+  }, [reconcile]);
+  // The app's onMove can unmount the map before the adapter reaches this observer.
   const onMove = useActiveCallback((event: MoveEvent) => {
     observed.current = event;
     userProposal.current ||= event.origin === "user";
@@ -98,9 +101,9 @@ export const useNativeControlledCamera = (
     []
   );
 
-  const onCommand = useActiveCallback(() => {
+  const onCommand = useCallback(() => {
     if (!dispatchingCorrection.current) correctedTarget.current = undefined;
-  });
+  }, []);
 
   return { onMove, onLoad: schedule, onCommand };
 };

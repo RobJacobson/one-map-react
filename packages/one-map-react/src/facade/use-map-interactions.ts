@@ -10,7 +10,7 @@ import type {
 import type { MapProps } from "../contracts/map-types.js";
 import type { MapSession } from "./map-context.js";
 
-/** Owns source hits, common propagation, subscriptions, and pending-hit teardown. */
+/** Owns map/source event propagation, subscriptions, and pending-hit teardown. */
 export const useMapInteractions = (
   props: MapProps,
   backend: Backend,
@@ -20,6 +20,8 @@ export const useMapInteractions = (
     event: "click" | "move",
     payload: ClickEvent | MoveEvent
   ) => void;
+  /** Delivers movement only while its map attachment remains active. */
+  readonly move: (event: MoveEvent) => void;
   readonly click: (event: ClickEvent) => Promise<void>;
 } => {
   const listeners = useRef({
@@ -61,12 +63,23 @@ export const useMapInteractions = (
     []
   );
   const reportClick = useCallback(
-    (event: ClickEvent) => {
+    (event: ClickEvent, currentGeneration: number) => {
+      if (!active.current || generation.current !== currentGeneration) return;
       emit("click", event);
-      propsRef.current.onClick?.(event);
+      if (active.current && generation.current === currentGeneration) {
+        propsRef.current.onClick?.(event);
+      }
     },
     [emit]
   );
+
+  const move = (event: MoveEvent): void => {
+    const currentGeneration = generation.current;
+    emit("move", event);
+    if (active.current && generation.current === currentGeneration)
+      propsRef.current.onMove?.(event);
+  };
+
   const queryHit = useCallback(
     async (event: ClickEvent): Promise<ClickEvent> => {
       const layers = propsRef.current.interactiveLayerIds;
@@ -82,6 +95,7 @@ export const useMapInteractions = (
   );
   const dispatchSource = useCallback(
     (id: string, event: ClickEvent) => {
+      const currentGeneration = generation.current;
       let stopped = false;
       const source = sources.current.get(id);
       source?.callback({
@@ -91,8 +105,13 @@ export const useMapInteractions = (
           stopped = true;
         },
       });
-      if (stopped) return;
-      const currentGeneration = generation.current;
+      if (
+        stopped ||
+        !active.current ||
+        generation.current !== currentGeneration
+      ) {
+        return;
+      }
       void queryHit(event)
         .then((hit) => {
           if (
@@ -100,7 +119,7 @@ export const useMapInteractions = (
             generation.current === currentGeneration &&
             sources.current.get(id)?.attachment === source?.attachment
           )
-            reportClick(hit);
+            reportClick(hit, currentGeneration);
         })
         .catch((error: unknown) => {
           if (
@@ -194,7 +213,7 @@ export const useMapInteractions = (
       });
       if (!propsRef.current.interactiveLayerIds) hit = { ...hit, features };
     }
-    if (!stopped) reportClick(hit);
+    if (!stopped) reportClick(hit, currentGeneration);
   };
-  return { emit, subscribe, registerSource, dispatchSource, click };
+  return { emit, move, subscribe, registerSource, dispatchSource, click };
 };

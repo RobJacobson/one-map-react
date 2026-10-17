@@ -32,7 +32,7 @@ export interface LocationAbortSignal {
 export interface LocationOptions {
   /** Finite nonnegative initial deadline in milliseconds; default 15000. */
   readonly timeoutMs?: number;
-  /** Maximum accepted cache age in milliseconds; default zero. */
+  /** Maximum cache age at acquisition or foreground reattachment, in milliseconds; default zero. */
   readonly maximumAgeMs?: number;
   /** Cancels this acquisition/watch; MapSetup supplies one for owned requests. */
   readonly signal?: LocationAbortSignal;

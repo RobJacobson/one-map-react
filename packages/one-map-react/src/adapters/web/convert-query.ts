@@ -1,39 +1,8 @@
-import type { Point } from "../../contracts/camera-types.js";
 import type {
   FeatureIdentifier,
   QueryRenderedFeaturesOptions,
   QuerySourceFeaturesOptions,
-  ScreenBounds,
 } from "../../contracts/query-types.js";
-import { isScreenBounds } from "../shared/feature-values.js";
-
-/**
- * Converts a common query target into a react-map-gl geometry argument.
- *
- * `undefined` stays `undefined`: both web renderers substitute the visible
- * viewport when no geometry is passed. A point stays `[x, y]`; a bounds
- * pair is copied into the mutable corner pair the renderers accept.
- *
- * @param target - Point, screen bounds, or `undefined` for the viewport.
- * @returns The geometry argument for the wrapper call.
- * @throws When a corner is missing.
- */
-export const toWebQueryGeometry = (
-  target: Point | ScreenBounds | undefined
-): unknown => {
-  if (target === undefined) {
-    return undefined;
-  }
-
-  if (!isScreenBounds(target)) {
-    return [target[0], target[1]];
-  }
-
-  return [
-    [target[0][0], target[0][1]],
-    [target[1][0], target[1][1]],
-  ];
-};
 
 /**
  * Converts common rendered-query options into wrapper parameters.

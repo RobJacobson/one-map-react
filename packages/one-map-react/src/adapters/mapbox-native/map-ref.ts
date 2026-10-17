@@ -8,13 +8,7 @@ import {
   nativeStopError,
   unavailableMapMethodError,
 } from "../native-map-options.js";
-import {
-  assertFeatureIdentifier,
-  assertFeatureState,
-  featureStateFromWrapper,
-  featuresFromWrapper,
-  mutableFeatureState,
-} from "../shared/feature-values.js";
+import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
   normalizeElevation,
@@ -22,13 +16,13 @@ import {
 } from "../shared/terrain-values.js";
 import {
   boundsFromRnmapboxVisible,
+  finiteNumber,
   lngLatFromWrapper,
   pointFromWrapper,
   rejectJumpTiming,
 } from "../shared/wrapper-values.js";
 import {
   toRnmapboxFitBoundsStop,
-  toRnmapboxFlyToStop,
   toRnmapboxStop,
   toRnmapboxZoomStop,
 } from "./convert-camera.js";
@@ -38,8 +32,8 @@ import {
   toRnmapboxQueryRect,
   toRnmapboxRenderedQueryArgs,
   toRnmapboxSourceQueryArgs,
-  toRnmapboxStateKey,
 } from "./convert-query.js";
+import { createMapboxFeatureStateMethods } from "./feature-state-methods.js";
 import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
 /** Selected native operations retain the wrapper signatures. */
@@ -97,7 +91,7 @@ export const createMapboxMapRef = (
     const camera = requireCamera(cameraRef.current);
 
     onCameraCommand?.();
-    await camera.setCamera(toRnmapboxFlyToStop(options));
+    await camera.setCamera(toRnmapboxStop(options, "flyTo"));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current);
@@ -117,7 +111,7 @@ export const createMapboxMapRef = (
   getCenter: async () =>
     lngLatFromWrapper(await requireMap(mapViewRef.current).getCenter()),
   getZoom: async () =>
-    finiteNumber(await requireMap(mapViewRef.current).getZoom()),
+    finiteNumber(await requireMap(mapViewRef.current).getZoom(), "Map zoom"),
   getBearing: async () => {
     throw unavailableMapMethodError("getBearing", "mapbox-native");
   },
@@ -177,7 +171,7 @@ export const createMapboxMapRef = (
       toRnmapboxClusterFeature(clusterId)
     );
 
-    return clusterZoom(zoom);
+    return finiteNumber(zoom, "Cluster expansion zoom");
   },
   getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
     const source = geoJsonSources.require(sourceId);
@@ -199,56 +193,10 @@ export const createMapboxMapRef = (
       "getClusterChildren"
     );
   },
-  setFeatureState: async (identifier, state) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
-    assertFeatureState(state);
-    const mutableState = mutableFeatureState(state);
-
-    await geoJsonSources.featureState.run(
-      target,
-      async () => {
-        const map = requireMap(mapViewRef.current);
-        await map.setFeatureState(
-          featureId,
-          mutableState,
-          sourceId,
-          sourceLayerId
-        );
-      },
-      "write"
-    );
-  },
-  getFeatureState: async (identifier) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
-
-    return geoJsonSources.featureState.run(target, async () => {
-      const map = requireMap(mapViewRef.current);
-      return featureStateFromWrapper(
-        await map.getFeatureState(featureId, sourceId, sourceLayerId)
-      );
-    });
-  },
-  removeFeatureState: async (identifier, key) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
-    const stateKey = toRnmapboxStateKey(key);
-
-    await geoJsonSources.featureState.run(
-      target,
-      async () => {
-        const map = requireMap(mapViewRef.current);
-        await map.removeFeatureState(
-          featureId,
-          stateKey,
-          sourceId,
-          sourceLayerId
-        );
-      },
-      key === undefined ? "remove" : undefined
-    );
-  },
+  ...createMapboxFeatureStateMethods(
+    () => requireMap(mapViewRef.current),
+    geoJsonSources
+  ),
   resize: async () => {
     throw nativeResizeError();
   },
@@ -269,21 +217,6 @@ export const resetMapboxFeatureState = async (
   await map.removeFeatureState(featureId, null, sourceId, sourceLayerId);
 };
 
-/**
- * Reads a cluster expansion zoom from the wrapper.
- *
- * @param value - Wrapper zoom value.
- * @returns The zoom as a finite number.
- * @throws When the wrapper returned a non-finite value.
- */
-const clusterZoom = (value: unknown): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error("Cluster expansion zoom must be a finite number.");
-  }
-
-  return value;
-};
-
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null
 ): NonNullable<ComponentRef<typeof Camera>> => {
@@ -302,14 +235,6 @@ const requireMap = (
   }
 
   return map;
-};
-
-const finiteNumber = (value: unknown): number => {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error("Map zoom must be a finite number.");
-  }
-
-  return value;
 };
 
 const mutablePair = (value: LngLat | Point): number[] => [value[0], value[1]];

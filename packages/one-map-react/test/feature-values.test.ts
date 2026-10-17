@@ -7,6 +7,7 @@ import {
   featuresFromWrapper,
   isScreenBounds,
   mutableFeatureState,
+  toQueryGeometry,
   toRnmapboxRect,
 } from "../src/adapters/shared/feature-values.js";
 
@@ -96,6 +97,33 @@ describe("isScreenBounds", () => {
     expect(isScreenBounds(undefined)).toBe(false);
   });
 });
+
+test.each([
+  { target: undefined, expected: undefined },
+  { target: [10, 20], expected: [10, 20] },
+  {
+    target: [
+      [10, 20],
+      [30, 40],
+    ],
+    expected: [
+      [10, 20],
+      [30, 40],
+    ],
+  },
+] as const)(
+  "query geometry preserves $target without sharing coordinates",
+  ({ target, expected }) => {
+    const geometry = toQueryGeometry(target);
+    expect(geometry).toEqual(expected);
+
+    if (Array.isArray(geometry)) {
+      const coordinates = Array.isArray(geometry[0]) ? geometry : [geometry];
+      for (const coordinate of coordinates) coordinate[0] = 99;
+    }
+    expect(target).toEqual(expected);
+  }
+);
 
 describe("toRnmapboxRect", () => {
   test("reorders corners into top, left, bottom, right", () => {

@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-16",
+  "scope": "Four audit findings: named-map attachment, adapter replacement, pending native navigation, and duplicate camera validation/conversion helpers.",
+  "baseRevision": "4b51e8fa291411a06a86718f19978f598ff0f170",
+  "reviewedDiffSha256": "a9eba6cb25aca59b2ce7a4bac055940a390b7299362cf9a6c5c5c4efeeddda4f",
+  "diffCommand": "git diff --binary -- docs packages/one-map-react",
+  "validatedPackageSha256": "707285eb98a710ee31c9b6ff5969fc3844cc09b9cc645cf073b8a8d1fbe93f0d",
+  "changes": [
+    "Named useMap returns undefined while absent and follows attachment; enclosing useMap retains its required MapRef return type.",
+    "MapSetup requires a new React key when the adapter changes, resetting readiness and pending interactions.",
+    "Native navigation uses the existing committed callback guard and verifies map identity before dispatching a delayed zoom command.",
+    "One finite-number validator preserves each caller's error message; RNMapbox flyTo uses the existing camera converter directly."
+  ],
+  "regressions": {
+    "beforeFixes": "Named initial attachment, unkeyed adapter replacement, navigation after control removal, and navigation after map replacement all failed as expected.",
+    "afterFixes": "All pass, including StrictMode named removal/reattachment, keyed adapter readiness and pending-query reset, camera failure propagation, and finite-number rejection."
+  },
+  "checks": {
+    "bun run check": "passed",
+    "bun run check:docs": "passed",
+    "bun run typecheck": "passed",
+    "bun run typecheck:apps": "passed",
+    "testScriptSubcommands": {
+      "result": "passed",
+      "execution": "Every command in package.json scripts.test ran in separate source, native, standalone-script, and process-cleanup groups. The Node and Bun process-cleanup tests ran with local process permissions; neither launches a renderer.",
+      "unitAndWebTests": 750,
+      "mockedNativeTests": 235
+    },
+    "bun run test:compiled": {
+      "result": "passed",
+      "webTests": 524,
+      "mockedNativeTests": 235,
+      "libraryBuilds": "passed",
+      "compilerAssertions": "passed"
+    },
+    "bun scripts/test-package.mjs": {
+      "result": "passed",
+      "isolatedSelections": 13
+    },
+    "git diff --check": "passed",
+    "manualReview": "Reviewed changed callers, preserved validation and error handling, emitted hook overloads, current documentation and example usage. Historical acceptance records remain unchanged."
+  },
+  "diagnostics": "Nonblocking Bun moduleSuffixes and experimental TypeScript API warnings remained visible; the build reported 17 React Compiler optimization diagnostics.",
+  "acceptance": {
+    "result": "not_run",
+    "reason": "Explicitly deferred by the owner. Actual renderer timing and interactions remain unverified for these repairs."
+  },
+  "retention": "Packed consumers and temporary archives cleaned themselves up. No raw test logs or screenshots were retained."
+}

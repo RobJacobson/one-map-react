@@ -85,6 +85,72 @@ interface MapboxClusterCaller {
   ) => unknown;
 }
 
+const forwardedMethodNames = [
+  "on",
+  "off",
+  "once",
+  "addControl",
+  "removeControl",
+  "hasControl",
+  "getSource",
+  "getLayer",
+  "getCanvas",
+  "getCanvasContainer",
+  "getContainer",
+  "getStyle",
+  "loaded",
+  "isStyleLoaded",
+  "areTilesLoaded",
+  "triggerRepaint",
+  "getVerticalFieldOfView",
+  "setVerticalFieldOfView",
+  "getTerrain",
+  "getProjection",
+  "getLight",
+  "getLanguage",
+  "setLanguage",
+  "getWorldview",
+  "setWorldview",
+  "getScaleFactor",
+  "setScaleFactor",
+  "getGlyphsUrl",
+  "getSchema",
+  "getSlot",
+  "getSlots",
+  "listModels",
+  "setGlyphsUrl",
+  "setSchema",
+  "setSlot",
+  "setRain",
+  "getRain",
+  "setSnow",
+  "getSnow",
+  "setLights",
+  "getLights",
+  "getFog",
+  "addImport",
+  "updateImport",
+  "removeImport",
+  "moveImport",
+  "setColorTheme",
+  "setConfig",
+  "getConfig",
+  "addInteraction",
+  "addModel",
+  "removeModel",
+  "hasModel",
+  "queryRasterValue",
+  "getHorizontalFieldOfView",
+  "getFeaturesetDescriptors",
+  "getIndoorTileOptions",
+  "getNearClipOffset",
+  "setNearClipOffset",
+  "setImportColorTheme",
+  "setConfigProperty",
+  "getConfigProperty",
+  "removeInteraction",
+] as const satisfies readonly (keyof MapboxMapRef)[];
+
 // The react-map-gl components accept the full style-spec surface; the facade
 // converts props before they reach this boundary.
 /** Selects mapbox-web and supplies react-map-gl Mapbox components. */
@@ -94,71 +160,7 @@ export const adapter: Adapter & { readonly backend: "mapbox-web" } =
     createAdvancedMethods: (getHandle) => {
       const selectedHandle = () => getHandle() as unknown as MapboxMapRef;
       return {
-        ...createWebMethodForwarders(selectedHandle, [
-          "on",
-          "off",
-          "once",
-          "addControl",
-          "removeControl",
-          "hasControl",
-          "getSource",
-          "getLayer",
-          "getCanvas",
-          "getCanvasContainer",
-          "getContainer",
-          "getStyle",
-          "loaded",
-          "isStyleLoaded",
-          "areTilesLoaded",
-          "triggerRepaint",
-          "getVerticalFieldOfView",
-          "setVerticalFieldOfView",
-          "getTerrain",
-          "getProjection",
-          "getLight",
-          "getLanguage",
-          "setLanguage",
-          "getWorldview",
-          "setWorldview",
-          "getScaleFactor",
-          "setScaleFactor",
-          "getGlyphsUrl",
-          "getSchema",
-          "getSlot",
-          "getSlots",
-          "listModels",
-          "setGlyphsUrl",
-          "setSchema",
-          "setSlot",
-          "setRain",
-          "getRain",
-          "setSnow",
-          "getSnow",
-          "setLights",
-          "getLights",
-          "getFog",
-          "addImport",
-          "updateImport",
-          "removeImport",
-          "moveImport",
-          "setColorTheme",
-          "setConfig",
-          "getConfig",
-          "addInteraction",
-          "addModel",
-          "removeModel",
-          "hasModel",
-          "queryRasterValue",
-          "getHorizontalFieldOfView",
-          "getFeaturesetDescriptors",
-          "getIndoorTileOptions",
-          "getNearClipOffset",
-          "setNearClipOffset",
-          "setImportColorTheme",
-          "setConfigProperty",
-          "getConfigProperty",
-          "removeInteraction",
-        ]),
+        ...createWebMethodForwarders(selectedHandle, forwardedMethodNames),
         fire: ((...args: Parameters<MapboxMapInstance["fire"]>) =>
           selectedHandle()
             .getMap()
@@ -322,72 +324,7 @@ export type WebMapRef = MapRef & {
   readonly setDebugOptions: (options: Partial<WebDebugOptions>) => void;
   /** Reads renderer diagnostics. */
   readonly getDebugOptions: () => WebDebugOptions;
-} & Pick<
-    MapboxMapRef,
-    | "on"
-    | "off"
-    | "once"
-    | "addControl"
-    | "removeControl"
-    | "hasControl"
-    | "getSource"
-    | "getLayer"
-    | "getCanvas"
-    | "getCanvasContainer"
-    | "getContainer"
-    | "getStyle"
-    | "loaded"
-    | "isStyleLoaded"
-    | "areTilesLoaded"
-    | "triggerRepaint"
-    | "queryRasterValue"
-    | "getVerticalFieldOfView"
-    | "setVerticalFieldOfView"
-    | "getHorizontalFieldOfView"
-    | "setRain"
-    | "getRain"
-    | "setSnow"
-    | "getSnow"
-    | "setLights"
-    | "getLights"
-    | "getFog"
-    | "getTerrain"
-    | "getProjection"
-    | "getLight"
-    | "addImport"
-    | "updateImport"
-    | "removeImport"
-    | "moveImport"
-    | "setImportColorTheme"
-    | "setColorTheme"
-    | "setConfig"
-    | "getConfig"
-    | "setConfigProperty"
-    | "getConfigProperty"
-    | "addInteraction"
-    | "removeInteraction"
-    | "addModel"
-    | "removeModel"
-    | "hasModel"
-    | "getGlyphsUrl"
-    | "getNearClipOffset"
-    | "getSchema"
-    | "getSlot"
-    | "getSlots"
-    | "listModels"
-    | "setGlyphsUrl"
-    | "setNearClipOffset"
-    | "setSchema"
-    | "setSlot"
-    | "getFeaturesetDescriptors"
-    | "getIndoorTileOptions"
-    | "getLanguage"
-    | "setLanguage"
-    | "getWorldview"
-    | "setWorldview"
-    | "getScaleFactor"
-    | "setScaleFactor"
-  >;
+} & Pick<MapboxMapRef, (typeof forwardedMethodNames)[number]>;
 
 /** Map props with DOM presentation forwarded to the map container. */
 export interface WebMapProps extends Omit<MapProps, "mapStyle"> {

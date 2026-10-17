@@ -10,16 +10,146 @@ test("idle frames do not traverse historical source registrations", async () => 
   const state = new NativeFeatureState(async () => {});
   for (let index = 0; index < 1000; index += 1)
     state.register(`temporary-${index}`, "geojson")();
-  // Inspect traversal only: retained ownership still protects detached-source errors.
+  const detach = state.register("retained", "geojson");
+  await state.run({ source: "retained", id: 1 }, async () => {}, "write");
+  detach();
+  // Inspect retained storage and traversal without exposing production diagnostics.
   const history = (state as unknown as { sources: Map<string, unknown> })
     .sources;
   const traversal = vi.spyOn(history, "values");
   await state.flush(() => {});
   expect(traversal).not.toHaveBeenCalled();
-  await expect(
-    state.run({ source: "temporary-0", id: 1 }, async () => {})
-  ).rejects.toThrow("detached");
+  expect(history.size).toBe(1);
 });
+
+test("failed reset obligations survive detachment until a replacement retries cleanup", async () => {
+  const failure = new Error("Reset failed.");
+  const reset = vi.fn<() => Promise<void>>().mockRejectedValue(failure);
+  const state = new NativeFeatureState(reset);
+  state.register("routes", "geojson");
+  await state.run(route, async () => {}, "write");
+  state.register("routes", "geojson")();
+  const reportError = vi.fn();
+  const retryDetach = state.register("routes", "geojson");
+  await state.flush(reportError);
+  expect(reportError).toHaveBeenCalledWith(failure);
+  retryDetach();
+  await state.flush(reportError);
+  const history = (
+    state as unknown as { sources: ReadonlyMap<string, unknown> }
+  ).sources;
+  expect(history.size).toBe(1);
+  reset.mockResolvedValue(undefined);
+  const detach = state.register("routes", "geojson");
+  await state.flush(reportError);
+  expect(reset).toHaveBeenCalledTimes(2);
+  detach();
+  await state.flush(reportError);
+  expect(history.size).toBe(0);
+});
+
+test.each(["resolve", "reject"] as const)(
+  "empty detached records wait for queued work to %s before allowing raw-style reuse",
+  async (outcome) => {
+    const state = new NativeFeatureState(async () => {});
+    const detach = state.register("routes", "geojson");
+    const started = deferred();
+    const finish = deferred();
+    const failure = new Error("Retiring read failed.");
+    const reading = state.run(route, async () => {
+      started.resolve();
+      await finish.promise;
+      if (outcome === "reject") throw failure;
+    });
+    const rejected = expect(reading).rejects.toThrow();
+    await started.promise;
+    const dispatchQueued = vi.fn(async () => {});
+    const queued = state.run(route, dispatchQueued);
+    const queuedRejection = expect(queued).rejects.toThrow("detached");
+    detach();
+    const history = (
+      state as unknown as { sources: ReadonlyMap<string, unknown> }
+    ).sources;
+    expect(history.size).toBe(1);
+    finish.resolve();
+    await Promise.all([rejected, queuedRejection]);
+    await state.flush(() => {});
+    expect(dispatchQueued).not.toHaveBeenCalled();
+    expect(history.size).toBe(0);
+    const rawRead = vi.fn(async () => ({ raw: true }));
+    await expect(state.run(route, rawRead)).resolves.toEqual({ raw: true });
+    await state.flush(() => {});
+    expect(rawRead).toHaveBeenCalledTimes(1);
+    expect(history.size).toBe(0);
+  }
+);
+
+test("pending reclamation cannot delete a same-id replacement or its later queued work", async () => {
+  const state = new NativeFeatureState(async () => {});
+  state.register("routes", "geojson")();
+  const detach = state.register("routes", "vector");
+  const started = deferred();
+  const finish = deferred();
+  const reading = state.run(route, async () => {
+    started.resolve();
+    await finish.promise;
+  });
+  await started.promise;
+  const history = (
+    state as unknown as { sources: ReadonlyMap<string, unknown> }
+  ).sources;
+  expect(history.size).toBe(1);
+  finish.resolve();
+  await reading;
+  await state.flush(() => {});
+  expect(history.size).toBe(1);
+  detach();
+  await state.flush(() => {});
+  expect(history.size).toBe(0);
+  state.register("routes", "geojson");
+  await state.run(route, async () => {});
+  expect(history.size).toBe(1);
+});
+
+test.each(["geojson", "vector"] as const)(
+  "empty %s records are reclaimed after whole-state removal",
+  async (kind) => {
+    const state = new NativeFeatureState(async () => {});
+    const detach = state.register("routes", kind);
+    await state.run(route, async () => {}, "write");
+    await state.run(route, async () => {}, "remove");
+    detach();
+    await state.flush(() => {});
+    expect(
+      (state as unknown as { sources: ReadonlyMap<string, unknown> }).sources
+        .size
+    ).toBe(0);
+  }
+);
+
+test.each(["geojson", "vector"] as const)(
+  "detached empty current families preserve the inactive %s write journal",
+  async (kind) => {
+    const removals: FeatureIdentifier[] = [];
+    const state = new NativeFeatureState(async (target) => {
+      removals.push(target);
+    });
+    state.register("routes", kind);
+    await state.run(route, async () => {}, "write");
+    state.register("routes", kind === "geojson" ? "vector" : "geojson")();
+    await state.flush(() => {});
+    const history = (
+      state as unknown as { sources: ReadonlyMap<string, unknown> }
+    ).sources;
+    expect(history.size).toBe(1);
+    const detach = state.register("routes", kind);
+    await state.flush(() => {});
+    expect(removals).toEqual([route]);
+    detach();
+    await state.flush(() => {});
+    expect(history.size).toBe(0);
+  }
+);
 
 test("the first owned lifetime preserves writes without resetting unrelated backend state", async () => {
   const renderer = createRetainedRenderer();

@@ -21,7 +21,7 @@
     "test:peers": "bun run build && bun scripts/test-peers.mjs",
     "test:package": "bun run build && bun scripts/test-package.mjs",
     "test:example-resolution": "bun run build && bun scripts/test-example-resolution.mjs",
-    "validate": "bun run check && bun run check:docs && bun run typecheck && bun run test && bun run test:package",
+    "validate": "bun run check && bun run check:docs && bun run typecheck && bun run typecheck:apps && bun run test && bun run test:package",
     "pack": "bun run build && mkdir -p artifacts && cd packages/one-map-react && bun pm pack --destination ../../artifacts --ignore-scripts",
     "test:native": "jest --runInBand",
     "dev:web": "bun run build && bun run --parallel --filter one-map-react --filter @one-map/example-map --filter @one-map/web dev",

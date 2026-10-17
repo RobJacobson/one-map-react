@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-17",
+  "scope": "Two remaining audit bugs: overlapping one-shot location requests and custom web images after style replacement; remove the redundant browser location conversion wrapper.",
+  "baseRevision": "bd0ef7f744d11bff8d5af39452345c01ae93f095",
+  "reviewedDiffSha256": "1fa7657d0815b051a54981f6cdb7709a68cf325a3071bc2fdf98d2f9f206b24e",
+  "diffCommand": "git diff --binary -- docs packages/one-map-react",
+  "validatedPackageSha256": "556d66bc5d96a4b116417982fff04a3f3b7f24d62e8cd212c9c90418135ef469",
+  "findings": [
+    {
+      "finding": "Repeated one-shot location requests leave camera dispatch permanently blocked.",
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "affectedPaths": [
+        "Shared useGeolocationControl",
+        "NativeGeolocateControl for both native adapters",
+        "InjectedGeolocateControl for both web adapters"
+      ],
+      "change": "A fresh acquisition resets dispatch ownership; generation guards still suppress stale completion and errors. Streaming resume retains its existing dispatch ownership.",
+      "evidence": "Four regression cases cover injected and service acquisition with older camera commands resolving or rejecting. A separate test preserves streaming coalescing, gesture interruption and resume without another watch. Existing native and web control suites pass."
+    },
+    {
+      "finding": "A replacement style sprite with the same name substitutes for a registered custom image.",
+      "implementation": "fixed",
+      "routineVerification": "passed",
+      "affectedPaths": [
+        "Shared web Images for Mapbox and MapLibre",
+        "MapLibre sprite changes during in-place style diffs"
+      ],
+      "change": "Style load retires installed-image ownership and pending loads before reconciling current entries. MapLibre getSprite value changes trigger the same reset. Explicit pending removals retain their existing retry contract.",
+      "evidence": "Ten cases across both web adapters cover ready and delayed styles, late load success/failure, unrelated sprite preservation and unmount before readiness. One MapLibre case covers sprite replacement through styledata without style.load and avoids reloads on ordinary styledata.",
+      "boundaryReview": "Inspected installed MapLibre 6.13.0 Map.getSprite, Style._updateDiff/setState/setSprite/_loadSprite, and ImageManager.setSpriteImages. Native images delegate registration to their existing wrappers and have no shared web ownership bookkeeping."
+    },
+    {
+      "finding": "The browser geolocation conversion wrapper and its private event type are redundant.",
+      "implementation": "removed",
+      "routineVerification": "passed",
+      "affectedPaths": [
+        "createWebUi default SDK geolocation callbacks for both web adapters"
+      ],
+      "change": "Call positionFromWrapper directly with an unknown event; preserve validation, normalization and the committed callback guard.",
+      "evidence": "Existing browser geolocation forwarding and normalization tests pass. Repository search found no remaining references to the removed wrapper or private type."
+    }
+  ],
+  "regressions": {
+    "beforeFixes": "Four overlapping-location cases and ten style-replacement cases failed as expected; streaming coalescing already passed. The additional MapLibre in-place sprite replacement case also failed before its correction.",
+    "afterFixes": "All 16 new cases pass in source and compiled web suites.",
+    "setupCorrection": "The first type check rejected Promise.withResolvers in test code under the existing TypeScript library target. Tests now use the existing Promise callback pattern; type checks pass without configuration changes."
+  },
+  "checks": {
+    "bun run check": "passed",
+    "bun run check:docs": "passed",
+    "bun run typecheck": "passed",
+    "bun run typecheck:apps": "passed",
+    "testScriptSubcommands": {
+      "result": "passed",
+      "execution": "Every package.json scripts.test command ran in source/native, standalone-script, and process-cleanup groups. Node and Bun process-cleanup tests used local process permissions; no renderer launched.",
+      "unitAndWebTests": 766,
+      "mockedNativeTests": 235
+    },
+    "bun run test:compiled": {
+      "result": "passed",
+      "webTests": 540,
+      "mockedNativeTests": 235,
+      "libraryBuilds": "passed",
+      "compilerAssertions": "passed"
+    },
+    "bun scripts/test-package.mjs": {
+      "result": "passed",
+      "isolatedSelections": 13
+    },
+    "git diff --check": "passed",
+    "manualReview": "Reviewed all shared hook callers and generation changes, both image loader conventions, installed and pending image lifetimes, URL/sdf updates, pending removal retries, failure reporting, teardown/reuse, the browser normalization boundary, comments and current implementation documentation."
+  },
+  "diagnostics": "Nonblocking Bun moduleSuffixes and experimental TypeScript API warnings remain. React Compiler reports 17 optimization diagnostics, matching the previous recorded count; they do not represent runtime acceptance.",
+  "outstanding": [
+    "Renderer acceptance for these repairs is explicitly deferred. Existing renderer results apply to their recorded artifacts."
+  ],
+  "outsideScope": [
+    "A new whole-repository audit",
+    "Physical devices, browsers, simulators and emulators",
+    "New selected-peer installs and Metro transport; exports, dependency versions and linking are unchanged"
+  ],
+  "retention": "Package-check consumers and temporary archive cleaned themselves up. No raw logs, screenshots, native applications or acceptance workspaces were created."
+}

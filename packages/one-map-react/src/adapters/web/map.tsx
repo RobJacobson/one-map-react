@@ -14,7 +14,7 @@ import type { ClickEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { MapStyle } from "../../contracts/style-types.js";
 import { useMapCapture } from "../shared/map-capture.js";
-import { useActiveCallback } from "../shared/use-active-callback.js";
+import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding, toFlatBounds } from "../shared/wrapper-values.js";
 import type {
@@ -28,6 +28,7 @@ import { toWebInitialViewState } from "./convert-camera.js";
 import { toWebGestureProps } from "./convert-gestures.js";
 import { clickEventFromWeb, moveEventFromWeb } from "./convert-move-event.js";
 import { createWebMapRef } from "./map-ref.js";
+import { useWebStyleLoad } from "./use-web-style-load.js";
 
 /**
  * Builds a web Map component that delegates to a react-map-gl Map.
@@ -123,33 +124,38 @@ export const createWebMap = <
       const [styleMap, setStyleMap] = useState<StyleLoadTarget | null>(null);
       const styleKey = styleContentKey(mapStyle);
       const frozenViewState = useFrozenValue(initialViewState);
-      const reportMove = useActiveCallback(onMove);
-      const reportMoveStart = useActiveCallback(onMoveStart);
-      const reportMoveEnd = useActiveCallback(onMoveEnd);
-      const reportIdle = useActiveCallback(onIdle);
-      const reportClick = useActiveCallback(onClick);
-      const reportDblClick = useActiveCallback(onDblClick);
-      const reportContextMenu = useActiveCallback(onContextMenu);
-      const reportMouseDown = useActiveCallback(onMouseDown);
-      const reportMouseUp = useActiveCallback(onMouseUp);
-      const reportMouseMove = useActiveCallback(onMouseMove);
-      const reportMouseEnter = useActiveCallback(onMouseEnter);
-      const reportMouseLeave = useActiveCallback(onMouseLeave);
-      const reportMouseOver = useActiveCallback(onMouseOver);
-      const reportMouseOut = useActiveCallback(onMouseOut);
-      const reportWheel = useActiveCallback(onWheel);
-      const reportDrag = useActiveCallback(onDrag);
-      const reportDragStart = useActiveCallback(onDragStart);
-      const reportDragEnd = useActiveCallback(onDragEnd);
-      const reportTouchStart = useActiveCallback(onTouchStart);
-      const reportTouchMove = useActiveCallback(onTouchMove);
-      const reportTouchEnd = useActiveCallback(onTouchEnd);
-      const reportTouchCancel = useActiveCallback(onTouchCancel);
-      const reportLoad = useActiveCallback(onLoad);
+      // recycle() retains SDK listeners and old props until the next logical map attaches.
+      const report = useActiveCallbacks({
+        onMove,
+        onMoveStart,
+        onMoveEnd,
+        onIdle,
+        onClick,
+        onDblClick,
+        onContextMenu,
+        onMouseDown,
+        onMouseUp,
+        onMouseMove,
+        onMouseEnter,
+        onMouseLeave,
+        onMouseOver,
+        onMouseOut,
+        onWheel,
+        onDrag,
+        onDragStart,
+        onDragEnd,
+        onTouchStart,
+        onTouchMove,
+        onTouchEnd,
+        onTouchCancel,
+        onLoad,
+        onStyleLoad,
+        onError,
+        onResize,
+      });
+
       const pendingLoad = useRef(false);
-      const reportStyleLoad = useActiveCallback(onStyleLoad);
-      const reportError = useActiveCallback(onError);
-      const reportResize = useActiveCallback(onResize);
+
       const setMapHandle = useCallback((handle: WebMapHandle | null) => {
         mapRef.current = handle;
         const next = handle?.getMap() ?? null;
@@ -181,9 +187,9 @@ export const createWebMap = <
       useLayoutEffect(() => {
         if (styleMap && pendingLoad.current) {
           pendingLoad.current = false;
-          reportLoad();
+          report.onLoad();
         }
-      }, [styleMap, reportLoad]);
+      }, [styleMap, report]);
 
       useLayoutEffect(
         () => () => {
@@ -192,51 +198,7 @@ export const createWebMap = <
         []
       );
 
-      // style.load is style completion. react-map-gl onStyleData is activity
-      // and is not this callback. A fresh map can finish style.load before
-      // this commit, while isStyleLoaded() is still false; the map load that
-      // follows then reports once. reuse() can fire that load before this
-      // listener exists and still leave isStyleLoaded() false, so the next
-      // idle reports once when the style is loaded. A later mapStyle
-      // replacement re-runs this effect so an in-place style diff that
-      // never emits style.load still reports once the current style is
-      // loaded. The listener is facade-owned, so logical unmount removes
-      // it even when reuseMaps keeps the renderer.
-      useLayoutEffect(() => {
-        if (!styleMap) {
-          return;
-        }
-
-        let sawStyleLoad = false;
-        const onStyleLoadEvent = () => {
-          sawStyleLoad = true;
-          reportStyleLoad();
-        };
-        const reportMissedStyleLoad = () => {
-          if (sawStyleLoad || !styleMap.isStyleLoaded()) {
-            return;
-          }
-
-          sawStyleLoad = true;
-          reportStyleLoad();
-        };
-
-        styleMap.on("style.load", onStyleLoadEvent);
-
-        if (styleMap.isStyleLoaded()) {
-          sawStyleLoad = true;
-          reportStyleLoad();
-        } else {
-          styleMap.on("load", reportMissedStyleLoad);
-          styleMap.on("idle", reportMissedStyleLoad);
-        }
-
-        return () => {
-          styleMap.off("style.load", onStyleLoadEvent);
-          styleMap.off("load", reportMissedStyleLoad);
-          styleMap.off("idle", reportMissedStyleLoad);
-        };
-      }, [styleMap, styleKey, reportStyleLoad]);
+      useWebStyleLoad(styleMap, styleKey, report.onStyleLoad);
 
       // Pinch zoom and rotation are one handler. Disabling the handler would
       // also disable zoom, so rotation is turned off on the handler itself.
@@ -368,44 +330,44 @@ export const createWebMap = <
               hash,
             })}
             onLoad={() => {
-              if (mapRef.current) reportLoad();
+              if (mapRef.current) report.onLoad();
               else pendingLoad.current = true;
             }}
             onError={(event) => {
               capture.fail(event.error);
-              reportError({ error: event.error });
+              report.onError({ error: event.error });
             }}
             onResize={() => {
-              reportResize();
+              report.onResize();
             }}
-            onMove={bindMove(onMove, reportMove)}
-            onMoveStart={bindMove(onMoveStart, reportMoveStart)}
-            onMoveEnd={bindMove(onMoveEnd, reportMoveEnd)}
+            onMove={bindMove(onMove, report.onMove)}
+            onMoveStart={bindMove(onMoveStart, report.onMoveStart)}
+            onMoveEnd={bindMove(onMoveEnd, report.onMoveEnd)}
             onIdle={
               onIdle
                 ? () => {
-                    reportIdle();
+                    report.onIdle();
                   }
                 : undefined
             }
-            onClick={bindPointer(onClick, reportClick)}
-            onDblClick={bindPointer(onDblClick, reportDblClick)}
-            onContextMenu={bindPointer(onContextMenu, reportContextMenu)}
-            onMouseDown={bindPointer(onMouseDown, reportMouseDown)}
-            onMouseUp={bindPointer(onMouseUp, reportMouseUp)}
-            onMouseMove={bindPointer(onMouseMove, reportMouseMove)}
-            onMouseEnter={bindPointer(onMouseEnter, reportMouseEnter)}
-            onMouseLeave={bindPointer(onMouseLeave, reportMouseLeave)}
-            onMouseOver={bindPointer(onMouseOver, reportMouseOver)}
-            onMouseOut={bindPointer(onMouseOut, reportMouseOut)}
-            onWheel={bindPointer(onWheel, reportWheel)}
-            onDrag={bindMove(onDrag, reportDrag)}
-            onDragStart={bindMove(onDragStart, reportDragStart)}
-            onDragEnd={bindMove(onDragEnd, reportDragEnd)}
-            onTouchStart={bindPointer(onTouchStart, reportTouchStart)}
-            onTouchMove={bindPointer(onTouchMove, reportTouchMove)}
-            onTouchEnd={bindPointer(onTouchEnd, reportTouchEnd)}
-            onTouchCancel={bindPointer(onTouchCancel, reportTouchCancel)}
+            onClick={bindPointer(onClick, report.onClick)}
+            onDblClick={bindPointer(onDblClick, report.onDblClick)}
+            onContextMenu={bindPointer(onContextMenu, report.onContextMenu)}
+            onMouseDown={bindPointer(onMouseDown, report.onMouseDown)}
+            onMouseUp={bindPointer(onMouseUp, report.onMouseUp)}
+            onMouseMove={bindPointer(onMouseMove, report.onMouseMove)}
+            onMouseEnter={bindPointer(onMouseEnter, report.onMouseEnter)}
+            onMouseLeave={bindPointer(onMouseLeave, report.onMouseLeave)}
+            onMouseOver={bindPointer(onMouseOver, report.onMouseOver)}
+            onMouseOut={bindPointer(onMouseOut, report.onMouseOut)}
+            onWheel={bindPointer(onWheel, report.onWheel)}
+            onDrag={bindMove(onDrag, report.onDrag)}
+            onDragStart={bindMove(onDragStart, report.onDragStart)}
+            onDragEnd={bindMove(onDragEnd, report.onDragEnd)}
+            onTouchStart={bindPointer(onTouchStart, report.onTouchStart)}
+            onTouchMove={bindPointer(onTouchMove, report.onTouchMove)}
+            onTouchEnd={bindPointer(onTouchEnd, report.onTouchEnd)}
+            onTouchCancel={bindPointer(onTouchCancel, report.onTouchCancel)}
           >
             {children}
           </wrapper.Map>

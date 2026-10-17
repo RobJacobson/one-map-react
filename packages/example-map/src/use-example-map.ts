@@ -5,7 +5,13 @@ import type {
   MoveEvent,
   ViewState,
 } from "one-map-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 
 import { cameraMatches, initialCamera, readCamera } from "./camera.js";
 
@@ -19,7 +25,7 @@ interface Attachment {
 }
 
 /**
- * Owns camera handoff outside the keyed map tree and rejects stale callbacks.
+ * Bounds map loading and camera handoff outside the keyed map tree, rejecting stale callbacks.
  * @param adapters - Platform-specific adapters imported through public package entries.
  * @param mapboxEnabled - Whether a public Mapbox token is configured.
  * @returns Shared map callbacks and engine controls for either application shell.
@@ -62,7 +68,8 @@ export const useExampleMap = (
 
   const fail = () => {
     if (!isCurrent()) return;
-    verification.current?.abort();
+    verification.current ??= new AbortController();
+    verification.current.abort();
     busy.current = false;
     setStatus("error");
     // Renderer errors can contain authenticated URLs; keep application guidance credential-free.
@@ -71,40 +78,55 @@ export const useExampleMap = (
     );
   };
 
+  const failLoading = useEffectEvent(fail);
+  useEffect(() => {
+    if (status !== "loading" && status !== "switching") return;
+    const timer = setTimeout(() => failLoading(), 10000);
+    return () => clearTimeout(timer);
+  }, [attachment.generation, status]);
+
   const onLoad = async (): Promise<void> => {
     const map = mapRef.current;
-    if (!map || !isCurrent()) return;
+    if (!map || !isCurrent() || verification.current?.signal.aborted) return;
     verification.current?.abort();
     const controller = new AbortController();
     verification.current = controller;
+    let poll: ReturnType<typeof setTimeout> | undefined;
     try {
-      await map.jumpTo({
-        center: [attachment.camera.longitude, attachment.camera.latitude],
-        zoom: attachment.camera.zoom,
-        bearing: attachment.camera.bearing,
-        pitch: attachment.camera.pitch,
-      });
-      const deadline = Date.now() + 10000;
-      while (!controller.signal.aborted && isCurrent()) {
-        const actual = await readCamera(map, adapter.backend, observed.current);
-        if (controller.signal.aborted || !isCurrent()) return;
-        // Native Mapbox orientation must come from this map's event, not the outgoing snapshot.
-        const orientationObserved =
-          adapter.backend !== "mapbox-native" ||
-          observedGeneration.current === attachment.generation;
-        if (orientationObserved && cameraMatches(actual, attachment.camera)) {
-          observed.current = actual;
-          setCamera(actual);
-          busy.current = false;
-          setStatus("ready");
-          return;
+      await withCameraDeadline(async () => {
+        await map.jumpTo({
+          center: [attachment.camera.longitude, attachment.camera.latitude],
+          zoom: attachment.camera.zoom,
+          bearing: attachment.camera.bearing,
+          pitch: attachment.camera.pitch,
+        });
+        while (!controller.signal.aborted && isCurrent()) {
+          const actual = await readCamera(
+            map,
+            adapter.backend,
+            observed.current
+          );
+          if (controller.signal.aborted || !isCurrent()) return;
+          // Native Mapbox orientation must come from this map's event, not the outgoing snapshot.
+          const orientationObserved =
+            adapter.backend !== "mapbox-native" ||
+            observedGeneration.current === attachment.generation;
+          if (orientationObserved && cameraMatches(actual, attachment.camera)) {
+            observed.current = actual;
+            setCamera(actual);
+            busy.current = false;
+            setStatus("ready");
+            return;
+          }
+          await new Promise<void>((resolve) => {
+            poll = setTimeout(resolve, 50);
+          });
         }
-        if (Date.now() >= deadline)
-          throw new Error("Camera restoration timed out.");
-        await new Promise<void>((resolve) => setTimeout(resolve, 50));
-      }
+      }, controller.signal);
     } catch {
       if (!controller.signal.aborted) fail();
+    } finally {
+      clearTimeout(poll);
     }
   };
 
@@ -115,13 +137,19 @@ export const useExampleMap = (
     busy.current = true;
     setStatus("switching");
     setError(undefined);
+    verification.current?.abort();
+    const controller = new AbortController();
+    verification.current = controller;
     try {
+      const map = mapRef.current;
       const snapshot =
-        status === "error" || !mapRef.current
+        status === "error" || !map
           ? attachment.camera
-          : await readCamera(mapRef.current, adapter.backend, observed.current);
-      if (!isCurrent()) return;
-      verification.current?.abort();
+          : await withCameraDeadline(
+              () => readCamera(map, adapter.backend, observed.current),
+              controller.signal
+            );
+      if (controller.signal.aborted || !isCurrent()) return;
       currentGeneration.current += 1;
       observed.current = snapshot;
       setCamera(snapshot);
@@ -131,7 +159,7 @@ export const useExampleMap = (
         camera: snapshot,
       });
     } catch {
-      fail();
+      if (!controller.signal.aborted) fail();
     }
   };
 
@@ -167,4 +195,30 @@ export const useExampleMap = (
     selectEngine,
     inspectCamera,
   };
+};
+
+/** Bounds camera waits and releases their timers when the attachment retires. */
+const withCameraDeadline = async <Result>(
+  operation: () => Promise<Result>,
+  signal: AbortSignal
+): Promise<Result> => {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let cancel = () => {};
+  try {
+    return await Promise.race([
+      new Promise<never>((_resolve, reject) => {
+        cancel = () => reject(new Error("Camera operation cancelled."));
+        signal.addEventListener("abort", cancel);
+        timer = setTimeout(
+          () => reject(new Error("Camera operation timed out.")),
+          10000
+        );
+        if (signal.aborted) cancel();
+      }),
+      operation(),
+    ]);
+  } finally {
+    clearTimeout(timer);
+    signal.removeEventListener("abort", cancel);
+  }
 };

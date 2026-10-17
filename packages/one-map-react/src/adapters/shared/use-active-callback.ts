@@ -1,4 +1,42 @@
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+
+type CallbackRecord = Record<string, ((...args: never[]) => void) | undefined>;
+
+type ActiveCallbacks<Callbacks extends CallbackRecord> = {
+  readonly [Key in keyof Callbacks]-?: (
+    ...args: Parameters<NonNullable<Callbacks[Key]>>
+  ) => void;
+};
+
+/**
+ * Shares one committed callback snapshot and lifetime across a fixed set of names.
+ *
+ * @param callbacks - Fixed callback names; their optional functions may change.
+ * @returns Stable handlers with each callback's argument types and teardown guard.
+ */
+export const useActiveCallbacks = <Callbacks extends CallbackRecord>(
+  callbacks: Callbacks
+): ActiveCallbacks<Callbacks> => {
+  const dispatch = useActiveCallback((key: string, args: unknown[]) => {
+    // Dynamic keys erase the argument relationship retained by ActiveCallbacks.
+    const callback = callbacks[key] as
+      | ((...values: unknown[]) => void)
+      | undefined;
+    callback?.(...args);
+  });
+  const [handlers] = useState(
+    () =>
+      // Object.fromEntries cannot retain each fixed key's argument tuple.
+      Object.fromEntries(
+        Object.keys(callbacks).map((key) => [
+          key,
+          (...args: unknown[]) => dispatch(key, args),
+        ])
+      ) as unknown as ActiveCallbacks<Callbacks>
+  );
+
+  return handlers;
+};
 
 /**
  * Returns a function that calls `callback` only while the component is mounted.

@@ -1,0 +1,112 @@
+{
+  "status": "implemented; routine verification passed through split execution; renderer acceptance deferred",
+  "recordedAt": "2026-10-17T21:13:46.582092+00:00",
+  "baselineCommit": "541652295382f6bbc2aaba45f7911c92f9b5aa22",
+  "source": {
+    "algorithm": "SHA-256 of sorted repository-relative paths, NUL, bytes, NUL",
+    "files": 101,
+    "sha256": "49ccb4cabc16c08040b9a9ba84d689140035188eab097c09d8d2c2290d177283",
+    "changedFiles": [
+      "packages/one-map-react/src/adapters/mapbox-native/feature-state-methods.ts",
+      "packages/one-map-react/src/adapters/mapbox-native/map-ref.ts",
+      "packages/one-map-react/src/adapters/mapbox-native/map.tsx",
+      "packages/one-map-react/src/adapters/mapbox-native/use-mapbox-scale-position.ts",
+      "packages/one-map-react/src/adapters/maplibre-native/feature-state-methods.ts",
+      "packages/one-map-react/src/adapters/maplibre-native/map-ref.ts",
+      "packages/one-map-react/src/adapters/maplibre-native/map.tsx",
+      "packages/one-map-react/src/adapters/shared/native-ui.tsx",
+      "packages/one-map-react/src/adapters/shared/offline-service.ts",
+      "packages/one-map-react/src/adapters/shared/use-native-marker-drag.ts",
+      "packages/one-map-react/src/adapters/web/map.tsx",
+      "packages/one-map-react/src/adapters/web/use-web-style-load.ts",
+      "packages/one-map-react/src/facade/map-setup.tsx",
+      "packages/one-map-react/src/facade/map.tsx",
+      "packages/one-map-react/src/facade/scope-map-services.ts"
+    ]
+  },
+  "changes": [
+    "Extracted native marker drag lifetime, web style-load subscriptions, and Mapbox iOS scale-position reconciliation into internal hooks.",
+    "Moved offline identity/status conversion to private module-level helpers while retaining the existing observer owner.",
+    "Extracted private shared and MapLibre native map validators.",
+    "Extracted backend-local feature-state method factories; preserved the shared queue owner and Mapbox reset operation.",
+    "Moved setup-scoped location subscriptions and acquisition cancellation into scopeMapServices."
+  ],
+  "checks": {
+    "bun run check": "passed; no formatting, lint errors, or lint warnings",
+    "bun run check:docs": "passed",
+    "bun run typecheck": "passed; four TypeScript projects",
+    "bun run typecheck:apps": "passed; three TypeScript projects",
+    "bun run test": {
+      "firstAttempt": "interrupted after source tests and initial fixtures by sandbox EPERM in the process-cleanup fixture",
+      "unitAndMockedWeb": {
+        "status": "passed",
+        "files": 36,
+        "tests": 809
+      },
+      "mockedNative": {
+        "status": "passed",
+        "suites": 6,
+        "tests": 268
+      },
+      "unrestrictedAggregateRetry": "automatic approval review rejected the aggregate because it classified renderer-related fixtures as acceptance; aggregate was not rerun unrestricted",
+      "node scripts/native-smoke-process.test.mjs": "passed separately with approved process access; local JavaScript processes only",
+      "bun scripts/native-smoke-process.test.mjs": "passed separately with approved process access; local JavaScript processes only",
+      "remainingFixtures": "all 16 remaining script invocations passed in the sandbox; no acceptance flow executed"
+    },
+    "bun run test:compiled": {
+      "status": "passed",
+      "libraryAndExampleBuilds": "passed",
+      "mockedWebTests": 560,
+      "mockedNativeTests": 268,
+      "compilerAssertions": "passed"
+    },
+    "bun scripts/test-package.mjs": {
+      "status": "passed",
+      "isolatedSelections": 13,
+      "archiveSha256": "061d80d8ec8dc9e0773afdbf4923a011172dc05b30280a68ea7bd1e8ef82fa52",
+      "scope": "packed publication, common-entry declaration isolation, aliases and selected-entry resolution; no wrapper installs or native builds"
+    },
+    "git diff --check": "passed"
+  },
+  "review": {
+    "scope": "All six requested extractions; no public entry, package manifest, dependency, fixture, or test changes.",
+    "behavior": "Reviewed moved bodies, effect dependencies, committed callbacks, queue snapshots, lazy handle lookup, error propagation and teardown ownership against baseline.",
+    "tests": "Reused existing behavioral regressions; no new behavior or uncovered extraction-specific scenario identified.",
+    "compiler": "Compared diagnostics before/after for every changed and added source module. Existing reasons unchanged; the marker try/catch optimization limitation moved from NativeMarker to its drag hook.",
+    "warnings": "Existing Bun moduleSuffixes and experimental TypeScript 7 notices remain."
+  },
+  "runtimeAcceptance": {
+    "executed": false,
+    "status": "deferred by explicit user instruction; changed lifecycle paths remain unverified with real renderers"
+  },
+  "retention": "Temporary packed consumers and archive removed by the runner; no raw logs, screenshots, or new acceptance workspace retained.",
+  "commit": "Requested: one combined fix commit followed by a separate refactor commit; exact SHAs are recorded in Git.",
+  "followupReview": {
+    "result": "no actionable findings in the six refactors",
+    "unitAndMockedWebTests": 399,
+    "mockedNativeTests": 268,
+    "rendererAcceptance": "not run; explicitly deferred",
+    "sourceSha256": "49ccb4cabc16c08040b9a9ba84d689140035188eab097c09d8d2c2290d177283",
+    "scope": "Reviewed original implementations, callers, queued snapshots, committed callbacks, effect ordering and cleanup, plus emitted marker code; affected source suites rerun."
+  },
+  "historyPreparation": {
+    "recordedAt": "2026-10-17T21:19:23.598734+00:00",
+    "squashedFixCommit": "1a84e2bad9ecf8e407344b35256a97941617529d",
+    "originalHead": "541652295382f6bbc2aaba45f7911c92f9b5aa22",
+    "recoveryBranch": "codex/ponytail-audit-map-fixes-before-squash",
+    "treePreservation": "Verified squashed fix commit tree is byte-identical to original head tree",
+    "originalCommits": [
+      "541652295382f6bbc2aaba45f7911c92f9b5aa22 fix: close map reference and native lifecycle audit findings",
+      "b92f75ebd9d570f17e20ec6df615cf3e43f11b5b fix: preserve offline subscription and image cleanup ownership",
+      "054dff599011cce70d7e72115151dbd64d036ad7 fix: restore location and image lifecycle ownership",
+      "bd0ef7f744d11bff8d5af39452345c01ae93f095 docs: define audit and fix completion standard",
+      "bea5e08ed047ded7c0243ddfdc68e6c22480561a fix: repair map lifecycles and simplify camera helpers",
+      "4b51e8fa291411a06a86718f19978f598ff0f170 fix: preserve offline observers and reject feature-state errors",
+      "3b64dfb7b2850d3d5c8b481eeb0a094de9aa835c fix: address four map audit findings",
+      "b96b2fcfd9a49664275500c56df2a90cf0da7027 fix: preserve offline subscriptions and stop clicks after teardown",
+      "3a38d78f9499aab9b8503fdf4165a9fe306f86da fix: harden location acquisition and camera handoff",
+      "f884a5d3592d69b741a945c142d0d228e60f9fd3 refactor: simplify callback guards around wrapper lifetimes",
+      "8cb29c0f11f9a101c39833b06ff81b0d5d93e74b fix: propagate settled native cameras and simplify map adapters"
+    ]
+  }
+}

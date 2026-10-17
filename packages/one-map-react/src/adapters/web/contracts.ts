@@ -204,10 +204,14 @@ export interface WebForwardedProps {
  * adapter supplies `loadWebImage` on the wrapper record.
  */
 interface WebImageMap {
+  /** Reports facade-owned registration failures through the wrapper's map error path. */
+  fire: (type: "error", event: { readonly error: Error }) => unknown;
   // Pinned maplibre-gl returns void while no style is loaded; mapbox-gl
   // returns boolean. Callers treat non-true as not loaded.
   isStyleLoaded: () => unknown;
   hasImage: (name: string) => boolean;
+  /** MapLibre can replace sprites through an in-place style diff. */
+  getSprite?: () => { id: string; url: string }[];
   // Each renderer declares its own image union; this boundary accepts any
   // decoded image a renderer-specific loadWebImage produced.
   // eslint-disable-next-line typescript/no-explicit-any -- renderer-specific image union

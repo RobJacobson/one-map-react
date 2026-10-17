@@ -1,0 +1,60 @@
+{
+  "checkpoint": "Ponytail audit fixes",
+  "date": "2026-10-16",
+  "baseRevision": "3a38d78f9499aab9b8503fdf4165a9fe306f86da",
+  "sourceSha256": "f940a4526827804463ac6a437c6ddf9dceb95b7f86f2759b309e54af278b9e75",
+  "files": {
+    "packages/one-map-react/src/adapters/maplibre-native/convert-query.ts": "5c4a0f1b6c72e92ff2177ad6f8d4716f78d2abb64dd1d8f569b338b934c58d66",
+    "packages/one-map-react/src/adapters/maplibre-native/map-ref.ts": "5c89dfe6f381bbd55c42de1328ac44739d4eade846af15741690a7f6eda0efef",
+    "packages/one-map-react/src/adapters/shared/feature-values.ts": "e759cbb782d39fbd7246541ffebf159163cf7446631f98763a6988ca43d3cf8a",
+    "packages/one-map-react/src/adapters/shared/offline-service.ts": "e1a7fd95825ae541ccf88b070396e8ffebd2062741984d4fa835f8fc6eb18a80",
+    "packages/one-map-react/src/adapters/web/convert-query.ts": "5c8338d516e9b78f9c2a1020960a4b3db53ba896e36a4dad128534726116da05",
+    "packages/one-map-react/src/adapters/web/map-ref.ts": "9383a9b85d00a6d02cd36747e0ee8139b2672bdf87c42baf47c47bb9c9470fb6",
+    "packages/one-map-react/src/facade/use-map-interactions.ts": "2759ed1e5fe36346cd0db7d22a647ae38dd8fbdb6a53570762a4f9be124eb433",
+    "packages/one-map-react/test/feature-values.test.ts": "3f1462ac6f851d190093adb9b89a196853c185f31557df8c083e4ebaa3747547",
+    "packages/one-map-react/test/map-interactions.web.test.tsx": "5e886047a5ef73ecdcf0fef6d63238befb5e11474b166226ca3a3ca7ffeae806",
+    "packages/one-map-react/test/tf08-offline.test.ts": "cd8070a08e092a8a6c0b4b0965b2e329da6b3fd2d35a2c1672c777580f64c4fb"
+  },
+  "removedProbes": {
+    "examples/shared/native-tf07-focused-screen.tmp.tsx": "c78f3d80b07c86bb0b4bc3bdef060ee7aac41f18cea3aabad2c877d9b9221d0c",
+    "examples/shared/tf07-focused-web-mapbox.tmp.tsx": "cf745b9af699c1facec9d69bea2dc26da2b4cef7c923c31f61f4c0ae7c07a272",
+    "examples/shared/tf07-focused-web-maplibre.tmp.tsx": "096157dc3b3ecf1543bce6593ccd819aaeeeec54cb892533060fdff28aa0a003"
+  },
+  "changes": [
+    "Preserve shared offline listeners after failed status readback while retaining cleanup for failed attachment.",
+    "Stop click propagation after a source callback or click subscriber retires the map attachment.",
+    "Remove three unused TF07 probes; retain historical outcome and provenance records.",
+    "Share the unchanged point/rectangle query conversion across web and MapLibre Native."
+  ],
+  "regressions": {
+    "beforeFix": "Five assertions failed as expected: offline status failure on both backends, web source unmount, and map/source click-subscriber unmount.",
+    "added": 11,
+    "finalSourceTests": {
+      "vitest": 727,
+      "mockedNativeJest": 230
+    },
+    "compiledTests": {
+      "webVitest": 505,
+      "mockedNativeJest": 230
+    },
+    "finalFocusedTests": "75 passed after refining active-download and coordinate-copy fixtures."
+  },
+  "routineChecks": {
+    "formattingAndLint": "passed",
+    "documentationStructure": "passed",
+    "libraryAndLegacyExampleTypes": "passed",
+    "workspaceAppTypes": "passed",
+    "libraryAndSharedExampleBuilds": "passed",
+    "compilerTransformChecks": "passed",
+    "standaloneRegressions": "passed, including all 16 commands after the process-cleanup checks",
+    "packageSelections": "13 passed",
+    "diffWhitespaceAndReview": "passed"
+  },
+  "validationFailureAndRecovery": {
+    "firstAttempt": "bun run validate stopped at the Node process-cleanup test because the sandbox denied spawning ps (EPERM). Earlier formatting, docs, types, source suites and standalone checks passed.",
+    "recovery": "Node and Bun process-cleanup tests passed outside the sandbox. Remaining standalone commands, build, compiled suites, app types and package checks passed separately."
+  },
+  "packageArchiveSha256": "ba6458d8337027365279fc4b44dbd2591671670e8c33f7ca5cdf0619d90cc489",
+  "rendererAcceptance": "Not run, per explicit user instruction; no acceptance renewed for the changed artifact.",
+  "commit": "Owner authorized committing the reviewed fixes after routine checks and read-only review."
+}

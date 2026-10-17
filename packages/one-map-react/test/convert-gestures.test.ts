@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vite-plus/test";
+import { describe, expect, expectTypeOf, test } from "vite-plus/test";
 
 import { toRnmapboxGestures } from "../src/adapters/mapbox-native/convert-gestures.js";
 import { toMaplibreGestures } from "../src/adapters/maplibre-native/convert-gestures.js";
@@ -6,6 +6,29 @@ import {
   toWebGestureProps,
   webTouchZoomRotate,
 } from "../src/adapters/web/convert-gestures.js";
+import type { GestureSelection, MapProps } from "../src/contracts/map-types.js";
+
+test("gesture selection retains the common map field types", () => {
+  expectTypeOf<GestureSelection>().toEqualTypeOf<
+    Pick<
+      MapProps,
+      | "interactive"
+      | "dragPan"
+      | "touchZoom"
+      | "touchRotate"
+      | "touchPitch"
+      | "doubleTapZoom"
+      | "scrollZoom"
+      | "doubleClickZoom"
+      | "dragRotate"
+      | "boxZoom"
+      | "keyboard"
+      | "cooperativeGestures"
+      | "clickTolerance"
+      | "hash"
+    >
+  >();
+});
 
 describe("gesture conversion", () => {
   test("web interactive false disables all mutable handlers and preserves unrelated options", () => {

@@ -6,16 +6,16 @@ import type { GestureSettings } from "./gesture-settings.js";
  * `styleJSON`.
  *
  * @param mapStyle - Style URL or document.
- * @returns Exactly one of `styleURL` or `styleJSON`.
+ * @returns One defined style field, explicitly clearing the alternative.
  */
 export const toRnmapboxStyleProps = (
   mapStyle: MapStyle
-): { readonly styleURL: string } | { readonly styleJSON: string } => {
+): { readonly styleURL?: string; readonly styleJSON?: string } => {
   if (typeof mapStyle === "string") {
-    return { styleURL: mapStyle };
+    return { styleURL: mapStyle, styleJSON: undefined };
   }
 
-  return { styleJSON: JSON.stringify(mapStyle) };
+  return { styleURL: undefined, styleJSON: JSON.stringify(mapStyle) };
 };
 
 /**

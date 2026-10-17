@@ -28,3 +28,32 @@ test("MapLibre stale cleanup cannot delete a replacement using the same entry", 
   cleanup();
   expect(() => registry.require("routes")).toThrow("not a mounted");
 });
+
+test.each(
+  (["mapbox", "maplibre"] as const).flatMap((backend) =>
+    (["geojson", "vector"] as const).map((kind) => ({ backend, kind }))
+  )
+)(
+  "$backend $kind releases 10000 unwritten source lifetimes",
+  async ({ backend, kind }) => {
+    const registry =
+      backend === "mapbox"
+        ? new GeoJsonSourceRegistry(async () => {})
+        : new MaplibreSourceRegistry();
+    for (let index = 0; index < 10000; index += 1) {
+      const id = `temporary-${index}`;
+      if (registry instanceof MaplibreSourceRegistry)
+        registry.register(id, () => undefined, kind)();
+      else if (kind === "geojson") registry.register(id, null)();
+      else registry.featureState.register(id, kind)();
+    }
+    await registry.featureState.flush(() => {});
+    // Storage inspection verifies reclamation without adding a production diagnostic API.
+    const history = (
+      registry.featureState as unknown as {
+        sources: ReadonlyMap<string, unknown>;
+      }
+    ).sources;
+    expect(history.size).toBe(0);
+  }
+);

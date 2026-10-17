@@ -216,9 +216,15 @@ const scaleCamera: ViewState = {
   bearing: 0,
   pitch: 0,
 };
+const scaleMapProps = jest.fn<(props: MapProps) => void>();
 const ScaleMap = withNativeMapPresentation(
-  forwardRef<MapRef, MapProps>((props, _ref) => <View>{props.children}</View>)
+  forwardRef<MapRef, MapProps>((props, _ref) => {
+    scaleMapProps(props);
+    return <View>{props.children}</View>;
+  })
 );
+const moveScale = (event: MoveEvent): void =>
+  scaleMapProps.mock.calls.at(-1)?.[0].onMove?.(event);
 
 test("scale observes each movement once, including unchanged controlled targets", async () => {
   const fixture = sessionFixture();
@@ -248,7 +254,7 @@ test("scale observes each movement once, including unchanged controlled targets"
   fixture.project.mockClear();
   fixture.unproject.mockClear();
   await act(async () =>
-    fixture.emit("move", {
+    moveScale({
       viewState: { ...scaleCamera, zoom: 5 },
       origin: "user",
     })
@@ -261,7 +267,7 @@ test("scale observes each movement once, including unchanged controlled targets"
   fixture.project.mockClear();
   fixture.unproject.mockClear();
   await act(async () =>
-    fixture.emit("move", {
+    moveScale({
       viewState: { ...scaleCamera, longitude: 11, zoom: 7 },
       origin: "user",
     })
@@ -277,6 +283,48 @@ test("scale observes each movement once, including unchanged controlled targets"
   await waitFor(() => expect(mounted.getByText("0.5 nm")).toBeTruthy());
   expect(reportError).not.toHaveBeenCalled();
   await mounted.unmount();
+});
+
+test("scale suppresses errors between layout and passive unmount cleanup", async () => {
+  const react = jest.requireActual<typeof import("react")>("react");
+  const useEffect = react.useEffect;
+  const cleanups: (() => void)[] = [];
+  // A concurrent removal can defer passive cleanup past promise settlement.
+  const effect = jest
+    .spyOn(react, "useEffect")
+    .mockImplementation((create, deps) =>
+      useEffect(() => {
+        const cleanup = create();
+        return () => {
+          if (cleanup) cleanups.push(cleanup);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- The spy forwards each effect's original dependencies unchanged.
+      }, deps)
+    );
+  try {
+    const fixture = sessionFixture();
+    let rejectProject: ((error: Error) => void) | undefined;
+    fixture.project.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectProject = reject;
+        })
+    );
+    const reportError = jest.fn();
+    const mounted = await render(
+      <FixtureSessionProvider value={fixture.session}>
+        <ui.ScaleControl onError={reportError} />
+      </FixtureSessionProvider>
+    );
+    expect(fixture.project).toHaveBeenCalledTimes(1);
+    await mounted.unmount();
+    expect(cleanups.length).toBeGreaterThan(0);
+    await act(async () => rejectProject?.(new Error("detached scale")));
+    expect(reportError).not.toHaveBeenCalled();
+  } finally {
+    effect.mockRestore();
+    for (const cleanup of cleanups) cleanup();
+  }
 });
 
 test.each(["resolve", "reject"])(
@@ -307,7 +355,7 @@ test.each(["resolve", "reject"])(
     );
     await waitFor(() => expect(fixture.unproject).toHaveBeenCalledTimes(1));
     await act(async () =>
-      fixture.emit("move", {
+      moveScale({
         viewState: { ...scaleCamera, zoom: 5 },
         origin: "user",
       })
@@ -322,7 +370,7 @@ test.each(["resolve", "reject"])(
     const failure = new Error("current scale");
     fixture.unproject.mockRejectedValueOnce(failure);
     await act(async () =>
-      fixture.emit("move", {
+      moveScale({
         viewState: { ...scaleCamera, zoom: 6 },
         origin: "user",
       })
@@ -337,7 +385,7 @@ test.each(["resolve", "reject"])(
         })
     );
     await act(async () =>
-      fixture.emit("move", {
+      moveScale({
         viewState: { ...scaleCamera, zoom: 7 },
         origin: "user",
       })
@@ -426,15 +474,175 @@ afterEach(() => {
   refresh.mockClear();
 });
 
+test.each(
+  (["mapbox", "maplibre"] as const).flatMap((backend) =>
+    (
+      [
+        "newer press",
+        "compass",
+        "user movement",
+        "map replacement",
+        "readiness cycle",
+        "unmount",
+      ] as const
+    ).flatMap((interruption) =>
+      (["resolve", "reject"] as const).map((outcome) => ({
+        backend,
+        interruption,
+        outcome,
+      }))
+    )
+  )
+)(
+  "$backend navigation ignores an older read's $outcome after $interruption",
+  async ({ backend, interruption, outcome }) => {
+    const fixture = sessionFixture();
+    const reads: Array<{
+      resolve: (zoom: number) => void;
+      reject: (error: unknown) => void;
+    }> = [];
+    const getZoom = jest.fn(
+      () =>
+        new Promise<number>((resolve, reject) => {
+          reads.push({ resolve, reject });
+        })
+    );
+    const zoomTo = jest.fn<MapRef["zoomTo"]>().mockResolvedValue(undefined);
+    const onError = jest.fn();
+    fixture.session.ref.current = {
+      ...fixture.session.ref.current,
+      getZoom,
+      zoomTo,
+    } as MapRef;
+    const Navigation =
+      backend === "mapbox"
+        ? mapboxNativeUI.NavigationControl
+        : maplibreNativeUI.NavigationControl;
+    const tree = (session: FixtureSession) => (
+      <NativeOverlayHost session={session}>
+        <Navigation onError={onError} />
+      </NativeOverlayHost>
+    );
+    const view = await render(tree(fixture.session));
+    await fireEvent.press(view.getByLabelText("Zoom in"));
+    if (interruption === "newer press") {
+      await fireEvent.press(view.getByLabelText("Zoom out"));
+      await act(async () => reads[1].resolve(12));
+    } else if (interruption === "compass") {
+      await fireEvent.press(view.getByLabelText("Reset north"));
+      expect(fixture.easeTo).toHaveBeenCalledWith({ bearing: 0 });
+    } else if (interruption === "user movement") {
+      await act(async () =>
+        fixture.emit("move", { viewState: scaleCamera, origin: "user" })
+      );
+    } else if (interruption === "map replacement") {
+      await view.rerender(
+        tree({
+          ...fixture.session,
+          ref: { current: { ...fixture.session.ref.current } as MapRef },
+        })
+      );
+    } else if (interruption === "readiness cycle") {
+      await view.rerender(tree({ ...fixture.session, ready: false }));
+      await view.rerender(tree(fixture.session));
+    } else {
+      await view.unmount();
+    }
+    await act(async () => {
+      if (outcome === "resolve") reads[0].resolve(12);
+      else reads[0].reject(new Error("Superseded zoom read failed."));
+    });
+    expect(zoomTo.mock.calls).toEqual(
+      interruption === "newer press" ? [[11]] : []
+    );
+    expect(onError).not.toHaveBeenCalled();
+    if (interruption !== "unmount") await view.unmount();
+  }
+);
+
+test.each(
+  (["mapbox", "maplibre"] as const).flatMap((backend) =>
+    (["zoom", "compass"] as const).map((command) => ({ backend, command }))
+  )
+)(
+  "$backend navigation suppresses a superseded $command command failure",
+  async ({ backend, command }) => {
+    const fixture = sessionFixture();
+    const getZoom = jest.fn<MapRef["getZoom"]>().mockResolvedValue(12);
+    const zoomTo = jest.fn<MapRef["zoomTo"]>().mockResolvedValue(undefined);
+    const easeTo = jest.fn<MapRef["easeTo"]>().mockResolvedValue(undefined);
+    let rejectCommand: (error: Error) => void = () => {};
+    const pending = () =>
+      new Promise<void>((_resolve, reject) => {
+        rejectCommand = reject;
+      });
+    if (command === "zoom") zoomTo.mockImplementationOnce(pending);
+    else easeTo.mockImplementationOnce(pending);
+    fixture.session.ref.current = {
+      ...fixture.session.ref.current,
+      getZoom,
+      zoomTo,
+      easeTo,
+    } as MapRef;
+    const onError = jest.fn();
+    const Navigation =
+      backend === "mapbox"
+        ? mapboxNativeUI.NavigationControl
+        : maplibreNativeUI.NavigationControl;
+    const view = await render(
+      <NativeOverlayHost session={fixture.session}>
+        <Navigation onError={onError} />
+      </NativeOverlayHost>
+    );
+    await fireEvent.press(
+      view.getByLabelText(command === "zoom" ? "Zoom in" : "Reset north")
+    );
+    await fireEvent.press(view.getByLabelText("Zoom out"));
+    await act(async () =>
+      rejectCommand(new Error("Superseded command failed."))
+    );
+    expect(zoomTo).toHaveBeenLastCalledWith(11);
+    expect(onError).not.toHaveBeenCalled();
+    await view.unmount();
+  }
+);
+
+test.each(["mapbox", "maplibre"] as const)(
+  "%s navigation reports the current compass failure",
+  async (backend) => {
+    const fixture = sessionFixture();
+    const failure = new Error("Compass failed.");
+    fixture.easeTo.mockRejectedValueOnce(failure);
+    const onError = jest.fn();
+    const Navigation =
+      backend === "mapbox"
+        ? mapboxNativeUI.NavigationControl
+        : maplibreNativeUI.NavigationControl;
+    const view = await render(
+      <NativeOverlayHost session={fixture.session}>
+        <Navigation onError={onError} />
+      </NativeOverlayHost>
+    );
+    await fireEvent.press(view.getByLabelText("Reset north"));
+    expect(onError).toHaveBeenCalledWith(failure);
+    await view.unmount();
+  }
+);
+
 describe("TF07 native UI composition", () => {
   test("live overlay follows measured anchors, offsets, camera movement, and viewport layout", async () => {
     const fixture = sessionFixture();
     const scene = (
       offset: Point,
-      layout?: { width: number; height: number }
+      layout?: { width: number; height: number },
+      observed = scaleCamera
     ) => (
       <FixtureSessionProvider
-        value={{ ...fixture.session, nativeLayout: layout }}
+        value={{
+          ...fixture.session,
+          nativeLayout: layout,
+          viewState: observed,
+        }}
       >
         <NativeMarkerOverlay
           id="live"
@@ -464,18 +672,7 @@ describe("TF07 native UI composition", () => {
       top: 180,
     });
     fixture.project.mockResolvedValue([150, 260]);
-    await act(async () =>
-      fixture.emit("move", {
-        viewState: {
-          longitude: 0,
-          latitude: 0,
-          zoom: 10,
-          bearing: 0,
-          pitch: 0,
-        },
-        origin: "user",
-      })
-    );
+    await view.rerender(scene([0, 0], undefined, { ...scaleCamera, zoom: 10 }));
     await waitFor(() =>
       expect(StyleSheet.flatten(host().props.style)).toMatchObject({
         left: 110,
@@ -539,6 +736,59 @@ describe("TF07 native UI composition", () => {
     await view.unmount();
     await act(async () => rejectLate(new Error("Detached")));
     expect(error).not.toHaveBeenCalled();
+  });
+
+  test("live overlay follows observed cameras under an unchanged controlled target", async () => {
+    const fixture = sessionFixture();
+    const error = jest.fn();
+    let resolveOld: (point: Point) => void = () => {};
+    fixture.project.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveOld = resolve;
+        })
+    );
+    const view = await render(
+      <MapSessionContext.Provider value={fixture.session}>
+        <ScaleMap
+          mapStyle={{ version: 8, sources: {}, layers: [] }}
+          initialViewState={scaleCamera}
+          viewState={scaleCamera}
+        >
+          <NativeMarkerOverlay
+            id="controlled"
+            lngLat={[10, 20]}
+            anchor="top-left"
+            offset={[0, 0]}
+            onProjectionError={error}
+          >
+            <Text>Observed position</Text>
+          </NativeMarkerOverlay>
+        </ScaleMap>
+      </MapSessionContext.Provider>
+    );
+    await act(async () =>
+      moveScale({ viewState: { ...scaleCamera, zoom: 5 }, origin: "user" })
+    );
+    const host = () => view.getByTestId("native-marker-overlay");
+    expect(StyleSheet.flatten(host().props.style)).toMatchObject({
+      left: 100,
+      top: 200,
+    });
+    fixture.project.mockResolvedValueOnce([150, 250]);
+    await act(async () =>
+      scaleMapProps.mock.calls.at(-1)?.[0].onMoveEnd?.({
+        viewState: { ...scaleCamera, zoom: 6 },
+        origin: "unknown",
+      })
+    );
+    await act(async () => resolveOld([999, 999]));
+    expect(StyleSheet.flatten(host().props.style)).toMatchObject({
+      left: 150,
+      top: 250,
+    });
+    expect(error).not.toHaveBeenCalled();
+    await view.unmount();
   });
 
   test("native controls preserve nested providers, child state, and lifetime", async () => {
@@ -867,6 +1117,73 @@ describe("TF07 native UI composition", () => {
     expect(getZoom).toHaveBeenCalledTimes(1);
     expect(zoomTo).toHaveBeenCalledWith(11);
   });
+
+  test.each(["control removal", "map replacement"])(
+    "pending navigation cannot move the map after %s",
+    async (change) => {
+      const fixture = sessionFixture();
+      let resolve: ((zoom: number) => void) | undefined;
+      const getZoom = jest.fn(
+        () =>
+          new Promise<number>((done) => {
+            resolve = done;
+          })
+      );
+      const zoomTo = jest.fn(async () => undefined);
+      fixture.session.ref.current = {
+        ...fixture.session.ref.current,
+        getZoom,
+        zoomTo,
+      } as MapRef;
+      const tree = (session: FixtureSession, visible: boolean) => (
+        <NativeOverlayHost session={session}>
+          {visible && <ui.NavigationControl />}
+        </NativeOverlayHost>
+      );
+      const view = await render(tree(fixture.session, true));
+      await fireEvent.press(view.getByLabelText("Zoom in"));
+      expect(getZoom).toHaveBeenCalledTimes(1);
+
+      const replacement = {
+        ...fixture.session,
+        ref: { current: { ...fixture.session.ref.current } as MapRef },
+      };
+      await view.rerender(
+        tree(
+          change === "map replacement" ? replacement : fixture.session,
+          change === "map replacement"
+        )
+      );
+      await act(async () => resolve?.(12));
+      expect(zoomTo).not.toHaveBeenCalled();
+    }
+  );
+
+  test.each(["read", "command"])(
+    "navigation reports a failed camera %s while mounted",
+    async (operation) => {
+      const fixture = sessionFixture();
+      const error = new Error("Camera failed");
+      const getZoom = jest.fn<MapRef["getZoom"]>().mockResolvedValue(12);
+      const zoomTo = jest.fn<MapRef["zoomTo"]>().mockResolvedValue(undefined);
+      if (operation === "read") getZoom.mockRejectedValue(error);
+      else zoomTo.mockRejectedValue(error);
+      fixture.session.ref.current = {
+        ...fixture.session.ref.current,
+        getZoom,
+        zoomTo,
+      } as MapRef;
+      const onError = jest.fn();
+      const view = await render(
+        <NativeOverlayHost session={fixture.session}>
+          <ui.NavigationControl onError={onError} />
+        </NativeOverlayHost>
+      );
+      await fireEvent.press(view.getByLabelText("Zoom in"));
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith(error);
+    }
+  );
 
   test("child scroll handoff keeps SDK gestures unchanged", async () => {
     const fixture = sessionFixture();

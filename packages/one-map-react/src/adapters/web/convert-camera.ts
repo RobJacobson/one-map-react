@@ -1,7 +1,6 @@
 import type {
   CameraCommandOptions,
   FitBoundsOptions,
-  FlyToOptions,
   ViewState,
   ZoomToOptions,
 } from "../../contracts/camera-types.js";
@@ -22,22 +21,22 @@ export const toWebInitialViewState = (viewState: ViewState): ViewState => ({
 });
 
 /**
- * Converts a shared flight into MapLibre or Mapbox GL JS `flyTo` arguments.
- *
- * @param options - Shared flight.
- * @returns Wrapper fields that were provided, plus `center`.
- */
-export const toWebFlyToOptions = (options: FlyToOptions) =>
-  webCommandOptions(options);
-
-/**
- * Converts a shared ease or jump into GL JS command arguments.
+ * Converts a shared flight, ease, or jump into GL JS command arguments.
  *
  * @param options - Partial camera target.
- * @returns Wrapper fields that were provided. Jump timing is not included.
+ * @returns Wrapper fields that were provided.
  */
-export const toWebCommandOptions = (options: CameraCommandOptions) =>
-  webCommandOptions(options);
+export const toWebCommandOptions = (options: CameraCommandOptions) => ({
+  ...(options.center === undefined ? {} : { center: options.center }),
+  ...(options.zoom === undefined ? {} : { zoom: options.zoom }),
+  ...(options.bearing === undefined ? {} : { bearing: options.bearing }),
+  ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
+  ...(options.padding === undefined
+    ? {}
+    : { padding: normalizePadding(options.padding) }),
+  ...(options.duration === undefined ? {} : { duration: options.duration }),
+  ...(options.easing === undefined ? {} : { easing: options.easing }),
+});
 
 /**
  * Converts fit options into GL JS `fitBounds` options.
@@ -63,18 +62,6 @@ export const toWebFitBoundsOptions = (options: FitBoundsOptions = {}) => ({
  * @returns The fields that were provided.
  */
 export const toWebZoomToOptions = (options: ZoomToOptions = {}) => ({
-  ...(options.duration === undefined ? {} : { duration: options.duration }),
-  ...(options.easing === undefined ? {} : { easing: options.easing }),
-});
-
-const webCommandOptions = (options: CameraCommandOptions) => ({
-  ...(options.center === undefined ? {} : { center: options.center }),
-  ...(options.zoom === undefined ? {} : { zoom: options.zoom }),
-  ...(options.bearing === undefined ? {} : { bearing: options.bearing }),
-  ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
-  ...(options.padding === undefined
-    ? {}
-    : { padding: normalizePadding(options.padding) }),
   ...(options.duration === undefined ? {} : { duration: options.duration }),
   ...(options.easing === undefined ? {} : { easing: options.easing }),
 });

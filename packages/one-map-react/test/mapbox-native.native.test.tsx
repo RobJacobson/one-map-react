@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { createRef, type ReactNode, type Ref } from "react";
+import { createRef, type ReactNode, type Ref, useContext } from "react";
 import { Platform, Text } from "react-native";
 
 import {
@@ -9,6 +9,8 @@ import {
   replacementStyle,
   routes,
 } from "../../../tests/fixtures/map-fixture.js";
+import { NativeCameraContext } from "../src/adapters/shared/native-map-presentation.js";
+import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
 import type {
@@ -299,6 +301,44 @@ const drawingContext = (): ExternalDrawingContext => ({
   drawingBufferWidth: 1,
   drawingBufferHeight: 1,
 });
+
+test.each(["document", "url"] as const)(
+  "common %s styles clear conflicting selected style fields through replacement",
+  async (initial) => {
+    const styleURL = "https://example.test/common-style.json";
+    const styles =
+      initial === "document"
+        ? [emptyStyle, styleURL, replacementStyle]
+        : [styleURL, emptyStyle, styleURL];
+    const tree = (mapStyle: MapProps["mapStyle"]) => (
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={mapStyle}
+          initialViewState={initialViewState}
+          options={{
+            styleURL: "https://example.test/selected.json",
+            styleJSON: JSON.stringify(replacementStyle),
+          }}
+        />
+      </MapSetup>
+    );
+    const view = await render(tree(styles[0]));
+    for (const mapStyle of styles) {
+      await view.rerender(tree(mapStyle));
+      const forwarded = lastMapProps<{
+        styleURL?: string;
+        styleJSON?: string;
+      }>();
+      expect(forwarded.styleURL).toBe(
+        typeof mapStyle === "string" ? mapStyle : undefined
+      );
+      expect(forwarded.styleJSON).toBe(
+        typeof mapStyle === "string" ? undefined : JSON.stringify(mapStyle)
+      );
+    }
+    await view.unmount();
+  }
+);
 
 const example = (
   ref?: Ref<MapRef>,
@@ -744,14 +784,16 @@ describe("mapbox-native adapter", () => {
       lastCall[0] as { onCameraChanged: (state: object) => void }
     ).onCameraChanged;
 
-    onCameraChanged({
-      properties: {
-        center: [-122.34, 47.61],
-        zoom: 11,
-        heading: 4,
-        pitch: 1,
-      },
-      gestures: { isGestureActive: true },
+    await act(async () => {
+      onCameraChanged({
+        properties: {
+          center: [-122.34, 47.61],
+          zoom: 11,
+          heading: 4,
+          pitch: 1,
+        },
+        gestures: { isGestureActive: true },
+      });
     });
 
     expect(onMove).toHaveBeenCalledWith({
@@ -768,37 +810,43 @@ describe("mapbox-native adapter", () => {
     const onMapIdle = (lastCall[0] as { onMapIdle: (state: object) => void })
       .onMapIdle;
 
-    onMapIdle({
-      properties: {
-        center: [-122.32, 47.64],
-        zoom: 11,
-        heading: 0,
-        pitch: 0,
-      },
-      gestures: { isGestureActive: false },
+    await act(async () => {
+      onMapIdle({
+        properties: {
+          center: [-122.32, 47.64],
+          zoom: 11,
+          heading: 0,
+          pitch: 0,
+        },
+        gestures: { isGestureActive: false },
+      });
     });
 
     expect(onMove).toHaveBeenCalledTimes(1);
 
     await rendered.unmount();
-    onCameraChanged({
-      properties: {
-        center: [-122.3, 47.6],
-        zoom: 12,
-        heading: 0,
-        pitch: 0,
-      },
-      gestures: { isGestureActive: true },
+    await act(async () => {
+      onCameraChanged({
+        properties: {
+          center: [-122.3, 47.6],
+          zoom: 12,
+          heading: 0,
+          pitch: 0,
+        },
+        gestures: { isGestureActive: true },
+      });
     });
 
-    onMapIdle({
-      properties: {
-        center: [-122.3, 47.6],
-        zoom: 12,
-        heading: 0,
-        pitch: 0,
-      },
-      gestures: { isGestureActive: false },
+    await act(async () => {
+      onMapIdle({
+        properties: {
+          center: [-122.3, 47.6],
+          zoom: 12,
+          heading: 0,
+          pitch: 0,
+        },
+        gestures: { isGestureActive: false },
+      });
     });
 
     expect(onMove).toHaveBeenCalledTimes(1);
@@ -863,7 +911,7 @@ describe("mapbox-native adapter", () => {
       onMapLoadingError: (payload?: unknown) => void;
     }>();
 
-    props.onDidFinishLoadingMap();
+    await act(async () => props.onDidFinishLoadingMap());
     props.onDidFinishLoadingStyle();
     props.onMapLoadingError();
     // iOS includes tileId and sourceId. Android never calls this prop.
@@ -879,7 +927,7 @@ describe("mapbox-native adapter", () => {
     expect(onError).toHaveBeenNthCalledWith(2, { error: "tile failed" });
 
     await rendered.unmount();
-    props.onDidFinishLoadingMap();
+    await act(async () => props.onDidFinishLoadingMap());
     props.onDidFinishLoadingStyle();
     props.onMapLoadingError({ error: "later" });
 
@@ -1065,14 +1113,16 @@ describe("mapbox-native adapter", () => {
       onMapIdle: (state: object) => void;
     }>();
 
-    props.onMapIdle({
-      properties: {
-        center: [-122.34, 47.61],
-        zoom: 11,
-        heading: 0,
-        pitch: 0,
-      },
-      gestures: { isGestureActive: false },
+    await act(async () => {
+      props.onMapIdle({
+        properties: {
+          center: [-122.34, 47.61],
+          zoom: 11,
+          heading: 0,
+          pitch: 0,
+        },
+        gestures: { isGestureActive: false },
+      });
     });
 
     expect(onMove).toHaveBeenCalledTimes(1);
@@ -1517,15 +1567,15 @@ describe("mapbox-native layers", () => {
     }
   );
 
-  test("line conversion retains expression identity and ignores fields outside their accepted family", async () => {
+  test("line conversion forwards wrapper-validated properties and preserves expressions and resets", async () => {
     const color = ["get", "color"] as const;
-    const paint = {
+    const paint = Object.freeze({
       "line-color": color,
       "line-width": 0,
-      visibility: "none",
-      unknown: true,
-    };
-    const layout = { "line-cap": "round" as const, "line-opacity": 0 };
+      "line-emissive-strength": 0.5,
+      "line-color-transition": { duration: 200 },
+    });
+    const layout = Object.freeze({ "line-cap": "round", visibility: "none" });
     const scene = (removed: boolean) =>
       tree(
         <Source id="routes" type="geojson" data={routes}>
@@ -1544,7 +1594,10 @@ describe("mapbox-native layers", () => {
     expect(current.style).toEqual({
       lineColor: color,
       lineWidth: 0,
+      lineEmissiveStrength: 0.5,
+      lineColorTransition: { duration: 200 },
       lineCap: "round",
+      visibility: "none",
     });
     expect(current.style.lineColor).toBe(color);
     await view.rerender(scene(true));
@@ -2502,3 +2555,64 @@ test("terrain/light/projection and hillshade use native public components, inclu
 
 const lastRenderingProps = (component: unknown): Record<string, unknown> =>
   (component as jest.Mock).mock.calls.at(-1)?.[0] as Record<string, unknown>;
+
+test("settled camera updates controls and live overlays without another public move", async () => {
+  const observe = jest.fn();
+  const onMove = jest.fn();
+  const onMoveEnd = jest.fn();
+  const Probe = () => {
+    observe(useContext(NativeCameraContext)?.viewState.bearing);
+    return null;
+  };
+  const view = await render(
+    <MapSetup adapter={adapter}>
+      <OneMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        onMove={onMove}
+        onMoveEnd={onMoveEnd}
+      >
+        <Probe />
+        <NativeMarkerOverlay
+          id="settled"
+          lngLat={[1, 2]}
+          anchor="top-left"
+          offset={[0, 0]}
+        >
+          <Text>Final position</Text>
+        </NativeMarkerOverlay>
+      </OneMap>
+    </MapSetup>
+  );
+  const events = lastMapProps<{
+    onDidFinishLoadingMap: () => void;
+    onCameraChanged: (event: object) => void;
+    onMapIdle: (event: object) => void;
+  }>();
+  const payload = (bearing: number) => ({
+    properties: { center: [1, 2], zoom: 3, heading: bearing, pitch: 0 },
+    gestures: { isGestureActive: false },
+  });
+  await act(async () => events.onDidFinishLoadingMap());
+  mockGetPointInView.mockResolvedValueOnce([40, 50]);
+  await act(async () => events.onCameraChanged(payload(40)));
+  expect(observe.mock.calls.at(-1)?.[0]).toBe(40);
+  await waitFor(() =>
+    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(40)
+  );
+  mockGetPointInView.mockResolvedValueOnce([60, 70]);
+  await act(async () => events.onMapIdle(payload(0)));
+  expect(observe.mock.calls.at(-1)?.[0]).toBe(0);
+  await waitFor(() =>
+    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(60)
+  );
+  expect(onMove).toHaveBeenCalledTimes(1);
+  expect(onMoveEnd).toHaveBeenCalledTimes(1);
+  await view.unmount();
+  await act(async () => {
+    events.onCameraChanged(payload(80));
+    events.onMapIdle(payload(90));
+  });
+  expect(onMove).toHaveBeenCalledTimes(1);
+  expect(onMoveEnd).toHaveBeenCalledTimes(1);
+});

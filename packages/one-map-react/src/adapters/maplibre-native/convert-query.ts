@@ -1,14 +1,11 @@
 import type { FilterSpecification } from "@maplibre/maplibre-react-native";
 
-import type { Point } from "../../contracts/camera-types.js";
 import type { FilterExpression } from "../../contracts/layer-types.js";
 import type {
   FeatureIdentifier,
   QueryRenderedFeaturesOptions,
   QuerySourceFeaturesOptions,
-  ScreenBounds,
 } from "../../contracts/query-types.js";
-import { isScreenBounds } from "../shared/feature-values.js";
 
 /**
  * Converts a query filter into MapLibre React Native's filter value.
@@ -43,33 +40,6 @@ export const toMaplibreRenderedQueryOptions = (
           ? {}
           : { filter: toMaplibreFilter(options.filter) }),
       };
-
-/**
- * Converts a query target into the wrapper argument.
- *
- * A point stays `[x, y]`; a bounds pair becomes the wrapper's
- * `[[left, top], [right, bottom]]` corner pair; `undefined` omits the
- * argument so the wrapper queries the visible viewport.
- *
- * @param target - Point, screen bounds, or `undefined` for the viewport.
- * @returns The pixel point, pixel bounds, or `undefined`.
- */
-export const toMaplibreQueryTarget = (
-  target: Point | ScreenBounds | undefined
-): unknown => {
-  if (target === undefined) {
-    return undefined;
-  }
-
-  if (!isScreenBounds(target)) {
-    return [target[0], target[1]];
-  }
-
-  return [
-    [target[0][0], target[0][1]],
-    [target[1][0], target[1][1]],
-  ];
-};
 
 /**
  * Converts common source-query options into wrapper `querySourceFeatures`
