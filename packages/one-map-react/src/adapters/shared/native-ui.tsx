@@ -36,7 +36,6 @@ import type {
 } from "../../contracts/ui-types.js";
 import { useMapSession } from "../../facade/map-context.js";
 import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
-import { useStableOptions } from "../../facade/use-stable-options.js";
 import { UserLocation } from "../../facade/user-location.js";
 import {
   NativeCameraContext,
@@ -164,11 +163,9 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
           ? "bottom"
           : "center"
       );
-      const initial = useStableOptions("Marker", {
-        id: props.id,
-        anchor: props.anchor ?? defaultAnchor,
-        renderMode: props.renderMode ?? "view",
-      });
+      const markerId = props.id ?? generatedId;
+      const anchor = props.anchor ?? defaultAnchor;
+      const isAnnotation = props.renderMode === "annotation";
       const click = useActiveCallback(props.onClick);
       const dragStart = useActiveCallback(props.onDragStart);
       const drag = useActiveCallback(props.onDrag);
@@ -232,7 +229,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
 
       useImperativeHandle(ref, () => ({
         refresh: async () => {
-          if (initial.renderMode === "annotation") {
+          if (isAnnotation) {
             if (!annotationRef.current)
               throw new Error("Annotation is detached.");
             await annotationRef.current.refresh();
@@ -350,7 +347,6 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         cancel();
       };
 
-      const isAnnotation = initial.renderMode === "annotation";
       const Host = isAnnotation ? options.Annotation : options.Marker;
       const markerCoordinate = dragCoordinate ?? coordinate;
       const markerClick = (event: MarkerEvent): void => {
@@ -393,9 +389,9 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         <Host
           key={isAnnotation ? annotationRevision : "view"}
           ref={annotationRef}
-          id={initial.id ?? generatedId}
+          id={markerId}
           lngLat={[markerCoordinate[0], markerCoordinate[1]]}
-          anchor={initial.anchor}
+          anchor={anchor}
           offset={offset}
           draggable={isAnnotation && props.draggable}
           onProjectionError={reportError}
@@ -467,11 +463,9 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     const id = useId();
     const close = useActiveCallback(props.onClose);
     const open = useActiveCallback(props.onOpen);
-    const initial = useStableOptions("Popup", {
-      closeOnClick: props.closeOnClick ?? true,
-      closeOnMove: props.closeOnMove ?? false,
-      closeButton: props.closeButton ?? true,
-    });
+    const closeOnClick = props.closeOnClick ?? true;
+    const closeOnMove = props.closeOnMove ?? false;
+    const closeButton = props.closeButton ?? true;
     const dismissed = useRef(false);
     const requestClose = useCallback((): void => {
       if (dismissed.current) return;
@@ -482,23 +476,17 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     useLayoutEffect(() => {
       dismissed.current = false;
       open();
-      const removeClick = initial.closeOnClick
+      const removeClick = closeOnClick
         ? subscribe("click", requestClose)
         : undefined;
-      const removeMove = initial.closeOnMove
+      const removeMove = closeOnMove
         ? subscribe("move", requestClose)
         : undefined;
       return () => {
         removeClick?.();
         removeMove?.();
       };
-    }, [
-      subscribe,
-      initial.closeOnClick,
-      initial.closeOnMove,
-      open,
-      requestClose,
-    ]);
+    }, [subscribe, closeOnClick, closeOnMove, open, requestClose]);
 
     if (props.focusAfterOpen !== undefined) {
       throw new Error("Native Popup does not support browser focusAfterOpen.");
@@ -530,7 +518,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
             { maxWidth: nativeMaxWidth(props.maxWidth) },
           ]}
         >
-          {initial.closeButton && (
+          {closeButton && (
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Close popup"
@@ -562,9 +550,7 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
   const { setOverlay } = presentation;
   const overlays = useContext(NativeOverlayContext);
   const id = useId();
-  const { position } = useStableOptions("Control", {
-    position: props.position ?? "top-right",
-  });
+  const position = props.position ?? "top-right";
   const index = overlays.findIndex((overlay) => overlay.id === id);
   const neighbors = position.startsWith("top")
     ? overlays.slice(0, Math.max(0, index))
@@ -618,12 +604,6 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
 };
 
 const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
-  useStableOptions("NavigationControl", {
-    position: props.position ?? "top-right",
-    showZoom: props.showZoom ?? true,
-    showCompass: props.showCompass ?? true,
-    visualizePitch: props.visualizePitch ?? false,
-  });
   const viewState = useContext(NativeCameraContext)?.viewState;
   const mapSession = useMapSession();
   const reportError = useActiveCallback(props.onError);
@@ -706,11 +686,7 @@ const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
 
 const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
   const { setAttributionPosition } = useNativeMapPresentation();
-  const { position } = useStableOptions("AttributionControl", {
-    position: props.position ?? "bottom-right",
-    compact: props.compact ?? true,
-    customAttribution: props.customAttribution,
-  });
+  const position = props.position ?? "bottom-right";
   useLayoutEffect(() => {
     setAttributionPosition(position);
     return () => setAttributionPosition(undefined);
@@ -740,10 +716,7 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
     readonly width: number;
     readonly text: string;
   } | null>(null);
-  const { maxWidth } = useStableOptions("ScaleControl", {
-    position: props.position ?? "bottom-left",
-    maxWidth: props.maxWidth ?? 100,
-  });
+  const maxWidth = props.maxWidth ?? 100;
   const reportError = useActiveCallback(props.onError);
   const unit = props.unit ?? "metric";
   if (!Number.isFinite(maxWidth) || maxWidth <= 0)

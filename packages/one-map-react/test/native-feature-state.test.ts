@@ -1,10 +1,25 @@
-import { expect, test } from "vite-plus/test";
+import { expect, test, vi } from "vite-plus/test";
 
 import { NativeFeatureState } from "../src/adapters/shared/native-feature-state.js";
 import type {
   FeatureIdentifier,
   FeatureState,
 } from "../src/contracts/query-types.js";
+
+test("idle frames do not traverse historical source registrations", async () => {
+  const state = new NativeFeatureState(async () => {});
+  for (let index = 0; index < 1000; index += 1)
+    state.register(`temporary-${index}`, "geojson")();
+  // Inspect traversal only: retained ownership still protects detached-source errors.
+  const history = (state as unknown as { sources: Map<string, unknown> })
+    .sources;
+  const traversal = vi.spyOn(history, "values");
+  await state.flush(() => {});
+  expect(traversal).not.toHaveBeenCalled();
+  await expect(
+    state.run({ source: "temporary-0", id: 1 }, async () => {})
+  ).rejects.toThrow("detached");
+});
 
 test("the first owned lifetime preserves writes without resetting unrelated backend state", async () => {
   const renderer = createRetainedRenderer();

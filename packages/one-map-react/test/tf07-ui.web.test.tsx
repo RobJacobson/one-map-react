@@ -1,6 +1,7 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import {
   createRef,
+  type ReactNode,
   forwardRef,
   useEffect,
   useImperativeHandle,
@@ -81,14 +82,8 @@ const wrapper = {
     return control;
   },
 } as unknown as WebWrapper<"mapbox-web">;
-const {
-  Marker,
-  Popup,
-  Control,
-  NavigationControl,
-  ScaleControl,
-  GeolocateControl,
-} = createWebUi(wrapper);
+const { Marker, Popup, Control, ScaleControl, GeolocateControl } =
+  createWebUi(wrapper);
 
 beforeEach(() => {
   markerProps.length = 0;
@@ -111,6 +106,13 @@ const notify = (props: WebForwardedProps, key: string, event: object): void => {
 };
 
 describe("TF07 web UI delegates", () => {
+  test("custom control placement is forwarded", () => {
+    const placement = vi.spyOn(wrapper, "useControl");
+    render(<Control position="bottom-left" />);
+    expect(placement).toHaveBeenLastCalledWith(expect.any(Function), {
+      position: "bottom-left",
+    });
+  });
   test("normalizes marker drag proposals, resets omitted offset, and refreshes without work", async () => {
     const onDrag = vi.fn();
     const ref = createRef<MarkerRef>();
@@ -342,16 +344,52 @@ describe("TF07 web UI delegates", () => {
 
   test("rejects changes to marker and control creation options", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
+    const tree = (children: ReactNode) => (
+      <MapSetup adapter={sharedUiAdapter}>
+        <OneMap
+          mapStyle={{ version: 8, sources: {}, layers: [] }}
+          initialViewState={{
+            longitude: 0,
+            latitude: 0,
+            zoom: 1,
+            bearing: 0,
+            pitch: 0,
+          }}
+        >
+          {children}
+        </OneMap>
+      </MapSetup>
+    );
     const marker = render(
-      <Marker longitude={5} latitude={6} anchor="bottom" />
+      tree(<SharedMarker longitude={5} latitude={6} anchor="bottom" />)
     );
     expect(() =>
-      marker.rerender(<Marker longitude={5} latitude={6} anchor="top" />)
+      marker.rerender(
+        tree(<SharedMarker longitude={5} latitude={6} anchor="top" />)
+      )
     ).toThrow("creation option");
-    const control = render(<NavigationControl position="top-left" />);
+    const control = render(
+      tree(<SharedNavigationControl position="top-left" />)
+    );
     expect(() =>
-      control.rerender(<NavigationControl position="bottom-left" />)
+      control.rerender(tree(<SharedNavigationControl position="bottom-left" />))
     ).toThrow("creation option");
+  });
+  test("adapter-specific marker creation options remain guarded", () => {
+    const SelectedMarker =
+      Marker as typeof import("../src/mapbox-web.js").Marker;
+    const view = render(
+      <SelectedMarker longitude={5} latitude={6} options={{ color: "red" }} />
+    );
+    expect(() =>
+      view.rerender(
+        <SelectedMarker
+          longitude={5}
+          latitude={6}
+          options={{ color: "blue" }}
+        />
+      )
+    ).toThrow('creation option "color"');
   });
   test("TF08 tracking-mode changes release the old SDK control resource", () => {
     const release = vi.fn();

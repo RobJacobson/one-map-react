@@ -1,0 +1,110 @@
+{
+  "checkpoint": "Ponytail six-finding simplification",
+  "date": "2026-10-16",
+  "baseRevision": "ef33b6d94821c3f5cfe14acf8b3e04caebe9bf83",
+  "workingTree": "Uncommitted implementation and regression tests",
+  "librarySourceSha256": "d881bc010dd4d73d5bce498ad7cb09f46f9bb74ff5c5dedabd464491d6c7f38a",
+  "packageSha256": "01c94828ee31a690538e8b977dc1c6c58581f0d7c72f53ea13cf6971e664b78d",
+  "changes": [
+    "Snapshot click/move registrations and suppress disposed or retired listeners.",
+    "Flush native feature-state reset candidates rather than historical sources; retain ownership and written-target journals.",
+    "Combine source/map web hit queries through a private symbol; retain strict errors and custom-adapter fallback.",
+    "Keep portable UI creation checks in the facade and selected-option checks in adapters.",
+    "Require live getters and explicit families for MapLibre source registration.",
+    "Remove session publishing access and unreachable useMap fallback; keep fixture producers outside session context."
+  ],
+  "routineChecks": {
+    "bun run validate": {
+      "result": "passed",
+      "vitestTests": 686,
+      "mockedNativeTests": 225,
+      "packageSelections": 13
+    },
+    "bun run typecheck:apps": {
+      "result": "passed"
+    },
+    "bun run test:compiled": {
+      "result": "passed",
+      "webTests": 482,
+      "mockedNativeTests": 225,
+      "compilerChecks": "passed"
+    },
+    "bun run test:peers": {
+      "result": "passed",
+      "selectedAndMixedConsumers": 8
+    },
+    "git diff --check": {
+      "result": "passed"
+    }
+  },
+  "developmentCorrections": [
+    "Moved a failing direct-adapter creation assertion to the facade that now owns that rule.",
+    "Diff review caught and corrected dropped custom-control position forwarding; added a regression.",
+    "Corrected selected-option fixture typing before final type checks.",
+    "Sandboxed validation passed unit/mock suites but stopped on process-cleanup EPERM; final validation passed with access to its owned test processes.",
+    "A custom forwarding-proxy regression reproduced false private-method detection; explicit symbol presence now preserves fallback."
+  ],
+  "diagnostics": [
+    "Mocked native adapter suites emit React act warnings while passing.",
+    "Bun reports unsupported moduleSuffixes; all TypeScript project checks passed.",
+    "Build reports 17 React Compiler diagnostics; required component/compiler checks passed."
+  ],
+  "runtimeAcceptance": {
+    "result": "not_run",
+    "reason": "Explicitly excluded by the owner; changed-artifact renderer behavior remains unverified."
+  },
+  "commit": "not_created",
+  "retention": "Consumer scripts removed temporary installs and archives. Task-created raw logs removed; no leftover cleanup-test process groups found.",
+  "reviewCorrections": {
+    "checkpoint": "Ponytail fixes for both review findings",
+    "date": "2026-10-16",
+    "provenance": "The hashes and check counts above describe the earlier implementation. This section records the current uncommitted artifact, which supersedes its combined-query shortcut.",
+    "librarySourceSha256": "54167de7def5bb67b420d6c6c235c095bcb07b54b018acad75870d85cf0f4210",
+    "sourceDigestFormat": "Sorted relative source paths, NUL, file bytes, NUL, under packages/one-map-react/src.",
+    "packageSha256": "878b1166f4177d6a62711ac9372a084f8a886e4defdead2c7770b79531d1e90c",
+    "changes": [
+      "Deleted the private combined-query symbol and web method; source activation and map-hit selection use independent SDK queries.",
+      "Passed creationOptions results directly into all seven web selected-option checks.",
+      "Added regressions executing installed Mapbox 3.32.0 and MapLibre 6.13.0 ordering methods and Mapbox public featureset query dispatch without constructing renderers.",
+      "Retained independent hits, duplicate order, empty layers/results, missing layers, emitted/thrown failures in either query, propagation stopping, custom-adapter forwarding, and stale-result suppression during either pending query.",
+      "Reset the shared query mock implementation and use its actual handle signature to isolate SDK fixtures between tests."
+    ],
+    "regressionProof": "Before removing the shortcut, Mapbox and MapLibre ordering cases failed with reversed map hit order; Mapbox featureset case failed with an extra variant. All three pass after correction.",
+    "routineChecks": {
+      "focusedWebTests": {
+        "result": "passed",
+        "tests": 235
+      },
+      "bun run validate": {
+        "result": "passed",
+        "vitestTests": 697,
+        "mockedNativeTests": 225,
+        "packageSelections": 13
+      },
+      "bun run typecheck:apps": {
+        "result": "passed"
+      },
+      "bun run test:compiled": {
+        "result": "passed",
+        "webTests": 493,
+        "mockedNativeTests": 225,
+        "compilerChecks": "passed"
+      },
+      "bun run test:peers": {
+        "result": "passed",
+        "selectedAndMixedConsumers": 8
+      },
+      "git diff --check": {
+        "result": "passed"
+      }
+    },
+    "review": "Reviewed final source/test diff and emitted boundaries. No dependencies or public exports changed; deleted shortcut and test helpers are absent from emitted modules.",
+    "diagnostics": "Existing mocked-native act warnings, Bun moduleSuffixes warning, and 17 React Compiler diagnostics remain; required checks passed.",
+    "runtimeAcceptance": {
+      "result": "not_run",
+      "reason": "Explicitly excluded; changed-artifact renderer behavior remains unverified."
+    },
+    "commit": "not_created",
+    "retention": "Temporary consumer scripts cleaned their installs and archives; no consumer directories remained. Task-created raw logs removed after recording results. Removed the Vitest result cache."
+  }
+}

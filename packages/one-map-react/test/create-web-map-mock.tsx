@@ -182,7 +182,9 @@ export const createWebMapMock = () => {
     { type: "Feature", id: 1, properties: { kind: "route" } },
     { type: "Feature", id: 1, properties: { kind: "route" } },
   ];
-  const queryRenderedFeatures = vi.fn(() => queriedFeatures);
+  const queryRenderedFeatures = vi.fn<MapHandle["queryRenderedFeatures"]>(
+    () => queriedFeatures
+  );
   const querySourceFeatures = vi.fn(() => queriedFeatures.slice(0, 1));
   const clusterSource: ClusterSourceMock = {
     // Mapbox GL reports through a trailing callback; call it so the
@@ -287,7 +289,7 @@ export const createWebMapMock = () => {
     getMaxBounds.mockClear();
     project.mockClear();
     unproject.mockClear();
-    queryRenderedFeatures.mockClear();
+    queryRenderedFeatures.mockReset().mockReturnValue(queriedFeatures);
     querySourceFeatures.mockClear();
     clusterSource.getClusterExpansionZoom.mockClear();
     clusterSource.getClusterChildren.mockClear();
