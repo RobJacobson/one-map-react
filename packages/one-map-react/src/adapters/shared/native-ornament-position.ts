@@ -1,4 +1,4 @@
-import { useContext, useLayoutEffect, useRef } from "react";
+import { useContext, useState } from "react";
 
 import type { ControlPosition } from "../../contracts/ui-types.js";
 import {
@@ -12,13 +12,11 @@ import {
  */
 export const useNativeOrnamentPositions = () => {
   const overlays = useContext(NativeOverlayContext);
-  const previouslyManaged = useRef(false);
-  useLayoutEffect(() => {
-    if (overlays.length > 0) previouslyManaged.current = true;
-  }, [overlays.length]);
+  const [managed, setManaged] = useState(overlays.length > 0);
+  if (overlays.length > 0 && !managed) setManaged(true);
+
   return {
-    // eslint-disable-next-line react/refs -- Native ornaments stay managed after the last control is removed; this latch deliberately preserves that history.
-    managed: overlays.length > 0 || previouslyManaged.current,
+    managed,
     position: (corner: ControlPosition) =>
       nativeOrnamentPosition(corner, overlays),
   };

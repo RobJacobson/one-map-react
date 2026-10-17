@@ -1,5 +1,5 @@
 import { act, render, waitFor } from "@testing-library/react";
-import { createRef, type ReactNode } from "react";
+import { createRef, type ReactNode, StrictMode, Suspense } from "react";
 import { flushSync } from "react-dom";
 import { beforeEach, describe, expect, vi, test } from "vite-plus/test";
 
@@ -90,6 +90,57 @@ export const runWebFollowupRegressions = (
 
   describe("follow-up query, image, and interaction corrections", () => {
     beforeEach(() => mock.resetWebMapMock());
+
+    test("StrictMode retains one padding reset per removal across repeated cycles and remount", () => {
+      const content = (padding?: MapProps["padding"]) => (
+        <StrictMode>{scene({ padding })}</StrictMode>
+      );
+      const padding = () =>
+        (mock.Map.mock.calls.at(-1)?.[0] as { padding?: object } | undefined)
+          ?.padding;
+      const mounted = render(content());
+      expect(padding()).toBeUndefined();
+
+      for (const target of [{ top: 24 }, { left: 30 }]) {
+        mounted.rerender(content(target));
+        expect(padding()).toMatchObject(target);
+        mounted.rerender(content());
+        expect(padding()).toEqual({ top: 0, right: 0, bottom: 0, left: 0 });
+        mounted.rerender(content());
+        expect(padding()).toBeUndefined();
+      }
+
+      mounted.unmount();
+      render(content());
+      expect(padding()).toBeUndefined();
+    });
+
+    test("resuming a suspended padding removal sends a reset before restoring omission", () => {
+      const pending = new Promise<void>(() => {});
+      const Pause = () => {
+        throw pending;
+      };
+      const content = (padding?: MapProps["padding"], paused = false) => (
+        <Suspense fallback={<div>Loading</div>}>
+          {scene({ padding }, paused ? <Pause /> : undefined)}
+        </Suspense>
+      );
+      const padding = () =>
+        (mock.Map.mock.calls.at(-1)?.[0] as { padding?: object } | undefined)
+          ?.padding;
+      const mounted = render(content({ top: 24 }));
+      mounted.rerender(content(undefined, true));
+      expect(mounted.getByText("Loading")).toBeTruthy();
+      const beforeResume = mock.Map.mock.calls.length;
+      mounted.rerender(content());
+      expect(
+        mock.Map.mock.calls
+          .slice(beforeResume)
+          .map(([props]) => (props as { padding?: object }).padding)
+      ).toContainEqual({ top: 0, right: 0, bottom: 0, left: 0 });
+      mounted.rerender(content());
+      expect(padding()).toBeUndefined();
+    });
 
     test("map clicks preserve SDK ordering when excluded 3D hits overlap 2D hits", async () => {
       const sourceClick = vi.fn();
@@ -847,6 +898,26 @@ export const runWebFollowupRegressions = (
       ready.mockRestore();
     });
 
+    test("image registration preserves an explicitly disabled sdf option", async () => {
+      render(
+        scene(
+          {},
+          <Images
+            images={{
+              marker: { url: "https://example.com/custom.png", sdf: false },
+            }}
+          />
+        )
+      );
+      const renderer = target();
+      await act(async () => renderer.emitStyleLoad());
+      expect(renderer.addImage).toHaveBeenCalledExactlyOnceWith(
+        "marker",
+        { url: "https://example.com/custom.png", width: 1, height: 1 },
+        { sdf: false }
+      );
+    });
+
     if (adapter.backend === "maplibre-web") {
       test("a sprite changed by an in-place style diff restores colliding custom images", async () => {
         const mounted = render(
@@ -857,7 +928,8 @@ export const runWebFollowupRegressions = (
         );
         const renderer = target();
         let spriteUrl = "https://example.com/first-sprite";
-        renderer.getSprite = () => [{ id: "default", url: spriteUrl }];
+        const getSprite = vi.fn(() => [{ id: "default", url: spriteUrl }]);
+        renderer.getSprite = getSprite;
         await act(async () => renderer.emitStyleLoad());
         expect(renderer.loadImage).toHaveBeenCalledTimes(1);
         await act(async () => renderer.emitStyleData());
@@ -879,6 +951,10 @@ export const runWebFollowupRegressions = (
         );
         await act(async () => renderer.emitStyleData());
         expect(renderer.loadImage).toHaveBeenCalledTimes(2);
+        expect(getSprite.mock.calls.length).toBeGreaterThan(0);
+        expect(
+          getSprite.mock.contexts.every((receiver) => receiver === renderer)
+        ).toBe(true);
         mounted.unmount();
         expect(renderer.hasImage("marker")).toBe(false);
         ready.mockRestore();

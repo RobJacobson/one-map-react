@@ -6,7 +6,7 @@ import type {
   GeolocateControlProps,
   GeolocationPosition,
 } from "../contracts/ui-types.js";
-import { useMapSession } from "./map-context.js";
+import { type MapSession, useMapSession } from "./map-context.js";
 import { useOptionalSetupServices } from "./map-setup.js";
 
 /** One control's acquired resources and latest observed location. */
@@ -20,6 +20,11 @@ interface LocationControlRequest {
   latest?: GeolocationPosition;
   abort?: AbortController;
   release?: () => void;
+}
+
+interface LocationControlSnapshot {
+  readonly props: GeolocateControlProps;
+  readonly session: MapSession;
 }
 
 /** Coordinates only control-owned acquisition and follow interruption. */
@@ -196,51 +201,67 @@ export const useGeolocationControl = (
       const release = provider.watchPosition(receive, fail, {
         signal: controller.signal,
       });
-      if (owner.active && generation === owner.generation && owner.following)
-        owner.release = release;
-      else release();
+      if (owner.active) {
+        if (generation === owner.generation) {
+          if (owner.following) {
+            owner.release = release;
+            return;
+          }
+        }
+      }
+      release();
     } catch (error) {
       fail(error);
     }
   };
 
-  const center = async (
+  const center = (
     value: GeolocationPosition,
     generation: number
-  ): Promise<void> => {
-    const owner = request.current;
-    if (
-      owner.dispatching ||
-      !owner.active ||
-      !owner.following ||
-      generation !== owner.generation
-    )
-      return;
-    const map = current.current.session.ref.current;
-    if (!map) throw new Error("Geolocation target map is detached.");
-    owner.dispatching = true;
-    let next: GeolocationPosition | undefined = value;
-    try {
-      while (
-        next &&
-        owner.active &&
-        owner.following &&
-        generation === owner.generation &&
-        current.current.session.ref.current === map
-      ) {
-        const dispatched: GeolocationPosition = next;
-        await map[cameraMethod]({
-          center: dispatched.lngLat,
-          zoom: current.current.props.zoom ?? 14,
-        });
-        next =
-          current.current.props.trackUserLocation && owner.latest !== dispatched
-            ? owner.latest
-            : undefined;
-      }
-    } finally {
-      if (generation === owner.generation) owner.dispatching = false;
-    }
-  };
+  ): Promise<void> =>
+    centerLocation(request.current, current, cameraMethod, value, generation);
+
   return { pending, position, activate };
+};
+
+/** Serializes camera updates while retaining committed inputs and generation-owned cleanup. */
+const centerLocation = async (
+  owner: LocationControlRequest,
+  current: { readonly current: LocationControlSnapshot },
+  cameraMethod: "easeTo" | "flyTo",
+  value: GeolocationPosition,
+  generation: number
+): Promise<void> => {
+  if (
+    owner.dispatching ||
+    !owner.active ||
+    !owner.following ||
+    generation !== owner.generation
+  )
+    return;
+  const map = current.current.session.ref.current;
+  if (!map) throw new Error("Geolocation target map is detached.");
+  owner.dispatching = true;
+  let next: GeolocationPosition | undefined = value;
+  try {
+    while (
+      next &&
+      owner.active &&
+      owner.following &&
+      generation === owner.generation &&
+      current.current.session.ref.current === map
+    ) {
+      const dispatched: GeolocationPosition = next;
+      await map[cameraMethod]({
+        center: dispatched.lngLat,
+        zoom: current.current.props.zoom ?? 14,
+      });
+      next =
+        current.current.props.trackUserLocation && owner.latest !== dispatched
+          ? owner.latest
+          : undefined;
+    }
+  } finally {
+    if (generation === owner.generation) owner.dispatching = false;
+  }
 };

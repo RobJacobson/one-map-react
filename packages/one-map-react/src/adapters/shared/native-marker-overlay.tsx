@@ -56,7 +56,6 @@ export const NativeMarkerOverlay = (
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- actual native layout invalidates screen coordinates.
   }, [
     session.ref,
     session.ready,

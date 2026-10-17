@@ -266,6 +266,53 @@ describe("TF08 setup and location control lifetime", () => {
     expect(selected.easeTo).not.toHaveBeenCalled();
     expect(selected.release).toHaveBeenCalledTimes(1);
   });
+
+  test.each(["position", "error"] as const)(
+    "control releases a watch exactly once after synchronous %s unmount",
+    async (callback) => {
+      const selected = fixture();
+      let retire = () => {};
+      let receive: (position: GeolocationPosition) => void = () => {};
+      let fail: (error: unknown) => void = () => {};
+      const provider: LocationService = {
+        ...selected.location,
+        watchPosition: (position, error) => {
+          receive = position;
+          fail = error;
+          if (callback === "position") position({ lngLat: [7, 8] });
+          else error(new Error("Synchronous watch failure"));
+          return selected.release;
+        },
+      };
+      const onGeolocate = vi.fn(() => retire());
+      const onError = vi.fn(() => retire());
+      const view = render(
+        <MapSetup adapter={selected.adapter}>
+          <OneMap mapStyle={style} initialViewState={camera}>
+            <ControlProbe
+              trackUserLocation
+              locationProvider={provider}
+              onGeolocate={onGeolocate}
+              onError={onError}
+            />
+          </OneMap>
+        </MapSetup>
+      );
+      retire = () => view.unmount();
+      await act(async () => fireEvent.click(view.getByRole("button")));
+      expect(selected.release).toHaveBeenCalledTimes(1);
+      await act(async () => {
+        receive({ lngLat: [9, 10] });
+        fail(new Error("Retired watch failure"));
+      });
+      expect(onGeolocate).toHaveBeenCalledTimes(
+        callback === "position" ? 1 : 0
+      );
+      expect(onError).toHaveBeenCalledTimes(callback === "error" ? 1 : 0);
+      expect(selected.easeTo).not.toHaveBeenCalled();
+      expect(selected.release).toHaveBeenCalledTimes(1);
+    }
+  );
   test.each(["provider", "mode", "detach"] as const)(
     "resumed camera errors are suppressed after %s replacement",
     async (replacement) => {
@@ -511,13 +558,14 @@ describe("TF08 setup and location control lifetime", () => {
           finishCamera = resolve;
         })
     );
-    const view = render(
+    const tree = (zoom: number) => (
       <MapSetup adapter={selected.adapter}>
         <OneMap mapStyle={style} initialViewState={camera}>
-          <ControlProbe trackUserLocation />
+          <ControlProbe trackUserLocation zoom={zoom} />
         </OneMap>
       </MapSetup>
     );
+    const view = render(tree(14));
     fireEvent.click(view.getByRole("button"));
     await act(async () => selected.receive({ lngLat: [1, 2] }));
     act(selected.move);
@@ -525,11 +573,12 @@ describe("TF08 setup and location control lifetime", () => {
     await act(async () => fireEvent.click(view.getByRole("button")));
     await act(async () => selected.receive({ lngLat: [5, 6] }));
     expect(selected.easeTo).toHaveBeenCalledTimes(1);
+    view.rerender(tree(18));
     await act(async () => finishCamera());
     expect(selected.easeTo).toHaveBeenCalledTimes(2);
     expect(selected.easeTo).toHaveBeenLastCalledWith({
       center: [5, 6],
-      zoom: 14,
+      zoom: 18,
     });
     expect(selected.location.watchPosition).toHaveBeenCalledTimes(1);
   });

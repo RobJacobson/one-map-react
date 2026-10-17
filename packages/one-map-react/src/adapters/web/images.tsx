@@ -75,7 +75,9 @@ export const createWebImages = <
 
       const readSpriteKey = (): string | undefined => {
         try {
-          return JSON.stringify(map.getSprite?.());
+          const getSprite = map.getSprite;
+          if (!getSprite) return undefined;
+          return JSON.stringify(getSprite.call(map));
         } catch {
           return undefined;
         }
@@ -139,11 +141,9 @@ export const createWebImages = <
 
               // Cleanup must own the image before addImage can call application code.
               owned.set(name, fields);
-              map.addImage(
-                name,
-                data,
-                fields.sdf === undefined ? {} : { sdf: fields.sdf }
-              );
+              const options: { sdf?: boolean } = {};
+              if (fields.sdf !== undefined) options.sdf = fields.sdf;
+              map.addImage(name, data, options);
             } catch {
               if (released || revision !== registrationRevision) return;
               if (owned.get(name) === fields) {
@@ -180,7 +180,8 @@ export const createWebImages = <
 
       const sync = (next: ImagesProps["images"]): void => {
         if (released) return;
-        const currentRevision = ++revision;
+        revision += 1;
+        const currentRevision = revision;
         const isCurrent = (): boolean =>
           !released && revision === currentRevision;
         const nextNames = new Set(Object.keys(next));

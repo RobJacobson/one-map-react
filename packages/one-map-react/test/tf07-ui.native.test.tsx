@@ -285,6 +285,37 @@ test("scale observes each movement once, including unchanged controlled targets"
   await mounted.unmount();
 });
 
+test.each(["success", "failure"])(
+  "scale uses renderer center when no camera snapshot is available: %s",
+  async (outcome) => {
+    const fixture = sessionFixture();
+    const error = new Error("Center readback failed.");
+    const getCenter = jest
+      .fn<MapRef["getCenter"]>()
+      .mockResolvedValue([10, 20]);
+    if (outcome === "failure") getCenter.mockRejectedValue(error);
+    fixture.session.ref.current = { ...fixture.session.map, getCenter };
+    fixture.unproject.mockResolvedValue([10.01, 20]);
+    const onError = jest.fn();
+    const mounted = await render(
+      <FixtureSessionProvider value={{ ...fixture.session, viewState: null }}>
+        <ui.ScaleControl onError={onError} />
+      </FixtureSessionProvider>
+    );
+
+    expect(getCenter).toHaveBeenCalledTimes(1);
+    if (outcome === "success") {
+      await waitFor(() => expect(mounted.getByText("1 km")).toBeTruthy());
+      expect(fixture.project).toHaveBeenCalledWith([10, 20]);
+      expect(onError).not.toHaveBeenCalled();
+    } else {
+      await waitFor(() => expect(onError).toHaveBeenCalledWith(error));
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(fixture.project).not.toHaveBeenCalled();
+    }
+  }
+);
+
 test("scale suppresses errors between layout and passive unmount cleanup", async () => {
   const react = jest.requireActual<typeof import("react")>("react");
   const useEffect = react.useEffect;
@@ -1073,31 +1104,36 @@ describe("TF07 native UI composition", () => {
     ).rejects.toThrow("expanded attribution");
   });
 
-  test("compass pitch presentation and reset follow the observed camera", async () => {
-    const fixture = sessionFixture();
-    const session = {
-      ...fixture.session,
-      viewState: {
-        longitude: 10,
-        latitude: 20,
-        zoom: 4,
-        bearing: 30,
-        pitch: 60,
-      },
-    };
-    const view = await render(
-      <NativeOverlayHost session={session}>
-        <ui.NavigationControl visualizePitch />
-      </NativeOverlayHost>
-    );
-    expect(view.getByText("↑").props.style.transform).toEqual([
-      { rotate: "-30deg" },
-      { perspective: 400 },
-      { rotateX: "60deg" },
-    ]);
-    await fireEvent.press(view.getByLabelText("Reset north"));
-    expect(fixture.easeTo).toHaveBeenCalledWith({ bearing: 0, pitch: 0 });
-  });
+  test.each([true, false, undefined])(
+    "compass presentation and reset preserve visualizePitch=%s",
+    async (visualizePitch) => {
+      const fixture = sessionFixture();
+      const session = {
+        ...fixture.session,
+        viewState: {
+          longitude: 10,
+          latitude: 20,
+          zoom: 4,
+          bearing: 30,
+          pitch: 60,
+        },
+      };
+      const view = await render(
+        <NativeOverlayHost session={session}>
+          <ui.NavigationControl visualizePitch={visualizePitch} />
+        </NativeOverlayHost>
+      );
+      expect(view.getByText("↑").props.style.transform).toEqual(
+        visualizePitch
+          ? [{ rotate: "-30deg" }, { perspective: 400 }, { rotateX: "60deg" }]
+          : [{ rotate: "-30deg" }]
+      );
+      await fireEvent.press(view.getByLabelText("Reset north"));
+      expect(fixture.easeTo).toHaveBeenCalledWith(
+        visualizePitch ? { bearing: 0, pitch: 0 } : { bearing: 0 }
+      );
+    }
+  );
 
   test("navigation uses the renderer zoom when movement snapshots lag", async () => {
     const fixture = sessionFixture();

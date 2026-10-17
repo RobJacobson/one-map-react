@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 /**
  * Throws when a creation option of an owned resource changes between renders.
@@ -19,10 +19,9 @@ export const useStableOptions = <
   owner: string,
   options: Options
 ): Options => {
-  const initial = useRef(options);
+  const [initial] = useState(() => options);
 
-  // eslint-disable-next-line react/refs -- Compare against immutable creation inputs during render to reject unsupported resource replacement.
-  const changed = changedOptionKey(initial.current, options);
+  const changed = changedOptionKey(initial, options);
 
   if (changed !== undefined) {
     throw new Error(
@@ -31,8 +30,7 @@ export const useStableOptions = <
     );
   }
 
-  // eslint-disable-next-line react/refs -- Return the same immutable creation snapshot used for validation.
-  return initial.current;
+  return initial;
 };
 
 /**

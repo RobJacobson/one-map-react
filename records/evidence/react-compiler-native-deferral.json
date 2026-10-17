@@ -1,0 +1,78 @@
+{
+  "decision": "Keep both native-map React Compiler diagnostic groups deferred.",
+  "status": "Deferred optimization; no correctness defect established by this audit.",
+  "observedAt": "2026-10-17",
+  "revision": "5cc785cd1776e60247151a853675cd7b684a9174",
+  "compiler": {
+    "package": "babel-plugin-react-compiler",
+    "version": "1.0.0",
+    "target": "19",
+    "configuration": "scripts/react-compiler.mjs"
+  },
+  "sourceHashes": {
+    "packages/one-map-react/src/adapters/mapbox-native/map.tsx": "66158b538e84801457e8fa44115f3950752ac6152fb10f8a48d190ed0c1266a2",
+    "packages/one-map-react/src/adapters/mapbox-native/map-ref.ts": "1d877073583c8d2e2b78540d28d51098ba93a7da8b4fa0d4e97dc458fe526353",
+    "packages/one-map-react/src/adapters/mapbox-native/geojson-source-registry.ts": "64de3d1eede8531309e9c9930296d62f063596e5cf6b4273cdd9122efcff42c7",
+    "packages/one-map-react/src/adapters/shared/native-feature-state.ts": "8062b170179952fcf40783ea0400d2adcee2d7ea4dbdb572735cbdd15a46b259",
+    "packages/one-map-react/src/adapters/maplibre-native/map.tsx": "c288cfe128ff32de73fef43674778a24eda52b3837ee084fafb7103d0b3e04bf",
+    "packages/one-map-react/src/adapters/maplibre-native/map-ref.ts": "d76135f9e688d52b1688ad9887ec2ef8a50cf015306809447a7a057f6546a33d"
+  },
+  "diagnostics": {
+    "sourceFilesScanned": 101,
+    "groups": [
+      "packages/one-map-react/src/adapters/mapbox-native/map.tsx:70: Cannot access refs during render",
+      "packages/one-map-react/src/adapters/maplibre-native/map.tsx:74: Cannot access refs during render"
+    ],
+    "interpretation": "The compiler conservatively flags refs passed through lazy initialization. The Mapbox group includes registry and handle initialization; MapLibre includes handle initialization."
+  },
+  "rationale": [
+    "The inspected factories retain refs and callbacks for later commands. No render-time current read was established.",
+    "The Mapbox registry constructor stores its reset callback through NativeFeatureState without invoking it.",
+    "Handles must retain attachment identity and read current wrapper refs when commands run. MapLibre also gates camera commands on map-load readiness.",
+    "No small behavior-preserving rewrite tested in memory enabled compilation. Moving creation into effects would require reviewing handle availability and attachment ordering."
+  ],
+  "auditEvidence": {
+    "scan": "Babel transformSync over all committed library TypeScript sources at the recorded revision, using target 19 and CompileError logging from the installed compiler. Diagnostic grouping matches scripts/react-compiler.mjs.",
+    "factoryProbe": "The current emitted createMapboxMapRef and createMaplibreMapRef received refs whose current getters throw. Construction performed zero reads; later jumpTo calls read those getters and rejected. Constructing the Mapbox registry did not invoke its reset callback.",
+    "factoryProbeArtifact": "Emitted modules from the passing library build recorded in records/evidence/react-compiler-lifecycle-cleanups.json; no build was repeated during the read-only audit.",
+    "alternatives": [
+      {
+        "candidate": "useMemo initialization",
+        "outcome": "Ref diagnostics remain. It does not preserve state-owned lifetime guarantees as a replacement."
+      },
+      {
+        "candidate": "Guarded ref initialization",
+        "outcome": "Ref diagnostics remain, including additional render-time access reports."
+      },
+      {
+        "candidate": "Inline the full handle object while retaining existing refs and callback bindings",
+        "outcome": "Ref diagnostics remain. Unlike the small facade proxy, this does not enable compilation."
+      }
+    ],
+    "relatedVerification": "records/evidence/react-compiler-lifecycle-cleanups.json"
+  },
+  "consequences": [
+    "Both native-map components continue without compiler optimization. This record does not measure the performance cost.",
+    "Existing behavior, public signatures, source registries, capture ownership and command readiness remain unchanged."
+  ],
+  "revisit": {
+    "owner": "Maintainer changing the compiler configuration or either native adapter.",
+    "triggers": [
+      "A compiler upgrade or analysis change may recognize deferred ref captures; rerun the exact component compilation probes.",
+      "Profiling identifies material repeated work in either skipped native-map component.",
+      "A separately justified handle, registry or capture lifecycle change creates a smaller initialization boundary.",
+      "A regression establishes an actual render-time ref read, stale handle, readiness failure or ownership error."
+    ],
+    "completionCriteria": [
+      "The exact affected native-map implementation reports CompileSuccess without hiding or relocating its diagnostic to another hook.",
+      "Preserve stable handles and registries across rerenders, fresh ownership on remount and rejection of commands retained from detached attachments.",
+      "Preserve MapLibre map-load readiness, capture scope and teardown, camera command observation, committed callback behavior and feature-state queue/reset ordering.",
+      "Add regressions for any changed boundary and run applicable formatting, documentation, type, source, mocked native, library-build and compiled-output checks.",
+      "Assess affected runtime acceptance separately. Obtain explicit permission before renderer tests or native acceptance builds/installations."
+    ]
+  },
+  "limitations": [
+    "Routine component suites, native builds, renderer acceptance and performance benchmarks were not run for this deferral record.",
+    "The source review and isolated factory probe do not renew runtime acceptance or prove all possible ref-related failures absent."
+  ]
+}

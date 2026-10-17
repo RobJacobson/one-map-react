@@ -84,8 +84,7 @@ export const useMapInteractions = (
     async (event: ClickEvent): Promise<ClickEvent> => {
       const layers = propsRef.current.interactiveLayerIds;
       if (!layers) return event;
-      const map = mapRef.current;
-      if (!map) throw new Error("Map is not attached.");
+      const map = requireAttachedMap(mapRef.current);
       return {
         ...event,
         features: await map.queryRenderedFeatures(event.point, { layers }),
@@ -172,15 +171,16 @@ export const useMapInteractions = (
     let hit = event;
     let sourceHit = event;
     try {
-      if (!backend.endsWith("native") && sources.current.size > 0) {
-        const map = mapRef.current;
-        if (!map) throw new Error("Map is not attached.");
-        // Source activation owns its hit region independently of the map's
-        // interactiveLayerIds. Native wrappers already perform this query.
-        sourceHit = {
-          ...event,
-          features: await map.queryRenderedFeatures(event.point),
-        };
+      if (!backend.endsWith("native")) {
+        if (sources.current.size > 0) {
+          const map = requireAttachedMap(mapRef.current);
+          // Source activation owns its hit region independently of the map's
+          // interactiveLayerIds. Native wrappers already perform this query.
+          sourceHit = {
+            ...event,
+            features: await map.queryRenderedFeatures(event.point),
+          };
+        }
       }
       // SDK filtering owns ordering and featureset semantics, beyond layer IDs.
       if (propsRef.current.interactiveLayerIds) hit = await queryHit(event);
@@ -216,4 +216,9 @@ export const useMapInteractions = (
     if (!stopped) reportClick(hit, currentGeneration);
   };
   return { emit, move, subscribe, registerSource, dispatchSource, click };
+};
+
+const requireAttachedMap = (map: MapRef | null): MapRef => {
+  if (!map) throw new Error("Map is not attached.");
+  return map;
 };

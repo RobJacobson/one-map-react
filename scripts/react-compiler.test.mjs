@@ -9,9 +9,29 @@ import { reactCompiler } from "./react-compiler.mjs";
 
 // Check the actual component, since another compiled hook in its file proves nothing.
 for (const [relative, names] of [
-  ["facade/map.tsx", ["Map"]],
+  ["facade/map.tsx", ["Map", "useMapAttachment"]],
+  ["facade/use-geolocation-control.ts", ["useGeolocationControl"]],
+  [
+    "adapters/shared/use-native-controlled-camera.ts",
+    ["useNativeControlledCamera"],
+  ],
   ["facade/user-location.tsx", ["UserLocation"]],
-  ["adapters/web/map.tsx", ["WebMap"]],
+  ["facade/source.tsx", ["Source"]],
+  ["facade/use-stable-options.ts", ["useStableOptions"]],
+  ["adapters/shared/use-frozen-value.ts", ["useFrozenValue"]],
+  ["adapters/web/map.tsx", ["WebMap", "useWebPadding"]],
+  ["adapters/web/images.tsx", ["WebImages"]],
+  [
+    "adapters/shared/native-ui.tsx",
+    ["NativeNavigationControl", "NativeScaleControl"],
+  ],
+  ["adapters/shared/use-native-marker-drag.ts", ["useNativeMarkerDrag"]],
+  ["facade/use-map-interactions.ts", ["useMapInteractions"]],
+  ["adapters/shared/native-marker-overlay.tsx", ["NativeMarkerOverlay"]],
+  [
+    "adapters/shared/native-ornament-position.ts",
+    ["useNativeOrnamentPositions"],
+  ],
   [
     "adapters/shared/native-map-presentation.tsx",
     ["NativePresentationProvider", "NativeCameraProvider"],
@@ -68,7 +88,7 @@ for (const [relative, names] of [
     "Compiler must preserve source mapping for the packer"
   );
   const built = readFileSync(
-    resolve("packages/one-map-react/dist", relative.replace(/\.tsx$/, ".js")),
+    resolve("packages/one-map-react/dist", relative.replace(/\.tsx?$/, ".js")),
     "utf8"
   );
   assert(
@@ -77,6 +97,7 @@ for (const [relative, names] of [
   );
   assert.doesNotMatch(built, /react-compiler-runtime/);
 }
+
 console.log(
   "PASS compiler transform, emitted runtime and selected component compilation."
 );

@@ -1,0 +1,58 @@
+{
+  "scope": "Three recommended React Compiler fixes; optional cleanups and deferred diagnostics unchanged.",
+  "baseCommit": "b0670d45a504b263f4b6a4e86437ee0d3743ebc4",
+  "files": {
+    "packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx": "7d2b7316b977c0e6dd9672f25a711ea85c1a8c8f8ee4b23b4fc8b28cc5478f70",
+    "packages/one-map-react/src/adapters/shared/native-ornament-position.ts": "e60af44c712be2119e9c13aa7358addbc98a5847736e00db05754370ed3ff7f1",
+    "packages/one-map-react/src/adapters/web/map.tsx": "656d00228f36965e73dc34c91b672059fa663d608c429ae2f12c30427d5dc378",
+    "packages/one-map-react/test/mapbox-native.native.test.tsx": "65753a767b448052c2bea4a37487f53b5a220a827aaecbb9218c7cd91e1daf9f",
+    "packages/one-map-react/test/maplibre-native.native.test.tsx": "5ab7a5bdc110cebab4889a331aeb6b17767ca693da1556ec890f0d26acfb4058",
+    "packages/one-map-react/test/web-followup-regressions.tsx": "08697724ba287473638ae4e7ca418069e1ba320615f47ab836d84b2ec8549979",
+    "scripts/react-compiler.test.mjs": "fd9d8d983b20a8418c351eccbb78a237d31ce4e360115298a05cd93fa29388d6"
+  },
+  "changes": [
+    "Remove the unnecessary native marker overlay dependency-rule suppression while retaining native layout invalidation.",
+    "Store native ornament management history in state, retaining managed margins after controls are removed and preserving selected SDK overrides.",
+    "Store web padding output by caller props snapshot so render replays retain the zero reset and the next caller update releases it."
+  ],
+  "verification": {
+    "compilerRegression": "All three target functions skipped before and compiled after; compiler assertions cover each target and emitted runtime.",
+    "diagnostics": {
+      "before": 17,
+      "after": 14,
+      "remaining": "The same optional, intentional-boundary, and unsupported-syntax diagnostic groups remain."
+    },
+    "passed": [
+      "bun run check",
+      "bun run check:docs",
+      "bun run typecheck",
+      "bun run typecheck:apps",
+      "git diff --check"
+    ],
+    "sourceTests": {
+      "command": "node_modules/.bin/vp test run",
+      "files": 36,
+      "tests": 813
+    },
+    "nativeMockTests": {
+      "command": "node_modules/.bin/jest --runInBand",
+      "suites": 6,
+      "tests": 268
+    },
+    "compiledTests": {
+      "command": "bun run test:compiled",
+      "build": "passed",
+      "webFiles": 21,
+      "webTests": 564,
+      "nativeSuites": 6,
+      "nativeTests": 268,
+      "compilerAssertions": "passed"
+    },
+    "rerun": "The first broad source run overlapped package rebuilding and could not resolve a generated selected entry. The complete source suite passed after the build finished."
+  },
+  "limitations": [
+    "No renderer acceptance, native builds, or device installations ran, as requested. Mocked checks do not renew renderer acceptance.",
+    "Existing TypeScript experimental build-API and Bun moduleSuffixes warnings remain."
+  ],
+  "git": "Task changes left uncommitted; pre-existing staged changes left untouched."
+}

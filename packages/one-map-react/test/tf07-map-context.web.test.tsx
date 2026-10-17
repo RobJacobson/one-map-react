@@ -326,12 +326,17 @@ describe("TF07 map-local UI lifetime", () => {
     const rendered = render(tree(true));
     await expect(named?.getZoom()).resolves.toBe(3);
     const detached = named;
+    const retainedGetZoom = named?.getZoom;
+    rendered.rerender(tree(true));
+    expect(named).toBe(detached);
     rendered.rerender(tree(false));
     expect(named).toBeUndefined();
     await expect(detached?.getZoom()).rejects.toThrow("not attached");
+    await expect(retainedGetZoom?.()).rejects.toThrow("not attached");
     rendered.rerender(tree(true));
     expect(named).not.toBe(detached);
     await expect(named?.getZoom()).resolves.toBe(3);
+    await expect(retainedGetZoom?.()).rejects.toThrow("not attached");
     rendered.unmount();
     await expect(named?.getZoom()).rejects.toThrow("not attached");
   });

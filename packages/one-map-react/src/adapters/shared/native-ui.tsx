@@ -465,10 +465,9 @@ const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
     const sequence = ++requestSequence.current;
 
     try {
-      await map.easeTo({
-        bearing: 0,
-        ...(props.visualizePitch ? { pitch: 0 } : {}),
-      });
+      const options: { bearing: number; pitch?: number } = { bearing: 0 };
+      if (props.visualizePitch) options.pitch = 0;
+      await map.easeTo(options);
     } catch (error) {
       reportError(map, sequence, error);
     }
@@ -568,13 +567,17 @@ const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
       const map = mapRef.current;
       if (!map || !ready) return;
       try {
-        const center = camera
-          ? ([camera.viewState.longitude, camera.viewState.latitude] as const)
-          : await map.getCenter();
+        let center: LngLat;
+        if (camera) {
+          center = [camera.viewState.longitude, camera.viewState.latitude];
+        } else {
+          center = await map.getCenter();
+        }
         const origin = await map.project(center);
         const end = await map.unproject([origin[0] + maxWidth, origin[1]]);
         const meters = groundDistance(center, end);
-        if (active && meters > 0) {
+        if (!active) return;
+        if (meters > 0) {
           setScale(scaleDisplay(meters, maxWidth, unit));
         }
       } catch (error) {

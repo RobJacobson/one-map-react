@@ -99,11 +99,8 @@ export const useNativeMarkerDrag = (
 
     try {
       const lngLat = await map.unproject(point);
-      if (
-        generation.current !== currentGesture.generation ||
-        sequence !== requestSequence.current
-      )
-        return;
+      if (generation.current !== currentGesture.generation) return;
+      if (sequence !== requestSequence.current) return;
       gesture.current = { ...currentGesture, lngLat };
       setDragCoordinate(lngLat);
       if (ending) {
@@ -113,11 +110,8 @@ export const useNativeMarkerDrag = (
         drag({ lngLat, point });
       }
     } catch (error) {
-      if (
-        generation.current !== currentGesture.generation ||
-        sequence !== requestSequence.current
-      )
-        return;
+      if (generation.current !== currentGesture.generation) return;
+      if (sequence !== requestSequence.current) return;
       cancel();
       reportError(error);
     }
