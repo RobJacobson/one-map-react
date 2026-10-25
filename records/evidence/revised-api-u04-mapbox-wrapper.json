@@ -1,0 +1,289 @@
+{
+  "unit": "U04",
+  "status": "implemented and audited; required routine checks passed; commit/push/PR authorized by the owner workflow",
+  "successor": "U05 undispatched; explicit owner release required",
+  "authorization": "Owner merged U03 PR22 and released U04 only. Starting U04, coordinator may commit/push/open current-unit PR after successful independent review, coordinator audit and required routine checks; no successor, merge, renderer/native acceptance or package publication authorized.",
+  "scope": {
+    "runtime": "One asynchronous current-MapView lookup added to the existing RNMapbox factory and selected NativeAdvancedMapRef; selected entry already exports this type. No camera commands, camera ownership observer, source/query/cluster/state/capture paths, setSourceVisibility mirror, common MapRef, facade proxy, MapLibre code, peers, patches, versions, lockfiles or candidate metadata changed.",
+    "inventory": [
+      "One createMapboxMapRef caller in adapters/mapbox-native/map.tsx captures separate mapViewRef and cameraRef; selected Map aliases the common facade with selected ref typing.",
+      "Installed RNMapbox 10.3.8 MapView.tsx exports a class wrapper, distinct from its separate Camera. Deprecated MapView.setCamera exists, so method-name absence is not used to distinguish owners.",
+      "Existing mock useImperativeHandle supplies the real attached mock MapView ref and refreshes it on rerender; identity assertions read that ref, without extra handle cache or replacement owner.",
+      "Existing U03 proxy re-reads current attached adapter ref and returns rejected promises when detached; common useMap types continue omitting selected SDK access."
+    ],
+    "regressions": [
+      "Selected direct, enclosing proxy and named proxy (3 cases).",
+      "Exact current attached MapView identity before load, Promise result, no getter-triggered camera dispatch.",
+      "Retained extracted method follows handle replacement while the same mock MapView instance/mapId remains mounted.",
+      "Direct and extracted getter calls reject asynchronously after teardown; retained proxies remain non-thenable.",
+      "Existing common center/flyTo and advanced/source/query/cluster/state cases retained."
+    ],
+    "consumerChanges": "None required: getter is additive until advanced mirrors are migrated in U06.",
+    "newDependencies": [],
+    "applicationCodeAdded": 0,
+    "testsRetired": [],
+    "scopeAdjustments": [],
+    "resourceLifetime": "No new resource, wait, subscription, cancellation or ownership layer. Each invocation immediately borrows current handle; later handle validity follows the wrapper.",
+    "dataImplications": "No database/storage or destructive operation added."
+  },
+  "originalWorkingArtifact": {
+    "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+    "branch": "codex/comment-style-docs",
+    "basis": "Dirty rc.11 working basis preserved. Unit changes measured against captured unit-start contents, not HEAD/main.",
+    "snapshotFiles": 1035,
+    "unitStartManifestSha256": "54865e809137c237817118b2ab9fbd7eaafb17c6ed6e5e74f7aef2528eb6eb48",
+    "unitDeltaPatchSha256": "4e807953b533527733f26b649a6b90c421780add7a09a2a6d204c144226446da",
+    "changedExistingPaths": [
+      "AGENTS.md",
+      "README.md",
+      "docs/AGENTS.md",
+      "docs/README.md",
+      "docs/api-coverage.md",
+      "docs/requirements.md",
+      "docs/revised-api-implementation-plan.md",
+      "docs/revised-api-proposal.md",
+      "docs/stage-plan.md",
+      "packages/one-map-react/README.md",
+      "packages/one-map-react/src/adapters/mapbox-native/map-ref.ts",
+      "packages/one-map-react/test/mapbox-native.native.test.tsx",
+      "records/README.md",
+      "scripts/test-peers.mjs"
+    ],
+    "newPath": "records/evidence/revised-api-u04-mapbox-wrapper.json",
+    "unrelatedSnapshotChanges": [],
+    "candidateArchiveSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7",
+    "temporaryPackageSha256": "1f5a0035a429920e62b7d308ca1f0c6794dff93f81fcfcc6c617ff826936eee2",
+    "packageFreezeManifestSha256": "acb0a4730fc9c951573f619b493474d04940667cdf00510de64ec98ea0fc1214",
+    "routineChecks": [
+      {
+        "command": "bun run test:native --runTestsByPath packages/one-map-react/test/mapbox-native.native.test.tsx --testNamePattern=\"wrapper access\"",
+        "exit": 1,
+        "result": "Expected red: all 3 new cases failed before getter implementation (missing direct method/proxy target method)."
+      },
+      {
+        "command": "bun run test:native --runTestsByPath packages/one-map-react/test/mapbox-native.native.test.tsx",
+        "exit": 0,
+        "result": "94 tests pass, including 3 new lifecycle cases; rerun after coordinator test correction."
+      },
+      {
+        "command": "bun run test:native",
+        "exit": 0,
+        "result": "7 suites, 286 tests pass. Briefly overlapped the library/example build; no failures. Final focused suite reran after build completion."
+      },
+      {
+        "command": "bun run build",
+        "exit": 0,
+        "result": "Library and example package builds pass; no native app build."
+      },
+      {
+        "command": "bun run check",
+        "exit": 0,
+        "result": "346 formatted files, 328 linted files; final rerun passes."
+      },
+      {
+        "command": "bun run check:docs",
+        "exit": 0,
+        "result": "39 Markdown files, 42 SDK comparison tables; structural checks only."
+      },
+      {
+        "command": "bun run typecheck",
+        "exit": 0,
+        "result": "Root, tests, web examples, native examples pass; final rerun after build passes."
+      },
+      {
+        "command": "bun run typecheck:apps",
+        "exit": 0,
+        "result": "Example tests and web/Expo app declarations pass; final rerun after build passes."
+      },
+      {
+        "command": "bun pm pack --destination /tmp/one-map-u04-esll5msn/original-pack --ignore-scripts",
+        "cwd": "packages/one-map-react",
+        "exit": 0,
+        "result": "Separate temporary archive; existing candidate archive preserved."
+      },
+      {
+        "command": "bun scripts/test-package.mjs --archive /tmp/one-map-u04-esll5msn/original-pack/one-map-react-0.1.0-rc.11.tgz --evidence /tmp/one-map-u04-esll5msn/original-common.json",
+        "exit": 0,
+        "result": "13 isolated common/package selections pass, including common negative getter assertions and peer-free declaration graph."
+      }
+    ]
+  },
+  "mainBasedArtifact": {
+    "base": "83eb69ff8e2cc6d148a273d9a698e76764a203ab",
+    "branch": "codex/u04-rnmapbox-wrapper-access",
+    "basis": "Fresh clone of merged main (older rc.2 runtime), with U04 unit deltas only. No unrelated rc.11 runtime/candidate changes transplanted. Native test delta applies to main; peer assertions transplanted without working-tree model-puck additions; current coverage first three cells/checkmarks preserved.",
+    "packageFreezeManifestSha256": "92d628b856c172a44bbe2ee3df6e11ac64a693577fec10cfc7ce243b6de2e97c",
+    "dependencySetup": "Temporary per-package overlays reused existing third-party dependencies and routed all workspace imports to clone-local packages; realpaths asserted. Builds preceded final native/type/package checks. All overlays removed after final probes, without following dependency symlinks.",
+    "routineChecks": [
+      {
+        "command": "bun run build",
+        "exit": 0,
+        "result": "Clone-local library and example package builds, completed before native/type/package checks."
+      },
+      {
+        "command": "bun run test:native --runTestsByPath packages/one-map-react/test/mapbox-native.native.test.tsx",
+        "exit": 0,
+        "result": "94 tests pass, including all 3 new lifecycle cases."
+      },
+      {
+        "command": "bun run check",
+        "exit": 0,
+        "result": "305 formatted files, 279 linted files."
+      },
+      {
+        "command": "bun run check:docs",
+        "exit": 0,
+        "result": "Structure and local links pass."
+      },
+      {
+        "command": "bun run typecheck",
+        "exit": 0,
+        "result": "Root, tests, web examples and native examples pass."
+      },
+      {
+        "command": "bun run typecheck:apps",
+        "exit": 0,
+        "result": "Example tests and web/Expo app declarations pass."
+      },
+      {
+        "command": "bun scripts/test-package.mjs --archive /tmp/one-map-u04-esll5msn/main-pack/one-map-react-0.1.0-rc.2.tgz --evidence /tmp/one-map-u04-esll5msn/main-package.json",
+        "exit": 0,
+        "result": "13 isolated common/explicit/conditional/mixed file-resolution selections passed; common getter negative declarations and peer-free imports preserved."
+      }
+    ],
+    "packedChecks": "All 13 common/package selections and both RNMapbox selected endpoint declaration probes passed against the same frozen main archive. No native linking or renderer execution.",
+    "temporaryPackageSha256": "99123e746acc2b9f989188f8c5fce9f9a5d5215146d53563f5525060419aba4b"
+  },
+  "selectedDeclarationChecks": {
+    "scope": "RNMapbox selected entry exact Promise<ComponentRef<typeof MapView>>, selected Map ref inference, representative getCenter/takeSnap/setSourceVisibility call shapes; peer patch application and declared tuple checks. No native linking claim.",
+    "versions": [
+      "@rnmapbox/maps 10.3.7 minimum",
+      "@rnmapbox/maps 10.3.8 endpoint"
+    ],
+    "hostDistinction": "Mocked host uses installed React Native 0.86.3; isolated peer checks use declared React Native 0.87.1 / React 19.2.3. Mock success does not advertise new release support.",
+    "runnerDerivation": "Temporary derivative of existing test-peers.mjs: explicit mapbox-native filter, entire mixed loop removed, absolute root/helper imports, console scope qualified RNMapbox-only. No new repository harness or CLI.",
+    "originalRunnerSha256": "3c48b71f5f32eb82eaa98d6602157458a4f7f5ddb49d7c3154998209c477637e",
+    "mainRunnerSha256": "6d0edfe653828014ebfd091e61910227a6a30e481b783187a9034bc01f0f87e5",
+    "firstAttempt": "Original sandboxed minimum bun add failed at tempdir EPERM before declaration execution. Coordinator then ran all four isolated minimum/endpoint checks with approved filesystem/network access; all passed. Initial failure retained separately from passing outcomes.",
+    "executions": [
+      {
+        "artifact": "original",
+        "endpoint": "minimum",
+        "command": "TMPDIR=/private/tmp/one-map-u04-esll5msn bun /tmp/one-map-u04-esll5msn/peer-native-original.mjs --archive /tmp/one-map-u04-esll5msn/original-pack/one-map-react-0.1.0-rc.11.tgz --evidence /tmp/one-map-u04-esll5msn/original-peers-minimum.json",
+        "exit": 0,
+        "status": "passed",
+        "archiveSha256": "1f5a0035a429920e62b7d308ca1f0c6794dff93f81fcfcc6c617ff826936eee2",
+        "resolvedPeers": {
+          "react": "19.2.3",
+          "react-dom": "19.2.3",
+          "react-native": "0.87.1",
+          "@types/react": "19.2.18",
+          "@rnmapbox/maps": "10.3.7",
+          "react-native-teleport": "1.2.2"
+        },
+        "patchedFilesVerified": 31,
+        "lockfileSha256": "98ab58ad0d06ebf1e1a39bfea9e3003e465a364c801a5de430c29c56bd888ba1"
+      },
+      {
+        "artifact": "original",
+        "endpoint": "endpoint",
+        "command": "TMPDIR=/private/tmp/one-map-u04-esll5msn bun /tmp/one-map-u04-esll5msn/peer-native-original.mjs --archive /tmp/one-map-u04-esll5msn/original-pack/one-map-react-0.1.0-rc.11.tgz --versions /tmp/one-map-u04-esll5msn/endpoint.json --evidence /tmp/one-map-u04-esll5msn/original-peers-endpoint.json",
+        "exit": 0,
+        "status": "passed",
+        "archiveSha256": "1f5a0035a429920e62b7d308ca1f0c6794dff93f81fcfcc6c617ff826936eee2",
+        "resolvedPeers": {
+          "react": "19.2.3",
+          "react-dom": "19.2.3",
+          "react-native": "0.87.1",
+          "@types/react": "19.2.18",
+          "@rnmapbox/maps": "10.3.8",
+          "react-native-teleport": "1.2.2"
+        },
+        "patchedFilesVerified": 36,
+        "lockfileSha256": "9c84829b4aa031fa1d0eab2324e98c5336deb2073be48dc5b1741a676b14c30c"
+      },
+      {
+        "artifact": "main",
+        "endpoint": "minimum",
+        "command": "TMPDIR=/private/tmp/one-map-u04-esll5msn bun /tmp/one-map-u04-esll5msn/peer-native-main.mjs --archive /tmp/one-map-u04-esll5msn/main-pack/one-map-react-0.1.0-rc.2.tgz --evidence /tmp/one-map-u04-esll5msn/main-peers-minimum.json",
+        "exit": 0,
+        "status": "passed",
+        "archiveSha256": "99123e746acc2b9f989188f8c5fce9f9a5d5215146d53563f5525060419aba4b",
+        "resolvedPeers": {
+          "react": "19.2.3",
+          "react-dom": "19.2.3",
+          "react-native": "0.87.1",
+          "@types/react": "19.2.18",
+          "@rnmapbox/maps": "10.3.7",
+          "react-native-teleport": "1.2.1"
+        },
+        "patchedFilesVerified": 25,
+        "lockfileSha256": "17840195ab8e57c87c0ad03cafa5aaabda52b744066152f5dd3754a9cd93f003"
+      },
+      {
+        "artifact": "main",
+        "endpoint": "endpoint",
+        "command": "TMPDIR=/private/tmp/one-map-u04-esll5msn bun /tmp/one-map-u04-esll5msn/peer-native-main.mjs --archive /tmp/one-map-u04-esll5msn/main-pack/one-map-react-0.1.0-rc.2.tgz --versions /tmp/one-map-u04-esll5msn/endpoint.json --evidence /tmp/one-map-u04-esll5msn/main-peers-endpoint.json",
+        "exit": 0,
+        "status": "passed",
+        "archiveSha256": "99123e746acc2b9f989188f8c5fce9f9a5d5215146d53563f5525060419aba4b",
+        "resolvedPeers": {
+          "react": "19.2.3",
+          "react-dom": "19.2.3",
+          "react-native": "0.87.1",
+          "@types/react": "19.2.18",
+          "@rnmapbox/maps": "10.3.8",
+          "react-native-teleport": "1.2.1"
+        },
+        "patchedFilesVerified": 25,
+        "lockfileSha256": "bbf534730a61fa9d416f4d4f84587a74833bbbbacfc24d5d9083f3117e8c7e58"
+      }
+    ]
+  },
+  "review": {
+    "implementer": "Self-review completed against current-handle/borrowed-lifetime contract and connected factory/facade paths.",
+    "coordinatorPreAudit": "Removed incorrect assumption that real MapView lacks setCamera; strict actual-ref identity and no camera dispatch remain. Converted peer MapView import to type-only. Corrected focused tests pass in both artifacts.",
+    "independentReview": "Passed read-only review of original and main-based U04 code, connected ownership/lifecycle paths, selected declarations, all current coverage cells, tests, package freezes and final probe evidence. No actionable findings.",
+    "coordinatorAudit": "Passed final audit of current MapView lookup, no separate Camera substitution, detached promises, source/common/MapLibre preservation and both artifact verification packets. Pre-audit test/type-import corrections are recorded above; no remaining issue. Final edits only record the completed review disposition.",
+    "finalDocumentation": "After audit-disposition status updates, expanded existing structural checker passed 43 original Markdown files/42 comparison tables and 42 main-based files/38 tables. No production or package bytes changed after frozen probe checks."
+  },
+  "verificationLimits": [
+    "No renderer/browser smoke, Metro mixed transport, native build/installation/linking/device run or package publication performed. These require separate owner authorization.",
+    "No U05 or later work. Advanced mirrors and wider contract removals remain pending.",
+    "Full main web suite not rerun for this native-only additive change; U03 records the bounded baseline marker.ts source-import failures in its temporary dependency setup.",
+    "Documentation structural success does not replace editorial/source review."
+  ],
+  "retention": "Compact outcomes, initial failures, archive/patch/dependency identities and log hashes remain here. Temporary overlays, consumers, raw logs, peer lockfiles and duplicate archives are removed after audit/publication. Unit-start recovery and source-only delta remain temporary for the working-tree provenance; no candidate archive replaced.",
+  "logHashes": {
+    "build-main.log": "47d9ff01d1670d9d0f25456d9b80f3d2c1314f536aabbce34dcbe83a68130c3e",
+    "build.log": "d1ccd350398ead3835a89d692e6456d6a098ac86951fb4ea2ea2e93df7f6cb98",
+    "check-docs-main.log": "c28c390cdcbfd51469493fd13ce06605dd70a7667b6580ae9976cd552596e116",
+    "check-main.log": "5e81a1342a70352897bce3d3edbb6125cd7382332567e636bce3b71bd83fad50",
+    "check-original-final.log": "3b24f5dde269177958f14101f14a402572ffa3fefb7f498fca9cafbc82db5d1c",
+    "check.log": "e88cb6c16be6a5afd123c249974341de80e548dc438bd5007e2c22a95f5d9938",
+    "common-original.log": "5fe4f283df568ca870f15b93c812290bd47ad60c413510438083c37337cd90de",
+    "docs-evidence-main.log": "c28c390cdcbfd51469493fd13ce06605dd70a7667b6580ae9976cd552596e116",
+    "docs-original-final.log": "feb4ceee89ee2252939b66e282f57942db8754988a566df001ae691b888a73e3",
+    "docs-original.log": "feb4ceee89ee2252939b66e282f57942db8754988a566df001ae691b888a73e3",
+    "format.log": "d9ef046cd133f9b95f57db33929d4cce0616ff33e7e752070dfc7fd1b38b2170",
+    "main-pack.log": "f76da2bd2fe95e8b8a108fc8ce9ceeffe3ae9b2b1bc820849cdefd0220cc3bba",
+    "main-package.log": "9a54db75b58b7a39c4214ec9f85669fc440464a104e317c21a3be73d8c514f74",
+    "main-peers-endpoint.log": "2339971100f283e40eb3abbf8265ea4c5e5aec934d258b5c79417c24f62e423d",
+    "main-peers-minimum.log": "718e95f9c11da66133873141602a2afea54db9ef3437dec2388c51e424cfe0f4",
+    "native-all.log": "8832a7e74adc4809712a13d63c45266a6674a85a10587444e0eac7232c5c578e",
+    "native-final.log": "b0ebd676957ddd303f0d58b443ff7ac2a17358984e41ed6125a973b5e8e86e57",
+    "native-green.log": "9f06658fb9d77b0e4351b00675c33c3d01be8e1af8b6cfde810fb9c0a07ed355",
+    "native-main.log": "65e6c3f1067aaeef866de67770a415ba6fa6e11683fb4fb98ba45f0303c26166",
+    "native-red.log": "7c4d32e465b7eb5d6be4c31f335677a6f21ca1fdd505c60955542f3d4cdea16f",
+    "original-peers-endpoint-approved.log": "081fcbdcaebcda5765b1471341e403229a46b2ffcbb1e0863492bf329776ec5d",
+    "original-peers-minimum-approved.log": "f42cbe7282a4cb2f35808f2f9de1a91ac273c1c0560deddf3fd2993b10486327",
+    "pack-original.log": "8c0c24d629463956a8510fb47be3fb9c41304488d6dd1558b980647780e17621",
+    "peers-original-minimum.log": "5928bb12b03b4580c73e6af79ce2a96e4cd8b5d17130c5d42320942aeaedcfb5",
+    "typecheck-apps-main.log": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962",
+    "typecheck-main.log": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa",
+    "types-apps-original-final.log": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962",
+    "types-apps.log": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962",
+    "types-original-final.log": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa",
+    "types.log": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+  }
+}

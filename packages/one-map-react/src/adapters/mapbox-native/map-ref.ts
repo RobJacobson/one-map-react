@@ -38,7 +38,17 @@ import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
 /** Selected native operations retain the wrapper signatures. */
 export type NativeAdvancedMapRef = MapRef &
-  Pick<ComponentRef<typeof MapView>, "setSourceVisibility">;
+  Pick<ComponentRef<typeof MapView>, "setSourceVisibility"> & {
+    /**
+     * Borrows the currently attached RNMapbox MapView wrapper.
+     *
+     * @returns The current wrapper handle, without waiting for map load.
+     * @remarks Call again for each operation; handles retain the wrapper's
+     * lifetime and do not transfer ownership or expose the separate Camera.
+     * @throws Rejects when the MapView is not attached.
+     */
+    readonly getWrapperMap: () => Promise<ComponentRef<typeof MapView>>;
+  };
 
 /**
  * Builds the imperative map handle over RNMapbox camera and map refs.
@@ -48,7 +58,7 @@ export type NativeAdvancedMapRef = MapRef &
  * @param geoJsonSources - Registry of mounted GeoJSON source refs.
  * @param capture - Existing map-capture operation.
  * @param onCameraCommand - Notifies controlled-camera ownership before public command dispatch.
- * @returns The common map ref.
+ * @returns The selected native map ref.
  */
 export const createMapboxMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
@@ -57,6 +67,8 @@ export const createMapboxMapRef = (
   capture?: MapRef["capture"],
   onCameraCommand?: () => void
 ): NativeAdvancedMapRef => ({
+  getWrapperMap: async () => requireMap(mapViewRef.current),
+
   setSourceVisibility: (
     ...args: Parameters<ComponentRef<typeof MapView>["setSourceVisibility"]>
   ) => requireMap(mapViewRef.current).setSourceVisibility(...args),
