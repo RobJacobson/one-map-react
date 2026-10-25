@@ -2,7 +2,7 @@
 
 The new Expo/Vite example workspace is at its minimal checkpoint. See [workspace setup and migration status](docs/examples-workspace.md). Native coexistence acceptance and migration of the legacy scenarios are pending.
 
-one-map-react is being built as a thin React facade over RNMapbox, MapLibre React Native, and react-map-gl. Applications choose a backend at setup and use a shared map API, generally following react-map-gl. Full upstream API coverage and map reuse are requirements.
+one-map-react is being built as a thin React facade over RNMapbox, MapLibre React Native, and react-map-gl. Applications choose a backend at setup and use a shared map API, generally following react-map-gl. The current TF contract targets full upstream API coverage and map reuse. The next incompatible release has an agreed narrower [scope and migration contract](docs/revised-api-proposal.md), with implementation pending. U02 reconciles documentation only; this README and its examples describe the existing API. The future selected getWrapperMap operation is not available yet.
 
 TF10 prepares the expanded peer ranges, reconciled inventory and package candidate. Its [release record](docs/tf10-release.md) distinguishes routine checks from the still-open renderer/native acceptance gates. The [package README](packages/one-map-react/README.md) contains installation, shared map, selected extensions and native patch instructions. Exact current host versions and patch identities live in [the support matrix](records/support-matrix.json).
 

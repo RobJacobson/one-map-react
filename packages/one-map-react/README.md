@@ -4,6 +4,8 @@ one-map-react supplies shared React map components over react-map-gl, RNMapbox, 
 
 This release candidate is under verification. Expanded peer ranges are declared, while the release inventory and renderer acceptance gates remain open. The candidate currently targets the exact minimum peers listed below. Endpoint checks also cover React/DOM 19.3.1 on web, Mapbox GL JS 3.33.0, MapLibre GL JS 6.14.0, RNMapbox 10.3.8, and Teleport 1.2.2. Native React/DOM remain 19.2.3 with React Native 0.87.1. The configured minimum release age remains enabled. These are routine consumer checks; release renderer certification is pending. The source checkout records detailed compatibility evidence in `records/support-matrix.json`.
 
+The next incompatible release has an agreed narrower [scope and migration contract](../../docs/revised-api-proposal.md), with implementation pending. Its After examples target that future release. This README describes the existing API; the future selected getWrapperMap operation is not available yet. Current peers, required patches, installation instructions, and release verification limits remain applicable to this candidate.
+
 ## Install one backend
 
 Install this candidate from its local archive until it is published:
