@@ -1,6 +1,6 @@
 # Thin facade stage plan
 
-The next incompatible release follows the agreed [revised API implementation plan](revised-api-implementation-plan.md), within the narrowed [requirements](requirements.md#purpose-and-scope). U01 supplied the frozen baseline; U02 documentation passed independent review and coordinator audit; the owner authorized its PR. U03 and later units remain undispatched. The [coverage checklist](api-coverage.md) owns current routes and pending next-release dispositions. No runtime API or current release gate changes in U02.
+The next incompatible release follows the agreed [revised API implementation plan](revised-api-implementation-plan.md), within the narrowed [requirements](requirements.md#purpose-and-scope). U02 is merged; selected web wrapper access is implemented on the development branch under U03, passed independent review and coordinator audit, and is owner-authorized for a PR. U04 and later units remain undispatched. The [coverage checklist](api-coverage.md) owns current routes and pending next-release dispositions. The current release gates remain unchanged.
 
 ## Current candidate and historical TF sequence
 

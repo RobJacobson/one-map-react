@@ -1,6 +1,6 @@
 # Revised API implementation plan
 
-**Agreed unit sequence; U02 documentation reviewed and owner-authorized for a PR.** Implement the [revised shared API](revised-api-proposal.md) as small, independently reviewable changes. Every unit ends with subagent handoff, coordinator review, routine verification, and explicit user sign-off before the next unit starts. Creating this plan authorizes no implementation, acceptance run, commit, publication, or peer-version change.
+**Agreed unit sequence; U03 implemented, reviewed, and owner-authorized for a PR.** Implement the [revised shared API](revised-api-proposal.md) as small, independently reviewable changes. Every unit ends with subagent handoff, coordinator review, routine verification, and explicit user sign-off before the next unit starts. Creating this plan authorizes no implementation, acceptance run, commit, publication, or peer-version change.
 
 The proposal owns the target API and before/after consumer examples. This plan owns the work order, assignments, proof required, and permission gates. The [requirements](requirements.md) define the agreed next-release scope. The [coverage checklist](api-coverage.md) separates pending migration from current routes, and the [release record](tf10-release.md) continues owning the unchanged candidate gates. Source paths, dependencies, routine command routes, and existing guarantees below describe the 0.1.0-rc.11 working basis captured by [U01](../records/evidence/revised-api-u01-baseline.md), inspected on 2026-10-24. This publication uses an older main-branch base, not that working implementation; every assignment must refresh its caller inventory against the approved working state before editing.
 
@@ -16,7 +16,7 @@ This trades convenience and strict parity for a smaller library-owned contract. 
 
 ## Agreed planning decisions
 
-The owner adopted the narrower target and initially released U01 only. U01 supplied the [frozen baseline and caller inventory](../records/evidence/revised-api-u01-baseline.md). The owner subsequently authorized U02. Its documentation result passed independent review and coordinator audit, and the owner authorized creating its PR. U03 requires a separate explicit release. The default remains one unit at a time. An owner can explicitly change that authorization later; a general progress acknowledgement, agent completion, or coordinator recommendation is not permission to advance.
+The owner adopted the narrower target and initially released U01 only. U01 supplied the [frozen baseline and caller inventory](../records/evidence/revised-api-u01-baseline.md). U02 was merged as PR21, and the owner authorized U03 only. Its selected web wrapper access implementation passed independent review and coordinator audit, and the owner authorized its PR. The default remains one unit at a time. An owner can explicitly change that authorization later; a general progress acknowledgement, agent completion, or coordinator recommendation is not permission to advance.
 
 These planning decisions define the next-release target; they do not claim implementation:
 
@@ -59,7 +59,7 @@ Recheck shared files before each dispatch. If another task changes them, reconci
 
 ## Work order
 
-U01 has supplied its frozen evidence. U02 documentation passed independent review and coordinator audit, and the owner authorized its PR; U03-U27 remain undispatched and unapproved for execution. This status authorizes neither renderer execution nor merge. The sequence below is the default; dependencies highlight why related work cannot be reversed. Each row ends at its own owner sign-off gate. The fuller cards below define scope and proof.
+U01 has supplied its frozen evidence. U02 is merged; U03 selected web wrapper access is implemented on the development branch, passed independent review and coordinator audit, and is owner-authorized for a PR. U04-U27 remain undispatched and unapproved for execution. The [U03 evidence](../records/evidence/revised-api-u03-web-wrapper.json) records routine verification and provenance; renderer acceptance remains unverified and requires separate permission. The sequence below is the default; dependencies highlight why related work cannot be reversed. Each row ends at its own owner sign-off gate. The fuller cards below define scope and proof.
 
 | Unit | Deliverable | Key dependency | Gate after completion |
 | --- | --- | --- | --- |

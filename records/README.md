@@ -1,8 +1,10 @@
 # API research and evidence
 
-The [U01 baseline and migration inventory](evidence/revised-api-u01-baseline.md) records the approved revised-API plan's working base, fresh routine checks, candidate provenance and caller/test closure. U01 changes no runtime behavior; U02 remains subject to separate owner sign-off. Its [frozen hashes and search references](evidence/revised-api-u01-baseline.json) are a checkpoint, not a second live coverage ledger.
+The [U03 selected web wrapper access evidence](evidence/revised-api-u03-web-wrapper.json) records original working-stage provenance, development-branch publication checks, and deferred renderer verification. Independent review and coordinator audit passed; the owner authorized its PR. U04 is undispatched.
 
-The [U02 contract checkpoint](evidence/revised-api-u02-contract.json) records the reviewed next-release design, owner authorization for its PR, publication-base preservation, and fresh documentation checks. It supersedes U01's pending-U02 authorization status only; U03 and later implementation remain on hold. The original U01 snapshot and results remain historical.
+The [U01 baseline and migration inventory](evidence/revised-api-u01-baseline.md) records the approved revised-API plan's working base, fresh routine checks, candidate provenance and caller/test closure. U01 changes no runtime behavior; the [unit plan](../docs/revised-api-implementation-plan.md#work-order) owns successor authorization and review status. Its [frozen hashes and search references](evidence/revised-api-u01-baseline.json) are a checkpoint, not a second live coverage ledger.
+
+The [U02 contract checkpoint](evidence/revised-api-u02-contract.json) records the reviewed next-release design, owner authorization for its PR, publication-base preservation, and fresh documentation checks. It supersedes U01's pending-U02 authorization status only; the [unit plan](../docs/revised-api-implementation-plan.md#work-order) records current successor authorization. The original U01 snapshot and results remain historical.
 
 [support-matrix.json](support-matrix.json) and [evidence/tf10-release.json](evidence/tf10-release.json) own current candidate versions, patch paths, routine checks and open release gates. The [grouped Markdown checklist](../docs/api-coverage.md) owns current coverage contracts, exceptions and open work, separately from runtime verification. [TF10 native style sources](evidence/tf10-native-style-sources.json) preserves compact exact-tag source identities for native unsupported boundaries.
 

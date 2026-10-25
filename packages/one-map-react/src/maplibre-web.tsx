@@ -245,6 +245,17 @@ export {
 
 /** Selected advanced methods retain the pinned wrapper's signatures. */
 export type WebMapRef = MapRef & {
+  /**
+   * Borrows the currently attached react-map-gl wrapper ref.
+   *
+   * @remarks Looks up the current handle on each call without waiting for load.
+   * The wrapper retains ownership; returned handles follow its lifetime and
+   * timing. Call again for each operation instead of retaining a borrowed handle.
+   *
+   * @returns The attached wrapper ref, without waiting for renderer readiness.
+   * @throws Rejects when the map is detached.
+   */
+  readonly getWrapperMap: () => Promise<MaplibreMapRef>;
   /** Bubbles plugin events through the public selected SDK parent facility. */
   readonly setEventedParent: MaplibreMapInstance["setEventedParent"];
   /** Public SDK event producer for plugins; dispatch is synchronous and follows SDK event semantics. */
