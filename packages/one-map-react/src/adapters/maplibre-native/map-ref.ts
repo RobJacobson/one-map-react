@@ -40,7 +40,17 @@ export type NativeAdvancedMapRef = MapRef &
   Pick<
     ComponentRef<typeof MaplibreMap>,
     "setSourceVisibility" | "showAttribution" | "getViewState"
-  >;
+  > & {
+    /**
+     * Borrows the currently attached MapLibre Native Map wrapper.
+     *
+     * @returns The current wrapper handle, without waiting for map load.
+     * @remarks Call again for each operation; handles retain the wrapper's
+     * lifetime and do not transfer ownership or expose the separate Camera.
+     * @throws Rejects when the Map is not attached.
+     */
+    readonly getWrapperMap: () => Promise<ComponentRef<typeof MaplibreMap>>;
+  };
 
 /**
  * Builds the imperative map handle over MapLibre Native camera and map refs.
@@ -52,7 +62,7 @@ export type NativeAdvancedMapRef = MapRef &
  * @param sources - Registry of mounted GeoJSON and vector source refs.
  * @param capture - Existing map-capture operation.
  * @param onCameraCommand - Notifies controlled-camera ownership before public command dispatch.
- * @returns The common map ref.
+ * @returns The selected native map ref.
  */
 export const createMaplibreMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
@@ -62,6 +72,8 @@ export const createMaplibreMapRef = (
   capture?: MapRef["capture"],
   onCameraCommand?: () => void
 ): NativeAdvancedMapRef => ({
+  getWrapperMap: async () => requireMap(mapRef.current),
+
   setSourceVisibility: (
     ...args: Parameters<ComponentRef<typeof MaplibreMap>["setSourceVisibility"]>
   ) => requireMap(mapRef.current).setSourceVisibility(...args),

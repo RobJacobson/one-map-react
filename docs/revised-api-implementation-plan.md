@@ -1,6 +1,6 @@
 # Revised API implementation plan
 
-**Agreed unit sequence; U03 merged; U04 implemented and audited; PR authorized by the unit workflow.** Implement the [revised shared API](revised-api-proposal.md) as small, independently reviewable changes. Every unit ends with subagent handoff, coordinator review, routine verification, and explicit user sign-off before the next unit starts. Creating this plan authorizes no successor implementation, acceptance run, package publication, or peer-version change.
+**Agreed unit sequence; U04 merged; U05 implemented and audited; PR authorized by the unit workflow.** Implement the [revised shared API](revised-api-proposal.md) as small, independently reviewable changes. Every unit ends with subagent handoff, coordinator review, routine verification, and explicit user sign-off before the next unit starts. Creating this plan authorizes no successor implementation, acceptance run, package publication, or peer-version change.
 
 The proposal owns the target API and before/after consumer examples. This plan owns the work order, assignments, proof required, and permission gates. The [requirements](requirements.md) define the agreed next-release scope. The [coverage checklist](api-coverage.md) separates pending migration from current routes, and the [release record](tf10-release.md) continues owning the unchanged candidate gates. Source paths, dependencies, routine command routes, and existing guarantees below describe the 0.1.0-rc.11 working basis captured by [U01](../records/evidence/revised-api-u01-baseline.md), inspected on 2026-10-24. This publication uses an older main-branch base, not that working implementation; every assignment must refresh its caller inventory against the approved working state before editing.
 
@@ -16,7 +16,7 @@ This trades convenience and strict parity for a smaller library-owned contract. 
 
 ## Agreed planning decisions
 
-The owner adopted the narrower target and initially released U01 only. U01 supplied the [frozen baseline and caller inventory](../records/evidence/revised-api-u01-baseline.md). U02 was merged as PR21 and U03 as PR22. The owner released U04 only. The default remains one unit at a time. An owner can explicitly change that authorization later; a general progress acknowledgement, agent completion, or coordinator recommendation is not permission to advance.
+The owner adopted the narrower target and initially released U01 only. U01 supplied the [frozen baseline and caller inventory](../records/evidence/revised-api-u01-baseline.md). U02 was merged as PR21, U03 as PR22, and U04 as PR23. The owner released U05 only. The default remains one unit at a time. An owner can explicitly change that authorization later; a general progress acknowledgement, agent completion, or coordinator recommendation is not permission to advance.
 
 These planning decisions define the next-release target; they do not claim implementation:
 
@@ -59,7 +59,7 @@ Recheck shared files before each dispatch. If another task changes them, reconci
 
 ## Work order
 
-U01 has supplied its frozen evidence. U03 is merged; U04 RNMapbox wrapper access is implemented and audited; its PR is authorized under the unit workflow. U05-U27 remain undispatched and unapproved for execution. The [U03 evidence](../records/evidence/revised-api-u03-web-wrapper.json) and [U04 evidence](../records/evidence/revised-api-u04-mapbox-wrapper.json) record routine verification and provenance; renderer acceptance remains unverified and requires separate permission. The sequence below is the default; dependencies highlight why related work cannot be reversed. Each row ends at its own owner sign-off gate. The fuller cards below define scope and proof.
+U01 has supplied its frozen evidence. U04 is merged; U05 MapLibre native wrapper access is implemented and audited; its PR is authorized under the unit workflow. U06-U27 remain undispatched and unapproved for execution. The [U03 evidence](../records/evidence/revised-api-u03-web-wrapper.json), [U04 evidence](../records/evidence/revised-api-u04-mapbox-wrapper.json), and [U05 evidence](../records/evidence/revised-api-u05-maplibre-wrapper.json) record routine verification and provenance; renderer acceptance remains unverified and requires separate permission. The sequence below is the default; dependencies highlight why related work cannot be reversed. Each row ends at its own owner sign-off gate. The fuller cards below define scope and proof.
 
 | Unit | Deliverable | Key dependency | Gate after completion |
 | --- | --- | --- | --- |
