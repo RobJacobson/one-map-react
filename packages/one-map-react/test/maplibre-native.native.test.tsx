@@ -1,6 +1,12 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { createRef, type ReactNode, type Ref, useContext } from "react";
+import {
+  createRef,
+  type ComponentRef,
+  type ReactNode,
+  type Ref,
+  useContext,
+} from "react";
 import { Text } from "react-native";
 
 import {
@@ -21,7 +27,7 @@ import type { FeatureState } from "../src/contracts/query-types.js";
 import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
-import { Map as OneMap } from "../src/facade/map.js";
+import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
 import { AttributionControl, ScaleControl } from "../src/facade/ui.js";
 
@@ -257,7 +263,12 @@ import {
   VectorSource,
 } from "@maplibre/maplibre-react-native";
 
-import { adapter, Control, Map as NativeMap } from "../src/maplibre-native.js";
+import {
+  adapter,
+  Control,
+  Map as NativeMap,
+  type NativeAdvancedMapRef,
+} from "../src/maplibre-native.js";
 
 const MapMock = MaplibreMap as unknown as jest.Mock;
 const LayerMock = MaplibreLayer as unknown as jest.Mock;
@@ -349,6 +360,77 @@ const vectorTree = (ref?: Ref<MapRef>) => (
 );
 
 describe("maplibre-native adapter", () => {
+  test.each(["selected", "enclosing", "named"] as const)(
+    "%s wrapper access follows attachment before load and rejects after detach",
+    async (access) => {
+      const ref = createRef<NativeAdvancedMapRef>();
+      let observed: NativeAdvancedMapRef | undefined;
+      const Probe = () => {
+        // The common type omits selected access; exercise its real runtime proxy.
+        // eslint-disable-next-line react/globals -- Capture the attached facade proxy for lifecycle assertions.
+        observed = useMap(access === "named" ? "borrowed" : undefined) as
+          | NativeAdvancedMapRef
+          | undefined;
+        return null;
+      };
+      const MapComponent = access === "selected" ? NativeMap : OneMap;
+      const loaded = jest.fn();
+      const scene = (mapStyle: MapProps["mapStyle"]) => (
+        <MapSetup adapter={adapter}>
+          <MapComponent
+            id="borrowed"
+            ref={ref}
+            mapStyle={mapStyle}
+            initialViewState={initialViewState}
+            onLoad={loaded}
+          >
+            {access !== "selected" && <Probe />}
+          </MapComponent>
+        </MapSetup>
+      );
+      mockFlyTo.mockClear();
+      const view = await render(scene(emptyStyle));
+      const retained = access === "selected" ? ref.current : observed;
+      if (!retained) throw new Error("Map ref was not attached.");
+      const getWrapperMap = retained.getWrapperMap;
+      const first = getWrapperMap();
+      expect(first).toBeInstanceOf(Promise);
+      const original = await first;
+      const attachedMap = () =>
+        lastMapProps<{
+          ref: { current: ComponentRef<typeof MaplibreMap> | null };
+        }>().ref.current;
+      expect(original).toBe(attachedMap());
+      expect(original.getCenter).toBe(mockGetCenter);
+      expect(loaded).not.toHaveBeenCalled();
+      expect(mockFlyTo).not.toHaveBeenCalled();
+      await expect(retained.getCenter()).resolves.toEqual([-122.34, 47.61]);
+      const mapId = view.getByTestId("wrapper-map").props.mapId;
+
+      await view.rerender(scene(replacementStyle));
+      const replacement = await getWrapperMap();
+      expect(replacement).toBe(attachedMap());
+      expect(replacement).not.toBe(original);
+      expect(view.getByTestId("wrapper-map").props.mapId).toBe(mapId);
+      await expect(retained.getWrapperMap()).resolves.toBe(replacement);
+      await expect(retained.flyTo({ center: [1, 2], zoom: 3 })).rejects.toThrow(
+        "not attached"
+      );
+      expect(mockFlyTo).not.toHaveBeenCalled();
+      await finishMapLoad();
+      await retained.flyTo({ center: [1, 2], zoom: 3 });
+      expect(mockFlyTo).toHaveBeenCalledTimes(1);
+      await expect(Promise.resolve(retained)).resolves.toBe(retained);
+
+      await view.unmount();
+      const detached = getWrapperMap();
+      expect(detached).toBeInstanceOf(Promise);
+      await expect(detached).rejects.toThrow("not attached");
+      await expect(retained.getWrapperMap()).rejects.toThrow("not attached");
+      await expect(Promise.resolve(retained)).resolves.toBe(retained);
+    }
+  );
+
   test("attribution control restores selected position and disabled state after removal", async () => {
     const options = {
       attributionPosition: { top: 5, right: 6 },

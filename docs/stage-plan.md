@@ -1,6 +1,6 @@
 # Thin facade stage plan
 
-The next incompatible release follows the agreed [revised API implementation plan](revised-api-implementation-plan.md), within the narrowed [requirements](requirements.md#purpose-and-scope). U03 is merged; U04 RNMapbox wrapper access is implemented and audited; its PR is authorized under the unit workflow. U05 and later units remain undispatched. The unit plan owns PR and successor authorization gates. The [coverage checklist](api-coverage.md) owns current routes and pending next-release dispositions. The current release gates remain unchanged.
+The next incompatible release follows the agreed [revised API implementation plan](revised-api-implementation-plan.md), within the narrowed [requirements](requirements.md#purpose-and-scope). U04 is merged; U05 MapLibre native wrapper access is implemented and audited; its PR is authorized under the unit workflow. U06 and later units remain undispatched. The unit plan owns PR and successor authorization gates. The [coverage checklist](api-coverage.md) owns current routes and pending next-release dispositions. The current release gates remain unchanged.
 
 ## Current candidate and historical TF sequence
 

@@ -244,7 +244,24 @@ void useBorrowedWrapper;
 selectedRef.setSourceVisibility(false, 'source');
 `
       : `
-import { WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer } from "one-map-react/maplibre-native";
+import type { ComponentRef } from "react";
+import type { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
+import { Map as SelectedMap, type NativeAdvancedMapRef, WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer } from "one-map-react/maplibre-native";
+declare const selectedRef: NativeAdvancedMapRef;
+type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
+const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof MaplibreMap>>> = true;
+const borrowed: Promise<ComponentRef<typeof MaplibreMap>> = selectedRef.getWrapperMap();
+void exactWrapperPromise; void borrowed;
+void <SelectedMap ref={(map) => { if (map) { const wrapper: Promise<ComponentRef<typeof MaplibreMap>> = map.getWrapperMap(); void wrapper; } }} mapStyle={style} initialViewState={viewState} />;
+const useBorrowedWrapper = async (): Promise<void> => {
+  const wrapper = await selectedRef.getWrapperMap();
+  const capture: string = await wrapper.createStaticMapImage({ output: "file" });
+  const camera = await wrapper.getViewState();
+  wrapper.setSourceVisibility(false, 'source');
+  wrapper.showAttribution();
+  void capture; void camera;
+};
+void useBorrowedWrapper;
 void <WrapperMap mapStyle={style}><WrapperCamera initialViewState={{center: [0,0], zoom: 0}} /><WrapperGeoJSONSource id="selected" data={{ type: "FeatureCollection", features: [] }} /></WrapperMap>;
 void Animated; void SelectedLayer; void TransformRequestManager;
 NetworkManager.setConnected(false);
