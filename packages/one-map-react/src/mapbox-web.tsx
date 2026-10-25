@@ -29,7 +29,6 @@ import {
   createWebAdapter,
   type WebForwardedProps,
 } from "./adapters/web/create-adapter.js";
-import { createWebMethodForwarders } from "./adapters/web/method-forwarders.js";
 import type { Adapter } from "./contracts/adapter.js";
 import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
@@ -85,146 +84,12 @@ interface MapboxClusterCaller {
   ) => unknown;
 }
 
-const forwardedMethodNames = [
-  "on",
-  "off",
-  "once",
-  "addControl",
-  "removeControl",
-  "hasControl",
-  "getSource",
-  "getLayer",
-  "getCanvas",
-  "getCanvasContainer",
-  "getContainer",
-  "getStyle",
-  "loaded",
-  "isStyleLoaded",
-  "areTilesLoaded",
-  "triggerRepaint",
-  "getVerticalFieldOfView",
-  "setVerticalFieldOfView",
-  "getTerrain",
-  "getProjection",
-  "getLight",
-  "getLanguage",
-  "setLanguage",
-  "getWorldview",
-  "setWorldview",
-  "getScaleFactor",
-  "setScaleFactor",
-  "getGlyphsUrl",
-  "getSchema",
-  "getSlot",
-  "getSlots",
-  "listModels",
-  "setGlyphsUrl",
-  "setSchema",
-  "setSlot",
-  "setRain",
-  "getRain",
-  "setSnow",
-  "getSnow",
-  "setLights",
-  "getLights",
-  "getFog",
-  "addImport",
-  "updateImport",
-  "removeImport",
-  "moveImport",
-  "setColorTheme",
-  "setConfig",
-  "getConfig",
-  "addInteraction",
-  "addModel",
-  "removeModel",
-  "hasModel",
-  "queryRasterValue",
-  "getHorizontalFieldOfView",
-  "getFeaturesetDescriptors",
-  "getIndoorTileOptions",
-  "getNearClipOffset",
-  "setNearClipOffset",
-  "setImportColorTheme",
-  "setConfigProperty",
-  "getConfigProperty",
-  "removeInteraction",
-] as const satisfies readonly (keyof MapboxMapRef)[];
-
 // The react-map-gl components accept the full style-spec surface; the facade
 // converts props before they reach this boundary.
 /** Selects mapbox-web and supplies react-map-gl Mapbox components. */
 export const adapter: Adapter & { readonly backend: "mapbox-web" } =
   createWebAdapter({
     backend: "mapbox-web",
-    createAdvancedMethods: (getHandle) => {
-      const selectedHandle = () => getHandle() as unknown as MapboxMapRef;
-      return {
-        ...createWebMethodForwarders(selectedHandle, forwardedMethodNames),
-        fire: ((...args: Parameters<MapboxMapInstance["fire"]>) =>
-          selectedHandle()
-            .getMap()
-            .fire(...args)) as MapboxMapInstance["fire"],
-        getGestureHandler: <Name extends keyof WebGestureHandlers>(
-          name: Name
-        ): WebGestureHandlers[Name] => {
-          const map = selectedHandle().getMap();
-          const handlers = {
-            boxZoom: map.boxZoom,
-            doubleClickZoom: map.doubleClickZoom,
-            dragPan: map.dragPan,
-            dragRotate: map.dragRotate,
-            keyboard: map.keyboard,
-            scrollZoom: map.scrollZoom,
-            touchPitch: map.touchPitch,
-            touchZoomRotate: map.touchZoomRotate,
-          };
-          if (!Object.hasOwn(handlers, name))
-            throw new RangeError(`Unknown gesture handler: ${name}`);
-          return handlers[name];
-        },
-        getVersion: (): string => selectedHandle().getMap().version,
-        getCanvasSource: (id: string): import("mapbox-gl").CanvasSource => {
-          const source = selectedHandle().getSource(id);
-          if (!source || source.type !== "canvas")
-            throw new Error(`Source "${id}" is not an attached CanvasSource.`);
-          return source as import("mapbox-gl").CanvasSource;
-        },
-        getVideoSource: (id: string): import("mapbox-gl").VideoSource => {
-          const source = selectedHandle().getSource(id);
-          if (!source || source.type !== "video")
-            throw new Error(`Source "${id}" is not an attached VideoSource.`);
-          return source as import("mapbox-gl").VideoSource;
-        },
-        getModelSource: (id: string): import("mapbox-gl").ModelSource => {
-          const source = selectedHandle().getSource(id);
-          if (!source || source.type !== "model")
-            throw new Error(`Source "${id}" is not an attached ModelSource.`);
-          return source as import("mapbox-gl").ModelSource;
-        },
-        setDebugOptions: (options: Partial<WebDebugOptions>) => {
-          const map = selectedHandle().getMap();
-          Object.assign(map, options);
-        },
-        getDebugOptions: (): WebDebugOptions => {
-          const map = selectedHandle().getMap();
-          return {
-            showCollisionBoxes: map.showCollisionBoxes,
-            showTileBoundaries: map.showTileBoundaries,
-            showOverdrawInspector: map.showOverdrawInspector,
-            showTerrainWireframe: map.showTerrainWireframe,
-            showLayers2DWireframe: map.showLayers2DWireframe,
-            showLayers3DWireframe: map.showLayers3DWireframe,
-            showElevationIdDebug: map.showElevationIdDebug,
-            showPadding: map.showPadding,
-            vertices: map.vertices,
-            repaint: map.repaint,
-            showParseStatus: map.showParseStatus,
-            showTileAABBs: map.showTileAABBs,
-          };
-        },
-      };
-    },
     Map: MapboxMap,
     Source: MapboxSource as ComponentType<WebForwardedProps>,
     Layer: MapboxLayer as Adapter["Layer"],
@@ -295,47 +160,19 @@ export {
   useControl,
 };
 
-/** Selected advanced methods retain the pinned wrapper's signatures. */
+/** Common map operations and access to the selected wrapper. */
 export type WebMapRef = MapRef & {
   /**
    * Borrows the currently attached react-map-gl wrapper ref.
    *
-   * @remarks Looks up the current handle on each call without waiting for load.
-   * The wrapper retains ownership; returned handles follow its lifetime and
-   * timing. Call again for each operation instead of retaining a borrowed handle.
-   *
+   * @remarks Call again for each operation to look up the current handle
+   * without waiting for load. Borrowed handles follow upstream lifetime and
+   * ownership; facade detachment does not invalidate them.
    * @returns The attached wrapper ref, without waiting for renderer readiness.
    * @throws Rejects when the map is detached.
    */
   readonly getWrapperMap: () => Promise<MapboxMapRef>;
-  /** Public SDK event producer for plugins; dispatch is synchronous and follows SDK event semantics. */
-  readonly fire: MapboxMapInstance["fire"];
-  /**
-   * Selects an attached renderer's public gesture controls and independent state readback.
-   * @param name - SDK gesture handler name.
-   * @returns The renderer-owned public handler; use only while this map remains mounted.
-   * @throws For an unknown handler name or a detached map.
-   */
-  readonly getGestureHandler: <Name extends keyof WebGestureHandlers>(
-    name: Name
-  ) => WebGestureHandlers[Name];
-  /**
-   * Reads the attached renderer's pinned SDK version.
-   * @returns SDK version string; throws when detached.
-   */
-  readonly getVersion: () => string;
-  /** Reads the attached CanvasSource with its named media/model operations. */
-  readonly getCanvasSource: (id: string) => import("mapbox-gl").CanvasSource;
-  /** Reads the attached VideoSource with its named media/model operations. */
-  readonly getVideoSource: (id: string) => import("mapbox-gl").VideoSource;
-  /** Reads the attached ModelSource with its named media/model operations. */
-  readonly getModelSource: (id: string) => import("mapbox-gl").ModelSource;
-
-  /** Updates selected renderer diagnostics; settings follow SDK lifetime. */
-  readonly setDebugOptions: (options: Partial<WebDebugOptions>) => void;
-  /** Reads renderer diagnostics. */
-  readonly getDebugOptions: () => WebDebugOptions;
-} & Pick<MapboxMapRef, (typeof forwardedMethodNames)[number]>;
+};
 
 /** Map props with DOM presentation forwarded to the map container. */
 export interface WebMapProps extends Omit<MapProps, "mapStyle"> {
@@ -536,23 +373,6 @@ export const {
   Point,
 } = MapboxRenderer as unknown as (typeof import("mapbox-gl"))["default"];
 
-/** Renderer diagnostic properties, with SDK defaults and units. */
-export type WebDebugOptions = Pick<
-  ReturnType<MapboxMapRef["getMap"]>,
-  | "showCollisionBoxes"
-  | "showTileBoundaries"
-  | "showOverdrawInspector"
-  | "showTerrainWireframe"
-  | "showLayers2DWireframe"
-  | "showLayers3DWireframe"
-  | "showElevationIdDebug"
-  | "showPadding"
-  | "vertices"
-  | "repaint"
-  | "showParseStatus"
-  | "showTileAABBs"
->;
-
 /** Explicit global SDK settings; assign before constructing maps/workers. */
 export const rendererSettings: Pick<
   (typeof import("mapbox-gl"))["default"],
@@ -563,35 +383,6 @@ export const rendererSettings: Pick<
   | "accessToken"
   | "baseApiUrl"
 > = MapboxRenderer as unknown as (typeof import("mapbox-gl"))["default"];
-
-/** Public gesture controls/readbacks; renderer input dispatch and frame hooks stay private. */
-export type WebGestureHandlers = {
-  readonly [
-    Name in
-      | "boxZoom"
-      | "doubleClickZoom"
-      | "dragPan"
-      | "dragRotate"
-      | "keyboard"
-      | "scrollZoom"
-      | "touchPitch"
-      | "touchZoomRotate"
-  ]: Pick<
-    MapboxMapInstance[Name],
-    Extract<
-      keyof MapboxMapInstance[Name],
-      | "enable"
-      | "disable"
-      | "isEnabled"
-      | "isActive"
-      | "isZooming"
-      | "enableRotation"
-      | "disableRotation"
-      | "setZoomRate"
-      | "setWheelZoomRate"
-    >
-  >;
-};
 
 /** Geographic coordinate instance supplied by the selected SDK constructor. */
 export type LngLat = InstanceType<typeof LngLat>;

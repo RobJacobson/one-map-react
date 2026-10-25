@@ -208,14 +208,45 @@ const borrowed: Promise<WrapperMapRef> = selectedRef.getWrapperMap();
 void exactWrapperPromise; void borrowed;
 const useBorrowedWrapper = async (): Promise<void> => {
   const wrapper = await selectedRef.getWrapperMap();
-  ${entry === "mapbox-web" ? "wrapper.setRain({ density: 0 }); wrapper.getMap().setLanguage('en');" : "wrapper.setGlobalStateProperty('fixture', 1); wrapper.getMap().refreshTiles('source');"}
+  ${entry === "mapbox-web" ? "wrapper.setRain({ density: 0 }); wrapper.getMap().setLanguage('en'); wrapper.getMap().fire('fixture'); wrapper.getMap().dragPan.disable(); const version: string = wrapper.getMap().version; void version;" : "wrapper.setGlobalStateProperty('fixture', 1); wrapper.getMap().refreshTiles('source'); wrapper.getMap().fire('idle'); wrapper.getMap().setEventedParent(null); wrapper.getMap().dragPan.disable(); const version: string = wrapper.getMap().version; void version;"}
 };
 void useBorrowedWrapper;
-const selectedVersion: string = selectedRef.getVersion(); void selectedVersion;
+const commonCenter: Promise<readonly [number, number]> = selectedRef.getCenter();
+void commonCenter;
+// @ts-expect-error Advanced renderer reads belong to the wrapper.
+selectedRef.getStyle();
+// @ts-expect-error Plugin event production belongs to the raw renderer.
+selectedRef.fire('fixture');
+// @ts-expect-error Gesture controls belong to the raw renderer.
+selectedRef.getGestureHandler('dragPan');
+// @ts-expect-error Debug options belong to the raw renderer.
+selectedRef.setDebugOptions({ repaint: false });
+// @ts-expect-error Renderer version belongs to the raw renderer.
+selectedRef.getVersion();
+// @ts-expect-error Media sources are accessed through the wrapper.
+selectedRef.getCanvasSource('canvas');
 void <SelectedMap mapStyle={style} initialViewState={viewState} options={{ transformRequest: (url) => ({ url }), ${entry === "maplibre-web" ? "maxCanvasSize: [4096, 4096]," : "language: 'en', worldview: 'US',"} }} />;
 void <SelectedSource id="canvas" type="canvas" canvas={"canvas-id"} coordinates={[[0,1],[1,1],[1,0],[0,0]]} />;
 void <SelectedLayer id="custom" type="custom" render={() => undefined} />;
-${entry === "mapbox-web" ? "selectedRef.setRain({ density: 0 }); selectedRef.setLanguage('en'); selectedRef.getIndoorTileOptions('source', '');" : "selectedRef.setGlobalStateProperty('fixture', 1); selectedRef.refreshTiles('source'); selectedRef.setCancelPendingTileRequestsWhileZooming(false); const cancellation: boolean = selectedRef.getCancelPendingTileRequestsWhileZooming(); void cancellation;"}
+${
+  entry === "mapbox-web"
+    ? `// @ts-expect-error Weather methods belong to the wrapper.
+selectedRef.setRain({ density: 0 });
+// @ts-expect-error Locale methods belong to the wrapper.
+selectedRef.setLanguage('en');
+// @ts-expect-error Indoor methods belong to the wrapper.
+selectedRef.getIndoorTileOptions('source', '');`
+    : `// @ts-expect-error Style state belongs to the wrapper.
+selectedRef.setGlobalStateProperty('fixture', 1);
+// @ts-expect-error Tile refresh belongs to the wrapper.
+selectedRef.refreshTiles('source');
+// @ts-expect-error Cancellation belongs to the raw renderer.
+selectedRef.setCancelPendingTileRequestsWhileZooming(false);
+// @ts-expect-error Cancellation belongs to the raw renderer.
+selectedRef.getCancelPendingTileRequestsWhileZooming();
+// @ts-expect-error Plugin parent routing belongs to the raw renderer.
+selectedRef.setEventedParent(null);`
+}
 `
     : entry === "mapbox-native"
       ? `
@@ -241,6 +272,7 @@ const useBorrowedWrapper = async (): Promise<void> => {
   void center; void capture;
 };
 void useBorrowedWrapper;
+// @ts-expect-error Source visibility belongs to the borrowed native wrapper.
 selectedRef.setSourceVisibility(false, 'source');
 `
       : `
@@ -262,6 +294,12 @@ const useBorrowedWrapper = async (): Promise<void> => {
   void capture; void camera;
 };
 void useBorrowedWrapper;
+// @ts-expect-error Source visibility belongs to the borrowed native wrapper.
+selectedRef.setSourceVisibility(false, 'source');
+// @ts-expect-error Attribution belongs to the borrowed native wrapper.
+selectedRef.showAttribution();
+// @ts-expect-error Selected camera reads belong to the borrowed native wrapper.
+selectedRef.getViewState();
 void <WrapperMap mapStyle={style}><WrapperCamera initialViewState={{center: [0,0], zoom: 0}} /><WrapperGeoJSONSource id="selected" data={{ type: "FeatureCollection", features: [] }} /></WrapperMap>;
 void Animated; void SelectedLayer; void TransformRequestManager;
 NetworkManager.setConnected(false);

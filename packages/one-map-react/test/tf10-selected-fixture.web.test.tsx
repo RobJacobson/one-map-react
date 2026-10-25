@@ -6,13 +6,13 @@ import type { MapRef } from "../src/contracts/camera-types.js";
 
 test.each([mapbox, maplibre])(
   "selected release callback restores gestures and removes only its own listener",
-  (named) => {
+  async (named) => {
     let enabled = true;
     const listeners = new Set<() => void>();
     const unrelated = vi.fn();
     listeners.add(unrelated);
     const selected = {
-      getGestureHandler: vi.fn(() => ({
+      dragPan: {
         isEnabled: () => enabled,
         disable: () => {
           enabled = false;
@@ -20,7 +20,7 @@ test.each([mapbox, maplibre])(
         enable: () => {
           enabled = true;
         },
-      })),
+      },
       on: vi.fn((_type, listener: () => void) => listeners.add(listener)),
       off: vi.fn((_type, listener: () => void) => listeners.delete(listener)),
       fire: vi.fn(() => {
@@ -41,7 +41,13 @@ test.each([mapbox, maplibre])(
       getGlobalState: () => ({ "rendering-fixture": 9009 }),
       getSky: () => ({}),
     };
-    expect(named(selected as unknown as MapRef).tf10).toEqual({
+    expect(
+      (
+        await named({
+          getWrapperMap: async () => ({ ...selected, getMap: () => selected }),
+        } as unknown as MapRef)
+      ).tf10
+    ).toEqual({
       dragPan: { before: true, disabled: false, restored: true },
       source: true,
       layer: true,
@@ -49,7 +55,6 @@ test.each([mapbox, maplibre])(
       styleLayer: true,
       eventCalls: 1,
     });
-    expect(selected.getGestureHandler).toHaveBeenCalledWith("dragPan");
     expect(selected.getSource).toHaveBeenCalledWith("point");
     expect(selected.getLayer).toHaveBeenCalledWith("known");
     expect(listeners).toEqual(new Set([unrelated]));

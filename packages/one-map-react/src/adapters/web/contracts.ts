@@ -239,7 +239,6 @@ interface WebWrapper<
   Name extends Extract<Backend, "mapbox-web" | "maplibre-web">,
 > {
   readonly backend: Name;
-  readonly createAdvancedMethods?: (getHandle: () => WebMapHandle) => object;
   readonly Map: ComponentType<WebMapProps>;
   readonly Source: ComponentType<WebForwardedProps>;
   readonly Layer: Adapter["Layer"];

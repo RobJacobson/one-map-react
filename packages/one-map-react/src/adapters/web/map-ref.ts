@@ -48,7 +48,6 @@ export const createWebMapRef = (
   capture?: MapRef["capture"]
 ): MapRef & { readonly getWrapperMap: () => Promise<WebMapHandle> } => ({
   getWrapperMap: async () => requireWebMap(mapRef.current),
-  ...wrapper.createAdvancedMethods?.(() => requireWebMap(mapRef.current)),
   queryTerrainElevation: async (coordinate) => {
     validateTerrainCoordinate(coordinate);
     const map = requireWebMap(mapRef.current);

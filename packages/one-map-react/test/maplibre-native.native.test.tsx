@@ -392,6 +392,11 @@ describe("maplibre-native adapter", () => {
       const view = await render(scene(emptyStyle));
       const retained = access === "selected" ? ref.current : observed;
       if (!retained) throw new Error("Map ref was not attached.");
+      expect(
+        Reflect.get(ref.current ?? {}, "setSourceVisibility")
+      ).toBeUndefined();
+      expect(Reflect.get(ref.current ?? {}, "showAttribution")).toBeUndefined();
+      expect(Reflect.get(ref.current ?? {}, "getViewState")).toBeUndefined();
       const getWrapperMap = retained.getWrapperMap;
       const first = getWrapperMap();
       expect(first).toBeInstanceOf(Promise);

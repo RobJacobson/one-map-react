@@ -36,19 +36,19 @@ import {
 import { createMapboxFeatureStateMethods } from "./feature-state-methods.js";
 import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
-/** Selected native operations retain the wrapper signatures. */
-export type NativeAdvancedMapRef = MapRef &
-  Pick<ComponentRef<typeof MapView>, "setSourceVisibility"> & {
-    /**
-     * Borrows the currently attached RNMapbox MapView wrapper.
-     *
-     * @returns The current wrapper handle, without waiting for map load.
-     * @remarks Call again for each operation; handles retain the wrapper's
-     * lifetime and do not transfer ownership or expose the separate Camera.
-     * @throws Rejects when the MapView is not attached.
-     */
-    readonly getWrapperMap: () => Promise<ComponentRef<typeof MapView>>;
-  };
+/** Common map operations and access to the selected native wrapper. */
+export type NativeAdvancedMapRef = MapRef & {
+  /**
+   * Borrows the currently attached RNMapbox MapView wrapper.
+   *
+   * @returns The current wrapper handle, without waiting for map load.
+   * @remarks Call again for each operation. Handles retain the wrapper's
+   * lifetime and ownership; facade detachment does not invalidate them or
+   * expose the separate Camera.
+   * @throws Rejects when the MapView is not attached.
+   */
+  readonly getWrapperMap: () => Promise<ComponentRef<typeof MapView>>;
+};
 
 /**
  * Builds the imperative map handle over RNMapbox camera and map refs.
@@ -68,10 +68,6 @@ export const createMapboxMapRef = (
   onCameraCommand?: () => void
 ): NativeAdvancedMapRef => ({
   getWrapperMap: async () => requireMap(mapViewRef.current),
-
-  setSourceVisibility: (
-    ...args: Parameters<ComponentRef<typeof MapView>["setSourceVisibility"]>
-  ) => requireMap(mapViewRef.current).setSourceVisibility(...args),
 
   queryTerrainElevation: async (coordinate) => {
     validateTerrainCoordinate(coordinate);
