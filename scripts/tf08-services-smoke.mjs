@@ -249,43 +249,40 @@ const main = async () => {
       return pickRead(await action("read"));
     });
     if (platform === "web") await browserScenarios();
-    await scenario("actual PNG capture and overlay scope", async () => {
-      await configure("injected");
-      const image = await action("capture", { scope: "backend" });
-      const pixels = imagePixels(image.uri);
-      if (pixels.red <= 20 && process.env.TF08_CAPTURE_OUTPUT)
-        writeFileSync(
-          process.env.TF08_CAPTURE_OUTPUT,
-          Buffer.from(image.uri.split(",")[1], "base64")
+    await scenario(
+      "selected SDK PNG content and overlay observation",
+      async () => {
+        await configure("injected");
+        const image = await action("capture");
+        const pixels = imagePixels(image.uri);
+        if (pixels.red <= 20 && process.env.TF08_CAPTURE_OUTPUT)
+          writeFileSync(
+            process.env.TF08_CAPTURE_OUTPUT,
+            Buffer.from(image.uri.split(",")[1], "base64")
+          );
+        assert(
+          pixels.red > 20,
+          "Known renderer point is absent from the capture."
         );
-      assert(
-        pixels.red > 20,
-        "Known renderer point is absent from the capture."
-      );
-      assert(
-        pixels.navy > 1000,
-        "Known background is absent from the capture."
-      );
-      if (platform === "web")
-        assert.equal(pixels.green, 0, "DOM marker leaked into canvas output.");
-      return {
-        ...pixels,
-        scope: image.scope,
-        overlayInclusion:
-          pixels.green > 20
-            ? "green-host-overlay-observed"
-            : "green-host-overlay-excluded",
-      };
-    });
-    await scenario("strict renderer capture scope", async () => {
-      if (platform === "ios") {
-        await assert.rejects(action("capture", { scope: "renderer" }));
-        return { explicitRejection: true };
+        assert(
+          pixels.navy > 1000,
+          "Known background is absent from the capture."
+        );
+        if (platform === "web")
+          assert.equal(
+            pixels.green,
+            0,
+            "DOM marker leaked into canvas output."
+          );
+        return {
+          ...pixels,
+          overlayInclusion:
+            pixels.green > 20
+              ? "green-host-overlay-observed"
+              : "green-host-overlay-excluded",
+        };
       }
-      const image = await action("capture", { scope: "renderer" });
-      assert(imagePixels(image.uri).red > 20);
-      return { scope: image.scope };
-    });
+    );
     await scenario(
       "detach releases tracking and suppresses late fixes",
       async () => {
@@ -827,23 +824,6 @@ const browserScenarios = async () => {
         10000
       );
       return { observedError: true };
-    }
-  );
-  await scenario(
-    "retained incompatible drawing buffer rejects capture",
-    async () => {
-      await configure("unpreserved");
-      await configure("retained");
-      await assert.rejects(action("capture"));
-      return { explicitRejection: true };
-    }
-  );
-  await scenario(
-    "external incompatible drawing buffer rejects capture",
-    async () => {
-      await configure("external");
-      await assert.rejects(action("capture"));
-      return { explicitRejection: true };
     }
   );
   await scenario("canvas export failure propagates", async () => {

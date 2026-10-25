@@ -1,0 +1,349 @@
+{
+  "unit": "U10",
+  "status": "Implemented and independently audited; applicable routine verification recorded; commit/push/PR authorized under owner workflow.",
+  "authorization": "Owner merged U09 PR28 and released U10 only. No U11, merge, package publication, renderer/browser/Metro acceptance or native application build/install authorized.",
+  "scope": {
+    "removed": "MapRef.capture, MapProps.captureEnabled, capture-only types/exports, MapCaptureGate/useMapCapture, capture-only frame/layout/error subscriptions, and ref factory parameters/defaults.",
+    "retained": "Shared camera/query/state contracts and current wrapper access, map layout/marker ownership, lifecycle and selected raw frame callbacks, native SDK options, independent snapshot services, image validation/output/deadline helpers still needed until U12. Offline/location services, peers, patches, lockfiles, support records and candidate unchanged.",
+    "application": "Small browser/native example helpers borrow selected wrapper per operation. Browser uses getCanvas().toDataURL with application-selected Mapbox preserveDrawingBuffer or MapLibre canvasContextAttributes. RNMapbox takeSnap(false/true) and MapLibre createStaticMapImage(base64/file) are typed against installed wrappers. Native bare path/base64 adaptation only serves existing harness transport.",
+    "boundary": "No common readiness, output validation, overlay inclusion, dimension, file persistence, deadline, cancellation or transaction guarantee is replaced. Applications and SDKs own those decisions. Helpers reject missing refs, unknown selected backends and unsupported browser file output, and propagate wrapper/canvas/SDK failures. Borrowed SDK handles retain upstream lifetime.",
+    "callersOriginal": "TF08 acceptance/service scene and standalone map, TF09 advanced rendering scene, MapLibre global-state app and native model scene migrated; pixel observers and independently settled rendering assertions remain.",
+    "callersMain": "Older main contains only examples/shared TF08 acceptance/map and TF09 scenes. Those three migrate; absent original global-state/model/workspace and attachment fixtures are not copied or claimed as inspected main runtime.",
+    "retiredTests": "Common frame+layout readiness, facade detach/deadline/strict capture scope, automatic buffer setup and incompatible-buffer rejection guarantees retired. Existing native state tests drop only calls to deleted capture-only frame handler. Snapshot validation, zero zoom, file escaping, dimension and deadline regressions remain; SDK file/density observations remain bounded to their fixture.",
+    "newTests": "Application web/native file/base64/PNG transport, ref absence/detached getter, invalid backend, canvas/SDK errors and per-call wrapper borrowing; original scene command wiring; selected native frame option callback forwarding; negative common capture/types/prop probes; web buffer/canvas and both native output declaration routes."
+  },
+  "artifacts": {
+    "original": {
+      "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+      "basis": "Approved dirty rc.11 working tree with unrelated baseline preserved.",
+      "snapshotPaths": 944,
+      "snapshotSha256": "4252e30814ac8dca9365145d02bd2d7be5df7e887c94b19f9b787e9fc74ed9f2",
+      "changedPathsBeforeEvidence": 50,
+      "recoveryPatchSha256": "8557b68cf115133b1488633f6d7387420e98fbef88bd5082353ce87390bf3cac",
+      "candidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7",
+      "archiveAudit": {
+        "archiveSha256": "681b5be37058eea61171f22b6cd60cd53792f48425df5aa50b21dd46a465dd09",
+        "members": 199,
+        "matchedSourceDistReadme": 193,
+        "retiredMapCaptureAbsent": true
+      },
+      "helperTestSha256": "40c3cb7e143dfbbf158e58dc3a294802154790bc6f209ab5bfa45226a9cfc386"
+    },
+    "main": {
+      "base": "121001382feb4e04887b3b093e6b25dd6e6dad59",
+      "branch": "codex/u10-wrapper-map-capture",
+      "basis": "Minimal U10 port onto main rc.2. Original-only workspace/global-state/model/attachment changes excluded; older UI/import/AppState and web map baseline preserved. Temporary per-package dependency overlays resolve workspace imports within clone; third-party dependencies reused.",
+      "changedPathsBeforeEvidence": 46,
+      "trackedDeltaSha256": "d383fdd643441817622a4ba7e2f460b6132ab093c530489f820be79dfc981da2",
+      "archiveAudit": {
+        "archiveSha256": "1e38ad1f51717c49209a030d5560c742a2d43274cb6a91ec580272296bd5fff6",
+        "members": 199,
+        "matchedSourceDistReadme": 193,
+        "retiredMapCaptureAbsent": true
+      },
+      "helperTestSha256": "f563516aeaf13038866316ce4a16728d0568319f8357506dfb7e762ba1262dc4"
+    },
+    "archiveProof": "Each archive has 199 members; all 193 shipped source/dist/README members byte-match its final tree. Removed map-capture output is absent. Original package-selection runner generated the same frozen archive hash; main selections and both peer matrices use their explicit frozen archives.",
+    "recoveryNote": "records/README stage-start bytes recovered from retained U09 before+delta and verified against captured U10 start SHA; no original workspace reset performed.",
+    "movement": {
+      "librarySource": {
+        "added": 8,
+        "removed": 293
+      },
+      "applicationSource": {
+        "added": 130,
+        "removed": 16
+      },
+      "sourceNetRemoved": 171,
+      "newDependencies": 0,
+      "nativePatchChanges": 0
+    }
+  },
+  "checks": {
+    "original": {
+      "unitWeb": "816 passed /45files",
+      "mockedNative": "280 passed /7suites (final rerun includes two added raw-frame callback tests)",
+      "compiledWeb": "537 passed /22files",
+      "compiledNative": "280 passed /7suites",
+      "routine": "Formatting/lint, four type projects, three app declarations, library/example builds and compiler transform/emitted runtime passed.",
+      "focused": "12 app/image/scene checks passed; 169 affected native tests including new callback cases passed before final full rerun.",
+      "fixtures": "TF09 DEM+settling+command-bounds static fixtures, TF10 model/global-state/light pixel observers, TF08 image/final/coverage/display observers passed without renderer execution.",
+      "packedCommon": "13 isolated package selections passed; archive 681b5be37058eea61171f22b6cd60cd53792f48425df5aa50b21dd46a465dd09."
+    },
+    "main": {
+      "unitWebFull": "736 passed; two unchanged wrapper-callback marker.ts import failures against installed marker.tsx.",
+      "unitWebBounded": "736 passed /35files excluding only known callback fixture.",
+      "baselineProof": "Merged main base equals U09 commit8093d6e9560185cb7069b407f4ccda22193d2e1d (empty diff). Before U10, ready baseline full run passed740 with same two callback imports failing. Callback/dependency paths remain unchanged.",
+      "mockedNative": "273 passed /6suites",
+      "compiledWeb": "523 passed /20files excluding known callback fixture",
+      "compiledNative": "273 passed /6suites",
+      "routine": "Formatting/lint, four type projects, three app declarations, library/example builds, compiler transform/emitted runtime passed. Focused7 app/image cases and TF09/TF08 fixture checks passed.",
+      "packedCommon": "13 isolated package selections passed on frozen main archive."
+    },
+    "documentationStructure": {
+      "original": "PASS expanded:43 Markdown files,42 SDK comparison tables; docs-only39. Paragraphs/fences/local links/whitespace and69 coverage rows pass.",
+      "main": "PASS expanded:42 Markdown files,38 SDK comparison tables; docs-only38. Paragraphs/fences/local links/whitespace and69 coverage rows pass."
+    }
+  },
+  "firstAttemptsAndRepairs": [
+    "Interim shared app helper imported DOM canvas into native no-DOM types; split browser/native modules using existing platform resolution. Stale dist capture types resolved by rebuilding before dependent declarations.",
+    "A build and dist-dependent tests were initially run concurrently, causing an import-resolution failure; sequential build then rerun passed. Native seven failures called removed capture-only frame handler; those synthetic steps removed while retaining state/style/load assertions. Newly unused Platform import removed.",
+    "Coordinator initial main baseline ran before built dist/root workspace resolution, adding one fixture import failure; clone setup/build corrected and pre-U10 rerun showed only the known two callback failures.",
+    "Worker peer attempts hit temp EPERM, DNS restriction and ENOSPC while creating a duplicate temporary cache. That cache was removed. Coordinator default-cache peer attempt then hit disk exhaustion during archive extraction. A main native attempt could not create its Jest haste-map due ENOSPC. No production fix inferred from these host failures.",
+    "Removed only project-owned completed Jest caches identified by perf-cache test paths, freeing space. Final original and main peer matrices passed all eight cases; final main source/compiled native checks used --no-cache and passed. Temporary consumers clean themselves in finally."
+  ],
+  "selectedPeers": {
+    "scope": "Eight existing cases per archive: four standalone selected entries and both ends of both mixed pairs. Actual declarations, selected web Node imports, peer installations and patch verification only; no SDK linking or renderer. No filtering or weakening of accumulated previous assertions.",
+    "hostBoundary": "Mock native host React Native0.86.3; isolated peer declarations React Native0.87.1. These checks establish no new version support or linking claim.",
+    "versions": {
+      "tuple-1": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "tuple-2": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "tuple-3": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-4": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-5": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-6": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-7": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "tuple-8": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-9": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-10": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      }
+    },
+    "executions": [
+      {
+        "artifact": "original",
+        "archiveSha256": "681b5be37058eea61171f22b6cd60cd53792f48425df5aa50b21dd46a465dd09",
+        "reportSha256": "19027899e4b9e856afd796c9d189b867353a8322b7f99d7ae123a1ebbaca33d7",
+        "runnerSha256": "1f6632c99c5980d9467cc0c6315dae673aa316f29005c55030cedb96b350038b",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "2008c8a2616019c710b9ba2a66ef4972f48f19394496965aaceaabd5df0f52fb",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "81c683da06ebf6779c117be072d685fa815443e92ce2d0ba17d3d3b7d125339a",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-3",
+            "lockSha256": "3b3ba96a32080b162adb53dc944c63c7de3048ebe17216af6eab3c5cfce22153",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-4",
+            "lockSha256": "f9766275f45299a2de383e946447e17ec17a0f0a9c7b25ab3067d3211260dd31",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "041f9f4f856bcb34e310230f0f169ecfbb0bedeb3b35b36f92aaebbd1e84509e",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "041f9f4f856bcb34e310230f0f169ecfbb0bedeb3b35b36f92aaebbd1e84509e",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "4cc1059bafa67b2e4bb17c0afa6557bbce6a4c5ee4d9adafa704ba315b6f3f68",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "4cc1059bafa67b2e4bb17c0afa6557bbce6a4c5ee4d9adafa704ba315b6f3f68",
+            "patchedFilesVerified": 31
+          }
+        ]
+      },
+      {
+        "artifact": "main",
+        "archiveSha256": "1e38ad1f51717c49209a030d5560c742a2d43274cb6a91ec580272296bd5fff6",
+        "reportSha256": "b5c5b37042d725b3e1ad9f9b30ed9232c5fa0495fb10407500f719731c321493",
+        "runnerSha256": "a2a5c0580dcda351ff09892613a0f3f6df861fbd98a54f6398d7467994e11289",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "f66a6eb233b0f19168c30d967d43629dd8822da5d61d7b032f3fbffaf2a1afd8",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "fa052fc9fee20ec3a1600f41dc8322aeb59d8d9fd0c7a7b6ee36d1ebb72c30fb",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-7",
+            "lockSha256": "42723088d14d3dbd06254af7ed605bcea56e304c73f85c32098b91d370f3eeab",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-8",
+            "lockSha256": "7f31c939591fba42d06ff546b553e3ca314f6d3acf08e655100aea6cfd6f9394",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "b694b54eaf352b2313d4ef624c4958a9a4bccadcd38e8139f50ce11e82739c7b",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "b694b54eaf352b2313d4ef624c4958a9a4bccadcd38e8139f50ce11e82739c7b",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "88f021baadc6929840bde4cbe5e6d6ea4bc661108b62960ca12cc56f5d3f1c9c",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "88f021baadc6929840bde4cbe5e6d6ea4bc661108b62960ca12cc56f5d3f1c9c",
+            "patchedFilesVerified": 25
+          }
+        ]
+      }
+    ]
+  },
+  "audit": {
+    "independent": "GPT-6.1 Sol medium implementation/documentation/review workers. Read-only reviewer audited original delta and actual publication diff: removals, all callers, helpers/ref/errors, retained lifecycle/raw frame forwarding, image ownership, tests/fixtures and packed probes. No actionable findings remain.",
+    "coordinator": "Verified current wrapper paths and installed declarations, scoped native callbacks/layout/state retention, shared snapshot validation, actual routine/compiled/archive/peer evidence, baseline isolation and unchanged candidate/peer/patch/version boundaries.",
+    "documentation": "69 coverage row IDs/checkmarks/first-three substantive cells preserved in each tree except three approved historical links pinned to main121001382feb4e04887b3b093e6b25dd6e6dad59. Historical acceptance stays tied to original artifacts.",
+    "limits": "Mocked/declaration/compiled/static checks support only exercised behavior. Actual canvas/native capture, overlay inclusion, file output, renderer readiness/source/style integration and bridge timing remain unverified."
+  },
+  "openGates": [
+    "Two pre-existing main callback import fixture failures remain outside U10.",
+    "Renderer/browser/Metro/native linking/build/install and changed capture runtime acceptance unverified; separate permission required.",
+    "U11 and later units remain undispatched pending explicit owner release. Merge, tagging and package publication are not authorized."
+  ],
+  "cleanup": "After PR, retain compact outcome/provenance/recovery; remove temporary clone/dependency overlays, generated consumers/lock copies, archives/raw logs and clone-specific test caches. Preserve original branch/head and candidate archive."
+}

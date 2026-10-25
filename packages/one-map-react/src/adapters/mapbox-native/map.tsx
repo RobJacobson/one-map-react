@@ -24,7 +24,6 @@ import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
-import { useMapCapture } from "../shared/map-capture.js";
 import {
   useNativeMapPresentation,
   withNativeMapPresentation,
@@ -70,7 +69,6 @@ const MapboxNativeMapImplementation = forwardRef<
   const session = useNativeMapPresentation();
   if (props.viewState && props.locationOptions?.followUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
-  const capture = useMapCapture(props.captureEnabled);
   const ornaments = useNativeOrnamentPositions();
   const scaleBarPosition =
     props.options?.scaleBarPosition ??
@@ -161,19 +159,7 @@ const MapboxNativeMapImplementation = forwardRef<
         cameraRef,
         // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapViewRef,
-        geoJsonSources,
-        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
-        async (options) => {
-          if (options.scope === "renderer" && Platform.OS === "ios")
-            throw new Error(
-              "Renderer-only capture is unavailable through RNMapbox iOS view capture. Use scope backend."
-            );
-          return capture.run(options, async () => {
-            const map = mapViewRef.current;
-            if (!map) throw new Error("Map is not attached.");
-            return map.takeSnap(options.output === "file");
-          });
-        }
+        geoJsonSources
       )
   );
   // Descendant control effects must retain the attached ref during prop updates.
@@ -209,7 +195,6 @@ const MapboxNativeMapImplementation = forwardRef<
         onLayout={(event) => {
           const { width, height } = event.nativeEvent.layout;
           session?.setNativeLayout(width, height);
-          capture.layout(width, height);
           props.hostProps?.onLayout?.(event);
         }}
         // Common width strings cross the native host dimension boundary here.
@@ -257,9 +242,6 @@ const MapboxNativeMapImplementation = forwardRef<
                 }
               : {})}
             gestureSettings={gestureSettings}
-            onDidFinishRenderingFrameFully={() => {
-              capture.frame();
-            }}
             onDidFinishLoadingMap={() => {
               report.onLoad();
             }}
@@ -268,7 +250,6 @@ const MapboxNativeMapImplementation = forwardRef<
             }}
             onMapLoadingError={(payload: unknown) => {
               const event = mapLoadingErrorEvent(payload);
-              capture.fail(event.error);
               report.onError(event);
             }}
             onCameraChanged={reportChanging}

@@ -13,10 +13,7 @@ export type {
   ZoomToOptions,
 } from "./contracts/camera-types.js";
 export type {
-  CaptureOptions,
-  CaptureScope,
   ImageOutput,
-  MapCapture,
   MapImage,
   StaticMapImageOptions,
   StaticMapImageService,

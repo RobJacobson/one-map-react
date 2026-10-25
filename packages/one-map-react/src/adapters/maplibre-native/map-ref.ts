@@ -57,26 +57,19 @@ export type NativeAdvancedMapRef = MapRef & {
  * @param mapLoaded - Ref tracking `onDidFinishLoadingMap`, after which the
  * camera applies imperative stops.
  * @param sources - Registry of mounted GeoJSON and vector source refs.
- * @param capture - Existing map-capture operation.
  * @returns The selected native map ref.
  */
 export const createMaplibreMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapRef: { readonly current: ComponentRef<typeof MaplibreMap> | null },
   mapLoaded: { readonly current: boolean },
-  sources: MaplibreSourceRegistry,
-  capture?: MapRef["capture"]
+  sources: MaplibreSourceRegistry
 ): NativeAdvancedMapRef => ({
   getWrapperMap: async () => requireMap(mapRef.current),
 
   queryTerrainElevation: async () => {
     throw new Error("queryTerrainElevation is unsupported on MapLibre Native.");
   },
-  capture:
-    capture ??
-    (async () => {
-      throw new Error("Capture is not enabled on this map.");
-    }),
   jumpTo: async (options) => {
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current, mapLoaded.current);

@@ -205,9 +205,14 @@ declare const selectedRef: WebMapRef;
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<WebMapRef["getWrapperMap"]>, Promise<WrapperMapRef>> = true;
 const borrowed: Promise<WrapperMapRef> = selectedRef.getWrapperMap();
+void <SelectedMap mapStyle={style} initialViewState={viewState} options={${entry === "mapbox-web" ? "{ preserveDrawingBuffer: true }" : "{ canvasContextAttributes: { preserveDrawingBuffer: true } }"}} />;
+// @ts-expect-error Capture belongs to the application and selected wrapper.
+selectedRef.capture({ output: "data-url", scope: "backend" });
 void exactWrapperPromise; void borrowed;
 const useBorrowedWrapper = async (): Promise<void> => {
   const wrapper = await selectedRef.getWrapperMap();
+  const png: string = wrapper.getCanvas().toDataURL("image/png");
+  void png;
   ${entry === "mapbox-web" ? "wrapper.setRain({ density: 0 }); wrapper.getMap().setLanguage('en'); wrapper.getMap().fire('fixture'); wrapper.getMap().dragPan.disable(); const version: string = wrapper.getMap().version; void version;" : "wrapper.setGlobalStateProperty('fixture', 1); wrapper.getMap().refreshTiles('source'); wrapper.getMap().fire('idle'); wrapper.getMap().setEventedParent(null); wrapper.getMap().dragPan.disable(); const version: string = wrapper.getMap().version; void version;"}
 };
 void useBorrowedWrapper;
@@ -268,6 +273,8 @@ const useBorrowedWrapper = async (): Promise<void> => {
   const wrapper = await selectedRef.getWrapperMap();
   const center: number[] = await wrapper.getCenter();
   const capture: string = await wrapper.takeSnap(true);
+  const base64: string = await wrapper.takeSnap(false);
+  void base64;
   wrapper.setSourceVisibility(false, 'source');
   void center; void capture;
 };
@@ -288,6 +295,8 @@ void <SelectedMap ref={(map) => { if (map) { const wrapper: Promise<ComponentRef
 const useBorrowedWrapper = async (): Promise<void> => {
   const wrapper = await selectedRef.getWrapperMap();
   const capture: string = await wrapper.createStaticMapImage({ output: "file" });
+  const base64: string = await wrapper.createStaticMapImage({ output: "base64" });
+  void base64;
   const camera = await wrapper.getViewState();
   wrapper.setSourceVisibility(false, 'source');
   wrapper.showAttribution();

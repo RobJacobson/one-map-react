@@ -19,6 +19,11 @@ import {
 } from "one-map-react";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  captureRendering,
+  renderingBufferOptions,
+} from "./capture-rendering.js";
+
 /** Commands expose application actions and independent renderer readback only. */
 export interface Tf08AcceptanceProbe {
   /** Executes a test action against the mounted map or selected public service. */
@@ -173,11 +178,11 @@ export const Tf08AcceptanceScene = ({
         return null;
       }
       if (action === "capture") {
-        return requireMap().capture({
-          output: value.output === "file" ? "file" : "data-url",
-          scope: value.scope === "renderer" ? "renderer" : "backend",
-          timeoutMs: Number(value.timeoutMs ?? 15000),
-        });
+        return captureRendering(
+          backend,
+          mapRef.current,
+          value.output === "file" ? "file" : "data-url"
+        );
       }
       if (action === "annotation-refresh") {
         await annotationRef.current?.refresh();
@@ -301,7 +306,10 @@ export const Tf08AcceptanceScene = ({
       mapStyle={mapStyle}
       style={style}
       initialViewState={camera}
-      captureEnabled={mode !== "unpreserved"}
+      {...{
+        options:
+          mode === "unpreserved" ? undefined : renderingBufferOptions(backend),
+      }}
       reuseMaps={
         backend.endsWith("web") &&
         (mode === "unpreserved" || mode === "retained")

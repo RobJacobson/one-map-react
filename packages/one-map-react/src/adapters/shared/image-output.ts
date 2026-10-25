@@ -1,5 +1,4 @@
 import type {
-  CaptureOptions,
   ImageOutput,
   MapImage,
   StaticMapImageOptions,
@@ -11,14 +10,6 @@ export const imageDeadline = (timeoutMs = 15000): number => {
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0)
     throw new Error("Image timeout must be finite and positive.");
   return timeoutMs;
-};
-
-/** Validates current-map requests without silently weakening scope. */
-export const validateCapture = (options: CaptureOptions): void => {
-  if (!options || !["backend", "renderer"].includes(options.scope))
-    throw new Error("Capture requires an explicit backend or renderer scope.");
-  validateOutput(options.output);
-  imageDeadline(options.timeoutMs);
 };
 
 /** Validates independent style/camera inputs, including legitimate zero zoom. */

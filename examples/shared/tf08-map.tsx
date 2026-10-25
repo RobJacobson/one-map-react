@@ -10,7 +10,7 @@ import {
 } from "one-map-react";
 import { forwardRef } from "react";
 
-/** Shared foreground-location/capture scene; setup and permission UI belong to the shell. */
+/** Shared foreground-location scene; setup and permission UI belong to the shell. */
 export interface Tf08MapProps {
   /** Style supplied by the selected application's shell. */
   readonly mapStyle: MapStyle;
@@ -24,7 +24,7 @@ export interface Tf08MapProps {
   readonly onError: (error: unknown) => void;
 }
 
-/** Shared scene for all four adapters, with capture enabled at construction. */
+/** Shared scene for all four adapters. */
 export const Tf08Map = forwardRef<MapRef, Tf08MapProps>(
   ({ mapStyle, style, locationProvider, position, onError }, ref) => (
     <OneMap
@@ -38,7 +38,6 @@ export const Tf08Map = forwardRef<MapRef, Tf08MapProps>(
         bearing: 0,
         pitch: 0,
       }}
-      captureEnabled
     >
       <UserLocation position={position} showAccuracyCircle />
       <GeolocateControl
