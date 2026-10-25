@@ -82,7 +82,6 @@ export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
     | "onDidFinishLoadingStyle"
     | "onDidFailLoadingMap"
     | "onMapLoadingError"
-    | "onDidFinishRenderingFrameFully"
   >;
 }
 /** Selected map retaining shared map context and named access. */

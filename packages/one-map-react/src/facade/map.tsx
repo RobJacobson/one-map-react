@@ -56,7 +56,6 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
 
   useStableOptions("Map", {
     id: props.id,
-    captureEnabled: props.captureEnabled ?? false,
   });
   const { mapRef, proxy } = useMapAttachment(props.id, forwardedRef);
   const [ready, setReady] = useState(false);

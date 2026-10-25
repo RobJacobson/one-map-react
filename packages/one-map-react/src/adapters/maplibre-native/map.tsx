@@ -13,7 +13,6 @@ import {
 } from "react";
 import {
   type NativeSyntheticEvent,
-  Platform,
   type StyleProp,
   View,
   type ViewProps,
@@ -28,7 +27,6 @@ import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
-import { useMapCapture } from "../shared/map-capture.js";
 import {
   useNativeMapPresentation,
   withNativeMapPresentation,
@@ -70,7 +68,6 @@ const MaplibreNativeMapImplementation = forwardRef<
   assertMaplibreStyleRoots(props.mapStyle);
   const session = useNativeMapPresentation();
   validateMaplibreMapOptions(props);
-  const capture = useMapCapture(props.captureEnabled);
   const ornaments = useNativeOrnamentPositions();
   const {
     mapStyle,
@@ -129,21 +126,7 @@ const MaplibreNativeMapImplementation = forwardRef<
         mapRef,
         // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapLoaded,
-        sources,
-        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
-        async (options) => {
-          if (options.scope === "renderer" && Platform.OS === "ios")
-            throw new Error(
-              "Renderer-only capture is unavailable through MapLibre iOS view capture. Use scope backend."
-            );
-          return capture.run(options, async () => {
-            const map = mapRef.current;
-            if (!map) throw new Error("Map is not attached.");
-            return map.createStaticMapImage({
-              output: options.output === "file" ? "file" : "base64",
-            });
-          });
-        }
+        sources
       )
   );
   // Descendant control effects must retain the attached ref during prop updates.
@@ -194,7 +177,6 @@ const MaplibreNativeMapImplementation = forwardRef<
         onLayout={(event) => {
           const { width, height } = event.nativeEvent.layout;
           session?.setNativeLayout(width, height);
-          capture.layout(width, height);
           props.hostProps?.onLayout?.(event);
         }}
         // Common width strings cross the native host dimension boundary here.
@@ -242,9 +224,6 @@ const MaplibreNativeMapImplementation = forwardRef<
               mapStyle as ComponentProps<typeof MaplibreMap>["mapStyle"]
             }
             {...gestures}
-            onDidFinishRenderingFrameFully={() => {
-              capture.frame();
-            }}
             onDidFinishLoadingMap={() => {
               mapLoaded.current = true;
               onLoad?.();
@@ -253,9 +232,6 @@ const MaplibreNativeMapImplementation = forwardRef<
               onStyleLoad?.();
             }}
             onDidFailLoadingMap={() => {
-              capture.fail(
-                new Error("MapLibre reported a map loading failure.")
-              );
               onError?.({});
             }}
             onRegionWillChange={

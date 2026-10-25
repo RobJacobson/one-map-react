@@ -313,6 +313,23 @@ const drawingContext = (): ExternalDrawingContext => ({
   drawingBufferHeight: 1,
 });
 
+test("forwards selected frame observation callbacks without common capture ownership", async () => {
+  const onFrame = jest.fn();
+  await render(
+    <MapSetup adapter={adapter}>
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        options={{ onDidFinishRenderingFrameFully: onFrame }}
+      />
+    </MapSetup>
+  );
+  const props = lastMapProps<{ onDidFinishRenderingFrameFully: () => void }>();
+  expect(props.onDidFinishRenderingFrameFully).toBe(onFrame);
+  await act(async () => props.onDidFinishRenderingFrameFully());
+  expect(onFrame).toHaveBeenCalledTimes(1);
+});
+
 test.each(["document", "url"] as const)(
   "common %s styles clear conflicting selected style fields through replacement",
   async (initial) => {
@@ -2116,11 +2133,9 @@ describe("mapbox-native queries and feature state", () => {
         ).entries()) {
           await mounted.rerender(scene(kind, revision + 1, replacementStyle));
           const props = lastMapProps<{
-            onDidFinishRenderingFrameFully: () => void;
             onDidFinishLoadingStyle: () => void;
           }>();
           await act(async () => {
-            props.onDidFinishRenderingFrameFully();
             props.onDidFinishLoadingStyle();
           });
           await expect(

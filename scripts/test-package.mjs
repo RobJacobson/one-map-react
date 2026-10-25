@@ -293,6 +293,14 @@ import type { Adapter, Backend, MapRef } from "one-map-react";
 import { Map as OneMap, MapSetup, Source, Layer, Marker, Popup, Control, NavigationControl, AttributionControl, ScaleControl, GeolocateControl, FullscreenControl, useMap } from "one-map-react";
 ${declarations}
 declare const commonRef: MapRef;
+// @ts-expect-error Capture belongs to the application and selected wrapper.
+commonRef.capture({ output: "data-url", scope: "backend" });
+// @ts-expect-error Capture-only options are removed from the common package.
+import type { CaptureOptions } from "one-map-react";
+// @ts-expect-error Capture scope is no longer a common promise.
+import type { CaptureScope } from "one-map-react";
+// @ts-expect-error Capture-only results are removed from the common package.
+import type { MapCapture } from "one-map-react";
 // @ts-expect-error Wrapper access belongs only to selected web refs.
 commonRef.getWrapperMap();
 // @ts-expect-error Common hooks retain the portable ref contract.
@@ -311,6 +319,8 @@ const viewState = {
   pitch: 0,
 };
 const style = { version: 8 as const, sources: {}, layers: [] };
+// @ts-expect-error Drawing-buffer configuration is a selected wrapper option.
+void <OneMap mapStyle={style} initialViewState={viewState} captureEnabled />;
 void (
   <OneMap mapStyle={style} initialViewState={viewState} terrain={{ source: "dem", exaggeration: 0 }} projection="mercator" light={{ intensity: 0 }} />
 );

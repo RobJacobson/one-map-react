@@ -317,11 +317,6 @@ const finishMapLoad = async (): Promise<void> => {
   await act(async () => onDidFinishLoadingMap());
 };
 
-const finishRenderingFrame = async (): Promise<void> => {
-  const props = lastMapProps<{ onDidFinishRenderingFrameFully: () => void }>();
-  await act(async () => props.onDidFinishRenderingFrameFully());
-};
-
 const example = (
   ref?: Ref<MapRef>,
   onMove?: (event: object) => void,
@@ -439,6 +434,25 @@ describe("maplibre-native adapter", () => {
       await expect(Promise.resolve(retained)).resolves.toBe(retained);
     }
   );
+
+  test("forwards selected frame observation callbacks without common capture ownership", async () => {
+    const onFrame = jest.fn();
+    await render(
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          options={{ onDidFinishRenderingFrameFully: onFrame }}
+        />
+      </MapSetup>
+    );
+    const props = lastMapProps<{
+      onDidFinishRenderingFrameFully: () => void;
+    }>();
+    expect(props.onDidFinishRenderingFrameFully).toBe(onFrame);
+    await act(async () => props.onDidFinishRenderingFrameFully());
+    expect(onFrame).toHaveBeenCalledTimes(1);
+  });
 
   test("attribution control restores selected position and disabled state after removal", async () => {
     const options = {
@@ -1867,7 +1881,6 @@ describe("maplibre-native queries and feature state", () => {
       ).entries()) {
         activeFamily = family;
         await mounted.rerender(scene(family, revision + 1));
-        await finishRenderingFrame();
         const target = { source: "shared", id: 9, sourceLayer: "way" };
         await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
           retained: true,
@@ -1972,7 +1985,6 @@ describe("maplibre-native queries and feature state", () => {
     await mounted.rerender(
       example(ref, undefined, { mapStyle: replacementStyle, onStyleLoad })
     );
-    await finishRenderingFrame();
     const props = MapMock.mock.calls.at(-1)?.[0] as {
       onDidFinishLoadingStyle: () => void;
     };
@@ -2008,7 +2020,6 @@ describe("maplibre-native queries and feature state", () => {
       await expect(ref.current?.removeFeatureState(target)).rejects.toBe(
         failure
       );
-      await finishRenderingFrame();
       expect(remove).toHaveBeenCalledTimes(1);
       await expect(
         ref.current?.removeFeatureState(target)

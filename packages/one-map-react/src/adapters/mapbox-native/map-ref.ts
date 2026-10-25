@@ -54,14 +54,12 @@ export type NativeAdvancedMapRef = MapRef & {
  * @param cameraRef - Ref to the RNMapbox `Camera` child.
  * @param mapViewRef - Ref to the RNMapbox `MapView`.
  * @param geoJsonSources - Registry of mounted GeoJSON source refs.
- * @param capture - Existing map-capture operation.
  * @returns The selected native map ref.
  */
 export const createMapboxMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
-  geoJsonSources: GeoJsonSourceRegistry,
-  capture?: MapRef["capture"]
+  geoJsonSources: GeoJsonSourceRegistry
 ): NativeAdvancedMapRef => ({
   getWrapperMap: async () => requireMap(mapViewRef.current),
 
@@ -73,11 +71,6 @@ export const createMapboxMapRef = (
       ])
     );
   },
-  capture:
-    capture ??
-    (async () => {
-      throw new Error("Capture is not enabled on this map.");
-    }),
   jumpTo: async (options) => {
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current);

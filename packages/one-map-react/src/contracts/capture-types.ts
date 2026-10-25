@@ -3,19 +3,6 @@ import type { Bounds, LngLat } from "./camera-types.js";
 /** PNG output selected explicitly by the caller. */
 export type ImageOutput = "data-url" | "file";
 
-/** Current wrapper view contents or strict renderer-only contents. */
-export type CaptureScope = "backend" | "renderer";
-
-/** Current-map capture inputs. */
-export interface CaptureOptions {
-  /** PNG data URL or native temporary file. Browser file output rejects. */
-  readonly output: ImageOutput;
-  /** Backend scope preserves documented wrapper inclusion differences. */
-  readonly scope: CaptureScope;
-  /** Finite positive deadline in milliseconds; default 15000. */
-  readonly timeoutMs?: number;
-}
-
 /** Available PNG image; file URIs refer to OS-managed temporary storage. */
 export interface MapImage {
   /** Distinguishes a PNG data URL from a temporary file URI. */
@@ -24,12 +11,6 @@ export interface MapImage {
   readonly mimeType: "image/png";
   /** Validated PNG data URL or native file URI. */
   readonly uri: string;
-}
-
-/** Image from the attached map, with explicitly requested content scope. */
-export interface MapCapture extends MapImage {
-  /** Content scope honored by this capture. */
-  readonly scope: CaptureScope;
 }
 
 /** Independent snapshot inputs; mounted map resources are not inherited. */

@@ -8,6 +8,11 @@ import {
 } from "one-map-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
+import {
+  captureRendering,
+  renderingBufferOptions,
+} from "./capture-rendering.js";
+
 /** Actions exposed only by the targeted renderer acceptance examples. */
 export interface Tf09Probe {
   /** Changes fixture state or reads independently returned renderer values. */
@@ -136,8 +141,7 @@ export const Tf09Scene = ({
           return true;
         }
         if (action === "named") return named?.(map);
-        if (action === "capture")
-          return map.capture({ scope: "backend", output: "data-url" });
+        if (action === "capture") return captureRendering(backend, map);
         if (action === "read") {
           let elevation: number | null = null;
           let unsupported: string | undefined;
@@ -184,7 +188,7 @@ export const Tf09Scene = ({
         cameraObservations.current.viewState = event.viewState;
         if (acceptProposals.current) setControlled(event.viewState);
       }}
-      captureEnabled
+      {...{ options: renderingBufferOptions(backend) }}
       style={style}
       projection={projection}
       terrain={

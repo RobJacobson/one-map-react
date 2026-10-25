@@ -45,8 +45,6 @@ export interface MapProps {
   /** Legacy extrusion light; omission follows selected SDK reset semantics. */
   readonly light?: LegacyLight;
 
-  /** Enable current-map capture at construction; default false, immutable. */
-  readonly captureEnabled?: boolean;
   /** Optional provider-local identity for useMap(id); changing requires remount. */
   readonly id?: string;
   /** Layer ids whose rendered feature hits are included with map clicks. */
