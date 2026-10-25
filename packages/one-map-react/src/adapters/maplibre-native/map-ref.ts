@@ -58,7 +58,6 @@ export type NativeAdvancedMapRef = MapRef & {
  * camera applies imperative stops.
  * @param sources - Registry of mounted GeoJSON and vector source refs.
  * @param capture - Existing map-capture operation.
- * @param onCameraCommand - Notifies controlled-camera ownership before public command dispatch.
  * @returns The selected native map ref.
  */
 export const createMaplibreMapRef = (
@@ -66,8 +65,7 @@ export const createMaplibreMapRef = (
   mapRef: { readonly current: ComponentRef<typeof MaplibreMap> | null },
   mapLoaded: { readonly current: boolean },
   sources: MaplibreSourceRegistry,
-  capture?: MapRef["capture"],
-  onCameraCommand?: () => void
+  capture?: MapRef["capture"]
 ): NativeAdvancedMapRef => ({
   getWrapperMap: async () => requireMap(mapRef.current),
 
@@ -83,25 +81,21 @@ export const createMaplibreMapRef = (
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.jumpTo(toMaplibreCommand(options));
   },
   easeTo: async (options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.easeTo(toMaplibreCommand(options));
   },
   flyTo: async (options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.flyTo(toMaplibreCommand(options));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.fitBounds(
       mutableFlatBounds(bounds),
       toMaplibreFitBoundsOptions(options)
@@ -110,7 +104,6 @@ export const createMaplibreMapRef = (
   zoomTo: async (zoom, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.zoomTo(zoom, options ? toMaplibreCommand(options) : undefined);
   },
   stop: async () => {

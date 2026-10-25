@@ -40,7 +40,6 @@ import {
   useActiveCallbacks,
 } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
-import { useNativeControlledCamera } from "../shared/use-native-controlled-camera.js";
 import { normalizePadding } from "../shared/wrapper-values.js";
 import { mutableFlatBounds, toMaplibreViewState } from "./convert-camera.js";
 import { toMaplibreGestures } from "./convert-gestures.js";
@@ -139,7 +138,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     doubleTapZoom,
   });
 
-  const cameraCommandObserver = useRef<(() => void) | undefined>(undefined);
   const [mapHandle] = useState(
     // eslint-disable-next-line react/refs -- This lazy initializer only captures refs; commands dereference them after attachment.
     () =>
@@ -164,24 +162,9 @@ const MaplibreNativeMapImplementation = forwardRef<
               output: options.output === "file" ? "file" : "base64",
             });
           });
-        },
-        // eslint-disable-next-line react/refs -- Factory captures this callback; only later imperative camera commands read the committed observer.
-        () => cameraCommandObserver.current?.()
+        }
       )
   );
-  const controlledCamera = useNativeControlledCamera(
-    viewState,
-    mapHandle.jumpTo,
-    () => mapLoaded.current,
-    (error) => onError?.({ error })
-  );
-  const onCameraCommand = controlledCamera.onCommand;
-  useLayoutEffect(() => {
-    cameraCommandObserver.current = onCameraCommand;
-    return () => {
-      cameraCommandObserver.current = undefined;
-    };
-  }, [onCameraCommand]);
   // Descendant control effects must retain the attached ref during prop updates.
   useImperativeHandle(ref, () => mapHandle, [mapHandle]);
 
@@ -209,7 +192,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     if (phase === "change") {
       sawMove.current = true;
       report.onMove(move);
-      controlledCamera.onMove(move);
       return;
     }
 
@@ -219,7 +201,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     }
 
     report.onMoveEnd(move);
-    controlledCamera.onMove(move);
   };
   const controlled = viewState ? toMaplibreViewState(viewState) : undefined;
   const flatMaxBounds =
@@ -286,7 +267,6 @@ const MaplibreNativeMapImplementation = forwardRef<
             }}
             onDidFinishLoadingMap={() => {
               mapLoaded.current = true;
-              controlledCamera.onLoad();
               onLoad?.();
             }}
             onDidFinishLoadingStyle={() => {

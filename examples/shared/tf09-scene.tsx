@@ -80,7 +80,16 @@ export const Tf09Scene = ({
       command: async (action, value = {}) => {
         if (action === "controlled-camera") {
           acceptProposals.current = value.accept === true;
-          setControlled(value.enabled === false ? undefined : camera);
+          setControlled(
+            value.enabled === false
+              ? undefined
+              : {
+                  ...camera,
+                  ...(value.target === "changed"
+                    ? { longitude: 5, latitude: 5 }
+                    : {}),
+                }
+          );
           setClamped(value.enabled !== false && value.clamp === true);
           cameraObservations.current = { moves: 0, ends: 0, origin: "unknown" };
           return true;
@@ -99,7 +108,16 @@ export const Tf09Scene = ({
         const map = ref.current;
         if (!map) throw new Error("Map is not attached.");
         if (action === "camera-command") {
-          await map.jumpTo({ center: [10, 10], zoom: 3, bearing: 0, pitch: 0 });
+          const target =
+            value.target === "reapply"
+              ? camera
+              : { longitude: 10, latitude: 10, zoom: 3, bearing: 0, pitch: 0 };
+          await map.jumpTo({
+            center: [target.longitude, target.latitude],
+            zoom: target.zoom,
+            bearing: target.bearing,
+            pitch: target.pitch,
+          });
           return true;
         }
         if (action === "camera-read")

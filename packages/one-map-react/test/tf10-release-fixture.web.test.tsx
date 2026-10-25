@@ -1,6 +1,8 @@
-import { act, render } from "@testing-library/react";
+import { act, render, renderHook } from "@testing-library/react";
 import { expect, test, vi } from "vite-plus/test";
 
+import { useCameraSmoke } from "../../../examples/shared/camera-smoke.js";
+import type { MapRef } from "../src/contracts/camera-types.js";
 import type { MoveEvent } from "../src/contracts/event-types.js";
 
 const fixture = vi.hoisted(() => ({
@@ -38,7 +40,7 @@ import {
   type Tf09Probe,
 } from "../../../examples/shared/tf09-scene.js";
 
-test("release camera probe arms rejection, accepts committed proposals, reports commands and releases control", async () => {
+test("release camera probe tracks targets, accepts movement, reports commands and releases targets", async () => {
   let probe: Tf09Probe | null = null;
   const mounted = render(
     <Tf09Scene
@@ -66,6 +68,19 @@ test("release camera probe arms rejection, accepts committed proposals, reports 
     viewState: proposal.viewState,
     origin: "user",
     controlled: { longitude: 0 },
+  });
+  await command("camera-command", { target: "reapply" });
+  expect(fixture.jumpTo).toHaveBeenCalledWith({
+    center: [0, 0],
+    zoom: 2,
+    bearing: 0,
+    pitch: 35,
+  });
+  await act(async () => {
+    await command("controlled-camera", { target: "changed" });
+  });
+  expect(await command("camera-read")).toMatchObject({
+    controlled: { longitude: 5, latitude: 5 },
   });
   await act(async () => {
     await command("controlled-camera", { accept: true });
@@ -108,3 +123,54 @@ test("release camera probe arms rejection, accepts committed proposals, reports 
   mounted.unmount();
   expect(probe).toBeNull();
 });
+
+test.each(["web", "native"] as const)(
+  "camera smoke observes %s command behavior without inferring movement from its target",
+  async (platform) => {
+    vi.useFakeTimers();
+    let center: readonly [number, number] = [-122.32, 47.64];
+    const jumpTo = vi.fn(async () => {
+      if (platform === "native") center = [-120, 45];
+    });
+    const mapRef = {
+      current: {
+        fitBounds: vi.fn(async () => undefined),
+        stop: vi.fn(async () => {
+          if (platform === "native") throw new Error("unsupported");
+        }),
+        flyTo: vi.fn(async () => undefined),
+        jumpTo,
+        getCenter: vi.fn(async () => center),
+      } as unknown as MapRef,
+    };
+    const hook = renderHook(() =>
+      useCameraSmoke({ mapRef, platform, doubleTap: false })
+    );
+    try {
+      act(() => hook.result.current.onLoad());
+      const fitted = {
+        longitude: -122.32,
+        latitude: 47.64,
+        zoom: 11,
+        bearing: 0,
+        pitch: 0,
+      };
+      act(() => hook.result.current.onMoveEnd({ viewState: fitted }));
+      await act(async () =>
+        hook.result.current.onClick({ lngLat: center } as never)
+      );
+      if (platform === "web")
+        await act(async () => vi.advanceTimersByTimeAsync(9000));
+      expect(hook.result.current.phase).toBe("await-hold");
+      await act(async () => vi.advanceTimersByTimeAsync(2500));
+      expect(jumpTo).toHaveBeenCalledWith({ center: [-120, 45] });
+      expect(hook.result.current.status).toContain(
+        platform === "native" ? "held=0 command=applied" : "held=1 command=skip"
+      );
+      expect(hook.result.current.phase).toBe("done");
+    } finally {
+      hook.unmount();
+      vi.useRealTimers();
+    }
+  }
+);

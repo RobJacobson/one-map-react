@@ -29,7 +29,11 @@ import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
-import { AttributionControl, ScaleControl } from "../src/facade/ui.js";
+import {
+  AttributionControl,
+  NavigationControl,
+  ScaleControl,
+} from "../src/facade/ui.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
 const mockJumpTo = jest.fn(() => Promise.resolve());
@@ -879,7 +883,117 @@ describe("maplibre-native adapter", () => {
     expect(MapMock).not.toHaveBeenCalled();
   });
 
-  test("controlled viewState is written onto the camera", async () => {
+  test("native movement does not dispatch an unchanged target, including an equal new object", async () => {
+    const frames = new Map<number, FrameRequestCallback>();
+    let nextFrame = 0;
+    const schedule = jest
+      .spyOn(globalThis, "requestAnimationFrame")
+      .mockImplementation((callback) => {
+        frames.set(++nextFrame, callback);
+        return nextFrame;
+      });
+    const cancel = jest
+      .spyOn(globalThis, "cancelAnimationFrame")
+      .mockImplementation((id) => {
+        if (id != null) frames.delete(id);
+      });
+    const ref = createRef<MapRef>();
+    const target = { ...initialViewState, zoom: 12 };
+    const mounted = await render(
+      example(ref, undefined, { viewState: target })
+    );
+    const flush = async () => {
+      const callbacks = [...frames.values()];
+      frames.clear();
+      await act(async () => {
+        for (const callback of callbacks) callback(0);
+      });
+    };
+    try {
+      await finishMapLoad();
+      await flush();
+      mockJumpTo.mockClear();
+      const movement = lastMapProps<{
+        onRegionIsChanging: (event: object) => void;
+      }>().onRegionIsChanging;
+      const move = async (center: readonly number[], zoom = 4) =>
+        act(async () =>
+          movement({
+            nativeEvent: {
+              center,
+              zoom,
+              bearing: 30,
+              pitch: 10,
+              userInteraction: true,
+            },
+          })
+        );
+      await move([10, 20]);
+      await flush();
+      expect(mockJumpTo).not.toHaveBeenCalled();
+      await mounted.rerender(
+        example(ref, undefined, { viewState: { ...target } })
+      );
+      await flush();
+      expect(mockJumpTo).not.toHaveBeenCalled();
+      await ref.current?.jumpTo({
+        center: [target.longitude, target.latitude],
+        zoom: target.zoom,
+      });
+      expect(mockJumpTo).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          center: [target.longitude, target.latitude],
+          zoom: target.zoom,
+        })
+      );
+      expect(mockJumpTo).toHaveBeenCalledTimes(1);
+      await ref.current?.jumpTo({ center: [40, 50], zoom: 8 });
+      await move([40, 50], 8);
+      await flush();
+      expect(mockJumpTo).toHaveBeenCalledTimes(2);
+      expect(mockJumpTo).toHaveBeenLastCalledWith(
+        expect.objectContaining({ center: [40, 50], zoom: 8 })
+      );
+      // Props exercise forwarding only; actual native prop application is a renderer gate.
+      await mounted.rerender(
+        example(ref, undefined, { viewState: { ...target, zoom: 13 } })
+      );
+      expect(mounted.getByTestId("wrapper-camera").props.zoom).toBe(13);
+      await mounted.rerender(example(ref));
+      expect(mounted.getByTestId("wrapper-camera").props.zoom).toBeUndefined();
+      expect(mockJumpTo).toHaveBeenCalledTimes(2);
+      const failure = new Error("camera dispatch failed");
+      mockJumpTo.mockImplementationOnce(() => {
+        throw failure;
+      });
+      await expect(ref.current?.jumpTo({ zoom: 8 })).rejects.toBe(failure);
+      const detached = ref.current;
+      await mounted.unmount();
+      await expect(detached?.jumpTo({ zoom: 8 })).rejects.toThrow(
+        "Map camera is not attached."
+      );
+      const replacement = await render(
+        example(ref, undefined, { viewState: target })
+      );
+      try {
+        const dispatches = mockJumpTo.mock.calls.length;
+        await move([70, 80], 9);
+        await flush();
+        expect(mockJumpTo).toHaveBeenCalledTimes(dispatches);
+        await expect(detached?.jumpTo({ zoom: 8 })).rejects.toThrow(
+          "Map camera is not attached."
+        );
+      } finally {
+        await replacement.unmount();
+      }
+    } finally {
+      await mounted.unmount();
+      schedule.mockRestore();
+      cancel.mockRestore();
+    }
+  });
+
+  test("native viewState targets are written onto the camera", async () => {
     const rendered = await render(
       example(undefined, undefined, {
         viewState: { ...initialViewState, zoom: 12 },
@@ -2382,10 +2496,12 @@ test("settled camera updates controls and live overlays without another public m
       <OneMap
         mapStyle={emptyStyle}
         initialViewState={initialViewState}
+        viewState={initialViewState}
         onMove={onMove}
         onMoveEnd={onMoveEnd}
       >
         <Probe />
+        <NavigationControl />
         <NativeMarkerOverlay
           id="settled"
           lngLat={[1, 2]}
@@ -2415,6 +2531,9 @@ test("settled camera updates controls and live overlays without another public m
   mockProject.mockResolvedValueOnce([40, 50]);
   await act(async () => events.onRegionIsChanging(payload(40)));
   expect(observe.mock.calls.at(-1)?.[0]).toBe(40);
+  expect(view.getByText("↑").props.style.transform).toEqual([
+    { rotate: "-40deg" },
+  ]);
   await waitFor(() =>
     expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(40)
   );
@@ -2433,4 +2552,22 @@ test("settled camera updates controls and live overlays without another public m
   });
   expect(onMove).toHaveBeenCalledTimes(1);
   expect(onMoveEnd).toHaveBeenCalledTimes(1);
+});
+
+test("selected native location follow rejects a simultaneous viewState target", async () => {
+  await expect(
+    render(
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          viewState={initialViewState}
+          locationOptions={{
+            trackUserLocation: "default",
+            onTrackUserLocationChange: undefined,
+          }}
+        />
+      </MapSetup>
+    )
+  ).rejects.toThrow("Selected location follow conflicts with viewState.");
 });

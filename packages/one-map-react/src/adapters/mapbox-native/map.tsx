@@ -33,7 +33,6 @@ import {
 import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
-import { useNativeControlledCamera } from "../shared/use-native-controlled-camera.js";
 import {
   toRnmapboxControlledCamera,
   toRnmapboxCornerBounds,
@@ -178,7 +177,6 @@ const MapboxNativeMapImplementation = forwardRef<
     portableGestureSettings
   );
 
-  const cameraCommandObserver = useRef<(() => void) | undefined>(undefined);
   const [mapHandle] = useState(
     // eslint-disable-next-line react/refs -- This lazy initializer only captures refs; commands dereference them after attachment.
     () =>
@@ -199,24 +197,9 @@ const MapboxNativeMapImplementation = forwardRef<
             if (!map) throw new Error("Map is not attached.");
             return map.takeSnap(options.output === "file");
           });
-        },
-        // eslint-disable-next-line react/refs -- Factory captures this callback; only later imperative camera commands read the committed observer.
-        () => cameraCommandObserver.current?.()
+        }
       )
   );
-  const controlledCamera = useNativeControlledCamera(
-    viewState,
-    mapHandle.jumpTo,
-    () => mapViewRef.current !== null,
-    (error) => report.onError({ error })
-  );
-  const onCameraCommand = controlledCamera.onCommand;
-  useLayoutEffect(() => {
-    cameraCommandObserver.current = onCameraCommand;
-    return () => {
-      cameraCommandObserver.current = undefined;
-    };
-  }, [onCameraCommand]);
   // Descendant control effects must retain the attached ref during prop updates.
   useImperativeHandle(ref, () => mapHandle, [mapHandle]);
 
@@ -227,7 +210,6 @@ const MapboxNativeMapImplementation = forwardRef<
     sawMove.current = true;
     const event = moveFromState(state);
     report.onMove(event);
-    controlledCamera.onMove(event);
   };
   const reportSettled = (state: MapState) => {
     const event = moveFromState(state);
@@ -238,7 +220,6 @@ const MapboxNativeMapImplementation = forwardRef<
     }
 
     report.onMoveEnd(event);
-    controlledCamera.onMove(event);
     report.onIdle();
   };
   const controlled = viewState
@@ -305,7 +286,6 @@ const MapboxNativeMapImplementation = forwardRef<
               flushFeatureState();
             }}
             onDidFinishLoadingMap={() => {
-              controlledCamera.onLoad();
               report.onLoad();
             }}
             onDidFinishLoadingStyle={() => {

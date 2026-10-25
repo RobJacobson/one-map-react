@@ -44,11 +44,11 @@ export const NativeMapPresentationContext =
   createContext<NativeMapPresentation | null>(null);
 export const NativeOverlayContext = createContext<readonly NativeOverlay[]>([]);
 
-/** Effective camera configuration and movement observed from the native wrapper. */
+/** Camera movement observed from the native wrapper. */
 interface NativeCameraState {
-  /** Authoritative target when controlled, otherwise the observed camera. */
+  /** Observed camera used by native controls. */
   readonly viewState: ViewState;
-  /** Invalidates control and overlay projection when the controlled target stays unchanged. */
+  /** Invalidates control and overlay projection when the native target stays unchanged. */
   readonly observedViewState: ViewState;
 }
 
@@ -64,7 +64,6 @@ export const withNativeMapPresentation = <Props extends MapProps>(
     <NativePresentationProvider following={selectedLocationFollowing(props)}>
       <NativeCameraProvider
         initial={props.initialViewState}
-        controlled={props.viewState}
         onMove={props.onMove}
         onMoveEnd={props.onMoveEnd}
       >
@@ -160,13 +159,11 @@ const NativePresentationProvider = ({
 
 const NativeCameraProvider = ({
   initial,
-  controlled,
   onMove,
   onMoveEnd,
   children,
 }: {
   readonly initial: ViewState;
-  readonly controlled?: ViewState;
   readonly onMove?: MapProps["onMove"];
   readonly onMoveEnd?: MapProps["onMoveEnd"];
   readonly children: (
@@ -190,8 +187,8 @@ const NativeCameraProvider = ({
   // Observations update camera consumers without recreating the renderer child.
   const content = useMemo(() => children(callbacks), [children, callbacks]);
   const camera = useMemo(
-    () => ({ viewState: controlled ?? observed, observedViewState: observed }),
-    [controlled, observed]
+    () => ({ viewState: observed, observedViewState: observed }),
+    [observed]
   );
   return (
     <NativeCameraContext.Provider value={camera}>
