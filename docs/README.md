@@ -2,18 +2,22 @@
 
 The [advanced rendering record](tf09-rendering.md) describes portable terrain/projection/light/hillshade, selected advanced facilities, typed options, wrapper boundaries and the targeted acceptance procedure. Targeted acceptance passed in all six environments; the record preserves scope and earlier attempts.
 
-one-map-react is being built as a thin facade over RNMapbox, MapLibre React Native, and react-map-gl. Full API coverage, mixed backend selection, and map reuse remain requirements. TF01 established the package and selection foundation. TF02 is complete. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03's reuse and lifecycle API is implemented, and its renderer smoke passed. TF04's camera, gesture, and interaction API is implemented. Its renderer smoke passed.
+one-map-react is being built as a thin facade over RNMapbox, MapLibre React Native, and react-map-gl. The current TF contract targets full API coverage. The next incompatible release retains shared rendering/queries, mixed backend selection, and documented map reuse within the narrower [scope](requirements.md#purpose-and-scope). Implementation of that migration remains pending; current APIs and historical acceptance remain separate. TF01 established the package and selection foundation. TF02 is complete. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03's reuse and lifecycle API is implemented, and its renderer smoke passed. TF04's camera, gesture, and interaction API is implemented. Its renderer smoke passed.
 
 ## Current direction
 
 Read these documents in order:
 
 1. [Requirements](requirements.md): scope, delegation, ownership, public API, and compatibility rules.
-2. [Stage plan](stage-plan.md): TF01–TF10, with a working shared map before expanding coverage.
+2. [Stage plan](stage-plan.md): next-release routing plus the preserved TF01-TF10 sequence and recorded scope.
 3. [Testing policy](testing-policy.md): tests selected by changed behavior, runtime permission, and compact evidence.
-4. [API coverage checklist](api-coverage.md): current grouped contracts, source/test routes, meaningful exceptions, and open gates.
+4. [API coverage checklist](api-coverage.md): current grouped routes, pending next-release dispositions and owners, meaningful exceptions, and open gates.
 
 The [TF10 implementation plan](tf10-proposal.md) defines coverage closure, expanded peer ranges, public documentation, packed consumers, and the release candidate acceptance gates. The [TF10 release record](tf10-release.md) tracks the candidate and current gates. Publication remains a separate action.
+
+The [revised shared API and migration proposal](revised-api-proposal.md) owns the agreed next-release destination with shared rendering/queries, application-owned services, explicit native exclusions, and before/after consumer changes. Its After examples target the future incompatible release; current runtime code remains unchanged. The earlier contract review at docs/contract-review.md in the [U01 captured working basis](../records/evidence/revised-api-u01-baseline.md) explains the broader feature-preserving alternative and underlying mechanisms; it is not part of this publication.
+
+The [revised API implementation plan](revised-api-implementation-plan.md) explains the motivation, discrete subagent assignments, verification requirements, and owner sign-off gates. U01 supplied the frozen baseline; U02 documentation passed independent review and coordinator audit; the owner authorized its PR. U03 and later units remain undispatched. Renderer acceptance and merge require separate authorization.
 
 The [TF01 record](tf01-foundation.md) describes backup verification, removal, and foundation checks. The [TF02 record](tf02-shared-map.md) describes the completed shared map and its architecture trace. The [TF02 handoff](tf02-handoff.md) remains the original stage brief. The [Android camera handoff](tf02-android-camera-handoff.md) records why the Mapbox Android opening camera matches the pinned wrapper. The [TF03 record](tf03-reuse.md) describes the completed reuse and lifecycle stage. The [TF04 record](tf04-camera.md) describes the camera, gesture, and interaction implementation. The TF04 renderer smoke passed. Historical S04 acceptance does not certify this replacement.
 

@@ -1,5 +1,9 @@
 # Thin facade stage plan
 
+The next incompatible release follows the agreed [revised API implementation plan](revised-api-implementation-plan.md), within the narrowed [requirements](requirements.md#purpose-and-scope). U01 supplied the frozen baseline; U02 documentation passed independent review and coordinator audit; the owner authorized its PR. U03 and later units remain undispatched. The [coverage checklist](api-coverage.md) owns current routes and pending next-release dispositions. No runtime API or current release gate changes in U02.
+
+## Current candidate and historical TF sequence
+
 TF10 prepares the current release candidate and expanded peer ranges. [Current release evidence](tf10-release.md) owns its open gates; earlier acceptance records apply only to their original artifacts.
 
 TF09 implementation, review/fixes, routine checks and targeted six-environment acceptance are complete for the recorded scope in [advanced rendering](tf09-rendering.md). Its coverage reconciliation and acceptance evidence preserve unexercised combinations and earlier failures.
@@ -49,11 +53,11 @@ Document any consumer-visible restriction, including backend availability and co
 
 TF02 provides an early working subset; TF04–TF09 finish the API families. Assign ordinary map configuration and host forwarding to TF03 or the family it affects. Assign source schemas to TF05, query methods to TF06, UI composition to TF07, service/native facilities to TF08, and advanced renderer/global options to TF09. TF10 reviews the grouped checklist and upstream research for anything missed by those assignments.
 
-An unchanged forwarded family may share one implementation and forwarding test. Conversions need their own input/output assertions. Known platform limitations need an explicit capability/error contract. Backend-specific APIs remain required named work; a generic raw handle is not a substitute for their mapping.
+An unchanged forwarded family may share one implementation and forwarding test. Conversions need their own input/output assertions. Known platform limitations need an explicit capability/error contract. Under the current TF contract, backend-specific APIs remain required named work; a generic raw handle does not complete that mapping. For the next incompatible release, selected advanced method mirrors deliberately move to getWrapperMap. Retained common conversions remain required; exclusions and implementation owners are recorded in the existing checklist.
 
 Historical inventory IDs remain stable research keys. The grouped Markdown checklist owns current coverage; the retired machine-readable stage ledger and its removed scripts do not define this stage sequence.
 
-## Current status and next action
+## Recorded TF implementation status
 
 TF01 is complete. The old implementation and obsolete tooling have been retired after backup verification. The replacement contains package exports, selection descriptors, conditional aliases, a TypeScript build, and isolated package checks. [Foundation evidence](tf01-foundation.md) records that scope.
 
@@ -63,7 +67,7 @@ TF03's web `reuseMaps`, external `gl`, and load, style, error, and resize callba
 
 TF04's camera commands, getters, bounds, padding, gesture flags, and interaction callbacks are implemented. Web `viewState` is delegated. Native `viewState` writes camera props, and `controlledCamera` is not advertised. Mocked Jest covers the conversions and adapter calls. The renderer smoke passed. See the [TF04 record](tf04-camera.md).
 
-TF05's five portable source families, eight layer types, clustering configuration, registered images, and update/reset/style-replacement behavior are implemented. Converters remap wrapper field names and reject capability-gated options per adapter; range and unknown-key checks are deferred to the selected map library. Mocked Jest covers the conversions and adapter calls. The renderer smoke passed. `raster-array`, `video`, and `canvas` sources are deferred to TF09. See the [TF05 record](tf05-sources.md). Full API coverage remains required across the subsequent stages.
+TF05's five portable source families, eight layer types, clustering configuration, registered images, and update/reset/style-replacement behavior are implemented. Converters remap wrapper field names and reject capability-gated options per adapter; range and unknown-key checks are deferred to the selected map library. Mocked Jest covers the conversions and adapter calls. The renderer smoke passed. `raster-array`, `video`, and `canvas` sources are deferred to TF09. See the [TF05 record](tf05-sources.md). Full API coverage was the TF sequence goal. The next incompatible release requires complete coverage of its agreed retained contract, with deliberate exclusions documented separately.
 
 TF06's rendered and source queries, cluster queries, and feature state are implemented as promise-based `MapRef` methods on every adapter, with normalized results, shared state validation, and native source-ref registries for source-scoped dispatch. Mocked Jest covers the conversions and dispatch. The native source-lifecycle correction passed routine validation and TF06 acceptance in all six environments. See the [TF06 record](tf06-queries.md). `interactiveLayerIds` and source press handling stay TF07. TF07 implementation, review, routine checks, and the authorized six-environment R16 renderer acceptance passed for the recorded exercised scope; full VoiceOver and TalkBack audits remain outside this checkpoint. See [the TF07 record](tf07-ui.md).
 
