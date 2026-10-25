@@ -262,6 +262,8 @@ export const createWebMapMock = () => {
   let saved: PooledMap | null = null;
   let serial = 0;
   let currentStyleTarget: StyleLoadTarget | null = null;
+  let currentWrapperMap: MapHandle | null = null;
+  let replaceWrapperMap = (): void => {};
   let loadBeforeAttachment = false;
   let controlledSizeFeedback = false;
   let feedbackReports = 0;
@@ -270,6 +272,8 @@ export const createWebMapMock = () => {
     saved = null;
     serial = 0;
     currentStyleTarget = null;
+    currentWrapperMap = null;
+    replaceWrapperMap = (): void => {};
     loadBeforeAttachment = false;
     controlledSizeFeedback = false;
     feedbackReports = 0;
@@ -321,6 +325,12 @@ export const createWebMapMock = () => {
       ...handlerProps
     }: WebMapMockProps) => {
       const [attached, setAttached] = useState(!loadBeforeAttachment);
+      const [handleGeneration, setHandleGeneration] = useState(0);
+
+      useLayoutEffect(() => {
+        replaceWrapperMap = () => setHandleGeneration((current) => current + 1);
+      }, []);
+
       const [record] = useState(() => {
         if (reuseMaps && saved) {
           const reused = saved;
@@ -400,36 +410,41 @@ export const createWebMapMock = () => {
 
       useImperativeHandle(
         attached ? ref : undefined,
-        () => ({
-          ...selectedMethods,
-          flyTo,
-          jumpTo,
-          easeTo,
-          fitBounds,
-          zoomTo,
-          stop,
-          resize,
-          getCenter,
-          getZoom,
-          getBearing,
-          getPitch,
-          getPadding,
-          getBounds,
-          getMinZoom,
-          getMaxZoom,
-          getMaxBounds,
-          project,
-          unproject,
-          queryRenderedFeatures,
-          querySourceFeatures,
-          getSource,
-          getLayer,
-          setFeatureState,
-          getFeatureState,
-          removeFeatureState,
-          getMap: () => record.styleTarget,
-        }),
-        [record.styleTarget]
+        () => {
+          const handle = {
+            ...selectedMethods,
+            flyTo,
+            jumpTo,
+            easeTo,
+            fitBounds,
+            zoomTo,
+            stop,
+            resize,
+            getCenter,
+            getZoom,
+            getBearing,
+            getPitch,
+            getPadding,
+            getBounds,
+            getMinZoom,
+            getMaxZoom,
+            getMaxBounds,
+            project,
+            unproject,
+            queryRenderedFeatures,
+            querySourceFeatures,
+            getSource,
+            getLayer,
+            setFeatureState,
+            getFeatureState,
+            removeFeatureState,
+            getMap: () => record.styleTarget,
+          };
+          currentWrapperMap = handle;
+          return handle;
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- Replace the wrapper handle independently of its retained renderer.
+        [record.styleTarget, handleGeneration]
       );
 
       return createElement(
@@ -527,6 +542,9 @@ export const createWebMapMock = () => {
       loadBeforeAttachment = true;
     },
     getStyleTarget: () => currentStyleTarget,
+    getWrapperMap: () => currentWrapperMap,
+    replaceWrapperMap: () => replaceWrapperMap(),
+    getConstructionCount: () => serial,
     queryRenderedFeatures,
     querySourceFeatures,
     getSource,

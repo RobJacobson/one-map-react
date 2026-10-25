@@ -289,9 +289,14 @@ console.log(JSON.stringify(Object.keys(common).sort()));
   writeFileSync(
     join(consumer, "selection.tsx"),
     `${imports}
-import type { Adapter, Backend } from "one-map-react";
+import type { Adapter, Backend, MapRef } from "one-map-react";
 import { Map as OneMap, MapSetup, Source, Layer, Marker, Popup, Control, NavigationControl, AttributionControl, ScaleControl, GeolocateControl, FullscreenControl, useMap } from "one-map-react";
 ${declarations}
+declare const commonRef: MapRef;
+// @ts-expect-error Wrapper access belongs only to selected web refs.
+commonRef.getWrapperMap();
+// @ts-expect-error Common hooks retain the portable ref contract.
+useMap().getWrapperMap();
 const applicationChoice = (adapter: Adapter): Backend => adapter.backend;
 void Marker; void Popup; void Control; void NavigationControl; void AttributionControl; void ScaleControl; void GeolocateControl; void FullscreenControl; void useMap;
 void MapSetup;

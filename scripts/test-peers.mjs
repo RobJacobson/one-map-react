@@ -200,7 +200,17 @@ const checkPeerConsumer = async (archive, entry, packages) => {
     ? `
 import { Map as SelectedMap, Source as SelectedSource, Layer as SelectedLayer, type WebMapRef } from "one-map-react/${entry}";
 ${entry === "mapbox-web" ? 'import { supported, LngLat, LngLatBounds, MercatorCoordinate, Point, IndoorControl } from "one-map-react/mapbox-web"; const browserSupported: boolean = supported(false); const coordinate: LngLat = new LngLat(0, 0); const bounds: LngLatBounds = new LngLatBounds([0,0], [1,1]); const mercator: MercatorCoordinate = new MercatorCoordinate(0,0,0); const pixel: Point = new Point(0,0); const indoor: IndoorControl = new IndoorControl(); void coordinate; void bounds; void mercator; void pixel; void indoor; void browserSupported;' : ""}
+import type { MapRef as WrapperMapRef } from "react-map-gl/${entry === "mapbox-web" ? "mapbox" : "maplibre"}";
 declare const selectedRef: WebMapRef;
+type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
+const exactWrapperPromise: Equal<ReturnType<WebMapRef["getWrapperMap"]>, Promise<WrapperMapRef>> = true;
+const borrowed: Promise<WrapperMapRef> = selectedRef.getWrapperMap();
+void exactWrapperPromise; void borrowed;
+const useBorrowedWrapper = async (): Promise<void> => {
+  const wrapper = await selectedRef.getWrapperMap();
+  ${entry === "mapbox-web" ? "wrapper.setRain({ density: 0 }); wrapper.getMap().setLanguage('en');" : "wrapper.setGlobalStateProperty('fixture', 1); wrapper.getMap().refreshTiles('source');"}
+};
+void useBorrowedWrapper;
 const selectedVersion: string = selectedRef.getVersion(); void selectedVersion;
 void <SelectedMap mapStyle={style} initialViewState={viewState} options={{ transformRequest: (url) => ({ url }), ${entry === "maplibre-web" ? "maxCanvasSize: [4096, 4096]," : "language: 'en', worldview: 'US',"} }} />;
 void <SelectedSource id="canvas" type="canvas" canvas={"canvas-id"} coordinates={[[0,1],[1,1],[1,0],[0,0]]} />;
