@@ -1,6 +1,8 @@
 # API research and evidence
 
-The [U03 selected web wrapper access evidence](evidence/revised-api-u03-web-wrapper.json) records original working-stage provenance, development-branch publication checks, and deferred renderer verification. Independent review and coordinator audit passed; the owner authorized its PR. U04 is undispatched.
+The [U04 RNMapbox wrapper access evidence](evidence/revised-api-u04-mapbox-wrapper.json) records attachment regressions, routine checks, and the separate working and main-based artifacts. See the [unit protocol](../docs/revised-api-implementation-plan.md#sign-off-and-subagent-protocol) for review and PR gates; U05 remains undispatched.
+
+The [U03 selected web wrapper access evidence](evidence/revised-api-u03-web-wrapper.json) records original working-stage provenance, development-branch publication checks, and deferred renderer verification. Its historical review and authorization record remains frozen; U03 was merged as PR22.
 
 The [U01 baseline and migration inventory](evidence/revised-api-u01-baseline.md) records the approved revised-API plan's working base, fresh routine checks, candidate provenance and caller/test closure. U01 changes no runtime behavior; the [unit plan](../docs/revised-api-implementation-plan.md#work-order) owns successor authorization and review status. Its [frozen hashes and search references](evidence/revised-api-u01-baseline.json) are a checkpoint, not a second live coverage ledger.
 

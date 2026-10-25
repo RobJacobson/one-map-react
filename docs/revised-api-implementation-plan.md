@@ -1,6 +1,6 @@
 # Revised API implementation plan
 
-**Agreed unit sequence; U03 implemented, reviewed, and owner-authorized for a PR.** Implement the [revised shared API](revised-api-proposal.md) as small, independently reviewable changes. Every unit ends with subagent handoff, coordinator review, routine verification, and explicit user sign-off before the next unit starts. Creating this plan authorizes no implementation, acceptance run, commit, publication, or peer-version change.
+**Agreed unit sequence; U03 merged; U04 implemented and audited; PR authorized by the unit workflow.** Implement the [revised shared API](revised-api-proposal.md) as small, independently reviewable changes. Every unit ends with subagent handoff, coordinator review, routine verification, and explicit user sign-off before the next unit starts. Creating this plan authorizes no successor implementation, acceptance run, package publication, or peer-version change.
 
 The proposal owns the target API and before/after consumer examples. This plan owns the work order, assignments, proof required, and permission gates. The [requirements](requirements.md) define the agreed next-release scope. The [coverage checklist](api-coverage.md) separates pending migration from current routes, and the [release record](tf10-release.md) continues owning the unchanged candidate gates. Source paths, dependencies, routine command routes, and existing guarantees below describe the 0.1.0-rc.11 working basis captured by [U01](../records/evidence/revised-api-u01-baseline.md), inspected on 2026-10-24. This publication uses an older main-branch base, not that working implementation; every assignment must refresh its caller inventory against the approved working state before editing.
 
@@ -16,7 +16,7 @@ This trades convenience and strict parity for a smaller library-owned contract. 
 
 ## Agreed planning decisions
 
-The owner adopted the narrower target and initially released U01 only. U01 supplied the [frozen baseline and caller inventory](../records/evidence/revised-api-u01-baseline.md). U02 was merged as PR21, and the owner authorized U03 only. Its selected web wrapper access implementation passed independent review and coordinator audit, and the owner authorized its PR. The default remains one unit at a time. An owner can explicitly change that authorization later; a general progress acknowledgement, agent completion, or coordinator recommendation is not permission to advance.
+The owner adopted the narrower target and initially released U01 only. U01 supplied the [frozen baseline and caller inventory](../records/evidence/revised-api-u01-baseline.md). U02 was merged as PR21 and U03 as PR22. The owner released U04 only. The default remains one unit at a time. An owner can explicitly change that authorization later; a general progress acknowledgement, agent completion, or coordinator recommendation is not permission to advance.
 
 These planning decisions define the next-release target; they do not claim implementation:
 
@@ -28,7 +28,7 @@ These planning decisions define the next-release target; they do not claim imple
 
 ## Sign-off and subagent protocol
 
-The user is the owner who releases the next unit. A subagent implements only its assigned unit. A second, read-only subagent reviews the final diff and connected paths after implementation. The coordinator reconciles findings, verifies the evidence and current base, and presents the owner with a concrete result. Neither implementer nor reviewer can sign on the user's behalf.
+The user is the owner who releases the next unit. A subagent implements only its assigned unit. A second, read-only subagent reviews the final diff and connected paths after implementation. The coordinator reconciles findings, verifies the evidence and current base, and presents the owner with a concrete result. Neither implementer nor reviewer can sign on the user's behalf. Starting with U04, the owner authorizes the coordinator to commit, push, and open a PR for the currently released unit automatically after implementation, independent review, coordinator audit, and required routine checks pass. This authorization covers only that unit's reviewed artifact; owner approval remains required to start its successor, merge, run renderer acceptance or native builds/installations, or publish a package.
 
 Use one implementation writer at a time because many units share map/ref adapters, public entries, native-ui, and scenario files. Implementation agents inherit the coordinator's model unless the owner requests otherwise. The model requirement for later approved smoke workers is specified separately below. Do not launch implementation or review agents merely because their assignments appear in this document.
 
@@ -59,7 +59,7 @@ Recheck shared files before each dispatch. If another task changes them, reconci
 
 ## Work order
 
-U01 has supplied its frozen evidence. U02 is merged; U03 selected web wrapper access is implemented on the development branch, passed independent review and coordinator audit, and is owner-authorized for a PR. U04-U27 remain undispatched and unapproved for execution. The [U03 evidence](../records/evidence/revised-api-u03-web-wrapper.json) records routine verification and provenance; renderer acceptance remains unverified and requires separate permission. The sequence below is the default; dependencies highlight why related work cannot be reversed. Each row ends at its own owner sign-off gate. The fuller cards below define scope and proof.
+U01 has supplied its frozen evidence. U03 is merged; U04 RNMapbox wrapper access is implemented and audited; its PR is authorized under the unit workflow. U05-U27 remain undispatched and unapproved for execution. The [U03 evidence](../records/evidence/revised-api-u03-web-wrapper.json) and [U04 evidence](../records/evidence/revised-api-u04-mapbox-wrapper.json) record routine verification and provenance; renderer acceptance remains unverified and requires separate permission. The sequence below is the default; dependencies highlight why related work cannot be reversed. Each row ends at its own owner sign-off gate. The fuller cards below define scope and proof.
 
 | Unit | Deliverable | Key dependency | Gate after completion |
 | --- | --- | --- | --- |
@@ -259,7 +259,7 @@ U23 can identify necessary extra patch work. It cannot authorize it. The coordin
 
 **Outcome and write scope.** The coordinator reviews the approved renderer results against every retained contract and open gate, reconciles migration/public docs and the existing support matrix, and removes temporary consumers, caches, unused binaries and nonessential raw logs under the retention policy. Preserve compact provenance and the recovery information for existing offline data.
 
-**Proof and owner decision.** Report implementation complete, routine results, actual renderer evidence, deliberately excluded behavior, remaining gaps, actual code/dependency movement, and any migration risks. Unfinished retained behavior remains unfinished; do not relabel it unsupported at the end. Owner sign-off accepts this result and its verification limits. No publish, merge, push, tag, or commit follows automatically; when requested, commits use the repository's Conventional Commit subject and bullet summary.
+**Proof and owner decision.** Report implementation complete, routine results, actual renderer evidence, deliberately excluded behavior, remaining gaps, actual code/dependency movement, and any migration risks. Unfinished retained behavior remains unfinished; do not relabel it unsupported at the end. Owner sign-off accepts this result and its verification limits. The current unit PR workflow above governs commits, pushes, and PR creation. Package publication, merge, and tagging require separate authorization; commits use the repository's Conventional Commit subject and bullet summary.
 
 ## Routine verification menu
 
@@ -303,7 +303,7 @@ Do not change peers, patches, unrelated files, or start the next unit.
 Do not commit, publish, build/install a native app, or retry renderer runs.
 Return the concrete diff, checks and first failures, retained/retired tests,
 consumer consequences, actual code movement, risks, and unverified gates.
-Then stop for coordinator review and owner sign-off.
+Then return for coordinator review under the unit PR workflow above; leave the successor undispatched until owner sign-off.
 ```
 
 The reviewer receives the same base/contract, the completed diff and check outputs, a read-only assignment, and explicit instructions to trace callers, replacement, stale work, errors, teardown, and deliberate exclusions. The coordinator keeps the owner gate; agents do not chain their own successor tasks.

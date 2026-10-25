@@ -219,13 +219,28 @@ ${entry === "mapbox-web" ? "selectedRef.setRain({ density: 0 }); selectedRef.set
 `
     : entry === "mapbox-native"
       ? `
-import { WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef } from "one-map-react/mapbox-native";
+import type { ComponentRef } from "react";
+import type { MapView as RnmapboxMapView } from "@rnmapbox/maps";
+import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef } from "one-map-react/mapbox-native";
 void <WrapperMapView styleJSON={JSON.stringify(style)}><WrapperCamera zoomLevel={0} /><WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} /></WrapperMapView>;
 void Terrain; void Light; void Models; void RasterArraySource; void Viewport;
 setTelemetryEnabled(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
 setTelemetryEnabled(42);
 declare const selectedRef: NativeAdvancedMapRef;
+type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
+const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof RnmapboxMapView>>> = true;
+const borrowed: Promise<ComponentRef<typeof RnmapboxMapView>> = selectedRef.getWrapperMap();
+void exactWrapperPromise; void borrowed;
+void <SelectedMap ref={(map) => { if (map) { const wrapper: Promise<ComponentRef<typeof RnmapboxMapView>> = map.getWrapperMap(); void wrapper; } }} mapStyle={style} initialViewState={viewState} />;
+const useBorrowedWrapper = async (): Promise<void> => {
+  const wrapper = await selectedRef.getWrapperMap();
+  const center: number[] = await wrapper.getCenter();
+  const capture: string = await wrapper.takeSnap(true);
+  wrapper.setSourceVisibility(false, 'source');
+  void center; void capture;
+};
+void useBorrowedWrapper;
 selectedRef.setSourceVisibility(false, 'source');
 `
       : `
