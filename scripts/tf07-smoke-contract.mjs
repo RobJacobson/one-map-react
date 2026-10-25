@@ -2,8 +2,8 @@
 export const nativeUiScenarios = [
   "live-child-button",
   "nested-scroll",
-  "live-drag",
-  "annotation-drag",
+  "live-activation",
+  "annotation-activation",
   "offset-touch-bounds",
   "popup-follow-dismissal",
   "source-propagation",
@@ -45,9 +45,8 @@ export const judgeNativeUi = (observation, manual, identity) => {
     Number.isFinite(observation.zoom) &&
     events.load >= 2 &&
     events["child-click"] >= 1 &&
-    events["live-start"] >= 1 &&
-    events["live-end"] >= 1 &&
-    events["annotation-end"] >= 1 &&
+    events["marker-click"] >= 1 &&
+    events["annotation-click"] >= 1 &&
     events["source-click"] >= 2 &&
     events["popup-close"] >= 1 &&
     events.location >= 1 &&

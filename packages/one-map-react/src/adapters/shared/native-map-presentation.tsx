@@ -25,13 +25,11 @@ export interface NativeOverlay {
 
 /** Native-only presentation owned by the selected adapter's map. */
 export interface NativeMapPresentation {
-  readonly gestureLocked: boolean;
   readonly overlayHostName: string;
   readonly nativeLocationFollowing: boolean;
   readonly nativeLayout?: { readonly width: number; readonly height: number };
   /** Placement requested by the mounted attribution control. */
   readonly attributionPosition: ControlPosition | undefined;
-  requestGestureLock(locked: boolean): void;
   setNativeLayout(width: number, height: number): void;
   /** Clears the control override with undefined, restoring selected SDK options. */
   setAttributionPosition(position: ControlPosition | undefined): void;
@@ -97,7 +95,6 @@ const NativePresentationProvider = ({
   readonly children: ReactNode;
 }) => {
   const overlayHostName = useId();
-  const [gestureLocked, requestGestureLock] = useState(false);
   const [nativeLayout, storeNativeLayout] =
     useState<NativeMapPresentation["nativeLayout"]>();
   const [attributionPosition, setAttributionPosition] =
@@ -133,8 +130,6 @@ const NativePresentationProvider = ({
   }));
   const presentation = useMemo(
     () => ({
-      gestureLocked,
-      requestGestureLock,
       overlayHostName,
       nativeLocationFollowing: following,
       nativeLayout,
@@ -144,7 +139,6 @@ const NativePresentationProvider = ({
       setOverlay,
     }),
     [
-      gestureLocked,
       overlayHostName,
       following,
       nativeLayout,

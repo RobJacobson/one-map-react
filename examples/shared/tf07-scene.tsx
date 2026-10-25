@@ -63,6 +63,7 @@ export interface Tf07Probe {
 }
 
 interface Tf07SceneProps {
+  readonly native?: boolean;
   readonly style: MapLayoutStyle;
   readonly markerContent: (
     kind: "live" | "annotation" | "popup",
@@ -88,6 +89,7 @@ const location = { lngLat: [-122.33, 47.62] as LngLat, accuracy: 12 };
  * the renderer; it does not dispatch callbacks or certify visual behavior.
  */
 export const Tf07Scene = ({
+  native = false,
   style,
   markerContent,
   controlContent,
@@ -238,18 +240,20 @@ export const Tf07Scene = ({
         longitude={live[0]}
         latitude={live[1]}
         offset={offset}
-        draggable
         onClick={() => record("marker-click")}
-        onDragStart={() => record("live-start")}
-        onDrag={(event) => {
-          setLive(event.lngLat);
-          record("live-drag");
-        }}
-        onDragEnd={(event) => {
-          lastPositions.current.live = event.lngLat;
-          setLive(event.lngLat);
-          record("live-end");
-        }}
+        {...(!native && {
+          draggable: true,
+          onDragStart: () => record("live-start"),
+          onDrag: (event) => {
+            setLive(event.lngLat);
+            record("live-drag");
+          },
+          onDragEnd: (event) => {
+            lastPositions.current.live = event.lngLat;
+            setLive(event.lngLat);
+            record("live-end");
+          },
+        })}
         onError={fail}
       >
         {/* eslint-disable-next-line react/refs -- markerContent receives an event callback; the callback reads observation refs only when clicked. */}
@@ -260,15 +264,17 @@ export const Tf07Scene = ({
         longitude={annotation[0]}
         latitude={annotation[1]}
         renderMode="annotation"
-        draggable
         onClick={() => record("annotation-click")}
-        onDragStart={() => record("annotation-start")}
-        onDrag={(event) => setAnnotation(event.lngLat)}
-        onDragEnd={(event) => {
-          lastPositions.current.annotation = event.lngLat;
-          setAnnotation(event.lngLat);
-          record("annotation-end");
-        }}
+        {...(!native && {
+          draggable: true,
+          onDragStart: () => record("annotation-start"),
+          onDrag: (event) => setAnnotation(event.lngLat),
+          onDragEnd: (event) => {
+            lastPositions.current.annotation = event.lngLat;
+            setAnnotation(event.lngLat);
+            record("annotation-end");
+          },
+        })}
         onError={fail}
       >
         {markerContent("annotation", () => undefined)}

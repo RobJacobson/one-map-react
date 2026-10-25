@@ -44,17 +44,17 @@ export interface MarkerProps {
   readonly children?: ReactNode;
   /** Native live view by default; annotation explicitly opts into Android bitmap content. */
   readonly renderMode?: "view" | "annotation";
-  /** Enables native annotation drag or long-press live-view drag. */
+  /** Enables web dragging; native requests fail explicitly. */
   readonly draggable?: boolean;
   /** Called when activated. */
   readonly onClick?: (event: MarkerEvent) => void;
-  /** Called when a drag begins. */
+  /** Called when a web drag begins; unsupported on native. */
   readonly onDragStart?: (event: MarkerEvent) => void;
-  /** Called with proposed coordinates while dragging. */
+  /** Called with proposed web drag coordinates; unsupported on native. */
   readonly onDrag?: (event: MarkerEvent) => void;
-  /** Called with final proposed coordinates when released. */
+  /** Called with final web drag coordinates; unsupported on native. */
   readonly onDragEnd?: (event: MarkerEvent) => void;
-  /** Reports projection or gesture failures. */
+  /** Reports marker projection failures. */
   readonly onError?: (error: unknown) => void;
 }
 

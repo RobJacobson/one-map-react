@@ -102,7 +102,7 @@ const MapboxNativeMapImplementation = forwardRef<
     onError,
     reuseMaps,
     gl,
-    interactive: requestedInteractive,
+    interactive,
     dragPan,
     touchZoom,
     touchRotate,
@@ -110,7 +110,6 @@ const MapboxNativeMapImplementation = forwardRef<
     doubleTapZoom,
     children,
   } = props;
-  const interactive = session.gestureLocked ? false : requestedInteractive;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
   const mapViewRef = useRef<ComponentRef<typeof MapView>>(null);
   const sawMove = useRef(false);
