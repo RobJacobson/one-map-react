@@ -1,8 +1,10 @@
 # API research and evidence
 
+U06 selected advanced-call migration and method-mirror removal are implemented and audited; routine verification is recorded, and the PR is authorized under the unit workflow. Its [evidence record](evidence/revised-api-u06-advanced-refs.json) records review, bounded routine checks, the two baseline publication wrapper-callback import failures, and artifact provenance; renderer, Metro, and native linking acceptance remain unverified.
+
 The [U05 MapLibre native wrapper access evidence](evidence/revised-api-u05-maplibre-wrapper.json) records current-handle and camera-load regressions, routine verification, and separate working/main-based artifact provenance.
 
-The [U04 RNMapbox wrapper access evidence](evidence/revised-api-u04-mapbox-wrapper.json) records attachment regressions, routine checks, and the separate working and main-based artifacts. See the [unit protocol](../docs/revised-api-implementation-plan.md#sign-off-and-subagent-protocol) for review and PR gates; U06 remains undispatched.
+The [U04 RNMapbox wrapper access evidence](evidence/revised-api-u04-mapbox-wrapper.json) records attachment regressions, routine checks, and the separate working and main-based artifacts. See the [unit protocol](../docs/revised-api-implementation-plan.md#sign-off-and-subagent-protocol) for review and PR gates; U06 is released and U07 remains undispatched.
 
 The [U03 selected web wrapper access evidence](evidence/revised-api-u03-web-wrapper.json) records original working-stage provenance, development-branch publication checks, and deferred renderer verification. Its historical review and authorization record remains frozen; U03 was merged as PR22.
 

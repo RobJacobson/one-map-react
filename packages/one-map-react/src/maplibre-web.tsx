@@ -27,7 +27,6 @@ import {
   createWebAdapter,
   type WebForwardedProps,
 } from "./adapters/web/create-adapter.js";
-import { createWebMethodForwarders } from "./adapters/web/method-forwarders.js";
 import type { Adapter } from "./contracts/adapter.js";
 import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
@@ -72,126 +71,12 @@ interface MaplibreClusterCaller {
   ) => Promise<readonly object[]>;
 }
 
-const forwardedMethodNames = [
-  "on",
-  "off",
-  "once",
-  "addControl",
-  "removeControl",
-  "hasControl",
-  "getSource",
-  "getLayer",
-  "getCanvas",
-  "getCanvasContainer",
-  "getContainer",
-  "getStyle",
-  "loaded",
-  "isStyleLoaded",
-  "areTilesLoaded",
-  "triggerRepaint",
-  "getVerticalFieldOfView",
-  "setVerticalFieldOfView",
-  "getTerrain",
-  "getProjection",
-  "getLight",
-  "getStyleUrl",
-  "redraw",
-  "setSky",
-  "getSky",
-  "refreshTiles",
-  "setGlyphs",
-  "getGlyphs",
-  "setFontFaces",
-  "getFontFaces",
-  "getPixelRatio",
-  "setPixelRatio",
-  "getRoll",
-  "setRoll",
-  "getCameraTargetElevation",
-  "getCenterElevation",
-  "setCenterElevation",
-  "setTransformConstrain",
-  "setGlobalStateProperty",
-  "getGlobalState",
-  "setSourceTileLodParams",
-  "setTransformRequest",
-] as const satisfies readonly (keyof MaplibreMapRef)[];
-
 // The react-map-gl components accept the full style-spec surface; the facade
 // converts props before they reach this boundary.
 /** Selects maplibre-web and supplies react-map-gl MapLibre components. */
 export const adapter: Adapter & { readonly backend: "maplibre-web" } =
   createWebAdapter({
     backend: "maplibre-web",
-    createAdvancedMethods: (getHandle) => {
-      const selectedHandle = () => getHandle() as unknown as MaplibreMapRef;
-      return {
-        ...createWebMethodForwarders(selectedHandle, forwardedMethodNames),
-        setEventedParent: (
-          ...args: Parameters<MaplibreMapInstance["setEventedParent"]>
-        ) =>
-          selectedHandle()
-            .getMap()
-            .setEventedParent(...args),
-        fire: ((...args: Parameters<MaplibreMapInstance["fire"]>) =>
-          selectedHandle()
-            .getMap()
-            .fire(...args)) as MaplibreMapInstance["fire"],
-        getGestureHandler: <Name extends keyof WebGestureHandlers>(
-          name: Name
-        ): WebGestureHandlers[Name] => {
-          const map = selectedHandle().getMap();
-          const handlers = {
-            boxZoom: map.boxZoom,
-            doubleClickZoom: map.doubleClickZoom,
-            dragPan: map.dragPan,
-            dragRotate: map.dragRotate,
-            keyboard: map.keyboard,
-            scrollZoom: map.scrollZoom,
-            touchPitch: map.touchPitch,
-            touchZoomRotate: map.touchZoomRotate,
-          };
-          if (!Object.hasOwn(handlers, name))
-            throw new RangeError(`Unknown gesture handler: ${name}`);
-          return handlers[name];
-        },
-        getCancelPendingTileRequestsWhileZooming: (): boolean =>
-          selectedHandle().getMap().cancelPendingTileRequestsWhileZooming,
-        setCancelPendingTileRequestsWhileZooming: (value: boolean): void => {
-          (
-            getHandle() as unknown as MaplibreMapRef
-          ).getMap().cancelPendingTileRequestsWhileZooming = value;
-        },
-        getVersion: (): string => selectedHandle().getMap().version,
-        getCanvasSource: (id: string): import("maplibre-gl").CanvasSource => {
-          const source = selectedHandle().getSource(id);
-          if (!source || source.type !== "canvas")
-            throw new Error(`Source "${id}" is not an attached CanvasSource.`);
-          return source as import("maplibre-gl").CanvasSource;
-        },
-        getVideoSource: (id: string): import("maplibre-gl").VideoSource => {
-          const source = selectedHandle().getSource(id);
-          if (!source || source.type !== "video")
-            throw new Error(`Source "${id}" is not an attached VideoSource.`);
-          return source as import("maplibre-gl").VideoSource;
-        },
-        setDebugOptions: (options: Partial<WebDebugOptions>) => {
-          const map = selectedHandle().getMap();
-          Object.assign(map, options);
-        },
-        getDebugOptions: (): WebDebugOptions => {
-          const map = selectedHandle().getMap();
-          return {
-            showCollisionBoxes: map.showCollisionBoxes,
-            showTileBoundaries: map.showTileBoundaries,
-            showOverdrawInspector: map.showOverdrawInspector,
-            showPadding: map.showPadding,
-            vertices: map.vertices,
-            repaint: map.repaint,
-          };
-        },
-      };
-    },
     Map: MaplibreMap,
     Source: MaplibreSource as ComponentType<WebForwardedProps>,
     Layer: MaplibreLayer as Adapter["Layer"],
@@ -243,57 +128,19 @@ export {
   useControl,
 };
 
-/** Selected advanced methods retain the pinned wrapper's signatures. */
+/** Common map operations and access to the selected wrapper. */
 export type WebMapRef = MapRef & {
   /**
    * Borrows the currently attached react-map-gl wrapper ref.
    *
-   * @remarks Looks up the current handle on each call without waiting for load.
-   * The wrapper retains ownership; returned handles follow its lifetime and
-   * timing. Call again for each operation instead of retaining a borrowed handle.
-   *
+   * @remarks Call again for each operation to look up the current handle
+   * without waiting for load. Borrowed handles follow upstream lifetime and
+   * ownership; facade detachment does not invalidate them.
    * @returns The attached wrapper ref, without waiting for renderer readiness.
    * @throws Rejects when the map is detached.
    */
   readonly getWrapperMap: () => Promise<MaplibreMapRef>;
-  /** Bubbles plugin events through the public selected SDK parent facility. */
-  readonly setEventedParent: MaplibreMapInstance["setEventedParent"];
-  /** Public SDK event producer for plugins; dispatch is synchronous and follows SDK event semantics. */
-  readonly fire: MaplibreMapInstance["fire"];
-  /**
-   * Selects an attached renderer's public gesture controls and independent state readback.
-   * @param name - SDK gesture handler name.
-   * @returns The renderer-owned public handler; use only while this map remains mounted.
-   * @throws For an unknown handler name or a detached map.
-   */
-  readonly getGestureHandler: <Name extends keyof WebGestureHandlers>(
-    name: Name
-  ) => WebGestureHandlers[Name];
-  /**
-   * Reads whether obsolete loading tiles are cancelled while zooming in.
-   * @returns The attached SDK's current cancellation setting.
-   */
-  readonly getCancelPendingTileRequestsWhileZooming: () => boolean;
-  /**
-   * Updates whether obsolete loading tiles are cancelled while zooming in.
-   * @param value - True cancels previous zoom levels' pending requests.
-   */
-  readonly setCancelPendingTileRequestsWhileZooming: (value: boolean) => void;
-  /**
-   * Reads the attached renderer's pinned SDK version.
-   * @returns SDK version string; throws when detached.
-   */
-  readonly getVersion: () => string;
-  /** Reads the attached CanvasSource with its named media/model operations. */
-  readonly getCanvasSource: (id: string) => import("maplibre-gl").CanvasSource;
-  /** Reads the attached VideoSource with its named media/model operations. */
-  readonly getVideoSource: (id: string) => import("maplibre-gl").VideoSource;
-
-  /** Updates selected renderer diagnostics; settings follow SDK lifetime. */
-  readonly setDebugOptions: (options: Partial<WebDebugOptions>) => void;
-  /** Reads renderer diagnostics. */
-  readonly getDebugOptions: () => WebDebugOptions;
-} & Pick<MaplibreMapRef, (typeof forwardedMethodNames)[number]>;
+};
 
 /** Map props with DOM presentation forwarded to the map container. */
 export interface WebMapProps extends Omit<MapProps, "mapStyle"> {
@@ -501,43 +348,3 @@ export {
   prewarm,
   clearPrewarmedResources,
 } from "maplibre-gl";
-
-/** Renderer diagnostic properties, with SDK defaults and units. */
-export type WebDebugOptions = Pick<
-  ReturnType<MaplibreMapRef["getMap"]>,
-  | "showCollisionBoxes"
-  | "showTileBoundaries"
-  | "showOverdrawInspector"
-  | "showPadding"
-  | "vertices"
-  | "repaint"
->;
-
-/** Public gesture controls/readbacks; renderer input dispatch and frame hooks stay private. */
-export type WebGestureHandlers = {
-  readonly [
-    Name in
-      | "boxZoom"
-      | "doubleClickZoom"
-      | "dragPan"
-      | "dragRotate"
-      | "keyboard"
-      | "scrollZoom"
-      | "touchPitch"
-      | "touchZoomRotate"
-  ]: Pick<
-    MaplibreMapInstance[Name],
-    Extract<
-      keyof MaplibreMapInstance[Name],
-      | "enable"
-      | "disable"
-      | "isEnabled"
-      | "isActive"
-      | "isZooming"
-      | "enableRotation"
-      | "disableRotation"
-      | "setZoomRate"
-      | "setWheelZoomRate"
-    >
-  >;
-};

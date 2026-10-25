@@ -104,9 +104,10 @@ const renderMedia = ({ canvas, urls, coordinates, custom }: Tf09Media) => (
 );
 
 /** Exercises selected rendering and TF10 ref paths against the actual attached map. */
-export const namedRendering = (map: MapRef) => {
-  const selected = map as WebMapRef;
-  const handler = selected.getGestureHandler("dragPan");
+export const namedRendering = async (map: MapRef) => {
+  const selected = await (map as WebMapRef).getWrapperMap();
+  const renderer = selected.getMap();
+  const handler = renderer.dragPan;
   const before = handler.isEnabled();
   let disabled;
   try {
@@ -121,11 +122,11 @@ export const namedRendering = (map: MapRef) => {
   };
   Reflect.apply(selected.on, selected, ["tf10-probe", listener]);
   try {
-    Reflect.apply(selected.fire, selected, ["tf10-probe"]);
+    Reflect.apply(renderer.fire, renderer, ["tf10-probe"]);
   } finally {
     Reflect.apply(selected.off, selected, ["tf10-probe", listener]);
   }
-  Reflect.apply(selected.fire, selected, ["tf10-probe"]);
+  Reflect.apply(renderer.fire, renderer, ["tf10-probe"]);
   const tf10 = {
     dragPan: { before, disabled, restored: handler.isEnabled() },
     source: !!selected.getSource("point"),

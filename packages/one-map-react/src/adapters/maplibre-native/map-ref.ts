@@ -35,22 +35,19 @@ import {
 import { createMaplibreFeatureStateMethods } from "./feature-state-methods.js";
 import type { MaplibreSourceRegistry } from "./source-registry.js";
 
-/** Selected native operations retain the wrapper signatures. */
-export type NativeAdvancedMapRef = MapRef &
-  Pick<
-    ComponentRef<typeof MaplibreMap>,
-    "setSourceVisibility" | "showAttribution" | "getViewState"
-  > & {
-    /**
-     * Borrows the currently attached MapLibre Native Map wrapper.
-     *
-     * @returns The current wrapper handle, without waiting for map load.
-     * @remarks Call again for each operation; handles retain the wrapper's
-     * lifetime and do not transfer ownership or expose the separate Camera.
-     * @throws Rejects when the Map is not attached.
-     */
-    readonly getWrapperMap: () => Promise<ComponentRef<typeof MaplibreMap>>;
-  };
+/** Common map operations and access to the selected native wrapper. */
+export type NativeAdvancedMapRef = MapRef & {
+  /**
+   * Borrows the currently attached MapLibre Native Map wrapper.
+   *
+   * @returns The current wrapper handle, without waiting for map load.
+   * @remarks Call again for each operation. Handles retain the wrapper's
+   * lifetime and ownership; facade detachment does not invalidate them or
+   * expose the separate Camera.
+   * @throws Rejects when the Map is not attached.
+   */
+  readonly getWrapperMap: () => Promise<ComponentRef<typeof MaplibreMap>>;
+};
 
 /**
  * Builds the imperative map handle over MapLibre Native camera and map refs.
@@ -73,16 +70,6 @@ export const createMaplibreMapRef = (
   onCameraCommand?: () => void
 ): NativeAdvancedMapRef => ({
   getWrapperMap: async () => requireMap(mapRef.current),
-
-  setSourceVisibility: (
-    ...args: Parameters<ComponentRef<typeof MaplibreMap>["setSourceVisibility"]>
-  ) => requireMap(mapRef.current).setSourceVisibility(...args),
-  showAttribution: (
-    ...args: Parameters<ComponentRef<typeof MaplibreMap>["showAttribution"]>
-  ) => requireMap(mapRef.current).showAttribution(...args),
-  getViewState: (
-    ...args: Parameters<ComponentRef<typeof MaplibreMap>["getViewState"]>
-  ) => requireMap(mapRef.current).getViewState(...args),
 
   queryTerrainElevation: async () => {
     throw new Error("queryTerrainElevation is unsupported on MapLibre Native.");
