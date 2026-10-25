@@ -140,9 +140,14 @@ const drive = async (hook: { result: { current: { phase: string } } }) => {
     await tick(250);
 };
 
-test.each([false, true])(
-  "vector namespaces and both keyed family transitions complete with bridge string ids=%s",
-  async (stringIds) => {
+test.each([
+  { stringIds: false, retainState: false },
+  { stringIds: true, retainState: false },
+  { stringIds: false, retainState: true },
+  { stringIds: true, retainState: true },
+])(
+  "application state works with bridge string ids=$stringIds and retained renderer state=$retainState",
+  async ({ stringIds, retainState }) => {
     const renderer = fixture(stringIds);
     const retainedBeforeTransition: number[] = [];
     const hook = renderHook(() => {
@@ -151,7 +156,7 @@ test.each([false, true])(
       useLayoutEffect(() => {
         if (sourceRevision === 0 || phase === "done") return;
         retainedBeforeTransition.push(renderer.states.size);
-        renderer.commit(sourceRevision, family, false, phase);
+        renderer.commit(sourceRevision, family, retainState, phase);
         if (phase === "style") onStyleLoad();
       }, [sourceRevision, family, phase, onStyleLoad]);
       return smoke;
@@ -160,18 +165,32 @@ test.each([false, true])(
     await drive(hook);
     expect(hook.result.current.phase).toBe("done");
     expect(hook.result.current.status).toContain("vector-namespaces=ok");
-    expect(hook.result.current.status).toContain("vector-remount=cleared");
-    expect(hook.result.current.status).toContain("vector-style=cleared");
-    expect(hook.result.current.status).toContain("vector-to-geojson=cleared");
-    expect(hook.result.current.status).toContain("geojson-to-vector=cleared");
-    expect(hook.result.current.status).toContain("final-remount=cleared");
+    expect(hook.result.current.status).toContain(
+      "vector-remount=explicitly-cleared"
+    );
+    expect(hook.result.current.status).toContain(
+      "vector-style=explicitly-cleared"
+    );
+    expect(hook.result.current.status).toContain(
+      "vector-to-geojson=explicitly-cleared"
+    );
+    expect(hook.result.current.status).toContain(
+      "geojson-to-vector=explicitly-cleared"
+    );
+    expect(hook.result.current.status).toContain(
+      "final-remount=explicitly-cleared"
+    );
     expect(hook.result.current.status).toContain("error=none");
-    expect(retainedBeforeTransition).toEqual([4, 4, 4, 2, 4]);
+    expect(retainedBeforeTransition).toEqual(
+      retainState ? [4, 4, 4, 6, 6] : [4, 4, 4, 2, 4]
+    );
     expect(
       renderer.calls
         .filter((call) => call.method === "removeFeatureState")
         .map((call) => call.revision)
-    ).toEqual([0, 0, 2, 2]);
+    ).toEqual([
+      0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
+    ]);
     const transitions = renderer.calls.filter(
       (call) => call.method === "setFeatureState" && call.revision >= 2
     );
@@ -221,7 +240,7 @@ test("render generation gates source and state dispatch while native attachment 
 });
 
 test.each(["remount", "style", "to-geojson", "to-vector", "final-remount"])(
-  "retained whole state fails phase %s without smoke cleanup masking the transition",
+  "application explicitly clears retained renderer state after phase %s",
   async (retainPhase) => {
     const renderer = fixture();
     const hook = renderHook(() => {
@@ -248,14 +267,14 @@ test.each(["remount", "style", "to-geojson", "to-vector", "final-remount"])(
       step += 1
     )
       await tick(250);
-    expect(hook.result.current.status).toContain("error=whole-state-removal-");
-    expect(hook.result.current.status).not.toContain("error=none");
+    expect(hook.result.current.status).toContain("error=none");
+    expect(hook.result.current.phase).toBe("done");
     expect(
       renderer.calls.filter(
         (call) =>
           call.method === "removeFeatureState" && call.phase === retainPhase
       )
-    ).toHaveLength(0);
+    ).not.toHaveLength(0);
   }
 );
 
@@ -369,5 +388,7 @@ test("style replacement preserves the vector source key, revision and tile URL",
   const style = inputs.find((input) => input.phase === "style");
   expect(remount).toBeDefined();
   expect(style).toEqual({ ...remount, phase: "style" });
-  expect(hook.result.current.status).toContain("vector-style=cleared");
+  expect(hook.result.current.status).toContain(
+    "vector-style=explicitly-cleared"
+  );
 });

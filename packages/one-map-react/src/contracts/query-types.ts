@@ -193,16 +193,12 @@ export interface FeatureStateMethods {
   /**
    * Merges state onto an identified feature.
    *
-   * Resolution acknowledges dispatch, not a completed repaint. Feature state
-   * resets when an owned source is recreated or the style is replaced.
-   * Native adapters clear facade-written targets after a fully rendered frame
-   * or before the replacement source's first state operation, ordered after
-   * pending prior writes. Automatic reset failures reach the map error callback.
-   * Pending operations against a detached or replaced source reject. Empty
-   * retired native records are forgotten after their queues settle; later calls
-   * for those ids use the selected adapter's normal source validation. Written
-   * family journals remain until cleanup succeeds. Reset failures reject later
-   * state calls until another source lifetime or style begins.
+   * Resolution acknowledges dispatch, not a completed repaint. The selected
+   * renderer owns state lifetime across source remounts and style replacement.
+   * The facade does not clear or replay state, order calls across lifetimes,
+   * or cancel a call already sent to the SDK. Applications needing known state
+   * explicitly remove and reapply it after the replacement source is ready.
+   * Each new call uses the currently attached map or source ref.
    *
    * @param identifier - Source, feature id, and optional vector source layer.
    * @param state - JSON values merged onto the feature's state.

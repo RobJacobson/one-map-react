@@ -177,7 +177,7 @@ export const featureStateFromWrapper = (value: unknown): FeatureState => {
     return {};
   }
 
-  if (!isRecord(value)) {
+  if (!isRecord(value) || Array.isArray(value)) {
     throw new Error("Feature state must be an object.");
   }
 

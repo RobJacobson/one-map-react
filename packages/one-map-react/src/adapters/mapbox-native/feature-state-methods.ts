@@ -9,12 +9,10 @@ import {
   mutableFeatureState,
 } from "../shared/feature-values.js";
 import { toRnmapboxFeatureArgs, toRnmapboxStateKey } from "./convert-query.js";
-import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
-/** Captures bridge arguments before queueing; reads the attached map at dispatch. */
+/** Validates and copies bridge arguments before dispatch to the attached map. */
 export const createMapboxFeatureStateMethods = (
-  getMap: () => ComponentRef<typeof MapView>,
-  geoJsonSources: GeoJsonSourceRegistry
+  getMap: () => ComponentRef<typeof MapView>
 ): FeatureStateMethods => ({
   setFeatureState: async (identifier, state) => {
     const target = assertFeatureIdentifier(identifier);
@@ -22,48 +20,31 @@ export const createMapboxFeatureStateMethods = (
     assertFeatureState(state);
     const mutableState = mutableFeatureState(state);
 
-    await geoJsonSources.featureState.run(
-      target,
-      async () => {
-        const map = getMap();
-        await map.setFeatureState(
-          featureId,
-          mutableState,
-          sourceId,
-          sourceLayerId
-        );
-      },
-      "write"
+    await getMap().setFeatureState(
+      featureId,
+      mutableState,
+      sourceId,
+      sourceLayerId
     );
   },
   getFeatureState: async (identifier) => {
     const target = assertFeatureIdentifier(identifier);
     const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
 
-    return geoJsonSources.featureState.run(target, async () => {
-      const map = getMap();
-      return featureStateFromWrapper(
-        await map.getFeatureState(featureId, sourceId, sourceLayerId)
-      );
-    });
+    return featureStateFromWrapper(
+      await getMap().getFeatureState(featureId, sourceId, sourceLayerId)
+    );
   },
   removeFeatureState: async (identifier, key) => {
     const target = assertFeatureIdentifier(identifier);
     const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
     const stateKey = toRnmapboxStateKey(key);
 
-    await geoJsonSources.featureState.run(
-      target,
-      async () => {
-        const map = getMap();
-        await map.removeFeatureState(
-          featureId,
-          stateKey,
-          sourceId,
-          sourceLayerId
-        );
-      },
-      key === undefined ? "remove" : undefined
+    await getMap().removeFeatureState(
+      featureId,
+      stateKey,
+      sourceId,
+      sourceLayerId
     );
   },
 });

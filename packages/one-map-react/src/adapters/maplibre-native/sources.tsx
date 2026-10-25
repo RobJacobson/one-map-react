@@ -107,13 +107,10 @@ const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
 
     // The pinned wrapper refreshes its imperative handle on each render.
     // Read it when dispatching instead of retaining an earlier native handle.
-    return registry.register(
-      props.id,
-      () =>
-        sourceRef.current
-          ? { kind: "geojson", ref: sourceRef.current }
-          : undefined,
-      "geojson"
+    return registry.register(props.id, () =>
+      sourceRef.current
+        ? { kind: "geojson", ref: sourceRef.current }
+        : undefined
     );
   }, [registry, props.id]);
 
@@ -178,13 +175,8 @@ const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
       return;
     }
 
-    return registry.register(
-      props.id,
-      () =>
-        sourceRef.current
-          ? { kind: "vector", ref: sourceRef.current }
-          : undefined,
-      "vector"
+    return registry.register(props.id, () =>
+      sourceRef.current ? { kind: "vector", ref: sourceRef.current } : undefined
     );
   }, [registry, props.id]);
 

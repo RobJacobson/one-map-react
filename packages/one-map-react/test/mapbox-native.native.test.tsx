@@ -2063,77 +2063,27 @@ describe("mapbox-native queries and feature state", () => {
   });
 
   test.each(["geojson", "vector"] as const)(
-    "%s forgets whole-state removals but keeps partial removals for style cleanup",
-    async (kind) => {
-      const ref = createRef<MapRef>();
-      await render(
-        <MapSetup adapter={adapter}>
-          <OneMap
-            ref={ref}
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-          >
-            {kind === "geojson" ? (
-              <Source id="routes" type="geojson" data={routes} />
-            ) : (
-              <Source id="routes" type="vector" url="mapbox://tiles" />
-            )}
-          </OneMap>
-        </MapSetup>
-      );
-      const cleared = {
-        source: "routes",
-        id: 1,
-        ...(kind === "vector" ? { sourceLayer: "way" } : {}),
-      };
-      const partial = { ...cleared, id: 2 };
-      await ref.current?.setFeatureState(cleared, { selected: true });
-      await ref.current?.setFeatureState(partial, { selected: true, count: 1 });
-      await ref.current?.removeFeatureState(cleared);
-      await ref.current?.removeFeatureState(partial, "selected");
-      mockRemoveFeatureState.mockClear();
-
-      await act(async () =>
-        lastMapProps<{
-          onDidFinishLoadingStyle: () => void;
-        }>().onDidFinishLoadingStyle()
-      );
-      await ref.current?.getFeatureState(partial);
-      expect(mockRemoveFeatureState).toHaveBeenCalledTimes(1);
-      expect(mockRemoveFeatureState).toHaveBeenCalledWith(
-        "2",
-        null,
-        "routes",
-        kind === "vector" ? "way" : null
-      );
-    }
-  );
-
-  test.each(["geojson", "vector"] as const)(
-    "%s source can change family without resetting an incompatible old target",
+    "%s state lifetime belongs to the renderer across remounts, family changes and styles",
     async (initialKind) => {
-      let currentKind = initialKind;
       let state: Record<string, unknown> = {};
       mockSetFeatureState.mockImplementation(async (_id, value) => {
         state = { ...state, ...value };
       });
       mockGetFeatureState.mockImplementation(async () => state);
-      mockRemoveFeatureState.mockImplementation(
-        async (_id, _key, _source, layer) => {
-          if ((currentKind === "vector") !== (layer === "way")) {
-            throw new Error(
-              "The cleanup target belongs to the prior source family."
-            );
-          }
-          state = {};
-        }
-      );
+      mockRemoveFeatureState.mockImplementation(async (_id, key) => {
+        if (key === null) state = {};
+        else delete state[key];
+      });
       const ref = createRef<MapRef>();
-      const scene = (kind: "geojson" | "vector", revision: number) => (
+      const scene = (
+        kind: "geojson" | "vector",
+        revision: number,
+        mapStyle = emptyStyle
+      ) => (
         <MapSetup adapter={adapter}>
           <OneMap
             ref={ref}
-            mapStyle={emptyStyle}
+            mapStyle={mapStyle}
             initialViewState={initialViewState}
           >
             {kind === "geojson" ? (
@@ -2143,7 +2093,7 @@ describe("mapbox-native queries and feature state", () => {
                 key={revision}
                 id="routes"
                 type="vector"
-                tiles={["https://example.com/{z}/{x}/{y}.pbf"]}
+                url="mapbox://tiles"
               />
             )}
           </OneMap>
@@ -2158,274 +2108,35 @@ describe("mapbox-native queries and feature state", () => {
         const mounted = await render(scene(initialKind, 0));
         await ref.current?.setFeatureState(target(initialKind), {
           selected: true,
-        });
-        currentKind = initialKind === "geojson" ? "vector" : "geojson";
-        // Recreating a different SDK source family establishes a new state scope.
-        state = {};
-        await mounted.rerender(scene(currentKind, 1));
-        await expect(
-          ref.current?.setFeatureState(target(currentKind), { count: 3 })
-        ).resolves.toBeUndefined();
-        await expect(
-          ref.current?.getFeatureState(target(currentKind))
-        ).resolves.toEqual({ count: 3 });
-        expect(mockRemoveFeatureState).not.toHaveBeenCalled();
-        await mounted.rerender(scene(currentKind, 2));
-        await expect(
-          ref.current?.getFeatureState(target(currentKind))
-        ).resolves.toEqual({});
-        expect(mockRemoveFeatureState).toHaveBeenCalledTimes(1);
-      } finally {
-        mockSetFeatureState.mockImplementation(async () => undefined);
-        mockGetFeatureState.mockImplementation(async () => ({
-          selected: true,
-        }));
-        mockRemoveFeatureState.mockImplementation(async () => undefined);
-      }
-    }
-  );
-
-  test.each(["geojson", "vector"] as const)(
-    "%s family roundtrips clear retained ids and layers only when their family returns",
-    async (initialKind) => {
-      let currentKind = initialKind;
-      // The renderer keeps each family's state when its source is temporarily absent.
-      const backend = {
-        geojson: new globalThis.Map<string, Record<string, unknown>>(),
-        vector: new globalThis.Map<string, Record<string, unknown>>(),
-      };
-      const events: string[] = [];
-      const key = (id: string, layer: string | null) =>
-        JSON.stringify([id, layer]);
-      const requireActiveFamily = (layer: string | null) => {
-        if ((currentKind === "vector") !== (layer !== null))
-          throw new Error(
-            "State operation used an incompatible source family."
-          );
-      };
-      mockSetFeatureState.mockImplementation(
-        async (id, state, _source, layer) => {
-          requireActiveFamily(layer);
-          backend[currentKind].set(key(id, layer), state);
-        }
-      );
-      mockGetFeatureState.mockImplementation(async (id, _source, layer) => {
-        requireActiveFamily(layer);
-        events.push(`get:${currentKind}:${key(id, layer)}`);
-        return backend[currentKind].get(key(id, layer)) ?? {};
-      });
-      mockRemoveFeatureState.mockImplementation(
-        async (id, _property, _source, layer) => {
-          requireActiveFamily(layer);
-          events.push(`remove:${currentKind}:${key(id, layer)}`);
-          backend[currentKind].delete(key(id, layer));
-        }
-      );
-      const ref = createRef<MapRef>();
-      const scene = (kind: "geojson" | "vector", revision: number) => (
-        <MapSetup adapter={adapter}>
-          <OneMap
-            ref={ref}
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-          >
-            {kind === "geojson" ? (
-              <Source
-                key={`${kind}-${revision}`}
-                id="shared"
-                type="geojson"
-                data={routes}
-              />
-            ) : (
-              <Source
-                key={`${kind}-${revision}`}
-                id="shared"
-                type="vector"
-                tiles={["https://example.com/{z}/{x}/{y}.pbf"]}
-              />
-            )}
-          </OneMap>
-        </MapSetup>
-      );
-      const targets = (kind: "geojson" | "vector") =>
-        (kind === "vector" ? ["way", "alternate"] : [undefined]).flatMap(
-          (sourceLayer) =>
-            [1, 2].map((id) => ({
-              source: "shared",
-              id,
-              ...(sourceLayer === undefined ? {} : { sourceLayer }),
-            }))
-        );
-      const write = async () => {
-        for (const [index, target] of targets(currentKind).entries()) {
-          await ref.current?.setFeatureState(target, {
-            selected: true,
-            count: index + 2,
-          });
-        }
-      };
-      const readEmpty = async () => {
-        for (const target of targets(currentKind)) {
-          await expect(ref.current?.getFeatureState(target)).resolves.toEqual(
-            {}
-          );
-        }
-      };
-
-      try {
-        const mounted = await render(scene(initialKind, 0));
-        await write();
-        const otherKind = initialKind === "geojson" ? "vector" : "geojson";
-        currentKind = otherKind;
-        await mounted.rerender(scene(currentKind, 1));
-        await readEmpty();
-        expect(mockRemoveFeatureState).not.toHaveBeenCalled();
-        await write();
-        expect(backend[initialKind].size).toBe(targets(initialKind).length);
-        currentKind = initialKind;
-        events.length = 0;
-        await mounted.rerender(scene(currentKind, 2));
-        await readEmpty();
-        expect(backend[otherKind].size).toBe(targets(otherKind).length);
-        expect(
-          events
-            .slice(0, targets(initialKind).length)
-            .every((event) => event.startsWith(`remove:${initialKind}:`))
-        ).toBe(true);
-        expect(mockRemoveFeatureState).toHaveBeenCalledTimes(
-          targets(initialKind).length
-        );
-        await write();
-        await mounted.rerender(scene(currentKind, 3));
-        await readEmpty();
-        currentKind = otherKind;
-        await mounted.rerender(scene(currentKind, 4));
-        await readEmpty();
-        expect(backend[initialKind].size).toBe(0);
-        expect(backend[otherKind].size).toBe(0);
-        await write();
-        await mounted.rerender(scene(currentKind, 5));
-        await readEmpty();
-        expect(mockRemoveFeatureState).toHaveBeenCalledTimes(
-          2 * (targets(initialKind).length + targets(otherKind).length)
-        );
-      } finally {
-        mockSetFeatureState.mockImplementation(async () => undefined);
-        mockGetFeatureState.mockImplementation(async () => ({
-          selected: true,
-        }));
-        mockRemoveFeatureState.mockImplementation(async () => undefined);
-      }
-    }
-  );
-
-  test.each(["geojson", "vector"] as const)(
-    "%s same-id remount clears retained whole state before the first operation",
-    async (kind) => {
-      const backend = new globalThis.Map<string, Record<string, unknown>>();
-      const identity = (id: string, source: string, layer: string | null) =>
-        JSON.stringify([id, source, layer]);
-      const set = async (
-        id: string,
-        state: Record<string, unknown>,
-        source: string,
-        layer: string | null
-      ) => {
-        const key = identity(id, source, layer);
-        backend.set(key, { ...backend.get(key), ...state });
-        return undefined;
-      };
-      const get = async (id: string, source: string, layer: string | null) =>
-        backend.get(identity(id, source, layer)) ?? {};
-      const remove = async (
-        id: string,
-        key: string | null,
-        source: string,
-        layer: string | null
-      ) => {
-        const target = identity(id, source, layer);
-        if (key === null) backend.delete(target);
-        else delete backend.get(target)?.[key];
-        return undefined;
-      };
-      mockSetFeatureState.mockImplementation(set);
-      mockGetFeatureState.mockImplementation(get);
-      mockRemoveFeatureState.mockImplementation(remove);
-      const ref = createRef<MapRef>();
-      const scene = (revision: number, mapStyle = emptyStyle) => (
-        <MapSetup adapter={adapter}>
-          <OneMap
-            ref={ref}
-            mapStyle={mapStyle}
-            initialViewState={initialViewState}
-          >
-            {kind === "geojson" ? (
-              <Source key={revision} id="routes" type="geojson" data={routes} />
-            ) : (
-              <Source
-                key={revision}
-                id="routes"
-                type="vector"
-                tiles={["https://example.com/{z}/{x}/{y}.pbf"]}
-              />
-            )}
-          </OneMap>
-        </MapSetup>
-      );
-      try {
-        const mounted = await render(scene(0));
-        const target = {
-          source: "routes",
-          id: 1,
-          ...(kind === "vector" ? { sourceLayer: "way" } : {}),
-        };
-        await ref.current?.setFeatureState(target, {
-          selected: true,
           count: 2,
         });
-        await mounted.rerender(scene(1));
-        expect(backend.size).toBe(1);
-        const frameProps = () =>
-          MapViewMock.mock.calls.at(-1)?.[0] as {
+        const otherKind = initialKind === "geojson" ? "vector" : "geojson";
+        for (const [revision, kind] of (
+          [initialKind, otherKind, initialKind] as const
+        ).entries()) {
+          await mounted.rerender(scene(kind, revision + 1, replacementStyle));
+          const props = lastMapProps<{
             onDidFinishRenderingFrameFully: () => void;
-          };
-        frameProps().onDidFinishRenderingFrameFully();
-        await waitFor(() => expect(backend.size).toBe(0));
-        await expect(ref.current?.getFeatureState(target)).resolves.toEqual({});
-        expect(mockRemoveFeatureState).toHaveBeenCalledWith(
-          "1",
-          null,
-          "routes",
-          kind === "vector" ? "way" : null
-        );
-        await ref.current?.setFeatureState(target, { count: 3 });
-        await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
-          count: 3,
-        });
-        await mounted.rerender(scene(2));
-        await ref.current?.setFeatureState(target, { selected: false });
-        await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
-          selected: false,
-        });
-        await mounted.rerender(scene(2, { ...emptyStyle }));
-        await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
-          selected: false,
-        });
-        await mounted.rerender(scene(2, replacementStyle));
-        expect(backend.size).toBe(1);
-        frameProps().onDidFinishRenderingFrameFully();
-        await waitFor(() => expect(backend.size).toBe(0));
-        await expect(ref.current?.getFeatureState(target)).resolves.toEqual({});
-        await ref.current?.setFeatureState(target, { count: 4 });
-        const mapProps = MapViewMock.mock.calls.at(-1)?.[0] as {
-          onDidFinishLoadingStyle: () => void;
-        };
-        mapProps.onDidFinishLoadingStyle();
-        await expect(ref.current?.getFeatureState(target)).resolves.toEqual({});
-        await ref.current?.setFeatureState(target, { count: 5 });
-        await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
-          count: 5,
-        });
+            onDidFinishLoadingStyle: () => void;
+          }>();
+          await act(async () => {
+            props.onDidFinishRenderingFrameFully();
+            props.onDidFinishLoadingStyle();
+          });
+          await expect(
+            ref.current?.getFeatureState(target(kind))
+          ).resolves.toEqual({ selected: true, count: 2 });
+          expect(mockRemoveFeatureState).not.toHaveBeenCalled();
+        }
+        await ref.current?.removeFeatureState(target(initialKind), "selected");
+        await expect(
+          ref.current?.getFeatureState(target(initialKind))
+        ).resolves.toEqual({ count: 2 });
+        await ref.current?.removeFeatureState(target(initialKind));
+        await expect(
+          ref.current?.getFeatureState(target(initialKind))
+        ).resolves.toEqual({});
+        expect(mockRemoveFeatureState).toHaveBeenCalledTimes(2);
       } finally {
         mockSetFeatureState.mockImplementation(async () => undefined);
         mockGetFeatureState.mockImplementation(async () => ({
