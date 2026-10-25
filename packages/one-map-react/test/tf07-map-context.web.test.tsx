@@ -636,7 +636,7 @@ test("native camera observations and controls leave unrelated contexts unchanged
   const controlledAccessRenders = access.mock.calls.length;
   const controlledPresentationRenders = presentation.mock.calls.length;
   mounted.rerender(tree(9));
-  expect(cameraChanged.mock.calls.at(-1)?.[0].zoom).toBe(9);
+  expect(cameraChanged.mock.calls.at(-1)?.[0].zoom).toBe(6);
   expect(access).toHaveBeenCalledTimes(controlledAccessRenders);
   expect(presentation).toHaveBeenCalledTimes(controlledPresentationRenders);
   mounted.unmount();

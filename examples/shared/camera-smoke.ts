@@ -61,17 +61,18 @@ interface SmokeFields {
   clickAt: string;
   stop: string;
   held: string;
+  command: string;
   doubletap: string;
   center: string;
   note: string;
 }
 
 /**
- * Drives the TF04 camera smoke: fit, click, stop, then a rejected move.
+ * Drives TF04 fit, click, stop, and platform-specific camera target behavior.
  *
  * The page records what the renderer did. Web `stop` is a cancel. Native
- * `stop` is expected to reject. `held` is whether an unaccepted jump stayed
- * at the fitted camera. MapLibre can then wait for a double tap while pinch
+ * `stop` is expected to reject. Web holds the fitted controlled camera; native
+ * observes the explicit jump target. MapLibre then waits for a double tap while pinch
  * zoom is off.
  */
 export const useCameraSmoke = ({
@@ -307,6 +308,7 @@ export const useCameraSmoke = ({
     const probe = setTimeout(() => {
       void mapRef.current?.jumpTo({ center: flightTarget }).catch(() => {
         fields.current.note = "jump-rejected";
+        if (platform === "native") fields.current.command = "rejected";
       });
     }, 800);
     const read = setTimeout(() => {
@@ -319,6 +321,13 @@ export const useCameraSmoke = ({
 
           fields.current.center = formatLngLat(center);
           fields.current.held = samePlace(center, fitted.current) ? "1" : "0";
+          if (fields.current.command !== "rejected")
+            fields.current.command =
+              platform === "native"
+                ? flightOutcome(center) === "arrived"
+                  ? "applied"
+                  : "missed"
+                : "skip";
 
           if (!doubleTap) {
             fields.current.doubletap = "skip";
@@ -343,6 +352,13 @@ export const useCameraSmoke = ({
           }
 
           fields.current.held = samePlace(fallback, fitted.current) ? "1" : "0";
+          if (fields.current.command !== "rejected")
+            fields.current.command =
+              platform === "native"
+                ? flightOutcome(fallback) === "arrived"
+                  ? "applied"
+                  : "missed"
+                : "skip";
 
           if (!doubleTap) {
             fields.current.doubletap = "skip";
@@ -359,7 +375,7 @@ export const useCameraSmoke = ({
       clearTimeout(probe);
       clearTimeout(read);
     };
-  }, [doubleTap, mapRef, phase]);
+  }, [doubleTap, mapRef, phase, platform]);
 
   useEffect(() => {
     if (phase !== "await-stop" && phase !== "await-hold") {
@@ -504,6 +520,7 @@ const initialFields = (doubleTap: boolean): SmokeFields => ({
   clickAt: "pending",
   stop: "pending",
   held: "pending",
+  command: "pending",
   doubletap: doubleTap ? "pending" : "skip",
   center: "pending",
   note: "none",
@@ -546,4 +563,4 @@ const errorText = (error: unknown): string => {
 };
 
 const statusLine = (fields: SmokeFields, phase: SmokePhase): string =>
-  `TF04 fit=${fields.fit} click=${fields.click} clickAt=${fields.clickAt} stop=${fields.stop} held=${fields.held} doubletap=${fields.doubletap} center=${fields.center} note=${fields.note} phase=${phase} done=${phase === "done" ? 1 : 0}`;
+  `TF04 fit=${fields.fit} click=${fields.click} clickAt=${fields.clickAt} stop=${fields.stop} held=${fields.held} command=${fields.command} doubletap=${fields.doubletap} center=${fields.center} note=${fields.note} phase=${phase} done=${phase === "done" ? 1 : 0}`;

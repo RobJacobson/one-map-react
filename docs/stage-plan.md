@@ -1,6 +1,6 @@
 # Thin facade stage plan
 
-The next incompatible release follows the agreed [revised API implementation plan](revised-api-implementation-plan.md), within the narrowed [requirements](requirements.md#purpose-and-scope). U06 is merged as PR25. U07 common native marker drag removal is implemented and audited; routine verification is recorded, and the PR is authorized under the unit workflow. U08 and later units remain undispatched. The unit plan owns PR and successor authorization gates. The [coverage checklist](api-coverage.md) owns current routes and pending next-release dispositions. The current release gates remain unchanged.
+The next incompatible release follows the agreed [revised API implementation plan](revised-api-implementation-plan.md), within the narrowed [requirements](requirements.md#purpose-and-scope). U06 is merged as PR25 and U07 as PR26. U08 native camera target migration is implemented and audited; routine verification is recorded, and the PR is authorized under the unit workflow. U09 and later units remain undispatched. The unit plan owns PR and successor authorization gates. The [coverage checklist](api-coverage.md) owns current routes and pending next-release dispositions. The current release gates remain unchanged.
 
 ## Current candidate and historical TF sequence
 

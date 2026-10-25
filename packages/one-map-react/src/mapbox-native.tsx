@@ -61,7 +61,7 @@ export type NativeLocationOptions = Pick<
 export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
   /** Complete selected style document. */
   readonly mapStyle: MapProps["mapStyle"] | NativeStyleDocument;
-  /** SDK follow facilities; conflicts with authoritative viewState/common follow. */
+  /** SDK follow facilities; conflicts with a viewState target/common follow. */
   readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
   readonly hostProps?: ViewProps;

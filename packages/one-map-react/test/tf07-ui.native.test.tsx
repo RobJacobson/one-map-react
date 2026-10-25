@@ -275,6 +275,7 @@ test("scale observes each movement once, including unchanged controlled targets"
   expect(fixture.project).toHaveBeenCalledTimes(1);
   expect(fixture.unproject).toHaveBeenCalledTimes(1);
 
+  fixture.unproject.mockResolvedValue([11.01, 20]);
   const controlled = { ...scaleCamera, zoom: 6 };
   await mounted.rerender(tree(true, controlled));
   fixture.project.mockClear();
@@ -286,10 +287,10 @@ test("scale observes each movement once, including unchanged controlled targets"
     })
   );
   expect(fixture.project).toHaveBeenCalledTimes(1);
-  expect(fixture.project).toHaveBeenCalledWith([10, 20]);
+  expect(fixture.project).toHaveBeenCalledWith([11, 20]);
   expect(fixture.unproject).toHaveBeenCalledTimes(1);
   await mounted.rerender(tree(true, { ...controlled, zoom: 8 }));
-  expect(fixture.project).toHaveBeenCalledTimes(2);
+  expect(fixture.project).toHaveBeenCalledTimes(1);
   await mounted.rerender(tree(true, controlled, "imperial"));
   await waitFor(() => expect(mounted.getByText("2000 ft")).toBeTruthy());
   await mounted.rerender(tree(true, controlled, "nautical"));

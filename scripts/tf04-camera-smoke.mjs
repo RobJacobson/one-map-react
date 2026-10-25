@@ -870,16 +870,16 @@ function judge(status, doubleTap, platform = "web") {
       .filter((part) => part.length === 2)
   );
   const stopOk = fields.stop === "stayed" || fields.stop === "rejected";
-  const heldOk =
-    fields.stop === "rejected"
-      ? fields.held === "0" || fields.held === "1"
-      : fields.held === "1";
+  const cameraOk =
+    platform === "web"
+      ? fields.held === "1"
+      : fields.held === "0" && fields.command === "applied";
   const doubleTapOk = doubleTapPassed(fields.doubletap, doubleTap, platform);
   const passed =
     fields.fit === "ok" &&
     fields.click === "hit" &&
     stopOk &&
-    heldOk &&
+    cameraOk &&
     doubleTapOk &&
     fields.done === "1";
 
