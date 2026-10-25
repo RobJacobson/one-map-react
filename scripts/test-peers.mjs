@@ -306,6 +306,24 @@ NetworkManager.setConnected(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
 NetworkManager.setConnected(42);
 `;
+  const markerAssertions = entry.endsWith("web")
+    ? `
+import { Marker as SelectedMarker } from "one-map-react/${entry}";
+void <SelectedMarker longitude={0} latitude={0} draggable onDragStart={() => undefined} onDrag={() => undefined} onDragEnd={() => undefined} />;
+`
+    : `
+import { Marker as SelectedMarker, ${entry === "mapbox-native" ? "PointAnnotation" : "ViewAnnotation"} as RawAnnotation } from "one-map-react/${entry}";
+void <SelectedMarker longitude={0} latitude={0} draggable={false} onClick={() => undefined} />;
+// @ts-expect-error Shared native markers do not drag.
+void <SelectedMarker longitude={0} latitude={0} draggable />;
+// @ts-expect-error Native shared markers exclude drag-start callbacks.
+void <SelectedMarker longitude={0} latitude={0} onDragStart={() => undefined} />;
+// @ts-expect-error Native shared markers exclude drag callbacks even when disabled.
+void <SelectedMarker longitude={0} latitude={0} draggable={false} onDrag={() => undefined} />;
+// @ts-expect-error Native shared markers exclude drag-end callbacks.
+void <SelectedMarker longitude={0} latitude={0} onDragEnd={() => undefined} />;
+void <RawAnnotation id="raw-drag" ${entry === "mapbox-native" ? "coordinate" : "lngLat"}={[0, 0]} draggable onDragStart={() => undefined} onDrag={() => undefined} onDragEnd={() => undefined}><></></RawAnnotation>;
+`;
   writeFileSync(
     join(consumer, "consumer.tsx"),
     `import { Map as OneMap, MapSetup, Source, Layer } from "one-map-react";
@@ -326,6 +344,7 @@ const viewState = {
 };
 const style = { version: 8 as const, sources: {}, layers: [] };
 ${selectedAssertions}
+${markerAssertions}
 void (
   <OneMap mapStyle={style} initialViewState={viewState} />
 );

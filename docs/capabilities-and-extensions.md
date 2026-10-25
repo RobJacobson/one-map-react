@@ -1,5 +1,7 @@
 # Capabilities and extensions
 
+**Working next-release marker scope.** The [migration contract](revised-api-proposal.md#markers-images-popups-and-controls) excludes common native Marker dragging in live and annotation modes: selected native Marker types permit draggable=false and omit drag callbacks; common-entry native requests for draggable=true or any drag callback must fail clearly. Web dragging and selected raw native annotation dragging remain available. The capability comparisons and optional-drag example below preserve the broader historical proposal. The [unit plan](revised-api-implementation-plan.md#u07-remove-common-native-marker-dragging) owns implementation and verification status; retained native marker interactions await new touch acceptance.
+
 **Current advanced facilities:** See [advanced rendering](tf09-rendering.md) for the implemented selected routes and explicit wrapper/native boundaries; targeted six-environment acceptance passed for the recorded scope.
 
 **Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.

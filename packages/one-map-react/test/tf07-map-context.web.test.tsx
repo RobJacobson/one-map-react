@@ -642,7 +642,7 @@ test("native camera observations and controls leave unrelated contexts unchanged
   mounted.unmount();
 });
 
-test("native presentation retains layout, overlay order, attribution and gesture ownership", async () => {
+test("native presentation retains layout, overlay order, and attribution", async () => {
   const fixture = createFixture();
   const adapter = {
     ...fixture.adapter,
@@ -667,12 +667,10 @@ test("native presentation retains layout, overlay order, attribution and gesture
     initial.setOverlay("first", "top-right", 20);
     initial.setOverlay("second", "top-right", 30);
     initial.setAttributionPosition("top-left");
-    initial.requestGestureLock(true);
   });
   const updated = observe.mock.calls.at(-1)?.[0];
   expect(updated).toMatchObject({
     nativeLayout: { width: 400, height: 300 },
-    gestureLocked: true,
     attributionPosition: "top-left",
   });
   expect(updated.setOverlay).toBe(initial.setOverlay);
@@ -689,13 +687,11 @@ test("native presentation retains layout, overlay order, attribution and gesture
   await act(async () => {
     updated.setOverlay("first", null);
     updated.setAttributionPosition(undefined);
-    updated.requestGestureLock(false);
   });
   expect(
     observe.mock.calls.at(-1)?.[1].map((overlay: { id: string }) => overlay.id)
   ).toEqual(["second"]);
   expect(observe.mock.calls.at(-1)?.[0]).toMatchObject({
-    gestureLocked: false,
     attributionPosition: undefined,
   });
   mounted.unmount();

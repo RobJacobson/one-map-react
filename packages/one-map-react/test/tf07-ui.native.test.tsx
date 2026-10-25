@@ -1,9 +1,18 @@
-import { afterEach, describe, expect, jest, test } from "@jest/globals";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  jest,
+  test,
+} from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import {
   type ComponentProps,
   createContext,
   createRef,
+  startTransition,
+  Suspense,
   forwardRef,
   type ReactNode,
   useContext,
@@ -13,7 +22,15 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  AppState,
+  type AppStateStatus,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { mapboxNativeUI } from "../src/adapters/mapbox-native/ui.js";
 import { maplibreNativeUI } from "../src/adapters/maplibre-native/ui.js";
@@ -29,7 +46,6 @@ import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overla
 import {
   createNativeUI,
   type NativeMarkerHostProps,
-  type NativeMarkerProps,
 } from "../src/adapters/shared/native-ui.js";
 import type { Adapter } from "../src/contracts/adapter.js";
 import type {
@@ -150,11 +166,7 @@ const Host = forwardRef<MarkerRef, NativeMarkerHostProps>((props, ref) => {
   const nativeID = useId();
   useImperativeHandle(ref, () => ({ refresh }));
   return (
-    <View
-      testID="native-marker"
-      nativeID={nativeID}
-      {...{ onAnnotationDragEnd: props.onDragEnd }}
-    >
+    <View testID="native-marker" nativeID={nativeID}>
       {props.children}
     </View>
   );
@@ -178,28 +190,29 @@ const sessionFixture = () => {
   };
   // The fixture exercises UI operations only; absent MapRef methods deliberately fail.
   const map = { project, unproject, easeTo } as unknown as MapRef;
-  const session: FixtureSession = {
-    nativeLocationFollowing: false,
-    ref: { current: map },
-    map,
-    ready: true,
-    viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
-    gestureLocked: false,
-    overlayHostName: "fixture-control-host",
-    attributionPosition: undefined,
-    requestGestureLock: lock,
-    setNativeLayout: jest.fn(),
-    setOverlay: jest.fn(),
-    setAttributionPosition: jest.fn(),
-    subscribe: (event, callback) => {
-      listeners[event].add(callback);
-      return () => {
-        listeners[event].delete(callback);
-      };
-    },
-    registerSource: () => () => undefined,
-    dispatchSource: () => undefined,
-  };
+  const session: FixtureSession & { readonly requestGestureLock: typeof lock } =
+    {
+      nativeLocationFollowing: false,
+      // A removed gesture-lock request would expose accidental drag ownership.
+      requestGestureLock: lock,
+      ref: { current: map },
+      map,
+      ready: true,
+      viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
+      overlayHostName: "fixture-control-host",
+      attributionPosition: undefined,
+      setNativeLayout: jest.fn(),
+      setOverlay: jest.fn(),
+      setAttributionPosition: jest.fn(),
+      subscribe: (event, callback) => {
+        listeners[event].add(callback);
+        return () => {
+          listeners[event].delete(callback);
+        };
+      },
+      registerSource: () => () => undefined,
+      dispatchSource: () => undefined,
+    };
   const emit = (
     event: "click" | "move",
     payload: ClickEvent | MoveEvent
@@ -469,7 +482,22 @@ const NativeOverlayHost = (props: {
   );
 };
 
+const initialAppState = AppState.currentState;
+const initialAppStateSubscription = jest
+  .mocked(AppState.addEventListener)
+  .getMockImplementation();
+
+beforeEach(() => {
+  // The RN preset models currentState as a function rather than a foreground state.
+  AppState.currentState = "active";
+  jest.mocked(AppState.addEventListener).mockReturnValue({ remove: jest.fn() });
+});
+
 afterEach(() => {
+  AppState.currentState = initialAppState;
+  const subscribe = jest.mocked(AppState.addEventListener).mockReset();
+  if (initialAppStateSubscription)
+    subscribe.mockImplementation(initialAppStateSubscription);
   jest.useRealTimers();
   refresh.mockClear();
 });
@@ -943,6 +971,32 @@ describe("TF07 native UI composition", () => {
       }
     }
   );
+  test.each(["view", "annotation"] as const)(
+    "native %s markers reject dragging and every supplied drag callback",
+    async (renderMode) => {
+      for (const request of [
+        { draggable: true },
+        { onDragStart: jest.fn() },
+        { draggable: false, onDrag: jest.fn() },
+        { onDragEnd: jest.fn() },
+      ]) {
+        const fixture = sessionFixture();
+        await expect(
+          render(
+            <FixtureSessionProvider value={fixture.session}>
+              <ui.Marker
+                longitude={10}
+                latitude={20}
+                renderMode={renderMode}
+                {...request}
+              />
+            </FixtureSessionProvider>
+          )
+        ).rejects.toThrow("Native Marker does not support dragging");
+      }
+    }
+  );
+
   test("native markers reject nonfinite coordinates and offsets before wrapper dispatch", async () => {
     const fixture = sessionFixture();
     await expect(
@@ -1189,7 +1243,7 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const view = await render(
       <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker longitude={10} latitude={20} draggable>
+        <ui.Marker longitude={10} latitude={20}>
           <View testID="child-scroll" />
         </ui.Marker>
       </FixtureSessionProvider>
@@ -1207,14 +1261,13 @@ describe("TF07 native UI composition", () => {
   test("null negotiation target does not treat overflowing page layout as marker child content", async () => {
     jest.useFakeTimers();
     const fixture = sessionFixture();
-    const started = jest.fn();
+    const clicked = jest.fn();
     const view = await render(
       <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
-          draggable
-          onDragStart={started}
+          onClick={clicked}
           {...{ hostProps: { testID: "label-marker" } }}
         >
           <Text>Label</Text>
@@ -1248,10 +1301,15 @@ describe("TF07 native UI composition", () => {
     };
     await beginTouch(view.getByTestId("label-marker"), event);
     await act(async () => jest.advanceTimersByTime(500));
-    expect(started).toHaveBeenCalledTimes(1);
-    expect(fixture.lock).toHaveBeenLastCalledWith(true);
+    await nativeTouch(
+      view.getByTestId("label-marker"),
+      "touchEnd",
+      touch(5, 8, 0)
+    );
+    expect(fixture.lock).not.toHaveBeenCalled();
+    expect(clicked).toHaveBeenCalledTimes(1);
     await view.unmount();
-    expect(fixture.lock).toHaveBeenLastCalledWith(false);
+    expect(fixture.lock).not.toHaveBeenCalled();
   });
 
   test.each(["vertical", "horizontal"])(
@@ -1260,15 +1318,12 @@ describe("TF07 native UI composition", () => {
       jest.useFakeTimers();
       const fixture = sessionFixture();
       const clicked = jest.fn();
-      const started = jest.fn();
       const view = await render(
         <FixtureSessionProvider value={fixture.session}>
           <ui.Marker
             longitude={10}
             latitude={20}
-            draggable
             onClick={clicked}
-            onDragStart={started}
             {...{ hostProps: { testID: "scroll-marker" } }}
           >
             <Text>Child rows</Text>
@@ -1305,23 +1360,23 @@ describe("TF07 native UI composition", () => {
       await act(async () => jest.advanceTimersByTime(700));
       await nativeTouch(marker, "touchEnd", touch(5, 8, 0));
       expect(fixture.lock).not.toHaveBeenCalled();
-      expect(started).not.toHaveBeenCalled();
       expect(clicked).not.toHaveBeenCalled();
     }
   );
 
-  test("Android child touches keep SDK ownership until a live drag activates", async () => {
+  test("Android child buttons and ordinary marker touches keep SDK gesture ownership", async () => {
     const platform = jest.replaceProperty(Platform, "OS", "android");
     jest.useFakeTimers();
     try {
       const fixture = sessionFixture();
       const pressed = jest.fn();
+      const clicked = jest.fn();
       const view = await render(
         <FixtureSessionProvider value={fixture.session}>
           <ui.Marker
             longitude={10}
             latitude={20}
-            draggable
+            onClick={clicked}
             {...{ hostProps: { testID: "android-marker" } }}
           >
             <Pressable testID="android-child" onPress={pressed}>
@@ -1335,23 +1390,31 @@ describe("TF07 native UI composition", () => {
       expect(fixture.lock).not.toHaveBeenCalled();
       await fireEvent.press(child);
       expect(pressed).toHaveBeenCalledTimes(1);
+      await nativeTouch(child, "touchEnd", touch(5, 8, 0));
+      expect(clicked).not.toHaveBeenCalled();
       await beginTouch(view.getByTestId("android-marker"), touch(5, 8));
       await act(async () => jest.advanceTimersByTime(500));
-      expect(fixture.lock).toHaveBeenLastCalledWith(true);
+      expect(fixture.lock).not.toHaveBeenCalled();
+      await nativeTouch(
+        view.getByTestId("android-marker"),
+        "touchEnd",
+        touch(5, 8, 0)
+      );
+      expect(clicked).toHaveBeenCalledTimes(1);
       await view.unmount();
-      expect(fixture.lock).toHaveBeenLastCalledWith(false);
+      expect(fixture.lock).not.toHaveBeenCalled();
     } finally {
       platform.restore();
     }
   });
 
   test.each(["touchCancel", "multiple-touch", "unmount"])(
-    "%s restores map gestures after child interaction",
+    "%s leaves map gestures unchanged after child interaction",
     async (ending) => {
       const fixture = sessionFixture();
       const view = await render(
         <FixtureSessionProvider value={fixture.session}>
-          <ui.Marker longitude={10} latitude={20} draggable>
+          <ui.Marker longitude={10} latitude={20}>
             <View testID="child" />
           </ui.Marker>
         </FixtureSessionProvider>
@@ -1367,13 +1430,12 @@ describe("TF07 native UI composition", () => {
   );
 
   test.each(["ios", "android"] as const)(
-    "Mapbox %s annotation reports consecutive taps and still supports dragging and refresh",
+    "Mapbox %s annotation reports consecutive taps and retains refresh",
     async (os) => {
       const platform = jest.replaceProperty(Platform, "OS", os);
       try {
         const fixture = sessionFixture();
         const clicked = jest.fn();
-        const dragged = jest.fn();
         const ref = createRef<MarkerRef>();
         const view = await render(
           <FixtureSessionProvider value={fixture.session}>
@@ -1382,9 +1444,7 @@ describe("TF07 native UI composition", () => {
               longitude={10}
               latitude={20}
               renderMode="annotation"
-              draggable
               onClick={clicked}
-              onDragEnd={dragged}
             />
           </FixtureSessionProvider>
         );
@@ -1396,16 +1456,12 @@ describe("TF07 native UI composition", () => {
           ...(os === "android" ? { point: [100, 200] } : {}),
         });
 
-        await fireEvent(view.getByTestId("mapbox-annotation"), "dragEnd", {
-          geometry: { coordinates: [11, 21] },
-          properties: { screenPointX: 110, screenPointY: 210 },
-        });
-        expect(dragged).toHaveBeenCalledWith(
-          expect.objectContaining({ lngLat: [11, 21] })
-        );
-        expect(view.getByTestId("mapbox-annotation").props.coordinate).toEqual([
-          10, 20,
-        ]);
+        expect(
+          view.getByTestId("mapbox-annotation").props.draggable
+        ).toBeUndefined();
+        expect(
+          view.getByTestId("mapbox-annotation").props.onDragEnd
+        ).toBeUndefined();
         await expect(ref.current?.refresh()).resolves.toBeUndefined();
         await fireEvent.press(view.getByTestId("mapbox-annotation"));
         expect(clicked).toHaveBeenCalledTimes(3);
@@ -1472,254 +1528,227 @@ describe("TF07 native UI composition", () => {
     expect(closed).toHaveBeenCalledTimes(1);
   });
 
-  test("long press emits coordinate proposals and releases the gesture lock", async () => {
-    jest.useFakeTimers();
-    const fixture = sessionFixture();
-    const started = jest.fn();
-    const ended = jest.fn();
-    const markerProps: NativeMarkerProps = {
-      longitude: 10,
-      latitude: 20,
-      draggable: true,
-      hostProps: { testID: "content" },
-      onDragStart: started,
-      onDragEnd: ended,
-    };
-    const view = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker {...markerProps} />
-      </FixtureSessionProvider>
-    );
-    const marker = view.getByTestId("content");
-    await beginTouch(marker, touch(5, 8));
-    await act(async () => {
-      jest.advanceTimersByTime(499);
-    });
-    expect(started).not.toHaveBeenCalled();
-    await act(async () => {
-      jest.advanceTimersByTime(1);
-    });
-    expect(started).toHaveBeenCalledWith({
-      lngLat: [10, 20],
-      point: [100, 200],
-    });
-    await act(async () => {
-      await nativeTouch(marker, "touchMove", touch(25, 18));
-    });
-    expect(fixture.unproject).toHaveBeenLastCalledWith([120, 210]);
-    await act(async () => {
-      await nativeTouch(marker, "touchEnd", touch(35, 28, 0));
-    });
-    expect(ended).toHaveBeenCalledWith({ lngLat: [13, 22], point: [130, 220] });
-    expect(fixture.lock.mock.calls).toEqual([[true], [false]]);
-  });
+  test.each(["view", "annotation"] as const)(
+    "%s activation keeps committed callbacks during a suspended update",
+    async (renderMode) => {
+      const fixture = sessionFixture();
+      const committed = jest.fn();
+      const abandoned = jest.fn();
+      const pending = new Promise<never>(() => {});
+      let suspend = () => {};
+      const Pending = ({ enabled }: { readonly enabled: boolean }) => {
+        if (enabled) throw pending;
+        return null;
+      };
+      const Screen = () => {
+        const [enabled, setEnabled] = useState(false);
+        useLayoutEffect(() => {
+          suspend = () => startTransition(() => setEnabled(true));
+        }, []);
+        return (
+          <Suspense fallback={<Text>Pending</Text>}>
+            <mapboxNativeUI.Marker
+              longitude={10}
+              latitude={20}
+              renderMode={renderMode}
+              onClick={enabled ? abandoned : committed}
+              {...{ hostProps: { testID: "committed-marker" } }}
+            />
+            <Pending enabled={enabled} />
+          </Suspense>
+        );
+      };
+      const view = await render(
+        <FixtureSessionProvider value={fixture.session}>
+          <Screen />
+        </FixtureSessionProvider>
+      );
+      await act(async () => suspend());
+      if (renderMode === "annotation")
+        await fireEvent.press(view.getByTestId("mapbox-annotation"));
+      else {
+        const marker = view.getByTestId("committed-marker");
+        await beginTouch(marker, touch(0, 0));
+        await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+      }
+      expect(committed).toHaveBeenCalledTimes(1);
+      expect(abandoned).not.toHaveBeenCalled();
+      await view.unmount();
+    }
+  );
 
-  test("early motion and additional touches cancel long press without starting a drag", async () => {
-    jest.useFakeTimers();
+  test("marker activation composes host callbacks after its own touch handling", async () => {
     const fixture = sessionFixture();
-    const view = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker
-          longitude={10}
-          latitude={20}
-          draggable
-          {...{ hostProps: { testID: "content" } }}
-        />
-      </FixtureSessionProvider>
-    );
-    const marker = view.getByTestId("content");
-    await beginTouch(marker, touch(0, 0));
-    await nativeTouch(marker, "touchMove", touch(20, 0));
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-    expect(fixture.project).not.toHaveBeenCalled();
-    await beginTouch(marker, touch(0, 0));
-    await nativeTouch(marker, "touchMove", touch(0, 0, 2));
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-    expect(fixture.project).not.toHaveBeenCalled();
-  });
-
-  test("unmount discards a pending drag projection and restores gestures", async () => {
-    jest.useFakeTimers();
-    const fixture = sessionFixture();
-    let finish: (point: Point) => void = () => undefined;
-    fixture.project.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          finish = resolve;
-        })
-    );
-    const started = jest.fn();
+    const order: string[] = [];
     const view = await render(
       <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={10}
           latitude={20}
-          draggable
-          onDragStart={started}
-          {...{ hostProps: { testID: "content" } }}
+          onClick={() => order.push("click")}
+          {...{
+            hostProps: {
+              testID: "composed-marker",
+              onStartShouldSetResponder: () => {
+                order.push("negotiate");
+                return false;
+              },
+              onTouchStart: () => order.push("start"),
+              onTouchMove: () => order.push("move"),
+              onTouchEnd: () => order.push("end"),
+              onResponderTerminate: () => order.push("terminate"),
+              onTouchCancel: () => order.push("cancel"),
+            },
+          }}
         />
       </FixtureSessionProvider>
     );
-    await beginTouch(view.getByTestId("content"), touch(0, 0));
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-    await view.unmount();
-    await act(async () => {
-      finish([100, 200]);
-    });
-    expect(started).not.toHaveBeenCalled();
-    expect(fixture.lock.mock.calls).toEqual([[true], [false]]);
+    const marker = view.getByTestId("composed-marker");
+    await beginTouch(marker, touch(0, 0));
+    await nativeTouch(marker, "touchMove", touch(1, 1));
+    await nativeTouch(marker, "touchEnd", touch(1, 1, 0));
+    await act(async () => marker.props.onResponderTerminate(touch(1, 1)));
+    await nativeTouch(marker, "touchCancel", touch(1, 1));
+    expect(order).toEqual([
+      "negotiate",
+      "start",
+      "move",
+      "click",
+      "end",
+      "terminate",
+      "cancel",
+    ]);
+    expect(fixture.lock).not.toHaveBeenCalled();
   });
 
-  test("external coordinates cancel a drag while application proposal echoes keep it active", async () => {
-    jest.useFakeTimers();
+  test.each([
+    "movement",
+    "second-contact",
+    "touchCancel",
+    "responderTerminate",
+  ])(
+    "%s cancels live activation without projection or gesture changes",
+    async (ending) => {
+      jest.useFakeTimers();
+      const fixture = sessionFixture();
+      const clicked = jest.fn();
+      const view = await render(
+        <FixtureSessionProvider value={fixture.session}>
+          <ui.Marker
+            longitude={10}
+            latitude={20}
+            onClick={clicked}
+            {...{ hostProps: { testID: "activation" } }}
+          />
+        </FixtureSessionProvider>
+      );
+      const marker = view.getByTestId("activation");
+      await beginTouch(marker, touch(0, 0));
+      if (ending === "movement")
+        await nativeTouch(marker, "touchMove", touch(20, 0));
+      else if (ending === "second-contact")
+        await nativeTouch(marker, "touchStart", touch(0, 0, 2));
+      else if (ending === "touchCancel")
+        await nativeTouch(marker, "touchCancel", touch(0, 0));
+      else
+        await act(async () => marker.props.onResponderTerminate(touch(0, 0)));
+      await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+      await act(async () => jest.advanceTimersByTime(1000));
+      expect(clicked).not.toHaveBeenCalled();
+      expect(fixture.project).not.toHaveBeenCalled();
+      expect(fixture.unproject).not.toHaveBeenCalled();
+      expect(fixture.lock).not.toHaveBeenCalled();
+      await beginTouch(marker, touch(0, 0));
+      await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+      expect(clicked).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  test("background cancellation blocks transformed touches until a fresh foreground contact", async () => {
     const fixture = sessionFixture();
-    const proposal = jest.fn();
-    const marker = (longitude: number, latitude: number) => (
+    const clicked = jest.fn();
+    let change: (state: AppStateStatus) => void = () => {};
+    const remove = jest.fn();
+    const subscription = jest
+      .spyOn(AppState, "addEventListener")
+      .mockImplementation((_event, callback) => {
+        change = callback;
+        return { remove };
+      });
+    try {
+      const view = await render(
+        <FixtureSessionProvider value={fixture.session}>
+          <ui.Marker
+            longitude={10}
+            latitude={20}
+            onClick={clicked}
+            {...{ hostProps: { testID: "activation" } }}
+          />
+        </FixtureSessionProvider>
+      );
+      const marker = view.getByTestId("activation");
+      await beginTouch(marker, touch(0, 0));
+      await act(async () => change("background"));
+      await nativeTouch(marker, "touchEnd", touch(-400, 5000, 0));
+      await beginTouch(marker, touch(0, 0));
+      await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+      await act(async () => change("active"));
+      await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+      expect(clicked).not.toHaveBeenCalled();
+      await beginTouch(marker, touch(0, 0));
+      await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+      expect(clicked).toHaveBeenCalledTimes(1);
+      await view.unmount();
+      expect(remove).toHaveBeenCalledTimes(1);
+      expect(fixture.project).not.toHaveBeenCalled();
+      expect(fixture.unproject).not.toHaveBeenCalled();
+      expect(fixture.lock).not.toHaveBeenCalled();
+    } finally {
+      subscription.mockRestore();
+    }
+  });
+
+  test("coordinate and mode changes cancel pending activation and detached handlers stay silent", async () => {
+    const fixture = sessionFixture();
+    const first = jest.fn();
+    const latest = jest.fn();
+    const tree = (longitude: number, renderMode?: "view" | "annotation") => (
       <FixtureSessionProvider value={fixture.session}>
         <ui.Marker
           longitude={longitude}
-          latitude={latitude}
-          draggable
-          onDrag={proposal}
-          {...{ hostProps: { testID: "content" } }}
-        />
-      </FixtureSessionProvider>
-    );
-    const view = await render(marker(10, 20));
-    await beginTouch(view.getByTestId("content"), touch(0, 0));
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-    await nativeTouch(view.getByTestId("content"), "touchMove", touch(20, 10));
-    await view.rerender(marker(12, 21));
-    expect(fixture.lock).toHaveBeenCalledTimes(1);
-    await view.rerender(marker(30, 40));
-    expect(fixture.lock.mock.calls).toEqual([[true], [false]]);
-  });
-
-  test("an older unprojection cannot replace a newer drag proposal", async () => {
-    jest.useFakeTimers();
-    const fixture = sessionFixture();
-    const proposal = jest.fn();
-    const view = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker
-          longitude={10}
           latitude={20}
-          draggable
-          onDrag={proposal}
-          {...{ hostProps: { testID: "content" } }}
+          renderMode={renderMode}
+          onClick={longitude === 10 ? first : latest}
+          {...{ hostProps: { testID: "activation" } }}
         />
       </FixtureSessionProvider>
     );
-    await beginTouch(view.getByTestId("content"), touch(0, 0));
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-    proposal.mockClear();
-    let older: (coordinate: readonly [number, number]) => void = () =>
-      undefined;
-    let newer: (coordinate: readonly [number, number]) => void = () =>
-      undefined;
-    fixture.unproject.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          older = resolve;
-        })
-    );
-    fixture.unproject.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          newer = resolve;
-        })
-    );
-    await nativeTouch(view.getByTestId("content"), "touchMove", touch(20, 10));
-    await nativeTouch(view.getByTestId("content"), "touchMove", touch(30, 20));
-    await act(async () => {
-      newer([13, 22]);
-    });
-    await act(async () => {
-      older([12, 21]);
-    });
-    expect(proposal).toHaveBeenCalledTimes(1);
-    expect(proposal).toHaveBeenCalledWith({
-      lngLat: [13, 22],
-      point: [130, 220],
-    });
-  });
-
-  test("a superseded unprojection failure does not cancel the current drag", async () => {
-    jest.useFakeTimers();
-    const fixture = sessionFixture();
-    const failed = jest.fn();
-    const ended = jest.fn();
-    const view = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker
-          longitude={10}
-          latitude={20}
-          draggable
-          onError={failed}
-          onDragEnd={ended}
-          {...{ hostProps: { testID: "content" } }}
-        />
-      </FixtureSessionProvider>
-    );
-    const marker = view.getByTestId("content");
+    const view = await render(tree(10));
+    let marker = view.getByTestId("activation");
     await beginTouch(marker, touch(0, 0));
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-    let rejectOlder: (error: Error) => void = () => {};
-    fixture.unproject.mockImplementationOnce(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejectOlder = reject;
-        })
-    );
-    await nativeTouch(marker, "touchMove", touch(20, 10));
-    await nativeTouch(marker, "touchMove", touch(30, 20));
-    await act(async () => {
-      rejectOlder(new Error("stale bridge failure"));
-    });
-    expect(fixture.lock.mock.calls).toEqual([[true]]);
-    expect(failed).not.toHaveBeenCalled();
-    await nativeTouch(marker, "touchEnd", touch(40, 30, 0));
-    expect(ended).toHaveBeenCalledWith({ lngLat: [14, 23], point: [140, 230] });
-    expect(fixture.lock.mock.calls).toEqual([[true], [false]]);
-  });
-
-  test("the current unprojection failure still reports and releases the drag", async () => {
-    jest.useFakeTimers();
-    const fixture = sessionFixture();
-    const failed = jest.fn();
-    const view = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker
-          longitude={10}
-          latitude={20}
-          draggable
-          onError={failed}
-          {...{ hostProps: { testID: "content" } }}
-        />
-      </FixtureSessionProvider>
-    );
-    const marker = view.getByTestId("content");
+    await view.rerender(tree(30));
+    marker = view.getByTestId("activation");
+    await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+    expect(first).not.toHaveBeenCalled();
+    expect(latest).not.toHaveBeenCalled();
     await beginTouch(marker, touch(0, 0));
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-    const failure = new Error("current bridge failure");
-    fixture.unproject.mockRejectedValueOnce(failure);
-    await nativeTouch(marker, "touchMove", touch(20, 10));
-    expect(failed).toHaveBeenCalledWith(failure);
-    expect(fixture.lock.mock.calls).toEqual([[true], [false]]);
+    await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+    expect(latest).toHaveBeenCalledWith({ lngLat: [30, 20] });
+    await beginTouch(marker, touch(0, 0));
+    const end = marker.props.onTouchEnd;
+    await view.rerender(tree(30, "annotation"));
+    await act(async () => end(touch(0, 0, 0)));
+    expect(latest).toHaveBeenCalledTimes(1);
+    await view.rerender(tree(30));
+    marker = view.getByTestId("activation");
+    await beginTouch(marker, touch(0, 0));
+    const detachedEnd = marker.props.onTouchEnd;
+    await view.unmount();
+    await act(async () => detachedEnd(touch(0, 0, 0)));
+    expect(latest).toHaveBeenCalledTimes(1);
+    expect(fixture.project).not.toHaveBeenCalled();
+    expect(fixture.unproject).not.toHaveBeenCalled();
+    expect(fixture.lock).not.toHaveBeenCalled();
   });
 
   test("annotation refresh delegates, live refresh resolves without work", async () => {
@@ -1745,30 +1774,6 @@ describe("TF07 native UI composition", () => {
     );
     await ref.current?.refresh();
     expect(refresh).toHaveBeenCalledTimes(1);
-  });
-
-  test("annotation drag rejection reapplies the authoritative coordinate", async () => {
-    const fixture = sessionFixture();
-    const ended = jest.fn();
-    const view = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker
-          longitude={10}
-          latitude={20}
-          renderMode="annotation"
-          draggable
-          onDragEnd={ended}
-        />
-      </FixtureSessionProvider>
-    );
-    const originalHost = view.getByTestId("native-marker").props.nativeID;
-    await fireEvent(view.getByTestId("native-marker"), "annotationDragEnd", {
-      lngLat: [30, 40],
-    });
-    expect(ended).toHaveBeenCalledWith({ lngLat: [30, 40] });
-    expect(view.getByTestId("native-marker").props.nativeID).not.toBe(
-      originalHost
-    );
   });
 
   test("popup dismissal is requested once and teardown is silent", async () => {

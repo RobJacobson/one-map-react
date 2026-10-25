@@ -14,7 +14,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { Platform, Pressable, Text, View, type ViewProps } from "react-native";
+import {
+  AppState,
+  type GestureResponderEvent,
+  Platform,
+  Pressable,
+  Text,
+  View,
+  type ViewProps,
+} from "react-native";
 import { Portal } from "react-native-teleport";
 
 import type { Adapter } from "../../contracts/adapter.js";
@@ -36,12 +44,8 @@ import {
   NativeOverlayContext,
   useNativeMapPresentation,
 } from "./native-map-presentation.js";
-import {
-  useActiveCallback,
-  useActiveCallbacks,
-} from "./use-active-callback.js";
+import { useActiveCallback } from "./use-active-callback.js";
 import { useFrozenValue } from "./use-frozen-value.js";
-import { useNativeMarkerDrag } from "./use-native-marker-drag.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 
 /** Selected native marker host presentation. */
@@ -72,16 +76,8 @@ export interface NativeMarkerHostProps {
   readonly anchor: Anchor;
   /** Logical-unit displacement of drawing and touch bounds. */
   readonly offset: Point;
-  /** Annotation dragging; live dragging is owned by the composition. */
-  readonly draggable?: boolean;
   /** Activation callback. */
   readonly onClick?: (event: MarkerEvent) => void;
-  /** Annotation drag start. */
-  readonly onDragStart?: (event: MarkerEvent) => void;
-  /** Annotation coordinate proposal. */
-  readonly onDrag?: (event: MarkerEvent) => void;
-  /** Annotation drag end. */
-  readonly onDragEnd?: (event: MarkerEvent) => void;
   /** Snapshot refresh handle. */
   readonly ref?: Ref<MarkerRef>;
   /** Reports asynchronous live-overlay projection failures. */
@@ -134,24 +130,19 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const markerId = props.id ?? generatedId;
       const anchor = props.anchor ?? defaultAnchor;
       const isAnnotation = props.renderMode === "annotation";
-      // Long-press timers and projection promises need current committed drag handlers.
-      const {
-        onDragStart: dragStart,
-        onDrag: drag,
-        onDragEnd: dragEnd,
-        onError: reportError,
-      } = useActiveCallbacks({
-        onDragStart: props.onDragStart,
-        onDrag: props.onDrag,
-        onDragEnd: props.onDragEnd,
-        onError: props.onError,
-      });
-      const { dragCoordinate, responders } = useNativeMarkerDrag(props, {
-        onDragStart: dragStart,
-        onDrag: drag,
-        onDragEnd: dragEnd,
-        onError: reportError,
-      });
+      const reportError = useActiveCallback(props.onError);
+      const responders = useNativeMarkerActivation(props);
+
+      if (
+        props.draggable === true ||
+        props.onDragStart !== undefined ||
+        props.onDrag !== undefined ||
+        props.onDragEnd !== undefined
+      ) {
+        throw new Error(
+          "Native Marker does not support dragging. Use a selected raw native annotation for SDK dragging."
+        );
+      }
 
       useImperativeHandle(ref, () => ({
         refresh: async () => {
@@ -164,34 +155,24 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       }));
 
       const Host = isAnnotation ? options.Annotation : options.Marker;
-      const markerCoordinate = dragCoordinate ?? coordinate;
-      const markerClick = (event: MarkerEvent): void => {
+      const markerClick = useActiveCallback((event: MarkerEvent): void => {
         props.onClick?.(event);
         // RNMapbox 10.3.7 toggles selection on taps; reset until it exposes per-tap events.
         if (options.backend === "mapbox-native") {
           setAnnotationRevision((revision) => revision + 1);
         }
-      };
+      });
 
       return (
         <Host
           key={isAnnotation ? annotationRevision : "view"}
           ref={annotationRef}
           id={markerId}
-          lngLat={[markerCoordinate[0], markerCoordinate[1]]}
+          lngLat={[coordinate[0], coordinate[1]]}
           anchor={anchor}
           offset={offset}
-          draggable={isAnnotation && props.draggable}
           onProjectionError={reportError}
           onClick={isAnnotation ? markerClick : undefined}
-          onDragStart={dragStart}
-          onDrag={drag}
-          onDragEnd={(event: MarkerEvent) => {
-            dragEnd(event);
-            // Native annotation wrappers retain a dragged coordinate when the
-            // unchanged controlled prop is rejected; reattachment reapplies it.
-            if (isAnnotation) setAnnotationRevision((revision) => revision + 1);
-          }}
         >
           <View
             {...props.hostProps}
@@ -332,6 +313,97 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     GeolocateControl: NativeGeolocateControl,
     FullscreenControl: NativeFullscreenControl,
   };
+};
+
+/** Observes live-marker activation without claiming scrolling or child-button touches. */
+const useNativeMarkerActivation = (props: MarkerProps): ViewProps => {
+  const eligible = useRef(false);
+  const origin = useRef<Point | null>(null);
+  const foreground = useRef(
+    AppState.currentState === null || AppState.currentState === "active"
+  );
+  const click = useActiveCallback(() =>
+    props.onClick?.({ lngLat: [props.longitude, props.latitude] })
+  );
+  const cancel = useCallback((): void => {
+    eligible.current = false;
+    origin.current = null;
+  }, []);
+
+  useLayoutEffect(() => {
+    // Home can transform native touch coordinates before touch cancellation arrives.
+    const subscription = AppState.addEventListener("change", (state) => {
+      foreground.current = state === "active";
+      if (!foreground.current) cancel();
+    });
+    return () => {
+      subscription.remove();
+      cancel();
+    };
+  }, [cancel]);
+
+  useLayoutEffect(() => {
+    cancel();
+  }, [props.longitude, props.latitude, props.renderMode, cancel]);
+
+  if (props.renderMode === "annotation") return {};
+  return {
+    // Fabric blocks native scrolling below a responder ancestor; observe only.
+    onStartShouldSetResponder: (event) => {
+      if (event)
+        eligible.current =
+          foreground.current && event.nativeEvent.touches.length === 1;
+      return false;
+    },
+    onResponderTerminate: cancel,
+    onResponderTerminationRequest: () => true,
+    onTouchStart: (event) => {
+      const canActivate =
+        eligible.current &&
+        foreground.current &&
+        event.nativeEvent.touches.length === 1;
+      cancel();
+      if (canActivate && !startsInScrollableChild(event)) {
+        origin.current = [event.nativeEvent.pageX, event.nativeEvent.pageY];
+      }
+    },
+    onTouchMove: (event) => {
+      if (
+        event.nativeEvent.touches.length !== 1 ||
+        (origin.current &&
+          Math.hypot(
+            event.nativeEvent.pageX - origin.current[0],
+            event.nativeEvent.pageY - origin.current[1]
+          ) > 8)
+      )
+        cancel();
+    },
+    onTouchEnd: (event) => {
+      const activate =
+        origin.current !== null &&
+        foreground.current &&
+        event.nativeEvent.touches.length === 0;
+      cancel();
+      if (activate) click();
+    },
+    onTouchCancel: cancel,
+  };
+};
+
+/** Leaves overflowing child content with its native scroll host, bounded to this marker. */
+const startsInScrollableChild = (event: GestureResponderEvent): boolean => {
+  const target = event.target;
+  if (!target || typeof target !== "object") return false;
+  let node: typeof target.parentElement = target;
+  while (node && node !== event.currentTarget) {
+    if (
+      (node.clientHeight > 0 && node.scrollHeight > node.clientHeight) ||
+      (node.clientWidth > 0 && node.scrollWidth > node.clientWidth)
+    )
+      return true;
+    node = node.parentElement;
+  }
+  return false;
 };
 
 const NativeControl = (props: NativeControlProps): ReactElement => {

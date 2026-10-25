@@ -92,11 +92,16 @@ export const Map = SharedMap as ForwardRefExoticComponent<
 >;
 
 /** Selected marker content host, including accessibility and layout attributes. */
-export interface NativeMarkerProps extends MarkerProps {
+export interface NativeMarkerProps extends Omit<
+  MarkerProps,
+  "draggable" | "onDragStart" | "onDrag" | "onDragEnd"
+> {
+  /** Native shared markers support programmatic coordinates and activation only. */
+  readonly draggable?: false;
   /** Attributes composed on the marker's owned native child View. */
   readonly hostProps?: ViewProps;
 }
-/** Selected marker retaining portable drag and geometry semantics. */
+/** Selected marker retaining shared geometry and activation. */
 export const Marker = SharedMarker as ForwardRefExoticComponent<
   NativeMarkerProps & RefAttributes<MarkerRef>
 >;

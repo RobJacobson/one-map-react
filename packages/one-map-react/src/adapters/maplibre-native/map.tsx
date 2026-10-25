@@ -96,7 +96,7 @@ const MaplibreNativeMapImplementation = forwardRef<
     onError,
     reuseMaps,
     gl,
-    interactive: requestedInteractive,
+    interactive,
     dragPan,
     touchZoom,
     touchRotate,
@@ -104,7 +104,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     doubleTapZoom,
     children,
   } = props;
-  const interactive = session.gestureLocked ? false : requestedInteractive;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
   const mapRef = useRef<ComponentRef<typeof MaplibreMap>>(null);
   // onDidFinishLoadingMap is the signal that MapLibre will apply an

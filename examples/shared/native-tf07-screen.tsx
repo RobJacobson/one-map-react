@@ -101,13 +101,14 @@ export const NativeTf07Screen = ({
           {readback}
         </Text>
         <Tf07Scene
+          native
           style={{ flex: 1 }}
           attach={attach}
           report={(event) => setStatus(`TF07 ${event}`)}
           controlContent={<Text>Custom control</Text>}
           markerContent={(kind, activate) => (
             <View testID={`tf07-${kind}`} style={styles.content}>
-              <Text>{kind === "live" ? "Long press to drag" : kind}</Text>
+              <Text>{kind === "live" ? "Live marker" : kind}</Text>
               {kind !== "annotation" && (
                 <Pressable
                   accessibilityRole="button"

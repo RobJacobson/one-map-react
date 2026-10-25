@@ -1,5 +1,7 @@
 # Example workspace checkpoint
 
+**Historical scope.** Native marker drag results and commands below remain attached to their recorded artifacts. The [next-release migration](revised-api-proposal.md#markers-images-popups-and-controls) excludes common native dragging in both render modes; U07 removal is implemented and retires only the native live-drag and annotation-drag acceptance scenarios. Web dragging and selected raw native annotation dragging remain available. Retained native marker interactions await new touch acceptance; these earlier results do not verify the changed implementation.
+
 The new Expo and Vite apps implement the minimal shared-basemap checkpoint. Native coexistence and renderer behavior are unverified. Migration of the existing acceptance scenarios and removal of the old shells wait for the separately authorized native checkpoint. The [testing policy](testing-policy.md) governs that authorization and evidence retention.
 
 ## Development setup

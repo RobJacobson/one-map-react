@@ -12,6 +12,7 @@ for (const [relative, names] of [
   ["facade/map.tsx", ["Map"]],
   ["facade/user-location.tsx", ["UserLocation"]],
   ["adapters/web/map.tsx", ["WebMap"]],
+  ["adapters/shared/native-ui.tsx", ["useNativeMarkerActivation"]],
   [
     "adapters/shared/native-map-presentation.tsx",
     ["NativePresentationProvider", "NativeCameraProvider"],
