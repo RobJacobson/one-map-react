@@ -64,8 +64,8 @@ interface LifetimeFields {
 
 /**
  * Observes vector feature-state namespaces across keyed source lifetimes and
- * both family changes. Writes stay present before every transition; only the
- * initial operation checks explicitly remove state. Generation-bearing tiles
+ * both family changes. The application explicitly clears destination state
+ * after every transition, then reapplies its values. Generation-bearing tiles
  * establish attachment before any ref-based source query or state operation.
  */
 export const useLifetimesSmoke = ({
@@ -193,16 +193,21 @@ export const useLifetimesSmoke = ({
           nextFields.vectorNamespaces = "ok";
           commit("remount", { sourceRevision: scene.sourceRevision + 1 });
         } else {
+          // State may persist or disappear with the selected renderer lifetime.
+          for (const target of targets) {
+            await map.removeFeatureState(target);
+            assertActive(signal);
+          }
           await assertEmptyState(map, targets, signal);
           if (scene.phase === "remount") {
-            nextFields.vectorRemount = "cleared";
+            nextFields.vectorRemount = "explicitly-cleared";
             await writeAndVerify(map, targets, signal);
             styleLoaded.current = false;
             commit("style", {
               mapStyle: replacementStyle,
             });
           } else if (scene.phase === "style") {
-            nextFields.vectorStyle = "cleared";
+            nextFields.vectorStyle = "explicitly-cleared";
             await writeAndVerify(map, targets, signal);
             commit("to-geojson", {
               family: "geojson",
@@ -211,19 +216,19 @@ export const useLifetimesSmoke = ({
           } else if (scene.phase === "to-geojson") {
             await assertInitialOperations(map, targets[0], signal);
             await writeAndVerify(map, targets, signal);
-            nextFields.vectorToGeojson = "cleared";
+            nextFields.vectorToGeojson = "explicitly-cleared";
             commit("to-vector", {
               family: "vector",
               sourceRevision: scene.sourceRevision + 1,
             });
           } else if (scene.phase === "to-vector") {
             await writeAndVerify(map, targets, signal);
-            nextFields.geojsonToVector = "cleared";
+            nextFields.geojsonToVector = "explicitly-cleared";
             commit("final-remount", {
               sourceRevision: scene.sourceRevision + 1,
             });
           } else if (scene.phase === "final-remount") {
-            nextFields.finalRemount = "cleared";
+            nextFields.finalRemount = "explicitly-cleared";
             commit("done");
           }
         }

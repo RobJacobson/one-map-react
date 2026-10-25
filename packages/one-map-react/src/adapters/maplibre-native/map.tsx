@@ -8,7 +8,6 @@ import {
   type ComponentRef,
   forwardRef,
   useImperativeHandle,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -35,10 +34,7 @@ import {
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
 import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
-import {
-  useActiveCallback,
-  useActiveCallbacks,
-} from "../shared/use-active-callback.js";
+import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding } from "../shared/wrapper-values.js";
 import { mutableFlatBounds, toMaplibreViewState } from "./convert-camera.js";
@@ -111,24 +107,9 @@ const MaplibreNativeMapImplementation = forwardRef<
   const mapLoaded = useRef(false);
   const sawMove = useRef(false);
   const [sources] = useState(() => new MaplibreSourceRegistry());
-  const styleKey = JSON.stringify(mapStyle);
-  const previousStyle = useRef(styleKey);
-  useLayoutEffect(() => {
-    if (previousStyle.current !== styleKey) {
-      previousStyle.current = styleKey;
-      sources.featureState.resetStyle();
-    }
-  }, [sources, styleKey]);
   const frozenViewState = useFrozenValue(initialViewState);
   // One settled native event can report several callbacks; an earlier one may unmount the map.
   const report = useActiveCallbacks({ onMove, onMoveEnd });
-  // Feature-state resets finish after the native frame callback returns.
-  const reportFeatureStateError = useActiveCallback((error: unknown) =>
-    onError?.({ error })
-  );
-  const flushFeatureState = (): void => {
-    void sources.featureState.flush(reportFeatureStateError);
-  };
   const gestures = toMaplibreGestures({
     interactive,
     dragPan,
@@ -263,14 +244,12 @@ const MaplibreNativeMapImplementation = forwardRef<
             {...gestures}
             onDidFinishRenderingFrameFully={() => {
               capture.frame();
-              flushFeatureState();
             }}
             onDidFinishLoadingMap={() => {
               mapLoaded.current = true;
               onLoad?.();
             }}
             onDidFinishLoadingStyle={() => {
-              sources.featureState.resetStyle();
               onStyleLoad?.();
             }}
             onDidFailLoadingMap={() => {

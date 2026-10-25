@@ -2,7 +2,6 @@ import type { Camera, MapView } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
 import type { LngLat, MapRef, Point } from "../../contracts/camera-types.js";
-import type { FeatureIdentifier } from "../../contracts/query-types.js";
 import {
   nativeResizeError,
   nativeStopError,
@@ -28,7 +27,6 @@ import {
 } from "./convert-camera.js";
 import {
   toRnmapboxClusterFeature,
-  toRnmapboxFeatureArgs,
   toRnmapboxQueryRect,
   toRnmapboxRenderedQueryArgs,
   toRnmapboxSourceQueryArgs,
@@ -194,29 +192,11 @@ export const createMapboxMapRef = (
       "getClusterChildren"
     );
   },
-  ...createMapboxFeatureStateMethods(
-    () => requireMap(mapViewRef.current),
-    geoJsonSources
-  ),
+  ...createMapboxFeatureStateMethods(() => requireMap(mapViewRef.current)),
   resize: async () => {
     throw nativeResizeError();
   },
 });
-
-/**
- * Removes the whole state of a previously written target after source remount.
- * @param mapViewRef - Current native map ref.
- * @param identifier - Validated native feature-state target.
- */
-export const resetMapboxFeatureState = async (
-  mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
-  identifier: FeatureIdentifier
-): Promise<void> => {
-  const map = requireMap(mapViewRef.current);
-  const [featureId, sourceId, sourceLayerId] =
-    toRnmapboxFeatureArgs(identifier);
-  await map.removeFeatureState(featureId, null, sourceId, sourceLayerId);
-};
 
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null

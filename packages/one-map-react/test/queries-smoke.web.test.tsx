@@ -188,8 +188,12 @@ test.each([false, true])(
       await tick(250);
     expect(hook.result.current.status).toContain("remove-state=ok");
     expect(hook.result.current.status).toContain("whole-state=ok");
-    expect(hook.result.current.status).toContain("recreated-state=cleared");
-    expect(hook.result.current.status).toContain("cleared-state=cleared");
+    expect(hook.result.current.status).toContain(
+      "recreated-state=explicitly-cleared"
+    );
+    expect(hook.result.current.status).toContain(
+      "cleared-state=explicitly-cleared"
+    );
     expect(hook.result.current.status).toContain("error=none");
     expect(hook.result.current.phase).toBe("done");
     expect(fixture.setFeatureState).toHaveBeenCalledWith(
@@ -265,10 +269,14 @@ test("recreation waits for the loaded source generation before reading state", a
   expect(hook.result.current.phase).toBe("recreate");
   await tick(500);
   expect(hook.result.current.phase).toBe("done");
-  expect(hook.result.current.status).toContain("recreated-state=cleared");
-  expect(hook.result.current.status).toContain("cleared-state=cleared");
+  expect(hook.result.current.status).toContain(
+    "recreated-state=explicitly-cleared"
+  );
+  expect(hook.result.current.status).toContain(
+    "cleared-state=explicitly-cleared"
+  );
   expect(hook.result.current.status).toContain("error=none");
-  expect(fixture.removeFeatureState).toHaveBeenCalledTimes(2);
+  expect(fixture.removeFeatureState).toHaveBeenCalledTimes(4);
   expect(renders.filter((render) => render.phase === "recreate")).toEqual(
     expect.arrayContaining([
       { phase: "recreate", sourceRevision: 1, reset: false },
@@ -353,8 +361,12 @@ test("an attaching native source tag is not queried before its generation render
   await tick(500);
   expect(hook.result.current.phase).toBe("done");
   expect(hook.result.current.status).toContain("error=none");
-  expect(hook.result.current.status).toContain("recreated-state=cleared");
-  expect(hook.result.current.status).toContain("cleared-state=cleared");
+  expect(hook.result.current.status).toContain(
+    "recreated-state=explicitly-cleared"
+  );
+  expect(hook.result.current.status).toContain(
+    "cleared-state=explicitly-cleared"
+  );
 });
 
 test("a native tag failure during remount readiness propagates immediately", async () => {
@@ -381,7 +393,7 @@ test("a native tag failure during remount readiness propagates immediately", asy
   );
 });
 
-test("recreated sources must clear the entire state, including count", async () => {
+test("the application explicitly clears retained whole state after recreation", async () => {
   const fixture = scene(1);
   const hook = renderHook(() => {
     const smoke = useQueriesSmoke({ mapRef: fixture.mapRef });
@@ -393,13 +405,16 @@ test("recreated sources must clear the entire state, including count", async () 
   });
   act(() => hook.result.current.onLoad());
   await tick(250);
-  expect(hook.result.current.phase).toBe("recreate");
-  await tick(5500);
-  expect(hook.result.current.phase).toBe("done");
+  expect(hook.result.current.phase).toBe("reset");
   expect(hook.result.current.status).toContain(
-    "whole-state-removal-timed-out-after-5000-ms"
+    "recreated-state=explicitly-cleared"
   );
-  expect(hook.result.current.status).toContain("recreated-state=pending");
+  expect(fixture.removeFeatureState).toHaveBeenCalledTimes(3);
+  act(() => hook.result.current.onStyleLoad());
+  await tick(250);
+  expect(hook.result.current.phase).toBe("done");
+  expect(hook.result.current.status).toContain("error=none");
+  expect(fixture.removeFeatureState).toHaveBeenCalledTimes(4);
 });
 
 test("state removal times out after five seconds", async () => {

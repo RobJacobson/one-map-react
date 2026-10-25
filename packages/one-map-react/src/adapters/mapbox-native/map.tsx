@@ -4,7 +4,6 @@ import {
   type ComponentRef,
   forwardRef,
   useImperativeHandle,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -50,7 +49,7 @@ import {
 } from "./geojson-source-registry.js";
 import { useMapboxGestureSettings } from "./gesture-settings.js";
 import { assertLabelLocalization } from "./label-localization.js";
-import { createMapboxMapRef, resetMapboxFeatureState } from "./map-ref.js";
+import { createMapboxMapRef } from "./map-ref.js";
 import { mergeGestureSettings, toRnmapboxStyleProps } from "./style-props.js";
 import { useMapboxScalePosition } from "./use-mapbox-scale-position.js";
 
@@ -112,14 +111,7 @@ const MapboxNativeMapImplementation = forwardRef<
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
   const mapViewRef = useRef<ComponentRef<typeof MapView>>(null);
   const sawMove = useRef(false);
-  const [geoJsonSources] = useState(
-    // eslint-disable-next-line react/refs -- The registry retains its reset callback without invoking it during initialization.
-    () =>
-      // eslint-disable-next-line react/refs -- The registry stores a reset callback; it reads the map ref only when a source resets.
-      new GeoJsonSourceRegistry((target) =>
-        resetMapboxFeatureState(mapViewRef, target)
-      )
-  );
+  const [geoJsonSources] = useState(() => new GeoJsonSourceRegistry());
   const frozenViewState = useFrozenValue(initialViewState);
   const extraGestureSettings = useMapboxGestureSettings();
   // RNMapbox class event handlers read this.props, including props from a suspended render.
@@ -133,23 +125,7 @@ const MapboxNativeMapImplementation = forwardRef<
     onStyleLoad,
     onError,
   });
-  const flushFeatureState = (): void => {
-    void geoJsonSources.featureState.flush((error) =>
-      report.onError({ error })
-    );
-  };
   const styleProps = toRnmapboxStyleProps(mapStyle);
-  const styleKey =
-    styleProps.styleJSON !== undefined
-      ? `json:${styleProps.styleJSON}`
-      : `url:${styleProps.styleURL}`;
-  const previousStyle = useRef(styleKey);
-  useLayoutEffect(() => {
-    if (previousStyle.current !== styleKey) {
-      previousStyle.current = styleKey;
-      geoJsonSources.featureState.resetStyle();
-    }
-  }, [geoJsonSources, styleKey]);
   const gestures = toRnmapboxGestures({
     interactive,
     dragPan,
@@ -283,15 +259,11 @@ const MapboxNativeMapImplementation = forwardRef<
             gestureSettings={gestureSettings}
             onDidFinishRenderingFrameFully={() => {
               capture.frame();
-              flushFeatureState();
             }}
             onDidFinishLoadingMap={() => {
               report.onLoad();
             }}
             onDidFinishLoadingStyle={() => {
-              // Native style diffing can retain source state. Invalidate before
-              // the callback so writes it makes belong to the loaded style.
-              geoJsonSources.featureState.resetStyle();
               report.onStyleLoad();
             }}
             onMapLoadingError={(payload: unknown) => {

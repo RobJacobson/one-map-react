@@ -204,7 +204,9 @@ export const createMaplibreMapRef = (
       "getClusterChildren"
     );
   },
-  ...createMaplibreFeatureStateMethods(sources),
+  ...createMaplibreFeatureStateMethods(sources, () =>
+    requireMap(mapRef.current)
+  ),
   resize: async () => {
     throw nativeResizeError();
   },

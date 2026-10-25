@@ -80,7 +80,7 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
       return;
     }
 
-    return registry.register(props.id, sourceRef.current);
+    return registry.register(props.id, () => sourceRef.current);
   }, [registry, props.id]);
 
   return (
@@ -101,7 +101,7 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
   );
 };
 
-/** Registers the vector source lifetime for native feature-state reset. */
+/** Forwards vector data and source activation to RNMapbox. */
 const MapboxNativeVectorSource = (props: VectorSourceProps) => {
   const session = useOptionalMapSession();
   const press = (
@@ -111,12 +111,6 @@ const MapboxNativeVectorSource = (props: VectorSourceProps) => {
   ): void => {
     session?.dispatchSource(props.id, sourceHitFromMapbox(event));
   };
-  const registry = useGeoJsonSourceRegistry();
-
-  useLayoutEffect(
-    () => registry?.featureState.register(props.id, "vector"),
-    [registry, props.id]
-  );
 
   return (
     <VectorSource

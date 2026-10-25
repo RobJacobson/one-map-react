@@ -657,7 +657,7 @@ function judge(status) {
     const passed =
       fields.loaded === "1" &&
       operations.every((key) => fields[key] === "ok") &&
-      transitions.every((key) => fields[key] === "cleared") &&
+      transitions.every((key) => fields[key] === "explicitly-cleared") &&
       fields.error === "none" &&
       fields.phase === "done" &&
       fields.done === "1";
@@ -673,14 +673,14 @@ function judge(status) {
     fields.filters === "ok" &&
     fields.pagination === "ok" &&
     fields["whole-state"] === "ok" &&
-    fields["recreated-state"] === "cleared" &&
+    fields["recreated-state"] === "explicitly-cleared" &&
     fields["cluster-zoom"] === "ok" &&
     fields.leaves === "ok" &&
     fields.children === "ok" &&
     fields["set-state"] === "ok" &&
     fields["get-state"] === "ok" &&
     fields["remove-state"] === "ok" &&
-    fields["cleared-state"] === "cleared" &&
+    fields["cleared-state"] === "explicitly-cleared" &&
     fields.error === "none" &&
     fields.done === "1";
 

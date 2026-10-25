@@ -93,6 +93,8 @@ For mixed engines, keep this setup import in platform files. A `setup.ts` can se
 
 `MapRef` camera, query, cluster, and feature-state methods return promises. A camera command resolves when its wrapper accepts dispatch, before an animation necessarily finishes. Queries propagate failures; empty successful results remain distinct. `useMap()` reads the enclosing map; `Map.id` and `useMap(id)` provide setup-local named maps. Named lookup returns `undefined` before attachment and after removal, and updates when the map attaches. See [camera and events](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf04-camera.md) and [queries](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf06-queries.md).
 
+Feature-state lifetime follows the selected renderer. Explicit `setFeatureState`, `getFeatureState`, and `removeFeatureState` calls validate and copy arguments, use the current attached map/source handle, and propagate SDK errors. Same-ID source remounts and style replacement provide no automatic clearing, replay, queue, or transaction guarantee. Applications retain the desired state and explicitly clear or reapply it after the relevant source is attached and ready; awaiting removal acknowledges dispatch rather than rendered visibility. Already dispatched SDK calls retain SDK ordering and lifetime. See the [migration status](https://github.com/RobJacobson/one-map-react/blob/main/docs/revised-api-implementation-plan.md#work-order) for review and verification gates.
+
 UI creation options compare their effective defaults. For example, changing a control's omitted `position` to its existing default does not require remounting. Genuine creation changes still require a new React key. Backend-specific defaults and unsupported requests retain their selected implementation's behavior.
 
 The published JavaScript includes React Compiler optimizations targeting React 19. Applications do not need to enable a compiler or install a compiler runtime package. Callback teardown, immutable creation rules, and resource ownership remain explicit library behavior.
@@ -139,7 +141,7 @@ See [advanced rendering](https://github.com/RobJacobson/one-map-react/blob/main/
 
 ## Native patches and linking
 
-Apply the repair for the exact installed native wrapper. Patches ship inside this package and belong in the application's dependency installation.
+Apply the repair for the exact installed native wrapper. Patches ship inside this package and belong in the application's dependency installation. Native feature-state/source operations retain SDK error reporting. Rebuild the native application after updating these patches.
 
 | Wrapper | Included combined repair |
 | --- | --- |
