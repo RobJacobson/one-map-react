@@ -1,5 +1,7 @@
 # API research and evidence
 
+The [U01 baseline and migration inventory](evidence/revised-api-u01-baseline.md) records the approved revised-API plan's working base, fresh routine checks, candidate provenance and caller/test closure. U01 changes no runtime behavior; U02 remains subject to separate owner sign-off. Its [frozen hashes and search references](evidence/revised-api-u01-baseline.json) are a checkpoint, not a second live coverage ledger.
+
 [support-matrix.json](support-matrix.json) and [evidence/tf10-release.json](evidence/tf10-release.json) own current candidate versions, patch paths, routine checks and open release gates. The [grouped Markdown checklist](../docs/api-coverage.md) owns current coverage contracts, exceptions and open work, separately from runtime verification. [TF10 native style sources](evidence/tf10-native-style-sources.json) preserves compact exact-tag source identities for native unsupported boundaries.
 
 The [facade simplification evidence](evidence/facade-simplification.json) records the compiler configuration, unchanged public contracts, routine outcomes, frozen archive, and proposed acceptance scope. Renderer acceptance for that archive remains unrun and requires separate permission.
