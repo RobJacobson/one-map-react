@@ -1,6 +1,15 @@
 import { act, fireEvent, render } from "@testing-library/react";
+import type {
+  Adapter,
+  MapProps,
+  MapRef,
+  MarkerProps,
+  MarkerRef,
+  ViewState,
+} from "one-map-react";
 import {
   createContext,
+  forwardRef,
   type ReactNode,
   useContext,
   useEffect,
@@ -16,6 +25,11 @@ import {
 
 const fixture = vi.hoisted(() => ({
   markers: [] as Array<Record<string, unknown>>,
+  viewState: undefined as ViewState | undefined,
+  observedCenter: [-122.31, 47.6],
+  zoom: 11,
+  commands: [] as string[],
+  probeInMap: [] as boolean[],
   click: undefined as
     | undefined
     | ((event: {
@@ -26,6 +40,7 @@ const fixture = vi.hoisted(() => ({
 }));
 vi.mock("one-map-react", async () => {
   const react = await import("react");
+  const InMap = react.createContext(false);
   const Content = ({ children }: { readonly children?: ReactNode }) => children;
   return {
     MapSetup: Content,
@@ -34,20 +49,43 @@ vi.mock("one-map-react", async () => {
         props: {
           readonly children?: ReactNode;
           readonly onClick?: typeof fixture.click;
+          readonly viewState?: ViewState;
         },
-        _ref
+        ref
       ) => {
         fixture.click = props.onClick;
+        fixture.viewState = props.viewState;
+        react.useImperativeHandle(ref, () => ({
+          getCenter: async () => fixture.observedCenter,
+          getZoom: async () => fixture.zoom,
+          queryRenderedFeatures: async () => [],
+          project: async () => [100, 100],
+          jumpTo: async () => {
+            fixture.commands.push("jumpTo");
+          },
+          zoomTo: async (zoom: number) => {
+            fixture.zoom = zoom;
+            fixture.commands.push("zoomTo");
+          },
+        }));
         return react.createElement(
           "div",
           { "data-testid": "sdk-map" },
-          props.children
+          react.createElement(InMap.Provider, { value: true }, props.children)
         );
       }
     ),
     Source: Content,
     Layer: () => null,
     Marker: (props: Record<string, unknown>) => {
+      const inMap = react.useContext(InMap);
+      if (String(props.id).startsWith("tf07-rejection")) {
+        fixture.probeInMap.push(inMap);
+        if (props.draggable || props.onDrag)
+          throw new Error(
+            "Native Marker does not support dragging. Use a selected raw native annotation for SDK dragging."
+          );
+      }
       fixture.markers.push(props);
       return null;
     },
@@ -160,13 +198,15 @@ vi.mock("react-native", async () => {
   const View = ({
     children,
     style,
+    testID,
   }: {
     children?: ReactNode;
     style?: object;
+    testID?: string;
   }) =>
     react.createElement(
       "div",
-      { "data-layout": JSON.stringify(style) },
+      { "data-layout": JSON.stringify(style), "data-testid": testID },
       children
     );
   return {
@@ -257,3 +297,94 @@ test.each([false, true])(
     view.unmount();
   }
 );
+
+const nativeAdapter: Adapter = {
+  backend: "mapbox-native",
+  Map: forwardRef<MapRef, MapProps>(() => null),
+  Source: () => null,
+  Layer: () => null,
+  Images: () => null,
+  Marker: forwardRef<MarkerRef, MarkerProps>(() => null),
+};
+
+test("native target controls distinguish fresh equal inputs from actual renderer readback", async () => {
+  fixture.commands = [];
+  fixture.observedCenter = [-122.31, 47.6];
+  const request = vi
+    .spyOn(globalThis, "fetch")
+    .mockResolvedValue(new Response());
+  const mounted = render(
+    <NativeTf07Screen adapter={nativeAdapter} ornaments={{}} />
+  );
+  const map = mounted.getByTestId("sdk-map");
+  fireEvent.click(mounted.getByRole("button", { name: "Target A" }));
+  const first = fixture.viewState;
+  expect(first).toMatchObject({ longitude: -122.34, latitude: 47.61 });
+  fireEvent.click(mounted.getByRole("button", { name: "Repeat target" }));
+  expect(fixture.viewState).toEqual(first);
+  expect(fixture.viewState).not.toBe(first);
+  expect(fixture.commands).toEqual([]);
+  await act(async () => {
+    fireEvent.click(mounted.getByRole("button", { name: "Read renderer" }));
+  });
+  expect(mounted.getByTestId("tf07-readback").textContent).toContain(
+    '"center":[-122.31,47.6]'
+  );
+  expect(mounted.getByTestId("tf07-requested-target").textContent).toContain(
+    '"longitude":-122.34'
+  );
+  fireEvent.click(mounted.getByRole("button", { name: "Target B" }));
+  expect(fixture.viewState).toMatchObject({
+    longitude: -122.32,
+    latitude: 47.615,
+  });
+  fireEvent.click(mounted.getByRole("button", { name: "Target A" }));
+  expect(fixture.viewState).toEqual(first);
+  fireEvent.click(mounted.getByRole("button", { name: "Clear target" }));
+  expect(fixture.viewState).toBeUndefined();
+  await act(async () => {
+    fireEvent.click(mounted.getByRole("button", { name: "Zoom in" }));
+  });
+  expect(fixture.commands).toEqual(["zoomTo"]);
+  expect(mounted.getByTestId("sdk-map")).toBe(map);
+  mounted.unmount();
+  request.mockRestore();
+});
+
+test("each native legacy-prop probe rejects inside map context and resets without replacing map", () => {
+  fixture.markers = [];
+  fixture.probeInMap = [];
+  const errors = vi.spyOn(console, "error").mockImplementation(() => undefined);
+  const mounted = render(
+    <NativeTf07Screen adapter={nativeAdapter} ornaments={{}} />
+  );
+  const map = mounted.getByTestId("sdk-map");
+  for (const title of [
+    "Reject view draggable",
+    "Reject view callback",
+    "Reject annotation draggable",
+    "Reject annotation callback",
+  ]) {
+    fireEvent.click(mounted.getByRole("button", { name: title }));
+    expect(mounted.getByTestId("tf07-marker-rejection").textContent).toContain(
+      "Native Marker does not support dragging."
+    );
+    expect(mounted.getByTestId("tf07-marker-rejection").textContent).toContain(
+      title
+    );
+    expect(
+      fixture.markers.some((props) =>
+        String(props.id).startsWith("tf07-rejection")
+      )
+    ).toBe(false);
+    fireEvent.click(mounted.getByRole("button", { name: "Clear rejection" }));
+    expect(mounted.getByTestId("tf07-marker-rejection").textContent).toBe(
+      "No rejection requested"
+    );
+    expect(mounted.getByTestId("sdk-map")).toBe(map);
+  }
+  expect(fixture.probeInMap.length).toBeGreaterThanOrEqual(4);
+  expect(fixture.probeInMap.every(Boolean)).toBe(true);
+  mounted.unmount();
+  errors.mockRestore();
+});

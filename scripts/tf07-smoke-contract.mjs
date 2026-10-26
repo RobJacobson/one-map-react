@@ -11,6 +11,8 @@ export const nativeUiScenarios = [
   "style-remount",
   "host-accessibility",
   "sdk-ornaments",
+  "camera-target-and-gesture",
+  "marker-prop-rejection",
 ];
 
 /** A final physical read may finish only after every run-bound outcome is recorded. */
