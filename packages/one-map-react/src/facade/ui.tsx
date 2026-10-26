@@ -3,7 +3,6 @@ import { forwardRef } from "react";
 import { useFrozenValue } from "../adapters/shared/use-frozen-value.js";
 import type {
   ControlProps,
-  GeolocateControlProps,
   MarkerProps,
   MarkerRef,
 } from "../contracts/ui-types.js";
@@ -33,15 +32,5 @@ export const Control = (props: ControlProps) => {
   useMapSession();
   const { Control: Implementation } = useSelectedAdapter();
   useStableOptions("Control", { position: props.position ?? "top-right" });
-  return <Implementation {...props} />;
-};
-
-/** Acquires location and centers the enclosing map. */
-export const GeolocateControl = (props: GeolocateControlProps) => {
-  useMapSession();
-  const { GeolocateControl: Implementation } = useSelectedAdapter();
-  useStableOptions("GeolocateControl", {
-    position: props.position ?? "top-right",
-  });
   return <Implementation {...props} />;
 };

@@ -125,4 +125,5 @@ export default App;
 const tf07Ornaments = {
   scaleBar: true,
   scaleBarPosition: { top: 64, left: 8 },
+  compassPosition: { top: 148, right: 8 },
 } satisfies NativeMapProps["options"];

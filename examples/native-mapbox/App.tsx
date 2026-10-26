@@ -188,4 +188,6 @@ export default App;
 // Native scale units and appearance belong to the selected SDK.
 const tf07Ornaments = {
   scaleBarEnabled: true,
+  scaleBarPosition: { top: 64, left: 8 },
+  compassPosition: { top: 148, right: 8 },
 } satisfies NativeMapProps["options"];

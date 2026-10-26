@@ -12,20 +12,11 @@ import type { Adapter } from "../../contracts/adapter.js";
 import type { LngLat } from "../../contracts/camera-types.js";
 import type {
   ControlProps,
-  GeolocateControlProps,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
 } from "../../contracts/ui-types.js";
-import {
-  useMapSession,
-  useOptionalMapSession,
-} from "../../facade/map-context.js";
-import { useLocationOverride } from "../../facade/map-setup.js";
-import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
 import { useStableOptions } from "../../facade/use-stable-options.js";
-import { UserLocation } from "../../facade/user-location.js";
-import { positionFromWrapper } from "../shared/location-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import {
@@ -65,7 +56,7 @@ interface WebMarkerHandle {
  */
 export const createWebUi = (
   wrapper: WebWrapper<"mapbox-web" | "maplibre-web">
-): Pick<Adapter, "Marker" | "Control" | "GeolocateControl"> => {
+): Pick<Adapter, "Marker" | "Control"> => {
   const Marker = forwardRef<MarkerRef, MarkerProps & WebUiOptions>(
     (props, ref) => {
       const {
@@ -165,63 +156,9 @@ export const createWebUi = (
     );
   };
 
-  const GeolocateControl = (props: GeolocateControlProps & WebUiOptions) => {
-    const {
-      options,
-      hostProps,
-      children,
-      getCurrentPosition,
-      locationProvider,
-      zoom,
-      onGeolocate,
-      onError,
-      ...forwarded
-    } = props;
-    useStableOptions(
-      "GeolocateControl",
-      creationOptions(options, [
-        "style",
-        "onOutOfMaxBounds",
-        "onTrackUserLocationStart",
-        "onTrackUserLocationEnd",
-      ])
-    );
-    // react-map-gl writes its callback ref during render, before a Suspense commit.
-    const { onGeolocate: locate, onError: error } = useActiveCallbacks({
-      onGeolocate,
-      onError,
-    });
-
-    const session = useOptionalMapSession();
-    const setupProvider = useLocationOverride();
-    if (props.trackUserLocation && session?.cameraControlled) {
-      throw new Error(
-        "Location follow conflicts with viewState or selected native camera follow."
-      );
-    }
-
-    if (getCurrentPosition || locationProvider || setupProvider) {
-      return <InjectedGeolocateControl {...props} Control={Control} />;
-    }
-
-    return (
-      <wrapper.GeolocateControl
-        key={props.trackUserLocation ? "tracking" : "once"}
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-        onGeolocate={(event: unknown) =>
-          locate(positionFromWrapper(event, "browser"))
-        }
-        onError={error}
-      />
-    );
-  };
-
   return {
     Marker,
     Control,
-    GeolocateControl,
   };
 };
 
@@ -275,30 +212,4 @@ const createControlHost = (): WebCustomControl => {
   element.className = "mapboxgl-ctrl maplibregl-ctrl";
 
   return { element, onAdd: () => element, onRemove: () => element.remove() };
-};
-
-/** One-shot injected locations permit deterministic browser/native app behavior. */
-const InjectedGeolocateControl = (
-  props: GeolocateControlProps &
-    WebUiOptions & {
-      readonly Control: (props: ControlProps & WebUiOptions) => ReactNode;
-    }
-): ReactNode => {
-  const session = useMapSession();
-  const { pending, position, activate } = useGeolocationControl(props, "flyTo");
-  return (
-    <>
-      <UserLocation position={position} showAccuracyCircle />
-      <props.Control position={props.position} hostProps={props.hostProps}>
-        <button
-          type="button"
-          aria-label="Locate me"
-          disabled={pending || !session.ready}
-          onClick={activate}
-        >
-          Locate me
-        </button>
-      </props.Control>
-    </>
-  );
 };

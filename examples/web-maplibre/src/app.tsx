@@ -7,6 +7,7 @@ import {
 import {
   adapter,
   WrapperPopup,
+  WrapperGeolocateControl,
   WrapperScaleControl,
   WrapperAttributionControl,
   WrapperNavigationControl,
@@ -14,6 +15,7 @@ import {
 import { type ReactNode, useEffect } from "react";
 import { useMap } from "react-map-gl/maplibre";
 
+import type { NativeLocationButtonProps } from "../../shared/native-location-button.js";
 import { WebCameraApp } from "../../shared/web-camera-app.js";
 import {
   useWebCorrectionProbe,
@@ -47,6 +49,7 @@ export const App = () => {
   if (new URLSearchParams(window.location.search).get("tf08") === "services")
     return (
       <WebTf08App
+        renderLocation={WebLocationControl}
         navigationControl={<WrapperNavigationControl position="top-right" />}
         ornamentControls={
           <>
@@ -61,6 +64,7 @@ export const App = () => {
   if (new URLSearchParams(window.location.search).get("tf07") === "ui")
     return (
       <WebTf07App
+        renderLocation={WebLocationControl}
         renderNavigation={renderNavigation}
         renderScale={renderScale}
         adapter={adapter}
@@ -242,4 +246,29 @@ const renderNavigation = () => (
 
 const renderScale = (unit: "metric" | "imperial") => (
   <WrapperScaleControl position="bottom-left" unit={unit} />
+);
+
+/** Browser acquisition and camera behavior are owned by the selected wrapper. */
+const WebLocationControl = ({
+  onGeolocate,
+  onError,
+  zoom,
+  corner,
+}: Pick<
+  NativeLocationButtonProps,
+  "onGeolocate" | "onError" | "zoom" | "corner"
+>) => (
+  <WrapperGeolocateControl
+    position={corner === "right" ? "top-right" : "top-left"}
+    showUserLocation={false}
+    fitBoundsOptions={{ maxZoom: zoom ?? 14 }}
+    onGeolocate={(event) =>
+      onGeolocate?.({
+        lngLat: [event.coords.longitude, event.coords.latitude],
+        accuracy: event.coords.accuracy,
+        timestamp: event.timestamp,
+      })
+    }
+    onError={onError}
+  />
 );

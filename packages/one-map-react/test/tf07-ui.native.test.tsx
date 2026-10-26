@@ -687,47 +687,6 @@ describe("TF07 native UI composition", () => {
     ).rejects.toThrow("map point");
   });
 
-  test("invalid injected locations report failure without successful notification or camera dispatch", async () => {
-    const fixture = sessionFixture();
-    const located = jest.fn();
-    const failed = jest.fn();
-    const view = await render(
-      <NativeOverlayHost session={fixture.session}>
-        <ui.GeolocateControl
-          getCurrentPosition={async () => ({ lngLat: [1, Number.NaN] })}
-          onGeolocate={located}
-          onError={failed}
-        />
-      </NativeOverlayHost>
-    );
-    await fireEvent.press(view.getByLabelText("Locate me"));
-    expect(failed).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: expect.stringContaining("coordinate"),
-      })
-    );
-    expect(located).not.toHaveBeenCalled();
-    expect(fixture.easeTo).not.toHaveBeenCalled();
-  });
-
-  test("injected location coordinates are copied before callbacks and camera dispatch", async () => {
-    const fixture = sessionFixture();
-    const located = jest.fn();
-    const position: { lngLat: [number, number] } = { lngLat: [1, 2] };
-    const view = await render(
-      <NativeOverlayHost session={fixture.session}>
-        <ui.GeolocateControl
-          getCurrentPosition={async () => position}
-          onGeolocate={located}
-        />
-      </NativeOverlayHost>
-    );
-    await fireEvent.press(view.getByLabelText("Locate me"));
-    position.lngLat[0] = 99;
-    expect(located).toHaveBeenCalledWith({ lngLat: [1, 2] });
-    expect(fixture.easeTo).toHaveBeenCalledWith({ center: [1, 2], zoom: 14 });
-  });
-
   test("native custom controls forward their owned host presentation", async () => {
     const fixture = sessionFixture();
     const control = await render(
@@ -1281,43 +1240,6 @@ describe("TF07 native UI composition", () => {
     );
     await ref.current?.refresh();
     expect(refresh).toHaveBeenCalledTimes(1);
-  });
-
-  test("injected location centers once and pending work is ignored after teardown", async () => {
-    const fixture = sessionFixture();
-    const located = jest.fn();
-    let finish: (position: {
-      lngLat: readonly [number, number];
-    }) => void = () => undefined;
-    const provider = jest.fn(
-      () =>
-        new Promise<{ lngLat: readonly [number, number] }>((resolve) => {
-          finish = resolve;
-        })
-    );
-    const view = await render(
-      <NativeOverlayHost session={fixture.session}>
-        <ui.GeolocateControl
-          getCurrentPosition={provider}
-          onGeolocate={located}
-        />
-      </NativeOverlayHost>
-    );
-    await fireEvent.press(view.getByLabelText("Locate me"));
-    await fireEvent.press(view.getByLabelText("Locate me"));
-    expect(provider).toHaveBeenCalledTimes(1);
-    await act(async () => {
-      finish({ lngLat: [1, 2] });
-    });
-    expect(fixture.easeTo).toHaveBeenCalledWith({ center: [1, 2], zoom: 14 });
-    expect(located).toHaveBeenCalledTimes(1);
-    await fireEvent.press(view.getByLabelText("Locate me"));
-    await view.unmount();
-    await act(async () => {
-      finish({ lngLat: [3, 4] });
-    });
-    expect(fixture.easeTo).toHaveBeenCalledTimes(1);
-    expect(located).toHaveBeenCalledTimes(1);
   });
 });
 

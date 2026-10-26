@@ -15,9 +15,11 @@ export const WebTf07App = ({
   adapter,
   renderNavigation,
   renderScale,
+  renderLocation,
   renderPopup,
 }: {
   readonly adapter: Adapter;
+  readonly renderLocation: ComponentProps<typeof Tf07Scene>["renderLocation"];
   readonly renderScale: ComponentProps<typeof Tf07Scene>["renderScale"];
   readonly renderNavigation: ComponentProps<
     typeof Tf07Scene
@@ -52,6 +54,7 @@ export const WebTf07App = ({
         </div>
         <div id="tf07-map-host" style={{ flex: 1, position: "relative" }}>
           <Tf07Scene
+            renderLocation={renderLocation}
             renderNavigation={renderNavigation}
             renderScale={renderScale}
             renderPopup={renderPopup}

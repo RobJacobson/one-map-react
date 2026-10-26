@@ -32,16 +32,11 @@ import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
 import type {
   ControlProps,
-  GeolocateControlProps,
   MarkerProps,
   MarkerRef,
 } from "./contracts/ui-types.js";
 import { Map as OneMap } from "./facade/map.js";
-import {
-  Control as OneControl,
-  GeolocateControl as OneGeolocateControl,
-  Marker as OneMarker,
-} from "./facade/ui.js";
+import { Control as OneControl, Marker as OneMarker } from "./facade/ui.js";
 import { useStableOptions } from "./facade/use-stable-options.js";
 
 type WebControlHook = WebWrapper<"maplibre-web">["useControl"];
@@ -71,8 +66,6 @@ export const adapter: Adapter & { readonly backend: "maplibre-web" } =
     Source: MaplibreSource as ComponentType<WebForwardedProps>,
     Layer: MaplibreLayer as Adapter["Layer"],
     Marker: MaplibreMarker as unknown as ComponentType<WebForwardedProps>,
-    GeolocateControl:
-      MaplibreGeolocateControl as ComponentType<WebForwardedProps>,
     useControl: useControl as unknown as WebControlHook,
     useMap,
     // MapLibre GL resolves image loads with a { data } response; the shared
@@ -175,18 +168,6 @@ export interface WebControlProps extends ControlProps {
 }
 /** Custom control with DOM content attributes. */
 export const Control = OneControl as ComponentType<WebControlProps>;
-
-/** Geolocation control props with selected browser facilities. */
-export interface WebGeolocateControlProps extends GeolocateControlProps {
-  /** Remaining selected browser options and events. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibreGeolocateControl>,
-    keyof GeolocateControlProps | "ref"
-  >;
-}
-/** Geolocation control with selected web options. */
-export const GeolocateControl =
-  OneGeolocateControl as ComponentType<WebGeolocateControlProps>;
 
 export {
   GlobeControl as WrapperGlobeControl,

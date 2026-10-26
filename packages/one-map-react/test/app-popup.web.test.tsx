@@ -1,9 +1,14 @@
-import { fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 import { createContext, type ReactNode, useContext, useState } from "react";
 import { expect, test, vi } from "vite-plus/test";
 
+import type { NativeLocationButtonProps } from "../../../examples/shared/native-location-button.js";
 import { NativePopupBubble } from "../../../examples/shared/native-popup-bubble.js";
 import { Tf07Scene } from "../../../examples/shared/tf07-scene.js";
+import {
+  Tf08AcceptanceScene,
+  type Tf08AcceptanceProbe,
+} from "../../../examples/shared/tf08-acceptance-scene.js";
 
 vi.mock("react-native", async () => {
   const react = await import("react");
@@ -85,7 +90,15 @@ vi.mock("one-map-react", async () => {
     Source: Container,
     Layer: Empty,
     Control: Empty,
-    GeolocateControl: Empty,
+    UserLocation: ({
+      position,
+    }: {
+      position?: { lngLat: readonly [number, number] };
+    }) => (
+      <output data-testid="supplied-location">
+        {position ? JSON.stringify(position.lngLat) : "hidden"}
+      </output>
+    ),
   };
 });
 
@@ -105,6 +118,7 @@ test("TF07 application popup close removes its content and teardown stays silent
   );
   const scene = () => (
     <Tf07Scene
+      renderLocation={() => null}
       renderNavigation={() => null}
       native
       style={{ width: 400, height: 300 }}
@@ -132,3 +146,68 @@ test("TF07 application popup close removes its content and teardown stays silent
     report.mock.calls.filter(([event]) => event === "popup-close")
   ).toHaveLength(closeCount);
 });
+
+test.each(["mapbox-native", "maplibre-native", "mapbox-web", "maplibre-web"])(
+  "TF08 %s configuration clears app display and native SDK puck coverage has one owner",
+  async (backend) => {
+    let probe: Tf08AcceptanceProbe | null = null;
+    const Location = ({ onGeolocate }: NativeLocationButtonProps) => (
+      <button
+        type="button"
+        onClick={() => onGeolocate?.({ lngLat: [7, 8], accuracy: 12 })}
+      >
+        Deliver application fix
+      </button>
+    );
+    const mounted = render(
+      <Tf08AcceptanceScene
+        services={{
+          location: {
+            requestPermission: async () => ({
+              status: "granted",
+              accuracy: "unknown",
+            }),
+            getCurrentPosition: async () => ({ lngLat: [7, 8] }),
+            watchPosition: () => () => undefined,
+          },
+        }}
+        backend={backend}
+        style={{ width: 400, height: 300 }}
+        overlay={null}
+        renderCoveragePopup={() => null}
+        renderLocation={Location}
+        nativePuck={<span data-testid="raw-sdk-puck">SDK puck</span>}
+        attach={(value) => {
+          probe = value;
+        }}
+        fixtureUrl="http://fixture.invalid"
+      />
+    );
+    const configure = async (mode: string) => {
+      await act(async () => {
+        await probe?.command("configure", { mode });
+      });
+    };
+    fireEvent.click(
+      mounted.getByRole("button", { name: "Deliver application fix" })
+    );
+    expect(mounted.getByTestId("supplied-location").textContent).toBe("[7,8]");
+    await configure("coverage-base");
+    expect(mounted.getByTestId("supplied-location").textContent).toBe("hidden");
+    await configure("coverage-puck");
+    fireEvent.click(
+      mounted.getByRole("button", { name: "Deliver application fix" })
+    );
+    if (backend.endsWith("native")) {
+      expect(mounted.queryByTestId("supplied-location")).toBeNull();
+      expect(mounted.getByTestId("raw-sdk-puck")).toBeTruthy();
+    } else {
+      expect(mounted.getByTestId("supplied-location").textContent).toBe(
+        "[7,8]"
+      );
+    }
+    await configure("coverage-base");
+    expect(mounted.getByTestId("supplied-location").textContent).toBe("hidden");
+    mounted.unmount();
+  }
+);

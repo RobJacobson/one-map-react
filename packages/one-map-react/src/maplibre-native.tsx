@@ -50,7 +50,7 @@ export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
   readonly mapStyle:
     | MapProps["mapStyle"]
     | import("@maplibre/maplibre-react-native").StyleSpecification;
-  /** SDK follow facilities; conflicts with a viewState target/common follow. */
+  /** SDK follow facilities; conflicts with an explicit viewState target. */
   readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
   readonly hostProps?: ViewProps;

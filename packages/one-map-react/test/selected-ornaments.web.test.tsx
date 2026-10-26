@@ -8,6 +8,7 @@ import { App as MaplibreApp } from "../../../examples/web-maplibre/src/app.js";
 const ornaments = vi.hoisted(() => ({
   scale: [] as Array<Record<string, unknown>>,
   attribution: [] as Array<Record<string, unknown>>,
+  location: [] as Array<Record<string, unknown>>,
 }));
 
 vi.mock("one-map-react", async (original) => {
@@ -25,12 +26,16 @@ vi.mock("one-map-react", async (original) => {
     Source: Content,
     Layer: Empty,
     Control: Empty,
-    GeolocateControl: Empty,
+    UserLocation: Empty,
   };
 });
 vi.mock("one-map-react/mapbox-web", () => ({
   adapter: { backend: "mapbox-web", services: { location: {} } },
   WrapperPopup: () => null,
+  WrapperGeolocateControl: (props: Record<string, unknown>) => {
+    ornaments.location.push(props);
+    return null;
+  },
   WrapperNavigationControl: () => null,
   WrapperScaleControl: (props: Record<string, unknown>) => {
     ornaments.scale.push(props);
@@ -44,6 +49,10 @@ vi.mock("one-map-react/mapbox-web", () => ({
 vi.mock("one-map-react/maplibre-web", () => ({
   adapter: { backend: "maplibre-web", services: { location: {} } },
   WrapperPopup: () => null,
+  WrapperGeolocateControl: (props: Record<string, unknown>) => {
+    ornaments.location.push(props);
+    return null;
+  },
   WrapperNavigationControl: () => null,
   WrapperScaleControl: (props: Record<string, unknown>) => {
     ornaments.scale.push(props);
@@ -80,5 +89,27 @@ test.each([MapboxApp, MaplibreApp])(
     expect(ornaments.attribution.at(-1)).toEqual({ position: "bottom-right" });
     expect(ornaments.scale.at(-1)).toEqual({ position: "bottom-left" });
     coverage.unmount();
+  }
+);
+
+test.each([MapboxApp, MaplibreApp])(
+  "selected browser location leaves supplied display ownership to the scene",
+  (App) => {
+    window.history.replaceState(null, "", "?tf07=ui");
+    const tf07 = render(<App />);
+    expect(ornaments.location.at(-1)).toMatchObject({
+      position: "top-left",
+      showUserLocation: false,
+      fitBoundsOptions: { maxZoom: 11 },
+    });
+    tf07.unmount();
+    window.history.replaceState(null, "", "?tf08=services");
+    const tf08 = render(<App />);
+    expect(ornaments.location.at(-1)).toMatchObject({
+      position: "top-right",
+      showUserLocation: false,
+      fitBoundsOptions: { maxZoom: 12 },
+    });
+    tf08.unmount();
   }
 );

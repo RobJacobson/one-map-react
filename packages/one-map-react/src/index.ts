@@ -107,7 +107,6 @@ export type {
   Anchor,
   ControlPosition,
   ControlProps,
-  GeolocateControlProps,
   GeolocationPosition,
   MarkerEvent,
   MarkerProps,
@@ -120,5 +119,5 @@ export { useMapServices } from "./facade/map-services.js";
 export type { MapSetupProps } from "./facade/map-setup.js";
 export { MapSetup } from "./facade/map-setup.js";
 export { Source } from "./facade/source.js";
-export { Control, GeolocateControl, Marker } from "./facade/ui.js";
+export { Control, Marker } from "./facade/ui.js";
 export { UserLocation } from "./facade/user-location.js";

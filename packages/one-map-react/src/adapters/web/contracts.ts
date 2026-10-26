@@ -227,8 +227,6 @@ interface WebWrapper<
   readonly Layer: Adapter["Layer"];
   /** Live marker delegated to the selected wrapper. */
   readonly Marker: ComponentType<WebForwardedProps>;
-  /** Selected wrapper browser location control. */
-  readonly GeolocateControl: ComponentType<WebForwardedProps>;
   /** Registers facade-owned hosts through the wrapper lifecycle. */
   readonly useControl: (
     create: () => WebCustomControl,

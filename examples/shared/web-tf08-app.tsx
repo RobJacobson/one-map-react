@@ -16,11 +16,15 @@ declare global {
 /** Browser TF08 acceptance shell, selected with ?tf08=services. */
 export const WebTf08App = ({
   adapter,
+  renderLocation,
   navigationControl,
   ornamentControls,
   renderCoveragePopup,
 }: {
   readonly adapter: Adapter;
+  readonly renderLocation: ComponentProps<
+    typeof Tf08AcceptanceScene
+  >["renderLocation"];
   readonly ornamentControls: ComponentProps<
     typeof Tf08AcceptanceScene
   >["ornamentControls"];
@@ -46,6 +50,7 @@ export const WebTf08App = ({
     <MapSetup adapter={adapter}>
       <div id="tf08-map-host" style={{ width: "100vw", height: "100vh" }}>
         <Tf08AcceptanceScene
+          renderLocation={renderLocation}
           navigationControl={navigationControl}
           ornamentControls={ornamentControls}
           renderCoveragePopup={renderCoveragePopup}

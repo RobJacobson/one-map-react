@@ -1,6 +1,5 @@
 import {
   Control,
-  GeolocateControl,
   Layer,
   type LngLat,
   type MapLayoutStyle,
@@ -8,6 +7,7 @@ import {
   Marker,
   Map as OneMap,
   Source,
+  UserLocation,
 } from "one-map-react";
 import {
   type ComponentType,
@@ -24,6 +24,7 @@ import {
   initialViewState,
   replacementStyle,
 } from "../../tests/fixtures/map-fixture.js";
+import type { NativeLocationButtonProps } from "./native-location-button.js";
 
 /** Configuration changes driven by the acceptance toolbar. */
 export type Tf07Action = "remount" | "style" | "offset" | "popup" | "units";
@@ -62,6 +63,7 @@ export interface Tf07Probe {
 }
 
 interface Tf07SceneProps {
+  readonly renderLocation: ComponentType<NativeLocationButtonProps>;
   readonly native?: boolean;
   readonly nativeOrnaments?: object;
   readonly renderScale?: (unit: "metric" | "imperial") => ReactNode;
@@ -102,6 +104,7 @@ export const Tf07Scene = ({
   native = false,
   nativeOrnaments,
   renderScale,
+  renderLocation: Location,
   style,
   markerContent,
   controlContent,
@@ -110,6 +113,8 @@ export const Tf07Scene = ({
   report,
   attach,
 }: Tf07SceneProps) => {
+  const [displayPosition, setDisplayPosition] =
+    useState<import("one-map-react").GeolocationPosition>();
   const mapRef = useRef<MapRef>(null);
   const observations = useRef<Record<string, number>>({});
   const lastPositions = useRef<Record<string, LngLat>>({});
@@ -311,17 +316,39 @@ export const Tf07Scene = ({
           )}
         {/* eslint-enable react/refs */}
         {!native && <Navigation mapRef={mapRef} onError={fail} />}
-        <GeolocateControl
-          position="top-left"
-          getCurrentPosition={async () => location}
-          zoom={11}
-          onGeolocate={() => record("location")}
-          onError={fail}
-        />
+        <UserLocation position={displayPosition} showAccuracyCircle />
+        {!native && (
+          <Location
+            key={generation}
+            mapRef={mapRef}
+            getCurrentPosition={async () => location}
+            zoom={11}
+            onGeolocate={(position) => {
+              setDisplayPosition(position);
+              record("location");
+            }}
+            onError={fail}
+          />
+        )}
         {!native && renderScale?.(unit)}
         <Control position="bottom-right">{controlContent}</Control>
       </OneMap>
-      {native && <Navigation mapRef={mapRef} onError={fail} />}
+      {native && (
+        <>
+          <Navigation mapRef={mapRef} onError={fail} />
+          <Location
+            key={generation}
+            mapRef={mapRef}
+            getCurrentPosition={async () => location}
+            zoom={11}
+            onGeolocate={(position) => {
+              setDisplayPosition(position);
+              record("location");
+            }}
+            onError={fail}
+          />
+        </>
+      )}
     </>
   );
 };
