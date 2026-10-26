@@ -50,6 +50,7 @@ export const WebTf07App = ({
               </button>
             )
           )}
+          <span data-tf07="custom-control">Custom control</span>
           <span id="tf07-status">{status}</span>
         </div>
         <div id="tf07-map-host" style={{ flex: 1, position: "relative" }}>
@@ -61,9 +62,6 @@ export const WebTf07App = ({
             style={{ width: "100%", height: "100%" }}
             attach={attach}
             report={(event) => setStatus(`TF07 ${event}`)}
-            controlContent={
-              <span data-tf07="custom-control">Custom control</span>
-            }
             markerContent={(kind, activate) => (
               <div data-tf07={kind} style={{ background: "white", padding: 8 }}>
                 <span>{kind === "live" ? "Long press to drag" : kind}</span>

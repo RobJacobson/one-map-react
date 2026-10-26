@@ -22,7 +22,6 @@ import {
   useMap,
 } from "react-map-gl/maplibre";
 
-import type { WebWrapper } from "./adapters/web/contracts.js";
 import {
   createWebAdapter,
   type WebForwardedProps,
@@ -30,16 +29,10 @@ import {
 import type { Adapter } from "./contracts/adapter.js";
 import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
-import type {
-  ControlProps,
-  MarkerProps,
-  MarkerRef,
-} from "./contracts/ui-types.js";
+import type { MarkerProps, MarkerRef } from "./contracts/ui-types.js";
 import { Map as OneMap } from "./facade/map.js";
-import { Control as OneControl, Marker as OneMarker } from "./facade/ui.js";
+import { Marker as OneMarker } from "./facade/ui.js";
 import { useStableOptions } from "./facade/use-stable-options.js";
-
-type WebControlHook = WebWrapper<"maplibre-web">["useControl"];
 
 type MaplibreMapInstance = ReturnType<MaplibreMapRef["getMap"]>;
 
@@ -66,7 +59,6 @@ export const adapter: Adapter & { readonly backend: "maplibre-web" } =
     Source: MaplibreSource as ComponentType<WebForwardedProps>,
     Layer: MaplibreLayer as Adapter["Layer"],
     Marker: MaplibreMarker as unknown as ComponentType<WebForwardedProps>,
-    useControl: useControl as unknown as WebControlHook,
     useMap,
     // MapLibre GL resolves image loads with a { data } response; the shared
     // web surface omits the loader so each entry normalizes its own.
@@ -160,14 +152,6 @@ export interface WebMarkerProps extends MarkerProps {
 export const Marker = OneMarker as ForwardRefExoticComponent<
   WebMarkerProps & RefAttributes<MarkerRef>
 >;
-
-/** Custom control props with DOM content attributes. */
-export interface WebControlProps extends ControlProps {
-  /** Attributes applied to the custom control content host. */
-  readonly hostProps?: HTMLAttributes<HTMLDivElement>;
-}
-/** Custom control with DOM content attributes. */
-export const Control = OneControl as ComponentType<WebControlProps>;
 
 export {
   GlobeControl as WrapperGlobeControl,

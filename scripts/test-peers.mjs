@@ -365,6 +365,12 @@ NetworkManager.setConnected(false);
 NetworkManager.setConnected(42);
 `;
   const popupAssertions = `
+// @ts-expect-error Applications own selected custom control layout.
+import { Control } from "one-map-react/${entry}";
+// @ts-expect-error Selected custom control props are removed.
+import type { ${entry.endsWith("web") ? "WebControlProps" : "NativeControlProps"} } from "one-map-react/${entry}";
+// @ts-expect-error Selected adapters no longer supply control composition.
+adapter.Control;
 // @ts-expect-error The selected common location control is removed.
 import { GeolocateControl } from "one-map-react/${entry}";
 ${
@@ -407,7 +413,8 @@ import type { WebFullscreenControlProps } from "one-map-react/${entry}";`
 }
 ${
   entry.endsWith("web")
-    ? `import { WrapperMarker, WrapperNavigationControl, WrapperFullscreenControl, WrapperScaleControl, WrapperAttributionControl, WrapperGeolocateControl } from "one-map-react/${entry}";
+    ? `import { WrapperMarker, WrapperNavigationControl, WrapperFullscreenControl, WrapperScaleControl, WrapperAttributionControl, WrapperGeolocateControl, useControl, useWrapperMap } from "one-map-react/${entry}";
+void useControl; void useWrapperMap;
 void <WrapperMarker longitude={0} latitude={0} />;
 void <WrapperGeolocateControl position="top-left" positionOptions={{enableHighAccuracy: true, timeout: 1234}} trackUserLocation showAccuracyCircle={false} fitBoundsOptions={{maxZoom: 13}} onGeolocate={position => { const longitude: number = position.coords.longitude; void longitude; }} />;
 ${entry === "mapbox-web" ? "void <WrapperGeolocateControl geolocation={navigator.geolocation} />;" : ""}

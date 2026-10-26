@@ -70,7 +70,6 @@ vi.mock("one-map-react", async (original) => {
     Marker: Empty,
     Source: Content,
     Layer: Empty,
-    Control: Empty,
 
     UserLocation: Empty,
   };

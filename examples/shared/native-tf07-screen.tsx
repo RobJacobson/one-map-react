@@ -111,42 +111,44 @@ export const NativeTf07Screen = ({
         <Text testID="tf07-readback" style={styles.readback} numberOfLines={3}>
           {readback}
         </Text>
-        <Tf07Scene
-          renderLocation={NativeLocationButton}
-          renderNavigation={NativeCameraButtons}
-          nativeOrnaments={ornaments}
-          renderPopup={renderPopup}
-          native
-          style={{ flex: 1 }}
-          attach={attach}
-          report={(event) => setStatus(`TF07 ${event}`)}
-          controlContent={<Text>Custom control</Text>}
-          markerContent={(kind, activate) => (
-            <View testID={`tf07-${kind}`} style={styles.content}>
-              <Text>{kind === "live" ? "Live marker" : kind}</Text>
-              {kind !== "annotation" && (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={`${kind} child button`}
-                  onPress={(event) => {
-                    event.stopPropagation();
-                    activate();
-                  }}
-                >
-                  <Text>Child button</Text>
-                </Pressable>
-              )}
-              {kind === "live" && (
-                <ScrollView style={styles.scroll} nestedScrollEnabled>
-                  <Text>Scroll one</Text>
-                  <Text>Scroll two</Text>
-                  <Text>Scroll three</Text>
-                  <Text>Scroll four</Text>
-                </ScrollView>
-              )}
-            </View>
-          )}
-        />
+        <Text>Custom control</Text>
+        <View style={{ flex: 1 }}>
+          <Tf07Scene
+            renderLocation={NativeLocationButton}
+            renderNavigation={NativeCameraButtons}
+            nativeOrnaments={ornaments}
+            renderPopup={renderPopup}
+            native
+            style={{ flex: 1 }}
+            attach={attach}
+            report={(event) => setStatus(`TF07 ${event}`)}
+            markerContent={(kind, activate) => (
+              <View testID={`tf07-${kind}`} style={styles.content}>
+                <Text>{kind === "live" ? "Live marker" : kind}</Text>
+                {kind !== "annotation" && (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`${kind} child button`}
+                    onPress={(event) => {
+                      event.stopPropagation();
+                      activate();
+                    }}
+                  >
+                    <Text>Child button</Text>
+                  </Pressable>
+                )}
+                {kind === "live" && (
+                  <ScrollView style={styles.scroll} nestedScrollEnabled>
+                    <Text>Scroll one</Text>
+                    <Text>Scroll two</Text>
+                    <Text>Scroll three</Text>
+                    <Text>Scroll four</Text>
+                  </ScrollView>
+                )}
+              </View>
+            )}
+          />
+        </View>
       </SafeAreaView>
     </MapSetup>
   );

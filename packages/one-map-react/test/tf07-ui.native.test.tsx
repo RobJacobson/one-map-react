@@ -19,7 +19,6 @@ import {
   useId,
   useImperativeHandle,
   useLayoutEffect,
-  useMemo,
   useState,
 } from "react";
 import {
@@ -37,9 +36,7 @@ import { maplibreNativeUI } from "../src/adapters/maplibre-native/ui.js";
 import {
   NativeCameraContext,
   NativeMapPresentationContext,
-  NativeOverlayContext,
   type NativeMapPresentation,
-  type NativeOverlay,
   withNativeMapPresentation,
 } from "../src/adapters/shared/native-map-presentation.js";
 import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
@@ -55,7 +52,7 @@ import type {
 } from "../src/contracts/camera-types.js";
 import type { ClickEvent, MoveEvent } from "../src/contracts/event-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
-import type { ControlPosition, MarkerRef } from "../src/contracts/ui-types.js";
+import type { MarkerRef } from "../src/contracts/ui-types.js";
 import {
   type MapSession,
   MapSessionContext,
@@ -196,7 +193,6 @@ const sessionFixture = () => {
       viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
       overlayHostName: "fixture-control-host",
       setNativeLayout: jest.fn(),
-      setOverlay: jest.fn(),
       subscribe: (event, callback) => {
         listeners[event].add(callback);
         return () => {
@@ -265,44 +261,6 @@ const nativeTouch = async (
   let node: typeof target | null = target;
   while (node && !node.props[name]) node = node.parent;
   await act(async () => node?.props[name](event));
-};
-
-const NativeOverlayHost = (props: {
-  readonly session: FixtureSession;
-  readonly children: ReactNode;
-}) => {
-  const [overlays, setOverlays] = useState<ReadonlyMap<string, NativeOverlay>>(
-    new globalThis.Map()
-  );
-  const session = useMemo(
-    () => ({
-      ...props.session,
-      setOverlay: (
-        id: string,
-        position: ControlPosition | null,
-        height?: number
-      ) => {
-        setOverlays((previous) => {
-          const current = previous.get(id);
-          const nextHeight = height ?? current?.height ?? 0;
-          if (current?.position === position && current.height === nextHeight)
-            return previous;
-          const next = new globalThis.Map(previous);
-          if (position === null) next.delete(id);
-          else next.set(id, { id, position, height: nextHeight });
-          return next;
-        });
-      },
-    }),
-    [props.session]
-  );
-  return (
-    <FixtureSessionProvider value={session}>
-      <NativeOverlayContext.Provider value={[...overlays.values()]}>
-        {props.children}
-      </NativeOverlayContext.Provider>
-    </FixtureSessionProvider>
-  );
 };
 
 const initialAppState = AppState.currentState;
@@ -487,7 +445,7 @@ describe("TF07 native UI composition", () => {
     await view.unmount();
   });
 
-  test("native controls preserve nested providers, child state, and lifetime", async () => {
+  test("native markers preserve nested providers, child state, and lifetime", async () => {
     const fixture = sessionFixture();
     const theme = createContext("outside");
     const mounted = jest.fn<() => void>();
@@ -506,13 +464,13 @@ describe("TF07 native UI composition", () => {
       );
     };
     const tree = (value: string) => (
-      <NativeOverlayHost session={fixture.session}>
+      <FixtureSessionProvider value={fixture.session}>
         <theme.Provider value={value}>
-          <ui.Control>
+          <ui.Marker longitude={10} latitude={20}>
             <Consumer />
-          </ui.Control>
+          </ui.Marker>
         </theme.Provider>
-      </NativeOverlayHost>
+      </FixtureSessionProvider>
     );
     const view = await render(tree("inside"));
     expect(view.getByText("inside:0")).toBeTruthy();
@@ -524,121 +482,6 @@ describe("TF07 native UI composition", () => {
     expect(released).toHaveBeenCalledTimes(1);
   });
 
-  test.each(["top-right", "top-left", "bottom-left", "bottom-right"] as const)(
-    "native controls retain measured stacking and cleanup at %s",
-    async (position) => {
-      const fixture = sessionFixture();
-      const layout = jest.fn();
-      const tree = (first: boolean) => (
-        <NativeOverlayHost session={fixture.session}>
-          {first && (
-            <ui.Control
-              position={position}
-              {...{ hostProps: { testID: "first-control", onLayout: layout } }}
-            >
-              <Text>First</Text>
-            </ui.Control>
-          )}
-          <ui.Control
-            position={position}
-            {...{ hostProps: { testID: "second-control" } }}
-          >
-            <Text>Second</Text>
-          </ui.Control>
-        </NativeOverlayHost>
-      );
-      const view = await render(tree(true));
-      await fireEvent(view.getByTestId("first-control"), "layout", {
-        nativeEvent: { layout: { width: 40, height: 48, x: 0, y: 0 } },
-      });
-      await fireEvent(view.getByTestId("second-control"), "layout", {
-        nativeEvent: { layout: { width: 40, height: 24, x: 0, y: 0 } },
-      });
-      const first = StyleSheet.flatten(
-        view.getByTestId("first-control").props.style
-      );
-      const second = StyleSheet.flatten(
-        view.getByTestId("second-control").props.style
-      );
-      if (position.startsWith("top")) {
-        expect(first.top).toBe(8);
-        expect(second.top).toBe(64);
-      } else {
-        expect(first.bottom).toBe(40);
-        expect(second.bottom).toBe(8);
-      }
-      expect(layout).toHaveBeenCalledTimes(1);
-      await view.rerender(tree(false));
-      const remaining = StyleSheet.flatten(
-        view.getByTestId("second-control").props.style
-      );
-      expect(
-        position.startsWith("top") ? remaining.top : remaining.bottom
-      ).toBe(8);
-    }
-  );
-  test.each(["android", "ios"] as const)(
-    "native control portal keeps platform sizing and child state on %s",
-    async (os) => {
-      const platform = jest.replaceProperty(Platform, "OS", os);
-      try {
-        const fixture = sessionFixture();
-        const mounted = jest.fn();
-        const Child = () => {
-          const [count, setCount] = useState(0);
-          useLayoutEffect(() => {
-            mounted();
-          }, []);
-          return (
-            <Pressable
-              testID="resize-child"
-              onPress={() => setCount(count + 1)}
-            >
-              <Text>{`Count ${count}`}</Text>
-            </Pressable>
-          );
-        };
-        const tree = (width: number, height: number) => (
-          <NativeOverlayHost
-            session={{ ...fixture.session, nativeLayout: { width, height } }}
-          >
-            <ui.Control position="bottom-right">
-              <Child />
-            </ui.Control>
-          </NativeOverlayHost>
-        );
-        const view = await render(tree(400, 300));
-        const portalStyle = () => {
-          let node = view.getByTestId("resize-child").parent;
-          while (
-            node &&
-            node.props.hostName !== fixture.session.overlayHostName
-          )
-            node = node.parent;
-          expect(node).not.toBeNull();
-          return StyleSheet.flatten(node?.props.style);
-        };
-        if (os === "android") {
-          expect(portalStyle()).toMatchObject({ width: 400, height: 300 });
-        } else {
-          expect(portalStyle().width).toBeUndefined();
-          expect(portalStyle().height).toBeUndefined();
-        }
-        await fireEvent.press(view.getByTestId("resize-child"));
-        await view.rerender(tree(600, 200));
-        if (os === "android") {
-          expect(portalStyle()).toMatchObject({ width: 600, height: 200 });
-        } else {
-          expect(portalStyle().width).toBeUndefined();
-          expect(portalStyle().height).toBeUndefined();
-        }
-        expect(view.getByText("Count 1")).toBeTruthy();
-        expect(mounted).toHaveBeenCalledTimes(1);
-      } finally {
-        platform.restore();
-      }
-    }
-  );
   test.each(["view", "annotation"] as const)(
     "native %s markers reject dragging and every supplied drag callback",
     async (renderMode) => {
@@ -685,32 +528,6 @@ describe("TF07 native UI composition", () => {
         </FixtureSessionProvider>
       )
     ).rejects.toThrow("map point");
-  });
-
-  test("native custom controls forward their owned host presentation", async () => {
-    const fixture = sessionFixture();
-    const control = await render(
-      <NativeOverlayHost session={fixture.session}>
-        <ui.Control
-          {...{
-            hostProps: {
-              testID: "custom-control",
-              style: { opacity: 0.8 },
-              accessibilityLabel: "My control",
-            },
-          }}
-        >
-          <View />
-        </ui.Control>
-      </NativeOverlayHost>
-    );
-    expect(control.getByLabelText("My control").props.testID).toBe(
-      "custom-control"
-    );
-    expect(
-      StyleSheet.flatten(control.getByTestId("custom-control").props.style)
-        .opacity
-    ).toBe(0.8);
   });
 
   test("child scroll handoff keeps SDK gestures unchanged", async () => {

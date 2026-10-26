@@ -513,7 +513,6 @@ export const createWebMapMock = () => {
   return {
     Marker: undefined,
 
-    useControl: undefined,
     Map: WrapperMap,
     Source,
     Layer,

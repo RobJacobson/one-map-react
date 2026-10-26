@@ -28,7 +28,6 @@ import {
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
-import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import {
@@ -69,10 +68,7 @@ const MapboxNativeMapImplementation = forwardRef<
   const session = useNativeMapPresentation();
   if (props.viewState && props.locationOptions?.followUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
-  const ornaments = useNativeOrnamentPositions();
-  const scaleBarPosition =
-    props.options?.scaleBarPosition ??
-    (ornaments.managed ? ornaments.position("top-left") : undefined);
+  const scaleBarPosition = props.options?.scaleBarPosition;
   const refreshScalePosition = useMapboxScalePosition(
     scaleBarPosition,
     session.nativeLayout?.width,
@@ -204,22 +200,6 @@ const MapboxNativeMapImplementation = forwardRef<
           <MapView
             {...props.options}
             projection={props.projection ?? props.options?.projection}
-            logoPosition={
-              props.options?.logoPosition ??
-              (ornaments.managed
-                ? ornaments.position("bottom-left")
-                : undefined)
-            }
-            attributionPosition={
-              props.options?.attributionPosition ??
-              (ornaments.managed
-                ? ornaments.position("bottom-right")
-                : undefined)
-            }
-            compassPosition={
-              props.options?.compassPosition ??
-              (ornaments.managed ? ornaments.position("top-right") : undefined)
-            }
             scaleBarPosition={scaleBarPosition}
             {...(refreshScalePosition ? { scaleBarEnabled: false } : {})}
             ref={mapViewRef}

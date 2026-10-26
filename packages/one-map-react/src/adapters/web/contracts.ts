@@ -227,11 +227,6 @@ interface WebWrapper<
   readonly Layer: Adapter["Layer"];
   /** Live marker delegated to the selected wrapper. */
   readonly Marker: ComponentType<WebForwardedProps>;
-  /** Registers facade-owned hosts through the wrapper lifecycle. */
-  readonly useControl: (
-    create: () => WebCustomControl,
-    options: { readonly position?: string }
-  ) => WebCustomControl;
   readonly useMap: () => WebMapSelection;
   readonly loadWebImage: (map: WebImageMap, url: string) => Promise<unknown>;
   /**
@@ -248,21 +243,10 @@ interface WebWrapper<
   ) => Promise<unknown>;
 }
 
-/** DOM control owned by the facade and registered through react-map-gl. */
-interface WebCustomControl {
-  /** Portal container returned when the map adds the control. */
-  readonly element: Element & { className: string; remove(): void };
-  /** Returns the owned host; the wrapper appends it to the map. */
-  readonly onAdd: () => Element;
-  /** Removes the owned host when the wrapper releases this control. */
-  readonly onRemove: () => void;
-}
-
 export type {
   StyleLoadTarget,
   WebClusterMethod,
   WebClusterSource,
-  WebCustomControl,
   WebErrorNotice,
   WebImageMap,
   WebMapHandle,

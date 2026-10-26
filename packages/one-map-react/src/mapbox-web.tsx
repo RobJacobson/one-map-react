@@ -24,7 +24,6 @@ import {
   useMap,
 } from "react-map-gl/mapbox";
 
-import type { WebWrapper } from "./adapters/web/contracts.js";
 import {
   createWebAdapter,
   type WebForwardedProps,
@@ -32,13 +31,9 @@ import {
 import type { Adapter } from "./contracts/adapter.js";
 import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
-import type {
-  ControlProps,
-  MarkerProps,
-  MarkerRef,
-} from "./contracts/ui-types.js";
+import type { MarkerProps, MarkerRef } from "./contracts/ui-types.js";
 import { Map as OneMap } from "./facade/map.js";
-import { Control as OneControl, Marker as OneMarker } from "./facade/ui.js";
+import { Marker as OneMarker } from "./facade/ui.js";
 import { useStableOptions } from "./facade/use-stable-options.js";
 
 /** Reports browser/GPU support using the pinned Mapbox renderer probe. */
@@ -46,8 +41,6 @@ export const {
   supported,
 }: Pick<(typeof import("mapbox-gl"))["default"], "supported"> =
   MapboxRenderer as unknown as (typeof import("mapbox-gl"))["default"];
-
-type WebControlHook = WebWrapper<"mapbox-web">["useControl"];
 
 type MapboxMapInstance = ReturnType<MapboxMapRef["getMap"]>;
 
@@ -79,7 +72,6 @@ export const adapter: Adapter & { readonly backend: "mapbox-web" } =
     Source: MapboxSource as ComponentType<WebForwardedProps>,
     Layer: MapboxLayer as Adapter["Layer"],
     Marker: MapboxMarker as unknown as ComponentType<WebForwardedProps>,
-    useControl: useControl as unknown as WebControlHook,
     useMap,
     // Mapbox GL JS reports image loads through a callback; the shared web
     // surface omits the loader so each entry normalizes its own.
@@ -192,14 +184,6 @@ export interface WebMarkerProps extends MarkerProps {
 export const Marker = OneMarker as ForwardRefExoticComponent<
   WebMarkerProps & RefAttributes<MarkerRef>
 >;
-
-/** Custom control props with DOM content attributes. */
-export interface WebControlProps extends ControlProps {
-  /** Attributes applied to the custom control content host. */
-  readonly hostProps?: HTMLAttributes<HTMLDivElement>;
-}
-/** Custom control with DOM content attributes. */
-export const Control = OneControl as ComponentType<WebControlProps>;
 
 /** Direct wrapper map and map access for selected canvas/container facilities. */
 export {

@@ -6,12 +6,10 @@ import {
   useLayoutEffect,
   useRef,
 } from "react";
-import { createPortal } from "react-dom";
 
 import type { Adapter } from "../../contracts/adapter.js";
 import type { LngLat } from "../../contracts/camera-types.js";
 import type {
-  ControlProps,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
@@ -23,11 +21,7 @@ import {
   lngLatFromWrapper,
   pointFromWrapper,
 } from "../shared/wrapper-values.js";
-import type {
-  WebCustomControl,
-  WebForwardedProps,
-  WebWrapper,
-} from "./contracts.js";
+import type { WebForwardedProps, WebWrapper } from "./contracts.js";
 
 /** Platform additions accepted only by selected web UI entry points. */
 interface WebUiOptions {
@@ -51,12 +45,12 @@ interface WebMarkerHandle {
 /**
  * Builds UI delegates while converting only portable events and resets.
  *
- * @param wrapper - Selected react-map-gl components and control hook.
- * @returns Marker and control implementations for the adapter.
+ * @param wrapper - Selected react-map-gl components.
+ * @returns Marker implementation for the adapter.
  */
 export const createWebUi = (
   wrapper: WebWrapper<"mapbox-web" | "maplibre-web">
-): Pick<Adapter, "Marker" | "Control"> => {
+): Pick<Adapter, "Marker"> => {
   const Marker = forwardRef<MarkerRef, MarkerProps & WebUiOptions>(
     (props, ref) => {
       const {
@@ -145,21 +139,7 @@ export const createWebUi = (
     }
   );
 
-  const Control = (props: ControlProps & WebUiOptions) => {
-    const control = wrapper.useControl(createControlHost, {
-      position: props.position ?? "top-right",
-    });
-
-    return createPortal(
-      <div {...props.hostProps}>{props.children}</div>,
-      control.element
-    );
-  };
-
-  return {
-    Marker,
-    Control,
-  };
+  return { Marker };
 };
 
 const markerEvent = (
@@ -202,14 +182,3 @@ const DefaultPin = (): ReactNode => (
     <circle cx="12" cy="12" r="4" fill="white" />
   </svg>
 );
-
-/** Creates only the facade's DOM host; react-map-gl owns map registration. */
-const createControlHost = (): WebCustomControl => {
-  const browser = globalThis as unknown as {
-    document: { createElement: (name: string) => WebCustomControl["element"] };
-  };
-  const element = browser.document.createElement("div");
-  element.className = "mapboxgl-ctrl maplibregl-ctrl";
-
-  return { element, onAdd: () => element, onRemove: () => element.remove() };
-};
