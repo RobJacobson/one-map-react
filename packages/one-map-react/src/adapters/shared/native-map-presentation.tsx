@@ -18,7 +18,6 @@ import type { MapProps } from "../../contracts/map-types.js";
 /** Native-only presentation owned by the selected adapter's map. */
 export interface NativeMapPresentation {
   readonly overlayHostName: string;
-  readonly nativeLocationFollowing: boolean;
   readonly nativeLayout?: { readonly width: number; readonly height: number };
   setNativeLayout(width: number, height: number): void;
 }
@@ -30,8 +29,6 @@ export const NativeMapPresentationContext =
 interface NativeCameraState {
   /** Observed native camera. */
   readonly viewState: ViewState;
-  /** Invalidates marker projection when the native target stays unchanged. */
-  readonly observedViewState: ViewState;
 }
 
 export const NativeCameraContext = createContext<NativeCameraState | null>(
@@ -43,7 +40,7 @@ export const withNativeMapPresentation = <Props extends MapProps>(
   Implementation: ForwardRefExoticComponent<Props & RefAttributes<MapRef>>
 ): ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<MapRef>> =>
   forwardRef<MapRef, Props>((props, ref) => (
-    <NativePresentationProvider following={selectedLocationFollowing(props)}>
+    <NativePresentationProvider>
       <NativeCameraProvider
         initial={props.initialViewState}
         onMove={props.onMove}
@@ -69,10 +66,8 @@ export const useNativeMapPresentation = (): NativeMapPresentation => {
 };
 
 const NativePresentationProvider = ({
-  following,
   children,
 }: {
-  readonly following: boolean;
   readonly children: ReactNode;
 }) => {
   const overlayHostName = useId();
@@ -90,11 +85,10 @@ const NativePresentationProvider = ({
   const presentation = useMemo(
     () => ({
       overlayHostName,
-      nativeLocationFollowing: following,
       nativeLayout,
       setNativeLayout,
     }),
-    [overlayHostName, following, nativeLayout, setNativeLayout]
+    [overlayHostName, nativeLayout, setNativeLayout]
   );
   return (
     <NativeMapPresentationContext.Provider value={presentation}>
@@ -132,30 +126,10 @@ const NativeCameraProvider = ({
   );
   // Observations update camera consumers without recreating the renderer child.
   const content = useMemo(() => children(callbacks), [children, callbacks]);
-  const camera = useMemo(
-    () => ({ viewState: observed, observedViewState: observed }),
-    [observed]
-  );
+  const camera = useMemo(() => ({ viewState: observed }), [observed]);
   return (
     <NativeCameraContext.Provider value={camera}>
       {content}
     </NativeCameraContext.Provider>
-  );
-};
-
-const selectedLocationFollowing = (props: MapProps): boolean => {
-  if (
-    !("locationOptions" in props) ||
-    !props.locationOptions ||
-    typeof props.locationOptions !== "object"
-  )
-    return false;
-  const options = props.locationOptions as {
-    followUserLocation?: boolean;
-    trackUserLocation?: unknown;
-  };
-  return (
-    options.followUserLocation === true ||
-    options.trackUserLocation !== undefined
   );
 };

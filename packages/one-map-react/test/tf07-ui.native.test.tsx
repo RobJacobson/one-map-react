@@ -50,7 +50,7 @@ import type {
   Point,
   ViewState,
 } from "../src/contracts/camera-types.js";
-import type { ClickEvent, MoveEvent } from "../src/contracts/event-types.js";
+import type { MoveEvent } from "../src/contracts/event-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
 import type { MarkerRef } from "../src/contracts/ui-types.js";
 import {
@@ -73,11 +73,7 @@ const FixtureSessionProvider = ({
   <MapSessionContext.Provider value={value}>
     <NativeMapPresentationContext.Provider value={value}>
       <NativeCameraContext.Provider
-        value={
-          value.viewState
-            ? { viewState: value.viewState, observedViewState: value.viewState }
-            : null
-        }
+        value={value.viewState ? { viewState: value.viewState } : null}
       >
         {children}
       </NativeCameraContext.Provider>
@@ -176,15 +172,10 @@ const sessionFixture = () => {
   );
   const easeTo = jest.fn(async () => undefined);
   const lock = jest.fn((_locked: boolean) => undefined);
-  const listeners = {
-    click: new Set<(event: ClickEvent | MoveEvent) => void>(),
-    move: new Set<(event: ClickEvent | MoveEvent) => void>(),
-  };
   // The fixture exercises UI operations only; absent MapRef methods deliberately fail.
   const map = { project, unproject, easeTo } as unknown as MapRef;
   const session: FixtureSession & { readonly requestGestureLock: typeof lock } =
     {
-      nativeLocationFollowing: false,
       // A removed gesture-lock request would expose accidental drag ownership.
       requestGestureLock: lock,
       ref: { current: map },
@@ -193,20 +184,8 @@ const sessionFixture = () => {
       viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
       overlayHostName: "fixture-control-host",
       setNativeLayout: jest.fn(),
-      subscribe: (event, callback) => {
-        listeners[event].add(callback);
-        return () => {
-          listeners[event].delete(callback);
-        };
-      },
     };
-  const emit = (
-    event: "click" | "move",
-    payload: ClickEvent | MoveEvent
-  ): void => {
-    for (const callback of listeners[event]) callback(payload);
-  };
-  return { session, project, unproject, easeTo, lock, emit };
+  return { session, project, unproject, easeTo, lock };
 };
 
 const scaleCamera: ViewState = {

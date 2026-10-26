@@ -13,6 +13,7 @@ for (const [relative, names] of [
   ["facade/user-location.tsx", ["UserLocation"]],
   ["adapters/web/map.tsx", ["WebMap"]],
   ["adapters/web/images.tsx", ["WebImages", "WebImage"]],
+  ["facade/use-map-interactions.ts", ["useMapInteractions"]],
   ["adapters/shared/native-ui.tsx", ["useNativeMarkerActivation"]],
   [
     "adapters/shared/native-map-presentation.tsx",
@@ -70,7 +71,7 @@ for (const [relative, names] of [
     "Compiler must preserve source mapping for the packer"
   );
   const built = readFileSync(
-    resolve("packages/one-map-react/dist", relative.replace(/\.tsx$/, ".js")),
+    resolve("packages/one-map-react/dist", relative.replace(/\.tsx?$/, ".js")),
     "utf8"
   );
   assert(
