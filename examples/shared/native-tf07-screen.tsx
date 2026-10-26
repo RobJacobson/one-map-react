@@ -18,6 +18,7 @@ import {
   View,
 } from "react-native";
 
+import { NativeCameraButtons } from "./native-camera-buttons.js";
 import { NativePopupBubble } from "./native-popup-bubble.js";
 import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
 
@@ -108,6 +109,7 @@ export const NativeTf07Screen = ({
           {readback}
         </Text>
         <Tf07Scene
+          renderNavigation={NativeCameraButtons}
           renderPopup={renderPopup}
           native
           style={{ flex: 1 }}

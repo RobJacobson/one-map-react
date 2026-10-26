@@ -10,10 +10,8 @@ import { Map as OneMap } from "../src/facade/map.js";
 import {
   AttributionControl,
   Control,
-  FullscreenControl,
   GeolocateControl,
   Marker,
-  NavigationControl,
   ScaleControl,
 } from "../src/facade/ui.js";
 
@@ -31,11 +29,11 @@ const fakeAdapter = (backend: Backend): Adapter => ({
   Images: Empty,
   Marker: forwardRef((_props, _ref) => null),
   Control: Empty,
-  NavigationControl: Empty,
+
   AttributionControl: Empty,
   ScaleControl: Empty,
   GeolocateControl: Empty,
-  FullscreenControl: Empty,
+
   services: {
     location: {
       requestPermission: async () => ({
@@ -77,24 +75,7 @@ const genuineChanges = [
       <Control position={changed ? "bottom-left" : "top-right"} />
     ),
   ],
-  [
-    "NavigationControl",
-    (changed: boolean) => <NavigationControl showZoom={!changed} />,
-  ],
-  [
-    "NavigationControl position",
-    (changed: boolean) => (
-      <NavigationControl position={changed ? "bottom-left" : "top-right"} />
-    ),
-  ],
-  [
-    "NavigationControl compass",
-    (changed: boolean) => <NavigationControl showCompass={!changed} />,
-  ],
-  [
-    "NavigationControl pitch",
-    (changed: boolean) => <NavigationControl visualizePitch={changed} />,
-  ],
+
   [
     "AttributionControl",
     (changed: boolean) => (
@@ -125,12 +106,6 @@ const genuineChanges = [
     "GeolocateControl",
     (changed: boolean) => (
       <GeolocateControl position={changed ? "bottom-left" : "top-right"} />
-    ),
-  ],
-  [
-    "FullscreenControl",
-    (changed: boolean) => (
-      <FullscreenControl position={changed ? "bottom-left" : "top-right"} />
     ),
   ],
 ] as const;
@@ -175,12 +150,7 @@ describe.each<Backend>([
         <Control position={explicit ? "top-right" : undefined}>
           {explicit ? "updated" : "original"}
         </Control>
-        <NavigationControl
-          position={explicit ? "top-right" : undefined}
-          showZoom={explicit ? true : undefined}
-          showCompass={explicit ? true : undefined}
-          visualizePitch={explicit ? false : undefined}
-        />
+
         <AttributionControl
           position={
             explicit ? (native ? "bottom-right" : "top-right") : undefined
@@ -198,7 +168,6 @@ describe.each<Backend>([
           position={explicit ? "top-right" : undefined}
           zoom={explicit ? 10 : 14}
         />
-        <FullscreenControl position={explicit ? "top-right" : undefined} />
       </>
     );
     const mounted = render(tree(controls(false)));

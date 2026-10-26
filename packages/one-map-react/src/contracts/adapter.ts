@@ -13,11 +13,9 @@ import type { SourceProps } from "./source-types.js";
 import type {
   AttributionControlProps,
   ControlProps,
-  FullscreenControlProps,
   GeolocateControlProps,
   MarkerProps,
   MarkerRef,
-  NavigationControlProps,
   ScaleControlProps,
 } from "./ui-types.js";
 
@@ -59,14 +57,10 @@ export interface Adapter {
   >;
   /** Application UI in a map corner. */
   readonly Control: ComponentType<ControlProps>;
-  /** Camera buttons and compass. */
-  readonly NavigationControl: ComponentType<NavigationControlProps>;
   /** Renderer attribution. */
   readonly AttributionControl: ComponentType<AttributionControlProps>;
   /** Ground distance scale. */
   readonly ScaleControl: ComponentType<ScaleControlProps>;
   /** Location acquisition and camera centering. */
   readonly GeolocateControl: ComponentType<GeolocateControlProps>;
-  /** Browser fullscreen UI. */
-  readonly FullscreenControl: ComponentType<FullscreenControlProps>;
 }

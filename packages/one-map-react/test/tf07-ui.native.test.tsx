@@ -63,7 +63,6 @@ import {
 import { MapSetup } from "../src/facade/map-setup.js";
 import {
   Marker as SharedMarker,
-  NavigationControl as SharedNavigationControl,
   ScaleControl as SharedScaleControl,
 } from "../src/facade/ui.js";
 
@@ -501,161 +500,6 @@ afterEach(() => {
   jest.useRealTimers();
   refresh.mockClear();
 });
-
-test.each(
-  (["mapbox", "maplibre"] as const).flatMap((backend) =>
-    (
-      [
-        "newer press",
-        "compass",
-        "user movement",
-        "map replacement",
-        "readiness cycle",
-        "unmount",
-      ] as const
-    ).flatMap((interruption) =>
-      (["resolve", "reject"] as const).map((outcome) => ({
-        backend,
-        interruption,
-        outcome,
-      }))
-    )
-  )
-)(
-  "$backend navigation ignores an older read's $outcome after $interruption",
-  async ({ backend, interruption, outcome }) => {
-    const fixture = sessionFixture();
-    const reads: Array<{
-      resolve: (zoom: number) => void;
-      reject: (error: unknown) => void;
-    }> = [];
-    const getZoom = jest.fn(
-      () =>
-        new Promise<number>((resolve, reject) => {
-          reads.push({ resolve, reject });
-        })
-    );
-    const zoomTo = jest.fn<MapRef["zoomTo"]>().mockResolvedValue(undefined);
-    const onError = jest.fn();
-    fixture.session.ref.current = {
-      ...fixture.session.ref.current,
-      getZoom,
-      zoomTo,
-    } as MapRef;
-    const Navigation =
-      backend === "mapbox"
-        ? mapboxNativeUI.NavigationControl
-        : maplibreNativeUI.NavigationControl;
-    const tree = (session: FixtureSession) => (
-      <NativeOverlayHost session={session}>
-        <Navigation onError={onError} />
-      </NativeOverlayHost>
-    );
-    const view = await render(tree(fixture.session));
-    await fireEvent.press(view.getByLabelText("Zoom in"));
-    if (interruption === "newer press") {
-      await fireEvent.press(view.getByLabelText("Zoom out"));
-      await act(async () => reads[1].resolve(12));
-    } else if (interruption === "compass") {
-      await fireEvent.press(view.getByLabelText("Reset north"));
-      expect(fixture.easeTo).toHaveBeenCalledWith({ bearing: 0 });
-    } else if (interruption === "user movement") {
-      await act(async () =>
-        fixture.emit("move", { viewState: scaleCamera, origin: "user" })
-      );
-    } else if (interruption === "map replacement") {
-      await view.rerender(
-        tree({
-          ...fixture.session,
-          ref: { current: { ...fixture.session.ref.current } as MapRef },
-        })
-      );
-    } else if (interruption === "readiness cycle") {
-      await view.rerender(tree({ ...fixture.session, ready: false }));
-      await view.rerender(tree(fixture.session));
-    } else {
-      await view.unmount();
-    }
-    await act(async () => {
-      if (outcome === "resolve") reads[0].resolve(12);
-      else reads[0].reject(new Error("Superseded zoom read failed."));
-    });
-    expect(zoomTo.mock.calls).toEqual(
-      interruption === "newer press" ? [[11]] : []
-    );
-    expect(onError).not.toHaveBeenCalled();
-    if (interruption !== "unmount") await view.unmount();
-  }
-);
-
-test.each(
-  (["mapbox", "maplibre"] as const).flatMap((backend) =>
-    (["zoom", "compass"] as const).map((command) => ({ backend, command }))
-  )
-)(
-  "$backend navigation suppresses a superseded $command command failure",
-  async ({ backend, command }) => {
-    const fixture = sessionFixture();
-    const getZoom = jest.fn<MapRef["getZoom"]>().mockResolvedValue(12);
-    const zoomTo = jest.fn<MapRef["zoomTo"]>().mockResolvedValue(undefined);
-    const easeTo = jest.fn<MapRef["easeTo"]>().mockResolvedValue(undefined);
-    let rejectCommand: (error: Error) => void = () => {};
-    const pending = () =>
-      new Promise<void>((_resolve, reject) => {
-        rejectCommand = reject;
-      });
-    if (command === "zoom") zoomTo.mockImplementationOnce(pending);
-    else easeTo.mockImplementationOnce(pending);
-    fixture.session.ref.current = {
-      ...fixture.session.ref.current,
-      getZoom,
-      zoomTo,
-      easeTo,
-    } as MapRef;
-    const onError = jest.fn();
-    const Navigation =
-      backend === "mapbox"
-        ? mapboxNativeUI.NavigationControl
-        : maplibreNativeUI.NavigationControl;
-    const view = await render(
-      <NativeOverlayHost session={fixture.session}>
-        <Navigation onError={onError} />
-      </NativeOverlayHost>
-    );
-    await fireEvent.press(
-      view.getByLabelText(command === "zoom" ? "Zoom in" : "Reset north")
-    );
-    await fireEvent.press(view.getByLabelText("Zoom out"));
-    await act(async () =>
-      rejectCommand(new Error("Superseded command failed."))
-    );
-    expect(zoomTo).toHaveBeenLastCalledWith(11);
-    expect(onError).not.toHaveBeenCalled();
-    await view.unmount();
-  }
-);
-
-test.each(["mapbox", "maplibre"] as const)(
-  "%s navigation reports the current compass failure",
-  async (backend) => {
-    const fixture = sessionFixture();
-    const failure = new Error("Compass failed.");
-    fixture.easeTo.mockRejectedValueOnce(failure);
-    const onError = jest.fn();
-    const Navigation =
-      backend === "mapbox"
-        ? mapboxNativeUI.NavigationControl
-        : maplibreNativeUI.NavigationControl;
-    const view = await render(
-      <NativeOverlayHost session={fixture.session}>
-        <Navigation onError={onError} />
-      </NativeOverlayHost>
-    );
-    await fireEvent.press(view.getByLabelText("Reset north"));
-    expect(onError).toHaveBeenCalledWith(failure);
-    await view.unmount();
-  }
-);
 
 describe("TF07 native UI composition", () => {
   test("live overlay follows measured anchors, offsets, camera movement, and viewport layout", async () => {
@@ -1096,118 +940,6 @@ describe("TF07 native UI composition", () => {
       )
     ).rejects.toThrow("expanded attribution");
   });
-
-  test("compass pitch presentation and reset follow the observed camera", async () => {
-    const fixture = sessionFixture();
-    const session = {
-      ...fixture.session,
-      viewState: {
-        longitude: 10,
-        latitude: 20,
-        zoom: 4,
-        bearing: 30,
-        pitch: 60,
-      },
-    };
-    const view = await render(
-      <NativeOverlayHost session={session}>
-        <ui.NavigationControl visualizePitch />
-      </NativeOverlayHost>
-    );
-    expect(view.getByText("↑").props.style.transform).toEqual([
-      { rotate: "-30deg" },
-      { perspective: 400 },
-      { rotateX: "60deg" },
-    ]);
-    await fireEvent.press(view.getByLabelText("Reset north"));
-    expect(fixture.easeTo).toHaveBeenCalledWith({ bearing: 0, pitch: 0 });
-  });
-
-  test("navigation uses the renderer zoom when movement snapshots lag", async () => {
-    const fixture = sessionFixture();
-    const getZoom = jest.fn(async () => 12);
-    const zoomTo = jest.fn(async () => undefined);
-    fixture.session.ref.current = {
-      ...fixture.session.ref.current,
-      getZoom,
-      zoomTo,
-    } as MapRef;
-    const view = await render(
-      <NativeOverlayHost session={fixture.session}>
-        <ui.NavigationControl />
-      </NativeOverlayHost>
-    );
-    await fireEvent.press(view.getByLabelText("Zoom out"));
-    expect(getZoom).toHaveBeenCalledTimes(1);
-    expect(zoomTo).toHaveBeenCalledWith(11);
-  });
-
-  test.each(["control removal", "map replacement"])(
-    "pending navigation cannot move the map after %s",
-    async (change) => {
-      const fixture = sessionFixture();
-      let resolve: ((zoom: number) => void) | undefined;
-      const getZoom = jest.fn(
-        () =>
-          new Promise<number>((done) => {
-            resolve = done;
-          })
-      );
-      const zoomTo = jest.fn(async () => undefined);
-      fixture.session.ref.current = {
-        ...fixture.session.ref.current,
-        getZoom,
-        zoomTo,
-      } as MapRef;
-      const tree = (session: FixtureSession, visible: boolean) => (
-        <NativeOverlayHost session={session}>
-          {visible && <ui.NavigationControl />}
-        </NativeOverlayHost>
-      );
-      const view = await render(tree(fixture.session, true));
-      await fireEvent.press(view.getByLabelText("Zoom in"));
-      expect(getZoom).toHaveBeenCalledTimes(1);
-
-      const replacement = {
-        ...fixture.session,
-        ref: { current: { ...fixture.session.ref.current } as MapRef },
-      };
-      await view.rerender(
-        tree(
-          change === "map replacement" ? replacement : fixture.session,
-          change === "map replacement"
-        )
-      );
-      await act(async () => resolve?.(12));
-      expect(zoomTo).not.toHaveBeenCalled();
-    }
-  );
-
-  test.each(["read", "command"])(
-    "navigation reports a failed camera %s while mounted",
-    async (operation) => {
-      const fixture = sessionFixture();
-      const error = new Error("Camera failed");
-      const getZoom = jest.fn<MapRef["getZoom"]>().mockResolvedValue(12);
-      const zoomTo = jest.fn<MapRef["zoomTo"]>().mockResolvedValue(undefined);
-      if (operation === "read") getZoom.mockRejectedValue(error);
-      else zoomTo.mockRejectedValue(error);
-      fixture.session.ref.current = {
-        ...fixture.session.ref.current,
-        getZoom,
-        zoomTo,
-      } as MapRef;
-      const onError = jest.fn();
-      const view = await render(
-        <NativeOverlayHost session={fixture.session}>
-          <ui.NavigationControl onError={onError} />
-        </NativeOverlayHost>
-      );
-      await fireEvent.press(view.getByLabelText("Zoom in"));
-      expect(onError).toHaveBeenCalledTimes(1);
-      expect(onError).toHaveBeenCalledWith(error);
-    }
-  );
 
   test("child scroll handoff keeps SDK gestures unchanged", async () => {
     const fixture = sessionFixture();
@@ -1803,12 +1535,7 @@ test("native creation defaults compare by their effective values", async () => {
         anchor={explicit ? "bottom" : undefined}
         renderMode={explicit ? "view" : undefined}
       />
-      <SharedNavigationControl
-        position={explicit ? "top-right" : undefined}
-        showZoom={explicit ? true : undefined}
-        showCompass={explicit ? true : undefined}
-        visualizePitch={explicit ? false : undefined}
-      />
+
       <SharedScaleControl
         position={explicit ? "bottom-left" : undefined}
         maxWidth={explicit ? 100 : undefined}
@@ -1819,19 +1546,6 @@ test("native creation defaults compare by their effective values", async () => {
   await mounted.rerender(tree(true));
   await mounted.rerender(tree(false));
   await mounted.unmount();
-});
-
-test("native creation validation continues rejecting genuine changes", async () => {
-  const fixture = sessionFixture();
-  const tree = (showZoom: boolean) => (
-    <CreationSessionProvider value={fixture.session}>
-      <SharedNavigationControl showZoom={showZoom} />
-    </CreationSessionProvider>
-  );
-  const mounted = await render(tree(true));
-  await expect(mounted.rerender(tree(false))).rejects.toThrow(
-    'NavigationControl changed the creation option "showZoom"'
-  );
 });
 
 test.each([false, true])(

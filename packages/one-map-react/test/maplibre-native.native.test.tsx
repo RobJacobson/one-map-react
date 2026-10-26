@@ -29,11 +29,7 @@ import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
-import {
-  AttributionControl,
-  NavigationControl,
-  ScaleControl,
-} from "../src/facade/ui.js";
+import { AttributionControl, ScaleControl } from "../src/facade/ui.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
 const mockJumpTo = jest.fn(() => Promise.resolve());
@@ -851,6 +847,26 @@ describe("maplibre-native adapter", () => {
     await expect(ref.current?.stop()).rejects.toThrow(
       "stop() is not available on native maps."
     );
+  });
+
+  test("getZoom forwards renderer values and errors independently of UI, and rejects after detach", async () => {
+    const ref = createRef<MapRef>();
+    const view = await render(example(ref));
+    const map = ref.current;
+    if (!map) throw new Error("Map ref did not attach.");
+    const calls = mockGetZoom.mock.calls.length;
+    mockGetZoom.mockResolvedValueOnce(0).mockResolvedValueOnce(12.5);
+    await expect(map.getZoom()).resolves.toBe(0);
+    await expect(map.getZoom()).resolves.toBe(12.5);
+    const failure = new Error("Renderer zoom failed");
+    mockGetZoom.mockRejectedValueOnce(failure);
+    await expect(map.getZoom()).rejects.toBe(failure);
+    mockGetZoom.mockResolvedValueOnce(Number.NaN);
+    await expect(map.getZoom()).rejects.toThrow();
+    expect(mockGetZoom.mock.calls.length).toBe(calls + 4);
+    await view.unmount();
+    await expect(map.getZoom()).rejects.toThrow("not attached");
+    expect(mockGetZoom.mock.calls.length).toBe(calls + 4);
   });
 
   test("getters convert flat bounds and reject padding", async () => {
@@ -2122,7 +2138,7 @@ test("MapLibre Native forwards legacy light and rejects unsupported terrain/glob
   }
 });
 
-test("settled camera updates controls and live overlays without another public move", async () => {
+test("settled camera updates live overlays without another public move", async () => {
   const observe = jest.fn();
   const onMove = jest.fn();
   const onMoveEnd = jest.fn();
@@ -2140,7 +2156,7 @@ test("settled camera updates controls and live overlays without another public m
         onMoveEnd={onMoveEnd}
       >
         <Probe />
-        <NavigationControl />
+
         <NativeMarkerOverlay
           id="settled"
           lngLat={[1, 2]}
@@ -2170,9 +2186,6 @@ test("settled camera updates controls and live overlays without another public m
   mockProject.mockResolvedValueOnce([40, 50]);
   await act(async () => events.onRegionIsChanging(payload(40)));
   expect(observe.mock.calls.at(-1)?.[0]).toBe(40);
-  expect(view.getByText("↑").props.style.transform).toEqual([
-    { rotate: "-40deg" },
-  ]);
   await waitFor(() =>
     expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(40)
   );

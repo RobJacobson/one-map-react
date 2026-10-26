@@ -13,12 +13,10 @@ import type { LngLat } from "../../contracts/camera-types.js";
 import type {
   AttributionControlProps,
   ControlProps,
-  FullscreenControlProps,
   GeolocateControlProps,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
-  NavigationControlProps,
   ScaleControlProps,
 } from "../../contracts/ui-types.js";
 import {
@@ -73,11 +71,9 @@ export const createWebUi = (
   Adapter,
   | "Marker"
   | "Control"
-  | "NavigationControl"
   | "AttributionControl"
   | "ScaleControl"
   | "GeolocateControl"
-  | "FullscreenControl"
 > => {
   const Marker = forwardRef<MarkerRef, MarkerProps & WebUiOptions>(
     (props, ref) => {
@@ -178,19 +174,6 @@ export const createWebUi = (
     );
   };
 
-  const NavigationControl = (props: NavigationControlProps & WebUiOptions) => {
-    const { options, hostProps, onError, children, ...forwarded } = props;
-    useStableOptions("NavigationControl", creationOptions(options, ["style"]));
-
-    return (
-      <wrapper.NavigationControl
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-      />
-    );
-  };
-
   const AttributionControl = (
     props: AttributionControlProps & WebUiOptions
   ) => {
@@ -274,27 +257,12 @@ export const createWebUi = (
     );
   };
 
-  const FullscreenControl = (props: FullscreenControlProps & WebUiOptions) => {
-    const { options, hostProps, children, ...forwarded } = props;
-    useStableOptions("FullscreenControl", creationOptions(options, ["style"]));
-
-    return (
-      <wrapper.FullscreenControl
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-      />
-    );
-  };
-
   return {
     Marker,
     Control,
-    NavigationControl,
     AttributionControl,
     ScaleControl,
     GeolocateControl,
-    FullscreenControl,
   };
 };
 

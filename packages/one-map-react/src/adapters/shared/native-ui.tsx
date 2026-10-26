@@ -25,7 +25,7 @@ import {
 import { Portal } from "react-native-teleport";
 
 import type { Adapter } from "../../contracts/adapter.js";
-import type { LngLat, MapRef, Point } from "../../contracts/camera-types.js";
+import type { LngLat, Point } from "../../contracts/camera-types.js";
 import type {
   Anchor,
   ControlProps,
@@ -92,11 +92,9 @@ type NativeUI = Pick<
   Adapter,
   | "Marker"
   | "Control"
-  | "NavigationControl"
   | "AttributionControl"
   | "ScaleControl"
   | "GeolocateControl"
-  | "FullscreenControl"
 >;
 
 /**
@@ -218,11 +216,9 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
   return {
     Marker: NativeMarker,
     Control: NativeControl,
-    NavigationControl: NativeNavigationControl,
     AttributionControl: NativeAttributionControl,
     ScaleControl: NativeScaleControl,
     GeolocateControl: NativeGeolocateControl,
-    FullscreenControl: NativeFullscreenControl,
   };
 };
 
@@ -375,136 +371,6 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
   );
 };
 
-const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
-  const viewState = useContext(NativeCameraContext)?.viewState;
-  const mapSession = useMapSession();
-  const requestSequence = useRef(0);
-
-  useLayoutEffect(
-    () => () => {
-      requestSequence.current += 1;
-    },
-    [mapSession.ref, mapSession.ready]
-  );
-
-  const subscribe = mapSession.subscribe;
-
-  useLayoutEffect(
-    () =>
-      subscribe("move", (event) => {
-        if ("origin" in event && event.origin === "user")
-          requestSequence.current += 1;
-      }),
-    [subscribe]
-  );
-
-  // Readbacks and failures belong to the latest navigation intent and attachment.
-  const reportError = useActiveCallback(
-    (map: MapRef, sequence: number, error: unknown) => {
-      if (
-        sequence === requestSequence.current &&
-        mapSession.ref.current === map &&
-        mapSession.ready
-      ) {
-        props.onError?.(error);
-      }
-    }
-  );
-  const applyZoom = useActiveCallback(
-    (map: MapRef, zoom: number, sequence: number) => {
-      if (
-        sequence !== requestSequence.current ||
-        mapSession.ref.current !== map ||
-        !mapSession.ready
-      ) {
-        return;
-      }
-      void map
-        .zoomTo(
-          Math.max(
-            mapSession.minZoom ?? 0,
-            Math.min(mapSession.maxZoom ?? 24, zoom)
-          )
-        )
-        .catch((error) => reportError(map, sequence, error));
-    }
-  );
-  const navigate = async (change: number): Promise<void> => {
-    const map = mapSession.ref.current;
-    if (!map || !mapSession.ready) return;
-    const sequence = ++requestSequence.current;
-
-    try {
-      // Region-change snapshots can precede the settled renderer zoom.
-      const zoom = await map.getZoom();
-      applyZoom(map, zoom + change, sequence);
-    } catch (error) {
-      reportError(map, sequence, error);
-    }
-  };
-  const resetNorth = async (): Promise<void> => {
-    const map = mapSession.ref.current;
-    if (!map || !mapSession.ready) return;
-    const sequence = ++requestSequence.current;
-
-    try {
-      await map.easeTo({
-        bearing: 0,
-        ...(props.visualizePitch ? { pitch: 0 } : {}),
-      });
-    } catch (error) {
-      reportError(map, sequence, error);
-    }
-  };
-  return (
-    <NativeControl position={props.position}>
-      <View style={{ backgroundColor: "white", borderRadius: 4 }}>
-        {props.showZoom !== false && (
-          <>
-            <ControlButton
-              label="Zoom in"
-              disabled={!mapSession.ready}
-              onPress={() => void navigate(1)}
-            >
-              +
-            </ControlButton>
-            <ControlButton
-              label="Zoom out"
-              disabled={!mapSession.ready}
-              onPress={() => void navigate(-1)}
-            >
-              −
-            </ControlButton>
-          </>
-        )}
-        {props.showCompass !== false && (
-          <ControlButton
-            label="Reset north"
-            disabled={!mapSession.ready}
-            onPress={() => void resetNorth()}
-          >
-            <Text
-              style={{
-                transform: [
-                  { rotate: `${-(viewState?.bearing ?? 0)}deg` },
-                  ...(props.visualizePitch
-                    ? [
-                        { perspective: 400 },
-                        { rotateX: `${viewState?.pitch ?? 0}deg` },
-                      ]
-                    : []),
-                ],
-              }}
-            >
-              ↑
-            </Text>
-          </ControlButton>
-        )}
-      </View>
-    </NativeControl>
-  );
-};
-
 const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
   const { setAttributionPosition } = useNativeMapPresentation();
   const position = props.position ?? "bottom-right";
@@ -608,10 +474,6 @@ const NativeGeolocateControl: Adapter["GeolocateControl"] = (props) => {
       </NativeControl>
     </>
   );
-};
-
-const NativeFullscreenControl: Adapter["FullscreenControl"] = () => {
-  throw new Error("FullscreenControl requires a browser fullscreen API.");
 };
 
 const ControlButton = (props: {

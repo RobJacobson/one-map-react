@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 import {
   createContext,
   type ComponentProps,
@@ -16,6 +16,8 @@ import { App as MaplibreApp } from "../../../examples/web-maplibre/src/app.js";
 const popup = vi.hoisted(() => ({
   props: {} as Record<string, unknown>,
   closes: 0,
+  navigation: [] as Array<Record<string, unknown>>,
+  fullscreen: [] as Array<Record<string, unknown>>,
 }));
 const Theme = createContext("missing");
 
@@ -69,19 +71,37 @@ vi.mock("one-map-react", async (original) => {
     Source: Content,
     Layer: Empty,
     Control: Empty,
-    NavigationControl: Empty,
+    AttributionControl: Empty,
     GeolocateControl: Empty,
     ScaleControl: Empty,
   };
 });
 vi.mock("one-map-react/mapbox-web", () => ({
-  adapter: { backend: "mapbox-web" },
+  adapter: { backend: "mapbox-web", services: { location: {} } },
+  Map: ({ children }: { children?: ReactNode }) => children,
+  WrapperNavigationControl: (props: Record<string, unknown>) => {
+    popup.navigation.push(props);
+    return null;
+  },
+  WrapperFullscreenControl: (props: Record<string, unknown>) => {
+    popup.fullscreen.push(props);
+    return null;
+  },
   WrapperPopup: (props: ComponentProps<typeof RawPopup>) => (
     <RawPopup {...props} />
   ),
 }));
 vi.mock("one-map-react/maplibre-web", () => ({
-  adapter: { backend: "maplibre-web" },
+  adapter: { backend: "maplibre-web", services: { location: {} } },
+  Map: ({ children }: { children?: ReactNode }) => children,
+  WrapperNavigationControl: (props: Record<string, unknown>) => {
+    popup.navigation.push(props);
+    return null;
+  },
+  WrapperFullscreenControl: (props: Record<string, unknown>) => {
+    popup.fullscreen.push(props);
+    return null;
+  },
   WrapperPopup: (props: ComponentProps<typeof RawPopup>) => (
     <RawPopup {...props} />
   ),
@@ -124,5 +144,25 @@ test.each([MapboxApp, MaplibreApp])(
     expect(mounted.getByText("updated: 0")).toBeTruthy();
     mounted.unmount();
     expect(popup.closes).toBe(1);
+  }
+);
+
+test.each([MapboxApp, MaplibreApp])(
+  "selected web entry forwards navigation to the raw wrapper",
+  async (App) => {
+    for (const scenario of ["tf07=ui", "tf08=services"]) {
+      window.history.replaceState({}, "", `?${scenario}`);
+      popup.navigation = [];
+      const view = render(<App />);
+      if (scenario === "tf08=services") {
+        await act(async () => {
+          await window.__oneMapTf08?.command("configure", {
+            mode: "coverage-ornaments",
+          });
+        });
+      }
+      expect(popup.navigation.at(-1)).toEqual({ position: "top-right" });
+      view.unmount();
+    }
   }
 );

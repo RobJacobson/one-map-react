@@ -33,7 +33,6 @@ import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import {
   Marker as SharedMarker,
-  NavigationControl as SharedNavigationControl,
   ScaleControl as SharedScaleControl,
   Control as SharedControl,
 } from "../src/facade/ui.js";
@@ -52,11 +51,11 @@ const ControlMock = (props: WebForwardedProps) => {
 };
 const wrapper = {
   Marker: MarkerMock,
-  NavigationControl: ControlMock,
+
   AttributionControl: ControlMock,
   ScaleControl: ControlMock,
   GeolocateControl: ControlMock,
-  FullscreenControl: ControlMock,
+
   useControl: (create: () => WebCustomControl) => {
     const control = useMemo(create, [create]);
     useEffect(() => {
@@ -299,12 +298,6 @@ describe("TF07 web UI delegates", () => {
         tree(<SharedMarker longitude={5} latitude={6} anchor="top" />)
       )
     ).toThrow("creation option");
-    const control = render(
-      tree(<SharedNavigationControl position="top-left" />)
-    );
-    expect(() =>
-      control.rerender(tree(<SharedNavigationControl position="bottom-left" />))
-    ).toThrow("creation option");
   });
   test("adapter-specific marker creation options remain guarded", () => {
     const SelectedMarker =
@@ -374,12 +367,7 @@ test("shared UI accepts effective creation defaults in both directions", () => {
           anchor={explicit ? "bottom" : undefined}
           renderMode={explicit ? "view" : undefined}
         />
-        <SharedNavigationControl
-          position={explicit ? "top-right" : undefined}
-          showZoom={explicit ? true : undefined}
-          showCompass={explicit ? true : undefined}
-          visualizePitch={explicit ? false : undefined}
-        />
+
         <SharedScaleControl
           position={explicit ? "top-right" : undefined}
           maxWidth={explicit ? 100 : undefined}

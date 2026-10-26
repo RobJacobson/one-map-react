@@ -4,11 +4,9 @@ import { useFrozenValue } from "../adapters/shared/use-frozen-value.js";
 import type {
   AttributionControlProps,
   ControlProps,
-  FullscreenControlProps,
   GeolocateControlProps,
   MarkerProps,
   MarkerRef,
-  NavigationControlProps,
   ScaleControlProps,
 } from "../contracts/ui-types.js";
 import { useMapSession } from "./map-context.js";
@@ -37,19 +35,6 @@ export const Control = (props: ControlProps) => {
   useMapSession();
   const { Control: Implementation } = useSelectedAdapter();
   useStableOptions("Control", { position: props.position ?? "top-right" });
-  return <Implementation {...props} />;
-};
-
-/** Zoom and bearing controls targeting the enclosing map. */
-export const NavigationControl = (props: NavigationControlProps) => {
-  useMapSession();
-  const { NavigationControl: Implementation } = useSelectedAdapter();
-  useStableOptions("NavigationControl", {
-    position: props.position ?? "top-right",
-    showZoom: props.showZoom ?? true,
-    showCompass: props.showCompass ?? true,
-    visualizePitch: props.visualizePitch ?? false,
-  });
   return <Implementation {...props} />;
 };
 
@@ -84,16 +69,6 @@ export const GeolocateControl = (props: GeolocateControlProps) => {
   useMapSession();
   const { GeolocateControl: Implementation } = useSelectedAdapter();
   useStableOptions("GeolocateControl", {
-    position: props.position ?? "top-right",
-  });
-  return <Implementation {...props} />;
-};
-
-/** Delegates browser fullscreen behavior. */
-export const FullscreenControl = (props: FullscreenControlProps) => {
-  useMapSession();
-  const { FullscreenControl: Implementation } = useSelectedAdapter();
-  useStableOptions("FullscreenControl", {
     position: props.position ?? "top-right",
   });
   return <Implementation {...props} />;
