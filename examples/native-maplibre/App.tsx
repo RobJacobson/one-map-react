@@ -10,6 +10,7 @@ import { Button, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
 import { createMaplibreOfflineCommands } from "../shared/maplibre-offline-commands.js";
+import { createMaplibreSnapshot } from "../shared/maplibre-snapshot.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
@@ -49,6 +50,7 @@ const App = () => {
     return (
       <NativeTf08Screen
         adapter={adapter}
+        createSnapshot={createMaplibreSnapshot}
         getLocationDiagnostic={() =>
           WrapperLocationManager.getCurrentPosition()
         }

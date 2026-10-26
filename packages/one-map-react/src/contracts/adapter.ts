@@ -5,7 +5,6 @@ import type {
 } from "react";
 
 import type { MapRef } from "./camera-types.js";
-import type { StaticMapImageService } from "./capture-types.js";
 import type { ImagesProps } from "./images-types.js";
 import type { LayerProps } from "./layer-types.js";
 import type { LocationService } from "./location-types.js";
@@ -27,8 +26,6 @@ import type {
 export interface MapServices {
   /** Explicit foreground acquisition. */
   readonly location: LocationService;
-  /** Independent native snapshotter when implemented. */
-  readonly staticMapImage?: StaticMapImageService;
 }
 
 /** Explicit engine and host selection; native covers both iOS and Android. */

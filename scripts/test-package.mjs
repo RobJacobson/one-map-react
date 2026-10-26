@@ -304,6 +304,16 @@ import type { OfflineService } from "one-map-react";
 declare const services: import("one-map-react").MapServices;
 // @ts-expect-error Selected SDK managers replace the common offline service.
 services.offline;
+// @ts-expect-error Independent snapshots belong to selected SDK managers.
+services.staticMapImage;
+// @ts-expect-error Common independent image output is removed.
+import type { ImageOutput } from "one-map-react";
+// @ts-expect-error Common independent image result is removed.
+import type { MapImage } from "one-map-react";
+// @ts-expect-error Snapshot inputs belong to the selected SDK.
+import type { StaticMapImageOptions } from "one-map-react";
+// @ts-expect-error No common snapshot service remains.
+import type { StaticMapImageService } from "one-map-react";
 // @ts-expect-error Capture belongs to the application and selected wrapper.
 commonRef.capture({ output: "data-url", scope: "backend" });
 // @ts-expect-error Capture-only options are removed from the common package.

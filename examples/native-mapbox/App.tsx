@@ -14,6 +14,7 @@ import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
 import { createMapboxOfflineCommands } from "../shared/mapbox-offline-commands.js";
+import { createMapboxSnapshot } from "../shared/mapbox-snapshot.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
@@ -108,6 +109,7 @@ const App = () => {
     return (
       <NativeTf08Screen
         adapter={adapter}
+        createSnapshot={createMapboxSnapshot}
         getLocationDiagnostic={() =>
           WrapperLocationManager.getLastKnownLocation()
         }
