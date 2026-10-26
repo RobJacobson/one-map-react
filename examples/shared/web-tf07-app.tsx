@@ -1,5 +1,5 @@
 import { type Adapter, MapSetup } from "one-map-react";
-import { useCallback, useState } from "react";
+import { type ComponentProps, useCallback, useState } from "react";
 
 import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
 
@@ -11,7 +11,13 @@ declare global {
 }
 
 /** Web acceptance shell opened with `?tf07=ui`. */
-export const WebTf07App = ({ adapter }: { readonly adapter: Adapter }) => {
+export const WebTf07App = ({
+  adapter,
+  renderPopup,
+}: {
+  readonly adapter: Adapter;
+  readonly renderPopup: ComponentProps<typeof Tf07Scene>["renderPopup"];
+}) => {
   const [status, setStatus] = useState("TF07 waiting for map");
   const attach = useCallback((probe: Tf07Probe | null) => {
     if (probe) window.__oneMapTf07 = probe;
@@ -40,6 +46,7 @@ export const WebTf07App = ({ adapter }: { readonly adapter: Adapter }) => {
         </div>
         <div id="tf07-map-host" style={{ flex: 1, position: "relative" }}>
           <Tf07Scene
+            renderPopup={renderPopup}
             style={{ width: "100%", height: "100%" }}
             attach={attach}
             report={(event) => setStatus(`TF07 ${event}`)}

@@ -6,7 +6,6 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
-  useRef,
 } from "react";
 import {
   afterEach,
@@ -34,31 +33,17 @@ import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import {
   Marker as SharedMarker,
-  Popup as SharedPopup,
   NavigationControl as SharedNavigationControl,
   ScaleControl as SharedScaleControl,
   Control as SharedControl,
 } from "../src/facade/ui.js";
 
 const markerProps: WebForwardedProps[] = [];
-const popupProps: WebForwardedProps[] = [];
 const controlProps: WebForwardedProps[] = [];
-const popupHandle = { options: { anchor: "bottom" }, setOffset: vi.fn() };
 const markerHandle = { setLngLat: vi.fn() };
 const MarkerMock = forwardRef((props: WebForwardedProps, ref) => {
   useImperativeHandle(ref, () => markerHandle, []);
   markerProps.push(props);
-  return <div>{props.children}</div>;
-});
-const PopupMock = forwardRef((props: WebForwardedProps, ref) => {
-  popupProps.push(props);
-  useImperativeHandle(ref, () => popupHandle, []);
-  const initialProps = useRef(props);
-  useEffect(() => {
-    const mountedProps = initialProps.current;
-    (mountedProps.onOpen as () => void)?.();
-    return () => (mountedProps.onClose as () => void)?.();
-  }, []);
   return <div>{props.children}</div>;
 });
 const ControlMock = (props: WebForwardedProps) => {
@@ -67,7 +52,6 @@ const ControlMock = (props: WebForwardedProps) => {
 };
 const wrapper = {
   Marker: MarkerMock,
-  Popup: PopupMock,
   NavigationControl: ControlMock,
   AttributionControl: ControlMock,
   ScaleControl: ControlMock,
@@ -82,14 +66,12 @@ const wrapper = {
     return control;
   },
 } as unknown as WebWrapper<"mapbox-web">;
-const { Marker, Popup, Control, ScaleControl, GeolocateControl } =
+const { Marker, Control, ScaleControl, GeolocateControl } =
   createWebUi(wrapper);
 
 beforeEach(() => {
   markerProps.length = 0;
-  popupProps.length = 0;
   controlProps.length = 0;
-  popupHandle.setOffset.mockClear();
   markerHandle.setLngLat.mockClear();
 });
 afterEach(() => {
@@ -191,57 +173,6 @@ describe("TF07 web UI delegates", () => {
     expect(second).toHaveBeenCalledTimes(1);
     view.unmount();
     notify(staleProps, "onClick", {});
-    expect(second).toHaveBeenCalledTimes(1);
-  });
-
-  test("applies popup anchor-only changes, width conversion, and offset clearing", () => {
-    const view = render(
-      <Popup
-        longitude={5}
-        latitude={6}
-        anchor="bottom"
-        offset={[2, 3]}
-        maxWidth={300}
-      >
-        Content
-      </Popup>
-    );
-    expect(latest(popupProps).maxWidth).toBe("300px");
-    view.rerender(
-      <Popup longitude={5} latitude={6} anchor="top" offset={[2, 3]}>
-        Content
-      </Popup>
-    );
-    expect(popupHandle.options.anchor).toBe("top");
-    expect(popupHandle.setOffset).toHaveBeenLastCalledWith([2, 3]);
-    const updates = popupHandle.setOffset.mock.calls.length;
-    view.rerender(
-      <Popup longitude={5} latitude={6} anchor="top" offset={[2, 3]}>
-        Content
-      </Popup>
-    );
-    expect(popupHandle.setOffset).toHaveBeenCalledTimes(updates);
-    view.rerender(
-      <Popup longitude={5} latitude={6} anchor="top">
-        Content
-      </Popup>
-    );
-    expect(popupHandle.setOffset).toHaveBeenLastCalledWith([0, 0]);
-  });
-
-  test("popup dismissal calls current callback while teardown emits no close", () => {
-    const onOpen = vi.fn();
-    const first = vi.fn();
-    const second = vi.fn();
-    const view = render(
-      <Popup longitude={5} latitude={6} onOpen={onOpen} onClose={first} />
-    );
-    expect(onOpen).toHaveBeenCalledTimes(1);
-    view.rerender(<Popup longitude={5} latitude={6} onClose={second} />);
-    notify(latest(popupProps), "onClose", {});
-    expect(first).not.toHaveBeenCalled();
-    expect(second).toHaveBeenCalledTimes(1);
-    view.unmount();
     expect(second).toHaveBeenCalledTimes(1);
   });
 
@@ -442,14 +373,6 @@ test("shared UI accepts effective creation defaults in both directions", () => {
           latitude={0}
           anchor={explicit ? "bottom" : undefined}
           renderMode={explicit ? "view" : undefined}
-        />
-        <SharedPopup
-          longitude={0}
-          latitude={0}
-          closeButton={explicit ? true : undefined}
-          closeOnClick={explicit ? true : undefined}
-          closeOnMove={explicit ? false : undefined}
-          focusAfterOpen={explicit ? true : undefined}
         />
         <SharedNavigationControl
           position={explicit ? "top-right" : undefined}

@@ -364,6 +364,19 @@ NetworkManager.setConnected(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
 NetworkManager.setConnected(42);
 `;
+  const popupAssertions = `
+// @ts-expect-error No selected common popup facade remains.
+import { Popup } from "one-map-react/${entry}";
+// @ts-expect-error Popup facade props are removed.
+import type { ${entry.endsWith("web") ? "WebPopupProps" : "NativePopupProps"} } from "one-map-react/${entry}";
+${
+  entry.endsWith("web")
+    ? `import { WrapperPopup } from "one-map-react/${entry}";
+void <WrapperPopup longitude={0} latitude={0} maxWidth="300px" closeOnClick={false} onClose={() => undefined}>Application content</WrapperPopup>;`
+    : `import { Callout } from "one-map-react/${entry}";
+void <Callout title="Application callout" />;`
+}
+`;
   const markerAssertions = entry.endsWith("web")
     ? `
 import { Marker as SelectedMarker } from "one-map-react/${entry}";
@@ -403,6 +416,7 @@ const viewState = {
 const style = { version: 8 as const, sources: {}, layers: [] };
 ${selectedAssertions}
 ${markerAssertions}
+${popupAssertions}
 void (
   <OneMap mapStyle={style} initialViewState={viewState} />
 );

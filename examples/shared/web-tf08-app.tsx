@@ -1,5 +1,5 @@
 import { type Adapter, MapSetup } from "one-map-react";
-import { useCallback, useMemo } from "react";
+import { type ComponentProps, useCallback, useMemo } from "react";
 
 import {
   type Tf08AcceptanceProbe,
@@ -14,7 +14,15 @@ declare global {
 }
 
 /** Browser TF08 acceptance shell, selected with ?tf08=services. */
-export const WebTf08App = ({ adapter }: { readonly adapter: Adapter }) => {
+export const WebTf08App = ({
+  adapter,
+  renderCoveragePopup,
+}: {
+  readonly adapter: Adapter;
+  readonly renderCoveragePopup: ComponentProps<
+    typeof Tf08AcceptanceScene
+  >["renderCoveragePopup"];
+}) => {
   const attach = useCallback((probe: Tf08AcceptanceProbe | null) => {
     if (probe) window.__oneMapTf08 = probe;
     else delete window.__oneMapTf08;
@@ -30,6 +38,7 @@ export const WebTf08App = ({ adapter }: { readonly adapter: Adapter }) => {
     <MapSetup adapter={adapter}>
       <div id="tf08-map-host" style={{ width: "100vw", height: "100vh" }}>
         <Tf08AcceptanceScene
+          renderCoveragePopup={renderCoveragePopup}
           backend={adapter.backend}
           services={adapter.services}
           style={{ width: "100%", height: "100%" }}

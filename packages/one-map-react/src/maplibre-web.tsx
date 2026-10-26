@@ -38,7 +38,6 @@ import type {
   MarkerProps,
   MarkerRef,
   NavigationControlProps,
-  PopupProps,
   ScaleControlProps,
 } from "./contracts/ui-types.js";
 import { Map as OneMap } from "./facade/map.js";
@@ -49,7 +48,6 @@ import {
   GeolocateControl as OneGeolocateControl,
   Marker as OneMarker,
   NavigationControl as OneNavigationControl,
-  Popup as OnePopup,
   ScaleControl as OneScaleControl,
 } from "./facade/ui.js";
 import { useStableOptions } from "./facade/use-stable-options.js";
@@ -81,7 +79,6 @@ export const adapter: Adapter & { readonly backend: "maplibre-web" } =
     Source: MaplibreSource as ComponentType<WebForwardedProps>,
     Layer: MaplibreLayer as Adapter["Layer"],
     Marker: MaplibreMarker as unknown as ComponentType<WebForwardedProps>,
-    Popup: MaplibrePopup as unknown as ComponentType<WebForwardedProps>,
     NavigationControl:
       MaplibreNavigationControl as ComponentType<WebForwardedProps>,
     AttributionControl:
@@ -185,19 +182,6 @@ export interface WebMarkerProps extends MarkerProps {
 export const Marker = OneMarker as ForwardRefExoticComponent<
   WebMarkerProps & RefAttributes<MarkerRef>
 >;
-
-/** Popup props with selected wrapper options and DOM content attributes. */
-export interface WebPopupProps extends PopupProps {
-  /** Remaining selected wrapper options; common fields take precedence. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibrePopup>,
-    keyof PopupProps | "ref"
-  >;
-  /** Attributes applied to the popup content host. */
-  readonly hostProps?: HTMLAttributes<HTMLDivElement>;
-}
-/** Popup with selected web options. */
-export const Popup = OnePopup as ComponentType<WebPopupProps>;
 
 /** Custom control props with DOM content attributes. */
 export interface WebControlProps extends ControlProps {

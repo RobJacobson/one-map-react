@@ -1,5 +1,11 @@
-import { type Adapter, MapSetup } from "one-map-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type Adapter, MapSetup, Marker } from "one-map-react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Button,
   Platform,
@@ -12,6 +18,7 @@ import {
   View,
 } from "react-native";
 
+import { NativePopupBubble } from "./native-popup-bubble.js";
 import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
 
 /**
@@ -101,6 +108,7 @@ export const NativeTf07Screen = ({
           {readback}
         </Text>
         <Tf07Scene
+          renderPopup={renderPopup}
           native
           style={{ flex: 1 }}
           attach={attach}
@@ -145,3 +153,15 @@ const styles = StyleSheet.create({
   content: { padding: 8, backgroundColor: "white" },
   scroll: { height: 32 },
 });
+
+const renderPopup = (
+  children: ReactNode,
+  onOpen: () => void,
+  onClose: () => void
+): ReactNode => (
+  <Marker longitude={-122.3} latitude={47.63} anchor="bottom">
+    <NativePopupBubble onOpen={onOpen} onClose={onClose}>
+      {children}
+    </NativePopupBubble>
+  </Marker>
+);

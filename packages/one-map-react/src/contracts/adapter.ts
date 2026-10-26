@@ -18,7 +18,6 @@ import type {
   MarkerProps,
   MarkerRef,
   NavigationControlProps,
-  PopupProps,
   ScaleControlProps,
 } from "./ui-types.js";
 
@@ -58,8 +57,6 @@ export interface Adapter {
   readonly Marker: ForwardRefExoticComponent<
     MarkerProps & RefAttributes<MarkerRef>
   >;
-  /** Mounted popup with application-owned dismissal. */
-  readonly Popup: ComponentType<PopupProps>;
   /** Application UI in a map corner. */
   readonly Control: ComponentType<ControlProps>;
   /** Camera buttons and compass. */

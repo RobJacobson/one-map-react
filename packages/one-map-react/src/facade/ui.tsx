@@ -9,7 +9,6 @@ import type {
   MarkerProps,
   MarkerRef,
   NavigationControlProps,
-  PopupProps,
   ScaleControlProps,
 } from "../contracts/ui-types.js";
 import { useMapSession } from "./map-context.js";
@@ -32,21 +31,6 @@ export const Marker = forwardRef<MarkerRef, MarkerProps>((props, ref) => {
   });
   return <Implementation {...props} ref={ref} />;
 });
-
-/** Mount controls visibility; teardown does not request dismissal. */
-export const Popup = (props: PopupProps) => {
-  useMapSession();
-  const { Popup: Implementation, backend } = useSelectedAdapter();
-  useStableOptions("Popup", {
-    closeButton: props.closeButton ?? true,
-    closeOnClick: props.closeOnClick ?? true,
-    closeOnMove: props.closeOnMove ?? false,
-    focusAfterOpen: backend.endsWith("native")
-      ? props.focusAfterOpen
-      : (props.focusAfterOpen ?? true),
-  });
-  return <Implementation {...props} />;
-};
 
 /** Renders application host content at a map corner. */
 export const Control = (props: ControlProps) => {

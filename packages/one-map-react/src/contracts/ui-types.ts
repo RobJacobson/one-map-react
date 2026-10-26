@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import type { LngLat, Point } from "./camera-types.js";
 
-/** Geographic attachment point within the marker or popup content. */
+/** Geographic attachment point within the marker content. */
 export type Anchor =
   | "center"
   | "top"
@@ -56,34 +56,6 @@ export interface MarkerProps {
   readonly onDragEnd?: (event: MarkerEvent) => void;
   /** Reports marker projection failures. */
   readonly onError?: (error: unknown) => void;
-}
-
-/** Mounted standalone popup; onClose requests application dismissal. */
-export interface PopupProps {
-  /** Longitude in degrees. */
-  readonly longitude: number;
-  /** Latitude in degrees. */
-  readonly latitude: number;
-  /** Geographic attachment point; defaults to bottom. */
-  readonly anchor?: Anchor;
-  /** Offset in logical map-view units. */
-  readonly offset?: Point;
-  /** Maximum logical width; defaults to 240. */
-  readonly maxWidth?: number | string;
-  /** Shows an accessible dismissal button; creation input. */
-  readonly closeButton?: boolean;
-  /** Dismisses on map click; creation input. */
-  readonly closeOnClick?: boolean;
-  /** Dismisses on camera movement; creation input. */
-  readonly closeOnMove?: boolean;
-  /** Browser focus behavior; creation input. */
-  readonly focusAfterOpen?: boolean;
-  /** Popup host content. */
-  readonly children?: ReactNode;
-  /** Called when attached. */
-  readonly onOpen?: () => void;
-  /** Called on requested dismissal, never during component teardown. */
-  readonly onClose?: () => void;
 }
 
 /** Corner of the map container. */

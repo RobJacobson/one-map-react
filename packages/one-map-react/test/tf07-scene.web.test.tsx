@@ -20,7 +20,6 @@ vi.mock("one-map-react", async () => {
       fixture.markers.push(props);
       return null;
     },
-    Popup: () => null,
     Control: () => null,
     NavigationControl: () => null,
     GeolocateControl: () => null,
@@ -36,6 +35,7 @@ test.each([false, true])(
       <Tf07Scene
         native={native}
         style={{ width: 400, height: 300 }}
+        renderPopup={() => null}
         markerContent={() => null}
         controlContent={null}
         report={() => undefined}

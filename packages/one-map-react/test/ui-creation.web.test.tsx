@@ -14,7 +14,6 @@ import {
   GeolocateControl,
   Marker,
   NavigationControl,
-  Popup,
   ScaleControl,
 } from "../src/facade/ui.js";
 
@@ -31,7 +30,6 @@ const fakeAdapter = (backend: Backend): Adapter => ({
   Layer: Empty,
   Images: Empty,
   Marker: forwardRef((_props, _ref) => null),
-  Popup: Empty,
   Control: Empty,
   NavigationControl: Empty,
   AttributionControl: Empty,
@@ -71,30 +69,6 @@ const genuineChanges = [
         latitude={0}
         renderMode={changed ? "annotation" : "view"}
       />
-    ),
-  ],
-  [
-    "Popup",
-    (changed: boolean) => (
-      <Popup longitude={0} latitude={0} closeButton={!changed} />
-    ),
-  ],
-  [
-    "Popup click",
-    (changed: boolean) => (
-      <Popup longitude={0} latitude={0} closeOnClick={!changed} />
-    ),
-  ],
-  [
-    "Popup move",
-    (changed: boolean) => (
-      <Popup longitude={0} latitude={0} closeOnMove={changed} />
-    ),
-  ],
-  [
-    "Popup focus",
-    (changed: boolean) => (
-      <Popup longitude={0} latitude={0} focusAfterOpen={!changed} />
     ),
   ],
   [
@@ -197,14 +171,6 @@ describe.each<Backend>([
           latitude={0}
           anchor={explicit ? "bottom" : undefined}
           renderMode={explicit ? "view" : undefined}
-        />
-        <Popup
-          longitude={0}
-          latitude={explicit ? 1 : 0}
-          closeButton={explicit ? true : undefined}
-          closeOnClick={explicit ? true : undefined}
-          closeOnMove={explicit ? false : undefined}
-          focusAfterOpen={!native && explicit ? true : undefined}
         />
         <Control position={explicit ? "top-right" : undefined}>
           {explicit ? "updated" : "original"}
