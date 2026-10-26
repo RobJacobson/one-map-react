@@ -84,12 +84,6 @@ export type {
   MapProps,
 } from "./contracts/map-types.js";
 export type {
-  OfflinePack,
-  OfflinePackOptions,
-  OfflinePackStatus,
-  OfflineService,
-} from "./contracts/offline-types.js";
-export type {
   ClusterQueryMethods,
   FeatureIdentifier,
   FeatureQueryMethods,

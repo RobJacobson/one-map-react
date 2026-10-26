@@ -21,12 +21,24 @@ import {
   Tf08AcceptanceScene,
 } from "./tf08-acceptance-scene.js";
 
+/** Explicit application test commands; no portable offline service is exposed. */
+export interface Tf08OfflineCommands {
+  /** Performs an explicitly requested test action with raw selected SDK output. */
+  readonly command: (
+    action: string,
+    value?: Record<string, unknown>
+  ) => Promise<unknown>;
+  /** Releases only this screen's observer, including pending setup. */
+  readonly dispose: () => void;
+}
+
 /** Native TF08 shell; the runner sends application actions over local HTTP. */
 export const NativeTf08Screen = ({
   adapter,
   getLocationDiagnostic,
   setNetworkConnected,
   offlineOperations,
+  createOfflineCommands,
   startDetached = false,
   nativePuck,
 }: {
@@ -36,9 +48,20 @@ export const NativeTf08Screen = ({
   readonly offlineOperations?: Readonly<
     Record<string, (value: Record<string, unknown>) => unknown>
   >;
+  readonly createOfflineCommands?: () => Tf08OfflineCommands;
   readonly startDetached?: boolean;
   readonly nativePuck?: ReactNode;
 }) => {
+  const offlineCommands = useRef<Tf08OfflineCommands | undefined>(undefined);
+  useEffect(() => {
+    const commands = createOfflineCommands?.();
+    offlineCommands.current = commands;
+    return () => {
+      offlineCommands.current = undefined;
+      commands?.dispose();
+    };
+  }, [createOfflineCommands]);
+
   const [sceneMounted, setSceneMounted] = useState(!startDetached);
   const probe = useRef<Tf08AcceptanceProbe | null>(null);
   const [status, setStatus] = useState("TF08 awaiting runner");
@@ -63,6 +86,7 @@ export const NativeTf08Screen = ({
         };
         const environment = `${adapter.backend.replace("-native", "")}-${Platform.OS}`;
         if (
+          !active ||
           !request.id ||
           request.id === last ||
           request.environment !== environment
@@ -76,6 +100,7 @@ export const NativeTf08Screen = ({
             setSceneMounted(true);
           if (
             !probe.current &&
+            !request.action.startsWith("offline-") &&
             !["configure", "device-info", "named-offline", "network"].includes(
               request.action
             )
@@ -86,24 +111,32 @@ export const NativeTf08Screen = ({
             environment,
             ok: true,
             value:
-              request.action === "device-info"
-                ? { scale: PixelRatio.get(), window: Dimensions.get("window") }
-                : request.action === "named-offline"
-                  ? await runOfflineOperation(
-                      offlineOperations,
-                      String(request.value?.operation),
-                      request.value ?? {}
-                    )
-                  : request.action === "network" && setNetworkConnected
-                    ? await setNetworkConnected(
-                        request.value?.connected === true
+              request.action.startsWith("offline-") && offlineCommands.current
+                ? await offlineCommands.current.command(
+                    request.action,
+                    request.value
+                  )
+                : request.action === "device-info"
+                  ? {
+                      scale: PixelRatio.get(),
+                      window: Dimensions.get("window"),
+                    }
+                  : request.action === "named-offline"
+                    ? await runOfflineOperation(
+                        offlineOperations,
+                        String(request.value?.operation),
+                        request.value ?? {}
                       )
-                    : !probe.current && request.action === "configure"
-                      ? null
-                      : await probe.current?.command(
-                          request.action,
-                          request.value
-                        ),
+                    : request.action === "network" && setNetworkConnected
+                      ? await setNetworkConnected(
+                          request.value?.connected === true
+                        )
+                      : !probe.current && request.action === "configure"
+                        ? null
+                        : await probe.current?.command(
+                            request.action,
+                            request.value
+                          ),
           };
         } catch (error) {
           result = {

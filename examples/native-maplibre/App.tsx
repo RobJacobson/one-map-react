@@ -9,6 +9,7 @@ import { useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
+import { createMaplibreOfflineCommands } from "../shared/maplibre-offline-commands.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
@@ -52,6 +53,7 @@ const App = () => {
           WrapperLocationManager.getCurrentPosition()
         }
         offlineOperations={offlineOperations}
+        createOfflineCommands={createMaplibreOfflineCommands}
         startDetached={smokeTarget === "tf08-storage"}
         nativePuck={<NativeUserLocation />}
       />
