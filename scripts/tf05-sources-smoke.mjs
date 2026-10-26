@@ -5,6 +5,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { deflateSync } from "node:zlib";
 
+import { stopOwnedProcess } from "./native-smoke-process.mjs";
+
 const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
@@ -86,7 +88,7 @@ async function runWeb(directory, port, label) {
       "--host",
       "127.0.0.1",
     ],
-    { cwd: shell, stdio: ["ignore", "pipe", "pipe"] }
+    { cwd: shell, detached: true, stdio: ["ignore", "pipe", "pipe"] }
   );
   let viteLog = "";
   const record = (chunk) => {
@@ -107,7 +109,7 @@ async function runWeb(directory, port, label) {
       "--no-first-run",
       `http://127.0.0.1:${port}/?tf05=${webScenario}`,
     ],
-    { stdio: "ignore" }
+    { detached: true, stdio: "ignore" }
   );
 
   try {
@@ -130,8 +132,8 @@ async function runWeb(directory, port, label) {
       log: viteLog.slice(-1500),
     };
   } finally {
-    chrome.kill("SIGKILL");
-    vite.kill("SIGTERM");
+    await stopOwnedProcess(chrome);
+    await stopOwnedProcess(vite);
     rmSync(profile, { recursive: true, force: true });
   }
 }
