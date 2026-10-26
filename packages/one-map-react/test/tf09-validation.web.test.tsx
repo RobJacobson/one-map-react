@@ -10,13 +10,6 @@ import { Map as OneMap } from "../src/facade/map.js";
 
 const adapter = {
   backend: "maplibre-native",
-  services: {
-    location: {
-      requestPermission: vi.fn(),
-      getCurrentPosition: vi.fn(),
-      watchPosition: vi.fn(),
-    },
-  },
   Map: vi.fn(() => null),
 } as unknown as Adapter;
 const camera = { longitude: 0, latitude: 0, zoom: 0, bearing: 0, pitch: 0 };

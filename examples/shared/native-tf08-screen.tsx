@@ -37,6 +37,8 @@ export interface Tf08OfflineCommands {
 export const NativeTf08Screen = ({
   adapter,
   getLocationDiagnostic,
+  requestLocationPermission,
+  getCurrentPosition,
   setNetworkConnected,
   offlineOperations,
   createOfflineCommands,
@@ -45,6 +47,13 @@ export const NativeTf08Screen = ({
   nativePuck,
 }: {
   readonly adapter: Adapter;
+  readonly requestLocationPermission: (
+    signal?: AbortSignal
+  ) => Promise<unknown>;
+  readonly getCurrentPosition: (
+    signal?: AbortSignal,
+    timeoutMs?: number
+  ) => Promise<import("one-map-react").GeolocationPosition>;
   readonly getLocationDiagnostic?: () => Promise<unknown>;
   readonly setNetworkConnected?: (connected: boolean) => Promise<boolean>;
   readonly offlineOperations?: Readonly<
@@ -208,7 +217,8 @@ export const NativeTf08Screen = ({
             renderLocation={NativeLocationButton}
             renderCoveragePopup={renderCoveragePopup}
             backend={adapter.backend}
-            services={adapter.services}
+            requestLocationPermission={requestLocationPermission}
+            getCurrentPosition={getCurrentPosition}
             style={{ flex: 1 }}
             attach={attach}
             fixtureUrl="http://127.0.0.1:8798"

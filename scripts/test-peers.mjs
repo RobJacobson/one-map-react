@@ -257,9 +257,13 @@ selectedRef.setEventedParent(null);`
       ? `
 import type { ComponentRef } from "react";
 import type { MapView as RnmapboxMapView, SnapshotOptions } from "@rnmapbox/maps";
-import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef, WrapperOfflineManager, WrapperSnapshotManager } from "one-map-react/mapbox-native";
+import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef, WrapperOfflineManager, WrapperSnapshotManager, WrapperLocationManager } from "one-map-react/mapbox-native";
 void <WrapperMapView styleJSON={JSON.stringify(style)}><WrapperCamera zoomLevel={0} /><WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} /></WrapperMapView>;
 void Terrain; void Light; void Models; void RasterArraySource; void Viewport;
+const selectedLocationManager: typeof import("@rnmapbox/maps").locationManager = WrapperLocationManager;
+const addLocationListener: typeof selectedLocationManager.addListener = WrapperLocationManager.addListener;
+const removeLocationListener: typeof selectedLocationManager.removeListener = WrapperLocationManager.removeListener;
+void addLocationListener; void removeLocationListener;
 setTelemetryEnabled(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
 setTelemetryEnabled(42);
@@ -311,7 +315,11 @@ selectedRef.setSourceVisibility(false, 'source');
       : `
 import type { ComponentRef } from "react";
 import type { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
-import { Map as SelectedMap, type NativeAdvancedMapRef, WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer, WrapperOfflineManager, WrapperStaticMapImageManager } from "one-map-react/maplibre-native";
+import { Map as SelectedMap, type NativeAdvancedMapRef, WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer, WrapperOfflineManager, WrapperStaticMapImageManager, WrapperLocationManager } from "one-map-react/maplibre-native";
+const selectedLocationManager: typeof import("@maplibre/maplibre-react-native").LocationManager = WrapperLocationManager;
+const addLocationListener: typeof selectedLocationManager.addListener = WrapperLocationManager.addListener;
+const removeLocationListener: typeof selectedLocationManager.removeListener = WrapperLocationManager.removeListener;
+void addLocationListener; void removeLocationListener;
 declare const selectedRef: NativeAdvancedMapRef;
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof MaplibreMap>>> = true;
@@ -468,6 +476,8 @@ import { adapter } from "one-map-react/${entry}";
 import type { Adapter } from "one-map-react";
 
 const selected: Adapter = adapter;
+// @ts-expect-error Selected adapters no longer own application acquisition.
+adapter.services;
 void MapSetup;
 void Source;
 void Layer;

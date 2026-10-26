@@ -159,16 +159,11 @@ test.each(["mapbox-native", "maplibre-native", "mapbox-web", "maplibre-web"])(
     );
     const mounted = render(
       <Tf08AcceptanceScene
-        services={{
-          location: {
-            requestPermission: async () => ({
-              status: "granted",
-              accuracy: "unknown",
-            }),
-            getCurrentPosition: async () => ({ lngLat: [7, 8] }),
-            watchPosition: () => () => undefined,
-          },
-        }}
+        requestLocationPermission={async () => ({
+          status: "granted",
+          accuracy: "unknown",
+        })}
+        getCurrentPosition={async () => ({ lngLat: [7, 8] })}
         backend={backend}
         style={{ width: 400, height: 300 }}
         overlay={null}
@@ -207,5 +202,92 @@ test.each(["mapbox-native", "maplibre-native", "mapbox-web", "maplibre-web"])(
     await configure("coverage-base");
     expect(mounted.getByTestId("supplied-location").textContent).toBe("hidden");
     mounted.unmount();
+  }
+);
+
+test("TF08 screen owns overlapping position and permission requests until each completes or the scene disposes", async () => {
+  let probe: Tf08AcceptanceProbe | null = null;
+  const signals: AbortSignal[] = [];
+  const completions: (() => void)[] = [];
+  const getCurrentPosition = (signal?: AbortSignal) =>
+    new Promise<import("one-map-react").GeolocationPosition>(
+      (resolve, reject) => {
+        if (!signal)
+          throw new Error("Expected application-owned cancellation.");
+        signals.push(signal);
+        completions.push(() => resolve({ lngLat: [1, 2] }));
+        signal.addEventListener("abort", () => reject(new Error("cancelled")), {
+          once: true,
+        });
+      }
+    );
+  const mounted = render(
+    <Tf08AcceptanceScene
+      backend="mapbox-native"
+      style={{ width: 400, height: 300 }}
+      overlay={null}
+      renderCoveragePopup={() => null}
+      renderLocation={() => null}
+      fixtureUrl="http://fixture.invalid"
+      attach={(value) => {
+        probe = value;
+      }}
+      getCurrentPosition={getCurrentPosition}
+      requestLocationPermission={getCurrentPosition}
+    />
+  );
+  const command = (action: string) => {
+    if (!probe) throw new Error("Missing scene probe.");
+    return probe.command(action);
+  };
+  const first = command("position");
+  const second = command("position");
+  const permission = command("permission");
+  completions[0]();
+  await expect(first).resolves.toMatchObject({ lngLat: [1, 2] });
+  expect(signals.map((signal) => signal.aborted)).toEqual([
+    false,
+    false,
+    false,
+  ]);
+  const secondRejected = expect(second).rejects.toThrow("cancelled");
+  const permissionRejected = expect(permission).rejects.toThrow("cancelled");
+  mounted.unmount();
+  await secondRejected;
+  await permissionRejected;
+  expect(signals.map((signal) => signal.aborted)).toEqual([false, true, true]);
+});
+
+test.each(["position", "permission"])(
+  "TF08 disposed app owner rejects late %s results from a noncancellable integration",
+  async (action) => {
+    let probe: Tf08AcceptanceProbe | null = null;
+    let complete: (() => void) | undefined;
+    const acquire = () =>
+      new Promise<import("one-map-react").GeolocationPosition>((resolve) => {
+        complete = () => resolve({ lngLat: [1, 2] });
+      });
+    const mounted = render(
+      <Tf08AcceptanceScene
+        backend="mapbox-native"
+        style={{ width: 400, height: 300 }}
+        overlay={null}
+        renderCoveragePopup={() => null}
+        renderLocation={() => null}
+        fixtureUrl="http://fixture.invalid"
+        attach={(value) => {
+          probe = value;
+        }}
+        getCurrentPosition={acquire}
+        requestLocationPermission={acquire}
+      />
+    );
+    if (!probe) throw new Error("Missing scene probe.");
+    const command = probe as Tf08AcceptanceProbe;
+    const pending = command.command(action);
+    const rejected = expect(pending).rejects.toThrow("owner disposed");
+    mounted.unmount();
+    complete?.();
+    await rejected;
   }
 );

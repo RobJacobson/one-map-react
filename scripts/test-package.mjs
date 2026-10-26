@@ -249,7 +249,6 @@ console.log(JSON.stringify(Object.keys(common).sort()));
         "Source",
         "UserLocation",
         "useMap",
-        "useMapServices",
       ])
     );
   }
@@ -339,11 +338,24 @@ import type { OfflinePackOptions } from "one-map-react";
 import type { OfflinePackStatus } from "one-map-react";
 // @ts-expect-error No common offline service remains.
 import type { OfflineService } from "one-map-react";
-declare const services: import("one-map-react").MapServices;
-// @ts-expect-error Selected SDK managers replace the common offline service.
-services.offline;
-// @ts-expect-error Independent snapshots belong to selected SDK managers.
-services.staticMapImage;
+// @ts-expect-error Common location services are removed.
+import type { MapServices } from "one-map-react";
+// @ts-expect-error Common acquisition type is removed.
+import type { LocationService } from "one-map-react";
+// @ts-expect-error Common acquisition type is removed.
+import type { LocationPermission } from "one-map-react";
+// @ts-expect-error Common acquisition type is removed.
+import type { LocationOptions } from "one-map-react";
+// @ts-expect-error Common acquisition type is removed.
+import type { LocationAbortSignal } from "one-map-react";
+
+// @ts-expect-error Application acquisition no longer uses a common hook.
+import { useMapServices } from "one-map-react";
+// @ts-expect-error Custom adapters no longer own app services.
+adapterContract.services;
+declare const setupProps: import("one-map-react").MapSetupProps;
+// @ts-expect-error Setup no longer owns app acquisition.
+setupProps.locationProvider;
 // @ts-expect-error Common independent image output is removed.
 import type { ImageOutput } from "one-map-react";
 // @ts-expect-error Common independent image result is removed.

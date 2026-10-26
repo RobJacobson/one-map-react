@@ -51,13 +51,6 @@ const createFixture = () => {
   });
   const adapter = {
     backend: "mapbox-web",
-    services: {
-      location: {
-        requestPermission: vi.fn(),
-        getCurrentPosition: vi.fn(),
-        watchPosition: vi.fn(),
-      },
-    },
     Map: FakeMap,
     Source: ({ children }: { children?: ReactNode }) => <>{children}</>,
   } as unknown as Adapter;

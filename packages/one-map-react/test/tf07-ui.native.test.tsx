@@ -1062,7 +1062,6 @@ describe("TF07 native UI composition", () => {
 
 const creationAdapter = {
   backend: "mapbox-native",
-  services: { location: {} },
   ...ui,
 } as unknown as Adapter;
 const CreationSessionProvider = ({

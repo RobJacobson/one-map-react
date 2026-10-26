@@ -1,242 +1,138 @@
-import { afterEach, describe, expect, jest, test } from "@jest/globals";
+import { afterEach, expect, jest, test } from "@jest/globals";
+import { PermissionsAndroid, Platform } from "react-native";
+
 import {
-  AppState,
-  type AppStateStatus,
-  PermissionsAndroid,
-  Platform,
-} from "react-native";
+  acquireNativeLocation,
+  requestNativeLocationPermission,
+} from "../../../examples/shared/native-location.js";
 
-import { createNativeLocation } from "../src/adapters/shared/native-location.js";
-
-/** Native payload injection includes legitimate partial and malformed updates. */
-type NativePayloadListener = (value: unknown) => void;
+const initialPlatform = Object.getOwnPropertyDescriptor(Platform, "OS");
 
 afterEach(() => {
+  if (initialPlatform) Object.defineProperty(Platform, "OS", initialPlatform);
   jest.restoreAllMocks();
   jest.useRealTimers();
 });
-
-describe("TF08 native public location boundaries", () => {
-  test.each(["watch", "once"] as const)(
-    "RNMapbox iOS %s waits through heading-only updates for a measured fix",
-    async (mode) => {
-      jest.useFakeTimers().setSystemTime(10000);
-      const previousPlatform = Platform.OS;
-      const previousState = AppState.currentState;
-      Object.defineProperty(Platform, "OS", {
-        value: "ios",
-        configurable: true,
-      });
-      Object.defineProperty(AppState, "currentState", {
-        value: "active",
-        configurable: true,
-      });
-      const manager = { addListener: jest.fn(), removeListener: jest.fn() };
-      const service = createNativeLocation(() => manager, "mapbox");
-      const position = jest.fn();
-      const error = jest.fn();
-      const acquired =
-        mode === "once" ? service.getCurrentPosition() : undefined;
-      const release =
-        mode === "watch" ? service.watchPosition(position, error) : () => {};
-      const emit = manager.addListener.mock
-        .calls[0][0] as NativePayloadListener;
-
-      try {
-        emit({ coords: { heading: 45 }, timestamp: 10000 });
-        expect(position).not.toHaveBeenCalled();
-        expect(error).not.toHaveBeenCalled();
-        expect(manager.removeListener).not.toHaveBeenCalled();
-        expect(jest.getTimerCount()).toBe(1);
-
-        emit({
-          coords: { longitude: 7, latitude: 8, heading: 45 },
-          timestamp: 10000,
-        });
-        if (acquired) {
-          await expect(acquired).resolves.toMatchObject({ lngLat: [7, 8] });
-          expect(manager.removeListener).toHaveBeenCalledWith(emit);
-        } else {
-          expect(position).toHaveBeenCalledWith(
-            expect.objectContaining({ lngLat: [7, 8] })
-          );
-        }
-        expect(jest.getTimerCount()).toBe(0);
-      } finally {
-        release();
-        Object.defineProperty(Platform, "OS", {
-          value: previousPlatform,
-          configurable: true,
-        });
-        Object.defineProperty(AppState, "currentState", {
-          value: previousState,
-          configurable: true,
-        });
-      }
-    }
+const fixture = () => {
+  const listeners = new Set<(position: unknown) => void>();
+  const manager = {
+    addListener: jest.fn((listener: (position: unknown) => void) => {
+      listeners.add(listener);
+    }),
+    removeListener: jest.fn((listener: (position: unknown) => void) => {
+      listeners.delete(listener);
+    }),
+  };
+  return { manager, listeners };
+};
+test("native one-shot requests isolate abort, retained callbacks and overlapping listeners", async () => {
+  const selected = fixture();
+  const controller = new AbortController();
+  const first = acquireNativeLocation(
+    selected.manager,
+    "mapbox",
+    controller.signal
   );
-
-  test("RNMapbox iOS heading-only updates do not extend the initial deadline or mask malformed fixes", async () => {
-    jest.useFakeTimers().setSystemTime(10000);
-    const previousPlatform = Platform.OS;
-    const previousState = AppState.currentState;
-    Object.defineProperty(Platform, "OS", {
-      value: "ios",
-      configurable: true,
-    });
-    Object.defineProperty(AppState, "currentState", {
-      value: "active",
-      configurable: true,
-    });
-    const manager = { addListener: jest.fn(), removeListener: jest.fn() };
-    const service = createNativeLocation(() => manager, "mapbox");
-
-    try {
-      const acquired = service.getCurrentPosition({ timeoutMs: 20 });
-      const timedOut = expect(acquired).rejects.toThrow("timed out");
-      const headingUpdate = manager.addListener.mock
-        .calls[0][0] as NativePayloadListener;
-      headingUpdate({
-        coords: { heading: 45 },
-        timestamp: 10000,
-      });
-      jest.advanceTimersByTime(20);
-      await timedOut;
-
-      const malformed = service.getCurrentPosition();
-      const rejected = expect(malformed).rejects.toThrow("coordinate");
-      const malformedUpdate = manager.addListener.mock
-        .calls[1][0] as NativePayloadListener;
-      malformedUpdate({
-        coords: { longitude: 7, heading: 45 },
-        timestamp: 10020,
-      });
-      await rejected;
-      expect(manager.removeListener).toHaveBeenCalledTimes(2);
-      expect(jest.getTimerCount()).toBe(0);
-    } finally {
-      Object.defineProperty(Platform, "OS", {
-        value: previousPlatform,
-        configurable: true,
-      });
-      Object.defineProperty(AppState, "currentState", {
-        value: previousState,
-        configurable: true,
-      });
-    }
+  const aborted = expect(first).rejects.toThrow("cancelled");
+  const stale = [...selected.listeners][0];
+  const second = acquireNativeLocation(selected.manager, "mapbox");
+  controller.abort();
+  await aborted;
+  stale({ coords: { longitude: 9, latitude: 10 } });
+  expect(selected.listeners.size).toBe(1);
+  const remaining = [...selected.listeners][0];
+  remaining({ coords: { longitude: 1, latitude: 2 } });
+  await expect(second).resolves.toMatchObject({ lngLat: [1, 2] });
+  expect(selected.manager.removeListener.mock.calls).toEqual([
+    [stale],
+    [remaining],
+  ]);
+});
+test("RNMapbox iOS waits through heading-only events, rejects malformed fixes and times out", async () => {
+  Object.defineProperty(Platform, "OS", { value: "ios", configurable: true });
+  jest.useFakeTimers();
+  const selected = fixture();
+  const request = acquireNativeLocation(
+    selected.manager,
+    "mapbox",
+    undefined,
+    20
+  );
+  const timed = expect(request).rejects.toThrow("timed out");
+  const listener = [...selected.listeners][0];
+  listener({ coords: { heading: 45 } });
+  expect(selected.manager.removeListener).not.toHaveBeenCalled();
+  jest.advanceTimersByTime(20);
+  await timed;
+  const malformed = acquireNativeLocation(selected.manager, "mapbox");
+  const rejected = expect(malformed).rejects.toThrow("coordinates");
+  [...selected.listeners][0]({ coords: { latitude: 91, longitude: 0 } });
+  await rejected;
+});
+test("RNMapbox iOS unsupported permission request does not prevent acquisition", async () => {
+  Object.defineProperty(Platform, "OS", { value: "ios", configurable: true });
+  await expect(requestNativeLocationPermission()).rejects.toThrow(
+    "no public permission"
+  );
+  const selected = fixture();
+  const request = acquireNativeLocation(selected.manager, "mapbox");
+  [...selected.listeners][0]({ coords: { longitude: 1, latitude: 2 } });
+  await expect(request).resolves.toMatchObject({ lngLat: [1, 2] });
+  await expect(
+    requestNativeLocationPermission(async () => true)
+  ).resolves.toMatchObject({ status: "granted" });
+});
+test("Android permission preserves approximate and blocked outcomes", async () => {
+  Object.defineProperty(Platform, "OS", {
+    value: "android",
+    configurable: true,
   });
-
-  test("Android coarse-only permission is usable approximate authorization", async () => {
-    const previous = Platform.OS;
-    Object.defineProperty(Platform, "OS", {
-      value: "android",
-      configurable: true,
-    });
-    jest.spyOn(PermissionsAndroid, "requestMultiple").mockResolvedValue({
-      ...(Object.fromEntries(
-        Object.values(PermissionsAndroid.PERMISSIONS).map((permission) => [
+  const permissions = PermissionsAndroid.PERMISSIONS;
+  jest
+    .spyOn(PermissionsAndroid, "requestMultiple")
+    .mockResolvedValue(
+      Object.fromEntries(
+        Object.values(permissions).map((permission) => [
           permission,
-          "denied",
+          permission === permissions.ACCESS_COARSE_LOCATION
+            ? "granted"
+            : "denied",
         ])
-      ) as Awaited<ReturnType<typeof PermissionsAndroid.requestMultiple>>),
-      "android.permission.ACCESS_FINE_LOCATION": "denied",
-      "android.permission.ACCESS_COARSE_LOCATION": "granted",
-    });
-    const service = createNativeLocation(
-      () => ({ addListener: () => {}, removeListener: () => {} }),
-      "maplibre"
+      ) as Awaited<ReturnType<typeof PermissionsAndroid.requestMultiple>>
     );
-    await expect(service.requestPermission()).resolves.toEqual({
-      status: "granted",
-      accuracy: "approximate",
-      blocked: false,
-    });
-    Object.defineProperty(Platform, "OS", {
-      value: previous,
-      configurable: true,
-    });
+  await expect(requestNativeLocationPermission()).resolves.toMatchObject({
+    status: "granted",
+    accuracy: "approximate",
+    blocked: false,
   });
-  test("RNMapbox iOS permission request fails without starting sensors", async () => {
-    const previous = Platform.OS;
-    Object.defineProperty(Platform, "OS", { value: "ios", configurable: true });
-    const manager = { addListener: jest.fn(), removeListener: jest.fn() };
-    const service = createNativeLocation(() => manager, "mapbox");
-    await expect(service.requestPermission()).rejects.toThrow(
-      "application permission integration"
+  jest
+    .mocked(PermissionsAndroid.requestMultiple)
+    .mockResolvedValue(
+      Object.fromEntries(
+        Object.values(permissions).map((permission) => [
+          permission,
+          "never_ask_again",
+        ])
+      ) as Awaited<ReturnType<typeof PermissionsAndroid.requestMultiple>>
     );
-    expect(manager.addListener).not.toHaveBeenCalled();
-    Object.defineProperty(Platform, "OS", {
-      value: previous,
-      configurable: true,
-    });
+  await expect(requestNativeLocationPermission()).resolves.toMatchObject({
+    status: "denied",
+    accuracy: "unknown",
+    blocked: true,
   });
-  test.each(["mapbox", "maplibre"] as const)(
-    "%s foreground reattachment rejects stale cache and allows delayed fresh fixes",
-    (backend) => {
-      jest.useFakeTimers().setSystemTime(10000);
-      const previousState = AppState.currentState;
-      const previousPlatform = Platform.OS;
-      Object.defineProperty(AppState, "currentState", {
-        value: "active",
-        configurable: true,
-      });
-      Object.defineProperty(Platform, "OS", {
-        value: "android",
-        configurable: true,
-      });
-      let change: (value: AppStateStatus) => void = () => {};
-      const removeAppState = jest.fn();
-      jest
-        .spyOn(AppState, "addEventListener")
-        .mockImplementation((_type, listener) => {
-          change = listener;
-          return { remove: removeAppState };
-        });
-      let timestamp = 10000;
-      const payload = () => ({
-        coords: { longitude: 7, latitude: 8 },
-        timestamp,
-      });
-      const manager = {
-        addListener: jest.fn((listener: NativePayloadListener) =>
-          listener(payload())
-        ),
-        removeListener: jest.fn(),
-      };
-      const service = createNativeLocation(() => manager, backend);
-      const position = jest.fn();
-      const error = jest.fn();
-      const release = service.watchPosition(position, error);
-      const listener = manager.addListener.mock.calls[0][0];
-      try {
-        change("background");
-        expect(manager.removeListener).toHaveBeenCalledWith(listener);
-        jest.setSystemTime(60000);
-        timestamp = 20000;
-        change("active");
-        expect(manager.addListener).toHaveBeenCalledTimes(2);
-        expect(position).toHaveBeenCalledTimes(1);
-        jest.setSystemTime(60006);
-        timestamp = 60005;
-        listener(payload());
-        expect(position).toHaveBeenCalledTimes(2);
-        expect(position).toHaveBeenLastCalledWith(
-          expect.objectContaining({ timestamp: 60005 })
-        );
-        expect(error).not.toHaveBeenCalled();
-      } finally {
-        release();
-        Object.defineProperty(AppState, "currentState", {
-          value: previousState,
-          configurable: true,
-        });
-        Object.defineProperty(Platform, "OS", {
-          value: previousPlatform,
-          configurable: true,
-        });
-      }
-      expect(removeAppState).toHaveBeenCalledTimes(1);
-      expect(manager.removeListener).toHaveBeenCalledTimes(2);
-    }
+});
+
+test("native subscription setup failure removes its exact listener", async () => {
+  const selected = fixture();
+  selected.manager.addListener.mockImplementation((listener) => {
+    selected.listeners.add(listener);
+    throw new Error("setup");
+  });
+  await expect(
+    acquireNativeLocation(selected.manager, "maplibre")
+  ).rejects.toThrow("setup");
+  expect(selected.listeners.size).toBe(0);
+  expect(selected.manager.removeListener).toHaveBeenCalledWith(
+    selected.manager.addListener.mock.calls[0][0]
   );
 });

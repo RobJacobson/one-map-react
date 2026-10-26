@@ -14,6 +14,10 @@ import { createMaplibreOfflineCommands } from "../shared/maplibre-offline-comman
 import { createMaplibreSnapshot } from "../shared/maplibre-snapshot.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
+import {
+  acquireNativeLocation,
+  requestNativeLocationPermission,
+} from "../shared/native-location.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
@@ -45,6 +49,13 @@ const offlineOperations = {
   packs: async () => (await WrapperOfflineManager.getPacks()).length,
 };
 
+const getCurrentPosition = (signal?: AbortSignal, timeoutMs?: number) =>
+  acquireNativeLocation(WrapperLocationManager, "maplibre", signal, timeoutMs);
+const requestLocationPermission = () =>
+  requestNativeLocationPermission(() =>
+    WrapperLocationManager.requestPermissions()
+  );
+
 const App = () => {
   if (smokeTarget === "tf09") return <NativeTf09Screen adapter={adapter} />;
   if (smokeTarget === "tf08" || smokeTarget === "tf08-storage")
@@ -52,6 +63,8 @@ const App = () => {
       <NativeTf08Screen
         adapter={adapter}
         createSnapshot={createMaplibreSnapshot}
+        getCurrentPosition={getCurrentPosition}
+        requestLocationPermission={requestLocationPermission}
         getLocationDiagnostic={() =>
           WrapperLocationManager.getCurrentPosition()
         }

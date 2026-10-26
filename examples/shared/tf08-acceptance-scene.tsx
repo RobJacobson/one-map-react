@@ -4,7 +4,6 @@ import {
   type MapLayoutStyle,
   type MapProps,
   type MapRef,
-  type MapServices,
   type MapStyle,
   Marker,
   type MarkerRef,
@@ -37,7 +36,13 @@ export interface Tf08AcceptanceProbe {
 
 interface Tf08AcceptanceSceneProps {
   readonly renderLocation: ComponentType<NativeLocationButtonProps>;
-  readonly services: MapServices;
+  readonly requestLocationPermission: (
+    signal?: AbortSignal
+  ) => Promise<unknown>;
+  readonly getCurrentPosition: (
+    signal?: AbortSignal,
+    timeoutMs?: number
+  ) => Promise<GeolocationPosition>;
   readonly backend: string;
   readonly style: MapLayoutStyle;
   readonly overlay: ReactNode;
@@ -72,7 +77,8 @@ const localStyle: MapStyle = {
 
 /** Real-renderer TF08 fixture; injected fixes never pretend to certify sensors. */
 export const Tf08AcceptanceScene = ({
-  services,
+  requestLocationPermission,
+  getCurrentPosition,
   renderLocation: Location,
   backend,
   style,
@@ -112,6 +118,7 @@ export const Tf08AcceptanceScene = ({
   const [displayPosition, setDisplayPosition] = useState<GeolocationPosition>();
 
   useEffect(() => {
+    const requests = new Set<AbortController>();
     const requireMap = (): MapRef => {
       if (!mapRef.current) throw new Error("Acceptance map is detached.");
       return mapRef.current;
@@ -162,21 +169,41 @@ export const Tf08AcceptanceScene = ({
         });
         return null;
       }
-      if (action === "permission") return services.location.requestPermission();
-      if (action === "position") {
+      if (action === "permission" || action === "position") {
         const requestedAt = Date.now();
-        const position = await services.location.getCurrentPosition({
-          timeoutMs: 12000,
-        });
-        return { ...position, requestedAt, completedAt: Date.now() };
+        const controller = new AbortController();
+        requests.add(controller);
+        try {
+          if (action === "permission") {
+            const permission = await requestLocationPermission(
+              controller.signal
+            );
+            if (controller.signal.aborted)
+              throw new Error("Location request owner disposed.");
+            return permission;
+          }
+          const position = await getCurrentPosition(controller.signal, 12000);
+          if (controller.signal.aborted)
+            throw new Error("Location request owner disposed.");
+          return { ...position, requestedAt, completedAt: Date.now() };
+        } finally {
+          requests.delete(controller);
+        }
       }
       throw new Error("Unknown acceptance action.");
     };
     attach({ command });
     return () => {
       attach(null);
+      for (const controller of requests) controller.abort();
     };
-  }, [attach, backend, fixtureUrl, services]);
+  }, [
+    attach,
+    backend,
+    fixtureUrl,
+    requestLocationPermission,
+    getCurrentPosition,
+  ]);
 
   if (!mounted) return null;
   const locationControl = (
@@ -186,7 +213,7 @@ export const Tf08AcceptanceScene = ({
       corner="right"
       getCurrentPosition={(signal) =>
         mode === "default"
-          ? services.location.getCurrentPosition({ signal })
+          ? getCurrentPosition(signal)
           : Promise.resolve({
               lngLat: [-122.33, 47.62],
               timestamp: Date.now(),

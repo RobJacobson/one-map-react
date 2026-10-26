@@ -18,6 +18,10 @@ import { createMapboxOfflineCommands } from "../shared/mapbox-offline-commands.j
 import { createMapboxSnapshot } from "../shared/mapbox-snapshot.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
+import {
+  acquireNativeLocation,
+  requestNativeLocationPermission,
+} from "../shared/native-location.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
@@ -104,6 +108,10 @@ const offlineOperations = {
   },
 };
 
+const getCurrentPosition = (signal?: AbortSignal, timeoutMs?: number) =>
+  acquireNativeLocation(WrapperLocationManager, "mapbox", signal, timeoutMs);
+const requestLocationPermission = () => requestNativeLocationPermission();
+
 const App = () => {
   if (smokeTarget === "tf09") return <NativeTf09Screen adapter={adapter} />;
   if (smokeTarget === "tf08" || smokeTarget === "tf08-storage")
@@ -111,6 +119,8 @@ const App = () => {
       <NativeTf08Screen
         adapter={adapter}
         createSnapshot={createMapboxSnapshot}
+        getCurrentPosition={getCurrentPosition}
+        requestLocationPermission={requestLocationPermission}
         getLocationDiagnostic={() =>
           WrapperLocationManager.getLastKnownLocation()
         }
