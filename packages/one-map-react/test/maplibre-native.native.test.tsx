@@ -985,6 +985,61 @@ describe("maplibre-native adapter", () => {
     expect(onMoveEnd).toHaveBeenCalledTimes(1);
   });
 
+  test.each(["success", "failure", "unmount"] as const)(
+    "filtered map press queries its logical point and retains %s semantics",
+    async (outcome) => {
+      const onClick = jest.fn();
+      const onError = jest.fn();
+      let resolve!: (value: typeof queryFeatures) => void;
+      let reject!: (error: Error) => void;
+      mockQueryRenderedFeatures.mockImplementationOnce(
+        () =>
+          new Promise((done, fail) => {
+            resolve = done;
+            reject = fail;
+          })
+      );
+      const view = await render(
+        example(undefined, undefined, {
+          interactiveLayerIds: ["upper", "lower"],
+          onClick,
+          onError,
+        })
+      );
+      const press = lastMapProps<{ onPress: (event: object) => void }>()
+        .onPress;
+      await act(async () =>
+        press({
+          nativeEvent: {
+            lngLat: [-122.34, 47.61],
+            point: [23, 41],
+            features: [{ id: "unfiltered-wrapper-hit" }],
+          },
+        })
+      );
+      expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith([23, 41], {
+        layers: ["upper", "lower"],
+      });
+      if (outcome === "unmount") await view.unmount();
+      const error = new Error("native feature query failed");
+      await act(async () => {
+        if (outcome === "failure") reject(error);
+        else resolve(queryFeatures);
+      });
+      if (outcome === "success") {
+        expect(onClick).toHaveBeenCalledTimes(1);
+        expect(onClick).toHaveBeenCalledWith({
+          lngLat: [-122.34, 47.61],
+          point: [23, 41],
+          features: queryFeatures,
+        });
+      } else expect(onClick).not.toHaveBeenCalled();
+      if (outcome === "failure")
+        expect(onError).toHaveBeenCalledWith({ error });
+      else expect(onError).not.toHaveBeenCalled();
+    }
+  );
+
   test("onClick converts the press and stops after unmount", async () => {
     const onClick = jest.fn();
     const rendered = await render(example(undefined, undefined, { onClick }));

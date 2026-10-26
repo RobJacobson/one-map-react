@@ -1,11 +1,7 @@
 import { createContext, type MutableRefObject, useContext } from "react";
 
 import type { MapRef } from "../contracts/camera-types.js";
-import type {
-  ClickEvent,
-  MoveEvent,
-  SourceClickEvent,
-} from "../contracts/event-types.js";
+import type { ClickEvent, MoveEvent } from "../contracts/event-types.js";
 
 /** Map-local resources owned by the facade, released on logical unmount. */
 export interface MapSession {
@@ -20,12 +16,6 @@ export interface MapSession {
     event: "click" | "move",
     listener: (event: ClickEvent | MoveEvent) => void
   ): () => void;
-  registerSource(
-    id: string,
-    callback: (event: SourceClickEvent) => void,
-    attachment: object
-  ): () => void;
-  dispatchSource(id: string, event: ClickEvent): void;
 }
 
 export const MapSessionContext = createContext<MapSession | null>(null);

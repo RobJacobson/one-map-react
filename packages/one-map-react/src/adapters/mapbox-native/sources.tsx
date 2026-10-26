@@ -16,13 +16,11 @@ import type {
   SourceProps,
   VectorSourceProps,
 } from "../../contracts/source-types.js";
-import { useOptionalMapSession } from "../../facade/map-context.js";
 import {
   rejectNativeGeoJsonOptions,
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
-import { sourceHitFromMapbox } from "../shared/source-hit.js";
 import { useGeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
 /** Mapbox-native source that dispatches to the matching RNMapbox source. */
@@ -64,14 +62,6 @@ export const MapboxNativeSource = (props: SourceProps) => {
  * @throws When an option is unavailable on the pinned RNMapbox wrapper.
  */
 const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
-  const session = useOptionalMapSession();
-  const press = (
-    event: Parameters<
-      NonNullable<ComponentProps<typeof ShapeSource>["onPress"]>
-    >[0]
-  ): void => {
-    session?.dispatchSource(props.id, sourceHitFromMapbox(event));
-  };
   const registry = useGeoJsonSourceRegistry();
   const sourceRef = useRef<ComponentRef<typeof ShapeSource>>(null);
 
@@ -84,50 +74,18 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
   }, [registry, props.id]);
 
   return (
-    <ShapeSource
-      ref={sourceRef}
-      {...toRnmapboxShapeSource(props)}
-      hitbox={
-        (
-          props as GeoJsonSourceProps & {
-            hitbox?: { width: number; height: number };
-          }
-        ).hitbox
-      }
-      onPress={props.onClick ? press : undefined}
-    >
+    <ShapeSource ref={sourceRef} {...toRnmapboxShapeSource(props)}>
       {props.children}
     </ShapeSource>
   );
 };
 
-/** Forwards vector data and source activation to RNMapbox. */
-const MapboxNativeVectorSource = (props: VectorSourceProps) => {
-  const session = useOptionalMapSession();
-  const press = (
-    event: Parameters<
-      NonNullable<ComponentProps<typeof ShapeSource>["onPress"]>
-    >[0]
-  ): void => {
-    session?.dispatchSource(props.id, sourceHitFromMapbox(event));
-  };
-
-  return (
-    <VectorSource
-      {...toRnmapboxVectorSource(props)}
-      hitbox={
-        (
-          props as VectorSourceProps & {
-            hitbox?: { width: number; height: number };
-          }
-        ).hitbox
-      }
-      onPress={props.onClick ? press : undefined}
-    >
-      {props.children}
-    </VectorSource>
-  );
-};
+/** Forwards vector data to RNMapbox. */
+const MapboxNativeVectorSource = (props: VectorSourceProps) => (
+  <VectorSource {...toRnmapboxVectorSource(props)}>
+    {props.children}
+  </VectorSource>
+);
 
 /**
  * Converts common GeoJSON source props into RNMapbox `ShapeSource` props.

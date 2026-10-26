@@ -45,8 +45,6 @@ export interface Tf07Observation {
   readonly features: readonly object[];
   /** Current map attachment generation. */
   readonly generation: number;
-  /** Current source propagation configuration. */
-  readonly stopSourcePropagation: boolean;
 }
 
 /** Test-only controls published by the mounted acceptance scene. */
@@ -57,8 +55,6 @@ export interface Tf07Probe {
   readonly project: (target: Tf07Target) => Promise<readonly [number, number]>;
   /** Changes React configuration; never fabricates a pointer or touch event. */
   readonly configure: (action: Tf07Action) => void;
-  /** Toggles source-to-map propagation for the next physical source press. */
-  readonly stopSource: (stop: boolean) => void;
 }
 
 interface Tf07SceneProps {
@@ -116,7 +112,6 @@ export const Tf07Scene = ({
   const observations = useRef<Record<string, number>>({});
   const lastPositions = useRef<Record<string, LngLat>>({});
   const generationRef = useRef(0);
-  const stopSource = useRef(false);
   const [generation, setGeneration] = useState(0);
   const [mapStyle, setMapStyle] = useState(emptyStyle);
   const [live, setLive] = useState(targets.live);
@@ -181,7 +176,7 @@ export const Tf07Scene = ({
       if (!native)
         setUnit((current) => (current === "metric" ? "imperial" : "metric"));
     },
-    [native]
+    [native, setAnnotation, setPopup]
   );
 
   useEffect(() => {
@@ -206,14 +201,10 @@ export const Tf07Scene = ({
           zoom,
           features,
           generation: generationRef.current,
-          stopSourcePropagation: stopSource.current,
         };
       },
       project: (target) => requireMap().project(targets[target]),
       configure,
-      stopSource: (stop) => {
-        stopSource.current = stop;
-      },
     });
 
     return () => attach(null);
@@ -233,7 +224,16 @@ export const Tf07Scene = ({
         onLoad={loaded}
         onStyleLoad={() => record("style")}
         onMove={() => record("move")}
-        onClick={() => record("map-click")}
+        onClick={(event) => {
+          if (
+            event.features?.some(
+              (feature) =>
+                String((feature as { id?: string | number }).id) === "707"
+            )
+          )
+            record("source-click");
+          record("map-click");
+        }}
         onError={fail}
       >
         <Source
@@ -244,10 +244,6 @@ export const Tf07Scene = ({
             id: 707,
             properties: { fixture: "tf07" },
             geometry: { type: "Point", coordinates: targets.source },
-          }}
-          onClick={(event) => {
-            record("source-click");
-            if (stopSource.current) event.stopPropagation();
           }}
         >
           <Layer

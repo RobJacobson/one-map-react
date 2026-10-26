@@ -258,7 +258,7 @@ selectedRef.setEventedParent(null);`
 import type { ComponentRef } from "react";
 import type { MapView as RnmapboxMapView, SnapshotOptions } from "@rnmapbox/maps";
 import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef, WrapperOfflineManager, WrapperSnapshotManager, WrapperLocationManager } from "one-map-react/mapbox-native";
-void <WrapperMapView styleJSON={JSON.stringify(style)}><WrapperCamera zoomLevel={0} /><WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} /></WrapperMapView>;
+void <WrapperMapView styleJSON={JSON.stringify(style)}><WrapperCamera zoomLevel={0} /><WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} hitbox={{ width: 20, height: 20 }} onPress={() => {}} /></WrapperMapView>;
 void Terrain; void Light; void Models; void RasterArraySource; void Viewport;
 const selectedLocationManager: typeof import("@rnmapbox/maps").locationManager = WrapperLocationManager;
 const addLocationListener: typeof selectedLocationManager.addListener = WrapperLocationManager.addListener;
@@ -268,6 +268,10 @@ setTelemetryEnabled(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
 setTelemetryEnabled(42);
 declare const selectedRef: NativeAdvancedMapRef;
+// @ts-expect-error Selected common source hitbox is removed.
+type RemovedSelectedHitbox = import("one-map-react/mapbox-native").NativeSourceProps["hitbox"];
+// @ts-expect-error Selected common source activation is removed.
+type RemovedSelectedCallback = import("one-map-react/mapbox-native").NativeSourceProps["onClick"];
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof RnmapboxMapView>>> = true;
 const borrowed: Promise<ComponentRef<typeof RnmapboxMapView>> = selectedRef.getWrapperMap();
@@ -321,6 +325,10 @@ const addLocationListener: typeof selectedLocationManager.addListener = WrapperL
 const removeLocationListener: typeof selectedLocationManager.removeListener = WrapperLocationManager.removeListener;
 void addLocationListener; void removeLocationListener;
 declare const selectedRef: NativeAdvancedMapRef;
+// @ts-expect-error Selected common source hitbox is removed.
+type RemovedSelectedHitbox = import("one-map-react/maplibre-native").NativeSourceProps["hitbox"];
+// @ts-expect-error Selected common source activation is removed.
+type RemovedSelectedCallback = import("one-map-react/maplibre-native").NativeSourceProps["onClick"];
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof MaplibreMap>>> = true;
 const borrowed: Promise<ComponentRef<typeof MaplibreMap>> = selectedRef.getWrapperMap();
@@ -366,7 +374,7 @@ selectedRef.setSourceVisibility(false, 'source');
 selectedRef.showAttribution();
 // @ts-expect-error Selected camera reads belong to the borrowed native wrapper.
 selectedRef.getViewState();
-void <WrapperMap mapStyle={style}><WrapperCamera initialViewState={{center: [0,0], zoom: 0}} /><WrapperGeoJSONSource id="selected" data={{ type: "FeatureCollection", features: [] }} /></WrapperMap>;
+void <WrapperMap mapStyle={style}><WrapperCamera initialViewState={{center: [0,0], zoom: 0}} /><WrapperGeoJSONSource id="selected" data={{ type: "FeatureCollection", features: [] }} hitbox={{ top: 10, right: 10, bottom: 10, left: 10 }} onPress={() => {}} /></WrapperMap>;
 void Animated; void SelectedLayer; void TransformRequestManager;
 NetworkManager.setConnected(false);
 // @ts-expect-error Selected native settings preserve their boolean input.

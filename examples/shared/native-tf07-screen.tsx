@@ -39,7 +39,6 @@ export const NativeTf07Screen = ({
   const probeRef = useRef<Tf07Probe | null>(null);
   const [status, setStatus] = useState("TF07 waiting for map");
   const [readback, setReadback] = useState("");
-  const [sourceStopped, setSourceStopped] = useState(false);
   const attached = useRef(true);
   const attach = useCallback((probe: Tf07Probe | null) => {
     probeRef.current = probe;
@@ -95,15 +94,6 @@ export const NativeTf07Screen = ({
             )
           )}
           <Button title="Read renderer" onPress={read} />
-          <Button
-            title={
-              sourceStopped ? "Allow source bubbling" : "Stop source bubbling"
-            }
-            onPress={() => {
-              probeRef.current?.stopSource(!sourceStopped);
-              setSourceStopped(!sourceStopped);
-            }}
-          />
         </ScrollView>
         <Text testID="tf07-status" style={styles.status} numberOfLines={2}>
           {status}

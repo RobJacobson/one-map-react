@@ -6,6 +6,4 @@ export interface UserLocationProps {
   readonly position?: GeolocationPosition;
   /** Renderer-drawn uncertainty circle in meters; default false. */
   readonly showAccuracyCircle?: boolean;
-  /** Invoked when the location geometry is pressed. */
-  readonly onPress?: () => void;
 }

@@ -184,13 +184,12 @@ const runWeb = async (selectedEngine) => {
       (await read()).events["map-click"],
       (beforeSource.events["map-click"] ?? 0) + 1
     );
-    await page.evaluate("window.__oneMapTf07.stopSource(true)");
-    const beforeStopped = await read();
+    const beforeRepeated = await read();
     await press(page, sourceInput);
     await until(async () => (await read()).events["source-click"] >= 2, 5000);
     assert.equal(
       (await read()).events["map-click"],
-      beforeStopped.events["map-click"]
+      beforeRepeated.events["map-click"] + 1
     );
 
     const zoom = (await read()).zoom;

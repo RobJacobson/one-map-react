@@ -49,6 +49,7 @@ test("setup and supplied location display need no acquisition manager", async ()
     data: { features: unknown[] };
   };
   expect(source.data.features).toHaveLength(2);
+  expect(source).not.toHaveProperty("onClick");
   mounted.unmount();
   expect(controller.signal.aborted).toBe(false);
   expect(release).not.toHaveBeenCalled();

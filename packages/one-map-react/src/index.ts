@@ -18,7 +18,6 @@ export type {
   MapErrorEvent,
   MoveEvent,
   MoveOrigin,
-  SourceClickEvent,
 } from "./contracts/event-types.js";
 export type {
   ImageEntry,

@@ -1,5 +1,7 @@
 # Sources and layers
 
+**Working feature-click migration.** The [map-click migration](revised-api-proposal.md#rendering-and-queries-stay-shared) uses Map.onClick with interactiveLayerIds for source activation. Source.onClick, SourceClickEvent, synthetic source bubbling, selected facade native source hitbox additions and UserLocation.onPress are removed. Raw native Wrapper source onPress/hitbox facilities, source refs/queries/state, live markers/portals and supplied location geometry/accuracy remain. Native filtered clicks retain queries at the actual logical map point, observable errors and stale-map callback protection. The future native focused source stop/bubbling probe is retired; historical scenario IDs and outcomes remain attached to their recorded artifacts. Renderer/query/touch behavior, Metro and native builds/installations remain unverified.
+
 **Current advanced source/layer routes:** See [advanced rendering](tf09-rendering.md) for selected canvas/video/custom and renderer-specific families. Both web engines passed canvas/video/custom output and teardown; all six environments passed hillshade. Other advanced families retain explicit runtime-unverified status.
 
 **Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.

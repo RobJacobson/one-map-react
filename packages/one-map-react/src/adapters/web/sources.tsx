@@ -18,8 +18,6 @@ export const createWebSource = (
   const toWebSourceProps = (props: SourceProps): Record<string, unknown> => {
     const { children: _children, ...options } = props;
     const spec = { ...options } as Record<string, unknown>;
-    delete spec.onClick;
-    delete spec.hitbox;
 
     if (props.type === "image") {
       return {

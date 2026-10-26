@@ -1,21 +1,15 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
 
-import type { Backend } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
-import type {
-  ClickEvent,
-  MoveEvent,
-  SourceClickEvent,
-} from "../contracts/event-types.js";
+import type { ClickEvent, MoveEvent } from "../contracts/event-types.js";
 import type { MapProps } from "../contracts/map-types.js";
 import type { MapSession } from "./map-context.js";
 
-/** Owns map/source event propagation, subscriptions, and pending-hit teardown. */
+/** Owns map notifications, subscriptions, and pending-query teardown. */
 export const useMapInteractions = (
   props: MapProps,
-  backend: Backend,
   mapRef: { readonly current: MapRef | null }
-): Pick<MapSession, "subscribe" | "registerSource" | "dispatchSource"> & {
+): Pick<MapSession, "subscribe"> & {
   readonly emit: (
     event: "click" | "move",
     payload: ClickEvent | MoveEvent
@@ -28,15 +22,6 @@ export const useMapInteractions = (
     click: new Set<(event: ClickEvent | MoveEvent) => void>(),
     move: new Set<(event: ClickEvent | MoveEvent) => void>(),
   });
-  const sources = useRef(
-    new globalThis.Map<
-      string,
-      {
-        readonly callback: (event: SourceClickEvent) => void;
-        readonly attachment: object;
-      }
-    >()
-  );
   const propsRef = useRef(props);
   const active = useRef(true);
   const generation = useRef(0);
@@ -45,12 +30,10 @@ export const useMapInteractions = (
   });
   useLayoutEffect(() => {
     active.current = true;
-    const sourceRegistry = sources.current;
     const eventListeners = listeners.current;
     return () => {
       active.current = false;
       generation.current += 1;
-      sourceRegistry.clear();
       eventListeners.click.clear();
       eventListeners.move.clear();
     };
@@ -62,17 +45,6 @@ export const useMapInteractions = (
     },
     []
   );
-  const reportClick = useCallback(
-    (event: ClickEvent, currentGeneration: number) => {
-      if (!active.current || generation.current !== currentGeneration) return;
-      emit("click", event);
-      if (active.current && generation.current === currentGeneration) {
-        propsRef.current.onClick?.(event);
-      }
-    },
-    [emit]
-  );
-
   const move = (event: MoveEvent): void => {
     const currentGeneration = generation.current;
     emit("move", event);
@@ -80,73 +52,6 @@ export const useMapInteractions = (
       propsRef.current.onMove?.(event);
   };
 
-  const queryHit = useCallback(
-    async (event: ClickEvent): Promise<ClickEvent> => {
-      const layers = propsRef.current.interactiveLayerIds;
-      if (!layers) return event;
-      const map = mapRef.current;
-      if (!map) throw new Error("Map is not attached.");
-      return {
-        ...event,
-        features: await map.queryRenderedFeatures(event.point, { layers }),
-      };
-    },
-    [mapRef]
-  );
-  const dispatchSource = useCallback(
-    (id: string, event: ClickEvent) => {
-      const currentGeneration = generation.current;
-      let stopped = false;
-      const source = sources.current.get(id);
-      source?.callback({
-        ...event,
-        sourceId: id,
-        stopPropagation: () => {
-          stopped = true;
-        },
-      });
-      if (
-        stopped ||
-        !active.current ||
-        generation.current !== currentGeneration
-      ) {
-        return;
-      }
-      void queryHit(event)
-        .then((hit) => {
-          if (
-            active.current &&
-            generation.current === currentGeneration &&
-            sources.current.get(id)?.attachment === source?.attachment
-          )
-            reportClick(hit, currentGeneration);
-        })
-        .catch((error: unknown) => {
-          if (
-            active.current &&
-            generation.current === currentGeneration &&
-            sources.current.get(id)?.attachment === source?.attachment
-          )
-            propsRef.current.onError?.({ error });
-        });
-    },
-    [queryHit, reportClick]
-  );
-  const registerSource = useCallback(
-    (
-      id: string,
-      callback: (event: SourceClickEvent) => void,
-      attachment: object
-    ) => {
-      const registration = { callback, attachment };
-      sources.current.set(id, registration);
-      return () => {
-        if (sources.current.get(id) === registration)
-          sources.current.delete(id);
-      };
-    },
-    []
-  );
   const subscribe = useCallback(
     (
       event: "click" | "move",
@@ -166,54 +71,38 @@ export const useMapInteractions = (
     },
     []
   );
-  const click = async (event: ClickEvent) => {
+  const click = async (event: ClickEvent): Promise<void> => {
     const currentGeneration = generation.current;
-    const sourceAttachments = new globalThis.Map(sources.current);
+    const map = mapRef.current;
+    const isCurrent = (): boolean =>
+      active.current &&
+      generation.current === currentGeneration &&
+      mapRef.current === map;
     let hit = event;
-    let sourceHit = event;
     try {
-      if (!backend.endsWith("native") && sources.current.size > 0) {
-        const map = mapRef.current;
-        if (!map) throw new Error("Map is not attached.");
-        // Source activation owns its hit region independently of the map's
-        // interactiveLayerIds. Native wrappers already perform this query.
-        sourceHit = {
+      const layers = propsRef.current.interactiveLayerIds;
+      if (layers) {
+        // Capture the concrete owner before awaiting a query that can outlive it.
+        hit = {
           ...event,
-          features: await map.queryRenderedFeatures(event.point),
+          features: await requireAttachedMap(map).queryRenderedFeatures(
+            event.point,
+            { layers }
+          ),
         };
       }
-      // SDK filtering owns ordering and featureset semantics, beyond layer IDs.
-      if (propsRef.current.interactiveLayerIds) hit = await queryHit(event);
     } catch (error) {
-      if (active.current && generation.current === currentGeneration)
-        propsRef.current.onError?.({ error });
+      if (isCurrent()) propsRef.current.onError?.({ error });
       return;
     }
-    if (!active.current || generation.current !== currentGeneration) return;
-    let stopped = false;
-    const topSource = sourceHit.features
-      ?.map((feature) => (feature as { source?: string }).source)
-      .find((id) => id !== undefined && sourceAttachments.has(id));
-    if (topSource) {
-      if (
-        sources.current.get(topSource)?.attachment !==
-        sourceAttachments.get(topSource)?.attachment
-      )
-        return;
-      const features = sourceHit.features?.filter(
-        (feature) => (feature as { source?: string }).source === topSource
-      );
-      sources.current.get(topSource)?.callback({
-        ...sourceHit,
-        features,
-        sourceId: topSource,
-        stopPropagation: () => {
-          stopped = true;
-        },
-      });
-      if (!propsRef.current.interactiveLayerIds) hit = { ...hit, features };
-    }
-    if (!stopped) reportClick(hit, currentGeneration);
+    if (!isCurrent()) return;
+    emit("click", hit);
+    if (isCurrent()) propsRef.current.onClick?.(hit);
   };
-  return { emit, move, subscribe, registerSource, dispatchSource, click };
+  return { emit, move, subscribe, click };
+};
+
+const requireAttachedMap = (map: MapRef | null): MapRef => {
+  if (!map) throw new Error("Map is not attached.");
+  return map;
 };
