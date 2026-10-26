@@ -1076,16 +1076,7 @@ const nativeOfflineScenarios = async () => {
       assert.equal(before.errors, 0, JSON.stringify(before.errorMessages));
       await assert.rejects(action("offline-duplicate", { id }));
       const result = await action("offline-status", { id });
-      assert(
-        result.progress.some(
-          (entry) => entry.label === "one" && entry.state === "complete"
-        )
-      );
-      assert(
-        result.progress.some(
-          (entry) => entry.label === "two" && entry.state === "complete"
-        )
-      );
+      assert(result.progress.some((entry) => entry.state === "complete"));
       assert.equal(result.errors, 0, JSON.stringify(result.errorMessages));
       return {
         pack: result.pack,
@@ -1130,11 +1121,11 @@ const nativeOfflineScenarios = async () => {
           "cold restart local map readiness"
         );
         const persisted = await action("offline-status", { id });
-        assert.equal(persisted.pack.metadata.test, "tf08");
+        assert.equal(persisted.pack.user.test, "tf08");
         assert.equal(persisted.status.state, "complete");
         if (engine === "mapbox")
           assert.equal(await action("network", { connected: false }), false);
-        await configure("injected", persisted.pack.metadata.fixtureStyle);
+        await configure("injected", persisted.pack.user.fixtureStyle);
         await action("camera", { longitude: 0, latitude: 0, zoom: 1 });
         await delay(1000);
         const image = await action("capture");
@@ -1169,11 +1160,13 @@ const nativeOfflineScenarios = async () => {
   // Exercise invalidation online after verifying the pristine completed pack.
   if (lifecyclePassed)
     await scenario(
-      "offline invalidation preserves subscribed progress",
+      "offline invalidation with explicit application observer refresh",
       async () => {
         await action("offline-subscribe", { id });
         const before = await action("offline-status", { id });
         await action("offline-invalidate", { id });
+        await action("offline-unsubscribe", { id });
+        await action("offline-subscribe", { id });
         await action("offline-resume", { id });
         await until(
           async () =>

@@ -157,12 +157,12 @@ const main = async () => {
       "PASS packed selected-peer consumers: each explicit entry typechecks with only its peers."
     );
   } finally {
+    rmSync(output, { recursive: true, force: true });
     if (options.evidence)
       writeFileSync(
         options.evidence,
         JSON.stringify({ checks: evidence }, null, 2) + "\n"
       );
-    rmSync(output, { recursive: true, force: true });
   }
 };
 
@@ -257,7 +257,7 @@ selectedRef.setEventedParent(null);`
       ? `
 import type { ComponentRef } from "react";
 import type { MapView as RnmapboxMapView } from "@rnmapbox/maps";
-import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef } from "one-map-react/mapbox-native";
+import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef, WrapperOfflineManager } from "one-map-react/mapbox-native";
 void <WrapperMapView styleJSON={JSON.stringify(style)}><WrapperCamera zoomLevel={0} /><WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} /></WrapperMapView>;
 void Terrain; void Light; void Models; void RasterArraySource; void Viewport;
 setTelemetryEnabled(false);
@@ -269,6 +269,19 @@ const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"
 const borrowed: Promise<ComponentRef<typeof RnmapboxMapView>> = selectedRef.getWrapperMap();
 void exactWrapperPromise; void borrowed;
 void <SelectedMap ref={(map) => { if (map) { const wrapper: Promise<ComponentRef<typeof RnmapboxMapView>> = map.getWrapperMap(); void wrapper; } }} mapStyle={style} initialViewState={viewState} />;
+const useSelectedOfflineManager = async (): Promise<void> => {
+  await WrapperOfflineManager.createPack({ name: "harbor", styleURL: "https://example.test/style", bounds: [[10,10],[-10,-10]], minZoom: 0, maxZoom: 1, metadata: { regionId: "harbor" } }, (pack, status) => {
+    const name: string = pack.name;
+    const percentage: number | null = status.percentage;
+    void name; void percentage;
+  }, (pack, error) => { const message: string = error.message; void pack.name; void message; });
+  const pack = await WrapperOfflineManager.getPack("harbor");
+  void pack?.name;
+  WrapperOfflineManager.unsubscribe("harbor");
+  // @ts-expect-error RNMapbox creation requires its native name.
+  await WrapperOfflineManager.createPack({ mapStyle: "https://example.test/style", bounds: [0,0,1,1] }, () => {});
+};
+void useSelectedOfflineManager;
 const useBorrowedWrapper = async (): Promise<void> => {
   const wrapper = await selectedRef.getWrapperMap();
   const center: number[] = await wrapper.getCenter();
@@ -285,13 +298,25 @@ selectedRef.setSourceVisibility(false, 'source');
       : `
 import type { ComponentRef } from "react";
 import type { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
-import { Map as SelectedMap, type NativeAdvancedMapRef, WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer } from "one-map-react/maplibre-native";
+import { Map as SelectedMap, type NativeAdvancedMapRef, WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer, WrapperOfflineManager } from "one-map-react/maplibre-native";
 declare const selectedRef: NativeAdvancedMapRef;
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof MaplibreMap>>> = true;
 const borrowed: Promise<ComponentRef<typeof MaplibreMap>> = selectedRef.getWrapperMap();
 void exactWrapperPromise; void borrowed;
 void <SelectedMap ref={(map) => { if (map) { const wrapper: Promise<ComponentRef<typeof MaplibreMap>> = map.getWrapperMap(); void wrapper; } }} mapStyle={style} initialViewState={viewState} />;
+const useSelectedOfflineManager = async (): Promise<void> => {
+  const pack = await WrapperOfflineManager.createPack({ mapStyle: "https://example.test/style", bounds: [-10,-10,10,10], minZoom: 0, maxZoom: 1, metadata: { regionId: "harbor" } }, (pack, status) => {
+    const id: string = pack.id;
+    const percentage: number = status.percentage;
+    void id; void percentage;
+  }, (pack, error) => { const message: string = error.message; void pack.id; void message; });
+  const id: string = pack.id;
+  WrapperOfflineManager.removeListener(id);
+  // @ts-expect-error MapLibre bounds are flat west/south/east/north values.
+  await WrapperOfflineManager.createPack({ mapStyle: "https://example.test/style", bounds: [[10,10],[-10,-10]] }, () => {}, () => {});
+};
+void useSelectedOfflineManager;
 const useBorrowedWrapper = async (): Promise<void> => {
   const wrapper = await selectedRef.getWrapperMap();
   const capture: string = await wrapper.createStaticMapImage({ output: "file" });
@@ -372,8 +397,9 @@ void (
     JSON.stringify({
       compilerOptions: {
         target: "ES2022",
-        module: "NodeNext",
-        moduleResolution: "NodeNext",
+        // Metro consumers use bundler resolution for the peers' extensionless declarations.
+        module: entry.endsWith("native") ? "ESNext" : "NodeNext",
+        moduleResolution: entry.endsWith("native") ? "Bundler" : "NodeNext",
         jsx: "react-jsx",
         strict: true,
         noEmit: true,
@@ -443,6 +469,7 @@ console.log(adapter.backend);
     scope:
       "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
   });
+  rmSync(consumer, { recursive: true, force: true });
 };
 
 await main();

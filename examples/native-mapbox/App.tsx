@@ -13,6 +13,7 @@ import { useRef } from "react";
 import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
+import { createMapboxOfflineCommands } from "../shared/mapbox-offline-commands.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
@@ -112,6 +113,7 @@ const App = () => {
         }
         setNetworkConnected={setNetworkConnected}
         offlineOperations={offlineOperations}
+        createOfflineCommands={createMapboxOfflineCommands}
         startDetached={smokeTarget === "tf08-storage"}
         nativePuck={
           <>

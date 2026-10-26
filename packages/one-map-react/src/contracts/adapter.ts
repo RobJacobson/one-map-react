@@ -10,7 +10,6 @@ import type { ImagesProps } from "./images-types.js";
 import type { LayerProps } from "./layer-types.js";
 import type { LocationService } from "./location-types.js";
 import type { MapProps } from "./map-types.js";
-import type { OfflineService } from "./offline-types.js";
 import type { SourceProps } from "./source-types.js";
 import type {
   AttributionControlProps,
@@ -28,8 +27,6 @@ import type {
 export interface MapServices {
   /** Explicit foreground acquisition. */
   readonly location: LocationService;
-  /** Native persistent download manager when implemented. */
-  readonly offline?: OfflineService;
   /** Independent native snapshotter when implemented. */
   readonly staticMapImage?: StaticMapImageService;
 }

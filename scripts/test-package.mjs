@@ -185,12 +185,12 @@ const main = async () => {
       "SCOPE: packed publication, common entry without backend types, and selected-entry file resolution; no wrapper installs, Metro, or native builds."
     );
   } finally {
+    rmSync(output, { recursive: true, force: true });
     if (options.evidence)
       writeFileSync(
         options.evidence,
         JSON.stringify({ checks: evidence }, null, 2) + "\n"
       );
-    rmSync(output, { recursive: true, force: true });
   }
 };
 
@@ -293,6 +293,17 @@ import type { Adapter, Backend, MapRef } from "one-map-react";
 import { Map as OneMap, MapSetup, Source, Layer, Marker, Popup, Control, NavigationControl, AttributionControl, ScaleControl, GeolocateControl, FullscreenControl, useMap } from "one-map-react";
 ${declarations}
 declare const commonRef: MapRef;
+// @ts-expect-error Offline packs belong to the selected SDK.
+import type { OfflinePack } from "one-map-react";
+// @ts-expect-error Offline creation options belong to the selected SDK.
+import type { OfflinePackOptions } from "one-map-react";
+// @ts-expect-error Offline status belongs to the selected SDK.
+import type { OfflinePackStatus } from "one-map-react";
+// @ts-expect-error No common offline service remains.
+import type { OfflineService } from "one-map-react";
+declare const services: import("one-map-react").MapServices;
+// @ts-expect-error Selected SDK managers replace the common offline service.
+services.offline;
 // @ts-expect-error Capture belongs to the application and selected wrapper.
 commonRef.capture({ output: "data-url", scope: "backend" });
 // @ts-expect-error Capture-only options are removed from the common package.
@@ -386,6 +397,7 @@ const invalid: Adapter = { backend: "automatic" };
     scope:
       "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers",
   });
+  rmSync(consumer, { recursive: true, force: true });
 };
 
 await main();

@@ -1,6 +1,5 @@
 import {
   LocationManager,
-  OfflineManager,
   StaticMapImageManager,
 } from "@maplibre/maplibre-react-native";
 
@@ -11,7 +10,6 @@ import {
   withImageDeadline,
 } from "../shared/image-output.js";
 import { createNativeLocation } from "../shared/native-location.js";
-import { createOfflineService } from "../shared/offline-service.js";
 import { toFlatBounds } from "../shared/wrapper-values.js";
 
 /** MapLibre public services, accessed only by explicit operations. */
@@ -21,31 +19,6 @@ export const maplibreNativeServices: MapServices = {
     "maplibre",
     () => LocationManager.requestPermissions()
   ),
-  offline: createOfflineService({
-    kind: "maplibre",
-    getPacks: () => OfflineManager.getPacks(),
-    create: (options, metadata, progress, error) =>
-      OfflineManager.createPack(
-        {
-          mapStyle: options.mapStyle,
-          bounds: [...toFlatBounds(options.bounds)],
-          minZoom: options.minZoom,
-          maxZoom: options.maxZoom,
-          metadata,
-        },
-        progress,
-        error
-      ),
-    observe: (id, progress, error) =>
-      OfflineManager.addListener(id, progress, error),
-    unobserve: (id) => OfflineManager.removeListener(id),
-    deletePack: (id) => OfflineManager.deletePack(id),
-    invalidatePack: (id) => OfflineManager.invalidatePack(id),
-    state: (value) =>
-      value === "inactive" || value === "active" || value === "complete"
-        ? value
-        : "unknown",
-  }),
   staticMapImage: {
     create: async (options) => {
       validateStaticImage(options);

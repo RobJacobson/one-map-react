@@ -173,7 +173,7 @@ describe("TF08 setup and location control lifetime", () => {
         </OneMap>
       </MapSetup>
     );
-    expect(services?.offline).toBeUndefined();
+    expect(services).not.toHaveProperty("offline");
     expect(selected.location.watchPosition).not.toHaveBeenCalled();
     expect(selected.location.getCurrentPosition).not.toHaveBeenCalled();
     const source = selected.source.mock.calls[0][0] as unknown as {

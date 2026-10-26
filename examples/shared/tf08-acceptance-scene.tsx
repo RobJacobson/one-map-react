@@ -102,9 +102,6 @@ export const Tf08AcceptanceScene = ({
   });
   const receiver = useRef<(position: GeolocationPosition) => void>(() => {});
   const lastPosition = useRef<GeolocationPosition | undefined>(undefined);
-  const subscriptions = useRef<(() => void)[]>([]);
-  const offlineProgress = useRef<Record<string, unknown>[]>([]);
-  const offlineErrors = useRef<unknown[]>([]);
   const provider = useMemo<LocationService>(
     () => ({
       requestPermission: async () => ({
@@ -134,10 +131,6 @@ export const Tf08AcceptanceScene = ({
     const requireMap = (): MapRef => {
       if (!mapRef.current) throw new Error("Acceptance map is detached.");
       return mapRef.current;
-    };
-    const requireOffline = () => {
-      if (!services.offline) throw new Error("Offline service unavailable.");
-      return services.offline;
     };
     const command: Tf08AcceptanceProbe["command"] = async (
       action,
@@ -216,85 +209,11 @@ export const Tf08AcceptanceScene = ({
           timeoutMs: Number(value.timeoutMs ?? 20000),
         });
       }
-      const offline = requireOffline();
-      const id = String(value.id);
-      if (action === "offline-create" || action === "offline-duplicate") {
-        const fixtureStyle = `${fixtureUrl}/offline-style.json?id=${encodeURIComponent(id)}`;
-        return offline
-          .createPack({
-            id,
-            mapStyle: fixtureStyle,
-            bounds: [
-              [-10, -10],
-              [10, 10],
-            ],
-            minZoom: 0,
-            maxZoom: 1,
-            metadata: { test: "tf08", backend, fixtureStyle },
-          })
-          .then((pack) => ({
-            id: pack.id,
-            backendId: pack.backendId,
-            metadata: pack.metadata,
-            bounds: pack.bounds,
-          }));
-      }
-      if (action === "offline-delete") {
-        for (const release of subscriptions.current.splice(0)) release();
-        await offline.deletePack(id);
-        return null;
-      }
-      const pack = await offline.getPack(id);
-      if (!pack) throw new Error("Acceptance pack missing.");
-      if (action === "offline-subscribe") {
-        for (const label of ["one", "two"]) {
-          subscriptions.current.push(
-            offline.subscribe(
-              id,
-              (status) => {
-                offlineProgress.current.push({ label, ...status });
-              },
-              (error) => {
-                offlineErrors.current.push(error);
-              }
-            )
-          );
-        }
-        return null;
-      }
-      if (action === "offline-status") {
-        return {
-          pack: {
-            id: pack.id,
-            backendId: pack.backendId,
-            metadata: pack.metadata,
-            bounds: pack.bounds,
-          },
-          status: await pack.status(),
-          progress: [...offlineProgress.current],
-          errors: offlineErrors.current.length,
-          errorMessages: [...offlineErrors.current],
-        };
-      }
-      if (action === "offline-pause") {
-        await pack.pause();
-        return pack.status();
-      }
-      if (action === "offline-resume") {
-        await pack.resume();
-        return pack.status();
-      }
-      if (action === "offline-invalidate") {
-        await offline.invalidatePack(id);
-        return pack.status();
-      }
       throw new Error("Unknown acceptance action.");
     };
-    const ownedSubscriptions = subscriptions.current;
     attach({ command });
     return () => {
       attach(null);
-      for (const release of ownedSubscriptions.splice(0)) release();
     };
   }, [attach, backend, fixtureUrl, services]);
 
