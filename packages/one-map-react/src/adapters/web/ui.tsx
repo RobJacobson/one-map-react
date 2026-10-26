@@ -9,7 +9,7 @@ import {
 import { createPortal } from "react-dom";
 
 import type { Adapter } from "../../contracts/adapter.js";
-import type { LngLat, Point } from "../../contracts/camera-types.js";
+import type { LngLat } from "../../contracts/camera-types.js";
 import type {
   AttributionControlProps,
   ControlProps,
@@ -19,7 +19,6 @@ import type {
   MarkerProps,
   MarkerRef,
   NavigationControlProps,
-  PopupProps,
   ScaleControlProps,
 } from "../../contracts/ui-types.js";
 import {
@@ -62,23 +61,17 @@ interface WebMarkerHandle {
   readonly setLngLat: (coordinate: LngLat) => unknown;
 }
 
-interface WebPopupHandle {
-  readonly options: { anchor?: PopupProps["anchor"] };
-  readonly setOffset: (offset: Point) => unknown;
-}
-
 /**
  * Builds UI delegates while converting only portable events and resets.
  *
  * @param wrapper - Selected react-map-gl components and control hook.
- * @returns Marker, popup, and control implementations for the adapter.
+ * @returns Marker and control implementations for the adapter.
  */
 export const createWebUi = (
   wrapper: WebWrapper<"mapbox-web" | "maplibre-web">
 ): Pick<
   Adapter,
   | "Marker"
-  | "Popup"
   | "Control"
   | "NavigationControl"
   | "AttributionControl"
@@ -173,50 +166,6 @@ export const createWebUi = (
       );
     }
   );
-
-  const Popup = (props: PopupProps & WebUiOptions) => {
-    const { options, hostProps, children, onOpen, onClose, ...popupProps } =
-      props;
-    const handle = useRef<WebPopupHandle | null>(null);
-    const anchor = props.anchor ?? "bottom";
-    const offset = props.offset ?? [0, 0];
-    const [offsetX, offsetY] = offset;
-    useStableOptions("Popup", creationOptions(options, ["style", "className"]));
-    // react-map-gl writes its callback ref during render, before a Suspense commit.
-    const { onOpen: open, onClose: close } = useActiveCallbacks({
-      onOpen,
-      onClose,
-    });
-
-    useLayoutEffect(() => {
-      // react-map-gl 8.1.3 updates options.anchor only when offset changes.
-      // Apply the SDK's public offset setter so anchor-only updates reposition.
-      // Remove when the wrapper handles anchor updates independently.
-      if (handle.current) {
-        handle.current.options.anchor = anchor;
-        handle.current.setOffset([offsetX, offsetY]);
-      }
-    }, [anchor, offsetX, offsetY]);
-
-    return (
-      <wrapper.Popup
-        {...options}
-        {...popupProps}
-        anchor={anchor}
-        offset={offset}
-        maxWidth={
-          typeof props.maxWidth === "number"
-            ? `${props.maxWidth}px`
-            : (props.maxWidth ?? "240px")
-        }
-        ref={handle}
-        onOpen={open}
-        onClose={close}
-      >
-        <div {...hostProps}>{children}</div>
-      </wrapper.Popup>
-    );
-  };
 
   const Control = (props: ControlProps & WebUiOptions) => {
     const control = wrapper.useControl(createControlHost, {
@@ -340,7 +289,6 @@ export const createWebUi = (
 
   return {
     Marker,
-    Popup,
     Control,
     NavigationControl,
     AttributionControl,

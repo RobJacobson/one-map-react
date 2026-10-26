@@ -15,10 +15,7 @@ import type {
 } from "react";
 import type { ViewProps } from "react-native";
 
-import type {
-  NativeControlProps,
-  NativePopupProps,
-} from "./adapters/shared/native-ui.js";
+import type { NativeControlProps } from "./adapters/shared/native-ui.js";
 import type { MapProps } from "./contracts/map-types.js";
 import type {
   GeoJsonSourceProps,
@@ -32,7 +29,6 @@ import { Source as SharedSource } from "./facade/source.js";
 import {
   Control as SharedControl,
   Marker as SharedMarker,
-  Popup as SharedPopup,
 } from "./facade/ui.js";
 
 export type { GestureSettings } from "./adapters/mapbox-native/index.js";
@@ -41,10 +37,7 @@ export {
   CameraGestureObserver,
   MapboxGestureSettings,
 } from "./adapters/mapbox-native/index.js";
-export type {
-  NativeControlProps,
-  NativePopupProps,
-} from "./adapters/shared/native-ui.js";
+export type { NativeControlProps } from "./adapters/shared/native-ui.js";
 
 /** Selected native map with typed renderer facilities and host attributes. */
 /** Selected SDK location follow options, applied to the existing camera. */
@@ -123,8 +116,6 @@ export {
   PointAnnotation,
 } from "./adapters/mapbox-native/ui.js";
 
-/** Popup with owned native bubble host attributes and style. */
-export const Popup = SharedPopup as ComponentType<NativePopupProps>;
 /** Corner control with owned native host attributes and style. */
 export const Control = SharedControl as ComponentType<NativeControlProps>;
 

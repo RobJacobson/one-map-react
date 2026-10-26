@@ -512,7 +512,6 @@ export const createWebMapMock = () => {
 
   return {
     Marker: undefined,
-    Popup: undefined,
     NavigationControl: undefined,
     AttributionControl: undefined,
     ScaleControl: undefined,

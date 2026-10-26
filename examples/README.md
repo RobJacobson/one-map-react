@@ -1,5 +1,7 @@
 # Shared map examples
 
+Popup examples use selected web WrapperPopup directly and a screen-owned native bubble inside Marker. The native close button has an accessible label and removes the bubble through application state; unmount has no dismissal action. The old common automatic dismissal, focus and maxWidth guarantees are excluded. See [migration guidance](../docs/revised-api-proposal.md#markers-images-popups-and-controls) and [U13 status](../docs/revised-api-implementation-plan.md#u13-remove-common-popup-composition). Renderer interaction and native touch/provider/state retention remain unverified.
+
 `shared/route-map.tsx` renders the TF02 map, GeoJSON source, and line layer. Each shell selects one adapter, sizes the map, and owns the remount and fly-to controls. Metro and Vite pin shared imports to that shell's `node_modules`. Mapbox shells read `MAPBOX_ACCESS_TOKEN` from the shell or a gitignored `.env` file. The shell variable wins. An example `.env` wins over the repository `.env`. Copy `.env.example` to `.env` and set the public token there, or export `MAPBOX_ACCESS_TOKEN` before starting Vite or Metro. Do not commit a token. The examples embed that public value in the local bundle, so a secret token must not be used. Restart Vite or Metro after changing it.
 
 Web shells use Vite+ for development and production builds. From the repository root, `bun run build` writes the package `dist/` that the shells import. Then from `web-mapbox` or `web-maplibre`:

@@ -115,7 +115,6 @@ export type {
   MarkerProps,
   MarkerRef,
   NavigationControlProps,
-  PopupProps,
   ScaleControlProps,
 } from "./contracts/ui-types.js";
 export { Images } from "./facade/images.js";
@@ -132,7 +131,6 @@ export {
   GeolocateControl,
   Marker,
   NavigationControl,
-  Popup,
   ScaleControl,
 } from "./facade/ui.js";
 export { UserLocation } from "./facade/user-location.js";

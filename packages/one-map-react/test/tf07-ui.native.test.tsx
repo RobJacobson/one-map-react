@@ -63,7 +63,6 @@ import {
 import { MapSetup } from "../src/facade/map-setup.js";
 import {
   Marker as SharedMarker,
-  Popup as SharedPopup,
   NavigationControl as SharedNavigationControl,
   ScaleControl as SharedScaleControl,
 } from "../src/facade/ui.js";
@@ -1061,31 +1060,8 @@ describe("TF07 native UI composition", () => {
     expect(fixture.easeTo).toHaveBeenCalledWith({ center: [1, 2], zoom: 14 });
   });
 
-  test("native popups and custom controls forward their owned host presentation", async () => {
+  test("native custom controls forward their owned host presentation", async () => {
     const fixture = sessionFixture();
-    const touched = jest.fn();
-    const popup = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Popup
-          longitude={10}
-          latitude={20}
-          {...{
-            hostProps: {
-              testID: "bubble",
-              style: { backgroundColor: "pink" },
-              onTouchStart: touched,
-            },
-          }}
-        />
-      </FixtureSessionProvider>
-    );
-    expect(
-      StyleSheet.flatten(popup.getByTestId("bubble").props.style)
-        .backgroundColor
-    ).toBe("pink");
-    await nativeTouch(popup.getByTestId("bubble"), "touchStart", touch(1, 2));
-    expect(touched).toHaveBeenCalledTimes(1);
-    await popup.unmount();
     const control = await render(
       <NativeOverlayHost session={fixture.session}>
         <ui.Control
@@ -1110,15 +1086,8 @@ describe("TF07 native UI composition", () => {
     ).toBe(0.8);
   });
 
-  test("browser focus and expanded attribution requests fail explicitly on native", async () => {
+  test("expanded attribution requests fail explicitly on native", async () => {
     const fixture = sessionFixture();
-    await expect(
-      render(
-        <FixtureSessionProvider value={fixture.session}>
-          <ui.Popup longitude={10} latitude={20} focusAfterOpen />
-        </FixtureSessionProvider>
-      )
-    ).rejects.toThrow("focusAfterOpen");
     await expect(
       render(
         <FixtureSessionProvider value={fixture.session}>
@@ -1473,10 +1442,9 @@ describe("TF07 native UI composition", () => {
     }
   );
 
-  test("MapLibre live, annotation, and popup activation each notify once", async () => {
+  test("MapLibre live and annotation activation each notify once", async () => {
     const fixture = sessionFixture();
     const clicked = jest.fn();
-    const closed = jest.fn();
     const stopPropagation = jest.fn();
     const event = {
       nativeEvent: { lngLat: [10, 20], point: [100, 200] },
@@ -1520,13 +1488,6 @@ describe("TF07 native UI composition", () => {
       point: [100, 200],
     });
     await annotation.unmount();
-    const popup = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <maplibreNativeUI.Popup longitude={10} latitude={20} onClose={closed} />
-      </FixtureSessionProvider>
-    );
-    await fireEvent.press(popup.getByLabelText("Close popup"));
-    expect(closed).toHaveBeenCalledTimes(1);
   });
 
   test.each(["view", "annotation"] as const)(
@@ -1777,42 +1738,6 @@ describe("TF07 native UI composition", () => {
     expect(refresh).toHaveBeenCalledTimes(1);
   });
 
-  test("popup dismissal is requested once and teardown is silent", async () => {
-    const fixture = sessionFixture();
-    const closed = jest.fn();
-    const opened = jest.fn();
-    const view = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.Popup
-          longitude={10}
-          latitude={20}
-          onClose={closed}
-          onOpen={opened}
-          closeOnMove
-        />
-      </FixtureSessionProvider>
-    );
-    expect(opened).toHaveBeenCalledTimes(1);
-    await act(async () => {
-      fixture.emit("move", {
-        viewState: {
-          longitude: 10,
-          latitude: 20,
-          zoom: 4,
-          bearing: 0,
-          pitch: 0,
-        },
-        origin: "user",
-      });
-    });
-    await act(async () => {
-      fixture.emit("click", { lngLat: [10, 20], point: [0, 0] });
-    });
-    expect(closed).toHaveBeenCalledTimes(1);
-    await view.unmount();
-    expect(closed).toHaveBeenCalledTimes(1);
-  });
-
   test("injected location centers once and pending work is ignored after teardown", async () => {
     const fixture = sessionFixture();
     const located = jest.fn();
@@ -1877,13 +1802,6 @@ test("native creation defaults compare by their effective values", async () => {
         latitude={20}
         anchor={explicit ? "bottom" : undefined}
         renderMode={explicit ? "view" : undefined}
-      />
-      <SharedPopup
-        longitude={10}
-        latitude={20}
-        closeButton={explicit ? true : undefined}
-        closeOnClick={explicit ? true : undefined}
-        closeOnMove={explicit ? false : undefined}
       />
       <SharedNavigationControl
         position={explicit ? "top-right" : undefined}

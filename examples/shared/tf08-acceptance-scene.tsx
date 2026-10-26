@@ -10,7 +10,6 @@ import {
   type MapStyle,
   Marker,
   type MarkerRef,
-  Popup,
   AttributionControl,
   NavigationControl,
   ScaleControl,
@@ -38,6 +37,7 @@ interface Tf08AcceptanceSceneProps {
   readonly backend: string;
   readonly style: MapLayoutStyle;
   readonly overlay: ReactNode;
+  readonly renderCoveragePopup: (children: ReactNode) => ReactNode;
   readonly attach: (probe: Tf08AcceptanceProbe | null) => void;
   readonly fixtureUrl: string;
   readonly externalContext?: MapProps["gl"];
@@ -70,6 +70,7 @@ export const Tf08AcceptanceScene = ({
   backend,
   style,
   overlay,
+  renderCoveragePopup,
   attach,
   fixtureUrl,
   externalContext,
@@ -320,16 +321,7 @@ export const Tf08AcceptanceScene = ({
           {overlay}
         </Marker>
       )}
-      {mode === "coverage-popup" && (
-        <Popup
-          longitude={-122.35}
-          latitude={47.61}
-          closeButton={false}
-          closeOnClick={false}
-        >
-          {overlay}
-        </Popup>
-      )}
+      {mode === "coverage-popup" && renderCoveragePopup(overlay)}
       {mode === "coverage-ornaments" && (
         <>
           <AttributionControl position="bottom-right" />

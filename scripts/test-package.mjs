@@ -251,7 +251,6 @@ console.log(JSON.stringify(Object.keys(common).sort()));
         "MapSetup",
         "Marker",
         "NavigationControl",
-        "Popup",
         "ScaleControl",
         "Source",
         "UserLocation",
@@ -290,9 +289,16 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     join(consumer, "selection.tsx"),
     `${imports}
 import type { Adapter, Backend, MapRef } from "one-map-react";
-import { Map as OneMap, MapSetup, Source, Layer, Marker, Popup, Control, NavigationControl, AttributionControl, ScaleControl, GeolocateControl, FullscreenControl, useMap } from "one-map-react";
+import { Map as OneMap, MapSetup, Source, Layer, Marker, Control, NavigationControl, AttributionControl, ScaleControl, GeolocateControl, FullscreenControl, useMap } from "one-map-react";
 ${declarations}
 declare const commonRef: MapRef;
+// @ts-expect-error Popups are selected wrapper components or application UI.
+import { Popup } from "one-map-react";
+// @ts-expect-error Common popup props are removed.
+import type { PopupProps } from "one-map-react";
+declare const adapterContract: Adapter;
+// @ts-expect-error Custom adapters no longer supply popup composition.
+adapterContract.Popup;
 // @ts-expect-error Offline packs belong to the selected SDK.
 import type { OfflinePack } from "one-map-react";
 // @ts-expect-error Offline creation options belong to the selected SDK.
@@ -327,7 +333,7 @@ commonRef.getWrapperMap();
 // @ts-expect-error Common hooks retain the portable ref contract.
 useMap().getWrapperMap();
 const applicationChoice = (adapter: Adapter): Backend => adapter.backend;
-void Marker; void Popup; void Control; void NavigationControl; void AttributionControl; void ScaleControl; void GeolocateControl; void FullscreenControl; void useMap;
+void Marker; void Control; void NavigationControl; void AttributionControl; void ScaleControl; void GeolocateControl; void FullscreenControl; void useMap;
 void MapSetup;
 void Source;
 void Layer;

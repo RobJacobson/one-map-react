@@ -4,8 +4,8 @@ import {
   Layer as AdvancedLayer,
   type WebMapRef,
 } from "one-map-react/maplibre-web";
-import { adapter } from "one-map-react/maplibre-web";
-import { useEffect } from "react";
+import { adapter, WrapperPopup } from "one-map-react/maplibre-web";
+import { type ReactNode, useEffect } from "react";
 import { useMap } from "react-map-gl/maplibre";
 
 import { WebCameraApp } from "../../shared/web-camera-app.js";
@@ -39,9 +39,11 @@ export const App = () => {
       />
     );
   if (new URLSearchParams(window.location.search).get("tf08") === "services")
-    return <WebTf08App adapter={adapter} />;
+    return (
+      <WebTf08App adapter={adapter} renderCoveragePopup={renderCoveragePopup} />
+    );
   if (new URLSearchParams(window.location.search).get("tf07") === "ui")
-    return <WebTf07App adapter={adapter} />;
+    return <WebTf07App adapter={adapter} renderPopup={renderPopup} />;
   if (cameraSmoke === "corrections" || sourcesSmoke === "corrections") {
     return <WebCorrectionsApp adapter={adapter} probe={<CorrectionProbe />} />;
   }
@@ -182,3 +184,31 @@ const RenderingProbe = () => {
   }, [map]);
   return null;
 };
+
+const renderPopup = (
+  children: ReactNode,
+  onOpen: () => void,
+  onClose: () => void
+): ReactNode => (
+  <WrapperPopup
+    longitude={-122.3}
+    latitude={47.63}
+    closeOnClick={false}
+    closeOnMove={false}
+    onOpen={onOpen}
+    onClose={onClose}
+  >
+    {children}
+  </WrapperPopup>
+);
+
+const renderCoveragePopup = (children: ReactNode): ReactNode => (
+  <WrapperPopup
+    longitude={-122.35}
+    latitude={47.61}
+    closeButton={false}
+    closeOnClick={false}
+  >
+    {children}
+  </WrapperPopup>
+);

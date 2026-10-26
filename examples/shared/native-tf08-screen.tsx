@@ -1,4 +1,4 @@
-import { type Adapter, MapSetup } from "one-map-react";
+import { type Adapter, MapSetup, Marker } from "one-map-react";
 import {
   type ReactNode,
   useCallback,
@@ -204,6 +204,7 @@ export const NativeTf08Screen = ({
         <Text testID="tf08-status">{status}</Text>
         {sceneMounted && (
           <Tf08AcceptanceScene
+            renderCoveragePopup={renderCoveragePopup}
             backend={adapter.backend}
             services={adapter.services}
             style={{ flex: 1 }}
@@ -252,3 +253,18 @@ const runOfflineOperation = async (
     console.warn = warn;
   }
 };
+
+const renderCoveragePopup = (children: ReactNode): ReactNode => (
+  <Marker longitude={-122.35} latitude={47.61} anchor="bottom">
+    <View
+      style={{
+        padding: 12,
+        backgroundColor: "white",
+        borderRadius: 6,
+        maxWidth: 240,
+      }}
+    >
+      {children}
+    </View>
+  </Marker>
+);

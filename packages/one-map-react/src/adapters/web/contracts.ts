@@ -227,8 +227,6 @@ interface WebWrapper<
   readonly Layer: Adapter["Layer"];
   /** Live marker delegated to the selected wrapper. */
   readonly Marker: ComponentType<WebForwardedProps>;
-  /** Standalone popup delegated to the selected wrapper. */
-  readonly Popup: ComponentType<WebForwardedProps>;
   /** Selected wrapper navigation buttons and compass. */
   readonly NavigationControl: ComponentType<WebForwardedProps>;
   /** Selected wrapper attribution control. */

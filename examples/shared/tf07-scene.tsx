@@ -8,7 +8,6 @@ import {
   Marker,
   NavigationControl,
   Map as OneMap,
-  Popup,
   ScaleControl,
   Source,
 } from "one-map-react";
@@ -70,6 +69,11 @@ interface Tf07SceneProps {
     activateChild: () => void
   ) => ReactNode;
   readonly controlContent: ReactNode;
+  readonly renderPopup: (
+    children: ReactNode,
+    onOpen: () => void,
+    onClose: () => void
+  ) => ReactNode;
   readonly report: (event: string) => void;
   readonly attach: (probe: Tf07Probe | null) => void;
 }
@@ -93,6 +97,7 @@ export const Tf07Scene = ({
   style,
   markerContent,
   controlContent,
+  renderPopup,
   report,
   attach,
 }: Tf07SceneProps) => {
@@ -279,22 +284,17 @@ export const Tf07Scene = ({
       >
         {markerContent("annotation", () => undefined)}
       </Marker>
-      {popup && (
-        <Popup
-          longitude={-122.3}
-          latitude={47.63}
-          closeOnClick={false}
-          closeOnMove={false}
-          onOpen={() => record("popup-open")}
-          onClose={() => {
+      {/* eslint-disable react/refs -- Host renderers receive event callbacks; observation refs are read only when activated. */}
+      {popup &&
+        renderPopup(
+          markerContent("popup", () => record("popup-child")),
+          () => record("popup-open"),
+          () => {
             record("popup-close");
             setPopup(false);
-          }}
-        >
-          {/* eslint-disable-next-line react/refs -- markerContent receives an event callback; the callback reads observation refs only when clicked. */}
-          {markerContent("popup", () => record("popup-child"))}
-        </Popup>
-      )}
+          }
+        )}
+      {/* eslint-enable react/refs */}
       <NavigationControl position="top-right" onError={fail} />
       <GeolocateControl
         position="top-left"

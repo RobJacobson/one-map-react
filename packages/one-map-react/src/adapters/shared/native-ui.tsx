@@ -7,7 +7,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useEffectEvent,
   useId,
   useImperativeHandle,
   useLayoutEffect,
@@ -33,7 +32,6 @@ import type {
   MarkerEvent,
   MarkerProps,
   MarkerRef,
-  PopupProps,
   ScaleControlProps,
 } from "../../contracts/ui-types.js";
 import { useMapSession } from "../../facade/map-context.js";
@@ -51,12 +49,6 @@ import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 /** Selected native marker host presentation. */
 export interface NativeMarkerProps extends MarkerProps {
   /** Props for the owned content View; facade responder handlers stay composed. */
-  readonly hostProps?: ViewProps;
-}
-
-/** Selected native popup bubble presentation. */
-export interface NativePopupProps extends PopupProps {
-  /** Bubble View props and style; native marker bounds contain presses. */
   readonly hostProps?: ViewProps;
 }
 
@@ -99,7 +91,6 @@ export interface NativeUIOptions {
 type NativeUI = Pick<
   Adapter,
   | "Marker"
-  | "Popup"
   | "Control"
   | "NavigationControl"
   | "AttributionControl"
@@ -109,7 +100,7 @@ type NativeUI = Pick<
 >;
 
 /**
- * Composes native markers, popup bubbles, and corner controls.
+ * Composes native markers and corner controls.
  *
  * @param options - Native wrappers with converted marker props.
  * @returns UI implementations for a native adapter.
@@ -224,88 +215,8 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     }
   );
 
-  const NativePopup = (props: NativePopupProps): ReactElement => {
-    const coordinate = lngLatFromWrapper([props.longitude, props.latitude]);
-    const offset = pointFromWrapper(props.offset ?? [0, 0]);
-    const mapSession = useMapSession();
-    const { subscribe } = mapSession;
-    const id = useId();
-    // The facade's map subscription retains requestClose across prop updates.
-    const close = useActiveCallback(props.onClose);
-    const open = useEffectEvent(() => props.onOpen?.());
-    const closeOnClick = props.closeOnClick ?? true;
-    const closeOnMove = props.closeOnMove ?? false;
-    const closeButton = props.closeButton ?? true;
-    const dismissed = useRef(false);
-    const requestClose = useCallback((): void => {
-      if (dismissed.current) return;
-      dismissed.current = true;
-      close();
-    }, [close]);
-
-    useLayoutEffect(() => {
-      dismissed.current = false;
-      open();
-      const removeClick = closeOnClick
-        ? subscribe("click", requestClose)
-        : undefined;
-      const removeMove = closeOnMove
-        ? subscribe("move", requestClose)
-        : undefined;
-      return () => {
-        removeClick?.();
-        removeMove?.();
-      };
-    }, [subscribe, closeOnClick, closeOnMove, requestClose]);
-
-    if (props.focusAfterOpen !== undefined) {
-      throw new Error("Native Popup does not support browser focusAfterOpen.");
-    }
-
-    return (
-      <options.Marker
-        id={id}
-        lngLat={coordinate}
-        anchor={props.anchor ?? "bottom"}
-        offset={offset}
-      >
-        <View
-          {...props.hostProps}
-          collapsable={false}
-          onTouchStart={(event) => {
-            props.hostProps?.onTouchStart?.(event);
-          }}
-          style={[
-            {
-              padding: 12,
-              backgroundColor: "white",
-              borderRadius: 6,
-              elevation: 4,
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-            },
-            props.hostProps?.style,
-            { maxWidth: nativeMaxWidth(props.maxWidth) },
-          ]}
-        >
-          {closeButton && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Close popup"
-              onPress={requestClose}
-            >
-              <Text style={{ alignSelf: "flex-end", fontSize: 20 }}>×</Text>
-            </Pressable>
-          )}
-          {props.children}
-        </View>
-      </options.Marker>
-    );
-  };
-
   return {
     Marker: NativeMarker,
-    Popup: NativePopup,
     Control: NativeControl,
     NavigationControl: NativeNavigationControl,
     AttributionControl: NativeAttributionControl,
@@ -807,16 +718,4 @@ const scaleDisplay = (
     width: (maxWidth * value) / amount,
     text: `${Number(value.toPrecision(3))} ${suffix}`,
   };
-};
-
-const nativeMaxWidth = (width: number | string | undefined): number => {
-  if (width === undefined) return 240;
-  if (typeof width === "number") {
-    if (!Number.isFinite(width) || width <= 0)
-      throw new Error("Native Popup maxWidth must be a positive finite width.");
-    return width;
-  }
-  if (/^\d+(?:\.\d+)?(?:px)?$/.test(width))
-    return nativeMaxWidth(Number.parseFloat(width));
-  throw new Error("Native Popup maxWidth requires a number or a pixel width.");
 };
