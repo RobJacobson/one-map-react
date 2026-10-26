@@ -25,6 +25,8 @@ test("StrictMode effect replay owns a fresh offline command instance", async () 
       <NativeTf08Screen
         adapter={adapter}
         createOfflineCommands={createCommands}
+        requestLocationPermission={async () => undefined}
+        getCurrentPosition={async () => ({ lngLat: [0, 0] })}
         startDetached
       />
     </StrictMode>

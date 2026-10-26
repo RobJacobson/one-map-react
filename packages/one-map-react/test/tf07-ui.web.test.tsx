@@ -187,7 +187,6 @@ const UIMap = forwardRef<never, MapProps>((props, _ref) => (
 ));
 const sharedUiAdapter = {
   backend: "mapbox-web",
-  services: { location: {} },
   Map: UIMap,
   ...createWebUi(wrapper),
 } as unknown as Adapter;

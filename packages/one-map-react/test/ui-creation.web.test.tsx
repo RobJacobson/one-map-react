@@ -22,17 +22,6 @@ const fakeAdapter = (backend: Backend): Adapter => ({
   Layer: Empty,
   Images: Empty,
   Marker: forwardRef((_props, _ref) => null),
-
-  services: {
-    location: {
-      requestPermission: async () => ({
-        status: "granted",
-        accuracy: "unknown",
-      }),
-      getCurrentPosition: async () => ({ lngLat: [0, 0] }),
-      watchPosition: () => () => undefined,
-    },
-  },
 });
 
 const genuineChanges = [

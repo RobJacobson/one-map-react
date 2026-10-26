@@ -1,4 +1,4 @@
-export type { Adapter, Backend, MapServices } from "./contracts/adapter.js";
+export type { Adapter, Backend } from "./contracts/adapter.js";
 export type {
   Bounds,
   CameraCommandOptions,
@@ -63,13 +63,7 @@ export type {
   SymbolPaint,
   Visibility,
 } from "./contracts/layer-types.js";
-export type {
-  LocationAbortSignal,
-  LocationOptions,
-  LocationPermission,
-  LocationService,
-  UserLocationProps,
-} from "./contracts/location-types.js";
+export type { UserLocationProps } from "./contracts/location-types.js";
 export type {
   LegacyLight,
   StyleTransition,
@@ -114,7 +108,6 @@ export type {
 export { Images } from "./facade/images.js";
 export { Layer } from "./facade/layer.js";
 export { Map, useMap } from "./facade/map.js";
-export { useMapServices } from "./facade/map-services.js";
 export type { MapSetupProps } from "./facade/map-setup.js";
 export { MapSetup } from "./facade/map-setup.js";
 export { Source } from "./facade/source.js";

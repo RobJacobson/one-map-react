@@ -1,6 +1,7 @@
 import { type Adapter, MapSetup } from "one-map-react";
 import { type ComponentProps, useCallback, useMemo } from "react";
 
+import { acquireLocation, locationPosition } from "./location-acquisition.js";
 import {
   type Tf08AcceptanceProbe,
   Tf08AcceptanceScene,
@@ -55,7 +56,8 @@ export const WebTf08App = ({
           ornamentControls={ornamentControls}
           renderCoveragePopup={renderCoveragePopup}
           backend={adapter.backend}
-          services={adapter.services}
+          requestLocationPermission={requestLocationPermission}
+          getCurrentPosition={getCurrentPosition}
           style={{ width: "100%", height: "100%" }}
           attach={attach}
           fixtureUrl="http://127.0.0.1:8798"
@@ -69,4 +71,42 @@ export const WebTf08App = ({
       </div>
     </MapSetup>
   );
+};
+
+const getCurrentPosition = (signal?: AbortSignal, timeoutMs?: number) =>
+  acquireLocation(
+    (success, failure) => {
+      const geolocation = globalThis.navigator?.geolocation;
+      if (!geolocation) throw new Error("Browser geolocation is unavailable.");
+      const id = geolocation.watchPosition(
+        (position) => {
+          try {
+            success(locationPosition(position, "browser"));
+          } catch (error) {
+            failure(error);
+          }
+        },
+        failure,
+        { maximumAge: 0 }
+      );
+      return () => geolocation.clearWatch(id);
+    },
+    signal,
+    timeoutMs
+  );
+
+const requestLocationPermission = async (signal?: AbortSignal) => {
+  try {
+    await getCurrentPosition(signal);
+    return { status: "granted", accuracy: "unknown" };
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === 1
+    )
+      return { status: "denied", accuracy: "unknown" };
+    throw error;
+  }
 };
