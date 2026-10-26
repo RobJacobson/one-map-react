@@ -10,7 +10,7 @@ export const nativeUiScenarios = [
   "navigation-location",
   "style-remount",
   "host-accessibility",
-  "scale-units",
+  "sdk-ornaments",
 ];
 
 /** A final physical read may finish only after every run-bound outcome is recorded. */

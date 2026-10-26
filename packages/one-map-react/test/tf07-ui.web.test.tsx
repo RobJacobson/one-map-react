@@ -33,7 +33,6 @@ import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import {
   Marker as SharedMarker,
-  ScaleControl as SharedScaleControl,
   Control as SharedControl,
 } from "../src/facade/ui.js";
 
@@ -52,8 +51,6 @@ const ControlMock = (props: WebForwardedProps) => {
 const wrapper = {
   Marker: MarkerMock,
 
-  AttributionControl: ControlMock,
-  ScaleControl: ControlMock,
   GeolocateControl: ControlMock,
 
   useControl: (create: () => WebCustomControl) => {
@@ -65,8 +62,7 @@ const wrapper = {
     return control;
   },
 } as unknown as WebWrapper<"mapbox-web">;
-const { Marker, Control, ScaleControl, GeolocateControl } =
-  createWebUi(wrapper);
+const { Marker, Control, GeolocateControl } = createWebUi(wrapper);
 
 beforeEach(() => {
   markerProps.length = 0;
@@ -197,14 +193,6 @@ describe("TF07 web UI delegates", () => {
     expect(view.getByText("Updated content")).toBeTruthy();
     view.unmount();
     expect(document.querySelector(".mapboxgl-ctrl.maplibregl-ctrl")).toBeNull();
-  });
-
-  test("delegates scale unit changes and supplies common defaults", () => {
-    const view = render(<ScaleControl unit="metric" />);
-    view.rerender(<ScaleControl unit="nautical" />);
-    expect(latest(controlProps).unit).toBe("nautical");
-    expect(latest(controlProps).maxWidth).toBe(100);
-    expect(latest(controlProps).position).toBe("top-right");
   });
 
   test("uses browser geolocation and strips the native provider and zoom", () => {
@@ -366,11 +354,6 @@ test("shared UI accepts effective creation defaults in both directions", () => {
           latitude={0}
           anchor={explicit ? "bottom" : undefined}
           renderMode={explicit ? "view" : undefined}
-        />
-
-        <SharedScaleControl
-          position={explicit ? "top-right" : undefined}
-          maxWidth={explicit ? 100 : undefined}
         />
         <SharedControl position={explicit ? "top-right" : undefined} />
       </OneMap>

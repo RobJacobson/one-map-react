@@ -11,13 +11,11 @@ import { createPortal } from "react-dom";
 import type { Adapter } from "../../contracts/adapter.js";
 import type { LngLat } from "../../contracts/camera-types.js";
 import type {
-  AttributionControlProps,
   ControlProps,
   GeolocateControlProps,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
-  ScaleControlProps,
 } from "../../contracts/ui-types.js";
 import {
   useMapSession,
@@ -67,14 +65,7 @@ interface WebMarkerHandle {
  */
 export const createWebUi = (
   wrapper: WebWrapper<"mapbox-web" | "maplibre-web">
-): Pick<
-  Adapter,
-  | "Marker"
-  | "Control"
-  | "AttributionControl"
-  | "ScaleControl"
-  | "GeolocateControl"
-> => {
+): Pick<Adapter, "Marker" | "Control" | "GeolocateControl"> => {
   const Marker = forwardRef<MarkerRef, MarkerProps & WebUiOptions>(
     (props, ref) => {
       const {
@@ -174,36 +165,6 @@ export const createWebUi = (
     );
   };
 
-  const AttributionControl = (
-    props: AttributionControlProps & WebUiOptions
-  ) => {
-    const { options, hostProps, children, ...forwarded } = props;
-    useStableOptions("AttributionControl", creationOptions(options, ["style"]));
-
-    return (
-      <wrapper.AttributionControl
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-      />
-    );
-  };
-
-  const ScaleControl = (props: ScaleControlProps & WebUiOptions) => {
-    const { options, hostProps, onError, children, ...forwarded } = props;
-    useStableOptions("ScaleControl", creationOptions(options, ["style"]));
-
-    return (
-      <wrapper.ScaleControl
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-        unit={props.unit ?? "metric"}
-        maxWidth={props.maxWidth ?? 100}
-      />
-    );
-  };
-
   const GeolocateControl = (props: GeolocateControlProps & WebUiOptions) => {
     const {
       options,
@@ -260,8 +221,6 @@ export const createWebUi = (
   return {
     Marker,
     Control,
-    AttributionControl,
-    ScaleControl,
     GeolocateControl,
   };
 };

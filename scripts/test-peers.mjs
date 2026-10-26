@@ -365,6 +365,21 @@ NetworkManager.setConnected(false);
 NetworkManager.setConnected(42);
 `;
   const popupAssertions = `
+// @ts-expect-error Scale belongs to the selected SDK.
+import { ScaleControl } from "one-map-react/${entry}";
+// @ts-expect-error Attribution belongs to the selected SDK.
+import { AttributionControl } from "one-map-react/${entry}";
+${
+  entry.endsWith("web")
+    ? `// @ts-expect-error Common selected scale props are removed.
+import type { WebScaleControlProps } from "one-map-react/${entry}";
+// @ts-expect-error Common selected attribution props are removed.
+import type { WebAttributionControlProps } from "one-map-react/${entry}";`
+    : `import type { NativeMapProps as OrnamentMapProps } from "one-map-react/${entry}";
+const ornaments: OrnamentMapProps["options"] = ${entry === "mapbox-native" ? "{ scaleBarEnabled: true, attributionEnabled: true, logoEnabled: true, scaleBarPosition: { top: 10, left: 10 } }" : "{ scaleBar: true, attribution: true, logo: true, scaleBarPosition: { top: 10, left: 10 } }"};
+void ornaments;`
+}
+
 // @ts-expect-error Application controls replace the selected facade.
 import { NavigationControl } from "one-map-react/${entry}";
 ${
@@ -383,10 +398,12 @@ import type { WebFullscreenControlProps } from "one-map-react/${entry}";`
 }
 ${
   entry.endsWith("web")
-    ? `import { WrapperMarker, WrapperNavigationControl, WrapperFullscreenControl } from "one-map-react/${entry}";
+    ? `import { WrapperMarker, WrapperNavigationControl, WrapperFullscreenControl, WrapperScaleControl, WrapperAttributionControl } from "one-map-react/${entry}";
 void <WrapperMarker longitude={0} latitude={0} />;
 void <WrapperNavigationControl position="top-left" showZoom={false} visualizePitch />;
 void <WrapperFullscreenControl position="bottom-right" />;
+void <WrapperScaleControl position="bottom-left" unit="nautical" maxWidth={150} />;
+void <WrapperAttributionControl position="bottom-right" compact customAttribution="Application data" />;
 ${
   entry === "maplibre-web"
     ? `import { WrapperGlobeControl, WrapperLogoControl, WrapperTerrainControl } from "one-map-react/maplibre-web";

@@ -241,7 +241,6 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     assert.equal(
       run("node", [join(consumer, "common.mjs")], consumer),
       JSON.stringify([
-        "AttributionControl",
         "Control",
         "GeolocateControl",
         "Images",
@@ -249,7 +248,6 @@ console.log(JSON.stringify(Object.keys(common).sort()));
         "Map",
         "MapSetup",
         "Marker",
-        "ScaleControl",
         "Source",
         "UserLocation",
         "useMap",
@@ -287,7 +285,7 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     join(consumer, "selection.tsx"),
     `${imports}
 import type { Adapter, Backend, MapRef } from "one-map-react";
-import { Map as OneMap, MapSetup, Source, Layer, Marker, Control, AttributionControl, ScaleControl, GeolocateControl, useMap } from "one-map-react";
+import { Map as OneMap, MapSetup, Source, Layer, Marker, Control, GeolocateControl, useMap } from "one-map-react";
 ${declarations}
 declare const commonRef: MapRef;
 // @ts-expect-error Popups are selected wrapper components or application UI.
@@ -295,6 +293,18 @@ import { Popup } from "one-map-react";
 // @ts-expect-error Common popup props are removed.
 import type { PopupProps } from "one-map-react";
 declare const adapterContract: Adapter;
+// @ts-expect-error Scale belongs to the selected SDK.
+import { ScaleControl } from "one-map-react";
+// @ts-expect-error Attribution belongs to the selected SDK.
+import { AttributionControl } from "one-map-react";
+// @ts-expect-error Common scale props, including width and units, are removed.
+import type { ScaleControlProps } from "one-map-react";
+// @ts-expect-error Common attribution props are removed.
+import type { AttributionControlProps } from "one-map-react";
+// @ts-expect-error Custom adapters no longer supply scale composition.
+adapterContract.ScaleControl;
+// @ts-expect-error Custom adapters no longer supply attribution composition.
+adapterContract.AttributionControl;
 // @ts-expect-error Custom adapters no longer supply popup composition.
 adapterContract.Popup;
 // @ts-expect-error Applications own camera and browser controls.
@@ -343,7 +353,7 @@ commonRef.getWrapperMap();
 // @ts-expect-error Common hooks retain the portable ref contract.
 useMap().getWrapperMap();
 const applicationChoice = (adapter: Adapter): Backend => adapter.backend;
-void Marker; void Control; void AttributionControl; void ScaleControl; void GeolocateControl; void useMap;
+void Marker; void Control; void GeolocateControl; void useMap;
 void MapSetup;
 void Source;
 void Layer;

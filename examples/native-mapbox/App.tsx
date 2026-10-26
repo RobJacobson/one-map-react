@@ -1,6 +1,7 @@
 import { type MapRef, MapSetup } from "one-map-react";
 import {
   adapter,
+  type NativeMapProps,
   setAccessToken,
   WrapperLocationManager,
   WrapperOfflineManager,
@@ -125,7 +126,8 @@ const App = () => {
         }
       />
     );
-  if (smokeTarget === "tf07") return <NativeTf07Screen adapter={adapter} />;
+  if (smokeTarget === "tf07")
+    return <NativeTf07Screen adapter={adapter} ornaments={tf07Ornaments} />;
   if (smokeTarget === "tf06-lifetimes") {
     return <NativeLifetimesScreen adapter={adapter} />;
   }
@@ -182,3 +184,8 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+// Native scale units and appearance belong to the selected SDK.
+const tf07Ornaments = {
+  scaleBarEnabled: true,
+} satisfies NativeMapProps["options"];

@@ -2,7 +2,7 @@
 
 **Agreed design for the next incompatible release; migration in progress.** Keep rendering, camera commands, feature queries, cluster queries, and explicit feature-state operations shared. Applications own location acquisition, offline storage, snapshots, and screen controls. Native movement and feature-state retention follow the selected renderer. This proposal deliberately narrows compatibility; it does not claim full react-map-gl or native-wrapper parity.
 
-This document owns the agreed destination and exact migration examples. The [requirements](requirements.md) define the next-release scope and retained ownership rules; the [coverage checklist](api-coverage.md) separates current implementation evidence from pending migration work. The current package retains its existing broader API; [the package manifest](../packages/one-map-react/package.json) owns its version. All four selected wrapper getters are implemented on the development branch. The working selected refs retain common operations and getWrapperMap; U06 removes their advanced method mirrors. U06 is merged as PR25 and U07 as PR26. U08 native camera target migration is merged as PR27. U09 feature-state lifetime migration is merged as PR28. U10 current-map capture migration is merged as PR29. U11 selected offline manager migration is merged as PR30. U12 independent snapshot migration is implemented and audited with PR31 open; [applicable routine verification is recorded](../records/evidence/revised-api-u12-snapshots.json). U13 common popup migration is implemented and independently audited with PR32 open; [routine verification and provenance are recorded](../records/evidence/revised-api-u13-popups.json); U14 navigation and fullscreen migration is implemented and independently audited; [routine verification and provenance are recorded](../records/evidence/revised-api-u14-navigation.json); U15 follows its reviewed PR automatically under the unit protocol. Other migration changes remain pending. The [unit plan](revised-api-implementation-plan.md#work-order) owns review and authorization status. The earlier contract review at docs/contract-review.md in the [U01 captured working basis](../records/evidence/revised-api-u01-baseline.md) explains the mechanisms; its recommendation to retain all controls and native dragging belongs to the broader alternative. That research document is not part of this publication. This proposal does not claim renderer acceptance, a package version change, or a current release-gate change.
+This document owns the agreed destination and exact migration examples. The [requirements](requirements.md) define the next-release scope and retained ownership rules; the [coverage checklist](api-coverage.md) separates current implementation evidence from pending migration work. The current package retains its existing broader API; [the package manifest](../packages/one-map-react/package.json) owns its version. All four selected wrapper getters are implemented on the development branch. The working selected refs retain common operations and getWrapperMap; U06 removes their advanced method mirrors. U06 is merged as PR25 and U07 as PR26. U08 native camera target migration is merged as PR27. U09 feature-state lifetime migration is merged as PR28. U10 current-map capture migration is merged as PR29. U11 selected offline manager migration is merged as PR30. U12 independent snapshot migration is implemented and audited with PR31 open; [applicable routine verification is recorded](../records/evidence/revised-api-u12-snapshots.json). U13 common popup migration is implemented and independently audited with PR32 open; [routine verification and provenance are recorded](../records/evidence/revised-api-u13-popups.json); U14 navigation and fullscreen migration is implemented and independently audited with PR33 open; [routine verification and provenance are recorded](../records/evidence/revised-api-u14-navigation.json); U15 scale and attribution migration is implemented and independently audited after reviewed U14 PR33; [routine verification and provenance are recorded](../records/evidence/revised-api-u15-ornaments.json). U16 follows its reviewed PR automatically under the unit protocol. Other migration changes remain pending. The [unit plan](revised-api-implementation-plan.md#work-order) owns review and authorization status. The earlier contract review at docs/contract-review.md in the [U01 captured working basis](../records/evidence/revised-api-u01-baseline.md) explains the mechanisms; its recommendation to retain all controls and native dragging belongs to the broader alternative. That research document is not part of this publication. This proposal does not claim renderer acceptance, a package version change, or a current release-gate change.
 
 ## Research basis and limits
 
@@ -128,7 +128,7 @@ This removes source-level stopPropagation and custom native source hit regions f
 />
 ```
 
-The native behavioral change is explicit: target A followed by a user drag to B stays at B if handleMove leaves cameraTarget unchanged. A fresh cameraTarget object with the same values does not request a rollback; a changed target C requests a move to C. Explicit jumpTo can reapply A. Web can continue rejecting B. Reading scale/compass state must use observed native movement, not the old application target. Native locationOptions follow and an explicit viewState remain mutually exclusive owners.
+The native behavioral change is explicit: target A followed by a user drag to B stays at B if handleMove leaves cameraTarget unchanged. A fresh cameraTarget object with the same values does not request a rollback; a changed target C requests a move to C. Explicit jumpTo can reapply A. Web can continue rejecting B. Application camera readouts must use observed native movement, not the old application target; SDK ornaments retain selected renderer behavior. Native locationOptions follow and an explicit viewState remain mutually exclusive owners.
 
 **After, preferred portable navigation.** Use initialViewState for the opening camera and common commands for explicit navigation. Code inside a Map can obtain map from useMap; the following is an event-handler excerpt, with a target supplied by the application.
 
@@ -217,13 +217,20 @@ Images can await its initial usable style. A later style replacement invalidates
 **Before: common browser controls and popup.** These imports would no longer exist at the root.
 
 ```tsx
-import { FullscreenControl, NavigationControl, Popup, ScaleControl } from "one-map-react";
+import {
+  AttributionControl,
+  FullscreenControl,
+  NavigationControl,
+  Popup,
+  ScaleControl,
+} from "one-map-react";
 ```
 
 **After on Mapbox web.** These exports already exist. MapLibre web uses the same Wrapper names from one-map-react/maplibre-web. Render them inside the selected web Map so the upstream React context exists. Follow the wrapper's own props, refs, callbacks, and creation/update rules; the old common Popup dismissal/refresh contracts do not apply.
 
 ```tsx
 import {
+  WrapperAttributionControl as AttributionControl,
   WrapperFullscreenControl as FullscreenControl,
   WrapperNavigationControl as NavigationControl,
   WrapperPopup as Popup,
@@ -274,7 +281,37 @@ const HomeButton = ({ onError }: HomeButtonProps) => {
 </View>;
 ```
 
-The application owns safe areas, stacking, overlap, pending UI, command ordering, and any inset needed to keep attribution visible. Enable native scale/compass/attribution using selected Map.options. RNMapbox uses scaleBarEnabled; MapLibre uses scaleBar. Their supported placement, units, and appearance remain native. Keep legal attribution and logo requirements; removing common AttributionControl does not authorize hiding them.
+The application owns safe areas, stacking, overlap, pending UI, command ordering, and any inset needed to keep attribution visible. Use the selected Map.options for native ornaments. Keep legal attribution and logo requirements; removing common AttributionControl does not authorize hiding them. Supplemental screen text is needed only for notices the selected style/source attribution does not already supply.
+
+| RNMapbox | MapLibre React Native | react-map-gl | Proposed one-map-react API |
+| --- | --- | --- | --- |
+| scaleBarEnabled and scaleBarPosition configure the scale; attributionEnabled/attributionPosition and logoEnabled/logoPosition configure legal ornaments. | scaleBar and scaleBarPosition configure the scale; attribution/attributionPosition and logo/logoPosition configure legal ornaments. Android scale placement supports top-left only. | WrapperScaleControl and WrapperAttributionControl retain upstream props and lifetime inside the selected web Map. | Selected Map.options forward native options. Common scale/attribution components, their props, aliases, scale calculations and attribution overrides are removed. |
+| Inspected RNMapbox 10.3.7 and 10.3.8 scaleBarUnits declare metric, imperial and nautical; their iOS and Android implementations apply those values. | No scale-units prop is declared; the selected SDK owns units. | WrapperScaleControl accepts upstream unit and maxWidth. | No portable native units or width policy. Applications use only the selected wrapper's supported configuration. |
+
+These boundaries were checked against installed RNMapbox 10.3.8 and integrity-verified npm source archives for RNMapbox 10.3.7 and 10.3.8: src/components/MapView.tsx, ios/RNMBX/RNMBXMapView.swift, and Android RNMBXMapViewManager.kt/RNMBXMapView.kt. Both versions forward scaleBarUnits to native metric/imperial/nautical mappings. MapLibre React Native 11.5.0 src/components/map/Map.tsx exposes scaleBar and scaleBarPosition; both native component schemas retain those fields without a units field. Its Android MLRNMapViewManager.kt forwards position to MLRNMapView.kt, which reads top/left margins and applies ScaleBarOptions.marginTop/marginLeft. That is a wrapper boundary, not an SDK impossibility. Selected option types live in the [Mapbox native entry](../packages/one-map-react/src/mapbox-native.tsx) and [MapLibre native entry](../packages/one-map-react/src/maplibre-native.tsx). Source inspection and declarations do not establish renderer behavior; the migrated ornament configuration still needs scoped renderer acceptance.
+
+For example, these are separate native modules using the same selected option boundary. Setup, style and initial camera are omitted. RNMapbox enables its SDK scale without replacing its default units or legal ornaments:
+
+```tsx
+import { Map as OneMap } from "one-map-react/mapbox-native";
+
+<OneMap options={{ scaleBarEnabled: true }} />;
+```
+
+MapLibre enables its SDK scale at a supported Android corner; iOS accepts the same top-left configuration:
+
+```tsx
+import { Map as OneMap } from "one-map-react/maplibre-native";
+
+<OneMap
+  options={{
+    scaleBar: true,
+    scaleBarPosition: { top: 12, left: 12 },
+  }}
+/>;
+```
+
+Omit ornament options to retain selected SDK defaults. Explicit positions remain selected options; retained common Control layout can still supply temporary avoidance until its separate removal. Keep the RNMapbox scale-position/resize refresh workaround while selected position changes depend on it. The facade no longer calculates a native scale width or reads camera state solely for scale labels.
 
 For a native popup, render an application-owned bubble as a Marker child, or use a selected SDK annotation plus Callout. Conditional rendering owns dismissal. The application implements close buttons, movement/click dismissal, width, accessibility, and focus behavior it needs. The old common closeOnClick, closeOnMove, focusAfterOpen and maxWidth guarantees no longer apply. Native interactive marker children remain supported, so the existing live overlay and portal remain necessary for that retained behavior. SDK live-host replacement is a separate proof-gated optimization.
 
@@ -507,7 +544,7 @@ Advanced selected ref calls change through the same access method. For example, 
 
 ## Migration and implementation sequence
 
-The [detailed implementation plan](revised-api-implementation-plan.md) breaks this sequence into subagent-sized units, including the agreed UserLocation.onPress exclusion, with independent review, coordinator checks, and automatic sequential PR progression through U24 under the owner's authorization. U01 supplied the [frozen baseline and caller inventory](../records/evidence/revised-api-u01-baseline.md). U06 is merged as PR25 and U07 as PR26. U08 native camera target migration is merged as PR27. U09 feature-state lifetime migration is merged as PR28. U10 current-map capture migration is merged as PR29. U11 selected offline manager migration is merged as PR30. U12 independent snapshot migration is implemented and audited with PR31 open; [applicable routine verification is recorded](../records/evidence/revised-api-u12-snapshots.json). U13 common popup migration is implemented and independently audited with PR32 open; [routine verification and provenance are recorded](../records/evidence/revised-api-u13-popups.json); U14 navigation and fullscreen migration is implemented and independently audited; [routine verification and provenance are recorded](../records/evidence/revised-api-u14-navigation.json); U15 follows its reviewed PR automatically under the unit protocol. U15 and later units remain undispatched. The coordinator advances after each reviewed PR; acceptance, merge, publication, and the plan's scoped decisions retain separate approval requirements.
+The [detailed implementation plan](revised-api-implementation-plan.md) breaks this sequence into subagent-sized units, including the agreed UserLocation.onPress exclusion, with independent review, coordinator checks, and automatic sequential PR progression through U24 under the owner's authorization. U01 supplied the [frozen baseline and caller inventory](../records/evidence/revised-api-u01-baseline.md). U06 is merged as PR25 and U07 as PR26. U08 native camera target migration is merged as PR27. U09 feature-state lifetime migration is merged as PR28. U10 current-map capture migration is merged as PR29. U11 selected offline manager migration is merged as PR30. U12 independent snapshot migration is implemented and audited with PR31 open; [applicable routine verification is recorded](../records/evidence/revised-api-u12-snapshots.json). U13 common popup migration is implemented and independently audited with PR32 open; [routine verification and provenance are recorded](../records/evidence/revised-api-u13-popups.json); U14 navigation and fullscreen migration is implemented and independently audited with PR33 open; [routine verification and provenance are recorded](../records/evidence/revised-api-u14-navigation.json); U15 scale and attribution migration is implemented and independently audited after reviewed U14 PR33; [routine verification and provenance are recorded](../records/evidence/revised-api-u15-ornaments.json). U16 follows its reviewed PR automatically under the unit protocol. U16 and later units remain undispatched. The coordinator advances after each reviewed PR; acceptance, merge, publication, and the plan's scoped decisions retain separate approval requirements.
 
 1. **Freeze the contract change separately from the current candidate.** Reconcile requirements and the existing coverage checklist to distinguish the retained shared contract, selected pass-through facilities, and deliberately excluded common behavior. Keep historical acceptance and current candidate gates attached to their original artifacts. Use a breaking prerelease whose version the owner chooses later (0.2.0-rc.1 remains a proposal while the package is pre-1.0); do not publish it under the current candidate's version or claim full parity.
 2. **Move application services first.** Convert maintained example consumers to selected manager imports or application services, remove MapSetup.locationProvider and useMapServices calls, and add read-only lookup of existing offline metadata. Verify imported and previously created packs remain discoverable without database changes. Introduce getWrapperMap and migrate capture/advanced calls before deleting their old routes in the development branch. No permanent dual implementation or compatibility flag is needed.

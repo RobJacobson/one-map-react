@@ -105,7 +105,6 @@ export type {
 export type { MapStyle, StyleDocument } from "./contracts/style-types.js";
 export type {
   Anchor,
-  AttributionControlProps,
   ControlPosition,
   ControlProps,
   GeolocateControlProps,
@@ -113,7 +112,6 @@ export type {
   MarkerEvent,
   MarkerProps,
   MarkerRef,
-  ScaleControlProps,
 } from "./contracts/ui-types.js";
 export { Images } from "./facade/images.js";
 export { Layer } from "./facade/layer.js";
@@ -122,11 +120,5 @@ export { useMapServices } from "./facade/map-services.js";
 export type { MapSetupProps } from "./facade/map-setup.js";
 export { MapSetup } from "./facade/map-setup.js";
 export { Source } from "./facade/source.js";
-export {
-  AttributionControl,
-  Control,
-  GeolocateControl,
-  Marker,
-  ScaleControl,
-} from "./facade/ui.js";
+export { Control, GeolocateControl, Marker } from "./facade/ui.js";
 export { UserLocation } from "./facade/user-location.js";

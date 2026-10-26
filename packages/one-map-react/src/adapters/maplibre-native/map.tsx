@@ -202,22 +202,15 @@ const MaplibreNativeMapImplementation = forwardRef<
                 : undefined)
             }
             attributionPosition={
-              session.attributionPosition
-                ? ornaments.position(session.attributionPosition)
-                : (props.options?.attributionPosition ??
-                  (ornaments.managed
-                    ? ornaments.position("bottom-right")
-                    : undefined))
+              props.options?.attributionPosition ??
+              (ornaments.managed
+                ? ornaments.position("bottom-right")
+                : undefined)
             }
             compassPosition={
               props.options?.compassPosition ??
               (ornaments.managed ? ornaments.position("top-right") : undefined)
             }
-            {...(session.attributionPosition
-              ? {
-                  attribution: true,
-                }
-              : {})}
             ref={mapRef}
             style={{ flex: 1 }}
             mapStyle={

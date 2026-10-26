@@ -22,7 +22,6 @@ vi.mock("one-map-react", async () => {
     },
     Control: () => null,
     GeolocateControl: () => null,
-    ScaleControl: () => null,
   };
 });
 
