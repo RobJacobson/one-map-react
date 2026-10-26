@@ -241,7 +241,6 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     assert.equal(
       run("node", [join(consumer, "common.mjs")], consumer),
       JSON.stringify([
-        "Control",
         "Images",
         "Layer",
         "Map",
@@ -284,7 +283,7 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     join(consumer, "selection.tsx"),
     `${imports}
 import type { Adapter, Backend, MapRef } from "one-map-react";
-import { Map as OneMap, MapSetup, Source, Layer, Marker, Control, useMap } from "one-map-react";
+import { Map as OneMap, MapSetup, Source, Layer, Marker, useMap } from "one-map-react";
 ${declarations}
 declare const commonRef: MapRef;
 // @ts-expect-error Popups are selected wrapper components or application UI.
@@ -292,6 +291,14 @@ import { Popup } from "one-map-react";
 // @ts-expect-error Common popup props are removed.
 import type { PopupProps } from "one-map-react";
 declare const adapterContract: Adapter;
+// @ts-expect-error Applications own custom control layout.
+import { Control } from "one-map-react";
+// @ts-expect-error Common custom control props are removed.
+import type { ControlProps } from "one-map-react";
+// @ts-expect-error Common placement positions are removed.
+import type { ControlPosition } from "one-map-react";
+// @ts-expect-error Custom adapters no longer supply control composition.
+adapterContract.Control;
 // @ts-expect-error Location controls belong to the application or selected wrapper.
 import { GeolocateControl } from "one-map-react";
 // @ts-expect-error Common location control props are removed.
@@ -358,7 +365,7 @@ commonRef.getWrapperMap();
 // @ts-expect-error Common hooks retain the portable ref contract.
 useMap().getWrapperMap();
 const applicationChoice = (adapter: Adapter): Backend => adapter.backend;
-void Marker; void Control; void useMap;
+void Marker; void useMap;
 void MapSetup;
 void Source;
 void Layer;

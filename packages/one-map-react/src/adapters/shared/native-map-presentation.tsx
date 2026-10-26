@@ -14,14 +14,6 @@ import {
 import type { MapRef, ViewState } from "../../contracts/camera-types.js";
 import type { MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
-import type { ControlPosition } from "../../contracts/ui-types.js";
-
-/** Native control placement; children retain their original React ancestry. */
-export interface NativeOverlay {
-  readonly id: string;
-  readonly position: ControlPosition;
-  readonly height: number;
-}
 
 /** Native-only presentation owned by the selected adapter's map. */
 export interface NativeMapPresentation {
@@ -29,22 +21,16 @@ export interface NativeMapPresentation {
   readonly nativeLocationFollowing: boolean;
   readonly nativeLayout?: { readonly width: number; readonly height: number };
   setNativeLayout(width: number, height: number): void;
-  setOverlay(
-    id: string,
-    position: ControlPosition | null,
-    height?: number
-  ): void;
 }
 
 export const NativeMapPresentationContext =
   createContext<NativeMapPresentation | null>(null);
-export const NativeOverlayContext = createContext<readonly NativeOverlay[]>([]);
 
 /** Camera movement observed from the native wrapper. */
 interface NativeCameraState {
-  /** Observed camera used by native controls. */
+  /** Observed native camera. */
   readonly viewState: ViewState;
-  /** Invalidates control and overlay projection when the native target stays unchanged. */
+  /** Invalidates marker projection when the native target stays unchanged. */
   readonly observedViewState: ViewState;
 }
 
@@ -92,33 +78,13 @@ const NativePresentationProvider = ({
   const overlayHostName = useId();
   const [nativeLayout, storeNativeLayout] =
     useState<NativeMapPresentation["nativeLayout"]>();
-  const [overlays, setOverlays] = useState<ReadonlyMap<string, NativeOverlay>>(
-    () => new Map()
-  );
-  const [{ setNativeLayout, setOverlay }] = useState(() => ({
+  const [{ setNativeLayout }] = useState(() => ({
     setNativeLayout: (width: number, height: number): void => {
       storeNativeLayout((previous) =>
         previous?.width === width && previous.height === height
           ? previous
           : { width, height }
       );
-    },
-    setOverlay: (
-      id: string,
-      position: ControlPosition | null,
-      height?: number
-    ) => {
-      setOverlays((current) => {
-        const previous = current.get(id);
-        if (position === null && !previous) return current;
-        const nextHeight = height ?? previous?.height ?? 0;
-        if (previous?.position === position && previous.height === nextHeight)
-          return current;
-        const next = new Map(current);
-        if (position === null) next.delete(id);
-        else next.set(id, { id, height: nextHeight, position });
-        return next;
-      });
     },
   }));
   const presentation = useMemo(
@@ -127,16 +93,12 @@ const NativePresentationProvider = ({
       nativeLocationFollowing: following,
       nativeLayout,
       setNativeLayout,
-      setOverlay,
     }),
-    [overlayHostName, following, nativeLayout, setNativeLayout, setOverlay]
+    [overlayHostName, following, nativeLayout, setNativeLayout]
   );
-  const placement = useMemo(() => [...overlays.values()], [overlays]);
   return (
     <NativeMapPresentationContext.Provider value={presentation}>
-      <NativeOverlayContext.Provider value={placement}>
-        {children}
-      </NativeOverlayContext.Provider>
+      {children}
     </NativeMapPresentationContext.Provider>
   );
 };

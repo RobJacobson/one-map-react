@@ -1,5 +1,4 @@
 import {
-  Control,
   Layer,
   type LngLat,
   type MapLayoutStyle,
@@ -76,7 +75,6 @@ interface Tf07SceneProps {
     kind: "live" | "annotation" | "popup",
     activateChild: () => void
   ) => ReactNode;
-  readonly controlContent: ReactNode;
   readonly renderPopup: (
     children: ReactNode,
     onOpen: () => void,
@@ -107,7 +105,6 @@ export const Tf07Scene = ({
   renderLocation: Location,
   style,
   markerContent,
-  controlContent,
   renderPopup,
   renderNavigation: Navigation,
   report,
@@ -331,7 +328,6 @@ export const Tf07Scene = ({
           />
         )}
         {!native && renderScale?.(unit)}
-        <Control position="bottom-right">{controlContent}</Control>
       </OneMap>
       {native && (
         <>

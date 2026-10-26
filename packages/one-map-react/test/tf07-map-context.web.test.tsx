@@ -10,7 +10,6 @@ import { describe, expect, expectTypeOf, vi, test } from "vite-plus/test";
 
 import {
   NativeCameraContext,
-  NativeOverlayContext,
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../src/adapters/shared/native-map-presentation.js";
@@ -642,7 +641,7 @@ test("native camera observations and controls leave unrelated contexts unchanged
   mounted.unmount();
 });
 
-test("native presentation retains layout and overlay order", async () => {
+test("native presentation retains viewport layout and stable setters", async () => {
   const fixture = createFixture();
   const adapter = {
     ...fixture.adapter,
@@ -651,7 +650,7 @@ test("native presentation retains layout and overlay order", async () => {
   };
   const observe = vi.fn();
   const Probe = () => {
-    observe(useNativeMapPresentation(), useContext(NativeOverlayContext));
+    observe(useNativeMapPresentation());
     return null;
   };
   const mounted = render(
@@ -664,29 +663,16 @@ test("native presentation retains layout and overlay order", async () => {
   const initial = observe.mock.calls.at(-1)?.[0];
   await act(async () => {
     initial.setNativeLayout(400, 300);
-    initial.setOverlay("first", "top-right", 20);
-    initial.setOverlay("second", "top-right", 30);
   });
   const updated = observe.mock.calls.at(-1)?.[0];
   expect(updated).toMatchObject({
     nativeLayout: { width: 400, height: 300 },
   });
-  expect(updated.setOverlay).toBe(initial.setOverlay);
   expect(updated.setNativeLayout).toBe(initial.setNativeLayout);
-  expect(
-    observe.mock.calls.at(-1)?.[1].map((overlay: { id: string }) => overlay.id)
-  ).toEqual(["first", "second"]);
   const renders = observe.mock.calls.length;
   await act(async () => {
     updated.setNativeLayout(400, 300);
-    updated.setOverlay("first", "top-right", 20);
   });
   expect(observe).toHaveBeenCalledTimes(renders);
-  await act(async () => {
-    updated.setOverlay("first", null);
-  });
-  expect(
-    observe.mock.calls.at(-1)?.[1].map((overlay: { id: string }) => overlay.id)
-  ).toEqual(["second"]);
   mounted.unmount();
 });

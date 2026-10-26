@@ -89,7 +89,6 @@ vi.mock("one-map-react", async () => {
     Marker: Empty,
     Source: Container,
     Layer: Empty,
-    Control: Empty,
     UserLocation: ({
       position,
     }: {
@@ -126,7 +125,6 @@ test("TF07 application popup close removes its content and teardown stays silent
       markerContent={(kind) =>
         kind === "popup" ? <span>Popup child</span> : null
       }
-      controlContent={null}
       report={report}
       attach={() => undefined}
     />

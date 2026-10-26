@@ -3,9 +3,7 @@ import {
   createRef,
   type ReactNode,
   forwardRef,
-  useEffect,
   useImperativeHandle,
-  useMemo,
 } from "react";
 import {
   afterEach,
@@ -17,7 +15,6 @@ import {
 } from "vite-plus/test";
 
 import type {
-  WebCustomControl,
   WebForwardedProps,
   WebWrapper,
 } from "../src/adapters/web/contracts.js";
@@ -27,10 +24,7 @@ import type { MapProps } from "../src/contracts/map-types.js";
 import type { MarkerRef } from "../src/contracts/ui-types.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
-import {
-  Marker as SharedMarker,
-  Control as SharedControl,
-} from "../src/facade/ui.js";
+import { Marker as SharedMarker } from "../src/facade/ui.js";
 
 const markerProps: WebForwardedProps[] = [];
 const markerHandle = { setLngLat: vi.fn() };
@@ -41,17 +35,8 @@ const MarkerMock = forwardRef((props: WebForwardedProps, ref) => {
 });
 const wrapper = {
   Marker: MarkerMock,
-
-  useControl: (create: () => WebCustomControl) => {
-    const control = useMemo(create, [create]);
-    useEffect(() => {
-      document.body.append(control.onAdd());
-      return control.onRemove;
-    }, [control]);
-    return control;
-  },
 } as unknown as WebWrapper<"mapbox-web">;
-const { Marker, Control } = createWebUi(wrapper);
+const { Marker } = createWebUi(wrapper);
 
 beforeEach(() => {
   markerProps.length = 0;
@@ -71,13 +56,6 @@ const notify = (props: WebForwardedProps, key: string, event: object): void => {
 };
 
 describe("TF07 web UI delegates", () => {
-  test("custom control placement is forwarded", () => {
-    const placement = vi.spyOn(wrapper, "useControl");
-    render(<Control position="bottom-left" />);
-    expect(placement).toHaveBeenLastCalledWith(expect.any(Function), {
-      position: "bottom-left",
-    });
-  });
   test("normalizes marker drag proposals, resets omitted offset, and refreshes without work", async () => {
     const onDrag = vi.fn();
     const ref = createRef<MarkerRef>();
@@ -159,31 +137,7 @@ describe("TF07 web UI delegates", () => {
     expect(second).toHaveBeenCalledTimes(1);
   });
 
-  test("custom control registers a host with live children and releases it", () => {
-    const click = vi.fn();
-    const view = render(
-      <Control>
-        <button type="button" onClick={click}>
-          Custom action
-        </button>
-      </Control>
-    );
-    fireEvent.click(view.getByText("Custom action"));
-    expect(click).toHaveBeenCalledTimes(1);
-    expect(
-      document.querySelector(".mapboxgl-ctrl.maplibregl-ctrl")
-    ).not.toBeNull();
-    view.rerender(
-      <Control>
-        <span>Updated content</span>
-      </Control>
-    );
-    expect(view.getByText("Updated content")).toBeTruthy();
-    view.unmount();
-    expect(document.querySelector(".mapboxgl-ctrl.maplibregl-ctrl")).toBeNull();
-  });
-
-  test("rejects changes to marker and control creation options", () => {
+  test("rejects changes to marker creation options", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const tree = (children: ReactNode) => (
       <MapSetup adapter={sharedUiAdapter}>
@@ -257,7 +211,6 @@ test("shared UI accepts effective creation defaults in both directions", () => {
           anchor={explicit ? "bottom" : undefined}
           renderMode={explicit ? "view" : undefined}
         />
-        <SharedControl position={explicit ? "top-right" : undefined} />
       </OneMap>
     </MapSetup>
   );

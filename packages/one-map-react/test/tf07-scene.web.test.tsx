@@ -1,7 +1,14 @@
-import { act, render } from "@testing-library/react";
-import { type ReactNode, useEffect } from "react";
+import { act, fireEvent, render } from "@testing-library/react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { expect, test, vi } from "vite-plus/test";
 
+import { NativeTf07Screen } from "../../../examples/shared/native-tf07-screen.js";
 import {
   Tf07Scene,
   type Tf07Probe,
@@ -14,8 +21,9 @@ vi.mock("one-map-react", async () => {
   const react = await import("react");
   const Content = ({ children }: { readonly children?: ReactNode }) => children;
   return {
+    MapSetup: Content,
     Map: react.forwardRef((props: { readonly children?: ReactNode }, _ref) =>
-      react.createElement(Content, props)
+      react.createElement("div", { "data-testid": "sdk-map" }, props.children)
     ),
     Source: Content,
     Layer: () => null,
@@ -23,7 +31,6 @@ vi.mock("one-map-react", async () => {
       fixture.markers.push(props);
       return null;
     },
-    Control: () => null,
     UserLocation: () => null,
   };
 });
@@ -40,7 +47,6 @@ test.each([false, true])(
         style={{ width: 400, height: 300 }}
         renderPopup={() => null}
         markerContent={() => null}
-        controlContent={null}
         report={() => undefined}
         attach={() => undefined}
       />
@@ -78,7 +84,6 @@ test("TF07 native scene remount retires its screen location action with the map 
       renderNavigation={() => null}
       renderPopup={() => null}
       markerContent={() => null}
-      controlContent={null}
       style={{ width: 400, height: 300 }}
       report={() => undefined}
       attach={(value) => {
@@ -94,4 +99,105 @@ test("TF07 native scene remount retires its screen location action with the map 
   expect(mountedLocation).toHaveBeenCalledTimes(2);
   mounted.unmount();
   expect(disposedLocation).toHaveBeenCalledTimes(2);
+});
+
+test("native application siblings preserve providers and local state when the map resizes", () => {
+  const Theme = createContext("outside");
+  const Navigation = () => {
+    const theme = useContext(Theme);
+    const [count, setCount] = useState(0);
+    return (
+      <button type="button" onClick={() => setCount(count + 1)}>
+        {theme} {count}
+      </button>
+    );
+  };
+  const tree = (width: number, theme: string) => (
+    <Theme.Provider value={theme}>
+      <Tf07Scene
+        native
+        renderLocation={() => null}
+        renderNavigation={Navigation}
+        renderPopup={() => null}
+        markerContent={() => null}
+        style={{ width, height: 300 }}
+        report={() => undefined}
+        attach={() => undefined}
+      />
+    </Theme.Provider>
+  );
+  const mounted = render(tree(400, "inside"));
+  const button = mounted.getByRole("button", { name: "inside 0" });
+  expect(mounted.getByTestId("sdk-map").contains(button)).toBe(false);
+  fireEvent.click(button);
+  mounted.rerender(tree(600, "updated"));
+  expect(mounted.getByRole("button", { name: "updated 1" })).toBeTruthy();
+  mounted.unmount();
+});
+
+vi.mock("react-native", async () => {
+  const react = await import("react");
+  const View = ({
+    children,
+    style,
+  }: {
+    children?: ReactNode;
+    style?: object;
+  }) =>
+    react.createElement(
+      "div",
+      { "data-layout": JSON.stringify(style) },
+      children
+    );
+  return {
+    View,
+    SafeAreaView: View,
+    ScrollView: View,
+    Text: View,
+    Platform: { OS: "ios" },
+    StatusBar: { currentHeight: 0 },
+    StyleSheet: { create: (styles: object) => styles },
+    Pressable: ({
+      children,
+      accessibilityLabel,
+      onPress,
+    }: {
+      children?: ReactNode;
+      accessibilityLabel?: string;
+      onPress?: () => void;
+    }) =>
+      react.createElement(
+        "button",
+        { "aria-label": accessibilityLabel, onClick: onPress },
+        children
+      ),
+    Button: ({ title, onPress }: { title: string; onPress: () => void }) =>
+      react.createElement("button", { onClick: onPress }, title),
+  };
+});
+
+test("native TF07 host bounds the map and screen buttons below the toolbar", () => {
+  const mounted = render(
+    <NativeTf07Screen
+      adapter={{} as import("one-map-react").Adapter}
+      ornaments={{}}
+    />
+  );
+  const renderer = mounted.getByTestId("sdk-map");
+  const host = renderer.parentElement;
+  expect(host?.getAttribute("data-layout")).toBe(JSON.stringify({ flex: 1 }));
+  expect(host?.contains(mounted.getByRole("button", { name: "Zoom in" }))).toBe(
+    true
+  );
+  expect(
+    host?.contains(mounted.getByRole("button", { name: "Locate me" }))
+  ).toBe(true);
+  expect(
+    renderer.contains(mounted.getByRole("button", { name: "Zoom in" }))
+  ).toBe(false);
+  expect(host?.contains(mounted.getByRole("button", { name: "remount" }))).toBe(
+    false
+  );
+  expect(host?.contains(mounted.getByText("Custom control"))).toBe(false);
+  mounted.unmount();
 });

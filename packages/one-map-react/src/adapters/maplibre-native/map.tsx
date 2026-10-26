@@ -31,7 +31,6 @@ import {
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
-import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding } from "../shared/wrapper-values.js";
@@ -68,7 +67,6 @@ const MaplibreNativeMapImplementation = forwardRef<
   assertMaplibreStyleRoots(props.mapStyle);
   const session = useNativeMapPresentation();
   validateMaplibreMapOptions(props);
-  const ornaments = useNativeOrnamentPositions();
   const {
     mapStyle,
     initialViewState,
@@ -194,22 +192,6 @@ const MaplibreNativeMapImplementation = forwardRef<
                       : undefined,
                   }
                 : props.options?.light
-            }
-            logoPosition={
-              props.options?.logoPosition ??
-              (ornaments.managed
-                ? ornaments.position("bottom-left")
-                : undefined)
-            }
-            attributionPosition={
-              props.options?.attributionPosition ??
-              (ornaments.managed
-                ? ornaments.position("bottom-right")
-                : undefined)
-            }
-            compassPosition={
-              props.options?.compassPosition ??
-              (ornaments.managed ? ornaments.position("top-right") : undefined)
             }
             ref={mapRef}
             style={{ flex: 1 }}

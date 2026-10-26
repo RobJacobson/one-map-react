@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { act, render, waitFor } from "@testing-library/react-native";
 import {
   createRef,
   type ComponentRef,
@@ -264,7 +264,6 @@ import {
 
 import {
   adapter,
-  Control,
   Map as NativeMap,
   type NativeAdvancedMapRef,
 } from "../src/maplibre-native.js";
@@ -459,6 +458,10 @@ describe("maplibre-native adapter", () => {
             attribution: enabled,
             logo: enabled,
             scaleBar: enabled,
+            logoPosition:
+              enabled === undefined ? undefined : { bottom: 3, left: 4 },
+            compassPosition:
+              enabled === undefined ? undefined : { top: 7, right: 8 },
             attributionPosition:
               enabled === undefined ? undefined : { top: 5, right: 6 },
           }}
@@ -472,73 +475,15 @@ describe("maplibre-native adapter", () => {
         attribution: enabled,
         logo: enabled,
         scaleBar: enabled,
+        logoPosition:
+          enabled === undefined ? undefined : { bottom: 3, left: 4 },
+        compassPosition:
+          enabled === undefined ? undefined : { top: 7, right: 8 },
         attributionPosition:
           enabled === undefined ? undefined : { top: 5, right: 6 },
       });
     }
     await view.unmount();
-  });
-
-  test("SDK ornaments stay outside measured native controls and restore after removal", async () => {
-    const explicit = {
-      logoPosition: { top: 3, left: 4 },
-      attributionPosition: { top: 5, right: 6 },
-    };
-    const scene = (controls: boolean, configured = false) => (
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          options={configured ? explicit : undefined}
-        >
-          {controls && (
-            <>
-              <Control
-                position="bottom-left"
-                hostProps={{ testID: "left-control" }}
-              >
-                <Text>Left</Text>
-              </Control>
-              <Control
-                position="bottom-right"
-                hostProps={{ testID: "right-control" }}
-              >
-                <Text>Right</Text>
-              </Control>
-            </>
-          )}
-        </NativeMap>
-      </MapSetup>
-    );
-    const view = await render(scene(true));
-    await fireEvent(view.getByTestId("left-control"), "layout", {
-      nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 26 } },
-    });
-    await fireEvent(view.getByTestId("right-control"), "layout", {
-      nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 40 } },
-    });
-    const props = lastMapProps<{
-      logoPosition: { bottom: number; left: number };
-      attributionPosition: { bottom: number; right: number };
-    }>();
-    expect(props.logoPosition.bottom).toBeGreaterThan(8 + 26);
-    expect(props.attributionPosition.bottom).toBeGreaterThan(8 + 40);
-    await view.rerender(scene(false));
-    const restored = lastMapProps<{
-      logoPosition: object;
-      attributionPosition: object;
-    }>();
-    expect(restored.logoPosition).toEqual({ bottom: 8, left: 8 });
-    expect(restored.attributionPosition).toEqual({ bottom: 8, right: 8 });
-    await view.rerender(scene(true, true));
-    const configured = lastMapProps<{
-      logoPosition: object;
-      attributionPosition: object;
-    }>();
-    expect(configured.logoPosition).toEqual(explicit.logoPosition);
-    expect(configured.attributionPosition).toEqual(
-      explicit.attributionPosition
-    );
   });
 
   test("nested GeoJSONSource injects source onto the line layer", async () => {

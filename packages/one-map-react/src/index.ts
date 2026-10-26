@@ -78,6 +78,7 @@ export type {
   MapLayoutStyle,
   MapProps,
 } from "./contracts/map-types.js";
+
 export type {
   ClusterQueryMethods,
   FeatureIdentifier,
@@ -105,8 +106,6 @@ export type {
 export type { MapStyle, StyleDocument } from "./contracts/style-types.js";
 export type {
   Anchor,
-  ControlPosition,
-  ControlProps,
   GeolocationPosition,
   MarkerEvent,
   MarkerProps,
@@ -119,5 +118,5 @@ export { useMapServices } from "./facade/map-services.js";
 export type { MapSetupProps } from "./facade/map-setup.js";
 export { MapSetup } from "./facade/map-setup.js";
 export { Source } from "./facade/source.js";
-export { Control, Marker } from "./facade/ui.js";
+export { Marker } from "./facade/ui.js";
 export { UserLocation } from "./facade/user-location.js";

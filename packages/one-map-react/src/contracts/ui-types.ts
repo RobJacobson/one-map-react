@@ -58,21 +58,6 @@ export interface MarkerProps {
   readonly onError?: (error: unknown) => void;
 }
 
-/** Corner of the map container. */
-export type ControlPosition =
-  | "top-left"
-  | "top-right"
-  | "bottom-left"
-  | "bottom-right";
-
-/** Application-supplied host UI anchored to a map corner. */
-export interface ControlProps {
-  /** Corner selected at creation; defaults to top-right. */
-  readonly position?: ControlPosition;
-  /** Interactive host content. */
-  readonly children?: ReactNode;
-}
-
 /** Measured location supplied by an application or selected service. */
 export interface GeolocationPosition {
   /** Geographic coordinate. */

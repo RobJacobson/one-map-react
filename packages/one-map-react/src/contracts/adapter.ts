@@ -10,7 +10,7 @@ import type { LayerProps } from "./layer-types.js";
 import type { LocationService } from "./location-types.js";
 import type { MapProps } from "./map-types.js";
 import type { SourceProps } from "./source-types.js";
-import type { ControlProps, MarkerProps, MarkerRef } from "./ui-types.js";
+import type { MarkerProps, MarkerRef } from "./ui-types.js";
 
 /** App-level services independent of map attachment. */
 export interface MapServices {
@@ -48,6 +48,4 @@ export interface Adapter {
   readonly Marker: ForwardRefExoticComponent<
     MarkerProps & RefAttributes<MarkerRef>
   >;
-  /** Application UI in a map corner. */
-  readonly Control: ComponentType<ControlProps>;
 }

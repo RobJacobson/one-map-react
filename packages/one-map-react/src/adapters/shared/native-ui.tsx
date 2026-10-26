@@ -4,7 +4,6 @@ import {
   type ReactElement,
   type Ref,
   useCallback,
-  useContext,
   useId,
   useImperativeHandle,
   useLayoutEffect,
@@ -14,25 +13,18 @@ import {
 import {
   AppState,
   type GestureResponderEvent,
-  Platform,
   View,
   type ViewProps,
 } from "react-native";
-import { Portal } from "react-native-teleport";
 
 import type { Adapter } from "../../contracts/adapter.js";
 import type { LngLat, Point } from "../../contracts/camera-types.js";
 import type {
   Anchor,
-  ControlProps,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
 } from "../../contracts/ui-types.js";
-import {
-  NativeOverlayContext,
-  useNativeMapPresentation,
-} from "./native-map-presentation.js";
 import { useActiveCallback } from "./use-active-callback.js";
 import { useFrozenValue } from "./use-frozen-value.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
@@ -40,12 +32,6 @@ import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 /** Selected native marker host presentation. */
 export interface NativeMarkerProps extends MarkerProps {
   /** Props for the owned content View; facade responder handlers stay composed. */
-  readonly hostProps?: ViewProps;
-}
-
-/** Selected native custom control presentation. */
-export interface NativeControlProps extends ControlProps {
-  /** Control content View props and style; corner placement stays map-owned. */
   readonly hostProps?: ViewProps;
 }
 
@@ -79,10 +65,10 @@ export interface NativeUIOptions {
   readonly backend: "mapbox-native" | "maplibre-native";
 }
 
-type NativeUI = Pick<Adapter, "Marker" | "Control">;
+type NativeUI = Pick<Adapter, "Marker">;
 
 /**
- * Composes native markers and corner controls.
+ * Composes native markers.
  *
  * @param options - Native wrappers with converted marker props.
  * @returns UI implementations for a native adapter.
@@ -199,7 +185,6 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
 
   return {
     Marker: NativeMarker,
-    Control: NativeControl,
   };
 };
 
@@ -292,64 +277,6 @@ const startsInScrollableChild = (event: GestureResponderEvent): boolean => {
     node = node.parentElement;
   }
   return false;
-};
-
-const NativeControl = (props: NativeControlProps): ReactElement => {
-  const presentation = useNativeMapPresentation();
-  const { setOverlay } = presentation;
-  const overlays = useContext(NativeOverlayContext);
-  const id = useId();
-  const position = props.position ?? "top-right";
-  const index = overlays.findIndex((overlay) => overlay.id === id);
-  const neighbors = position.startsWith("top")
-    ? overlays.slice(0, Math.max(0, index))
-    : overlays.slice(index + 1);
-  const inset = neighbors
-    .filter((overlay) => overlay.position === position && overlay.id !== id)
-    .reduce((offset, overlay) => offset + overlay.height + 8, 8);
-
-  useLayoutEffect(() => {
-    setOverlay(id, position);
-    return () => setOverlay(id, null);
-  }, [setOverlay, id, position]);
-
-  // Teleport moves native views only. Rendering children here preserves
-  // application providers, local state, and effects in the original React tree.
-  return (
-    <Portal
-      name={id}
-      hostName={presentation.overlayHostName}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        // Android SDK parents leave the source portal detached, so native host
-        // notifications may not refresh its constraints. iOS keeps host sizing.
-        ...(Platform.OS === "android" ? presentation.nativeLayout : undefined),
-      }}
-    >
-      <View
-        {...props.hostProps}
-        pointerEvents="box-none"
-        onLayout={(event) => {
-          setOverlay(id, position, event.nativeEvent.layout.height);
-          props.hostProps?.onLayout?.(event);
-        }}
-        style={[
-          props.hostProps?.style,
-          {
-            position: "absolute",
-            ...(position.startsWith("top")
-              ? { top: inset }
-              : { bottom: inset }),
-            ...(position.endsWith("left") ? { left: 8 } : { right: 8 }),
-          },
-        ]}
-      >
-        {props.children}
-      </View>
-    </Portal>
-  );
 };
 
 const DefaultPin = (): ReactElement => (
