@@ -1,30 +1,21 @@
-import { act, fireEvent, render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import {
-  type ComponentType,
   forwardRef,
   type ReactNode,
-  StrictMode,
   useImperativeHandle,
   useLayoutEffect,
 } from "react";
 import { describe, expect, vi, test } from "vite-plus/test";
 
-import type { WebWrapper } from "../src/adapters/web/contracts.js";
-import { createWebUi } from "../src/adapters/web/ui.js";
 import type { Adapter, MapServices } from "../src/contracts/adapter.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { LocationService } from "../src/contracts/location-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
-import type {
-  GeolocateControlProps,
-  GeolocationPosition,
-} from "../src/contracts/ui-types.js";
+import type { GeolocationPosition } from "../src/contracts/ui-types.js";
 import { useMapServices } from "../src/facade/map-services.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
-import { useGeolocationControl } from "../src/facade/use-geolocation-control.js";
 import { UserLocation } from "../src/facade/user-location.js";
-import type { WebGeolocateControlProps } from "../src/mapbox-web.js";
 
 const style = { version: 8 as const, sources: {}, layers: [] };
 const camera = { longitude: 1, latitude: 2, zoom: 3, bearing: 0, pitch: 0 };
@@ -81,79 +72,7 @@ const fixture = () => {
   };
 };
 
-const ControlProbe = (props: GeolocateControlProps) => {
-  const state = useGeolocationControl(props);
-  return (
-    <button type="button" onClick={state.activate} disabled={state.pending}>
-      Locate
-    </button>
-  );
-};
-
-describe("TF08 setup and location control lifetime", () => {
-  test("replacing a selected SDK geolocation provider requires a control remount", () => {
-    class Provider {
-      getCurrentPosition(): void {}
-      watchPosition(): number {
-        return 1;
-      }
-      clearWatch(): void {}
-    }
-
-    const delegate = vi.fn(() => null);
-    const GeolocateControl = createWebUi({
-      backend: "mapbox-web",
-      GeolocateControl: delegate,
-    } as unknown as WebWrapper<"mapbox-web">)
-      .GeolocateControl as ComponentType<WebGeolocateControlProps>;
-    const provider = new Provider();
-    const mounted = render(
-      <GeolocateControl options={{ geolocation: provider }} />
-    );
-    mounted.rerender(<GeolocateControl options={{ geolocation: provider }} />);
-    expect(() =>
-      mounted.rerender(
-        <GeolocateControl options={{ geolocation: new Provider() }} />
-      )
-    ).toThrow('GeolocateControl changed the creation option "geolocation"');
-  });
-
-  test.each(["mapbox-web", "maplibre-web"] as const)(
-    "%s default tracking rejects a controlled camera before SDK delegation",
-    (backend) => {
-      const selected = fixture();
-      const delegate = vi.fn(() => null);
-      const { GeolocateControl } = createWebUi({
-        backend,
-        GeolocateControl: delegate,
-      } as unknown as WebWrapper<typeof backend>);
-
-      expect(() =>
-        render(
-          <MapSetup adapter={selected.adapter}>
-            <OneMap
-              mapStyle={style}
-              initialViewState={camera}
-              viewState={camera}
-            >
-              <GeolocateControl trackUserLocation />
-            </OneMap>
-          </MapSetup>
-        )
-      ).toThrow("conflicts with viewState");
-      expect(delegate).not.toHaveBeenCalled();
-
-      render(
-        <MapSetup adapter={selected.adapter}>
-          <OneMap mapStyle={style} initialViewState={camera} viewState={camera}>
-            <GeolocateControl />
-          </OneMap>
-        </MapSetup>
-      );
-      expect(delegate).toHaveBeenCalled();
-    }
-  );
-
+describe("TF08 retained setup services and location display", () => {
   test("services are usable outside a Map and mounting location display starts no acquisition", () => {
     const selected = fixture();
     let services: MapServices | undefined;
@@ -180,358 +99,6 @@ describe("TF08 setup and location control lifetime", () => {
       data: { features: { geometry: { coordinates: unknown } }[] };
     };
     expect(source.data.features).toHaveLength(2);
-  });
-  test("explicit tracking follows updates, suspends for gestures, and resumes without a second watch", async () => {
-    const selected = fixture();
-    const view = render(
-      <StrictMode>
-        <MapSetup adapter={selected.adapter}>
-          <OneMap mapStyle={style} initialViewState={camera}>
-            <ControlProbe trackUserLocation />
-          </OneMap>
-        </MapSetup>
-      </StrictMode>
-    );
-    fireEvent.click(view.getByRole("button"));
-    expect(selected.location.watchPosition).toHaveBeenCalledTimes(1);
-    await act(async () => selected.receive({ lngLat: [7, 8] }));
-    expect(selected.easeTo).toHaveBeenLastCalledWith({
-      center: [7, 8],
-      zoom: 14,
-    });
-    act(selected.move);
-    await act(async () => selected.receive({ lngLat: [9, 10] }));
-    expect(selected.easeTo).toHaveBeenCalledTimes(1);
-    await act(async () => fireEvent.click(view.getByRole("button")));
-    expect(selected.easeTo).toHaveBeenLastCalledWith({
-      center: [9, 10],
-      zoom: 14,
-    });
-    expect(selected.location.watchPosition).toHaveBeenCalledTimes(1);
-    view.unmount();
-    await act(async () => selected.receive({ lngLat: [11, 12] }));
-    expect(selected.release).toHaveBeenCalledTimes(1);
-    expect(selected.easeTo).toHaveBeenCalledTimes(2);
-  });
-  test.each(["abort", "release"] as const)(
-    "%s-triggered unmount suppresses the location failure callback",
-    async (cleanup) => {
-      const selected = fixture();
-      const onError = vi.fn();
-      let retire = () => {};
-      const provider: LocationService = {
-        ...selected.location,
-        watchPosition: (position, error, options) => {
-          if (cleanup === "abort")
-            options?.signal?.addEventListener("abort", () => retire());
-          return selected.location.watchPosition(position, error, options);
-        },
-      };
-      if (cleanup === "release")
-        selected.release.mockImplementationOnce(() => retire());
-      const view = render(
-        <MapSetup adapter={selected.adapter}>
-          <OneMap mapStyle={style} initialViewState={camera}>
-            <ControlProbe
-              locationProvider={provider}
-              trackUserLocation
-              onError={onError}
-            />
-          </OneMap>
-        </MapSetup>
-      );
-      retire = () => view.unmount();
-      fireEvent.click(view.getByRole("button"));
-      await act(async () => selected.fail(new Error("location failed")));
-      expect(view.queryByRole("button")).toBeNull();
-      expect(selected.release).toHaveBeenCalled();
-      expect(onError).not.toHaveBeenCalled();
-      expect(selected.easeTo).not.toHaveBeenCalled();
-    }
-  );
-
-  test("callback-triggered unmount prevents subsequent camera dispatch", async () => {
-    const selected = fixture();
-    let retire = () => {};
-    const view = render(
-      <MapSetup adapter={selected.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          <ControlProbe trackUserLocation onGeolocate={() => retire()} />
-        </OneMap>
-      </MapSetup>
-    );
-    retire = () => view.unmount();
-    fireEvent.click(view.getByRole("button"));
-    await act(async () => selected.receive({ lngLat: [7, 8] }));
-    expect(selected.easeTo).not.toHaveBeenCalled();
-    expect(selected.release).toHaveBeenCalledTimes(1);
-  });
-  test.each(["provider", "mode", "detach"] as const)(
-    "resumed camera errors are suppressed after %s replacement",
-    async (replacement) => {
-      const selected = fixture();
-      const onError = vi.fn();
-      let rejectCamera: (error: Error) => void = () => {};
-      const tree = (
-        provider: LocationService,
-        tracking = true,
-        attached = true
-      ) => (
-        <MapSetup adapter={selected.adapter}>
-          <OneMap mapStyle={style} initialViewState={camera}>
-            {attached && (
-              <ControlProbe
-                locationProvider={provider}
-                trackUserLocation={tracking}
-                onError={onError}
-              />
-            )}
-          </OneMap>
-        </MapSetup>
-      );
-      const view = render(tree(selected.location));
-      fireEvent.click(view.getByRole("button"));
-      await act(async () => selected.receive({ lngLat: [7, 8] }));
-      act(selected.move);
-      selected.easeTo.mockImplementationOnce(
-        () =>
-          new Promise((_resolve, reject) => {
-            rejectCamera = reject;
-          })
-      );
-      await act(async () => fireEvent.click(view.getByRole("button")));
-
-      view.rerender(
-        tree(
-          replacement === "provider"
-            ? { ...selected.location }
-            : selected.location,
-          replacement !== "mode",
-          replacement !== "detach"
-        )
-      );
-      await act(async () => rejectCamera(new Error("Retired camera request")));
-      expect(onError).not.toHaveBeenCalled();
-      expect(selected.release).toHaveBeenCalledTimes(1);
-    }
-  );
-
-  test("a current resumed camera failure releases tracking and permits a fresh retry", async () => {
-    const selected = fixture();
-    const onError = vi.fn();
-    const view = render(
-      <MapSetup adapter={selected.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          <ControlProbe trackUserLocation onError={onError} />
-        </OneMap>
-      </MapSetup>
-    );
-    fireEvent.click(view.getByRole("button"));
-    await act(async () => selected.receive({ lngLat: [7, 8] }));
-    act(selected.move);
-    const error = new Error("Camera dispatch failed");
-    selected.easeTo.mockRejectedValueOnce(error);
-    await act(async () => fireEvent.click(view.getByRole("button")));
-    expect(onError).toHaveBeenCalledWith(error);
-    expect(selected.release).toHaveBeenCalledTimes(1);
-
-    await act(async () => selected.receive({ lngLat: [9, 10] }));
-    expect(selected.easeTo).toHaveBeenCalledTimes(2);
-    fireEvent.click(view.getByRole("button"));
-    await act(async () => selected.receive({ lngLat: [11, 12] }));
-    expect(selected.location.watchPosition).toHaveBeenCalledTimes(2);
-    expect(selected.easeTo).toHaveBeenLastCalledWith({
-      center: [11, 12],
-      zoom: 14,
-    });
-  });
-
-  test("retrying after a watch failure is not blocked by its pending camera dispatch", async () => {
-    const selected = fixture();
-    let rejectCamera: (error: Error) => void = () => {};
-    selected.easeTo.mockImplementationOnce(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejectCamera = reject;
-        })
-    );
-    const onError = vi.fn();
-    const view = render(
-      <MapSetup adapter={selected.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          <ControlProbe trackUserLocation onError={onError} />
-        </OneMap>
-      </MapSetup>
-    );
-    fireEvent.click(view.getByRole("button"));
-    await act(async () => selected.receive({ lngLat: [7, 8] }));
-    act(() => selected.fail(new Error("Watch failed")));
-    fireEvent.click(view.getByRole("button"));
-    await act(async () => selected.receive({ lngLat: [9, 10] }));
-    expect(selected.easeTo).toHaveBeenLastCalledWith({
-      center: [9, 10],
-      zoom: 14,
-    });
-
-    await act(async () => rejectCamera(new Error("Retired camera request")));
-    expect(onError).toHaveBeenCalledTimes(1);
-  });
-
-  test("terminal errors release tracking and go to the current error callback", () => {
-    const selected = fixture();
-    const onError = vi.fn();
-    const view = render(
-      <MapSetup adapter={selected.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          <ControlProbe trackUserLocation onError={onError} />
-        </OneMap>
-      </MapSetup>
-    );
-    fireEvent.click(view.getByRole("button"));
-    const error = new Error("acquisition failed");
-    act(() => selected.fail(error));
-    expect(onError).toHaveBeenCalledWith(error);
-    expect(selected.release).toHaveBeenCalledTimes(1);
-  });
-  test("an immediate one-shot provider failure reports the error and permits retry", async () => {
-    const selected = fixture();
-    const error = new Error("Provider unavailable");
-    vi.mocked(selected.location.getCurrentPosition).mockImplementationOnce(
-      () => {
-        throw error;
-      }
-    );
-    const onError = vi.fn();
-    const view = render(
-      <MapSetup adapter={selected.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          <ControlProbe
-            locationProvider={selected.location}
-            onError={onError}
-          />
-        </OneMap>
-      </MapSetup>
-    );
-    fireEvent.click(view.getByRole("button"));
-    expect(onError).toHaveBeenCalledExactlyOnceWith(error);
-    expect(view.getByRole("button").hasAttribute("disabled")).toBe(false);
-    await act(async () => fireEvent.click(view.getByRole("button")));
-    expect(selected.easeTo).toHaveBeenCalledExactlyOnceWith({
-      center: [7, 8],
-      zoom: 14,
-    });
-    expect(view.getByRole("button").hasAttribute("disabled")).toBe(false);
-  });
-  test.each([
-    ["provider", "resolve"],
-    ["provider", "reject"],
-    ["injected", "resolve"],
-    ["injected", "reject"],
-  ] as const)(
-    "%s one-shot requests keep centering when an older camera command completes with %s",
-    async (acquisition, outcome) => {
-      const selected = fixture();
-      let finishFirst: () => void = () => {};
-      let rejectFirst: (error: Error) => void = () => {};
-      let finishSecond: () => void = () => {};
-      selected.easeTo
-        .mockImplementationOnce(
-          () =>
-            new Promise<void>((resolve, reject) => {
-              finishFirst = resolve;
-              rejectFirst = reject;
-            })
-        )
-        .mockImplementationOnce(
-          () =>
-            new Promise<void>((resolve) => {
-              finishSecond = resolve;
-            })
-        );
-      const locate = vi
-        .fn<NonNullable<GeolocateControlProps["getCurrentPosition"]>>()
-        .mockResolvedValueOnce({ lngLat: [1, 2] })
-        .mockResolvedValueOnce({ lngLat: [3, 4] })
-        .mockResolvedValueOnce({ lngLat: [5, 6] });
-      const onError = vi.fn();
-      const onGeolocate = vi.fn();
-      const props =
-        acquisition === "provider"
-          ? {
-              locationProvider: {
-                ...selected.location,
-                getCurrentPosition: locate,
-              },
-            }
-          : { getCurrentPosition: locate };
-      const view = render(
-        <StrictMode>
-          <MapSetup adapter={selected.adapter}>
-            <OneMap mapStyle={style} initialViewState={camera}>
-              <ControlProbe
-                {...props}
-                onError={onError}
-                onGeolocate={onGeolocate}
-              />
-            </OneMap>
-          </MapSetup>
-        </StrictMode>
-      );
-      await act(async () => fireEvent.click(view.getByRole("button")));
-      expect(view.getByRole("button").hasAttribute("disabled")).toBe(false);
-      await act(async () => fireEvent.click(view.getByRole("button")));
-      expect(selected.easeTo).toHaveBeenCalledTimes(2);
-      expect(selected.easeTo).toHaveBeenLastCalledWith({
-        center: [3, 4],
-        zoom: 14,
-      });
-
-      await act(async () => {
-        if (outcome === "resolve") finishFirst();
-        else rejectFirst(new Error("Retired camera command"));
-      });
-      await act(async () => fireEvent.click(view.getByRole("button")));
-      await act(async () => finishSecond());
-      expect(selected.easeTo).toHaveBeenCalledTimes(3);
-      expect(selected.easeTo).toHaveBeenLastCalledWith({
-        center: [5, 6],
-        zoom: 14,
-      });
-      expect(onGeolocate).toHaveBeenCalledTimes(3);
-      expect(onError).not.toHaveBeenCalled();
-    }
-  );
-
-  test("tracking coalesces pending camera updates and resumes without another watch", async () => {
-    const selected = fixture();
-    let finishCamera: () => void = () => {};
-    selected.easeTo.mockImplementationOnce(
-      () =>
-        new Promise<void>((resolve) => {
-          finishCamera = resolve;
-        })
-    );
-    const view = render(
-      <MapSetup adapter={selected.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          <ControlProbe trackUserLocation />
-        </OneMap>
-      </MapSetup>
-    );
-    fireEvent.click(view.getByRole("button"));
-    await act(async () => selected.receive({ lngLat: [1, 2] }));
-    act(selected.move);
-    await act(async () => selected.receive({ lngLat: [3, 4] }));
-    await act(async () => fireEvent.click(view.getByRole("button")));
-    await act(async () => selected.receive({ lngLat: [5, 6] }));
-    expect(selected.easeTo).toHaveBeenCalledTimes(1);
-    await act(async () => finishCamera());
-    expect(selected.easeTo).toHaveBeenCalledTimes(2);
-    expect(selected.easeTo).toHaveBeenLastCalledWith({
-      center: [5, 6],
-      zoom: 14,
-    });
-    expect(selected.location.watchPosition).toHaveBeenCalledTimes(1);
   });
 
   test("setup rejects provider replacement and a pending acquisition on teardown", async () => {
@@ -570,26 +137,7 @@ describe("TF08 setup and location control lifetime", () => {
       )
     ).toThrow("new key");
   });
-  test("unmounting only the control aborts its owned one-shot acquisition", async () => {
-    const selected = fixture();
-    vi.mocked(selected.location.getCurrentPosition).mockImplementation(
-      () => new Promise(() => {})
-    );
-    const tree = (control: boolean) => (
-      <MapSetup adapter={selected.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          {control && <ControlProbe />}
-        </OneMap>
-      </MapSetup>
-    );
-    const view = render(tree(true));
-    await act(async () => fireEvent.click(view.getByRole("button")));
-    const signal = vi.mocked(selected.location.getCurrentPosition).mock
-      .calls[0][0]?.signal;
-    expect(signal?.aborted).toBe(false);
-    view.rerender(tree(false));
-    expect(signal?.aborted).toBe(true);
-  });
+
   test("scoped services reject cancellation before provider dispatch and suppress disposed callbacks", async () => {
     const selected = fixture();
     let services: MapServices | undefined;
@@ -661,3 +209,62 @@ describe("TF08 setup and location control lifetime", () => {
     }
   );
 });
+
+const rawControls = vi.hoisted(() => ({
+  mapbox: vi.fn(() => null),
+  maplibre: vi.fn(() => null),
+}));
+vi.mock("react-map-gl/mapbox", async (original) => ({
+  ...(await original<typeof import("react-map-gl/mapbox")>()),
+  GeolocateControl: rawControls.mapbox,
+}));
+vi.mock("react-map-gl/maplibre", async (original) => ({
+  ...(await original<typeof import("react-map-gl/maplibre")>()),
+  GeolocateControl: rawControls.maplibre,
+}));
+
+// Raw selected exports are upstream components, independent of facade setup policy.
+test.each(["mapbox", "maplibre"] as const)(
+  "%s selected raw geolocation forwards upstream options and callbacks without setup override interception",
+  async (backend) => {
+    const selected = fixture();
+    const entry =
+      backend === "mapbox"
+        ? await import("../src/mapbox-web.js")
+        : await import("../src/maplibre-web.js");
+    const RawControl = entry.WrapperGeolocateControl;
+    const delegate = rawControls[backend];
+    delegate.mockClear();
+    expect(RawControl).toBe(delegate);
+    const onGeolocate = vi.fn();
+    const onError = vi.fn();
+    const positionOptions = { enableHighAccuracy: true, timeout: 1234 };
+    const mounted = render(
+      <MapSetup adapter={selected.adapter} locationProvider={selected.location}>
+        <RawControl
+          position="bottom-left"
+          positionOptions={positionOptions}
+          fitBoundsOptions={{ maxZoom: 13 }}
+          trackUserLocation
+          onGeolocate={onGeolocate}
+          onError={onError}
+        />
+      </MapSetup>
+    );
+    expect(delegate).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        position: "bottom-left",
+        positionOptions,
+        fitBoundsOptions: { maxZoom: 13 },
+        trackUserLocation: true,
+        onGeolocate,
+        onError,
+      }),
+      undefined
+    );
+    expect(selected.location.requestPermission).not.toHaveBeenCalled();
+    expect(selected.location.getCurrentPosition).not.toHaveBeenCalled();
+    expect(selected.location.watchPosition).not.toHaveBeenCalled();
+    mounted.unmount();
+  }
+);

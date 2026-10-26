@@ -90,19 +90,3 @@ export interface GeolocationPosition {
   /** Direction of travel in degrees clockwise from north; not device heading. */
   readonly course?: number;
 }
-
-/** User-triggered acquisition and optional foreground following. */
-export interface GeolocateControlProps extends ControlProps {
-  /** One-shot override; cannot be combined with locationProvider or tracking. */
-  readonly getCurrentPosition?: () => Promise<GeolocationPosition>;
-  /** Zoom used when centering a native position; default 14. */
-  readonly zoom?: number;
-  /** Reports a acquired position. */
-  readonly onGeolocate?: (position: GeolocationPosition) => void;
-  /** Reports acquisition or centering failure. */
-  readonly onError?: (error: unknown) => void;
-  /** Follow acquired coordinates; user gestures suspend following until reactivation. */
-  readonly trackUserLocation?: boolean;
-  /** Streaming override; otherwise uses MapSetup or the selected default. */
-  readonly locationProvider?: import("./location-types.js").LocationService;
-}

@@ -2,7 +2,6 @@ import {
   type ComponentType,
   forwardRef,
   type ReactElement,
-  type ReactNode,
   type Ref,
   useCallback,
   useContext,
@@ -16,8 +15,6 @@ import {
   AppState,
   type GestureResponderEvent,
   Platform,
-  Pressable,
-  Text,
   View,
   type ViewProps,
 } from "react-native";
@@ -32,9 +29,6 @@ import type {
   MarkerProps,
   MarkerRef,
 } from "../../contracts/ui-types.js";
-import { useMapSession } from "../../facade/map-context.js";
-import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
-import { UserLocation } from "../../facade/user-location.js";
 import {
   NativeOverlayContext,
   useNativeMapPresentation,
@@ -85,7 +79,7 @@ export interface NativeUIOptions {
   readonly backend: "mapbox-native" | "maplibre-native";
 }
 
-type NativeUI = Pick<Adapter, "Marker" | "Control" | "GeolocateControl">;
+type NativeUI = Pick<Adapter, "Marker" | "Control">;
 
 /**
  * Composes native markers and corner controls.
@@ -206,7 +200,6 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
   return {
     Marker: NativeMarker,
     Control: NativeControl,
-    GeolocateControl: NativeGeolocateControl,
   };
 };
 
@@ -358,54 +351,6 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
     </Portal>
   );
 };
-
-const NativeGeolocateControl: Adapter["GeolocateControl"] = (props) => {
-  const session = useMapSession();
-  const { pending, position, activate } = useGeolocationControl(props);
-  return (
-    <>
-      <UserLocation position={position} showAccuracyCircle />
-      <NativeControl position={props.position}>
-        <ControlButton
-          label="Locate me"
-          disabled={pending || !session.ready}
-          onPress={activate}
-        >
-          ◎
-        </ControlButton>
-      </NativeControl>
-    </>
-  );
-};
-
-const ControlButton = (props: {
-  readonly label: string;
-  readonly disabled: boolean;
-  readonly onPress: () => void;
-  readonly children: ReactNode;
-}): ReactElement => (
-  <Pressable
-    accessibilityRole="button"
-    accessibilityLabel={props.label}
-    accessibilityState={{ disabled: props.disabled }}
-    disabled={props.disabled}
-    onPress={props.onPress}
-    style={{
-      minWidth: 40,
-      minHeight: 40,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "white",
-      opacity: props.disabled ? 0.5 : 1,
-    }}
-  >
-    {typeof props.children === "string" ? (
-      <Text style={{ fontSize: 24 }}>{props.children}</Text>
-    ) : (
-      props.children
-    )}
-  </Pressable>
-);
 
 const DefaultPin = (): ReactElement => (
   <View style={{ width: 24, height: 32, alignItems: "center" }}>

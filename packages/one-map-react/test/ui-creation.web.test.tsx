@@ -7,7 +7,7 @@ import type { MapRef } from "../src/contracts/camera-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
-import { Control, GeolocateControl, Marker } from "../src/facade/ui.js";
+import { Control, Marker } from "../src/facade/ui.js";
 
 const camera = { longitude: 0, latitude: 0, zoom: 1, bearing: 0, pitch: 0 };
 const style = { version: 8 as const, sources: {}, layers: [] };
@@ -23,8 +23,6 @@ const fakeAdapter = (backend: Backend): Adapter => ({
   Images: Empty,
   Marker: forwardRef((_props, _ref) => null),
   Control: Empty,
-
-  GeolocateControl: Empty,
 
   services: {
     location: {
@@ -65,13 +63,6 @@ const genuineChanges = [
     "Control",
     (changed: boolean) => (
       <Control position={changed ? "bottom-left" : "top-right"} />
-    ),
-  ],
-
-  [
-    "GeolocateControl",
-    (changed: boolean) => (
-      <GeolocateControl position={changed ? "bottom-left" : "top-right"} />
     ),
   ],
 ] as const;
@@ -115,10 +106,6 @@ describe.each<Backend>([
         <Control position={explicit ? "top-right" : undefined}>
           {explicit ? "updated" : "original"}
         </Control>
-        <GeolocateControl
-          position={explicit ? "top-right" : undefined}
-          zoom={explicit ? 10 : 14}
-        />
       </>
     );
     const mounted = render(tree(controls(false)));

@@ -25,10 +25,6 @@ import { createWebUi } from "../src/adapters/web/ui.js";
 import type { Adapter } from "../src/contracts/adapter.js";
 import type { MapProps } from "../src/contracts/map-types.js";
 import type { MarkerRef } from "../src/contracts/ui-types.js";
-import {
-  type MapSession,
-  MapSessionContext,
-} from "../src/facade/map-context.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import {
@@ -37,21 +33,14 @@ import {
 } from "../src/facade/ui.js";
 
 const markerProps: WebForwardedProps[] = [];
-const controlProps: WebForwardedProps[] = [];
 const markerHandle = { setLngLat: vi.fn() };
 const MarkerMock = forwardRef((props: WebForwardedProps, ref) => {
   useImperativeHandle(ref, () => markerHandle, []);
   markerProps.push(props);
   return <div>{props.children}</div>;
 });
-const ControlMock = (props: WebForwardedProps) => {
-  controlProps.push(props);
-  return null;
-};
 const wrapper = {
   Marker: MarkerMock,
-
-  GeolocateControl: ControlMock,
 
   useControl: (create: () => WebCustomControl) => {
     const control = useMemo(create, [create]);
@@ -62,11 +51,10 @@ const wrapper = {
     return control;
   },
 } as unknown as WebWrapper<"mapbox-web">;
-const { Marker, Control, GeolocateControl } = createWebUi(wrapper);
+const { Marker, Control } = createWebUi(wrapper);
 
 beforeEach(() => {
   markerProps.length = 0;
-  controlProps.length = 0;
   markerHandle.setLngLat.mockClear();
 });
 afterEach(() => {
@@ -195,71 +183,6 @@ describe("TF07 web UI delegates", () => {
     expect(document.querySelector(".mapboxgl-ctrl.maplibregl-ctrl")).toBeNull();
   });
 
-  test("uses browser geolocation and strips the native provider and zoom", () => {
-    const provider =
-      vi.fn<() => Promise<{ lngLat: readonly [number, number] }>>();
-    const onGeolocate = vi.fn();
-    render(<GeolocateControl zoom={9} onGeolocate={onGeolocate} />);
-    const props = latest(controlProps);
-    expect(props.getCurrentPosition).toBeUndefined();
-    expect(props.zoom).toBeUndefined();
-    notify(props, "onGeolocate", {
-      coords: { longitude: 7, latitude: 8, accuracy: 10 },
-      timestamp: 12,
-    });
-    expect(onGeolocate).toHaveBeenCalledWith({
-      lngLat: [7, 8],
-      accuracy: 10,
-      timestamp: 12,
-    });
-    expect(provider).not.toHaveBeenCalled();
-  });
-
-  test("injected geolocation ignores repeat presses, centers once, and discards work after teardown", async () => {
-    let resolvePosition: (value: {
-      lngLat: readonly [number, number];
-    }) => void = () => {};
-    const provider = vi.fn(
-      () =>
-        new Promise<{ lngLat: readonly [number, number] }>((resolve) => {
-          resolvePosition = resolve;
-        })
-    );
-    const flyTo = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
-    const onGeolocate = vi.fn();
-    const map = { flyTo };
-    const session = {
-      ready: true,
-      map,
-      ref: { current: map },
-      subscribe: () => () => {},
-    } as unknown as MapSession;
-    const view = render(
-      <MapSessionContext.Provider value={session}>
-        <GeolocateControl
-          getCurrentPosition={provider}
-          onGeolocate={onGeolocate}
-          zoom={11}
-        />
-      </MapSessionContext.Provider>
-    );
-    fireEvent.click(view.getByRole("button", { name: "Locate me" }));
-    fireEvent.click(view.getByRole("button", { name: "Locate me" }));
-    expect(provider).toHaveBeenCalledTimes(1);
-    await act(async () => {
-      resolvePosition({ lngLat: [7, 8] });
-    });
-    expect(flyTo).toHaveBeenCalledWith({ center: [7, 8], zoom: 11 });
-    expect(onGeolocate).toHaveBeenCalledTimes(1);
-    fireEvent.click(view.getByRole("button", { name: "Locate me" }));
-    view.unmount();
-    await act(async () => {
-      resolvePosition({ lngLat: [9, 10] });
-    });
-    expect(flyTo).toHaveBeenCalledTimes(1);
-    expect(onGeolocate).toHaveBeenCalledTimes(1);
-  });
-
   test("rejects changes to marker and control creation options", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const tree = (children: ReactNode) => (
@@ -302,27 +225,6 @@ describe("TF07 web UI delegates", () => {
         />
       )
     ).toThrow('creation option "color"');
-  });
-  test("TF08 tracking-mode changes release the old SDK control resource", () => {
-    const release = vi.fn();
-    const ControlWithResource = () => {
-      useEffect(
-        () => () => {
-          release();
-        },
-        []
-      );
-      return null;
-    };
-    const ui = createWebUi({
-      ...wrapper,
-      GeolocateControl: ControlWithResource,
-    });
-    const view = render(<ui.GeolocateControl trackUserLocation />);
-    view.rerender(<ui.GeolocateControl trackUserLocation={false} />);
-    expect(release).toHaveBeenCalledTimes(1);
-    view.unmount();
-    expect(release).toHaveBeenCalledTimes(2);
   });
 });
 

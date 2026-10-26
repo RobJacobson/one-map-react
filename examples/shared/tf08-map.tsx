@@ -1,14 +1,12 @@
 import {
-  GeolocateControl,
   type GeolocationPosition,
-  type LocationService,
   type MapLayoutStyle,
   type MapRef,
   type MapStyle,
   Map as OneMap,
   UserLocation,
 } from "one-map-react";
-import { forwardRef } from "react";
+import { forwardRef, type ReactNode } from "react";
 
 /** Shared foreground-location scene; setup and permission UI belong to the shell. */
 export interface Tf08MapProps {
@@ -16,8 +14,8 @@ export interface Tf08MapProps {
   readonly mapStyle: MapStyle;
   /** Platform host layout. */
   readonly style?: MapLayoutStyle;
-  /** Optional deterministic provider for a fixture or application service. */
-  readonly locationProvider?: LocationService;
+  /** Application-supplied location action; display itself acquires nothing. */
+  readonly locationAction?: ReactNode;
   /** Explicit external position; displaying it performs no acquisition. */
   readonly position?: GeolocationPosition;
   /** Acquisition/camera failures. */
@@ -26,25 +24,24 @@ export interface Tf08MapProps {
 
 /** Shared scene for all four adapters. */
 export const Tf08Map = forwardRef<MapRef, Tf08MapProps>(
-  ({ mapStyle, style, locationProvider, position, onError }, ref) => (
-    <OneMap
-      ref={ref}
-      mapStyle={mapStyle}
-      style={style}
-      initialViewState={{
-        longitude: -122.34,
-        latitude: 47.61,
-        zoom: 12,
-        bearing: 0,
-        pitch: 0,
-      }}
-    >
-      <UserLocation position={position} showAccuracyCircle />
-      <GeolocateControl
-        locationProvider={locationProvider}
-        trackUserLocation
+  ({ mapStyle, style, locationAction, position, onError }, ref) => (
+    <>
+      <OneMap
+        ref={ref}
+        mapStyle={mapStyle}
+        style={style}
         onError={onError}
-      />
-    </OneMap>
+        initialViewState={{
+          longitude: -122.34,
+          latitude: 47.61,
+          zoom: 12,
+          bearing: 0,
+          pitch: 0,
+        }}
+      >
+        <UserLocation position={position} showAccuracyCircle />
+      </OneMap>
+      {locationAction}
+    </>
   )
 );

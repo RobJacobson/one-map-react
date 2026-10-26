@@ -231,23 +231,41 @@ const main = async () => {
       await nativeOfflineScenarios();
       return;
     }
-    await scenario("injected location display and following", async () => {
-      await activateLocation();
-      await until(async () => (await action("read")).watches === 1, 5000);
-      await action("emit", { longitude: -122.33, latitude: 47.62 });
-      await until(
-        async () => near((await action("read")).center, [-122.33, 47.62]),
-        15000
-      );
-      await until(
-        async () =>
-          (await action("read")).features.some(
-            (feature) => feature.properties?.kind === "position"
-          ),
-        10000
-      );
-      return pickRead(await action("read"));
-    });
+    await scenario(
+      "explicit location action and supplied display",
+      async () => {
+        if (platform === "web") {
+          await page.send("Browser.setPermission", {
+            permission: { name: "geolocation" },
+            setting: "granted",
+            origin: browserUrl(),
+          });
+          await page.send("Emulation.setGeolocationOverride", {
+            longitude: -122.33,
+            latitude: 47.62,
+            accuracy: 25,
+          });
+        }
+        const before = await action("read");
+        await activateLocation();
+        await until(
+          async () => (await action("read")).fixes > before.fixes,
+          15000
+        );
+        await until(
+          async () => near((await action("read")).center, [-122.33, 47.62]),
+          15000
+        );
+        await until(
+          async () =>
+            (await action("read")).features.some(
+              (feature) => feature.properties?.kind === "position"
+            ),
+          10000
+        );
+        return pickRead(await action("read"));
+      }
+    );
     if (platform === "web") await browserScenarios();
     await scenario(
       "selected SDK PNG content and overlay observation",
@@ -283,24 +301,15 @@ const main = async () => {
         };
       }
     );
-    await scenario(
-      "detach releases tracking and suppresses late fixes",
-      async () => {
-        await activateLocation();
-        await action("emit");
-        const before = await action("read");
-        await action("configure", { mode: "detached" });
-        await delay(500);
-        const late = await action("emit", {
-          longitude: -122.31,
-          latitude: 47.64,
-        });
-        assert.equal(late.fixes, before.fixes);
-        assert.equal(late.releases, late.watches);
-        await configure("injected");
-        return late;
-      }
-    );
+    await scenario("detach removes the location action", async () => {
+      const before = await action("observations");
+      await action("configure", { mode: "detached" });
+      await delay(500);
+      const detached = await action("observations");
+      assert.equal(detached.fixes, before.fixes);
+      await configure("injected");
+      return detached;
+    });
     if (platform !== "web") await nativeScenarios();
   }
 };
@@ -691,8 +700,22 @@ const captureCoverageScenarios = async () => {
             "47.615,-122.34",
           ]);
         if (kind === "puck" && platform === "web") {
+          const before = await action("read");
+          await page.send("Browser.setPermission", {
+            permission: { name: "geolocation" },
+            setting: "granted",
+            origin: browserUrl(),
+          });
+          await page.send("Emulation.setGeolocationOverride", {
+            longitude: -122.34,
+            latitude: 47.615,
+            accuracy: 25,
+          });
           await activateLocation();
-          await action("emit", { longitude: -122.34, latitude: 47.615 });
+          await until(
+            async () => (await action("read")).fixes > before.fixes,
+            10000
+          );
         }
         return observe();
       }
@@ -744,49 +767,7 @@ const readNativeImage = async (uri) => {
 };
 
 const browserScenarios = async () => {
-  await scenario(
-    "gesture interruption and resume without another watch",
-    async () => {
-      const before = await action("read");
-      await page.send("Input.dispatchMouseEvent", {
-        type: "mousePressed",
-        x: 550,
-        y: 350,
-        button: "left",
-        buttons: 1,
-        clickCount: 1,
-      });
-      for (let step = 1; step <= 8; step += 1)
-        await page.send("Input.dispatchMouseEvent", {
-          type: "mouseMoved",
-          x: 550 + step * 10,
-          y: 350 + step * 3,
-          buttons: 1,
-        });
-      await page.send("Input.dispatchMouseEvent", {
-        type: "mouseReleased",
-        x: 630,
-        y: 374,
-        button: "left",
-        clickCount: 1,
-      });
-      await delay(500);
-      const moved = await action("read");
-      await action("emit", { longitude: -122.32, latitude: 47.63 });
-      await delay(700);
-      assert(
-        near((await action("read")).center, moved.center),
-        "An injected fix overrode the interrupted camera."
-      );
-      await activateLocation();
-      await until(
-        async () => near((await action("read")).center, [-122.32, 47.63]),
-        15000
-      );
-      assert.equal((await action("read")).watches, before.watches);
-      return pickRead(await action("read"));
-    }
-  );
+  // U16 retires common tracking, gesture-resume and coalescing policy.
   await scenario("browser geolocation success after activation", async () => {
     await configure("default");
     const before = await action("read");
@@ -843,86 +824,7 @@ const browserScenarios = async () => {
 };
 
 const nativeScenarios = async () => {
-  await scenario(
-    "native gesture interruption and resume without another watch",
-    async () => {
-      await configure("injected");
-      const inactive = await action("read");
-      await activateLocation();
-      await until(
-        async () => (await action("read")).watches > inactive.watches,
-        15000,
-        "native control watch registration"
-      );
-      await action("emit");
-      await until(
-        async () => {
-          const value = await action("read");
-          return (
-            near(value.center, [-122.33, 47.62]) &&
-            !value.moving &&
-            value.moveEnds > inactive.moveEnds
-          );
-        },
-        15000,
-        "native initial follow completion"
-      );
-      const before = await action("read");
-      if (platform === "android") {
-        const size = (await adb(["shell", "wm", "size"])).match(/(\d+)x(\d+)/);
-        assert(size);
-        const width = Number(size[1]);
-        const height = Number(size[2]);
-        await adb([
-          "shell",
-          "input",
-          "swipe",
-          String(width * 0.5),
-          String(height * 0.5),
-          String(width * 0.7),
-          String(height * 0.6),
-          "400",
-        ]);
-      } else {
-        currentTap = `drag ${applicationId} ${randomUUID()}`;
-      }
-      await until(
-        async () => {
-          const value = await action("read");
-          return (
-            !near(value.center, before.center) &&
-            !value.moving &&
-            value.moveEnds > before.moveEnds
-          );
-        },
-        15000,
-        "native physical drag completion"
-      );
-      const moved = await action("read");
-      assert(
-        !near(moved.center, before.center),
-        "Native drag did not move the camera."
-      );
-      await action("emit", { longitude: -122.32, latitude: 47.63 });
-      await delay(1000);
-      assert(
-        near((await action("read")).center, moved.center),
-        "Location fix overrode native gesture interruption."
-      );
-      await activateLocation();
-      await until(
-        async () => near((await action("read")).center, [-122.32, 47.63]),
-        15000,
-        "native control follow resume"
-      );
-      assert.equal((await action("read")).watches, before.watches);
-      return {
-        before: pickRead(before),
-        afterDrag: pickRead(moved),
-        afterResume: pickRead(await action("read")),
-      };
-    }
-  );
+  // U16 uses a one-shot application button; continuous follow is a selected SDK/app choice.
   await scenario("foreground permission boundary", async () => {
     if (platform === "ios" && engine === "mapbox") {
       await assert.rejects(action("permission"));
@@ -1780,8 +1682,6 @@ const pickRead = (value) => ({
   loads: value.loads,
   fixes: value.fixes,
   errors: value.errors,
-  watches: value.watches,
-  releases: value.releases,
   center: value.center,
   zoom: value.zoom,
   featureCount: value.features.length,

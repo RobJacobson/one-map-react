@@ -365,6 +365,15 @@ NetworkManager.setConnected(false);
 NetworkManager.setConnected(42);
 `;
   const popupAssertions = `
+// @ts-expect-error The selected common location control is removed.
+import { GeolocateControl } from "one-map-react/${entry}";
+${
+  entry.endsWith("web")
+    ? `// @ts-expect-error Selected facade location props are removed.
+import type { WebGeolocateControlProps } from "one-map-react/${entry}";`
+    : ""
+}
+
 // @ts-expect-error Scale belongs to the selected SDK.
 import { ScaleControl } from "one-map-react/${entry}";
 // @ts-expect-error Attribution belongs to the selected SDK.
@@ -398,8 +407,10 @@ import type { WebFullscreenControlProps } from "one-map-react/${entry}";`
 }
 ${
   entry.endsWith("web")
-    ? `import { WrapperMarker, WrapperNavigationControl, WrapperFullscreenControl, WrapperScaleControl, WrapperAttributionControl } from "one-map-react/${entry}";
+    ? `import { WrapperMarker, WrapperNavigationControl, WrapperFullscreenControl, WrapperScaleControl, WrapperAttributionControl, WrapperGeolocateControl } from "one-map-react/${entry}";
 void <WrapperMarker longitude={0} latitude={0} />;
+void <WrapperGeolocateControl position="top-left" positionOptions={{enableHighAccuracy: true, timeout: 1234}} trackUserLocation showAccuracyCircle={false} fitBoundsOptions={{maxZoom: 13}} onGeolocate={position => { const longitude: number = position.coords.longitude; void longitude; }} />;
+${entry === "mapbox-web" ? "void <WrapperGeolocateControl geolocation={navigator.geolocation} />;" : ""}
 void <WrapperNavigationControl position="top-left" showZoom={false} visualizePitch />;
 void <WrapperFullscreenControl position="bottom-right" />;
 void <WrapperScaleControl position="bottom-left" unit="nautical" maxWidth={150} />;

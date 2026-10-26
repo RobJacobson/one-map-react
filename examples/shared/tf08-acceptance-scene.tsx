@@ -1,8 +1,6 @@
 import {
-  GeolocateControl,
   type GeolocationPosition,
   Layer,
-  type LocationService,
   type MapLayoutStyle,
   type MapProps,
   type MapRef,
@@ -12,13 +10,21 @@ import {
   type MarkerRef,
   Map as OneMap,
   Source,
+  UserLocation,
 } from "one-map-react";
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ComponentType,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   captureRendering,
   renderingBufferOptions,
 } from "./capture-rendering.js";
+import type { NativeLocationButtonProps } from "./native-location-button.js";
 
 /** Commands expose application actions and independent renderer readback only. */
 export interface Tf08AcceptanceProbe {
@@ -30,6 +36,7 @@ export interface Tf08AcceptanceProbe {
 }
 
 interface Tf08AcceptanceSceneProps {
+  readonly renderLocation: ComponentType<NativeLocationButtonProps>;
   readonly services: MapServices;
   readonly backend: string;
   readonly style: MapLayoutStyle;
@@ -66,6 +73,7 @@ const localStyle: MapStyle = {
 /** Real-renderer TF08 fixture; injected fixes never pretend to certify sensors. */
 export const Tf08AcceptanceScene = ({
   services,
+  renderLocation: Location,
   backend,
   style,
   overlay,
@@ -92,8 +100,6 @@ export const Tf08AcceptanceScene = ({
     loads: 0,
     fixes: 0,
     errors: 0,
-    watches: 0,
-    releases: 0,
     moving: false,
     moveEnds: 0,
     moves: [] as {
@@ -102,32 +108,8 @@ export const Tf08AcceptanceScene = ({
       zoom: number;
     }[],
   });
-  const receiver = useRef<(position: GeolocationPosition) => void>(() => {});
   const lastPosition = useRef<GeolocationPosition | undefined>(undefined);
-  const provider = useMemo<LocationService>(
-    () => ({
-      requestPermission: async () => ({
-        status: "granted",
-        accuracy: "unknown",
-      }),
-      getCurrentPosition: async () => ({
-        lngLat: [-122.33, 47.62],
-        timestamp: Date.now(),
-        accuracy: 25,
-      }),
-      watchPosition: (position) => {
-        observations.current.watches += 1;
-        receiver.current = position;
-        let active = true;
-        return () => {
-          if (!active) return;
-          active = false;
-          observations.current.releases += 1;
-        };
-      },
-    }),
-    []
-  );
+  const [displayPosition, setDisplayPosition] = useState<GeolocationPosition>();
 
   useEffect(() => {
     const requireMap = (): MapRef => {
@@ -153,19 +135,9 @@ export const Tf08AcceptanceScene = ({
           position: lastPosition.current,
         };
       }
-      if (action === "emit") {
-        receiver.current({
-          lngLat: [
-            Number(value.longitude ?? -122.33),
-            Number(value.latitude ?? 47.62),
-          ],
-          accuracy: 25,
-          timestamp: Date.now(),
-        });
-        return { ...observations.current };
-      }
       if (action === "configure") {
         const next = String(value.mode ?? "injected");
+        setDisplayPosition(undefined);
         setMode(next);
         setMounted(next !== "detached");
         setGeneration((current) => current + 1);
@@ -207,129 +179,153 @@ export const Tf08AcceptanceScene = ({
   }, [attach, backend, fixtureUrl, services]);
 
   if (!mounted) return null;
-  return (
-    <OneMap
-      key={generation}
-      ref={mapRef}
-      mapStyle={mapStyle}
-      style={style}
-      initialViewState={camera}
-      {...{
-        options:
-          mode === "unpreserved" ? undefined : renderingBufferOptions(backend),
-      }}
-      reuseMaps={
-        backend.endsWith("web") &&
-        (mode === "unpreserved" || mode === "retained")
+  const locationControl = (
+    <Location
+      key={`${generation}-${mode}`}
+      mapRef={mapRef}
+      corner="right"
+      getCurrentPosition={(signal) =>
+        mode === "default"
+          ? services.location.getCurrentPosition({ signal })
+          : Promise.resolve({
+              lngLat: [-122.33, 47.62],
+              timestamp: Date.now(),
+              accuracy: 25,
+            })
       }
-      gl={mode === "external" ? externalContext : undefined}
-      {...(backend.endsWith("native") && mode.startsWith("coverage")
-        ? {
-            options:
-              backend === "mapbox-native"
-                ? {
-                    logoEnabled: mode === "coverage-ornaments",
-                    attributionEnabled: mode === "coverage-ornaments",
-                    compassEnabled: mode === "coverage-ornaments",
-                    compassFadeWhenNorth: false,
-                    scaleBarEnabled: mode === "coverage-ornaments",
-                  }
-                : {
-                    logo: mode === "coverage-ornaments",
-                    attribution: mode === "coverage-ornaments",
-                    compass: mode === "coverage-ornaments",
-                    compassHiddenFacingNorth: false,
-                    scaleBar: mode === "coverage-ornaments",
-                  },
-          }
-        : {})}
-      onLoad={() => {
-        observations.current.loads += 1;
-        void mapRef.current
-          ?.jumpTo({
-            center: [camera.longitude, camera.latitude],
-            zoom: camera.zoom,
-          })
-          .catch(() => {
-            observations.current.errors += 1;
-          });
+      zoom={12}
+      onGeolocate={(position) => {
+        observations.current.fixes += 1;
+        lastPosition.current = position;
+        setDisplayPosition(position);
       }}
       onError={() => {
         observations.current.errors += 1;
       }}
-      onMoveStart={() => {
-        observations.current.moving = true;
-      }}
-      onMove={(event) => {
-        observations.current.moves = [
-          ...observations.current.moves,
-          {
-            origin: event.origin,
-            center: [
-              event.viewState.longitude,
-              event.viewState.latitude,
-            ] as const,
-            zoom: event.viewState.zoom,
-          },
-        ].slice(-12);
-      }}
-      onMoveEnd={() => {
-        observations.current.moving = false;
-        observations.current.moveEnds += 1;
-      }}
-    >
-      <Source
-        id="tf08-points"
-        type="geojson"
-        data={{
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              id: 8008,
-              properties: { test: "tf08" },
-              geometry: { type: "Point", coordinates: [-122.34, 47.61] },
-            },
-          ],
+    />
+  );
+  return (
+    <>
+      <OneMap
+        key={generation}
+        ref={mapRef}
+        mapStyle={mapStyle}
+        style={style}
+        initialViewState={camera}
+        {...{
+          options:
+            mode === "unpreserved"
+              ? undefined
+              : renderingBufferOptions(backend),
         }}
-      >
-        <Layer
-          id="tf08-point"
-          type="circle"
-          paint={{ "circle-color": "#ff0000", "circle-radius": 14 }}
-        />
-      </Source>
-      <GeolocateControl
-        key={mode}
-        locationProvider={mode === "default" ? undefined : provider}
-        trackUserLocation={mode !== "default"}
-        zoom={12}
-        onGeolocate={(position) => {
-          observations.current.fixes += 1;
-          lastPosition.current = position;
+        reuseMaps={
+          backend.endsWith("web") &&
+          (mode === "unpreserved" || mode === "retained")
+        }
+        gl={mode === "external" ? externalContext : undefined}
+        {...(backend.endsWith("native") && mode.startsWith("coverage")
+          ? {
+              options:
+                backend === "mapbox-native"
+                  ? {
+                      logoEnabled: mode === "coverage-ornaments",
+                      attributionEnabled: mode === "coverage-ornaments",
+                      compassEnabled: mode === "coverage-ornaments",
+                      compassFadeWhenNorth: false,
+                      compassPosition: { top: 64, right: 8 },
+                      scaleBarEnabled: mode === "coverage-ornaments",
+                    }
+                  : {
+                      logo: mode === "coverage-ornaments",
+                      attribution: mode === "coverage-ornaments",
+                      compass: mode === "coverage-ornaments",
+                      compassHiddenFacingNorth: false,
+                      compassPosition: { top: 64, right: 8 },
+                      scaleBar: mode === "coverage-ornaments",
+                    },
+            }
+          : {})}
+        onLoad={() => {
+          observations.current.loads += 1;
+          void mapRef.current
+            ?.jumpTo({
+              center: [camera.longitude, camera.latitude],
+              zoom: camera.zoom,
+            })
+            .catch(() => {
+              observations.current.errors += 1;
+            });
         }}
         onError={() => {
           observations.current.errors += 1;
         }}
-      />
-      {(!mode.startsWith("coverage") || mode === "coverage-annotation") && (
-        <Marker
-          ref={annotationRef}
-          longitude={-122.35}
-          latitude={47.61}
-          renderMode={mode === "coverage-annotation" ? "annotation" : "view"}
+        onMoveStart={() => {
+          observations.current.moving = true;
+        }}
+        onMove={(event) => {
+          observations.current.moves = [
+            ...observations.current.moves,
+            {
+              origin: event.origin,
+              center: [
+                event.viewState.longitude,
+                event.viewState.latitude,
+              ] as const,
+              zoom: event.viewState.zoom,
+            },
+          ].slice(-12);
+        }}
+        onMoveEnd={() => {
+          observations.current.moving = false;
+          observations.current.moveEnds += 1;
+        }}
+      >
+        <Source
+          id="tf08-points"
+          type="geojson"
+          data={{
+            type: "FeatureCollection",
+            features: [
+              {
+                type: "Feature",
+                id: 8008,
+                properties: { test: "tf08" },
+                geometry: { type: "Point", coordinates: [-122.34, 47.61] },
+              },
+            ],
+          }}
         >
-          {overlay}
-        </Marker>
-      )}
-      {mode === "coverage-popup" && renderCoveragePopup(overlay)}
-      {mode === "coverage-ornaments" && (
-        <>
-          {backend.endsWith("web") && ornamentControls}
-          {backend.endsWith("web") && navigationControl}
-        </>
-      )}
-      {mode === "coverage-puck" && nativePuck}
-    </OneMap>
+          <Layer
+            id="tf08-point"
+            type="circle"
+            paint={{ "circle-color": "#ff0000", "circle-radius": 14 }}
+          />
+        </Source>
+        {!(backend.endsWith("native") && mode === "coverage-puck") && (
+          <UserLocation position={displayPosition} showAccuracyCircle />
+        )}
+        {backend.endsWith("web") && locationControl}
+
+        {(!mode.startsWith("coverage") || mode === "coverage-annotation") && (
+          <Marker
+            ref={annotationRef}
+            longitude={-122.35}
+            latitude={47.61}
+            renderMode={mode === "coverage-annotation" ? "annotation" : "view"}
+          >
+            {overlay}
+          </Marker>
+        )}
+        {mode === "coverage-popup" && renderCoveragePopup(overlay)}
+        {mode === "coverage-ornaments" && (
+          <>
+            {backend.endsWith("web") && ornamentControls}
+            {backend.endsWith("web") && navigationControl}
+          </>
+        )}
+        {mode === "coverage-puck" && nativePuck}
+      </OneMap>
+      {backend.endsWith("native") && locationControl}
+    </>
   );
 };

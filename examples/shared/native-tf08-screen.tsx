@@ -16,6 +16,7 @@ import {
   View,
 } from "react-native";
 
+import { NativeLocationButton } from "./native-location-button.js";
 import {
   type Tf08AcceptanceProbe,
   Tf08AcceptanceScene,
@@ -204,6 +205,7 @@ export const NativeTf08Screen = ({
         <Text testID="tf08-status">{status}</Text>
         {sceneMounted && (
           <Tf08AcceptanceScene
+            renderLocation={NativeLocationButton}
             renderCoveragePopup={renderCoveragePopup}
             backend={adapter.backend}
             services={adapter.services}
