@@ -6,7 +6,7 @@ export const nativeUiScenarios = [
   "annotation-activation",
   "offset-touch-bounds",
   "popup-follow-dismissal",
-  "source-propagation",
+  "map-feature-click",
   "navigation-location",
   "style-remount",
   "host-accessibility",

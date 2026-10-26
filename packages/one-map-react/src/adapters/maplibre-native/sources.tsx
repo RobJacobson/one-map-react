@@ -13,12 +13,10 @@ import type {
   SourceProps,
   VectorSourceProps,
 } from "../../contracts/source-types.js";
-import { useOptionalMapSession } from "../../facade/map-context.js";
 import {
   rejectNativeGeoJsonOptions,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
-import { sourceHitFromMaplibre } from "../shared/source-hit.js";
 import { useMaplibreSourceRegistry } from "./source-registry.js";
 
 /** Maplibre-native source that dispatches to the matching MapLibre source. */
@@ -88,15 +86,6 @@ export const MaplibreNativeSource = (props: SourceProps) => {
  * @returns The MapLibre `GeoJSONSource` with nested layers.
  */
 const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
-  const session = useOptionalMapSession();
-  const press = (
-    event: Parameters<
-      NonNullable<ComponentProps<typeof GeoJSONSource>["onPress"]>
-    >[0]
-  ): void => {
-    event.stopPropagation();
-    session?.dispatchSource(props.id, sourceHitFromMaplibre(event.nativeEvent));
-  };
   const registry = useMaplibreSourceRegistry();
   const sourceRef = useRef<ComponentRef<typeof GeoJSONSource>>(null);
 
@@ -118,19 +107,6 @@ const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
 
   return (
     <GeoJSONSource
-      onPress={props.onClick ? press : undefined}
-      hitbox={
-        (
-          props as GeoJsonSourceProps & {
-            hitbox?: {
-              top: number;
-              right: number;
-              bottom: number;
-              left: number;
-            };
-          }
-        ).hitbox
-      }
       ref={sourceRef}
       id={props.id}
       // The facade's readonly GeoJSON contracts cross into the wrapper's
@@ -158,15 +134,6 @@ const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
  * @returns The MapLibre `VectorSource` with nested layers.
  */
 const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
-  const session = useOptionalMapSession();
-  const press = (
-    event: Parameters<
-      NonNullable<ComponentProps<typeof GeoJSONSource>["onPress"]>
-    >[0]
-  ): void => {
-    event.stopPropagation();
-    session?.dispatchSource(props.id, sourceHitFromMaplibre(event.nativeEvent));
-  };
   const registry = useMaplibreSourceRegistry();
   const sourceRef = useRef<ComponentRef<typeof VectorSource>>(null);
 
@@ -182,19 +149,6 @@ const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
 
   return (
     <VectorSource
-      onPress={props.onClick ? press : undefined}
-      hitbox={
-        (
-          props as VectorSourceProps & {
-            hitbox?: {
-              top: number;
-              right: number;
-              bottom: number;
-              left: number;
-            };
-          }
-        ).hitbox
-      }
       ref={sourceRef}
       id={props.id}
       url={props.url}

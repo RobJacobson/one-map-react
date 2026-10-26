@@ -16,14 +16,34 @@ import {
 
 const fixture = vi.hoisted(() => ({
   markers: [] as Array<Record<string, unknown>>,
+  click: undefined as
+    | undefined
+    | ((event: {
+        lngLat: readonly [number, number];
+        point: readonly [number, number];
+        features: readonly object[];
+      }) => void),
 }));
 vi.mock("one-map-react", async () => {
   const react = await import("react");
   const Content = ({ children }: { readonly children?: ReactNode }) => children;
   return {
     MapSetup: Content,
-    Map: react.forwardRef((props: { readonly children?: ReactNode }, _ref) =>
-      react.createElement("div", { "data-testid": "sdk-map" }, props.children)
+    Map: react.forwardRef(
+      (
+        props: {
+          readonly children?: ReactNode;
+          readonly onClick?: typeof fixture.click;
+        },
+        _ref
+      ) => {
+        fixture.click = props.onClick;
+        return react.createElement(
+          "div",
+          { "data-testid": "sdk-map" },
+          props.children
+        );
+      }
     ),
     Source: Content,
     Layer: () => null,
@@ -201,3 +221,39 @@ test("native TF07 host bounds the map and screen buttons below the toolbar", () 
   expect(host?.contains(mounted.getByText("Custom control"))).toBe(false);
   mounted.unmount();
 });
+
+test.each([false, true])(
+  "TF07 native=%s activates GeoJSON identity without web metadata",
+  (native) => {
+    const report = vi.fn();
+    const view = render(
+      <Tf07Scene
+        native={native}
+        renderLocation={() => null}
+        renderNavigation={() => null}
+        renderPopup={() => null}
+        markerContent={() => null}
+        style={{ width: 400, height: 300 }}
+        report={report}
+        attach={() => undefined}
+      />
+    );
+    act(() =>
+      fixture.click?.({
+        lngLat: [1, 2],
+        point: [3, 4],
+        features: [
+          {
+            type: "Feature",
+            id: "707",
+            properties: { fixture: "tf07" },
+            geometry: { type: "Point", coordinates: [1, 2] },
+          },
+        ],
+      })
+    );
+    expect(report).toHaveBeenCalledWith("source-click");
+    expect(report).toHaveBeenCalledWith("map-click");
+    view.unmount();
+  }
+);

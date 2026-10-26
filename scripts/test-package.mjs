@@ -285,6 +285,16 @@ import type { Adapter, Backend, MapRef } from "one-map-react";
 import { Map as OneMap, MapSetup, Source, Layer, Marker, useMap } from "one-map-react";
 ${declarations}
 declare const commonRef: MapRef;
+// @ts-expect-error Source click events are removed.
+import type { SourceClickEvent } from "one-map-react";
+// @ts-expect-error Common source activation belongs to Map.onClick.
+type RemovedCommonSourceCallback = import("one-map-react").SourceProps["onClick"];
+// @ts-expect-error Source activation belongs to Map.onClick.
+type RemovedSourceCallback = import("one-map-react").GeoJsonSourceProps["onClick"];
+// @ts-expect-error Vector source activation belongs to Map.onClick.
+type RemovedVectorCallback = import("one-map-react").VectorSourceProps["onClick"];
+// @ts-expect-error Supplied location is display only.
+type RemovedLocationPress = import("one-map-react").UserLocationProps["onPress"];
 // @ts-expect-error Popups are selected wrapper components or application UI.
 import { Popup } from "one-map-react";
 // @ts-expect-error Common popup props are removed.

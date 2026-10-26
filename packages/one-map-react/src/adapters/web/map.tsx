@@ -160,7 +160,7 @@ export const createWebMap = <
         setStyleMap((current) => (current === next ? current : next));
       }, []);
 
-      useImperativeHandle(ref, () => createWebMapRef(mapRef, wrapper));
+      useImperativeHandle(ref, () => createWebMapRef(mapRef, wrapper), []);
 
       // Mapbox can emit load before react-map-gl commits its imperative handle.
       // Deliver the callback after attachment so camera operations are usable.

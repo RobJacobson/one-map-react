@@ -10,10 +10,7 @@ import {
 } from "../../../tests/fixtures/map-fixture.js";
 import type { Adapter } from "../src/contracts/adapter.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
-import type {
-  ClickEvent,
-  SourceClickEvent,
-} from "../src/contracts/event-types.js";
+import type { ClickEvent } from "../src/contracts/event-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
 import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
@@ -70,77 +67,89 @@ export const runWebFollowupRegressions = (
   const click = async (): Promise<void> => {
     await act(async () => dispatchClick());
   };
-  const sourceScene = (
-    props: Partial<MapProps>,
-    onClick: (event: SourceClickEvent) => void,
-    key = 0
-  ) =>
-    scene(
-      props,
-      <Source
-        key={key}
-        id="places"
-        type="geojson"
-        data={routes}
-        onClick={onClick}
-      >
-        <Layer id="places-line" type="line" />
-      </Source>
-    );
 
   describe("follow-up query, image, and interaction corrections", () => {
     beforeEach(() => mock.resetWebMapMock());
 
+    test("pending filtered click uses the latest committed callback after an ordinary update", async () => {
+      const original = vi.fn();
+      const updated = vi.fn();
+      const ref = createRef<MapRef>();
+      const features = [
+        {
+          type: "Feature",
+          geometry: { type: "Point", coordinates: [1, 2] },
+          source: "routes",
+          layer: { id: "route-line" },
+        },
+      ];
+      const view = render(
+        scene(
+          { interactiveLayerIds: ["route-line"], onClick: original },
+          undefined,
+          ref
+        )
+      );
+      mock.queryRenderedFeatures.mockReturnValueOnce(features);
+      await act(async () => {
+        dispatchClick();
+        flushSync(() =>
+          view.rerender(
+            scene(
+              { interactiveLayerIds: ["route-line"], onClick: updated },
+              undefined,
+              ref
+            )
+          )
+        );
+      });
+      expect(original).not.toHaveBeenCalled();
+      expect(updated).toHaveBeenCalledExactlyOnceWith({ ...hit, features });
+    });
+
     test("map clicks preserve SDK ordering when excluded 3D hits overlap 2D hits", async () => {
-      const sourceClick = vi.fn();
       const mapClick = vi.fn();
       if (
         adapter.backend !== "mapbox-web" &&
         adapter.backend !== "maplibre-web"
       )
-        throw new Error("Expected a web adapter.");
+        throw new Error("Expected web adapter.");
       mock.queryRenderedFeatures.mockImplementation(
         sdkOrderedQuery(adapter.backend)
       );
       render(
-        sourceScene(
+        scene(
           {
             interactiveLayerIds: ["route-line", "places-line"],
             onClick: mapClick,
           },
-          sourceClick
+          <Source id="places" type="geojson" data={routes}>
+            <Layer id="places-line" type="line" />
+          </Source>
         )
       );
       await click();
-      expect(
-        sourceClick.mock.calls[0]?.[0].features.map(
-          (feature: { id: string }) => feature.id
-        )
-      ).toEqual(["near-building", "places-line"]);
       expect(
         mapClick.mock.calls[0]?.[0].features.map(
           (feature: { id: string }) => feature.id
         )
       ).toEqual(["places-line", "route-line"]);
+      expect(mock.queryRenderedFeatures).toHaveBeenCalledTimes(1);
     });
 
     if (adapter.backend === "mapbox-web") {
       test("Mapbox filtered map clicks exclude root featureset variants", async () => {
-        const sourceClick = vi.fn();
         const mapClick = vi.fn();
         mock.queryRenderedFeatures.mockImplementation(sdkFeaturesetQuery());
         render(
-          sourceScene(
+          scene(
             { interactiveLayerIds: ["places-line"], onClick: mapClick },
-            sourceClick
+            <Source id="places" type="geojson" data={routes}>
+              <Layer id="places-line" type="line" />
+            </Source>
           )
         );
         await click();
-        expect(
-          sourceClick.mock.calls[0]?.[0].features.map(
-            (feature: { id: string }) => feature.id
-          )
-        ).toEqual(["plain", "variant"]);
         expect(
           mapClick.mock.calls[0]?.[0].features.map(
             (feature: { id: string }) => feature.id
@@ -150,199 +159,82 @@ export const runWebFollowupRegressions = (
     }
 
     test.each([{ layers: ["route-line"] }, { layers: [] }])(
-      "SDK click queries preserve independent source and map hits for layers $layers",
+      "filtered map query preserves results for layers $layers",
       async ({ layers }) => {
-        const sourceClick = vi.fn();
-        const mapClick = vi.fn();
-        const sourceFeature = {
-          type: "Feature",
-          id: 2,
-          source: "places",
-          layer: { id: "places-line" },
-          properties: { kind: "place" },
-        };
-        const mapFeature = {
+        const onClick = vi.fn();
+        const feature = {
           type: "Feature",
           id: 1,
           source: "routes",
           layer: { id: "route-line" },
-          properties: { kind: "route" },
+          properties: {},
         };
-        mock.queryRenderedFeatures
-          .mockReturnValueOnce([sourceFeature, mapFeature, mapFeature])
-          .mockReturnValueOnce(layers.length ? [mapFeature, mapFeature] : []);
-        render(
-          sourceScene(
-            { interactiveLayerIds: layers, onClick: mapClick },
-            sourceClick
-          )
-        );
+        const features = layers.length ? [feature, feature] : [];
+        mock.queryRenderedFeatures.mockReturnValueOnce(features);
+        render(scene({ interactiveLayerIds: layers, onClick }));
         await click();
-        expect(mock.queryRenderedFeatures).toHaveBeenCalledTimes(2);
-        expect(mock.queryRenderedFeatures).toHaveBeenNthCalledWith(
-          1,
-          hit.point,
-          undefined
-        );
-        expect(mock.queryRenderedFeatures).toHaveBeenNthCalledWith(
-          2,
+        expect(mock.queryRenderedFeatures).toHaveBeenCalledExactlyOnceWith(
           hit.point,
           { layers }
         );
-        expect(sourceClick).toHaveBeenCalledWith(
-          expect.objectContaining({
-            sourceId: "places",
-            features: [sourceFeature],
-          })
-        );
-        expect(mapClick).toHaveBeenCalledWith({
-          ...hit,
-          features: layers.length ? [mapFeature, mapFeature] : [],
-        });
+        expect(onClick).toHaveBeenCalledWith({ ...hit, features });
       }
     );
 
-    test("missing map layers suppress both click callbacks", async () => {
-      const sourceClick = vi.fn();
-      const mapClick = vi.fn();
+    test("missing map layers report failure without delivering a click", async () => {
+      const onClick = vi.fn();
       const onError = vi.fn();
       render(
-        sourceScene(
-          {
-            interactiveLayerIds: ["route-line", "missing"],
-            onClick: mapClick,
-            onError,
-          },
-          sourceClick
-        )
+        scene({
+          interactiveLayerIds: ["route-line", "missing"],
+          onClick,
+          onError,
+        })
       );
       await click();
-      expect(mock.queryRenderedFeatures).toHaveBeenCalledExactlyOnceWith(
-        hit.point,
-        undefined
-      );
+      expect(mock.queryRenderedFeatures).not.toHaveBeenCalled();
       expect(onError).toHaveBeenCalledWith({
         error: expect.objectContaining({
           message: 'Layer "missing" is not present in the loaded style.',
         }),
       });
-      expect(sourceClick).not.toHaveBeenCalled();
-      expect(mapClick).not.toHaveBeenCalled();
+      expect(onClick).not.toHaveBeenCalled();
       expect(target().listenerCount("error")).toBe(1);
     });
 
-    test.each([
-      ["emitted", "source"],
-      ["thrown", "source"],
-      ["emitted", "map"],
-      ["thrown", "map"],
-    ])(
-      "%s failure in the %s query suppresses both click callbacks",
-      async (kind, phase) => {
-        const sourceClick = vi.fn();
-        const mapClick = vi.fn();
+    test.each(["emitted", "thrown"])(
+      "%s map query failure suppresses click delivery",
+      async (kind) => {
+        const onClick = vi.fn();
         const onError = vi.fn();
-        const failure = new Error("click query failed");
+        const error = new Error("click query failed");
         render(
-          sourceScene(
-            { interactiveLayerIds: ["route-line"], onClick: mapClick, onError },
-            sourceClick
-          )
+          scene({ interactiveLayerIds: ["route-line"], onClick, onError })
         );
-        if (phase === "map") mock.queryRenderedFeatures.mockReturnValueOnce([]);
         mock.queryRenderedFeatures.mockImplementationOnce(() => {
-          if (kind === "thrown") throw failure;
-          target().emitError(failure);
+          if (kind === "thrown") throw error;
+          target().emitError(error);
           return [];
         });
         await click();
-        expect(onError).toHaveBeenCalledWith({ error: failure });
-        expect(sourceClick).not.toHaveBeenCalled();
-        expect(mapClick).not.toHaveBeenCalled();
+        expect(onError).toHaveBeenCalledWith({ error });
+        expect(onClick).not.toHaveBeenCalled();
         expect(target().listenerCount("error")).toBe(1);
       }
     );
 
-    test("source click propagation can stop the map callback", async () => {
-      const sourceClick = vi.fn((event: SourceClickEvent) =>
-        event.stopPropagation()
+    test("pending map query completion ignores unmount", async () => {
+      const onClick = vi.fn();
+      mock.queryRenderedFeatures.mockReturnValueOnce([]);
+      const view = render(
+        scene({ interactiveLayerIds: ["route-line"], onClick })
       );
-      const mapClick = vi.fn();
-      const feature = {
-        type: "Feature",
-        id: 2,
-        source: "places",
-        layer: { id: "places-line" },
-        properties: { kind: "place" },
-      };
-      mock.queryRenderedFeatures.mockReturnValueOnce([feature]);
-      render(
-        sourceScene(
-          { interactiveLayerIds: ["route-line"], onClick: mapClick },
-          sourceClick
-        )
-      );
-      await click();
-      expect(sourceClick).toHaveBeenCalledTimes(1);
-      expect(mapClick).not.toHaveBeenCalled();
-      expect(mock.queryRenderedFeatures).toHaveBeenCalledTimes(2);
+      await act(async () => {
+        dispatchClick();
+        flushSync(() => view.unmount());
+      });
+      expect(onClick).not.toHaveBeenCalled();
     });
-
-    test("click queries preserve a successful empty result", async () => {
-      const sourceClick = vi.fn();
-      const mapClick = vi.fn();
-      mock.queryRenderedFeatures
-        .mockReturnValueOnce([])
-        .mockReturnValueOnce([]);
-      render(
-        sourceScene(
-          { interactiveLayerIds: ["route-line"], onClick: mapClick },
-          sourceClick
-        )
-      );
-      await click();
-      expect(sourceClick).not.toHaveBeenCalled();
-      expect(mapClick).toHaveBeenCalledWith({ ...hit, features: [] });
-      expect(mock.queryRenderedFeatures).toHaveBeenCalledTimes(2);
-    });
-
-    test.each([
-      ["source", "replacement"],
-      ["source", "unmount"],
-      ["map", "replacement"],
-      ["map", "unmount"],
-    ])(
-      "pending %s query completion ignores source %s",
-      async (phase, change) => {
-        const original = vi.fn();
-        const replacement = vi.fn();
-        const mapClick = vi.fn();
-        const feature = {
-          type: "Feature",
-          id: 2,
-          source: "places",
-          layer: { id: "places-line" },
-          properties: { kind: "place" },
-        };
-        mock.queryRenderedFeatures.mockReturnValueOnce([feature]);
-        const props = {
-          interactiveLayerIds: ["route-line"],
-          onClick: mapClick,
-        };
-        const view = render(sourceScene(props, original));
-        await act(async () => {
-          dispatchClick();
-          if (phase === "map") await Promise.resolve();
-          flushSync(() => {
-            if (change === "unmount") view.unmount();
-            else view.rerender(sourceScene(props, replacement, 1));
-          });
-        });
-        expect(original).not.toHaveBeenCalled();
-        expect(replacement).not.toHaveBeenCalled();
-        expect(mapClick).not.toHaveBeenCalled();
-      }
-    );
 
     test("onLoad camera operations wait for the wrapper handle attachment", async () => {
       mock.loadBeforeAttachment();

@@ -16,11 +16,7 @@ import type {
 import type { ViewProps } from "react-native";
 
 import type { MapProps } from "./contracts/map-types.js";
-import type {
-  GeoJsonSourceProps,
-  SourceProps,
-  VectorSourceProps,
-} from "./contracts/source-types.js";
+import type { SourceProps } from "./contracts/source-types.js";
 import type { StyleDocument } from "./contracts/style-types.js";
 import type { MarkerProps, MarkerRef } from "./contracts/ui-types.js";
 import { Map as SharedMap } from "./facade/map.js";
@@ -93,13 +89,10 @@ export const Marker = SharedMarker as ForwardRefExoticComponent<
   NativeMarkerProps & RefAttributes<MarkerRef>
 >;
 
-/** Source activation hit region with selected native dimensions. */
-export type NativeSourceProps =
-  | Exclude<SourceProps, GeoJsonSourceProps | VectorSourceProps>
-  | ((GeoJsonSourceProps | VectorSourceProps) & {
-      readonly hitbox?: { width: number; height: number };
-    });
-/** Selected source with mutable activation hitbox. */
+/** Selected source using the shared rendering contract. */
+export type NativeSourceProps = SourceProps;
+
+/** Selected source using the shared rendering contract. */
 export const Source = SharedSource as ComponentType<NativeSourceProps>;
 
 export { getAnnotationsLayerID, PointAnnotationManager } from "@rnmapbox/maps";

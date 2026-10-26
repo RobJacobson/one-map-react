@@ -199,8 +199,6 @@ const sessionFixture = () => {
           listeners[event].delete(callback);
         };
       },
-      registerSource: () => () => undefined,
-      dispatchSource: () => undefined,
     };
   const emit = (
     event: "click" | "move",

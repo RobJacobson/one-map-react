@@ -1274,6 +1274,60 @@ describe("mapbox-native adapter", () => {
     expect(onIdle).toHaveBeenCalledTimes(1);
   });
 
+  test.each(["success", "failure", "unmount"] as const)(
+    "filtered map press queries its logical point and retains %s semantics",
+    async (outcome) => {
+      const onClick = jest.fn();
+      const onError = jest.fn();
+      let resolve!: (value: typeof queryCollection) => void;
+      let reject!: (error: Error) => void;
+      mockQueryRenderedFeaturesAtPoint.mockImplementationOnce(
+        () =>
+          new Promise((done, fail) => {
+            resolve = done;
+            reject = fail;
+          })
+      );
+      const view = await render(
+        example(undefined, undefined, {
+          interactiveLayerIds: ["upper", "lower"],
+          onClick,
+          onError,
+        })
+      );
+      const press = lastMapProps<{ onPress: (event: object) => void }>()
+        .onPress;
+      await act(async () =>
+        press({
+          geometry: { coordinates: [-122.34, 47.61] },
+          properties: { screenPointX: 23, screenPointY: 41 },
+        })
+      );
+      expect(mockQueryRenderedFeaturesAtPoint).toHaveBeenLastCalledWith(
+        [23, 41],
+        [],
+        ["upper", "lower"]
+      );
+      if (outcome === "unmount") await view.unmount();
+      const error = new Error("native feature query failed");
+      await act(async () => {
+        if (outcome === "failure") reject(error);
+        else resolve(queryCollection);
+      });
+      if (outcome === "success") {
+        expect(onClick).toHaveBeenCalledTimes(1);
+        expect(onClick).toHaveBeenCalledWith({
+          lngLat: [-122.34, 47.61],
+          point: [23, 41],
+          features: queryCollection.features,
+        });
+      } else expect(onClick).not.toHaveBeenCalled();
+      if (outcome === "failure")
+        expect(onError).toHaveBeenCalledWith({ error });
+      else expect(onError).not.toHaveBeenCalled();
+    }
+  );
+
   test("onClick converts the press feature and stops after unmount", async () => {
     const onClick = jest.fn();
     const rendered = await render(example(undefined, undefined, { onClick }));
