@@ -35,21 +35,17 @@ import type { MapProps } from "./contracts/map-types.js";
 import type {
   AttributionControlProps,
   ControlProps,
-  FullscreenControlProps,
   GeolocateControlProps,
   MarkerProps,
   MarkerRef,
-  NavigationControlProps,
   ScaleControlProps,
 } from "./contracts/ui-types.js";
 import { Map as OneMap } from "./facade/map.js";
 import {
   AttributionControl as OneAttributionControl,
   Control as OneControl,
-  FullscreenControl as OneFullscreenControl,
   GeolocateControl as OneGeolocateControl,
   Marker as OneMarker,
-  NavigationControl as OneNavigationControl,
   ScaleControl as OneScaleControl,
 } from "./facade/ui.js";
 import { useStableOptions } from "./facade/use-stable-options.js";
@@ -92,15 +88,11 @@ export const adapter: Adapter & { readonly backend: "mapbox-web" } =
     Source: MapboxSource as ComponentType<WebForwardedProps>,
     Layer: MapboxLayer as Adapter["Layer"],
     Marker: MapboxMarker as unknown as ComponentType<WebForwardedProps>,
-    NavigationControl:
-      MapboxNavigationControl as ComponentType<WebForwardedProps>,
     AttributionControl:
       MapboxAttributionControl as ComponentType<WebForwardedProps>,
     ScaleControl: MapboxScaleControl as ComponentType<WebForwardedProps>,
     GeolocateControl:
       MapboxGeolocateControl as ComponentType<WebForwardedProps>,
-    FullscreenControl:
-      MapboxFullscreenControl as ComponentType<WebForwardedProps>,
     useControl: useControl as unknown as WebControlHook,
     useMap,
     // Mapbox GL JS reports image loads through a callback; the shared web
@@ -223,18 +215,6 @@ export interface WebControlProps extends ControlProps {
 /** Custom control with DOM content attributes. */
 export const Control = OneControl as ComponentType<WebControlProps>;
 
-/** Navigation control props with selected wrapper options. */
-export interface WebNavigationControlProps extends NavigationControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MapboxNavigationControl>,
-    keyof NavigationControlProps
-  >;
-}
-/** Navigation control with selected web options. */
-export const NavigationControl =
-  OneNavigationControl as ComponentType<WebNavigationControlProps>;
-
 /** Attribution control props with selected wrapper options. */
 export interface WebAttributionControlProps extends AttributionControlProps {
   /** Remaining selected constructor options and CSS presentation. */
@@ -270,18 +250,6 @@ export interface WebGeolocateControlProps extends GeolocateControlProps {
 /** Geolocation control with selected web options. */
 export const GeolocateControl =
   OneGeolocateControl as ComponentType<WebGeolocateControlProps>;
-
-/** Fullscreen control props with selected browser target. */
-export interface WebFullscreenControlProps extends FullscreenControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MapboxFullscreenControl>,
-    keyof FullscreenControlProps
-  >;
-}
-/** Fullscreen control with selected web options. */
-export const FullscreenControl =
-  OneFullscreenControl as ComponentType<WebFullscreenControlProps>;
 
 /** Direct wrapper map and map access for selected canvas/container facilities. */
 export {

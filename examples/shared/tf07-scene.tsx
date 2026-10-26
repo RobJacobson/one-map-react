@@ -6,13 +6,14 @@ import {
   type MapLayoutStyle,
   type MapRef,
   Marker,
-  NavigationControl,
   Map as OneMap,
   ScaleControl,
   Source,
 } from "one-map-react";
 import {
+  type ComponentType,
   type ReactNode,
+  type RefObject,
   useCallback,
   useEffect,
   useRef,
@@ -63,6 +64,10 @@ export interface Tf07Probe {
 
 interface Tf07SceneProps {
   readonly native?: boolean;
+  readonly renderNavigation: ComponentType<{
+    readonly mapRef: RefObject<MapRef | null>;
+    readonly onError: (error: unknown) => void;
+  }>;
   readonly style: MapLayoutStyle;
   readonly markerContent: (
     kind: "live" | "annotation" | "popup",
@@ -98,6 +103,7 @@ export const Tf07Scene = ({
   markerContent,
   controlContent,
   renderPopup,
+  renderNavigation: Navigation,
   report,
   attach,
 }: Tf07SceneProps) => {
@@ -205,106 +211,109 @@ export const Tf07Scene = ({
   }, [attach, configure]);
 
   return (
-    <OneMap
-      key={generation}
-      id="tf07-map"
-      ref={mapRef}
-      mapStyle={mapStyle}
-      initialViewState={initialViewState}
-      style={style}
-      interactiveLayerIds={["tf07-point"]}
-      onLoad={loaded}
-      onStyleLoad={() => record("style")}
-      onMove={() => record("move")}
-      onClick={() => record("map-click")}
-      onError={fail}
-    >
-      <Source
-        id="tf07-source"
-        type="geojson"
-        data={{
-          type: "Feature",
-          id: 707,
-          properties: { fixture: "tf07" },
-          geometry: { type: "Point", coordinates: targets.source },
-        }}
-        onClick={(event) => {
-          record("source-click");
-          if (stopSource.current) event.stopPropagation();
-        }}
+    <>
+      <OneMap
+        key={generation}
+        id="tf07-map"
+        ref={mapRef}
+        mapStyle={mapStyle}
+        initialViewState={initialViewState}
+        style={style}
+        interactiveLayerIds={["tf07-point"]}
+        onLoad={loaded}
+        onStyleLoad={() => record("style")}
+        onMove={() => record("move")}
+        onClick={() => record("map-click")}
+        onError={fail}
       >
-        <Layer
-          id="tf07-point"
-          type="circle"
-          paint={{ "circle-color": "#16a34a", "circle-radius": 16 }}
+        <Source
+          id="tf07-source"
+          type="geojson"
+          data={{
+            type: "Feature",
+            id: 707,
+            properties: { fixture: "tf07" },
+            geometry: { type: "Point", coordinates: targets.source },
+          }}
+          onClick={(event) => {
+            record("source-click");
+            if (stopSource.current) event.stopPropagation();
+          }}
+        >
+          <Layer
+            id="tf07-point"
+            type="circle"
+            paint={{ "circle-color": "#16a34a", "circle-radius": 16 }}
+          />
+        </Source>
+        <Marker id="tf07-default" longitude={-122.38} latitude={47.63} />
+        <Marker
+          id="tf07-live"
+          longitude={live[0]}
+          latitude={live[1]}
+          offset={offset}
+          onClick={() => record("marker-click")}
+          {...(!native && {
+            draggable: true,
+            onDragStart: () => record("live-start"),
+            onDrag: (event) => {
+              setLive(event.lngLat);
+              record("live-drag");
+            },
+            onDragEnd: (event) => {
+              lastPositions.current.live = event.lngLat;
+              setLive(event.lngLat);
+              record("live-end");
+            },
+          })}
+          onError={fail}
+        >
+          {/* eslint-disable-next-line react/refs -- markerContent receives an event callback; the callback reads observation refs only when clicked. */}
+          {markerContent("live", () => record("child-click"))}
+        </Marker>
+        <Marker
+          id="tf07-annotation"
+          longitude={annotation[0]}
+          latitude={annotation[1]}
+          renderMode="annotation"
+          onClick={() => record("annotation-click")}
+          {...(!native && {
+            draggable: true,
+            onDragStart: () => record("annotation-start"),
+            onDrag: (event) => setAnnotation(event.lngLat),
+            onDragEnd: (event) => {
+              lastPositions.current.annotation = event.lngLat;
+              setAnnotation(event.lngLat);
+              record("annotation-end");
+            },
+          })}
+          onError={fail}
+        >
+          {markerContent("annotation", () => undefined)}
+        </Marker>
+        {/* eslint-disable react/refs -- Host renderers receive event callbacks; observation refs are read only when activated. */}
+        {popup &&
+          renderPopup(
+            markerContent("popup", () => record("popup-child")),
+            () => record("popup-open"),
+            () => {
+              record("popup-close");
+              setPopup(false);
+            }
+          )}
+        {/* eslint-enable react/refs */}
+        {!native && <Navigation mapRef={mapRef} onError={fail} />}
+        <GeolocateControl
+          position="top-left"
+          getCurrentPosition={async () => location}
+          zoom={11}
+          onGeolocate={() => record("location")}
+          onError={fail}
         />
-      </Source>
-      <Marker id="tf07-default" longitude={-122.38} latitude={47.63} />
-      <Marker
-        id="tf07-live"
-        longitude={live[0]}
-        latitude={live[1]}
-        offset={offset}
-        onClick={() => record("marker-click")}
-        {...(!native && {
-          draggable: true,
-          onDragStart: () => record("live-start"),
-          onDrag: (event) => {
-            setLive(event.lngLat);
-            record("live-drag");
-          },
-          onDragEnd: (event) => {
-            lastPositions.current.live = event.lngLat;
-            setLive(event.lngLat);
-            record("live-end");
-          },
-        })}
-        onError={fail}
-      >
-        {/* eslint-disable-next-line react/refs -- markerContent receives an event callback; the callback reads observation refs only when clicked. */}
-        {markerContent("live", () => record("child-click"))}
-      </Marker>
-      <Marker
-        id="tf07-annotation"
-        longitude={annotation[0]}
-        latitude={annotation[1]}
-        renderMode="annotation"
-        onClick={() => record("annotation-click")}
-        {...(!native && {
-          draggable: true,
-          onDragStart: () => record("annotation-start"),
-          onDrag: (event) => setAnnotation(event.lngLat),
-          onDragEnd: (event) => {
-            lastPositions.current.annotation = event.lngLat;
-            setAnnotation(event.lngLat);
-            record("annotation-end");
-          },
-        })}
-        onError={fail}
-      >
-        {markerContent("annotation", () => undefined)}
-      </Marker>
-      {/* eslint-disable react/refs -- Host renderers receive event callbacks; observation refs are read only when activated. */}
-      {popup &&
-        renderPopup(
-          markerContent("popup", () => record("popup-child")),
-          () => record("popup-open"),
-          () => {
-            record("popup-close");
-            setPopup(false);
-          }
-        )}
-      {/* eslint-enable react/refs */}
-      <NavigationControl position="top-right" onError={fail} />
-      <GeolocateControl
-        position="top-left"
-        getCurrentPosition={async () => location}
-        zoom={11}
-        onGeolocate={() => record("location")}
-        onError={fail}
-      />
-      <ScaleControl position="bottom-left" unit={unit} onError={fail} />
-      <Control position="bottom-right">{controlContent}</Control>
-    </OneMap>
+        <ScaleControl position="bottom-left" unit={unit} onError={fail} />
+        <Control position="bottom-right">{controlContent}</Control>
+      </OneMap>
+      {native && <Navigation mapRef={mapRef} onError={fail} />}
+    </>
   );
 };

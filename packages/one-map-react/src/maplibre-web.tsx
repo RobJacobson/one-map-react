@@ -33,21 +33,17 @@ import type { MapProps } from "./contracts/map-types.js";
 import type {
   AttributionControlProps,
   ControlProps,
-  FullscreenControlProps,
   GeolocateControlProps,
   MarkerProps,
   MarkerRef,
-  NavigationControlProps,
   ScaleControlProps,
 } from "./contracts/ui-types.js";
 import { Map as OneMap } from "./facade/map.js";
 import {
   AttributionControl as OneAttributionControl,
   Control as OneControl,
-  FullscreenControl as OneFullscreenControl,
   GeolocateControl as OneGeolocateControl,
   Marker as OneMarker,
-  NavigationControl as OneNavigationControl,
   ScaleControl as OneScaleControl,
 } from "./facade/ui.js";
 import { useStableOptions } from "./facade/use-stable-options.js";
@@ -79,15 +75,11 @@ export const adapter: Adapter & { readonly backend: "maplibre-web" } =
     Source: MaplibreSource as ComponentType<WebForwardedProps>,
     Layer: MaplibreLayer as Adapter["Layer"],
     Marker: MaplibreMarker as unknown as ComponentType<WebForwardedProps>,
-    NavigationControl:
-      MaplibreNavigationControl as ComponentType<WebForwardedProps>,
     AttributionControl:
       MaplibreAttributionControl as ComponentType<WebForwardedProps>,
     ScaleControl: MaplibreScaleControl as ComponentType<WebForwardedProps>,
     GeolocateControl:
       MaplibreGeolocateControl as ComponentType<WebForwardedProps>,
-    FullscreenControl:
-      MaplibreFullscreenControl as ComponentType<WebForwardedProps>,
     useControl: useControl as unknown as WebControlHook,
     useMap,
     // MapLibre GL resolves image loads with a { data } response; the shared
@@ -191,18 +183,6 @@ export interface WebControlProps extends ControlProps {
 /** Custom control with DOM content attributes. */
 export const Control = OneControl as ComponentType<WebControlProps>;
 
-/** Navigation control props with selected wrapper options. */
-export interface WebNavigationControlProps extends NavigationControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibreNavigationControl>,
-    keyof NavigationControlProps
-  >;
-}
-/** Navigation control with selected web options. */
-export const NavigationControl =
-  OneNavigationControl as ComponentType<WebNavigationControlProps>;
-
 /** Attribution control props with selected wrapper options. */
 export interface WebAttributionControlProps extends AttributionControlProps {
   /** Remaining selected constructor options and CSS presentation. */
@@ -238,18 +218,6 @@ export interface WebGeolocateControlProps extends GeolocateControlProps {
 /** Geolocation control with selected web options. */
 export const GeolocateControl =
   OneGeolocateControl as ComponentType<WebGeolocateControlProps>;
-
-/** Fullscreen control props with selected browser target. */
-export interface WebFullscreenControlProps extends FullscreenControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibreFullscreenControl>,
-    keyof FullscreenControlProps
-  >;
-}
-/** Fullscreen control with selected web options. */
-export const FullscreenControl =
-  OneFullscreenControl as ComponentType<WebFullscreenControlProps>;
 
 export {
   GlobeControl as WrapperGlobeControl,

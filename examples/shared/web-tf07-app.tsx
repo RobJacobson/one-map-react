@@ -13,9 +13,13 @@ declare global {
 /** Web acceptance shell opened with `?tf07=ui`. */
 export const WebTf07App = ({
   adapter,
+  renderNavigation,
   renderPopup,
 }: {
   readonly adapter: Adapter;
+  readonly renderNavigation: ComponentProps<
+    typeof Tf07Scene
+  >["renderNavigation"];
   readonly renderPopup: ComponentProps<typeof Tf07Scene>["renderPopup"];
 }) => {
   const [status, setStatus] = useState("TF07 waiting for map");
@@ -46,6 +50,7 @@ export const WebTf07App = ({
         </div>
         <div id="tf07-map-host" style={{ flex: 1, position: "relative" }}>
           <Tf07Scene
+            renderNavigation={renderNavigation}
             renderPopup={renderPopup}
             style={{ width: "100%", height: "100%" }}
             attach={attach}

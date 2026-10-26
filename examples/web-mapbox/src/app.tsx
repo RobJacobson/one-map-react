@@ -4,7 +4,11 @@ import {
   Layer as AdvancedLayer,
   type WebMapRef,
 } from "one-map-react/mapbox-web";
-import { adapter, WrapperPopup } from "one-map-react/mapbox-web";
+import {
+  adapter,
+  WrapperPopup,
+  WrapperNavigationControl,
+} from "one-map-react/mapbox-web";
 import { type ReactNode, useEffect } from "react";
 import { useMap } from "react-map-gl/mapbox";
 
@@ -40,10 +44,20 @@ export const App = () => {
     );
   if (new URLSearchParams(window.location.search).get("tf08") === "services")
     return (
-      <WebTf08App adapter={adapter} renderCoveragePopup={renderCoveragePopup} />
+      <WebTf08App
+        navigationControl={<WrapperNavigationControl position="top-right" />}
+        adapter={adapter}
+        renderCoveragePopup={renderCoveragePopup}
+      />
     );
   if (new URLSearchParams(window.location.search).get("tf07") === "ui")
-    return <WebTf07App adapter={adapter} renderPopup={renderPopup} />;
+    return (
+      <WebTf07App
+        renderNavigation={renderNavigation}
+        adapter={adapter}
+        renderPopup={renderPopup}
+      />
+    );
   if (cameraSmoke === "corrections" || sourcesSmoke === "corrections") {
     return <WebCorrectionsApp adapter={adapter} probe={<CorrectionProbe />} />;
   }
@@ -213,4 +227,8 @@ const renderCoveragePopup = (children: ReactNode): ReactNode => (
   >
     {children}
   </WrapperPopup>
+);
+
+const renderNavigation = () => (
+  <WrapperNavigationControl position="top-right" />
 );

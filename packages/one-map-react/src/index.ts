@@ -108,13 +108,11 @@ export type {
   AttributionControlProps,
   ControlPosition,
   ControlProps,
-  FullscreenControlProps,
   GeolocateControlProps,
   GeolocationPosition,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
-  NavigationControlProps,
   ScaleControlProps,
 } from "./contracts/ui-types.js";
 export { Images } from "./facade/images.js";
@@ -127,10 +125,8 @@ export { Source } from "./facade/source.js";
 export {
   AttributionControl,
   Control,
-  FullscreenControl,
   GeolocateControl,
   Marker,
-  NavigationControl,
   ScaleControl,
 } from "./facade/ui.js";
 export { UserLocation } from "./facade/user-location.js";

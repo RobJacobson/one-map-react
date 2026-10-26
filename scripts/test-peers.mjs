@@ -365,6 +365,37 @@ NetworkManager.setConnected(false);
 NetworkManager.setConnected(42);
 `;
   const popupAssertions = `
+// @ts-expect-error Application controls replace the selected facade.
+import { NavigationControl } from "one-map-react/${entry}";
+${
+  entry.endsWith("web")
+    ? `// @ts-expect-error Selected facade props are removed.
+import type { WebNavigationControlProps } from "one-map-react/${entry}";`
+    : ""
+}
+// @ts-expect-error Application controls replace the selected facade.
+import { FullscreenControl } from "one-map-react/${entry}";
+${
+  entry.endsWith("web")
+    ? `// @ts-expect-error Selected facade props are removed.
+import type { WebFullscreenControlProps } from "one-map-react/${entry}";`
+    : ""
+}
+${
+  entry.endsWith("web")
+    ? `import { WrapperMarker, WrapperNavigationControl, WrapperFullscreenControl } from "one-map-react/${entry}";
+void <WrapperMarker longitude={0} latitude={0} />;
+void <WrapperNavigationControl position="top-left" showZoom={false} visualizePitch />;
+void <WrapperFullscreenControl position="bottom-right" />;
+${
+  entry === "maplibre-web"
+    ? `import { WrapperGlobeControl, WrapperLogoControl, WrapperTerrainControl } from "one-map-react/maplibre-web";
+void WrapperGlobeControl; void WrapperLogoControl; void WrapperTerrainControl;`
+    : ""
+}`
+    : ""
+}
+
 // @ts-expect-error No selected common popup facade remains.
 import { Popup } from "one-map-react/${entry}";
 // @ts-expect-error Popup facade props are removed.

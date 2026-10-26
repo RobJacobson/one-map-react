@@ -73,18 +73,6 @@ export interface ControlProps {
   readonly children?: ReactNode;
 }
 
-/** Zoom buttons and camera compass. */
-export interface NavigationControlProps extends ControlProps {
-  /** Shows zoom buttons; creation input, default true. */
-  readonly showZoom?: boolean;
-  /** Shows a bearing reset button; creation input, default true. */
-  readonly showCompass?: boolean;
-  /** Includes pitch in compass presentation; creation input. */
-  readonly visualizePitch?: boolean;
-  /** Reports camera command failures. */
-  readonly onError?: (error: unknown) => void;
-}
-
 /** Renderer attribution ornament. */
 export interface AttributionControlProps extends ControlProps {
   /** Compact presentation; creation input. */
@@ -136,6 +124,3 @@ export interface GeolocateControlProps extends ControlProps {
   /** Streaming override; otherwise uses MapSetup or the selected default. */
   readonly locationProvider?: import("./location-types.js").LocationService;
 }
-
-/** Browser fullscreen control; native fails explicitly. */
-export interface FullscreenControlProps extends ControlProps {}

@@ -85,7 +85,6 @@ vi.mock("one-map-react", async () => {
     Source: Container,
     Layer: Empty,
     Control: Empty,
-    NavigationControl: Empty,
     GeolocateControl: Empty,
     ScaleControl: Empty,
   };
@@ -107,6 +106,7 @@ test("TF07 application popup close removes its content and teardown stays silent
   );
   const scene = () => (
     <Tf07Scene
+      renderNavigation={() => null}
       native
       style={{ width: 400, height: 300 }}
       renderPopup={popup}

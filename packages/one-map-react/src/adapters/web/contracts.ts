@@ -227,16 +227,12 @@ interface WebWrapper<
   readonly Layer: Adapter["Layer"];
   /** Live marker delegated to the selected wrapper. */
   readonly Marker: ComponentType<WebForwardedProps>;
-  /** Selected wrapper navigation buttons and compass. */
-  readonly NavigationControl: ComponentType<WebForwardedProps>;
   /** Selected wrapper attribution control. */
   readonly AttributionControl: ComponentType<WebForwardedProps>;
   /** Selected wrapper scale control. */
   readonly ScaleControl: ComponentType<WebForwardedProps>;
   /** Selected wrapper browser location control. */
   readonly GeolocateControl: ComponentType<WebForwardedProps>;
-  /** Selected wrapper browser fullscreen control. */
-  readonly FullscreenControl: ComponentType<WebForwardedProps>;
   /** Registers facade-owned hosts through the wrapper lifecycle. */
   readonly useControl: (
     create: () => WebCustomControl,

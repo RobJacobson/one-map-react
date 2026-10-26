@@ -11,7 +11,6 @@ import {
   Marker,
   type MarkerRef,
   AttributionControl,
-  NavigationControl,
   ScaleControl,
   Map as OneMap,
   Source,
@@ -42,6 +41,7 @@ interface Tf08AcceptanceSceneProps {
   readonly fixtureUrl: string;
   readonly externalContext?: MapProps["gl"];
   readonly nativePuck?: ReactNode;
+  readonly navigationControl?: ReactNode;
 }
 
 const initialCamera = {
@@ -75,6 +75,7 @@ export const Tf08AcceptanceScene = ({
   fixtureUrl,
   externalContext,
   nativePuck,
+  navigationControl,
 }: Tf08AcceptanceSceneProps) => {
   const mapRef = useRef<MapRef>(null);
   const annotationRef = useRef<MarkerRef>(null);
@@ -326,9 +327,7 @@ export const Tf08AcceptanceScene = ({
         <>
           <AttributionControl position="bottom-right" />
           <ScaleControl position="bottom-left" />
-          {backend.endsWith("web") && (
-            <NavigationControl position="top-right" />
-          )}
+          {backend.endsWith("web") && navigationControl}
         </>
       )}
       {mode === "coverage-puck" && nativePuck}
