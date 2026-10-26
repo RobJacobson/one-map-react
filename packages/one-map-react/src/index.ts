@@ -12,12 +12,7 @@ export type {
   ViewState,
   ZoomToOptions,
 } from "./contracts/camera-types.js";
-export type {
-  ImageOutput,
-  MapImage,
-  StaticMapImageOptions,
-  StaticMapImageService,
-} from "./contracts/capture-types.js";
+
 export type {
   ClickEvent,
   MapErrorEvent,

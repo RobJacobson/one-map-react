@@ -1,16 +1,7 @@
-import {
-  LocationManager,
-  StaticMapImageManager,
-} from "@maplibre/maplibre-react-native";
+import { LocationManager } from "@maplibre/maplibre-react-native";
 
 import type { MapServices } from "../../contracts/adapter.js";
-import {
-  normalizeStaticImage,
-  validateStaticImage,
-  withImageDeadline,
-} from "../shared/image-output.js";
 import { createNativeLocation } from "../shared/native-location.js";
-import { toFlatBounds } from "../shared/wrapper-values.js";
 
 /** MapLibre public services, accessed only by explicit operations. */
 export const maplibreNativeServices: MapServices = {
@@ -19,35 +10,4 @@ export const maplibreNativeServices: MapServices = {
     "maplibre",
     () => LocationManager.requestPermissions()
   ),
-  staticMapImage: {
-    create: async (options) => {
-      validateStaticImage(options);
-      const camera = options.bounds
-        ? {
-            bounds: [...toFlatBounds(options.bounds)] as [
-              number,
-              number,
-              number,
-              number,
-            ],
-          }
-        : {
-            center: [...options.center] as [number, number],
-            zoom: options.zoom,
-            bearing: options.bearing,
-            pitch: options.pitch,
-          };
-      const result = await withImageDeadline(
-        StaticMapImageManager.createImage({
-          ...camera,
-          mapStyle: options.mapStyle,
-          width: options.width,
-          height: options.height,
-          output: options.output === "file" ? "file" : "base64",
-        }),
-        options.timeoutMs
-      );
-      return normalizeStaticImage(result, options);
-    },
-  },
 };

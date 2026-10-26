@@ -39,6 +39,7 @@ export const NativeTf08Screen = ({
   setNetworkConnected,
   offlineOperations,
   createOfflineCommands,
+  createSnapshot,
   startDetached = false,
   nativePuck,
 }: {
@@ -49,6 +50,9 @@ export const NativeTf08Screen = ({
     Record<string, (value: Record<string, unknown>) => unknown>
   >;
   readonly createOfflineCommands?: () => Tf08OfflineCommands;
+  readonly createSnapshot?: (
+    value: Record<string, unknown>
+  ) => Promise<{ uri: string }>;
   readonly startDetached?: boolean;
   readonly nativePuck?: ReactNode;
 }) => {
@@ -111,32 +115,35 @@ export const NativeTf08Screen = ({
             environment,
             ok: true,
             value:
-              request.action.startsWith("offline-") && offlineCommands.current
-                ? await offlineCommands.current.command(
-                    request.action,
-                    request.value
-                  )
-                : request.action === "device-info"
-                  ? {
-                      scale: PixelRatio.get(),
-                      window: Dimensions.get("window"),
-                    }
-                  : request.action === "named-offline"
-                    ? await runOfflineOperation(
-                        offlineOperations,
-                        String(request.value?.operation),
-                        request.value ?? {}
-                      )
-                    : request.action === "network" && setNetworkConnected
-                      ? await setNetworkConnected(
-                          request.value?.connected === true
+              request.action === "snapshot" && createSnapshot
+                ? await createSnapshot(request.value ?? {})
+                : request.action.startsWith("offline-") &&
+                    offlineCommands.current
+                  ? await offlineCommands.current.command(
+                      request.action,
+                      request.value
+                    )
+                  : request.action === "device-info"
+                    ? {
+                        scale: PixelRatio.get(),
+                        window: Dimensions.get("window"),
+                      }
+                    : request.action === "named-offline"
+                      ? await runOfflineOperation(
+                          offlineOperations,
+                          String(request.value?.operation),
+                          request.value ?? {}
                         )
-                      : !probe.current && request.action === "configure"
-                        ? null
-                        : await probe.current?.command(
-                            request.action,
-                            request.value
-                          ),
+                      : request.action === "network" && setNetworkConnected
+                        ? await setNetworkConnected(
+                            request.value?.connected === true
+                          )
+                        : !probe.current && request.action === "configure"
+                          ? null
+                          : await probe.current?.command(
+                              request.action,
+                              request.value
+                            ),
           };
         } catch (error) {
           result = {
@@ -189,6 +196,7 @@ export const NativeTf08Screen = ({
     getLocationDiagnostic,
     setNetworkConnected,
     offlineOperations,
+    createSnapshot,
   ]);
   return (
     <MapSetup adapter={adapter}>

@@ -1009,20 +1009,16 @@ const nativeScenarios = async () => {
     }
   );
   await scenario(
-    "invalid snapshot style rejects before the facade deadline",
+    "selected SDK rejects an invalid independent snapshot style",
     async () => {
       const started = Date.now();
       await assert.rejects(
         action("snapshot", {
           mapStyle: `${fixtureUrl}/invalid-style.json`,
-          timeoutMs: 20000,
-        })
+        }),
+        { name: "Tf08CommandError" }
       );
       const elapsedMs = Date.now() - started;
-      assert(
-        elapsedMs < 19000,
-        "Only the facade deadline rejected a stalled native snapshot."
-      );
       return { elapsedMs };
     }
   );
@@ -1230,7 +1226,9 @@ const action = async (name, value = {}) => {
   replies.delete(id);
   if (!reply.ok) {
     if (name === "position") locationDiagnostic = reply.diagnostic;
-    throw new Error(reply.message ?? reply.error);
+    throw Object.assign(new Error(reply.message ?? reply.error), {
+      name: "Tf08CommandError",
+    });
   }
   if (name === "read")
     lastRendererObservation = {

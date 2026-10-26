@@ -196,19 +196,6 @@ export const Tf08AcceptanceScene = ({
         });
         return { ...position, requestedAt, completedAt: Date.now() };
       }
-      if (action === "snapshot") {
-        if (!services.staticMapImage)
-          throw new Error("Snapshot service unavailable.");
-        return services.staticMapImage.create({
-          mapStyle: String(value.mapStyle ?? `${fixtureUrl}/style.json`),
-          center: [0, 0],
-          zoom: 0,
-          width: Number(value.width ?? 96),
-          height: Number(value.height ?? 64),
-          output: value.output === "file" ? "file" : "data-url",
-          timeoutMs: Number(value.timeoutMs ?? 20000),
-        });
-      }
       throw new Error("Unknown acceptance action.");
     };
     attach({ command });

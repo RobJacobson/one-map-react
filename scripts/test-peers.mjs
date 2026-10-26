@@ -256,8 +256,8 @@ selectedRef.setEventedParent(null);`
     : entry === "mapbox-native"
       ? `
 import type { ComponentRef } from "react";
-import type { MapView as RnmapboxMapView } from "@rnmapbox/maps";
-import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef, WrapperOfflineManager } from "one-map-react/mapbox-native";
+import type { MapView as RnmapboxMapView, SnapshotOptions } from "@rnmapbox/maps";
+import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef, WrapperOfflineManager, WrapperSnapshotManager } from "one-map-react/mapbox-native";
 void <WrapperMapView styleJSON={JSON.stringify(style)}><WrapperCamera zoomLevel={0} /><WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} /></WrapperMapView>;
 void Terrain; void Light; void Models; void RasterArraySource; void Viewport;
 setTelemetryEnabled(false);
@@ -282,6 +282,19 @@ const useSelectedOfflineManager = async (): Promise<void> => {
   await WrapperOfflineManager.createPack({ mapStyle: "https://example.test/style", bounds: [0,0,1,1] }, () => {});
 };
 void useSelectedOfflineManager;
+const useSelectedSnapshot = async (): Promise<void> => {
+  const centeredOptions: ConstructorParameters<typeof SnapshotOptions>[0] = { centerCoordinate: [0,0], zoomLevel: 0, width: 128, height: 80, writeToDisk: false };
+  const centered: string = await WrapperSnapshotManager.takeSnap(centeredOptions);
+  // @ts-expect-error RNMapbox output is selected with a boolean file flag.
+  const invalidOutput: ConstructorParameters<typeof SnapshotOptions>[0] = { centerCoordinate: [0,0], writeToDisk: "file" };
+  // @ts-expect-error RNMapbox bounds are coordinate pairs, not flat corners.
+  const invalidBounds: ConstructorParameters<typeof SnapshotOptions>[0] = { bounds: [-10,-10,10,10] };
+  void invalidOutput; void invalidBounds;
+  const bounded: string = await WrapperSnapshotManager.takeSnap({ bounds: [[10,10],[-10,-10]], width: 128, height: 80, writeToDisk: true });
+  void centered; void bounded;
+};
+void useSelectedSnapshot;
+
 const useBorrowedWrapper = async (): Promise<void> => {
   const wrapper = await selectedRef.getWrapperMap();
   const center: number[] = await wrapper.getCenter();
@@ -298,7 +311,7 @@ selectedRef.setSourceVisibility(false, 'source');
       : `
 import type { ComponentRef } from "react";
 import type { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
-import { Map as SelectedMap, type NativeAdvancedMapRef, WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer, WrapperOfflineManager } from "one-map-react/maplibre-native";
+import { Map as SelectedMap, type NativeAdvancedMapRef, WrapperMap, WrapperCamera, WrapperGeoJSONSource, Animated, NetworkManager, TransformRequestManager, Layer as SelectedLayer, WrapperOfflineManager, WrapperStaticMapImageManager } from "one-map-react/maplibre-native";
 declare const selectedRef: NativeAdvancedMapRef;
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof MaplibreMap>>> = true;
@@ -317,6 +330,17 @@ const useSelectedOfflineManager = async (): Promise<void> => {
   await WrapperOfflineManager.createPack({ mapStyle: "https://example.test/style", bounds: [[10,10],[-10,-10]] }, () => {}, () => {});
 };
 void useSelectedOfflineManager;
+const useSelectedSnapshot = async (): Promise<void> => {
+  const centered: string = await WrapperStaticMapImageManager.createImage({ mapStyle: "https://example.test/style", center: [0,0], zoom: 0, width: 128, height: 80, output: "base64" });
+  const bounded: string = await WrapperStaticMapImageManager.createImage({ mapStyle: "https://example.test/style", bounds: [-10,-10,10,10], width: 128, height: 80, output: "file" });
+  // @ts-expect-error MapLibre snapshot bounds are flat west/south/east/north.
+  await WrapperStaticMapImageManager.createImage({ mapStyle: "https://example.test/style", bounds: [[10,10],[-10,-10]], width: 128, height: 80, output: "file" });
+  // @ts-expect-error SDK output choices are file or base64.
+  await WrapperStaticMapImageManager.createImage({ mapStyle: "https://example.test/style", center: [0,0], width: 128, height: 80, output: "data-url" });
+  void centered; void bounded;
+};
+void useSelectedSnapshot;
+
 const useBorrowedWrapper = async (): Promise<void> => {
   const wrapper = await selectedRef.getWrapperMap();
   const capture: string = await wrapper.createStaticMapImage({ output: "file" });

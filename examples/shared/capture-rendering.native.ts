@@ -37,6 +37,19 @@ export const captureRendering = async (
   } else {
     throw new Error(`Unknown observation backend: ${backend}`);
   }
+  return observationImageUri(image, output);
+};
+
+/**
+ * Adapts native output only for this application's PNG observer transport.
+ * @param image - Unchanged SDK result.
+ * @param output - Transport chosen by this application.
+ * @returns URI the observer can read, without checking format or dimensions.
+ */
+export const observationImageUri = (
+  image: string,
+  output: "data-url" | "file"
+): { uri: string } => {
   // The harness reads file URLs and PNG data URLs, while native SDKs may return bare paths/base64.
   if (output === "file")
     return {
