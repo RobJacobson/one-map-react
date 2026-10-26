@@ -773,7 +773,7 @@ describe("maplibre-web images", () => {
     expect(target.addImage).toHaveBeenCalledTimes(1);
   });
 
-  test("a replaced style drops images and styledata re-registers them", async () => {
+  test("styledata does not replay dropped images", async () => {
     render(tree(<Images images={{ marker: "https://example.com/m.png" }} />));
     const target = loadedStyle();
 
@@ -786,9 +786,9 @@ describe("maplibre-web images", () => {
     target.emitStyleData();
 
     await waitFor(() => {
-      expect(target.hasImage("marker")).toBe(true);
+      expect(target.hasImage("marker")).toBe(false);
     });
-    expect(target.addImage).toHaveBeenCalledTimes(2);
+    expect(target.addImage).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1088,7 +1088,7 @@ describe("web correction regressions", () => {
   });
 });
 
-test("registered image removals retry when image methods are unavailable", async () => {
+test("failed image cleanup reports an error without style-event retry", async () => {
   resetWebMapMock();
   const rendered = render(
     tree(<Images images={{ marker: "https://example.com/marker.png" }} />)
@@ -1105,7 +1105,8 @@ test("registered image removals retry when image methods are unavailable", async
   expect(target.hasImage("marker")).toBe(true);
   ready.mockReturnValue(true);
   target.emitStyleLoad();
-  expect(target.hasImage("marker")).toBe(false);
+  expect(target.hasImage("marker")).toBe(true);
+  expect(target.removeImage).toHaveBeenCalledTimes(1);
   ready.mockRestore();
 });
 

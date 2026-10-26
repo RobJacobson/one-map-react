@@ -98,7 +98,7 @@ export interface StyleLoadTarget {
   emitStyleData: () => void;
   emitError: (error: unknown) => void;
   clearImages: () => void;
-  getSprite?: () => { id: string; url: string }[];
+  beginStyleChange: () => void;
   hasImage: (name: string) => boolean;
   addImage: Mock<
     (name: string, image: unknown, options?: { sdf?: boolean }) => void
@@ -121,6 +121,7 @@ export interface StyleLoadTarget {
 }
 
 interface WebMapMockProps extends HandlerProps {
+  readonly mapStyle?: unknown;
   readonly children?: ReactNode;
   readonly ref?: Ref<MapHandle>;
   readonly reuseMaps?: boolean;
@@ -151,6 +152,8 @@ interface WebMapMockProps extends HandlerProps {
  * @returns The mocked Map, Source, and Layer plus pool controls.
  */
 export const createWebMapMock = () => {
+  const styleChange =
+    vi.fn<(style: unknown, target: StyleLoadTarget) => void>();
   const selectedMethods: Record<string, (...args: unknown[]) => unknown> = {};
   const flyTo = vi.fn(() => ({ id: "map" }));
   const jumpTo = vi.fn();
@@ -310,6 +313,7 @@ export const createWebMapMock = () => {
     removeFeatureState.mockClear();
     disableRotation.mockClear();
     enableRotation.mockClear();
+    styleChange.mockReset();
     Source.mockClear();
     Layer.mockClear();
   };
@@ -317,6 +321,7 @@ export const createWebMapMock = () => {
   const WrapperMap = vi.fn(
     ({
       children,
+      mapStyle,
       ref,
       reuseMaps,
       gl,
@@ -353,6 +358,10 @@ export const createWebMapMock = () => {
       });
 
       currentStyleTarget = record.styleTarget;
+
+      useLayoutEffect(() => {
+        styleChange(mapStyle, record.styleTarget);
+      }, [mapStyle, record.styleTarget]);
 
       useEffect(() => {
         if (!attached) {
@@ -536,6 +545,7 @@ export const createWebMapMock = () => {
       loadBeforeAttachment = true;
     },
     getStyleTarget: () => currentStyleTarget,
+    styleChange,
     getWrapperMap: () => currentWrapperMap,
     replaceWrapperMap: () => replaceWrapperMap(),
     getConstructionCount: () => serial,
@@ -620,6 +630,10 @@ const createStyleTarget = (
       for (const listener of [...listenersFor("error")]) {
         listener({ error });
       }
+    },
+    beginStyleChange: () => {
+      loaded = false;
+      images.clear();
     },
     clearImages: () => {
       images.clear();
