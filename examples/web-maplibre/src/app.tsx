@@ -7,6 +7,8 @@ import {
 import {
   adapter,
   WrapperPopup,
+  WrapperScaleControl,
+  WrapperAttributionControl,
   WrapperNavigationControl,
 } from "one-map-react/maplibre-web";
 import { type ReactNode, useEffect } from "react";
@@ -46,6 +48,12 @@ export const App = () => {
     return (
       <WebTf08App
         navigationControl={<WrapperNavigationControl position="top-right" />}
+        ornamentControls={
+          <>
+            <WrapperAttributionControl position="bottom-right" />
+            <WrapperScaleControl position="bottom-left" />
+          </>
+        }
         adapter={adapter}
         renderCoveragePopup={renderCoveragePopup}
       />
@@ -54,6 +62,7 @@ export const App = () => {
     return (
       <WebTf07App
         renderNavigation={renderNavigation}
+        renderScale={renderScale}
         adapter={adapter}
         renderPopup={renderPopup}
       />
@@ -229,4 +238,8 @@ const renderCoveragePopup = (children: ReactNode): ReactNode => (
 
 const renderNavigation = () => (
   <WrapperNavigationControl position="top-right" />
+);
+
+const renderScale = (unit: "metric" | "imperial") => (
+  <WrapperScaleControl position="bottom-left" unit={unit} />
 );

@@ -7,7 +7,6 @@ import {
   type MapRef,
   Marker,
   Map as OneMap,
-  ScaleControl,
   Source,
 } from "one-map-react";
 import {
@@ -64,6 +63,8 @@ export interface Tf07Probe {
 
 interface Tf07SceneProps {
   readonly native?: boolean;
+  readonly nativeOrnaments?: object;
+  readonly renderScale?: (unit: "metric" | "imperial") => ReactNode;
   readonly renderNavigation: ComponentType<{
     readonly mapRef: RefObject<MapRef | null>;
     readonly onError: (error: unknown) => void;
@@ -99,6 +100,8 @@ const location = { lngLat: [-122.33, 47.62] as LngLat, accuracy: 12 };
  */
 export const Tf07Scene = ({
   native = false,
+  nativeOrnaments,
+  renderScale,
   style,
   markerContent,
   controlContent,
@@ -145,35 +148,39 @@ export const Tf07Scene = ({
       .catch(fail);
   };
 
-  const configure = useCallback((action: Tf07Action): void => {
-    if (action === "remount") {
-      generationRef.current += 1;
-      setGeneration(generationRef.current);
-      setLive(targets.live);
-      setAnnotation(targets.annotation);
-      setPopup(true);
-      return;
-    }
+  const configure = useCallback(
+    (action: Tf07Action): void => {
+      if (action === "remount") {
+        generationRef.current += 1;
+        setGeneration(generationRef.current);
+        setLive(targets.live);
+        setAnnotation(targets.annotation);
+        setPopup(true);
+        return;
+      }
 
-    if (action === "style") {
-      setMapStyle((current) =>
-        current === emptyStyle ? replacementStyle : emptyStyle
-      );
-      return;
-    }
+      if (action === "style") {
+        setMapStyle((current) =>
+          current === emptyStyle ? replacementStyle : emptyStyle
+        );
+        return;
+      }
 
-    if (action === "offset") {
-      setOffset((current) => (current ? undefined : [24, -12]));
-      return;
-    }
+      if (action === "offset") {
+        setOffset((current) => (current ? undefined : [24, -12]));
+        return;
+      }
 
-    if (action === "popup") {
-      setPopup((current) => !current);
-      return;
-    }
+      if (action === "popup") {
+        setPopup((current) => !current);
+        return;
+      }
 
-    setUnit((current) => (current === "metric" ? "imperial" : "metric"));
-  }, []);
+      if (!native)
+        setUnit((current) => (current === "metric" ? "imperial" : "metric"));
+    },
+    [native]
+  );
 
   useEffect(() => {
     const requireMap = (): MapRef => {
@@ -217,6 +224,7 @@ export const Tf07Scene = ({
         id="tf07-map"
         ref={mapRef}
         mapStyle={mapStyle}
+        {...(native ? { options: nativeOrnaments } : {})}
         initialViewState={initialViewState}
         style={style}
         interactiveLayerIds={["tf07-point"]}
@@ -310,7 +318,7 @@ export const Tf07Scene = ({
           onGeolocate={() => record("location")}
           onError={fail}
         />
-        <ScaleControl position="bottom-left" unit={unit} onError={fail} />
+        {!native && renderScale?.(unit)}
         <Control position="bottom-right">{controlContent}</Control>
       </OneMap>
       {native && <Navigation mapRef={mapRef} onError={fail} />}

@@ -73,24 +73,6 @@ export interface ControlProps {
   readonly children?: ReactNode;
 }
 
-/** Renderer attribution ornament. */
-export interface AttributionControlProps extends ControlProps {
-  /** Compact presentation; creation input. */
-  readonly compact?: boolean;
-  /** Additional attribution; creation input. */
-  readonly customAttribution?: string | readonly string[];
-}
-
-/** Scale of projected ground distance. */
-export interface ScaleControlProps extends ControlProps {
-  /** Maximum logical width; creation input, default 100. */
-  readonly maxWidth?: number;
-  /** Mutable display unit; default metric. */
-  readonly unit?: "metric" | "imperial" | "nautical";
-  /** Reports projection failures. */
-  readonly onError?: (error: unknown) => void;
-}
-
 /** Measured location supplied by an application or selected service. */
 export interface GeolocationPosition {
   /** Geographic coordinate. */

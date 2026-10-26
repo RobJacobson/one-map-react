@@ -86,7 +86,6 @@ vi.mock("one-map-react", async () => {
     Layer: Empty,
     Control: Empty,
     GeolocateControl: Empty,
-    ScaleControl: Empty,
   };
 });
 

@@ -11,12 +11,10 @@ import type { LocationService } from "./location-types.js";
 import type { MapProps } from "./map-types.js";
 import type { SourceProps } from "./source-types.js";
 import type {
-  AttributionControlProps,
   ControlProps,
   GeolocateControlProps,
   MarkerProps,
   MarkerRef,
-  ScaleControlProps,
 } from "./ui-types.js";
 
 /** App-level services independent of map attachment. */
@@ -57,10 +55,6 @@ export interface Adapter {
   >;
   /** Application UI in a map corner. */
   readonly Control: ComponentType<ControlProps>;
-  /** Renderer attribution. */
-  readonly AttributionControl: ComponentType<AttributionControlProps>;
-  /** Ground distance scale. */
-  readonly ScaleControl: ComponentType<ScaleControlProps>;
   /** Location acquisition and camera centering. */
   readonly GeolocateControl: ComponentType<GeolocateControlProps>;
 }

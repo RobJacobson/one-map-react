@@ -6,7 +6,6 @@ import {
   type Ref,
   useCallback,
   useContext,
-  useEffect,
   useId,
   useImperativeHandle,
   useLayoutEffect,
@@ -32,13 +31,11 @@ import type {
   MarkerEvent,
   MarkerProps,
   MarkerRef,
-  ScaleControlProps,
 } from "../../contracts/ui-types.js";
 import { useMapSession } from "../../facade/map-context.js";
 import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
 import { UserLocation } from "../../facade/user-location.js";
 import {
-  NativeCameraContext,
   NativeOverlayContext,
   useNativeMapPresentation,
 } from "./native-map-presentation.js";
@@ -88,14 +85,7 @@ export interface NativeUIOptions {
   readonly backend: "mapbox-native" | "maplibre-native";
 }
 
-type NativeUI = Pick<
-  Adapter,
-  | "Marker"
-  | "Control"
-  | "AttributionControl"
-  | "ScaleControl"
-  | "GeolocateControl"
->;
+type NativeUI = Pick<Adapter, "Marker" | "Control" | "GeolocateControl">;
 
 /**
  * Composes native markers and corner controls.
@@ -216,8 +206,6 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
   return {
     Marker: NativeMarker,
     Control: NativeControl,
-    AttributionControl: NativeAttributionControl,
-    ScaleControl: NativeScaleControl,
     GeolocateControl: NativeGeolocateControl,
   };
 };
@@ -371,92 +359,6 @@ const NativeControl = (props: NativeControlProps): ReactElement => {
   );
 };
 
-const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
-  const { setAttributionPosition } = useNativeMapPresentation();
-  const position = props.position ?? "bottom-right";
-  useLayoutEffect(() => {
-    setAttributionPosition(position);
-    return () => setAttributionPosition(undefined);
-  }, [setAttributionPosition, position]);
-  if (props.compact === false) {
-    throw new Error(
-      "Native AttributionControl does not support expanded attribution."
-    );
-  }
-  if (!props.customAttribution) return null;
-  const attribution = Array.isArray(props.customAttribution)
-    ? props.customAttribution.join(" · ")
-    : props.customAttribution;
-  return (
-    <NativeControl position={position}>
-      <Text style={{ backgroundColor: "white", fontSize: 10 }}>
-        {attribution}
-      </Text>
-    </NativeControl>
-  );
-};
-
-const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
-  const { ref: mapRef, ready } = useMapSession();
-  const camera = useContext(NativeCameraContext);
-  const [scale, setScale] = useState<{
-    readonly width: number;
-    readonly text: string;
-  } | null>(null);
-  const maxWidth = props.maxWidth ?? 100;
-  // Passive effect cleanup can run after layout unmount and promise settlement.
-  const reportError = useActiveCallback(props.onError);
-  const unit = props.unit ?? "metric";
-  if (!Number.isFinite(maxWidth) || maxWidth <= 0)
-    throw new Error("ScaleControl maxWidth must be positive and finite.");
-
-  // Wrapper imperative handles attach after descendant layout effects.
-  useEffect(() => {
-    let active = true;
-    const updateScale = async (): Promise<void> => {
-      const map = mapRef.current;
-      if (!map || !ready) return;
-      try {
-        const center = camera
-          ? ([camera.viewState.longitude, camera.viewState.latitude] as const)
-          : await map.getCenter();
-        const origin = await map.project(center);
-        const end = await map.unproject([origin[0] + maxWidth, origin[1]]);
-        const meters = groundDistance(center, end);
-        if (active && meters > 0) {
-          setScale(scaleDisplay(meters, maxWidth, unit));
-        }
-      } catch (error) {
-        if (active) {
-          setScale(null);
-          reportError(error);
-        }
-      }
-    };
-    void updateScale();
-    return () => {
-      active = false;
-    };
-  }, [ready, mapRef, camera, maxWidth, unit, reportError]);
-
-  if (!scale) return null;
-  return (
-    <NativeControl position={props.position ?? "bottom-left"}>
-      <View
-        style={{
-          width: scale.width,
-          backgroundColor: "rgba(255,255,255,0.8)",
-          borderColor: "black",
-          borderWidth: 1,
-          borderTopWidth: 0,
-        }}
-      >
-        <Text style={{ fontSize: 10 }}>{scale.text}</Text>
-      </View>
-    </NativeControl>
-  );
-};
-
 const NativeGeolocateControl: Adapter["GeolocateControl"] = (props) => {
   const session = useMapSession();
   const { pending, position, activate } = useGeolocationControl(props);
@@ -538,46 +440,3 @@ const DefaultPin = (): ReactElement => (
     </View>
   </View>
 );
-
-const groundDistance = (first: LngLat, second: LngLat): number => {
-  const radians = Math.PI / 180;
-  const latitudeDelta = (second[1] - first[1]) * radians;
-  const longitudeDelta = (second[0] - first[0]) * radians;
-  const chord =
-    Math.sin(latitudeDelta / 2) ** 2 +
-    Math.cos(first[1] * radians) *
-      Math.cos(second[1] * radians) *
-      Math.sin(longitudeDelta / 2) ** 2;
-  return (
-    6371008.8 *
-    2 *
-    Math.atan2(Math.sqrt(chord), Math.sqrt(Math.max(0, 1 - chord)))
-  );
-};
-
-const scaleDisplay = (
-  meters: number,
-  maxWidth: number,
-  unit: ScaleControlProps["unit"]
-): { readonly width: number; readonly text: string } => {
-  let divisor = 1;
-  let suffix = "m";
-  if (unit === "nautical") {
-    divisor = 1852;
-    suffix = "nm";
-  } else if (unit === "imperial") {
-    divisor = meters >= 1609.344 ? 1609.344 : 0.3048;
-    suffix = meters >= 1609.344 ? "mi" : "ft";
-  } else if (meters >= 1000) {
-    divisor = 1000;
-    suffix = "km";
-  }
-  const amount = meters / divisor;
-  const magnitude = 10 ** Math.floor(Math.log10(amount));
-  const rounded = [5, 2, 1].find((step) => step * magnitude <= amount) ?? 1;
-  const value = rounded * magnitude;
-  return {
-    width: (maxWidth * value) / amount,
-    text: `${Number(value.toPrecision(3))} ${suffix}`,
-  };
-};

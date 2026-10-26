@@ -28,7 +28,6 @@ import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
-import { AttributionControl, ScaleControl } from "../src/facade/ui.js";
 
 const mockSetCamera = jest.fn();
 const mockGetCenter = jest.fn(async () => [-122.34, 47.61]);
@@ -714,36 +713,33 @@ describe("mapbox-native adapter", () => {
     }
   });
 
-  test("attribution control restores selected position and disabled state after removal", async () => {
-    const options = {
-      attributionPosition: { top: 5, right: 6 },
-      attributionEnabled: false,
-    };
-    const scene = (mounted: boolean, position?: "top-left") => (
+  test("selected SDK ornament flags and positions update and reset to defaults", async () => {
+    const scene = (enabled: boolean | undefined) => (
       <MapSetup adapter={adapter}>
         <NativeMap
           mapStyle={emptyStyle}
           initialViewState={initialViewState}
-          options={options}
-        >
-          {mounted && <AttributionControl position={position} />}
-        </NativeMap>
+          options={{
+            attributionEnabled: enabled,
+            logoEnabled: enabled,
+            scaleBarEnabled: enabled,
+            attributionPosition:
+              enabled === undefined ? undefined : { top: 5, right: 6 },
+          }}
+        />
       </MapSetup>
     );
-    const view = await render(scene(false));
-    expect(lastMapProps()).toMatchObject(options);
-    await view.rerender(scene(true));
-    expect(lastMapProps()).toMatchObject({
-      attributionPosition: { bottom: 8, right: 8 },
-      attributionEnabled: true,
-    });
-    await view.rerender(scene(false));
-    expect(lastMapProps()).toMatchObject(options);
-    await view.rerender(scene(true, "top-left"));
-    expect(lastMapProps()).toMatchObject({
-      attributionPosition: { top: 8, left: 8 },
-      attributionEnabled: true,
-    });
+    const view = await render(scene(true));
+    for (const enabled of [true, false, undefined]) {
+      await view.rerender(scene(enabled));
+      expect(lastMapProps()).toMatchObject({
+        attributionEnabled: enabled,
+        logoEnabled: enabled,
+        scaleBarEnabled: enabled,
+        attributionPosition:
+          enabled === undefined ? undefined : { top: 5, right: 6 },
+      });
+    }
     await view.unmount();
   });
 
@@ -807,27 +803,6 @@ describe("mapbox-native adapter", () => {
     expect(configured.attributionPosition).toEqual(
       explicit.attributionPosition
     );
-  });
-
-  test("scale initializes at load and changes units without camera movement", async () => {
-    mockGetCoordinateFromView
-      .mockResolvedValueOnce([-122.32, 47.61])
-      .mockResolvedValueOnce([-122.32, 47.61]);
-    const scene = (unit: "metric" | "imperial") => (
-      <MapSetup adapter={adapter}>
-        <OneMap mapStyle={emptyStyle} initialViewState={initialViewState}>
-          <ScaleControl unit={unit} />
-        </OneMap>
-      </MapSetup>
-    );
-    const view = await render(scene("metric"));
-    await act(async () =>
-      view.getByTestId("wrapper-map").props.onDidFinishLoadingMap()
-    );
-    await waitFor(() => expect(view.getByText("1 km")).toBeTruthy());
-    await view.rerender(scene("imperial"));
-    await waitFor(() => expect(view.getByText("2000 ft")).toBeTruthy());
-    expect(view.queryByText("1 km")).toBeNull();
   });
 
   test("nested ShapeSource injects sourceID onto the line layer", async () => {

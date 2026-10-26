@@ -211,12 +211,10 @@ const MapboxNativeMapImplementation = forwardRef<
                 : undefined)
             }
             attributionPosition={
-              session.attributionPosition
-                ? ornaments.position(session.attributionPosition)
-                : (props.options?.attributionPosition ??
-                  (ornaments.managed
-                    ? ornaments.position("bottom-right")
-                    : undefined))
+              props.options?.attributionPosition ??
+              (ornaments.managed
+                ? ornaments.position("bottom-right")
+                : undefined)
             }
             compassPosition={
               props.options?.compassPosition ??
@@ -224,11 +222,6 @@ const MapboxNativeMapImplementation = forwardRef<
             }
             scaleBarPosition={scaleBarPosition}
             {...(refreshScalePosition ? { scaleBarEnabled: false } : {})}
-            {...(session.attributionPosition
-              ? {
-                  attributionEnabled: true,
-                }
-              : {})}
             ref={mapViewRef}
             style={{ flex: 1 }}
             {...styleProps}

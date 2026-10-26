@@ -2,12 +2,10 @@ import { forwardRef } from "react";
 
 import { useFrozenValue } from "../adapters/shared/use-frozen-value.js";
 import type {
-  AttributionControlProps,
   ControlProps,
   GeolocateControlProps,
   MarkerProps,
   MarkerRef,
-  ScaleControlProps,
 } from "../contracts/ui-types.js";
 import { useMapSession } from "./map-context.js";
 import { useSelectedAdapter } from "./map-setup.js";
@@ -35,32 +33,6 @@ export const Control = (props: ControlProps) => {
   useMapSession();
   const { Control: Implementation } = useSelectedAdapter();
   useStableOptions("Control", { position: props.position ?? "top-right" });
-  return <Implementation {...props} />;
-};
-
-/** Delegates attribution to the selected renderer. */
-export const AttributionControl = (props: AttributionControlProps) => {
-  useMapSession();
-  const { AttributionControl: Implementation, backend } = useSelectedAdapter();
-  const native = backend.endsWith("native");
-  useStableOptions("AttributionControl", {
-    position: props.position ?? (native ? "bottom-right" : "top-right"),
-    compact: native ? (props.compact ?? true) : props.compact,
-    customAttribution: props.customAttribution,
-  });
-  return <Implementation {...props} />;
-};
-
-/** Displays projected ground distance in the requested units. */
-export const ScaleControl = (props: ScaleControlProps) => {
-  useMapSession();
-  const { ScaleControl: Implementation, backend } = useSelectedAdapter();
-  useStableOptions("ScaleControl", {
-    position:
-      props.position ??
-      (backend.endsWith("native") ? "bottom-left" : "top-right"),
-    maxWidth: props.maxWidth ?? 100,
-  });
   return <Implementation {...props} />;
 };
 

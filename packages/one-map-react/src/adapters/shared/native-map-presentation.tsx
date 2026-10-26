@@ -28,11 +28,7 @@ export interface NativeMapPresentation {
   readonly overlayHostName: string;
   readonly nativeLocationFollowing: boolean;
   readonly nativeLayout?: { readonly width: number; readonly height: number };
-  /** Placement requested by the mounted attribution control. */
-  readonly attributionPosition: ControlPosition | undefined;
   setNativeLayout(width: number, height: number): void;
-  /** Clears the control override with undefined, restoring selected SDK options. */
-  setAttributionPosition(position: ControlPosition | undefined): void;
   setOverlay(
     id: string,
     position: ControlPosition | null,
@@ -96,8 +92,6 @@ const NativePresentationProvider = ({
   const overlayHostName = useId();
   const [nativeLayout, storeNativeLayout] =
     useState<NativeMapPresentation["nativeLayout"]>();
-  const [attributionPosition, setAttributionPosition] =
-    useState<ControlPosition>();
   const [overlays, setOverlays] = useState<ReadonlyMap<string, NativeOverlay>>(
     () => new Map()
   );
@@ -132,20 +126,10 @@ const NativePresentationProvider = ({
       overlayHostName,
       nativeLocationFollowing: following,
       nativeLayout,
-      attributionPosition,
       setNativeLayout,
-      setAttributionPosition,
       setOverlay,
     }),
-    [
-      overlayHostName,
-      following,
-      nativeLayout,
-      attributionPosition,
-      setNativeLayout,
-      setAttributionPosition,
-      setOverlay,
-    ]
+    [overlayHostName, following, nativeLayout, setNativeLayout, setOverlay]
   );
   const placement = useMemo(() => [...overlays.values()], [overlays]);
   return (

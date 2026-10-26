@@ -61,10 +61,7 @@ import {
   MapSessionContext,
 } from "../src/facade/map-context.js";
 import { MapSetup } from "../src/facade/map-setup.js";
-import {
-  Marker as SharedMarker,
-  ScaleControl as SharedScaleControl,
-} from "../src/facade/ui.js";
+import { Marker as SharedMarker } from "../src/facade/ui.js";
 
 type FixtureSession = MapSession &
   NativeMapPresentation & { readonly viewState: ViewState | null };
@@ -198,10 +195,8 @@ const sessionFixture = () => {
       ready: true,
       viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
       overlayHostName: "fixture-control-host",
-      attributionPosition: undefined,
       setNativeLayout: jest.fn(),
       setOverlay: jest.fn(),
-      setAttributionPosition: jest.fn(),
       subscribe: (event, callback) => {
         listeners[event].add(callback);
         return () => {
@@ -236,177 +231,6 @@ const ScaleMap = withNativeMapPresentation(
 );
 const moveScale = (event: MoveEvent): void =>
   scaleMapProps.mock.calls.at(-1)?.[0].onMove?.(event);
-
-test("scale observes each movement once, including unchanged controlled targets", async () => {
-  const fixture = sessionFixture();
-  fixture.unproject.mockResolvedValue([10.01, 20]);
-  const reportError = jest.fn();
-  const tree = (
-    ready: boolean,
-    viewState?: ViewState,
-    unit: "metric" | "imperial" | "nautical" = "metric"
-  ) => (
-    <MapSessionContext.Provider value={{ ...fixture.session, ready }}>
-      <ScaleMap
-        mapStyle={{ version: 8, sources: {}, layers: [] }}
-        initialViewState={scaleCamera}
-        viewState={viewState}
-      >
-        <ui.ScaleControl unit={unit} onError={reportError} />
-      </ScaleMap>
-    </MapSessionContext.Provider>
-  );
-  const mounted = await render(tree(false));
-  expect(fixture.project).not.toHaveBeenCalled();
-  await mounted.rerender(tree(true));
-  await waitFor(() => expect(mounted.getByText("1 km")).toBeTruthy());
-  expect(fixture.project).toHaveBeenCalledTimes(1);
-  expect(fixture.unproject).toHaveBeenCalledTimes(1);
-  fixture.project.mockClear();
-  fixture.unproject.mockClear();
-  await act(async () =>
-    moveScale({
-      viewState: { ...scaleCamera, zoom: 5 },
-      origin: "user",
-    })
-  );
-  expect(fixture.project).toHaveBeenCalledTimes(1);
-  expect(fixture.unproject).toHaveBeenCalledTimes(1);
-
-  fixture.unproject.mockResolvedValue([11.01, 20]);
-  const controlled = { ...scaleCamera, zoom: 6 };
-  await mounted.rerender(tree(true, controlled));
-  fixture.project.mockClear();
-  fixture.unproject.mockClear();
-  await act(async () =>
-    moveScale({
-      viewState: { ...scaleCamera, longitude: 11, zoom: 7 },
-      origin: "user",
-    })
-  );
-  expect(fixture.project).toHaveBeenCalledTimes(1);
-  expect(fixture.project).toHaveBeenCalledWith([11, 20]);
-  expect(fixture.unproject).toHaveBeenCalledTimes(1);
-  await mounted.rerender(tree(true, { ...controlled, zoom: 8 }));
-  expect(fixture.project).toHaveBeenCalledTimes(1);
-  await mounted.rerender(tree(true, controlled, "imperial"));
-  await waitFor(() => expect(mounted.getByText("2000 ft")).toBeTruthy());
-  await mounted.rerender(tree(true, controlled, "nautical"));
-  await waitFor(() => expect(mounted.getByText("0.5 nm")).toBeTruthy());
-  expect(reportError).not.toHaveBeenCalled();
-  await mounted.unmount();
-});
-
-test("scale suppresses errors between layout and passive unmount cleanup", async () => {
-  const react = jest.requireActual<typeof import("react")>("react");
-  const useEffect = react.useEffect;
-  const cleanups: (() => void)[] = [];
-  // A concurrent removal can defer passive cleanup past promise settlement.
-  const effect = jest
-    .spyOn(react, "useEffect")
-    .mockImplementation((create, deps) =>
-      useEffect(() => {
-        const cleanup = create();
-        return () => {
-          if (cleanup) cleanups.push(cleanup);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- The spy forwards each effect's original dependencies unchanged.
-      }, deps)
-    );
-  try {
-    const fixture = sessionFixture();
-    let rejectProject: ((error: Error) => void) | undefined;
-    fixture.project.mockImplementationOnce(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejectProject = reject;
-        })
-    );
-    const reportError = jest.fn();
-    const mounted = await render(
-      <FixtureSessionProvider value={fixture.session}>
-        <ui.ScaleControl onError={reportError} />
-      </FixtureSessionProvider>
-    );
-    expect(fixture.project).toHaveBeenCalledTimes(1);
-    await mounted.unmount();
-    expect(cleanups.length).toBeGreaterThan(0);
-    await act(async () => rejectProject?.(new Error("detached scale")));
-    expect(reportError).not.toHaveBeenCalled();
-  } finally {
-    effect.mockRestore();
-    for (const cleanup of cleanups) cleanup();
-  }
-});
-
-test.each(["resolve", "reject"])(
-  "scale ignores stale %s results and reports only current failures",
-  async (settlement) => {
-    const fixture = sessionFixture();
-    let resolveOld: ((value: readonly [number, number]) => void) | undefined;
-    let rejectOld: ((error: Error) => void) | undefined;
-    fixture.unproject
-      .mockImplementationOnce(
-        () =>
-          new Promise((resolve, reject) => {
-            resolveOld = resolve;
-            rejectOld = reject;
-          })
-      )
-      .mockResolvedValue([10.01, 20]);
-    const reportError = jest.fn();
-    const mounted = await render(
-      <MapSessionContext.Provider value={fixture.session}>
-        <ScaleMap
-          mapStyle={{ version: 8, sources: {}, layers: [] }}
-          initialViewState={scaleCamera}
-        >
-          <ui.ScaleControl onError={reportError} />
-        </ScaleMap>
-      </MapSessionContext.Provider>
-    );
-    await waitFor(() => expect(fixture.unproject).toHaveBeenCalledTimes(1));
-    await act(async () =>
-      moveScale({
-        viewState: { ...scaleCamera, zoom: 5 },
-        origin: "user",
-      })
-    );
-    await waitFor(() => expect(mounted.getByText("1 km")).toBeTruthy());
-    await act(async () => {
-      if (settlement === "resolve") resolveOld?.([10.0001, 20]);
-      else rejectOld?.(new Error("superseded scale"));
-    });
-    expect(mounted.getByText("1 km")).toBeTruthy();
-    expect(reportError).not.toHaveBeenCalled();
-    const failure = new Error("current scale");
-    fixture.unproject.mockRejectedValueOnce(failure);
-    await act(async () =>
-      moveScale({
-        viewState: { ...scaleCamera, zoom: 6 },
-        origin: "user",
-      })
-    );
-    expect(reportError).toHaveBeenCalledWith(failure);
-    expect(mounted.queryByText("1 km")).toBeNull();
-    let rejectDetached: ((error: Error) => void) | undefined;
-    fixture.project.mockImplementationOnce(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejectDetached = reject;
-        })
-    );
-    await act(async () =>
-      moveScale({
-        viewState: { ...scaleCamera, zoom: 7 },
-        origin: "user",
-      })
-    );
-    await mounted.unmount();
-    await act(async () => rejectDetached?.(new Error("detached scale")));
-    expect(reportError).toHaveBeenCalledTimes(1);
-  }
-);
 
 const touch = (x: number, y: number, count = 1) => ({
   nativeEvent: {
@@ -928,17 +752,6 @@ describe("TF07 native UI composition", () => {
       StyleSheet.flatten(control.getByTestId("custom-control").props.style)
         .opacity
     ).toBe(0.8);
-  });
-
-  test("expanded attribution requests fail explicitly on native", async () => {
-    const fixture = sessionFixture();
-    await expect(
-      render(
-        <FixtureSessionProvider value={fixture.session}>
-          <ui.AttributionControl compact={false} />
-        </FixtureSessionProvider>
-      )
-    ).rejects.toThrow("expanded attribution");
   });
 
   test("child scroll handoff keeps SDK gestures unchanged", async () => {
@@ -1534,11 +1347,6 @@ test("native creation defaults compare by their effective values", async () => {
         latitude={20}
         anchor={explicit ? "bottom" : undefined}
         renderMode={explicit ? "view" : undefined}
-      />
-
-      <SharedScaleControl
-        position={explicit ? "bottom-left" : undefined}
-        maxWidth={explicit ? 100 : undefined}
       />
     </CreationSessionProvider>
   );

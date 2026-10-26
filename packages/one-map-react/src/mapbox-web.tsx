@@ -33,20 +33,16 @@ import type { Adapter } from "./contracts/adapter.js";
 import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
 import type {
-  AttributionControlProps,
   ControlProps,
   GeolocateControlProps,
   MarkerProps,
   MarkerRef,
-  ScaleControlProps,
 } from "./contracts/ui-types.js";
 import { Map as OneMap } from "./facade/map.js";
 import {
-  AttributionControl as OneAttributionControl,
   Control as OneControl,
   GeolocateControl as OneGeolocateControl,
   Marker as OneMarker,
-  ScaleControl as OneScaleControl,
 } from "./facade/ui.js";
 import { useStableOptions } from "./facade/use-stable-options.js";
 
@@ -88,9 +84,6 @@ export const adapter: Adapter & { readonly backend: "mapbox-web" } =
     Source: MapboxSource as ComponentType<WebForwardedProps>,
     Layer: MapboxLayer as Adapter["Layer"],
     Marker: MapboxMarker as unknown as ComponentType<WebForwardedProps>,
-    AttributionControl:
-      MapboxAttributionControl as ComponentType<WebForwardedProps>,
-    ScaleControl: MapboxScaleControl as ComponentType<WebForwardedProps>,
     GeolocateControl:
       MapboxGeolocateControl as ComponentType<WebForwardedProps>,
     useControl: useControl as unknown as WebControlHook,
@@ -214,30 +207,6 @@ export interface WebControlProps extends ControlProps {
 }
 /** Custom control with DOM content attributes. */
 export const Control = OneControl as ComponentType<WebControlProps>;
-
-/** Attribution control props with selected wrapper options. */
-export interface WebAttributionControlProps extends AttributionControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MapboxAttributionControl>,
-    keyof AttributionControlProps
-  >;
-}
-/** Attribution control with selected web options. */
-export const AttributionControl =
-  OneAttributionControl as ComponentType<WebAttributionControlProps>;
-
-/** Scale control props with selected wrapper options. */
-export interface WebScaleControlProps extends ScaleControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MapboxScaleControl>,
-    keyof ScaleControlProps
-  >;
-}
-/** Scale control with selected web options. */
-export const ScaleControl =
-  OneScaleControl as ComponentType<WebScaleControlProps>;
 
 /** Geolocation control props with selected browser facilities. */
 export interface WebGeolocateControlProps extends GeolocateControlProps {

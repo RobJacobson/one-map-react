@@ -10,8 +10,6 @@ import {
   type MapStyle,
   Marker,
   type MarkerRef,
-  AttributionControl,
-  ScaleControl,
   Map as OneMap,
   Source,
 } from "one-map-react";
@@ -42,6 +40,7 @@ interface Tf08AcceptanceSceneProps {
   readonly externalContext?: MapProps["gl"];
   readonly nativePuck?: ReactNode;
   readonly navigationControl?: ReactNode;
+  readonly ornamentControls?: ReactNode;
 }
 
 const initialCamera = {
@@ -76,6 +75,7 @@ export const Tf08AcceptanceScene = ({
   externalContext,
   nativePuck,
   navigationControl,
+  ornamentControls,
 }: Tf08AcceptanceSceneProps) => {
   const mapRef = useRef<MapRef>(null);
   const annotationRef = useRef<MarkerRef>(null);
@@ -325,8 +325,7 @@ export const Tf08AcceptanceScene = ({
       {mode === "coverage-popup" && renderCoveragePopup(overlay)}
       {mode === "coverage-ornaments" && (
         <>
-          <AttributionControl position="bottom-right" />
-          <ScaleControl position="bottom-left" />
+          {backend.endsWith("web") && ornamentControls}
           {backend.endsWith("web") && navigationControl}
         </>
       )}

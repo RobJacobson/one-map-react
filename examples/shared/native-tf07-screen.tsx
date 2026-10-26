@@ -30,8 +30,10 @@ import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
  */
 export const NativeTf07Screen = ({
   adapter,
+  ornaments,
 }: {
   readonly adapter: Adapter;
+  readonly ornaments: object;
 }) => {
   const probeRef = useRef<Tf07Probe | null>(null);
   const [status, setStatus] = useState("TF07 waiting for map");
@@ -82,7 +84,7 @@ export const NativeTf07Screen = ({
         ]}
       >
         <ScrollView horizontal style={styles.toolbar}>
-          {(["remount", "style", "offset", "popup", "units"] as const).map(
+          {(["remount", "style", "offset", "popup"] as const).map(
             (action: Tf07Action) => (
               <Button
                 key={action}
@@ -110,6 +112,7 @@ export const NativeTf07Screen = ({
         </Text>
         <Tf07Scene
           renderNavigation={NativeCameraButtons}
+          nativeOrnaments={ornaments}
           renderPopup={renderPopup}
           native
           style={{ flex: 1 }}

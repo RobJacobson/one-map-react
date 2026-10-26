@@ -17,9 +17,13 @@ declare global {
 export const WebTf08App = ({
   adapter,
   navigationControl,
+  ornamentControls,
   renderCoveragePopup,
 }: {
   readonly adapter: Adapter;
+  readonly ornamentControls: ComponentProps<
+    typeof Tf08AcceptanceScene
+  >["ornamentControls"];
   readonly navigationControl: ComponentProps<
     typeof Tf08AcceptanceScene
   >["navigationControl"];
@@ -43,6 +47,7 @@ export const WebTf08App = ({
       <div id="tf08-map-host" style={{ width: "100vw", height: "100vh" }}>
         <Tf08AcceptanceScene
           navigationControl={navigationControl}
+          ornamentControls={ornamentControls}
           renderCoveragePopup={renderCoveragePopup}
           backend={adapter.backend}
           services={adapter.services}

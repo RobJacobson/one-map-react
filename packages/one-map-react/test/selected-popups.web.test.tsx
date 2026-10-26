@@ -71,14 +71,15 @@ vi.mock("one-map-react", async (original) => {
     Source: Content,
     Layer: Empty,
     Control: Empty,
-    AttributionControl: Empty,
+
     GeolocateControl: Empty,
-    ScaleControl: Empty,
   };
 });
 vi.mock("one-map-react/mapbox-web", () => ({
   adapter: { backend: "mapbox-web", services: { location: {} } },
   Map: ({ children }: { children?: ReactNode }) => children,
+  WrapperScaleControl: () => null,
+  WrapperAttributionControl: () => null,
   WrapperNavigationControl: (props: Record<string, unknown>) => {
     popup.navigation.push(props);
     return null;
@@ -94,6 +95,8 @@ vi.mock("one-map-react/mapbox-web", () => ({
 vi.mock("one-map-react/maplibre-web", () => ({
   adapter: { backend: "maplibre-web", services: { location: {} } },
   Map: ({ children }: { children?: ReactNode }) => children,
+  WrapperScaleControl: () => null,
+  WrapperAttributionControl: () => null,
   WrapperNavigationControl: (props: Record<string, unknown>) => {
     popup.navigation.push(props);
     return null;
