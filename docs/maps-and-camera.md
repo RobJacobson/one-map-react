@@ -14,13 +14,13 @@ This reference compares map containers, camera configuration, events, and impera
 
 **Existing API:** The wrapper names, declaration shapes, and source mechanisms below were rechecked against the frozen stable versions. This source review does not establish one-map-react adapter support or native runtime equivalence.
 
-**Historical design:** Portable map, camera, event, and ref declarations were implemented in the retired source; their existence does not certify adapter behavior. The archived implementation-status document records the owning stages' runtime evidence. Other interfaces remain proposed, and strict native controlled-camera behavior remains an open implementation question.
+**Historical design:** Portable map, camera, event, and ref declarations were implemented in the retired source; their existence does not certify adapter behavior. The archived implementation-status document records the owning stages' runtime evidence. Other interfaces in that retired design remained proposed, and strict native controlled-camera behavior remained an open implementation question. The working changed-target contract is described above.
 
-**Implemented in TF02:** `Map` accepts `mapStyle` (URL or a plain style document), `initialViewState` with longitude, latitude, zoom, bearing, and pitch, optional host `style`, `onMove`, and `ref.flyTo({ center, duration })`. Native adapters copy `initialViewState` on first render and keep passing that copy. `onMove` receives `{ viewState, origin }` with `origin` `user`, `programmatic`, or `unknown`; adapters currently report `user` or `unknown`. `flyTo` returns `Promise<void>` that adopts the wrapper result: RNMapbox resolves after synchronous `setCamera` with `animationMode: "flyTo"`; MapLibre Native awaits `setStop`; web resolves after react-map-gl `flyTo` returns the map instance. Fulfillment does not mean the animation finished. The camera command family, gestures, and `viewState` are implemented in TF04. Map ids and provider registration stay future contracts. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7. See the [TF02 record](tf02-shared-map.md) and the [TF04 record](tf04-camera.md).
+**Historical TF02 implementation checkpoint:** `Map` accepts `mapStyle` (URL or a plain style document), `initialViewState` with longitude, latitude, zoom, bearing, and pitch, optional host `style`, `onMove`, and `ref.flyTo({ center, duration })`. Native adapters copy `initialViewState` on first render and keep passing that copy. `onMove` receives `{ viewState, origin }` with `origin` `user`, `programmatic`, or `unknown`; adapters currently report `user` or `unknown`. `flyTo` returns `Promise<void>` that adopts the wrapper result: RNMapbox resolves after synchronous `setCamera` with `animationMode: "flyTo"`; MapLibre Native awaits `setStop`; web resolves after react-map-gl `flyTo` returns the map instance. Fulfillment does not mean the animation finished. The camera command family, gestures, and `viewState` are implemented in TF04. Map ids and provider registration stay future contracts. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7. See the [TF02 record](tf02-shared-map.md) and the [TF04 record](tf04-camera.md).
 
-**Implemented in TF03:** `Map` also accepts `reuseMaps`, a structural `gl` context, `onLoad`, `onStyleLoad`, `onError`, and `onResize`. `MapRef.resize()` measures a web map. Web adapters forward `reuseMaps` and `gl` to react-map-gl. Native adapters reject both, and native `resize()` rejects, because those wrappers have no reuse prop, external context, or resize method. `onStyleLoad` listens for web `style.load`. If that event was missed, the following `load`, or the next `idle` after reuse, reports it once when the style is loaded. It follows native `onDidFinishLoadingStyle`. Mapbox native `onError` copies the iOS loading-error string. Android's pinned wrapper does not deliver that callback. MapLibre native omits `error`. The renderer smoke passed. See the [TF03 record](tf03-reuse.md).
+**Historical TF03 implementation checkpoint:** `Map` also accepts `reuseMaps`, a structural `gl` context, `onLoad`, `onStyleLoad`, `onError`, and `onResize`. `MapRef.resize()` measures a web map. Web adapters forward `reuseMaps` and `gl` to react-map-gl. Native adapters reject both, and native `resize()` rejects, because those wrappers have no reuse prop, external context, or resize method. `onStyleLoad` listens for web `style.load`. If that event was missed, the following `load`, or the next `idle` after reuse, reports it once when the style is loaded. It follows native `onDidFinishLoadingStyle`. Mapbox native `onError` copies the iOS loading-error string. Android's pinned wrapper does not deliver that callback. MapLibre native omits `error`. The renderer smoke passed. See the [TF03 record](tf03-reuse.md).
 
-**Implemented in TF04:** `Map` also accepts `viewState`, `minZoom`, `maxZoom`, `maxBounds`, `padding`, the portable gesture flags, and `onMoveStart`, `onMoveEnd`, `onIdle`, and `onClick`. `onLongPress` is forwarded on native and rejected on web. Desktop gesture options are forwarded on web and rejected on native when set. `MapRef` adds `jumpTo`, `easeTo`, `fitBounds`, `zoomTo`, `stop`, the camera getters, `project`, and `unproject`. Each promise resolves when the wrapper accepts the call. RNMapbox flight, ease, and jump set `animationMode` explicitly. Getters the wrapper lacks reject. Web `viewState` is delegated to react-map-gl. Native `viewState` writes the camera props, and `controlledCamera` is not advertised. The renderer smoke passed. See the [TF04 record](tf04-camera.md).
+**Historical TF04 implementation checkpoint:** `Map` also accepts `viewState`, `minZoom`, `maxZoom`, `maxBounds`, `padding`, the portable gesture flags, and `onMoveStart`, `onMoveEnd`, `onIdle`, and `onClick`. `onLongPress` is forwarded on native and rejected on web. Desktop gesture options are forwarded on web and rejected on native when set. `MapRef` adds `jumpTo`, `easeTo`, `fitBounds`, `zoomTo`, `stop`, the camera getters, `project`, and `unproject`. Each promise resolves when the wrapper accepts the call. RNMapbox flight, ease, and jump set `animationMode` explicitly. Getters the wrapper lacks reject. Web `viewState` is delegated to react-map-gl. Native `viewState` writes the camera props, and `controlledCamera` is not advertised. The renderer smoke passed. See the [TF04 record](tf04-camera.md).
 
 ## Research basis
 
@@ -136,14 +136,13 @@ import "maplibre-gl/dist/maplibre-gl.css";
 />;
 ```
 
-The agreed one-map-react declaration preserves the web camera shape; adapter runtime verification remains separate:
+The working one-map-react component preserves the web camera shape; renderer verification remains separate:
 
 ```tsx
-import { Map } from "one-map-react";
+import { Map as OneMap } from "one-map-react";
 
-// Agreed declaration; see implementation status for runtime evidence.
-// Backend setup belongs in OneMapProvider.
-<Map
+// Backend setup belongs in an enclosing MapSetup.
+<OneMap
   id="seattle"
   style={{ width: "100%", height: 400 }}
   mapStyle="https://demotiles.maplibre.org/style.json"
@@ -243,22 +242,22 @@ const [viewState, setViewState] = useState({
 />;
 ```
 
-The agreed one-map-react declaration receives the same common state; strict native fulfillment remains an investigation:
+The working one-map-react component receives the same common state. Web delegates controlled behavior; native applies changed camera targets and reports observed movement:
 
 ```tsx
 import { useState } from "react";
-import { Map, type ViewState } from "one-map-react";
+import { Map as OneMap, type ViewState } from "one-map-react";
 
-// Inside a component; agreed declaration, runtime fulfillment pending.
-// OneMapProvider and map/container setup omitted.
+// Inside a component; enclosing MapSetup and sized container omitted.
 const [viewState, setViewState] = useState<ViewState>({
   longitude: -122.34, latitude: 47.61,
   zoom: 11, bearing: 0, pitch: 0,
 });
 
-<Map
+<OneMap
   id="seattle"
   mapStyle="https://demotiles.maplibre.org/style.json"
+  initialViewState={viewState}
   viewState={viewState}
   onMove={(event) => setViewState(event.viewState)}
 />;
@@ -266,7 +265,7 @@ const [viewState, setViewState] = useState<ViewState>({
 
 Accepting every event can look similar across these examples. Native reporting does not itself prevent movement when an application ignores an event. Sending the previous props back can introduce a visible correction, timing problems, or an event loop. react-map-gl's Mapbox entry uses a [proxy transform][web-mapbox-proxy] to retain controlled values while reporting proposals. Its [MapLibre entry][web-camera-impl] installs the renderer's [camera-update callback][sdk-maplibre-map], saves the proposed camera, and applies controlled props before the update is accepted. These inspected mechanisms explain the web control model; source and declaration checks do not certify native strict control.
 
-The agreed contract is strict: if `viewState` is supplied, unaccepted movement must not become the persistent displayed camera state. Native adapters must validate that contract before advertising `controlledCamera`. A weaker eventual-synchronization mode, if introduced, needs a separate name and opt-in. Event deduplication and command attribution are adapter responsibilities; neither proves strict control.
+**Historical strict-control contract, superseded on native by the [changed-target contract](revised-api-proposal.md#camera-and-feature-state-guarantees).** The recorded contract is strict: if `viewState` is supplied, unaccepted movement must not become the persistent displayed camera state. Native adapters must validate that contract before advertising `controlledCamera`. A weaker eventual-synchronization mode, if introduced, needs a separate name and opt-in. Event deduplication and command attribution are adapter responsibilities; neither proves strict control.
 
 ## Events and readiness
 

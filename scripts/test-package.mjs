@@ -283,6 +283,21 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     `${imports}
 import type { Adapter, Backend, MapRef } from "one-map-react";
 import { Map as OneMap, MapSetup, Source, Layer, Marker, useMap } from "one-map-react";
+import { forwardRef } from "react";
+type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
+const exactAdapterKeys: Equal<keyof Adapter, "backend" | "Map" | "Source" | "Layer" | "Images" | "Marker"> = true;
+const exactSetupKeys: Equal<keyof import("one-map-react").MapSetupProps, "adapter" | "children"> = true;
+const customAdapter: Adapter = {
+  backend: "mapbox-web",
+  Map: forwardRef<MapRef, import("one-map-react").MapProps>(() => null),
+  Source: () => null,
+  Layer: () => null,
+  Images: () => null,
+  Marker: forwardRef<import("one-map-react").MarkerRef, import("one-map-react").MarkerProps>(() => null),
+};
+const customSetup: import("one-map-react").MapSetupProps = { adapter: customAdapter, children: null };
+void customSetup; void exactAdapterKeys; void exactSetupKeys;
+
 ${declarations}
 declare const commonRef: MapRef;
 // @ts-expect-error Source click events are removed.

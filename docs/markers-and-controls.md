@@ -2,7 +2,7 @@
 
 **Working feature-click migration.** The [map-click migration](revised-api-proposal.md#rendering-and-queries-stay-shared) uses Map.onClick with interactiveLayerIds for source activation. Source.onClick, SourceClickEvent, synthetic source bubbling, selected facade native source hitbox additions and UserLocation.onPress are removed. Raw native Wrapper source onPress/hitbox facilities, source refs/queries/state, live markers/portals and supplied location geometry/accuracy remain. Native filtered clicks retain queries at the actual logical map point, observable errors and stale-map callback protection. The future native focused source stop/bubbling probe is retired; historical scenario IDs and outcomes remain attached to their recorded artifacts. Renderer/query/touch behavior, Metro and native builds/installations remain unverified.
 
-U18 location acquisition migration is implemented and independently audited. The [U18 evidence](../records/evidence/revised-api-u18-location-acquisition.json) records bounded routine checks, exact archive provenance and inherited publication failures. U18 PR37 is merged. U19 feature-click migration is merged as PR38; [U19 evidence](../records/evidence/revised-api-u19-feature-clicks.json) records bounded routine verification and exact archive provenance. U20 Images migration is implemented and independently audited; [U20 evidence](../records/evidence/revised-api-u20-images.json) records bounded routine verification, inherited publication exclusions and exact archive provenance. U20 [PR40](https://github.com/RobJacobson/one-map-react/pull/40) is open after independent review. U21 private-coordination cleanup is implemented and independently audited; [U21 evidence](../records/evidence/revised-api-u21-private-coordination.json) records bounded routine verification and exact archive provenance. A reviewed U21 PR is authorized; U22 follows it automatically and remains undispatched. Renderer interaction, browser geolocation, sensors, real permissions, Metro and native builds/installations remain unverified.
+U18 location acquisition migration is implemented and independently audited. The [U18 evidence](../records/evidence/revised-api-u18-location-acquisition.json) records bounded routine checks, exact archive provenance and inherited publication failures. U18 PR37 is merged. U19 feature-click migration is merged as PR38; [U19 evidence](../records/evidence/revised-api-u19-feature-clicks.json) records bounded routine verification and exact archive provenance. U20 Images migration is implemented and independently audited; [U20 evidence](../records/evidence/revised-api-u20-images.json) records bounded routine verification, inherited publication exclusions and exact archive provenance. U20 [PR40](https://github.com/RobJacobson/one-map-react/pull/40) is open after independent review. U21 private-coordination cleanup is implemented and independently audited; [U21 evidence](../records/evidence/revised-api-u21-private-coordination.json) records bounded routine verification and exact archive provenance. U21 [PR41](https://github.com/RobJacobson/one-map-react/pull/41) is open after independent review. U22 public-surface audit and bounded documentation/test fixes are implemented and independently audited; [U22 evidence](../records/evidence/revised-api-u22-surface-audit.json) records full routine checks without fixture exclusions, exact packed/declaration verification and the corrected fixture-loading diagnosis. A reviewed U22 PR is authorized; U23 read-only patch/peer review follows it automatically and remains undispatched. Renderer interaction, browser geolocation, sensors, real permissions, Metro and native builds/installations remain unverified.
 
 **Working control layout migration.** Common Control, its props, adapter field and selected facade aliases, web custom-control composition, and native corner registration/measurement and automatic SDK ornament avoidance are removed. Application screen or DOM siblings own placement, stacking, safe areas and overlap. Native live-marker hosts/portals, viewport layout, observed camera state and react-native-teleport remain. Selected SDK ornament options/defaults, legal attribution and logos, and the RNMapbox scale-position/resize refresh remain. See [layout migration guidance](revised-api-proposal.md#markers-images-popups-and-controls) and [U17 status](revised-api-implementation-plan.md#u17-remove-common-control-layout). Historical instructions and outcomes below retain their recorded artifact scope. Changed renderer layout, touches, assistive technology, Metro and native builds/installations remain unverified.
 
@@ -16,7 +16,7 @@ U18 location acquisition migration is implemented and independently audited. The
 
 **Working next-release marker contract.** Common native Marker dragging is excluded in both live and annotation modes: selected native Marker types permit draggable=false and omit onDragStart/onDrag/onDragEnd; native common-entry JavaScript requests with draggable=true or any drag callback fail clearly. Web Marker dragging and selected raw PointAnnotation/ViewAnnotation dragging remain available. Live native markers retain activation, child buttons and scrolling, providers, offsets, refresh, coordinate updates, and cleanup. The [U07 evidence](../records/evidence/revised-api-u07-native-markers.json) records the completed audit and routine verification; new native touch acceptance remains unverified.
 
-**TF07 implementation checkpoint.** Common UI components and map access are implemented; the authorized R16 renderer acceptance passed across all six environments for the recorded exercised scope. Full VoiceOver and TalkBack audits remain outside that checkpoint. The upstream comparisons below retain their recorded research versions. The [TF07 record](tf07-ui.md) describes that frozen checkpoint's contracts, mapping, and runtime evidence. The broader marker drag contract and proposal examples below are historical comparisons, not the working next-release native contract.
+**Historical TF07 implementation checkpoint.** Common UI components and map access were implemented; the authorized R16 renderer acceptance passed across all six environments for the recorded exercised scope. Full VoiceOver and TalkBack audits remain outside that checkpoint. The upstream comparisons below retain their recorded research versions. The [TF07 record](tf07-ui.md) describes that frozen checkpoint's contracts, mapping, and runtime evidence. The broader marker drag contract and proposal examples below are historical comparisons, not the working next-release native contract.
 
 Markers place content at a geographic position. Their appearance can be similar across platforms while their child content, dragging, selection, and event behavior differ. Controls and popups also depend on the host user interface.
 
@@ -28,9 +28,9 @@ Markers place content at a geographic position. Their appearance can be similar 
 
 **Recorded TF07 marker behavior:** `Marker` defaults to live children, with a blue 24 × 32 logical-unit pin when children are absent. `renderMode="annotation"` explicitly selects native bitmap annotations on Android. Native live dragging activates after a 500 ms long press on noninteractive content; nested child controls retain their responders. `onDragStart`, `onDrag`, and `onDragEnd` propose `event.lngLat` coordinates; longitude and latitude props remain authoritative. `MarkerRef.refresh()` updates annotation snapshots and resolves without work for live views and web. Marker identity, anchor, and render mode require a new React key to change. Clearing offset sends `[0, 0]`.
 
-`Popup` follows mutable position, anchor, offset, width, children, and callbacks. Dismissal and focus options are creation inputs. Native popups compose live anchored content and an accessible close button; unmount never calls `onClose`. `Control` positions host content in a corner, and standard native controls use the common camera methods. TF08 adds default native acquisition, streaming provider overrides, explicit permission services, location display, and following; one-shot `getCurrentPosition` injection remains supported. Web without an explicit provider retains SDK delegation. See [the TF08 record](tf08-location-offline-capture.md) for implemented behavior and pending acceptance. Browser fullscreen keeps browser semantics and native requests fail explicitly. Native popups reject an explicit `focusAfterOpen`; native attribution uses the platform icon and rejects `compact={false}` instead of ignoring expanded presentation.
+**Recorded TF07 popup/control behavior:** `Popup` follows mutable position, anchor, offset, width, children, and callbacks. Dismissal and focus options are creation inputs. Native popups compose live anchored content and an accessible close button; unmount never calls `onClose`. `Control` positions host content in a corner, and standard native controls use the common camera methods. TF08 adds default native acquisition, streaming provider overrides, explicit permission services, location display, and following; one-shot `getCurrentPosition` injection remains supported. Web without an explicit provider retains SDK delegation. See [the TF08 record](tf08-location-offline-capture.md) for implemented behavior and pending acceptance. Browser fullscreen keeps browser semantics and native requests fail explicitly. Native popups reject an explicit `focusAfterOpen`; native attribution uses the platform icon and rejects `compact={false}` instead of ignoring expanded presentation.
 
-GeoJSON and vector `Source.onClick` callbacks receive source feature hits and `stopPropagation()`. Map clicks include rendered features from `interactiveLayerIds`; failed queries report `onError`, and pending queries are discarded on unmount. Source callbacks and selected native hitboxes are mutable. Web source activation selects the topmost registered source independently from map `interactiveLayerIds`. Pending hits cannot activate a keyed replacement source; callback updates on the same source remain current. `Map.id` is a creation input. `useMap()` returns an enclosing common ref and `useMap(id)` resolves a named map in the same `MapSetup`, following the [map-access lifecycle](tf07-ui.md#common-behavior). Commands still reject when the underlying map is not attached or ready.
+**Recorded TF07 source behavior:** GeoJSON and vector `Source.onClick` callbacks receive source feature hits and `stopPropagation()`. Map clicks include rendered features from `interactiveLayerIds`; failed queries report `onError`, and pending queries are discarded on unmount. Source callbacks and selected native hitboxes are mutable. Web source activation selects the topmost registered source independently from map `interactiveLayerIds`. Pending hits cannot activate a keyed replacement source; callback updates on the same source remain current. `Map.id` is a creation input. `useMap()` returns an enclosing common ref and `useMap(id)` resolves a named map in the same `MapSetup`, following the [map-access lifecycle](tf07-ui.md#common-behavior). Commands still reject when the underlying map is not attached or ready.
 
 ## Research basis
 
@@ -38,7 +38,7 @@ Inspected October 8, 2026: [RNMapbox 10.3.7][rn-index] at `0f50e8164c1aefe45de9e
 
 The tables cover marker rendering, interaction, annotations, popup composition, controls, and map access. The rendering SDK draws the map, the React wrapper attaches host UI and translates its own props, and the one-map-react adapter would normalize the common contract. A source supplies data to the renderer; a layer defines how it draws that data. Renderer-managed point layers therefore have different placement and interaction responsibilities from React view markers.
 
-The upstream TSX excerpts below are declaration-checked with TypeScript 7.0.2, React 19.2.3 and React Native 0.87.1 where relevant, including matching Mapbox-web variations of the MapLibre-web examples. Map setup, native build configuration, credentials, and the selected web SDK stylesheet are omitted explicitly. The historical proposal examples below remain research excerpts; the current TF07 scene is declaration-checked against the implemented exports. [The current review evidence](../records/evidence/markers-controls-current-review.json) records source checks, declaration runs, failures/reruns, and remaining behavioral investigations. Readable guides for [web markers][web-marker-docs], [web popups][web-popup-docs] and [custom web controls][web-control-docs] accompany the pinned implementation links. Readable upstream documentation can evolve; pinned sources identify the versions compared here.
+The upstream TSX excerpts below are declaration-checked with TypeScript 7.0.2, React 19.2.3 and React Native 0.87.1 where relevant, including matching Mapbox-web variations of the MapLibre-web examples. Map setup, native build configuration, credentials, and the selected web SDK stylesheet are omitted explicitly. The historical proposal examples below remain research excerpts; the TF07 checkpoint scene was declaration-checked against its then-implemented exports. [The current review evidence](../records/evidence/markers-controls-current-review.json) records source checks, declaration runs, failures/reruns, and remaining behavioral investigations. Readable guides for [web markers][web-marker-docs], [web popups][web-popup-docs] and [custom web controls][web-control-docs] accompany the pinned implementation links. Readable upstream documentation can evolve; pinned sources identify the versions compared here.
 
 ## Point content components
 
@@ -207,25 +207,24 @@ const [position, setPosition] = useState<[number, number]>([-122.34, 47.61]);
 </Marker>;
 ```
 
+The working common native Marker displays application-owned coordinates without drag props or callbacks. This excerpt uses the opening coordinate; the screen can replace it from its own map, search or form input. Raw selected annotations above retain their SDK dragging behavior.
+
 ```tsx
-import { useState } from "react";
-import { Marker } from "one-map-react";
+import { type LngLat, Marker } from "one-map-react";
 import { Text } from "react-native";
 
-const [position, setPosition] = useState<[number, number]>([-122.34, 47.61]);
+const position: LngLat = [-122.34, 47.61];
 
-// Proposed API; annotation mode accepts static-content differences.
 <Marker
   id="ferry-1"
   longitude={position[0]} latitude={position[1]}
-  renderMode="annotation" draggable
-  onDragEnd={(event) => setPosition(event.lngLat)}
+  renderMode="annotation"
 >
   <Text>Ferry</Text>
 </Marker>;
 ```
 
-The annotation adapter selects `PointAnnotation` or `ViewAnnotation`, normalizes drag payloads to a tuple, and manages refreshed bitmap content when required. Web annotation mode can use a DOM marker with the narrower static-content contract. The callbacks expose different values: RNMapbox supplies a decoded GeoJSON point feature, MapLibre React Native supplies `event.nativeEvent.lngLat`, and react-map-gl attaches an SDK `LngLat` object. The one-map-react adapter would validate and copy two finite coordinates into its own tuple; coordinate props remain authoritative after application state accepts the proposal. Android annotations expose `refresh()` for child snapshots after an image loads. **Open question:** Validate image refresh, drag interruption, coordinate rejection/update timing, selection, and cleanup, including native live-child dragging as a separate contract.
+The common annotation adapter selects `PointAnnotation` or `ViewAnnotation` and manages refreshed bitmap content when required. Common native dragging is excluded; applications needing annotation dragging use the raw selected wrapper facilities. Web annotation mode can use a DOM marker with the narrower static-content contract. The callbacks expose different values: RNMapbox supplies a decoded GeoJSON point feature, MapLibre React Native supplies `event.nativeEvent.lngLat`, and react-map-gl attaches an SDK `LngLat` object. These raw drag payloads belong to the selected wrappers. The shared native Marker keeps the application-supplied coordinate authoritative without a drag callback. Android annotations expose `refresh()` for child snapshots after an image loads. **Open question:** Validate image refresh, drag interruption, coordinate rejection/update timing, selection, and cleanup, with live-child interaction and raw annotation dragging treated as separate contracts.
 
 ## Popups and callouts
 
@@ -282,28 +281,34 @@ open && (
 );
 ```
 
+The working native composition uses an application-owned bubble inside Marker. The application owns its close button and mounting state; unmounting the bubble emits no close action. Web applications use the selected WrapperPopup export directly, as shown in the [migration examples](revised-api-proposal.md#markers-images-popups-and-controls).
+
 ```tsx
 import { useState } from "react";
-import { Popup } from "one-map-react";
-import { Text } from "react-native";
+import { Marker } from "one-map-react";
+import { Pressable, Text, View } from "react-native";
 
 const [open, setOpen] = useState(true);
 
-// Proposed API; requires standalonePopup capability.
 open && (
-  <Popup
-    longitude={-122.34}
-    latitude={47.61}
-    onClose={() => setOpen(false)}
-  >
-    <Text>Ferry details</Text>
-  </Popup>
+  <Marker longitude={-122.34} latitude={47.61} anchor="bottom">
+    <View>
+      <Text>Ferry details</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Close ferry details"
+        onPress={() => setOpen(false)}
+      >
+        <Text>Close</Text>
+      </Pressable>
+    </View>
+  </Marker>
 );
 ```
 
-**Proposed API:** A native standalone popup could use a positioned overlay or an adapter-owned anchor annotation. Either mechanism must handle camera movement, measurement, dismissal, offscreen positions, and child interaction. Async projection can introduce lag; an attached callout can introduce selection constraints. Do not advertise `standalonePopup` until the supported contract works.
+**Historical standalone-popup proposal:** A native standalone popup could use a positioned overlay or an adapter-owned anchor annotation. Either mechanism must handle camera movement, measurement, dismissal, offscreen positions, and child interaction. Async projection can introduce lag; an attached callout can introduce selection constraints. Do not advertise `standalonePopup` until the supported contract works.
 
-**Agreed design:** Application state controls mounting, and `onClose` requests dismissal rather than authorizing an adapter to change React state. Unmounting is teardown and must not emit `onClose`.
+**Recorded common-popup design:** Application state controls mounting, and `onClose` requests dismissal rather than authorizing an adapter to change React state. Unmounting is teardown and must not emit `onClose`.
 
 **Existing API:** react-map-gl detaches its close listener before removal on unmount in both pinned web implementations; this provides implementation evidence for its cleanup path, while equivalent native behavior still requires a prototype.
 
@@ -401,7 +406,7 @@ const map = useMap("ferry-map");
 />;
 ```
 
-A web application can invoke the same common handle from a DOM button. The common promise acknowledges validation/dispatch rather than camera settling. A future one-map-react navigation component would own readiness, subscriptions and explicit error reporting; the button excerpts do not implement that component. react-map-gl's `useControl` creates a DOM-owning SDK control inside the selected map context and removes it during cleanup; native controls instead compose host UI with the camera handle. Changes to custom control options need explicit update handling because `useControl` does not recreate the control on every render.
+A web application can invoke the same common handle from a DOM button. The common promise acknowledges validation/dispatch rather than camera settling. The historical one-map-react navigation proposal would own readiness, subscriptions and explicit error reporting; the button excerpts do not implement that component. react-map-gl's `useControl` creates a DOM-owning SDK control inside the selected map context and removes it during cleanup; native controls instead compose host UI with the camera handle. Changes to custom control options need explicit update handling because `useControl` does not recreate the control on every render.
 
 Location controls and native pucks are covered in [capabilities and extensions](capabilities-and-extensions.md). Marker coordinates, async projection, and map events follow [maps and camera](maps-and-camera.md). Renderer-managed point styling follows [sources and layers](sources-and-layers.md).
 
