@@ -1,5 +1,5 @@
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
-index e51687f..e3d2b95 100644
+index e51687fb9b6fcafb38b3437bfab8593ecbd28982..e3d2b95859a10e0f489014b671e7d6ae1af63d81 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt
 @@ -56,6 +56,13 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac
@@ -28,10 +28,18 @@ index e51687f..e3d2b95 100644
  
      companion object {
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
-index 91243df..1c0c906 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
-@@ -1140,7 +1140,7 @@ open class RNMBXMapView(private val mContext: Context, var mManager: RNMBXMapVie
+@@ -27,6 +27,8 @@
+ import com.mapbox.maps.extension.style.layers.Layer
+ import com.mapbox.maps.extension.style.layers.generated.*
+ import com.mapbox.maps.extension.style.layers.getLayer
++import com.mapbox.maps.extension.style.sources.getSource
++import com.mapbox.maps.extension.style.sources.generated.VectorSource
+ import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
+ import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
+ import com.mapbox.maps.extension.style.projection.generated.Projection
+@@ -1140,7 +1142,7 @@
                  it.putDouble("data", result)
              }
          } else {
@@ -40,8 +48,22 @@ index 91243df..1c0c906 100644
          }
      }
  
+@@ -1204,6 +1206,13 @@
+       sourceLayerId: String?,
+       response: CommandResponse
+     ) {
++        // A JS source ref can precede native replacement of the previous family.
++        val source = mapView.getMapboxMap().getStyle()?.getSource(sourceId)
++        if (source == null || (sourceLayerId != null && source !is VectorSource)) {
++            response.error("source_not_attached")
++            return
++        }
++
+         mapView.getMapboxMap().removeFeatureStateCompat(
+             sourceId,
+             sourceLayerId,
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
-index 7b6de8a..e234791 100644
+index 7b6de8ab94adcd42c6973f999b63f357d0ea98ed..e2347912af3ac0ccc76280a4f140ae9a2ddc720e 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
 @@ -39,6 +39,10 @@ class RNMBXTerrain(context: Context?) : AbstractSourceConsumer(context) {
@@ -56,7 +78,7 @@ index 7b6de8a..e234791 100644
          mTerrain = terrain
          addStyles()
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
-index f8b6edb..9b815d3 100644
+index f8b6edb55ad05c6745cc7928f4bacd3a3839f0f0..9b815d35b57bfeb5fe8c7e092d0d45a296c416cf 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt
 @@ -25,7 +25,7 @@ class RNMBXTerrainManager : ViewGroupManager<RNMBXTerrain>(),
@@ -69,7 +91,7 @@ index f8b6edb..9b815d3 100644
  
      @ReactProp(name = "reactStyle")
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
-index 17f3f62..ef13333 100644
+index 17f3f62965733bde648d4375449fc11dac2e5a00..ef13333915217edb3c82b5c0fd0b543e4ab4d700 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
 @@ -181,6 +181,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon
@@ -87,7 +109,7 @@ index 17f3f62..ef13333 100644
      fun setAccessToken(accessToken: String?, promise: Promise) {
          mReactContext.runOnUiQueueThread(Runnable {
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
-index ed4eab9..d463ff5 100644
+index ed4eab99654a9557b3bd3eb0fc38b2bfc24e5e6d..d8cb3650f28023120f416e317892e931d9d46a79 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt
 @@ -46,6 +46,7 @@ enum class TileRegionPackState(val rawValue: String) {
@@ -106,7 +128,19 @@ index ed4eab9..d463ff5 100644
  
  
      val tileStore: TileStore by lazy {
-@@ -180,13 +182,15 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -175,18 +177,27 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+             promise.reject(Error("Pack: $name not found"))
+             return
+         }
++        // A live load can be observed before its tile region is persisted.
++        if (pack.state == TileRegionPackState.ACTIVE ||
++            pack.state == TileRegionPackState.INACTIVE ||
++            pack.state == TileRegionPackState.COMPLETE) {
++            promise.resolve(_makeRegionStatusPayload(pack))
++            return
++        }
+         tileStore.getTileRegion(name) { expected ->
+             expected.value?.also {
                  val region = it
                  tileStore.getTileRegionMetadata(name) { expected ->
                      expected.value?.also {
@@ -128,7 +162,7 @@ index ed4eab9..d463ff5 100644
                      } ?: run {
                          promise.reject(LOG_TAG, expected.error!!.message)
                      }
-@@ -197,11 +201,25 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -197,11 +208,25 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
          }
      }
  
@@ -155,7 +189,7 @@ index ed4eab9..d463ff5 100644
          } else {
              promise.reject("resumePackDownload", "Unknown offline pack: $name")
          }
-@@ -212,11 +230,13 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -212,11 +237,13 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
          val pack = tileRegionPacks[name]
          if (pack != null) {
              if (pack.cancelable != null) {
@@ -170,7 +204,7 @@ index ed4eab9..d463ff5 100644
              }
          } else {
              promise.reject("resumeRegionDownload", "Unknown offline region")
-@@ -245,6 +265,9 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -245,6 +272,9 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
              return
          }
  
@@ -180,7 +214,7 @@ index ed4eab9..d463ff5 100644
          tileStore.removeTileRegion(name, object: TileRegionCallback {
              override fun run(expected: Expected<TileRegionError, TileRegion>) {
                  expected.value.also {
-@@ -275,7 +298,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -275,7 +305,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
      }
      // endregion
  
@@ -189,7 +223,7 @@ index ed4eab9..d463ff5 100644
          try {
              val id = pack.name
              val bounds = pack.bounds
-@@ -286,7 +309,14 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -286,7 +316,14 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
                  ?: return Result.failure(IllegalArgumentException("startLoading failed as there is no styleURI in pack"))
              val metadata = pack.metadata
                  ?: return Result.failure(IllegalArgumentException("startLoading failed as there is no metadata in pack"))
@@ -204,7 +238,7 @@ index ed4eab9..d463ff5 100644
                  .glyphsRasterizationMode(GlyphsRasterizationMode.IDEOGRAPHS_RASTERIZED_LOCALLY)
                  .metadata(metadata.toMapboxValue())
                  .build()
-@@ -301,7 +331,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -301,7 +338,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
                  .geometry(bounds)
                  .descriptors(descriptors)
                  .metadata(metadata.toMapboxValue())
@@ -213,7 +247,7 @@ index ed4eab9..d463ff5 100644
                  .networkRestriction(NetworkRestriction.NONE)
                  .averageBytesPerSecond(null)
                  .build()
-@@ -309,6 +339,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -309,6 +346,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
              val task = this.tileStore.loadTileRegion(
                  id, loadOptions,
                  { progress ->
@@ -221,7 +255,7 @@ index ed4eab9..d463ff5 100644
                      lastProgress = progress
                      tileRegionPacks[id]!!.progress = progress
                      tileRegionPacks[id]!!.state = TileRegionPackState.ACTIVE
-@@ -316,6 +347,8 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -316,6 +354,8 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
                      offlinePackProgressDidChange(progress, metadata, TileRegionPackState.ACTIVE)
                  },
                  { expected ->
@@ -230,7 +264,7 @@ index ed4eab9..d463ff5 100644
                      expected.value?.also {
                          val progress = lastProgress
                          if (progress != null) {
-@@ -399,7 +432,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -399,7 +439,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
                          metadata= metadataJSON ?: JSONObject()
                      )
  
@@ -239,7 +273,7 @@ index ed4eab9..d463ff5 100644
                          pack.state = TileRegionPackState.COMPLETE
                      }
                      tileRegionPacks[region.id] = pack
-@@ -467,7 +500,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -467,7 +507,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
          var result = Arguments.createMap()
          if (progress != null) {
              result = writableMapOf(
@@ -248,7 +282,7 @@ index ed4eab9..d463ff5 100644
                  "name" to name,
                  "percentage" to progress.toPercentage(),
                  "completedResourceCount" to progress.completedResourceCount,
-@@ -561,6 +594,47 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
+@@ -561,6 +601,47 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :
  
      }
  
@@ -297,7 +331,7 @@ index ed4eab9..d463ff5 100644
      fun migrateOfflineCache() {
          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
-index 771884c..cf96ca3 100644
+index 771884c6d6c6ed703bc752744ca4020192e741a0..cf96ca3ba4e7d75e8ef1575de24967a797241580 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt
 @@ -139,7 +139,7 @@ class RNMBXSnapshotModule(private val mContext: ReactApplicationContext) :
@@ -310,7 +344,7 @@ index 771884c..cf96ca3 100644
          builder.accessToken(getAccessToken(mContext))
          return builder.build()
 diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.m b/ios/RNMBX/Offline/RNMBXOfflineModule.m
-index 1808393..95b1081 100644
+index 18083931f899bd403126bed135ef24cd9ab2fb0b..95b1081488121be59e4cf5dd7c73ef7eafae9e77 100644
 --- a/ios/RNMBX/Offline/RNMBXOfflineModule.m
 +++ b/ios/RNMBX/Offline/RNMBXOfflineModule.m
 @@ -6,6 +6,10 @@
@@ -334,7 +368,7 @@ index 1808393..95b1081 100644
  @end
 \ No newline at end of file
 diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.swift b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
-index 1253ba1..38f0114 100644
+index 1253ba14303a7d8929c846cead88929a1d3ab123..239ab6d1e1209aabaa8c4bf4a6dafcfb6419ee6d 100644
 --- a/ios/RNMBX/Offline/RNMBXOfflineModule.swift
 +++ b/ios/RNMBX/Offline/RNMBXOfflineModule.swift
 @@ -14,6 +14,7 @@ extension Date {
@@ -353,7 +387,21 @@ index 1253ba1..38f0114 100644
      var cancelables: [Cancelable] = []
      var progress : TileRegionLoadProgress? = nil
      var state : State = .inactive
-@@ -208,13 +210,15 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -201,6 +203,13 @@ class RNMBXOfflineModule: RCTEventEmitter {
+         return
+       }
+ 
++      // A live load can be observed before its tile region is persisted.
++      if let pack = self.tileRegionPacks[name],
++         pack.state == .active || pack.state == .inactive || pack.state == .complete {
++        resolver(self._makeRegionStatusPayload(pack: pack))
++        return
++      }
++
+       self.tileStore.tileRegion(forId: name) { result in
+         switch result {
+         case .success(let region):
+@@ -208,13 +217,15 @@ class RNMBXOfflineModule: RCTEventEmitter {
              DispatchQueue.main.async {
                switch result {
                case .success(let metadata):
@@ -375,7 +423,7 @@ index 1253ba1..38f0114 100644
                case .failure(let error):
                  Logger.log(level:.error, message: "Unable to fetch metadata for \(name)")
                  rejecter("RNMBXOfflineModule.getPackStatus", error.localizedDescription, error)
-@@ -229,12 +233,26 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -229,12 +240,26 @@ class RNMBXOfflineModule: RCTEventEmitter {
      }
    }
    
@@ -403,7 +451,7 @@ index 1253ba1..38f0114 100644
          resolver(nil)
        } else {
          rejecter("resumePackDownload", "Unknown offline pack: \(name)", nil)
-@@ -247,6 +265,9 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -247,6 +272,9 @@ class RNMBXOfflineModule: RCTEventEmitter {
    {
      DispatchQueue.main.async {
        if let pack = self.tileRegionPacks[name] {
@@ -413,7 +461,7 @@ index 1253ba1..38f0114 100644
          pack.cancelables.forEach { $0.cancel() }
          resolver(nil)
        } else {
-@@ -275,12 +296,62 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -275,12 +303,62 @@ class RNMBXOfflineModule: RCTEventEmitter {
          return rejecter("deletePack", "Pack: \(name) has already been deleted", nil)
        }
  
@@ -476,7 +524,7 @@ index 1253ba1..38f0114 100644
    @objc
    func migrateOfflineCache(_ resolve : @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
      // Old and new cache file paths
-@@ -343,7 +414,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -343,7 +421,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
      }
    }
    
@@ -485,7 +533,7 @@ index 1253ba1..38f0114 100644
      let id = pack.name
      let metadata = pack.metadata
      let taskGroup = DispatchGroup()
-@@ -361,9 +432,16 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -361,9 +439,16 @@ class RNMBXOfflineModule: RCTEventEmitter {
        return
      }
        
@@ -503,7 +551,7 @@ index 1253ba1..38f0114 100644
      
      let threadedOfflineManager = OfflineManager()
      taskGroup.enter()
-@@ -371,6 +449,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -371,6 +456,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
        // progress callbacks arrive on SDK background threads; tileRegionPacks
        // is main-thread state (see #4252)
        DispatchQueue.main.async {
@@ -511,7 +559,7 @@ index 1253ba1..38f0114 100644
          self.tileRegionPacks[id]!.state = .active
        }
      } completion: { result in
-@@ -379,6 +458,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -379,6 +465,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
            taskGroup.leave()
          }
  
@@ -519,7 +567,7 @@ index 1253ba1..38f0114 100644
          switch result {
          case let .success(stylePack): break
          case let .failure(error):
-@@ -401,7 +481,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -401,7 +488,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
        geometry: bounds, // RNMBXFeatureUtils.geometryToGeometry(bounds),
        descriptors: descriptors,
        metadata: metadata,
@@ -528,7 +576,7 @@ index 1253ba1..38f0114 100644
        networkRestriction: .none,
        averageBytesPerSecond: nil)
      
-@@ -413,6 +493,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -413,6 +500,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
        // delivered on the "MB TileStore RW" thread; mutating tileRegionPacks
        // here races the main thread and corrupts the dictionary (#4252)
        DispatchQueue.main.async {
@@ -536,7 +584,7 @@ index 1253ba1..38f0114 100644
          lastProgress = progress
          self.tileRegionPacks[id]!.progress = progress
          self.tileRegionPacks[id]!.state = .active
-@@ -423,31 +504,25 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -423,31 +511,25 @@ class RNMBXOfflineModule: RCTEventEmitter {
              defer {
                  taskGroup.leave()
              }
@@ -577,7 +625,7 @@ index 1253ba1..38f0114 100644
      }
  
      self.tileRegionPacks[id]!.cancelables = [task, stylePackTask]
-@@ -516,7 +591,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -516,7 +598,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
            metadata: logged("RNMBXOfflineModule.getPacks metadata is null") { metadata } ?? [:]
          )
          
@@ -586,7 +634,7 @@ index 1253ba1..38f0114 100644
            pack.state = .complete
          }
          
-@@ -605,7 +680,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
+@@ -605,7 +687,7 @@ class RNMBXOfflineModule: RCTEventEmitter {
      var result : [String:Any?] = [:]
      if let progress = progress {
        result = [
@@ -596,7 +644,7 @@ index 1253ba1..38f0114 100644
          "percentage": progress.toPercentage(),
          "completedResourceCount": progress.completedResourceCount,
 diff --git a/ios/RNMBX/RNMBXModule.m b/ios/RNMBX/RNMBXModule.m
-index 61978cd..737f3cd 100644
+index 61978cdae9e8a2f5ccfbbdb26ecc4b6029c0d390..737f3cdf3caaecd0c3576721ae267fb4ddaa3b4f 100644
 --- a/ios/RNMBX/RNMBXModule.m
 +++ b/ios/RNMBX/RNMBXModule.m
 @@ -2,6 +2,8 @@
@@ -609,10 +657,20 @@ index 61978cd..737f3cd 100644
  
  RCT_EXTERN_METHOD(addCustomHeader:(NSString *)headerName forHeaderValue:(NSString *) headerValue)
 diff --git a/ios/RNMBX/RNMBXModule.swift b/ios/RNMBX/RNMBXModule.swift
-index 25f3eff..9434cc4 100644
+index 25f3effd6dea741000fbb126d2166d5bf18d6f21..73cea9cd42201dee4f86ebfddc1689a4d72cbfe1 100644
 --- a/ios/RNMBX/RNMBXModule.swift
 +++ b/ios/RNMBX/RNMBXModule.swift
-@@ -86,6 +86,13 @@ class RNMBXModule : NSObject {
+@@ -56,7 +56,8 @@ class RNMBXModule : NSObject {
+           "Flight": CameraMode.flight.rawValue,
+           "Ease": CameraMode.ease.rawValue,
+           "Linear": CameraMode.linear.rawValue,
+-          "Move": CameraMode.none.rawValue
++          "Move": CameraMode.none.rawValue,
++          "None": CameraMode.none.rawValue
+         ],
+       "EventTypes":
+         [
+@@ -86,6 +87,13 @@ class RNMBXModule : NSObject {
        return true
    }
  
@@ -627,7 +685,7 @@ index 25f3eff..9434cc4 100644
      _ token: String, 
      resolver: RCTPromiseResolveBlock,
 diff --git a/ios/RNMBX/RNMBXTerrain.swift b/ios/RNMBX/RNMBXTerrain.swift
-index e3cfdc5..5030e1b 100644
+index e3cfdc550924157222e4cbdebb33101bc16f5fdf..5030e1bf0168d036bc2c083ac0d5eb1f5b9dfb50 100644
 --- a/ios/RNMBX/RNMBXTerrain.swift
 +++ b/ios/RNMBX/RNMBXTerrain.swift
 @@ -17,6 +17,11 @@ public class RNMBXTerrain : RNMBXSingletonLayer, RNMBXMapComponent, RNMBXSourceC
@@ -643,9 +701,18 @@ index e3cfdc5..5030e1b 100644
      self.terrain = terrain
      addStylesAndUpdate()
 diff --git a/lib/module/components/MapView.js b/lib/module/components/MapView.js
-index 57797d1..a78263d 100644
+index 57797d1fae29fbef8712cae734c89b63932f4b95..3b06872ba0eea54de46fee86851180b40ff851fe 100644
 --- a/lib/module/components/MapView.js
 +++ b/lib/module/components/MapView.js
+@@ -4,7 +4,7 @@ import React from 'react';
+ import { View, StyleSheet, NativeModules } from 'react-native';
+ import debounce from 'debounce';
+ import NativeMapView from '../specs/RNMBXMapViewNativeComponent';
+-import NativeMapViewModule from "../specs/NativeMapViewModule.js";
++import NativeMapViewModule from "../specs/NativeRNMBXMapViewModule.js";
+ import { isFunction, isAndroid } from "../utils/index.js";
+ import { getFilter } from "../utils/filterUtils.js";
+ import Logger from "../utils/Logger.js";
 @@ -345,7 +345,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo
     */
    async queryTerrainElevation(coordinate) {
@@ -656,7 +723,7 @@ index 57797d1..a78263d 100644
  
    /**
 diff --git a/lib/module/modules/offline/offlineManager.js b/lib/module/modules/offline/offlineManager.js
-index b1c8e6a..890a440 100644
+index b1c8e6ab4e89dd04476c532c6acf4bb0f328d4af..890a4400708b980ff8ad68336527c6aaadfd5f04 100644
 --- a/lib/module/modules/offline/offlineManager.js
 +++ b/lib/module/modules/offline/offlineManager.js
 @@ -116,22 +116,20 @@ class OfflineManager {
@@ -695,7 +762,7 @@ index b1c8e6a..890a440 100644
  
    /**
 diff --git a/lib/module/modules/offline/offlineManagerLegacy.js b/lib/module/modules/offline/offlineManagerLegacy.js
-index 5943b63..84cec51 100644
+index 5943b63bdd717ebd9d2b09318c314a23cd083143..84cec51849a1a388e698ec3d5e69b222c449eaff 100644
 --- a/lib/module/modules/offline/offlineManagerLegacy.js
 +++ b/lib/module/modules/offline/offlineManagerLegacy.js
 @@ -121,7 +121,7 @@ class OfflineManagerLegacy {
@@ -708,7 +775,7 @@ index 5943b63..84cec51 100644
    }
  
 diff --git a/lib/module/modules/snapshot/SnapshotOptions.js b/lib/module/modules/snapshot/SnapshotOptions.js
-index ea91cd6..b6fd036 100644
+index ea91cd61e66c3f01be8800555c61e3e89b11c64b..b6fd036ab6143e2d735c50521d3c5ab4a5147ac8 100644
 --- a/lib/module/modules/snapshot/SnapshotOptions.js
 +++ b/lib/module/modules/snapshot/SnapshotOptions.js
 @@ -12,7 +12,7 @@ class SnapshotOptions {
@@ -721,7 +788,7 @@ index ea91cd6..b6fd036 100644
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
 diff --git a/lib/typescript/src/Mapbox.native.d.ts b/lib/typescript/src/Mapbox.native.d.ts
-index 9bffceb..a53f5c0 100644
+index 9bffceb17d44a6a4c69769c0f33176e9284121d7..a53f5c00c3e28e9701a0516dcd65b3f5cfddfbc3 100644
 --- a/lib/typescript/src/Mapbox.native.d.ts
 +++ b/lib/typescript/src/Mapbox.native.d.ts
 @@ -1,4 +1,4 @@
@@ -731,7 +798,7 @@ index 9bffceb..a53f5c0 100644
  export { Atmosphere } from './components/Atmosphere';
  export { Snow } from './components/Snow';
 diff --git a/lib/typescript/src/RNMBXModule.d.ts b/lib/typescript/src/RNMBXModule.d.ts
-index 5e8079d..d838720 100644
+index 5e8079d84a2e89b1ad5ae12ec8989eb45279bcfc..d83872034ee4f93b6df3c7f4f05dd514698dde6d 100644
 --- a/lib/typescript/src/RNMBXModule.d.ts
 +++ b/lib/typescript/src/RNMBXModule.d.ts
 @@ -14,19 +14,31 @@ export declare const StyleURL: {
@@ -773,7 +840,7 @@ index 5e8079d..d838720 100644
  //# sourceMappingURL=RNMBXModule.d.ts.map
 \ No newline at end of file
 diff --git a/lib/typescript/src/components/MapView.d.ts b/lib/typescript/src/components/MapView.d.ts
-index 9f1b137..d7dd260 100644
+index 9f1b137dac8095f1a9ef71a0205fe27a3760fb30..d7dd2606447f8ebbf21e062393f9ccba5d21ba22 100644
 --- a/lib/typescript/src/components/MapView.d.ts
 +++ b/lib/typescript/src/components/MapView.d.ts
 @@ -556,7 +556,7 @@ declare class MapView extends MapView_base {
@@ -786,7 +853,7 @@ index 9f1b137..d7dd260 100644
       * Sets the visibility of all the layers referencing the specified `sourceLayerId` and/or `sourceId`
       *
 diff --git a/lib/typescript/src/index.native.d.ts b/lib/typescript/src/index.native.d.ts
-index e57b0af..d9bd66e 100644
+index e57b0af701810cfa2007ea913794168eb80c82a0..d9bd66e2e4fc9ff7da3938f5971d84c475663608 100644
 --- a/lib/typescript/src/index.native.d.ts
 +++ b/lib/typescript/src/index.native.d.ts
 @@ -1,4 +1,4 @@
@@ -798,7 +865,7 @@ index e57b0af..d9bd66e 100644
  //# sourceMappingURL=index.native.d.ts.map
 \ No newline at end of file
 diff --git a/lib/typescript/src/modules/offline/offlineManager.d.ts b/lib/typescript/src/modules/offline/offlineManager.d.ts
-index fd0c239..cccc144 100644
+index fd0c239924198386d0bc68b7a1ef9e57e3e01658..cccc14407738a536c779e203df032b3c630b8895 100644
 --- a/lib/typescript/src/modules/offline/offlineManager.d.ts
 +++ b/lib/typescript/src/modules/offline/offlineManager.d.ts
 @@ -107,8 +107,6 @@ declare class OfflineManager {
@@ -811,9 +878,18 @@ index fd0c239..cccc144 100644
       * await Mapbox.offlineManager.clearAmbientCache();
       *
 diff --git a/src/components/MapView.tsx b/src/components/MapView.tsx
-index d742f19..e776b47 100644
+index d742f1915f81ad3317a97bce81c2a03642d12409..cc99a0b056b88184e8e9dbd10028f0b32b5a7796 100644
 --- a/src/components/MapView.tsx
 +++ b/src/components/MapView.tsx
+@@ -14,7 +14,7 @@ import debounce from 'debounce';
+ import NativeMapView, {
+   type NativeMapViewActual,
+ } from '../specs/RNMBXMapViewNativeComponent';
+-import NativeMapViewModule from '../specs/NativeMapViewModule';
++import NativeMapViewModule from '../specs/NativeRNMBXMapViewModule';
+ import {
+   isFunction,
+   isAndroid,
 @@ -926,12 +926,12 @@ class MapView extends NativeBridgeComponent(
     * @param {Position} coordinate - The geographic coordinates `[longitude, latitude]` at which to query elevation.
     * @return {number} Elevation in meters relative to mean sea-level.
@@ -831,7 +907,7 @@ index d742f19..e776b47 100644
  
    /**
 diff --git a/src/modules/offline/offlineManager.ts b/src/modules/offline/offlineManager.ts
-index e3d747f..f997923 100644
+index e3d747f4579505b32b84f0f35a86ff14d47cc3ce..f9979239ca0585035676253c9d494d86c7bf78fa 100644
 --- a/src/modules/offline/offlineManager.ts
 +++ b/src/modules/offline/offlineManager.ts
 @@ -191,22 +191,20 @@ class OfflineManager {
@@ -870,7 +946,7 @@ index e3d747f..f997923 100644
  
    /**
 diff --git a/src/modules/offline/offlineManagerLegacy.ts b/src/modules/offline/offlineManagerLegacy.ts
-index 523071f..95c3217 100644
+index 523071f6737f6aaf865b79a8e9ba811d2ceed142..95c321753c815cb3fd92a9b5ba01cafec898cb10 100644
 --- a/src/modules/offline/offlineManagerLegacy.ts
 +++ b/src/modules/offline/offlineManagerLegacy.ts
 @@ -139,7 +139,7 @@ class OfflineManagerLegacy {
@@ -883,7 +959,7 @@ index 523071f..95c3217 100644
        (name) => this._offlinePacks[name],
      ) as OfflinePack[];
 diff --git a/src/modules/snapshot/SnapshotOptions.ts b/src/modules/snapshot/SnapshotOptions.ts
-index 766dbd8..b9791a0 100644
+index 766dbd812f0ff0a09172c7c3125e1eef74471f7a..b9791a086e08962a9ef35c80f3b267001afccbc1 100644
 --- a/src/modules/snapshot/SnapshotOptions.ts
 +++ b/src/modules/snapshot/SnapshotOptions.ts
 @@ -40,7 +40,7 @@ class SnapshotOptions {
@@ -895,3 +971,140 @@ index 766dbd8..b9791a0 100644
      this.width = options.width || 50.0;
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
+index 38de6c8d52d7334970921a1a7f78624caac052a9..759ad864d097aaec984f42f705573001294b35c0 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
+@@ -6,7 +6,7 @@ import com.facebook.react.bridge.ReadableArray
+ import com.facebook.react.bridge.ReadableMap
+ import com.facebook.react.bridge.WritableMap
+ import com.facebook.react.bridge.WritableNativeMap
+-import com.rnmapbox.rnmbx.NativeMapViewModuleSpec
++import com.rnmapbox.rnmbx.NativeRNMBXMapViewModuleSpec
+ import com.rnmapbox.rnmbx.utils.ConvertUtils
+ import com.rnmapbox.rnmbx.utils.ExpressionParser
+ import com.rnmapbox.rnmbx.utils.ViewRefTag
+@@ -16,7 +16,7 @@ import com.rnmapbox.rnmbx.utils.extensions.toScreenBox
+ import com.rnmapbox.rnmbx.utils.extensions.toScreenCoordinate
+ import com.rnmapbox.rnmbx.utils.extensions.toValueHashMap
+ 
+-class NativeMapViewModule(context: ReactApplicationContext, val viewTagResolver: ViewTagResolver) : NativeMapViewModuleSpec(context) {
++class NativeMapViewModule(context: ReactApplicationContext, val viewTagResolver: ViewTagResolver) : NativeRNMBXMapViewModuleSpec(context) {
+     private fun withMapViewOnUIThread(
+         viewRef: ViewRefTag?,
+         reject: Promise,
+diff --git a/ios/RNMBX/RNMBXCustomLocationProvider.swift b/ios/RNMBX/RNMBXCustomLocationProvider.swift
+index 79187f4bbca8b6ae8108afb07a7808fbff6e3e50..34bd0c87d30f884fd9e376b45e3dd9acfdab662e 100644
+--- a/ios/RNMBX/RNMBXCustomLocationProvider.swift
++++ b/ios/RNMBX/RNMBXCustomLocationProvider.swift
+@@ -110,6 +110,9 @@ class CustomLocationProvider: LocationProvider & HeadingProvider {
+ 
+   func addLocationObserver(for observer: LocationObserver) {
+     observers.add(observer)
++    if let location = location {
++      observer.onLocationUpdateReceived(for: [location])
++    }
+   }
+ 
+   func removeLocationObserver(for observer: LocationObserver) {
+@@ -135,6 +138,9 @@ class CustomLocationProvider: LocationProvider & HeadingProvider {
+ 
+   func add(headingObserver: HeadingObserver) {
+     headingObservers.add(headingObserver)
++    if let heading = latestHeading {
++      headingObserver.onHeadingUpdate(heading)
++    }
+   }
+ 
+   func remove(headingObserver: HeadingObserver) {
+diff --git a/ios/RNMBX/RNMBXMapViewModule.h b/ios/RNMBX/RNMBXMapViewModule.h
+index a826c22452dddcbf23f26691888cc0f5764a817e..7ce58023115c9eaec292e87c10e889a89b37b8cf 100644
+--- a/ios/RNMBX/RNMBXMapViewModule.h
++++ b/ios/RNMBX/RNMBXMapViewModule.h
+@@ -5,7 +5,7 @@
+ #ifdef __cplusplus
+ #import "rnmapbox_maps_specs.h"
+ 
+-@interface RNMBXMapViewModule : NSObject <NativeMapViewModuleSpec, RNMBXViewResolverDelegate>
++@interface RNMBXMapViewModule : NSObject <NativeRNMBXMapViewModuleSpec, RNMBXViewResolverDelegate>
+ @end
+ 
+ #else
+diff --git a/ios/RNMBX/RNMBXMapViewModule.mm b/ios/RNMBX/RNMBXMapViewModule.mm
+index 8aaf1a08803f8b9f25b722db225c773182f744bc..0b45774c617f895f81ad5baa8e2311894cbb8004 100644
+--- a/ios/RNMBX/RNMBXMapViewModule.mm
++++ b/ios/RNMBX/RNMBXMapViewModule.mm
+@@ -147,7 +147,7 @@ RCT_EXPORT_METHOD(querySourceFeatures:(nonnull NSNumber*)viewRef sourceId:(NSStr
+ - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+     (const facebook::react::ObjCTurboModule::InitParams &)params
+ {
+-    return std::make_shared<facebook::react::NativeMapViewModuleSpecJSI>(params);
++    return std::make_shared<facebook::react::NativeRNMBXMapViewModuleSpecJSI>(params);
+ }
+ 
+ @end
+diff --git a/lib/module/specs/NativeMapViewModule.js.map b/lib/module/specs/NativeMapViewModule.js.map
+index 8032c71737df52f0ced33ebc23e54c7e08803a2c..7eeb6d818239a5b08b40d9f1e57a9410cb4f49a0 100644
+--- a/lib/module/specs/NativeMapViewModule.js.map
++++ b/lib/module/specs/NativeMapViewModule.js.map
+@@ -1 +1 @@
+-{"version":3,"names":["TurboModuleRegistry","getEnforcing"],"sourceRoot":"../../../src","sources":["specs/NativeMapViewModule.ts"],"mappings":";;AACA;;AAEA,SAASA,mBAAmB,QAAQ,cAAc;AAsElD,eAAeA,mBAAmB,CAACC,YAAY,CAAO,oBAAoB,CAAC","ignoreList":[]}
++{"version":3,"names":["TurboModuleRegistry","getEnforcing"],"sourceRoot":"../../../src","sources":["specs/NativeRNMBXMapViewModule.ts"],"mappings":";;AACA;;AAEA,SAASA,mBAAmB,QAAQ,cAAc;AAsElD,eAAeA,mBAAmB,CAACC,YAAY,CAAO,oBAAoB,CAAC","ignoreList":[]}
+diff --git a/lib/module/specs/NativeMapViewModule.js b/lib/module/specs/NativeRNMBXMapViewModule.js
+similarity index 100%
+rename from lib/module/specs/NativeMapViewModule.js
+rename to lib/module/specs/NativeRNMBXMapViewModule.js
+diff --git a/lib/typescript/src/specs/NativeMapViewModule.d.ts.map b/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
+index 3e2e987ea7d08de0806ae41a350d9061e5dfe884..2c4f968b402742e674befc153f81128a1e6677ed 100644
+--- a/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
++++ b/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"NativeMapViewModule.d.ts","sourceRoot":"","sources":["../../../../src/specs/NativeMapViewModule.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"NativeRNMBXMapViewModule.d.ts","sourceRoot":"","sources":["../../../../src/specs/NativeRNMBXMapViewModule.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,8CAA8C,CAAC;AAEhF,OAAO,EAAE,KAAK,EAAE,MAAM,2CAA2C,CAAC;AAGlE,MAAM,WAAW,IAAK,SAAQ,WAAW;IACvC,QAAQ,EAAE,CAAC,OAAO,EAAE,KAAK,GAAG,IAAI,EAAE,WAAW,EAAE,OAAO,KAAK,OAAO,CAAC,MAAM,CAAC,CAAC;IAC3E,qBAAqB,EAAE,CACrB,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,WAAW,EAAE,aAAa,CAAC,MAAM,CAAC,KAC/B,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,mBAAmB,EAAE,CACnB,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,OAAO,EAAE,OAAO,EAChB,QAAQ,EAAE,MAAM,EAChB,aAAa,EAAE,MAAM,KAClB,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,SAAS,EAAE,CAAC,OAAO,EAAE,KAAK,GAAG,IAAI,KAAK,OAAO,CAAC,MAAM,CAAC,CAAC;IACtD,qBAAqB,EAAE,CACrB,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,OAAO,EAAE,aAAa,CAAC,MAAM,CAAC,KAC3B,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,cAAc,EAAE,CACd,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,YAAY,EAAE,aAAa,CAAC,MAAM,CAAC,KAChC,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,OAAO,EAAE,CAAC,OAAO,EAAE,KAAK,GAAG,IAAI,KAAK,OAAO,CAAC,MAAM,CAAC,CAAC;IACpD,gBAAgB,EAAE,CAAC,OAAO,EAAE,KAAK,GAAG,IAAI,KAAK,OAAO,CAAC,MAAM,CAAC,CAAC;IAC7D,4BAA4B,EAAE,CAC5B,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,OAAO,EAAE,aAAa,CAAC,MAAM,CAAC,EAC9B,UAAU,EAAE,aAAa,CAAC,MAAM,CAAC,EACjC,YAAY,EAAE,aAAa,CAAC,MAAM,CAAC,KAChC,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,2BAA2B,EAAE,CAC3B,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,QAAQ,EAAE,aAAa,CAAC,MAAM,CAAC,EAC/B,UAAU,EAAE,aAAa,CAAC,MAAM,CAAC,EACjC,YAAY,EAAE,aAAa,CAAC,MAAM,CAAC,KAChC,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,0BAA0B,EAAE,CAC1B,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,MAAM,EAAE,aAAa,CAAC,MAAM,CAAC,KAC1B,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,SAAS,EAAE,CAAC,OAAO,EAAE,KAAK,GAAG,IAAI,KAAK,OAAO,CAAC,MAAM,CAAC,CAAC;IACtD,mBAAmB,EAAE,CACnB,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,QAAQ,EAAE,MAAM,EAChB,UAAU,EAAE,aAAa,CAAC,MAAM,CAAC,EACjC,kBAAkB,EAAE,aAAa,CAAC,MAAM,CAAC,KACtC,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,eAAe,EAAE,CACf,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,SAAS,EAAE,MAAM,EACjB,KAAK,EAAE,MAAM,EACb,QAAQ,EAAE,MAAM,EAChB,aAAa,EAAE,MAAM,GAAG,IAAI,KACzB,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,eAAe,EAAE,CACf,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,SAAS,EAAE,MAAM,EACjB,QAAQ,EAAE,MAAM,EAChB,aAAa,EAAE,MAAM,GAAG,IAAI,KACzB,OAAO,CAAC,MAAM,CAAC,CAAC;IACrB,kBAAkB,EAAE,CAClB,OAAO,EAAE,KAAK,GAAG,IAAI,EACrB,SAAS,EAAE,MAAM,EACjB,QAAQ,EAAE,MAAM,GAAG,IAAI,EACvB,QAAQ,EAAE,MAAM,EAChB,aAAa,EAAE,MAAM,GAAG,IAAI,KACzB,OAAO,CAAC,MAAM,CAAC,CAAC;CACtB;;AAED,wBAA4E"}
+\ No newline at end of file
+diff --git a/lib/typescript/src/specs/NativeMapViewModule.d.ts b/lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts
+similarity index 100%
+rename from lib/typescript/src/specs/NativeMapViewModule.d.ts
+rename to lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts
+diff --git a/src/specs/NativeMapViewModule.ts b/src/specs/NativeRNMBXMapViewModule.ts
+similarity index 100%
+rename from src/specs/NativeMapViewModule.ts
+rename to src/specs/NativeRNMBXMapViewModule.ts
+diff --git a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
+--- a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
++++ b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
+@@ -19,8 +19,8 @@
+     state: Value,
+     callback: (Expected<String, None>) -> Unit
+ ) {
+-    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { _ ->
+-        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())
++    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { expected ->
++        callback(expected)
+     }
+ }
+ 
+@@ -31,8 +31,8 @@
+     stateKey: String?,
+     callback: (Expected<String, None>) -> Unit
+ ) {
+-    this.removeFeatureState(sourceId, sourceLayerId, featureId, stateKey) { _ ->
+-        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())
++    this.removeFeatureState(sourceId, sourceLayerId, featureId, stateKey) { expected ->
++        callback(expected)
+     }
+ }
+ 
+diff --git a/ios/RNMBX/RNMBXStyleValue.swift b/ios/RNMBX/RNMBXStyleValue.swift
+--- a/ios/RNMBX/RNMBXStyleValue.swift
++++ b/ios/RNMBX/RNMBXStyleValue.swift
+@@ -264,7 +264,7 @@
+     }
+     let valueObj = RNMBXStyleValue.convert(value["stylevalue"] as! [String:Any])
+ 
+-    if let num = value as? Int {
++    if let num = valueObj as? Int {
+       let uicolor = uicolor(num)
+       return .constant(StyleColor(uicolor))
+     } else {

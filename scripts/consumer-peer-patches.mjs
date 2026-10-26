@@ -29,7 +29,7 @@ export const installConsumerPatch = (consumer, peer, run) => {
   run("bun", ["install", "--force"], consumer);
   assert.equal(readFileSync(join(consumer, "peer.patch"), "utf8"), patch);
   run("git", ["apply", "--reverse", "--check", shipped], peerRoot);
-  const files = [...patch.matchAll(/^diff --git a\/(.+) b\//gm)].map(
+  const files = [...patch.matchAll(/^diff --git a\/.* b\/(.+)$/gm)].map(
     (match) => match[1]
   );
   assert(

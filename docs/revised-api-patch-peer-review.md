@@ -1,5 +1,21 @@
 # Patch and peer review decision
 
+**Historical assessment and completed follow-up.** The U23 assessment body below preserves its pre-repair findings, identities/counts and proposed scope; the original evidence/matrix is unchanged. The owner-approved [U23-F01 reconciliation](revised-api-implementation-plan.md#u23-f01-reconcile-retained-publication-repairs) is implemented and independently audited. The [reconciliation evidence](../records/evidence/revised-api-u23-native-patch-reconciliation.json) owns final identities, bounded verification and remaining acceptance gates. A reviewed follow-up PR is authorized; U24 follows it and remains undispatched.
+
+## Current publication reconciliation
+
+P1-P8 are implemented in the three publication bundles. Pristine forward/reverse application and repaired SDK-output comparison preserve the original version-specific intent and all prior publication section semantics. The original patch files, production library modules, peers, locks, versions and SDK pins are unchanged. RNMapbox 10.3.8 keeps its existing bounds-reset behavior rather than receiving copied 10.3.7 camera hunks.
+
+| Publication bundle | Final sections/hunks | Final SHA-256 |
+| --- | --- | --- |
+| rnmapbox-10.3.7-tf08.patch | 31/68 | `807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1` |
+| rnmapbox-10.3.8.patch | 36/73 | `0b9cdb09c6b39c1b5527678155246e9116a8db71249fd7fd08d9d1fe1288a788` |
+| maplibre-native-11.5.0-tf08.patch | 13/20 | `ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0` |
+
+Focused proofs cover the repaired source boundaries, extracted Swift/Objective-C++ methods with stubbed SDK boundaries and Node codegen; executable Kotlin checks were skipped because the compiler was unavailable. Static Android checks, routine source/compiled tests and exact archive/isolated cases remain bounded evidence. They do not establish native application builds/linking, device/service behavior or renderer acceptance. The peer/development-host distinctions in the historical assessment remain relevant because no range, version or SDK pin changed.
+
+**Pre-repair U23 assessment body follows unchanged.**
+
 Keep all three active repair bundles. The publication bundles omit eight repair groups still needed by retained behavior; the original working tree contains those repairs. Reconcile the omissions through a separately approved bounded follow-up before U24. The read-only assessment is complete; native implementation readiness is not.
 
 The [review evidence](../records/evidence/revised-api-u23-patch-peer-review.json) owns the complete section/hunk matrix, patch and source hashes, actual callers, manifest identities and prior isolated-check provenance. This review inspected source and records. It ran no installs, builds, codegen, package/peer tests, native linking or renderer acceptance. The consequences below are source-backed risks, not newly observed native failures. Locally installed SDKs contain stronger patches and can mask publication omissions.
