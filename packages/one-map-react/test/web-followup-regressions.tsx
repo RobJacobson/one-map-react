@@ -1,5 +1,5 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
-import { createRef, type ReactNode } from "react";
+import { createRef, type ReactNode, StrictMode, Suspense } from "react";
 import { flushSync } from "react-dom";
 import { beforeEach, describe, expect, vi, test } from "vite-plus/test";
 
@@ -72,6 +72,57 @@ export const runWebFollowupRegressions = (
 
   describe("follow-up query, image, and interaction corrections", () => {
     beforeEach(() => mock.resetWebMapMock());
+
+    test("StrictMode retains one padding reset per removal across repeated cycles and remount", () => {
+      const content = (padding?: MapProps["padding"]) => (
+        <StrictMode>{scene({ padding })}</StrictMode>
+      );
+      const padding = () =>
+        (mock.Map.mock.calls.at(-1)?.[0] as { padding?: object } | undefined)
+          ?.padding;
+      const mounted = render(content());
+      expect(padding()).toBeUndefined();
+
+      for (const target of [{ top: 24 }, { left: 30 }]) {
+        mounted.rerender(content(target));
+        expect(padding()).toMatchObject(target);
+        mounted.rerender(content());
+        expect(padding()).toEqual({ top: 0, right: 0, bottom: 0, left: 0 });
+        mounted.rerender(content());
+        expect(padding()).toBeUndefined();
+      }
+
+      mounted.unmount();
+      render(content());
+      expect(padding()).toBeUndefined();
+    });
+
+    test("resuming a suspended padding removal sends a reset before restoring omission", () => {
+      const pending = new Promise<void>(() => {});
+      const Pause = () => {
+        throw pending;
+      };
+      const content = (padding?: MapProps["padding"], paused = false) => (
+        <Suspense fallback={<div>Loading</div>}>
+          {scene({ padding }, paused ? <Pause /> : undefined)}
+        </Suspense>
+      );
+      const padding = () =>
+        (mock.Map.mock.calls.at(-1)?.[0] as { padding?: object } | undefined)
+          ?.padding;
+      const mounted = render(content({ top: 24 }));
+      mounted.rerender(content(undefined, true));
+      expect(mounted.getByText("Loading")).toBeTruthy();
+      const beforeResume = mock.Map.mock.calls.length;
+      mounted.rerender(content());
+      expect(
+        mock.Map.mock.calls
+          .slice(beforeResume)
+          .map(([props]) => (props as { padding?: object }).padding)
+      ).toContainEqual({ top: 0, right: 0, bottom: 0, left: 0 });
+      mounted.rerender(content());
+      expect(padding()).toBeUndefined();
+    });
 
     test("pending filtered click uses the latest committed callback after an ordinary update", async () => {
       const original = vi.fn();

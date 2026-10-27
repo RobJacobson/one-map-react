@@ -1,0 +1,113 @@
+{
+  "scope": "Five recommended React Compiler syntax cleanups; optional camera assignment cleanup and deferred diagnostics unchanged.",
+  "baseCommit": "38cdd8accfa6a43f144ad397fd2d429fe99f52ea",
+  "files": {
+    "packages/one-map-react/src/adapters/shared/native-ui.tsx": "910395a7ab32db8ba8496113abe063488ef910cbf9adf8d570f72ce06165bf2e",
+    "packages/one-map-react/src/adapters/shared/use-native-marker-drag.ts": "18727cb38a2e56c368df26fd175711baf844725daf9e93f5dff553ae9470f502",
+    "packages/one-map-react/src/adapters/web/images.tsx": "289015b065150798b455da5f5d2216efa1efd1fef8690aa52684debf71a5f4a1",
+    "packages/one-map-react/src/facade/use-map-interactions.ts": "37ba118ba333af8fa706877543b9dab7bdcb06321f6ec11d6337b1494c994cd8",
+    "packages/one-map-react/test/map-interactions.web.test.tsx": "3f908cdd87115cc8bc5c6c41be7e28cda5eaefdc6a4d6908b5a0a351ef34dd2f",
+    "packages/one-map-react/test/tf07-ui.native.test.tsx": "bdac57c18240b03c6bb7dc9e4cfa533a364807a456e8d16e0d5e4e87a2cdac4b",
+    "packages/one-map-react/test/web-followup-regressions.tsx": "76abe7b382d654d8f6cf4c3d57174daf439f5270caf1582779fbc538cda95b0f",
+    "scripts/react-compiler.test.mjs": "574d1a616658cefa1f5848065741da8c4bc51414593cfc837a0a182275f46709"
+  },
+  "findings": [
+    {
+      "name": "Native navigation",
+      "status": "fixed and verified",
+      "change": "Build compass-reset options with an explicit branch inside the existing failure boundary; preserve omitted pitch."
+    },
+    {
+      "name": "Native scale",
+      "status": "fixed and verified",
+      "change": "Use explicit camera-center selection and active guards; preserve renderer fallback, sequential projection, failure reporting and teardown."
+    },
+    {
+      "name": "Native marker drag",
+      "status": "fixed and verified",
+      "change": "Split stale-generation and request-sequence guards in success and failure paths; preserve short-circuit order and gesture cleanup."
+    },
+    {
+      "name": "Web images",
+      "status": "fixed and verified",
+      "change": "Separate revision increment from capture and expand sprite/registration option branches; retain the sprite method receiver, sdf omission/false, ownership and reentrancy guards."
+    },
+    {
+      "name": "Map interactions",
+      "status": "fixed and verified",
+      "change": "Share the detached-map assertion and split web/source branching; preserve caught errors, query ordering, source attachment ownership and propagation."
+    }
+  ],
+  "verification": {
+    "compilerRegression": "All five affected functions skip compilation at the base revision and compile after; permanent assertions check each function, source maps and emitted compiler runtime. The added assertion failed before implementation with WebImages was skipped.",
+    "diagnostics": {
+      "sourceFiles": 101,
+      "before": 11,
+      "after": 6,
+      "functionsNowCompiled": [
+        "useNativeMarkerDrag",
+        "NativeNavigationControl",
+        "NativeScaleControl",
+        "WebImages",
+        "useMapInteractions"
+      ],
+      "remainingGroups": [
+        "adapters/mapbox-native/map.tsx:70: Cannot access refs during render",
+        "adapters/maplibre-native/map.tsx:74: Cannot access refs during render",
+        "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerExpression) Handle ||= operators in AssignmentExpression",
+        "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause",
+        "facade/map.tsx:135: Cannot access refs during render",
+        "facade/use-geolocation-control.ts:26: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause"
+      ],
+      "unchangedDeferredFiles": true
+    },
+    "passed": [
+      "bun run check",
+      "bun run check:docs",
+      "bun run typecheck",
+      "bun run typecheck:apps",
+      "git diff --check"
+    ],
+    "sourceTests": {
+      "command": "node_modules/.bin/vp test run",
+      "files": 37,
+      "tests": 819
+    },
+    "nativeMockTests": {
+      "command": "node_modules/.bin/jest --runInBand",
+      "suites": 6,
+      "tests": 272
+    },
+    "compiledTests": {
+      "command": "bun run test:compiled",
+      "build": "passed",
+      "webFiles": 22,
+      "webTests": 570,
+      "nativeSuites": 6,
+      "nativeTests": 272,
+      "compilerAssertions": "passed"
+    },
+    "newBehaviorCoverage": [
+      "Compass pitch omission for false and undefined",
+      "Renderer-center scale fallback success and rejection",
+      "Detached source and layer queries report exactly one failure without delivering clicks",
+      "Explicit sdf false survives registration in both web adapters",
+      "Sprite lookup retains its renderer receiver"
+    ],
+    "existingBehaviorCoverage": [
+      "Stale marker projection successes and failures, drag cancellation and gesture release",
+      "Navigation read/command failures and attachment replacement",
+      "Scale movement, controlled targets and delayed cleanup",
+      "Image replacement, failed registration, reentrant callbacks and unmount",
+      "Source propagation, query failures and replacement attachments"
+    ],
+    "review": "Diff contains four implementation files, three behavioral test files and compiler assertions. No public signatures, exports or package configuration changed; all five deferred files match the base revision byte-for-byte.",
+    "transientFailure": "An initial typecheck:apps run overlapped the build cleaning dist and failed to resolve generated package declarations. It passed after the build; the final complete typecheck and typecheck:apps sequence passed without concurrent builds."
+  },
+  "limitations": [
+    "Renderer acceptance, real-renderer smoke tests, native builds and device installations were not run, as requested. Mocked checks do not renew runtime acceptance.",
+    "One optional diagnostic and five deferred diagnostic groups remain intentionally unchanged.",
+    "Existing TypeScript experimental build-API and Bun moduleSuffixes warnings remain."
+  ],
+  "git": "Task changes left uncommitted."
+}

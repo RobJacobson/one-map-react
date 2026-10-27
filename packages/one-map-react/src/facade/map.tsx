@@ -114,8 +114,20 @@ const useMapAttachment = (
 ) => {
   const registry = useMapRegistry();
   const mapRef = useRef<MapRef | null>(null);
-  // eslint-disable-next-line react/refs -- The lazy initializer only captures the ref; commands read it after attachment.
-  const [proxy] = useState(() => createDeferredMapRef(mapRef));
+  const [proxy] = useState(
+    () =>
+      new Proxy({} as MapRef, {
+        get: (_target, key: keyof MapRef | "then") => {
+          if (key === "then") return undefined;
+          return (...args: unknown[]) => {
+            const map = mapRef.current;
+            if (!map) return Promise.reject(new Error("Map is not attached."));
+            const method = map[key] as (...args: unknown[]) => unknown;
+            return method(...args);
+          };
+        },
+      })
+  );
   useImperativeHandle(forwardedRef, () => mapRef.current ?? proxy);
   useLayoutEffect(
     () => (id === undefined ? undefined : registry.register(id, proxy)),
@@ -123,16 +135,3 @@ const useMapAttachment = (
   );
   return { mapRef, proxy };
 };
-
-const createDeferredMapRef = (ref: { current: MapRef | null }): MapRef =>
-  new Proxy({} as MapRef, {
-    get: (_target, key: keyof MapRef | "then") => {
-      if (key === "then") return undefined;
-      return (...args: unknown[]) => {
-        const map = ref.current;
-        if (!map) return Promise.reject(new Error("Map is not attached."));
-        const method = map[key] as (...args: unknown[]) => unknown;
-        return method(...args);
-      };
-    },
-  });

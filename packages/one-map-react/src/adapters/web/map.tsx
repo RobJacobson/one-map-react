@@ -53,310 +53,315 @@ export const createWebMap = <
         "children" | "dangerouslySetInnerHTML"
       >;
     }
-  >(
-    (
-      {
-        mapStyle,
-        terrain,
-        projection,
-        light,
-        options,
-        interactiveLayerIds,
-        hostProps,
-        initialViewState,
-        viewState,
-        minZoom,
-        maxZoom,
-        maxBounds,
-        padding,
-        style,
-        onMove,
-        onMoveStart,
-        onMoveEnd,
-        onIdle,
-        onClick,
-        onDblClick,
-        onContextMenu,
-        onMouseDown,
-        onMouseUp,
-        onMouseMove,
-        onMouseEnter,
-        onMouseLeave,
-        onMouseOver,
-        onMouseOut,
-        onWheel,
-        onDrag,
-        onDragStart,
-        onDragEnd,
-        onTouchStart,
-        onTouchMove,
-        onTouchEnd,
-        onTouchCancel,
-        onLoad,
-        onStyleLoad,
-        onError,
-        onResize,
-        onLongPress,
-        reuseMaps,
-        gl,
-        interactive,
-        dragPan,
-        touchZoom,
-        touchRotate,
-        touchPitch,
-        scrollZoom,
-        doubleClickZoom,
-        doubleTapZoom,
-        dragRotate,
-        boxZoom,
-        keyboard,
-        cooperativeGestures,
-        clickTolerance,
-        hash,
-        children,
+  >((props, ref) => {
+    const {
+      mapStyle,
+      terrain,
+      projection,
+      light,
+      options,
+      interactiveLayerIds,
+      hostProps,
+      initialViewState,
+      viewState,
+      minZoom,
+      maxZoom,
+      maxBounds,
+      style,
+      onMove,
+      onMoveStart,
+      onMoveEnd,
+      onIdle,
+      onClick,
+      onDblClick,
+      onContextMenu,
+      onMouseDown,
+      onMouseUp,
+      onMouseMove,
+      onMouseEnter,
+      onMouseLeave,
+      onMouseOver,
+      onMouseOut,
+      onWheel,
+      onDrag,
+      onDragStart,
+      onDragEnd,
+      onTouchStart,
+      onTouchMove,
+      onTouchEnd,
+      onTouchCancel,
+      onLoad,
+      onStyleLoad,
+      onError,
+      onResize,
+      onLongPress,
+      reuseMaps,
+      gl,
+      interactive,
+      dragPan,
+      touchZoom,
+      touchRotate,
+      touchPitch,
+      scrollZoom,
+      doubleClickZoom,
+      doubleTapZoom,
+      dragRotate,
+      boxZoom,
+      keyboard,
+      cooperativeGestures,
+      clickTolerance,
+      hash,
+      children,
+    } = props;
+    const mapRef = useRef<WebMapHandle | null>(null);
+    const [styleMap, setStyleMap] = useState<StyleLoadTarget | null>(null);
+    const styleKey = styleContentKey(mapStyle);
+    const frozenViewState = useFrozenValue(initialViewState);
+    // recycle() retains SDK listeners and old props until the next logical map attaches.
+    const report = useActiveCallbacks({
+      onMove,
+      onMoveStart,
+      onMoveEnd,
+      onIdle,
+      onClick,
+      onDblClick,
+      onContextMenu,
+      onMouseDown,
+      onMouseUp,
+      onMouseMove,
+      onMouseEnter,
+      onMouseLeave,
+      onMouseOver,
+      onMouseOut,
+      onWheel,
+      onDrag,
+      onDragStart,
+      onDragEnd,
+      onTouchStart,
+      onTouchMove,
+      onTouchEnd,
+      onTouchCancel,
+      onLoad,
+      onStyleLoad,
+      onError,
+      onResize,
+    });
+
+    const pendingLoad = useRef(false);
+
+    const setMapHandle = useCallback((handle: WebMapHandle | null) => {
+      mapRef.current = handle;
+      const next = handle?.getMap() ?? null;
+
+      setStyleMap((current) => (current === next ? current : next));
+    }, []);
+
+    useImperativeHandle(ref, () => createWebMapRef(mapRef, wrapper), []);
+
+    // Mapbox can emit load before react-map-gl commits its imperative handle.
+    // Deliver the callback after attachment so camera operations are usable.
+    useLayoutEffect(() => {
+      if (styleMap && pendingLoad.current) {
+        pendingLoad.current = false;
+        report.onLoad();
+      }
+    }, [styleMap, report]);
+
+    useLayoutEffect(
+      () => () => {
+        pendingLoad.current = false;
       },
-      ref
-    ) => {
-      const mapRef = useRef<WebMapHandle | null>(null);
-      const [styleMap, setStyleMap] = useState<StyleLoadTarget | null>(null);
-      const styleKey = styleContentKey(mapStyle);
-      const frozenViewState = useFrozenValue(initialViewState);
-      // recycle() retains SDK listeners and old props until the next logical map attaches.
-      const report = useActiveCallbacks({
-        onMove,
-        onMoveStart,
-        onMoveEnd,
-        onIdle,
-        onClick,
-        onDblClick,
-        onContextMenu,
-        onMouseDown,
-        onMouseUp,
-        onMouseMove,
-        onMouseEnter,
-        onMouseLeave,
-        onMouseOver,
-        onMouseOut,
-        onWheel,
-        onDrag,
-        onDragStart,
-        onDragEnd,
-        onTouchStart,
-        onTouchMove,
-        onTouchEnd,
-        onTouchCancel,
-        onLoad,
-        onStyleLoad,
-        onError,
-        onResize,
-      });
+      []
+    );
 
-      const pendingLoad = useRef(false);
+    useWebStyleLoad(styleMap, styleKey, report.onStyleLoad);
 
-      const setMapHandle = useCallback((handle: WebMapHandle | null) => {
-        mapRef.current = handle;
-        const next = handle?.getMap() ?? null;
+    // Pinch zoom and rotation are one handler. Disabling the handler would
+    // also disable zoom, so rotation is turned off on the handler itself.
+    useLayoutEffect(() => {
+      const handler = styleMap?.touchZoomRotate;
 
-        setStyleMap((current) => (current === next ? current : next));
-      }, []);
-
-      useImperativeHandle(ref, () => createWebMapRef(mapRef, wrapper), []);
-
-      // Mapbox can emit load before react-map-gl commits its imperative handle.
-      // Deliver the callback after attachment so camera operations are usable.
-      useLayoutEffect(() => {
-        if (styleMap && pendingLoad.current) {
-          pendingLoad.current = false;
-          report.onLoad();
-        }
-      }, [styleMap, report]);
-
-      useLayoutEffect(
-        () => () => {
-          pendingLoad.current = false;
-        },
-        []
-      );
-
-      useWebStyleLoad(styleMap, styleKey, report.onStyleLoad);
-
-      // Pinch zoom and rotation are one handler. Disabling the handler would
-      // also disable zoom, so rotation is turned off on the handler itself.
-      useLayoutEffect(() => {
-        const handler = styleMap?.touchZoomRotate;
-
-        if (!handler || touchRotate === undefined || touchZoom === false) {
-          return;
-        }
-
-        if (touchRotate) {
-          handler.enableRotation();
-          return;
-        }
-
-        handler.disableRotation();
-        return () => handler.enableRotation();
-      }, [styleMap, touchRotate, touchZoom]);
-
-      assertWebLongPress(onLongPress);
-
-      const paddingValue = useWebPadding(padding);
-      const initialCamera = {
-        ...toWebInitialViewState(frozenViewState),
-        ...(paddingValue === undefined ? {} : { padding: paddingValue }),
-      };
-      const controlledCamera =
-        viewState === undefined
-          ? undefined
-          : {
-              ...viewState,
-              ...(paddingValue === undefined ? {} : { padding: paddingValue }),
-            };
-
-      const wrapperOptions = { ...options };
-      if (wrapper.backend === "maplibre-web") {
-        // @vis.gl/react-maplibre 8.1.3 utils/transform.ts checks key presence.
-        // Regression: "MapLibre camera forwarding preserves absence".
-        for (const key of [
-          "longitude",
-          "latitude",
-          "zoom",
-          "bearing",
-          "pitch",
-        ] as const) {
-          const value = controlledCamera?.[key] ?? options?.[key];
-          if (value === undefined) delete wrapperOptions[key];
-          else wrapperOptions[key] = value;
-        }
+      if (!handler || touchRotate === undefined || touchZoom === false) {
+        return;
       }
 
-      return (
-        <div
-          {...hostProps}
-          style={{
-            position: "relative",
-            width: "100%",
-            height: "100%",
-            ...style,
-            ...hostProps?.style,
-          }}
-        >
-          <wrapper.Map
-            {...wrapperOptions}
-            {...(terrain === undefined && options?.terrain === undefined
-              ? {}
-              : {
-                  terrain: terrain === undefined ? options?.terrain : terrain,
-                })}
-            projection={
-              projection === undefined
-                ? options?.projection
-                : wrapper.backend === "mapbox-web"
-                  ? { name: projection }
-                  : { type: projection }
-            }
-            light={light ?? options?.light}
-            ref={setMapHandle}
-            interactiveLayerIds={
-              interactiveLayerIds === undefined
-                ? undefined
-                : [...interactiveLayerIds]
-            }
-            mapStyle={mapStyle}
-            initialViewState={initialCamera}
-            // MapLibre nested viewState also controls canvas size. Portable camera
-            // fields use top-level props to leave dimensions uncontrolled.
-            viewState={
-              wrapper.backend === "mapbox-web" ? controlledCamera : undefined
-            }
-            padding={paddingValue}
-            minZoom={minZoom ?? options?.minZoom}
-            maxZoom={maxZoom ?? options?.maxZoom}
-            maxBounds={
-              maxBounds === undefined
-                ? options?.maxBounds
-                : toFlatBounds(maxBounds)
-            }
-            style={{ width: "100%", height: "100%" }}
-            reuseMaps={reuseMaps ?? options?.reuseMaps}
-            gl={gl ?? options?.gl}
-            {...toWebGestureProps({
-              interactive,
-              dragPan,
-              touchZoom,
-              touchRotate,
-              touchPitch,
-              scrollZoom,
-              doubleClickZoom,
-              doubleTapZoom,
-              dragRotate,
-              boxZoom,
-              keyboard,
-              cooperativeGestures,
-              clickTolerance,
-              hash,
-            })}
-            onLoad={() => {
-              if (mapRef.current) report.onLoad();
-              else pendingLoad.current = true;
-            }}
-            onError={(event) => {
-              report.onError({ error: event.error });
-            }}
-            onResize={() => {
-              report.onResize();
-            }}
-            onMove={bindMove(onMove, report.onMove)}
-            onMoveStart={bindMove(onMoveStart, report.onMoveStart)}
-            onMoveEnd={bindMove(onMoveEnd, report.onMoveEnd)}
-            onIdle={
-              onIdle
-                ? () => {
-                    report.onIdle();
-                  }
-                : undefined
-            }
-            onClick={bindPointer(onClick, report.onClick)}
-            onDblClick={bindPointer(onDblClick, report.onDblClick)}
-            onContextMenu={bindPointer(onContextMenu, report.onContextMenu)}
-            onMouseDown={bindPointer(onMouseDown, report.onMouseDown)}
-            onMouseUp={bindPointer(onMouseUp, report.onMouseUp)}
-            onMouseMove={bindPointer(onMouseMove, report.onMouseMove)}
-            onMouseEnter={bindPointer(onMouseEnter, report.onMouseEnter)}
-            onMouseLeave={bindPointer(onMouseLeave, report.onMouseLeave)}
-            onMouseOver={bindPointer(onMouseOver, report.onMouseOver)}
-            onMouseOut={bindPointer(onMouseOut, report.onMouseOut)}
-            onWheel={bindPointer(onWheel, report.onWheel)}
-            onDrag={bindMove(onDrag, report.onDrag)}
-            onDragStart={bindMove(onDragStart, report.onDragStart)}
-            onDragEnd={bindMove(onDragEnd, report.onDragEnd)}
-            onTouchStart={bindPointer(onTouchStart, report.onTouchStart)}
-            onTouchMove={bindPointer(onTouchMove, report.onTouchMove)}
-            onTouchEnd={bindPointer(onTouchEnd, report.onTouchEnd)}
-            onTouchCancel={bindPointer(onTouchCancel, report.onTouchCancel)}
-          >
-            {children}
-          </wrapper.Map>
-        </div>
-      );
+      if (touchRotate) {
+        handler.enableRotation();
+        return;
+      }
+
+      handler.disableRotation();
+      return () => handler.enableRotation();
+    }, [styleMap, touchRotate, touchZoom]);
+
+    assertWebLongPress(onLongPress);
+
+    const paddingValue = useWebPadding(props);
+    const initialCamera = {
+      ...toWebInitialViewState(frozenViewState),
+      ...(paddingValue === undefined ? {} : { padding: paddingValue }),
+    };
+    const controlledCamera =
+      viewState === undefined
+        ? undefined
+        : {
+            ...viewState,
+            ...(paddingValue === undefined ? {} : { padding: paddingValue }),
+          };
+
+    const wrapperOptions = { ...options };
+    if (wrapper.backend === "maplibre-web") {
+      // @vis.gl/react-maplibre 8.1.3 utils/transform.ts checks key presence.
+      // Regression: "MapLibre camera forwarding preserves absence".
+      for (const key of [
+        "longitude",
+        "latitude",
+        "zoom",
+        "bearing",
+        "pitch",
+      ] as const) {
+        const value = controlledCamera?.[key] ?? options?.[key];
+        if (value === undefined) delete wrapperOptions[key];
+        else wrapperOptions[key] = value;
+      }
     }
-  );
+
+    return (
+      <div
+        {...hostProps}
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "100%",
+          ...style,
+          ...hostProps?.style,
+        }}
+      >
+        <wrapper.Map
+          {...wrapperOptions}
+          {...(terrain === undefined && options?.terrain === undefined
+            ? {}
+            : {
+                terrain: terrain === undefined ? options?.terrain : terrain,
+              })}
+          projection={
+            projection === undefined
+              ? options?.projection
+              : wrapper.backend === "mapbox-web"
+                ? { name: projection }
+                : { type: projection }
+          }
+          light={light ?? options?.light}
+          ref={setMapHandle}
+          interactiveLayerIds={
+            interactiveLayerIds === undefined
+              ? undefined
+              : [...interactiveLayerIds]
+          }
+          mapStyle={mapStyle}
+          initialViewState={initialCamera}
+          // MapLibre nested viewState also controls canvas size. Portable camera
+          // fields use top-level props to leave dimensions uncontrolled.
+          viewState={
+            wrapper.backend === "mapbox-web" ? controlledCamera : undefined
+          }
+          padding={paddingValue}
+          minZoom={minZoom ?? options?.minZoom}
+          maxZoom={maxZoom ?? options?.maxZoom}
+          maxBounds={
+            maxBounds === undefined
+              ? options?.maxBounds
+              : toFlatBounds(maxBounds)
+          }
+          style={{ width: "100%", height: "100%" }}
+          reuseMaps={reuseMaps ?? options?.reuseMaps}
+          gl={gl ?? options?.gl}
+          {...toWebGestureProps({
+            interactive,
+            dragPan,
+            touchZoom,
+            touchRotate,
+            touchPitch,
+            scrollZoom,
+            doubleClickZoom,
+            doubleTapZoom,
+            dragRotate,
+            boxZoom,
+            keyboard,
+            cooperativeGestures,
+            clickTolerance,
+            hash,
+          })}
+          onLoad={() => {
+            if (mapRef.current) report.onLoad();
+            else pendingLoad.current = true;
+          }}
+          onError={(event) => {
+            report.onError({ error: event.error });
+          }}
+          onResize={() => {
+            report.onResize();
+          }}
+          onMove={bindMove(onMove, report.onMove)}
+          onMoveStart={bindMove(onMoveStart, report.onMoveStart)}
+          onMoveEnd={bindMove(onMoveEnd, report.onMoveEnd)}
+          onIdle={
+            onIdle
+              ? () => {
+                  report.onIdle();
+                }
+              : undefined
+          }
+          onClick={bindPointer(onClick, report.onClick)}
+          onDblClick={bindPointer(onDblClick, report.onDblClick)}
+          onContextMenu={bindPointer(onContextMenu, report.onContextMenu)}
+          onMouseDown={bindPointer(onMouseDown, report.onMouseDown)}
+          onMouseUp={bindPointer(onMouseUp, report.onMouseUp)}
+          onMouseMove={bindPointer(onMouseMove, report.onMouseMove)}
+          onMouseEnter={bindPointer(onMouseEnter, report.onMouseEnter)}
+          onMouseLeave={bindPointer(onMouseLeave, report.onMouseLeave)}
+          onMouseOver={bindPointer(onMouseOver, report.onMouseOver)}
+          onMouseOut={bindPointer(onMouseOut, report.onMouseOut)}
+          onWheel={bindPointer(onWheel, report.onWheel)}
+          onDrag={bindMove(onDrag, report.onDrag)}
+          onDragStart={bindMove(onDragStart, report.onDragStart)}
+          onDragEnd={bindMove(onDragEnd, report.onDragEnd)}
+          onTouchStart={bindPointer(onTouchStart, report.onTouchStart)}
+          onTouchMove={bindPointer(onTouchMove, report.onTouchMove)}
+          onTouchEnd={bindPointer(onTouchEnd, report.onTouchEnd)}
+          onTouchCancel={bindPointer(onTouchCancel, report.onTouchCancel)}
+        >
+          {children}
+        </wrapper.Map>
+      </div>
+    );
+  });
 
   return WebMap;
 };
 
 /** Preserves initial omission and sends one explicit reset after clearing padding. */
-const useWebPadding = (padding: Padding | undefined) => {
-  const hadPadding = useRef(false);
-  const paddingValue =
-    // eslint-disable-next-line react/refs -- Previous committed padding requires one explicit zero reset when removed; keep that SDK transition.
-    padding === undefined && !hadPadding.current
-      ? undefined
-      : normalizePadding(padding ?? 0);
-  useLayoutEffect(() => {
-    hadPadding.current = padding !== undefined;
-  }, [padding]);
-  return paddingValue;
+const useWebPadding = (
+  props: Pick<MapProps, "padding">
+): Required<Padding> | undefined => {
+  const [snapshot, setSnapshot] = useState(() => ({
+    props,
+    value:
+      props.padding === undefined ? undefined : normalizePadding(props.padding),
+  }));
+
+  // A render replay retains the reset; the next caller props snapshot releases it.
+  if (snapshot.props !== props) {
+    setSnapshot({
+      props,
+      value:
+        props.padding === undefined && snapshot.props.padding === undefined
+          ? undefined
+          : normalizePadding(props.padding ?? 0),
+    });
+  }
+
+  return snapshot.value;
 };
 
 /** Content equality keeps equivalent inline styles from rearming completion. */

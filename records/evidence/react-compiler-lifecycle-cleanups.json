@@ -1,0 +1,93 @@
+{
+  "scope": "Three recommended React Compiler lifecycle cleanups; two native-map ref-capture diagnostic groups remain deferred.",
+  "baseCommit": "e61b869a34063d24d0069339ce915e31f92934f7",
+  "files": {
+    "packages/one-map-react/src/adapters/shared/use-native-controlled-camera.ts": "88818f97f0077cb5129e9c3c7298a1f4a19389cdd17da2a3ea68a90a226e8c0f",
+    "packages/one-map-react/src/facade/map.tsx": "672ff7951ed2f215be3a9d5ad0d8a9205c0ca89aabcdbf478877175ab0f849c0",
+    "packages/one-map-react/src/facade/use-geolocation-control.ts": "2ba2cfb89d54755f143d479f2e2209daf7ab80d3eb9bcbac9bd7b1db73f43a46",
+    "packages/one-map-react/test/native-controlled-camera.web.test.tsx": "4e19e80330004bd26ae9a750f1dc652f29bb9d817ad6260f0e6e3dbda538644b",
+    "packages/one-map-react/test/tf07-map-context.web.test.tsx": "2af8389a3a753f45c97315e9e246026c8474e734c212c3747412dc92e9d97ca5",
+    "packages/one-map-react/test/tf08-controls.web.test.tsx": "dc00e25b64d650f5170e040af8b90d7b5bb9f3d0b8dd4f32890001965175792d",
+    "scripts/react-compiler.test.mjs": "6fc899012dfe28de23cbbe2edd9d6e23aa43d9f27db0e9ab39cea6a57f7d279d"
+  },
+  "findings": [
+    {
+      "name": "Deferred map proxy",
+      "status": "fixed and verified",
+      "change": "Inline the single-use proxy factory into its existing lazy initializer, preserving current attachment lookup, identity, detached rejection, command invocation and then exclusion."
+    },
+    {
+      "name": "Controlled-camera dispatch",
+      "status": "fixed and verified",
+      "change": "Extract synchronous dispatch ownership with its intact try/finally into a plain helper, preserving reentrant command notification and synchronous exception propagation."
+    },
+    {
+      "name": "Geolocation camera loop",
+      "status": "fixed and verified",
+      "change": "Extract the async camera loop with its intact generation-owned finally and committed-input reads; split watch-registration guards while preserving cleanup and short-circuit order."
+    }
+  ],
+  "verification": {
+    "compilerRegression": "All three affected hooks skip compilation at the base revision and compile after. Permanent assertions cover each hook, source maps and emitted compiler runtime. The new assertion failed before implementation with useMapAttachment was skipped. Full-hook compilation assertions replace the former logical-assignment-only assertion.",
+    "diagnostics": {
+      "sourceFiles": 101,
+      "before": 5,
+      "after": 2,
+      "functionsNowCompiled": [
+        "useNativeControlledCamera",
+        "useGeolocationControl",
+        "useMapAttachment"
+      ],
+      "remainingGroups": [
+        "adapters/mapbox-native/map.tsx:70: Cannot access refs during render",
+        "adapters/maplibre-native/map.tsx:74: Cannot access refs during render"
+      ],
+      "nativeMapFilesUnchanged": true
+    },
+    "structuralReview": "Compared syntax trees: the extracted synchronous dispatch body is unchanged; the extracted geolocation loop is unchanged apart from moving its owner lookup into the caller; the proxy constructor body is unchanged apart from renaming its captured ref binding. Public signatures and exports are unchanged.",
+    "passed": [
+      "bun run check",
+      "bun run check:docs",
+      "bun run typecheck",
+      "bun run typecheck:apps",
+      "git diff --check"
+    ],
+    "sourceTests": {
+      "command": "node_modules/.bin/vp test run",
+      "files": 37,
+      "tests": 823
+    },
+    "nativeMockTests": {
+      "command": "node_modules/.bin/jest --runInBand",
+      "suites": 6,
+      "tests": 272
+    },
+    "compiledTests": {
+      "command": "bun run test:compiled",
+      "build": "passed",
+      "webFiles": 22,
+      "webTests": 574,
+      "nativeSuites": 6,
+      "nativeTests": 272,
+      "compilerAssertions": "passed"
+    },
+    "newBehaviorCoverage": [
+      "A synchronous camera correction throw releases dispatch ownership so a later public command can reconcile.",
+      "Named proxy identity survives rerenders; captured commands reject after detach and cannot target a replacement attachment.",
+      "Direct control-provider synchronous position and error callbacks that unmount release the returned watch exactly once and suppress late delivery.",
+      "Pending geolocation camera updates use the latest committed zoom when draining."
+    ],
+    "existingBehaviorCoverage": [
+      "Named and enclosing proxy promise assimilation, command forwarding, detach and reattachment.",
+      "Camera correction feedback, pending acknowledgements, short-circuit origin evaluation and teardown.",
+      "Location follow interruption, camera update coalescing, watch reuse, provider/mode/attachment replacement, stale-generation failure suppression and retry."
+    ]
+  },
+  "limitations": [
+    "Both native-map diagnostic groups and their source files remain unchanged, as requested.",
+    "Renderer acceptance, real-renderer smoke tests, native builds and device installations were not run. Routine mocked checks do not renew runtime acceptance.",
+    "No performance benchmark was run; compilation success does not establish a measured performance gain.",
+    "Existing TypeScript experimental build-API and Bun moduleSuffixes warnings remain."
+  ],
+  "git": "Task changes left uncommitted."
+}

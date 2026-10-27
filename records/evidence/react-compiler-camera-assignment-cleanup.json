@@ -1,0 +1,65 @@
+{
+  "scope": "Remaining optional React Compiler logical-assignment cleanup in native controlled camera; five deferred diagnostics unchanged.",
+  "baseCommit": "3249ecd361743ca3c50051b3c407f8460b138543",
+  "files": {
+    "packages/one-map-react/src/adapters/shared/use-native-controlled-camera.ts": "739855c8195104f3e153ea777585552e21ec1902cb7654e011c726ee093fb7b5",
+    "packages/one-map-react/test/native-controlled-camera.web.test.tsx": "69bbc1d7ccbde6b6d5d44d312d433573c3be9a20c540f998c3586307327b5343",
+    "scripts/react-compiler.test.mjs": "dd038156a42e97ecedea33ff51fbb7463ae367aec8333470991d2d414cd52091"
+  },
+  "status": "fixed and verified",
+  "change": "Replace the user-proposal ||= assignment with an equivalent guarded assignment. Preserve origin short-circuit evaluation, proposal latching, frame coalescing, reset and correction-loop prevention.",
+  "verification": {
+    "compilerRegression": "The permanent diagnostic assertion fails before the change with Controlled camera still uses an unsupported logical assignment and passes afterward.",
+    "diagnostics": {
+      "sourceFiles": 101,
+      "before": 6,
+      "after": 5,
+      "removed": [
+        "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerExpression) Handle ||= operators in AssignmentExpression"
+      ],
+      "remainingGroups": [
+        "adapters/mapbox-native/map.tsx:70: Cannot access refs during render",
+        "adapters/maplibre-native/map.tsx:74: Cannot access refs during render",
+        "adapters/shared/use-native-controlled-camera.ts:28: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause",
+        "facade/map.tsx:135: Cannot access refs during render",
+        "facade/use-geolocation-control.ts:26: (BuildHIR::lowerStatement) Handle TryStatement without a catch clause"
+      ],
+      "deferredDiagnosticsUnchanged": true,
+      "cameraTryFinallyUnchanged": true
+    },
+    "behaviorRegression": "A latched user proposal skips subsequent event origin getters, coalesces to one frame, resets after reconciliation, suppresses non-user feedback and permits the next user proposal.",
+    "passed": [
+      "bun run check",
+      "bun run check:docs",
+      "bun run typecheck",
+      "bun run typecheck:apps",
+      "git diff --check"
+    ],
+    "sourceTests": {
+      "command": "node_modules/.bin/vp test run",
+      "files": 37,
+      "tests": 820
+    },
+    "nativeMockTests": {
+      "command": "node_modules/.bin/jest --runInBand",
+      "suites": 6,
+      "tests": 272
+    },
+    "compiledTests": {
+      "command": "bun run test:compiled",
+      "build": "passed",
+      "webFiles": 22,
+      "webTests": 571,
+      "nativeSuites": 6,
+      "nativeTests": 272,
+      "compilerAssertions": "passed"
+    },
+    "review": "The hook differs only in the logical-assignment replacement. Both native adapter callers, deferred ref captures, geolocation control, public signatures and the camera try/finally boundary are unchanged."
+  },
+  "limitations": [
+    "The camera hook still skips compilation for its deferred try/finally diagnostic; this cleanup removes one warning without enabling additional hook compilation.",
+    "Renderer acceptance, real-renderer smoke tests, native builds and device installations were not run, as requested. Routine mocked checks do not renew runtime acceptance.",
+    "Existing TypeScript experimental build-API and Bun moduleSuffixes warnings remain."
+  ],
+  "git": "Task changes left uncommitted."
+}
