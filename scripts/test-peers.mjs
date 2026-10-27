@@ -204,6 +204,8 @@ import type { MapRef as WrapperMapRef } from "react-map-gl/${entry === "mapbox-w
 declare const selectedRef: WebMapRef;
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<WebMapRef["getWrapperMap"]>, Promise<WrapperMapRef>> = true;
+const exactSelectedKeys: Equal<Exclude<keyof WebMapRef, keyof import("one-map-react").MapRef>, "getWrapperMap"> = true;
+void exactSelectedKeys;
 const borrowed: Promise<WrapperMapRef> = selectedRef.getWrapperMap();
 void <SelectedMap mapStyle={style} initialViewState={viewState} options={${entry === "mapbox-web" ? "{ preserveDrawingBuffer: true }" : "{ canvasContextAttributes: { preserveDrawingBuffer: true } }"}} />;
 // @ts-expect-error Capture belongs to the application and selected wrapper.
@@ -272,8 +274,18 @@ declare const selectedRef: NativeAdvancedMapRef;
 type RemovedSelectedHitbox = import("one-map-react/mapbox-native").NativeSourceProps["hitbox"];
 // @ts-expect-error Selected common source activation is removed.
 type RemovedSelectedCallback = import("one-map-react/mapbox-native").NativeSourceProps["onClick"];
+// @ts-expect-error Selected GeoJson facade onClick is removed.
+type RemovedSelectedGeoJsonCallback = Extract<import("one-map-react/mapbox-native").NativeSourceProps, { type: "geojson" }>["onClick"];
+// @ts-expect-error Selected GeoJson facade hitbox is removed.
+type RemovedSelectedGeoJsonHitbox = Extract<import("one-map-react/mapbox-native").NativeSourceProps, { type: "geojson" }>["hitbox"];
+// @ts-expect-error Selected Vector facade onClick is removed.
+type RemovedSelectedVectorCallback = Extract<import("one-map-react/mapbox-native").NativeSourceProps, { type: "vector" }>["onClick"];
+// @ts-expect-error Selected Vector facade hitbox is removed.
+type RemovedSelectedVectorHitbox = Extract<import("one-map-react/mapbox-native").NativeSourceProps, { type: "vector" }>["hitbox"];
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof RnmapboxMapView>>> = true;
+const exactSelectedKeys: Equal<Exclude<keyof NativeAdvancedMapRef, keyof import("one-map-react").MapRef>, "getWrapperMap"> = true;
+void exactSelectedKeys;
 const borrowed: Promise<ComponentRef<typeof RnmapboxMapView>> = selectedRef.getWrapperMap();
 void exactWrapperPromise; void borrowed;
 void <SelectedMap ref={(map) => { if (map) { const wrapper: Promise<ComponentRef<typeof RnmapboxMapView>> = map.getWrapperMap(); void wrapper; } }} mapStyle={style} initialViewState={viewState} />;
@@ -329,8 +341,18 @@ declare const selectedRef: NativeAdvancedMapRef;
 type RemovedSelectedHitbox = import("one-map-react/maplibre-native").NativeSourceProps["hitbox"];
 // @ts-expect-error Selected common source activation is removed.
 type RemovedSelectedCallback = import("one-map-react/maplibre-native").NativeSourceProps["onClick"];
+// @ts-expect-error Selected GeoJson facade onClick is removed.
+type RemovedSelectedGeoJsonCallback = Extract<import("one-map-react/maplibre-native").NativeSourceProps, { type: "geojson" }>["onClick"];
+// @ts-expect-error Selected GeoJson facade hitbox is removed.
+type RemovedSelectedGeoJsonHitbox = Extract<import("one-map-react/maplibre-native").NativeSourceProps, { type: "geojson" }>["hitbox"];
+// @ts-expect-error Selected Vector facade onClick is removed.
+type RemovedSelectedVectorCallback = Extract<import("one-map-react/maplibre-native").NativeSourceProps, { type: "vector" }>["onClick"];
+// @ts-expect-error Selected Vector facade hitbox is removed.
+type RemovedSelectedVectorHitbox = Extract<import("one-map-react/maplibre-native").NativeSourceProps, { type: "vector" }>["hitbox"];
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof MaplibreMap>>> = true;
+const exactSelectedKeys: Equal<Exclude<keyof NativeAdvancedMapRef, keyof import("one-map-react").MapRef>, "getWrapperMap"> = true;
+void exactSelectedKeys;
 const borrowed: Promise<ComponentRef<typeof MaplibreMap>> = selectedRef.getWrapperMap();
 void exactWrapperPromise; void borrowed;
 void <SelectedMap ref={(map) => { if (map) { const wrapper: Promise<ComponentRef<typeof MaplibreMap>> = map.getWrapperMap(); void wrapper; } }} mapStyle={style} initialViewState={viewState} />;

@@ -2,6 +2,8 @@ import { fileURLToPath } from "node:url";
 
 import { defineConfig } from "vite-plus";
 
+import { wrapperSourceRoots } from "./scripts/wrapper-source-roots.mjs";
+
 export default defineConfig({
   fmt: {
     printWidth: 80,
@@ -114,6 +116,15 @@ export default defineConfig({
         },
       },
       {
+        // Computed SDK imports must also load when linked outside this checkout.
+        server: {
+          fs: {
+            allow: [
+              fileURLToPath(new URL(".", import.meta.url)),
+              ...wrapperSourceRoots,
+            ],
+          },
+        },
         resolve: {
           alias: [
             {

@@ -278,7 +278,7 @@ const features = map.queryRenderedFeatures(
 ```
 
 ```ts
-// Agreed one-map-react declaration; adapter query behavior remains unfinished.
+// Shared MapRef; renderer verification remains artifact-specific.
 const features = await map.queryRenderedFeatures(
   [240, 320], { layers: ["route-line"] },
 );
@@ -322,13 +322,13 @@ map.setFeatureState(
 ```
 
 ```ts
-// Agreed one-map-react declaration; adapter feature-state behavior remains unfinished.
+// Shared MapRef; renderer verification remains artifact-specific.
 await map.setFeatureState(
   { source: "routes", id: "route-1" }, { selected: true },
 );
 ```
 
-The adapter must convert identifiers and route MapLibre calls to registered source refs. The agreed portable feature-state contract uses stable string IDs and JSON values without null, undefined, or non-finite numbers. MapLibre React Native's [current source documentation][ml-geojson] states that null-valued object keys, including nested keys, are dropped while null array elements remain. This review establishes that documented upstream contract, not identical native conversion observations on both platforms. RNMapbox's native argument conversion also needs value validation. Use `removeFeatureState` to remove a key rather than treating null as deletion. Numeric ID normalization and richer values require an explicit tested extension.
+The adapters convert identifiers and route MapLibre calls to registered source refs. The working [FeatureIdentifier](../packages/one-map-react/src/contracts/query-types.ts) accepts stable string or numeric IDs; feature state accepts JSON values without null, undefined or non-finite numbers. MapLibre React Native's [current source documentation][ml-geojson] states that null-valued object keys, including nested keys, are dropped while null array elements remain. This review establishes that documented upstream contract, not identical native conversion observations on both platforms. RNMapbox's native argument conversion also needs value validation. Use `removeFeatureState` to remove a key rather than treating null as deletion. Values outside the supported feature-state JSON shape remain excluded.
 
 MapLibre declares feature-state methods in the inspected [11.5.0 source][ml-geojson]. Its documented removals apply on the next rendered frame, so awaiting the call does not guarantee immediate read-after-removal consistency or a completed repaint. Define stronger guarantees separately if needed. The historical [portable-defaults decision](decisions/0001-baselines-and-ownership.md#accepted-portable-defaults) required reset after source recreation or style replacement. The next-release [renderer-owned lifetime contract](revised-api-proposal.md#camera-and-feature-state-guarantees) supersedes that requirement: explicit operations retain validation and errors, while applications clear or reapply desired state after source attachment and readiness. Same-ID remounts and style changes add no automatic reset, replay, queue, or transaction guarantee. U09 migration is implemented and audited; its [evidence record](../records/evidence/revised-api-u09-feature-state.json) separates routine verification from unverified renderer acceptance.
 
