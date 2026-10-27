@@ -203,12 +203,34 @@ const runWeb = async (selectedEngine) => {
     await click(page, '[data-tf07-action="popup"]');
     await click(page, '[data-tf07-action="remount"]');
     await until(async () => (await read()).events.load >= 2, 60000);
-    const final = await read();
+    const remounted = await read();
     assert.equal(
-      final.events["popup-close"],
+      remounted.events["popup-close"],
       1,
       "Popup teardown requested dismissal."
     );
+    await until(
+      async () =>
+        page.evaluate(
+          `Boolean(document.querySelector('[data-tf07-child="popup"]'))`,
+          true
+        ),
+      5000
+    );
+    await click(
+      page,
+      ".mapboxgl-popup-close-button, .maplibregl-popup-close-button"
+    );
+    await until(
+      async () =>
+        (await read()).events["popup-close"] === 2 &&
+        (await page.evaluate(
+          `!document.querySelector('[data-tf07-child="popup"]')`,
+          true
+        )),
+      5000
+    );
+    const final = await read();
     assert.equal(
       final.events.error ?? 0,
       0,
