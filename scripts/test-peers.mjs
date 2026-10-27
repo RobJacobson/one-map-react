@@ -575,7 +575,7 @@ console.log(adapter.backend);
     if (!packages.some((specifier) => specifier.startsWith(`${peer}@`)))
       continue;
     const patch = readFileSync(join(consumer, "peer.patch"), "utf8");
-    for (const match of patch.matchAll(/^diff --git a\/(.+) b\//gm)) {
+    for (const match of patch.matchAll(/^diff --git a\/.* b\/(.+)$/gm)) {
       patchedFiles[`${peer}/${match[1]}`] = sha256(
         join(consumer, "node_modules", peer, match[1])
       );

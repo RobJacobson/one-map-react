@@ -294,3 +294,63 @@ index 19314dd..70c1358 100644
    }
  
    /**
+diff --git a/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt b/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt
+--- a/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt
++++ b/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt
+@@ -173,7 +173,7 @@
+ 
+     private fun updateMaxBounds() {
+         val map = maplibreMap
+-        if (map != null && maxBounds != null) {
++        if (map != null) {
+             map.setLatLngBoundsForCameraTarget(maxBounds)
+         }
+     }
+diff --git a/ios/components/camera/MLRNCamera.m b/ios/components/camera/MLRNCamera.m
+--- a/ios/components/camera/MLRNCamera.m
++++ b/ios/components/camera/MLRNCamera.m
+@@ -150,6 +150,9 @@
+   if (_map != nil) {
+     if (_maxBounds) {
+       _map.maxBounds = [MLRNUtils fromReactBounds:_maxBounds];
++    } else {
++      // Empty bounds disable the map delegate's camera constraint.
++      _map.maxBounds = (MLNCoordinateBounds){0};
+     }
+   }
+ }
+diff --git a/android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolver.kt b/android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolver.kt
+--- a/android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolver.kt
++++ b/android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolver.kt
+@@ -67,24 +67,15 @@
+                     val message =
+                         "`reactTag` $reactTag resolved to `view` $resolvedView which is null or a wrong type"
+                     Logger.e(LOG_TAG, message)
+-                    promise?.reject(Throwable(message))
++                    if (resolvedView == null) {
++                        promise?.reject("view_not_attached", message)
++                    } else {
++                        promise?.reject(Throwable(message))
++                    }
+                 }
+             } catch (err: IllegalViewOperationException) {
+-                if (!createdViews.contains(reactTag)) {
+-                    awaitedViews.getOrPut(reactTag) { mutableListOf() }.add(
+-                        Await({ view ->
+-                            if (view != null) {
+-                                fn(view as V)
+-                            } else {
+-                                val message = "`reactTag` $reactTag resolved null"
+-                                Logger.e(LOG_TAG, message)
+-                                promise?.reject(Throwable(message))
+-                            }
+-                        }, promise),
+-                    )
+-                } else {
+-                    promise?.reject(err)
+-                }
++                // Fabric does not publish through tagAssigned; never leave this request pending.
++                promise?.reject("view_not_attached", err)
+             }
+         }
+     }
