@@ -1,0 +1,378 @@
+{
+  "unit": "U25",
+  "attempt": 2,
+  "recordedAt": "2026-10-26T23:17:47.711675+00:00",
+  "status": "stopped_first_failure_command5",
+  "authorization": "Owner approved the exact nine serial browser commands for corrected PR46 candidate; stop first failure; no native permission or independently chosen retry",
+  "candidate": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f01/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "21424251b5ea315684227440fe59269562be7d93ed458a06dac2106b699c08e3",
+    "purpose": "Corrected rehearsal archive; rc.2 metadata unchanged, no registry publication/version bump"
+  },
+  "reviewedPublicationCommit": "bce31fbf33467430b3b107c9de90ee4c7da23618",
+  "sourceCommit": "3596f382dfca6a11cbda2975dde0c3f8c6c4dff9",
+  "pullRequest": 46,
+  "acceptancePlanSha256": "efc492a39256df6daf109ff1c7a33df281e58ec28556c72109930282aee239e8",
+  "driverDistDigest": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "low",
+    "count": 1,
+    "schedule": "serial",
+    "codeOrDependencyChanges": false
+  },
+  "preflight": {
+    "initialFilesAndLinks": 13149,
+    "beforeEveryCommand": "passed",
+    "afterStop": "passed",
+    "reservedPortsBefore": "free",
+    "reservedUsedPortsAfter": "released",
+    "node": "v24.22.1",
+    "bun": "1.4.1",
+    "credentialsRecorded": false
+  },
+  "wholeCommandTotals": {
+    "passed": 4,
+    "failed": 1,
+    "notRun": 4,
+    "commandRuntimeMs": 73113
+  },
+  "commands": [
+    {
+      "ordinal": 1,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 34276,
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 command=skip doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+          "fields": {
+            "fit": "ok",
+            "click": "hit",
+            "clickAt": "-122.32000,47.64002",
+            "stop": "stayed",
+            "held": "1",
+            "command": "skip",
+            "doubletap": "skip",
+            "center": "-122.32000,47.64000",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 command=skip doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+          "fields": {
+            "fit": "ok",
+            "click": "hit",
+            "clickAt": "-122.32000,47.64002",
+            "stop": "stayed",
+            "held": "1",
+            "command": "skip",
+            "doubletap": "skip",
+            "center": "-122.32000,47.64000",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        }
+      },
+      "sanitizedLogSha256": "09628e193febbdc0a6bb2143ff8800bdb5754e8e61f1872649f3a16e8b2ee896",
+      "resultSha256": "3385f59604846ceadc092ba9ec59c94b5b0031c6726264529641dee61721d6b3"
+    },
+    {
+      "ordinal": 2,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 5650,
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "scenarios": [
+            "padding update/reset",
+            "double tap zoom",
+            "rotation reset with pinch disabled",
+            "rotation release/reuse",
+            "master disables all eight handlers",
+            "disabled physical double click",
+            "explicit/default gesture restoration",
+            "interaction settings on renderer reuse"
+          ],
+          "mode": "real automation"
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "scenarios": [
+            "padding update/reset",
+            "double tap zoom",
+            "rotation reset with pinch disabled",
+            "rotation release/reuse",
+            "master disables all eight handlers",
+            "disabled physical double click",
+            "explicit/default gesture restoration",
+            "interaction settings on renderer reuse"
+          ],
+          "mode": "real automation"
+        }
+      },
+      "sanitizedLogSha256": "785d5b3374c55dd69072ae4c6288277c203581faa7018746fc40faf41d764d04",
+      "resultSha256": "2589f80d2b7cd435d38c733e4286df49cb6f04f447b1b98a50fda5aa18bc7860"
+    },
+    {
+      "ordinal": 3,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 18661,
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+          "fields": {
+            "mounted": "1",
+            "reset": "ok",
+            "data": "updated",
+            "style": "rebuilt",
+            "removed": "clean",
+            "error": "none",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+          "fields": {
+            "mounted": "1",
+            "reset": "ok",
+            "data": "updated",
+            "style": "rebuilt",
+            "removed": "clean",
+            "error": "none",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        }
+      },
+      "sanitizedLogSha256": "020368d10ea14bce59bb322c0454f9e9b8a24e1bac348edc4925898a2bd65fc9",
+      "resultSha256": "087358bb787738e7fb68c10345ad5a7e29d1ebd32f92b7b1ac18b8103960dfb7"
+    },
+    {
+      "ordinal": 4,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 10039,
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "scenarios": [
+            "pending image removal during style loading",
+            "owned image removal during same-style loading",
+            "owned image absence after renderer reuse",
+            "late image load cannot register after session release/reuse"
+          ],
+          "mode": "real automation"
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "scenarios": [
+            "pending image removal during style loading",
+            "owned image removal during same-style loading",
+            "owned image absence after renderer reuse",
+            "late image load cannot register after session release/reuse"
+          ],
+          "mode": "real automation"
+        }
+      },
+      "sanitizedLogSha256": "7ed0bed1670815e0729e9cdf13ea4114d938e406730f6db659846ef27b4b1ebd",
+      "resultSha256": "827c95d75c1366dd7c4cb6c99463e3d60fc183d49634da358d327fc6f9e35e6f"
+    },
+    {
+      "ordinal": 5,
+      "argv": [
+        "bun",
+        "scripts/tf06-queries-smoke.mjs",
+        "web"
+      ],
+      "status": "failed",
+      "exitCode": 1,
+      "signal": null,
+      "elapsedMs": 4487,
+      "observations": {
+        "mapbox-web": {
+          "status": "failed",
+          "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=explicitly-cleared cleared-state=pending error=Cannot-read-properties-of-undefined-(reading-'1') note=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "point": "ok",
+            "bounds": "ok",
+            "viewport": "ok",
+            "empty": "ok",
+            "source": "ok",
+            "cluster-zoom": "ok",
+            "leaves": "ok",
+            "children": "ok",
+            "set-state": "ok",
+            "get-state": "ok",
+            "remove-state": "ok",
+            "filters": "ok",
+            "pagination": "ok",
+            "whole-state": "ok",
+            "recreated-state": "explicitly-cleared",
+            "cleared-state": "pending",
+            "error": "Cannot-read-properties-of-undefined-(reading-'1')",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        },
+        "maplibre-web": {
+          "status": "failed",
+          "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=explicitly-cleared cleared-state=pending error=Cannot-read-properties-of-undefined-(reading-'1') note=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "point": "ok",
+            "bounds": "ok",
+            "viewport": "ok",
+            "empty": "ok",
+            "source": "ok",
+            "cluster-zoom": "ok",
+            "leaves": "ok",
+            "children": "ok",
+            "set-state": "ok",
+            "get-state": "ok",
+            "remove-state": "ok",
+            "filters": "ok",
+            "pagination": "ok",
+            "whole-state": "ok",
+            "recreated-state": "explicitly-cleared",
+            "cleared-state": "pending",
+            "error": "Cannot-read-properties-of-undefined-(reading-'1')",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        }
+      },
+      "sanitizedLogSha256": "dafe01aaf1952474087705f73dbffc85305fcccc6305cc2c0553ce72bec9fcea",
+      "resultSha256": "434293acef1bcdfd0ce79dba21237bab976445824056196fa4e7c2f601279889"
+    },
+    {
+      "ordinal": 6,
+      "argv": [
+        "bun",
+        "scripts/tf07-ui-smoke.mjs",
+        "web",
+        "mapbox"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop after first failed whole command"
+    },
+    {
+      "ordinal": 7,
+      "argv": [
+        "bun",
+        "scripts/tf07-ui-smoke.mjs",
+        "web",
+        "maplibre"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop after first failed whole command"
+    },
+    {
+      "ordinal": 8,
+      "argv": [
+        "bun",
+        "scripts/tf09-rendering-smoke.mjs",
+        "web",
+        "mapbox"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop after first failed whole command"
+    },
+    {
+      "ordinal": 9,
+      "argv": [
+        "bun",
+        "scripts/tf09-rendering-smoke.mjs",
+        "web",
+        "maplibre"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop after first failed whole command"
+    }
+  ],
+  "priorFixObservations": {
+    "cameraForwarding": "Command1 passed for MapLibre and Mapbox; prior InvalidLngLat no longer observed in that exercised scenario",
+    "processTeardown": "All five commands exited normally, including failed command5; used Vite/debugger/fixture ports released and no owned Chrome profile processes remain; no coordinator termination needed",
+    "scope": "These observations do not establish full U25 or native acceptance"
+  },
+  "newFinding": {
+    "id": "U25-F03",
+    "status": "confirmed_failure_root_cause_unresolved",
+    "environments": [
+      "mapbox-web",
+      "maplibre-web"
+    ],
+    "phase": "Replacement style / cleared-state verification after source recreation",
+    "error": "Cannot read properties of undefined (reading '1')",
+    "observations": "Both engines passed initial rendered/source/cluster/filter/pagination and feature-state set/get/key-remove/whole-remove checks; recreated-state=explicitly-cleared, cleared-state=pending when error was reported",
+    "sourceBoundary": "examples/shared/queries-smoke.ts reset phase waits style load, then sourceReady, removeFeatureState and observeStateRemoval",
+    "limitation": "Existing caught error stores message only; exact throwing call/stack not captured. Do not attribute to harness, facade or SDK without further diagnosis. No browser retry performed."
+  },
+  "cleanup": {
+    "manualProcessTermination": false,
+    "ownedBrowserProfileProcessesRemaining": 0,
+    "reservedUsedPorts": "free",
+    "frozenInputsUnchanged": true
+  },
+  "history": {
+    "priorFailureEvidence": "records/evidence/revised-api-u25-web-acceptance.json",
+    "priorFailureSha256": "a708cd586a4b284dc9a82ea9652faeac0eb79bf113ffc60e7f705e77d24b24e2",
+    "repairEvidence": "records/evidence/revised-api-u25-repairs.json",
+    "unchanged": true
+  },
+  "remainingGates": [
+    "Diagnose command5 replacement-style failure without erasing successful/failed observations",
+    "New explicit permission required for another renderer attempt or changed candidate/harness",
+    "Commands6-9 remain unverified",
+    "Web-result sign-off and separately authorized native readiness/build/install/flow remain future gates"
+  ],
+  "notExecuted": [
+    "Commands6-9",
+    "Another retry within this approval",
+    "Source/dependency/candidate changes",
+    "Native Metro/build/install/device acceptance",
+    "Merge/tag/registry publication"
+  ],
+  "retention": "Compact per-backend observations and hashes retained; small sanitized command5 failure log retained for active diagnosis; successful raw logs and generated Vite caches removed"
+}
