@@ -24,14 +24,21 @@ export type ImageEntry = string | UrlImage;
  */
 export interface ImagesProps {
   /**
-   * Images registered on the enclosing map's style, keyed by the name symbol
-   * layers reference in `icon-image` and pattern properties. Entries may
-   * change between renders; removed entries are unregistered. Web cleanup
-   * attempts removal during style loading and on logical unmount, including
-   * when the wrapper retains a reusable renderer. An absent or destroyed
-   * style is guarded; late image loads cannot register after release.
-   * Web download and registration failures report a credential-safe Map.onError;
-   * failed entries retry on the next style load.
+   * Named style images referenced by symbol layers and pattern properties.
+   * react-map-gl has no Images component, so web deliberately supplies a small
+   * polyfill over renderer image methods. Native adapters delegate to their
+   * wrappers. URL/SDF updates and removals
+   * affect only the changed entry. Existing web names report a conflict.
+   * Reserve distinct names and do not mutate owned entries through raw APIs.
+   * Web waits for initial readiness, cancels obsolete loads, and removes its
+   * successful registrations on cleanup, including logical unmount with reuse.
+   * Download, conflict and registration failures report a credential-safe
+   * Map.onError. Style events do not retry failures or replay registrations.
+   * Finish Images unmount cleanup before replacing the web style, then mount
+   * fresh Images after readiness. A newly keyed Map with reuseMaps=false is an
+   * alternative boundary that resets the camera. Keying only Images after
+   * onStyleLoad, or hiding Images while changing style in one update, is unsafe.
+   * Native wrappers retain their normal restoration and collision behavior.
    */
   readonly images: Readonly<Record<string, ImageEntry>>;
 }

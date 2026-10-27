@@ -73,9 +73,6 @@ export const WebCorrectionsApp = ({
     "none"
   );
   const [heldSource, setHeldSource] = useState(false);
-  const [mapStyle, setMapStyle] = useState<string | typeof emptyStyle>(
-    emptyStyle
-  );
   const [error, setError] = useState("none");
   return (
     <MapSetup adapter={adapter}>
@@ -156,15 +153,6 @@ export const WebCorrectionsApp = ({
             onClick={() => setImage("delayed")}
           >
             Load delayed image
-          </button>
-          <button
-            id="style-loading"
-            type="button"
-            onClick={() =>
-              setMapStyle("http://127.0.0.1:8798/delayed-style.json")
-            }
-          >
-            Load delayed style
           </button>
           <button
             id="image-remove"
@@ -263,7 +251,7 @@ export const WebCorrectionsApp = ({
         </div>
         {visible && (
           <OneMap
-            mapStyle={mapStyle}
+            mapStyle={emptyStyle}
             initialViewState={initialViewState}
             padding={padding}
             {...gestures}

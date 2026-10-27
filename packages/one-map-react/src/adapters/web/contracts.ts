@@ -193,8 +193,6 @@ interface WebImageMap {
   // returns boolean. Callers treat non-true as not loaded.
   isStyleLoaded: () => unknown;
   hasImage: (name: string) => boolean;
-  /** MapLibre can replace sprites through an in-place style diff. */
-  getSprite?: () => { id: string; url: string }[];
   // Each renderer declares its own image union; this boundary accepts any
   // decoded image a renderer-specific loadWebImage produced.
   // eslint-disable-next-line typescript/no-explicit-any -- renderer-specific image union
