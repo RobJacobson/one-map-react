@@ -15,6 +15,7 @@ import {
   type RefObject,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -119,6 +120,7 @@ export const Tf07Scene = ({
   const observations = useRef<Record<string, number>>({});
   const lastPositions = useRef<Record<string, LngLat>>({});
   const generationRef = useRef(0);
+  const popupOwnerMounted = useRef(false);
   const [generation, setGeneration] = useState(0);
   const [mapStyle, setMapStyle] = useState(emptyStyle);
   const [live, setLive] = useState(targets.live);
@@ -126,6 +128,14 @@ export const Tf07Scene = ({
   const [offset, setOffset] = useState<readonly [number, number] | undefined>();
   const [popup, setPopup] = useState(true);
   const [unit, setUnit] = useState<"metric" | "imperial">("metric");
+
+  // Map teardown can emit raw popup callbacks before the child unsubscribes.
+  useLayoutEffect(() => {
+    popupOwnerMounted.current = true;
+    return () => {
+      popupOwnerMounted.current = false;
+    };
+  }, []);
 
   const record = (name: string): void => {
     observations.current[name] = (observations.current[name] ?? 0) + 1;
@@ -310,8 +320,20 @@ export const Tf07Scene = ({
         {popup &&
           renderPopup(
             markerContent("popup", () => record("popup-child")),
-            () => record("popup-open"),
             () => {
+              if (
+                !popupOwnerMounted.current ||
+                generation !== generationRef.current
+              )
+                return;
+              record("popup-open");
+            },
+            () => {
+              if (
+                !popupOwnerMounted.current ||
+                generation !== generationRef.current
+              )
+                return;
               record("popup-close");
               setPopup(false);
             }
