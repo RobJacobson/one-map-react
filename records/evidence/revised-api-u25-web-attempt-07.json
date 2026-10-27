@@ -1,0 +1,774 @@
+{
+  "checkpoint": "U25 browser attempt07; approved f05 continuation5-9",
+  "date": "2026-10-27",
+  "status": "Approved continuation5-9 passed;1-4samecandidate passes retained from attempt06; all nine approved browser rows passed",
+  "pullRequest": "https://github.com/RobJacobson/one-map-react/pull/51",
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "sourceCommit": "cbacadfb1213eaf9a50efd3e33a06ba592ebf530"
+  },
+  "originalPlanSha256": "9dcfba6c11eb55b89330b927bbb17bd31766f9485aa4c5cf77155b4cd437c3bc",
+  "originalLauncherSha256": "c46ecf72fe7bbab241d04e6b485ac6b1e9b802dbd77f1e71728b87f26dd60f4b",
+  "continuationPlanSha256": "1510476f5d05a70df7cfd1a02e4a0cfa3b8adeaaafeb4b5171d50f2ef7482e79",
+  "continuationDriverSha256": "10b8f16488ea369f7878fae07f749e51f3dda2a1ca6fd6f31b29442c29d3e0a0",
+  "worker": {
+    "name": "/root/u25_f05_browser_continuation",
+    "model": "gpt-6-luna",
+    "reasoning": "low",
+    "handoffSha256": "deb11fd3dcffd14b67cf9799afc0fc7300b9fc5643e9df1dcc3272698ed4d639"
+  },
+  "priorPartialAttempt": {
+    "record": "revised-api-u25-web-attempt-06.json",
+    "sha256": "3510d96b8ea175fd301307602aad0207cea115ed451c890962e1fb667966105a",
+    "scope": "Rows1-4passed; worker typo prevented row5 launch. Original failure record unchanged."
+  },
+  "commands": [
+    {
+      "ordinal": 1,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web"
+      ],
+      "status": "passed",
+      "executionScope": "pass reused without rerun from attempt06",
+      "exitCode": 0,
+      "elapsedMs": 28614,
+      "releasedPorts": true,
+      "resultSha256": "3d7e7fe7a7624c7143409c8de6e8a4d1072bee4e15c6466926d8bc877d6a6b52",
+      "logSha256": "09628e193febbdc0a6bb2143ff8800bdb5754e8e61f1872649f3a16e8b2ee896",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 command=skip doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+          "fields": {
+            "fit": "ok",
+            "click": "hit",
+            "clickAt": "-122.32000,47.64002",
+            "stop": "stayed",
+            "held": "1",
+            "command": "skip",
+            "doubletap": "skip",
+            "center": "-122.32000,47.64000",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 command=skip doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+          "fields": {
+            "fit": "ok",
+            "click": "hit",
+            "clickAt": "-122.32000,47.64002",
+            "stop": "stayed",
+            "held": "1",
+            "command": "skip",
+            "doubletap": "skip",
+            "center": "-122.32000,47.64000",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        }
+      }
+    },
+    {
+      "ordinal": 2,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "passed",
+      "executionScope": "pass reused without rerun from attempt06",
+      "exitCode": 0,
+      "elapsedMs": 4091,
+      "releasedPorts": true,
+      "resultSha256": "e347ac842e31e0099ed8c523dd22fccecdd9bee1f1b5b6ba8a3f67ed5808a2f9",
+      "logSha256": "785d5b3374c55dd69072ae4c6288277c203581faa7018746fc40faf41d764d04",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "scenarios": [
+            "padding update/reset",
+            "double tap zoom",
+            "rotation reset with pinch disabled",
+            "rotation release/reuse",
+            "master disables all eight handlers",
+            "disabled physical double click",
+            "explicit/default gesture restoration",
+            "interaction settings on renderer reuse"
+          ],
+          "mode": "real automation"
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "scenarios": [
+            "padding update/reset",
+            "double tap zoom",
+            "rotation reset with pinch disabled",
+            "rotation release/reuse",
+            "master disables all eight handlers",
+            "disabled physical double click",
+            "explicit/default gesture restoration",
+            "interaction settings on renderer reuse"
+          ],
+          "mode": "real automation"
+        }
+      }
+    },
+    {
+      "ordinal": 3,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web"
+      ],
+      "status": "passed",
+      "executionScope": "pass reused without rerun from attempt06",
+      "exitCode": 0,
+      "elapsedMs": 18633,
+      "releasedPorts": true,
+      "resultSha256": "44961a32286a87268cc515c5b94622ca275cf91c3f2545a9dc6da13edd556ed9",
+      "logSha256": "020368d10ea14bce59bb322c0454f9e9b8a24e1bac348edc4925898a2bd65fc9",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+          "fields": {
+            "mounted": "1",
+            "reset": "ok",
+            "data": "updated",
+            "style": "rebuilt",
+            "removed": "clean",
+            "error": "none",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+          "fields": {
+            "mounted": "1",
+            "reset": "ok",
+            "data": "updated",
+            "style": "rebuilt",
+            "removed": "clean",
+            "error": "none",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        }
+      }
+    },
+    {
+      "ordinal": 4,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "passed",
+      "executionScope": "pass reused without rerun from attempt06",
+      "exitCode": 0,
+      "elapsedMs": 9279,
+      "releasedPorts": true,
+      "resultSha256": "791d45c7f8e18e4b585211d9d764f4d150da6e6f075c63763be303ba4f315475",
+      "logSha256": "7ed0bed1670815e0729e9cdf13ea4114d938e406730f6db659846ef27b4b1ebd",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "scenarios": [
+            "pending image removal during style loading",
+            "owned image removal during same-style loading",
+            "owned image absence after renderer reuse",
+            "late image load cannot register after session release/reuse"
+          ],
+          "mode": "real automation"
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "scenarios": [
+            "pending image removal during style loading",
+            "owned image removal during same-style loading",
+            "owned image absence after renderer reuse",
+            "late image load cannot register after session release/reuse"
+          ],
+          "mode": "real automation"
+        }
+      }
+    },
+    {
+      "ordinal": 5,
+      "argv": [
+        "bun",
+        "scripts/tf06-queries-smoke.mjs",
+        "web"
+      ],
+      "status": "passed",
+      "executionScope": "first execution in approved continuation",
+      "exitCode": 0,
+      "elapsedMs": 3577,
+      "releasedPorts": true,
+      "resultSha256": "39940463177d1d534d59546427faa126e55b9798a10cfcf683b0fbb6e2d03be8",
+      "logSha256": "d0311c2cfdce21da4d8d0b1cf604b674465a45af247974fa89d9edaf82a8fc48",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=explicitly-cleared cleared-state=explicitly-cleared error=none note=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "point": "ok",
+            "bounds": "ok",
+            "viewport": "ok",
+            "empty": "ok",
+            "source": "ok",
+            "cluster-zoom": "ok",
+            "leaves": "ok",
+            "children": "ok",
+            "set-state": "ok",
+            "get-state": "ok",
+            "remove-state": "ok",
+            "filters": "ok",
+            "pagination": "ok",
+            "whole-state": "ok",
+            "recreated-state": "explicitly-cleared",
+            "cleared-state": "explicitly-cleared",
+            "error": "none",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "corrections": {
+            "missing-source": "ok",
+            "unsupported-source": "ok",
+            "vector-layer-omitted": "ok",
+            "vector-layer-0": "ok",
+            "vector-layer-3": "ok",
+            "missing-rendered-layer": "ok",
+            "omitted-layers": "ok",
+            "empty-layers": "ok",
+            "rendered-emitted-error": "ok",
+            "source-emitted-error": "ok",
+            "empty-result": "ok",
+            "subsequent-query": "ok",
+            "listener-cleanup": "ok"
+          }
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=explicitly-cleared cleared-state=explicitly-cleared error=none note=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "point": "ok",
+            "bounds": "ok",
+            "viewport": "ok",
+            "empty": "ok",
+            "source": "ok",
+            "cluster-zoom": "ok",
+            "leaves": "ok",
+            "children": "ok",
+            "set-state": "ok",
+            "get-state": "ok",
+            "remove-state": "ok",
+            "filters": "ok",
+            "pagination": "ok",
+            "whole-state": "ok",
+            "recreated-state": "explicitly-cleared",
+            "cleared-state": "explicitly-cleared",
+            "error": "none",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "corrections": {
+            "missing-source": "ok",
+            "unsupported-source": "ok",
+            "vector-layer-omitted": "ok",
+            "vector-layer-0": "ok",
+            "vector-layer-3": "ok",
+            "missing-rendered-layer": "ok",
+            "omitted-layers": "ok",
+            "empty-layers": "ok",
+            "rendered-emitted-error": "ok",
+            "source-emitted-error": "ok",
+            "empty-result": "ok",
+            "subsequent-query": "ok",
+            "listener-cleanup": "ok"
+          }
+        }
+      }
+    },
+    {
+      "ordinal": 6,
+      "argv": [
+        "bun",
+        "scripts/tf07-ui-smoke.mjs",
+        "web",
+        "mapbox"
+      ],
+      "status": "passed",
+      "executionScope": "first execution in approved continuation",
+      "exitCode": 0,
+      "elapsedMs": 2025,
+      "releasedPorts": true,
+      "resultSha256": "0d1936c1bb1dae50ca07ab7605d9af317f4a9866f589b29c9e339f863b6198ac",
+      "logSha256": "481b2f1ff4d663c419a23d8ed73450696a8f37142cdfa58d6ddaec1282735110",
+      "observations": {
+        "artifact": {
+          "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5"
+        },
+        "results": {
+          "mapbox-web": {
+            "status": "passed",
+            "execution": "browser-input",
+            "scope": [
+              "known-feature",
+              "child-click",
+              "annotation-repeat-tap",
+              "live-drag",
+              "annotation-drag",
+              "source-propagation",
+              "navigation",
+              "popup-dismissal",
+              "remount-teardown"
+            ],
+            "observation": {
+              "events": {
+                "popup-open": 3,
+                "load": 2,
+                "annotation-click": 2,
+                "marker-click": 1,
+                "child-click": 1,
+                "live-start": 1,
+                "live-drag": 6,
+                "live-end": 1,
+                "annotation-start": 1,
+                "style": 2,
+                "annotation-end": 1,
+                "source-click": 2,
+                "map-click": 2,
+                "move": 26,
+                "popup-close": 2
+              },
+              "positions": {
+                "live": [
+                  -122.32352050781279,
+                  47.60444468658437
+                ],
+                "annotation": [
+                  -122.36368927001988,
+                  47.60444468658437
+                ]
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "features": [
+                {
+                  "id": 707,
+                  "source": "tf07-source",
+                  "layer": "tf07-point",
+                  "properties": {
+                    "fixture": "tf07"
+                  }
+                }
+              ],
+              "generation": 1
+            },
+            "remaining": [
+              "offset-touch-bounds",
+              "popup-follow",
+              "scale-units",
+              "geolocation",
+              "accessibility",
+              "style-replacement",
+              "fullscreen"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "ordinal": 7,
+      "argv": [
+        "bun",
+        "scripts/tf07-ui-smoke.mjs",
+        "web",
+        "maplibre"
+      ],
+      "status": "passed",
+      "executionScope": "first execution in approved continuation",
+      "exitCode": 0,
+      "elapsedMs": 2186,
+      "releasedPorts": true,
+      "resultSha256": "a8bd1e461e4a3b557285db0f78e0eab545ceab8ee4b62b446a6bdbeb955e6960",
+      "logSha256": "61327393dda62b5db70a53c1c7327b86bf2a47c5a1143dda1c4f264b16c764db",
+      "observations": {
+        "artifact": {
+          "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5"
+        },
+        "results": {
+          "maplibre-web": {
+            "status": "passed",
+            "execution": "browser-input",
+            "scope": [
+              "known-feature",
+              "child-click",
+              "annotation-repeat-tap",
+              "live-drag",
+              "annotation-drag",
+              "source-propagation",
+              "navigation",
+              "popup-dismissal",
+              "remount-teardown"
+            ],
+            "observation": {
+              "events": {
+                "popup-open": 3,
+                "load": 2,
+                "move": 27,
+                "style": 2,
+                "annotation-click": 2,
+                "marker-click": 1,
+                "child-click": 1,
+                "live-start": 1,
+                "live-drag": 6,
+                "live-end": 1,
+                "annotation-start": 1,
+                "annotation-end": 1,
+                "source-click": 2,
+                "map-click": 2,
+                "popup-close": 2
+              },
+              "positions": {
+                "live": [
+                  -122.32352050781279,
+                  47.604444686584344
+                ],
+                "annotation": [
+                  -122.36368927001988,
+                  47.604444686584344
+                ]
+              },
+              "center": [
+                -122.34,
+                47.61
+              ],
+              "zoom": 11,
+              "features": [
+                {
+                  "id": 707,
+                  "source": "tf07-source",
+                  "layer": "tf07-point",
+                  "properties": {
+                    "fixture": "tf07"
+                  }
+                }
+              ],
+              "generation": 1
+            },
+            "remaining": [
+              "offset-touch-bounds",
+              "popup-follow",
+              "scale-units",
+              "geolocation",
+              "accessibility",
+              "style-replacement",
+              "fullscreen"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "ordinal": 8,
+      "argv": [
+        "bun",
+        "scripts/tf09-rendering-smoke.mjs",
+        "web",
+        "mapbox"
+      ],
+      "status": "passed",
+      "executionScope": "first execution in approved continuation",
+      "exitCode": 0,
+      "elapsedMs": 3535,
+      "releasedPorts": true,
+      "resultSha256": "a5898b9a4a24147a197ba8e26ce45675dcdbda5b80c0cd5256f0aa1f15c7973b",
+      "logSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "rendererResultSha256": "18b01312189d623e7a6a2942095cb103136b7fcdb6c39f77c571e874818e974e",
+      "observations": {
+        "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+        "artifact": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+        "outcomes": [
+          {
+            "name": "known rendered feature and initial no-data",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "featureIds": [
+                9009
+              ],
+              "elevation": null,
+              "light": {
+                "anchor": "map",
+                "color": "#ffffff",
+                "intensity": 0.5,
+                "position": [
+                  1.15,
+                  210,
+                  30
+                ]
+              }
+            }
+          },
+          {
+            "name": "terrain enabled before delayed DEM attachment",
+            "status": "passed",
+            "observation": {
+              "elevation": 2000,
+              "expectedMeters": 2000
+            }
+          },
+          {
+            "name": "explicit terrain clear and projection change",
+            "status": "passed",
+            "observation": {
+              "elevation": 2000
+            }
+          },
+          {
+            "name": "named selected renderer facilities",
+            "status": "passed",
+            "observation": {
+              "tf10": {
+                "dragPan": {
+                  "before": true,
+                  "disabled": false,
+                  "restored": true
+                },
+                "source": true,
+                "layer": true,
+                "canvas": true,
+                "styleLayer": true,
+                "eventCalls": 1
+              },
+              "scale": 1.2,
+              "weatherFacilities": {
+                "rain": {
+                  "density": 0
+                },
+                "snow": {
+                  "density": 0
+                }
+              }
+            }
+          },
+          {
+            "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+            "status": "passed",
+            "observation": {
+              "canvasBluePixels": 5504,
+              "videoGreenPixels": 6844,
+              "magentaPixels": 576,
+              "callbacks": {
+                "added": 1,
+                "removed": 1,
+                "frames": 41,
+                "ready": true
+              }
+            }
+          },
+          {
+            "name": "hillshade draws the fixture's slope patch",
+            "status": "passed",
+            "observation": {
+              "changedPixels": 440
+            }
+          },
+          {
+            "name": "globe projection has independently different viewport output",
+            "status": "passed",
+            "observation": {
+              "changedPixels": 852190,
+              "projectionReadback": {
+                "name": "globe",
+                "center": [
+                  0,
+                  0
+                ]
+              }
+            }
+          },
+          {
+            "name": "rendered output contains the known orange feature",
+            "status": "passed",
+            "observation": {
+              "width": 1280,
+              "height": 713,
+              "orangePixels": 402
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 9,
+      "argv": [
+        "bun",
+        "scripts/tf09-rendering-smoke.mjs",
+        "web",
+        "maplibre"
+      ],
+      "status": "passed",
+      "executionScope": "first execution in approved continuation",
+      "exitCode": 0,
+      "elapsedMs": 3211,
+      "releasedPorts": true,
+      "resultSha256": "06071f572446f67c711a0abbbd3c91f42ce9f4083cf0bd70a9a81fafe91d270f",
+      "logSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "rendererResultSha256": "635680759e5d60a1720508bc4bd2bdcb8c7ee4964211f422369c4cc4e7036304",
+      "observations": {
+        "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+        "artifact": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+        "outcomes": [
+          {
+            "name": "known rendered feature and initial no-data",
+            "status": "passed",
+            "observation": {
+              "loads": 1,
+              "featureIds": [
+                9009
+              ],
+              "elevation": null,
+              "light": {
+                "anchor": "map",
+                "color": "#ffffff",
+                "intensity": 0.5,
+                "position": [
+                  1.15,
+                  210,
+                  30
+                ]
+              }
+            }
+          },
+          {
+            "name": "terrain enabled before delayed DEM attachment",
+            "status": "passed",
+            "observation": {
+              "elevation": 2000.0000000000036,
+              "expectedMeters": 2000
+            }
+          },
+          {
+            "name": "explicit terrain clear and projection change",
+            "status": "passed",
+            "observation": {
+              "elevation": 2000.0000000000036
+            }
+          },
+          {
+            "name": "named selected renderer facilities",
+            "status": "passed",
+            "observation": {
+              "tf10": {
+                "dragPan": {
+                  "before": true,
+                  "disabled": false,
+                  "restored": true
+                },
+                "source": true,
+                "layer": true,
+                "canvas": true,
+                "styleLayer": true,
+                "eventCalls": 1
+              },
+              "globalState": {
+                "rendering-fixture": 9009
+              },
+              "sky": {
+                "sky-color": "#112233"
+              },
+              "weatherFacilities": {}
+            }
+          },
+          {
+            "name": "selected canvas/video/custom insertion, mutable coordinates and teardown",
+            "status": "passed",
+            "observation": {
+              "canvasBluePixels": 5504,
+              "videoGreenPixels": 6844,
+              "magentaPixels": 576,
+              "callbacks": {
+                "added": 1,
+                "removed": 1,
+                "frames": 26,
+                "ready": true
+              }
+            }
+          },
+          {
+            "name": "hillshade draws the fixture's slope patch",
+            "status": "passed",
+            "observation": {
+              "changedPixels": 4430
+            }
+          },
+          {
+            "name": "globe projection has independently different viewport output",
+            "status": "passed",
+            "observation": {
+              "changedPixels": 879270,
+              "projectionReadback": {
+                "type": "globe"
+              }
+            }
+          },
+          {
+            "name": "rendered output contains the known orange feature",
+            "status": "passed",
+            "observation": {
+              "width": 1280,
+              "height": 713,
+              "orangePixels": 402
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "elapsedContinuationCommandMs": 14534,
+  "elapsedNineCompletedCommandMs": 75151,
+  "coordinatorAudit": {
+    "frozenVerification": {
+      "exitCode": 0,
+      "stdout": "PASS frozen archive, 13155 initial input files/links, Node and Bun runtime identities; no renderer."
+    },
+    "portInventory": {
+      "exitCode": 1,
+      "free": true,
+      "output": ""
+    },
+    "ownedRunnerProcessCandidates": [],
+    "processInventoryExitCode": 0
+  },
+  "retention": "Compact outcomes/provenance retained; browser consumers, caches, runtime tools and raw logs retired after audit. Durable archives, pinned source and native recovery inputs preserved.",
+  "remainingGates": [
+    "Recreate and verify native consumers from exact f05 before full native execution request",
+    "Separately approve host readiness; iOS/Android targets remain unverified",
+    "Confirm manual operator, native scope and separate generation/build/install/Metro/flow permission"
+  ],
+  "verificationLimits": "Passing nine browser rows certifies only their recorded exercised scope. No native, device, Metro or host setup ran; no full accessibility or sensor certification."
+}

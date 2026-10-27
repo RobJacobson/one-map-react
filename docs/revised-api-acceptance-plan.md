@@ -1,6 +1,6 @@
 # Acceptance proposal
 
-**The refreshed PR19 candidate is prepared for a new browser decision; runtime acceptance of these bytes remains unverified.** This proposal owns the browser request and the separate later native gates. The [impact evidence](../records/evidence/pr19-acceptance-impact.json) binds the candidate, temporary browser packet, source impact and routine checks. No browser, native or host-readiness command ran during this refresh.
+**All nine approved browser rows passed on the refreshed PR19 candidate; native readiness and acceptance remain unverified.** This proposal records the completed browser gate and owns the separate later native gates. The [impact evidence](../records/evidence/pr19-acceptance-impact.json) binds the preparation; the [current browser outcome](../records/evidence/revised-api-u25-web-attempt-07.json) owns runtime results. No browser, native or host-readiness command ran during this refresh.
 
 The [historical browser outcome](../records/evidence/revised-api-u25-web-attempt-05.json) records all nine rows passing on f04, with commands 1-2 from attempt04 and commands 3-9 from approved recovery. That outcome is unchanged and does not certify f05. Earlier interrupted and failed attempts remain unchanged. Their retired browser harness and runtime tools are not current execution inputs.
 
@@ -17,27 +17,15 @@ The [historical browser outcome](../records/evidence/revised-api-u25-web-attempt
 
 PR19 changes useFrozenValue across initial camera and marker anchors, useStableOptions across map/source/layer/marker creation, the shared Map attachment proxy, web padding and native marker overlay compilation. Browser camera/correction, source/correction, query, UI and rendering rows therefore all receive fresh coverage. Named-map proxy detach/replacement is covered by routine mocks; the browser corrections row does not assert that observation. Native camera, sources, queries and core/retained UI remain future four-environment coverage; web padding is web-only and overlay compilation is native-only. No retired API is restored.
 
-## Next decision: nine browser rows
+## Browser outcome
 
-The prepared browser harness is /private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/frozen-harness. Both isolated single-renderer consumers match every archive member. Both actual Vite production graphs include the opposite mixed web/native selection setup, select the intended web backend and exclude unused renderer/native SDK imports and the original checkout. The frozen input manifest binds 13,155 initial files/links. PNG 7.0.0 encode/decode and runtime tool hash checks pass. These preparation checks start no server or browser.
+All nine approved browser rows passed on the unchanged f05 candidate. The [current outcome](../records/evidence/revised-api-u25-web-attempt-07.json) combines rows 1-4 from attempt06 with rows 5-9 from the separately approved continuation. The [partial attempt](../records/evidence/revised-api-u25-web-attempt-06.json) preserves the worker working-directory error before row 5 started. No passing row was repeated. Commands 6-9 reported the expected f05 dist digest; the post-run check verified all 13,155 frozen inputs, free reserved ports and no owned runner processes.
 
-The exact packet is /private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/browser-acceptance-plan.json with SHA-256 9dcfba6c11eb55b89330b927bbb17bd31766f9485aa4c5cf77155b4cd437c3bc. Its plan-bound launcher is /private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/runtime/run-u25-one.mjs. From the harness, use the exact Node binary /Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node and invoke that launcher once per ordinal 1 through 9, serially. The launcher binds the plan hash, verifies frozen files, archive and tool identities, requires free row-specific ports, and refuses a second start or progression after failure. The coordinator supplies the existing public Mapbox token without storing it in evidence.
+The completed scope covers both web engines through the original nine rows: camera, padding/gesture corrections, sources/images, lifecycle corrections, queries/state, UI and targeted rendering. Detailed observations and unexercised areas remain in the outcome record. Named-proxy detach/replacement remains mocked coverage; web results do not establish native overlay behavior or broader accessibility, sensor and service guarantees.
 
-| Row | Literal command in the packet | Environments |
-| --- | --- | --- |
-| 1 | `bun scripts/tf04-camera-smoke.mjs web` | Both web engines |
-| 2 | `bun scripts/tf04-camera-smoke.mjs web corrections` | Both web engines |
-| 3 | `bun scripts/tf05-sources-smoke.mjs web` | Both web engines |
-| 4 | `bun scripts/tf05-sources-smoke.mjs web corrections` | Both web engines |
-| 5 | `bun scripts/tf06-queries-smoke.mjs web` | Both web engines |
-| 6 | `bun scripts/tf07-ui-smoke.mjs web mapbox` | Mapbox web |
-| 7 | `bun scripts/tf07-ui-smoke.mjs web maplibre` | MapLibre web |
-| 8 | `bun scripts/tf09-rendering-smoke.mjs web mapbox` | Mapbox web |
-| 9 | `bun scripts/tf09-rendering-smoke.mjs web maplibre` | MapLibre web |
+The completed packet and continuation hashes are historical provenance in the outcome record. Their browser consumers, caches, runtime tools and raw logs are retired after audit. Any future browser rerun requires current preparation and separate approval. The durable f05 archive, compact outcomes and native recovery inputs remain available.
 
-One GPT-6 Luna worker at low reasoning owns all nine serial rows and the packet's reserved ports, caches, temporary browser profiles and child processes. Stop at the first failed whole command, unexpected identity or occupied port; report the first attempt without retry or source edits. Drivers clean up their owned resources, and the launcher verifies port release after each row. Unknown processes are never terminated. Keep only compact outcomes and provenance after the checkpoint.
-
-Allow 5-10 minutes, excluding diagnosis and retries. The prior nine completed rows totalled 78,388 milliseconds in the historical browser record; the allowance includes cold caches. All nine are first attempts for f05. Approval covers only this exact archive and packet, with no native permission, merge, tag or publication.
+The next decision is host readiness under the separate scope below. Native consumers must be recreated and verified against f05 before a full native execution request. No host, native build/install or Metro permission is implied by the completed browser run.
 
 The native scope remains four independent single-SDK environments: Mapbox iOS, Mapbox Android, MapLibre iOS and MapLibre Android. The proposed baseline retains React Native 0.87.1, RNMapbox 10.3.7 or MapLibre React Native 11.5.0 and Teleport 1.2.1. Requested pins do not establish resolved, linked or installed identities.
 
@@ -57,9 +45,9 @@ Host readiness remains unresolved. Prior queries timed out or returned a CoreSim
 
 The proposed retained scope includes application location/UI through TF07 and capture used for TF09 rendering observations. Broader raw offline, cache, import, snapshot and service acceptance needs an explicit owner scope disposition; those operations remain unverified. Physical devices, full VoiceOver/TalkBack and sensor certification retain their exclusions.
 
-## Separate later decision: host readiness
+## Next decision: host readiness
 
-Host readiness requires separate approval after the proposed browser run. The [first host attempt](../records/evidence/revised-api-u25-host-readiness-attempt-01.json) stopped at the obsolete Simulator application lookup. The [iOS retry record](../records/evidence/revised-api-u25-ios-readiness-retry-02.json) stopped in executable preflight before any simulator command because the worker checked Devices instead of the Info.plist-declared DevicesTrampoline. Its corrected executable and Info.plist hashes match the reviewed identities. No target readiness or Android setup is established. Those outcomes remain unchanged.
+Host readiness requires separate approval after the completed browser gate. The [first host attempt](../records/evidence/revised-api-u25-host-readiness-attempt-01.json) stopped at the obsolete Simulator application lookup. The [iOS retry record](../records/evidence/revised-api-u25-ios-readiness-retry-02.json) stopped in executable preflight before any simulator command because the worker checked Devices instead of the Info.plist-declared DevicesTrampoline. Its corrected executable and Info.plist hashes match the reviewed identities. No target readiness or Android setup is established. Those outcomes remain unchanged.
 
 For Android, the proposal downloads the official ARM64 [command-line tools archive](https://dl.google.com/android/repository/commandlinetools-mac_arm64-15859902_latest.zip), verifies SHA-256 835b62a26162b229b441d1f6d4680383815a270809eb33522c0d480fa5002c4e, and extracts it into this task's temporary host-tools directory. The archive is 156,083,281 bytes. This adds no SDK image and replaces no installed SDK or Android Studio files. Use Android Studio's existing Java runtime, the existing SDK at /Users/rob/Library/Android/sdk, and task-owned ANDROID_USER_HOME and ANDROID_AVD_HOME directories.
 
