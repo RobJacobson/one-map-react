@@ -157,7 +157,9 @@ See [advanced rendering](https://github.com/RobJacobson/one-map-react/blob/main/
 
 ## Native patches and linking
 
-Apply the repair for the exact installed native wrapper. Patches ship inside this package and belong in the application's dependency installation. Native feature-state/source operations retain SDK error reporting. Rebuild the native application after updating these patches.
+**Publication patch reconciliation is pending.** The current bundles omit retained bounds resets, feature-state source-family guards/error forwarding, boxed integer light-color decoding, absent Fabric-view rejection, RNMapbox 10.3.8 codegen namespacing, cached location/heading observer replay, live offline status and the iOS immediate-camera alias. These remain required behavior. The [patch and peer decision report](../../docs/revised-api-patch-peer-review.md) specifies P1-P8 and a separately approved bounded follow-up. Installing the files below does not establish that those gaps are repaired; candidate preparation remains blocked on the owner decision and resolution. No native failure or new compatibility result was observed by the read-only review.
+
+The files below are the current combined bundles for their exact wrapper versions. They are the targets of the pending reconciliation, not a completed implementation of every retained repair. The registration commands show how applications select a bundle; they do not close P1-P8 or certify native linking.
 
 | Wrapper | Included combined repair |
 | --- | --- |
