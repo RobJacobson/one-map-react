@@ -118,15 +118,7 @@ const MapboxAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
         id={props.id}
         coordinate={[props.lngLat[0], props.lngLat[1]]}
         anchor={anchor}
-        draggable={props.draggable}
         onSelected={(event: AnnotationEvent) => click(normalize(event))}
-        onDragStart={(event: AnnotationEvent) =>
-          props.onDragStart?.(normalize(event))
-        }
-        onDrag={(event: AnnotationEvent) => props.onDrag?.(normalize(event))}
-        onDragEnd={(event: AnnotationEvent) =>
-          props.onDragEnd?.(normalize(event))
-        }
       >
         {content}
       </Mapbox.PointAnnotation>

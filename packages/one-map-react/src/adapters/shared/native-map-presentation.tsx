@@ -14,44 +14,21 @@ import {
 import type { MapRef, ViewState } from "../../contracts/camera-types.js";
 import type { MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
-import type { ControlPosition } from "../../contracts/ui-types.js";
-
-/** Native control placement; children retain their original React ancestry. */
-export interface NativeOverlay {
-  readonly id: string;
-  readonly position: ControlPosition;
-  readonly height: number;
-}
 
 /** Native-only presentation owned by the selected adapter's map. */
 export interface NativeMapPresentation {
-  readonly gestureLocked: boolean;
   readonly overlayHostName: string;
-  readonly nativeLocationFollowing: boolean;
   readonly nativeLayout?: { readonly width: number; readonly height: number };
-  /** Placement requested by the mounted attribution control. */
-  readonly attributionPosition: ControlPosition | undefined;
-  requestGestureLock(locked: boolean): void;
   setNativeLayout(width: number, height: number): void;
-  /** Clears the control override with undefined, restoring selected SDK options. */
-  setAttributionPosition(position: ControlPosition | undefined): void;
-  setOverlay(
-    id: string,
-    position: ControlPosition | null,
-    height?: number
-  ): void;
 }
 
 export const NativeMapPresentationContext =
   createContext<NativeMapPresentation | null>(null);
-export const NativeOverlayContext = createContext<readonly NativeOverlay[]>([]);
 
-/** Effective camera configuration and movement observed from the native wrapper. */
+/** Camera movement observed from the native wrapper. */
 interface NativeCameraState {
-  /** Authoritative target when controlled, otherwise the observed camera. */
+  /** Observed native camera. */
   readonly viewState: ViewState;
-  /** Invalidates control and overlay projection when the controlled target stays unchanged. */
-  readonly observedViewState: ViewState;
 }
 
 export const NativeCameraContext = createContext<NativeCameraState | null>(
@@ -63,10 +40,9 @@ export const withNativeMapPresentation = <Props extends MapProps>(
   Implementation: ForwardRefExoticComponent<Props & RefAttributes<MapRef>>
 ): ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<MapRef>> =>
   forwardRef<MapRef, Props>((props, ref) => (
-    <NativePresentationProvider following={selectedLocationFollowing(props)}>
+    <NativePresentationProvider>
       <NativeCameraProvider
         initial={props.initialViewState}
-        controlled={props.viewState}
         onMove={props.onMove}
         onMoveEnd={props.onMoveEnd}
       >
@@ -90,22 +66,14 @@ export const useNativeMapPresentation = (): NativeMapPresentation => {
 };
 
 const NativePresentationProvider = ({
-  following,
   children,
 }: {
-  readonly following: boolean;
   readonly children: ReactNode;
 }) => {
   const overlayHostName = useId();
-  const [gestureLocked, requestGestureLock] = useState(false);
   const [nativeLayout, storeNativeLayout] =
     useState<NativeMapPresentation["nativeLayout"]>();
-  const [attributionPosition, setAttributionPosition] =
-    useState<ControlPosition>();
-  const [overlays, setOverlays] = useState<ReadonlyMap<string, NativeOverlay>>(
-    () => new Map()
-  );
-  const [{ setNativeLayout, setOverlay }] = useState(() => ({
+  const [{ setNativeLayout }] = useState(() => ({
     setNativeLayout: (width: number, height: number): void => {
       storeNativeLayout((previous) =>
         previous?.width === width && previous.height === height
@@ -113,66 +81,29 @@ const NativePresentationProvider = ({
           : { width, height }
       );
     },
-    setOverlay: (
-      id: string,
-      position: ControlPosition | null,
-      height?: number
-    ) => {
-      setOverlays((current) => {
-        const previous = current.get(id);
-        if (position === null && !previous) return current;
-        const nextHeight = height ?? previous?.height ?? 0;
-        if (previous?.position === position && previous.height === nextHeight)
-          return current;
-        const next = new Map(current);
-        if (position === null) next.delete(id);
-        else next.set(id, { id, height: nextHeight, position });
-        return next;
-      });
-    },
   }));
   const presentation = useMemo(
     () => ({
-      gestureLocked,
-      requestGestureLock,
       overlayHostName,
-      nativeLocationFollowing: following,
       nativeLayout,
-      attributionPosition,
       setNativeLayout,
-      setAttributionPosition,
-      setOverlay,
     }),
-    [
-      gestureLocked,
-      overlayHostName,
-      following,
-      nativeLayout,
-      attributionPosition,
-      setNativeLayout,
-      setAttributionPosition,
-      setOverlay,
-    ]
+    [overlayHostName, nativeLayout, setNativeLayout]
   );
-  const placement = useMemo(() => [...overlays.values()], [overlays]);
   return (
     <NativeMapPresentationContext.Provider value={presentation}>
-      <NativeOverlayContext.Provider value={placement}>
-        {children}
-      </NativeOverlayContext.Provider>
+      {children}
     </NativeMapPresentationContext.Provider>
   );
 };
 
 const NativeCameraProvider = ({
   initial,
-  controlled,
   onMove,
   onMoveEnd,
   children,
 }: {
   readonly initial: ViewState;
-  readonly controlled?: ViewState;
   readonly onMove?: MapProps["onMove"];
   readonly onMoveEnd?: MapProps["onMoveEnd"];
   readonly children: (
@@ -195,30 +126,10 @@ const NativeCameraProvider = ({
   );
   // Observations update camera consumers without recreating the renderer child.
   const content = useMemo(() => children(callbacks), [children, callbacks]);
-  const camera = useMemo(
-    () => ({ viewState: controlled ?? observed, observedViewState: observed }),
-    [controlled, observed]
-  );
+  const camera = useMemo(() => ({ viewState: observed }), [observed]);
   return (
     <NativeCameraContext.Provider value={camera}>
       {content}
     </NativeCameraContext.Provider>
-  );
-};
-
-const selectedLocationFollowing = (props: MapProps): boolean => {
-  if (
-    !("locationOptions" in props) ||
-    !props.locationOptions ||
-    typeof props.locationOptions !== "object"
-  )
-    return false;
-  const options = props.locationOptions as {
-    followUserLocation?: boolean;
-    trackUserLocation?: unknown;
-  };
-  return (
-    options.followUserLocation === true ||
-    options.trackUserLocation !== undefined
   );
 };

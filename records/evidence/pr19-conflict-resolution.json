@@ -1,0 +1,355 @@
+{
+  "scope": "PR19 conflict resolution against current main; retained React Compiler improvements only, preserving narrower migrated contract.",
+  "status": "Conflict resolution passed worker routine verification, independent audit and coordinator source/provenance review; authorized for merge.",
+  "provenance": {
+    "prHead": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+    "main": "4ce4dee98d17aecfbe2f84cff8631825d8f49103",
+    "mergeBase": "4031ac745372b3a828da8c276594ea4e964c7bbd",
+    "merge": "git merge --no-commit origin/main; conflict resolutions staged for coordinator; no commit/push/merge/delete by worker"
+  },
+  "originalPathCount": 31,
+  "conflictPathCount": 18,
+  "paths": [
+    {
+      "path": "packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx",
+      "conflict": false,
+      "resolution": "Retain removal of obsolete exhaustive-deps suppression. Current projection/session ownership and dependency list unchanged; assertion proves this retained hook compiles."
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/shared/native-ornament-position.ts",
+      "conflict": true,
+      "resolution": "Preserve main deletion. Next-release contract deliberately removes this implementation/test; no obsolete API, module or compiler assertion restored."
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/shared/native-ui.tsx",
+      "conflict": true,
+      "resolution": "Use main unchanged. U07/U13-U17 remove drag, popup, and control owners; current marker activation hook already compiles."
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/shared/use-frozen-value.ts",
+      "conflict": false,
+      "resolution": "Retain lazy useState snapshot, including callable/undefined values; all common/web/native callers preserved."
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/shared/use-native-controlled-camera.ts",
+      "conflict": true,
+      "resolution": "Preserve main deletion. Next-release contract deliberately removes this implementation/test; no obsolete API, module or compiler assertion restored."
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/shared/use-native-marker-drag.ts",
+      "conflict": true,
+      "resolution": "Preserve main deletion. Next-release contract deliberately removes this implementation/test; no obsolete API, module or compiler assertion restored."
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web/images.tsx",
+      "conflict": true,
+      "resolution": "Use main unchanged. U20 replaces style replay/sprite ownership with one-mounted-style WebImages/WebImage lifecycle; both already compile."
+    },
+    {
+      "path": "packages/one-map-react/src/adapters/web/map.tsx",
+      "conflict": true,
+      "resolution": "Retain props-object padding snapshot and compiler-compatible destructuring; preserve all main U25 MapLibre absence forwarding, attachment/load, getter, and gesture behavior."
+    },
+    {
+      "path": "packages/one-map-react/src/facade/map.tsx",
+      "conflict": false,
+      "resolution": "Retain inline lazy proxy initializer; preserve U21 current session, borrowed refs, named identity, then exclusion, detached rejection and call-time owner lookup."
+    },
+    {
+      "path": "packages/one-map-react/src/facade/source.tsx",
+      "conflict": true,
+      "resolution": "Use main unchanged. U19 removes source onClick and attachment registration; retaining old compiler registration would resurrect retired API. Source compilation remains asserted."
+    },
+    {
+      "path": "packages/one-map-react/src/facade/use-geolocation-control.ts",
+      "conflict": true,
+      "resolution": "Preserve main deletion. Next-release contract deliberately removes this implementation/test; no obsolete API, module or compiler assertion restored."
+    },
+    {
+      "path": "packages/one-map-react/src/facade/use-map-interactions.ts",
+      "conflict": true,
+      "resolution": "Use main unchanged. U19/U21 replace source hit/propagation/listener bus with map-owned query and current-generation guards; current hook already compiles."
+    },
+    {
+      "path": "packages/one-map-react/src/facade/use-stable-options.ts",
+      "conflict": false,
+      "resolution": "Retain lazy useState creation snapshot and existing comparison/error paths across Map, Source, Layer, Marker and selected callers."
+    },
+    {
+      "path": "packages/one-map-react/test/map-interactions.web.test.tsx",
+      "conflict": true,
+      "resolution": "Use main tests unchanged. Old source propagation reentrant regression targets removed Source.onClick; retained map query replacement/failure/teardown regressions remain."
+    },
+    {
+      "path": "packages/one-map-react/test/mapbox-native.native.test.tsx",
+      "conflict": true,
+      "resolution": "Use main tests unchanged. Original adds ornament positioning layout-latch/reset assertions, superseded by U15/U17 removal of common ornaments/control layout; current selected ornament and retained map tests remain."
+    },
+    {
+      "path": "packages/one-map-react/test/maplibre-native.native.test.tsx",
+      "conflict": true,
+      "resolution": "Use main tests unchanged. Original adds ornament positioning layout-latch/reset assertions, superseded by U15/U17 removal of common ornaments/control layout; current selected ornament and retained map tests remain."
+    },
+    {
+      "path": "packages/one-map-react/test/native-controlled-camera.web.test.tsx",
+      "conflict": true,
+      "resolution": "Preserve main deletion. Next-release contract deliberately removes this implementation/test; no obsolete API, module or compiler assertion restored."
+    },
+    {
+      "path": "packages/one-map-react/test/tf07-map-context.web.test.tsx",
+      "conflict": false,
+      "resolution": "Retain proxy rerender identity and retained-method rejection through detach/replacement assertions; main narrowed session tests preserved."
+    },
+    {
+      "path": "packages/one-map-react/test/tf07-ui.native.test.tsx",
+      "conflict": true,
+      "resolution": "Use main tests unchanged. Original additional navigation, scale, native drag and ornament tests cover removed owners; current marker/portal/projection tests retained."
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "conflict": true,
+      "resolution": "Use main tests unchanged. Original geolocation control watch/camera tests target removed common acquisition/control; current application-owned acquisition/control behavior retained."
+    },
+    {
+      "path": "packages/one-map-react/test/use-frozen-value.web.test.tsx",
+      "conflict": false,
+      "resolution": "Retain both callable-value/StrictMode/remount and initially undefined-value regressions."
+    },
+    {
+      "path": "packages/one-map-react/test/web-followup-regressions.tsx",
+      "conflict": true,
+      "resolution": "Retain original StrictMode repeated padding-removal/remount and suspended-removal regressions for both engines, and main SDF=false registration coverage. Omit retired sprite replay assertions. All main tests preserved."
+    },
+    {
+      "path": "records/README.md",
+      "conflict": true,
+      "resolution": "Preserve main migration narrative and add explicitly historical compiler audit/deferral links plus separate current resolution evidence routing."
+    },
+    {
+      "path": "records/evidence/react-compiler-camera-assignment-cleanup.json",
+      "conflict": false,
+      "resolution": "Retain byte-identical original historical record; its old contract, artifact hashes, diagnostics and tests are historical only."
+    },
+    {
+      "path": "records/evidence/react-compiler-diagnostics-fixes.json",
+      "conflict": false,
+      "resolution": "Retain byte-identical original historical record; its old contract, artifact hashes, diagnostics and tests are historical only."
+    },
+    {
+      "path": "records/evidence/react-compiler-lifecycle-cleanups.json",
+      "conflict": false,
+      "resolution": "Retain byte-identical original historical record; its old contract, artifact hashes, diagnostics and tests are historical only."
+    },
+    {
+      "path": "records/evidence/react-compiler-native-deferral.json",
+      "conflict": false,
+      "resolution": "Retain byte-identical original historical record; its old contract, artifact hashes, diagnostics and tests are historical only."
+    },
+    {
+      "path": "records/evidence/react-compiler-series-audit.json",
+      "conflict": false,
+      "resolution": "Retain byte-identical original historical record; its old contract, artifact hashes, diagnostics and tests are historical only."
+    },
+    {
+      "path": "records/evidence/react-compiler-snapshot-cleanups.json",
+      "conflict": false,
+      "resolution": "Retain byte-identical original historical record; its old contract, artifact hashes, diagnostics and tests are historical only."
+    },
+    {
+      "path": "records/evidence/react-compiler-syntax-cleanups.json",
+      "conflict": false,
+      "resolution": "Retain byte-identical original historical record; its old contract, artifact hashes, diagnostics and tests are historical only."
+    },
+    {
+      "path": "scripts/react-compiler.test.mjs",
+      "conflict": true,
+      "resolution": "Retain current main WebImages/WebImage, map interaction and marker activation proofs. Add surviving original Map attachment, Source, stable/frozen snapshots, native overlay and web padding proofs only; preserve .tsx? handling already in main."
+    }
+  ],
+  "compilerCoverage": {
+    "method": "Run actual compiler on current and origin/main source for every function named by final permanent assertions; check source maps and emitted React 19 runtime in compiled suite.",
+    "selectedFunctions": 15,
+    "mainCompiled": 10,
+    "resolvedCompiled": 15,
+    "newlyCompiled": [
+      "useMapAttachment",
+      "useStableOptions",
+      "useFrozenValue",
+      "NativeMarkerOverlay",
+      "useWebPadding"
+    ],
+    "remainingBuildDiagnostics": [
+      "adapters/mapbox-native/map.tsx:66 refs during render",
+      "adapters/maplibre-native/map.tsx:66 refs during render"
+    ],
+    "historicalCounts": "Original historical 17-to-2 series count is not a current comparison."
+  },
+  "verification": {
+    "passed": [
+      {
+        "command": "bun run check",
+        "result": "320 formatted files; 294 linted files; no warnings/errors"
+      },
+      {
+        "command": "bun run check:docs",
+        "result": "40 Markdown files; 39 comparison tables; links and structural checks"
+      },
+      {
+        "command": "bun run typecheck",
+        "result": "All four TypeScript projects passed after temporary workspace link repair"
+      },
+      {
+        "command": "bun run typecheck:apps",
+        "result": "Example-map, web and Expo TypeScript passed after temporary subpackage dependency copy"
+      },
+      {
+        "command": "bun run test",
+        "result": "Source web/unit 43 files / 653 tests and source native mocks 8 suites / 231 tests passed; aggregate then stopped at process self-test EPERM; remaining components passed separately below"
+      },
+      {
+        "command": "node scripts/native-smoke-process.test.mjs && bun scripts/native-smoke-process.test.mjs",
+        "result": "Both passed with approved normal-host execution for own synthetic dummy processes only; no renderer launch"
+      },
+      {
+        "command": "package.json scripts.test commands 8 through 24, sequentially",
+        "commands": [
+          "bun scripts/tf06-smoke-selection.test.mjs",
+          "bun scripts/tf07-smoke-contract.test.mjs",
+          "bun scripts/tf08-patches.test.mjs",
+          "bun scripts/native-location-permissions.test.mjs",
+          "node scripts/tf08-image-observations.test.mjs",
+          "node scripts/tf08-snapshot-errors.test.mjs",
+          "node scripts/tf08-final-observations.test.mjs",
+          "node scripts/tf08-pending-scope.test.mjs",
+          "node scripts/tf08-offline-observations.test.mjs",
+          "node scripts/tf08-offline-peers.test.mjs",
+          "node scripts/tf08-fused-location-fixture.test.mjs",
+          "node scripts/lint-policy.test.mjs",
+          "node scripts/tf09-rendering-fixture.test.mjs",
+          "node scripts/tf09-peer-patches.test.mjs",
+          "bun scripts/package-check-options.test.mjs",
+          "bun scripts/native-mapbox-version.test.mjs",
+          "node scripts/example-config.test.mjs"
+        ],
+        "result": "All 17 passed, including patch roundtrips/source checks and fixture/selection/policy regressions"
+      },
+      {
+        "command": "bun run test:compiled build phase; node_modules/.bin/vp test run --config vite.compiled.config.ts; node_modules/.bin/jest --config jest.compiled.config.cjs --runInBand; node scripts/react-compiler.test.mjs",
+        "result": "Library/example builds passed; compiled web 29 files / 497 tests; compiled native 8 suites / 231 tests; all 15 selected function compilation/source-map/runtime assertions passed"
+      },
+      {
+        "command": "bun scripts/test-package.mjs",
+        "result": "13 isolated package/common/declaration/export selections passed",
+        "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276"
+      },
+      {
+        "command": "git diff --check origin/main",
+        "result": "Passed"
+      },
+      {
+        "command": "Repeated bun run typecheck; bun run typecheck:apps; bun run test source/native phases; bun run test:compiled after locked teleport 1.2.1 link repair",
+        "result": "Both type commands passed; source 43 files/653 tests, native 8 suites/231 tests; compiled 29 files/497 tests, native 8 suites/231 tests and compiler assertions passed. Aggregate source script again reaches same process sandbox EPERM; synthetic test normal-host pass and independent safe tail remain applicable."
+      }
+    ],
+    "initialFailures": [
+      {
+        "command": "bun install --frozen-lockfile --ignore-scripts; TMPDIR=/private/tmp bun install --frozen-lockfile --ignore-scripts",
+        "cause": "Bun could not write tempdir (EPERM); no lock changes; used isolated copy instead"
+      },
+      {
+        "command": "initial typecheck, source and compiled suites",
+        "cause": "Copied root dependencies lacked workspace links; selected example imports failed. Temporary local links repaired; reruns passed without source changes."
+      },
+      {
+        "command": "initial typecheck:apps",
+        "cause": "Subpackage Expo dependencies absent; copied isolated app/package dependency symlinks; rerun passed without source changes."
+      },
+      {
+        "command": "bun run test synthetic process cleanup",
+        "cause": "Sandbox group-signal fallback could not spawn ps (EPERM). Both Node/Bun synthetic self-tests passed with approved normal-host execution; safe aggregate tail passed separately."
+      },
+      {
+        "command": "post-copy dependency audit",
+        "cause": "react-native-teleport resolved 1.2.2 rather than locked 1.2.1; repaired four temporary links, then repeated affected type/source/native/compiled checks."
+      }
+    ],
+    "warnings": [
+      "TypeScript 7 build API experimental",
+      "Bun moduleSuffixes unsupported warning",
+      "Upstream mocked React Native SafeAreaView deprecation warning",
+      "git diff --cached --check compares merge result to historical PR19 HEAD and flags inherited patch-file blank-line whitespace already in origin/main; patches preserved byte-identical. git diff --check origin/main passes."
+    ],
+    "dependencyProvenance": "Clone-copied original root and four subpackage node_modules into isolated checkout. Verified 60 dependency resolutions; corrected four temporary react-native-teleport links from 1.2.2 to existing isolated locked 1.2.1. All 60 now meet declared constraints. Scanned 4055 symlinks: none resolved into original checkout. No lock, peer, version, patch, or manifest changes."
+  },
+  "gaps": [
+    "No renderer/browser/native/Metro/device/build/install acceptance ran. New compiler output is not certified by historical acceptance.",
+    "Existing frozen candidate inputs and all main evidence/patch/manifest/lock files match main byte-for-byte; a future candidate impact/freeze review is required before acceptance of new output.",
+    "No peer reinstall matrix or performance benchmark: peers/locks/exports unchanged, packed declaration/export and mocked compiled checks cover this bounded change."
+  ],
+  "protectedInputs": {
+    "scope": "All origin/main records/evidence files, package manifests, bun.lock and publication patches compared byte-for-byte to origin/main",
+    "pathCount": 441,
+    "canonicalDigestFormat": "UTF-8 sorted path + NUL + lowercase file SHA-256 + LF for each protected path",
+    "canonicalSha256": "369199520d9a0f69f7c4332044810679d5e66d78659920a750d370d0d1a4be4f",
+    "changedProtectedPaths": [],
+    "keyFiles": [
+      {
+        "path": "bun.lock",
+        "sha256": "f92318aacbfdc79baaee5eb3355a2c866e5125e2b11577cede960a19a1d833e6",
+        "matchesOriginMain": true
+      },
+      {
+        "path": "package.json",
+        "sha256": "48aa24ff410e8ce7e5ba329e938b6e83434fdec5a806e274dfa48621a98ebf6c",
+        "matchesOriginMain": true
+      },
+      {
+        "path": "packages/one-map-react/package.json",
+        "sha256": "1560068e3334bf10669cc61c7d16b6467e710438fe50a62dbede0273376718c2",
+        "matchesOriginMain": true
+      },
+      {
+        "path": "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch",
+        "sha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0",
+        "matchesOriginMain": true
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+        "sha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
+        "matchesOriginMain": true
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
+        "sha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1",
+        "matchesOriginMain": true
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.8.patch",
+        "sha256": "0b9cdb09c6b39c1b5527678155246e9116a8db71249fd7fd08d9d1fe1288a788",
+        "matchesOriginMain": true
+      },
+      {
+        "path": "records/evidence/revised-api-u25-web-attempt-05.json",
+        "sha256": "ccdd56d8b96798bb999000adeed6d9b2bfc170392479064018b944b2cf3c9bcd",
+        "matchesOriginMain": true
+      }
+    ]
+  },
+  "audit": {
+    "verdict": "Passed in the inspected conflict-resolution scope",
+    "independentAuditSha256": "250318ff622885b9bde1d864e556394b05c72fc52e95cc03934710ef84c07e9d",
+    "originalPathsReviewed": 31,
+    "conflictsReviewed": 18,
+    "substantiveFindings": [],
+    "coordinatorChecks": [
+      "Reviewed every effective source/test/compiler delta relative to main and original PR intent",
+      "Confirmed final source hashes match independent audited source",
+      "Confirmed no unresolved conflicts and all protected main files unchanged",
+      "Confirmed original frozen candidate archive unchanged"
+    ],
+    "limitations": [
+      "Renderer acceptance and performance are not established by routine tests.",
+      "Prior browser acceptance certifies only its original frozen candidate; new output needs candidate impact/freeze review."
+    ]
+  }
+}

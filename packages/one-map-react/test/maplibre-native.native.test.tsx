@@ -1,6 +1,12 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { createRef, type ReactNode, type Ref, useContext } from "react";
+import { act, render, waitFor } from "@testing-library/react-native";
+import {
+  createRef,
+  type ComponentRef,
+  type ReactNode,
+  type Ref,
+  useContext,
+} from "react";
 import { Text } from "react-native";
 
 import {
@@ -21,9 +27,8 @@ import type { FeatureState } from "../src/contracts/query-types.js";
 import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
-import { Map as OneMap } from "../src/facade/map.js";
+import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
-import { AttributionControl, ScaleControl } from "../src/facade/ui.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
 const mockJumpTo = jest.fn(() => Promise.resolve());
@@ -257,7 +262,11 @@ import {
   VectorSource,
 } from "@maplibre/maplibre-react-native";
 
-import { adapter, Control, Map as NativeMap } from "../src/maplibre-native.js";
+import {
+  adapter,
+  Map as NativeMap,
+  type NativeAdvancedMapRef,
+} from "../src/maplibre-native.js";
 
 const MapMock = MaplibreMap as unknown as jest.Mock;
 const LayerMock = MaplibreLayer as unknown as jest.Mock;
@@ -302,11 +311,6 @@ const finishMapLoad = async (): Promise<void> => {
   await act(async () => onDidFinishLoadingMap());
 };
 
-const finishRenderingFrame = async (): Promise<void> => {
-  const props = lastMapProps<{ onDidFinishRenderingFrameFully: () => void }>();
-  await act(async () => props.onDidFinishRenderingFrameFully());
-};
-
 const example = (
   ref?: Ref<MapRef>,
   onMove?: (event: object) => void,
@@ -349,133 +353,137 @@ const vectorTree = (ref?: Ref<MapRef>) => (
 );
 
 describe("maplibre-native adapter", () => {
-  test("attribution control restores selected position and disabled state after removal", async () => {
-    const options = {
-      attributionPosition: { top: 5, right: 6 },
-      attribution: false,
-    };
-    const scene = (mounted: boolean, position?: "top-left") => (
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          options={options}
-        >
-          {mounted && <AttributionControl position={position} />}
-        </NativeMap>
-      </MapSetup>
-    );
-    const view = await render(scene(false));
-    expect(lastMapProps()).toMatchObject(options);
-    await view.rerender(scene(true));
-    expect(lastMapProps()).toMatchObject({
-      attributionPosition: { bottom: 8, right: 8 },
-      attribution: true,
-    });
-    await view.rerender(scene(false));
-    expect(lastMapProps()).toMatchObject(options);
-    await view.rerender(scene(true, "top-left"));
-    expect(lastMapProps()).toMatchObject({
-      attributionPosition: { top: 8, left: 8 },
-      attribution: true,
-    });
-    await view.unmount();
-  });
+  test.each(["selected", "enclosing", "named"] as const)(
+    "%s wrapper access follows attachment before load and rejects after detach",
+    async (access) => {
+      const ref = createRef<NativeAdvancedMapRef>();
+      let observed: NativeAdvancedMapRef | undefined;
+      const Probe = () => {
+        // The common type omits selected access; exercise its real runtime proxy.
+        // eslint-disable-next-line react/globals -- Capture the attached facade proxy for lifecycle assertions.
+        observed = useMap(access === "named" ? "borrowed" : undefined) as
+          | NativeAdvancedMapRef
+          | undefined;
+        return null;
+      };
+      const MapComponent = access === "selected" ? NativeMap : OneMap;
+      const loaded = jest.fn();
+      const scene = (mapStyle: MapProps["mapStyle"]) => (
+        <MapSetup adapter={adapter}>
+          <MapComponent
+            id="borrowed"
+            ref={ref}
+            mapStyle={mapStyle}
+            initialViewState={initialViewState}
+            onLoad={loaded}
+          >
+            {access !== "selected" && <Probe />}
+          </MapComponent>
+        </MapSetup>
+      );
+      mockFlyTo.mockClear();
+      const view = await render(scene(emptyStyle));
+      const retained = access === "selected" ? ref.current : observed;
+      if (!retained) throw new Error("Map ref was not attached.");
+      expect(
+        Reflect.get(ref.current ?? {}, "setSourceVisibility")
+      ).toBeUndefined();
+      expect(Reflect.get(ref.current ?? {}, "showAttribution")).toBeUndefined();
+      expect(Reflect.get(ref.current ?? {}, "getViewState")).toBeUndefined();
+      const getWrapperMap = retained.getWrapperMap;
+      const first = getWrapperMap();
+      expect(first).toBeInstanceOf(Promise);
+      const original = await first;
+      const attachedMap = () =>
+        lastMapProps<{
+          ref: { current: ComponentRef<typeof MaplibreMap> | null };
+        }>().ref.current;
+      expect(original).toBe(attachedMap());
+      expect(original.getCenter).toBe(mockGetCenter);
+      expect(loaded).not.toHaveBeenCalled();
+      expect(mockFlyTo).not.toHaveBeenCalled();
+      await expect(retained.getCenter()).resolves.toEqual([-122.34, 47.61]);
+      const mapId = view.getByTestId("wrapper-map").props.mapId;
 
-  test("SDK ornaments stay outside measured native controls and restore after removal", async () => {
-    const explicit = {
-      logoPosition: { top: 3, left: 4 },
-      attributionPosition: { top: 5, right: 6 },
-    };
-    const scene = (controls: boolean, configured = false) => (
+      await view.rerender(scene(replacementStyle));
+      const replacement = await getWrapperMap();
+      expect(replacement).toBe(attachedMap());
+      expect(replacement).not.toBe(original);
+      expect(view.getByTestId("wrapper-map").props.mapId).toBe(mapId);
+      await expect(retained.getWrapperMap()).resolves.toBe(replacement);
+      await expect(retained.flyTo({ center: [1, 2], zoom: 3 })).rejects.toThrow(
+        "not attached"
+      );
+      expect(mockFlyTo).not.toHaveBeenCalled();
+      await finishMapLoad();
+      await retained.flyTo({ center: [1, 2], zoom: 3 });
+      expect(mockFlyTo).toHaveBeenCalledTimes(1);
+      await expect(Promise.resolve(retained)).resolves.toBe(retained);
+
+      await view.unmount();
+      const detached = getWrapperMap();
+      expect(detached).toBeInstanceOf(Promise);
+      await expect(detached).rejects.toThrow("not attached");
+      await expect(retained.getWrapperMap()).rejects.toThrow("not attached");
+      await expect(Promise.resolve(retained)).resolves.toBe(retained);
+    }
+  );
+
+  test("forwards selected frame observation callbacks without common capture ownership", async () => {
+    const onFrame = jest.fn();
+    await render(
       <MapSetup adapter={adapter}>
         <NativeMap
           mapStyle={emptyStyle}
           initialViewState={initialViewState}
-          options={configured ? explicit : undefined}
-        >
-          {controls && (
-            <>
-              <Control
-                position="bottom-left"
-                hostProps={{ testID: "left-control" }}
-              >
-                <Text>Left</Text>
-              </Control>
-              <Control
-                position="bottom-right"
-                hostProps={{ testID: "right-control" }}
-              >
-                <Text>Right</Text>
-              </Control>
-            </>
-          )}
-        </NativeMap>
+          options={{ onDidFinishRenderingFrameFully: onFrame }}
+        />
       </MapSetup>
     );
-    const view = await render(scene(false));
-    expect(
-      lastMapProps<{ logoPosition?: object }>().logoPosition
-    ).toBeUndefined();
-    expect(
-      lastMapProps<{ attributionPosition?: object }>().attributionPosition
-    ).toBeUndefined();
-    await view.rerender(scene(true));
-    await fireEvent(view.getByTestId("left-control"), "layout", {
-      nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 26 } },
-    });
-    await fireEvent(view.getByTestId("right-control"), "layout", {
-      nativeEvent: { layout: { x: 0, y: 0, width: 80, height: 40 } },
-    });
     const props = lastMapProps<{
-      logoPosition: { bottom: number; left: number };
-      attributionPosition: { bottom: number; right: number };
+      onDidFinishRenderingFrameFully: () => void;
     }>();
-    expect(props.logoPosition.bottom).toBeGreaterThan(8 + 26);
-    expect(props.attributionPosition.bottom).toBeGreaterThan(8 + 40);
-    await view.rerender(scene(false));
-    const restored = lastMapProps<{
-      logoPosition: object;
-      attributionPosition: object;
-    }>();
-    expect(restored.logoPosition).toEqual({ bottom: 8, left: 8 });
-    expect(restored.attributionPosition).toEqual({ bottom: 8, right: 8 });
-    await view.rerender(scene(true, true));
-    const configured = lastMapProps<{
-      logoPosition: object;
-      attributionPosition: object;
-    }>();
-    expect(configured.logoPosition).toEqual(explicit.logoPosition);
-    expect(configured.attributionPosition).toEqual(
-      explicit.attributionPosition
-    );
-    await view.rerender(scene(false));
-    expect(lastMapProps<{ logoPosition: object }>().logoPosition).toEqual({
-      bottom: 8,
-      left: 8,
-    });
-    await view.unmount();
+    expect(props.onDidFinishRenderingFrameFully).toBe(onFrame);
+    await act(async () => props.onDidFinishRenderingFrameFully());
+    expect(onFrame).toHaveBeenCalledTimes(1);
   });
 
-  test("scale initializes at load and changes units without camera movement", async () => {
-    mockUnproject
-      .mockResolvedValueOnce([-122.32, 47.61])
-      .mockResolvedValueOnce([-122.32, 47.61]);
-    const scene = (unit: "metric" | "imperial") => (
+  test("selected SDK ornament flags and positions update and reset to defaults", async () => {
+    const scene = (enabled: boolean | undefined) => (
       <MapSetup adapter={adapter}>
-        <OneMap mapStyle={emptyStyle} initialViewState={initialViewState}>
-          <ScaleControl unit={unit} />
-        </OneMap>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          options={{
+            attribution: enabled,
+            logo: enabled,
+            scaleBar: enabled,
+            logoPosition:
+              enabled === undefined ? undefined : { bottom: 3, left: 4 },
+            compassPosition:
+              enabled === undefined ? undefined : { top: 7, right: 8 },
+            attributionPosition:
+              enabled === undefined ? undefined : { top: 5, right: 6 },
+          }}
+        />
       </MapSetup>
     );
-    const view = await render(scene("metric"));
-    await act(async () =>
-      view.getByTestId("wrapper-map").props.onDidFinishLoadingMap()
-    );
-    await waitFor(() => expect(view.getByText("1 km")).toBeTruthy());
-    await view.rerender(scene("imperial"));
-    await waitFor(() => expect(view.getByText("2000 ft")).toBeTruthy());
-    expect(view.queryByText("1 km")).toBeNull();
+    const view = await render(scene(true));
+    for (const enabled of [true, false, undefined]) {
+      await view.rerender(scene(enabled));
+      expect(lastMapProps()).toMatchObject({
+        attribution: enabled,
+        logo: enabled,
+        scaleBar: enabled,
+        logoPosition:
+          enabled === undefined ? undefined : { bottom: 3, left: 4 },
+        compassPosition:
+          enabled === undefined ? undefined : { top: 7, right: 8 },
+        attributionPosition:
+          enabled === undefined ? undefined : { top: 5, right: 6 },
+      });
+    }
+    await view.unmount();
   });
 
   test("nested GeoJSONSource injects source onto the line layer", async () => {
@@ -761,6 +769,26 @@ describe("maplibre-native adapter", () => {
     );
   });
 
+  test("getZoom forwards renderer values and errors independently of UI, and rejects after detach", async () => {
+    const ref = createRef<MapRef>();
+    const view = await render(example(ref));
+    const map = ref.current;
+    if (!map) throw new Error("Map ref did not attach.");
+    const calls = mockGetZoom.mock.calls.length;
+    mockGetZoom.mockResolvedValueOnce(0).mockResolvedValueOnce(12.5);
+    await expect(map.getZoom()).resolves.toBe(0);
+    await expect(map.getZoom()).resolves.toBe(12.5);
+    const failure = new Error("Renderer zoom failed");
+    mockGetZoom.mockRejectedValueOnce(failure);
+    await expect(map.getZoom()).rejects.toBe(failure);
+    mockGetZoom.mockResolvedValueOnce(Number.NaN);
+    await expect(map.getZoom()).rejects.toThrow();
+    expect(mockGetZoom.mock.calls.length).toBe(calls + 4);
+    await view.unmount();
+    await expect(map.getZoom()).rejects.toThrow("not attached");
+    expect(mockGetZoom.mock.calls.length).toBe(calls + 4);
+  });
+
   test("getters convert flat bounds and reject padding", async () => {
     const ref = createRef<MapRef>();
 
@@ -805,7 +833,117 @@ describe("maplibre-native adapter", () => {
     expect(MapMock).not.toHaveBeenCalled();
   });
 
-  test("controlled viewState is written onto the camera", async () => {
+  test("native movement does not dispatch an unchanged target, including an equal new object", async () => {
+    const frames = new Map<number, FrameRequestCallback>();
+    let nextFrame = 0;
+    const schedule = jest
+      .spyOn(globalThis, "requestAnimationFrame")
+      .mockImplementation((callback) => {
+        frames.set(++nextFrame, callback);
+        return nextFrame;
+      });
+    const cancel = jest
+      .spyOn(globalThis, "cancelAnimationFrame")
+      .mockImplementation((id) => {
+        if (id != null) frames.delete(id);
+      });
+    const ref = createRef<MapRef>();
+    const target = { ...initialViewState, zoom: 12 };
+    const mounted = await render(
+      example(ref, undefined, { viewState: target })
+    );
+    const flush = async () => {
+      const callbacks = [...frames.values()];
+      frames.clear();
+      await act(async () => {
+        for (const callback of callbacks) callback(0);
+      });
+    };
+    try {
+      await finishMapLoad();
+      await flush();
+      mockJumpTo.mockClear();
+      const movement = lastMapProps<{
+        onRegionIsChanging: (event: object) => void;
+      }>().onRegionIsChanging;
+      const move = async (center: readonly number[], zoom = 4) =>
+        act(async () =>
+          movement({
+            nativeEvent: {
+              center,
+              zoom,
+              bearing: 30,
+              pitch: 10,
+              userInteraction: true,
+            },
+          })
+        );
+      await move([10, 20]);
+      await flush();
+      expect(mockJumpTo).not.toHaveBeenCalled();
+      await mounted.rerender(
+        example(ref, undefined, { viewState: { ...target } })
+      );
+      await flush();
+      expect(mockJumpTo).not.toHaveBeenCalled();
+      await ref.current?.jumpTo({
+        center: [target.longitude, target.latitude],
+        zoom: target.zoom,
+      });
+      expect(mockJumpTo).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          center: [target.longitude, target.latitude],
+          zoom: target.zoom,
+        })
+      );
+      expect(mockJumpTo).toHaveBeenCalledTimes(1);
+      await ref.current?.jumpTo({ center: [40, 50], zoom: 8 });
+      await move([40, 50], 8);
+      await flush();
+      expect(mockJumpTo).toHaveBeenCalledTimes(2);
+      expect(mockJumpTo).toHaveBeenLastCalledWith(
+        expect.objectContaining({ center: [40, 50], zoom: 8 })
+      );
+      // Props exercise forwarding only; actual native prop application is a renderer gate.
+      await mounted.rerender(
+        example(ref, undefined, { viewState: { ...target, zoom: 13 } })
+      );
+      expect(mounted.getByTestId("wrapper-camera").props.zoom).toBe(13);
+      await mounted.rerender(example(ref));
+      expect(mounted.getByTestId("wrapper-camera").props.zoom).toBeUndefined();
+      expect(mockJumpTo).toHaveBeenCalledTimes(2);
+      const failure = new Error("camera dispatch failed");
+      mockJumpTo.mockImplementationOnce(() => {
+        throw failure;
+      });
+      await expect(ref.current?.jumpTo({ zoom: 8 })).rejects.toBe(failure);
+      const detached = ref.current;
+      await mounted.unmount();
+      await expect(detached?.jumpTo({ zoom: 8 })).rejects.toThrow(
+        "Map camera is not attached."
+      );
+      const replacement = await render(
+        example(ref, undefined, { viewState: target })
+      );
+      try {
+        const dispatches = mockJumpTo.mock.calls.length;
+        await move([70, 80], 9);
+        await flush();
+        expect(mockJumpTo).toHaveBeenCalledTimes(dispatches);
+        await expect(detached?.jumpTo({ zoom: 8 })).rejects.toThrow(
+          "Map camera is not attached."
+        );
+      } finally {
+        await replacement.unmount();
+      }
+    } finally {
+      await mounted.unmount();
+      schedule.mockRestore();
+      cancel.mockRestore();
+    }
+  });
+
+  test("native viewState targets are written onto the camera", async () => {
     const rendered = await render(
       example(undefined, undefined, {
         viewState: { ...initialViewState, zoom: 12 },
@@ -846,6 +984,61 @@ describe("maplibre-native adapter", () => {
     expect(onMove).toHaveBeenCalledTimes(1);
     expect(onMoveEnd).toHaveBeenCalledTimes(1);
   });
+
+  test.each(["success", "failure", "unmount"] as const)(
+    "filtered map press queries its logical point and retains %s semantics",
+    async (outcome) => {
+      const onClick = jest.fn();
+      const onError = jest.fn();
+      let resolve!: (value: typeof queryFeatures) => void;
+      let reject!: (error: Error) => void;
+      mockQueryRenderedFeatures.mockImplementationOnce(
+        () =>
+          new Promise((done, fail) => {
+            resolve = done;
+            reject = fail;
+          })
+      );
+      const view = await render(
+        example(undefined, undefined, {
+          interactiveLayerIds: ["upper", "lower"],
+          onClick,
+          onError,
+        })
+      );
+      const press = lastMapProps<{ onPress: (event: object) => void }>()
+        .onPress;
+      await act(async () =>
+        press({
+          nativeEvent: {
+            lngLat: [-122.34, 47.61],
+            point: [23, 41],
+            features: [{ id: "unfiltered-wrapper-hit" }],
+          },
+        })
+      );
+      expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith([23, 41], {
+        layers: ["upper", "lower"],
+      });
+      if (outcome === "unmount") await view.unmount();
+      const error = new Error("native feature query failed");
+      await act(async () => {
+        if (outcome === "failure") reject(error);
+        else resolve(queryFeatures);
+      });
+      if (outcome === "success") {
+        expect(onClick).toHaveBeenCalledTimes(1);
+        expect(onClick).toHaveBeenCalledWith({
+          lngLat: [-122.34, 47.61],
+          point: [23, 41],
+          features: queryFeatures,
+        });
+      } else expect(onClick).not.toHaveBeenCalled();
+      if (outcome === "failure")
+        expect(onError).toHaveBeenCalledWith({ error });
+      else expect(onError).not.toHaveBeenCalled();
+    }
+  );
 
   test("onClick converts the press and stops after unmount", async () => {
     const onClick = jest.fn();
@@ -1561,7 +1754,7 @@ describe("maplibre-native queries and feature state", () => {
   });
 
   test.each(["geojson", "vector"] as const)(
-    "%s forgets whole-state removals but keeps partial removals for style cleanup",
+    "%s style load does not add automatic removals after explicit key and whole removals",
     async (kind) => {
       const ref = createRef<MapRef>();
       await render(kind === "geojson" ? example(ref) : vectorTree(ref));
@@ -1587,11 +1780,7 @@ describe("maplibre-native queries and feature state", () => {
         }>().onDidFinishLoadingStyle()
       );
       await ref.current?.getFeatureState(partial);
-      expect(remove).toHaveBeenCalledTimes(1);
-      expect(remove).toHaveBeenCalledWith({
-        id: 2,
-        ...(kind === "vector" ? { sourceLayer: "way" } : {}),
-      });
+      expect(remove).not.toHaveBeenCalled();
     }
   );
 
@@ -1626,290 +1815,37 @@ describe("maplibre-native queries and feature state", () => {
   });
 
   test.each(["geojson", "vector"] as const)(
-    "%s same-id remount clears retained whole state before reads and new writes",
-    async (family) => {
-      const ref = createRef<MapRef>();
-      const backendState = new Map<string, Record<string, unknown>>();
-      const events: string[] = [];
-      const methods =
-        family === "geojson"
-          ? {
-              set: mockGeoJsonSetFeatureState,
-              get: mockGeoJsonGetFeatureState,
-              remove: mockGeoJsonRemoveFeatureState,
-            }
-          : {
-              set: mockVectorSetFeatureState,
-              get: mockVectorGetFeatureState,
-              remove: mockVectorRemoveFeatureState,
-            };
-      const stateKey = (feature: NativeStateFeature) =>
-        JSON.stringify([String(feature.id), feature.sourceLayer ?? null]);
-      methods.set.mockImplementation(async (feature, state) => {
-        events.push("set");
-        const key = stateKey(feature);
-        backendState.set(key, { ...backendState.get(key), ...state });
-      });
-      methods.get.mockImplementation(async (feature) => {
-        events.push("get");
-        return (backendState.get(stateKey(feature)) ?? {}) as FeatureState;
-      });
-      methods.remove.mockImplementation(async (feature, key) => {
-        events.push("remove");
-        const identifier = stateKey(feature);
-        if (key === undefined) backendState.delete(identifier);
-        else {
-          const state = { ...backendState.get(identifier) };
-          delete state[key];
-          backendState.set(identifier, state);
-        }
-      });
-      const sourceId = family === "geojson" ? "routes" : "tiles";
-      const target = {
-        source: sourceId,
-        id: 9,
-        ...(family === "vector" ? { sourceLayer: "way" } : {}),
-      };
-      const anotherTarget =
-        family === "vector"
-          ? { ...target, sourceLayer: "place" }
-          : { ...target, id: 10 };
-      const scene = (revision: number) => (
-        <MapSetup adapter={adapter}>
-          <OneMap
-            ref={ref}
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-          >
-            {family === "geojson" ? (
-              <Source
-                key={revision}
-                id={sourceId}
-                type="geojson"
-                data={routes}
-              />
-            ) : (
-              <Source
-                key={revision}
-                id={sourceId}
-                type="vector"
-                url="maplibre://tiles"
-              />
-            )}
-          </OneMap>
-        </MapSetup>
-      );
-      const mounted = await render(scene(0));
-      await ref.current?.setFeatureState(target, { selected: true, count: 2 });
-      await ref.current?.setFeatureState(anotherTarget, { selected: true });
-      expect(backendState.size).toBe(2);
-      await mounted.rerender(scene(1));
-      // The renderer retains state by id; the mock does not clear on remount.
-      expect(backendState.size).toBe(2);
-      events.length = 0;
-      await expect(
-        ref.current?.setFeatureState(target, { count: Number.NaN })
-      ).rejects.toThrow("non-finite");
-      if (family === "vector") {
-        await expect(
-          ref.current?.getFeatureState({ source: sourceId, id: 9 })
-        ).rejects.toThrow("need sourceLayer");
-      }
-      expect(events).toEqual([]);
-      await finishRenderingFrame();
-      await waitFor(() => expect(backendState.size).toBe(0));
-      expect(events).toEqual(["remove", "remove"]);
-      await expect(ref.current?.getFeatureState(target)).resolves.toEqual({});
-      expect(events).toEqual(["remove", "remove", "get"]);
-      expect(backendState.size).toBe(0);
-      const nativeTarget =
-        family === "vector" ? { id: 9, sourceLayer: "way" } : { id: 9 };
-      expect(methods.remove).toHaveBeenCalledWith(nativeTarget);
-      await ref.current?.setFeatureState(target, { fresh: true });
-      await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
-        fresh: true,
-      });
-      await mounted.rerender(scene(2));
-      events.length = 0;
-      await finishRenderingFrame();
-      await waitFor(() => expect(backendState.size).toBe(0));
-      expect(events).toEqual(["remove"]);
-      await ref.current?.setFeatureState(target, { next: true });
-      expect(events).toEqual(["remove", "set"]);
-      await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
-        next: true,
-      });
-    }
-  );
-
-  test.each([
-    { previous: "geojson", next: "vector", geoJsonLayer: false },
-    { previous: "geojson", next: "vector", geoJsonLayer: true },
-    { previous: "vector", next: "geojson", geoJsonLayer: true },
-  ] as const)(
-    "$previous to $next remount starts a new state scope (GeoJSON sourceLayer: $geoJsonLayer)",
-    async ({ previous, next, geoJsonLayer }) => {
-      const ref = createRef<MapRef>();
-      const onError = jest.fn();
-      const backend = {
-        geojson: new Map<string, FeatureState>(),
-        vector: new Map<string, FeatureState>(),
-      };
-      const methods = {
-        geojson: {
-          set: mockGeoJsonSetFeatureState,
-          get: mockGeoJsonGetFeatureState,
-          remove: mockGeoJsonRemoveFeatureState,
-        },
-        vector: {
-          set: mockVectorSetFeatureState,
-          get: mockVectorGetFeatureState,
-          remove: mockVectorRemoveFeatureState,
-        },
-      };
-      for (const family of ["geojson", "vector"] as const) {
-        const key = (feature: NativeStateFeature) =>
-          JSON.stringify([String(feature.id), feature.sourceLayer ?? null]);
-        methods[family].set.mockImplementation(async (feature, state) => {
-          backend[family].set(key(feature), state as FeatureState);
-        });
-        methods[family].get.mockImplementation(
-          async (feature) => backend[family].get(key(feature)) ?? {}
-        );
-        methods[family].remove.mockImplementation(async (feature) => {
-          backend[family].delete(key(feature));
-        });
-      }
-      const target = (family: "geojson" | "vector") => ({
-        source: "shared",
-        id: 9,
-        ...(family === "vector" || geoJsonLayer ? { sourceLayer: "way" } : {}),
-      });
-      const scene = (family: "geojson" | "vector", revision: number) => (
-        <MapSetup adapter={adapter}>
-          <OneMap
-            ref={ref}
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-            onError={onError}
-          >
-            {family === "geojson" ? (
-              <Source
-                key={`${family}-${revision}`}
-                id="shared"
-                type="geojson"
-                data={routes}
-              />
-            ) : (
-              <Source
-                key={`${family}-${revision}`}
-                id="shared"
-                type="vector"
-                url="maplibre://tiles"
-              />
-            )}
-          </OneMap>
-        </MapSetup>
-      );
-      const mounted = await render(scene(previous, 0));
-      await ref.current?.setFeatureState(target(previous), { old: true });
-      await mounted.rerender(scene(next, 1));
-      await finishRenderingFrame();
-      await expect(ref.current?.getFeatureState(target(next))).resolves.toEqual(
-        {}
-      );
-      expect(mockGeoJsonRemoveFeatureState).not.toHaveBeenCalled();
-      expect(mockVectorRemoveFeatureState).not.toHaveBeenCalled();
-      await ref.current?.setFeatureState(target(next), { fresh: true });
-      await expect(ref.current?.getFeatureState(target(next))).resolves.toEqual(
-        { fresh: true }
-      );
-      expect(methods[next].set).toHaveBeenLastCalledWith(
-        next === "vector" ? { id: 9, sourceLayer: "way" } : { id: 9 },
-        { fresh: true }
-      );
-      // Same-family replacement still clears the new lifetime's written state.
-      await mounted.rerender(scene(next, 2));
-      await finishRenderingFrame();
-      await waitFor(() => expect(backend[next].size).toBe(0));
-      expect(methods[next].remove).toHaveBeenCalledTimes(1);
-      expect(methods[previous].remove).not.toHaveBeenCalled();
-
-      // A GeoJSON identifier may carry sourceLayer; the registered family still
-      // owns its retained journal when that family returns.
-      await mounted.rerender(scene(previous, 3));
-      await finishRenderingFrame();
-      await expect(
-        ref.current?.getFeatureState(target(previous))
-      ).resolves.toEqual({});
-      expect(methods[previous].remove).toHaveBeenCalledTimes(1);
-      expect(backend[previous].size).toBe(0);
-      await mounted.rerender(scene(next, 4));
-      await finishRenderingFrame();
-      expect(onError).not.toHaveBeenCalled();
-      const failure = new Error("current source write failed");
-      methods[next].set.mockRejectedValueOnce(failure);
-      await expect(
-        ref.current?.setFeatureState(target(next), { fails: true })
-      ).rejects.toBe(failure);
-    }
-  );
-
-  test.each(["geojson", "vector"] as const)(
-    "%s family roundtrips clear retained ids and layers without inactive-family dispatch",
+    "%s remount and family roundtrip preserve renderer-owned state without automatic removals",
     async (initialFamily) => {
-      let currentFamily = initialFamily;
-      // The renderer keeps each family's state when its source is temporarily absent.
-      const backend = {
-        geojson: new Map<string, FeatureState>(),
-        vector: new Map<string, FeatureState>(),
+      let activeFamily = initialFamily;
+      const states = {
+        geojson: { retained: true },
+        vector: { retained: true },
       };
       const methods = {
         geojson: {
-          set: mockGeoJsonSetFeatureState,
           get: mockGeoJsonGetFeatureState,
           remove: mockGeoJsonRemoveFeatureState,
         },
         vector: {
-          set: mockVectorSetFeatureState,
           get: mockVectorGetFeatureState,
           remove: mockVectorRemoveFeatureState,
         },
       };
-      const events: string[] = [];
       for (const family of ["geojson", "vector"] as const) {
-        const key = (feature: NativeStateFeature) =>
-          JSON.stringify([String(feature.id), feature.sourceLayer ?? null]);
-        const requireActiveFamily = () => {
-          if (currentFamily !== family)
-            throw new Error(
-              "State operation used an inactive source family handle."
-            );
-        };
-        methods[family].set.mockImplementation(async (feature, state) => {
-          requireActiveFamily();
-          backend[family].set(key(feature), state as FeatureState);
-        });
-        methods[family].get.mockImplementation(async (feature) => {
-          requireActiveFamily();
-          events.push(`get:${family}:${key(feature)}`);
-          return backend[family].get(key(feature)) ?? {};
-        });
-        methods[family].remove.mockImplementation(async (feature) => {
-          requireActiveFamily();
-          events.push(`remove:${family}:${key(feature)}`);
-          backend[family].delete(key(feature));
+        methods[family].get.mockImplementation(async () => {
+          if (activeFamily !== family)
+            throw new Error("Inactive source handle");
+          return states[family];
         });
       }
       const ref = createRef<MapRef>();
-      const onError = jest.fn();
       const scene = (family: "geojson" | "vector", revision: number) => (
         <MapSetup adapter={adapter}>
           <OneMap
             ref={ref}
             mapStyle={emptyStyle}
             initialViewState={initialViewState}
-            onError={onError}
           >
             {family === "geojson" ? (
               <Source
@@ -1929,78 +1865,23 @@ describe("maplibre-native queries and feature state", () => {
           </OneMap>
         </MapSetup>
       );
-      const targets = (family: "geojson" | "vector") =>
-        (family === "vector" ? ["way", "alternate"] : [undefined]).flatMap(
-          (sourceLayer) =>
-            [1, 2].map((id) => ({
-              source: "shared",
-              id,
-              ...(sourceLayer === undefined ? {} : { sourceLayer }),
-            }))
-        );
-      const write = async () => {
-        for (const [index, target] of targets(currentFamily).entries()) {
-          await ref.current?.setFeatureState(target, {
-            selected: true,
-            count: index + 2,
-          });
-        }
-      };
-      const readEmpty = async () => {
-        for (const target of targets(currentFamily)) {
-          await expect(ref.current?.getFeatureState(target)).resolves.toEqual(
-            {}
-          );
-        }
-      };
-
       const mounted = await render(scene(initialFamily, 0));
-      await write();
       const otherFamily = initialFamily === "geojson" ? "vector" : "geojson";
-      currentFamily = otherFamily;
-      await mounted.rerender(scene(currentFamily, 1));
-      await finishRenderingFrame();
-      await readEmpty();
-      expect(methods.geojson.remove).not.toHaveBeenCalled();
-      expect(methods.vector.remove).not.toHaveBeenCalled();
-      await write();
-      expect(backend[initialFamily].size).toBe(targets(initialFamily).length);
-      currentFamily = initialFamily;
-      events.length = 0;
-      await mounted.rerender(scene(currentFamily, 2));
-      await finishRenderingFrame();
-      await readEmpty();
-      expect(backend[otherFamily].size).toBe(targets(otherFamily).length);
-      expect(
-        events
-          .slice(0, targets(initialFamily).length)
-          .every((event) => event.startsWith(`remove:${initialFamily}:`))
-      ).toBe(true);
-      expect(methods[initialFamily].remove).toHaveBeenCalledTimes(
-        targets(initialFamily).length
-      );
-      expect(methods[otherFamily].remove).not.toHaveBeenCalled();
-      await write();
-      await mounted.rerender(scene(currentFamily, 3));
-      await finishRenderingFrame();
-      await readEmpty();
-      currentFamily = otherFamily;
-      await mounted.rerender(scene(currentFamily, 4));
-      await finishRenderingFrame();
-      await readEmpty();
-      expect(backend[initialFamily].size).toBe(0);
-      expect(backend[otherFamily].size).toBe(0);
-      await write();
-      await mounted.rerender(scene(currentFamily, 5));
-      await finishRenderingFrame();
-      await readEmpty();
-      expect(methods[initialFamily].remove).toHaveBeenCalledTimes(
-        2 * targets(initialFamily).length
-      );
-      expect(methods[otherFamily].remove).toHaveBeenCalledTimes(
-        2 * targets(otherFamily).length
-      );
-      expect(onError).not.toHaveBeenCalled();
+      for (const [revision, family] of (
+        [initialFamily, otherFamily, initialFamily] as const
+      ).entries()) {
+        activeFamily = family;
+        await mounted.rerender(scene(family, revision + 1));
+        const target = { source: "shared", id: 9, sourceLayer: "way" };
+        await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
+          retained: true,
+        });
+        expect(methods[family].get).toHaveBeenLastCalledWith(
+          family === "vector" ? { id: 9, sourceLayer: "way" } : { id: 9 }
+        );
+        expect(mockGeoJsonRemoveFeatureState).not.toHaveBeenCalled();
+        expect(mockVectorRemoveFeatureState).not.toHaveBeenCalled();
+      }
     }
   );
 
@@ -2008,46 +1889,30 @@ describe("maplibre-native queries and feature state", () => {
     ["geojson", "vector"],
     ["vector", "geojson"],
   ])(
-    "%s to %s replacement waits for dispatched writes and rejects queued old writes",
+    "%s dispatched write may settle after %s replacement while fresh calls use the replacement",
     async (previous, next) => {
       const ref = createRef<MapRef>();
-      const onError = jest.fn();
       const methods = {
-        geojson: {
-          set: mockGeoJsonSetFeatureState,
-          remove: mockGeoJsonRemoveFeatureState,
-        },
-        vector: {
-          set: mockVectorSetFeatureState,
-          remove: mockVectorRemoveFeatureState,
-        },
+        geojson: mockGeoJsonSetFeatureState,
+        vector: mockVectorSetFeatureState,
       };
-      let finishOldWrite: () => void = () => undefined;
-      methods[previous].set.mockImplementationOnce(
-        () =>
-          new Promise<void>((resolve) => {
-            finishOldWrite = resolve;
-          })
-      );
-      const target = { source: "shared", id: 9, sourceLayer: "way" };
-      const scene = (family: "geojson" | "vector", revision: number) => (
+      let finish = () => {};
+      const pending = new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+      methods[previous].mockImplementationOnce(() => pending);
+      const scene = (family: "geojson" | "vector") => (
         <MapSetup adapter={adapter}>
           <OneMap
             ref={ref}
             mapStyle={emptyStyle}
             initialViewState={initialViewState}
-            onError={onError}
           >
             {family === "geojson" ? (
-              <Source
-                key={`${family}-${revision}`}
-                id="shared"
-                type="geojson"
-                data={routes}
-              />
+              <Source key={family} id="shared" type="geojson" data={routes} />
             ) : (
               <Source
-                key={`${family}-${revision}`}
+                key={family}
                 id="shared"
                 type="vector"
                 url="maplibre://tiles"
@@ -2056,37 +1921,17 @@ describe("maplibre-native queries and feature state", () => {
           </OneMap>
         </MapSetup>
       );
-      const mounted = await render(scene(previous, 0));
+      const mounted = await render(scene(previous));
+      const target = { source: "shared", id: 9, sourceLayer: "way" };
       const oldWrite = ref.current?.setFeatureState(target, { old: true });
-      const oldRejection = expect(oldWrite).rejects.toThrow("changed during");
-      await waitFor(() =>
-        expect(methods[previous].set).toHaveBeenCalledTimes(1)
-      );
-      const queuedWrite = ref.current?.setFeatureState(
-        { ...target, id: 10 },
-        { queued: true }
-      );
-      const queuedRejection =
-        expect(queuedWrite).rejects.toThrow("changed during");
-      await mounted.rerender(scene(next, 1));
-      const newWrite = ref.current?.setFeatureState(target, { fresh: true });
-      expect(methods[next].set).not.toHaveBeenCalled();
-      finishOldWrite();
-      await Promise.all([oldRejection, queuedRejection, newWrite]);
-      expect(methods[previous].set).toHaveBeenCalledTimes(1);
-      expect(methods[next].set).toHaveBeenCalledTimes(1);
+      expect(methods[previous]).toHaveBeenCalledTimes(1);
+      await mounted.rerender(scene(next));
+      await ref.current?.setFeatureState(target, { fresh: true });
+      expect(methods[next]).toHaveBeenCalledTimes(1);
+      finish();
+      await expect(oldWrite).resolves.toBeUndefined();
       expect(mockGeoJsonRemoveFeatureState).not.toHaveBeenCalled();
       expect(mockVectorRemoveFeatureState).not.toHaveBeenCalled();
-      await mounted.rerender(scene(next, 2));
-      await finishRenderingFrame();
-      await waitFor(() =>
-        expect(methods[next].remove).toHaveBeenCalledTimes(1)
-      );
-      expect(methods[next].remove).toHaveBeenCalledWith(
-        next === "vector" ? { id: 9, sourceLayer: "way" } : { id: 9 }
-      );
-      expect(methods[previous].remove).not.toHaveBeenCalled();
-      expect(onError).not.toHaveBeenCalled();
     }
   );
 
@@ -2112,7 +1957,7 @@ describe("maplibre-native queries and feature state", () => {
     expect(mockGeoJsonHandleData).toHaveBeenLastCalledWith(updatedRoutes);
   });
 
-  test("style replacement and style-load reset retained state before callback writes", async () => {
+  test("style replacement and load preserve renderer state and callback writes", async () => {
     const ref = createRef<MapRef>();
     const target = { source: "routes", id: 1 };
     let backendState: Record<string, unknown> = {};
@@ -2122,9 +1967,6 @@ describe("maplibre-native queries and feature state", () => {
     mockGeoJsonGetFeatureState.mockImplementation(
       async () => backendState as FeatureState
     );
-    mockGeoJsonRemoveFeatureState.mockImplementation(async () => {
-      backendState = {};
-    });
     let callbackWrite: Promise<void> | undefined;
     const onStyleLoad = jest.fn(() => {
       callbackWrite = ref.current?.setFeatureState(target, { callback: true });
@@ -2132,73 +1974,51 @@ describe("maplibre-native queries and feature state", () => {
     const mounted = await render(example(ref, undefined, { onStyleLoad }));
     await ref.current?.setFeatureState(target, { selected: true, count: 2 });
     await mounted.rerender(
-      example(ref, undefined, { mapStyle: { ...emptyStyle }, onStyleLoad })
-    );
-    await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
-      selected: true,
-      count: 2,
-    });
-    expect(mockGeoJsonRemoveFeatureState).not.toHaveBeenCalled();
-    await mounted.rerender(
       example(ref, undefined, { mapStyle: replacementStyle, onStyleLoad })
     );
-    // The mock retains renderer state across the prop update and load event.
-    expect(backendState).toEqual({ selected: true, count: 2 });
-    await finishRenderingFrame();
-    await waitFor(() => expect(backendState).toEqual({}));
-    await expect(ref.current?.getFeatureState(target)).resolves.toEqual({});
-    expect(mockGeoJsonRemoveFeatureState).toHaveBeenCalledTimes(1);
-    expect(mockGeoJsonRemoveFeatureState).toHaveBeenLastCalledWith({ id: 1 });
-    await ref.current?.setFeatureState(target, { during: true });
     const props = MapMock.mock.calls.at(-1)?.[0] as {
       onDidFinishLoadingStyle: () => void;
     };
     props.onDidFinishLoadingStyle();
-    expect(onStyleLoad).toHaveBeenCalledTimes(1);
     await callbackWrite;
     await expect(ref.current?.getFeatureState(target)).resolves.toEqual({
+      selected: true,
+      count: 2,
       callback: true,
     });
-    expect(mockGeoJsonRemoveFeatureState).toHaveBeenCalledTimes(2);
+    expect(mockGeoJsonRemoveFeatureState).not.toHaveBeenCalled();
+    expect(onStyleLoad).toHaveBeenCalledTimes(1);
   });
 
-  test("automatic frame cleanup reports a renderer failure only once", async () => {
-    const ref = createRef<MapRef>();
-    const onError = jest.fn();
-    const scene = (revision: number) => (
-      <MapSetup adapter={adapter}>
-        <OneMap
-          ref={ref}
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          onError={onError}
-        >
-          <Source key={revision} id="routes" type="geojson" data={routes} />
-        </OneMap>
-      </MapSetup>
-    );
-    const mounted = await render(scene(0));
-    await ref.current?.setFeatureState(
-      { source: "routes", id: 1 },
-      { selected: true }
-    );
-    const failure = new Error("native source cleanup failed");
-    mockGeoJsonRemoveFeatureState.mockRejectedValueOnce(failure);
-    await mounted.rerender(scene(1));
-    await finishRenderingFrame();
-    await waitFor(() => expect(onError).toHaveBeenCalledTimes(1));
-    expect(onError).toHaveBeenCalledWith({ error: failure });
-    await finishRenderingFrame();
-    await finishRenderingFrame();
-    expect(onError).toHaveBeenCalledTimes(1);
-    expect(mockGeoJsonRemoveFeatureState).toHaveBeenCalledTimes(1);
-    await expect(
-      ref.current?.getFeatureState({ source: "routes", id: 1 })
-    ).rejects.toBe(failure);
-    expect(onError).toHaveBeenCalledTimes(1);
-  });
+  test.each(["geojson", "vector"] as const)(
+    "%s explicit removal propagates attachment errors without retrying",
+    async (kind) => {
+      const ref = createRef<MapRef>();
+      await render(kind === "vector" ? vectorTree(ref) : example(ref));
+      const remove =
+        kind === "vector"
+          ? mockVectorRemoveFeatureState
+          : mockGeoJsonRemoveFeatureState;
+      const failure = Object.assign(new Error("Source is not attached"), {
+        code: "source_not_attached",
+      });
+      remove.mockRejectedValueOnce(failure);
+      const target = {
+        source: kind === "vector" ? "tiles" : "routes",
+        id: 1,
+        ...(kind === "vector" ? { sourceLayer: "way" } : {}),
+      };
+      await expect(ref.current?.removeFeatureState(target)).rejects.toBe(
+        failure
+      );
+      expect(remove).toHaveBeenCalledTimes(1);
+      await expect(
+        ref.current?.removeFeatureState(target)
+      ).resolves.toBeUndefined();
+    }
+  );
 
-  test("queued state writes preserve validated identifiers and values", async () => {
+  test("explicit state writes preserve validated identifiers and values", async () => {
     const ref = createRef<MapRef>();
     await render(vectorTree(ref));
     let finishWrite: () => void = () => undefined;
@@ -2212,8 +2032,6 @@ describe("maplibre-native queries and feature state", () => {
       { source: "tiles", sourceLayer: "way", id: 1 },
       { first: true }
     );
-    // Let the first native dispatch acquire the queue before adding another.
-    await Promise.resolve();
     const target = { source: "tiles", sourceLayer: "way", id: 2 };
     const state = { count: 2, nested: { enabled: true }, values: [1, 2] };
     const second = ref.current?.setFeatureState(target, state);
@@ -2295,7 +2113,7 @@ test("MapLibre Native forwards legacy light and rejects unsupported terrain/glob
   }
 });
 
-test("settled camera updates controls and live overlays without another public move", async () => {
+test("settled camera updates live overlays without another public move", async () => {
   const observe = jest.fn();
   const onMove = jest.fn();
   const onMoveEnd = jest.fn();
@@ -2308,10 +2126,12 @@ test("settled camera updates controls and live overlays without another public m
       <OneMap
         mapStyle={emptyStyle}
         initialViewState={initialViewState}
+        viewState={initialViewState}
         onMove={onMove}
         onMoveEnd={onMoveEnd}
       >
         <Probe />
+
         <NativeMarkerOverlay
           id="settled"
           lngLat={[1, 2]}
@@ -2359,4 +2179,22 @@ test("settled camera updates controls and live overlays without another public m
   });
   expect(onMove).toHaveBeenCalledTimes(1);
   expect(onMoveEnd).toHaveBeenCalledTimes(1);
+});
+
+test("selected native location follow rejects a simultaneous viewState target", async () => {
+  await expect(
+    render(
+      <MapSetup adapter={adapter}>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          viewState={initialViewState}
+          locationOptions={{
+            trackUserLocation: "default",
+            onTrackUserLocationChange: undefined,
+          }}
+        />
+      </MapSetup>
+    )
+  ).rejects.toThrow("Selected location follow conflicts with viewState.");
 });

@@ -1,4 +1,4 @@
-import { type Adapter, MapSetup } from "one-map-react";
+import { type Adapter, MapSetup, Marker } from "one-map-react";
 import {
   type ReactNode,
   useCallback,
@@ -16,29 +16,66 @@ import {
   View,
 } from "react-native";
 
+import { NativeLocationButton } from "./native-location-button.js";
 import {
   type Tf08AcceptanceProbe,
   Tf08AcceptanceScene,
 } from "./tf08-acceptance-scene.js";
 
+/** Explicit application test commands; no portable offline service is exposed. */
+export interface Tf08OfflineCommands {
+  /** Performs an explicitly requested test action with raw selected SDK output. */
+  readonly command: (
+    action: string,
+    value?: Record<string, unknown>
+  ) => Promise<unknown>;
+  /** Releases only this screen's observer, including pending setup. */
+  readonly dispose: () => void;
+}
+
 /** Native TF08 shell; the runner sends application actions over local HTTP. */
 export const NativeTf08Screen = ({
   adapter,
   getLocationDiagnostic,
+  requestLocationPermission,
+  getCurrentPosition,
   setNetworkConnected,
   offlineOperations,
+  createOfflineCommands,
+  createSnapshot,
   startDetached = false,
   nativePuck,
 }: {
   readonly adapter: Adapter;
+  readonly requestLocationPermission: (
+    signal?: AbortSignal
+  ) => Promise<unknown>;
+  readonly getCurrentPosition: (
+    signal?: AbortSignal,
+    timeoutMs?: number
+  ) => Promise<import("one-map-react").GeolocationPosition>;
   readonly getLocationDiagnostic?: () => Promise<unknown>;
   readonly setNetworkConnected?: (connected: boolean) => Promise<boolean>;
   readonly offlineOperations?: Readonly<
     Record<string, (value: Record<string, unknown>) => unknown>
   >;
+  readonly createOfflineCommands?: () => Tf08OfflineCommands;
+  readonly createSnapshot?: (
+    value: Record<string, unknown>
+  ) => Promise<{ uri: string }>;
   readonly startDetached?: boolean;
   readonly nativePuck?: ReactNode;
 }) => {
+  const offlineCommands = useRef<Tf08OfflineCommands | undefined>(undefined);
+  useEffect(() => {
+    const commands = createOfflineCommands?.();
+    offlineCommands.current = commands;
+    return () => {
+      offlineCommands.current = undefined;
+      commands?.dispose();
+    };
+  }, [createOfflineCommands]);
+
   const [sceneMounted, setSceneMounted] = useState(!startDetached);
   const probe = useRef<Tf08AcceptanceProbe | null>(null);
   const [status, setStatus] = useState("TF08 awaiting runner");
@@ -63,6 +100,7 @@ export const NativeTf08Screen = ({
         };
         const environment = `${adapter.backend.replace("-native", "")}-${Platform.OS}`;
         if (
+          !active ||
           !request.id ||
           request.id === last ||
           request.environment !== environment
@@ -76,6 +114,7 @@ export const NativeTf08Screen = ({
             setSceneMounted(true);
           if (
             !probe.current &&
+            !request.action.startsWith("offline-") &&
             !["configure", "device-info", "named-offline", "network"].includes(
               request.action
             )
@@ -86,24 +125,35 @@ export const NativeTf08Screen = ({
             environment,
             ok: true,
             value:
-              request.action === "device-info"
-                ? { scale: PixelRatio.get(), window: Dimensions.get("window") }
-                : request.action === "named-offline"
-                  ? await runOfflineOperation(
-                      offlineOperations,
-                      String(request.value?.operation),
-                      request.value ?? {}
+              request.action === "snapshot" && createSnapshot
+                ? await createSnapshot(request.value ?? {})
+                : request.action.startsWith("offline-") &&
+                    offlineCommands.current
+                  ? await offlineCommands.current.command(
+                      request.action,
+                      request.value
                     )
-                  : request.action === "network" && setNetworkConnected
-                    ? await setNetworkConnected(
-                        request.value?.connected === true
-                      )
-                    : !probe.current && request.action === "configure"
-                      ? null
-                      : await probe.current?.command(
-                          request.action,
-                          request.value
-                        ),
+                  : request.action === "device-info"
+                    ? {
+                        scale: PixelRatio.get(),
+                        window: Dimensions.get("window"),
+                      }
+                    : request.action === "named-offline"
+                      ? await runOfflineOperation(
+                          offlineOperations,
+                          String(request.value?.operation),
+                          request.value ?? {}
+                        )
+                      : request.action === "network" && setNetworkConnected
+                        ? await setNetworkConnected(
+                            request.value?.connected === true
+                          )
+                        : !probe.current && request.action === "configure"
+                          ? null
+                          : await probe.current?.command(
+                              request.action,
+                              request.value
+                            ),
           };
         } catch (error) {
           result = {
@@ -156,6 +206,7 @@ export const NativeTf08Screen = ({
     getLocationDiagnostic,
     setNetworkConnected,
     offlineOperations,
+    createSnapshot,
   ]);
   return (
     <MapSetup adapter={adapter}>
@@ -163,8 +214,11 @@ export const NativeTf08Screen = ({
         <Text testID="tf08-status">{status}</Text>
         {sceneMounted && (
           <Tf08AcceptanceScene
+            renderLocation={NativeLocationButton}
+            renderCoveragePopup={renderCoveragePopup}
             backend={adapter.backend}
-            services={adapter.services}
+            requestLocationPermission={requestLocationPermission}
+            getCurrentPosition={getCurrentPosition}
             style={{ flex: 1 }}
             attach={attach}
             fixtureUrl="http://127.0.0.1:8798"
@@ -211,3 +265,18 @@ const runOfflineOperation = async (
     console.warn = warn;
   }
 };
+
+const renderCoveragePopup = (children: ReactNode): ReactNode => (
+  <Marker longitude={-122.35} latitude={47.61} anchor="bottom">
+    <View
+      style={{
+        padding: 12,
+        backgroundColor: "white",
+        borderRadius: 6,
+        maxWidth: 240,
+      }}
+    >
+      {children}
+    </View>
+  </Marker>
+);

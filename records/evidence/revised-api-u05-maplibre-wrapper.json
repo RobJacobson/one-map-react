@@ -1,0 +1,334 @@
+{
+  "unit": "U05",
+  "status": "implemented and audited; required routine checks passed; commit/push/PR authorized by owner workflow",
+  "authorization": "Owner merged U04 PR23 and released U05 only. Coordinator may commit/push/open current-unit PR after independent review, audit and required checks. No U06, merge, acceptance, native app build/install, SDK operation or package publication authorized.",
+  "scope": {
+    "runtime": "One asynchronous current-Map lookup in existing MapLibre factory and exact selected NativeAdvancedMapRef; selected entry already exports/refers to this type. Camera/load ownership, source registry, query/cluster/state/capture, advanced mirrors, common types/proxy and other adapters unchanged.",
+    "inventory": [
+      "One createMaplibreMapRef caller in maplibre-native/map.tsx retains separate Camera, Map, mapLoaded and source refs.",
+      "Installed MapLibre 11.5.0 src/components/map/Map.tsx refreshes useImperativeHandle each render without dependency array. Getter borrows current handle each invocation.",
+      "Selected Map already aliases common facade with NativeAdvancedMapRef. Existing enclosing/named proxy resolves current adapter map and excludes then."
+    ],
+    "resourceLifetime": "No resource, cache, dispatcher, wait, observer or new ownership. Detached lookup rejects asynchronously; borrowed handle lifetime follows wrapper.",
+    "newDependencies": [],
+    "consumersChanged": false,
+    "testsRetired": []
+  },
+  "regressions": {
+    "cases": [
+      "Selected direct, enclosing proxy, named proxy.",
+      "Promise and exact current attached mock Map identity before load; getter never dispatches camera.",
+      "Extracted method follows refreshed handle while same mapId stays mounted.",
+      "Detached direct/extracted/proxy calls reject asynchronously and retained proxy Promise.resolve remains safe.",
+      "Common flyTo rejects before load, no dispatch, then forwards after onDidFinishLoadingMap. Existing camera-load guard test retained."
+    ],
+    "red": "3 new cases fail before production getter (TypeError absent method); green original 83/main 79 selected-file cases. Initial test import path typo corrected before recorded red; no production change at that point."
+  },
+  "artifacts": {
+    "original": {
+      "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+      "basis": "Approved dirty rc.11 basis; unrelated dirty U01-U04 state preserved.",
+      "snapshotPaths": 1036,
+      "snapshotSha256": "4e43ce9c3f90c63a43f9b69aaba8d22408ef77fa0058a9079fa5825a9af9e005",
+      "deltaSha256": "5f7a557f3db5b62aac113f322715db4c26fa44b995baa00cdcf75636d5802b12",
+      "changedExistingPaths": [
+        "AGENTS.md",
+        "README.md",
+        "docs/AGENTS.md",
+        "docs/README.md",
+        "docs/api-coverage.md",
+        "docs/requirements.md",
+        "docs/revised-api-implementation-plan.md",
+        "docs/revised-api-proposal.md",
+        "docs/stage-plan.md",
+        "packages/one-map-react/README.md",
+        "packages/one-map-react/src/adapters/maplibre-native/map-ref.ts",
+        "packages/one-map-react/test/maplibre-native.native.test.tsx",
+        "records/README.md",
+        "scripts/test-peers.mjs"
+      ],
+      "frozenArchiveSha256": "23250c46ee86dcb2dd36fb4d520f5ba813435c8e48204904cd694f48160f49cc",
+      "candidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7"
+    },
+    "main": {
+      "base": "925752cd4c61b044d72c40043502347ab3182f13",
+      "branch": "codex/u05-maplibre-wrapper-access",
+      "basis": "Main-based clone; unit hunks only. Main historical/current version facts preserved, all 69 coverage data rows first three cells identical. Per-package temporary dependency overlays redirected every workspace package to clone; third-party dependencies reused. Overlays removed after final probes without following symlinks.",
+      "frozenArchiveSha256": "ded30de5e7425ed38a37cc2915bd296333a75d0d5392cf415b3d617c571fade1"
+    }
+  },
+  "checks": {
+    "original": {
+      "focusedNative": "83/83 passed",
+      "allMockedNative": "7 suites, 289 tests passed",
+      "build": "bun run build passed",
+      "types": "bun run typecheck passed after build",
+      "appTypes": "bun run typecheck:apps passed",
+      "formatLint": "bun run check passed",
+      "docs": "bun run check:docs passed",
+      "packedCommon": "13 isolated package scenarios passed on frozen archive",
+      "focusedNativeCommand": "bun run test:native --runTestsByPath packages/one-map-react/test/maplibre-native.native.test.tsx",
+      "allMockedNativeCommand": "bun run test:native",
+      "packedCommonCommand": "bun scripts/test-package.mjs --archive /tmp/one-map-u05-heezt37i/original-pack/one-map-react-0.1.0-rc.11.tgz --evidence /tmp/one-map-u05-heezt37i/common-original.json"
+    },
+    "main": {
+      "focusedNative": "79/79 passed",
+      "allMockedNative": "6 suites, 274 tests passed",
+      "build": "bun run build passed",
+      "types": "bun run typecheck passed after build",
+      "appTypes": "bun run typecheck:apps passed",
+      "formatLint": "bun run check passed",
+      "docs": "bun run check:docs passed",
+      "packedCommon": "13 isolated package scenarios passed on frozen archive",
+      "focusedNativeCommand": "bun run test:native --runTestsByPath packages/one-map-react/test/maplibre-native.native.test.tsx",
+      "allMockedNativeCommand": "bun run test:native",
+      "packedCommonCommand": "bun scripts/test-package.mjs --archive /tmp/one-map-u05-heezt37i/main-pack/one-map-react-0.1.0-rc.2.tgz --evidence /tmp/one-map-u05-heezt37i/common-main.json"
+    }
+  },
+  "selectedPeerChecks": {
+    "status": "All 5 scoped declaration cases passed per artifact on their respective frozen archives.",
+    "scope": "5 declaration cases per artifact: MapLibre native standalone plus both selected ends of Mapbox web+MapLibre native and MapLibre web+Mapbox native. Exact Promise<ComponentRef<typeof upstream Map>>, selected Map ref inference, wrapper capture/view-state/visibility/attribution call shapes; accumulated all-four getter proofs retained.",
+    "derivation": "Temporary existing test-peers derivative filters explicit entries to MapLibre native only; both mixed pair loops intact. No new repo harness/CLI.",
+    "versions": "Installed MapLibre 11.5.0 inspected; no support range, shipped patch or lock changes. Isolated probes use declared React Native 0.87.1; mocked host 0.86.3 is separate.",
+    "originalRunnerSha256": "2c70de1de27f230f3dc069bbffa43b7a00911388f551fc15a3011885dba50745",
+    "mainRunnerSha256": "17501b4a4c1663c13ac03c31821c2f2367115b340edae21e22548a15bbf8b0ed",
+    "executions": [
+      {
+        "artifact": "original",
+        "command": "TMPDIR=/private/tmp/one-map-u05-heezt37i bun /tmp/one-map-u05-heezt37i/peer-u05-original.mjs --archive /tmp/one-map-u05-heezt37i/original-pack/one-map-react-0.1.0-rc.11.tgz --evidence /tmp/one-map-u05-heezt37i/peers-original.json",
+        "exit": 0,
+        "archiveSha256": "23250c46ee86dcb2dd36fb4d520f5ba813435c8e48204904cd694f48160f49cc",
+        "reportSha256": "b79994c364eda6da65ea6f634d3da58c441e28977b20bea633101a7bb6c49f82",
+        "cases": [
+          {
+            "scenario": "MapLibre native standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "react-native": "0.87.1",
+              "@types/react": "19.2.18",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.2",
+              "@types/geojson": "7946.0.16"
+            },
+            "patchedFilesVerified": 13,
+            "lockfileSha256": "fa605c4ff5a59aa3ee3180cd186aa1d827e554d9a8fdb84711dd78947448a3e3"
+          },
+          {
+            "scenario": "Mapbox web + MapLibre native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0",
+              "react-native": "0.87.1",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.2",
+              "@types/geojson": "7946.0.16"
+            },
+            "patchedFilesVerified": 13,
+            "lockfileSha256": "33475b1148b674361af50570d3a695463a891d42300d2f883b2b25127adfeb76"
+          },
+          {
+            "scenario": "Mapbox web + MapLibre native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0",
+              "react-native": "0.87.1",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.2",
+              "@types/geojson": "7946.0.16"
+            },
+            "patchedFilesVerified": 13,
+            "lockfileSha256": "33475b1148b674361af50570d3a695463a891d42300d2f883b2b25127adfeb76"
+          },
+          {
+            "scenario": "MapLibre web + Mapbox native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0",
+              "react-native": "0.87.1",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.2"
+            },
+            "patchedFilesVerified": 31,
+            "lockfileSha256": "636599fe637108b38921962d90549c620ac1247196bafa5a539ab38fd966d335"
+          },
+          {
+            "scenario": "MapLibre web + Mapbox native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0",
+              "react-native": "0.87.1",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.2"
+            },
+            "patchedFilesVerified": 31,
+            "lockfileSha256": "636599fe637108b38921962d90549c620ac1247196bafa5a539ab38fd966d335"
+          }
+        ]
+      },
+      {
+        "artifact": "main",
+        "command": "TMPDIR=/private/tmp/one-map-u05-heezt37i bun /tmp/one-map-u05-heezt37i/peer-u05-main.mjs --archive /tmp/one-map-u05-heezt37i/main-pack/one-map-react-0.1.0-rc.2.tgz --evidence /tmp/one-map-u05-heezt37i/peers-main.json",
+        "exit": 0,
+        "archiveSha256": "ded30de5e7425ed38a37cc2915bd296333a75d0d5392cf415b3d617c571fade1",
+        "reportSha256": "91587bb4740b50136a94cbbe4b8e2d1c259af1e36b0764f8837424603977b4ac",
+        "cases": [
+          {
+            "scenario": "MapLibre native standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "react-native": "0.87.1",
+              "@types/react": "19.2.18",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.1",
+              "@types/geojson": "7946.0.16"
+            },
+            "patchedFilesVerified": 10,
+            "lockfileSha256": "b125b69a8b3af372917560548431181e1e039bcc62fe507927f85ae5a5606b84"
+          },
+          {
+            "scenario": "Mapbox web + MapLibre native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0",
+              "react-native": "0.87.1",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.1",
+              "@types/geojson": "7946.0.16"
+            },
+            "patchedFilesVerified": 10,
+            "lockfileSha256": "16dab5da1840669d920046b5a4f15a631be0543780fb7f572b1c2460a78ea629"
+          },
+          {
+            "scenario": "Mapbox web + MapLibre native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0",
+              "react-native": "0.87.1",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.1",
+              "@types/geojson": "7946.0.16"
+            },
+            "patchedFilesVerified": 10,
+            "lockfileSha256": "16dab5da1840669d920046b5a4f15a631be0543780fb7f572b1c2460a78ea629"
+          },
+          {
+            "scenario": "MapLibre web + Mapbox native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0",
+              "react-native": "0.87.1",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.1"
+            },
+            "patchedFilesVerified": 25,
+            "lockfileSha256": "3824c1b6f918ec8ea5afbfe66eb77568a13e3502978d1d16b59367f2bd498b7e"
+          },
+          {
+            "scenario": "MapLibre web + Mapbox native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0",
+              "react-native": "0.87.1",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.1"
+            },
+            "patchedFilesVerified": 25,
+            "lockfileSha256": "3824c1b6f918ec8ea5afbfe66eb77568a13e3502978d1d16b59367f2bd498b7e"
+          }
+        ]
+      }
+    ]
+  },
+  "review": {
+    "implementer": "Connected lifecycle/types/source/camera/proxy self-review passed. No extra source/entry/facade changes required.",
+    "independent": "Passed read-only review of both U05 artifacts, installed wrapper implementation, selected types, facade proxies, camera guards, lifecycle regressions, package/mixed probes, scope preservation and final evidence hashes. No actionable correctness findings.",
+    "coordinator": "Passed final audit of current-handle lookup, camera-load separation, preserved common/other-adapter/source contracts, declarations, all checks and artifact identities. Corrected evidence data-row count and pre-completion log hashes; moved new records index entry below H1. No production or package changes after frozen verification.",
+    "finalDocumentation": "After audit-status and records-index formatting corrections, expanded existing structural checker passed 43 original Markdown files/42 tables and 42 main-based files/38 tables. Production and package bytes remained frozen."
+  },
+  "verificationLimits": [
+    "Renderer acceptance, browser smoke, mixed Metro transport, native app build/install/linking and SDK service operations not performed; separate owner authorization required.",
+    "No U06+ work; advanced mirrors retained.",
+    "Full web suite not rerun for native-only additive change. Prior U03 temporary main dependency marker.ts source-import failures outside scope.",
+    "Documentation structural checks do not replace source/editorial review."
+  ],
+  "retention": "Compact outcomes, failures, archive/dependency/patch provenance and validated log/report hashes remain here. Temporary dependency overlays, generated consumers, raw logs, lockfiles and duplicate archives are removed after audit/publication. Unit-start recovery copies and original delta remain temporary; original candidate archive preserved.",
+  "logHashes": {
+    "build-main.log": "9c0ed9106f736d8ef8175ca17e24e664f680c61d484f808ec59d60de50c40e2f",
+    "build.log": "2679dc892a4502ddcb472fe18639f2ce021ddb8787c8105cfd0856f6d5d53d8e",
+    "check-final.log": "52dd68469740a242f7f91b59c8572deb56744b4c6071b4fccebc00b2b2c74abb",
+    "check-main.log": "6afec798727f453575a426d521da9652ffcc8f233fdda3a7a0f0d902d4e2aa26",
+    "check.log": "6fe1f3f8b3a4bfe0e0c05920a50d2cac457067f069aa75e0415676897af9f810",
+    "common-main.log": "8edd998bdb0965d2e34eb5e5ce655182c33dc7b48df2d17e5b6b4ab61cfb26b2",
+    "common-original.log": "1bc5c3a2592d261e1a78026e38e7162470a31e6fce674d9efc81bcf09c046c65",
+    "docs-final.log": "feb4ceee89ee2252939b66e282f57942db8754988a566df001ae691b888a73e3",
+    "docs-main.log": "4b15c9762e38a2e67d3f5929356bf410a8d26faa68dd65f7e597f1dba42f1408",
+    "docs.log": "feb4ceee89ee2252939b66e282f57942db8754988a566df001ae691b888a73e3",
+    "format.log": "24fab60a12d49a98573f54fdea8d14a200c7e8a9dfd80f88d4defd57e7f93b05",
+    "main-pack.log": "1d4208841b8ef9fd75307c8eacde4fb646cf5a5c8a790f306b443af2b3da4885",
+    "native-all-main.log": "8cedc9235d3f8b4ea8486a974afa9e73df73a0672238638ee9c7bd7893e08fe3",
+    "native-all.log": "854c07ae2121869c6998114354d1497821506933d5be34fe118b8598903ab165",
+    "native-green.log": "a18344eb8229b9e9a1be2587f809e5ccc1e4b68a5de84615d035dcb3a858e850",
+    "native-main.log": "0f674cfa6f08d0bcb5c24107ee05745b497098bc37f1ccc557f5b7ab931732bb",
+    "native-red.log": "5184567ad8354dd5ca288f489fe091cd09a2d074af78032097b2fbe7163bceb5",
+    "original-pack.log": "2a065b419342a15de66b20239349347f6e4dc7383f8535f3e73b5f657c2c3b3d",
+    "peers-main.log": "9ab959ce90ace457b5324245141f51fa9b0e9bfb55b254dfdcd340ab31a38038",
+    "peers-original.log": "6ae5924c2066547f2de45ee4c5cb5e570a2321f0fbcbe948786b5f45af3ce39b",
+    "types-apps-main.log": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962",
+    "types-apps.log": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962",
+    "types-main.log": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa",
+    "types.log": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+  },
+  "preservation": {
+    "coverageDataRows": 69,
+    "mainCurrentFirstThreeCellsAndCheckboxesUnchanged": true,
+    "modifiedOriginalPaths": 14,
+    "newEvidencePaths": 1,
+    "temporaryVerifierRepair": "Initial helper incorrectly flagged unit-start null/absent tracked paths; corrected null-aware comparison confirmed no unrelated edit or deletion. No product files required repair."
+  }
+}

@@ -4,6 +4,8 @@ import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import { stopOwnedProcess } from "./native-smoke-process.mjs";
+
 const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
@@ -277,7 +279,7 @@ async function runWeb(directory, port, label) {
       "--host",
       "127.0.0.1",
     ],
-    { cwd: shell, stdio: ["ignore", "pipe", "pipe"] }
+    { cwd: shell, detached: true, stdio: ["ignore", "pipe", "pipe"] }
   );
   let viteLog = "";
   const record = (chunk) => {
@@ -298,7 +300,7 @@ async function runWeb(directory, port, label) {
       "--no-first-run",
       `http://127.0.0.1:${port}/?tf04=${webScenario}`,
     ],
-    { stdio: "ignore" }
+    { detached: true, stdio: "ignore" }
   );
 
   try {
@@ -321,8 +323,8 @@ async function runWeb(directory, port, label) {
       log: viteLog.slice(-1500),
     };
   } finally {
-    chrome.kill("SIGKILL");
-    vite.kill("SIGTERM");
+    await stopOwnedProcess(chrome);
+    await stopOwnedProcess(vite);
     rmSync(profile, { recursive: true, force: true });
   }
 }
@@ -870,16 +872,16 @@ function judge(status, doubleTap, platform = "web") {
       .filter((part) => part.length === 2)
   );
   const stopOk = fields.stop === "stayed" || fields.stop === "rejected";
-  const heldOk =
-    fields.stop === "rejected"
-      ? fields.held === "0" || fields.held === "1"
-      : fields.held === "1";
+  const cameraOk =
+    platform === "web"
+      ? fields.held === "1"
+      : fields.held === "0" && fields.command === "applied";
   const doubleTapOk = doubleTapPassed(fields.doubletap, doubleTap, platform);
   const passed =
     fields.fit === "ok" &&
     fields.click === "hit" &&
     stopOk &&
-    heldOk &&
+    cameraOk &&
     doubleTapOk &&
     fields.done === "1";
 

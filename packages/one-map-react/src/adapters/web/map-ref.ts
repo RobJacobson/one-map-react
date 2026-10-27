@@ -44,10 +44,9 @@ export const createWebMapRef = (
   mapRef: {
     readonly current: WebMapHandle | null;
   },
-  wrapper: WebWrapper<Extract<Backend, "mapbox-web" | "maplibre-web">>,
-  capture?: MapRef["capture"]
-): MapRef => ({
-  ...wrapper.createAdvancedMethods?.(() => requireWebMap(mapRef.current)),
+  wrapper: WebWrapper<Extract<Backend, "mapbox-web" | "maplibre-web">>
+): MapRef & { readonly getWrapperMap: () => Promise<WebMapHandle> } => ({
+  getWrapperMap: async () => requireWebMap(mapRef.current),
   queryTerrainElevation: async (coordinate) => {
     validateTerrainCoordinate(coordinate);
     const map = requireWebMap(mapRef.current);
@@ -59,11 +58,6 @@ export const createWebMapRef = (
       )
     );
   },
-  capture:
-    capture ??
-    (async () => {
-      throw new Error("Capture is not enabled on this map.");
-    }),
   jumpTo: async (options) => {
     rejectJumpTiming(options);
     const map = requireWebMap(mapRef.current);

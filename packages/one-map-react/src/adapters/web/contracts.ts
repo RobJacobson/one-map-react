@@ -19,31 +19,14 @@ interface TouchZoomRotateHandler {
 }
 
 interface StyleLoadTarget {
-  on(
-    type: "style.load" | "load" | "idle" | "render",
-    listener: () => void
-  ): void;
+  on(type: "style.load" | "load" | "idle", listener: () => void): void;
   on(type: "error", listener: (event: WebErrorNotice) => void): void;
-  off(
-    type: "style.load" | "load" | "idle" | "render",
-    listener: () => void
-  ): void;
+  off(type: "style.load" | "load" | "idle", listener: () => void): void;
   off(type: "error", listener: (event: WebErrorNotice) => void): void;
   // Pinned maplibre-gl returns void while no style is loaded; mapbox-gl
   // returns boolean. Callers treat non-true as not loaded.
   isStyleLoaded: () => unknown;
   touchZoomRotate?: TouchZoomRotateHandler;
-  /** Current canvas, used only by opt-in capture. */
-  getCanvas?: () => {
-    readonly width: number;
-    readonly height: number;
-    toDataURL(type: string): string;
-    getContext(type: "webgl2" | "webgl"): {
-      getContextAttributes(): { preserveDrawingBuffer?: boolean } | null;
-    } | null;
-  };
-  /** Capture requires an actual rendered frame; wrapper lifecycle owns these events. */
-  triggerRepaint?: () => void;
 }
 
 interface WebMapHandle {
@@ -210,8 +193,6 @@ interface WebImageMap {
   // returns boolean. Callers treat non-true as not loaded.
   isStyleLoaded: () => unknown;
   hasImage: (name: string) => boolean;
-  /** MapLibre can replace sprites through an in-place style diff. */
-  getSprite?: () => { id: string; url: string }[];
   // Each renderer declares its own image union; this boundary accepts any
   // decoded image a renderer-specific loadWebImage produced.
   // eslint-disable-next-line typescript/no-explicit-any -- renderer-specific image union
@@ -239,29 +220,11 @@ interface WebWrapper<
   Name extends Extract<Backend, "mapbox-web" | "maplibre-web">,
 > {
   readonly backend: Name;
-  readonly createAdvancedMethods?: (getHandle: () => WebMapHandle) => object;
   readonly Map: ComponentType<WebMapProps>;
   readonly Source: ComponentType<WebForwardedProps>;
   readonly Layer: Adapter["Layer"];
   /** Live marker delegated to the selected wrapper. */
   readonly Marker: ComponentType<WebForwardedProps>;
-  /** Standalone popup delegated to the selected wrapper. */
-  readonly Popup: ComponentType<WebForwardedProps>;
-  /** Selected wrapper navigation buttons and compass. */
-  readonly NavigationControl: ComponentType<WebForwardedProps>;
-  /** Selected wrapper attribution control. */
-  readonly AttributionControl: ComponentType<WebForwardedProps>;
-  /** Selected wrapper scale control. */
-  readonly ScaleControl: ComponentType<WebForwardedProps>;
-  /** Selected wrapper browser location control. */
-  readonly GeolocateControl: ComponentType<WebForwardedProps>;
-  /** Selected wrapper browser fullscreen control. */
-  readonly FullscreenControl: ComponentType<WebForwardedProps>;
-  /** Registers facade-owned hosts through the wrapper lifecycle. */
-  readonly useControl: (
-    create: () => WebCustomControl,
-    options: { readonly position?: string }
-  ) => WebCustomControl;
   readonly useMap: () => WebMapSelection;
   readonly loadWebImage: (map: WebImageMap, url: string) => Promise<unknown>;
   /**
@@ -278,21 +241,10 @@ interface WebWrapper<
   ) => Promise<unknown>;
 }
 
-/** DOM control owned by the facade and registered through react-map-gl. */
-interface WebCustomControl {
-  /** Portal container returned when the map adds the control. */
-  readonly element: Element & { className: string; remove(): void };
-  /** Returns the owned host; the wrapper appends it to the map. */
-  readonly onAdd: () => Element;
-  /** Removes the owned host when the wrapper releases this control. */
-  readonly onRemove: () => void;
-}
-
 export type {
   StyleLoadTarget,
   WebClusterMethod,
   WebClusterSource,
-  WebCustomControl,
   WebErrorNotice,
   WebImageMap,
   WebMapHandle,

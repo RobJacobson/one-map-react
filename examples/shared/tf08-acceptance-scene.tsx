@@ -1,23 +1,29 @@
 import {
-  GeolocateControl,
   type GeolocationPosition,
   Layer,
-  type LocationService,
   type MapLayoutStyle,
   type MapProps,
   type MapRef,
-  type MapServices,
   type MapStyle,
   Marker,
   type MarkerRef,
-  Popup,
-  AttributionControl,
-  NavigationControl,
-  ScaleControl,
   Map as OneMap,
   Source,
+  UserLocation,
 } from "one-map-react";
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ComponentType,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  captureRendering,
+  renderingBufferOptions,
+} from "./capture-rendering.js";
+import type { NativeLocationButtonProps } from "./native-location-button.js";
 
 /** Commands expose application actions and independent renderer readback only. */
 export interface Tf08AcceptanceProbe {
@@ -29,14 +35,24 @@ export interface Tf08AcceptanceProbe {
 }
 
 interface Tf08AcceptanceSceneProps {
-  readonly services: MapServices;
+  readonly renderLocation: ComponentType<NativeLocationButtonProps>;
+  readonly requestLocationPermission: (
+    signal?: AbortSignal
+  ) => Promise<unknown>;
+  readonly getCurrentPosition: (
+    signal?: AbortSignal,
+    timeoutMs?: number
+  ) => Promise<GeolocationPosition>;
   readonly backend: string;
   readonly style: MapLayoutStyle;
   readonly overlay: ReactNode;
+  readonly renderCoveragePopup: (children: ReactNode) => ReactNode;
   readonly attach: (probe: Tf08AcceptanceProbe | null) => void;
   readonly fixtureUrl: string;
   readonly externalContext?: MapProps["gl"];
   readonly nativePuck?: ReactNode;
+  readonly navigationControl?: ReactNode;
+  readonly ornamentControls?: ReactNode;
 }
 
 const initialCamera = {
@@ -61,14 +77,19 @@ const localStyle: MapStyle = {
 
 /** Real-renderer TF08 fixture; injected fixes never pretend to certify sensors. */
 export const Tf08AcceptanceScene = ({
-  services,
+  requestLocationPermission,
+  getCurrentPosition,
+  renderLocation: Location,
   backend,
   style,
   overlay,
+  renderCoveragePopup,
   attach,
   fixtureUrl,
   externalContext,
   nativePuck,
+  navigationControl,
+  ornamentControls,
 }: Tf08AcceptanceSceneProps) => {
   const mapRef = useRef<MapRef>(null);
   const annotationRef = useRef<MarkerRef>(null);
@@ -85,8 +106,6 @@ export const Tf08AcceptanceScene = ({
     loads: 0,
     fixes: 0,
     errors: 0,
-    watches: 0,
-    releases: 0,
     moving: false,
     moveEnds: 0,
     moves: [] as {
@@ -95,44 +114,14 @@ export const Tf08AcceptanceScene = ({
       zoom: number;
     }[],
   });
-  const receiver = useRef<(position: GeolocationPosition) => void>(() => {});
   const lastPosition = useRef<GeolocationPosition | undefined>(undefined);
-  const subscriptions = useRef<(() => void)[]>([]);
-  const offlineProgress = useRef<Record<string, unknown>[]>([]);
-  const offlineErrors = useRef<unknown[]>([]);
-  const provider = useMemo<LocationService>(
-    () => ({
-      requestPermission: async () => ({
-        status: "granted",
-        accuracy: "unknown",
-      }),
-      getCurrentPosition: async () => ({
-        lngLat: [-122.33, 47.62],
-        timestamp: Date.now(),
-        accuracy: 25,
-      }),
-      watchPosition: (position) => {
-        observations.current.watches += 1;
-        receiver.current = position;
-        let active = true;
-        return () => {
-          if (!active) return;
-          active = false;
-          observations.current.releases += 1;
-        };
-      },
-    }),
-    []
-  );
+  const [displayPosition, setDisplayPosition] = useState<GeolocationPosition>();
 
   useEffect(() => {
+    const requests = new Set<AbortController>();
     const requireMap = (): MapRef => {
       if (!mapRef.current) throw new Error("Acceptance map is detached.");
       return mapRef.current;
-    };
-    const requireOffline = () => {
-      if (!services.offline) throw new Error("Offline service unavailable.");
-      return services.offline;
     };
     const command: Tf08AcceptanceProbe["command"] = async (
       action,
@@ -153,19 +142,9 @@ export const Tf08AcceptanceScene = ({
           position: lastPosition.current,
         };
       }
-      if (action === "emit") {
-        receiver.current({
-          lngLat: [
-            Number(value.longitude ?? -122.33),
-            Number(value.latitude ?? 47.62),
-          ],
-          accuracy: 25,
-          timestamp: Date.now(),
-        });
-        return { ...observations.current };
-      }
       if (action === "configure") {
         const next = String(value.mode ?? "injected");
+        setDisplayPosition(undefined);
         setMode(next);
         setMounted(next !== "detached");
         setGeneration((current) => current + 1);
@@ -173,11 +152,11 @@ export const Tf08AcceptanceScene = ({
         return null;
       }
       if (action === "capture") {
-        return requireMap().capture({
-          output: value.output === "file" ? "file" : "data-url",
-          scope: value.scope === "renderer" ? "renderer" : "backend",
-          timeoutMs: Number(value.timeoutMs ?? 15000),
-        });
+        return captureRendering(
+          backend,
+          mapRef.current,
+          value.output === "file" ? "file" : "data-url"
+        );
       }
       if (action === "annotation-refresh") {
         await annotationRef.current?.refresh();
@@ -190,242 +169,190 @@ export const Tf08AcceptanceScene = ({
         });
         return null;
       }
-      if (action === "permission") return services.location.requestPermission();
-      if (action === "position") {
+      if (action === "permission" || action === "position") {
         const requestedAt = Date.now();
-        const position = await services.location.getCurrentPosition({
-          timeoutMs: 12000,
-        });
-        return { ...position, requestedAt, completedAt: Date.now() };
-      }
-      if (action === "snapshot") {
-        if (!services.staticMapImage)
-          throw new Error("Snapshot service unavailable.");
-        return services.staticMapImage.create({
-          mapStyle: String(value.mapStyle ?? `${fixtureUrl}/style.json`),
-          center: [0, 0],
-          zoom: 0,
-          width: Number(value.width ?? 96),
-          height: Number(value.height ?? 64),
-          output: value.output === "file" ? "file" : "data-url",
-          timeoutMs: Number(value.timeoutMs ?? 20000),
-        });
-      }
-      const offline = requireOffline();
-      const id = String(value.id);
-      if (action === "offline-create" || action === "offline-duplicate") {
-        const fixtureStyle = `${fixtureUrl}/offline-style.json?id=${encodeURIComponent(id)}`;
-        return offline
-          .createPack({
-            id,
-            mapStyle: fixtureStyle,
-            bounds: [
-              [-10, -10],
-              [10, 10],
-            ],
-            minZoom: 0,
-            maxZoom: 1,
-            metadata: { test: "tf08", backend, fixtureStyle },
-          })
-          .then((pack) => ({
-            id: pack.id,
-            backendId: pack.backendId,
-            metadata: pack.metadata,
-            bounds: pack.bounds,
-          }));
-      }
-      if (action === "offline-delete") {
-        for (const release of subscriptions.current.splice(0)) release();
-        await offline.deletePack(id);
-        return null;
-      }
-      const pack = await offline.getPack(id);
-      if (!pack) throw new Error("Acceptance pack missing.");
-      if (action === "offline-subscribe") {
-        for (const label of ["one", "two"]) {
-          subscriptions.current.push(
-            offline.subscribe(
-              id,
-              (status) => {
-                offlineProgress.current.push({ label, ...status });
-              },
-              (error) => {
-                offlineErrors.current.push(error);
-              }
-            )
-          );
+        const controller = new AbortController();
+        requests.add(controller);
+        try {
+          if (action === "permission") {
+            const permission = await requestLocationPermission(
+              controller.signal
+            );
+            if (controller.signal.aborted)
+              throw new Error("Location request owner disposed.");
+            return permission;
+          }
+          const position = await getCurrentPosition(controller.signal, 12000);
+          if (controller.signal.aborted)
+            throw new Error("Location request owner disposed.");
+          return { ...position, requestedAt, completedAt: Date.now() };
+        } finally {
+          requests.delete(controller);
         }
-        return null;
-      }
-      if (action === "offline-status") {
-        return {
-          pack: {
-            id: pack.id,
-            backendId: pack.backendId,
-            metadata: pack.metadata,
-            bounds: pack.bounds,
-          },
-          status: await pack.status(),
-          progress: [...offlineProgress.current],
-          errors: offlineErrors.current.length,
-          errorMessages: [...offlineErrors.current],
-        };
-      }
-      if (action === "offline-pause") {
-        await pack.pause();
-        return pack.status();
-      }
-      if (action === "offline-resume") {
-        await pack.resume();
-        return pack.status();
-      }
-      if (action === "offline-invalidate") {
-        await offline.invalidatePack(id);
-        return pack.status();
       }
       throw new Error("Unknown acceptance action.");
     };
-    const ownedSubscriptions = subscriptions.current;
     attach({ command });
     return () => {
       attach(null);
-      for (const release of ownedSubscriptions.splice(0)) release();
+      for (const controller of requests) controller.abort();
     };
-  }, [attach, backend, fixtureUrl, services]);
+  }, [
+    attach,
+    backend,
+    fixtureUrl,
+    requestLocationPermission,
+    getCurrentPosition,
+  ]);
 
   if (!mounted) return null;
-  return (
-    <OneMap
-      key={generation}
-      ref={mapRef}
-      mapStyle={mapStyle}
-      style={style}
-      initialViewState={camera}
-      captureEnabled={mode !== "unpreserved"}
-      reuseMaps={
-        backend.endsWith("web") &&
-        (mode === "unpreserved" || mode === "retained")
+  const locationControl = (
+    <Location
+      key={`${generation}-${mode}`}
+      mapRef={mapRef}
+      corner="right"
+      getCurrentPosition={(signal) =>
+        mode === "default"
+          ? getCurrentPosition(signal)
+          : Promise.resolve({
+              lngLat: [-122.33, 47.62],
+              timestamp: Date.now(),
+              accuracy: 25,
+            })
       }
-      gl={mode === "external" ? externalContext : undefined}
-      {...(backend.endsWith("native") && mode.startsWith("coverage")
-        ? {
-            options:
-              backend === "mapbox-native"
-                ? {
-                    logoEnabled: mode === "coverage-ornaments",
-                    attributionEnabled: mode === "coverage-ornaments",
-                    compassEnabled: mode === "coverage-ornaments",
-                    compassFadeWhenNorth: false,
-                    scaleBarEnabled: mode === "coverage-ornaments",
-                  }
-                : {
-                    logo: mode === "coverage-ornaments",
-                    attribution: mode === "coverage-ornaments",
-                    compass: mode === "coverage-ornaments",
-                    compassHiddenFacingNorth: false,
-                    scaleBar: mode === "coverage-ornaments",
-                  },
-          }
-        : {})}
-      onLoad={() => {
-        observations.current.loads += 1;
-        void mapRef.current
-          ?.jumpTo({
-            center: [camera.longitude, camera.latitude],
-            zoom: camera.zoom,
-          })
-          .catch(() => {
-            observations.current.errors += 1;
-          });
+      zoom={12}
+      onGeolocate={(position) => {
+        observations.current.fixes += 1;
+        lastPosition.current = position;
+        setDisplayPosition(position);
       }}
       onError={() => {
         observations.current.errors += 1;
       }}
-      onMoveStart={() => {
-        observations.current.moving = true;
-      }}
-      onMove={(event) => {
-        observations.current.moves = [
-          ...observations.current.moves,
-          {
-            origin: event.origin,
-            center: [
-              event.viewState.longitude,
-              event.viewState.latitude,
-            ] as const,
-            zoom: event.viewState.zoom,
-          },
-        ].slice(-12);
-      }}
-      onMoveEnd={() => {
-        observations.current.moving = false;
-        observations.current.moveEnds += 1;
-      }}
-    >
-      <Source
-        id="tf08-points"
-        type="geojson"
-        data={{
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              id: 8008,
-              properties: { test: "tf08" },
-              geometry: { type: "Point", coordinates: [-122.34, 47.61] },
-            },
-          ],
+    />
+  );
+  return (
+    <>
+      <OneMap
+        key={generation}
+        ref={mapRef}
+        mapStyle={mapStyle}
+        style={style}
+        initialViewState={camera}
+        {...{
+          options:
+            mode === "unpreserved"
+              ? undefined
+              : renderingBufferOptions(backend),
         }}
-      >
-        <Layer
-          id="tf08-point"
-          type="circle"
-          paint={{ "circle-color": "#ff0000", "circle-radius": 14 }}
-        />
-      </Source>
-      <GeolocateControl
-        key={mode}
-        locationProvider={mode === "default" ? undefined : provider}
-        trackUserLocation={mode !== "default"}
-        zoom={12}
-        onGeolocate={(position) => {
-          observations.current.fixes += 1;
-          lastPosition.current = position;
+        reuseMaps={
+          backend.endsWith("web") &&
+          (mode === "unpreserved" || mode === "retained")
+        }
+        gl={mode === "external" ? externalContext : undefined}
+        {...(backend.endsWith("native") && mode.startsWith("coverage")
+          ? {
+              options:
+                backend === "mapbox-native"
+                  ? {
+                      logoEnabled: mode === "coverage-ornaments",
+                      attributionEnabled: mode === "coverage-ornaments",
+                      compassEnabled: mode === "coverage-ornaments",
+                      compassFadeWhenNorth: false,
+                      compassPosition: { top: 64, right: 8 },
+                      scaleBarEnabled: mode === "coverage-ornaments",
+                    }
+                  : {
+                      logo: mode === "coverage-ornaments",
+                      attribution: mode === "coverage-ornaments",
+                      compass: mode === "coverage-ornaments",
+                      compassHiddenFacingNorth: false,
+                      compassPosition: { top: 64, right: 8 },
+                      scaleBar: mode === "coverage-ornaments",
+                    },
+            }
+          : {})}
+        onLoad={() => {
+          observations.current.loads += 1;
+          void mapRef.current
+            ?.jumpTo({
+              center: [camera.longitude, camera.latitude],
+              zoom: camera.zoom,
+            })
+            .catch(() => {
+              observations.current.errors += 1;
+            });
         }}
         onError={() => {
           observations.current.errors += 1;
         }}
-      />
-      {(!mode.startsWith("coverage") || mode === "coverage-annotation") && (
-        <Marker
-          ref={annotationRef}
-          longitude={-122.35}
-          latitude={47.61}
-          renderMode={mode === "coverage-annotation" ? "annotation" : "view"}
+        onMoveStart={() => {
+          observations.current.moving = true;
+        }}
+        onMove={(event) => {
+          observations.current.moves = [
+            ...observations.current.moves,
+            {
+              origin: event.origin,
+              center: [
+                event.viewState.longitude,
+                event.viewState.latitude,
+              ] as const,
+              zoom: event.viewState.zoom,
+            },
+          ].slice(-12);
+        }}
+        onMoveEnd={() => {
+          observations.current.moving = false;
+          observations.current.moveEnds += 1;
+        }}
+      >
+        <Source
+          id="tf08-points"
+          type="geojson"
+          data={{
+            type: "FeatureCollection",
+            features: [
+              {
+                type: "Feature",
+                id: 8008,
+                properties: { test: "tf08" },
+                geometry: { type: "Point", coordinates: [-122.34, 47.61] },
+              },
+            ],
+          }}
         >
-          {overlay}
-        </Marker>
-      )}
-      {mode === "coverage-popup" && (
-        <Popup
-          longitude={-122.35}
-          latitude={47.61}
-          closeButton={false}
-          closeOnClick={false}
-        >
-          {overlay}
-        </Popup>
-      )}
-      {mode === "coverage-ornaments" && (
-        <>
-          <AttributionControl position="bottom-right" />
-          <ScaleControl position="bottom-left" />
-          {backend.endsWith("web") && (
-            <NavigationControl position="top-right" />
-          )}
-        </>
-      )}
-      {mode === "coverage-puck" && nativePuck}
-    </OneMap>
+          <Layer
+            id="tf08-point"
+            type="circle"
+            paint={{ "circle-color": "#ff0000", "circle-radius": 14 }}
+          />
+        </Source>
+        {!(backend.endsWith("native") && mode === "coverage-puck") && (
+          <UserLocation position={displayPosition} showAccuracyCircle />
+        )}
+        {backend.endsWith("web") && locationControl}
+
+        {(!mode.startsWith("coverage") || mode === "coverage-annotation") && (
+          <Marker
+            ref={annotationRef}
+            longitude={-122.35}
+            latitude={47.61}
+            renderMode={mode === "coverage-annotation" ? "annotation" : "view"}
+          >
+            {overlay}
+          </Marker>
+        )}
+        {mode === "coverage-popup" && renderCoveragePopup(overlay)}
+        {mode === "coverage-ornaments" && (
+          <>
+            {backend.endsWith("web") && ornamentControls}
+            {backend.endsWith("web") && navigationControl}
+          </>
+        )}
+        {mode === "coverage-puck" && nativePuck}
+      </OneMap>
+      {backend.endsWith("native") && locationControl}
+    </>
   );
 };

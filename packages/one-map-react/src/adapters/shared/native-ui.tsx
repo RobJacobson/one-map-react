@@ -2,63 +2,36 @@ import {
   type ComponentType,
   forwardRef,
   type ReactElement,
-  type ReactNode,
   type Ref,
   useCallback,
-  useContext,
-  useEffect,
-  useEffectEvent,
   useId,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
-import { Platform, Pressable, Text, View, type ViewProps } from "react-native";
-import { Portal } from "react-native-teleport";
+import {
+  AppState,
+  type GestureResponderEvent,
+  View,
+  type ViewProps,
+} from "react-native";
 
 import type { Adapter } from "../../contracts/adapter.js";
-import type { LngLat, MapRef, Point } from "../../contracts/camera-types.js";
+import type { LngLat, Point } from "../../contracts/camera-types.js";
 import type {
   Anchor,
-  ControlProps,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
-  PopupProps,
-  ScaleControlProps,
 } from "../../contracts/ui-types.js";
-import { useMapSession } from "../../facade/map-context.js";
-import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
-import { UserLocation } from "../../facade/user-location.js";
-import {
-  NativeCameraContext,
-  NativeOverlayContext,
-  useNativeMapPresentation,
-} from "./native-map-presentation.js";
-import {
-  useActiveCallback,
-  useActiveCallbacks,
-} from "./use-active-callback.js";
+import { useActiveCallback } from "./use-active-callback.js";
 import { useFrozenValue } from "./use-frozen-value.js";
-import { useNativeMarkerDrag } from "./use-native-marker-drag.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 
 /** Selected native marker host presentation. */
 export interface NativeMarkerProps extends MarkerProps {
   /** Props for the owned content View; facade responder handlers stay composed. */
-  readonly hostProps?: ViewProps;
-}
-
-/** Selected native popup bubble presentation. */
-export interface NativePopupProps extends PopupProps {
-  /** Bubble View props and style; native marker bounds contain presses. */
-  readonly hostProps?: ViewProps;
-}
-
-/** Selected native custom control presentation. */
-export interface NativeControlProps extends ControlProps {
-  /** Control content View props and style; corner placement stays map-owned. */
   readonly hostProps?: ViewProps;
 }
 
@@ -72,16 +45,8 @@ export interface NativeMarkerHostProps {
   readonly anchor: Anchor;
   /** Logical-unit displacement of drawing and touch bounds. */
   readonly offset: Point;
-  /** Annotation dragging; live dragging is owned by the composition. */
-  readonly draggable?: boolean;
   /** Activation callback. */
   readonly onClick?: (event: MarkerEvent) => void;
-  /** Annotation drag start. */
-  readonly onDragStart?: (event: MarkerEvent) => void;
-  /** Annotation coordinate proposal. */
-  readonly onDrag?: (event: MarkerEvent) => void;
-  /** Annotation drag end. */
-  readonly onDragEnd?: (event: MarkerEvent) => void;
   /** Snapshot refresh handle. */
   readonly ref?: Ref<MarkerRef>;
   /** Reports asynchronous live-overlay projection failures. */
@@ -100,20 +65,10 @@ export interface NativeUIOptions {
   readonly backend: "mapbox-native" | "maplibre-native";
 }
 
-type NativeUI = Pick<
-  Adapter,
-  | "Marker"
-  | "Popup"
-  | "Control"
-  | "NavigationControl"
-  | "AttributionControl"
-  | "ScaleControl"
-  | "GeolocateControl"
-  | "FullscreenControl"
->;
+type NativeUI = Pick<Adapter, "Marker">;
 
 /**
- * Composes native markers, popup bubbles, and corner controls.
+ * Composes native markers.
  *
  * @param options - Native wrappers with converted marker props.
  * @returns UI implementations for a native adapter.
@@ -134,24 +89,19 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const markerId = props.id ?? generatedId;
       const anchor = props.anchor ?? defaultAnchor;
       const isAnnotation = props.renderMode === "annotation";
-      // Long-press timers and projection promises need current committed drag handlers.
-      const {
-        onDragStart: dragStart,
-        onDrag: drag,
-        onDragEnd: dragEnd,
-        onError: reportError,
-      } = useActiveCallbacks({
-        onDragStart: props.onDragStart,
-        onDrag: props.onDrag,
-        onDragEnd: props.onDragEnd,
-        onError: props.onError,
-      });
-      const { dragCoordinate, responders } = useNativeMarkerDrag(props, {
-        onDragStart: dragStart,
-        onDrag: drag,
-        onDragEnd: dragEnd,
-        onError: reportError,
-      });
+      const reportError = useActiveCallback(props.onError);
+      const responders = useNativeMarkerActivation(props);
+
+      if (
+        props.draggable === true ||
+        props.onDragStart !== undefined ||
+        props.onDrag !== undefined ||
+        props.onDragEnd !== undefined
+      ) {
+        throw new Error(
+          "Native Marker does not support dragging. Use a selected raw native annotation for SDK dragging."
+        );
+      }
 
       useImperativeHandle(ref, () => ({
         refresh: async () => {
@@ -164,34 +114,24 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       }));
 
       const Host = isAnnotation ? options.Annotation : options.Marker;
-      const markerCoordinate = dragCoordinate ?? coordinate;
-      const markerClick = (event: MarkerEvent): void => {
+      const markerClick = useActiveCallback((event: MarkerEvent): void => {
         props.onClick?.(event);
         // RNMapbox 10.3.7 toggles selection on taps; reset until it exposes per-tap events.
         if (options.backend === "mapbox-native") {
           setAnnotationRevision((revision) => revision + 1);
         }
-      };
+      });
 
       return (
         <Host
           key={isAnnotation ? annotationRevision : "view"}
           ref={annotationRef}
           id={markerId}
-          lngLat={[markerCoordinate[0], markerCoordinate[1]]}
+          lngLat={[coordinate[0], coordinate[1]]}
           anchor={anchor}
           offset={offset}
-          draggable={isAnnotation && props.draggable}
           onProjectionError={reportError}
           onClick={isAnnotation ? markerClick : undefined}
-          onDragStart={dragStart}
-          onDrag={drag}
-          onDragEnd={(event: MarkerEvent) => {
-            dragEnd(event);
-            // Native annotation wrappers retain a dragged coordinate when the
-            // unchanged controlled prop is rejected; reattachment reapplies it.
-            if (isAnnotation) setAnnotationRevision((revision) => revision + 1);
-          }}
         >
           <View
             {...props.hostProps}
@@ -243,425 +183,101 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
     }
   );
 
-  const NativePopup = (props: NativePopupProps): ReactElement => {
-    const coordinate = lngLatFromWrapper([props.longitude, props.latitude]);
-    const offset = pointFromWrapper(props.offset ?? [0, 0]);
-    const mapSession = useMapSession();
-    const { subscribe } = mapSession;
-    const id = useId();
-    // The facade's map subscription retains requestClose across prop updates.
-    const close = useActiveCallback(props.onClose);
-    const open = useEffectEvent(() => props.onOpen?.());
-    const closeOnClick = props.closeOnClick ?? true;
-    const closeOnMove = props.closeOnMove ?? false;
-    const closeButton = props.closeButton ?? true;
-    const dismissed = useRef(false);
-    const requestClose = useCallback((): void => {
-      if (dismissed.current) return;
-      dismissed.current = true;
-      close();
-    }, [close]);
-
-    useLayoutEffect(() => {
-      dismissed.current = false;
-      open();
-      const removeClick = closeOnClick
-        ? subscribe("click", requestClose)
-        : undefined;
-      const removeMove = closeOnMove
-        ? subscribe("move", requestClose)
-        : undefined;
-      return () => {
-        removeClick?.();
-        removeMove?.();
-      };
-    }, [subscribe, closeOnClick, closeOnMove, requestClose]);
-
-    if (props.focusAfterOpen !== undefined) {
-      throw new Error("Native Popup does not support browser focusAfterOpen.");
-    }
-
-    return (
-      <options.Marker
-        id={id}
-        lngLat={coordinate}
-        anchor={props.anchor ?? "bottom"}
-        offset={offset}
-      >
-        <View
-          {...props.hostProps}
-          collapsable={false}
-          onTouchStart={(event) => {
-            props.hostProps?.onTouchStart?.(event);
-          }}
-          style={[
-            {
-              padding: 12,
-              backgroundColor: "white",
-              borderRadius: 6,
-              elevation: 4,
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-            },
-            props.hostProps?.style,
-            { maxWidth: nativeMaxWidth(props.maxWidth) },
-          ]}
-        >
-          {closeButton && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Close popup"
-              onPress={requestClose}
-            >
-              <Text style={{ alignSelf: "flex-end", fontSize: 20 }}>×</Text>
-            </Pressable>
-          )}
-          {props.children}
-        </View>
-      </options.Marker>
-    );
-  };
-
   return {
     Marker: NativeMarker,
-    Popup: NativePopup,
-    Control: NativeControl,
-    NavigationControl: NativeNavigationControl,
-    AttributionControl: NativeAttributionControl,
-    ScaleControl: NativeScaleControl,
-    GeolocateControl: NativeGeolocateControl,
-    FullscreenControl: NativeFullscreenControl,
   };
 };
 
-const NativeControl = (props: NativeControlProps): ReactElement => {
-  const presentation = useNativeMapPresentation();
-  const { setOverlay } = presentation;
-  const overlays = useContext(NativeOverlayContext);
-  const id = useId();
-  const position = props.position ?? "top-right";
-  const index = overlays.findIndex((overlay) => overlay.id === id);
-  const neighbors = position.startsWith("top")
-    ? overlays.slice(0, Math.max(0, index))
-    : overlays.slice(index + 1);
-  const inset = neighbors
-    .filter((overlay) => overlay.position === position && overlay.id !== id)
-    .reduce((offset, overlay) => offset + overlay.height + 8, 8);
+/** Observes live-marker activation without claiming scrolling or child-button touches. */
+const useNativeMarkerActivation = (props: MarkerProps): ViewProps => {
+  const eligible = useRef(false);
+  const origin = useRef<Point | null>(null);
+  const foreground = useRef(
+    AppState.currentState === null || AppState.currentState === "active"
+  );
+  const click = useActiveCallback(() =>
+    props.onClick?.({ lngLat: [props.longitude, props.latitude] })
+  );
+  const cancel = useCallback((): void => {
+    eligible.current = false;
+    origin.current = null;
+  }, []);
 
   useLayoutEffect(() => {
-    setOverlay(id, position);
-    return () => setOverlay(id, null);
-  }, [setOverlay, id, position]);
-
-  // Teleport moves native views only. Rendering children here preserves
-  // application providers, local state, and effects in the original React tree.
-  return (
-    <Portal
-      name={id}
-      hostName={presentation.overlayHostName}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        // Android SDK parents leave the source portal detached, so native host
-        // notifications may not refresh its constraints. iOS keeps host sizing.
-        ...(Platform.OS === "android" ? presentation.nativeLayout : undefined),
-      }}
-    >
-      <View
-        {...props.hostProps}
-        pointerEvents="box-none"
-        onLayout={(event) => {
-          setOverlay(id, position, event.nativeEvent.layout.height);
-          props.hostProps?.onLayout?.(event);
-        }}
-        style={[
-          props.hostProps?.style,
-          {
-            position: "absolute",
-            ...(position.startsWith("top")
-              ? { top: inset }
-              : { bottom: inset }),
-            ...(position.endsWith("left") ? { left: 8 } : { right: 8 }),
-          },
-        ]}
-      >
-        {props.children}
-      </View>
-    </Portal>
-  );
-};
-
-const NativeNavigationControl: Adapter["NavigationControl"] = (props) => {
-  const viewState = useContext(NativeCameraContext)?.viewState;
-  const mapSession = useMapSession();
-  const requestSequence = useRef(0);
-
-  useLayoutEffect(
-    () => () => {
-      requestSequence.current += 1;
-    },
-    [mapSession.ref, mapSession.ready]
-  );
-
-  const subscribe = mapSession.subscribe;
-
-  useLayoutEffect(
-    () =>
-      subscribe("move", (event) => {
-        if ("origin" in event && event.origin === "user")
-          requestSequence.current += 1;
-      }),
-    [subscribe]
-  );
-
-  // Readbacks and failures belong to the latest navigation intent and attachment.
-  const reportError = useActiveCallback(
-    (map: MapRef, sequence: number, error: unknown) => {
-      if (
-        sequence === requestSequence.current &&
-        mapSession.ref.current === map &&
-        mapSession.ready
-      ) {
-        props.onError?.(error);
-      }
-    }
-  );
-  const applyZoom = useActiveCallback(
-    (map: MapRef, zoom: number, sequence: number) => {
-      if (
-        sequence !== requestSequence.current ||
-        mapSession.ref.current !== map ||
-        !mapSession.ready
-      ) {
-        return;
-      }
-      void map
-        .zoomTo(
-          Math.max(
-            mapSession.minZoom ?? 0,
-            Math.min(mapSession.maxZoom ?? 24, zoom)
-          )
-        )
-        .catch((error) => reportError(map, sequence, error));
-    }
-  );
-  const navigate = async (change: number): Promise<void> => {
-    const map = mapSession.ref.current;
-    if (!map || !mapSession.ready) return;
-    const sequence = ++requestSequence.current;
-
-    try {
-      // Region-change snapshots can precede the settled renderer zoom.
-      const zoom = await map.getZoom();
-      applyZoom(map, zoom + change, sequence);
-    } catch (error) {
-      reportError(map, sequence, error);
-    }
-  };
-  const resetNorth = async (): Promise<void> => {
-    const map = mapSession.ref.current;
-    if (!map || !mapSession.ready) return;
-    const sequence = ++requestSequence.current;
-
-    try {
-      const options: { bearing: number; pitch?: number } = { bearing: 0 };
-      if (props.visualizePitch) options.pitch = 0;
-      await map.easeTo(options);
-    } catch (error) {
-      reportError(map, sequence, error);
-    }
-  };
-  return (
-    <NativeControl position={props.position}>
-      <View style={{ backgroundColor: "white", borderRadius: 4 }}>
-        {props.showZoom !== false && (
-          <>
-            <ControlButton
-              label="Zoom in"
-              disabled={!mapSession.ready}
-              onPress={() => void navigate(1)}
-            >
-              +
-            </ControlButton>
-            <ControlButton
-              label="Zoom out"
-              disabled={!mapSession.ready}
-              onPress={() => void navigate(-1)}
-            >
-              −
-            </ControlButton>
-          </>
-        )}
-        {props.showCompass !== false && (
-          <ControlButton
-            label="Reset north"
-            disabled={!mapSession.ready}
-            onPress={() => void resetNorth()}
-          >
-            <Text
-              style={{
-                transform: [
-                  { rotate: `${-(viewState?.bearing ?? 0)}deg` },
-                  ...(props.visualizePitch
-                    ? [
-                        { perspective: 400 },
-                        { rotateX: `${viewState?.pitch ?? 0}deg` },
-                      ]
-                    : []),
-                ],
-              }}
-            >
-              ↑
-            </Text>
-          </ControlButton>
-        )}
-      </View>
-    </NativeControl>
-  );
-};
-
-const NativeAttributionControl: Adapter["AttributionControl"] = (props) => {
-  const { setAttributionPosition } = useNativeMapPresentation();
-  const position = props.position ?? "bottom-right";
-  useLayoutEffect(() => {
-    setAttributionPosition(position);
-    return () => setAttributionPosition(undefined);
-  }, [setAttributionPosition, position]);
-  if (props.compact === false) {
-    throw new Error(
-      "Native AttributionControl does not support expanded attribution."
-    );
-  }
-  if (!props.customAttribution) return null;
-  const attribution = Array.isArray(props.customAttribution)
-    ? props.customAttribution.join(" · ")
-    : props.customAttribution;
-  return (
-    <NativeControl position={position}>
-      <Text style={{ backgroundColor: "white", fontSize: 10 }}>
-        {attribution}
-      </Text>
-    </NativeControl>
-  );
-};
-
-const NativeScaleControl = (props: ScaleControlProps): ReactElement | null => {
-  const { ref: mapRef, ready } = useMapSession();
-  const camera = useContext(NativeCameraContext);
-  const [scale, setScale] = useState<{
-    readonly width: number;
-    readonly text: string;
-  } | null>(null);
-  const maxWidth = props.maxWidth ?? 100;
-  // Passive effect cleanup can run after layout unmount and promise settlement.
-  const reportError = useActiveCallback(props.onError);
-  const unit = props.unit ?? "metric";
-  if (!Number.isFinite(maxWidth) || maxWidth <= 0)
-    throw new Error("ScaleControl maxWidth must be positive and finite.");
-
-  // Wrapper imperative handles attach after descendant layout effects.
-  useEffect(() => {
-    let active = true;
-    const updateScale = async (): Promise<void> => {
-      const map = mapRef.current;
-      if (!map || !ready) return;
-      try {
-        let center: LngLat;
-        if (camera) {
-          center = [camera.viewState.longitude, camera.viewState.latitude];
-        } else {
-          center = await map.getCenter();
-        }
-        const origin = await map.project(center);
-        const end = await map.unproject([origin[0] + maxWidth, origin[1]]);
-        const meters = groundDistance(center, end);
-        if (!active) return;
-        if (meters > 0) {
-          setScale(scaleDisplay(meters, maxWidth, unit));
-        }
-      } catch (error) {
-        if (active) {
-          setScale(null);
-          reportError(error);
-        }
-      }
-    };
-    void updateScale();
+    // Home can transform native touch coordinates before touch cancellation arrives.
+    const subscription = AppState.addEventListener("change", (state) => {
+      foreground.current = state === "active";
+      if (!foreground.current) cancel();
+    });
     return () => {
-      active = false;
+      subscription.remove();
+      cancel();
     };
-  }, [ready, mapRef, camera, maxWidth, unit, reportError]);
+  }, [cancel]);
 
-  if (!scale) return null;
-  return (
-    <NativeControl position={props.position ?? "bottom-left"}>
-      <View
-        style={{
-          width: scale.width,
-          backgroundColor: "rgba(255,255,255,0.8)",
-          borderColor: "black",
-          borderWidth: 1,
-          borderTopWidth: 0,
-        }}
-      >
-        <Text style={{ fontSize: 10 }}>{scale.text}</Text>
-      </View>
-    </NativeControl>
-  );
+  useLayoutEffect(() => {
+    cancel();
+  }, [props.longitude, props.latitude, props.renderMode, cancel]);
+
+  if (props.renderMode === "annotation") return {};
+  return {
+    // Fabric blocks native scrolling below a responder ancestor; observe only.
+    onStartShouldSetResponder: (event) => {
+      if (event)
+        eligible.current =
+          foreground.current && event.nativeEvent.touches.length === 1;
+      return false;
+    },
+    onResponderTerminate: cancel,
+    onResponderTerminationRequest: () => true,
+    onTouchStart: (event) => {
+      const canActivate =
+        eligible.current &&
+        foreground.current &&
+        event.nativeEvent.touches.length === 1;
+      cancel();
+      if (canActivate && !startsInScrollableChild(event)) {
+        origin.current = [event.nativeEvent.pageX, event.nativeEvent.pageY];
+      }
+    },
+    onTouchMove: (event) => {
+      if (
+        event.nativeEvent.touches.length !== 1 ||
+        (origin.current &&
+          Math.hypot(
+            event.nativeEvent.pageX - origin.current[0],
+            event.nativeEvent.pageY - origin.current[1]
+          ) > 8)
+      )
+        cancel();
+    },
+    onTouchEnd: (event) => {
+      const activate =
+        origin.current !== null &&
+        foreground.current &&
+        event.nativeEvent.touches.length === 0;
+      cancel();
+      if (activate) click();
+    },
+    onTouchCancel: cancel,
+  };
 };
 
-const NativeGeolocateControl: Adapter["GeolocateControl"] = (props) => {
-  const session = useMapSession();
-  const { pending, position, activate } = useGeolocationControl(props);
-  return (
-    <>
-      <UserLocation position={position} showAccuracyCircle />
-      <NativeControl position={props.position}>
-        <ControlButton
-          label="Locate me"
-          disabled={pending || !session.ready}
-          onPress={activate}
-        >
-          ◎
-        </ControlButton>
-      </NativeControl>
-    </>
-  );
+/** Leaves overflowing child content with its native scroll host, bounded to this marker. */
+const startsInScrollableChild = (event: GestureResponderEvent): boolean => {
+  const target = event.target;
+  if (!target || typeof target !== "object") return false;
+  let node: typeof target.parentElement = target;
+  while (node && node !== event.currentTarget) {
+    if (
+      (node.clientHeight > 0 && node.scrollHeight > node.clientHeight) ||
+      (node.clientWidth > 0 && node.scrollWidth > node.clientWidth)
+    )
+      return true;
+    node = node.parentElement;
+  }
+  return false;
 };
-
-const NativeFullscreenControl: Adapter["FullscreenControl"] = () => {
-  throw new Error("FullscreenControl requires a browser fullscreen API.");
-};
-
-const ControlButton = (props: {
-  readonly label: string;
-  readonly disabled: boolean;
-  readonly onPress: () => void;
-  readonly children: ReactNode;
-}): ReactElement => (
-  <Pressable
-    accessibilityRole="button"
-    accessibilityLabel={props.label}
-    accessibilityState={{ disabled: props.disabled }}
-    disabled={props.disabled}
-    onPress={props.onPress}
-    style={{
-      minWidth: 40,
-      minHeight: 40,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "white",
-      opacity: props.disabled ? 0.5 : 1,
-    }}
-  >
-    {typeof props.children === "string" ? (
-      <Text style={{ fontSize: 24 }}>{props.children}</Text>
-    ) : (
-      props.children
-    )}
-  </Pressable>
-);
 
 const DefaultPin = (): ReactElement => (
   <View style={{ width: 24, height: 32, alignItems: "center" }}>
@@ -696,58 +312,3 @@ const DefaultPin = (): ReactElement => (
     </View>
   </View>
 );
-
-const groundDistance = (first: LngLat, second: LngLat): number => {
-  const radians = Math.PI / 180;
-  const latitudeDelta = (second[1] - first[1]) * radians;
-  const longitudeDelta = (second[0] - first[0]) * radians;
-  const chord =
-    Math.sin(latitudeDelta / 2) ** 2 +
-    Math.cos(first[1] * radians) *
-      Math.cos(second[1] * radians) *
-      Math.sin(longitudeDelta / 2) ** 2;
-  return (
-    6371008.8 *
-    2 *
-    Math.atan2(Math.sqrt(chord), Math.sqrt(Math.max(0, 1 - chord)))
-  );
-};
-
-const scaleDisplay = (
-  meters: number,
-  maxWidth: number,
-  unit: ScaleControlProps["unit"]
-): { readonly width: number; readonly text: string } => {
-  let divisor = 1;
-  let suffix = "m";
-  if (unit === "nautical") {
-    divisor = 1852;
-    suffix = "nm";
-  } else if (unit === "imperial") {
-    divisor = meters >= 1609.344 ? 1609.344 : 0.3048;
-    suffix = meters >= 1609.344 ? "mi" : "ft";
-  } else if (meters >= 1000) {
-    divisor = 1000;
-    suffix = "km";
-  }
-  const amount = meters / divisor;
-  const magnitude = 10 ** Math.floor(Math.log10(amount));
-  const rounded = [5, 2, 1].find((step) => step * magnitude <= amount) ?? 1;
-  const value = rounded * magnitude;
-  return {
-    width: (maxWidth * value) / amount,
-    text: `${Number(value.toPrecision(3))} ${suffix}`,
-  };
-};
-
-const nativeMaxWidth = (width: number | string | undefined): number => {
-  if (width === undefined) return 240;
-  if (typeof width === "number") {
-    if (!Number.isFinite(width) || width <= 0)
-      throw new Error("Native Popup maxWidth must be a positive finite width.");
-    return width;
-  }
-  if (/^\d+(?:\.\d+)?(?:px)?$/.test(width))
-    return nativeMaxWidth(Number.parseFloat(width));
-  throw new Error("Native Popup maxWidth requires a number or a pixel width.");
-};

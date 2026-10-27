@@ -6,42 +6,22 @@ import {
   useLayoutEffect,
   useRef,
 } from "react";
-import { createPortal } from "react-dom";
 
 import type { Adapter } from "../../contracts/adapter.js";
-import type { LngLat, Point } from "../../contracts/camera-types.js";
+import type { LngLat } from "../../contracts/camera-types.js";
 import type {
-  AttributionControlProps,
-  ControlProps,
-  FullscreenControlProps,
-  GeolocateControlProps,
   MarkerEvent,
   MarkerProps,
   MarkerRef,
-  NavigationControlProps,
-  PopupProps,
-  ScaleControlProps,
 } from "../../contracts/ui-types.js";
-import {
-  useMapSession,
-  useOptionalMapSession,
-} from "../../facade/map-context.js";
-import { useLocationOverride } from "../../facade/map-setup.js";
-import { useGeolocationControl } from "../../facade/use-geolocation-control.js";
 import { useStableOptions } from "../../facade/use-stable-options.js";
-import { UserLocation } from "../../facade/user-location.js";
-import { positionFromWrapper } from "../shared/location-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import {
   lngLatFromWrapper,
   pointFromWrapper,
 } from "../shared/wrapper-values.js";
-import type {
-  WebCustomControl,
-  WebForwardedProps,
-  WebWrapper,
-} from "./contracts.js";
+import type { WebForwardedProps, WebWrapper } from "./contracts.js";
 
 /** Platform additions accepted only by selected web UI entry points. */
 interface WebUiOptions {
@@ -62,30 +42,15 @@ interface WebMarkerHandle {
   readonly setLngLat: (coordinate: LngLat) => unknown;
 }
 
-interface WebPopupHandle {
-  readonly options: { anchor?: PopupProps["anchor"] };
-  readonly setOffset: (offset: Point) => unknown;
-}
-
 /**
  * Builds UI delegates while converting only portable events and resets.
  *
- * @param wrapper - Selected react-map-gl components and control hook.
- * @returns Marker, popup, and control implementations for the adapter.
+ * @param wrapper - Selected react-map-gl components.
+ * @returns Marker implementation for the adapter.
  */
 export const createWebUi = (
   wrapper: WebWrapper<"mapbox-web" | "maplibre-web">
-): Pick<
-  Adapter,
-  | "Marker"
-  | "Popup"
-  | "Control"
-  | "NavigationControl"
-  | "AttributionControl"
-  | "ScaleControl"
-  | "GeolocateControl"
-  | "FullscreenControl"
-> => {
+): Pick<Adapter, "Marker"> => {
   const Marker = forwardRef<MarkerRef, MarkerProps & WebUiOptions>(
     (props, ref) => {
       const {
@@ -174,180 +139,7 @@ export const createWebUi = (
     }
   );
 
-  const Popup = (props: PopupProps & WebUiOptions) => {
-    const { options, hostProps, children, onOpen, onClose, ...popupProps } =
-      props;
-    const handle = useRef<WebPopupHandle | null>(null);
-    const anchor = props.anchor ?? "bottom";
-    const offset = props.offset ?? [0, 0];
-    const [offsetX, offsetY] = offset;
-    useStableOptions("Popup", creationOptions(options, ["style", "className"]));
-    // react-map-gl writes its callback ref during render, before a Suspense commit.
-    const { onOpen: open, onClose: close } = useActiveCallbacks({
-      onOpen,
-      onClose,
-    });
-
-    useLayoutEffect(() => {
-      // react-map-gl 8.1.3 updates options.anchor only when offset changes.
-      // Apply the SDK's public offset setter so anchor-only updates reposition.
-      // Remove when the wrapper handles anchor updates independently.
-      if (handle.current) {
-        handle.current.options.anchor = anchor;
-        handle.current.setOffset([offsetX, offsetY]);
-      }
-    }, [anchor, offsetX, offsetY]);
-
-    return (
-      <wrapper.Popup
-        {...options}
-        {...popupProps}
-        anchor={anchor}
-        offset={offset}
-        maxWidth={
-          typeof props.maxWidth === "number"
-            ? `${props.maxWidth}px`
-            : (props.maxWidth ?? "240px")
-        }
-        ref={handle}
-        onOpen={open}
-        onClose={close}
-      >
-        <div {...hostProps}>{children}</div>
-      </wrapper.Popup>
-    );
-  };
-
-  const Control = (props: ControlProps & WebUiOptions) => {
-    const control = wrapper.useControl(createControlHost, {
-      position: props.position ?? "top-right",
-    });
-
-    return createPortal(
-      <div {...props.hostProps}>{props.children}</div>,
-      control.element
-    );
-  };
-
-  const NavigationControl = (props: NavigationControlProps & WebUiOptions) => {
-    const { options, hostProps, onError, children, ...forwarded } = props;
-    useStableOptions("NavigationControl", creationOptions(options, ["style"]));
-
-    return (
-      <wrapper.NavigationControl
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-      />
-    );
-  };
-
-  const AttributionControl = (
-    props: AttributionControlProps & WebUiOptions
-  ) => {
-    const { options, hostProps, children, ...forwarded } = props;
-    useStableOptions("AttributionControl", creationOptions(options, ["style"]));
-
-    return (
-      <wrapper.AttributionControl
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-      />
-    );
-  };
-
-  const ScaleControl = (props: ScaleControlProps & WebUiOptions) => {
-    const { options, hostProps, onError, children, ...forwarded } = props;
-    useStableOptions("ScaleControl", creationOptions(options, ["style"]));
-
-    return (
-      <wrapper.ScaleControl
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-        unit={props.unit ?? "metric"}
-        maxWidth={props.maxWidth ?? 100}
-      />
-    );
-  };
-
-  const GeolocateControl = (props: GeolocateControlProps & WebUiOptions) => {
-    const {
-      options,
-      hostProps,
-      children,
-      getCurrentPosition,
-      locationProvider,
-      zoom,
-      onGeolocate,
-      onError,
-      ...forwarded
-    } = props;
-    useStableOptions(
-      "GeolocateControl",
-      creationOptions(options, [
-        "style",
-        "onOutOfMaxBounds",
-        "onTrackUserLocationStart",
-        "onTrackUserLocationEnd",
-      ])
-    );
-    // react-map-gl writes its callback ref during render, before a Suspense commit.
-    const { onGeolocate: locate, onError: error } = useActiveCallbacks({
-      onGeolocate,
-      onError,
-    });
-
-    const session = useOptionalMapSession();
-    const setupProvider = useLocationOverride();
-    if (props.trackUserLocation && session?.cameraControlled) {
-      throw new Error(
-        "Location follow conflicts with viewState or selected native camera follow."
-      );
-    }
-
-    if (getCurrentPosition || locationProvider || setupProvider) {
-      return <InjectedGeolocateControl {...props} Control={Control} />;
-    }
-
-    return (
-      <wrapper.GeolocateControl
-        key={props.trackUserLocation ? "tracking" : "once"}
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-        onGeolocate={(event: unknown) =>
-          locate(positionFromWrapper(event, "browser"))
-        }
-        onError={error}
-      />
-    );
-  };
-
-  const FullscreenControl = (props: FullscreenControlProps & WebUiOptions) => {
-    const { options, hostProps, children, ...forwarded } = props;
-    useStableOptions("FullscreenControl", creationOptions(options, ["style"]));
-
-    return (
-      <wrapper.FullscreenControl
-        {...options}
-        {...forwarded}
-        position={props.position ?? "top-right"}
-      />
-    );
-  };
-
-  return {
-    Marker,
-    Popup,
-    Control,
-    NavigationControl,
-    AttributionControl,
-    ScaleControl,
-    GeolocateControl,
-    FullscreenControl,
-  };
+  return { Marker };
 };
 
 const markerEvent = (
@@ -390,40 +182,3 @@ const DefaultPin = (): ReactNode => (
     <circle cx="12" cy="12" r="4" fill="white" />
   </svg>
 );
-
-/** Creates only the facade's DOM host; react-map-gl owns map registration. */
-const createControlHost = (): WebCustomControl => {
-  const browser = globalThis as unknown as {
-    document: { createElement: (name: string) => WebCustomControl["element"] };
-  };
-  const element = browser.document.createElement("div");
-  element.className = "mapboxgl-ctrl maplibregl-ctrl";
-
-  return { element, onAdd: () => element, onRemove: () => element.remove() };
-};
-
-/** One-shot injected locations permit deterministic browser/native app behavior. */
-const InjectedGeolocateControl = (
-  props: GeolocateControlProps &
-    WebUiOptions & {
-      readonly Control: (props: ControlProps & WebUiOptions) => ReactNode;
-    }
-): ReactNode => {
-  const session = useMapSession();
-  const { pending, position, activate } = useGeolocationControl(props, "flyTo");
-  return (
-    <>
-      <UserLocation position={position} showAccuracyCircle />
-      <props.Control position={props.position} hostProps={props.hostProps}>
-        <button
-          type="button"
-          aria-label="Locate me"
-          disabled={pending || !session.ready}
-          onClick={activate}
-        >
-          Locate me
-        </button>
-      </props.Control>
-    </>
-  );
-};

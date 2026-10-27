@@ -1,6 +1,7 @@
 import { type MapRef, MapSetup } from "one-map-react";
 import {
   adapter,
+  type NativeMapProps,
   WrapperLocationManager,
   WrapperOfflineManager,
   NativeUserLocation,
@@ -9,10 +10,17 @@ import { useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
+import { createMaplibreOfflineCommands } from "../shared/maplibre-offline-commands.js";
+import { createMaplibreSnapshot } from "../shared/maplibre-snapshot.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
+import {
+  acquireNativeLocation,
+  requestNativeLocationPermission,
+} from "../shared/native-location.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
+import { NativeTf07RetainedScreen } from "../shared/native-tf07-retained-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
 import { NativeTf08Screen } from "../shared/native-tf08-screen.js";
 import { NativeTf09Screen } from "../shared/native-tf09-screen.js";
@@ -42,21 +50,35 @@ const offlineOperations = {
   packs: async () => (await WrapperOfflineManager.getPacks()).length,
 };
 
+const getCurrentPosition = (signal?: AbortSignal, timeoutMs?: number) =>
+  acquireNativeLocation(WrapperLocationManager, "maplibre", signal, timeoutMs);
+const requestLocationPermission = () =>
+  requestNativeLocationPermission(() =>
+    WrapperLocationManager.requestPermissions()
+  );
+
 const App = () => {
   if (smokeTarget === "tf09") return <NativeTf09Screen adapter={adapter} />;
   if (smokeTarget === "tf08" || smokeTarget === "tf08-storage")
     return (
       <NativeTf08Screen
         adapter={adapter}
+        createSnapshot={createMaplibreSnapshot}
+        getCurrentPosition={getCurrentPosition}
+        requestLocationPermission={requestLocationPermission}
         getLocationDiagnostic={() =>
           WrapperLocationManager.getCurrentPosition()
         }
         offlineOperations={offlineOperations}
+        createOfflineCommands={createMaplibreOfflineCommands}
         startDetached={smokeTarget === "tf08-storage"}
         nativePuck={<NativeUserLocation />}
       />
     );
-  if (smokeTarget === "tf07") return <NativeTf07Screen adapter={adapter} />;
+  if (smokeTarget === "tf07-retained")
+    return <NativeTf07RetainedScreen adapter={adapter} />;
+  if (smokeTarget === "tf07")
+    return <NativeTf07Screen adapter={adapter} ornaments={tf07Ornaments} />;
   if (smokeTarget === "tf06-lifetimes") {
     return <NativeLifetimesScreen adapter={adapter} />;
   }
@@ -113,3 +135,11 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+// Native scale units and appearance belong to the selected SDK.
+// Leave the top-left corner clear for the application location button.
+const tf07Ornaments = {
+  scaleBar: true,
+  scaleBarPosition: { top: 64, left: 8 },
+  compassPosition: { top: 148, right: 8 },
+} satisfies NativeMapProps["options"];

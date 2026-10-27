@@ -15,25 +15,13 @@ import type {
 } from "react";
 import type { ViewProps } from "react-native";
 
-import type {
-  NativeControlProps,
-  NativePopupProps,
-} from "./adapters/shared/native-ui.js";
 import type { MapProps } from "./contracts/map-types.js";
-import type {
-  GeoJsonSourceProps,
-  SourceProps,
-  VectorSourceProps,
-} from "./contracts/source-types.js";
+import type { SourceProps } from "./contracts/source-types.js";
 import type { StyleDocument } from "./contracts/style-types.js";
 import type { MarkerProps, MarkerRef } from "./contracts/ui-types.js";
 import { Map as SharedMap } from "./facade/map.js";
 import { Source as SharedSource } from "./facade/source.js";
-import {
-  Control as SharedControl,
-  Marker as SharedMarker,
-  Popup as SharedPopup,
-} from "./facade/ui.js";
+import { Marker as SharedMarker } from "./facade/ui.js";
 
 export type { GestureSettings } from "./adapters/mapbox-native/index.js";
 export {
@@ -41,10 +29,6 @@ export {
   CameraGestureObserver,
   MapboxGestureSettings,
 } from "./adapters/mapbox-native/index.js";
-export type {
-  NativeControlProps,
-  NativePopupProps,
-} from "./adapters/shared/native-ui.js";
 
 /** Selected native map with typed renderer facilities and host attributes. */
 /** Selected SDK location follow options, applied to the existing camera. */
@@ -61,7 +45,7 @@ export type NativeLocationOptions = Pick<
 export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
   /** Complete selected style document. */
   readonly mapStyle: MapProps["mapStyle"] | NativeStyleDocument;
-  /** SDK follow facilities; conflicts with authoritative viewState/common follow. */
+  /** SDK follow facilities; conflicts with an explicit viewState target. */
   readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
   readonly hostProps?: ViewProps;
@@ -82,7 +66,6 @@ export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
     | "onDidFinishLoadingStyle"
     | "onDidFailLoadingMap"
     | "onMapLoadingError"
-    | "onDidFinishRenderingFrameFully"
   >;
 }
 /** Selected map retaining shared map context and named access. */
@@ -92,22 +75,24 @@ export const Map = SharedMap as ForwardRefExoticComponent<
 >;
 
 /** Selected marker content host, including accessibility and layout attributes. */
-export interface NativeMarkerProps extends MarkerProps {
+export interface NativeMarkerProps extends Omit<
+  MarkerProps,
+  "draggable" | "onDragStart" | "onDrag" | "onDragEnd"
+> {
+  /** Native shared markers support programmatic coordinates and activation only. */
+  readonly draggable?: false;
   /** Attributes composed on the marker's owned native child View. */
   readonly hostProps?: ViewProps;
 }
-/** Selected marker retaining portable drag and geometry semantics. */
+/** Selected marker retaining shared geometry and activation. */
 export const Marker = SharedMarker as ForwardRefExoticComponent<
   NativeMarkerProps & RefAttributes<MarkerRef>
 >;
 
-/** Source activation hit region with selected native dimensions. */
-export type NativeSourceProps =
-  | Exclude<SourceProps, GeoJsonSourceProps | VectorSourceProps>
-  | ((GeoJsonSourceProps | VectorSourceProps) & {
-      readonly hitbox?: { width: number; height: number };
-    });
-/** Selected source with mutable activation hitbox. */
+/** Selected source using the shared rendering contract. */
+export type NativeSourceProps = SourceProps;
+
+/** Selected source using the shared rendering contract. */
 export const Source = SharedSource as ComponentType<NativeSourceProps>;
 
 export { getAnnotationsLayerID, PointAnnotationManager } from "@rnmapbox/maps";
@@ -118,11 +103,6 @@ export {
   MarkerView,
   PointAnnotation,
 } from "./adapters/mapbox-native/ui.js";
-
-/** Popup with owned native bubble host attributes and style. */
-export const Popup = SharedPopup as ComponentType<NativePopupProps>;
-/** Corner control with owned native host attributes and style. */
-export const Control = SharedControl as ComponentType<NativeControlProps>;
 
 export {
   CustomLocationProvider,

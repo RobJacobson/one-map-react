@@ -185,12 +185,12 @@ const main = async () => {
       "SCOPE: packed publication, common entry without backend types, and selected-entry file resolution; no wrapper installs, Metro, or native builds."
     );
   } finally {
+    rmSync(output, { recursive: true, force: true });
     if (options.evidence)
       writeFileSync(
         options.evidence,
         JSON.stringify({ checks: evidence }, null, 2) + "\n"
       );
-    rmSync(output, { recursive: true, force: true });
   }
 };
 
@@ -241,22 +241,14 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     assert.equal(
       run("node", [join(consumer, "common.mjs")], consumer),
       JSON.stringify([
-        "AttributionControl",
-        "Control",
-        "FullscreenControl",
-        "GeolocateControl",
         "Images",
         "Layer",
         "Map",
         "MapSetup",
         "Marker",
-        "NavigationControl",
-        "Popup",
-        "ScaleControl",
         "Source",
         "UserLocation",
         "useMap",
-        "useMapServices",
       ])
     );
   }
@@ -289,11 +281,128 @@ console.log(JSON.stringify(Object.keys(common).sort()));
   writeFileSync(
     join(consumer, "selection.tsx"),
     `${imports}
-import type { Adapter, Backend } from "one-map-react";
-import { Map as OneMap, MapSetup, Source, Layer, Marker, Popup, Control, NavigationControl, AttributionControl, ScaleControl, GeolocateControl, FullscreenControl, useMap } from "one-map-react";
+import type { Adapter, Backend, MapRef } from "one-map-react";
+import { Map as OneMap, MapSetup, Source, Layer, Marker, useMap } from "one-map-react";
+import { forwardRef } from "react";
+type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
+const exactAdapterKeys: Equal<keyof Adapter, "backend" | "Map" | "Source" | "Layer" | "Images" | "Marker"> = true;
+const exactSetupKeys: Equal<keyof import("one-map-react").MapSetupProps, "adapter" | "children"> = true;
+const customAdapter: Adapter = {
+  backend: "mapbox-web",
+  Map: forwardRef<MapRef, import("one-map-react").MapProps>(() => null),
+  Source: () => null,
+  Layer: () => null,
+  Images: () => null,
+  Marker: forwardRef<import("one-map-react").MarkerRef, import("one-map-react").MarkerProps>(() => null),
+};
+const customSetup: import("one-map-react").MapSetupProps = { adapter: customAdapter, children: null };
+void customSetup; void exactAdapterKeys; void exactSetupKeys;
+
 ${declarations}
+declare const commonRef: MapRef;
+// @ts-expect-error Source click events are removed.
+import type { SourceClickEvent } from "one-map-react";
+// @ts-expect-error Common source activation belongs to Map.onClick.
+type RemovedCommonSourceCallback = import("one-map-react").SourceProps["onClick"];
+// @ts-expect-error Source activation belongs to Map.onClick.
+type RemovedSourceCallback = import("one-map-react").GeoJsonSourceProps["onClick"];
+// @ts-expect-error Vector source activation belongs to Map.onClick.
+type RemovedVectorCallback = import("one-map-react").VectorSourceProps["onClick"];
+// @ts-expect-error Supplied location is display only.
+type RemovedLocationPress = import("one-map-react").UserLocationProps["onPress"];
+// @ts-expect-error Popups are selected wrapper components or application UI.
+import { Popup } from "one-map-react";
+// @ts-expect-error Common popup props are removed.
+import type { PopupProps } from "one-map-react";
+declare const adapterContract: Adapter;
+// @ts-expect-error Applications own custom control layout.
+import { Control } from "one-map-react";
+// @ts-expect-error Common custom control props are removed.
+import type { ControlProps } from "one-map-react";
+// @ts-expect-error Common placement positions are removed.
+import type { ControlPosition } from "one-map-react";
+// @ts-expect-error Custom adapters no longer supply control composition.
+adapterContract.Control;
+// @ts-expect-error Location controls belong to the application or selected wrapper.
+import { GeolocateControl } from "one-map-react";
+// @ts-expect-error Common location control props are removed.
+import type { GeolocateControlProps } from "one-map-react";
+// @ts-expect-error Custom adapters no longer supply a location control.
+adapterContract.GeolocateControl;
+// @ts-expect-error Scale belongs to the selected SDK.
+import { ScaleControl } from "one-map-react";
+// @ts-expect-error Attribution belongs to the selected SDK.
+import { AttributionControl } from "one-map-react";
+// @ts-expect-error Common scale props, including width and units, are removed.
+import type { ScaleControlProps } from "one-map-react";
+// @ts-expect-error Common attribution props are removed.
+import type { AttributionControlProps } from "one-map-react";
+// @ts-expect-error Custom adapters no longer supply scale composition.
+adapterContract.ScaleControl;
+// @ts-expect-error Custom adapters no longer supply attribution composition.
+adapterContract.AttributionControl;
+// @ts-expect-error Custom adapters no longer supply popup composition.
+adapterContract.Popup;
+// @ts-expect-error Applications own camera and browser controls.
+import { NavigationControl } from "one-map-react";
+// @ts-expect-error The common control props are removed.
+import type { NavigationControlProps } from "one-map-react";
+// @ts-expect-error Custom adapters no longer supply this control.
+adapterContract.NavigationControl;
+// @ts-expect-error Applications own camera and browser controls.
+import { FullscreenControl } from "one-map-react";
+// @ts-expect-error The common control props are removed.
+import type { FullscreenControlProps } from "one-map-react";
+// @ts-expect-error Custom adapters no longer supply this control.
+adapterContract.FullscreenControl;
+// @ts-expect-error Offline packs belong to the selected SDK.
+import type { OfflinePack } from "one-map-react";
+// @ts-expect-error Offline creation options belong to the selected SDK.
+import type { OfflinePackOptions } from "one-map-react";
+// @ts-expect-error Offline status belongs to the selected SDK.
+import type { OfflinePackStatus } from "one-map-react";
+// @ts-expect-error No common offline service remains.
+import type { OfflineService } from "one-map-react";
+// @ts-expect-error Common location services are removed.
+import type { MapServices } from "one-map-react";
+// @ts-expect-error Common acquisition type is removed.
+import type { LocationService } from "one-map-react";
+// @ts-expect-error Common acquisition type is removed.
+import type { LocationPermission } from "one-map-react";
+// @ts-expect-error Common acquisition type is removed.
+import type { LocationOptions } from "one-map-react";
+// @ts-expect-error Common acquisition type is removed.
+import type { LocationAbortSignal } from "one-map-react";
+
+// @ts-expect-error Application acquisition no longer uses a common hook.
+import { useMapServices } from "one-map-react";
+// @ts-expect-error Custom adapters no longer own app services.
+adapterContract.services;
+declare const setupProps: import("one-map-react").MapSetupProps;
+// @ts-expect-error Setup no longer owns app acquisition.
+setupProps.locationProvider;
+// @ts-expect-error Common independent image output is removed.
+import type { ImageOutput } from "one-map-react";
+// @ts-expect-error Common independent image result is removed.
+import type { MapImage } from "one-map-react";
+// @ts-expect-error Snapshot inputs belong to the selected SDK.
+import type { StaticMapImageOptions } from "one-map-react";
+// @ts-expect-error No common snapshot service remains.
+import type { StaticMapImageService } from "one-map-react";
+// @ts-expect-error Capture belongs to the application and selected wrapper.
+commonRef.capture({ output: "data-url", scope: "backend" });
+// @ts-expect-error Capture-only options are removed from the common package.
+import type { CaptureOptions } from "one-map-react";
+// @ts-expect-error Capture scope is no longer a common promise.
+import type { CaptureScope } from "one-map-react";
+// @ts-expect-error Capture-only results are removed from the common package.
+import type { MapCapture } from "one-map-react";
+// @ts-expect-error Wrapper access belongs only to selected web refs.
+commonRef.getWrapperMap();
+// @ts-expect-error Common hooks retain the portable ref contract.
+useMap().getWrapperMap();
 const applicationChoice = (adapter: Adapter): Backend => adapter.backend;
-void Marker; void Popup; void Control; void NavigationControl; void AttributionControl; void ScaleControl; void GeolocateControl; void FullscreenControl; void useMap;
+void Marker; void useMap;
 void MapSetup;
 void Source;
 void Layer;
@@ -306,6 +415,8 @@ const viewState = {
   pitch: 0,
 };
 const style = { version: 8 as const, sources: {}, layers: [] };
+// @ts-expect-error Drawing-buffer configuration is a selected wrapper option.
+void <OneMap mapStyle={style} initialViewState={viewState} captureEnabled />;
 void (
   <OneMap mapStyle={style} initialViewState={viewState} terrain={{ source: "dem", exaggeration: 0 }} projection="mercator" light={{ intensity: 0 }} />
 );
@@ -371,6 +482,7 @@ const invalid: Adapter = { backend: "automatic" };
     scope:
       "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers",
   });
+  rmSync(consumer, { recursive: true, force: true });
 };
 
 await main();

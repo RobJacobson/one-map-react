@@ -1,0 +1,393 @@
+{
+  "unit": "U12",
+  "status": "Implemented, independently audited and re-audited; applicable routine verification passed within the recorded baseline limits. PR creation and immediate U13 dispatch authorized.",
+  "authorization": "Owner merged U11 PR30, released U12, and authorized automatic reviewed PRs followed immediately by sequential implementation through U24. Pending PRs may stack. No merge, package publication, renderer execution or native build/install authorization.",
+  "scope": {
+    "removed": "MapServices.staticMapImage, common ImageOutput/MapImage/StaticMapImageOptions/StaticMapImageService, capture-types and orphan image-output normalization/validation/deadline helpers. Only common independent-image tests retired.",
+    "retained": "LocationService and MapServices.location until U18, current-map selected capture callers, raw selected snapshot/offline managers, native marker hosts, SDK peers/patches/locks/version/support and historical rc.11 candidate.",
+    "application": "Separate backend application modules call WrapperSnapshotManager.takeSnap or WrapperStaticMapImageManager.createImage with installed SDK options, zero zoom and requested dimensions. URI adaptation is limited to this observer transport; errors propagate unchanged. No universal format, dimensions, scope or snapshot deadline guarantee is recreated.",
+    "declarations": "RNMapbox SnapshotOptions constructor owns its input type because takeSnap declaration has weak default inference. Installed RN bounds are a coordinate collection, with no imposed offline NE/SW rule. MapLibre uses flat west/south/east/north bounds and file/base64 output. Negative selected/common probes cover mismatches.",
+    "testPipeline": "Only root scripts.test changes: append the new snapshot-error regression after the existing image observer regression. All other root JSON values and library package version/peer/patch fields remain unchanged."
+  },
+  "findings": [
+    {
+      "classification": "Introduced harness false-positive found by coordinator audit.",
+      "trigger": "Invalid-style observation accepted any rejected action, including an observation transport timeout with no SDK acknowledgement.",
+      "fix": "Acknowledged native command failures preserve SDK message and carry Tf08CommandError. Invalid-style assertion requires that name; no facade deadline added.",
+      "before": "New VM regression failed with Missing expected rejection for a missing native reply.",
+      "after": "Same regression passes in both trees: true acknowledged failure accepted; transport timeout, unrelated transport failure and unexpected success rejected; exact message/fallback preserved. Root routine test pipelines run this regression.",
+      "review": "Independent reviewer re-audited both final roots; no remaining finding. Initial review missed this gap."
+    }
+  ],
+  "artifacts": {
+    "original": {
+      "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+      "basis": "Approved dirty rc.11 workspace with prior units and unrelated work preserved. No original commit/reset/clean.",
+      "archiveAudit": {
+        "archiveSha256": "492cac8ba2acbdd188452f055c3ec64c00fd16d7013cb6ce60073a17323d0fda",
+        "members": 191,
+        "sourceDistReadmeMatched": 185,
+        "retiredSnapshotModulesAbsent": true,
+        "rootPackageOnlySnapshotRegressionAdded": true
+      },
+      "candidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7"
+    },
+    "main": {
+      "base": "7b09a672acd0724245eba35e2ea5f06b22c11f2e",
+      "branch": "codex/u12-selected-snapshots",
+      "basis": "Minimal port onto main rc.2. Existing examples/shared layout, native App branches, peers/patches and callback fixture retained. Original-only workspace/model/global/focused fixture refactors excluded.",
+      "archiveAudit": {
+        "archiveSha256": "ab77865767532e032a91b6d92b565eab972910ee09f732cba3bce62eddc8e209",
+        "members": 191,
+        "sourceDistReadmeMatched": 185,
+        "retiredSnapshotModulesAbsent": true,
+        "rootPackageOnlySnapshotRegressionAdded": true
+      }
+    },
+    "archiveProof": "Both archives:191 file members; all185 shipped source/dist/README members byte-match their tree. Retired capture-types/image-output modules absent. Package/peer checks use those fixed archives. Harness and root test-only changes after packing do not alter shipped package.",
+    "productionMovement": {
+      "publicationLibrarySourceNetLines": -304,
+      "publicationApplicationSourceNetLines": 62,
+      "newRuntimeDependencies": 0,
+      "patchChanges": 0
+    }
+  },
+  "checks": {
+    "original": {
+      "unitWeb": "774 passed /45files",
+      "mockedNative": "287 passed /8suites",
+      "compiledWeb": "537 passed /22files",
+      "compiledNative": "287 passed /8suites",
+      "routine": "Formatting/lint, four source type projects, three app declarations, library/example build and compiler emitted-runtime checks passed.",
+      "sdkAppTypes": "Both actual snapshot app modules and transitive capture helper passed temporary ESNext/Bundler check against built public library declarations.",
+      "staticChecks": [
+        {
+          "command": [
+            "node",
+            "scripts/tf08-snapshot-errors.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "34a8af1328277fd5bc1809231bf8094bd19704fb969a617c672519f3a9717009"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/tf08-display-scope.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "14815d4845c184a0e58b71b6fa35953c3a8453055b87dd90f32e8a9dfd7738b5"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/tf08-image-observations.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "8a0c439cedb26bb34da597ac361d8affcabcdbd048284b8023c85070629a554e"
+        }
+      ],
+      "otherObservers": "Existing image/final/android/display/pending static regressions passed; these do not execute a renderer.",
+      "packageSelections": "13 passed."
+    },
+    "main": {
+      "unitWebFull": "694 passed; two inherited wrapper-callbacks marker.ts imports fail against installed marker.tsx.",
+      "unitWebBounded": "694 passed /35files excluding only the known callback fixture.",
+      "baseline": "Base7b09 tree equals audited U11 commit60ad58 (empty tree diff verified). Callback fixture unchanged; failure has been reproduced since earlier units.",
+      "mockedNative": "280 passed /7suites",
+      "compiledWeb": "523 passed /20files excluding known callback fixture",
+      "compiledNative": "280 passed /7suites",
+      "routine": "Formatting/lint, source and app type projects, library/example build and compiler emitted-runtime checks passed.",
+      "sdkAppTypes": "Actual app snapshot modules passed temporary ESNext/Bundler check against built public library declarations.",
+      "staticChecks": [
+        {
+          "command": [
+            "node",
+            "scripts/tf08-snapshot-errors.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "34a8af1328277fd5bc1809231bf8094bd19704fb969a617c672519f3a9717009"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/tf08-image-observations.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "8a0c439cedb26bb34da597ac361d8affcabcdbd048284b8023c85070629a554e"
+        }
+      ],
+      "packageSelections": "13 passed."
+    },
+    "declarationBoundary": "Existing RNMapbox extensionless public declarations resolve too loosely under routine NodeNext. Actual app and selected packed Bundler probes independently check SDK signatures; NodeNext alone is not claimed as SDK input proof.",
+    "compiledBoundary": "Emitted library runtime checked with mocked adapters; application imports remain source boundaries. No native linking or renderer proof.",
+    "documentationStructure": {
+      "status": "passed",
+      "command": "bun /tmp/one-map-u12-7r7ls_vl/documentation/check-docs-expanded.mjs",
+      "original": {
+        "exitCode": 0,
+        "markdownFiles": 44,
+        "sdkComparisonTables": 42
+      },
+      "mainPublication": {
+        "exitCode": 0,
+        "markdownFiles": 43,
+        "sdkComparisonTables": 38
+      },
+      "scope": "All docs Markdown plus root AGENTS.md, root README.md, packages/one-map-react/README.md, records/README.md, and examples/README.md; paragraphs, fences, comparison-table structure, local paths and heading links. Both 69-row coverage invariants preserve IDs, order, checkmarks and the first three substantive cells except verified pinned historical paths. Structural checks do not certify source accuracy, equivalent examples, terminology, contract status, editorial quality or renderer behavior. Existing Bun moduleSuffixes warning remains."
+    }
+  },
+  "selectedPeers": {
+    "scope": "Eight cases per artifact: four standalone and both ends of both mixed pairs. Isolated installed declarations, selected web imports and patch-file verification only.",
+    "versions": {
+      "tuple-1": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "tuple-2": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "tuple-3": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-4": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-5": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-6": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-7": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "tuple-8": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-9": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-10": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      }
+    },
+    "executions": [
+      {
+        "artifact": "original",
+        "archiveSha256": "492cac8ba2acbdd188452f055c3ec64c00fd16d7013cb6ce60073a17323d0fda",
+        "reportSha256": "0de901adf266e040a987055a0be1f522c9a2522d59e4d91661bbd307bdb6a861",
+        "runnerSha256": "c5aa654082198ca60a55efde6bf32335e2b519ee629c1e842fa8a8b526a5c000",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "9e6b33d69e7d9aac40e374a0868e50e85520e6613e0e1f5cc180a70b35786776",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "f44d9a3958d0295bb813b055261656136ccdafcfc613a44c8b06c95720009d65",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-3",
+            "lockSha256": "fa417f2c3f875a7c6bdcac832f3d77ec7a387369a6947e9ccc3ebb1ed131d935",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-4",
+            "lockSha256": "fd6115c2ac35d07f96e98f8d4a18a7ed893a2846fa771a8e6535c3e489eb4783",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "b8d45b18603bacdac3b5f0bd446be81ed3fbc4349b701479b97106d27e915eef",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "b8d45b18603bacdac3b5f0bd446be81ed3fbc4349b701479b97106d27e915eef",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "89fb51b1cb83b10b10b4f9b2b3c33781d1d32c7537d13f29d6359346a61dfa61",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "89fb51b1cb83b10b10b4f9b2b3c33781d1d32c7537d13f29d6359346a61dfa61",
+            "patchedFilesVerified": 31
+          }
+        ]
+      },
+      {
+        "artifact": "main",
+        "archiveSha256": "ab77865767532e032a91b6d92b565eab972910ee09f732cba3bce62eddc8e209",
+        "reportSha256": "6e54dba1a89d265caeca5b8d2de8c83a81419bed1e923a32dee07c52472295cc",
+        "runnerSha256": "95ac7113656b33ce61e71bf895f28b161b047d412d14d1fb961a31e7196b8fe8",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "3febb7721a583b8ad16149d5f28dadbe22a4fb59e27b5bc19bbcaeabaf583e96",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "e90d99b2bb0026b9a11553d3399b2f478653a71a0093c21e4efa8122086c2d63",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-7",
+            "lockSha256": "ea51671d6054ae324c4bf41d0dd1c0c3e2ec68721b60f86a01a036134553505e",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-8",
+            "lockSha256": "ed3bdc4c3179a2ee4a9dd8aa6b929c2a50839963e2b6323c22e0eaa6ae8eda5c",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "c5a84133959b74d8d33f255a9b30495f86811cf2ce8bad1b8876ff1640493340",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "c5a84133959b74d8d33f255a9b30495f86811cf2ce8bad1b8876ff1640493340",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "2b012faa6512fc152fd50e62ecd0404e6ec3fd9bc89f57b40f93ee419d5c1154",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "2b012faa6512fc152fd50e62ecd0404e6ec3fd9bc89f57b40f93ee419d5c1154",
+            "patchedFilesVerified": 25
+          }
+        ]
+      }
+    ],
+    "hostBoundary": "Mock host RN0.86.3, RNMapbox10.3.8, MapLibre11.5.0; isolated resolved tuples recorded separately, no support claim.",
+    "cache": "Task-temporary cache and consumers removed after PR; compact version/lock/patch provenance retained."
+  },
+  "audit": {
+    "workers": "Implementation, documentation and independent review by GPT-6.1 Sol medium; coordinator audited final source, connected application transport, SDK declarations, scope, archives and actual check outputs.",
+    "review": "No remaining confirmed findings after the acknowledged-error correction and independent re-audit.",
+    "documentation": "69 historical coverage IDs/order/checkmarks/first-three cells preserved except verified base-pinned links for retired files. Future contract, migrated source and historical acceptance remain separate."
+  },
+  "openGates": [
+    "Two inherited main callback import fixture failures remain outside this unit.",
+    "Native snapshot output/errors/timing, current-map capture, popup/touch/renderer/Metro/native linking/build/install remain unverified; separate scoped permission required.",
+    "U13 starts after reviewed U12 PR. Later units are not claimed complete; U20 scope decisions, U23 peer/patch followups and U24 acceptance permission gates remain. Merge, tagging and package publication not authorized."
+  ],
+  "cleanup": "Preserve compact outcomes/provenance and task recovery patch/manifest; remove temporary consumers, cache, lock copies, logs, archives and publication overlays after PR. Original head/candidate preserved."
+}

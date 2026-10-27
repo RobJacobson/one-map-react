@@ -37,7 +37,7 @@ export const useWebQueriesProbe = (map: object | undefined): void => {
  * Open `/?tf06=queries`. The page runs rendered point, bounds, and
  * viewport queries, an empty off-screen query, a source query, cluster
  * expansion, leaves, and children, then feature-state set/get/remove and
- * the style-reset clearing.
+ * explicit state clearing after source and style replacement.
  */
 export const WebQueriesApp = ({ adapter, probe }: WebQueriesAppProps) => {
   const mapRef = useRef<MapRef>(null);

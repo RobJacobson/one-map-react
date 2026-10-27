@@ -72,7 +72,7 @@ interface SmokeFields {
  * queries with known feature ids, an empty off-screen result, a source
  * query, cluster expansion, leaves, and children, then feature-state
  * set/get/remove through a `feature-state` paint expression, followed by
- * source recreation and style replacement clearing feature state.
+ * explicit state clearing after source recreation and style replacement.
  *
  * Known-feature assertions stay independent of pixel rendering: each query
  * checks the ids the fixture pins, which survive SDK tile encoding.
@@ -200,8 +200,8 @@ export const useQueriesSmoke = ({
         } else if (phase === "recreate") {
           const map = requireMap(mapRef);
           await sourceReady(map, sourceRevision, signal);
-          await observeStateRemoval(map, signal, true);
-          nextFields.current.recreatedState = "cleared";
+          await clearAndVerifyState(map, signal);
+          nextFields.current.recreatedState = "explicitly-cleared";
           await setAndVerifyState(map, signal);
           assertActive(signal);
           // Rearm before requesting replacement; synchronous load is retained.
@@ -217,8 +217,8 @@ export const useQueriesSmoke = ({
           );
           const map = requireMap(mapRef);
           await sourceReady(map, sourceRevision, signal);
-          await observeStateRemoval(map, signal, true);
-          nextFields.current.clearedState = "cleared";
+          await clearAndVerifyState(map, signal);
+          nextFields.current.clearedState = "explicitly-cleared";
           commit("done");
         }
       } catch (error) {
@@ -344,6 +344,22 @@ const hasSourceRevision = (
       String(feature.id) === "1" &&
       feature.properties?.__oneMapSourceRevision === sourceRevision
   );
+
+// Both pinned SDKs can throw when an empty-source removal precedes a write
+// before the next frame (SourceFeatureState.updateState).
+const clearAndVerifyState = async (
+  map: MapRef,
+  signal: AbortSignal
+): Promise<void> => {
+  assertActive(signal);
+  const state = await map.getFeatureState(identifier);
+  assertActive(signal);
+  if (Object.keys(state).length > 0) {
+    await map.removeFeatureState(identifier);
+    assertActive(signal);
+  }
+  await observeStateRemoval(map, signal, true);
+};
 
 const setAndVerifyState = async (
   map: MapRef,
@@ -523,8 +539,7 @@ const assertQueries = async (
  * @param mapRef - Imperative handle of the mounted smoke map.
  * @param fields - Mutable status fields this step marks on success.
  * @param signal - Phase cancellation signal.
- * @throws When state set/get/remove or the style-reset clearing disagrees
- * with the contract.
+ * @throws When explicit state set/get/remove disagrees with the contract.
  */
 const assertState = async (
   mapRef: { readonly current: MapRef | null },

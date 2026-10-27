@@ -13,7 +13,6 @@ import type { MapRef, Padding } from "../../contracts/camera-types.js";
 import type { ClickEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { MapStyle } from "../../contracts/style-types.js";
-import { useMapCapture } from "../shared/map-capture.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding, toFlatBounds } from "../shared/wrapper-values.js";
@@ -61,7 +60,6 @@ export const createWebMap = <
       projection,
       light,
       options,
-      captureEnabled = false,
       interactiveLayerIds,
       hostProps,
       initialViewState,
@@ -116,7 +114,6 @@ export const createWebMap = <
       children,
     } = props;
     const mapRef = useRef<WebMapHandle | null>(null);
-    const capture = useMapCapture(captureEnabled);
     const [styleMap, setStyleMap] = useState<StyleLoadTarget | null>(null);
     const styleKey = styleContentKey(mapStyle);
     const frozenViewState = useFrozenValue(initialViewState);
@@ -159,22 +156,7 @@ export const createWebMap = <
       setStyleMap((current) => (current === next ? current : next));
     }, []);
 
-    useImperativeHandle(ref, () =>
-      createWebMapRef(mapRef, wrapper, async (options) => {
-        if (options.output === "file")
-          throw new Error("Browser capture cannot return a native file URI.");
-        const canvas = mapRef.current?.getMap().getCanvas?.();
-        if (!canvas) throw new Error("Renderer canvas is unavailable.");
-        const context =
-          canvas.getContext("webgl2") ?? canvas.getContext("webgl");
-        if (!context?.getContextAttributes()?.preserveDrawingBuffer)
-          throw new Error(
-            "Capture needs a preserved drawing buffer. Create a fresh capture-enabled map or provide a compatible context."
-          );
-        capture.layout(canvas.width, canvas.height);
-        return capture.run(options, async () => canvas.toDataURL("image/png"));
-      })
-    );
+    useImperativeHandle(ref, () => createWebMapRef(mapRef, wrapper), []);
 
     // Mapbox can emit load before react-map-gl commits its imperative handle.
     // Deliver the callback after attachment so camera operations are usable.
@@ -212,17 +194,6 @@ export const createWebMap = <
       return () => handler.enableRotation();
     }, [styleMap, touchRotate, touchZoom]);
 
-    useLayoutEffect(() => {
-      if (!captureEnabled || !styleMap) return;
-      const frame = () => {
-        const canvas = styleMap.getCanvas?.();
-        if (canvas) capture.layout(canvas.width, canvas.height);
-        capture.frame();
-      };
-      styleMap.on("render", frame);
-      styleMap.triggerRepaint?.();
-      return () => styleMap.off("render", frame);
-    }, [styleMap, captureEnabled, capture]);
     assertWebLongPress(onLongPress);
 
     const paddingValue = useWebPadding(props);
@@ -238,6 +209,23 @@ export const createWebMap = <
             ...(paddingValue === undefined ? {} : { padding: paddingValue }),
           };
 
+    const wrapperOptions = { ...options };
+    if (wrapper.backend === "maplibre-web") {
+      // @vis.gl/react-maplibre 8.1.3 utils/transform.ts checks key presence.
+      // Regression: "MapLibre camera forwarding preserves absence".
+      for (const key of [
+        "longitude",
+        "latitude",
+        "zoom",
+        "bearing",
+        "pitch",
+      ] as const) {
+        const value = controlledCamera?.[key] ?? options?.[key];
+        if (value === undefined) delete wrapperOptions[key];
+        else wrapperOptions[key] = value;
+      }
+    }
+
     return (
       <div
         {...hostProps}
@@ -250,7 +238,7 @@ export const createWebMap = <
         }}
       >
         <wrapper.Map
-          {...options}
+          {...wrapperOptions}
           {...(terrain === undefined && options?.terrain === undefined
             ? {}
             : {
@@ -274,15 +262,6 @@ export const createWebMap = <
           initialViewState={initialCamera}
           // MapLibre nested viewState also controls canvas size. Portable camera
           // fields use top-level props to leave dimensions uncontrolled.
-          {...(wrapper.backend === "maplibre-web"
-            ? {
-                longitude: controlledCamera?.longitude ?? options?.longitude,
-                latitude: controlledCamera?.latitude ?? options?.latitude,
-                zoom: controlledCamera?.zoom ?? options?.zoom,
-                bearing: controlledCamera?.bearing ?? options?.bearing,
-                pitch: controlledCamera?.pitch ?? options?.pitch,
-              }
-            : {})}
           viewState={
             wrapper.backend === "mapbox-web" ? controlledCamera : undefined
           }
@@ -295,16 +274,6 @@ export const createWebMap = <
               : toFlatBounds(maxBounds)
           }
           style={{ width: "100%", height: "100%" }}
-          {...(captureEnabled
-            ? wrapper.backend === "mapbox-web"
-              ? { preserveDrawingBuffer: true }
-              : {
-                  canvasContextAttributes: {
-                    ...options?.canvasContextAttributes,
-                    preserveDrawingBuffer: true,
-                  },
-                }
-            : {})}
           reuseMaps={reuseMaps ?? options?.reuseMaps}
           gl={gl ?? options?.gl}
           {...toWebGestureProps({
@@ -328,7 +297,6 @@ export const createWebMap = <
             else pendingLoad.current = true;
           }}
           onError={(event) => {
-            capture.fail(event.error);
             report.onError({ error: event.error });
           }}
           onResize={() => {

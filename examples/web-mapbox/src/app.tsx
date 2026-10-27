@@ -4,10 +4,18 @@ import {
   Layer as AdvancedLayer,
   type WebMapRef,
 } from "one-map-react/mapbox-web";
-import { adapter } from "one-map-react/mapbox-web";
-import { useEffect } from "react";
+import {
+  adapter,
+  WrapperPopup,
+  WrapperGeolocateControl,
+  WrapperScaleControl,
+  WrapperAttributionControl,
+  WrapperNavigationControl,
+} from "one-map-react/mapbox-web";
+import { type ReactNode, useEffect } from "react";
 import { useMap } from "react-map-gl/mapbox";
 
+import type { NativeLocationButtonProps } from "../../shared/native-location-button.js";
 import { WebCameraApp } from "../../shared/web-camera-app.js";
 import {
   useWebCorrectionProbe,
@@ -39,9 +47,30 @@ export const App = () => {
       />
     );
   if (new URLSearchParams(window.location.search).get("tf08") === "services")
-    return <WebTf08App adapter={adapter} />;
+    return (
+      <WebTf08App
+        renderLocation={WebLocationControl}
+        navigationControl={<WrapperNavigationControl position="top-right" />}
+        ornamentControls={
+          <>
+            <WrapperAttributionControl position="bottom-right" />
+            <WrapperScaleControl position="bottom-left" />
+          </>
+        }
+        adapter={adapter}
+        renderCoveragePopup={renderCoveragePopup}
+      />
+    );
   if (new URLSearchParams(window.location.search).get("tf07") === "ui")
-    return <WebTf07App adapter={adapter} />;
+    return (
+      <WebTf07App
+        renderLocation={WebLocationControl}
+        renderNavigation={renderNavigation}
+        renderScale={renderScale}
+        adapter={adapter}
+        renderPopup={renderPopup}
+      />
+    );
   if (cameraSmoke === "corrections" || sourcesSmoke === "corrections") {
     return <WebCorrectionsApp adapter={adapter} probe={<CorrectionProbe />} />;
   }
@@ -104,9 +133,10 @@ const renderMedia = ({ canvas, urls, coordinates, custom }: Tf09Media) => (
 );
 
 /** Exercises selected rendering and TF10 ref paths against the actual attached map. */
-export const namedRendering = (map: MapRef) => {
-  const selected = map as WebMapRef;
-  const handler = selected.getGestureHandler("dragPan");
+export const namedRendering = async (map: MapRef) => {
+  const selected = await (map as WebMapRef).getWrapperMap();
+  const renderer = selected.getMap();
+  const handler = renderer.dragPan;
   const before = handler.isEnabled();
   let disabled;
   try {
@@ -121,11 +151,11 @@ export const namedRendering = (map: MapRef) => {
   };
   Reflect.apply(selected.on, selected, ["tf10-probe", listener]);
   try {
-    Reflect.apply(selected.fire, selected, ["tf10-probe"]);
+    Reflect.apply(renderer.fire, renderer, ["tf10-probe"]);
   } finally {
     Reflect.apply(selected.off, selected, ["tf10-probe", listener]);
   }
-  Reflect.apply(selected.fire, selected, ["tf10-probe"]);
+  Reflect.apply(renderer.fire, renderer, ["tf10-probe"]);
   const tf10 = {
     dragPan: { before, disabled, restored: handler.isEnabled() },
     source: !!selected.getSource("point"),
@@ -183,3 +213,64 @@ const RenderingProbe = () => {
   }, [map]);
   return null;
 };
+
+const renderPopup = (
+  children: ReactNode,
+  onOpen: () => void,
+  onClose: () => void
+): ReactNode => (
+  <WrapperPopup
+    longitude={-122.3}
+    latitude={47.63}
+    closeOnClick={false}
+    closeOnMove={false}
+    onOpen={onOpen}
+    onClose={onClose}
+  >
+    {children}
+  </WrapperPopup>
+);
+
+const renderCoveragePopup = (children: ReactNode): ReactNode => (
+  <WrapperPopup
+    longitude={-122.35}
+    latitude={47.61}
+    closeButton={false}
+    closeOnClick={false}
+  >
+    {children}
+  </WrapperPopup>
+);
+
+const renderNavigation = () => (
+  <WrapperNavigationControl position="top-right" />
+);
+
+const renderScale = (unit: "metric" | "imperial") => (
+  <WrapperScaleControl position="bottom-left" unit={unit} />
+);
+
+/** Browser acquisition and camera behavior are owned by the selected wrapper. */
+const WebLocationControl = ({
+  onGeolocate,
+  onError,
+  zoom,
+  corner,
+}: Pick<
+  NativeLocationButtonProps,
+  "onGeolocate" | "onError" | "zoom" | "corner"
+>) => (
+  <WrapperGeolocateControl
+    position={corner === "right" ? "top-right" : "top-left"}
+    showUserLocation={false}
+    fitBoundsOptions={{ maxZoom: zoom ?? 14 }}
+    onGeolocate={(event) =>
+      onGeolocate?.({
+        lngLat: [event.coords.longitude, event.coords.latitude],
+        accuracy: event.coords.accuracy,
+        timestamp: event.timestamp,
+      })
+    }
+    onError={onError}
+  />
+);

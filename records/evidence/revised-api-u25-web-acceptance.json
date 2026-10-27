@@ -1,0 +1,247 @@
+{
+  "unit": "U25",
+  "recordedAt": "2026-10-26T22:32:26.777472+00:00",
+  "status": "failed_first_command; stopped; no retry",
+  "authorization": "Owner approved the exact nine serial browser commands against the frozen U24 candidate; one first attempt per command, stop at first failed command; no native permission",
+  "candidate": {
+    "archive": "artifacts/revised-api-u24/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "408c451d9b8da4642acd1843be1282e88259445f2a8879293682c2598d2a1f79",
+    "driverDistDigest": "e884b92cf6e20d46c05897512ebe88ba930f1f8cd774f98c1550e561b08dc7a6",
+    "reviewedPublicationCommit": "fb3de7d3172c1f64cb05635c8a69510565a2b1e8",
+    "pullRequest": 45,
+    "acceptancePlanSha256": "b928265f0f166168193e885cc6d0ff413c35dfc5984623c7d0159185d29836cc"
+  },
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "low",
+    "count": 1,
+    "schedule": "serial",
+    "codeOrDependencyChanges": false
+  },
+  "preflight": {
+    "initialFilesAndLinks": 46736,
+    "before": "passed",
+    "after": "passed",
+    "reservedPortsBefore": "free",
+    "node": "v24.22.1",
+    "bun": "1.4.1",
+    "tokenRecorded": false
+  },
+  "wholeCommandTotals": {
+    "passed": 0,
+    "failed": 1,
+    "notRun": 8
+  },
+  "commands": [
+    {
+      "ordinal": 1,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web"
+      ],
+      "status": "failed",
+      "reason": "MapLibre camera failed; runner hung after emitting results and required owned-process termination",
+      "elapsedMs": 372465
+    },
+    {
+      "ordinal": 2,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop-on-first-failed-command rule",
+      "elapsedMs": null
+    },
+    {
+      "ordinal": 3,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop-on-first-failed-command rule",
+      "elapsedMs": null
+    },
+    {
+      "ordinal": 4,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop-on-first-failed-command rule",
+      "elapsedMs": null
+    },
+    {
+      "ordinal": 5,
+      "argv": [
+        "bun",
+        "scripts/tf06-queries-smoke.mjs",
+        "web"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop-on-first-failed-command rule",
+      "elapsedMs": null
+    },
+    {
+      "ordinal": 6,
+      "argv": [
+        "bun",
+        "scripts/tf07-ui-smoke.mjs",
+        "web",
+        "mapbox"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop-on-first-failed-command rule",
+      "elapsedMs": null
+    },
+    {
+      "ordinal": 7,
+      "argv": [
+        "bun",
+        "scripts/tf07-ui-smoke.mjs",
+        "web",
+        "maplibre"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop-on-first-failed-command rule",
+      "elapsedMs": null
+    },
+    {
+      "ordinal": 8,
+      "argv": [
+        "bun",
+        "scripts/tf09-rendering-smoke.mjs",
+        "web",
+        "mapbox"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop-on-first-failed-command rule",
+      "elapsedMs": null
+    },
+    {
+      "ordinal": 9,
+      "argv": [
+        "bun",
+        "scripts/tf09-rendering-smoke.mjs",
+        "web",
+        "maplibre"
+      ],
+      "status": "not_run",
+      "reason": "Approved stop-on-first-failed-command rule",
+      "elapsedMs": null
+    }
+  ],
+  "firstCommandObservations": {
+    "mapbox-web": {
+      "status": "passed_scenario_only",
+      "scope": "TF04 fit, feature click, stop and held controlled camera; no claim about later scenarios",
+      "readback": {
+        "fit": "ok",
+        "click": "hit",
+        "stop": "stayed",
+        "held": "1",
+        "center": [
+          -122.32,
+          47.64
+        ]
+      }
+    },
+    "maplibre-web": {
+      "status": "failed",
+      "driverError": "MapLibre web did not finish",
+      "browserError": "Invalid LngLat object: (undefined, undefined)",
+      "stackOwner": "@vis.gl/react-maplibre applyViewStateToTransform -> Maplibre._updateViewState -> setProps"
+    }
+  },
+  "firstCommandProcessResult": {
+    "ordinal": 1,
+    "argv": [
+      "bun",
+      "scripts/tf04-camera-smoke.mjs",
+      "web"
+    ],
+    "exitCode": 1,
+    "signal": "SIGTERM",
+    "error": null,
+    "elapsedMs": 372465,
+    "log": "/private/tmp/one-map-u24-3shiv2no/runtime/results/first-attempt/web-01.log",
+    "candidateSha256": "408c451d9b8da4642acd1843be1282e88259445f2a8879293682c2598d2a1f79",
+    "firstAttempt": true
+  },
+  "findings": [
+    {
+      "id": "U25-F01",
+      "status": "confirmed_unfixed",
+      "scope": "Library MapLibre web camera forwarding",
+      "cause": "Facade materializes absent optional camera fields as own properties with undefined values; pinned MapLibre wrapper treats key presence as a camera request",
+      "versions": {
+        "reactMapGl": "8.1.3",
+        "reactMaplibre": "8.1.3",
+        "maplibreGl": "6.13.0"
+      },
+      "source": "packages/one-map-react/src/adapters/web/map.tsx:250-262",
+      "sourceHistory": {
+        "commit": "30ef2883",
+        "predatesPublicationU01": true,
+        "classification": "Pre-existing, not introduced by U24 fixture changes"
+      },
+      "proof": {
+        "method": "Pure Node calls actual installed applyViewStateToTransform and actual MapLibre LngLat class; no browser retry",
+        "presentUndefinedCameraFields": "throws",
+        "omittedCameraFields": "no changes",
+        "definedCameraFields": "valid center/zoom changes"
+      },
+      "repairDirection": "Omit absent camera properties while preserving defined values and selected-option/common precedence; add regression at the actual wrapper boundary. Not implemented in this run."
+    },
+    {
+      "id": "U25-F02",
+      "status": "confirmed_unfixed",
+      "scope": "TF04 web runner teardown",
+      "observed": "Driver emitted both backend results but remained live; Vite Node children on4173/4174 were orphaned after their bun wrappers were stopped",
+      "source": "scripts/tf04-camera-smoke.mjs:324-325",
+      "relatedUnexecutedPattern": [
+        "scripts/tf05-sources-smoke.mjs:133-134",
+        "scripts/tf06-queries-smoke.mjs:195-196"
+      ],
+      "repairDirection": "Use existing owned-process-tree cleanup rather than stopping only wrapper PIDs; review related web driver paths. Not implemented in this run."
+    }
+  ],
+  "cleanup": {
+    "coordinatorTerminatedOnlyVerifiedOwnedPids": [
+      70029,
+      70046,
+      70800
+    ],
+    "verification": "Exact command lines, frozen-shell working directories, initially free reserved ports and process ancestry verified before stopping",
+    "reservedPortsAfter": "released",
+    "ownedChromeProfilesAfter": "no remaining process matches",
+    "candidateInputsAfter": "all46736 files/links and runtime identities verified unchanged"
+  },
+  "evidence": {
+    "sanitizedLogSha256": "02d81c53615231a05541eeefce55689500cb51053280976741adbdff20df58f0",
+    "diagnosisScriptSha256": "ef7cad3e1382eda8eadd6b97b3a743b65959176da5155e71bfa5b5801361be41",
+    "sourceLog": "/private/tmp/one-map-u24-3shiv2no/runtime/results/first-attempt/web-01.log",
+    "rawLogRetention": "Small sanitized failure log retained for the active repair investigation; no screenshot or credential retained"
+  },
+  "remainingGates": [
+    "Fix and independently audit confirmed library/runner findings before freezing any replacement candidate/harness",
+    "New explicit permission required for a renderer retry or changed candidate/harness",
+    "Commands2-9 remain unverified",
+    "Native acceptance remains unapproved and unrun"
+  ],
+  "notExecuted": [
+    "Browser commands2-9",
+    "Renderer retry",
+    "Native Metro/build/install/device acceptance",
+    "Package/source/peer/lock/version changes",
+    "Merge, tag or registry publication"
+  ]
+}

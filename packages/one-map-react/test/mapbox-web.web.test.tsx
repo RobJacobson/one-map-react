@@ -928,7 +928,7 @@ describe("mapbox-web images", () => {
     expect(target.removeImage).toHaveBeenCalledWith("shield");
   });
 
-  test("a replaced style drops images and styledata re-registers them", async () => {
+  test("styledata does not replay dropped images", async () => {
     render(tree(<Images images={{ marker: "https://example.com/m.png" }} />));
     const target = loadedStyle();
 
@@ -941,12 +941,12 @@ describe("mapbox-web images", () => {
     target.emitStyleData();
 
     await waitFor(() => {
-      expect(target.hasImage("marker")).toBe(true);
+      expect(target.hasImage("marker")).toBe(false);
     });
-    expect(target.addImage).toHaveBeenCalledTimes(2);
+    expect(target.addImage).toHaveBeenCalledTimes(1);
   });
 
-  test("style.load re-registers current entries after a replacement", async () => {
+  test("style.load does not replay current entries", async () => {
     render(tree(<Images images={{ marker: "https://example.com/m.png" }} />));
     const target = loadedStyle();
 
@@ -958,9 +958,9 @@ describe("mapbox-web images", () => {
     target.emitStyleLoad();
 
     await waitFor(() => {
-      expect(target.hasImage("marker")).toBe(true);
+      expect(target.hasImage("marker")).toBe(false);
     });
-    expect(target.addImage).toHaveBeenCalledTimes(2);
+    expect(target.addImage).toHaveBeenCalledTimes(1);
   });
 
   test("a new images object with the same entries does not reload", async () => {
@@ -1117,7 +1117,7 @@ describe("mapbox-web images", () => {
     expect(target.hasImage("marker")).toBe(true);
   });
 
-  test("a thrown addImage stays unregistered until the next style.load", async () => {
+  test("a thrown addImage stays unregistered after later style.load", async () => {
     render(tree(<Images images={{ marker: "https://example.com/m.png" }} />));
     const target = getStyleTarget();
 
@@ -1138,7 +1138,7 @@ describe("mapbox-web images", () => {
     target.emitStyleLoad();
 
     await waitFor(() => {
-      expect(target.hasImage("marker")).toBe(true);
+      expect(target.hasImage("marker")).toBe(false);
     });
   });
 
@@ -1505,7 +1505,7 @@ describe("web correction regressions", () => {
   });
 });
 
-test("registered image removals retry when image methods are unavailable", async () => {
+test("failed image cleanup reports an error without style-event retry", async () => {
   resetWebMapMock();
   const rendered = render(
     tree(<Images images={{ marker: "https://example.com/marker.png" }} />)
@@ -1522,7 +1522,8 @@ test("registered image removals retry when image methods are unavailable", async
   expect(target.hasImage("marker")).toBe(true);
   ready.mockReturnValue(true);
   target.emitStyleLoad();
-  expect(target.hasImage("marker")).toBe(false);
+  expect(target.hasImage("marker")).toBe(true);
+  expect(target.removeImage).toHaveBeenCalledTimes(1);
   ready.mockRestore();
 });
 

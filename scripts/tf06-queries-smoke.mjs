@@ -120,7 +120,7 @@ async function runWeb(directory, port, label) {
       "--host",
       "127.0.0.1",
     ],
-    { cwd: shell, stdio: ["ignore", "pipe", "pipe"] }
+    { cwd: shell, detached: true, stdio: ["ignore", "pipe", "pipe"] }
   );
   let viteLog = "";
   const record = (chunk) => {
@@ -141,7 +141,7 @@ async function runWeb(directory, port, label) {
       "--no-first-run",
       `http://127.0.0.1:${port}/?tf06=queries`,
     ],
-    { stdio: "ignore" }
+    { detached: true, stdio: "ignore" }
   );
 
   try {
@@ -192,8 +192,8 @@ async function runWeb(directory, port, label) {
       log: viteLog.slice(-1500),
     };
   } finally {
-    chrome.kill("SIGKILL");
-    vite.kill("SIGTERM");
+    await stopOwnedProcess(chrome);
+    await stopOwnedProcess(vite);
     rmSync(profile, { recursive: true, force: true });
   }
 }
@@ -657,7 +657,7 @@ function judge(status) {
     const passed =
       fields.loaded === "1" &&
       operations.every((key) => fields[key] === "ok") &&
-      transitions.every((key) => fields[key] === "cleared") &&
+      transitions.every((key) => fields[key] === "explicitly-cleared") &&
       fields.error === "none" &&
       fields.phase === "done" &&
       fields.done === "1";
@@ -673,14 +673,14 @@ function judge(status) {
     fields.filters === "ok" &&
     fields.pagination === "ok" &&
     fields["whole-state"] === "ok" &&
-    fields["recreated-state"] === "cleared" &&
+    fields["recreated-state"] === "explicitly-cleared" &&
     fields["cluster-zoom"] === "ok" &&
     fields.leaves === "ok" &&
     fields.children === "ok" &&
     fields["set-state"] === "ok" &&
     fields["get-state"] === "ok" &&
     fields["remove-state"] === "ok" &&
-    fields["cleared-state"] === "cleared" &&
+    fields["cleared-state"] === "explicitly-cleared" &&
     fields.error === "none" &&
     fields.done === "1";
 

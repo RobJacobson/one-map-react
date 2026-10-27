@@ -20,9 +20,8 @@ const observation = {
   events: {
     load: 2,
     "child-click": 1,
-    "live-start": 1,
-    "live-end": 1,
-    "annotation-end": 1,
+    "marker-click": 1,
+    "annotation-click": 1,
     "source-click": 2,
     "popup-close": 1,
     location: 1,
@@ -35,6 +34,14 @@ const manual = {
     nativeUiScenarios.map((name) => [name, "passed"])
   ),
 };
+
+for (const scenario of ["camera-target-and-gesture", "marker-prop-rejection"]) {
+  assert(nativeUiScenarios.includes(scenario));
+  const old = { ...manual, scenarios: { ...manual.scenarios } };
+  delete old.scenarios[scenario];
+  assert.equal(nativeUiReportReady(old, identity), false);
+  assert.equal(judgeNativeUi(observation, old, identity).status, "unverified");
+}
 
 assert.equal(nativeUiReportReady(undefined, identity), false);
 assert.equal(nativeUiReportReady(manual, identity), true);
@@ -60,6 +67,17 @@ assert.equal(
   "unverified"
 );
 assert.equal(judgeNativeUi(observation, manual, identity).status, "passed");
+for (const activation of ["marker-click", "annotation-click"]) {
+  assert.equal(
+    judgeNativeUi(
+      { ...observation, events: { ...observation.events, [activation]: 0 } },
+      manual,
+      identity
+    ).status,
+    "unverified"
+  );
+}
+assert(!nativeUiScenarios.some((scenario) => scenario.includes("drag")));
 for (const id of ["707", 708, "708", "0707"]) {
   assert.equal(
     judgeNativeUi(

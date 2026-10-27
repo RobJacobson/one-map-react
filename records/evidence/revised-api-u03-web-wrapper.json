@@ -1,0 +1,612 @@
+{
+  "unit": "U03",
+  "status": "Selected web access implemented and reviewed; owner authorized commit and PR. Fresh main-based routine checks completed with two baseline-reproduced import failures in the isolated checkout.",
+  "successor": "U04 and later undispatched; separate explicit owner release required.",
+  "originalWorkingStage": {
+    "label": "Historical implementation-stage record on dirty rc.11 working basis. All bases, hashes, outcomes, actions not taken and pending approval wording within this object describe that original stage only, not the main publication artifact or current authorization.",
+    "sourceRecordSha256": "844f09faa064cd55ce64549b60d3056c0aed19847561ad2521593957ec7d9a17",
+    "record": {
+      "unit": "U03",
+      "status": "implemented and reviewed; owner sign-off pending",
+      "successor": "U04 undispatched; separate explicit owner release required",
+      "authorization": "Owner authorized U03 only after merging U02 PR21; stop before commit or PR. No renderer/native acceptance authorized.",
+      "base": {
+        "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+        "mergedMain": "8b83354758ef9768fb7bcf09a4e175078109337e",
+        "workspace": "/Users/rob/code/mapbox-code/one-map",
+        "snapshotFiles": 1033,
+        "branch": "codex/comment-style-docs",
+        "provenance": "Task changes measured against the captured dirty unit-start snapshot, not HEAD or merged main. Main U02 contains older runtime; no main source was copied over working rc.11.",
+        "unitStartManifestSha256": "f4209e7861a9880a98ffcd985a30d822bfbb33896c74d26a03f97fc43f9ba16c"
+      },
+      "scope": {
+        "runtime": "One asynchronous current-handle lookup added to existing shared web ref factory; both selected web ref types expose their exact upstream MapRef. No common MapRef, common exports, facade proxy, wrapper resource owner, camera, native implementation, peers, patches, versions or candidate metadata changed.",
+        "callerInventory": [
+          "Shared web factory has one caller in adapters/web/map.tsx; current wrapper handle comes from callback ref and is nulled by React teardown.",
+          "Selected Map aliases the common facade Map; direct ref reads adapter ref, enclosing/named useMap return the existing retained non-thenable proxy.",
+          "Installed react-map-gl 8.1.3 Mapbox and MapLibre create-ref.ts define wrapper MapRef distinct from getMap raw renderer; map components attach contextValue.map via useImperativeHandle.",
+          "Selected advanced mirrors and their consumers remain until U06; native selected getters remain U04/U05."
+        ],
+        "scopeAdjustments": [],
+        "newDependencies": [],
+        "applicationCodeAdded": 0,
+        "testsRetired": [],
+        "testsRewritten": "Existing web mock exposes/replaces its actual imperative handle while retaining the same renderer; existing suites retained.",
+        "regressionCoverage": [
+          "Both engines \u00d7 selected direct, enclosing common proxy, named common proxy (6 cases)",
+          "Actual wrapper identity vs raw getMap renderer, returned Promise, no waiting for load",
+          "Retained extracted direct/proxy method follows handle replacement with construction count fixed at one",
+          "Detached calls reject asynchronously; proxy remains safe through Promise.resolve",
+          "Common camera getter/flyTo still forward; selected existing advanced suites retained"
+        ],
+        "cancellation": "Getter resolves current borrowed handle immediately, creates no waiter/cancellable operation; subsequent borrowed-handle validity remains wrapper-owned.",
+        "dataImplications": "No storage/database, acquisition, capture policy, or destructive SDK operation added."
+      },
+      "changes": [
+        {
+          "path": "AGENTS.md",
+          "unitStartSha256": "a878423c782cc3398a6fc8f7d7b81aa37db655b96afe913179f75e5bce9afdff",
+          "resultSha256": "32080cba78e4dc7a46e41cc103c634d3f94e5a3718c3c5a1de1d36d52ab20a99",
+          "addedLines": 1,
+          "removedLines": 1
+        },
+        {
+          "path": "README.md",
+          "unitStartSha256": "aef09e96d8f6a45989451ca04f9f8432db77078eadd81942bf072faf796f6e33",
+          "resultSha256": "817b07cfb9b4e045a1244fa5c9d5ce223c50ee4efcf6d1ac68077b901570772f",
+          "addedLines": 1,
+          "removedLines": 1
+        },
+        {
+          "path": "docs/AGENTS.md",
+          "unitStartSha256": "0cddaa3144b7dcd612f3950593c6ac64e37cd1df62fa41fddcdd214acd303ae7",
+          "resultSha256": "5724b927fd0058560ff9e7d43bda7a39f8114e9cc7e9b7d8e3857d63b625dfd1",
+          "addedLines": 1,
+          "removedLines": 1
+        },
+        {
+          "path": "docs/README.md",
+          "unitStartSha256": "5e2b3b02657f4e1e2d5e01643bf9c3180774ad3943cf500ab8d5aa1d62ae635f",
+          "resultSha256": "9d86169bb2a413ed62fb6fb32d66608fd027322e948bcec8a7151603ba2085e9",
+          "addedLines": 3,
+          "removedLines": 3
+        },
+        {
+          "path": "docs/api-coverage.md",
+          "unitStartSha256": "d8cd0b9038799b57c7f6ef250952e4b7b4725885c7959b627779d5f0e6fcc95b",
+          "resultSha256": "6d247bd1211e158a60f1917d0daf64150d604127acf8a60da26fe6450aa01c16",
+          "addedLines": 12,
+          "removedLines": 12
+        },
+        {
+          "path": "docs/requirements.md",
+          "unitStartSha256": "9b7a05718cf87369dbd681d05cb70f6a4f305256186218883506efc49a945e02",
+          "resultSha256": "06a7a4f199bfd12ee86fc54abe2f17db3ca211f3e31a002615cfe1bd32981087",
+          "addedLines": 2,
+          "removedLines": 2
+        },
+        {
+          "path": "docs/revised-api-implementation-plan.md",
+          "unitStartSha256": "71a1a9b969dada77f87c665250fd57b4250569c69365f6d2a28172dd0b09900b",
+          "resultSha256": "635fa230843ef493cb214177a5b9356e6e4aeeefedda50115a71f9269020e826",
+          "addedLines": 3,
+          "removedLines": 3
+        },
+        {
+          "path": "docs/revised-api-proposal.md",
+          "unitStartSha256": "ca588447057d70ff71f9ec8a60cba931bb2641a26d27b65465723b58070fde16",
+          "resultSha256": "a184ffa81c41a64d709474129b045562040c6ba14148fb89a9fa1b7e37db52fc",
+          "addedLines": 7,
+          "removedLines": 7
+        },
+        {
+          "path": "docs/stage-plan.md",
+          "unitStartSha256": "5dc87052fa65fdb6d9a4e974c39e3d9c39b59d82cff465a3ac0ba5ef3aa26645",
+          "resultSha256": "c47edec1e35b5109b1e100cd260ddc0030dd32eee6cce92731a810fa52605909",
+          "addedLines": 1,
+          "removedLines": 1
+        },
+        {
+          "path": "packages/one-map-react/README.md",
+          "unitStartSha256": "a5eadb4609c9cbaf07e39440a0222952eebd5ed3a1622ccbbd639e40f3c1aa83",
+          "resultSha256": "1e2b17b2d4fb9260435e3091fc7436e39d4f056acf7520f092898186d1fd8b5e",
+          "addedLines": 1,
+          "removedLines": 1
+        },
+        {
+          "path": "packages/one-map-react/src/adapters/web/map-ref.ts",
+          "unitStartSha256": "0ddc9ab77212e090ac354014c4d2d39c34dc6eea493118ac768d9077ef6cf05e",
+          "resultSha256": "259777ea2ceee11317888f8c7bfc70fde8695bd314e2fdc1d6ae367a6aa9c973",
+          "addedLines": 2,
+          "removedLines": 1
+        },
+        {
+          "path": "packages/one-map-react/src/mapbox-web.tsx",
+          "unitStartSha256": "f6e1f1ebbbfc886d26e501f5e890ea2de4166f5164a76cef099e63482dd0ad34",
+          "resultSha256": "be55f8af7bc76214c90bd63608fd9cf5b48ef48e474ed43287b0230d36795143",
+          "addedLines": 11,
+          "removedLines": 0
+        },
+        {
+          "path": "packages/one-map-react/src/maplibre-web.tsx",
+          "unitStartSha256": "15a59ca0c5b5677afe419de161262f001cde0a20bfb675a5f8b4ac1973286e61",
+          "resultSha256": "da5aaaac70d9721b0dfb2879661ded4d4c4008a36ec187e8196bc208877e0093",
+          "addedLines": 11,
+          "removedLines": 0
+        },
+        {
+          "path": "packages/one-map-react/test/create-web-map-mock.tsx",
+          "unitStartSha256": "6751e0d1422efbc4dfb046f4f9e84ac8ccdebe95db9e3c49ae8bda6e44a47ad9",
+          "resultSha256": "d2b88216ff98a74b795893897204b989d6a39a7f1f8b66b0ebe0536d569dfc9d",
+          "addedLines": 48,
+          "removedLines": 30
+        },
+        {
+          "path": "records/README.md",
+          "unitStartSha256": "c00b4176bac5a2a7a8fb2c855e8bd423953e14947d282997b4663f48c8dd6ac2",
+          "resultSha256": "0543eccedcdff7b7000a00bf7eb44502c62893535c1f9527b1a1ec9263c41555",
+          "addedLines": 3,
+          "removedLines": 1
+        },
+        {
+          "path": "scripts/test-package.mjs",
+          "unitStartSha256": "beb48eedf3e6304cba5189d3a568874b8edc906d4e5c6588705c1835a561a8c7",
+          "resultSha256": "bcd79c215a94e9c7bda9c304afcf12bc48cd1b9526b55a1f1afa093d8eafdb31",
+          "addedLines": 6,
+          "removedLines": 1
+        },
+        {
+          "path": "scripts/test-peers.mjs",
+          "unitStartSha256": "32d2243cfac6681e3cf8e93d1cc30c9528a81ffc704aba6961a3d544daa10965",
+          "resultSha256": "d92e8e1f9f508d44702a4c76785da1933a2207484d404ffdc950cb709d92ab27",
+          "addedLines": 10,
+          "removedLines": 0
+        },
+        {
+          "path": "packages/one-map-react/test/web-wrapper-access.web.test.tsx",
+          "unitStartSha256": null,
+          "resultSha256": "1144abb090d52bdfdadfdc7a17afb8886c787da321ef8c6bac1a3be99ec5cada",
+          "addedLines": 96,
+          "removedLines": 0
+        }
+      ],
+      "preservation": {
+        "snapshotEntries": 1033,
+        "unchangedEntries": 1016,
+        "modifiedEntries": 17,
+        "newFiles": [
+          "packages/one-map-react/test/web-wrapper-access.web.test.tsx",
+          "records/evidence/revised-api-u03-web-wrapper.json"
+        ],
+        "candidateArchiveSha256BeforeAndAfter": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7",
+        "candidateReplaced": false,
+        "frozenU01U02EvidenceChanged": false
+      },
+      "checks": [
+        {
+          "command": "./node_modules/.bin/vp test run packages/one-map-react/test/web-wrapper-access.web.test.tsx",
+          "exit": 1,
+          "phase": "before production edits",
+          "result": "6 expected failures: missing getter on selected refs and actual enclosing/named facade proxies"
+        },
+        {
+          "command": "./node_modules/.bin/vp test run packages/one-map-react/test/web-wrapper-access.web.test.tsx",
+          "exit": 0,
+          "phase": "after production edits",
+          "result": "6 tests passed"
+        },
+        {
+          "command": "./node_modules/.bin/vp test run packages/one-map-react/test/web-wrapper-access.web.test.tsx packages/one-map-react/test/mapbox-web.web.test.tsx packages/one-map-react/test/maplibre-web.web.test.tsx packages/one-map-react/test/tf09-selected.web.test.tsx packages/one-map-react/test/tf07-map-context.web.test.tsx packages/one-map-react/test/wrapper-callbacks.web.test.tsx packages/one-map-react/test/lifetimes-smoke.web.test.tsx",
+          "exit": 0,
+          "result": "353 tests in 7 suites passed"
+        },
+        {
+          "command": "./node_modules/.bin/vp test run",
+          "exit": 0,
+          "result": "899 tests in 47 Node/jsdom suites passed; full suite covers the shared mock change"
+        },
+        {
+          "command": "bun run check",
+          "exit": 0,
+          "result": "346 files formatted; 328 files linted; final pass has no warnings/errors. Initial pass found one intentionally unused mock handle-generation dependency; added an explanatory test-only suppression."
+        },
+        {
+          "command": "bun run check:docs",
+          "exit": 0,
+          "result": "39 Markdown files, 42 SDK comparison tables; structure/fences/local links passed"
+        },
+        {
+          "command": "bun run typecheck",
+          "exit": 0,
+          "result": "All four library/test/web/native-example configurations passed. A later concurrent attempt exited 1 because test:package rebuilt and temporarily removed dist; full serial rerun passed after build completion."
+        },
+        {
+          "command": "bun run typecheck:apps",
+          "exit": 0,
+          "result": "Example-test, web and Expo app configurations passed"
+        },
+        {
+          "command": "bun run build",
+          "exit": 0,
+          "result": "Routine library/example package builds passed; no app/native renderer build"
+        },
+        {
+          "command": "bun run test:package",
+          "exit": 0,
+          "result": "Build plus all 13 isolated peer-free common/explicit/conditional/mixed export-path selections passed; includes common getter negative declarations"
+        },
+        {
+          "command": "bun /tmp/one-map-u03-rck0yuj1/test-peers-web-only.mjs --evidence /tmp/one-map-u03-rck0yuj1/peers-web.json",
+          "exit": 1,
+          "result": "Blocked before first dependency install: Bun tempdir EPERM"
+        },
+        {
+          "command": "TMPDIR=/private/tmp/one-map-u03-rck0yuj1 bun /tmp/one-map-u03-rck0yuj1/test-peers-web-only.mjs --evidence /tmp/one-map-u03-rck0yuj1/peers-web-tmp.json",
+          "exit": 1,
+          "result": "Same tempdir EPERM before dependency install"
+        },
+        {
+          "command": "TMPDIR=/private/tmp/one-map-u03-rck0yuj1 bun /tmp/one-map-u03-rck0yuj1/test-peers-web-only.mjs --evidence /tmp/one-map-u03-rck0yuj1/peers-web-approved.json",
+          "exit": 0,
+          "executor": "coordinator with approved filesystem/network access",
+          "result": "Both selected web entries passed isolated actual packed imports, exact Promise<upstream MapRef> identities, renderer-specific methods, and peer isolation"
+        },
+        {
+          "command": "bun scripts/test-package.mjs --archive /tmp/one-map-u03-rck0yuj1/final-artifact/one-map-react-0.1.0-rc.11.tgz --evidence /tmp/one-map-u03-rck0yuj1/package-final.json",
+          "exit": 1,
+          "executor": "coordinator",
+          "phase": "before packing process completed",
+          "result": "Missing --archive preflight only; packing was still running. No consumer/type check ran."
+        },
+        {
+          "command": "bun scripts/test-package.mjs --archive /tmp/one-map-u03-rck0yuj1/final-artifact/one-map-react-0.1.0-rc.11.tgz --evidence /tmp/one-map-u03-rck0yuj1/package-final.json",
+          "exit": 0,
+          "executor": "coordinator",
+          "phase": "serially after final packing completed",
+          "result": "13 isolated packed selections passed on final frozen archive; no rebuild."
+        },
+        {
+          "command": "TMPDIR=/private/tmp/one-map-u03-rck0yuj1 bun /tmp/one-map-u03-rck0yuj1/test-peers-web-only.mjs --archive /tmp/one-map-u03-rck0yuj1/final-artifact/one-map-react-0.1.0-rc.11.tgz --evidence /tmp/one-map-u03-rck0yuj1/peers-web-final.json",
+          "exit": 0,
+          "executor": "coordinator with approved filesystem/network access",
+          "phase": "serially after final common packed check",
+          "result": "Both explicit web selected-peer consumers passed against same final frozen archive. Final named arrow helper compiled. Native and mixed peer-install cases deliberately omitted."
+        },
+        {
+          "command": "bun /tmp/one-map-u03-rck0yuj1/check-markdown-final.mjs",
+          "exit": 0,
+          "phase": "after independent/coordinator review disposition updates",
+          "result": "43 Markdown files and 42 comparison tables passed structure, paragraphs, fences and local links, including root/package/agent and records index documents. Temporary copy of existing docs checker with only input list expanded."
+        }
+      ],
+      "webPeerDerivation": {
+        "source": "scripts/test-peers.mjs",
+        "temporaryOnly": true,
+        "changes": [
+          "Use original repository root and absolute original helper imports",
+          "Filter explicit peers to -web entries",
+          "Remove entire later mixed native/web pair loop",
+          "Qualify final output as web-only"
+        ],
+        "derivedScriptSha256": "78c3e91de8cb074e74cd2e3721389c69e53cb10b28f15b9d55325f203fc816dd",
+        "consumersRemovedByRunner": true,
+        "nativeAndMixedPeerInstallsRun": false
+      },
+      "packedWebChecks": [
+        {
+          "entry": "mapbox-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "mapbox-gl@3.32.0"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "mapbox-gl": "3.32.0"
+          },
+          "archiveSha256": "09bfa3be35fd29bf8088ec5c3a0a9cbe966be0d9fb807c956b3050536a615baf",
+          "lockfileSha256": "78570ac1fb2d55b149e28b4e2b7d42da32fb18e35f8556e47847cde9b30fbbce",
+          "patchedFiles": {},
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer"
+        },
+        {
+          "entry": "maplibre-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "maplibre-gl@6.13.0"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "maplibre-gl": "6.13.0"
+          },
+          "archiveSha256": "09bfa3be35fd29bf8088ec5c3a0a9cbe966be0d9fb807c956b3050536a615baf",
+          "lockfileSha256": "b4833879c6ed137b921dbca1430fd29d776dad2b90724f7ab4742f6207958b11",
+          "patchedFiles": {},
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer"
+        }
+      ],
+      "testedArchiveSha256": "09bfa3be35fd29bf8088ec5c3a0a9cbe966be0d9fb807c956b3050536a615baf",
+      "versions": {
+        "node": "24.22.1",
+        "bun": "1.4.1",
+        "typescript": "7.0.2",
+        "vitest": "5.0.3",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "maplibre-gl": "6.13.0"
+      },
+      "warnings": [
+        "Existing Bun moduleSuffixes unsupported warning in docs/package/peer commands",
+        "Full jsdom run emitted informational environment-cost note"
+      ],
+      "review": {
+        "implementer": "Self-review traced direct/selected/common-proxy paths, replacement and teardown; no new owner or retained-contract issue identified.",
+        "independent": "Passed read-only review of both selected entries, shared factory, callback-ref lifecycle, real facade proxies, installed wrapper definitions, tests, declaration probes, check logs and preservation hashes. No actionable findings in inspected U03 scope.",
+        "coordinator": "Passed final audit. Corrected new embedded declaration example to the required named-arrow form; final common and selected-web packed probes passed on the same archive. Verified current-handle borrowing, no new owner, SDK-free common/native APIs, preserved candidate and unrelated workspace. Verification orchestration failures remain recorded separately from product behavior.",
+        "ownerSignoff": "pending",
+        "finalDocumentation": "Status-only review disposition updated after independent/coordinator audits; documentation checks passed afterward. No code/declaration changed after the recorded full suite and frozen-archive probes."
+      },
+      "unverified": [
+        "Real browser renderer wrapper integration/acceptance",
+        "Native linking, native getters and native runtime behavior",
+        "Full native/mixed selected-peer install matrix",
+        "New release/publication readiness"
+      ],
+      "retention": "Compact outcomes, failures, reviewed artifact identities and log hashes retained here. Raw logs, temporary web peer lockfiles, derived probes and duplicate package archives removed after review. Unit-start recovery copies, manifest and task-only diff remain temporary until owner disposition; generated consumers/dependencies were removed by runners.",
+      "actionsNotTaken": [
+        "U04 or later implementation",
+        "Commit, push or pull request",
+        "Renderer/dev-server/Metro operations",
+        "Simulator/emulator/native build or installation",
+        "SDK sensor/storage operations"
+      ],
+      "finalFrozenArchive": {
+        "sha256": "09bfa3be35fd29bf8088ec5c3a0a9cbe966be0d9fb807c956b3050536a615baf",
+        "sameAsInitialPackageAndWebProbeArchive": true,
+        "scope": "Both final packed common and selected-web probes used this exact archive. It is temporary review material and does not replace the existing candidate archive."
+      },
+      "taskLineMetricsExcludingEvidence": {
+        "added": 219,
+        "removed": 65,
+        "basis": "Captured dirty unit-start files, not HEAD; includes documentation, tests and formatting of modified mock block. No unrelated baseline deletion attributed."
+      },
+      "logHashes": {
+        "red.log": "80d9fcf501915304e6c268f4f9757550b239cf2db55da0f62a18439048709cdc",
+        "green.log": "4c3d634850ba2adc704a82e98135be3cb301ab30985b14f9d55555409289c4c8",
+        "focused.log": "ffbf4c9bd1b83fbf9bec026c1225501e0a5ccbe1baa9756dedc074d497703eb0",
+        "web-all.log": "162a05bcb3ba2d062f16cf89c90c69acf818f847b3f74ea5cdefbd8f77b15e24",
+        "check.log": "6a1508b70ea372a53f6531f0234bf0c292d303ad8d6383cbf9763ff9d911d851",
+        "check-final.log": "947f6ac56d246844f355e2f2d7726c0f299a362f1423a22c40010424bb5d109a",
+        "docs-final.log": "feb4ceee89ee2252939b66e282f57942db8754988a566df001ae691b888a73e3",
+        "typecheck.log": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa",
+        "typecheck-final.log": "217ddb1cae11426cef5c737b91b67a1d40f0ef436e027cfe120f5118f64ac3b9",
+        "typecheck-serial.log": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa",
+        "apps.log": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962",
+        "build.log": "95f01430dc0de0e228527ac61aefbacbdb5114706d853fdfade994da6de9f0a1",
+        "package.log": "6b813d87163847655eb52a6376ec1842460497aa310854faf17e5533fd392d73",
+        "peers-web.log": "95bceaf378ac69ce9bc1782a13a355d1cae03ef8b6e3fd7e6c0cf360fbcaab8b",
+        "peers-web-tmp.log": "721df5a3973a54b7168821fea8dfde8c868af3ce5d5ada38311bd9f53f4f9ab5",
+        "peers-web-approved.log": "275d8ff0a44d32442970545a0c5ecaa08077937cb827b779272f11312bcc59c9",
+        "package-final-start-failure.log": "5f4acb58b778cadb846e75c22edff8b78d449cf4af3a58562b07965b473ec8c0",
+        "package-final.log": "7e3ffa0dbdf720fcbfb90754c6a5176376c2ec3849e297daf20553fb8c432eb1",
+        "peers-web-final.log": "275d8ff0a44d32442970545a0c5ecaa08077937cb827b779272f11312bcc59c9"
+      }
+    }
+  },
+  "publication": {
+    "base": "8b83354758ef9768fb7bcf09a4e175078109337e",
+    "branch": "codex/u03-web-wrapper-access",
+    "authorization": "The owner said Create a PR after receiving the reviewed U03 result. This authorizes commit/push/PR preparation; no merge, U04, renderer acceptance, native build/install, SDK operation or version/peer/patch change.",
+    "scopeAdjustment": "Port only reviewed U03 runtime/test/script additions to merged main; reconcile availability/status prose while preserving main release facts, coverage cells, source research provenance and historical evidence. No expansion beyond U03.",
+    "differencesFromOriginal": "Main retains its older runtime/package baseline. Reviewed runtime source, web mock, new regression suite and common negative declaration probe are copied byte-for-byte. Only the U03 insertion is added to main selected-peer runner. Documentation is reconciled onto main instead of copying rc.11 working documents.",
+    "dependencyResolution": "Temporary per-package symlink overlays reused existing third-party dependencies. Every workspace link resolved to this clone. Library/example built before final type/app checks; common and selected-web probes consumed same frozen clone archive. No dependency install in clone; temporary overlays removed before handoff.",
+    "checks": [
+      {
+        "command": "bun run check",
+        "exit": 0,
+        "result": "305 files formatted; 279 linted, no warnings/errors.",
+        "logSha256": "25399f0badb2fb97512b8ab31224d6d561c4a76d62ae158b93f183104c913d87"
+      },
+      {
+        "command": "bun run check:docs",
+        "exit": 1,
+        "result": "Initial run before evidence record creation:3 missing local links to that record. No product failure.",
+        "logSha256": "c80f3e0c33dd38cb9150b134f1dd81e6bba4d202489344d7d036ca1ae75179e2"
+      },
+      {
+        "command": "bun run check:docs",
+        "exit": 0,
+        "result": "38 Markdown files and 38 SDK comparison tables; structure/fences/local links passed.",
+        "logSha256": "5064cea233b69c6f15276f24ec84d61e8ac38a2e0af0c738f140f17427b865c2"
+      },
+      {
+        "command": "bun run build",
+        "exit": 0,
+        "result": "Library and example package build only; completed before type/app checks.",
+        "logSha256": "637ab0818e59d80f78cda4d65864b053d8dfa1a394265cb116f9ec29407dd9fe"
+      },
+      {
+        "command": "bun run typecheck",
+        "exit": 0,
+        "result": "All 4 library/test/web/native-example configurations passed against clone sources/dist.",
+        "logSha256": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+      },
+      {
+        "command": "bun run typecheck:apps",
+        "exit": 1,
+        "result": "Initial root-only overlay lacked package-local Expo dependencies; no source failure established.",
+        "logSha256": "893ba2628bb823afc1d58fed4f495b5891eb6961c460579969f0f0b8cf7642ea"
+      },
+      {
+        "command": "bun run typecheck:apps",
+        "exit": 0,
+        "result": "Passed example-test, web and Expo app configurations after package-local dependency overlay and clone workspace links.",
+        "logSha256": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962"
+      },
+      {
+        "command": "./node_modules/.bin/vp test run",
+        "exit": 1,
+        "result": "813 passed, 2 failed in 37 suites. All 6 new getter cases passed. Existing wrapper-callback suite imports marker.ts, missing from installed wrapper packages (marker.tsx exists).",
+        "logSha256": "709caae0fd04d6673dd2c0afd50808e0be1d958d9c646876827ce4fbb32cb251"
+      },
+      {
+        "command": "./node_modules/.bin/vp test run packages/one-map-react/test/wrapper-callbacks.web.test.tsx",
+        "exit": 1,
+        "result": "Identical2 missing marker.ts import failures reproduced against unchanged main 8b83354758ef9768fb7bcf09a4e175078109337e extracted to temporary baseline; file and production code from exact main. No unrelated correction included.",
+        "logSha256": "cfc33535b8766c46b6d8f80f22bd8c69767c7755747390e205efcd263403faa6"
+      },
+      {
+        "command": "bun scripts/test-package.mjs --evidence /tmp/one-map-u03-pr-zp6vxkul/package.json",
+        "exit": 0,
+        "result": "All 13 packed common/explicit/conditional/mixed export-path selections passed; no selected wrapper peer installations, Metro or native builds.",
+        "logSha256": "e8eab7bb95a1e5f6bb8bb4d5bc81c4d0b227fe5dbfba385e6beffda2744741d9"
+      },
+      {
+        "command": "bun /tmp/one-map-u03-pr-zp6vxkul/check-markdown.mjs",
+        "exit": 0,
+        "result": "Temporary existing checker with input list expanded to root/package/agents/records index:42 Markdown files and 38 tables passed.",
+        "logSha256": "547d580de6c64a8eb9f1173d52915e3c826a7805961874eca5768d57036ee57a"
+      },
+      {
+        "command": "./node_modules/.bin/vp test run packages/one-map-react/test/{web-wrapper-access,mapbox-web,maplibre-web,tf09-selected,tf07-map-context,lifetimes-smoke}.web.test.tsx",
+        "exit": 0,
+        "result": "344 tests in 6 affected suites passed, including all 6 getter lifecycle cases. Existing broken wrapper-callback imports are separately reproduced and recorded.",
+        "logSha256": "7273fffe0c5fbfc8c2008bdd7a2bf33d32201e6fb85b3c1680ec476ce82dd8d5"
+      },
+      {
+        "command": "bun scripts/test-package.mjs --archive /tmp/one-map-u03-pr-zp6vxkul/final-artifact/one-map-react-0.1.0-rc.2.tgz --evidence /tmp/one-map-u03-pr-zp6vxkul/package-final.json",
+        "exit": 0,
+        "executor": "coordinator with approved access",
+        "result": "13 isolated selections passed on final frozen archive, no rebuild.",
+        "archiveSha256": "d268011eadb0fb83094bd8c0bc7b915399f4bb87b67463326343decf661898e3",
+        "logSha256": "e8eab7bb95a1e5f6bb8bb4d5bc81c4d0b227fe5dbfba385e6beffda2744741d9"
+      },
+      {
+        "command": "TMPDIR=/private/tmp/one-map-u03-pr-zp6vxkul bun /tmp/one-map-u03-pr-zp6vxkul/test-peers-web-only.mjs --archive /tmp/one-map-u03-pr-zp6vxkul/final-artifact/one-map-react-0.1.0-rc.2.tgz --evidence /tmp/one-map-u03-pr-zp6vxkul/peers-web-final.json",
+        "exit": 0,
+        "executor": "coordinator with approved access",
+        "result": "Both explicit selected-web packed consumers passed exact Promise<upstream MapRef> identities, engine-specific wrapper/raw methods and peer isolation.",
+        "archiveSha256": "d268011eadb0fb83094bd8c0bc7b915399f4bb87b67463326343decf661898e3",
+        "logSha256": "a67bddd1a00a62638f2411a2cf8fb9f932271d685252e434489cdef4b667db6a"
+      },
+      {
+        "command": "bun /tmp/one-map-u03-pr-zp6vxkul/check-markdown.mjs",
+        "exit": 0,
+        "result": "Final expanded Markdown pass: 42 files, 38 comparison tables, paragraphs, fences and local links passed after reconciliation.",
+        "logSha256": "547d580de6c64a8eb9f1173d52915e3c826a7805961874eca5768d57036ee57a"
+      }
+    ],
+    "review": "Final independent review and coordinator audit passed for the U03 publication scope. No runtime, declaration or packaging findings. Corrected the reviewer-identified stale U03 hold clause in the records index to reference current unit-plan authorization. Two callback import failures remain reported as failing and reproduce on unchanged main in the same isolated dependency setup.",
+    "unverified": [
+      "Real browser renderer wrapper acceptance",
+      "Native linking, native getters and native runtime behavior",
+      "Full native/mixed selected-peer install matrix",
+      "Merge and release readiness"
+    ],
+    "preservation": {
+      "allowedChangedPaths": 19,
+      "coverageRows": 69,
+      "currentCoverageFirstThreeCellsAndCheckboxesUnchanged": true,
+      "reviewedCodeAndTestByteIdentity": true,
+      "peerRunnerContainsOnlyExactReviewedU03Insertions": true,
+      "commonNativeProxyAndWebContractUnchanged": true,
+      "packageLockPatchVersionCandidateHistoricalFilesUnchanged": true,
+      "originalWorkingCheckout": "No first-party writes performed. Coordinator retains original before/after manifest verification."
+    },
+    "dependencyResolutionAssertions": {
+      "workspaceLinks": {
+        "one-map-react": "/private/tmp/one-map-u03-pr-zp6vxkul/repo/packages/one-map-react",
+        "@one-map/example-map": "/private/tmp/one-map-u03-pr-zp6vxkul/repo/packages/example-map",
+        "@one-map/web": "/private/tmp/one-map-u03-pr-zp6vxkul/repo/apps/web",
+        "@one-map/expo": "/private/tmp/one-map-u03-pr-zp6vxkul/repo/apps/expo"
+      },
+      "packageLocalWorkspaceLinks": "Each temporary package-local overlay overrides workspace links to clone package paths. Existing third-party packages remain read-only symlink targets.",
+      "buildOrder": "Build completed before final typecheck/typecheck:apps and packed probe. No concurrent dist-clearing build."
+    },
+    "webPeerDerivation": {
+      "temporaryRunnerSha256": "086f5d45daba13d2b6d0528e8663a79c7a517e965be8f6c1ec1edb3ce6c2d849",
+      "source": "scripts/test-peers.mjs on publication clone",
+      "changes": [
+        "Absolute helper imports and root point to clone",
+        "Explicit peer list filtered to2web entries",
+        "Entire mixed native/web loop removed",
+        "Final output labeled web-only"
+      ],
+      "nativeOrMixedPeerInstalls": false,
+      "status": "Both web probes passed on final frozen archive; coordinator executed with approved access. No failed installation attempt for this publication stage."
+    },
+    "warnings": [
+      "Existing Bun moduleSuffixes unsupported warning",
+      "Full jsdom suite informational environment-cost note",
+      "Two wrapper-callback import failures reproduce on unchanged main in the same isolated dependency setup; full suite is not green."
+    ],
+    "reviewedTaskOnlyDiffSha256": "807f1b430f4cd9e90ace1fbdb66de6392c0d97eb59e8c68c9cec529bd1d87525",
+    "routinePackageArchiveSha256": "d268011eadb0fb83094bd8c0bc7b915399f4bb87b67463326343decf661898e3",
+    "finalFrozenArchive": {
+      "sha256": "d268011eadb0fb83094bd8c0bc7b915399f4bb87b67463326343decf661898e3",
+      "packageVersion": "0.1.0-rc.2",
+      "sameArchiveForCommonAndWebProbes": true,
+      "scope": "Temporary main-based publication artifact for U03; unchanged package version, no existing candidate archive replaced. Dist/package source/README frozen before these checks."
+    },
+    "packedWebChecks": [
+      {
+        "entry": "mapbox-web",
+        "packages": [
+          "react@19.2.3",
+          "react-dom@19.2.3",
+          "@types/react@19.2.18",
+          "react-map-gl@8.1.3",
+          "mapbox-gl@3.32.0"
+        ],
+        "resolvedPeers": {
+          "react": "19.2.3",
+          "react-dom": "19.2.3",
+          "@types/react": "19.2.18",
+          "react-map-gl": "8.1.3",
+          "mapbox-gl": "3.32.0"
+        },
+        "archiveSha256": "d268011eadb0fb83094bd8c0bc7b915399f4bb87b67463326343decf661898e3",
+        "lockfileSha256": "8a48b3f1be1cc23150589c4ad5be333aabfc7799f770ff7424c862b82d558cfc",
+        "patchedFiles": {},
+        "status": "passed",
+        "scope": "Isolated selected-web imports, exact wrapper declarations and selected peer installation; no renderer, native linking or native patch execution."
+      },
+      {
+        "entry": "maplibre-web",
+        "packages": [
+          "react@19.2.3",
+          "react-dom@19.2.3",
+          "@types/react@19.2.18",
+          "react-map-gl@8.1.3",
+          "maplibre-gl@6.13.0"
+        ],
+        "resolvedPeers": {
+          "react": "19.2.3",
+          "react-dom": "19.2.3",
+          "@types/react": "19.2.18",
+          "react-map-gl": "8.1.3",
+          "maplibre-gl": "6.13.0"
+        },
+        "archiveSha256": "d268011eadb0fb83094bd8c0bc7b915399f4bb87b67463326343decf661898e3",
+        "lockfileSha256": "91012f6a41ff64b3b29a1ef5ef94975ef336383b27413ad0254e28fede098134",
+        "patchedFiles": {},
+        "status": "passed",
+        "scope": "Isolated selected-web imports, exact wrapper declarations and selected peer installation; no renderer, native linking or native patch execution."
+      }
+    ],
+    "retention": "Compact publication outcomes, first failures, original working provenance and hashes retained here. Raw logs, temporary baseline/dependency overlays, peer lockfiles and duplicate archive are removed after publication audit. The published commit retains the final source and record."
+  }
+}

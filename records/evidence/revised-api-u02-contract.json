@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "unit": "U02",
+  "status": "documentation-reviewed-owner-authorized-pr-successors-on-hold",
+  "authorization": {
+    "source": "Direct owner approval of the reviewed U02 result, followed by Create a PR",
+    "approved": [
+      "U02 documentation",
+      "U02 commit/push/PR"
+    ],
+    "notAuthorized": [
+      "U03 and later units",
+      "runtime implementation",
+      "renderer acceptance",
+      "native builds/installations",
+      "merge",
+      "package publication",
+      "peer/patch/version changes"
+    ]
+  },
+  "reviewedWorkingArtifact": {
+    "basis": "U01 captured dirty working basis; not publication main",
+    "baselineRecord": "records/evidence/revised-api-u01-baseline.json",
+    "taskDiffSha256": "a9240ed2519f3ab7a1d4db5ba21e9248e63940881d4300c9d20d7b6263f9e8f1",
+    "changedPaths": [
+      "README.md",
+      "AGENTS.md",
+      "docs/requirements.md",
+      "docs/revised-api-implementation-plan.md",
+      "docs/stage-plan.md",
+      "docs/README.md",
+      "docs/api-coverage.md",
+      "docs/AGENTS.md",
+      "docs/revised-api-proposal.md",
+      "packages/one-map-react/README.md"
+    ],
+    "addedLines": 153,
+    "removedLines": 122,
+    "allCodeFencesUnchanged": true,
+    "allCoverageRowsAndCheckmarksUnchangedWithinWorkingBasis": true,
+    "review": "Independent review and coordinator audit passed; owner authorized PR",
+    "routineChecks": [
+      {
+        "command": "bun run check",
+        "result": "passed",
+        "scope": "345 formatted files; 327 linted files"
+      },
+      {
+        "command": "bun run check:docs",
+        "result": "passed",
+        "scope": "39 Markdown files; 42 SDK comparison tables"
+      },
+      {
+        "command": "expanded Markdown structure/link checker",
+        "result": "passed",
+        "scope": "42 Markdown files; 42 SDK comparison tables"
+      }
+    ],
+    "artifactHashes": {
+      "README.md": "aef09e96d8f6a45989451ca04f9f8432db77078eadd81942bf072faf796f6e33",
+      "AGENTS.md": "a878423c782cc3398a6fc8f7d7b81aa37db655b96afe913179f75e5bce9afdff",
+      "docs/requirements.md": "9b7a05718cf87369dbd681d05cb70f6a4f305256186218883506efc49a945e02",
+      "docs/revised-api-implementation-plan.md": "71a1a9b969dada77f87c665250fd57b4250569c69365f6d2a28172dd0b09900b",
+      "docs/stage-plan.md": "5dc87052fa65fdb6d9a4e974c39e3d9c39b59d82cff465a3ac0ba5ef3aa26645",
+      "docs/README.md": "5e2b3b02657f4e1e2d5e01643bf9c3180774ad3943cf500ab8d5aa1d62ae635f",
+      "docs/api-coverage.md": "d8cd0b9038799b57c7f6ef250952e4b7b4725885c7959b627779d5f0e6fcc95b",
+      "docs/AGENTS.md": "0cddaa3144b7dcd612f3950593c6ac64e37cd1df62fa41fddcdd214acd303ae7",
+      "docs/revised-api-proposal.md": "ca588447057d70ff71f9ec8a60cba931bb2641a26d27b65465723b58070fde16",
+      "packages/one-map-react/README.md": "a5eadb4609c9cbaf07e39440a0222952eebd5ed3a1622ccbbd639e40f3c1aa83"
+    }
+  },
+  "publication": {
+    "baseCommit": "7d77b78891372aa0bf62ee33456ad5bc8f43d296",
+    "baseBranch": "origin/main",
+    "branch": "codex/u02-next-release-contract",
+    "packageVersion": "0.1.0-rc.2",
+    "preparation": "Port reviewed U02-only paragraphs and dispositions onto main; preserve main runtime/release evidence. Add complete reviewed target documents absent from main. Clarify captured working provenance and updated owner authorization without changing target signatures or examples.",
+    "scopeAdditions": [
+      {
+        "paths": [
+          "docs/revised-api-proposal.md",
+          "docs/revised-api-implementation-plan.md"
+        ],
+        "reason": "Required U02 target documents existed only in the reviewed working basis, so publication adds their full content rather than only the working task delta."
+      },
+      {
+        "paths": [
+          "records/evidence/revised-api-u02-contract.json",
+          "records/README.md"
+        ],
+        "reason": "Compact checkpoint provenance and index route distinguish original working review from main-based publication."
+      }
+    ],
+    "workspaceOnlyResearch": "docs/contract-review.md remains a path reference to the U01 captured working basis; it is not published or linked as a local file.",
+    "currentCandidateFacts": "Manifest, support matrix, candidate evidence, peers, patches and historical acceptance unchanged from main. rc.11 source/Before observations are explicitly scoped to the U01 working basis.",
+    "artifactHashes": {
+      "README.md": "ecc9fe99365a6d219e6f8975e98be87eff9b5f3ac69d282e5c7ee72c7ced571b",
+      "AGENTS.md": "f97b1cde534d2bba5492752da3cdbed6cc7ec37820325ff13140b221e28a958f",
+      "docs/requirements.md": "f83faaea636b0f45a3047ea7dff8c7748f5f895c553459828634aca589395bd0",
+      "docs/revised-api-implementation-plan.md": "edb022ac8076e8eac429063f4eaeddf96e38fa2cedd2b128710b92878f8b2a8b",
+      "docs/stage-plan.md": "8c7f06b46f39da71370a2e8e597083b79d29bd021411c806694cf4194d2eead3",
+      "docs/README.md": "c05505aaad7d65862e6f2d20354ae3fb50aced2f7c747b4178e46447d334d178",
+      "docs/api-coverage.md": "a99f6df620c7cac8b75410f3abbf44e4aa0b03a7e1c8c54765ebe6bbdd63169b",
+      "docs/AGENTS.md": "8fe699c85c41c9539ffb0ad5beafe7bebf4af2d199e587f55926f20efb5ac6f0",
+      "docs/revised-api-proposal.md": "5efbaff2ca38915f46da8ebee6aca487710d245808ea766f9190ee0cdc8d2051",
+      "packages/one-map-react/README.md": "878336afaf68bf019c16ce41aa748f7d3f6a616521dbd5acb9ff4989447fa1c7"
+    },
+    "examplePreservation": "Proposal/plan fenced examples equal reviewed working artifact byte-for-byte. Existing-document fenced examples equal publication main byte-for-byte, including package README examples that differ from the newer working basis."
+  },
+  "freshPublicationChecks": {
+    "commandsInspected": [
+      "package.json check and check:docs",
+      "scripts/check-docs.mjs"
+    ],
+    "check": {
+      "command": "bun run check",
+      "result": "passed",
+      "scope": "304 formatted files; 278 linted files",
+      "execution": "Temporary node_modules symlink to existing original dependencies; no installation. Initial PATH-only attempt could not resolve vite-plus from clone; resolved with symlink."
+    },
+    "docs": {
+      "command": "bun run check:docs",
+      "result": "passed",
+      "scope": "38 Markdown files; 38 SDK comparison tables; paragraphs, fences and local links",
+      "warning": "Existing Bun moduleSuffixes support warning; no structural failure."
+    },
+    "expandedMarkdown": {
+      "command": "bun /tmp/one-map-u02-pr-yau195b7/check-markdown.mjs",
+      "result": "passed",
+      "scope": "43 Markdown files; 38 SDK comparison tables; docs plus root/package/agent and records index/U01 Markdown routes",
+      "method": "Existing scripts/check-docs.mjs with only the input file list expanded in a temporary copy."
+    },
+    "preservation": {
+      "result": "passed",
+      "coverageRowCount": 69,
+      "allMainCoverageCellsAndCheckmarksPreserved": true,
+      "workspaceRuntimeStillUnchecked": true,
+      "targetDocumentCodeFencesEqualReviewedOriginal": true,
+      "existingMainDocumentCodeFencesUnchanged": true,
+      "trackedRuntimeTestsConfigsPackagesPatchesAndReleaseRecordsUnchanged": true,
+      "originalTenReviewedFilesUnchanged": true
+    },
+    "diffWhitespace": {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  },
+  "limits": [
+    "No fresh runtime, type, unit, build, package or renderer verification; documentation-only publication preparation.",
+    "After examples describe unimplemented next-release APIs; Before examples and source observations describe the captured U01 working basis, not newer evidence for main.",
+    "Future retained-contract implementation and acceptance remain open. U03 requires explicit owner release."
+  ],
+  "retention": {
+    "rawPreparationLogs": "Temporary /tmp/one-map-u02-pr-yau195b7 only; compact outcomes and hashes retained here",
+    "freshLogHashes": {
+      "checkInitial": "df9d5992d8477b688922cc58f055539c7c6fe911b2c208a108602aa055fe44e4",
+      "checkPassed": "326bd0407cb780aa8ecae7b34e7fac0076708a8112d863bc28d6e2214df50af7",
+      "docsPassed": "8f5a5b93e932ae4a152e56f939ea12da7ceb1f05106e74af99a9489a88adf03c",
+      "expandedMarkdownPassed": "dc4d787cff180c39092029cda4e6003b8f496d715405e66ead056973e85e0ad1"
+    }
+  }
+}

@@ -38,7 +38,7 @@ export const MarkerView = NativeMarker;
 export { Callout, LayerAnnotation, ViewAnnotation };
 
 type AnnotationEvent = Parameters<
-  NonNullable<ComponentProps<typeof ViewAnnotation>["onDrag"]>
+  NonNullable<ComponentProps<typeof ViewAnnotation>["onPress"]>
 >[0];
 
 const MaplibreAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
@@ -65,18 +65,10 @@ const MaplibreAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
         lngLat={[props.lngLat[0], props.lngLat[1]]}
         anchor={props.anchor}
         offset={[props.offset[0], props.offset[1]]}
-        draggable={props.draggable}
         onPress={(event: AnnotationEvent) => {
           event.stopPropagation();
           props.onClick?.(normalize(event));
         }}
-        onDragStart={(event: AnnotationEvent) =>
-          props.onDragStart?.(normalize(event))
-        }
-        onDrag={(event: AnnotationEvent) => props.onDrag?.(normalize(event))}
-        onDragEnd={(event: AnnotationEvent) =>
-          props.onDragEnd?.(normalize(event))
-        }
       >
         {props.children}
       </ViewAnnotation>

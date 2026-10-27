@@ -1,5 +1,7 @@
 # Sources and layers
 
+**Working feature-click migration.** The [map-click migration](revised-api-proposal.md#rendering-and-queries-stay-shared) uses Map.onClick with interactiveLayerIds for source activation. Source.onClick, SourceClickEvent, synthetic source bubbling, selected facade native source hitbox additions and UserLocation.onPress are removed. Raw native Wrapper source onPress/hitbox facilities, source refs/queries/state, live markers/portals and supplied location geometry/accuracy remain. Native filtered clicks retain queries at the actual logical map point, observable errors and stale-map callback protection. The future native focused source stop/bubbling probe is retired; historical scenario IDs and outcomes remain attached to their recorded artifacts. Renderer/query/touch behavior, Metro and native builds/installations remain unverified.
+
 **Current advanced source/layer routes:** See [advanced rendering](tf09-rendering.md) for selected canvas/video/custom and renderer-specific families. Both web engines passed canvas/video/custom output and teardown; all six environments passed hillshade. Other advanced families retain explicit runtime-unverified status.
 
 **Preserved research.** Upstream comparisons and inventory references below remain useful at their recorded versions. Previous facade contracts, stage assignments, and implementation/acceptance claims are historical. Use the [thin-facade requirements](requirements.md) and [new stage plan](stage-plan.md) when implementing these APIs; full coverage remains required.
@@ -14,7 +16,7 @@ This reference covers component and property mappings, updates, queries, cluster
 
 **Implemented in TF02:** `Source` accepts `type: "geojson"`, a required `id`, and object `data`. `Layer` accepts `type: "line"` with `paint["line-color"]`, `paint["line-width"]`, and optional `layout["line-cap"]`. RNMapbox renders `ShapeSource` plus `LineLayer` with `shape` and camelCase `lineColor`, `lineWidth`, and `lineCap`. MapLibre Native renders `GeoJSONSource` plus `Layer`. Web forwards react-map-gl `Source` and `Layer`. The common `Layer` remains the direct child of the wrapper source: RNMapbox injects `sourceID`, and MapLibre Native and react-map-gl inject `source`; `Layer` forwards that injected prop. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7. See the [TF02 record](tf02-shared-map.md).
 
-**Implemented in TF05:** The remaining portable source families (`vector`, `raster`, `raster-dem`, `image`) and the full eight-type layer set (`background`, `fill`, `line`, `circle`, `symbol`, `raster`, `heatmap`, `fill-extrusion`) are implemented with typed paint/layout keys, structural expression and filter passthrough, `beforeId` ordering, GeoJSON clustering configuration with capability gates, a common `Images` component, data updates, removed-key reset, immutable-option remount rejection, and style-replacement rebuild. Each adapter defines per-family converters colocated in the adapter module; they list every field mapping explicitly and return the wrapper component's own prop types, so a renamed wrapper field fails at compile time. Range and unknown-key checks are deferred to the selected map library. Raster DEM `encoding` and `attribution` throw on mapbox-native; DEM `scheme` throws on both native adapters. `raster-array`, `video`, and `canvas` sources are deferred to TF09. The six-environment smoke passed. See the [TF05 record](tf05-sources.md).
+**Historical TF05 implementation checkpoint:** The remaining portable source families (`vector`, `raster`, `raster-dem`, `image`) and the full eight-type layer set (`background`, `fill`, `line`, `circle`, `symbol`, `raster`, `heatmap`, `fill-extrusion`) are implemented with typed paint/layout keys, structural expression and filter passthrough, `beforeId` ordering, GeoJSON clustering configuration with capability gates, a common `Images` component, data updates, removed-key reset, immutable-option remount rejection, and style-replacement rebuild. Each adapter defines per-family converters colocated in the adapter module; they list every field mapping explicitly and return the wrapper component's own prop types, so a renamed wrapper field fails at compile time. Range and unknown-key checks are deferred to the selected map library. Raster DEM `encoding` and `attribution` throw on mapbox-native; DEM `scheme` throws on both native adapters. `raster-array`, `video`, and `canvas` sources are deferred to TF09. The six-environment smoke passed. See the [TF05 record](tf05-sources.md).
 
 **Implemented in TF06:** Rendered and source queries, query filters, cluster queries, feature identifiers, and feature-state set/get/remove are promise-based `MapRef` methods on every adapter. Results are normalized (feature array, collection, or Android JSON string), preserve order and duplicates, and distinguish empty success from failure. Cluster dispatch goes through native source refs (a `ShapeSource` registry on mapbox-native; a GeoJSON-plus-vector registry on maplibre-native, where GeoJSON `getData` queries loaded source tiles on iOS and Android) and through the style source on web with each engine's report style normalized. See the [TF06 record](tf06-queries.md).
 
@@ -276,7 +278,7 @@ const features = map.queryRenderedFeatures(
 ```
 
 ```ts
-// Agreed one-map-react declaration; adapter query behavior remains unfinished.
+// Shared MapRef; renderer verification remains artifact-specific.
 const features = await map.queryRenderedFeatures(
   [240, 320], { layers: ["route-line"] },
 );
@@ -320,25 +322,45 @@ map.setFeatureState(
 ```
 
 ```ts
-// Agreed one-map-react declaration; adapter feature-state behavior remains unfinished.
+// Shared MapRef; renderer verification remains artifact-specific.
 await map.setFeatureState(
   { source: "routes", id: "route-1" }, { selected: true },
 );
 ```
 
-The adapter must convert identifiers and route MapLibre calls to registered source refs. The agreed portable feature-state contract uses stable string IDs and JSON values without null, undefined, or non-finite numbers. MapLibre React Native's [current source documentation][ml-geojson] states that null-valued object keys, including nested keys, are dropped while null array elements remain. This review establishes that documented upstream contract, not identical native conversion observations on both platforms. RNMapbox's native argument conversion also needs value validation. Use `removeFeatureState` to remove a key rather than treating null as deletion. Numeric ID normalization and richer values require an explicit tested extension.
+The adapters convert identifiers and route MapLibre calls to registered source refs. The working [FeatureIdentifier](../packages/one-map-react/src/contracts/query-types.ts) accepts stable string or numeric IDs; feature state accepts JSON values without null, undefined or non-finite numbers. MapLibre React Native's [current source documentation][ml-geojson] states that null-valued object keys, including nested keys, are dropped while null array elements remain. This review establishes that documented upstream contract, not identical native conversion observations on both platforms. RNMapbox's native argument conversion also needs value validation. Use `removeFeatureState` to remove a key rather than treating null as deletion. Values outside the supported feature-state JSON shape remain excluded.
 
-MapLibre declares feature-state methods in the inspected [11.5.0 source][ml-geojson]. Its documented removals apply on the next rendered frame, so awaiting the call does not guarantee immediate read-after-removal consistency or a completed repaint. Define stronger guarantees separately if needed. The [agreed one-map-react policy](decisions/0001-baselines-and-ownership.md#accepted-portable-defaults) resets feature state after an owned source is recreated or a style is replaced. Adapters must implement and test that policy; state retention is not assumed.
+MapLibre declares feature-state methods in the inspected [11.5.0 source][ml-geojson]. Its documented removals apply on the next rendered frame, so awaiting the call does not guarantee immediate read-after-removal consistency or a completed repaint. Define stronger guarantees separately if needed. The historical [portable-defaults decision](decisions/0001-baselines-and-ownership.md#accepted-portable-defaults) required reset after source recreation or style replacement. The next-release [renderer-owned lifetime contract](revised-api-proposal.md#camera-and-feature-state-guarantees) supersedes that requirement: explicit operations retain validation and errors, while applications clear or reapply desired state after source attachment and readiness. Same-ID remounts and style changes add no automatic reset, replay, queue, or transaction guarantee. U09 migration is implemented and audited; its [evidence record](../records/evidence/revised-api-u09-feature-state.json) separates routine verification from unverified renderer acceptance.
 
 ## Images and advanced rendering
 
 | RNMapbox | MapLibre React Native | react-map-gl | Proposed one-map-react API |
 | --- | --- | --- | --- |
-| [`Images`, native assets, `Image` component][rn-images] | [`Images`, consolidated entries, missing-image event][ml-images] | [Map image methods and style-image events][web-ref] | `Images` convenience component; portable URL entries and explicit asset extensions. |
+| [`Images`, native assets, `Image` component][rn-images] | [`Images`, consolidated entries, missing-image event][ml-images] | [Map image methods and style-image events][web-ref] | `Images` portable URL entries; deliberate web polyfill and native wrapper translation under the lifetime below. |
 | [`Terrain`, `Light`, `Atmosphere`, weather components][rn-index] | [Map `light` prop][ml-map] and [exported terrain/sky specification types][ml-index] | [Mapbox][web-mapbox-props] / [MapLibre][web-props] terrain/light props and SDK methods | Capability-specific configuration; no blanket field-equivalence claim. |
 | [`ModelLayer`, `Models`, `RasterParticleLayer`, `SkyLayer`][rn-index] | [Different generic style-spec surface][ml-layer] | [Generic layers with backend-specific types][web-layer] | Advanced layer/model capabilities, outside the initial common layer set. |
 
-Image registration must wait for style readiness, handle asset resolution on each host, remove owned images, and re-register after style changes. Native bundled image handles are not browser URLs. A URL-based core can be portable while asset loading remains host-specific.
+### Named style images
+
+**Working next-release contract; implemented and independently audited.** Images registers named assets used by symbol layers, such as icon-image, and by pattern properties, such as fill-pattern. Registration alone draws nothing. An ImageSource instead positions an image over geographic corners; a Marker places React or DOM content at a coordinate. Use Images when a layer needs a named picture in the map style.
+
+Images is a deliberate extension to the usual react-map-gl-shaped API. RNMapbox and MapLibre React Native supply Images components, but react-map-gl does not. Its renderers support loadImage, addImage and removeImage, so a small web polyfill lets shared symbol and pattern layers use the same asset declarations without application-specific platform components. The [migration contract](revised-api-proposal.md#markers-images-popups-and-controls) owns the exact scope; [U20 status](revised-api-implementation-plan.md#u20-keep-a-small-images-polyfill) separates implementation from verification.
+
+The portable images record maps each style image name to a URL or a { url, sdf } entry. Native bundled asset handles remain selected wrapper facilities. Native adapters translate portable entries and delegate to the wrappers, including their normal SDK restoration and collision behavior. The facade does not suppress native restoration to imitate web. Web reserves an entry for one mounted style lifetime and reports an existing image name as a conflict rather than overwriting a style sprite or another Images instance.
+
+Within that web lifetime, Images waits for the initial usable style, loads entries independently, and adds successful images. Unchanged names, URLs and SDF values keep their registrations; changing or removing one entry releases its registration and pending load without restarting unrelated entries. Late loads cannot register after release. Failures report through Map.onError without image URLs. There is no automatic replay or retry on style events. Reserve distinct names while mounted and do not mutate owned registrations through raw image APIs.
+
+For every web style replacement, including a mapStyle prop change or a raw renderer setStyle call:
+
+1. Unmount Images and wait until its effect cleanup has finished in a separate committed step.
+2. Replace the style only after that cleanup boundary.
+3. Mount fresh Images after the replacement style is ready.
+
+Changing only the Images key in onStyleLoad happens too late. Unmounting Images in the same update that replaces the style also fails to establish the required boundary. A fresh keyed Map with reuseMaps={false} is an alternative, shown in the [style-switch example](revised-api-proposal.md#markers-images-popups-and-controls). That alternative resets the camera to initialViewState; retain camera state in the application if it must survive the new map. Initial usable-style waiting remains available on the fresh mount.
+
+The maintained [SourcesMap example](../examples/shared/sources-map.tsx) keeps the same Map and stages Images cleanup before applying a different style; equal serialized style values leave its image lifetime unchanged. The [web corrections example](../examples/shared/web-corrections-app.tsx) retains its map for same-style loading, logical unmount and renderer reuse checks. The [keyed Map migration example](revised-api-proposal.md#markers-images-popups-and-controls) shows the separate full-map replacement alternative. Style replacement remains application-owned rather than automatic image restoration.
+
+The [U20 evidence](../records/evidence/revised-api-u20-images.json) records the independent audit, bounded routine and exact packed checks, including initial readiness, isolated entry updates/removals, conflicts, failed registrations, cleanup before replacement, obsolete loads and retained same-style reuse. Earlier TF05 image replay/retry guarantees and renderer results above belong to their recorded artifacts. They do not certify this narrower web lifetime. Renderer image behavior, Metro and native builds/installations remain unverified for the migration.
 
 See [maps and camera](maps-and-camera.md) for readiness and coordinate contracts, [markers](markers-and-controls.md) for point-display choices, and [capabilities](capabilities-and-extensions.md) for requests outside the portable source/layer subset.
 

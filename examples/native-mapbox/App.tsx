@@ -1,6 +1,7 @@
 import { type MapRef, MapSetup } from "one-map-react";
 import {
   adapter,
+  type NativeMapProps,
   setAccessToken,
   WrapperLocationManager,
   WrapperOfflineManager,
@@ -13,10 +14,17 @@ import { useRef } from "react";
 import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
 
 import { useLifecycleSmoke } from "../shared/lifecycle-smoke.js";
+import { createMapboxOfflineCommands } from "../shared/mapbox-offline-commands.js";
+import { createMapboxSnapshot } from "../shared/mapbox-snapshot.js";
 import { NativeCameraScreen } from "../shared/native-camera-screen.js";
 import { NativeLifetimesScreen } from "../shared/native-lifetimes-screen.js";
+import {
+  acquireNativeLocation,
+  requestNativeLocationPermission,
+} from "../shared/native-location.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
+import { NativeTf07RetainedScreen } from "../shared/native-tf07-retained-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
 import { NativeTf08Screen } from "../shared/native-tf08-screen.js";
 import { NativeTf09Screen } from "../shared/native-tf09-screen.js";
@@ -101,17 +109,25 @@ const offlineOperations = {
   },
 };
 
+const getCurrentPosition = (signal?: AbortSignal, timeoutMs?: number) =>
+  acquireNativeLocation(WrapperLocationManager, "mapbox", signal, timeoutMs);
+const requestLocationPermission = () => requestNativeLocationPermission();
+
 const App = () => {
   if (smokeTarget === "tf09") return <NativeTf09Screen adapter={adapter} />;
   if (smokeTarget === "tf08" || smokeTarget === "tf08-storage")
     return (
       <NativeTf08Screen
         adapter={adapter}
+        createSnapshot={createMapboxSnapshot}
+        getCurrentPosition={getCurrentPosition}
+        requestLocationPermission={requestLocationPermission}
         getLocationDiagnostic={() =>
           WrapperLocationManager.getLastKnownLocation()
         }
         setNetworkConnected={setNetworkConnected}
         offlineOperations={offlineOperations}
+        createOfflineCommands={createMapboxOfflineCommands}
         startDetached={smokeTarget === "tf08-storage"}
         nativePuck={
           <>
@@ -121,7 +137,10 @@ const App = () => {
         }
       />
     );
-  if (smokeTarget === "tf07") return <NativeTf07Screen adapter={adapter} />;
+  if (smokeTarget === "tf07-retained")
+    return <NativeTf07RetainedScreen adapter={adapter} />;
+  if (smokeTarget === "tf07")
+    return <NativeTf07Screen adapter={adapter} ornaments={tf07Ornaments} />;
   if (smokeTarget === "tf06-lifetimes") {
     return <NativeLifetimesScreen adapter={adapter} />;
   }
@@ -178,3 +197,10 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+// Native scale units and appearance belong to the selected SDK.
+const tf07Ornaments = {
+  scaleBarEnabled: true,
+  scaleBarPosition: { top: 64, left: 8 },
+  compassPosition: { top: 148, right: 8 },
+} satisfies NativeMapProps["options"];

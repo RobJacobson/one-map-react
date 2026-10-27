@@ -45,8 +45,6 @@ export interface MapProps {
   /** Legacy extrusion light; omission follows selected SDK reset semantics. */
   readonly light?: LegacyLight;
 
-  /** Enable current-map capture at construction; default false, immutable. */
-  readonly captureEnabled?: boolean;
   /** Optional provider-local identity for useMap(id); changing requires remount. */
   readonly id?: string;
   /** Layer ids whose rendered feature hits are included with map clicks. */
@@ -60,13 +58,13 @@ export interface MapProps {
    */
   readonly initialViewState: ViewState;
   /**
-   * Camera owned by React.
+   * Camera target supplied by React.
    *
-   * When this is set, it replaces later changes from `initialViewState`.
-   * Web adapters forward it to react-map-gl. Native adapters write it onto
-   * the camera child and reconcile rejected proposals after application callbacks
-   * commit. Native renderer acceptance remains unverified; the strict
-   * `controlledCamera` capability stays unavailable until that check passes.
+   * Web adapters delegate controlled movement to react-map-gl. Native adapters
+   * apply changed values through Camera props; movement can leave an unchanged
+   * target behind. Use an explicit command to reapply the same native target.
+   * Removing this value releases the target. Native location follow cannot own
+   * the camera at the same time. The `controlledCamera` capability remains unavailable.
    */
   readonly viewState?: ViewState;
   /** Lowest zoom the camera may use. */

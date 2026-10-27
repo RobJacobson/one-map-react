@@ -14,6 +14,11 @@ import { join, resolve } from "node:path";
 
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import {
+  judgeNativeRetained,
+  nativeRetainedReportReady,
+  nativeRetainedScenarios,
+} from "./tf07-retained-contract.mjs";
+import {
   judgeNativeUi,
   nativeUiReportReady,
   nativeUiScenarios,
@@ -22,6 +27,10 @@ import {
 const root = resolve(import.meta.dirname, "..");
 const platform = process.argv[2];
 const engine = process.argv[3] ?? "both";
+const retained = process.argv[4] === "retained";
+if (process.argv[4] !== undefined && (!retained || platform === "web"))
+  throw new Error("Use retained only for native supplemental observations.");
+const scenarios = retained ? nativeRetainedScenarios : nativeUiScenarios;
 
 if (
   !["web", "android", "ios"].includes(platform) ||
@@ -184,13 +193,12 @@ const runWeb = async (selectedEngine) => {
       (await read()).events["map-click"],
       (beforeSource.events["map-click"] ?? 0) + 1
     );
-    await page.evaluate("window.__oneMapTf07.stopSource(true)");
-    const beforeStopped = await read();
+    const beforeRepeated = await read();
     await press(page, sourceInput);
     await until(async () => (await read()).events["source-click"] >= 2, 5000);
     assert.equal(
       (await read()).events["map-click"],
-      beforeStopped.events["map-click"]
+      beforeRepeated.events["map-click"] + 1
     );
 
     const zoom = (await read()).zoom;
@@ -204,12 +212,34 @@ const runWeb = async (selectedEngine) => {
     await click(page, '[data-tf07-action="popup"]');
     await click(page, '[data-tf07-action="remount"]');
     await until(async () => (await read()).events.load >= 2, 60000);
-    const final = await read();
+    const remounted = await read();
     assert.equal(
-      final.events["popup-close"],
+      remounted.events["popup-close"],
       1,
       "Popup teardown requested dismissal."
     );
+    await until(
+      async () =>
+        page.evaluate(
+          `Boolean(document.querySelector('[data-tf07-child="popup"]'))`,
+          true
+        ),
+      5000
+    );
+    await click(
+      page,
+      ".mapboxgl-popup-close-button, .maplibregl-popup-close-button"
+    );
+    await until(
+      async () =>
+        (await read()).events["popup-close"] === 2 &&
+        (await page.evaluate(
+          `!document.querySelector('[data-tf07-child="popup"]')`,
+          true
+        )),
+      5000
+    );
+    const final = await read();
     assert.equal(
       final.events.error ?? 0,
       0,
@@ -344,7 +374,7 @@ const runNative = async (selectedEngine) => {
           {
             ...identity,
             scenarios: Object.fromEntries(
-              nativeUiScenarios.map((scenario) => [scenario, "unverified"])
+              scenarios.map((scenario) => [scenario, "unverified"])
             ),
           },
           null,
@@ -355,7 +385,12 @@ const runNative = async (selectedEngine) => {
     }
     let completed;
     status = await nativeStatus((observation) => {
-      if (!(observation?.generation >= 1)) return;
+      if (
+        retained
+          ? observation?.focusedComplete !== true
+          : !(observation?.generation >= 1)
+      )
+        return;
       let manual;
       if (manualPath) {
         try {
@@ -363,7 +398,13 @@ const runNative = async (selectedEngine) => {
         } catch {
           return;
         }
-        if (!nativeUiReportReady(manual, identity)) return;
+        if (
+          !(retained ? nativeRetainedReportReady : nativeUiReportReady)(
+            manual,
+            identity
+          )
+        )
+          return;
       }
       completed = { observation, manual };
     });
@@ -372,7 +413,10 @@ const runNative = async (selectedEngine) => {
       ["run", "start", "--", "--port", String(metroPort), "--reset-cache"],
       {
         cwd: join(root, "examples", `native-${selectedEngine}`),
-        env: { ...process.env, ONE_MAP_SMOKE: "tf07" },
+        env: {
+          ...process.env,
+          ONE_MAP_SMOKE: retained ? "tf07-retained" : "tf07",
+        },
       }
     );
     await until(
@@ -397,7 +441,7 @@ const runNative = async (selectedEngine) => {
         `127.0.0.1:${metroPort}`,
       ]);
     console.error(
-      `Perform the native touch flow in docs/tf07-ui.md, then press Read renderer. Required observations: ${nativeUiScenarios.join(", ")}.`
+      `Perform the native touch flow in docs/tf07-ui.md, then press Read renderer. Required observations: ${scenarios.join(", ")}.`
     );
     console.error(`Native report identity: ${JSON.stringify(identity)}`);
     await until(
@@ -407,8 +451,15 @@ const runNative = async (selectedEngine) => {
     const { observation, manual } = completed;
 
     return {
-      ...judgeNativeUi(observation, manual, identity),
+      ...(retained ? judgeNativeRetained : judgeNativeUi)(
+        observation,
+        manual,
+        identity
+      ),
       ...identity,
+      ...(retained
+        ? { nativeTarget: platform === "ios" ? iosDevice : serial }
+        : {}),
       observation,
     };
   } finally {
