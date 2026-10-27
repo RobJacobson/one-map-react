@@ -1,0 +1,72 @@
+{
+  "checkpoint": "U25 PR50 iOS readiness retry 02",
+  "date": "2026-10-27",
+  "status": "Stopped during worker preflight; no simulator commands executed",
+  "worker": "/root/u25_ios_readiness_retry02",
+  "model": "gpt-6-luna",
+  "reasoning": "medium",
+  "planSha256": "e0a4d176a2cdba236198c47a49c25e9e2382314e11f8e5bc8d4a3550f9962710",
+  "candidateSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+  "workerHandoffSha256": "6a5ced61f5f25491924d8211e048a225e082c32e47abade82156fc8fba01dde7",
+  "workerOutcome": {
+    "checkpoint": "U25 PR50 iOS host-readiness retry",
+    "status": "failed_step_1",
+    "timestampUtc": "2026-10-27T07:46:23.961415+00:00",
+    "planPath": "/Users/rob/code/mapbox-code/one-map/records/evidence/revised-api-u25-host-repair-plan.json",
+    "planSha256": "e0a4d176a2cdba236198c47a49c25e9e2382314e11f8e5bc8d4a3550f9962710",
+    "candidatePath": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f04/one-map-react-0.1.0-rc.2.tgz",
+    "candidateSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+    "target": {
+      "UDID": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "name": "iPhone 18 Pro",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-27-0"
+    },
+    "ownership": {
+      "deviceWasBootedByWorker": false,
+      "deviceWasPreexisting": null,
+      "cleanupAttempted": false,
+      "cleanupOutcome": null
+    },
+    "steps": [
+      {
+        "step": "step_1_identity_recheck",
+        "timestampUtc": "2026-10-27T07:46:23.961818+00:00",
+        "status": "failed",
+        "exactError": "FileNotFoundError: frozen-plan executable path does not exist: /Applications/Xcode.app/Contents/Applications/DeviceHub.app/Contents/MacOS/Devices",
+        "planExpectedExecutableSha256": "5140dda5d66d3d2eb474fad9ad59a39caa088e9cbc3d162759bd39ceff05fa72",
+        "observedExecutableSha256": null,
+        "planExpectedInfoSha256": "071735a79d8eee211ddfff6b8ddce006087cc47b44af1775883af4a2d82306c2",
+        "observedInfoSha256": "071735a79d8eee211ddfff6b8ddce006087cc47b44af1775883af4a2d82306c2"
+      }
+    ],
+    "unrunScope": [
+      "normal-host codesign verification",
+      "xcrun simctl initial list",
+      "conditional simulator boot",
+      "bootstatus",
+      "Device Hub open",
+      "final simctl list",
+      "Android setup",
+      "builds, installs, Metro, tests, and acceptance"
+    ],
+    "rawLogs": "Not retained; no subprocess readiness command was run."
+  },
+  "coordinatorAudit": {
+    "finding": "Worker checked an invented executable path ending in MacOS/Devices. The frozen plan did not specify that filename. This is a worker verification error, not evidence of a host identity change.",
+    "actualCFBundleExecutable": "DevicesTrampoline",
+    "actualExecutablePath": "/Applications/Xcode.app/Contents/Applications/DeviceHub.app/Contents/MacOS/DevicesTrampoline",
+    "actualExecutableSha256": "5140dda5d66d3d2eb474fad9ad59a39caa088e9cbc3d162759bd39ceff05fa72",
+    "actualInfoSha256": "071735a79d8eee211ddfff6b8ddce006087cc47b44af1775883af4a2d82306c2",
+    "bothHashesMatchFrozenPlan": true,
+    "scope": "Read-only file and metadata review; no host retry."
+  },
+  "cleanup": "Not needed; no device started or changed.",
+  "nextProposal": {
+    "status": "Awaiting owner approval; not executed",
+    "scope": "Repeat the same six-step iOS-only plan with executable identity read from CFBundleExecutable, requiring DevicesTrampoline and the existing frozen executable hash.",
+    "expectedDuration": "About 5 minutes",
+    "worker": "gpt-6-luna medium",
+    "stopRule": "First failure; no independent retry. Cleanup only the exact assigned device if newly booted and the attempt fails.",
+    "excluded": "No Android setup, app builds, installs, Metro or acceptance tests."
+  }
+}

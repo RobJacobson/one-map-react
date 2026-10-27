@@ -1,0 +1,136 @@
+{
+  "checkpoint": "U25 PR50 host diagnosis and proposed iOS readiness retry",
+  "date": "2026-10-27",
+  "status": "Diagnosis complete; proposed actions await owner approval; no repair or retry executed",
+  "scope": "Read-only diagnosis of the failed Simulator launch and a concrete approval plan. No app builds or acceptance tests.",
+  "priorAttempt": "revised-api-u25-host-readiness-attempt-01.json",
+  "diagnosis": {
+    "confirmed": "The host uses Xcode 27.1 (27A9275). The plan names Simulator, but this installation provides DeviceHub.app instead. The launch step assumed the older Xcode application name and layout.",
+    "primarySource": "https://apps.apple.com/us/app/xcode/id497799835?mt=12",
+    "sourceSupport": "Apple describes Device Hub as managing simulated and physical devices in Xcode 27.",
+    "localEvidence": {
+      "selectedDeveloper": "/Applications/Xcode.app/Contents/Developer",
+      "developerDirOverride": null,
+      "simctl": "/Applications/Xcode.app/Contents/Developer/usr/bin/simctl",
+      "simulatorBundlesInsideSelectedXcode": [],
+      "deviceHub": "/Applications/Xcode.app/Contents/Applications/DeviceHub.app",
+      "bundleIdentifier": "com.apple.dt.Devices",
+      "bundleVersion": "255.6.8.1",
+      "infoSha256": "071735a79d8eee211ddfff6b8ddce006087cc47b44af1775883af4a2d82306c2",
+      "executableSha256": "5140dda5d66d3d2eb474fad9ad59a39caa088e9cbc3d162759bd39ceff05fa72",
+      "signatureVerification": {
+        "argv": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--strict",
+          "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
+        ],
+        "restrictedContextExit": 1,
+        "restrictedContextError": "CSSMERR_TP_NOT_TRUSTED",
+        "normalHostContextExit": 0,
+        "conclusion": "Signature check passes with normal host trust access; restricted-context failure does not establish damaged signing."
+      }
+    },
+    "unresolved": "The prior CoreSimulatorService connection invalid/refused error remains unverified. App-name correction alone does not establish service, runtime or device readiness.",
+    "notSupportedByEvidence": [
+      "Xcode reinstall",
+      "Runtime download",
+      "Launch Services database reset",
+      "CoreSimulator reset or deletion",
+      "Global developer-directory change"
+    ]
+  },
+  "proposal": {
+    "status": "Not executed; fresh approval required",
+    "checkpoint": "PR50 unchanged frozen candidate; iOS host readiness only",
+    "candidateSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+    "worker": {
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "ownership": "One exclusive native-host worker; coordinator reviews first outcome; no independent retries"
+    },
+    "expectedDuration": "About 5 minutes; stop sooner on failure",
+    "target": {
+      "UDID": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "name": "iPhone 18 Pro",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-27-0"
+    },
+    "steps": [
+      {
+        "step": 1,
+        "action": "Recheck selected Xcode, Device Hub identity/signature and frozen candidate. Any unexpected change stops execution."
+      },
+      {
+        "step": 2,
+        "argv": [
+          "xcrun",
+          "simctl",
+          "list",
+          "--json"
+        ],
+        "timeoutSeconds": 10,
+        "context": "Normal host access",
+        "gate": "Require the exact assigned UDID, matching name and iOS 27.0 runtime, both runtime and device available. Inventory service failure, missing target, or any unowned booted device stops execution. Do not substitute another device."
+      },
+      {
+        "step": 3,
+        "argv": [
+          "xcrun",
+          "simctl",
+          "boot",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+        ],
+        "timeoutSeconds": 20,
+        "condition": "Only if the assigned device is Shutdown; if already Booted, record it as pre-existing and skip boot. Any other state stops execution."
+      },
+      {
+        "step": 4,
+        "argv": [
+          "xcrun",
+          "simctl",
+          "bootstatus",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "-b"
+        ],
+        "timeoutSeconds": 120,
+        "gate": "Require successful boot readiness; no retry after failure or timeout."
+      },
+      {
+        "step": 5,
+        "argv": [
+          "open",
+          "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
+        ],
+        "timeoutSeconds": 15,
+        "gate": "Launch the exact installed Device Hub bundle once, after the assigned simulator is ready. Do not pass the obsolete Simulator CurrentDeviceUDID flag."
+      },
+      {
+        "step": 6,
+        "argv": [
+          "xcrun",
+          "simctl",
+          "list",
+          "--json"
+        ],
+        "timeoutSeconds": 10,
+        "gate": "Require the same exact available runtime/device and Booted state; record output and ownership. A successful open alone is not readiness proof."
+      }
+    ],
+    "stopRule": "Stop at the first failed command, timeout, identity mismatch, unexpected target or request for host repair. Do not continue to Android.",
+    "hostChanges": "Only boot the existing assigned simulator if needed and open the installed Device Hub app. No software installation or persistent configuration edit.",
+    "cleanup": "Record pre-existing versus task-started resources. On failure do not reset services or terminate unowned resources. Any cleanup shutdown is limited to this exact device if newly booted by the worker, and only with the retry approval including that cleanup; otherwise leave it recorded for owner review. On success leave the assigned simulator available for the next separately approved phase.",
+    "excluded": [
+      "Android setup or download",
+      "Xcode or runtime installation",
+      "License or first-launch setup",
+      "Signing or security setting changes",
+      "Service restarts",
+      "Device creation, erase, reset or deletion",
+      "App project generation, build, install or launch",
+      "Metro",
+      "Test input or acceptance execution"
+    ],
+    "afterSuccess": "Coordinator records iOS host readiness and requests separate approval to resume the unchanged Android host proposal. Native builds and acceptance remain separately gated."
+  },
+  "historyPolicy": "Keep attempt 01 and its original frozen host proposal unchanged. This proposed iOS retry supersedes only that proposal\u2019s obsolete Simulator startup step and does not authorize execution."
+}
