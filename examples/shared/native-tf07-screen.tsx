@@ -1,5 +1,6 @@
-import { type Adapter, MapSetup, Marker } from "one-map-react";
+import { type Adapter, MapSetup, Marker, type ViewState } from "one-map-react";
 import {
+  Component,
   type ReactNode,
   useCallback,
   useEffect,
@@ -18,10 +19,46 @@ import {
   View,
 } from "react-native";
 
+import { initialViewState } from "../../tests/fixtures/map-fixture.js";
 import { NativeCameraButtons } from "./native-camera-buttons.js";
 import { NativeLocationButton } from "./native-location-button.js";
 import { NativePopupBubble } from "./native-popup-bubble.js";
 import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
+
+interface MarkerRejectionRequest {
+  readonly requestId: number;
+  readonly label: string;
+  readonly renderMode: "view" | "annotation";
+  readonly property: "draggable" | "onDrag";
+}
+
+const rejectionRequests = [
+  { label: "Reject view draggable", renderMode: "view", property: "draggable" },
+  { label: "Reject view callback", renderMode: "view", property: "onDrag" },
+  {
+    label: "Reject annotation draggable",
+    renderMode: "annotation",
+    property: "draggable",
+  },
+  {
+    label: "Reject annotation callback",
+    renderMode: "annotation",
+    property: "onDrag",
+  },
+] as const;
+
+const cameraTargetA: ViewState = {
+  ...initialViewState,
+  longitude: -122.34,
+  latitude: 47.61,
+};
+const cameraTargetB: ViewState = {
+  ...initialViewState,
+  longitude: -122.32,
+  latitude: 47.615,
+};
+const rejectionMessage =
+  "Native Marker does not support dragging. Use a selected raw native annotation for SDK dragging.";
 
 /**
  * Native TF07 touch fixture, selected by `ONE_MAP_SMOKE=tf07`.
@@ -37,6 +74,12 @@ export const NativeTf07Screen = ({
   readonly ornaments: object;
 }) => {
   const probeRef = useRef<Tf07Probe | null>(null);
+  const [cameraTarget, setCameraTarget] = useState<ViewState>();
+  const [rejection, setRejection] = useState<MarkerRejectionRequest>();
+  const [rejectionResult, setRejectionResult] = useState(
+    "No rejection requested"
+  );
+  const rejectionSequence = useRef(0);
   const [status, setStatus] = useState("TF07 waiting for map");
   const [readback, setReadback] = useState("");
   const attached = useRef(true);
@@ -73,6 +116,27 @@ export const NativeTf07Screen = ({
     );
   };
 
+  const requestRejection = (
+    request: Omit<MarkerRejectionRequest, "requestId">
+  ): void => {
+    rejectionSequence.current += 1;
+    setRejectionResult(`${request.label}: waiting`);
+    setRejection({ ...request, requestId: rejectionSequence.current });
+  };
+
+  const reportRejection = (error: Error): void => {
+    const result =
+      error.message === rejectionMessage
+        ? error.message
+        : `Unexpected rejection: ${error.name}`;
+    setRejectionResult(`${rejection?.label}: ${result}`);
+  };
+
+  const clearRejection = (): void => {
+    setRejection(undefined);
+    setRejectionResult("No rejection requested");
+  };
+
   return (
     <MapSetup adapter={adapter}>
       <SafeAreaView
@@ -93,6 +157,32 @@ export const NativeTf07Screen = ({
               />
             )
           )}
+          <Button
+            title="Target A"
+            onPress={() => setCameraTarget({ ...cameraTargetA })}
+          />
+          <Button
+            title="Target B"
+            onPress={() => setCameraTarget({ ...cameraTargetB })}
+          />
+          <Button
+            title="Repeat target"
+            onPress={() =>
+              setCameraTarget((current) => (current ? { ...current } : current))
+            }
+          />
+          <Button
+            title="Clear target"
+            onPress={() => setCameraTarget(undefined)}
+          />
+          {rejectionRequests.map((request) => (
+            <Button
+              key={request.label}
+              title={request.label}
+              onPress={() => requestRejection(request)}
+            />
+          ))}
+          <Button title="Clear rejection" onPress={clearRejection} />
           <Button title="Read renderer" onPress={read} />
         </ScrollView>
         <Text testID="tf07-status" style={styles.status} numberOfLines={2}>
@@ -101,9 +191,36 @@ export const NativeTf07Screen = ({
         <Text testID="tf07-readback" style={styles.readback} numberOfLines={3}>
           {readback}
         </Text>
+        <Text testID="tf07-requested-target">
+          Requested target:{" "}
+          {cameraTarget ? JSON.stringify(cameraTarget) : "none"}
+        </Text>
+        <Text testID="tf07-marker-rejection">{rejectionResult}</Text>
         <Text>Custom control</Text>
         <View style={{ flex: 1 }}>
           <Tf07Scene
+            cameraTarget={cameraTarget}
+            validationProbe={
+              rejection && (
+                <NativeMarkerRejectionBoundary
+                  key={rejection.requestId}
+                  onRejected={reportRejection}
+                >
+                  <Marker
+                    id={`tf07-rejection-${rejection.requestId}`}
+                    longitude={-122.34}
+                    latitude={47.61}
+                    renderMode={rejection.renderMode}
+                    {...(rejection.property === "draggable"
+                      ? { draggable: true }
+                      : {
+                          onDrag: () =>
+                            setRejectionResult("Unexpected drag callback"),
+                        })}
+                  />
+                </NativeMarkerRejectionBoundary>
+              )
+            }
             renderLocation={NativeLocationButton}
             renderNavigation={NativeCameraButtons}
             nativeOrnaments={ornaments}
@@ -164,3 +281,26 @@ const renderPopup = (
     </NativePopupBubble>
   </Marker>
 );
+
+/** React error boundaries require a class; this catches only the deliberate Marker probe. */
+class NativeMarkerRejectionBoundary extends Component<
+  {
+    readonly children: ReactNode;
+    readonly onRejected: (error: Error) => void;
+  },
+  { readonly failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError(): { readonly failed: boolean } {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: Error): void {
+    this.props.onRejected(error);
+  }
+
+  render(): ReactNode {
+    return this.state.failed ? null : this.props.children;
+  }
+}

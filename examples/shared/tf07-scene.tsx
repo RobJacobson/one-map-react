@@ -7,6 +7,7 @@ import {
   Map as OneMap,
   Source,
   UserLocation,
+  type ViewState,
 } from "one-map-react";
 import {
   type ComponentType,
@@ -58,6 +59,10 @@ export interface Tf07Probe {
 }
 
 interface Tf07SceneProps {
+  /** Explicit native acceptance target; repeated equal values must not hold gestures. */
+  readonly cameraTarget?: ViewState;
+  /** Deliberate invalid Marker guarded by the native screen error boundary. */
+  readonly validationProbe?: ReactNode;
   readonly renderLocation: ComponentType<NativeLocationButtonProps>;
   readonly native?: boolean;
   readonly nativeOrnaments?: object;
@@ -96,6 +101,8 @@ const location = { lngLat: [-122.33, 47.62] as LngLat, accuracy: 12 };
  */
 export const Tf07Scene = ({
   native = false,
+  cameraTarget,
+  validationProbe,
   nativeOrnaments,
   renderScale,
   renderLocation: Location,
@@ -219,6 +226,7 @@ export const Tf07Scene = ({
         mapStyle={mapStyle}
         {...(native ? { options: nativeOrnaments } : {})}
         initialViewState={initialViewState}
+        viewState={cameraTarget}
         style={style}
         interactiveLayerIds={["tf07-point"]}
         onLoad={loaded}
@@ -236,6 +244,7 @@ export const Tf07Scene = ({
         }}
         onError={fail}
       >
+        {validationProbe}
         <Source
           id="tf07-source"
           type="geojson"

@@ -1,6 +1,6 @@
 # Patch and peer review decision
 
-**Historical assessment and completed follow-up.** The U23 assessment body below preserves its pre-repair findings, identities/counts and proposed scope; the original evidence/matrix is unchanged. The owner-approved [U23-F01 reconciliation](revised-api-implementation-plan.md#u23-f01-reconcile-retained-publication-repairs) is implemented and independently audited. The [reconciliation evidence](../records/evidence/revised-api-u23-native-patch-reconciliation.json) owns final identities, bounded verification and remaining acceptance gates. A reviewed follow-up PR is authorized; U24 follows it and remains undispatched.
+**Historical assessment and completed follow-up.** The U23 assessment body below preserves its pre-repair findings, identities/counts and proposed scope; the original evidence/matrix is unchanged. The owner-approved [U23-F01 reconciliation](revised-api-implementation-plan.md#u23-f01-reconcile-retained-publication-repairs) is implemented and independently audited. The [reconciliation evidence](../records/evidence/revised-api-u23-native-patch-reconciliation.json) owns final identities, bounded verification and remaining acceptance gates. The reviewed reconciliation PR44 is open; U24 candidate preparation is implemented and independently audited; a reviewed PR is authorized and acceptance still requires explicit permission.
 
 ## Current publication reconciliation
 
