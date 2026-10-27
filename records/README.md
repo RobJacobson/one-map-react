@@ -1,5 +1,7 @@
 # API research and evidence
 
+The [current f05 browser outcome](evidence/revised-api-u25-web-attempt-07.json) records all nine approved rows passing, with the partial worker launch error retained in [attempt06](evidence/revised-api-u25-web-attempt-06.json). Native and host-readiness gates remain open in the [sole acceptance proposal](../docs/revised-api-acceptance-plan.md).
+
 The [PR19 acceptance impact](evidence/pr19-acceptance-impact.json) records the refreshed f05 archive and prepared nine-row browser packet. Historical f04 browser passes remain separate; native f04 consumers and freezes are superseded pending recreation. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the next permission request.
 
 The [PR19 conflict resolution](evidence/pr19-conflict-resolution.json) records retained compiler improvements against the migrated API, current routine checks, and unchanged protected inputs. The [original compiler series audit](evidence/react-compiler-series-audit.json) and [native-map compiler deferral](evidence/react-compiler-native-deferral.json) remain historical records of their original artifacts; their counts and acceptance limits do not certify the resolved implementation.

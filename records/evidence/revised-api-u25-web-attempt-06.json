@@ -1,0 +1,284 @@
+{
+  "checkpoint": "U25 browser attempt06; f05 artifact attempt01",
+  "date": "2026-10-27",
+  "status": "Stopped after four passing rows; worker process launch error prevented row5; rows5-9 unrun",
+  "pullRequest": "https://github.com/RobJacobson/one-map-react/pull/51",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "planSha256": "9dcfba6c11eb55b89330b927bbb17bd31766f9485aa4c5cf77155b4cd437c3bc",
+  "launcherSha256": "c46ecf72fe7bbab241d04e6b485ac6b1e9b802dbd77f1e71728b87f26dd60f4b",
+  "worker": {
+    "name": "/root/u25_f05_browser_attempt01",
+    "model": "gpt-6-luna",
+    "reasoning": "low",
+    "handoffSha256": "6105aeba2a3b85794166abd5a9cf0db1e99276a7e5de2ed19951ade569892d41"
+  },
+  "commands": [
+    {
+      "ordinal": 1,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "elapsedMs": 28614,
+      "releasedPorts": true,
+      "resultSha256": "3d7e7fe7a7624c7143409c8de6e8a4d1072bee4e15c6466926d8bc877d6a6b52",
+      "logSha256": "09628e193febbdc0a6bb2143ff8800bdb5754e8e61f1872649f3a16e8b2ee896",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 command=skip doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+          "fields": {
+            "fit": "ok",
+            "click": "hit",
+            "clickAt": "-122.32000,47.64002",
+            "stop": "stayed",
+            "held": "1",
+            "command": "skip",
+            "doubletap": "skip",
+            "center": "-122.32000,47.64000",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 command=skip doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+          "fields": {
+            "fit": "ok",
+            "click": "hit",
+            "clickAt": "-122.32000,47.64002",
+            "stop": "stayed",
+            "held": "1",
+            "command": "skip",
+            "doubletap": "skip",
+            "center": "-122.32000,47.64000",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        }
+      }
+    },
+    {
+      "ordinal": 2,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "elapsedMs": 4091,
+      "releasedPorts": true,
+      "resultSha256": "e347ac842e31e0099ed8c523dd22fccecdd9bee1f1b5b6ba8a3f67ed5808a2f9",
+      "logSha256": "785d5b3374c55dd69072ae4c6288277c203581faa7018746fc40faf41d764d04",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "scenarios": [
+            "padding update/reset",
+            "double tap zoom",
+            "rotation reset with pinch disabled",
+            "rotation release/reuse",
+            "master disables all eight handlers",
+            "disabled physical double click",
+            "explicit/default gesture restoration",
+            "interaction settings on renderer reuse"
+          ],
+          "mode": "real automation"
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "scenarios": [
+            "padding update/reset",
+            "double tap zoom",
+            "rotation reset with pinch disabled",
+            "rotation release/reuse",
+            "master disables all eight handlers",
+            "disabled physical double click",
+            "explicit/default gesture restoration",
+            "interaction settings on renderer reuse"
+          ],
+          "mode": "real automation"
+        }
+      }
+    },
+    {
+      "ordinal": 3,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "elapsedMs": 18633,
+      "releasedPorts": true,
+      "resultSha256": "44961a32286a87268cc515c5b94622ca275cf91c3f2545a9dc6da13edd556ed9",
+      "logSha256": "020368d10ea14bce59bb322c0454f9e9b8a24e1bac348edc4925898a2bd65fc9",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+          "fields": {
+            "mounted": "1",
+            "reset": "ok",
+            "data": "updated",
+            "style": "rebuilt",
+            "removed": "clean",
+            "error": "none",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+          "fields": {
+            "mounted": "1",
+            "reset": "ok",
+            "data": "updated",
+            "style": "rebuilt",
+            "removed": "clean",
+            "error": "none",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        }
+      }
+    },
+    {
+      "ordinal": 4,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "elapsedMs": 9279,
+      "releasedPorts": true,
+      "resultSha256": "791d45c7f8e18e4b585211d9d764f4d150da6e6f075c63763be303ba4f315475",
+      "logSha256": "7ed0bed1670815e0729e9cdf13ea4114d938e406730f6db659846ef27b4b1ebd",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "scenarios": [
+            "pending image removal during style loading",
+            "owned image removal during same-style loading",
+            "owned image absence after renderer reuse",
+            "late image load cannot register after session release/reuse"
+          ],
+          "mode": "real automation"
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "scenarios": [
+            "pending image removal during style loading",
+            "owned image removal during same-style loading",
+            "owned image absence after renderer reuse",
+            "late image load cannot register after session release/reuse"
+          ],
+          "mode": "real automation"
+        }
+      }
+    },
+    {
+      "ordinal": 5,
+      "status": "not started"
+    },
+    {
+      "ordinal": 6,
+      "status": "unrun"
+    },
+    {
+      "ordinal": 7,
+      "status": "unrun"
+    },
+    {
+      "ordinal": 8,
+      "status": "unrun"
+    },
+    {
+      "ordinal": 9,
+      "status": "unrun"
+    }
+  ],
+  "elapsedCompletedCommandMs": 60617,
+  "workerLaunchFailure": {
+    "ordinal": 5,
+    "launcherStarted": false,
+    "row5StartedMarkerExists": false,
+    "cwdSupplied": "/private/var/folders/cc/mjmcnnln739f6mxr3r0r3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/frozen-harness",
+    "toolError": "exec_command failed: CreateProcess { message: Rejected(\"Failed to create unified exec process: No such file or directory (os error 2)\") }",
+    "acceptanceRetried": false
+  },
+  "classification": "Worker orchestration failure, not a renderer assertion or library failure. No command5 launcher process or start marker exists. No command5 retry occurred.",
+  "dispatchClarification": {
+    "scope": "Dispatch clarification before any approved browser command execution",
+    "workerError": "Worker resolved runtime/run-u25-one.mjs relative to frozen-harness instead of stage root",
+    "approvedLauncher": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/runtime/run-u25-one.mjs",
+    "sha256": "c46ecf72fe7bbab241d04e6b485ac6b1e9b802dbd77f1e71728b87f26dd60f4b",
+    "approvedLauncherPresentAndUnchanged": true,
+    "browserCommandsStarted": 0,
+    "scopeChange": false,
+    "retryOfBrowserCommand": false,
+    "next": "First execution of command1 using exact absolute approved launcher; stop on any approved preflight or command failure"
+  },
+  "coordinatorAudit": {
+    "frozenVerification": {
+      "exitCode": 0,
+      "stdout": "PASS frozen archive, 13155 initial input files/links, Node and Bun runtime identities; no renderer.",
+      "stderr": ""
+    },
+    "portInventory": {
+      "exitCode": 1,
+      "free": true,
+      "output": ""
+    },
+    "ownedRunnerProcessCandidates": [],
+    "processInventoryExitCode": 0,
+    "browserCommandsStarted": [
+      "web-01-started.json",
+      "web-02-started.json",
+      "web-03-started.json",
+      "web-04-started.json"
+    ]
+  },
+  "continuation": {
+    "status": "Fresh approval required; not executed",
+    "plan": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/continuation-plan.json",
+    "sha256": "1510476f5d05a70df7cfd1a02e4a0cfa3b8adeaaafeb4b5171d50f2ef7482e79",
+    "rows": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "driver": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/runtime/resume-u25-rows-5-9.mjs",
+    "driverSha256": "10b8f16488ea369f7878fae07f749e51f3dda2a1ca6fd6f31b29442c29d3e0a0",
+    "selfCheck": {
+      "status": "Passed offline only",
+      "controls": [
+        "Rows5-9 exactly once with cwd read from pinned plan",
+        "Failure on6 prevents7-9",
+        "Changed plan rejected before subprocess"
+      ],
+      "realSubprocesses": 0,
+      "acceptanceExecuted": false
+    },
+    "duration": "3-5 minutes",
+    "scope": "One Luna low worker; same frozen candidate and original packet; first executions5-9only; stop first failure; no native or host setup"
+  },
+  "runtimeLimits": "Partial browser evidence only. Queries, UI and rendering rows5-9 remain unverified for f05. Native acceptance and host readiness unverified."
+}
