@@ -1,0 +1,2920 @@
+{
+  "unit": "U25-N02",
+  "status": "Resolver/retained native source fixes and refreshed native preparation independently audited; PR50open; next request HOST READINESS ONLY; full native execution remains separately gated",
+  "pullRequest": {
+    "number": 50,
+    "url": "https://github.com/RobJacobson/one-map-react/pull/50",
+    "sourceCommit": "704e7e67815f4fe1c2c7e792dc48c76098a26c80",
+    "baseHead": "14f888a84619ad7295c3c9f29b9ebadcb24d77f5"
+  },
+  "candidate": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f04/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+    "repacked": false,
+    "archiveFiles": 171,
+    "distFiles": 164,
+    "distDigest": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d"
+  },
+  "implementation": {
+    "unit": "U25-N02",
+    "status": "Source frozen after concrete regression/claim closure; affected routine checks passed; ready for independent audit. Native runtime unverified.",
+    "publication": "/private/tmp/one-map-u25-n02-6_rk_f7z/publication",
+    "original": "/Users/rob/code/mapbox-code/one-map",
+    "sourceManifest": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/implementation-source-manifest.json",
+      "sha256": "e1152a3f661cda553c69fe4aeaeaf8e28ed7a9a9f16db252491a869e6ec3d0c0",
+      "mappedRows": 15
+    },
+    "untouchedFocusedCore": {
+      "original/packages/example-map/src/scenarios/native-tf07-focused-screen.tsx": {
+        "beforeSha256": "26d05ca1cea7b8aad9b229c441179c7303de59b7c00a359f320d1e1f375504db",
+        "finalSha256": "26d05ca1cea7b8aad9b229c441179c7303de59b7c00a359f320d1e1f375504db",
+        "unchanged": true
+      },
+      "original/scripts/tf07-smoke-contract.mjs": {
+        "beforeSha256": "88d109776aa06f66302195f28f4a3a5769de076a55c8743b9cd1704d39808af8",
+        "finalSha256": "88d109776aa06f66302195f28f4a3a5769de076a55c8743b9cd1704d39808af8",
+        "unchanged": true
+      },
+      "publication/scripts/tf07-smoke-contract.mjs": {
+        "beforeSha256": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+        "finalSha256": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+        "unchanged": true
+      }
+    },
+    "protectedProof": {
+      "original": {
+        "checked": 95,
+        "mismatches": []
+      },
+      "publication": {
+        "checked": 101,
+        "mismatches": []
+      },
+      "archive": {
+        "sha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+        "distFilesEqual": 164
+      }
+    },
+    "artifact": {
+      "archiveSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+      "distSha256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+      "distFiles": 164,
+      "archiveChanged": false
+    },
+    "scope": {
+      "resolver": "Missing .js delegates extensionless to actual Metro, preserving native/platform precedence and original errors; direct JS/package first attempt retained.",
+      "fixture": "Two named common maps, actual initial camera jump for pinned Android baseline, live Marker portal children with provider/local state and named actual zoom/center, delayed annotation Image load->refresh, actual measured host geometry/window density, physical source/marker touch, target isolation, layout/orientation.",
+      "receipt": "Six supplemental names in separate contract, same four run identity fields; core13 exact unchanged. Current complete read geometry plus valid readiness snapshots, cumulative active errors preserved; no20read cap.",
+      "ownership": "Screen read latest sequence/layout epoch/current map and host refs guard success and failure; image callback captures generation before refresh; named child epoch includes map+theme; teardown cancels timer/invalidates pending work.",
+      "originalWebBoundary": "New native-only tf07-retained is omitted from browser picker and rejected before browser renderer dispatch; focused and all existing modes untouched."
+    },
+    "checks": [
+      {
+        "name": "publication source web",
+        "command": "bun x vp test run",
+        "status": "passed before final test-only addition; affected suite rerun passed",
+        "coverage": "42files646tests before final test-only regression closure; not rerun after the added9th retained-screen test",
+        "log": "source-tests-release.log"
+      },
+      {
+        "name": "publication mocked native",
+        "command": "bun run test:native",
+        "status": "passed",
+        "coverage": "8suites231tests",
+        "log": "native-tests.log"
+      },
+      {
+        "name": "retained screen",
+        "command": "bun x vp test run packages/one-map-react/test/tf07-retained-screen.web.test.tsx",
+        "status": "passed",
+        "coverage": "9behavioraltests including actual23reads retention",
+        "log": "retained-screen-final-closure.log"
+      },
+      {
+        "name": "actual Metro regression",
+        "command": "node examples/resolve-shell-deps.test.mjs <two frozen installed native consumer dirs>",
+        "status": "passed",
+        "coverage": "both engines x ios/android capture+opposite mixed, effective installed resolver settings, generic TS/TSX, actual JS, browser fallback, react package resolution and original error preservation",
+        "log": "resolver-effective-green.log"
+      },
+      {
+        "name": "retained receipt/density contract",
+        "command": "node scripts/tf07-retained-contract.test.mjs",
+        "status": "passed",
+        "log": "retained-contract-final-closure.log"
+      },
+      {
+        "name": "core contract",
+        "command": "node scripts/tf07-smoke-contract.test.mjs",
+        "status": "passed",
+        "log": "core-contract.log"
+      },
+      {
+        "name": "selector",
+        "command": "bun examples/inline-smoke-target.test.mjs",
+        "status": "passed",
+        "log": "selector.log"
+      },
+      {
+        "name": "build",
+        "command": "bun run build",
+        "status": "passed",
+        "log": "build-prerequisite.log"
+      },
+      {
+        "name": "compiler",
+        "command": "node scripts/react-compiler.test.mjs",
+        "status": "passed",
+        "scope": "Nine unchanged library components/hooks across seven modules; new fixture not compiler-enabled and no fixture compiler claim.",
+        "log": "compiler.log"
+      },
+      {
+        "name": "packed package",
+        "command": "bun scripts/test-package.mjs",
+        "status": "passed",
+        "coverage": "13isolated selections; exact unchanged archiveSHA",
+        "log": "package-check.log"
+      },
+      {
+        "name": "publication formatting/lint",
+        "command": "bun run check",
+        "status": "passed",
+        "log": "check-final-closure.log"
+      },
+      {
+        "name": "publication docs",
+        "command": "bun run check:docs",
+        "status": "passed",
+        "log": "docs-final.log"
+      },
+      {
+        "name": "publication types",
+        "command": "bun run typecheck",
+        "status": "passed",
+        "log": "types-final-closure.log"
+      },
+      {
+        "name": "publication apps types",
+        "command": "bun run typecheck:apps",
+        "status": "passed",
+        "log": "apps-first.log"
+      },
+      {
+        "name": "original formatting/lint",
+        "command": "bun run check",
+        "status": "passed",
+        "log": "original-check-final-closure.log"
+      },
+      {
+        "name": "original types",
+        "command": "bun run typecheck",
+        "status": "passed",
+        "log": "original-types-first.log"
+      },
+      {
+        "name": "original apps+test types",
+        "command": "bun run typecheck:apps",
+        "status": "passed",
+        "log": "original-apps-final-closure.log"
+      },
+      {
+        "name": "original mapped fixture/selection",
+        "command": "bun x vp test run packages/example-map/test/tf07-retained-screen.web.test.tsx packages/example-map/test/acceptance-selection.test.ts",
+        "status": "passed",
+        "log": "original-tests-final-closure.log",
+        "coverage": "3files40tests:9retainedscreen+29selection+2newbrowserboundary"
+      },
+      {
+        "name": "original actual resolver",
+        "command": "node scripts/consumer-shell-resolution.test.mjs <two frozen installed native consumers>",
+        "status": "passed",
+        "log": "original-resolver-final.log"
+      },
+      {
+        "name": "history cap behavioral RED/GREEN",
+        "command": "Actual retained screen23Readfocus interactions; temporary oldslice(-19) cap then current restored source",
+        "status": "RED oldcap expected23 got20; GREEN current source9screen tests",
+        "logs": [
+          "history-regression-red.log",
+          "retained-screen-final-closure.log"
+        ],
+        "scope": "No renderer, native runtime, library or permanent source mutation. Exact production screen bytes unchanged from prior freeze."
+      },
+      {
+        "name": "original retained receipt closure",
+        "command": "node scripts/tf07-retained-contract.test.mjs",
+        "status": "passed",
+        "log": "original-contract-final-closure.log"
+      }
+    ],
+    "firstAttempts": [
+      {
+        "result": "RED resolver",
+        "log": "resolver-red.log",
+        "cause": "Actual capture .js import selected generic browser helper rather than.native"
+      },
+      {
+        "result": "Failed test harness paths",
+        "logs": [
+          "resolver-green.log",
+          "resolver-green-02.log"
+        ],
+        "cause": "macOS /var realpath and browser preferNativePlatform test context corrected, production fix unchanged"
+      },
+      {
+        "result": "Type first failed",
+        "log": "types-first.log",
+        "cause": "Missing required bearing/pitch in new ViewState examples, typed mock call arguments; corrected"
+      },
+      {
+        "result": "Check first failed",
+        "log": "check-first.log",
+        "cause": "Three test nonnull assertions removed; check02 formatting new test then formatted"
+      }
+    ],
+    "reviewCorrections": "All prior guard fixes retained. Final audit found previously claimed preliminary/long-history regression assertions absent; corrected by adding actual published tests, not by inferring coverage. Actual23read component case fails old20cap and passes current source. Preliminary incomplete snapshot positive, invalid current final veto and cumulative current error checks now run in both roots.",
+    "runtime": {
+      "ownedBun": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-bin/bun",
+      "actualBunSha256": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959",
+      "version": "1.4.1",
+      "node": "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node",
+      "nodeSha256": "6f32069480ec14d52b6d7b1f3c7124cfbbc46203abf5ddf5c65b127435f3f329"
+    },
+    "remainingGates": [
+      "Independent source audit then coordinator-owned code/tests PR",
+      "Separately requested phase2 current native harness refresh/input freeze",
+      "Host readiness: CoreSimulator unrestricted timeout; no Android AVD or avdmanager; no host repair authorized",
+      "Operator availability, actual known feature/physical/visual receipts and at least two actual densities per engine across four native rows",
+      "Explicit native execution permission before generation/dependency resolution/build/install/Metro/device action; failures/retries stop for new review"
+    ],
+    "notRun": [
+      "No browser renderer or GPU",
+      "No Metro server/transport",
+      "No native generation, Pods/Bundler, Gradle/Xcode build",
+      "No device boot/install/launch/input",
+      "No host provisioning/repair",
+      "No library, publicAPI, packageREADME, peers/versions/locks/patch/archive changes",
+      "No git commit/push/PR by worker"
+    ],
+    "retainedCaseMap": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/retained-case-map.json",
+      "sha256": "7dc98e4de3f12e285c812ce6b1627a76c8f9b5e5f44b2d6f0e41ec5eff6991fa"
+    },
+    "sourceFrozen": true,
+    "regressionClosure": {
+      "changedFiles": [
+        "publication/scripts/tf07-retained-contract.test.mjs",
+        "original/scripts/tf07-retained-contract.test.mjs",
+        "publication/packages/one-map-react/test/tf07-retained-screen.web.test.tsx",
+        "original/packages/example-map/test/tf07-retained-screen.web.test.tsx"
+      ],
+      "productionSourceChanged": false,
+      "fullSuiteQualification": "Prior42file646web tests and8suite231mocked native tests remain before final test-only closure. Affected publication9screen tests and original3file40tests, both contracts, publication types/original app+test types and both formatting/lint checks passed final closure."
+    }
+  },
+  "sourceManifest": [
+    {
+      "publication": {
+        "path": "examples/resolve-shell-deps.cjs",
+        "beforeSha256": "dceb7aca0b617c880264cb765983158a728b004d0e2cc6f9cbfc85a6386261c3",
+        "finalSha256": "e417f3b1463e6a91dcaf310543eae70aa49ead6690d326a2366175536a3a6e3c"
+      },
+      "original": {
+        "path": "scripts/consumer-shell-resolution.cjs",
+        "beforeSha256": "9abf17305923451e719b66acc8f54fdea5cf24c3c0e53316731b20b11c1bf16a",
+        "finalSha256": "21525799aec1d293ba33c5acab51c0ff00eca2fe314407b65c482ad2215627f4"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "examples/resolve-shell-deps.test.mjs",
+        "beforeSha256": null,
+        "finalSha256": "86440b8925a07e3104423359985481d6e6352ecf69f89c43d65de4e0e3ca17bc"
+      },
+      "original": {
+        "path": "scripts/consumer-shell-resolution.test.mjs",
+        "beforeSha256": null,
+        "finalSha256": "c7e09d4079b9c15f2d67351d7d98dcc460fcd6f21bec1c3332afbc8584d17aaf"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "examples/shared/native-tf07-retained-screen.tsx",
+        "beforeSha256": null,
+        "finalSha256": "569aecf9dd5287010e568d0ba949e77b622693f20da30e104f19667818e9c41c"
+      },
+      "original": {
+        "path": "packages/example-map/src/scenarios/native-tf07-retained-screen.tsx",
+        "beforeSha256": null,
+        "finalSha256": "beaa8f45a7a9d3ecaeeed7edc59bd722024cd8903e334145de046c41550301c0"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "examples/shared/smoke-target.ts",
+        "beforeSha256": "f0eb4fda0c853cacda9cd50d237bfb1b1c55b77ab63e46dab35a0c0ede0d2320",
+        "finalSha256": "f9097227201e0a8658c25d4b34a1b33d4c1d483526493391665db2e55fc86f36"
+      },
+      "original": {
+        "path": "packages/example-map/src/acceptance-selection.ts",
+        "beforeSha256": "4e0404d6bb6df3d894cd606624670736b6bdbcb6ba04b680bc43a996fe79b1eb",
+        "finalSha256": "102d04fc405e5cdb0dd1dface7d5cccab5550a6e58390b259d447dd980dfd7dd"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "examples/inline-smoke-target.cjs",
+        "beforeSha256": "c20d6c21997ae89fe64a2e16d1b3aaf8c10e534495e1ea40254908d743a44daf",
+        "finalSha256": "6feb01f3c7b4056b6e995cf9b7dfc251fd66f7225ad2a4d9070cc21fbeed4b0f"
+      },
+      "original": null,
+      "mapping": "Publication native shell selector; original workspace uses acceptance-selection and scenario dispatch instead"
+    },
+    {
+      "publication": {
+        "path": "examples/inline-smoke-target.test.mjs",
+        "beforeSha256": "6a3962a47f821234daa4a0fc864cdc297e858e491f9edc1bf7ee838e85a8ebc3",
+        "finalSha256": "38acf51aadbd79bfd671d41c9fe55b1bc12a646ddcbc4efbac413d9a56158ad7"
+      },
+      "original": null,
+      "mapping": "Publication native shell selector; original workspace uses acceptance-selection and scenario dispatch instead"
+    },
+    {
+      "publication": {
+        "path": "examples/native-mapbox/App.tsx",
+        "beforeSha256": "10c6e76b80b92cd3ac7b35a55a11444ad9b0f19f4a365dc4c5b3969f56d140ed",
+        "finalSha256": "23d91331803ac9317d018e668a748b04913cf4a2a9db6749f7fc1d5bc46a9060"
+      },
+      "original": {
+        "path": "packages/example-map/src/scenarios/mapbox-native.tsx",
+        "beforeSha256": "ef613282624ed05dfa24a3fb54e4b0d79f97ba65ece82b24c258438626222105",
+        "finalSha256": "d7b5f253375866c6460b3a3f16d091b022994cea8e26e31fed14a10140df804a"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "examples/native-maplibre/App.tsx",
+        "beforeSha256": "3bed8b12d0e1b2e7fc15e252adad1fd27dfb4b84572f539e9d033be9369cf90e",
+        "finalSha256": "0c3bd5d5fde037e9f3542326189480a2c524a23ae742c3d6356f9a4e633aec0d"
+      },
+      "original": {
+        "path": "packages/example-map/src/scenarios/maplibre-native.tsx",
+        "beforeSha256": "148fadaf86becd1c89c44212d781c83d809c2f2db897a4cdf5ea51026365c631",
+        "finalSha256": "85cbe8ed00cd77c7f6a5e96cfa07368de17a7166990e9ebef643290375dd7bf8"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "scripts/tf07-ui-smoke.mjs",
+        "beforeSha256": "8b5db77823598fa491ef1e2272e432d395284ff23c40dfea08c902c2ed2068af",
+        "finalSha256": "eee588dd20e8d712491045801a194f7d67a0a61f43791ef2df0f61eb2b944a11"
+      },
+      "original": {
+        "path": "scripts/tf07-ui-smoke.mjs",
+        "beforeSha256": "263b6c502cf15b08208a0a0aa96a3c78171dac0bc9172753cf3167baa4c92965",
+        "finalSha256": "d70bede78d306a3bb1c3303d0268c4c288d98811ddbf679e6cb3750436f83d2f"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "scripts/tf07-retained-contract.mjs",
+        "beforeSha256": null,
+        "finalSha256": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852"
+      },
+      "original": {
+        "path": "scripts/tf07-retained-contract.mjs",
+        "beforeSha256": null,
+        "finalSha256": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "scripts/tf07-retained-contract.test.mjs",
+        "beforeSha256": null,
+        "finalSha256": "0c9bd9ceea6a02ab6d11985751d32b1df67325ef7bea1acc3337be95c0416027"
+      },
+      "original": {
+        "path": "scripts/tf07-retained-contract.test.mjs",
+        "beforeSha256": null,
+        "finalSha256": "0c9bd9ceea6a02ab6d11985751d32b1df67325ef7bea1acc3337be95c0416027"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": {
+        "path": "packages/one-map-react/test/tf07-retained-screen.web.test.tsx",
+        "beforeSha256": null,
+        "finalSha256": "11fa067104cd11d57c5b9d7160fc447d4729d60757047c515b666985d33b69cf"
+      },
+      "original": {
+        "path": "packages/example-map/test/tf07-retained-screen.web.test.tsx",
+        "beforeSha256": null,
+        "finalSha256": "756fe1a78c9a6e4902f700cd1f3cd3681f8bf78e8023270475320bfa6ce2e661"
+      },
+      "mapping": "Existing workspace scenario/dispatcher owner; preexisting focused architecture preserved"
+    },
+    {
+      "publication": null,
+      "original": {
+        "path": "packages/example-map/src/acceptance.web.tsx",
+        "beforeSha256": "3832a42e85e11973570f2dd65ed1282952bd50de55d8dec4069715da8818852b",
+        "finalSha256": "370595ad19e0326d6c2dad94a4cb9bc0704c88830bfd5692c5309b318ec745a5"
+      },
+      "mapping": "Original-only shared picker/browser dispatcher boundary: omit/reject only new native retained selector and preserve existing focused modes. Publication driver already rejects web retained."
+    },
+    {
+      "publication": null,
+      "original": {
+        "path": "packages/example-map/src/acceptance-controls.web.tsx",
+        "beforeSha256": "987785decfd94abf1b61eb41082a99eb4eb25d9a04bbcef66c3c77842dbc794a",
+        "finalSha256": "51cb44056fc8e517a9675734729c4bf80c93f0ea12c4b2b878eb701549f99ad1"
+      },
+      "mapping": "Original-only shared picker/browser dispatcher boundary: omit/reject only new native retained selector and preserve existing focused modes. Publication driver already rejects web retained."
+    },
+    {
+      "publication": null,
+      "original": {
+        "path": "packages/example-map/test/native-retained-dispatch.web.test.tsx",
+        "beforeSha256": null,
+        "finalSha256": "914f318e0ded0ed612240a05c243c011b7391c9f1693c3f591a1b47c5bdaf740"
+      },
+      "mapping": "Original-only shared picker/browser dispatcher boundary: omit/reject only new native retained selector and preserve existing focused modes. Publication driver already rejects web retained."
+    }
+  ],
+  "retainedCaseMap": {
+    "simultaneous-named-maps": {
+      "actions": "Wait for both explicit onLoad jumpTo setups. Press Map A initial0 and Map B initial0, then Read focus. Physically interact with each independently.",
+      "evidence": "Distinct actual centers/zooms, known IDs1707/2707 with map-specific fixture property, both live Marker children resolve named map actual camera, both hosts measured. No requested target label certifies renderer.",
+      "routineTests": "both live marker children retain provider/local state and query their own named renderer; retained contract known-feature/child-camera rejection cases"
+    },
+    "provider-child-state": {
+      "actions": "After both initial child presses show count1, press Theme. Observe both updated1 before clicking. Click each once to updated2, Read focus. Repeat child interactions after resize/orientation without resets.",
+      "evidence": "Provider theme and local component state survive inside each live Marker portal, own named renderer readbacks remain valid; manual observations plus initial/updated snapshots required.",
+      "routineTests": "Provider/local state test; old provider epoch read suppressed; contract accepts preliminary incomplete snapshot followed by full valid evidence, vetoes invalid final snapshot and cumulative active read-error; actual component issues23reads and retains early initial theme/count snapshots (old20read cap fails this case)."
+    },
+    "annotation-image-refresh": {
+      "actions": "Press Image. Wait for delayed actual Image onLoad and refresh acknowledgment. Visually confirm blue square and Image ready appear in mapA annotation at geographic target; check ordinary marker buttons still work.",
+      "evidence": "Image onLoad triggers current MarkerRef.refresh only; current failures remain cumulative image-error. Refresh acknowledgment alone does not establish visible bitmap; manual visual receipt required.",
+      "routineTests": "waits actual image load; retired image callback ignored; timer teardown; current refresh failure observable"
+    },
+    "resize-orientation": {
+      "actions": "Read in portrait; press Resize and read actual changed mapA dimensions. Rotate to landscape and Read focus; observe both child/feature targets follow correct map and remain usable. Restore initial orientation and size after future run.",
+      "evidence": "Actual measureInWindow host bounds, actual useWindowDimensions portrait/landscape and changed mapA height, latest read/layout/current-ref epoch; toggle labels alone do not pass.",
+      "routineTests": "stale success/rejection after resize/unmount ignored, overlapping reads publish only latest; contract requires actual changed height and portrait+landscape snapshots"
+    },
+    "camera-target-isolation": {
+      "actions": "Keep baseline renderer read. Press TargetA and Read focus; observe actual A near[-122.345,47.612] while B unchanged. Physically pan A empty region, Read focus; press RepeatA then Read focus; actual pan must remain. ClearA; verify both ordinary marker children usable.",
+      "evidence": "At least two actual A centers differ while B remains equal; actual equal target after physical gesture must not snap back, assessed manually. Each native Map explicitly jumpTo initializes fixture for pinned cold-style Android limitation.",
+      "routineTests": "receipt judgment requires independent A change/B stability and physical receipt; current query errors prevent pass"
+    },
+    "touch-density-bounds": {
+      "actions": "Use current projected feature point + measured map host to target both source features physically, and press both live Marker children. Read focus and record actual window.scale. Coordinator requires each engine observed at two distinct actual density values across approved OS rows; otherwise request an extra explicitly approved target/density run.",
+      "evidence": "Actual logical map point within measured host bounds, known per-map feature touch events plus manual touch/button observation, actual device target from runner, actual window.scale not requested density label. No in-app fake density selector.",
+      "routineTests": "contract geometry/density/known feature/touch failures and two-actual-densities-per-engine matrix tests"
+    }
+  },
+  "audits": {
+    "source": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/source-code-audit.json",
+      "sha256": "4134ef40975a31bae2371f37b2e5be40a4a88cb3a58aee4b90a1048f74a0a069",
+      "status": "passed; no unresolved findings in inspected scope"
+    },
+    "nativeFreezePlan": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-freeze-plan-audit.json",
+      "sha256": "83907edda243bfa316c778d1d1983db1d700f37a719f6ff152810218ad48ddce",
+      "status": "PASS frozeninputs/conditionalplan/hostproposalaccuracy; fullnativereadinessBLOCKED"
+    }
+  },
+  "frozenPhase1Packets": {
+    "implementation-handoff.json": "ca7f048e6bf1bff1c0680c280043c221bd31ca70a8a50ff0e4ad79e45dd11e15",
+    "implementation-source-manifest.json": "e1152a3f661cda553c69fe4aeaeaf8e28ed7a9a9f16db252491a869e6ec3d0c0",
+    "retained-case-map.json": "7dc98e4de3f12e285c812ce6b1627a76c8f9b5e5f44b2d6f0e41ec5eff6991fa"
+  },
+  "checks": {
+    "documentation": {
+      "status": "passed",
+      "scope": "Documentation structure, local links, current browser/native routing, conditional native command and identity proposal, source-backed blocker boundaries and historical preservation. A passing documentation check does not establish runnable native acceptance.",
+      "structure": {
+        "originalStandard": {
+          "exitCode": 0,
+          "markdownFiles": 41,
+          "sdkComparisonTables": 43,
+          "scope": "Structural paragraphs, fences, comparison tables and local links only.",
+          "notice": "Existing Bun moduleSuffixes notice emitted."
+        },
+        "publicationStandard": {
+          "exitCode": 0,
+          "markdownFiles": 40,
+          "sdkComparisonTables": 39,
+          "scope": "Structural paragraphs, fences, comparison tables and local links only.",
+          "notice": "Existing Bun moduleSuffixes notice emitted."
+        },
+        "originalExpanded": {
+          "exitCode": 0,
+          "markdownFiles": 46,
+          "sdkComparisonTables": 43,
+          "scope": "Structural paragraphs, fences, comparison tables and local links only.",
+          "notice": null
+        },
+        "publicationExpanded": {
+          "exitCode": 0,
+          "markdownFiles": 45,
+          "sdkComparisonTables": 39,
+          "scope": "Structural paragraphs, fences, comparison tables and local links only.",
+          "notice": null
+        }
+      },
+      "ownership": {
+        "existingOwnersPerRoot": 26,
+        "changedOwners": {
+          "original": 18,
+          "publication": 18
+        },
+        "manifestSha256": "b3922ce39f197175e896de8acc68327ec5b711cdb248879b47f858815b204e56"
+      },
+      "coverageHistory": {
+        "original": {
+          "rows": 69,
+          "firstThreeCellsIdentical": true,
+          "idsOrderCheckmarksIdentical": true,
+          "baseline": "per-root native-harness-repair entry snapshot",
+          "sha256": "9467150ae2b96d1e76169bcf801d82da08b2464a6f3e1047e91b4e6443c75c3b",
+          "exceptions": []
+        },
+        "publication": {
+          "rows": 69,
+          "firstThreeCellsIdentical": true,
+          "idsOrderCheckmarksIdentical": true,
+          "baseline": "per-root native-harness-repair entry snapshot",
+          "sha256": "0a61f4d40b1b0853f107d3d833b52feed6b3e8919c811b5cabf87f64a978433a",
+          "exceptions": []
+        }
+      },
+      "auditedFences": {
+        "countPerRoot": 87,
+        "allBytesUnchanged": true,
+        "newExcerptTypecheckClaim": false
+      },
+      "historicalEvidence": {
+        "original": {
+          "count": 33,
+          "allBytesUnchanged": true
+        },
+        "publication": {
+          "count": 34,
+          "allBytesUnchanged": true
+        }
+      },
+      "frozenPackageReadme": {
+        "original": {
+          "sha256": "18c30dd06597217ee370457f274e2a77018be215a94f9bbddd389c4627cf7a6f",
+          "entrySnapshotBytesUnchanged": true
+        },
+        "publication": {
+          "sha256": "fa71db9fecca858672bc5683c8221b6a5adb97d428c423cc085bcc65e11f9f15",
+          "entrySnapshotBytesUnchanged": true
+        }
+      },
+      "acceptanceOwner": {
+        "path": "docs/revised-api-acceptance-plan.md",
+        "sha256": "f1749fc462c68cb7239bbaea73f5455fd85434b333dfa4669979dcab7da1e13d",
+        "copiesIdentical": true,
+        "status": "Refreshed native proposal after approved harness repairs; host/operator/scope gates remain separate from source verification.",
+        "sourcePacketSha256": "f14a542daa91a865c637b90f72d977078e98ccd0f7d3efd20b4d386477fa6370"
+      },
+      "limits": "No browser renderer, Metro process/transport, native project generation, native dependency resolution, build/install/boot/launch/input, source/build/unit tests or new excerpt typechecking performed by the documentation lane.",
+      "retention": "Compact historical records, audits and expected peer inventory are preserved. Prior N01 native consumers/tools/publication and new preparation caches were removed after current-input independence verification. Current N02 consumers/tools remain for the pending host/native decision; no old N01 path is a current execution input."
+    }
+  },
+  "hostReadiness": {
+    "refresh": {
+      "scope": "Read-only native target readiness refresh; no boot/repair/build/launch",
+      "ios": {
+        "status": "timeout10s",
+        "action": "Only owned query terminated; no simulator service or device action"
+      },
+      "android": {
+        "exitCode": 0,
+        "avds": [],
+        "stderr": ""
+      }
+    },
+    "setupProposal": {
+      "status": "PROPOSAL ONLY; host setup not authorized or executed",
+      "purpose": "Separate host-readiness phase before native generation/build/install/acceptance permission",
+      "sources": [
+        {
+          "url": "https://developer.android.com/studio#command-line-tools-only",
+          "facts": "Official Mac ARM command-line-tools archive15859902, publishedSHA256,156.1MB; currentmetadata read during plan preparation"
+        },
+        {
+          "url": "https://dl.google.com/android/repository/commandlinetools-mac_arm64-15859902_latest.zip",
+          "verification": "HEAD200,content-length156083281; binary NOT downloaded"
+        }
+      ],
+      "toolArchive": {
+        "url": "https://dl.google.com/android/repository/commandlinetools-mac_arm64-15859902_latest.zip",
+        "sha256": "835b62a26162b229b441d1f6d4680383815a270809eb33522c0d480fa5002c4e",
+        "bytes": 156083281,
+        "architecture": "arm64",
+        "destination": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-tools/commandlinetools-mac_arm64-15859902_latest.zip",
+        "extraction": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-tools/android-cli-15859902",
+        "installBoundary": "Temporary owned taskdirectory; no replacement/update ofuserSDK or AndroidStudio"
+      },
+      "environment": {
+        "JAVA_HOME": "/Applications/Android Studio.app/Contents/jbr/Contents/Home",
+        "javaObserved": "OpenJDK25.0.3; read-only version query passed",
+        "ANDROID_HOME": "/Users/rob/Library/Android/sdk",
+        "ANDROID_SDK_ROOT": "/Users/rob/Library/Android/sdk",
+        "ANDROID_USER_HOME": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-android-user",
+        "ANDROID_AVD_HOME": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-avds"
+      },
+      "android": {
+        "imageAlreadyInstalled": "system-images;android-37.1;google_apis_playstore_ps16k;arm64-v8a",
+        "imageRevision": 9,
+        "profileGate": {
+          "argv": [
+            "/private/tmp/one-map-u25-n02-6_rk_f7z/host-tools/android-cli-15859902/cmdline-tools/bin/avdmanager",
+            "list",
+            "device"
+          ],
+          "require": "pixel_6 profile must be listed exactly; otherwise stop and report, no guessing"
+        },
+        "createArgv": [
+          "/private/tmp/one-map-u25-n02-6_rk_f7z/host-tools/android-cli-15859902/cmdline-tools/bin/avdmanager",
+          "create",
+          "avd",
+          "--name",
+          "one-map-u25",
+          "--package",
+          "system-images;android-37.1;google_apis_playstore_ps16k;arm64-v8a",
+          "--device",
+          "pixel_6"
+        ],
+        "stdinForDefaultHardware": "no\n",
+        "creationRules": "No --force; newtask-ownedAVDlocationmustnotexist; neveroverwriteuserAVD",
+        "bootArgv": [
+          "/Users/rob/Library/Android/sdk/emulator/emulator",
+          "-avd",
+          "one-map-u25",
+          "-port",
+          "5554",
+          "-no-snapshot-save"
+        ],
+        "requiredFreePorts": [
+          5037,
+          5554,
+          5555
+        ],
+        "serial": "emulator-5554",
+        "readinessCommands": [
+          [
+            "/Users/rob/Library/Android/sdk/platform-tools/adb",
+            "devices",
+            "-l"
+          ],
+          [
+            "/Users/rob/Library/Android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5554",
+            "shell",
+            "getprop",
+            "sys.boot_completed"
+          ],
+          [
+            "/Users/rob/Library/Android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5554",
+            "shell",
+            "wm",
+            "size"
+          ],
+          [
+            "/Users/rob/Library/Android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5554",
+            "shell",
+            "wm",
+            "density"
+          ]
+        ],
+        "readinessRules": "Exactlyoneattachedassignedemulator/no physicaldevice; verifyABI/image/API andmeasuredscale; bootpoll<=180s; noappinstall/input/flow",
+        "adbServerGate": {
+          "port": 5037,
+          "beforeAnyAdbOrEmulatorBoot": "Read-onlylistener+processidentityinventory; unknown/unowned/mismatched existingserver => STOP andreport beforeinvokingadb (whichcanreplaceaserver)",
+          "localToolCheck": [
+            "/Users/rob/Library/Android/sdk/platform-tools/adb",
+            "version"
+          ],
+          "whenPortFree": "Startserver onlyafterphase0approval with exactSDKadb; recordnewlistenerPID/executable/version/startidentity asowned; unexpectedlistener identity=>STOP",
+          "startArgv": [
+            "/Users/rob/Library/Android/sdk/platform-tools/adb",
+            "start-server"
+          ],
+          "dispatchBinding": "Freeze adb executablehash and ensure bareadb calls resolve thissamebinary beforelegacydrivers; no PATH-drivenserverreplacement",
+          "cleanup": "Stoponlyexacttask-ownedserver andownedforwards; neverkill/restartunknownuserdaemon. Recheckattachedtargets; unknownnewdevice=>stop/report ratherthaninterruptuserconnections."
+        }
+      },
+      "ios": {
+        "initialArgv": [
+          "xcrun",
+          "simctl",
+          "list",
+          "--json",
+          "devices",
+          "available"
+        ],
+        "queryTimeoutSeconds": 10,
+        "lastObservation": "Unrestrictedreadonlyqueryagain timedout10s inN02; nohostrepairperformed",
+        "permittedProposedStartup": [
+          "open",
+          "-a",
+          "Simulator",
+          "--args",
+          "-CurrentDeviceUDID",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+        ],
+        "afterStartup": "Repeatboundedreadonlyinventory. Selectuniqueavailable iPhone18Pro fromactualserviceoutput, recordUDID/runtime, thenbootonlyassignedtesttarget ifnonebooted. Ifcompatibleexistingruntime/target isabsent, stopandreport; noOSruntime download ordeviceerase proposed.",
+        "targetBootArgv": [
+          "xcrun",
+          "simctl",
+          "boot",
+          "<UDID_FROM_VERIFIED_AVAILABLE_DEVICE_LIST>"
+        ],
+        "ownership": "Do notshutdown/stopunowneddevices orservices. Ifanotherunownedbootedtargetpreventsexclusivity, stopandreport. Neverreset/erase/deleteuserdevices orrestartCoreSimulatorservice automatically.",
+        "failure": "Ifserviceremainsunavailable, privileged/first-launch/license/systemchangesare requested, ornoexistingcompatibletarget canbeassigned, stopandaskforseparatereviewedaction.",
+        "startupTargetMetadata": {
+          "name": "iPhone 18 Pro",
+          "UDID": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+          "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-27-0",
+          "deviceType": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro"
+        },
+        "startupGate": "Reverifyexactmetadataidentitybeforelaunch; thisexplicitstartupmaybootonlytheidentifiedintendedtestsimulator. Metadataaloneisnotreadiness; requireactualservice/available/bootedidentityafterstartup. No default-last-device launch."
+      },
+      "worker": "One exclusive native-host worker atmediumreasoning; coordinator reviewsreadiness; firstunexpectedfailureSTOP; noretry/repair escalation beyondthisscope",
+      "duration": "Planningallowance15-30minutesplus156MBdownload; servicefailuremaystopbeforecompletion. No measuredsetupduration.",
+      "outputs": [
+        "Confirmedavailable/bootediOSUDID/runtime/name",
+        "AssignedsingleAndroidserial/image/ABI/measuredsize+density",
+        "Toolarchivehashandactualtoolversion/paths",
+        "Resourceownershipandcleanupinstructions",
+        "Refreshedliteralnativeacceptanceplanforseparateapproval"
+      ],
+      "excluded": [
+        "No nativeprojectgeneration",
+        "No Pods/Gradle/Xcodebuild",
+        "No appbinaryinstall/launch/testinput",
+        "No Metroserver/transport",
+        "No SDKimage/OSruntime downloads",
+        "No erase/reset/deleteofuserdevices",
+        "No unrelatedprocess/service termination"
+      ]
+    },
+    "authorization": "No host repair/provisioning/boot authorized or executed; proposed separate approval phase only"
+  },
+  "runtime": {
+    "nativeExecuted": false,
+    "sourceFixesRuntimeVerified": false,
+    "web": "Previous allnineapprovedbrowserrows pass on samecandidate; newnativeharnessnotexecuted; no newwebresultclaimed"
+  },
+  "history": {
+    "nativePlanBeforeFixes": "records/evidence/revised-api-u25-native-plan.json preserved",
+    "browserPass": "records/evidence/revised-api-u25-web-attempt-05.json preserved",
+    "allEarlierOutcomesUnmodified": true
+  },
+  "remainingGates": [
+    "Ownerapproval for boundedhost-readiness phaseonly",
+    "Confirm actualtargets/operatortools andrefreshliteralnativeexecutioninputs",
+    "Separate explicitnativegeneration/build/install/Metro/flowapproval; per-planbinaryidentitygates beforeacceptingresults"
+  ],
+  "nativePlan": {
+    "unit": "U25-N02 native harness refresh (protocol U26 execution)",
+    "status": "Plan prepared after source audit; full native execution BLOCKED by host/target/operator readiness; no execution authorized",
+    "kind": "proposed command reference",
+    "candidate": {
+      "pr": 48,
+      "sourceCommit": "c293272c1fbf0dcab7a571cdbdaec6d0942a0d4d",
+      "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f04/one-map-react-0.1.0-rc.2.tgz",
+      "archiveSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+      "distSha256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+      "distFiles": 164,
+      "packageSourceOverlay": false,
+      "archiveSourcePr": 48,
+      "harnessSourcePr": 50,
+      "harnessSourceCommit": "704e7e67815f4fe1c2c7e792dc48c76098a26c80"
+    },
+    "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+    "worker": {
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "count": 1,
+      "exclusiveResources": [
+        "Metro8081",
+        "fixture8797",
+        "fixture8798",
+        "status8799",
+        "simulator",
+        "emulator",
+        "generated projects",
+        "builds",
+        "installations"
+      ],
+      "execution": "All commands serial. Stop first failed whole command; report first-attempt result. No edits or independent retries. Coordinator verifies artifact and build identity before flows."
+    },
+    "binding": {
+      "PATHPrefix": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-bin",
+      "credential": "Public MAPBOX_ACCESS_TOKEN required; no mandatory Mapbox download-secret token established by pinned peer source. Do not record token values."
+    },
+    "readinessGates": [
+      {
+        "id": "ios-target",
+        "status": "OPEN",
+        "reason": "Restricted simctl query exits1; unrestricted read-only query times out after10s. Xcode27.1 build27A9275 installed; iOS27.1 simulator SDK does not prove runtime availability. Prior iPhone18Pro/iOS27 metadata is not runnable identity."
+      },
+      {
+        "id": "android-target",
+        "status": "OPEN",
+        "reason": "No AVD metadata, emulator -list-avds empty, no observed adb server. Installed image android-37.1/google_apis_playstore_ps16k/arm64-v8a revision9. avdmanager unavailable under installed SDK/AndroidStudio search. No emulator serial assigned."
+      },
+      {
+        "id": "manual-operator",
+        "status": "OPEN",
+        "reason": "13core+6supplemental=19 physical/visual outcomes per native environment,76total across four rows, require actual operator/tool access for touch, nested scrolling, annotation image refresh, rotation, density-bound geometry and representative host accessibility checks. Callback logs cannot substitute; no outcomes are fabricated."
+      },
+      {
+        "id": "future-build-inputs-binary",
+        "status": "OPEN future acceptance preparation",
+        "reason": "No native projects, resolved Pods/Gradle SDKs, linked binaries or installed identities exist for this harness. Must be generated/resolved/built/installed only after separate full native scope approval."
+      }
+    ],
+    "hostSetupProposal": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-setup-proposal.json",
+      "sha256": "c28dbd3565f9859371832507fcc5425ae5bb0bc5a363991c08a3297349ecb4a5",
+      "status": "PROPOSED separatephase0; NOT authorized or executed",
+      "scope": "Root proposal alone defines pinned156083281byte Android CLI temp tooling/tempAVD and intended iOS Simulator startup/readiness; no native app generation/build/install/Metro/input. Stop at unexpected failure, no host repair escalation.",
+      "planningDuration": "15-30minutes plus156MBdownload; unmeasured current setup; failure may stop early.",
+      "adbOwnershipGate": "Latest root proposal gates port5037 before any adb/emulator boot, pins exact SDK adb, STOP unknown/unowned/mismatched daemon, owns explicitly created daemon/forwards only; required5037/5554/5555 gates. No phase0action now."
+    },
+    "portGate": {
+      "before": "EVERY native command including each TF04/05/06 invocation",
+      "argv": [
+        "lsof",
+        "-nP",
+        "-iTCP:8081",
+        "-iTCP:8797",
+        "-iTCP:8798",
+        "-iTCP:8799",
+        "-sTCP:LISTEN"
+      ],
+      "rule": "Required ports must be free or held only by recorded owned processes that worker stops before runner. Unknown listener => stop. Legacy freePort kills arbitrary listeners; never enter it with unknown owner. Record started PID/process groups, restore only own forwards, never kill user processes."
+    },
+    "baseline": {
+      "react-native": "0.87.1",
+      "react": "19.2.3",
+      "react-native-teleport": "1.2.1",
+      "@rnmapbox/maps": "10.3.7",
+      "@maplibre/maplibre-react-native": "11.5.0",
+      "MapboxMapsRequested": "11.23.1 exact both OS via generator",
+      "developmentExpoExcluded": "RN0.86.3 / RNMapbox10.3.8 does not establish this baseline",
+      "mixed": "Mapbox web/MapLibre native and MapLibre web/Mapbox native selections required; dual native SDK co-installation not promised."
+    },
+    "orderedPreparation": [
+      {
+        "order": 1,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/setup-native-example.mjs",
+          "native-mapbox"
+        ],
+        "status": "FUTURE only, requires approval",
+        "effect": "Generates ios/android/Gemfile via CLI20.2.0 init RN0.87.1; no JS install, pods, build or launch."
+      },
+      {
+        "order": 2,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+        "argv": [
+          "bundle",
+          "install"
+        ],
+        "status": "FUTURE iOS dependency resolution only"
+      },
+      {
+        "order": 3,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox/ios",
+        "argv": [
+          "bundle",
+          "exec",
+          "pod",
+          "install"
+        ],
+        "status": "FUTURE iOS dependency resolution only"
+      },
+      {
+        "order": 4,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/setup-native-example.mjs",
+          "native-maplibre"
+        ],
+        "status": "FUTURE only, requires approval",
+        "effect": "Generates ios/android/Gemfile via CLI20.2.0 init RN0.87.1; no JS install, pods, build or launch."
+      },
+      {
+        "order": 5,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+        "argv": [
+          "bundle",
+          "install"
+        ],
+        "status": "FUTURE iOS dependency resolution only"
+      },
+      {
+        "order": 6,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre/ios",
+        "argv": [
+          "bundle",
+          "exec",
+          "pod",
+          "install"
+        ],
+        "status": "FUTURE iOS dependency resolution only"
+      }
+    ],
+    "orderedScenarios": [
+      {
+        "order": 1,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf04-camera-smoke.mjs",
+          "ios"
+        ],
+        "covers": [
+          "mapbox-ios",
+          "maplibre-ios"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/tf04-camera-smoke-ios.log",
+        "identityAcceptanceGate": "After whole group, verify BOTH distinct engine produced+installed binary and linked SDK identities; accept no result until both reconciled. Pre-command baseline is context only."
+      },
+      {
+        "order": 2,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf04-camera-smoke.mjs",
+          "android"
+        ],
+        "covers": [
+          "mapbox-android",
+          "maplibre-android"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/tf04-camera-smoke-android.log",
+        "identityAcceptanceGate": "After whole group, verify BOTH distinct engine produced+installed binary and linked SDK identities; accept no result until both reconciled. Pre-command baseline is context only."
+      },
+      {
+        "order": 3,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf05-sources-smoke.mjs",
+          "ios"
+        ],
+        "covers": [
+          "mapbox-ios",
+          "maplibre-ios"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/tf05-sources-smoke-ios.log",
+        "identityAcceptanceGate": "After whole group, verify BOTH distinct engine produced+installed binary and linked SDK identities; accept no result until both reconciled. Pre-command baseline is context only."
+      },
+      {
+        "order": 4,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf05-sources-smoke.mjs",
+          "android"
+        ],
+        "covers": [
+          "mapbox-android",
+          "maplibre-android"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/tf05-sources-smoke-android.log",
+        "identityAcceptanceGate": "After whole group, verify BOTH distinct engine produced+installed binary and linked SDK identities; accept no result until both reconciled. Pre-command baseline is context only."
+      },
+      {
+        "order": 5,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "ios"
+        ],
+        "covers": [
+          "mapbox-ios",
+          "maplibre-ios"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/tf06-queries-smoke-ios.log",
+        "identityAcceptanceGate": "After whole group, verify BOTH distinct engine produced+installed binary and linked SDK identities; accept no result until both reconciled. Pre-command baseline is context only."
+      },
+      {
+        "order": 6,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "android"
+        ],
+        "covers": [
+          "mapbox-android",
+          "maplibre-android"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/tf06-queries-smoke-android.log",
+        "identityAcceptanceGate": "After whole group, verify BOTH distinct engine produced+installed binary and linked SDK identities; accept no result until both reconciled. Pre-command baseline is context only."
+      },
+      {
+        "order": 7,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "ios",
+          "lifetimes",
+          "mapbox"
+        ],
+        "env": {},
+        "effect": "Own Metro/build/install/launch; no optional stale binary reuse; first attempt."
+      },
+      {
+        "order": 8,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "ios",
+          "lifetimes",
+          "maplibre"
+        ],
+        "env": {},
+        "effect": "Own Metro/build/install/launch; no optional stale binary reuse; first attempt."
+      },
+      {
+        "order": 9,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "android",
+          "lifetimes",
+          "mapbox"
+        ],
+        "env": {
+          "ANDROID_SERIAL": "<assigned serial>"
+        },
+        "effect": "Own Metro/build/install/launch; no optional stale binary reuse; first attempt."
+      },
+      {
+        "order": 10,
+        "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "android",
+          "lifetimes",
+          "maplibre"
+        ],
+        "env": {
+          "ANDROID_SERIAL": "<assigned serial>"
+        },
+        "effect": "Own Metro/build/install/launch; no optional stale binary reuse; first attempt."
+      },
+      {
+        "order": 11,
+        "environment": "mapbox-ios",
+        "sequence": [
+          "Run explicit buildInstallLaunch with generated/resolved inputs recorded",
+          "Stop owned app/Metro; verify produced and installed baseline; coordinator checkpoint",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "ios",
+              "mapbox"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-ios.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-manual.json",
+              "TF07_IOS_UDID": "<confirmed UDID>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+            "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-core-result.json",
+            "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-core.log"
+          },
+          "Stop own core Metro/forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "ios",
+              "mapbox",
+              "retained"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-ios.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-retained-manual.json",
+              "TF07_IOS_UDID": "<confirmed UDID>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+            "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-retained-result.json",
+            "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-retained.log",
+            "receiptRule": "Unique absent report; runner wx writes6unverified with fresh4identity fields. Operator records actual outcomes only. Native target returned; actual window.scale in observation/density. Reuses TF07 own Metro/installed readback; no external Metro."
+          },
+          "Stop own retained Metro/forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf09-rendering-smoke.mjs",
+              "ios",
+              "mapbox"
+            ],
+            "env": {
+              "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+              "TF09_OUTPUT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf09.json",
+              "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+              "TF09_NATIVE_IDENTITY": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-ios.json",
+                "encoding": "compact JSON after external verified produced/installed identity"
+              },
+              "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-peer-evidence.json"
+            },
+            "metro": {
+              "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+              "argv": [
+                "bun",
+                "run",
+                "start",
+                "--",
+                "--port",
+                "8081",
+                "--reset-cache"
+              ],
+              "env": {
+                "ONE_MAP_SMOKE": "tf09"
+              }
+            },
+            "launch": [
+              "xcrun",
+              "simctl",
+              "launch",
+              "<UDID>",
+              "org.reactjs.native.example.OneMapMapbox",
+              "-RCT_jsLocation",
+              "127.0.0.1:8081"
+            ],
+            "androidForwarding": [],
+            "status": "Source/static capture resolution verified; FUTURE runner still serves fixture only, owns no Metro/build/install/launch."
+          }
+        ],
+        "status": "FUTURE only, after host/operator/targets and full native permission."
+      },
+      {
+        "order": 12,
+        "environment": "mapbox-android",
+        "sequence": [
+          "Run explicit buildInstallLaunch with generated/resolved inputs recorded",
+          "Stop owned app/Metro; verify produced and installed baseline; coordinator checkpoint",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "android",
+              "mapbox"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-manual.json",
+              "ANDROID_SERIAL": "<assigned serial>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+            "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-core-result.json",
+            "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-core.log"
+          },
+          "Stop own core Metro/forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "android",
+              "mapbox",
+              "retained"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-retained-manual.json",
+              "ANDROID_SERIAL": "<assigned serial>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+            "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-retained-result.json",
+            "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-retained.log",
+            "receiptRule": "Unique absent report; runner wx writes6unverified with fresh4identity fields. Operator records actual outcomes only. Native target returned; actual window.scale in observation/density. Reuses TF07 own Metro/installed readback; no external Metro."
+          },
+          "Stop own retained Metro/forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf09-rendering-smoke.mjs",
+              "android",
+              "mapbox"
+            ],
+            "env": {
+              "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+              "TF09_OUTPUT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf09.json",
+              "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+              "TF09_NATIVE_IDENTITY": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android.json",
+                "encoding": "compact JSON after external verified produced/installed identity"
+              },
+              "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-peer-evidence.json"
+            },
+            "metro": {
+              "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+              "argv": [
+                "bun",
+                "run",
+                "start",
+                "--",
+                "--port",
+                "8081",
+                "--reset-cache"
+              ],
+              "env": {
+                "ONE_MAP_SMOKE": "tf09"
+              }
+            },
+            "launch": [
+              "adb",
+              "-s",
+              "<serial>",
+              "shell",
+              "am",
+              "start",
+              "-n",
+              "com.onemapmapbox/.MainActivity"
+            ],
+            "androidForwarding": [
+              [
+                "adb",
+                "-s",
+                "<serial>",
+                "reverse",
+                "tcp:8081",
+                "tcp:8081"
+              ],
+              [
+                "adb",
+                "-s",
+                "<serial>",
+                "reverse",
+                "tcp:8798",
+                "tcp:8798"
+              ]
+            ],
+            "status": "Source/static capture resolution verified; FUTURE runner still serves fixture only, owns no Metro/build/install/launch."
+          }
+        ],
+        "status": "FUTURE only, after host/operator/targets and full native permission."
+      },
+      {
+        "order": 13,
+        "environment": "maplibre-ios",
+        "sequence": [
+          "Run explicit buildInstallLaunch with generated/resolved inputs recorded",
+          "Stop owned app/Metro; verify produced and installed baseline; coordinator checkpoint",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "ios",
+              "maplibre"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-ios.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-manual.json",
+              "TF07_IOS_UDID": "<confirmed UDID>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+            "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-core-result.json",
+            "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-core.log"
+          },
+          "Stop own core Metro/forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "ios",
+              "maplibre",
+              "retained"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-ios.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-retained-manual.json",
+              "TF07_IOS_UDID": "<confirmed UDID>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+            "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-retained-result.json",
+            "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-retained.log",
+            "receiptRule": "Unique absent report; runner wx writes6unverified with fresh4identity fields. Operator records actual outcomes only. Native target returned; actual window.scale in observation/density. Reuses TF07 own Metro/installed readback; no external Metro."
+          },
+          "Stop own retained Metro/forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf09-rendering-smoke.mjs",
+              "ios",
+              "maplibre"
+            ],
+            "env": {
+              "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+              "TF09_OUTPUT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf09.json",
+              "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+              "TF09_NATIVE_IDENTITY": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-ios.json",
+                "encoding": "compact JSON after external verified produced/installed identity"
+              },
+              "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-peer-evidence.json"
+            },
+            "metro": {
+              "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+              "argv": [
+                "bun",
+                "run",
+                "start",
+                "--",
+                "--port",
+                "8081",
+                "--reset-cache"
+              ],
+              "env": {
+                "ONE_MAP_SMOKE": "tf09"
+              }
+            },
+            "launch": [
+              "xcrun",
+              "simctl",
+              "launch",
+              "<UDID>",
+              "org.reactjs.native.example.OneMapMaplibre",
+              "-RCT_jsLocation",
+              "127.0.0.1:8081"
+            ],
+            "androidForwarding": [],
+            "status": "Source/static capture resolution verified; FUTURE runner still serves fixture only, owns no Metro/build/install/launch."
+          }
+        ],
+        "status": "FUTURE only, after host/operator/targets and full native permission."
+      },
+      {
+        "order": 14,
+        "environment": "maplibre-android",
+        "sequence": [
+          "Run explicit buildInstallLaunch with generated/resolved inputs recorded",
+          "Stop owned app/Metro; verify produced and installed baseline; coordinator checkpoint",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "android",
+              "maplibre"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-manual.json",
+              "ANDROID_SERIAL": "<assigned serial>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+            "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-core-result.json",
+            "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-core.log"
+          },
+          "Stop own core Metro/forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "android",
+              "maplibre",
+              "retained"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-retained-manual.json",
+              "ANDROID_SERIAL": "<assigned serial>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+            "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-retained-result.json",
+            "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-retained.log",
+            "receiptRule": "Unique absent report; runner wx writes6unverified with fresh4identity fields. Operator records actual outcomes only. Native target returned; actual window.scale in observation/density. Reuses TF07 own Metro/installed readback; no external Metro."
+          },
+          "Stop own retained Metro/forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf09-rendering-smoke.mjs",
+              "android",
+              "maplibre"
+            ],
+            "env": {
+              "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+              "TF09_OUTPUT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf09.json",
+              "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+              "TF09_NATIVE_IDENTITY": {
+                "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android.json",
+                "encoding": "compact JSON after external verified produced/installed identity"
+              },
+              "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-peer-evidence.json"
+            },
+            "metro": {
+              "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+              "argv": [
+                "bun",
+                "run",
+                "start",
+                "--",
+                "--port",
+                "8081",
+                "--reset-cache"
+              ],
+              "env": {
+                "ONE_MAP_SMOKE": "tf09"
+              }
+            },
+            "launch": [
+              "adb",
+              "-s",
+              "<serial>",
+              "shell",
+              "am",
+              "start",
+              "-n",
+              "com.onemapmaplibre/.MainActivity"
+            ],
+            "androidForwarding": [
+              [
+                "adb",
+                "-s",
+                "<serial>",
+                "reverse",
+                "tcp:8081",
+                "tcp:8081"
+              ],
+              [
+                "adb",
+                "-s",
+                "<serial>",
+                "reverse",
+                "tcp:8798",
+                "tcp:8798"
+              ]
+            ],
+            "status": "Source/static capture resolution verified; FUTURE runner still serves fixture only, owns no Metro/build/install/launch."
+          }
+        ],
+        "status": "FUTURE only, after host/operator/targets and full native permission."
+      }
+    ],
+    "environments": [
+      {
+        "environment": "mapbox-ios",
+        "shell": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+        "applicationId": "org.reactjs.native.example.OneMapMapbox",
+        "targetStatus": "UNASSIGNED; readiness required before approval",
+        "buildInstallLaunch": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+          "argv": [
+            "bun",
+            "run",
+            "ios",
+            "--",
+            "--no-packager",
+            "--port",
+            "8081",
+            "--udid",
+            "<confirmed iPhone18Pro UDID>",
+            "--mode",
+            "Debug",
+            "--buildFolder",
+            "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/mapbox-ios"
+          ],
+          "effect": "Builds, installs AND launches; future permission required despite --no-packager."
+        },
+        "identityFile": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-ios.json",
+        "tf07": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "ios",
+            "mapbox"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-ios.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-manual.json",
+            "TF07_IOS_UDID": "<confirmed UDID>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+          "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-core-result.json",
+          "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-core.log"
+        },
+        "tf09": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf09-rendering-smoke.mjs",
+            "ios",
+            "mapbox"
+          ],
+          "env": {
+            "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+            "TF09_OUTPUT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf09.json",
+            "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+            "TF09_NATIVE_IDENTITY": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-ios.json",
+              "encoding": "compact JSON after external verified produced/installed identity"
+            },
+            "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-peer-evidence.json"
+          },
+          "metro": {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+            "argv": [
+              "bun",
+              "run",
+              "start",
+              "--",
+              "--port",
+              "8081",
+              "--reset-cache"
+            ],
+            "env": {
+              "ONE_MAP_SMOKE": "tf09"
+            }
+          },
+          "launch": [
+            "xcrun",
+            "simctl",
+            "launch",
+            "<UDID>",
+            "org.reactjs.native.example.OneMapMapbox",
+            "-RCT_jsLocation",
+            "127.0.0.1:8081"
+          ],
+          "androidForwarding": [],
+          "status": "Source/static capture resolution verified; FUTURE runner still serves fixture only, owns no Metro/build/install/launch."
+        },
+        "retained": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "ios",
+            "mapbox",
+            "retained"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-ios.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-retained-manual.json",
+            "TF07_IOS_UDID": "<confirmed UDID>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+          "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-retained-result.json",
+          "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-ios-tf07-retained.log",
+          "receiptRule": "Unique absent report; runner wx writes6unverified with fresh4identity fields. Operator records actual outcomes only. Native target returned; actual window.scale in observation/density. Reuses TF07 own Metro/installed readback; no external Metro."
+        },
+        "identityProducerCommands": {
+          "ios": [
+            {
+              "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox/ios",
+              "argv": [
+                "xcodebuild",
+                "-showBuildSettings",
+                "-workspace",
+                "OneMapMapbox.xcworkspace",
+                "-scheme",
+                "OneMapMapbox",
+                "-configuration",
+                "Debug",
+                "-sdk",
+                "iphonesimulator",
+                "-derivedDataPath",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/mapbox-ios"
+              ]
+            },
+            {
+              "argv": [
+                "shasum",
+                "-a",
+                "256",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/mapbox-ios/Build/Products/Debug-iphonesimulator/OneMapMapbox.app/OneMapMapbox"
+              ]
+            },
+            {
+              "argv": [
+                "otool",
+                "-L",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/mapbox-ios/Build/Products/Debug-iphonesimulator/OneMapMapbox.app/OneMapMapbox"
+              ]
+            },
+            {
+              "argv": [
+                "xcrun",
+                "simctl",
+                "get_app_container",
+                "<confirmedUDID>",
+                "org.reactjs.native.example.OneMapMapbox",
+                "app"
+              ]
+            },
+            {
+              "argv": [
+                "/usr/libexec/PlistBuddy",
+                "-c",
+                "Print:CFBundleExecutable",
+                "<returnedAppPath>/Info.plist"
+              ]
+            },
+            {
+              "argv": [
+                "shasum",
+                "-a",
+                "256",
+                "<returnedAppPath>/<returnedCFBundleExecutable>"
+              ]
+            }
+          ]
+        },
+        "expectedProducedExecutable": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/mapbox-ios/Build/Products/Debug-iphonesimulator/OneMapMapbox.app/OneMapMapbox",
+        "identityCommandNote": "FUTURE only after permission. Substitutions come only from verified target/service/build outputs, never guessed hashes. Record produced path, architecture and actual resolved/linked SDKs. Grouped legacy commands may build elsewhere; discover their actual produced output independently rather than assuming standalone buildFolder. Standalone iOS showBuildSettings uses exactly the same derivedDataPath as run-ios buildFolder. Legacy driver default outputs may differ and must be discovered from their own actual build output."
+      },
+      {
+        "environment": "mapbox-android",
+        "shell": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+        "applicationId": "com.onemapmapbox",
+        "targetStatus": "UNASSIGNED; readiness required before approval",
+        "buildInstallLaunch": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+          "argv": [
+            "bun",
+            "run",
+            "android",
+            "--",
+            "--no-packager",
+            "--port",
+            "8081",
+            "--device",
+            "<assigned emulator serial>"
+          ],
+          "effect": "Builds, installs AND launches; future permission required despite --no-packager."
+        },
+        "identityFile": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android.json",
+        "tf07": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "android",
+            "mapbox"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-manual.json",
+            "ANDROID_SERIAL": "<assigned serial>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+          "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-core-result.json",
+          "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-core.log"
+        },
+        "tf09": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf09-rendering-smoke.mjs",
+            "android",
+            "mapbox"
+          ],
+          "env": {
+            "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+            "TF09_OUTPUT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf09.json",
+            "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+            "TF09_NATIVE_IDENTITY": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android.json",
+              "encoding": "compact JSON after external verified produced/installed identity"
+            },
+            "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-peer-evidence.json"
+          },
+          "metro": {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+            "argv": [
+              "bun",
+              "run",
+              "start",
+              "--",
+              "--port",
+              "8081",
+              "--reset-cache"
+            ],
+            "env": {
+              "ONE_MAP_SMOKE": "tf09"
+            }
+          },
+          "launch": [
+            "adb",
+            "-s",
+            "<serial>",
+            "shell",
+            "am",
+            "start",
+            "-n",
+            "com.onemapmapbox/.MainActivity"
+          ],
+          "androidForwarding": [
+            [
+              "adb",
+              "-s",
+              "<serial>",
+              "reverse",
+              "tcp:8081",
+              "tcp:8081"
+            ],
+            [
+              "adb",
+              "-s",
+              "<serial>",
+              "reverse",
+              "tcp:8798",
+              "tcp:8798"
+            ]
+          ],
+          "status": "Source/static capture resolution verified; FUTURE runner still serves fixture only, owns no Metro/build/install/launch."
+        },
+        "retained": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "android",
+            "mapbox",
+            "retained"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-retained-manual.json",
+            "ANDROID_SERIAL": "<assigned serial>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+          "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-retained-result.json",
+          "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/mapbox-android-tf07-retained.log",
+          "receiptRule": "Unique absent report; runner wx writes6unverified with fresh4identity fields. Operator records actual outcomes only. Native target returned; actual window.scale in observation/density. Reuses TF07 own Metro/installed readback; no external Metro."
+        },
+        "identityProducerCommands": {
+          "android": [
+            {
+              "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox/android",
+              "argv": [
+                "./gradlew",
+                ":app:dependencies",
+                "--configuration",
+                "debugRuntimeClasspath"
+              ]
+            },
+            {
+              "argv": [
+                "shasum",
+                "-a",
+                "256",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk"
+              ]
+            },
+            {
+              "argv": [
+                "adb",
+                "-s",
+                "<assignedSerial>",
+                "shell",
+                "pm",
+                "path",
+                "com.onemapmapbox"
+              ]
+            },
+            {
+              "argv": [
+                "adb",
+                "-s",
+                "<assignedSerial>",
+                "pull",
+                "<returnedBaseApkPath>",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android-installed.apk"
+              ]
+            },
+            {
+              "argv": [
+                "shasum",
+                "-a",
+                "256",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/mapbox-android-installed.apk"
+              ]
+            }
+          ]
+        },
+        "expectedProducedApk": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+        "identityCommandNote": "FUTURE only after permission. Substitutions come only from verified target/service/build outputs, never guessed hashes. Record produced path, architecture and actual resolved/linked SDKs. Grouped legacy commands may build elsewhere; discover their actual produced output independently rather than assuming standalone buildFolder."
+      },
+      {
+        "environment": "maplibre-ios",
+        "shell": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+        "applicationId": "org.reactjs.native.example.OneMapMaplibre",
+        "targetStatus": "UNASSIGNED; readiness required before approval",
+        "buildInstallLaunch": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+          "argv": [
+            "bun",
+            "run",
+            "ios",
+            "--",
+            "--no-packager",
+            "--port",
+            "8081",
+            "--udid",
+            "<confirmed iPhone18Pro UDID>",
+            "--mode",
+            "Debug",
+            "--buildFolder",
+            "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/maplibre-ios"
+          ],
+          "effect": "Builds, installs AND launches; future permission required despite --no-packager."
+        },
+        "identityFile": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-ios.json",
+        "tf07": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "ios",
+            "maplibre"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-ios.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-manual.json",
+            "TF07_IOS_UDID": "<confirmed UDID>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+          "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-core-result.json",
+          "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-core.log"
+        },
+        "tf09": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf09-rendering-smoke.mjs",
+            "ios",
+            "maplibre"
+          ],
+          "env": {
+            "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+            "TF09_OUTPUT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf09.json",
+            "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+            "TF09_NATIVE_IDENTITY": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-ios.json",
+              "encoding": "compact JSON after external verified produced/installed identity"
+            },
+            "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-peer-evidence.json"
+          },
+          "metro": {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+            "argv": [
+              "bun",
+              "run",
+              "start",
+              "--",
+              "--port",
+              "8081",
+              "--reset-cache"
+            ],
+            "env": {
+              "ONE_MAP_SMOKE": "tf09"
+            }
+          },
+          "launch": [
+            "xcrun",
+            "simctl",
+            "launch",
+            "<UDID>",
+            "org.reactjs.native.example.OneMapMaplibre",
+            "-RCT_jsLocation",
+            "127.0.0.1:8081"
+          ],
+          "androidForwarding": [],
+          "status": "Source/static capture resolution verified; FUTURE runner still serves fixture only, owns no Metro/build/install/launch."
+        },
+        "retained": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "ios",
+            "maplibre",
+            "retained"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-ios.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-retained-manual.json",
+            "TF07_IOS_UDID": "<confirmed UDID>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+          "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-retained-result.json",
+          "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-ios-tf07-retained.log",
+          "receiptRule": "Unique absent report; runner wx writes6unverified with fresh4identity fields. Operator records actual outcomes only. Native target returned; actual window.scale in observation/density. Reuses TF07 own Metro/installed readback; no external Metro."
+        },
+        "identityProducerCommands": {
+          "ios": [
+            {
+              "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre/ios",
+              "argv": [
+                "xcodebuild",
+                "-showBuildSettings",
+                "-workspace",
+                "OneMapMaplibre.xcworkspace",
+                "-scheme",
+                "OneMapMaplibre",
+                "-configuration",
+                "Debug",
+                "-sdk",
+                "iphonesimulator",
+                "-derivedDataPath",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/maplibre-ios"
+              ]
+            },
+            {
+              "argv": [
+                "shasum",
+                "-a",
+                "256",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/maplibre-ios/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app/OneMapMaplibre"
+              ]
+            },
+            {
+              "argv": [
+                "otool",
+                "-L",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/maplibre-ios/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app/OneMapMaplibre"
+              ]
+            },
+            {
+              "argv": [
+                "xcrun",
+                "simctl",
+                "get_app_container",
+                "<confirmedUDID>",
+                "org.reactjs.native.example.OneMapMaplibre",
+                "app"
+              ]
+            },
+            {
+              "argv": [
+                "/usr/libexec/PlistBuddy",
+                "-c",
+                "Print:CFBundleExecutable",
+                "<returnedAppPath>/Info.plist"
+              ]
+            },
+            {
+              "argv": [
+                "shasum",
+                "-a",
+                "256",
+                "<returnedAppPath>/<returnedCFBundleExecutable>"
+              ]
+            }
+          ]
+        },
+        "expectedProducedExecutable": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/builds/maplibre-ios/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app/OneMapMaplibre",
+        "identityCommandNote": "FUTURE only after permission. Substitutions come only from verified target/service/build outputs, never guessed hashes. Record produced path, architecture and actual resolved/linked SDKs. Grouped legacy commands may build elsewhere; discover their actual produced output independently rather than assuming standalone buildFolder. Standalone iOS showBuildSettings uses exactly the same derivedDataPath as run-ios buildFolder. Legacy driver default outputs may differ and must be discovered from their own actual build output."
+      },
+      {
+        "environment": "maplibre-android",
+        "shell": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+        "applicationId": "com.onemapmaplibre",
+        "targetStatus": "UNASSIGNED; readiness required before approval",
+        "buildInstallLaunch": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+          "argv": [
+            "bun",
+            "run",
+            "android",
+            "--",
+            "--no-packager",
+            "--port",
+            "8081",
+            "--device",
+            "<assigned emulator serial>"
+          ],
+          "effect": "Builds, installs AND launches; future permission required despite --no-packager."
+        },
+        "identityFile": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android.json",
+        "tf07": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "android",
+            "maplibre"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-manual.json",
+            "ANDROID_SERIAL": "<assigned serial>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+          "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-core-result.json",
+          "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-core.log"
+        },
+        "tf09": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf09-rendering-smoke.mjs",
+            "android",
+            "maplibre"
+          ],
+          "env": {
+            "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+            "TF09_OUTPUT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf09.json",
+            "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+            "TF09_NATIVE_IDENTITY": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android.json",
+              "encoding": "compact JSON after external verified produced/installed identity"
+            },
+            "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-peer-evidence.json"
+          },
+          "metro": {
+            "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+            "argv": [
+              "bun",
+              "run",
+              "start",
+              "--",
+              "--port",
+              "8081",
+              "--reset-cache"
+            ],
+            "env": {
+              "ONE_MAP_SMOKE": "tf09"
+            }
+          },
+          "launch": [
+            "adb",
+            "-s",
+            "<serial>",
+            "shell",
+            "am",
+            "start",
+            "-n",
+            "com.onemapmaplibre/.MainActivity"
+          ],
+          "androidForwarding": [
+            [
+              "adb",
+              "-s",
+              "<serial>",
+              "reverse",
+              "tcp:8081",
+              "tcp:8081"
+            ],
+            [
+              "adb",
+              "-s",
+              "<serial>",
+              "reverse",
+              "tcp:8798",
+              "tcp:8798"
+            ]
+          ],
+          "status": "Source/static capture resolution verified; FUTURE runner still serves fixture only, owns no Metro/build/install/launch."
+        },
+        "retained": {
+          "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "android",
+            "maplibre",
+            "retained"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-retained-manual.json",
+            "ANDROID_SERIAL": "<assigned serial>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro.",
+          "stdoutPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-retained-result.json",
+          "stderrPath": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/results/native-attempt-01/maplibre-android-tf07-retained.log",
+          "receiptRule": "Unique absent report; runner wx writes6unverified with fresh4identity fields. Operator records actual outcomes only. Native target returned; actual window.scale in observation/density. Reuses TF07 own Metro/installed readback; no external Metro."
+        },
+        "identityProducerCommands": {
+          "android": [
+            {
+              "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre/android",
+              "argv": [
+                "./gradlew",
+                ":app:dependencies",
+                "--configuration",
+                "debugRuntimeClasspath"
+              ]
+            },
+            {
+              "argv": [
+                "shasum",
+                "-a",
+                "256",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk"
+              ]
+            },
+            {
+              "argv": [
+                "adb",
+                "-s",
+                "<assignedSerial>",
+                "shell",
+                "pm",
+                "path",
+                "com.onemapmaplibre"
+              ]
+            },
+            {
+              "argv": [
+                "adb",
+                "-s",
+                "<assignedSerial>",
+                "pull",
+                "<returnedBaseApkPath>",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android-installed.apk"
+              ]
+            },
+            {
+              "argv": [
+                "shasum",
+                "-a",
+                "256",
+                "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime/native-identities/maplibre-android-installed.apk"
+              ]
+            }
+          ]
+        },
+        "expectedProducedApk": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+        "identityCommandNote": "FUTURE only after permission. Substitutions come only from verified target/service/build outputs, never guessed hashes. Record produced path, architecture and actual resolved/linked SDKs. Grouped legacy commands may build elsewhere; discover their actual produced output independently rather than assuming standalone buildFolder."
+      }
+    ],
+    "manual": {
+      "source": "scripts/tf07-smoke-contract.mjs, docs/tf07-ui.md, examples/shared/native-tf07-screen.tsx",
+      "requiredEachEnvironment": [
+        "live-child-button",
+        "nested-scroll",
+        "live-activation",
+        "annotation-activation",
+        "offset-touch-bounds",
+        "popup-follow-dismissal",
+        "map-feature-click",
+        "navigation-location",
+        "style-remount",
+        "host-accessibility",
+        "sdk-ornaments",
+        "camera-target-and-gesture",
+        "marker-prop-rejection"
+      ],
+      "identityFields": [
+        "installedBinarySha256",
+        "libraryDistSha256",
+        "environment",
+        "runId"
+      ],
+      "schema": {
+        "installedBinarySha256": "64hex actual installed APK/executable matching independently frozen produced binary",
+        "libraryDistSha256": "driver computed exact dist digest",
+        "environment": "engine-platform",
+        "runId": "runner randomUUID",
+        "scenarios": {
+          "live-child-button": "unverified initially; operator changes only observed passed/failed",
+          "nested-scroll": "unverified initially; operator changes only observed passed/failed",
+          "live-activation": "unverified initially; operator changes only observed passed/failed",
+          "annotation-activation": "unverified initially; operator changes only observed passed/failed",
+          "offset-touch-bounds": "unverified initially; operator changes only observed passed/failed",
+          "popup-follow-dismissal": "unverified initially; operator changes only observed passed/failed",
+          "map-feature-click": "unverified initially; operator changes only observed passed/failed",
+          "navigation-location": "unverified initially; operator changes only observed passed/failed",
+          "style-remount": "unverified initially; operator changes only observed passed/failed",
+          "host-accessibility": "unverified initially; operator changes only observed passed/failed",
+          "sdk-ornaments": "unverified initially; operator changes only observed passed/failed",
+          "camera-target-and-gesture": "unverified initially; operator changes only observed passed/failed",
+          "marker-prop-rejection": "unverified initially; operator changes only observed passed/failed"
+        }
+      },
+      "cameraAndMarkerDetailed": {
+        "camera-target-and-gesture": [
+          "Press Target A then Read renderer; actual center near[-122.34,47.61], requested label alone does not pass.",
+          "Physically pan an empty map region, then Read renderer; actual center must differ from A.",
+          "Press Repeat target (fresh object with identical primitive fields), then Read renderer; camera must remain at panned center rather than snap back.",
+          "Press Target B then Read renderer; actual center near[-122.32,47.615]. Pan again and repeat B; actual pan must remain.",
+          "Press Target A again then Read renderer; actual center returns near A (A/B/A target change applies).",
+          "Press Clear target, then existing Zoom in and Read renderer; requested label none, actual zoom increases, no target rollback.",
+          "Clear target and remount before completing ordinary TF07 feature/marker receipts; actual fixture feature707 and normal touch flow must still pass."
+        ],
+        "marker-prop-rejection": [
+          "For EACH Reject view draggable, Reject view callback, Reject annotation draggable, Reject annotation callback: press once and observe that exact case label plus actual Native Marker does not support dragging message. Waiting, Unexpected rejection or Unexpected drag callback is a failure.",
+          "After EACH attempt press Clear rejection; result must become No rejection requested while the same map remains mounted. Physically pan/read and activate ordinary marker child to confirm gestures/activation remain usable.",
+          "These are unsupported common-prop guard observations; they do not restore native facade dragging. The boundary wraps only the deliberate Marker inside Map context."
+        ]
+      },
+      "observedGate": "Actual known feature707 fixture=tf07, center/zoom finite, generation>=1, load>=2, live child/marker/annotation/source/popup/location events and no error; manual all13 passed. Physical map pan/child activation/nested scroll/offset bounds/popup follow-dismiss/ornaments/style-remount/accessibility cannot be inferred from callback counters.",
+      "retained": {
+        "source": "scripts/tf07-retained-contract.mjs, examples/shared/native-tf07-retained-screen.tsx",
+        "requiredEachEnvironment": [
+          "simultaneous-named-maps",
+          "provider-child-state",
+          "annotation-image-refresh",
+          "resize-orientation",
+          "camera-target-isolation",
+          "touch-density-bounds"
+        ],
+        "identityFields": [
+          "installedBinarySha256",
+          "libraryDistSha256",
+          "environment",
+          "runId"
+        ],
+        "schema": "Same four fields and scenarios dictionary as core. Six different exact names, fresh wx report path and fresh runner runId; all initially unverified. Never fabricate operator outcomes.",
+        "caseMap": "/private/tmp/one-map-u25-n02-6_rk_f7z/retained-case-map.json",
+        "caseMapSha256": "7dc98e4de3f12e285c812ce6b1627a76c8f9b5e5f44b2d6f0e41ec5eff6991fa",
+        "observedGate": "At least3valid current renderer/host snapshots, actual known per-map feature1707/2707, actual camera center/zoom and projected point in measured host bounds, named child own camera+initial/updated provider count evidence, actual portrait/landscape and resize, independent A target change with B stability, image load+refresh acknowledgment, physical known feature taps both maps; any cumulative active error vetoes. Incomplete preliminary readiness snapshots are non-evidence; latest final geometry must be valid. All six physical/visual outcomes must pass.",
+        "operatorProcedure": {
+          "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/publication/docs/tf07-ui.md",
+          "section": "Retained native supplemental procedure",
+          "anchor": "#retained-native-supplemental-procedure",
+          "ownership": "Sole detailed operator procedure; case-map is bounded source/test traceability, not a competing procedure."
+        }
+      }
+    },
+    "identityGates": {
+      "beforeGeneration": "Reverify complete initial freeze and exact archive installation; no live original/publication library source.",
+      "afterGeneration": "Record resolved CLI/template version+integrity, generated project tree+Gemfile hashes. Requested RN pin alone is not generated bytes.",
+      "afterResolution": "Freeze actual Gemfile.lock, Podfile.lock, Gradle dependency report, generated project/codegen, resolved SDK versions and expected patch files. Validate Mapbox native11.23.1 actual linked identity; do not treat config as linked proof.",
+      "afterBuild": "For prebuilt TF07 core/retained and TF09: record actual build command/environment, produced binary path/architecture, resolved+linked SDKs and produced APK/executable SHA; independently compare installed binary and require coordinator checkpoint BEFORE those prebuilt flows. For legacy TF04-06 internally rebuilt flows, use legacyDriverLimitation: post-command reconciliation of each engine produced/installed app+linkedSDK before accepting any outcomes; pre-command baseline hash is context only.",
+      "afterInstall": "Independently adb pm path/pull base.apk + SHA equality, or simctl get_app_container/PlistBuddy executable + SHA equality to produced baseline. TF07 repeats installed verification.",
+      "tf09": "TF09_NATIVE_IDENTITY only records nonempty string. Coordinator must verify installed/produced equality separately and bind compact JSON identity.",
+      "peerAttestation": "TF09_PEER_EVIDENCE.nativePeerDeltaVsHead selected peer contains full reviewed destination-relative patch file inventory and expected patched-byte SHA256 from reconciliation evidence; compare installed bytes. Do not self-hash arbitrary installed package to declare expected identity.",
+      "futureHashes": "NOT KNOWN; no stale historical hashes may substitute.",
+      "legacyDriverLimitation": "TF04/05 and TF06 scripts internally rebuild/install/launch/flow; no pause exists after the internal build. Baseline pre-command hashes are context only, not proof of internally rebuilt flows. Accept NO outcomes until coordinator independently reconciles each engine distinct produced+installed app and linked SDK identity after each grouped command under frozen inputs/exclusive ownership. Unexpected mismatch stops. TF07/core+retained and TF09 prebuilt flows retain strict actual before-flow installed verification.",
+      "baselineIdentityFileSchema": {
+        "environment": "exact engine-platform",
+        "libraryDistSha256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+        "installedBinarySha256": "future64hex independently compared produced/installed",
+        "nativeTarget": "futureverifiediOSUDID orAndroidserial; exact row.nativeTarget"
+      }
+    },
+    "scope": {
+      "TF01-03": "Shared scene and backend selection; logical map mount/remount; native reuse rejected by retained contract.",
+      "TF04": "Camera methods/events, gestures and wrapper ownership in native drivers; TF07 actual target A/B/A + equal primitive repeat after physical pan + clearing target and imperative zoom.",
+      "TF05": "Portable sources/layers, updates/reset/style replacement, images; selected wrapper behavior retained.",
+      "TF06": "Rendered/source/cluster queries and explicit feature state; added lifetimes verify data/style/source/map replacement without facade auto-clearing guarantees.",
+      "TF07": "Core13 receipts per native environment unchanged, plus separate6retained receipts for two named simultaneous maps/live marker provider+child state, annotation image refresh, actual resize/orientation, camera target isolation, physical touch at measured bounds/density. Native shared dragging remains removed.",
+      "TF09": "Native advanced rendering/capture observation and patched peer paths: source resolver repair and actual installed Metro static native capture selection passed. Native rendering/capture runtime remains unverified and requires separate execution permission plus installed binary/SDK identity.",
+      "TF08": "Current scope includes application location/UI in TF07 and selected capture used by TF09; unenumerated raw offline/cache/import/snapshot/service operations remain unverified, not silently marked accepted. Scope disposition required from owner for broader retained raw-service acceptance."
+    },
+    "duration": "Reserve a half day (provisional3-6hours) for serial four-environment native builds/flows and76manual outcomes. No measured current native duration; estimate expands earlier core-only52receipt2-4hour allowance for24supplemental receipts. Fresh native dependency/build caches can exceed this allowance. Host setup, failure diagnosis and retries excluded; target-specific duration must be refreshed before full native approval.",
+    "retry": "First native attempt only. Any failure stops; unknown readiness, changed inputs, repairs or retries require coordinator review and new owner permission.",
+    "excluded": [
+      "Physical devices (owner excluded)",
+      "Full VoiceOver/TalkBack audits",
+      "Sensor certification",
+      "RNMapbox invalidateAmbientCache and setMaximumAmbientCacheSize (owner excluded)",
+      "Host repairs/tool updates/provisioning without separate approval",
+      "Dual native SDK co-installation guarantee"
+    ],
+    "nativeProjectsGenerated": false,
+    "nativeBuildsPerformed": false,
+    "nativeRuntimeExecuted": false,
+    "proposedPrerequisiteRepairs": [
+      {
+        "status": "SOURCE COMPLETE audited PR50",
+        "sourceAudit": "/private/tmp/one-map-u25-n02-6_rk_f7z/source-code-audit.json",
+        "runtime": "Unverified; see sourceGatesClosed and current routine proofs. No source repair remains in this scoped checkpoint."
+      }
+    ],
+    "mixedSelectionPreparation": {
+      "status": "PREPARED and static proof GREEN",
+      "variants": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-mixed-variants.json",
+      "watchVariants": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-mixed-watch-variants.json",
+      "proof": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-mixed-static-proof.json",
+      "outcome": "Both existing opposite mixed setup.js imports resolve setup.native.ts for both OS/engines, expected native backend selected, exact paired watch roots and App Babel transforms pass. No Metro process/transport."
+    },
+    "preparedConsumers": [
+      {
+        "engine": "mapbox",
+        "shell": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+        "archiveFilesCompared": 171,
+        "archiveMemberBytesMatch": true,
+        "lockSha256": "3a2cff7f9db0732f10ed2334297d3cde2358ff5c67efcbdcba3596cb5fa77e2c",
+        "lockSource": "N01 existing frozen temporary lock; unchanged after actual1.4.1 --frozen-lockfile --ignore-scripts",
+        "versions": {
+          "@rnmapbox/maps": "10.3.7",
+          "react": "19.2.3",
+          "react-native": "0.87.1",
+          "react-native-teleport": "1.2.1",
+          "@react-native-community/cli": "20.2.0"
+        },
+        "oppositeNativePeerAbsent": true
+      },
+      {
+        "engine": "maplibre",
+        "shell": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+        "archiveFilesCompared": 171,
+        "archiveMemberBytesMatch": true,
+        "lockSha256": "fb37086b0f1f60175769d253a0129203716d388d0c345e13cbb2a36fc0878900",
+        "lockSource": "N01 existing frozen temporary lock; unchanged after actual1.4.1 --frozen-lockfile --ignore-scripts",
+        "versions": {
+          "@maplibre/maplibre-react-native": "11.5.0",
+          "react": "19.2.3",
+          "react-native": "0.87.1",
+          "react-native-teleport": "1.2.1",
+          "@react-native-community/cli": "20.2.0"
+        },
+        "oppositeNativePeerAbsent": true
+      }
+    ],
+    "peerEvidenceSha256": "2173e955fb5d1bcd15892144a4365c80c667e1811548c891f6bebe1c8803e36a",
+    "inputFreeze": {
+      "manifest": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-initial-inputs.json",
+      "sha256": "de5ca622cec28bea6e9d1cc64a7170c9fa2f27621f6d5d31502fc0db20a83994",
+      "entries": 33900,
+      "scope": "PR50tracked native harness+exact archive extraction+fresh independently installed consumers/temporarylocks+mixed variants; no generated native projects/buildoutputs."
+    },
+    "sourceHashes": {
+      "examples/README.md": "6344c89a57a32838ad97181c39671fe492209d9f5c2dbfc8f099429612979b34",
+      "examples/css-modules.d.ts": "96006289c535c3af4685ad429700653deea077eea4aacac018e58fddf0d0f7b2",
+      "examples/inline-smoke-target.cjs": "6feb01f3c7b4056b6e995cf9b7dfc251fd66f7225ad2a4d9070cc21fbeed4b0f",
+      "examples/inline-smoke-target.test.mjs": "38acf51aadbd79bfd671d41c9fe55b1bc12a646ddcbc4efbac413d9a56158ad7",
+      "examples/mapbox-token.cjs": "6a00040087135ecb439a434bc3339dce9b0518540286bb28a0133698c3ee3ddc",
+      "examples/mapbox-token.test.mjs": "dfe62b159fc6a39b5dc1c53347a3e863964031cd1a4fd25aedaf0f8b0072f06f",
+      "examples/pin-shell-deps.js": "f54cfdb067431e09c38b976f4009142370afb953e54c56850289d5936d85dbe1",
+      "examples/resolve-shell-deps.cjs": "e417f3b1463e6a91dcaf310543eae70aa49ead6690d326a2366175536a3a6e3c",
+      "examples/resolve-shell-deps.test.mjs": "86440b8925a07e3104423359985481d6e6352ecf69f89c43d65de4e0e3ca17bc",
+      "examples/mixed/mapbox-web-maplibre-native/setup.native.ts": "f922e92868c9f79e90c9f877dff5639b1acd1bed3350dbbfc114d820f354c14c",
+      "examples/mixed/mapbox-web-maplibre-native/setup.ts": "16880934f99060ae63cabc07d5e2b44433acf4764c150c852a1935634c93d291",
+      "examples/mixed/maplibre-web-mapbox-native/setup.native.ts": "c802c028688d99269ca7a6bdc08259771553db87ea07565569cb3908ffd40b2c",
+      "examples/mixed/maplibre-web-mapbox-native/setup.ts": "4f88e32ab3c5a6b45e91a180d07059911db2d7ada2272ccb2c108498bd7f23ce",
+      "examples/native-mapbox/App.tsx": "0baa798ba0f274834fb218da5a9ae914dc4776ea09dfa5c3a6a6a12a706fc386",
+      "examples/native-mapbox/Gemfile": "731cb657e8b565a302671772c6cde455dfa19f7c4015b778afec9b7e67da5200",
+      "examples/native-mapbox/README.md": "94847b30836dd7ea3e28fff274485d7b5ac1ea98a59f00d96f975ee501afa8c7",
+      "examples/native-mapbox/app.json": "7477cff8c5bfcbad3ed254481a446a883eae250e23b2ee022b84620ae35a74d6",
+      "examples/native-mapbox/babel.config.cjs": "1caafe326b1f69ad39c476171bdcad8f2213b824e7518fc89456340cc363ce91",
+      "examples/native-mapbox/bun.lock": "3a2cff7f9db0732f10ed2334297d3cde2358ff5c67efcbdcba3596cb5fa77e2c",
+      "examples/native-mapbox/index.js": "e58e53333550097bca178309144ea394926eff3ccf37189df79b9bcc15902f05",
+      "examples/native-mapbox/metro.config.cjs": "08c8b88e2575cc09cf2fbebe2a397de44bfbe2c3e3c598795dd81e233f00b8f9",
+      "examples/native-mapbox/package.json": "1bf6d3469daf2e192120944f4859e097dced1bcaf2ce6641777b34f32bbd6878",
+      "examples/native-maplibre/App.tsx": "db8ec4822c99bc3502b260cd36f4df2a6b3229acfec3a3cb8e453fa03b685f00",
+      "examples/native-maplibre/Gemfile": "731cb657e8b565a302671772c6cde455dfa19f7c4015b778afec9b7e67da5200",
+      "examples/native-maplibre/README.md": "c01597b00c04a05fea05d7cd97f3669567e1b39cdd100eb7fd857da58aafd817",
+      "examples/native-maplibre/app.json": "c18bca56b8d25e74468dccb60edb12cd6ea4241c94295c89f88e0f1115355684",
+      "examples/native-maplibre/babel.config.cjs": "fc4ab418e4825a61fe75ad04c6d944e099b52a69925c4c022d947beb5b3212ee",
+      "examples/native-maplibre/bun.lock": "fb37086b0f1f60175769d253a0129203716d388d0c345e13cbb2a36fc0878900",
+      "examples/native-maplibre/index.js": "e58e53333550097bca178309144ea394926eff3ccf37189df79b9bcc15902f05",
+      "examples/native-maplibre/metro.config.cjs": "adbe2c23cd48e68aa5bccfaa7f4e3d13028b4056bdd659895b12bee96a903fa4",
+      "examples/native-maplibre/package.json": "0f973fc53ad8c1867435eeafd17a78b2c0f894a228c45e17840a68588a62b1b5",
+      "examples/shared/camera-smoke.ts": "41a796349da41ec609f737b14af17b868a39affd0eecec65937b3e4b4ec26eb9",
+      "examples/shared/capture-rendering.native.ts": "c17621e8aedc59e559bc96fab38da39fe5af7dfa58a64d02d300958d5805fe31",
+      "examples/shared/capture-rendering.ts": "478c88df3f676722385c321bb496fb50fb4d4462758fca3b4e36dbe537cefe37",
+      "examples/shared/lifecycle-smoke.ts": "b6ae1b6c4301fcca8b54873e555ca6f496aa1ab22b96b77b3c9e287b3884fcae",
+      "examples/shared/lifetimes-map.tsx": "2e2c2c9711019d68772d644ceb1f589f10c85850f9fba3acd3d30507bcdb3f7f",
+      "examples/shared/lifetimes-smoke.ts": "14c58e76e2904e51f4e7e051ed42e087fd5974b8c84386d39115334c2306b39f",
+      "examples/shared/location-acquisition.ts": "bf33287a763d415ed5362ff6001e1ead4e5fdd6f67140bad1877fc67f2d6e9fa",
+      "examples/shared/mapbox-offline-commands.ts": "5952f1b97185c88c3789838e81a8066208eaaf4383cbb226ecb6ef963ec6409e",
+      "examples/shared/mapbox-snapshot.ts": "fe884a37d9d3cd3f1e21242ae2341ecf77b9cccad8bbae2823751a39a9e097b8",
+      "examples/shared/maplibre-offline-commands.ts": "c84efcf55bb9bdc402057daf049f37b1e19fc0fcaa51be664487827d6b75058c",
+      "examples/shared/maplibre-snapshot.ts": "80aedf8103c7868ccf9ad9104178de775739e4ee61f30d485ccd930fae9ac90c",
+      "examples/shared/native-camera-buttons.tsx": "8891194dfdb016b3cb337e99e9d8a9577d9c48af464e719eea549fe89bdc6f50",
+      "examples/shared/native-camera-screen.tsx": "57db92fc2eb6fdd85907a0da75196febcaa339f782334ffd87ab1b5837f046e3",
+      "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+      "examples/shared/native-location-button.tsx": "71d6f63b4e7c2bb201e1c42d2daaf6c53ad6bd01f3a96033fa1c202f45177b2f",
+      "examples/shared/native-location.ts": "f3156a095da8053508f5d8d8951f718a896b9cbcb9c6bbabdbe75c2b4d975990",
+      "examples/shared/native-popup-bubble.tsx": "1046ef25fc1c21f69be206e3f19b2b6a2c148adc3a05ffc8f3b832b94e942f24",
+      "examples/shared/native-queries-screen.tsx": "78b7b0eb158d37c5561c81f615ffb1089d4564c26debd250f92193a7bd4e1a56",
+      "examples/shared/native-sources-screen.tsx": "73f74314e2da333d4a9ce04058963775f0d4d52f59f17ffbdc444318d7b5aae2",
+      "examples/shared/native-tf07-retained-screen.tsx": "569aecf9dd5287010e568d0ba949e77b622693f20da30e104f19667818e9c41c",
+      "examples/shared/native-tf07-screen.tsx": "4f5e254be2b25b308d4bf44feac59bfc09b75c91cedcd295a0a20958bb53c1ba",
+      "examples/shared/native-tf08-screen.tsx": "15a440d9cf619446cd07ec3af1c63472288a3762e1ad554cbd0608a9905cb453",
+      "examples/shared/native-tf09-screen.tsx": "8e0e55a994872e16d0b6427097fa6ad373142edb677af4ef29c9a39656d08683",
+      "examples/shared/offline-pack-index.ts": "936aa92419de45e3ae15ee4af5c8c050d27cb8cacf9c686c0214fadd991354e2",
+      "examples/shared/queries-map.tsx": "ef9498b977c82c3707c3e2b83d05566a2f907a2b1741cc28601f96caad2e0d6b",
+      "examples/shared/queries-smoke.ts": "aadcd992843f3321c540ed1b9cfb19db32ae822edd2e531e54fe77fb6d1822b7",
+      "examples/shared/route-map.tsx": "9afc071795c3881080a0147562d22043221b36f30b65fc80c10761b42c22527b",
+      "examples/shared/smoke-target.ts": "f9097227201e0a8658c25d4b34a1b33d4c1d483526493391665db2e55fc86f36",
+      "examples/shared/sources-map.tsx": "7973ae80022d1611d6c742a89facc237b27b4454ca9b216d6ca7e65d0874c065",
+      "examples/shared/sources-smoke.ts": "da8b6f6455850b8f7cea5ad5ae4049cc1d180f09b4d9f7376557337894aecd6b",
+      "examples/shared/tf05-base.ts": "d68bed272d0ce895e7d2727409fcffecc8c72c0f954c4e9dffbc528ac2db9f52",
+      "examples/shared/tf06-base.ts": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+      "examples/shared/tf07-scene.tsx": "21279dc015f5f8bf3d4daa7754478b3b2d021dcf612b821384ae952f297e09fd",
+      "examples/shared/tf08-acceptance-scene.tsx": "a85cf86519ddf0162a3fad66bdd2980ef81cee7c964f30aff9870bf37c0de502",
+      "examples/shared/tf08-map.tsx": "766c66b3eba98734220da3f4626071defa440de1b52dbfd853e8fc999bb107bd",
+      "examples/shared/tf09-scene.tsx": "2672c2e38c5312260bedd9fdd84df0dc02b2cfa467095f683f8adbfe345e651e",
+      "examples/shared/web-camera-app.tsx": "ff2d95b4766fe173f18d13f415ecaf9c419b5b3ea3c0e172bcd700341612d602",
+      "examples/shared/web-corrections-app.tsx": "b7bd4ef22de932db6bcecf5b35fb8757d8112c38ea19f38cb0b7c6da71d93e46",
+      "examples/shared/web-lifecycle-app.tsx": "5fd4b6ec70737b15fff7295b3e6462ab5f083cee7204d49c1de360ea4e3cdf29",
+      "examples/shared/web-queries-app.tsx": "8973dff938e9b289c67c4951b2b90ac040b54b9ce0d4e9411d3763a23b7e355b",
+      "examples/shared/web-query-regressions.ts": "990cbe2cea61ec81aea1b8c7b2e37c43dfba69fb86c348acd7f26fae4ae94783",
+      "examples/shared/web-sources-app.tsx": "358da28bb656c7ad9092b9d135e3c3f51a73f99eaf9b4ec6d8de80774bc2ef28",
+      "examples/shared/web-tf07-app.tsx": "2434f3f243ebed31a1446e8da2a19f2760cbe0a14ae59450303dc9c2e58e63f1",
+      "examples/shared/web-tf08-app.tsx": "e67777e270161e6f2b2fd9265329b073582192198c6a79f6fdbd57b11307f571",
+      "examples/shared/web-tf09-app.tsx": "73d0156d09b2e472cfc219963e95c62f94f4472ab44748536e35f1983cd46c56",
+      "examples/shared/web-tf09-media.tsx": "b015b2430770e10e6ba0be50fc5bc1025cf85eb82db0e87b54c896f72a599382",
+      "scripts/check-docs.mjs": "544df7323201c99fbe2de360074c5951bfd66b9864a48529d760c2fefa569570",
+      "scripts/consumer-peer-patches.mjs": "8d2c1a5fef989f3054e623882329299b1209dc4f4b60cf50dbee14ca2f2688a0",
+      "scripts/example-config.test.mjs": "8aa9148ed57e9263b39ba669630acf4b50e3b87f49d535eaa1c1895f11387c09",
+      "scripts/example-native-codegen.test.mjs": "d58b27c1750919728fd7b424351930214ac1d8514c36057f5ce2fa171790a9a5",
+      "scripts/lint-policy.test.mjs": "0d46095c202e3428a14faabfd07a535e61c2f8df35a13abb688095c920fc77ad",
+      "scripts/lint-rules.mjs": "833f39f3c484ec5b11922f8b19b80b5741eb71f9cf7b36f4754c8f037c22080c",
+      "scripts/native-camera-bounds-reset.test.mjs": "e31cf58ef120fd234cbea8d006ab37911198d4c8d7f4f4bb5e3cd8a385ee599a",
+      "scripts/native-camera-mode.test.mjs": "f8c88ad623f10e065a1a7eb3b3d704e994dc1f0147a2c6fcfe41cc885dc0504f",
+      "scripts/native-location-permissions.mjs": "884448ff43d622d197d58596611e69d424dbc39dad6cb30d2c4b8bd856718adf",
+      "scripts/native-location-permissions.test.mjs": "c50d2753446695e47eb3a8123e0e3f13ba50f68d0744e9a926e29dd3ba754e42",
+      "scripts/native-mapbox-version.mjs": "97aabd7ae431097eb33cd0bf1a63b38eed84a2979f2ce16f98e774f15991613b",
+      "scripts/native-mapbox-version.test.mjs": "b531aa0659bfa58aaca276bdd509fff04bb3956546c893f045f65b4d12f66d3a",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "scripts/native-smoke-process.test.mjs": "94bcdf1d16935bfd433f87370e2dd8d8d8369f40f620fb38521952599483b1d6",
+      "scripts/native-source-lifetime.test.mjs": "e1225fb13bbbae9d4e332c0fcdc9a833157c3c2ef24e0c11a24aca7d868bce95",
+      "scripts/package-check-options.mjs": "d1fbb118c379bcd2004eb38ef05c67f4217fa073620187cc84ebac8b0a68f7ef",
+      "scripts/package-check-options.test.mjs": "f154f93984e3d1c7cc68e4e95283fa074b1be7d416df637909e87948b6523d3b",
+      "scripts/react-compiler.mjs": "b83f502bd9acac4c427e8020d95e2a40b3d5cbb358d60d5621b054e6d308b5dc",
+      "scripts/react-compiler.test.mjs": "3b7b0bbe7711ab2bbc355ae97a7890349431785938de63b1f75acf79170f7726",
+      "scripts/rnmapbox-light-color.test.mjs": "ca3f7e0f3e7169f0341500c7ba4e1716af7aeae2ea6c34fde4ade8e3b6ebe23d",
+      "scripts/rnmapbox-location-observer.test.mjs": "8aadda9410f8e58bdd1c590728789eaf19edb042a4a96a39496090440823a1db",
+      "scripts/rnmapbox-offline-status.test.mjs": "d6efecbe763dd6d080ca81a831e7fca8e6f8e8f5bbae7f59b7ab2f7d0a2bc9f9",
+      "scripts/setup-native-example.mjs": "bc99dc4edb3ee3d8d23456bd3a4e51ec88f21eb2249ad15982f16f1649daa6f5",
+      "scripts/test-example-resolution.mjs": "7900106093a8fc11a2b1f2c646e61317590913a2795f35d42c5a1d6fd270217f",
+      "scripts/test-package.mjs": "ffe8dfc141d96b7e237ed5bbc1900a12b84392c28d17016b17ce7b56758db74f",
+      "scripts/test-peers.mjs": "889f8fa35de29ad14ddc05b25f5fb41fec492e3c82307d4a18a95d8eb91f0ed8",
+      "scripts/tf04-camera-smoke.mjs": "cd0c856b89b6bd8e141ae7b16d8ee20e02de8caebab7870b9d6e69468bb0a20f",
+      "scripts/tf05-sources-smoke.mjs": "a3d5b7fe9793b48662cc1a4ef32f1dc2323512ae818d6dc923d96b19e93b245b",
+      "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+      "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+      "scripts/tf06-queries-smoke.mjs": "9a39cf777a76d164e925992f4863da79309c1e126ae8afb3dfee9bfbec97648f",
+      "scripts/tf06-smoke-selection.mjs": "2bf6a07aa61e28ced6283066cad4dd860c1a13ec52e73ffe47cc6dcee29919d7",
+      "scripts/tf06-smoke-selection.test.mjs": "2d27a797831f70e56b2252c3fd850beb1cbdb505a036db9ee913368169ae68a5",
+      "scripts/tf07-retained-contract.mjs": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852",
+      "scripts/tf07-retained-contract.test.mjs": "0c9bd9ceea6a02ab6d11985751d32b1df67325ef7bea1acc3337be95c0416027",
+      "scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+      "scripts/tf07-smoke-contract.test.mjs": "4cb9174d416afffa5cb65cd70f03628d057814bbcbd4a85f484c84a11314871d",
+      "scripts/tf07-ui-smoke.mjs": "eee588dd20e8d712491045801a194f7d67a0a61f43791ef2df0f61eb2b944a11",
+      "scripts/tf08-final-observations.mjs": "231c1b0f8dc9aabd0a493726c9660bcfa6b97d2e283967c5907aa0b0ef127aa1",
+      "scripts/tf08-final-observations.test.mjs": "40aaed60e658b8dff2e9122921ff28ff1d071d9385e30c4a000f068b9d295ed6",
+      "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+      "scripts/tf08-fused-location-fixture.test.mjs": "7c5ccf51737a73e67d0f6d95d5cdd1a1ccd611f0349f111176ca942000e981d4",
+      "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+      "scripts/tf08-image-observations.test.mjs": "8a0c439cedb26bb34da597ac361d8affcabcdbd048284b8023c85070629a554e",
+      "scripts/tf08-offline-observations.mjs": "f98f912fb47f56a778b1659387cf261f6d43e467d9f8aa76952cc86707c54863",
+      "scripts/tf08-offline-observations.test.mjs": "8f57c1493807c517ef07f9df47ec46f741e0aec2a8f38b4567607cca2d3f89dc",
+      "scripts/tf08-offline-peers.test.mjs": "ba544cbf3a16ec07814c2f32fcd943e5972aea91210b276af01d88c008d36f54",
+      "scripts/tf08-patches.test.mjs": "9f94823a7d237cbac50ecb73e1a71e7482b85d12fc722bd015a6e2caba9f4c1f",
+      "scripts/tf08-pending-scope.test.mjs": "141c164a2cc3d1f8b58b66241213ae985713b80714367ebc632c17106a5e4519",
+      "scripts/tf08-services-smoke.mjs": "4b40cd5a84d31be5e6ddf3cf8440fa549fd0dcb15f786fe6cdca4b9c5572dc97",
+      "scripts/tf08-snapshot-errors.test.mjs": "34a8af1328277fd5bc1809231bf8094bd19704fb969a617c672519f3a9717009",
+      "scripts/tf08-storage-fixture.py": "cabffaeebd3c016d8e57dbdd5f789bf2501f7e27fa3af43f733e45ac8e4a6467",
+      "scripts/tf09-peer-patches.test.mjs": "64588df3efebeee645e4dc3ebe9bd4da2ed6de5a80c2d34941ac74989f966cb3",
+      "scripts/tf09-rendering-fixture.mjs": "50b90fa0b06d2b4cc3129084322bcfb232ab3113a003f134dc8c826bc9f7ad15",
+      "scripts/tf09-rendering-fixture.test.mjs": "3045ea2c74ee2719c9a3dbaf5c7a17f3d6b44c9884df327322ac97316c9a836f",
+      "scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+      "scripts/verify-example-checkpoint.mjs": "6c9e26f1fd83d0c4bae0f081d9b102bc0c0101356de10924bfa9d4b3d5bbf2d9",
+      "scripts/wrapper-source-roots.mjs": "4f98ead7a84173305a05afa760e0cf8749bc789dda74ff3c8ebc1347ea94263a",
+      "scripts/ios-tap/generate-project.rb": "f94e5cf677229b69b3b9732fafe59516e01e7c4e39538520327f5f3e684e98f2",
+      "scripts/ios-tap/TapDriver/TapDriverApp.swift": "dbdad43492929bbc5438196bf3720c6c29008b8351aaf87ec0a440958e318620",
+      "scripts/ios-tap/TapDriver.xcodeproj/project.pbxproj": "11e2b06d3c924c52f3e2e8e570c48d4233c671df35489b637195fcf8d2209d21",
+      "scripts/ios-tap/TapDriver.xcodeproj/xcshareddata/xcschemes/TapDriver.xcscheme": "4c18ca7921e0e23dbde2efd5882011dd3f23cbb2f195fa506ec72d7674014b9f",
+      "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "e055ac139e0740a9e7cb5b381b097f21dfe652a8cee060c9ddf58c943a765d1e"
+    },
+    "nativePatchInventory": [
+      {
+        "path": "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch",
+        "sha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0"
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+        "sha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c"
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
+        "sha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1"
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.8.patch",
+        "sha256": "0b9cdb09c6b39c1b5527678155246e9116a8db71249fd7fd08d9d1fe1288a788"
+      }
+    ],
+    "actualRoutineProofs": {
+      "nativeResolver": "PASS effective actual consumer Metro resolver4capture/4mixed native rows plus browser/generic/package/error controls",
+      "retainedGraph": "PASS both actual installed Babel app/screen/selector transforms tf07-retained; no native imports executed",
+      "contracts": "PASS exact core13 and retained6judges; source tests9retainedscreen/40originalintegration passed before this copied harness freeze",
+      "nativeInputs": "Both actualBun1.4.1 frozen-lockfile ignoreScripts installs passed first attempt; locks unchanged;171packagefilesx2 exactly match archive;44reviewedexpectedpatchfilesmatch",
+      "png": "PASS1x1RGBAroundtrip; actualBun1.4.1 frozenlockcheck",
+      "distDigest": "Fresh archive extraction recomputed via actual JS driver localeCompare/path+rawbytes:164files exact52763b...; native-dist-proof.json"
+    },
+    "pngRuntime": {
+      "root": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-tools",
+      "version": "7.0.0",
+      "selfCheck": "PASS pureNode1x1RGBAroundtrip; actualBun1.4.1 frozenlock ignoreScripts no changes",
+      "manifest": "/private/tmp/one-map-u25-n02-6_rk_f7z/png-runtime-inputs.json",
+      "manifestSha256": "1ac86c39937354e42c5db478bc03a20eecb7e60e573afbd81dec50bba0b1f995",
+      "entries": 29,
+      "lockSha256": "5fce7e1ff943282db5fe644a3d305d88d8afc3e1234b359494f55291efca52be"
+    },
+    "actualRuntimeBinding": {
+      "bunCommand": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-bin/bun",
+      "bunSymlinkTarget": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native",
+      "bunSha256": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959",
+      "bunVersion": "1.4.1",
+      "childBunVersion": "1.4.1",
+      "nodeCommand": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-bin/node",
+      "nodeSymlinkTarget": "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node",
+      "nodeSha256": "6f32069480ec14d52b6d7b1f3c7124cfbbc46203abf5ddf5c65b127435f3f329",
+      "nodeVersion": "v24.22.1",
+      "rule": "Owned runtime-bin first in every cwd/child PATH; never VP bun dispatch shim."
+    },
+    "completeInputFreeze": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-complete-input-freeze.json",
+      "sha256": "443c7aaa576cad78bd3a61cbc80b0702b07c0798d738b8b9d1dfd29d47b30309",
+      "scope": "All initial/source/consumer/PNG/temporarylocks/actualtools/mixedvariant/proofsource/phase0proposal/readiness/sourceaudit inputs; no invented native outputs."
+    },
+    "requestNow": "Separate bounded HOST READINESS PHASE only. Full native generation/build/install/Metro/device input/flows require a later concrete-target plan and new permission.",
+    "sourceCommit": "704e7e67815f4fe1c2c7e792dc48c76098a26c80",
+    "sourcePr": 50,
+    "sourceGatesClosed": {
+      "resolver": "Actual installed Metro capture/native selection and two opposite mixed variants GREEN all4native engine/OS rows; browser/generic/package/error controls also pass.",
+      "retainedFixture": "Source audited PR50 covers two named maps, live marker provider/local state, delayed annotation refresh, actual layout/orientation/density geometry and independent target/physical receipts; mocked/static proofs do not establish runtime acceptance."
+    },
+    "hostReadinessRefresh": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-readiness-refresh.json",
+      "sha256": "fa2bc7da2b5ddcb5c27fc1ac00f25c550478e08cc94e37a8fe0977a13611564e",
+      "scope": "Root-owned bounded read-only refresh; iOS10s timeout, Android noAVD; no worker host query or mutation in phase2."
+    },
+    "receiptAccounting": {
+      "corePerEnvironment": 13,
+      "nativeEnvironments": 4,
+      "coreTotal": 52,
+      "retainedPerEnvironment": 6,
+      "retainedTotal": 24,
+      "total": 76,
+      "extraDensityRuns": "Not included; separate plan and permission required if four current rows fail density matrix."
+    },
+    "runtimeOutputs": "All first native attempt stdout/stderr/result/manual identity paths are under runtime/results/native-attempt-01, absent before run. Preserve first failed whole command and stop; never overwrite old outputs or replay stale receipts.",
+    "sourceFreeze": {
+      "manifest": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-source-inputs.json",
+      "sha256": "0e684e6e60bac92bd327103f020f4d2f0a34e91eced50cea099f9c497417bca7",
+      "entries": 314
+    },
+    "planAccuracy": "Routine packet self-check PASS; independent phase2 audit pending. Full native execution remains BLOCKED by host/target/operator and future binary gates.",
+    "densityCloseout": {
+      "cwd": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness",
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import assert from \"node:assert/strict\";\nimport {readFileSync} from \"node:fs\";\nimport {judgeNativeRetained,judgeNativeDensityMatrix} from \"./scripts/tf07-retained-contract.mjs\";\nconst stage=\"/private/tmp/one-map-u25-n02-6_rk_f7z\";\nconst digest=\"52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d\";\nconst environments=[\"mapbox-ios\",\"mapbox-android\",\"maplibre-ios\",\"maplibre-android\"];\nconst read=path=>JSON.parse(readFileSync(path,\"utf8\"));\nconst rows=environments.map(environment=>{\n const envelope=read(`${stage}/runtime/results/native-attempt-01/${environment}-tf07-retained-result.json`);\n const row=envelope.results[environment];\n const manual=read(`${stage}/runtime/results/native-attempt-01/${environment}-tf07-retained-manual.json`);\n const baseline=read(`${stage}/runtime/native-identities/${environment}.json`);\n assert.equal(envelope.artifact.distSha256,digest);\n assert.equal(row.environment,environment);assert.equal(baseline.environment,environment);\n assert.equal(row.libraryDistSha256,digest);assert.equal(baseline.libraryDistSha256,digest);\n assert.equal(row.installedBinarySha256,baseline.installedBinarySha256);\n assert.equal(row.nativeTarget,baseline.nativeTarget);\n assert(typeof row.runId===\"string\"&&row.runId.length>0);\n for(const field of [\"installedBinarySha256\",\"libraryDistSha256\",\"environment\",\"runId\"])assert.equal(manual[field],row[field]);\n assert.equal(row.status,\"passed\");\n assert.equal(judgeNativeRetained(row.observation,manual,row).status,\"passed\");\n assert.equal(row.density,row.observation.observations.at(-1).window.scale);\n return row;\n});\nassert.equal(new Set(rows.map(row=>row.runId)).size,4);\nassert(judgeNativeDensityMatrix(rows),\"Two actual densities per engine are not established; request a separately planned extra run.\");\nconsole.log(\"PASS current four-result native retained identity and density closeout\");"
+      ],
+      "status": "FUTURE coordinator-only after four current retained rows; not executed now",
+      "currentIdentityRule": "All stdout/manual paths absent before first attempt; runner creates manual with wx+fresh UUID. Future coordinator-owned baseline identity files require environment,libraryDistSha256,installedBinarySha256,nativeTarget bound to actual generated/resolved/produced/installed proofs. No prior result/manual may be reused.",
+      "scope": "Validate exact four current envelopes against current wx receipts and independently verified baseline+target, rejudge observations, then call existing tested judgeNativeDensityMatrix. Any stale/wrong identity/unverified outcome fails before density count.",
+      "extraRun": "If each engine lacks2actualscales, stop. Extra target/density run needs explicit changed plan/permission; no automatic density/host mutation.",
+      "syntaxCheck": "PASS node --check --input-type=module only; future identity/result reading and closeout NOT executed."
+    },
+    "oldInputsPreserved": {
+      "N01InitialManifestSha256": "3dab02f949756d5dd66ff9b74c5707a4e397899c0255c244dc3dca9f211ac721",
+      "status": "N01manifest unchanged; all inputs only read, no install/source edits or retirement done in N01"
+    },
+    "readmeProvenance": {
+      "path": "examples/README.md",
+      "sha256": "6344c89a57a32838ad97181c39671fe492209d9f5c2dbfc8f099429612979b34",
+      "sourceCommit": "704e7e67815f4fe1c2c7e792dc48c76098a26c80",
+      "note": "Harness documentation restored from exact audited source commit; working publication docs and package README unchanged."
+    }
+  },
+  "nativePreparation": {
+    "unit": "U25-N02 phase2",
+    "status": "Native input refresh self-check PASS; pending independent packet audit; full native execution BLOCKED and unauthorized",
+    "sourcePr": 50,
+    "sourceCommit": "704e7e67815f4fe1c2c7e792dc48c76098a26c80",
+    "sourceAudit": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/source-code-audit.json",
+      "sha256": "4134ef40975a31bae2371f37b2e5be40a4a88cb3a58aee4b90a1048f74a0a069"
+    },
+    "plan": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-acceptance-plan.json",
+      "sha256": "f14a542daa91a865c637b90f72d977078e98ccd0f7d3efd20b4d386477fa6370"
+    },
+    "completeFreeze": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-complete-input-freeze.json",
+      "sha256": "443c7aaa576cad78bd3a61cbc80b0702b07c0798d738b8b9d1dfd29d47b30309",
+      "scope": "All initial/source/consumer/PNG/temporarylocks/actualtools/mixedvariant/proofsource/phase0proposal/readiness/sourceaudit inputs; no invented native outputs."
+    },
+    "counts": {
+      "nativeInitial": 33900,
+      "nativeSource": 314,
+      "png": 29,
+      "toolSymlinks": 2,
+      "proofFiles": 17
+    },
+    "candidate": {
+      "pr": 48,
+      "sourceCommit": "c293272c1fbf0dcab7a571cdbdaec6d0942a0d4d",
+      "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f04/one-map-react-0.1.0-rc.2.tgz",
+      "archiveSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+      "distSha256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+      "distFiles": 164,
+      "packageSourceOverlay": false,
+      "archiveSourcePr": 48,
+      "harnessSourcePr": 50,
+      "harnessSourceCommit": "704e7e67815f4fe1c2c7e792dc48c76098a26c80"
+    },
+    "routineResults": {
+      "nativeResolver": "PASS effective actual consumer Metro resolver4capture/4mixed native rows plus browser/generic/package/error controls",
+      "retainedGraph": "PASS both actual installed Babel app/screen/selector transforms tf07-retained; no native imports executed",
+      "contracts": "PASS exact core13 and retained6judges; source tests9retainedscreen/40originalintegration passed before this copied harness freeze",
+      "nativeInputs": "Both actualBun1.4.1 frozen-lockfile ignoreScripts installs passed first attempt; locks unchanged;171packagefilesx2 exactly match archive;44reviewedexpectedpatchfilesmatch",
+      "png": "PASS1x1RGBAroundtrip; actualBun1.4.1 frozenlockcheck",
+      "distDigest": "Fresh archive extraction recomputed via actual JS driver localeCompare/path+rawbytes:164files exact52763b...; native-dist-proof.json"
+    },
+    "consumerProvenance": [
+      {
+        "engine": "mapbox",
+        "shell": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-mapbox",
+        "archiveFilesCompared": 171,
+        "archiveMemberBytesMatch": true,
+        "lockSha256": "3a2cff7f9db0732f10ed2334297d3cde2358ff5c67efcbdcba3596cb5fa77e2c",
+        "lockSource": "N01 existing frozen temporary lock; unchanged after actual1.4.1 --frozen-lockfile --ignore-scripts",
+        "versions": {
+          "@rnmapbox/maps": "10.3.7",
+          "react": "19.2.3",
+          "react-native": "0.87.1",
+          "react-native-teleport": "1.2.1",
+          "@react-native-community/cli": "20.2.0"
+        },
+        "oppositeNativePeerAbsent": true
+      },
+      {
+        "engine": "maplibre",
+        "shell": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-harness/examples/native-maplibre",
+        "archiveFilesCompared": 171,
+        "archiveMemberBytesMatch": true,
+        "lockSha256": "fb37086b0f1f60175769d253a0129203716d388d0c345e13cbb2a36fc0878900",
+        "lockSource": "N01 existing frozen temporary lock; unchanged after actual1.4.1 --frozen-lockfile --ignore-scripts",
+        "versions": {
+          "@maplibre/maplibre-react-native": "11.5.0",
+          "react": "19.2.3",
+          "react-native": "0.87.1",
+          "react-native-teleport": "1.2.1",
+          "@react-native-community/cli": "20.2.0"
+        },
+        "oppositeNativePeerAbsent": true
+      }
+    ],
+    "runtimeBinding": {
+      "bunCommand": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-bin/bun",
+      "bunSymlinkTarget": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native",
+      "bunSha256": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959",
+      "bunVersion": "1.4.1",
+      "childBunVersion": "1.4.1",
+      "nodeCommand": "/private/tmp/one-map-u25-n02-6_rk_f7z/runtime-bin/node",
+      "nodeSymlinkTarget": "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node",
+      "nodeSha256": "6f32069480ec14d52b6d7b1f3c7124cfbbc46203abf5ddf5c65b127435f3f329",
+      "nodeVersion": "v24.22.1",
+      "rule": "Owned runtime-bin first in every cwd/child PATH; never VP bun dispatch shim."
+    },
+    "retainedAccounting": {
+      "corePerEnvironment": 13,
+      "nativeEnvironments": 4,
+      "coreTotal": 52,
+      "retainedPerEnvironment": 6,
+      "retainedTotal": 24,
+      "total": 76,
+      "extraDensityRuns": "Not included; separate plan and permission required if four current rows fail density matrix."
+    },
+    "densityCloseout": "Four current stdout envelopes +freshwxmanual receipts rejudged against external installed/baseline/target identities, then existing tested judgeNativeDensityMatrix; syntax-only checked, no future outputs read now. Extra density runs require separate plan/permission.",
+    "legacyIdentityBoundary": "TF04/05 and TF06 scripts internally rebuild/install/launch/flow; no pause exists after the internal build. Baseline pre-command hashes are context only, not proof of internally rebuilt flows. Accept NO outcomes until coordinator independently reconciles each engine distinct produced+installed app and linked SDK identity after each grouped command under frozen inputs/exclusive ownership. Unexpected mismatch stops. TF07/core+retained and TF09 prebuilt flows retain strict actual before-flow installed verification.",
+    "firstAttempts": [
+      {
+        "action": "Fresh singleSDK consumers",
+        "result": "PASS first attempt actual1.4.1 --frozen-lockfile --ignore-scripts;519Mapbox/513MapLibre packages;priorN01locks unchanged"
+      },
+      {
+        "action": "PNG copy and frozen1.4.1 verification",
+        "result": "PASS no changes, pureNode1x1RGBAroundtrip"
+      },
+      {
+        "action": "ActualMetro capture/mixed tests",
+        "result": "PASS first attempt4capture/4mixed rows, effectiveconfig generic/browser/package/error controls; no transport"
+      },
+      {
+        "action": "Retained App/Babel/selector/staticgraph",
+        "result": "PASS first attempt2engines; native modules not executed"
+      },
+      {
+        "action": "Exactarchive/peer/dist/inputfreeze",
+        "result": "PASS first attempt171filesx2/44reviewedexpectedfiles/164dist/33900entries"
+      }
+    ],
+    "readiness": [
+      {
+        "id": "ios-target",
+        "status": "OPEN",
+        "reason": "Restricted simctl query exits1; unrestricted read-only query times out after10s. Xcode27.1 build27A9275 installed; iOS27.1 simulator SDK does not prove runtime availability. Prior iPhone18Pro/iOS27 metadata is not runnable identity."
+      },
+      {
+        "id": "android-target",
+        "status": "OPEN",
+        "reason": "No AVD metadata, emulator -list-avds empty, no observed adb server. Installed image android-37.1/google_apis_playstore_ps16k/arm64-v8a revision9. avdmanager unavailable under installed SDK/AndroidStudio search. No emulator serial assigned."
+      },
+      {
+        "id": "manual-operator",
+        "status": "OPEN",
+        "reason": "13core+6supplemental=19 physical/visual outcomes per native environment,76total across four rows, require actual operator/tool access for touch, nested scrolling, annotation image refresh, rotation, density-bound geometry and representative host accessibility checks. Callback logs cannot substitute; no outcomes are fabricated."
+      },
+      {
+        "id": "future-build-inputs-binary",
+        "status": "OPEN future acceptance preparation",
+        "reason": "No native projects, resolved Pods/Gradle SDKs, linked binaries or installed identities exist for this harness. Must be generated/resolved/built/installed only after separate full native scope approval."
+      }
+    ],
+    "hostProposal": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-setup-proposal.json",
+      "sha256": "c28dbd3565f9859371832507fcc5425ae5bb0bc5a363991c08a3297349ecb4a5",
+      "status": "PROPOSED separatephase0; NOT authorized or executed",
+      "scope": "Root proposal alone defines pinned156083281byte Android CLI temp tooling/tempAVD and intended iOS Simulator startup/readiness; no native app generation/build/install/Metro/input. Stop at unexpected failure, no host repair escalation.",
+      "planningDuration": "15-30minutes plus156MBdownload; unmeasured current setup; failure may stop early.",
+      "adbOwnershipGate": "Latest root proposal gates port5037 before any adb/emulator boot, pins exact SDK adb, STOP unknown/unowned/mismatched daemon, owns explicitly created daemon/forwards only; required5037/5554/5555 gates. No phase0action now."
+    },
+    "hostReadinessRefresh": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-readiness-refresh.json",
+      "sha256": "fa2bc7da2b5ddcb5c27fc1ac00f25c550478e08cc94e37a8fe0977a13611564e",
+      "scope": "Root-owned bounded read-only refresh; iOS10s timeout, Android noAVD; no worker host query or mutation in phase2."
+    },
+    "requestNow": "Separate bounded HOST READINESS PHASE only. Full native generation/build/install/Metro/device input/flows require a later concrete-target plan and new permission.",
+    "operatorProcedure": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/publication/docs/tf07-ui.md",
+      "section": "Retained native supplemental procedure",
+      "anchor": "#retained-native-supplemental-procedure",
+      "ownership": "Sole detailed operator procedure; case-map is bounded source/test traceability, not a competing procedure."
+    },
+    "oldInputs": {
+      "N01InitialManifestSha256": "3dab02f949756d5dd66ff9b74c5707a4e397899c0255c244dc3dca9f211ac721",
+      "status": "N01manifest unchanged; all inputs only read, no install/source edits or retirement done in N01"
+    },
+    "notExecuted": [
+      "No browser/GPU",
+      "No Metro server/transport",
+      "No native generation or Pod/Bundler/Gradle/Xcode build",
+      "No device boot/install/launch/input",
+      "No hosttools download/provisioning/AVD creation/Simulator startup/service repair",
+      "No source/Markdown/canonicalJSON/git mutation inphase2",
+      "No package/archive/README/library/API/peers/repositorylocks/versions/patch changes"
+    ],
+    "retention": "N01input trees remain unchanged pending independent newfreeze audit; newphase2input trees temporary. Keep compact provenance, retire superseded generated/dependency caches after coordinator approved closeout.",
+    "planPrecisionCorrection": "Prebuilt/legacy identity checkpoints separated; standaloneiOS derivedDataPath bound; incomplete readiness snapshots non-evidence; TF09sourcefixclosed/runtimeunverified;76operator outcomes. Harness examplesREADME restored to exact sourcecommit, all33900entries rehashed. Sourcecode/consumers/locks/tools unchanged, source/input/freeze hashes refreshed.",
+    "readmeProvenance": {
+      "path": "examples/README.md",
+      "sha256": "6344c89a57a32838ad97181c39671fe492209d9f5c2dbfc8f099429612979b34",
+      "sourceCommit": "704e7e67815f4fe1c2c7e792dc48c76098a26c80",
+      "note": "Harness documentation restored from exact audited source commit; working publication docs and package README unchanged."
+    }
+  },
+  "phase2Packets": {
+    "native-acceptance-plan.json": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-acceptance-plan.json",
+      "sha256": "f14a542daa91a865c637b90f72d977078e98ccd0f7d3efd20b4d386477fa6370"
+    },
+    "native-preparation-handoff.json": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-preparation-handoff.json",
+      "sha256": "4071b115396185758282e3d55320de271fa78661885f25582714d5f3a7a3ebab"
+    },
+    "native-complete-input-freeze.json": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/native-complete-input-freeze.json",
+      "sha256": "443c7aaa576cad78bd3a61cbc80b0702b07c0798d738b8b9d1dfd29d47b30309"
+    },
+    "host-setup-proposal.json": {
+      "path": "/private/tmp/one-map-u25-n02-6_rk_f7z/host-setup-proposal.json",
+      "sha256": "c28dbd3565f9859371832507fcc5425ae5bb0bc5a363991c08a3297349ecb4a5"
+    }
+  },
+  "retention": {
+    "removed": [
+      "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+      "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+      "/private/tmp/one-map-u25-n01-nz92pixo/runtime-bin",
+      "/private/tmp/one-map-u25-n01-nz92pixo/publication",
+      "/private/tmp/one-map-u25-n02-6_rk_f7z/bun-cache"
+    ],
+    "currentInputs": "Retained N02native consumers/tools pendinghost-readiness/acceptance decision",
+    "independentOldN01Inputs": false,
+    "preserved": [
+      "Allcandidatearchives",
+      "HistoricalN01blockedplan/audits/proofs/expectedpeerinventory",
+      "Compactcurrentchecks/case maps/sourceaudit",
+      "Originalunrelatedwork"
+    ],
+    "postCleanupCheck": "33900native+29PNGentriesverifiedbeforeolddependencyremoval; currentpathsallindependent"
+  }
+}

@@ -20,6 +20,7 @@ import {
 } from "../shared/native-location.js";
 import { NativeQueriesScreen } from "../shared/native-queries-screen.js";
 import { NativeSourcesScreen } from "../shared/native-sources-screen.js";
+import { NativeTf07RetainedScreen } from "../shared/native-tf07-retained-screen.js";
 import { NativeTf07Screen } from "../shared/native-tf07-screen.js";
 import { NativeTf08Screen } from "../shared/native-tf08-screen.js";
 import { NativeTf09Screen } from "../shared/native-tf09-screen.js";
@@ -74,6 +75,8 @@ const App = () => {
         nativePuck={<NativeUserLocation />}
       />
     );
+  if (smokeTarget === "tf07-retained")
+    return <NativeTf07RetainedScreen adapter={adapter} />;
   if (smokeTarget === "tf07")
     return <NativeTf07Screen adapter={adapter} ornaments={tf07Ornaments} />;
   if (smokeTarget === "tf06-lifetimes") {

@@ -38,16 +38,16 @@ const shellMetroResolver = (shellRoot) => ({
         throw error;
       }
 
-      const stem = moduleName.slice(0, -3);
-
+      // Let Metro choose platform/native suffixes before generic TS/TSX files.
       try {
-        return resolveModule(shellRoot, context, `${stem}.tsx`, platform);
+        return resolveModule(
+          shellRoot,
+          context,
+          moduleName.slice(0, -3),
+          platform
+        );
       } catch {
-        try {
-          return resolveModule(shellRoot, context, `${stem}.ts`, platform);
-        } catch {
-          throw error;
-        }
+        throw error;
       }
     }
   },
