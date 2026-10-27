@@ -1,0 +1,227 @@
+{
+  "checkpoint": "PR19 acceptance impact and candidate refresh",
+  "status": "Candidate and browser packet passed worker verification, independent audit and coordinator review; fresh owner permission pending; zero acceptance commands executed.",
+  "sourceCommit": "cbacadfb1213eaf9a50efd3e33a06ba592ebf530",
+  "sourceManifest": {
+    "files": 82,
+    "canonicalSha256": "3c9adb496edb9ff20a7797b800dfda82c80d954e60d5bed65542d051da7ac7fe",
+    "algorithm": "sorted path + NUL + file SHA-256 + LF"
+  },
+  "archive": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "memberCount": 171,
+    "memberManifestSha256": "4e13175819ed22fb2ba4aab3abb9c98e5c77eb9d3223716f14036695a7ed150b",
+    "distFiles": 164,
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "changedMembersFromF04": [
+      "dist/adapters/shared/native-marker-overlay.js",
+      "dist/adapters/shared/use-frozen-value.js",
+      "dist/adapters/web/map.js",
+      "dist/facade/map.js",
+      "dist/facade/use-stable-options.js"
+    ],
+    "declarationsUnchanged": true,
+    "exportsApiPeersRepositoryLocksVersionsPatchesUnchanged": true,
+    "oldArchiveSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+    "oldArchiveUnmodified": true
+  },
+  "impact": [
+    {
+      "source": "adapters/shared/use-frozen-value.ts",
+      "effect": "Lazy state creation snapshot preserves callable and undefined values; initial camera on all four adapters and marker anchors",
+      "browser": "camera/corrections and UI rows; source/renderer rows exercise shared lifecycle",
+      "native": "four future camera and core/retained UI environments"
+    },
+    {
+      "source": "facade/use-stable-options.ts",
+      "effect": "Lazy state creation snapshot validates Map/Source/Layer/Marker and selected web creation options",
+      "browser": "all nine rows; specific immutable creation errors remain routine tests",
+      "native": "four future source/camera/UI environments"
+    },
+    {
+      "source": "facade/map.tsx",
+      "effect": "Inline lazy deferred proxy creation preserves attached/detached and call-time ownership",
+      "browser": "map creation in nine rows; named-map proxy replacement/detach assertions are mocked, not in TF04 browser row",
+      "native": "four future camera/query and retained named-map receipts"
+    },
+    {
+      "source": "adapters/web/map.tsx",
+      "effect": "Compiler-compatible props destructuring and commit-owned padding reset snapshot",
+      "browser": "camera/corrections row explicitly exercises padding, eight gestures and reuse",
+      "native": "not a native adapter path"
+    },
+    {
+      "source": "adapters/shared/native-marker-overlay.tsx",
+      "effect": "Remove obsolete compiler suppression; compiled overlay changes",
+      "browser": "not a web overlay path",
+      "native": "four future core/retained marker projection, layout and touch observations"
+    }
+  ],
+  "browserPreparation": {
+    "root": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/frozen-harness",
+    "packet": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/browser-acceptance-plan.json",
+    "packetSha256": "9dcfba6c11eb55b89330b927bbb17bd31766f9485aa4c5cf77155b4cd437c3bc",
+    "launcher": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/runtime/run-u25-one.mjs",
+    "launcherSha256": "c46ecf72fe7bbab241d04e6b485ac6b1e9b802dbd77f1e71728b87f26dd60f4b",
+    "freeze": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/input-freeze.json",
+    "freezeSha256": "f1a3afa64ee7392e3a07a922ee92f2152ad1e764391852e4774c0352f859b230",
+    "initialManifest": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/initial-input-files.json",
+    "initialManifestSha256": "f36f31dc145b270b90e11c717bce9c8df748ccd20522ff1b9f47b4bf9a799ced",
+    "inputCount": 13155,
+    "verifier": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/verify-frozen-inputs.mjs",
+    "verifierSha256": "649482cd0fd7b7c033e6641605e8d628da9174498ee6a031ad8c357fc44a8a72",
+    "tools": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/tool-identities.json",
+    "toolsSha256": "a58c79fda453f7ae583f12e189b45d2c00a83c1d8a89dda0cc4294f55936d613",
+    "consumers": [
+      {
+        "engine": "mapbox",
+        "root": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/frozen-harness/examples/web-mapbox/node_modules/one-map-react",
+        "archiveMembersMatched": 171,
+        "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5"
+      },
+      {
+        "engine": "maplibre",
+        "root": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/frozen-harness/examples/web-maplibre/node_modules/one-map-react",
+        "archiveMembersMatched": 171,
+        "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5"
+      }
+    ],
+    "mixedVariants": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/mixed-entry-variants.json",
+    "staticProofs": [
+      "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/mixed-web-mapbox-graph.json",
+      "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/mixed-web-maplibre-graph.json"
+    ],
+    "rows": 9,
+    "executedRows": 0,
+    "worker": "one gpt-6-luna low, serial, stop first failure, no retry",
+    "estimate": "5-10 minutes; prior nine rows 78,388 ms, cold-cache allowance; no diagnosis/retries",
+    "launcherSelfCheck": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/launcher-self-check.mjs",
+      "sha256": "14d4924791e8b9ec0f174d8ec9bcd27e714e6070777f78d54e15871830959294",
+      "result": "Three tampered freeze/manifest/verifier inputs rejected before any subprocess; synthetic control reaches stub only",
+      "logSha256": "304f08f68d0e35bb54dc87cb84bb88413f0c7e88450e16d39e9c39a259f338d9"
+    },
+    "newRuntimeLinksIntoOriginalOrN02": []
+  },
+  "nativeDisposition": {
+    "oldStage": "/private/tmp/one-map-u25-n02-6_rk_f7z",
+    "status": "f04 native consumers and freeze superseded for f05; unchanged historical packets are not current inputs",
+    "nextPreparation": "Recreate both exact f05 consumers, archive/peer/Metro/mixed/Babel/PNG proofs and complete freeze before full native permission request",
+    "host": "Unresolved; no new inventory, setup, device boot or retry",
+    "iosCorrection": "Read CFBundleExecutable from DeviceHub Info.plist: DevicesTrampoline; only separately approved bounded exact-UDID retry",
+    "execution": "Separate host readiness, native preparation/full execution approval and operator/scope gates remain open",
+    "recoveryInputs": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-pr19-candidate-wn2x66_k/native-recovery/recovery-inputs.json",
+    "recoveryInputsSha256": "0a3e903bec0ce9e26e4d42cf98c60222e917475c3ee164702a5d6e66dcda995b"
+  },
+  "historicalIntegrity": {
+    "protectedExistingPaths": 449,
+    "changedProtectedPaths": [],
+    "hostRecordsCopiedByteExact": {
+      "revised-api-u25-host-readiness-attempt-01.json": true,
+      "revised-api-u25-host-repair-plan.json": true,
+      "revised-api-u25-ios-readiness-retry-02.json": true
+    },
+    "browserF04PassReusedAsF05": false
+  },
+  "routineVerification": [
+    {
+      "command": "bun run build",
+      "result": "library and example library build passed; two known native render-ref compiler diagnostics remain",
+      "logSha256": "3f77d24d94b8ee054e59ac24a5ae9cf6fb345e760c3853efcbe384d895bbb55b"
+    },
+    {
+      "command": "node scripts/react-compiler.test.mjs",
+      "result": "compiler/source-map/emitted-runtime assertions passed",
+      "logSha256": "a580905426596bfd7282f42d1b072644427814576e9b1b66c67372c414312542"
+    },
+    {
+      "command": "vp test run use-frozen-value.web.test.tsx tf07-map-context.web.test.tsx",
+      "result": "2 files / 16 tests passed",
+      "logSha256": "c14bd69d7fcb8eca049693a25b9c787bf5d6c44b9aaa320ebc2d6cfc112fc619"
+    },
+    {
+      "command": "vp test run --config vite.compiled.config.ts",
+      "result": "29 files / 497 tests passed",
+      "logSha256": "7f8daa40cd12b7310b72f09e71312e2224397e1e11878e57b2e6a344769f9840"
+    },
+    {
+      "command": "jest --config jest.compiled.config.cjs --runInBand",
+      "result": "8 suites / 231 mocked tests passed",
+      "logSha256": "0911d2fb676bb1d3340ed798764f3af3ee7c3215def04df697e2abea349f96d7"
+    },
+    {
+      "command": "bun scripts/test-package.mjs",
+      "result": "13 isolated package selections passed; archive matches f05",
+      "logSha256": "07edbb8c63ee0055cfa0c380530cccc8f48945b0befffcfdd8e007ff6e8bb6e0"
+    },
+    {
+      "command": "bun install --frozen-lockfile --ignore-scripts in isolated web-mapbox",
+      "result": "passed; repository lock unchanged",
+      "logSha256": "2f8b04eaef26a1e21712f5f82944f28c538b0b4dff33e3f510d2fb526bfecdd3"
+    },
+    {
+      "command": "bun install --frozen-lockfile --ignore-scripts in isolated web-maplibre",
+      "result": "passed; repository lock unchanged",
+      "logSha256": "3dff0d49051762c4f8d7f744545ec0ddc7328b101488d20e2be88de58222f04f"
+    },
+    {
+      "command": "static Vite production bundle mapbox",
+      "result": "passed: intended mixed setup, no unused/native/original-checkout graph",
+      "logSha256": "e7fc5aaacd9a1f620344146bf2a39eeb41822fd9a990aed0e59da5e9aa5b287f"
+    },
+    {
+      "command": "static Vite production bundle maplibre",
+      "result": "passed: intended mixed setup, no unused/native/original-checkout graph",
+      "logSha256": "8d9d71f0bc67ca37e1e8f3785e648516af18993f2c8693d0182697e9916b99ac"
+    },
+    {
+      "command": "node verify-frozen-inputs.mjs",
+      "result": "13,155 initial files/links, archive and runtime identity passed",
+      "logSha256": "662359b54a7bff4c95fe9800d7c6cdc7dc4bc6b7588172e705be1e5ad03e0528"
+    },
+    {
+      "command": "bun run check",
+      "result": "320 files formatted, 294 linted, no warnings/errors",
+      "logSha256": "1538a819247e4e6c149fe3708132808c548eb6f319b646bbb18a047d334f9673"
+    },
+    {
+      "command": "bun run check:docs",
+      "result": "40 Markdown files/39 comparison tables; structure and links passed",
+      "logSha256": "09a6fa0afc66d61b596cada89ff1dee40319ed67d6da3f0de0972d3620d787e5"
+    },
+    {
+      "command": "node launcher-self-check.mjs",
+      "result": "three tampered expected-input packets rejected before subprocess; positive control stub only",
+      "logSha256": "304f08f68d0e35bb54dc87cb84bb88413f0c7e88450e16d39e9c39a259f338d9"
+    }
+  ],
+  "gaps": [
+    "No current f05 renderer acceptance; all nine browser rows await fresh permission.",
+    "No native consumer refreeze, host readiness, native generation/build/install/Metro/runtime or manual observation.",
+    "No peer reinstall/performance matrix; peers unchanged.",
+    "Focused source run passed only the two named .web.test.tsx files (16 tests); helper-only web-followup-regressions.tsx is covered by full compiled-web suite."
+  ],
+  "dependencyPreparation": {
+    "method": "Clone-copied root installed dependencies into isolated checkout; repaired temporary Teleport1.2.2 links to existing locked1.2.1; no original source or repository lock edits",
+    "rootVersionBoundary": "Root routine RN0.86.3, RNMapbox10.3.8; proposed native tuple remains RN0.87.1/RNMapbox10.3.7 and is unverified",
+    "originalTargetingLinks": 0,
+    "browserConsumers": "Fresh isolated Bun1.4.1 frozen-lock scripts-disabled installs using unchanged temporary consumer locks; exact171 packed members verified"
+  },
+  "audit": {
+    "verdict": "Passed for candidate refresh and bounded browser preparation",
+    "independentAuditSha256": "3c21609b9473d177bc360e196b5c9b1429004c3ae02078d762dd9e65d1aa487e",
+    "findingsClosed": [
+      "Frozen expected-input and verifier hash checks execute before subprocess launch",
+      "Browser corrections coverage describes padding, gestures and reuse; named-proxy detach assertions remain mocked"
+    ],
+    "outstandingFindings": [],
+    "runtimeAcceptance": "Unverified for f05"
+  },
+  "retention": {
+    "supersededNativeConsumers": "Retired after preserving small exact recovery package/locks and proof recipes",
+    "temporaryBuildDependencies": "Removed after audit",
+    "currentBrowserFreeze": "Retained independently for proposed nine-row run",
+    "retentionRecordSha256": "e040feb2bc692d026b38dcdfa21920d2224ef27c9c410c6e3d2cabca0d575383"
+  }
+}

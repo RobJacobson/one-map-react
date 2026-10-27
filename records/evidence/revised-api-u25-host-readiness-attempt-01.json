@@ -1,0 +1,122 @@
+{
+  "checkpoint": "U25 PR50 host readiness attempt 01",
+  "recordedAt": "2026-10-27T06:44:54.141631+00:00",
+  "status": "Stopped at first startup failure; host readiness incomplete",
+  "pullRequest": "https://github.com/RobJacobson/one-map-react/pull/50",
+  "head": "398d88d4648c575aa6462fcad6dfe590a70c45f1",
+  "sourceCommit": "704e7e67815f4fe1c2c7e792dc48c76098a26c80",
+  "candidateSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+  "nativePlanSha256": "f14a542daa91a865c637b90f72d977078e98ccd0f7d3efd20b4d386477fa6370",
+  "hostProposalSha256": "c28dbd3565f9859371832507fcc5425ae5bb0bc5a363991c08a3297349ecb4a5",
+  "worker": "/root/u25_host_readiness_01",
+  "workerModel": "gpt-6-luna",
+  "reasoning": "medium",
+  "workerHandoffSha256": "7f79884ac7cd29edf46cc74421089d7818955db08818820e6dd9602852a7a6d9",
+  "execution": {
+    "attempt": "host-readiness-attempt-01",
+    "scope": "PR50 host readiness only; no app builds or acceptance tests",
+    "result": "stopped at iOS startup failure; Android unrun",
+    "model": {
+      "requested": "gpt-6-luna",
+      "reasoning": "medium"
+    },
+    "candidate": {
+      "pr": 50,
+      "head": "398d88d4648c575aa6462fcad6dfe590a70c45f1",
+      "packageCandidate": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d"
+    },
+    "steps": [
+      {
+        "step": "iOS initial diagnostic inventory",
+        "argv": [
+          "xcrun",
+          "simctl",
+          "list",
+          "--json",
+          "devices",
+          "available"
+        ],
+        "timeoutSeconds": 10,
+        "exit": 1,
+        "elapsedSeconds": 1.074,
+        "outcome": "CoreSimulatorService connection invalid/refused; no inventory returned"
+      },
+      {
+        "step": "Verify assigned simulator metadata",
+        "argv": [
+          "plutil",
+          "-p",
+          "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/device.plist"
+        ],
+        "exit": 0,
+        "outcome": "metadata matched name iPhone 18 Pro, UDID 8B7D7CE4-228E-409F-A156-A597D4E448A5, runtime com.apple.CoreSimulator.SimRuntime.iOS-27-0, device type com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro; metadata is not runtime readiness"
+      },
+      {
+        "step": "Single approved Simulator startup",
+        "argv": [
+          "open",
+          "-a",
+          "Simulator",
+          "--args",
+          "-CurrentDeviceUDID",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+        ],
+        "exit": 1,
+        "elapsedSeconds": 2.3,
+        "outcome": "Unable to find application named Simulator; stop condition reached"
+      },
+      {
+        "step": "iOS follow-up inventory / target boot",
+        "status": "unrun; startup failed"
+      },
+      {
+        "step": "Android port/process preflight, tooling, AVD and boot readiness",
+        "status": "unrun; iOS did not pass"
+      }
+    ],
+    "ownedResources": {
+      "started": [],
+      "pids": [],
+      "cleanup": "none required; no simulator launch succeeded"
+    },
+    "android": {
+      "status": "unrun; no adb command, port inspection, download, AVD creation, or emulator boot performed"
+    },
+    "executionBoundary": "No native project generation, Pods, Gradle, Xcode build, Metro, app build/install/launch, test input, or acceptance execution.",
+    "next_action": "Coordinator review and separate cleanup/host-action decision; no retry performed."
+  },
+  "coordinatorReview": {
+    "scope": "Read-only coordinator failure review; no launch or retry",
+    "selectedDeveloper": {
+      "exitCode": 0,
+      "lines": [
+        "/Applications/Xcode.app/Contents/Developer"
+      ],
+      "lineCount": 1,
+      "stderr": ""
+    },
+    "simulatorApplications": {
+      "exitCode": 0,
+      "lines": [],
+      "lineCount": 0,
+      "stderr": ""
+    },
+    "standardXcodeBundles": [
+      {
+        "xcode": "/Applications/Cleaner for Xcode.app",
+        "simulatorExists": false
+      },
+      {
+        "xcode": "/Applications/Xcode.app",
+        "simulatorExists": false
+      }
+    ]
+  },
+  "verificationLimits": [
+    "Simulator metadata does not establish runtime availability.",
+    "No Simulator application was found by name or Spotlight, and the selected Xcode standard Simulator bundle path was absent; no broader installation diagnosis was performed.",
+    "Android configuration, app builds, installations and native acceptance were not run."
+  ],
+  "nextGate": "Resolve the missing Simulator application prerequisite and approve a concrete revised host-readiness attempt before any retry.",
+  "retention": "Compact outcome and provenance retained; no tools downloaded or devices/processes started by this attempt."
+}
