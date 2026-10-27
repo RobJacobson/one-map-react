@@ -17,6 +17,7 @@ const smokeTarget = () => {
   if (process.env.ONE_MAP_SMOKE === "tf09") return "tf09";
   if (process.env.ONE_MAP_SMOKE === "tf08-storage") return "tf08-storage";
   if (process.env.ONE_MAP_SMOKE === "tf08") return "tf08";
+  if (process.env.ONE_MAP_SMOKE === "tf07-retained") return "tf07-retained";
   if (process.env.ONE_MAP_SMOKE === "tf07") return "tf07";
   if (process.env.ONE_MAP_SMOKE === "tf06-lifetimes") return "tf06-lifetimes";
   if (process.env.ONE_MAP_SMOKE === "tf06") return "tf06";
