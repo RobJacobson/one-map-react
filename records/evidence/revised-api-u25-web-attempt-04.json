@@ -1,0 +1,228 @@
+{
+  "unit": "U25",
+  "attempt": 4,
+  "status": "Interrupted during command3:2passed,1interrupted,6notrun; no product failure established",
+  "candidate": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f04/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+    "purpose": "F04 app-popup lifetime rehearsal archive; rc.2 metadata unchanged, no registry publication/version bump"
+  },
+  "pullRequest": {
+    "number": 48,
+    "url": "https://github.com/RobJacobson/one-map-react/pull/48",
+    "head": "c293272c1fbf0dcab7a571cdbdaec6d0942a0d4d",
+    "sourceCommit": "f76b24e4000ea72cf86b2952f811323a471e0628"
+  },
+  "frozenPlanSha256": "145f28519336cd83bb73da2e0d8fef9d849caee33f7052c7ee4d932cafac2d85",
+  "launcherSha256": "6e6d5bb07849dae4e6e134969d39cddb79521b7622f61cba3d0ad60e1d2ec976",
+  "worker": {
+    "task": "/root/u25_attempt04_smoke",
+    "requestedModel": "gpt-6-luna",
+    "reasoning": "low",
+    "status": "No longer present after turn interruption; no final handoff"
+  },
+  "commands": [
+    {
+      "ordinal": 1,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "elapsedMs": 30375,
+      "resultSha256": "f908e504eea2535a16935304ec86e7779ba5d1532196097ef0ae718233a7fabb",
+      "logSha256": "09628e193febbdc0a6bb2143ff8800bdb5754e8e61f1872649f3a16e8b2ee896",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 command=skip doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+          "fields": {
+            "fit": "ok",
+            "click": "hit",
+            "clickAt": "-122.32000,47.64002",
+            "stop": "stayed",
+            "held": "1",
+            "command": "skip",
+            "doubletap": "skip",
+            "center": "-122.32000,47.64000",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "line": "TF04 fit=ok click=hit clickAt=-122.32000,47.64002 stop=stayed held=1 command=skip doubletap=skip center=-122.32000,47.64000 note=none phase=done done=1",
+          "fields": {
+            "fit": "ok",
+            "click": "hit",
+            "clickAt": "-122.32000,47.64002",
+            "stop": "stayed",
+            "held": "1",
+            "command": "skip",
+            "doubletap": "skip",
+            "center": "-122.32000,47.64000",
+            "note": "none",
+            "phase": "done",
+            "done": "1"
+          }
+        }
+      }
+    },
+    {
+      "ordinal": 2,
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "passed",
+      "exitCode": 0,
+      "elapsedMs": 4472,
+      "resultSha256": "2b373e7080489413ade7c3b397a49808fac2a3cc33769093ca7119cc059f46d8",
+      "logSha256": "785d5b3374c55dd69072ae4c6288277c203581faa7018746fc40faf41d764d04",
+      "observations": {
+        "mapbox-web": {
+          "status": "passed",
+          "scenarios": [
+            "padding update/reset",
+            "double tap zoom",
+            "rotation reset with pinch disabled",
+            "rotation release/reuse",
+            "master disables all eight handlers",
+            "disabled physical double click",
+            "explicit/default gesture restoration",
+            "interaction settings on renderer reuse"
+          ],
+          "mode": "real automation"
+        },
+        "maplibre-web": {
+          "status": "passed",
+          "scenarios": [
+            "padding update/reset",
+            "double tap zoom",
+            "rotation reset with pinch disabled",
+            "rotation release/reuse",
+            "master disables all eight handlers",
+            "disabled physical double click",
+            "explicit/default gesture restoration",
+            "interaction settings on renderer reuse"
+          ],
+          "mode": "real automation"
+        }
+      }
+    },
+    {
+      "ordinal": 3,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web"
+      ],
+      "status": "interrupted; result unavailable",
+      "started": {
+        "ordinal": 3,
+        "argv": [
+          "bun",
+          "scripts/tf05-sources-smoke.mjs",
+          "web"
+        ],
+        "startedAt": "2026-10-27T04:21:26.786Z",
+        "preflight": "passed",
+        "ports": "free"
+      },
+      "startedSha256": "cec69087139c17f7b9707712d50df0be1c4a231a28e0c1fd4e461df098aed8af",
+      "exitCode": null,
+      "reason": "User-turn interruption ended worker and launcher; only owned child processes remained. No test verdict recorded."
+    },
+    {
+      "ordinal": 4,
+      "argv": [
+        "bun",
+        "scripts/tf05-sources-smoke.mjs",
+        "web",
+        "corrections"
+      ],
+      "status": "not run",
+      "reason": "Command3interrupted; serial sequence not resumed or retried"
+    },
+    {
+      "ordinal": 5,
+      "argv": [
+        "bun",
+        "scripts/tf06-queries-smoke.mjs",
+        "web"
+      ],
+      "status": "not run",
+      "reason": "Command3interrupted; serial sequence not resumed or retried"
+    },
+    {
+      "ordinal": 6,
+      "argv": [
+        "bun",
+        "scripts/tf07-ui-smoke.mjs",
+        "web",
+        "mapbox"
+      ],
+      "status": "not run",
+      "reason": "Command3interrupted; serial sequence not resumed or retried"
+    },
+    {
+      "ordinal": 7,
+      "argv": [
+        "bun",
+        "scripts/tf07-ui-smoke.mjs",
+        "web",
+        "maplibre"
+      ],
+      "status": "not run",
+      "reason": "Command3interrupted; serial sequence not resumed or retried"
+    },
+    {
+      "ordinal": 8,
+      "argv": [
+        "bun",
+        "scripts/tf09-rendering-smoke.mjs",
+        "web",
+        "mapbox"
+      ],
+      "status": "not run",
+      "reason": "Command3interrupted; serial sequence not resumed or retried"
+    },
+    {
+      "ordinal": 9,
+      "argv": [
+        "bun",
+        "scripts/tf09-rendering-smoke.mjs",
+        "web",
+        "maplibre"
+      ],
+      "status": "not run",
+      "reason": "Command3interrupted; serial sequence not resumed or retried"
+    }
+  ],
+  "elapsedCompletedCommandMs": 34847,
+  "interruption": {
+    "testVerdictForCommand3": "unknown; not a test failure or pass",
+    "workerAndLauncherGone": true,
+    "ownedOrphans": [
+      "Vitegroup28225",
+      "TF05Chromegroup28226"
+    ],
+    "cleanupReceiptSha256": "ac4694cfe1dc2ef78b729d5ecf65d951265bc61474dcbc771fbc92d56283da9c",
+    "coordinatorStoppedVerifiedOwnedGroups": true,
+    "cleanup": "SIGTERM both groups, no finalSIGKILLneeded; no unrelatedprocesses signaled",
+    "reservedPortsAfterCleanup": "No listeners",
+    "postRunFreeze": "All13149inputs/links+archive+Node/Bunidentities unchanged",
+    "retry": "Not executed; fresh ownerpermission required for interruptedcommand3restart"
+  },
+  "scopeLimits": [
+    "No result for command3; commands4-9notstarted",
+    "No source/dependency/frozeninput changes",
+    "No native execution",
+    "Prior failedattempts and repair records preserved unchanged"
+  ]
+}

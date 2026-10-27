@@ -1,0 +1,1585 @@
+{
+  "unit": "U25-N01",
+  "status": "Native preparation and conditional plan independently audited; execution readiness BLOCKED; no native execution authorized",
+  "candidate": {
+    "pr": 48,
+    "sourceCommit": "c293272c1fbf0dcab7a571cdbdaec6d0942a0d4d",
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f04/one-map-react-0.1.0-rc.2.tgz",
+    "archiveSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+    "distSha256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+    "distFiles": 164,
+    "packageSourceOverlay": false
+  },
+  "basePullRequest": {
+    "number": 48,
+    "url": "https://github.com/RobJacobson/one-map-react/pull/48",
+    "head": "c293272c1fbf0dcab7a571cdbdaec6d0942a0d4d"
+  },
+  "webCheckpoint": {
+    "status": "Allnineapprovedbrowserrows passed on samecandidate:04passes1-2 +05recovery3-9",
+    "evidence": "records/evidence/revised-api-u25-web-attempt-05.json",
+    "interruption": "records/evidence/revised-api-u25-web-attempt-04.json"
+  },
+  "plan": {
+    "unit": "U25 native preparation (protocol U26 execution)",
+    "status": "prepared conditionally; NOT execution ready; no native execution permission",
+    "kind": "proposed command reference",
+    "candidate": {
+      "pr": 48,
+      "sourceCommit": "c293272c1fbf0dcab7a571cdbdaec6d0942a0d4d",
+      "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f04/one-map-react-0.1.0-rc.2.tgz",
+      "archiveSha256": "8f8b93f57eeed914c5796dc302aab635628803a03be71cb9c50e639ccfac654d",
+      "distSha256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+      "distFiles": 164,
+      "packageSourceOverlay": false
+    },
+    "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+    "worker": {
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "count": 1,
+      "exclusiveResources": [
+        "Metro8081",
+        "fixture8797",
+        "fixture8798",
+        "status8799",
+        "simulator",
+        "emulator",
+        "generated projects",
+        "builds",
+        "installations"
+      ],
+      "execution": "All commands serial. Stop first failed whole command; report first-attempt result. No edits or independent retries. Coordinator verifies artifact and build identity before flows."
+    },
+    "binding": {
+      "PATHPrefix": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-bin:/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin",
+      "credential": "Public MAPBOX_ACCESS_TOKEN required by fixture; do not record value. Source review of pinned peer found no mandatory Mapbox download-secret token prerequisite."
+    },
+    "readinessGates": [
+      {
+        "id": "ios-target",
+        "status": "OPEN",
+        "reason": "Restricted simctl query exits1; unrestricted read-only query times out after10s. Xcode27.1 build27A9275 installed; iOS27.1 simulator SDK does not prove runtime availability. Prior iPhone18Pro/iOS27 metadata is not runnable identity."
+      },
+      {
+        "id": "android-target",
+        "status": "OPEN",
+        "reason": "No AVD metadata, emulator -list-avds empty, no observed adb server. Installed image android-37.1/google_apis_playstore_ps16k/arm64-v8a revision9. avdmanager unavailable under installed SDK/AndroidStudio search. No emulator serial assigned."
+      },
+      {
+        "id": "capture-resolution",
+        "status": "OPEN confirmed static failure",
+        "reason": "Installed shell Metro config resolves explicit ./capture-rendering.js to browser capture-rendering.ts for ios/android on both engines. Browser helper throws Unknown browser observation backend for native. Separate authorized source repair and new input freeze required before complete native scope approval. No fix applied.",
+        "evidence": "/private/tmp/one-map-u25-n01-nz92pixo/static-resolution.json"
+      },
+      {
+        "id": "manual-operator",
+        "status": "OPEN",
+        "reason": "13 physical/visual receipts per environment require operator capable of real touch, nested scroll, rotation and host accessibility checks; callback logs cannot substitute. Confirm operator/tool access before execution."
+      },
+      {
+        "id": "retained-native-coverage",
+        "status": "OPEN missing fixture coverage",
+        "reason": "Frozen publication TF07 has one map and plain Text annotation, no delayed-image annotation refresh ref. Named-map/multiple-map/provider ownership and retained local state, annotation refresh, resize/orientation and current target at two densities are not fully proved by core13 receipts. Original dirty-tree focused fixture is not an input and cannot be silently overlaid."
+      },
+      {
+        "id": "mixed-selection-resolution",
+        "status": "OPEN confirmed static failure",
+        "reason": "Actual .js resolves generic setup.ts exporting opposite web backend on ios/android both engines. Extensionless control resolves setup.native.ts. Backend runtime guard would reject wrong selection. No Metro process or transport run."
+      }
+    ],
+    "hostSetupProposal": {
+      "status": "separate approval required; NOT RUN",
+      "ios": "Read-only service diagnosis or user restoration required; no repair recipe asserted from timeout alone. Confirm exactly one booted iPhone 18 Pro with assigned UDID and available compatible runtime before legacy drivers.",
+      "android": {
+        "existingImage": "system-images;android-37.1;google_apis_playstore_ps16k;arm64-v8a",
+        "missingTool": "avdmanager: no installed executable found",
+        "conditionalRecipe": [
+          "Obtain owner approval for Android command-line tools provisioning (tool/version/download identity must be reviewed first).",
+          "Run avdmanager list device and choose confirmed installed profile.",
+          "Use creationArgv as literal argv; semicolon package identity is one argument, never raw shell separators.",
+          "emulator -avd one-map-u25 -port 5554",
+          "Verify assigned serial emulator-5554 and ABI via adb before any acceptance."
+        ],
+        "warning": "No creation/download/boot/adb server start performed. Missing profile ID is deliberately unresolved; command is conditional, not ready to execute.",
+        "creationArgv": [
+          "avdmanager",
+          "create",
+          "avd",
+          "--name",
+          "one-map-u25",
+          "--package",
+          "system-images;android-37.1;google_apis_playstore_ps16k;arm64-v8a",
+          "--device",
+          "<verified profile ID>"
+        ]
+      }
+    },
+    "portGate": {
+      "before": "EVERY native command including each TF04/05/06 invocation",
+      "argv": [
+        "lsof",
+        "-nP",
+        "-iTCP:8081",
+        "-iTCP:8797",
+        "-iTCP:8798",
+        "-iTCP:8799",
+        "-sTCP:LISTEN"
+      ],
+      "rule": "Required ports must be free or held only by recorded owned processes that worker stops before runner. Unknown listener => stop. Legacy freePort kills arbitrary listeners; never enter it with unknown owner. Record started PID/process groups, restore only own forwards, never kill user processes."
+    },
+    "baseline": {
+      "react-native": "0.87.1",
+      "react": "19.2.3",
+      "react-native-teleport": "1.2.1",
+      "@rnmapbox/maps": "10.3.7",
+      "@maplibre/maplibre-react-native": "11.5.0",
+      "MapboxMapsRequested": "11.23.1 exact both OS via generator",
+      "developmentExpoExcluded": "RN0.86.3 / RNMapbox10.3.8 does not establish this baseline",
+      "mixed": "Mapbox web/MapLibre native and MapLibre web/Mapbox native selections required; dual native SDK co-installation not promised."
+    },
+    "orderedPreparation": [
+      {
+        "order": 1,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/setup-native-example.mjs",
+          "native-mapbox"
+        ],
+        "status": "FUTURE only, requires approval",
+        "effect": "Generates ios/android/Gemfile via CLI20.2.0 init RN0.87.1; no JS install, pods, build or launch."
+      },
+      {
+        "order": 2,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+        "argv": [
+          "bundle",
+          "install"
+        ],
+        "status": "FUTURE iOS dependency resolution only"
+      },
+      {
+        "order": 3,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox/ios",
+        "argv": [
+          "bundle",
+          "exec",
+          "pod",
+          "install"
+        ],
+        "status": "FUTURE iOS dependency resolution only"
+      },
+      {
+        "order": 4,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/setup-native-example.mjs",
+          "native-maplibre"
+        ],
+        "status": "FUTURE only, requires approval",
+        "effect": "Generates ios/android/Gemfile via CLI20.2.0 init RN0.87.1; no JS install, pods, build or launch."
+      },
+      {
+        "order": 5,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+        "argv": [
+          "bundle",
+          "install"
+        ],
+        "status": "FUTURE iOS dependency resolution only"
+      },
+      {
+        "order": 6,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre/ios",
+        "argv": [
+          "bundle",
+          "exec",
+          "pod",
+          "install"
+        ],
+        "status": "FUTURE iOS dependency resolution only"
+      }
+    ],
+    "orderedScenarios": [
+      {
+        "order": 1,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf04-camera-smoke.mjs",
+          "ios"
+        ],
+        "covers": [
+          "mapbox-ios",
+          "maplibre-ios"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/tf04-camera-smoke-ios.log"
+      },
+      {
+        "order": 2,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf04-camera-smoke.mjs",
+          "android"
+        ],
+        "covers": [
+          "mapbox-android",
+          "maplibre-android"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/tf04-camera-smoke-android.log"
+      },
+      {
+        "order": 3,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf05-sources-smoke.mjs",
+          "ios"
+        ],
+        "covers": [
+          "mapbox-ios",
+          "maplibre-ios"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/tf05-sources-smoke-ios.log"
+      },
+      {
+        "order": 4,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf05-sources-smoke.mjs",
+          "android"
+        ],
+        "covers": [
+          "mapbox-android",
+          "maplibre-android"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/tf05-sources-smoke-android.log"
+      },
+      {
+        "order": 5,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "ios"
+        ],
+        "covers": [
+          "mapbox-ios",
+          "maplibre-ios"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/tf06-queries-smoke-ios.log"
+      },
+      {
+        "order": 6,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "android"
+        ],
+        "covers": [
+          "mapbox-android",
+          "maplibre-android"
+        ],
+        "ownership": "Driver starts Metro, builds/installs/launches both engine shells sequentially. iOS requires unique available named iPhone18Pro also sole booted assigned simulator; Android requires sole connected assigned emulator because driver has unscoped adb. Free-port gate every invocation.",
+        "outputLog": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/tf06-queries-smoke-android.log"
+      },
+      {
+        "order": 7,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "ios",
+          "lifetimes",
+          "mapbox"
+        ],
+        "env": {},
+        "effect": "Own Metro/build/install/launch; no optional stale binary reuse; first attempt."
+      },
+      {
+        "order": 8,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "ios",
+          "lifetimes",
+          "maplibre"
+        ],
+        "env": {},
+        "effect": "Own Metro/build/install/launch; no optional stale binary reuse; first attempt."
+      },
+      {
+        "order": 9,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "android",
+          "lifetimes",
+          "mapbox"
+        ],
+        "env": {
+          "ANDROID_SERIAL": "<assigned serial>"
+        },
+        "effect": "Own Metro/build/install/launch; no optional stale binary reuse; first attempt."
+      },
+      {
+        "order": 10,
+        "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+        "argv": [
+          "bun",
+          "scripts/tf06-queries-smoke.mjs",
+          "android",
+          "lifetimes",
+          "maplibre"
+        ],
+        "env": {
+          "ANDROID_SERIAL": "<assigned serial>"
+        },
+        "effect": "Own Metro/build/install/launch; no optional stale binary reuse; first attempt."
+      },
+      {
+        "order": 11,
+        "environment": "mapbox-ios",
+        "sequence": [
+          "Run explicit buildInstallLaunch with generated/resolved inputs recorded",
+          "Stop owned app/Metro, verify produced and installed identity; coordinator gate",
+          {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "ios",
+              "mapbox"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-ios.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/mapbox-ios-tf07-manual.json",
+              "TF07_IOS_UDID": "<confirmed UDID>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro."
+          },
+          "Stop owned TF07 processes and forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf09-rendering-smoke.mjs",
+              "ios",
+              "mapbox"
+            ],
+            "env": {
+              "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+              "TF09_OUTPUT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/mapbox-ios-tf09.json",
+              "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+              "TF09_NATIVE_IDENTITY": {
+                "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-ios.json",
+                "encoding": "compact JSON after external verified produced/installed identity"
+              },
+              "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n01-nz92pixo/native-peer-evidence.json"
+            },
+            "metro": {
+              "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+              "argv": [
+                "bun",
+                "run",
+                "start",
+                "--",
+                "--port",
+                "8081",
+                "--reset-cache"
+              ],
+              "env": {
+                "ONE_MAP_SMOKE": "tf09"
+              }
+            },
+            "launch": [
+              "xcrun",
+              "simctl",
+              "launch",
+              "<UDID>",
+              "org.reactjs.native.example.OneMapMapbox",
+              "-RCT_jsLocation",
+              "127.0.0.1:8081"
+            ],
+            "androidForwarding": [],
+            "status": "BLOCKED capture platform resolution; future runner serves fixture only, no own Metro/build/install/launch."
+          }
+        ],
+        "status": "FUTURE conditionally; all readiness gates first"
+      },
+      {
+        "order": 12,
+        "environment": "mapbox-android",
+        "sequence": [
+          "Run explicit buildInstallLaunch with generated/resolved inputs recorded",
+          "Stop owned app/Metro, verify produced and installed identity; coordinator gate",
+          {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "android",
+              "mapbox"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-android.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/mapbox-android-tf07-manual.json",
+              "ANDROID_SERIAL": "<assigned serial>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro."
+          },
+          "Stop owned TF07 processes and forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf09-rendering-smoke.mjs",
+              "android",
+              "mapbox"
+            ],
+            "env": {
+              "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+              "TF09_OUTPUT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/mapbox-android-tf09.json",
+              "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+              "TF09_NATIVE_IDENTITY": {
+                "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-android.json",
+                "encoding": "compact JSON after external verified produced/installed identity"
+              },
+              "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n01-nz92pixo/native-peer-evidence.json"
+            },
+            "metro": {
+              "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+              "argv": [
+                "bun",
+                "run",
+                "start",
+                "--",
+                "--port",
+                "8081",
+                "--reset-cache"
+              ],
+              "env": {
+                "ONE_MAP_SMOKE": "tf09"
+              }
+            },
+            "launch": [
+              "adb",
+              "-s",
+              "<serial>",
+              "shell",
+              "am",
+              "start",
+              "-n",
+              "com.onemapmapbox/.MainActivity"
+            ],
+            "androidForwarding": [
+              [
+                "adb",
+                "-s",
+                "<serial>",
+                "reverse",
+                "tcp:8081",
+                "tcp:8081"
+              ],
+              [
+                "adb",
+                "-s",
+                "<serial>",
+                "reverse",
+                "tcp:8798",
+                "tcp:8798"
+              ]
+            ],
+            "status": "BLOCKED capture platform resolution; future runner serves fixture only, no own Metro/build/install/launch."
+          }
+        ],
+        "status": "FUTURE conditionally; all readiness gates first"
+      },
+      {
+        "order": 13,
+        "environment": "maplibre-ios",
+        "sequence": [
+          "Run explicit buildInstallLaunch with generated/resolved inputs recorded",
+          "Stop owned app/Metro, verify produced and installed identity; coordinator gate",
+          {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "ios",
+              "maplibre"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-ios.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/maplibre-ios-tf07-manual.json",
+              "TF07_IOS_UDID": "<confirmed UDID>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro."
+          },
+          "Stop owned TF07 processes and forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf09-rendering-smoke.mjs",
+              "ios",
+              "maplibre"
+            ],
+            "env": {
+              "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+              "TF09_OUTPUT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/maplibre-ios-tf09.json",
+              "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+              "TF09_NATIVE_IDENTITY": {
+                "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-ios.json",
+                "encoding": "compact JSON after external verified produced/installed identity"
+              },
+              "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n01-nz92pixo/native-peer-evidence.json"
+            },
+            "metro": {
+              "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+              "argv": [
+                "bun",
+                "run",
+                "start",
+                "--",
+                "--port",
+                "8081",
+                "--reset-cache"
+              ],
+              "env": {
+                "ONE_MAP_SMOKE": "tf09"
+              }
+            },
+            "launch": [
+              "xcrun",
+              "simctl",
+              "launch",
+              "<UDID>",
+              "org.reactjs.native.example.OneMapMaplibre",
+              "-RCT_jsLocation",
+              "127.0.0.1:8081"
+            ],
+            "androidForwarding": [],
+            "status": "BLOCKED capture platform resolution; future runner serves fixture only, no own Metro/build/install/launch."
+          }
+        ],
+        "status": "FUTURE conditionally; all readiness gates first"
+      },
+      {
+        "order": 14,
+        "environment": "maplibre-android",
+        "sequence": [
+          "Run explicit buildInstallLaunch with generated/resolved inputs recorded",
+          "Stop owned app/Metro, verify produced and installed identity; coordinator gate",
+          {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf07-ui-smoke.mjs",
+              "android",
+              "maplibre"
+            ],
+            "env": {
+              "TF07_METRO_PORT": "8081",
+              "TF07_NATIVE_BINARY_SHA256": {
+                "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-android.json",
+                "field": "installedBinarySha256"
+              },
+              "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/maplibre-android-tf07-manual.json",
+              "ANDROID_SERIAL": "<assigned serial>"
+            },
+            "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro."
+          },
+          "Stop owned TF07 processes and forwards; free-port check",
+          {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+            "argv": [
+              "bun",
+              "scripts/tf09-rendering-smoke.mjs",
+              "android",
+              "maplibre"
+            ],
+            "env": {
+              "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+              "TF09_OUTPUT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/maplibre-android-tf09.json",
+              "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+              "TF09_NATIVE_IDENTITY": {
+                "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-android.json",
+                "encoding": "compact JSON after external verified produced/installed identity"
+              },
+              "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n01-nz92pixo/native-peer-evidence.json"
+            },
+            "metro": {
+              "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+              "argv": [
+                "bun",
+                "run",
+                "start",
+                "--",
+                "--port",
+                "8081",
+                "--reset-cache"
+              ],
+              "env": {
+                "ONE_MAP_SMOKE": "tf09"
+              }
+            },
+            "launch": [
+              "adb",
+              "-s",
+              "<serial>",
+              "shell",
+              "am",
+              "start",
+              "-n",
+              "com.onemapmaplibre/.MainActivity"
+            ],
+            "androidForwarding": [
+              [
+                "adb",
+                "-s",
+                "<serial>",
+                "reverse",
+                "tcp:8081",
+                "tcp:8081"
+              ],
+              [
+                "adb",
+                "-s",
+                "<serial>",
+                "reverse",
+                "tcp:8798",
+                "tcp:8798"
+              ]
+            ],
+            "status": "BLOCKED capture platform resolution; future runner serves fixture only, no own Metro/build/install/launch."
+          }
+        ],
+        "status": "FUTURE conditionally; all readiness gates first"
+      }
+    ],
+    "environments": [
+      {
+        "environment": "mapbox-ios",
+        "shell": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+        "applicationId": "org.reactjs.native.example.OneMapMapbox",
+        "targetStatus": "UNASSIGNED; readiness required before approval",
+        "buildInstallLaunch": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+          "argv": [
+            "bun",
+            "run",
+            "ios",
+            "--",
+            "--no-packager",
+            "--port",
+            "8081",
+            "--udid",
+            "<confirmed iPhone18Pro UDID>"
+          ],
+          "effect": "Builds, installs AND launches; future permission required despite --no-packager."
+        },
+        "identityFile": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-ios.json",
+        "tf07": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "ios",
+            "mapbox"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-ios.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/mapbox-ios-tf07-manual.json",
+            "TF07_IOS_UDID": "<confirmed UDID>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro."
+        },
+        "tf09": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf09-rendering-smoke.mjs",
+            "ios",
+            "mapbox"
+          ],
+          "env": {
+            "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+            "TF09_OUTPUT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/mapbox-ios-tf09.json",
+            "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+            "TF09_NATIVE_IDENTITY": {
+              "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-ios.json",
+              "encoding": "compact JSON after external verified produced/installed identity"
+            },
+            "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n01-nz92pixo/native-peer-evidence.json"
+          },
+          "metro": {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+            "argv": [
+              "bun",
+              "run",
+              "start",
+              "--",
+              "--port",
+              "8081",
+              "--reset-cache"
+            ],
+            "env": {
+              "ONE_MAP_SMOKE": "tf09"
+            }
+          },
+          "launch": [
+            "xcrun",
+            "simctl",
+            "launch",
+            "<UDID>",
+            "org.reactjs.native.example.OneMapMapbox",
+            "-RCT_jsLocation",
+            "127.0.0.1:8081"
+          ],
+          "androidForwarding": [],
+          "status": "BLOCKED capture platform resolution; future runner serves fixture only, no own Metro/build/install/launch."
+        }
+      },
+      {
+        "environment": "mapbox-android",
+        "shell": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+        "applicationId": "com.onemapmapbox",
+        "targetStatus": "UNASSIGNED; readiness required before approval",
+        "buildInstallLaunch": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+          "argv": [
+            "bun",
+            "run",
+            "android",
+            "--",
+            "--no-packager",
+            "--port",
+            "8081",
+            "--device",
+            "<assigned emulator serial>"
+          ],
+          "effect": "Builds, installs AND launches; future permission required despite --no-packager."
+        },
+        "identityFile": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-android.json",
+        "tf07": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "android",
+            "mapbox"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-android.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/mapbox-android-tf07-manual.json",
+            "ANDROID_SERIAL": "<assigned serial>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro."
+        },
+        "tf09": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf09-rendering-smoke.mjs",
+            "android",
+            "mapbox"
+          ],
+          "env": {
+            "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+            "TF09_OUTPUT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/mapbox-android-tf09.json",
+            "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+            "TF09_NATIVE_IDENTITY": {
+              "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/mapbox-android.json",
+              "encoding": "compact JSON after external verified produced/installed identity"
+            },
+            "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n01-nz92pixo/native-peer-evidence.json"
+          },
+          "metro": {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+            "argv": [
+              "bun",
+              "run",
+              "start",
+              "--",
+              "--port",
+              "8081",
+              "--reset-cache"
+            ],
+            "env": {
+              "ONE_MAP_SMOKE": "tf09"
+            }
+          },
+          "launch": [
+            "adb",
+            "-s",
+            "<serial>",
+            "shell",
+            "am",
+            "start",
+            "-n",
+            "com.onemapmapbox/.MainActivity"
+          ],
+          "androidForwarding": [
+            [
+              "adb",
+              "-s",
+              "<serial>",
+              "reverse",
+              "tcp:8081",
+              "tcp:8081"
+            ],
+            [
+              "adb",
+              "-s",
+              "<serial>",
+              "reverse",
+              "tcp:8798",
+              "tcp:8798"
+            ]
+          ],
+          "status": "BLOCKED capture platform resolution; future runner serves fixture only, no own Metro/build/install/launch."
+        }
+      },
+      {
+        "environment": "maplibre-ios",
+        "shell": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+        "applicationId": "org.reactjs.native.example.OneMapMaplibre",
+        "targetStatus": "UNASSIGNED; readiness required before approval",
+        "buildInstallLaunch": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+          "argv": [
+            "bun",
+            "run",
+            "ios",
+            "--",
+            "--no-packager",
+            "--port",
+            "8081",
+            "--udid",
+            "<confirmed iPhone18Pro UDID>"
+          ],
+          "effect": "Builds, installs AND launches; future permission required despite --no-packager."
+        },
+        "identityFile": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-ios.json",
+        "tf07": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "ios",
+            "maplibre"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-ios.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/maplibre-ios-tf07-manual.json",
+            "TF07_IOS_UDID": "<confirmed UDID>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro."
+        },
+        "tf09": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf09-rendering-smoke.mjs",
+            "ios",
+            "maplibre"
+          ],
+          "env": {
+            "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+            "TF09_OUTPUT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/maplibre-ios-tf09.json",
+            "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+            "TF09_NATIVE_IDENTITY": {
+              "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-ios.json",
+              "encoding": "compact JSON after external verified produced/installed identity"
+            },
+            "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n01-nz92pixo/native-peer-evidence.json"
+          },
+          "metro": {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+            "argv": [
+              "bun",
+              "run",
+              "start",
+              "--",
+              "--port",
+              "8081",
+              "--reset-cache"
+            ],
+            "env": {
+              "ONE_MAP_SMOKE": "tf09"
+            }
+          },
+          "launch": [
+            "xcrun",
+            "simctl",
+            "launch",
+            "<UDID>",
+            "org.reactjs.native.example.OneMapMaplibre",
+            "-RCT_jsLocation",
+            "127.0.0.1:8081"
+          ],
+          "androidForwarding": [],
+          "status": "BLOCKED capture platform resolution; future runner serves fixture only, no own Metro/build/install/launch."
+        }
+      },
+      {
+        "environment": "maplibre-android",
+        "shell": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+        "applicationId": "com.onemapmaplibre",
+        "targetStatus": "UNASSIGNED; readiness required before approval",
+        "buildInstallLaunch": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+          "argv": [
+            "bun",
+            "run",
+            "android",
+            "--",
+            "--no-packager",
+            "--port",
+            "8081",
+            "--device",
+            "<assigned emulator serial>"
+          ],
+          "effect": "Builds, installs AND launches; future permission required despite --no-packager."
+        },
+        "identityFile": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-android.json",
+        "tf07": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf07-ui-smoke.mjs",
+            "android",
+            "maplibre"
+          ],
+          "env": {
+            "TF07_METRO_PORT": "8081",
+            "TF07_NATIVE_BINARY_SHA256": {
+              "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-android.json",
+              "field": "installedBinarySha256"
+            },
+            "TF07_MANUAL_REPORT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/maplibre-android-tf07-manual.json",
+            "ANDROID_SERIAL": "<assigned serial>"
+          },
+          "reportRule": "Parent exists, file absent; runner writes wx and fresh runId; owns Metro and launch, no external competing Metro."
+        },
+        "tf09": {
+          "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness",
+          "argv": [
+            "bun",
+            "scripts/tf09-rendering-smoke.mjs",
+            "android",
+            "maplibre"
+          ],
+          "env": {
+            "TF09_LIBRARY_SHA256": "52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+            "TF09_OUTPUT": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/results/native-attempt-01/maplibre-android-tf09.json",
+            "TF09_RUNTIME_NODE_MODULES": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+            "TF09_NATIVE_IDENTITY": {
+              "producer": "/private/tmp/one-map-u25-n01-nz92pixo/runtime/native-identities/maplibre-android.json",
+              "encoding": "compact JSON after external verified produced/installed identity"
+            },
+            "TF09_PEER_EVIDENCE": "/private/tmp/one-map-u25-n01-nz92pixo/native-peer-evidence.json"
+          },
+          "metro": {
+            "cwd": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+            "argv": [
+              "bun",
+              "run",
+              "start",
+              "--",
+              "--port",
+              "8081",
+              "--reset-cache"
+            ],
+            "env": {
+              "ONE_MAP_SMOKE": "tf09"
+            }
+          },
+          "launch": [
+            "adb",
+            "-s",
+            "<serial>",
+            "shell",
+            "am",
+            "start",
+            "-n",
+            "com.onemapmaplibre/.MainActivity"
+          ],
+          "androidForwarding": [
+            [
+              "adb",
+              "-s",
+              "<serial>",
+              "reverse",
+              "tcp:8081",
+              "tcp:8081"
+            ],
+            [
+              "adb",
+              "-s",
+              "<serial>",
+              "reverse",
+              "tcp:8798",
+              "tcp:8798"
+            ]
+          ],
+          "status": "BLOCKED capture platform resolution; future runner serves fixture only, no own Metro/build/install/launch."
+        }
+      }
+    ],
+    "manual": {
+      "source": "scripts/tf07-smoke-contract.mjs, docs/tf07-ui.md, examples/shared/native-tf07-screen.tsx",
+      "requiredEachEnvironment": [
+        "live-child-button",
+        "nested-scroll",
+        "live-activation",
+        "annotation-activation",
+        "offset-touch-bounds",
+        "popup-follow-dismissal",
+        "map-feature-click",
+        "navigation-location",
+        "style-remount",
+        "host-accessibility",
+        "sdk-ornaments",
+        "camera-target-and-gesture",
+        "marker-prop-rejection"
+      ],
+      "identityFields": [
+        "installedBinarySha256",
+        "libraryDistSha256",
+        "environment",
+        "runId"
+      ],
+      "schema": {
+        "installedBinarySha256": "64hex actual installed APK/executable matching independently frozen produced binary",
+        "libraryDistSha256": "driver computed exact dist digest",
+        "environment": "engine-platform",
+        "runId": "runner randomUUID",
+        "scenarios": {
+          "live-child-button": "unverified initially; operator changes only observed passed/failed",
+          "nested-scroll": "unverified initially; operator changes only observed passed/failed",
+          "live-activation": "unverified initially; operator changes only observed passed/failed",
+          "annotation-activation": "unverified initially; operator changes only observed passed/failed",
+          "offset-touch-bounds": "unverified initially; operator changes only observed passed/failed",
+          "popup-follow-dismissal": "unverified initially; operator changes only observed passed/failed",
+          "map-feature-click": "unverified initially; operator changes only observed passed/failed",
+          "navigation-location": "unverified initially; operator changes only observed passed/failed",
+          "style-remount": "unverified initially; operator changes only observed passed/failed",
+          "host-accessibility": "unverified initially; operator changes only observed passed/failed",
+          "sdk-ornaments": "unverified initially; operator changes only observed passed/failed",
+          "camera-target-and-gesture": "unverified initially; operator changes only observed passed/failed",
+          "marker-prop-rejection": "unverified initially; operator changes only observed passed/failed"
+        }
+      },
+      "cameraAndMarkerDetailed": {
+        "camera-target-and-gesture": [
+          "Press Target A then Read renderer; actual center near[-122.34,47.61], requested label alone does not pass.",
+          "Physically pan an empty map region, then Read renderer; actual center must differ from A.",
+          "Press Repeat target (fresh object with identical primitive fields), then Read renderer; camera must remain at panned center rather than snap back.",
+          "Press Target B then Read renderer; actual center near[-122.32,47.615]. Pan again and repeat B; actual pan must remain.",
+          "Press Target A again then Read renderer; actual center returns near A (A/B/A target change applies).",
+          "Press Clear target, then existing Zoom in and Read renderer; requested label none, actual zoom increases, no target rollback.",
+          "Clear target and remount before completing ordinary TF07 feature/marker receipts; actual fixture feature707 and normal touch flow must still pass."
+        ],
+        "marker-prop-rejection": [
+          "For EACH Reject view draggable, Reject view callback, Reject annotation draggable, Reject annotation callback: press once and observe that exact case label plus actual Native Marker does not support dragging message. Waiting, Unexpected rejection or Unexpected drag callback is a failure.",
+          "After EACH attempt press Clear rejection; result must become No rejection requested while the same map remains mounted. Physically pan/read and activate ordinary marker child to confirm gestures/activation remain usable.",
+          "These are unsupported common-prop guard observations; they do not restore native facade dragging. The boundary wraps only the deliberate Marker inside Map context."
+        ]
+      },
+      "observedGate": "Actual known feature707 fixture=tf07, center/zoom finite, generation>=1, load>=2, live child/marker/annotation/source/popup/location events and no error; manual all13 passed. Physical map pan/child activation/nested scroll/offset bounds/popup follow-dismiss/ornaments/style-remount/accessibility cannot be inferred from callback counters."
+    },
+    "identityGates": {
+      "beforeGeneration": "Reverify complete initial freeze and exact archive installation; no live original/publication library source.",
+      "afterGeneration": "Record resolved CLI/template version+integrity, generated project tree+Gemfile hashes. Requested RN pin alone is not generated bytes.",
+      "afterResolution": "Freeze actual Gemfile.lock, Podfile.lock, Gradle dependency report, generated project/codegen, resolved SDK versions and expected patch files. Validate Mapbox native11.23.1 actual linked identity; do not treat config as linked proof.",
+      "afterBuild": "Record build command/environment, outputs, architecture, actual SDK-linked binary/framework dependencies and SHA256 produced APK or iOS CFBundleExecutable. Coordinator checkpoint before flows.",
+      "afterInstall": "Independently adb pm path/pull base.apk + SHA equality, or simctl get_app_container/PlistBuddy executable + SHA equality to produced baseline. TF07 repeats installed verification.",
+      "tf09": "TF09_NATIVE_IDENTITY only records nonempty string. Coordinator must verify installed/produced equality separately and bind compact JSON identity.",
+      "peerAttestation": "TF09_PEER_EVIDENCE.nativePeerDeltaVsHead selected peer contains full reviewed destination-relative patch file inventory and expected patched-byte SHA256 from reconciliation evidence; compare installed bytes. Do not self-hash arbitrary installed package to declare expected identity.",
+      "futureHashes": "NOT KNOWN; no stale historical hashes may substitute."
+    },
+    "scope": {
+      "TF01-03": "Shared scene and backend selection; logical map mount/remount; native reuse rejected by retained contract.",
+      "TF04": "Camera methods/events, gestures and wrapper ownership in native drivers; TF07 actual target A/B/A + equal primitive repeat after physical pan + clearing target and imperative zoom.",
+      "TF05": "Portable sources/layers, updates/reset/style replacement, images; selected wrapper behavior retained.",
+      "TF06": "Rendered/source/cluster queries and explicit feature state; added lifetimes verify data/style/source/map replacement without facade auto-clearing guarantees.",
+      "TF07": "13 exact current manual receipts, live marker child and annotation activation, control/application UI, known feature707 and actual renderer readback.",
+      "TF09": "Native advanced rendering/capture observation and patched peers; source capture-resolution blocker must be fixed first.",
+      "TF08": "Current scope includes application location/UI in TF07 and selected capture used by TF09; unenumerated raw offline/cache/import/snapshot/service operations remain unverified, not silently marked accepted. Scope disposition required from owner for broader retained raw-service acceptance."
+    },
+    "duration": "Planning allowance 2-4 hours with warm caches for serial four-environment native build/flows and 52 manual receipts; fresh framework/dependency/build caches can exceed4hours. No measured current candidate duration; host setup, diagnosis and retries excluded. Existing driver build timeout600000ms and TF07 default3600000ms are limits, not duration predictions.",
+    "retry": "First native attempt only. Any failure stops; unknown readiness, changed inputs, repairs or retries require coordinator review and new owner permission.",
+    "excluded": [
+      "Physical devices (owner excluded)",
+      "Full VoiceOver/TalkBack audits",
+      "Sensor certification",
+      "RNMapbox invalidateAmbientCache and setMaximumAmbientCacheSize (owner excluded)",
+      "Host repairs/tool updates/provisioning without separate approval",
+      "Dual native SDK co-installation guarantee"
+    ],
+    "nativeProjectsGenerated": false,
+    "nativeBuildsPerformed": false,
+    "nativeRuntimeExecuted": false,
+    "proposedPrerequisiteRepairs": [
+      {
+        "scope": "Application-only resolver/capture fixture repair",
+        "minimum": "Make .js import fallback choose platform sibling before generic .ts; preserve original error handling. Inspect every .js import caller for same affected pattern. Alternative explicit platform-selected capture import only after confirming all native platform siblings. Do not edit library, archive, peers, versions, locks or patches.",
+        "proof": "Regression must fail on current installed Metro resolver ios/android both consumers and pass after repair; generic web control still chooses browser helper; inspect popup/capture peers and routine source/type/build checks. New harness freeze and independent audit before permission."
+      },
+      {
+        "scope": "Retained native focused fixture and exact recipe preparation",
+        "minimum": "Review existing dirty-tree focused fixture without importing unrelated work. Prepare bounded tracked application fixture covering two simultaneous maps/named refs/provider ownership+local state, delayed annotation image refresh, resize/orientation and target behavior at two density settings. Add observable receipts and run-bound identity; keep native shared dragging removed.",
+        "proof": "Routine structural/mocked/type checks, complete command+manual receipt map, independent source audit, new frozen inputs; runtime still separately approval gated."
+      }
+    ],
+    "mixedSelectionPreparation": {
+      "status": "CONSTRUCTED; Babel/watch roots PASS; all4 native selection resolution FAILED",
+      "variants": "/private/tmp/one-map-u25-n01-nz92pixo/native-mixed-variants.json",
+      "watchVariants": "/private/tmp/one-map-u25-n01-nz92pixo/native-mixed-watch-variants.json",
+      "proof": "/private/tmp/one-map-u25-n01-nz92pixo/native-mixed-static-proof.json",
+      "outcome": "Actual .js resolves generic setup.ts exporting opposite web backend on ios/android both engines. Extensionless control resolves setup.native.ts. Backend runtime guard would reject wrong selection. No Metro process or transport run.",
+      "requiredNext": "Same approved bounded resolver repair as capture; rebuild proof and freeze before execution. Variants are temporary reviewedU24 recipe, not source overlay of dirty originals."
+    },
+    "preparedConsumers": [
+      {
+        "engine": "mapbox",
+        "shell": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-mapbox",
+        "archiveFilesCompared": 171,
+        "archiveMemberBytesMatch": true,
+        "lockSha256": "3a2cff7f9db0732f10ed2334297d3cde2358ff5c67efcbdcba3596cb5fa77e2c",
+        "versions": {
+          "@rnmapbox/maps": "10.3.7",
+          "react": "19.2.3",
+          "react-native": "0.87.1",
+          "react-native-teleport": "1.2.1",
+          "@react-native-community/cli": "20.2.0"
+        },
+        "oppositeNativePeerAbsent": true,
+        "frozenLockActualBun141": "PASS --frozen-lockfile --ignore-scripts, lock bytes unchanged; original resolution install used1.4.4"
+      },
+      {
+        "engine": "maplibre",
+        "shell": "/private/tmp/one-map-u25-n01-nz92pixo/native-harness/examples/native-maplibre",
+        "archiveFilesCompared": 171,
+        "archiveMemberBytesMatch": true,
+        "lockSha256": "fb37086b0f1f60175769d253a0129203716d388d0c345e13cbb2a36fc0878900",
+        "versions": {
+          "@maplibre/maplibre-react-native": "11.5.0",
+          "react": "19.2.3",
+          "react-native": "0.87.1",
+          "react-native-teleport": "1.2.1",
+          "@react-native-community/cli": "20.2.0"
+        },
+        "oppositeNativePeerAbsent": true,
+        "frozenLockActualBun141": "PASS --frozen-lockfile --ignore-scripts, lock bytes unchanged; original resolution install used1.4.4"
+      }
+    ],
+    "peerEvidenceSha256": "2173e955fb5d1bcd15892144a4365c80c667e1811548c891f6bebe1c8803e36a",
+    "inputFreeze": {
+      "manifest": "/private/tmp/one-map-u25-n01-nz92pixo/native-initial-inputs.json",
+      "sha256": "3dab02f949756d5dd66ff9b74c5707a4e397899c0255c244dc3dca9f211ac721",
+      "entries": 33896,
+      "scope": "Initial fixtures/scripts+archive extraction+fresh singleSDK JS consumers/temp locks+reviewedU24 mixed App/watch variants. Known resolver/coverage/host gates remain; no native outputs."
+    },
+    "sourceHashes": {
+      "scripts/native-location-permissions.mjs": "884448ff43d622d197d58596611e69d424dbc39dad6cb30d2c4b8bd856718adf",
+      "scripts/native-location-permissions.test.mjs": "c50d2753446695e47eb3a8123e0e3f13ba50f68d0744e9a926e29dd3ba754e42",
+      "scripts/native-mapbox-version.mjs": "97aabd7ae431097eb33cd0bf1a63b38eed84a2979f2ce16f98e774f15991613b",
+      "scripts/native-mapbox-version.test.mjs": "b531aa0659bfa58aaca276bdd509fff04bb3956546c893f045f65b4d12f66d3a",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "scripts/native-smoke-process.test.mjs": "94bcdf1d16935bfd433f87370e2dd8d8d8369f40f620fb38521952599483b1d6",
+      "scripts/setup-native-example.mjs": "bc99dc4edb3ee3d8d23456bd3a4e51ec88f21eb2249ad15982f16f1649daa6f5",
+      "scripts/tf04-camera-smoke.mjs": "cd0c856b89b6bd8e141ae7b16d8ee20e02de8caebab7870b9d6e69468bb0a20f",
+      "scripts/tf05-sources-smoke.mjs": "a3d5b7fe9793b48662cc1a4ef32f1dc2323512ae818d6dc923d96b19e93b245b",
+      "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+      "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+      "scripts/tf06-queries-smoke.mjs": "9a39cf777a76d164e925992f4863da79309c1e126ae8afb3dfee9bfbec97648f",
+      "scripts/tf06-smoke-selection.mjs": "2bf6a07aa61e28ced6283066cad4dd860c1a13ec52e73ffe47cc6dcee29919d7",
+      "scripts/tf06-smoke-selection.test.mjs": "2d27a797831f70e56b2252c3fd850beb1cbdb505a036db9ee913368169ae68a5",
+      "scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+      "scripts/tf07-smoke-contract.test.mjs": "4cb9174d416afffa5cb65cd70f03628d057814bbcbd4a85f484c84a11314871d",
+      "scripts/tf07-ui-smoke.mjs": "8b5db77823598fa491ef1e2272e432d395284ff23c40dfea08c902c2ed2068af",
+      "scripts/tf09-peer-patches.test.mjs": "64588df3efebeee645e4dc3ebe9bd4da2ed6de5a80c2d34941ac74989f966cb3",
+      "scripts/tf09-rendering-fixture.mjs": "50b90fa0b06d2b4cc3129084322bcfb232ab3113a003f134dc8c826bc9f7ad15",
+      "scripts/tf09-rendering-fixture.test.mjs": "3045ea2c74ee2719c9a3dbaf5c7a17f3d6b44c9884df327322ac97316c9a836f",
+      "scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696"
+    },
+    "nativePatchInventory": [
+      {
+        "path": "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch",
+        "sha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0"
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+        "sha256": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c"
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
+        "sha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1"
+      },
+      {
+        "path": "packages/one-map-react/patches/rnmapbox-10.3.8.patch",
+        "sha256": "0b9cdb09c6b39c1b5527678155246e9116a8db71249fd7fd08d9d1fe1288a788"
+      }
+    ],
+    "actualRoutineProofs": {
+      "distDigest": "Recomputed with Node and actual driver JS localeCompare path/raw-byte algorithm:164files52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+      "cliFlags": "Installed CLI20.2.0 apple runOptions.js declares no-packager,port,udid; android runAndroid/index.js declares no-packager,port,device. Read source only; did not invoke run commands.",
+      "runtime": {
+        "bun": "1.4.1",
+        "node": "v24.22.1",
+        "hashes": {
+          "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959",
+          "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node": "6f32069480ec14d52b6d7b1f3c7124cfbbc46203abf5ddf5c65b127435f3f329"
+        }
+      }
+    },
+    "pngRuntime": {
+      "root": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+      "version": "7.0.0",
+      "selfCheck": "PASS pure Node1x1 PNG encode/decode RGBA equality",
+      "manifest": "/private/tmp/one-map-u25-n01-nz92pixo/png-runtime-inputs.json",
+      "manifestSha256": "c3a8221ad73c8f0cce5f5868b6e34bf4b9001b2af0f1e83a5ccbd85af1daeb8e",
+      "lockSha256": "5fce7e1ff943282db5fe644a3d305d88d8afc3e1234b359494f55291efca52be"
+    },
+    "actualRuntimeBinding": {
+      "bunCommand": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-bin/bun",
+      "symlinkTarget": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native",
+      "actualExecutableSha256": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959",
+      "version": "1.4.1",
+      "childVersion": "1.4.1",
+      "rule": "Owned runtime-bin first in every cwd and inherited PATH. Do not use VP bun dispatch shim, which can select1.4.4 from manifests.",
+      "consumerLockVerification": "Both actual1.4.1 --frozen-lockfile --ignore-scripts PASS; locks unchanged."
+    },
+    "completeInputFreeze": {
+      "path": "/private/tmp/one-map-u25-n01-nz92pixo/native-complete-input-freeze.json",
+      "sha256": "3558ebb397696166133e3e1b736ea53234c6ffa21cea974c192b4ef6afbca7e4",
+      "scope": "Binds all actual runtime tools, native initial inputs, PNG runtime+locks, proof source and temporary source variants"
+    }
+  },
+  "preparation": {
+    "status": "Preparation complete with explicit blockers; execution NOT ready",
+    "plan": "/private/tmp/one-map-u25-n01-nz92pixo/native-acceptance-plan.json",
+    "planSha256": "8549d96b58b8da6d7651abce866722981f35e7776ee89c3bc9be8ca3c93733c8",
+    "nativeExecutionPerformed": false,
+    "hostInventory": [
+      "/private/tmp/one-map-u25-n01-nz92pixo/host-inventory.json",
+      "/private/tmp/one-map-u25-n01-nz92pixo/ios-unrestricted-inventory.json"
+    ],
+    "routineResults": {
+      "isolatedJSConsumers": "2 installs --ignore-scripts passed using Bun1.4.4; archive171 files each match, versions and oppositeSDK absence asserted",
+      "reviewedPatchExpectedBytes": "All 44 files match reviewed expected U24 reconciled identities",
+      "staticMetroResolution": "Confirmed capture .js -> browser helper on four native engine/platform rows; independent review confirms extensionless control ->native helper",
+      "inputFreeze": {
+        "manifest": "/private/tmp/one-map-u25-n01-nz92pixo/native-initial-inputs.json",
+        "sha256": "3dab02f949756d5dd66ff9b74c5707a4e397899c0255c244dc3dca9f211ac721",
+        "entries": 33896,
+        "scope": "Initial fixtures/scripts+archive extraction+fresh singleSDK JS consumers/temp locks+reviewedU24 mixed App/watch variants. Known resolver/coverage/host gates remain; no native outputs."
+      },
+      "distDigest": "Recomputed with Node and actual driver JS localeCompare path/raw-byte algorithm:164files52763b183574a8cc6a7436a7b9aefcba58793242917bd132570f0e5177b4aa5d",
+      "cliFlags": "Installed CLI20.2.0 apple runOptions.js declares no-packager,port,udid; android runAndroid/index.js declares no-packager,port,device. Read source only; did not invoke run commands.",
+      "runtime": {
+        "bun": "1.4.1",
+        "node": "v24.22.1",
+        "hashes": {
+          "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959",
+          "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node": "6f32069480ec14d52b6d7b1f3c7124cfbbc46203abf5ddf5c65b127435f3f329"
+        }
+      },
+      "pngRuntime": {
+        "root": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-tools",
+        "version": "7.0.0",
+        "selfCheck": "PASS pure Node1x1 PNG encode/decode RGBA equality",
+        "manifest": "/private/tmp/one-map-u25-n01-nz92pixo/png-runtime-inputs.json",
+        "manifestSha256": "c3a8221ad73c8f0cce5f5868b6e34bf4b9001b2af0f1e83a5ccbd85af1daeb8e",
+        "lockSha256": "5fce7e1ff943282db5fe644a3d305d88d8afc3e1234b359494f55291efca52be"
+      },
+      "runtimeBinding": {
+        "bunCommand": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-bin/bun",
+        "symlinkTarget": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native",
+        "actualExecutableSha256": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959",
+        "version": "1.4.1",
+        "childVersion": "1.4.1",
+        "rule": "Owned runtime-bin first in every cwd and inherited PATH. Do not use VP bun dispatch shim, which can select1.4.4 from manifests.",
+        "consumerLockVerification": "Both actual1.4.1 --frozen-lockfile --ignore-scripts PASS; locks unchanged."
+      },
+      "mixedPreparation": {
+        "status": "CONSTRUCTED; Babel/watch roots PASS; all4 native selection resolution FAILED",
+        "variants": "/private/tmp/one-map-u25-n01-nz92pixo/native-mixed-variants.json",
+        "watchVariants": "/private/tmp/one-map-u25-n01-nz92pixo/native-mixed-watch-variants.json",
+        "proof": "/private/tmp/one-map-u25-n01-nz92pixo/native-mixed-static-proof.json",
+        "outcome": "Actual .js resolves generic setup.ts exporting opposite web backend on ios/android both engines. Extensionless control resolves setup.native.ts. Backend runtime guard would reject wrong selection. No Metro process or transport run.",
+        "requiredNext": "Same approved bounded resolver repair as capture; rebuild proof and freeze before execution. Variants are temporary reviewedU24 recipe, not source overlay of dirty originals."
+      },
+      "completeInputFreeze": {
+        "path": "/private/tmp/one-map-u25-n01-nz92pixo/native-complete-input-freeze.json",
+        "sha256": "3558ebb397696166133e3e1b736ea53234c6ffa21cea974c192b4ef6afbca7e4",
+        "scope": "Binds all actual runtime tools, native initial inputs, PNG runtime+locks, proof source and temporary source variants"
+      }
+    },
+    "firstPreparationFailures": [
+      "Initial archive assertion copied parent typo concatenating171 count; corrected verified 64hex SHA before extraction.",
+      "Ambient bun vp shim attempted network resolution and failed DNS; actual pinned runtime located.",
+      "Bun1.4.4 default cache write EPERM; temporary cache selected.",
+      "Restricted install DNS failed; same --ignore-scripts isolated install escalated and passed.",
+      "Restricted simctl exit1, unrestricted query timeout10s; only own query terminated.",
+      "PNG install first call used nonexistent cwd; corrected creation then install passed."
+    ],
+    "readiness": [
+      {
+        "id": "ios-target",
+        "status": "OPEN",
+        "reason": "Restricted simctl query exits1; unrestricted read-only query times out after10s. Xcode27.1 build27A9275 installed; iOS27.1 simulator SDK does not prove runtime availability. Prior iPhone18Pro/iOS27 metadata is not runnable identity."
+      },
+      {
+        "id": "android-target",
+        "status": "OPEN",
+        "reason": "No AVD metadata, emulator -list-avds empty, no observed adb server. Installed image android-37.1/google_apis_playstore_ps16k/arm64-v8a revision9. avdmanager unavailable under installed SDK/AndroidStudio search. No emulator serial assigned."
+      },
+      {
+        "id": "capture-resolution",
+        "status": "OPEN confirmed static failure",
+        "reason": "Installed shell Metro config resolves explicit ./capture-rendering.js to browser capture-rendering.ts for ios/android on both engines. Browser helper throws Unknown browser observation backend for native. Separate authorized source repair and new input freeze required before complete native scope approval. No fix applied.",
+        "evidence": "/private/tmp/one-map-u25-n01-nz92pixo/static-resolution.json"
+      },
+      {
+        "id": "manual-operator",
+        "status": "OPEN",
+        "reason": "13 physical/visual receipts per environment require operator capable of real touch, nested scroll, rotation and host accessibility checks; callback logs cannot substitute. Confirm operator/tool access before execution."
+      },
+      {
+        "id": "retained-native-coverage",
+        "status": "OPEN missing fixture coverage",
+        "reason": "Frozen publication TF07 has one map and plain Text annotation, no delayed-image annotation refresh ref. Named-map/multiple-map/provider ownership and retained local state, annotation refresh, resize/orientation and current target at two densities are not fully proved by core13 receipts. Original dirty-tree focused fixture is not an input and cannot be silently overlaid."
+      },
+      {
+        "id": "mixed-selection-resolution",
+        "status": "OPEN confirmed static failure",
+        "reason": "Actual .js resolves generic setup.ts exporting opposite web backend on ios/android both engines. Extensionless control resolves setup.native.ts. Backend runtime guard would reject wrong selection. No Metro process or transport run."
+      }
+    ],
+    "skipped": [
+      "No browser/GPU",
+      "No Metro process or transport",
+      "No native generation",
+      "No Bundler/Pods",
+      "No Gradle/Xcode build",
+      "No native boot/install/launch/input",
+      "No host repair/tool provisioning",
+      "No library/package/patch/peer/version/lock edits in publication or original",
+      "No native Metro transport; mixed source variants/transforms/watch-root checks completed but actual resolver fails all4. Dual native SDK codegen not rerun; outside singleSDK baseline promise."
+    ],
+    "toolRuntime": {
+      "pathPrefix": "/private/tmp/one-map-u25-n01-nz92pixo/runtime-bin:/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin",
+      "binding": "Prepend exact two existing bins to inherited PATH for every web/native command and child process; no packageManager manifest edit. Verify bun/node versions and executable hashes first; mismatch stops for coordinator.",
+      "bun": {
+        "version": "1.4.1",
+        "commandPath": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun",
+        "dispatchShimSha256": "ec3dacd9560f1df3921b5a5a5cbb934fbb683a1958df3d12bec26f32edc53fd1",
+        "actualExecPath": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native",
+        "actualExecutableSha256": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959"
+      },
+      "node": {
+        "version": "v24.22.1",
+        "actualExecPath": "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node",
+        "actualExecutableSha256": "6f32069480ec14d52b6d7b1f3c7124cfbbc46203abf5ddf5c65b127435f3f329"
+      }
+    },
+    "temporaryInstallRuntime": {
+      "path": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.4/bun/bin/bun.native",
+      "sha256": "0a2237cdcfa0d16ef501d9acca9f0026309ef348bea7393a64e8d1e3609565cc",
+      "version": "1.4.4"
+    },
+    "cleanup": "Keep current native input trees pending prerequisite decision; retire after superseding freeze or abandonment, retain compact evidence."
+  },
+  "frozenPackets": {
+    "nativePlan": {
+      "path": "/private/tmp/one-map-u25-n01-nz92pixo/native-acceptance-plan.json",
+      "sha256": "8549d96b58b8da6d7651abce866722981f35e7776ee89c3bc9be8ca3c93733c8"
+    },
+    "handoff": {
+      "path": "/private/tmp/one-map-u25-n01-nz92pixo/native-preparation-handoff.json",
+      "sha256": "a4f5939fef14a8f51b68862c66830c7189f13413160c5eaf8d4f12c2a6e60405"
+    },
+    "completeInputFreeze": {
+      "path": "/private/tmp/one-map-u25-n01-nz92pixo/native-complete-input-freeze.json",
+      "sha256": "3558ebb397696166133e3e1b736ea53234c6ffa21cea974c192b4ef6afbca7e4"
+    }
+  },
+  "checks": {
+    "documentation": {
+      "status": "passed",
+      "scope": "Documentation structure, local links, current browser/native routing, conditional native command and identity proposal, source-backed blocker boundaries and historical preservation. A passing documentation check does not establish runnable native acceptance.",
+      "structure": {
+        "originalStandard": {
+          "exitCode": 0,
+          "markdownFiles": 41,
+          "sdkComparisonTables": 43,
+          "scope": "Structural paragraphs, fences, comparison tables and local links only.",
+          "notice": "Existing Bun moduleSuffixes notice emitted."
+        },
+        "publicationStandard": {
+          "exitCode": 0,
+          "markdownFiles": 40,
+          "sdkComparisonTables": 39,
+          "scope": "Structural paragraphs, fences, comparison tables and local links only.",
+          "notice": "Existing Bun moduleSuffixes notice emitted."
+        },
+        "originalExpanded": {
+          "exitCode": 0,
+          "markdownFiles": 46,
+          "sdkComparisonTables": 43,
+          "scope": "Structural paragraphs, fences, comparison tables and local links only.",
+          "notice": null
+        },
+        "publicationExpanded": {
+          "exitCode": 0,
+          "markdownFiles": 45,
+          "sdkComparisonTables": 39,
+          "scope": "Structural paragraphs, fences, comparison tables and local links only.",
+          "notice": null
+        }
+      },
+      "ownership": {
+        "existingOwnersPerRoot": 26,
+        "changedOwners": {
+          "original": 18,
+          "publication": 18
+        },
+        "manifestSha256": "b23f4261ce455fc6b8e1f6d47d4833e2cb0d12930726f465ded080bd1decc9a1"
+      },
+      "coverageHistory": {
+        "original": {
+          "rows": 69,
+          "firstThreeCellsIdentical": true,
+          "idsOrderCheckmarksIdentical": true,
+          "baseline": "per-root native-plan entry snapshot",
+          "sha256": "9467150ae2b96d1e76169bcf801d82da08b2464a6f3e1047e91b4e6443c75c3b",
+          "exceptions": []
+        },
+        "publication": {
+          "rows": 69,
+          "firstThreeCellsIdentical": true,
+          "idsOrderCheckmarksIdentical": true,
+          "baseline": "per-root native-plan entry snapshot",
+          "sha256": "0a61f4d40b1b0853f107d3d833b52feed6b3e8919c811b5cabf87f64a978433a",
+          "exceptions": []
+        }
+      },
+      "auditedFences": {
+        "countPerRoot": 87,
+        "allBytesUnchanged": true,
+        "newExcerptTypecheckClaim": false
+      },
+      "historicalEvidence": {
+        "original": {
+          "count": 32,
+          "allBytesUnchanged": true
+        },
+        "publication": {
+          "count": 33,
+          "allBytesUnchanged": true
+        }
+      },
+      "frozenPackageReadme": {
+        "original": {
+          "sha256": "18c30dd06597217ee370457f274e2a77018be215a94f9bbddd389c4627cf7a6f",
+          "entrySnapshotBytesUnchanged": true
+        },
+        "publication": {
+          "sha256": "fa71db9fecca858672bc5683c8221b6a5adb97d428c423cc085bcc65e11f9f15",
+          "entrySnapshotBytesUnchanged": true
+        }
+      },
+      "acceptanceOwner": {
+        "path": "docs/revised-api-acceptance-plan.md",
+        "sha256": "f12d94778897fc90e04342cee3364353f37ec923c323c295e265004644b8f11f",
+        "copiesIdentical": true,
+        "status": "Conditional native proposal; execution readiness blocked, prerequisite decisions required before acceptance permission.",
+        "sourcePacketSha256": "8549d96b58b8da6d7651abce866722981f35e7776ee89c3bc9be8ca3c93733c8"
+      },
+      "limits": "No browser renderer, Metro process/transport, native project generation, native dependency resolution, build/install/boot/launch/input, source/build/unit tests or new excerpt typechecking performed by the documentation lane.",
+      "retention": "Compact history preserved. Retired browser inputs are historical provenance; native temporary preparations remain subject to checkpoint retention policy."
+    }
+  },
+  "audits": {
+    "finalPlan": {
+      "path": "/private/tmp/one-map-u25-n01-nz92pixo/final-native-plan-audit.json",
+      "sha256": "1206812f0dfc4403158d96bb45401b3b9d9f4e3ce4899ea91c1789c2edc480ac",
+      "outcome": "PASS for preparation and conditional-plan accuracy; BLOCKED for native execution readiness"
+    },
+    "preliminaryPlan": {
+      "path": "/private/tmp/one-map-u25-n01-nz92pixo/plan-audit.json",
+      "sha256": "13abdba79c41ddec28c057529f78324565168a8eb04ff61d9549bd4b8eba6f09",
+      "status": "Superseded by final audit; historical checkpoint retained"
+    }
+  },
+  "authorization": {
+    "current": "Preparation and read-only/static checks only",
+    "nativeExecution": "NOT authorized; known substantive prerequisites require correction and new review first",
+    "sourceRepairs": "NOT authorized by plan preparation; proposed bounded resolver/fixture repairs awaitownerdecision",
+    "hostSetup": "No tool provisioning, simulator/emulator boot or host repair executed; separate explicit scope required"
+  },
+  "outstanding": {
+    "executionReadiness": "BLOCKED",
+    "prerequisites": [
+      "Fix shared .js-to-TypeScript Metro resolution for platform siblings; verify capture and mixed native selection onbothplatforms/engines",
+      "Prepare retained focused native coverage and identity-bound observations missing from frozen publication",
+      "Restore usable iOS simulator service and assign verifiedtarget; configure Android emulator/tooling fromavailableimage",
+      "Confirm real-input/manual-observation capability and final post-repair inputs before requesting full nativeexecution"
+    ]
+  },
+  "notExecuted": [
+    "No native project generation",
+    "No Pods/Bundler dependency resolution",
+    "No Gradle/Xcodebuild or native linking",
+    "No Metro server/transport",
+    "No device boot/install/launch/input",
+    "No browser runtime",
+    "No production/source/peer/lock/version/patch/archive changes"
+  ],
+  "nextDecision": "Approve bounded prerequisite resolver/fixture repairs and separately scoped host readiness setup; fullnativeacceptance permission comes after audit and readiness closure",
+  "protectedInputs": {
+    "original": 95,
+    "publication": 101,
+    "changed": 0
+  }
+}
