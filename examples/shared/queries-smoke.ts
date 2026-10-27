@@ -200,9 +200,7 @@ export const useQueriesSmoke = ({
         } else if (phase === "recreate") {
           const map = requireMap(mapRef);
           await sourceReady(map, sourceRevision, signal);
-          await map.removeFeatureState(identifier);
-          assertActive(signal);
-          await observeStateRemoval(map, signal, true);
+          await clearAndVerifyState(map, signal);
           nextFields.current.recreatedState = "explicitly-cleared";
           await setAndVerifyState(map, signal);
           assertActive(signal);
@@ -219,9 +217,7 @@ export const useQueriesSmoke = ({
           );
           const map = requireMap(mapRef);
           await sourceReady(map, sourceRevision, signal);
-          await map.removeFeatureState(identifier);
-          assertActive(signal);
-          await observeStateRemoval(map, signal, true);
+          await clearAndVerifyState(map, signal);
           nextFields.current.clearedState = "explicitly-cleared";
           commit("done");
         }
@@ -348,6 +344,22 @@ const hasSourceRevision = (
       String(feature.id) === "1" &&
       feature.properties?.__oneMapSourceRevision === sourceRevision
   );
+
+// Both pinned SDKs can throw when an empty-source removal precedes a write
+// before the next frame (SourceFeatureState.updateState).
+const clearAndVerifyState = async (
+  map: MapRef,
+  signal: AbortSignal
+): Promise<void> => {
+  assertActive(signal);
+  const state = await map.getFeatureState(identifier);
+  assertActive(signal);
+  if (Object.keys(state).length > 0) {
+    await map.removeFeatureState(identifier);
+    assertActive(signal);
+  }
+  await observeStateRemoval(map, signal, true);
+};
 
 const setAndVerifyState = async (
   map: MapRef,

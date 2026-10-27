@@ -1,4 +1,8 @@
+import { createRequire } from "node:module";
+import { dirname, resolve } from "node:path";
+
 import { act, render, waitFor } from "@testing-library/react";
+import { LngLat } from "maplibre-gl";
 import { createRef, type ReactNode, type Ref, StrictMode } from "react";
 import type { Mock } from "vite-plus/test";
 import { beforeEach, describe, expect, vi, test } from "vite-plus/test";
@@ -1220,15 +1224,11 @@ test("portable controlled camera settles repeated MapLibre resize/move feedback 
     padding: { top: 0, bottom: 0, left: 0, right: 0 },
   });
   mounted.rerender(example(undefined, onMove));
-  expect(lastMapProps()).toMatchObject({
-    longitude: undefined,
-    latitude: undefined,
-    zoom: undefined,
-    bearing: undefined,
-    pitch: undefined,
-    viewState: undefined,
-    padding: undefined,
-  });
+  const released = lastMapProps<Record<string, unknown>>();
+  for (const key of ["longitude", "latitude", "zoom", "bearing", "pitch"]) {
+    expect(released).not.toHaveProperty(key);
+  }
+  expect(released).toMatchObject({ viewState: undefined, padding: undefined });
   expect(mockResize).not.toHaveBeenCalled();
   mounted.unmount();
 });
@@ -1254,4 +1254,96 @@ test("common MapLibre control overrides selected camera options and releases bac
   expect(lastMapProps()).toMatchObject({ ...selected, viewState: undefined });
   expect(mockResize).not.toHaveBeenCalled();
   mounted.unmount();
+});
+
+test("MapLibre camera forwarding preserves absence for the actual wrapper transform", async () => {
+  resetWebMapMock();
+  const require = createRequire(import.meta.url);
+  const wrapperRequire = createRequire(
+    require.resolve("react-map-gl/maplibre")
+  );
+  const transformPath = resolve(
+    dirname(wrapperRequire.resolve("@vis.gl/react-maplibre")),
+    "utils/transform.js"
+  );
+  const observed = {
+    center: new LngLat(-122.33, 47.61),
+    zoom: 10,
+    bearing: 15,
+    pitch: 20,
+    padding: { top: 0, bottom: 0, left: 0, right: 0 },
+  };
+  const { applyViewStateToTransform } = (await import(
+    /* @vite-ignore */ transformPath
+  )) as {
+    applyViewStateToTransform: (
+      transform: typeof observed,
+      props: object
+    ) => Partial<typeof observed>;
+  };
+  const cameraKeys = [
+    "longitude",
+    "latitude",
+    "zoom",
+    "bearing",
+    "pitch",
+  ] as const;
+  const target = { longitude: 0, latitude: 0, zoom: 0, bearing: 0, pitch: 0 };
+  const cases = [
+    undefined,
+    {
+      longitude: undefined,
+      latitude: undefined,
+      zoom: undefined,
+      bearing: undefined,
+      pitch: undefined,
+    },
+    { longitude: 12 },
+    { latitude: 34, zoom: 0, bearing: 0, pitch: 0 },
+    { longitude: 12, latitude: 34, zoom: 5, bearing: 0, pitch: 0 },
+  ];
+  for (const options of cases) {
+    const originalOptions = options && { ...options };
+    const tree = (controlled: boolean) => (
+      <MapSetup adapter={adapter}>
+        <SelectedMap
+          mapStyle={{ version: 8, sources: {}, layers: [] }}
+          initialViewState={initialViewState}
+          options={options}
+          viewState={controlled ? target : undefined}
+        />
+      </MapSetup>
+    );
+    const mounted = render(tree(false));
+    const checkReleased = () => {
+      const props = lastMapProps<Record<string, unknown>>();
+      const changes = applyViewStateToTransform(observed, props);
+      for (const key of cameraKeys) {
+        expect(key in props).toBe(options?.[key] !== undefined);
+        if (options?.[key] !== undefined) expect(props[key]).toBe(options[key]);
+      }
+      expect(changes).not.toHaveProperty("zoom", undefined);
+      expect(changes).not.toHaveProperty("bearing", undefined);
+      expect(changes).not.toHaveProperty("pitch", undefined);
+      if (options?.longitude === undefined || options.latitude === undefined) {
+        expect(changes).not.toHaveProperty("center");
+      } else {
+        expect(changes.center).toEqual(
+          new LngLat(options.longitude, options.latitude)
+        );
+      }
+    };
+    checkReleased();
+    mounted.rerender(tree(true));
+    expect(applyViewStateToTransform(observed, lastMapProps())).toEqual({
+      center: new LngLat(0, 0),
+      zoom: 0,
+      bearing: 0,
+      pitch: 0,
+    });
+    mounted.rerender(tree(false));
+    checkReleased();
+    mounted.unmount();
+    expect(options).toEqual(originalOptions);
+  }
 });

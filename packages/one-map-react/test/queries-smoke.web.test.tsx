@@ -15,6 +15,7 @@ import {
 } from "../../../tests/fixtures/map-fixture.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { FeatureState } from "../src/contracts/query-types.js";
+import { sdkFeatureState } from "./sdk-feature-state.js";
 
 const scene = (removalReads = 2, stringIds = false) => {
   let state: FeatureState = {};
@@ -276,7 +277,8 @@ test("recreation waits for the loaded source generation before reading state", a
     "cleared-state=explicitly-cleared"
   );
   expect(hook.result.current.status).toContain("error=none");
-  expect(fixture.removeFeatureState).toHaveBeenCalledTimes(4);
+  // Both recreated and replacement sources are already empty in this scene.
+  expect(fixture.removeFeatureState).toHaveBeenCalledTimes(2);
   expect(renders.filter((render) => render.phase === "recreate")).toEqual(
     expect.arrayContaining([
       { phase: "recreate", sourceRevision: 1, reset: false },
@@ -514,4 +516,137 @@ test("a suspended render cannot redirect a committed smoke callback to a new sta
     "/committed",
     expect.objectContaining({ method: "POST" })
   );
+});
+
+test.each(["mapbox", "maplibre"] as const)(
+  "%s actual SDK state queue survives fresh and retained source/style lifetimes",
+  async (backend) => {
+    for (const retained of [false, true]) {
+      const fixture = scene(1);
+      let source = sdkFeatureState(backend);
+      const trace: string[] = [];
+      fixture.setFeatureState.mockImplementation(async (_target, value) => {
+        trace.push("set");
+        source.setFeatureState(1, value);
+      });
+      fixture.getFeatureState.mockImplementation(async () => {
+        trace.push("get");
+        return source.getFeatureState(1);
+      });
+      fixture.removeFeatureState.mockImplementation(async (_target, key) => {
+        trace.push(`remove:${key ?? "whole"}`);
+        source.removeFeatureState(1, key);
+      });
+      const attach = () => {
+        source = sdkFeatureState(backend);
+        if (retained) {
+          source.setFeatureState(1, {
+            selected: true,
+            count: 2,
+            retained: true,
+          });
+          source.coalesce();
+        }
+      };
+      const hook = renderHook(() => {
+        const smoke = useQueriesSmoke({ mapRef: fixture.mapRef });
+        useLayoutEffect(() => {
+          if (smoke.sourceRevision === 0) return;
+          trace.push("recreate");
+          fixture.commitSourceRevision(smoke.sourceRevision);
+          attach();
+        }, [smoke.sourceRevision]);
+        const { mapStyle, onStyleLoad } = smoke;
+        useLayoutEffect(() => {
+          if (mapStyle !== replacementStyle || trace.includes("replacement"))
+            return;
+          trace.push("replacement");
+          attach();
+          onStyleLoad();
+        }, [mapStyle, onStyleLoad]);
+        return smoke;
+      });
+      act(() => hook.result.current.onLoad());
+      await tick(1000);
+      expect(hook.result.current.status).toContain("error=none");
+      expect(hook.result.current.status).toContain(
+        "recreated-state=explicitly-cleared"
+      );
+      expect(hook.result.current.status).toContain(
+        "cleared-state=explicitly-cleared"
+      );
+      expect(hook.result.current.phase).toBe("done");
+      expect(trace).toContain("replacement");
+      expect(source.getFeatureState(1)).toEqual({});
+      expect(fixture.removeFeatureState).toHaveBeenCalledTimes(
+        retained ? 4 : 2
+      );
+      hook.unmount();
+    }
+  }
+);
+
+test.each(["read", "remove"] as const)(
+  "a recreation state %s failure propagates without retry or replacement",
+  async (operation) => {
+    const fixture = scene(1);
+    let replaced = false;
+    const hook = renderHook(() => {
+      const smoke = useQueriesSmoke({ mapRef: fixture.mapRef });
+      useLayoutEffect(() => {
+        if (smoke.sourceRevision === 0) return;
+        fixture.commitSourceRevision(smoke.sourceRevision, { retained: true });
+        const failure = new Error(`recreation ${operation} failed`);
+        if (operation === "read")
+          fixture.getFeatureState.mockRejectedValueOnce(failure);
+        else fixture.removeFeatureState.mockRejectedValueOnce(failure);
+      }, [smoke.sourceRevision]);
+      useLayoutEffect(() => {
+        if (smoke.mapStyle === replacementStyle) replaced = true;
+      }, [smoke.mapStyle]);
+      return smoke;
+    });
+    act(() => hook.result.current.onLoad());
+    await tick(250);
+    expect(hook.result.current.phase).toBe("done");
+    expect(hook.result.current.status).toContain(
+      `error=recreation-${operation}-failed`
+    );
+    expect(replaced).toBe(false);
+    const calls = fixture.getFeatureState.mock.calls.length;
+    await tick(1000);
+    expect(fixture.getFeatureState).toHaveBeenCalledTimes(calls);
+    expect(fixture.removeFeatureState).toHaveBeenCalledTimes(
+      operation === "read" ? 2 : 3
+    );
+    hook.unmount();
+  }
+);
+
+test("a pending recreation state read cannot remove state after unmount", async () => {
+  const fixture = scene(1);
+  let resolve: (state: FeatureState) => void = () => {};
+  const hook = renderHook(() => {
+    const smoke = useQueriesSmoke({ mapRef: fixture.mapRef });
+    useLayoutEffect(() => {
+      if (smoke.sourceRevision === 0) return;
+      fixture.commitSourceRevision(smoke.sourceRevision, { retained: true });
+      fixture.getFeatureState.mockImplementationOnce(
+        () =>
+          new Promise((done) => {
+            resolve = done;
+          })
+      );
+    }, [smoke.sourceRevision]);
+    return smoke;
+  });
+  act(() => hook.result.current.onLoad());
+  await tick(250);
+  expect(hook.result.current.phase).toBe("recreate");
+  expect(fixture.removeFeatureState).toHaveBeenCalledTimes(2);
+  hook.unmount();
+  await act(async () => {
+    resolve({ retained: true });
+  });
+  expect(fixture.removeFeatureState).toHaveBeenCalledTimes(2);
 });
