@@ -18,73 +18,22 @@ const props: MapProps = {
   },
   mapStyle: { version: 8, sources: {}, layers: [] },
 };
-const mountInteractions = () =>
-  renderHook(() => useMapInteractions(props, { current: null }));
-
-test.each(["click", "move"] as const)(
-  "%s delivery snapshots registrations and respects disposal",
-  (type) => {
-    const mounted = mountInteractions();
-    const interactions = mounted.result.current;
-    const deliveries: string[] = [];
-    const added = vi.fn(() => deliveries.push("added"));
-    let releaseSelf = () => {};
-    let releaseOther = () => {};
-    const self = () => {
-      deliveries.push("self");
-      releaseSelf();
-      releaseOther();
-      // Bound re-registration so a broken live iterator fails instead of hanging.
-      if (deliveries.length < 3)
-        releaseSelf = interactions.subscribe(type, self);
-      interactions.subscribe(type, added);
-    };
-    releaseSelf = interactions.subscribe(type, self);
-    releaseOther = interactions.subscribe(type, () =>
-      deliveries.push("removed")
-    );
-    interactions.subscribe(type, () => deliveries.push("last"));
-
-    act(() => interactions.emit(type, event));
-    expect(deliveries).toEqual(["self", "last"]);
-    expect(added).not.toHaveBeenCalled();
-    act(() => interactions.emit(type, event));
-    expect(deliveries).toEqual(["self", "last", "last", "self", "added"]);
-  }
-);
-
-test("unmount during delivery suppresses the rest of the snapshot and retained publishers", () => {
-  const mounted = mountInteractions();
-  const interactions = mounted.result.current;
-  const later = vi.fn();
-  interactions.subscribe("click", () => mounted.unmount());
-  interactions.subscribe("click", later);
-
-  act(() => interactions.emit("click", event));
-  act(() => interactions.emit("click", event));
-  expect(later).not.toHaveBeenCalled();
-});
-
-test("click subscriber unmount suppresses the map callback", async () => {
+test("callback teardown suppresses retained movement and click handlers", async () => {
+  const onMove = vi.fn(() => mounted.unmount());
   const onClick = vi.fn();
   const mounted = renderHook(() =>
-    useMapInteractions({ ...props, onClick }, { current: null })
+    useMapInteractions({ ...props, onMove, onClick }, { current: null })
   );
-  mounted.result.current.subscribe("click", () => mounted.unmount());
-  await act(async () => mounted.result.current.click(event));
-  expect(onClick).not.toHaveBeenCalled();
-});
-
-test("duplicate callbacks have independently disposable registrations", () => {
-  const mounted = mountInteractions();
   const interactions = mounted.result.current;
-  const callback = vi.fn();
-  const release = interactions.subscribe("move", callback);
-  interactions.subscribe("move", callback);
-  release();
-  release();
-  act(() => interactions.emit("move", event));
-  expect(callback).toHaveBeenCalledTimes(1);
+  act(() =>
+    interactions.move({ viewState: props.initialViewState, origin: "user" })
+  );
+  act(() =>
+    interactions.move({ viewState: props.initialViewState, origin: "user" })
+  );
+  await act(async () => interactions.click(event));
+  expect(onMove).toHaveBeenCalledTimes(1);
+  expect(onClick).not.toHaveBeenCalled();
 });
 
 test("custom forwarding proxies retain common queries", async () => {
@@ -284,18 +233,28 @@ test("simultaneous maps keep feature results and callbacks local", async () => {
   });
 });
 
-test("subscriber replacement suppresses the old map callback", async () => {
-  const ref = { current: {} as MapRef };
-  const onClick = vi.fn();
-  const mounted = renderHook(() =>
-    useMapInteractions({ ...props, onClick }, ref)
-  );
-  mounted.result.current.subscribe("click", () => {
-    ref.current = {} as MapRef;
-  });
-  await act(async () => mounted.result.current.click(event));
-  expect(onClick).not.toHaveBeenCalled();
-});
+test.each(["replace", "unmount"] as const)(
+  "a synchronous SDK query %s suppresses its former map callback",
+  async (change) => {
+    const ref = { current: {} as MapRef };
+    const onClick = vi.fn();
+    const query = vi.fn<MapRef["queryRenderedFeatures"]>(() => {
+      if (change === "replace") ref.current = {} as MapRef;
+      else mounted.unmount();
+      return Promise.resolve([]);
+    });
+    ref.current = { queryRenderedFeatures: query } as unknown as MapRef;
+    const mounted = renderHook(() =>
+      useMapInteractions(
+        { ...props, onClick, interactiveLayerIds: ["point"] },
+        ref
+      )
+    );
+    await act(async () => mounted.result.current.click(event));
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  }
+);
 
 test("a suspended transition cannot replace the committed click callback", async () => {
   let resolve!: (
@@ -340,5 +299,39 @@ test("a suspended transition cannot replace the committed click callback", async
     await pending;
   });
   expect(committed).toHaveBeenCalledExactlyOnceWith({ ...event, features: [] });
+  expect(suspended).not.toHaveBeenCalled();
+});
+
+test("a suspended transition cannot replace the committed movement callback", () => {
+  const committed = vi.fn();
+  const suspended = vi.fn();
+  const never = new Promise<void>(() => {});
+  const mounted = renderHook(
+    ({ callback, paused }) => {
+      const interactions = useMapInteractions(
+        { ...props, onMove: callback },
+        { current: null }
+      );
+      if (paused) throw never;
+      return interactions;
+    },
+    {
+      initialProps: { callback: committed, paused: false },
+      wrapper: ({ children }) => (
+        <Suspense fallback={null}>{children}</Suspense>
+      ),
+    }
+  );
+  act(() =>
+    startTransition(() =>
+      mounted.rerender({ callback: suspended, paused: true })
+    )
+  );
+  const movement = {
+    viewState: props.initialViewState,
+    origin: "user" as const,
+  };
+  act(() => mounted.result.current.move(movement));
+  expect(committed).toHaveBeenCalledExactlyOnceWith(movement);
   expect(suspended).not.toHaveBeenCalled();
 });

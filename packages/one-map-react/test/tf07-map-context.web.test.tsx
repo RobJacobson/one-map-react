@@ -109,28 +109,19 @@ test.each(
 );
 
 describe("TF07 map-local UI lifetime", () => {
-  test("move subscriber teardown suppresses the map callback and retained movement handler", () => {
+  test("movement callback teardown suppresses its retained handler", () => {
     const fixture = createFixture();
-    const onMove = vi.fn();
-    let session: MapSession | undefined;
-    const SessionProbe = () => {
-      // eslint-disable-next-line react/globals -- Test readback captures the committed map session.
-      session = useMapSession();
-      return null;
-    };
+    const onMove = vi.fn(() => mounted.unmount());
     const mounted = render(
       <MapSetup adapter={fixture.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera} onMove={onMove}>
-          <SessionProbe />
-        </OneMap>
+        <OneMap mapStyle={style} initialViewState={camera} onMove={onMove} />
       </MapSetup>
     );
     const move = fixture.props()?.onMove;
-    session?.subscribe("move", () => mounted.unmount());
 
     act(() => move?.({ viewState: camera, origin: "user" }));
     act(() => move?.({ viewState: camera, origin: "user" }));
-    expect(onMove).not.toHaveBeenCalled();
+    expect(onMove).toHaveBeenCalledTimes(1);
   });
 
   test("enclosing useMap forwards commands after attachment and rejects after teardown", async () => {
