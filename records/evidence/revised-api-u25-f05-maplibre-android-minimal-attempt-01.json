@@ -1,0 +1,85 @@
+{
+  "attempt": "U25 F05 minimal MapLibre Android attempt 01",
+  "status": "passed for the approved minimal scope",
+  "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "runnerSha256": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+  "environment": {
+    "platform": "Android emulator API 37, arm64-v8a, installed google_apis_playstore image",
+    "avd": "Task-owned OneMapU25F05 on emulator-5580; 2G userdata, 128M sdcard; removed after shutdown",
+    "java": "Android Studio bundled JBR (path explicitly set; version not measured)",
+    "androidSdk": "/Users/rob/Library/Android/sdk; existing build-tools 37.0.0 and NDK 27.1.12297006",
+    "hostAccess": "Emulator reverse mapping tcp:8081 -> tcp:8081 established. No credential values recorded.",
+    "devicePreflight": "Ports 5580/5581/8081 free; no existing adb targets listed.",
+    "freeDiskGiB": {
+      "before": 9.2,
+      "afterOwnedCleanup": 5.2
+    }
+  },
+  "command": {
+    "argv": [
+      "bun",
+      "scripts/tf04-camera-smoke.mjs",
+      "android",
+      "maplibre-basic"
+    ],
+    "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+    "exitCode": 0,
+    "durationSecondsApprox": 168,
+    "runnerResult": "passed",
+    "observedStatuses": [
+      {
+        "fit": "pending",
+        "phase": "await-load",
+        "center": "pending",
+        "done": "0"
+      },
+      {
+        "fit": "ok",
+        "phase": "await-click",
+        "centerLongitude": -122.32,
+        "centerLatitude": 47.64,
+        "done": "0"
+      }
+    ],
+    "inputScope": "No click or gesture input was sent. Input-dependent values remained pending. The runner's minimal automatic map fit/load and camera status passed.",
+    "boundedOutput": "See runner-output.txt."
+  },
+  "dependencies": {
+    "reactNative": "0.87.1 (prepared consumer dependency)",
+    "react": "19.2.3 (prepared consumer dependency)",
+    "mapLibreWrapper": "11.5.0",
+    "teleport": "1.2.1",
+    "mapLibreNativeSdk": "Not reliably identified from runner output; Gradle cache contains several org.maplibre.gl artifacts, so no version is asserted."
+  },
+  "artifact": {
+    "applicationId": "com.onemapmaplibre (debug output metadata)",
+    "debugApk": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sizeMiB": 51,
+    "sha256": "1113dafb99f380beafef48e989206fe1ca1572bcf4b71cc4f07c5a932cecb7f3"
+  },
+  "retainedFiles": {
+    "taskGradleHome": "3.4 GiB",
+    "androidProjectGradle": "2.3 MiB",
+    "androidAppBuild": "618 MiB including APK/build outputs",
+    "cleanup": "Stopped one isolated Gradle daemon; retained the shared task Gradle cache and native build outputs for subsequent authorized work."
+  },
+  "cleanup": {
+    "emulator": "Shut down with adb emu kill; task-owned AVD config and userdata removed after emulator exit",
+    "metroPort8081": "No listener remained after runner exit",
+    "reverseMapping": "Removed with emulator shutdown",
+    "adbServer": "Shared adb server left running",
+    "foreignResources": "No unrelated devices, applications, listeners, user AVDs, SDK images, or caches changed"
+  },
+  "provenance": {
+    "runnerOutput": "runner-output.txt",
+    "candidate": "Unchanged f05 archive; no source or dependency edits in this attempt"
+  },
+  "coordinatorReview": {
+    "outcome": "Passed one real MapLibre Android build/install/launch, map load and automatic fitBounds observation against unchanged f05.",
+    "evidence": "Coordinator inspected exact runner output progressing from fit=pending phase=await-load to fit=ok phase=await-click center=-122.32000,47.64000. Reported center lies within the unchanged approved bounds.",
+    "provenance": "Coordinator independently verified reviewed PR55 runner and unchanged f05 archive SHA256 before worker dispatch.",
+    "scopeLimit": "No independent installed-APK readback/hash comparison or linked native MapLibre SDK version verification. No clicks or other input; broader native acceptance remains unverified.",
+    "cleanup": "Worker reports task emulator shut down and removed, owned app/Metro cleanup complete, port8081 clear and isolated Gradle daemon stopped. Temporary dependency/build caches retained for subsequent authorized work.",
+    "nativeMinimalMatrix": "Together with separately recorded Mapbox iOS03, MapLibre iOS02 and Mapbox Android03, this completes the four minimal native build/load/automatic-camera checks only."
+  }
+}

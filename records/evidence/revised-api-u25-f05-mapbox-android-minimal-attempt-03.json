@@ -1,0 +1,86 @@
+{
+  "attempt": "U25 F05 minimal Mapbox Android attempt 03",
+  "status": "passed for the approved minimal scope",
+  "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "runnerSha256": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+  "environment": {
+    "platform": "Android emulator API 37, arm64-v8a, installed google_apis_playstore image",
+    "avd": "Task-owned OneMapU25F05 on emulator-5580; 2G userdata, 128M sdcard; removed after shutdown",
+    "java": "Android Studio bundled JBR (path explicitly set; no version assertion performed)",
+    "androidSdk": "/Users/rob/Library/Android/sdk; existing build-tools 37.0.0 and NDK 27.1.12297006",
+    "hostAccess": "Inherited Mapbox access token present; value not recorded. Emulator reverse mapping tcp:8081 -> tcp:8081 established.",
+    "devicePreflight": "Ports 5580/5581/8081 free; no attached adb targets.",
+    "freeDiskGiB": {
+      "before": 10,
+      "afterOwnedCleanup": 9.5
+    }
+  },
+  "command": {
+    "argv": [
+      "bun",
+      "scripts/tf04-camera-smoke.mjs",
+      "android",
+      "mapbox-basic"
+    ],
+    "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+    "exitCode": 0,
+    "durationSecondsApprox": 40,
+    "runnerResult": "passed",
+    "observedStatus": {
+      "fit": "ok",
+      "phase": "await-click",
+      "centerLongitude": -122.32,
+      "centerLatitude": 47.64,
+      "done": "0",
+      "click": "pending",
+      "clickAt": "pending",
+      "stop": "pending",
+      "held": "pending",
+      "command": "pending",
+      "doubletap": "skip",
+      "note": "none"
+    },
+    "statusScope": "The runner returned one final status line; it did not emit a separate opening status. The fit/load and expected final automatic camera center were observed. The minimal approved scope ends at await-click; no input was sent and no click/gesture assertions were made.",
+    "boundedOutput": "See runner-output.txt."
+  },
+  "artifact": {
+    "debugApk": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sizeMiB": 62,
+    "sha256": "ddd7d9527e50c5937abf4b2090eb6f56e4f9ad0788196b535372569db6cad485"
+  },
+  "versions": {
+    "reactNative": "0.87",
+    "metro": "0.87.1",
+    "nativeWrapper": "@rnmapbox/maps 10.3.7",
+    "mapboxNativeSdk": "11.23.1 (prepared harness pin)"
+  },
+  "retainedFiles": {
+    "taskGradleHome": "3.3 GiB",
+    "androidProjectGradle": "3.4 MiB",
+    "androidAppBuild": "712 MiB including APK/build outputs",
+    "cleanup": "Stopped one isolated Gradle daemon; kept caches and build outputs."
+  },
+  "cleanup": {
+    "emulator": "Shut down via adb emu kill; removed only the task-owned AVD config and userdata after process exit",
+    "metroPort8081": "No listener remained after runner exit",
+    "reverseMapping": "Removed with emulator shutdown",
+    "adbServer": "Shared adb server left running",
+    "foreignResources": "No unrelated devices, apps, listeners, user AVDs, SDK images, or caches changed"
+  },
+  "provenance": {
+    "runnerOutput": "runner-output.txt",
+    "runnerFix": "PR55 repaired Android local-network permission grant and status error propagation",
+    "priorAttempts": [
+      "mapbox-android-minimal-attempt-01/result.json",
+      "mapbox-android-minimal-attempt-02/result.json"
+    ]
+  },
+  "coordinatorReview": {
+    "outcome": "Passed for one real Mapbox Android build/install/launch, map load and automatic fitBounds observation against unchanged f05.",
+    "evidence": "Coordinator inspected exact runner output: fit=ok, phase=await-click, center=-122.32000,47.64000 and passed result. Final coordinates lie within the unchanged approved bounds.",
+    "repairConfirmation": "This approved real run passes with PR55 grant-before-launch runner and the same debug APK SHA256 as the prior no-status attempt. No production package or fixture change was made.",
+    "scopeLimit": "No independent installed-APK hash readback or linked native SDK identity verification. No opening status line was captured. Input interactions, MapLibre Android and full native acceptance remain unverified.",
+    "cleanup": "Worker reports task emulator shut down and deleted, selected-app/Metro cleanup complete, owned port clear and isolated Gradle daemon stopped. Retained downloaded caches and build outputs are temporary recovery inputs.",
+    "priorFailures": "Original disk exhaustion and no-status outcomes remain separate retained history; no independent retry occurred within this attempt."
+  }
+}

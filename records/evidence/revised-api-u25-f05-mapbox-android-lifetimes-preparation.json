@@ -1,0 +1,93 @@
+{
+  "checkpoint": "U25 f05 Mapbox Android feature-state lifetime preparation",
+  "status": "Implemented and independently audited; routine checks passed; reviewed execution harness frozen; real execution awaiting separate owner approval",
+  "scope": {
+    "changed": [
+      "scripts/tf06-queries-smoke.mjs",
+      "scripts/tf06-query-runner.test.mjs",
+      "docs/revised-api-acceptance-plan.md",
+      "records/README.md",
+      "package.json (private root test command only)"
+    ],
+    "unchanged": "Published library package, example scene, fixture, expected status fields, peers, versions, dependency locks, publication patches and frozen f05 archive. Root private package changes only its test command. No emulator, adb, Metro, native build/install or renderer ran during preparation."
+  },
+  "provenance": {
+    "publicationBase": "b009776 (open PR55)",
+    "branch": "codex/u25-mapbox-android-lifetimes",
+    "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "reviewedTf04RunnerSha256": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+    "preparedTf06RunnerSha256": "03f0c765620567aeeefac5abf98ce131e6afea74021965ec44f489edcaffa8ce",
+    "preparedTf06MockTestSha256": "79e5a95177cee2e75dc0a5ec4013598f2bd51fdf228afa5b8f5caad80f0cef79",
+    "harnessSync": "Coordinator copied only audited TF06 driver and new mock regression into retained execution harness and verified byte equality before requesting approval.",
+    "minimalNativeResults": [
+      "revised-api-u25-f05-mapbox-minimal-attempt-03.json",
+      "revised-api-u25-f05-maplibre-minimal-attempt-02.json",
+      "revised-api-u25-f05-mapbox-android-minimal-attempt-03.json",
+      "revised-api-u25-f05-maplibre-android-minimal-attempt-01.json"
+    ],
+    "copiedAndroidResults": "Copied byte-for-byte from primary records/evidence; earlier failures retained unchanged."
+  },
+  "sourceTrace": {
+    "entry": "scripts/tf06-queries-smoke.mjs selects lifetimes, starts fixture before platform dispatch and closes it in outer finally. One-engine mapbox selection uses unchanged tf06-smoke-selection.mjs.",
+    "transport": "Native environment selects tf06-lifetimes; examples/inline-smoke-target.cjs inlines TF06_BASE into examples/shared/tf06-base.ts. Lifetime loopback transport uses worker-owned adb reverse mappings 8081 and 8798; no LAN lookup.",
+    "scene": "examples/shared/lifetimes-smoke.ts sourceReady validates revision-tagged tile queries. Initial operations verify vector queries, key/whole removal and separate source-layer namespaces. Each source/style/family destination is explicitly cleared and checked empty before state is reapplied; final remount reports done. No automatic clear assertion.",
+    "fixture": "scripts/tf06-lifetimes-fixture.mjs serves generation-tagged MVT routes/alternates and retains unique revision/z/x/y requests as result provenance. Fixture bytes unchanged.",
+    "judgment": "Existing lifetimes judge unchanged: loaded=1; vector-queries/key-remove/whole-remove/vector-namespaces=ok; vector-remount/vector-style/vector-to-geojson/geojson-to-vector/final-remount=explicitly-cleared; phase=done,error=none,done=1.",
+    "ownership": "Assigned Android serial is mandatory for lifetimes; CLI selects it and adb inherits it. Runner owns detached Metro and subprocess groups, selected-app cleanup, iOS status server where applicable, fixture and bounded port-release observation. Worker owns task emulator and reverse mappings externally."
+  },
+  "repairs": {
+    "startup": "Apply reviewed PR55 API permission pattern after installation and debug-host force-stop/configuration, before final launch; API>=37 grants ACCESS_LOCAL_NETWORK, lower API unchanged, invalid/API/grant failures propagate. Lifetimes uses localhost:8081 and skips permission UI clicking.",
+    "observation": "Actual Dev server ready message required; mere port banner rejected. Metro exit/spawn error fails readiness or observation. Android logcat/UI fallback propagates tool errors; existing UI helper also propagates tool errors.",
+    "failure": "Both native engine loops print the compact failed result before stopping the command, preserving error/log evidence and preventing later engine execution.",
+    "cleanup": "Reviewed detached command-group timeout/nonzero/spawn cleanup replaces direct-child kill. Nested finally releases status/Metro/port observation despite app or prior cleanup failure. Unexpected preference errors propagate; only missing preferences are tolerated. Port checks tolerate only lsof exit1 with no output, never kill unknown listeners."
+  },
+  "routineVerification": {
+    "red": "Before runner changes, node scripts/tf06-query-runner.test.mjs failed: Lifetime transport must use loopback from the actual runNative LAN lookup.",
+    "green": [
+      "node --check scripts/tf06-queries-smoke.mjs",
+      "node scripts/tf06-query-runner.test.mjs",
+      "node scripts/tf06-smoke-selection.test.mjs",
+      "node scripts/tf06-lifetimes-fixture.test.mjs",
+      "node scripts/tf04-camera-runner.test.mjs",
+      "node scripts/native-smoke-process.test.mjs (test-owned dummy processes only; host process visibility)",
+      "bun run check",
+      "bun run check:docs",
+      "git diff --check",
+      "bun scripts/tf06-query-runner.test.mjs",
+      "bun examples/inline-smoke-target.test.mjs",
+      "bun scripts/tf06-lifetimes-fixture.test.mjs",
+      "bun scripts/tf06-smoke-selection.test.mjs",
+      "bun scripts/native-smoke-process.test.mjs (test-owned dummy processes only; host process visibility)",
+      "node --check scripts/tf06-query-runner.test.mjs"
+    ],
+    "mockCoverage": "Actual runNative: API36/37/38, invalid API, getprop/grant/build/status failures, loopback fixture/debug transport, assigned CLI device, grant before launch, no permission input, Metro banner/exit/spawn/timeout/poll-time exit and nested app/status/Metro cleanup. Extracted actual status/command/freePort and dispatch behavior cover adb errors, unknown listeners, owned command timeout/nonzero/spawn cleanup, single Mapbox selection and preserved diagnostics before first failure stops later engines.",
+    "limitations": "Mock checks execute JavaScript runner behavior only. Existing fixture unit test decodes generated MVT bytes without server/native rendering. No TypeScript/package build is applicable to this runner-only change.",
+    "intermediateFailures": [
+      "Initial docs check ran before this evidence file existed and reported its missing link; corrected by writing the evidence, then rerun.",
+      "Restricted Node and Bun dummy-process cleanup tests failed on host ps EPERM; each passed with approved host process visibility. Routine tests only, not acceptance retries."
+    ],
+    "toolReuse": "Temporary publication/node_modules symlink reused existing primary tooling without installing or refreshing dependencies; removed after checks."
+  },
+  "proposedExecution": {
+    "plan": "docs/revised-api-acceptance-plan.md#next-approval-mapbox-android-feature-state-lifetimes",
+    "command": "bun scripts/tf06-queries-smoke.mjs android lifetimes mapbox",
+    "worker": "One GPT-6 Luna worker, medium reasoning; stronger coordinator audits inputs and result. Stop first failure; no worker repair/retry.",
+    "environment": "Existing SDK37.0 arm64 emulator image, task-owned OneMapU25F05/emulator-5580; ports5580/5581/8081/8798; explicit SDK/JBR/task Gradle/AVD/PATH/host-access bindings; owned reverse8081+8798.",
+    "estimate": "10-20 minutes with cached build, unmeasured. Boot300s/build600s/watch240s/outer3600s limits.",
+    "identity": "Only after scene command success and before owned emulator cleanup, sequentially compare produced APK and assigned-device installed base.apk hashes. Record SDK identity available from same build outputs without another build and honestly record unresolved limitations. After scene failure, perform cleanup only, no extra identity follow-ups. Scope evidence is not full release certification.",
+    "risk": "Last recorded disk free5.2GiB; reuse retained project/dependencies/cache and outputs, no generators/clean build/new SDK download. AVD must be recreated because prior cleanup deleted it. New runtime errors or failed scope require coordinator review and separate approval for retry.",
+    "notAuthorized": "No execution during preparation; no MapLibre/iOS/TF04/full suite/input/service expansion/physical devices/merge/tag/publication."
+  },
+  "remainingGates": [
+    "Owner explicit execution approval",
+    "First-attempt worker execution and coordinator result/identity/cleanup review"
+  ],
+  "coordinatorAudit": {
+    "outcome": "Passed for source and routine/mock scope. Real lifetime scenario remains unverified.",
+    "review": "Traced fixture origin and Babel inlining, selected engine/device, loopback reverse mapping requirements, install/configuration/permission/launch ordering, actual query/state transition judgment, status failure propagation, failure output and app/server/process cleanup.",
+    "correction": "Required engine fail-fast to emit compact underlying failed result before throwing; regression now preserves actual error and Metro evidence while preventing next engine.",
+    "independentChecks": "Final TF06 runner mocks, engine selection test, documentation check, syntax and diff checks passed. Temporary removal of only grant-before-launch independently made the actual startup mock fail. Lifetime judge byte-equivalent to base.",
+    "freeze": "Reviewed driver and test copied to execution harness; their SHA256 fields above identify prepared bytes. Frozen f05 archive independently verified unchanged.",
+    "executionBoundary": "No emulator, native build, Metro, SDK transport or acceptance execution during preparation or audit. Only proposed one-engine Mapbox Android lifetime command awaits approval."
+  }
+}
