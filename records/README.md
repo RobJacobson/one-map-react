@@ -96,4 +96,6 @@ The [closed f05 iOS readiness proposal](evidence/revised-api-u25-f05-ios-readine
 
 The [second f05 iOS readiness attempt](evidence/revised-api-u25-f05-ios-readiness-attempt-02.json) records a stop in installer-log timestamp parsing after successful Xcode and DeviceHub signature checks. No simulator command or boot ran; diagnosis and a newly approved packet are required before retry.
 
-The [installer-log guard repair](evidence/revised-api-u25-f05-installer-log-guard-fix.json) records the reproduced descriptor false positive, bounded diagnostic correction, offline regressions and a new unrun readiness packet. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns the separate approval scope; native readiness remains unverified.
+The [installer-log guard repair](evidence/revised-api-u25-f05-installer-log-guard-fix.json) records the reproduced descriptor false positive, bounded diagnostic correction, offline regressions and the historical packet used in the third readiness attempt. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns the separate approval scope; native readiness remains unverified.
+
+The [third f05 iOS readiness attempt](evidence/revised-api-u25-f05-ios-readiness-attempt-03.json) records a stop at the first process-output guard before simulator commands. No device boot or cleanup ran; diagnosis and refreshed approval are required before retry.
