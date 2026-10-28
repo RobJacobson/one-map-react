@@ -66,5 +66,15 @@
     "planCorrections": "Removed unobserved Android opening-latitude assertion and retained 300-second boot wait. Final bounds still use actual renderer-reported fit state.",
     "freeze": "Copied only audited runner and regression test to execution harness and verified matching bytes before requesting user approval. Frozen archive SHA256 independently unchanged.",
     "execution": "No emulator, app build/install or acceptance rerun during diagnosis, implementation or audit."
+  },
+  "causalReaudit": {
+    "scope": "Read-only retained source/bytecode inspection and existing mocked runner regression after PR55 commit 6f2e5fb. No emulator, app build, installation, Metro server or real transport ran; no additional implementation defect found in the inspected startup-to-status path.",
+    "cachedBinary": "android-gradle/caches/9.4.1/transforms/c8d737c3c0055e1311341b8104ccc79b/transformed/react-android-0.87.1-debug-runtime.jar",
+    "cachedBinarySha256": "d6ff1f6d7c10c16c4d7a006cb711aaaffc57513ddb932507abf953b3c4652eca",
+    "binaryProof": "Read-only javap inspection confirms com.facebook.react.BuildConfig.DEBUG initializes from Boolean.parseBoolean(\"true\"); ReactBuildConfig.DEBUG reads that field. LocalNetworkPermissionUtil compares SDK_INT against literal 37 and the selected activity permission state. When permission is missing, the loadApp callback runs only after a permission response; no Metro-host/localhost bypass exists in this gate.",
+    "selectedAppChain": "MainActivity extends permission-aware ReactActivity and names OneMapMapbox, matching the app.json/index.js registration and runner applicationId com.onemapmapbox. The merged debug manifest declares ACCESS_LOCAL_NETWORK and android:debuggable=true. writeDebugHost force-stops that app before writing debug_http_host to its default package_preferences file; PackagerConnectionSettings reads the same key/file. The repaired grant then precedes the selected-app final launch. adb commands inherit ANDROID_SERIAL, and the basic CLI passes that device explicitly.",
+    "statusChain": "ONE_MAP_SMOKE=tf04 selects NativeCameraScreen, whose initial status text exists at mount and whose onLoad/onMoveEnd drive reported fit state. Status is read from logcat with UI fallback. Permission grant corrects the upstream loadApp gate itself; removing status-reader catches improves failure diagnostics only.",
+    "verification": "Existing node scripts/tf04-camera-runner.test.mjs passed again with no host tools. Reviewed runner hashes match between publication and execution harness; frozen f05 archive SHA remains unchanged.",
+    "confidenceLimit": "The failed historical run captured no permission dialog, permission-state dump or loadApp callback trace. Compiled dependency/source and mocked red/green establish the startup defect and correction mechanism; attribution of that historical no-status outcome and repaired real Android behavior still require the separately approved runtime rerun."
   }
 }
