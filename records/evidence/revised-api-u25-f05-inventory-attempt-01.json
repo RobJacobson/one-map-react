@@ -1,0 +1,49 @@
+{
+  "checkpoint": "f05 direct inventory proposal guard attempt01",
+  "date": "2026-10-27",
+  "status": "Stopped during preflight; direct inventory query not executed",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "proposalSha256": "fba1e4be4f58ed4abf6bc0bfd33dbb9085d47f5c47df1f38cb323a501e0d7518",
+  "worker": {
+    "name": "/root/f05_direct_inventory",
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "handoffSha256": "71cf11ee94758ad29db6535f98bb321170ebe6f0a0474808992739d716b294bf"
+  },
+  "queryAttempts": 0,
+  "workerReport": {
+    "workerModel": "gpt-6-luna",
+    "reasoning": "medium",
+    "queryAttempts": 0,
+    "guardScope": "Verified the exact approved proposal SHA, tool hashes/version, all 33,966 frozen input entries and frozen archive; inspected fresh filtered process and installer-log metadata.",
+    "guardResults": {
+      "proposalSha256": "fba1e4be4f58ed4abf6bc0bfd33dbb9085d47f5c47df1f38cb323a501e0d7518",
+      "toolHashesMatch": true,
+      "coreSimulatorVersion": "1174.9.2",
+      "freezeEntries": 33966,
+      "freezeEntriesMatch": true,
+      "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+      "recentInstallLifecycleCount": 0,
+      "activeSandboxMarkers": 0,
+      "blockedProcessExecutable": "package_script_service",
+      "blockedProcessMetadata": "PID 54547; PPID 1; elapsed 50:09 at preflight; PackageKit XPC executable path"
+    },
+    "outcome": "STOPPED before query: fresh process filter found package_script_service; preflight explicitly requires stop on active or uncertain installer activity. No simctl query was run.",
+    "resultPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/inventory-attempt-01-result.json",
+    "resultSha256": null,
+    "scopeAfterStop": "No retries, process termination, service changes, queries, builds, installs, boots or acceptance."
+  },
+  "coordinatorAudit": {
+    "resultAbsent": true,
+    "proposalAndCandidateUnchanged": true,
+    "finding": "The helper process presence and recorded metadata establish an uncertain installer state, not active installation. Recent lifecycle and active sandbox checks were empty; daemon/helper presence alone is not proof of activity.",
+    "disposition": "Conservative guard stop preserved; no query authorized past this stop, no process/service termination or repair.",
+    "remainingQuestion": "Determine whether the PackageKit helper is idle before proposing another guarded attempt; this observation alone justifies no reinstall or cleanup."
+  },
+  "unrun": [
+    "Direct simctl list --json",
+    "All device boot/GUI/installation/Android/build/Metro/acceptance actions"
+  ],
+  "ownership": "No query or device resources created; unowned PackageKit helper untouched.",
+  "verificationLimits": "Simulator inventory, runtime/target availability and readiness remain unverified."
+}

@@ -1,0 +1,111 @@
+{
+  "status": "Read-only helper assessment and revised one-query proposal passed worker verification, independent audit and coordinator review; new owner approval required.",
+  "classification": "No evidence of active package work; observed helper quiescence consistent with an idle persistent XPC helper",
+  "confidence": "Moderate bounded inference, not direct XPC transaction-count or kernel wait-reason proof",
+  "observationWindowUtc": {
+    "start": "2026-10-28T01:12:51.079658+00:00",
+    "end": "2026-10-28T01:13:29.589586+00:00"
+  },
+  "observations": {
+    "identity": {
+      "pid": 54547,
+      "ppid": 1,
+      "startLocal": "2026-10-27 17:13:54-07",
+      "executable": "/System/Library/PrivateFrameworks/PackageKit.framework/Versions/A/XPCServices/package_script_service.xpc/Contents/MacOS/package_script_service",
+      "reusedPidEvidence": false
+    },
+    "twoSamples": "Same start, path and PPID; S state; accumulated CPU 0:00.03 and 0.0 percent CPU unchanged across 38.5 seconds",
+    "threads": "Second valid ps -M sample showed two sleeping rows, both 0.0 percent CPU; first custom thread probe failed unsupported tid and was not used as proof",
+    "descendants": "Complete second process-table PID/PPID graph found no recursive helper descendants; arbitrary executable names included",
+    "services": "installd/system_installd were sleeping with unchanged CPU totals across both samples; no xcodebuild/simctl/installer executable matched",
+    "correlation": "install.log explicitly identifies package_script_service[54547] running XcodeSystemResources postinstall at 17:13:55; unified log records its connection to system_installd[21548] invalidated at 17:13:57.885; existing package receipt and End install/sandbox-removal records close transaction at 17:13:59",
+    "recentLogs": "Successful filtered unified-log read for preceding ten minutes returned header only; install.log last relevant records remain the 17:13:59 completed transaction",
+    "bundle": "Info.plist identifies com.apple.package-script-service XPC service with NSRunLoop; identifies service type, does not prove idle or lifetime"
+  },
+  "activeIndicators": [],
+  "limitations": [
+    "Non-root lsof exit 1 with empty output; open files unknown, not absent.",
+    "launchctl procinfo requires root; no root access requested. No transaction count, wait reason or direct connection state observed.",
+    "Initial sandbox ps denied; metadata subsequently read with approved normal-host access. macOS ps thcount/tid fields unsupported; corrected standard ps -M succeeds.",
+    "No atomic exclusion against unrelated host installation, no global no-install claim, and future activity may differ. No inference of orphan malfunction or need to kill/reinstall."
+  ],
+  "identityVerification": {
+    "atUtc": "2026-10-28T01:14:01.858534+00:00",
+    "oldProposalSha256": "fba1e4be4f58ed4abf6bc0bfd33dbb9085d47f5c47df1f38cb323a501e0d7518",
+    "newProposalSha256": "e39e294412462da6a8d701c0d1974028a5453c66baad6ed436e981ca761da77e",
+    "toolChecks": [
+      {
+        "path": "/Applications/Xcode.app/Contents/Developer/usr/bin/simctl",
+        "expected": "c8e73954e91dc5b6e9d7a84a185f3503368b586558c2b464dbe913e9bf0ab336",
+        "actual": "c8e73954e91dc5b6e9d7a84a185f3503368b586558c2b464dbe913e9bf0ab336"
+      },
+      {
+        "path": "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/Info.plist",
+        "expected": "f112b4113f57bf1a2a6b5b7a5f0254d44ad6bd07c0a84b7e9489b6ec0b7e2674",
+        "actual": "f112b4113f57bf1a2a6b5b7a5f0254d44ad6bd07c0a84b7e9489b6ec0b7e2674"
+      },
+      {
+        "path": "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "expected": "ae4278fb72ecdbf17675011db81b85235acb1bfeffcfe812d01d87a0f42329ea",
+        "actual": "ae4278fb72ecdbf17675011db81b85235acb1bfeffcfe812d01d87a0f42329ea"
+      }
+    ],
+    "coreSimulatorVersion": "1174.9.2",
+    "freeze": {
+      "sha256": "9c70ef930a3aa7362ae22f84ffcc9cd89782b5962761ec1442d85929434b842f",
+      "entries": 33966,
+      "mismatches": []
+    },
+    "archive": {
+      "path": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+      "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276"
+    },
+    "queryResultAbsent": true
+  },
+  "newProposal": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/packagekit-idle/inventory-query-proposal-02.json",
+    "sha256": "e39e294412462da6a8d701c0d1974028a5453c66baad6ed436e981ca761da77e",
+    "queryAttempts": 0,
+    "scope": "Exactly one actual installed simctl list --json, 30 seconds, one exclusive GPT-6 Luna medium worker, stop on first result, no follow-on",
+    "guard": "Two ten-second-separated process samples, full descendants, known helper identity, stable sleeping/CPU totals and closed/no-new installer lifecycle; recheck before query; active or meaningfully uncertain evidence stops",
+    "potentialSideEffects": "CoreSimulator activation/contact and ordinary cache/log writes possible; no explicit installation, downloads, boots, GUI, Android, builds, Metro or acceptance authorized"
+  },
+  "evidenceFiles": [
+    {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/packagekit-idle/sample-01.json",
+      "sha256": "cfebfddbc0181cff3c45e0276c4d26d1036145ebeca4d1cb963428b1a11cb478"
+    },
+    {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/packagekit-idle/sample-02.json",
+      "sha256": "5c6a30f2cfe6f7c150e3dbd297c2d305eb139653d17f267856b5c027a125fbd8"
+    },
+    {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/packagekit-idle/logs-and-bundle.json",
+      "sha256": "2ece1d6e13dd465666aebb6f2aa38b82b1dfed96271b83a534de050c229fe238"
+    },
+    {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/packagekit-idle/identity-checks.json",
+      "sha256": "cfd6aa7629ea5ec825d8b6e75b8e6b339301605211067ffaae6e756348a62feb"
+    }
+  ],
+  "unchangedHistory": {
+    "oldProposalSha256": "fba1e4be4f58ed4abf6bc0bfd33dbb9085d47f5c47df1f38cb323a501e0d7518",
+    "oldAttemptResultAbsent": true
+  },
+  "unrun": [
+    "All simctl and developer-tool invocations",
+    "Boot, GUI, host repair, process control, installs/downloads, Android, builds, Metro and acceptance"
+  ],
+  "remainingGates": "New owner approval of proposal02, successful inventory, later separate target/readiness and native acceptance approval",
+  "audit": {
+    "verdict": "Passed for bounded quiescence inference and proposed diagnostic query",
+    "independentAuditSha256": "37c39d6095a982acf9af435b81a632213656bc8281741c392a045e865bb75997",
+    "outstandingFindings": [],
+    "coordinatorReview": [
+      "Correlated same postinstall helper with completed transaction and disconnected client",
+      "Confirmed two-sample quiescence and descendant evidence with permission limits retained",
+      "Verified old/new proposal and tool/archive/evidence hashes; new result absent",
+      "No host repair or process termination justified; fresh guard required before query"
+    ]
+  }
+}
