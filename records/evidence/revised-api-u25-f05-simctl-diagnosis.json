@@ -1,0 +1,120 @@
+{
+  "checkpoint": "U25 f05 simctl startup diagnosis",
+  "date": "2026-10-27",
+  "status": "Read-only diagnosis and bounded inventory-only proposal passed worker verification, independent audit and coordinator review; new owner approval required.",
+  "scope": "Existing failure, launcher/installed bytes/plists, bounded existing installer logs/receipts and filtered process metadata. No xcrun/simctl/xcodebuild/device/installer/GUI invocation.",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "inputInventorySha256": "9c70ef930a3aa7362ae22f84ffcc9cd89782b5962761ec1442d85929434b842f",
+  "historicalInputs": {
+    "ios-readiness-result.json": "23a5bd6132edfa8a8c4c2b6821960147d5a2df75a802240096f058629394ac3a",
+    "ios-readiness-worker-handoff.json": "274ddfd852758844a25e2562048c7867ee7eb097945020d872d0179df30c756f",
+    "ios-readiness.py": "757059861a2dd799562265dd3f12078c1f0790384b99d6fdfb0d833eeec11c81",
+    "input-freeze.json": "9c70ef930a3aa7362ae22f84ffcc9cd89782b5962761ec1442d85929434b842f"
+  },
+  "confirmedFacts": [
+    "Captured xcrun simctl list --json timed out 10.003s with Install Started. No assigned-device boot requested. Xcode selection and Device Hub signature passed.",
+    "Selected simctl is a shell launcher. Missing/older installed CoreSimulator version than 1174.9.2 invokes selected xcodebuild -runFirstLaunch, followed by installed actual simctl. /usr/bin/xcrun is a native shim referencing _xcselect_invoke_xcrun; its full internals were not inspected.",
+    "Existing unified logs identify xcodebuild PID 54501 DVTFirstLaunchPackageInstaller electing bundled CoreTypes.pkg and XcodeSystemResources.pkg at 17:13:40 -0700. PackageKit starts two-package install 17:13:44, atomically replaces CoreSimulator 17:13:49, loses client 17:13:50, writes receipts 17:13:57, logs End install 17:13:59 and 14.8s elapsed.",
+    "Captured result mtime 2026-10-28T00:13:50.455352+00:00 matches client disappearance. Apple installation continued after timeout. cleanup:null refers to no assigned-device cleanup, not cancellation of installer activity.",
+    "Current CoreSimulator version 1174.9.2 equals launcher expectation. Installed actual simctl is Mach-O SHA ae4278fb72ecdbf17675011db81b85235acb1bfeffcfe812d01d87a0f42329ea. Receipts date the two package installations to 00:13:57UTC.",
+    "Later filtered process metadata shows no xcodebuild/simctl. Apple installer and CoreSimulator daemons remain; daemon presence alone establishes neither active installation nor health."
+  ],
+  "hypotheses": [
+    {
+      "rank": 1,
+      "hypothesis": "Tooling launch entered first-launch provisioning and consumed 10s before inventory",
+      "prediction": "Source exposes first-launch route and incident logs identify matching installer transaction",
+      "outcome": "Strongly supported by source/logs/timing. Historical parent chain and initial version are absent: xcrun versus selected shell trigger not directly proven.",
+      "confidence": "high for provisioning explanation, incomplete precise launch trace"
+    },
+    {
+      "rank": 2,
+      "hypothesis": "Actual simctl downloaded/installed a missing simulator runtime",
+      "prediction": "Incident logs identify actual simctl runtime-download installation",
+      "outcome": "Not supported in inspected evidence. Identified transaction uses local Xcode bundled system packages. No download elsewhere is not proven.",
+      "confidence": "low"
+    },
+    {
+      "rank": 3,
+      "hypothesis": "CoreSimulator startup alone stalled with unrelated install text",
+      "prediction": "No matching first-launch transaction, but inventory service failure evidence",
+      "outcome": "Pure startup-only explanation weakened by matching provisioning; residual service error unresolved because no JSON inventory returned.",
+      "confidence": "unresolved residual risk"
+    }
+  ],
+  "rootCauseConclusion": "High-confidence explanation: the 10s inventory budget overlapped Xcode first-launch bundled system installation. Increasing old launcher timeout alone could silently permit provisioning. No evidence of application/library defect; current simulator health remains unknown.",
+  "unknowns": [
+    "Historical parent chain/launcher branch and pre-failure installed version",
+    "Any download or other component activity outside inspected window",
+    "Successful first-launch health, inventory, runtime availability and target readiness",
+    "Whether direct inventory can succeed without service errors"
+  ],
+  "proposedNextStep": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/inventory-query-proposal.json",
+    "sha256": "fba1e4be4f58ed4abf6bc0bfd33dbb9085d47f5c47df1f38cb323a501e0d7518",
+    "executed": false,
+    "requiresApproval": true
+  },
+  "evidenceFiles": {
+    "process-metadata.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/process-metadata.json",
+      "sha256": "991f0fab18bd5529301f6eef997e9b428642c109a5ee26f5a30d4a19396bf302"
+    },
+    "install-window.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/install-window.json",
+      "sha256": "9d437fed23ecb699dd44acdf45ba8c45c2391d976d9e181f2b975d8e652c302a"
+    },
+    "install-outcome.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/install-outcome.json",
+      "sha256": "73c42aa790a7e330314f140ecf26dee73c1c3a71dfa5648d09c43c5d34fd255f"
+    },
+    "unified-log.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/unified-log.json",
+      "sha256": "48d33af6665bf5bf3c5a8a2075d1086441b7cc1286fdd7ed71917629f934250c"
+    },
+    "tool-files.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/tool-files.json",
+      "sha256": "55d97e233c900204c10ac776a1725dae19f89ae33af7eeabc8153ca9a668fce0"
+    },
+    "receipts.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/receipts.json",
+      "sha256": "118add2630a64be8d4412acd5d39fa9f7f9f09cfd50250ae5df843b4ad494ae9"
+    },
+    "first-launch-strings.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/first-launch-strings.json",
+      "sha256": "88cf6cb996c854220baa996dbcf11a43bfa2cbc0e8e0752de8b54b06155bc6c2"
+    },
+    "installed-files.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/installed-files.json",
+      "sha256": "576b3c52be65b1ed52047b4370b1511393b4ea990aaaa714d9e0e7ff3fe3d214"
+    },
+    "install-correlation.json": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/simctl-diagnosis/install-correlation.json",
+      "sha256": "766139fd6d4b89830b4c6100682926cf6deb4cba82eabef0fcaf1a9bd4b4ff21"
+    }
+  },
+  "externalCorroboration": {
+    "url": "https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components",
+    "claim": "Coordinator checked Apple documentation: xcodebuild -runFirstLaunch installs required system components including simctl. It does not prove historical branch/current health."
+  },
+  "verification": {
+    "jsonAndProposalAssertions": "Passed literal argv/cwd/timeout/fresh result and all bound tool/archive/evidence/historical input hashes; no query executed",
+    "frozenInputs": "All 33,966 input entries independently reverified, including symlinks and file hashes",
+    "documentationCheck": "Passed scripts/check-docs.mjs: 40 Markdown files, 39 SDK comparison tables; structural scope only",
+    "runtime": "Unrun; approval required"
+  },
+  "changes": "Evidence, sole acceptance proposal and records index only. Old driver/packet/result/history, freeze and archive preserved.",
+  "limitations": "No repair or new real reproduction by owner instruction; captured failed attempt supplies red signal. No builds, boots, GUI or acceptance.",
+  "audit": {
+    "verdict": "Passed in captured-failure/file/log diagnosis and proposed-query scope",
+    "independentAuditSha256": "5844fb68ca96f28c81bd764308bd2df7da65ae5f5f07c82183157a83969b929c",
+    "outstandingFindings": [],
+    "coordinatorChecks": [
+      "Independently read selected shell launcher and matching installed framework version",
+      "Verified unchanged historical timeout capture, proposal and actual-tool identities",
+      "Reviewed incident package-install timing and inference limits",
+      "Confirmed proposed result absent and no real diagnostic query executed"
+    ],
+    "permissionMechanism": "Preflight guards are explicit coordinator/worker handoff instructions; no executable enforcement driver is claimed."
+  }
+}

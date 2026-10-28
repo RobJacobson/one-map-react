@@ -1,0 +1,106 @@
+{
+  "checkpoint": "PR53 f05 iOS-only readiness attempt01",
+  "date": "2026-10-27",
+  "status": "Stopped at first approved-driver failure: simulator inventory timed out; iOS readiness unverified",
+  "pullRequest": "https://github.com/RobJacobson/one-map-react/pull/53",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "inputInventorySha256": "9c70ef930a3aa7362ae22f84ffcc9cd89782b5962761ec1442d85929434b842f",
+  "launchSha256": "071c0ed57e331f8b236646fa88857af585da46d46f10f78ddc47b84dcacfccc1",
+  "packetSha256": "2441888761e882bbee8dbe4c81c484980d3d559c16c65812c622d56ee8912bae",
+  "driverSha256": "757059861a2dd799562265dd3f12078c1f0790384b99d6fdfb0d833eeec11c81",
+  "planSha256": "cd3b146fb6783a6eb51e70b152137ea1c7981086e4734bdfcffaad99061c47a8",
+  "resultSha256": "23a5bd6132edfa8a8c4c2b6821960147d5a2df75a802240096f058629394ac3a",
+  "workerHandoffSha256": "274ddfd852758844a25e2562048c7867ee7eb097945020d872d0179df30c756f",
+  "worker": {
+    "name": "/root/f05_ios_readiness",
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "approvedDriverAttempts": 1
+  },
+  "outcome": {
+    "status": "failed",
+    "events": [
+      {
+        "step": "selectedXcode",
+        "argv": [
+          "/usr/bin/xcode-select",
+          "-p"
+        ],
+        "timeoutSeconds": 10,
+        "status": "passed",
+        "exitCode": 0,
+        "elapsedSeconds": 0.004
+      },
+      {
+        "step": "signature",
+        "argv": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--strict",
+          "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
+        ],
+        "timeoutSeconds": 15,
+        "status": "passed",
+        "exitCode": 0,
+        "elapsedSeconds": 0.016
+      },
+      {
+        "step": "inventory",
+        "argv": [
+          "/usr/bin/xcrun",
+          "simctl",
+          "list",
+          "--json"
+        ],
+        "timeoutSeconds": 10,
+        "status": "failed",
+        "error": "Command '['/usr/bin/xcrun', 'simctl', 'list', '--json']' timed out after 10 seconds",
+        "timedOut": true,
+        "exitCode": null,
+        "stderr": "Install Started\n1%.........20.........40.........60",
+        "elapsedSeconds": 10.003
+      }
+    ],
+    "newlyBooted": false,
+    "error": "Command '['/usr/bin/xcrun', 'simctl', 'list', '--json']' timed out after 10 seconds",
+    "failedStep": "inventory",
+    "bootOwnershipUncertain": false,
+    "cleanup": null
+  },
+  "unrunSteps": [
+    "Assigned simulator boot",
+    "Boot readiness wait",
+    "Device Hub open",
+    "Final inventory",
+    "Assigned device cleanup (not needed: no boot requested)"
+  ],
+  "unexpectedOutput": {
+    "stderr": "Install Started\n1%.........20.........40.........60",
+    "interpretation": "The query emitted an installation-progress message. Its component/type, completion and any continuing Apple-managed service activity were not established; no additional installation or service action was issued."
+  },
+  "coordinatorAudit": {
+    "verdict": "Worker followed first-failure stop and cleanup boundary after actual approved-driver execution",
+    "fileAndInputPreflight": "Passed before selectedXcode event",
+    "selectedXcodeAndSignature": "Passed",
+    "noBootRequest": true,
+    "cleanupNeeded": false,
+    "candidateAndDriverPacketHashesUnchanged": true,
+    "noRetryOrRepair": true,
+    "scope": "Result/hash review only; no further simulator/service query or host action"
+  },
+  "dispatchClarification": {
+    "scope": "Pre-driver dispatch clarification; no approved readiness command has executed",
+    "error": "Worker appended literal STAGE folder to provided absolute directory instead of reading the actual launch file",
+    "approvedLaunchPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-launch.json",
+    "launchSha256": "071c0ed57e331f8b236646fa88857af585da46d46f10f78ddc47b84dcacfccc1",
+    "driverStarted": false,
+    "scopeOrArtifactChange": false,
+    "next": "Read exact verified launch JSON and execute its argv/cwd once; stop first actual approved-driver failure"
+  },
+  "remainingGates": [
+    "Diagnose observed inventory startup/install message and refresh reviewed packet before any retry",
+    "Owner approval for any additional host actions or retry",
+    "Android readiness and full native build/install/Metro/acceptance remain separately gated"
+  ],
+  "retention": "Compact result and provenance retained; current prepared native inputs retained for active checkpoint. No new app binaries or generated projects."
+}
