@@ -1,0 +1,309 @@
+{
+  "status": "Implemented and independently audited; offline verified; readiness unrun",
+  "scope": "Temporary process-output guard and refreshed readiness proposal only; candidate and first-party runtime unchanged",
+  "historicalAttempt03": {
+    "resultSha256": "1e612a98b07f4d5dfff9d0dd82016ef9fa6df248f0ab0e8d350b52059be3405b",
+    "processStdoutSha256": "46e14eb9b7f5dbebd457ecceb9ca1ffa7e2388ccde6daf03f6acbf22784c7273",
+    "exitCode": 0,
+    "stderrEmpty": true,
+    "rejection": "Generic WARNINGS matched stdout before structured process/activity parsing",
+    "unknown": [
+      "Actual matching token/row not retained",
+      "Whether actual process table contained installer/developer activity"
+    ],
+    "closed": true,
+    "simulatorCommandsRan": false
+  },
+  "diagnosis": {
+    "rankedHypotheses": [
+      {
+        "rank": 1,
+        "cause": "Diagnostic substrings in executable metadata",
+        "prediction": "Valid row containing error or download fails generic call guard but passes explicit activity ownership",
+        "result": "Reproduced deterministically in injected execute path"
+      },
+      {
+        "rank": 2,
+        "cause": "Actual conflicting developer/installer process",
+        "prediction": "Explicit activity guard rejects parsed forbidden executable",
+        "result": "Still rejected by focused controls; historical table unknown"
+      },
+      {
+        "rank": 3,
+        "cause": "Malformed process metadata",
+        "prediction": "Structural parser rejects row after successful command result",
+        "result": "Still rejected by focused controls; historical parser was never reached"
+      }
+    ],
+    "minimalFixture": "123 1 Tue Oct 27 17:00:00 2026 0:00.00 0.0 S /System/Library/CoreServices/ReportCrash/error-reporter",
+    "secondFixtureExecutable": "/Applications/Download Manager.app/Contents/MacOS/Downloader",
+    "rootCause": "Generic diagnostic prose regex ran on structured process data before metadata/activity validation; executable substrings are not command diagnostics",
+    "historicalAttribution": "This source defect reproduces the historical rejection mechanism. Historical matched token and installer activity remain unknown."
+  },
+  "stdoutCallerReview": {
+    "process": "Structured metadata: nonempty table, field count, PID/PPID and executable control-character validation; start/CPU/state identity strings retain their original format and explicit forbidden/helper/descendant activity predicates; no generic substring guard",
+    "inventoryAndFinalInventory": "JSON parsing and exact runtime/device validation; any stderr, nonzero and malformed JSON stop",
+    "unifiedLog": "Filtered log text; retains generic warning/error guard plus explicit installer/helper activity detection; no demonstrated false positive, unchanged",
+    "selectedXcodeSignatureBootBootstatusOpenCleanup": "Diagnostic stdout guard retained, with nonzero/any stderr guards"
+  },
+  "change": {
+    "process": "Classify rows structurally inside call event, then apply original activity_snapshot predicates; pass only relevant installer rows to stable samples",
+    "diagnostics": "Failed events identify rejectionPhase; process parse failures add line number and SHA-256 without raw stdout; processRowCount is retained after successful parsing",
+    "retained": "Known helper identity/CPU stability, recursive descendant checks, forbidden command checks, installer log newer-activity detection and source/freeze/runtime/boot-ownership gates",
+    "selfcheck": "Rename existing self.fail selector to fail_step so unittest.fail remains callable"
+  },
+  "verification": {
+    "red": {
+      "command": "/usr/bin/python3 /private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/selfcheck.py ReadinessChecks.test_harmless_process_warning_substring_reaches_structural_activity_guard",
+      "driver": "Unchanged closed03 driver copied to new04 before fix",
+      "result": "FAILED: 2 subtests, status failed instead of passed; generic process warning/error rejection",
+      "initialTestHarnessCorrection": "Existing self.fail shadowed unittest.fail and obscured first red assertion with TypeError; renamed selector then reran to obtain exact assertion failure"
+    },
+    "green": {
+      "command": "/usr/bin/python3 /private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/selfcheck.py",
+      "result": "PASS: 21 offline tests, injected subprocess/log/sleep/source/freeze operations only",
+      "retainedTests": 17,
+      "newTestGroups": 4,
+      "covered": [
+        "Two harmless executable substrings through complete fake execute",
+        "All four forbidden executables",
+        "Nonzero command, nonempty and whitespace stderr",
+        "Empty and malformed fields/PID/PPID/executable data; valid Darwin PID0 accepted",
+        "Unified-log installer activity and diagnostic errors",
+        "Existing installer timestamps/new activity/mutation/rotation and helper identity/descendants",
+        "Existing stale runtime warnings, runtime identity and owned/unowned/uncertain boot cleanup"
+      ]
+    },
+    "fileOnlyBindings": {
+      "status": "PASS",
+      "scope": "File reads/hashes only; no driver main or readiness subprocess",
+      "sources": "packet,plan,driver,Python,tools,selfcheck,archive verified",
+      "freezeEntries": 33966,
+      "freezeSha256": "9c70ef930a3aa7362ae22f84ffcc9cd89782b5962761ec1442d85929434b842f",
+      "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+      "resultAbsent": true
+    },
+    "documentation": "PASS: 40 Markdown files, 39 SDK comparison tables, paragraphs/fences/local links; structural scope only",
+    "diffCheck": "PASS"
+  },
+  "remainingGates": [
+    "New approval for exactly one iOS readiness attempt and conditional owned cleanup",
+    "Actual runtime inventory/warning status and assigned boot readiness",
+    "Separate Android and native build/install/Metro/acceptance approvals"
+  ],
+  "scopeExcluded": [
+    "Host changes and host process queries",
+    "Readiness main/launch invocation",
+    "simctl/service/GUI/build/install/Metro/acceptance commands",
+    "Primary checkout edits, commits, pushes and PR changes"
+  ],
+  "independentAudit": {
+    "status": "PASS: no outstanding findings",
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/independent-audit.json",
+    "sha256": "a78ad709b436754b4643e0c26605af94b54272c6321e42aa5f32186025edebf8",
+    "scope": "Independent 21 injected tests and old-red/new-green full execute, valid PID0, source and all33966 freeze bindings, exact unchanged command/timeouts, immutable closed03 hashes and absent result; no host queries or readiness invocation"
+  },
+  "historyPreserved": {
+    "selfcheck.py": "b9d19304c5b412d168b6b9bc14678b7de1906eb04c921e186af95b97c0b5e0cf",
+    "prepare-packet.py": "598c207df336b30c89a06de8f9d5c6f8bd1969191e17a4e98689a9e55df25200",
+    "result.json": "1e612a98b07f4d5dfff9d0dd82016ef9fa6df248f0ab0e8d350b52059be3405b",
+    "packet.json": "3307476ed3a654d00951bb64a2988ef2ce742c7dc6c8d4c86a3207dcf9b672d8",
+    "worker-handoff-run.json": "08d8f4b6f991e43611a99aaa1c0af40075b2ee54eb47a65098d3bb2de6f8de3b",
+    "approved-plan.md": "7e465dbb2f936d95b2ed392787e3e95e34bf77c61f3e8bc5d0e8337f69576900",
+    "launch.json": "216031f674417217110916a4fef17df0803cb17dd01b5b47114aab20b01af610",
+    "offline-proof.json": "08ede3cf9a015d01496aaf350d3f9b345266ce9363d0ead4a98cdb1c05adc745",
+    "readiness.py": "8d8c6bc3b54ab89733bb8cf5de1ea53a3d31fcb46c1beff37b1ef8885c2ddf95",
+    "independent-audit.json": "8e94fe7c734f5ee92f01991d7c40522ccf3eabff1bd4a8ef46e5d352c9bee27f",
+    "diagnosis.json": "2ed183e8bac50132990eb71b38c170e6d2ee8d456008a4b48fa7ff98bff36e4c"
+  },
+  "newPacket": {
+    "directory": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+    "status": "PROPOSED / UNRUN; explicit approval required",
+    "resultPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/result.json",
+    "packet": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/packet.json",
+      "sha256": "b2056983407ecdae1ab99a4868e08c29abe4c45042bbf0998e0ca204b7af262f"
+    },
+    "launch": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/launch.json",
+      "sha256": "1c6d2c3dd35d0ff8ee18a7eb05a07432440ffbf58917914e38b16f3ee6290723",
+      "argv": [
+        "/usr/bin/python3",
+        "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/readiness.py",
+        "--execute-approved",
+        "--cleanup-approved",
+        "--packet-sha256",
+        "b2056983407ecdae1ab99a4868e08c29abe4c45042bbf0998e0ca204b7af262f"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04"
+    },
+    "selfcheck": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/selfcheck.py",
+      "sha256": "b7f0e51b41d21e7a02434e9b524cf81a0914a8b8308145a915ebc04d8ba57cd3"
+    },
+    "driver": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/readiness.py",
+      "sha256": "1ae7a8947c476e129329d7a7b5a6da8ee1c707942d4d4ac8752ddcf9fa6e9eef"
+    },
+    "python": {
+      "path": "/usr/bin/python3",
+      "sha256": "b8763cf250e607a778bb4603cecb5b90338814d0a3dfcba0d57b1de242f610e9"
+    },
+    "plan": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/publication/docs/revised-api-acceptance-plan.md",
+      "sha256": "7e101f75e5fadb8938d15489521343b7a73bc3272aeab860274cd489405b41d1"
+    },
+    "freeze": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/input-freeze.json",
+      "sha256": "9c70ef930a3aa7362ae22f84ffcc9cd89782b5962761ec1442d85929434b842f",
+      "verifyEveryEntry": true
+    },
+    "archive": {
+      "path": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+      "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276"
+    },
+    "worker": {
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "exclusiveNativeResources": true
+    },
+    "commands": {
+      "selectedXcode": {
+        "argv": ["/usr/bin/xcode-select", "-p"],
+        "timeoutSeconds": 10
+      },
+      "signature": {
+        "argv": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--strict",
+          "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
+        ],
+        "timeoutSeconds": 15
+      },
+      "process": {
+        "argv": [
+          "/bin/ps",
+          "-axo",
+          "pid=,ppid=,lstart=,time=,pcpu=,state=,comm="
+        ],
+        "timeoutSeconds": 5
+      },
+      "unifiedLog": {
+        "argv": [
+          "/usr/bin/log",
+          "show",
+          "--last",
+          "10m",
+          "--style",
+          "compact",
+          "--predicate",
+          "process == \"package_script_service\" OR process == \"system_installd\" OR process == \"installd\""
+        ],
+        "timeoutSeconds": 15
+      },
+      "inventory": {
+        "argv": [
+          "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+          "list",
+          "--json"
+        ],
+        "timeoutSeconds": 30
+      },
+      "boot": {
+        "argv": [
+          "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+          "boot",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+        ],
+        "timeoutSeconds": 20
+      },
+      "bootstatus": {
+        "argv": [
+          "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+          "bootstatus",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+        ],
+        "timeoutSeconds": 120
+      },
+      "open": {
+        "argv": [
+          "/usr/bin/open",
+          "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
+        ],
+        "timeoutSeconds": 15
+      },
+      "finalInventory": {
+        "argv": [
+          "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+          "list",
+          "--json"
+        ],
+        "timeoutSeconds": 30
+      },
+      "cleanup": {
+        "argv": [
+          "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+          "shutdown",
+          "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+        ],
+        "timeoutSeconds": 20
+      }
+    },
+    "files": [
+      {
+        "path": "/Applications/Xcode.app/Contents/Developer/usr/bin/simctl",
+        "sha256": "c8e73954e91dc5b6e9d7a84a185f3503368b586558c2b464dbe913e9bf0ab336"
+      },
+      {
+        "path": "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/Info.plist",
+        "sha256": "f112b4113f57bf1a2a6b5b7a5f0254d44ad6bd07c0a84b7e9489b6ec0b7e2674"
+      },
+      {
+        "path": "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "sha256": "ae4278fb72ecdbf17675011db81b85235acb1bfeffcfe812d01d87a0f42329ea"
+      },
+      {
+        "path": "/Applications/Xcode.app/Contents/Applications/DeviceHub.app/Contents/Info.plist",
+        "sha256": "071735a79d8eee211ddfff6b8ddce006087cc47b44af1775883af4a2d82306c2"
+      },
+      {
+        "path": "/Applications/Xcode.app/Contents/Applications/DeviceHub.app/Contents/MacOS/DevicesTrampoline",
+        "sha256": "5140dda5d66d3d2eb474fad9ad59a39caa088e9cbc3d162759bd39ceff05fa72"
+      },
+      {
+        "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/selfcheck.py",
+        "sha256": "b7f0e51b41d21e7a02434e9b524cf81a0914a8b8308145a915ebc04d8ba57cd3"
+      }
+    ],
+    "budget": {
+      "fixedWaitSeconds": 10,
+      "maximumSubprocessSecondsIncludingCleanup": 290,
+      "totalSecondsExcludingFileHashing": 300,
+      "estimate": "About six minutes including file hashing; stop on first failure; no retries"
+    },
+    "runtimeRequired": {
+      "identifier": "com.apple.CoreSimulator.SimRuntime.iOS-27-0",
+      "version": "27.0",
+      "buildversion": "nonempty; captured and must match final inventory",
+      "isAvailable": true
+    },
+    "warningPolicy": "Any stderr or nonzero exit stops. Process stdout requires nonempty valid metadata and explicit executable/activity ownership checks, not diagnostic substring matching. Inventory JSON/runtime validation and all other stdout diagnostic/activity guards remain. Parse rejection retains phase and line/hash only. Exit zero is not steady-state service-health proof.",
+    "cleanup": "Only new successful owned boot then later failure, only with separate cleanup-approved flag; no shutdown for uncertain boot or preexisting Booted target",
+    "sideEffects": "Actual simctl can initialize/contact/reconcile CoreSimulator services and write caches/logs. Unexpected Apple-managed cleanup attempts cannot be guaranteed cancellable. Stop and report; no explicit service cleanup.",
+    "excluded": [
+      "xcrun",
+      "selected shell simctl wrapper",
+      "xcodebuild",
+      "service resets/signals/reinstall",
+      "other device boots",
+      "erase",
+      "download/import",
+      "Android",
+      "native generation/dependency/build/app install",
+      "Metro",
+      "acceptance",
+      "automatic retry"
+    ]
+  }
+}

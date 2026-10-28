@@ -10,9 +10,21 @@ const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
 const group = process.argv[2] ?? "web";
+const iosUdid = process.env.TF04_IOS_UDID;
+if (
+  (group === "ios" || group === "all") &&
+  !/^[0-9A-F-]{36}$/i.test(iosUdid ?? "")
+) {
+  throw new Error("TF04_IOS_UDID must identify the assigned simulator.");
+}
+const mapboxBasic = process.argv[3] === "mapbox-basic";
 const corrections = process.argv[3] === "corrections";
-if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
-  throw new Error("The corrections scope requires: web corrections.");
+if (
+  process.argv[3] !== undefined &&
+  !(corrections && group === "web") &&
+  !(mapboxBasic && group === "ios")
+) {
+  throw new Error("Use web corrections or ios mapbox-basic for a scoped run.");
 }
 const webScenario = corrections ? "corrections" : "camera";
 
@@ -238,7 +250,15 @@ if (group === "android" || group === "all") {
   });
 }
 
-if (group === "ios" || group === "all") {
+if (mapboxBasic) {
+  results["mapbox-ios"] = await runNative({
+    directory: "native-mapbox",
+    platform: "ios",
+    applicationId: "org.reactjs.native.example.OneMapMapbox",
+    doubleTap: false,
+    basic: true,
+  });
+} else if (group === "ios" || group === "all") {
   const tapDriver = await startIosTapDriver();
 
   try {
@@ -247,15 +267,24 @@ if (group === "ios" || group === "all") {
       platform: "ios",
       applicationId: "org.reactjs.native.example.OneMapMapbox",
       doubleTap: false,
+      inputDriver: tapDriver,
     });
+    tapDriver.assertRunning();
+    if (results["mapbox-ios"].status !== "passed") {
+      console.log(JSON.stringify(results, null, 2));
+      throw new Error(
+        "Mapbox iOS camera smoke failed; stopping before MapLibre."
+      );
+    }
     results["maplibre-ios"] = await runNative({
       directory: "native-maplibre",
       platform: "ios",
       applicationId: "org.reactjs.native.example.OneMapMaplibre",
       doubleTap: true,
+      inputDriver: tapDriver,
     });
   } finally {
-    tapDriver.kill("SIGTERM");
+    await stopOwnedProcess(tapDriver.driver);
   }
 }
 
@@ -564,11 +593,15 @@ async function startIosTapDriver() {
     "simctl",
     "list",
     "devices",
-    "booted",
+    "--json",
   ]);
-
-  if (!listed.includes("iPhone 18 Pro")) {
-    throw new Error("iPhone 18 Pro is not booted");
+  const assigned = Object.values(JSON.parse(listed).devices)
+    .flat()
+    .find((device) => device.udid === iosUdid);
+  if (!assigned?.isAvailable || assigned.state !== "Booted") {
+    throw new Error(
+      "The assigned iOS simulator must already be available and Booted."
+    );
   }
 
   await freePort(8799);
@@ -582,32 +615,48 @@ async function startIosTapDriver() {
       "-scheme",
       "TapDriver",
       "-destination",
-      "platform=iOS Simulator,name=iPhone 18 Pro",
+      `platform=iOS Simulator,id=${iosUdid}`,
       "-only-testing:TapDriverUITests/TapDriver/testDriveTaps",
     ],
-    { cwd: root, stdio: ["ignore", "pipe", "pipe"] }
+    { cwd: root, detached: true, stdio: ["ignore", "pipe", "pipe"] }
   );
   const record = (chunk) => {
     log += chunk.toString();
   };
 
+  let driverFailure;
+  const abort = new AbortController();
+  const fail = (error) => {
+    driverFailure = error;
+    abort.abort(error);
+  };
+  const assertRunning = () => {
+    if (driverFailure) throw driverFailure;
+  };
+  driver.on("error", fail);
+  driver.on("exit", (code) => {
+    fail(new Error(`iOS tap driver exited ${code}`));
+  });
   driver.stdout.on("data", record);
   driver.stderr.on("data", record);
 
   try {
     await waitFor(
-      () => log.includes("testDriveTaps]' started"),
+      () => {
+        assertRunning();
+        return log.includes("testDriveTaps]' started");
+      },
       180000,
       "iOS tap driver"
     );
   } catch (error) {
-    driver.kill("SIGTERM");
+    await stopOwnedProcess(driver);
     throw new Error(
       `${error instanceof Error ? error.message : String(error)}\n${log.slice(-1500)}`
     );
   }
 
-  return driver;
+  return { driver, signal: abort.signal, assertRunning };
 }
 
 function openStatusPort() {
@@ -665,10 +714,29 @@ function openStatusPort() {
   });
 }
 
-async function runNative({ directory, platform, applicationId, doubleTap }) {
+async function runNative({
+  directory,
+  platform,
+  applicationId,
+  doubleTap,
+  inputDriver,
+  basic = false,
+}) {
   const shell = join(root, "examples", directory);
 
   await freePort(8081);
+  if (platform === "ios") {
+    try {
+      await command("xcrun", ["simctl", "terminate", iosUdid, applicationId]);
+    } catch (error) {
+      if (
+        !/application\b.*\bnot running|found nothing to terminate|no such process/i.test(
+          error.message
+        )
+      )
+        throw error;
+    }
+  }
 
   let metroLog = "";
   const metroArgs = ["run", "start", "--", "--port", "8081", "--reset-cache"];
@@ -680,21 +748,33 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
   const metro = spawn("bun", metroArgs, {
     cwd: shell,
     env: { ...process.env, ONE_MAP_SMOKE: "tf04" },
+    detached: true,
     stdio: ["ignore", "pipe", "pipe"],
   });
   const record = (chunk) => {
     metroLog += chunk.toString();
   };
 
+  let metroFailure;
+  metro.on("error", (error) => {
+    metroFailure = error;
+  });
+  metro.on("exit", (code) => {
+    metroFailure = new Error(`Metro exited ${code}`);
+  });
   metro.stdout.on("data", record);
   metro.stderr.on("data", record);
 
-  const statusPort = platform === "ios" ? await openStatusPort() : null;
-  let build = Promise.resolve();
+  let statusPort;
 
   try {
+    statusPort = platform === "ios" ? await openStatusPort() : null;
     await waitFor(
-      () => metroLog.includes("Dev server ready") || metroLog.includes("8081"),
+      () => {
+        inputDriver?.assertRunning();
+        if (metroFailure) throw metroFailure;
+        return metroLog.includes("Dev server ready");
+      },
       60000,
       "Metro"
     );
@@ -724,7 +804,7 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
       return judge(status, doubleTap, platform);
     }
 
-    build = command(
+    await command(
       "bun",
       [
         "run",
@@ -733,22 +813,30 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
         "--no-packager",
         "--port",
         "8081",
-        "--simulator",
-        "iPhone 18 Pro",
+        "--udid",
+        iosUdid,
       ],
-      { cwd: shell, env: { ...process.env, ONE_MAP_SMOKE: "tf04" } },
+      {
+        cwd: shell,
+        env: { ...process.env, ONE_MAP_SMOKE: "tf04" },
+        signal: inputDriver?.signal,
+      },
       600000
     );
-
     const status = await watchNative({
-      readStatus: () => statusPort.read(),
+      readStatus: () => {
+        inputDriver?.assertRunning();
+        if (metroFailure) throw metroFailure;
+        return statusPort.read();
+      },
       doubleTap,
       applicationId,
       platform,
       timeout: 600000,
+      basic,
     });
 
-    return judge(status, doubleTap, platform);
+    return judge(status, doubleTap, platform, basic);
   } catch (error) {
     return {
       status: "failed",
@@ -756,19 +844,29 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
       log: metroLog.slice(-1500),
     };
   } finally {
-    await build.catch(() => undefined);
-
-    if (platform === "ios") {
-      await command("xcrun", [
-        "simctl",
-        "terminate",
-        "booted",
-        applicationId,
-      ]).catch(() => undefined);
+    try {
+      if (platform === "ios") {
+        await command("xcrun", [
+          "simctl",
+          "terminate",
+          iosUdid,
+          applicationId,
+        ]).catch((error) => {
+          if (
+            !/application\b.*\bnot running|found nothing to terminate|no such process/i.test(
+              error.message
+            )
+          )
+            throw error;
+        });
+      }
+    } finally {
+      try {
+        await statusPort?.close();
+      } finally {
+        await stopOwnedProcess(metro);
+      }
     }
-
-    await statusPort?.close();
-    metro.kill("SIGTERM");
   }
 }
 
@@ -778,6 +876,7 @@ async function watchNative({
   applicationId,
   platform,
   timeout = 180000,
+  basic = false,
 }) {
   const started = Date.now();
   let clicks = 0;
@@ -797,12 +896,17 @@ async function watchNative({
       last = status;
     }
 
-    if (status.includes("phase=await-click") && clicks < 3) {
+    if (basic && (status.includes("fit=ok") || status.includes("done=1"))) {
+      return status;
+    }
+
+    if (!basic && status.includes("phase=await-click") && clicks < 3) {
       clicks += 1;
       await tapMap(platform, applicationId, 1);
     }
 
     if (
+      !basic &&
       status.includes("phase=await-double-tap") &&
       doubleTap &&
       doubleTaps < 4
@@ -864,13 +968,26 @@ async function tapMap(platform, applicationId, times) {
   });
 }
 
-function judge(status, doubleTap, platform = "web") {
+function judge(status, doubleTap, platform = "web", basic = false) {
   const fields = Object.fromEntries(
     status
       .split(" ")
       .map((part) => part.split("="))
       .filter((part) => part.length === 2)
   );
+  if (basic) {
+    const [longitude, latitude] = (fields.center ?? "").split(",").map(Number);
+    const passed =
+      fields.fit === "ok" &&
+      fields.phase === "await-click" &&
+      longitude >= -122.335 &&
+      longitude <= -122.305 &&
+      latitude >= 47.625 &&
+      latitude <= 47.655;
+
+    return { status: passed ? "passed" : "failed", line: status, fields };
+  }
+
   const stopOk = fields.stop === "stayed" || fields.stop === "rejected";
   const cameraOk =
     platform === "web"
@@ -995,53 +1112,52 @@ function command(file, args, options = {}, timeout = 120000) {
     const child = spawn(file, args, {
       cwd: options.cwd,
       env: options.env,
+      signal: options.signal,
+      detached: true,
       stdio: [options.input === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
-
-    if (options.input !== undefined) {
-      child.stdin.end(options.input);
-    }
+    if (options.input !== undefined) child.stdin.end(options.input);
     let output = "";
+    let stopping = false;
+    const stop = async (error) => {
+      if (stopping) return;
+      stopping = true;
+      clearTimeout(timer);
+      try {
+        await stopOwnedProcess(child);
+        reject(error);
+      } catch (cleanupError) {
+        reject(cleanupError);
+      }
+    };
     const timer = setTimeout(() => {
-      child.kill("SIGTERM");
-      reject(new Error(`${file} timed out`));
+      void stop(new Error(`${file} timed out`));
     }, timeout);
-
     child.stdout.on("data", (chunk) => {
       output += chunk.toString();
     });
     child.stderr.on("data", (chunk) => {
       output += chunk.toString();
     });
-    child.on("error", reject);
+    child.on("error", (error) => {
+      void stop(error);
+    });
     child.on("close", (code) => {
       clearTimeout(timer);
-
-      if (code === 0) {
-        resolve(output);
-        return;
-      }
-
-      reject(new Error(output.slice(-2000) || `${file} exited ${code}`));
+      if (stopping) return;
+      if (code === 0) resolve(output);
+      else
+        void stop(new Error(output.slice(-2000) || `${file} exited ${code}`));
     });
   });
 }
 
 async function freePort(port) {
-  const listed = await command("lsof", [
-    "-nP",
-    `-iTCP:${port}`,
-    "-sTCP:LISTEN",
-    "-t",
-  ]).catch(() => "");
-
-  for (const pid of listed.split("\n").filter(Boolean)) {
-    try {
-      process.kill(Number(pid), "SIGTERM");
-    } catch {
-      // The process can exit between the listing and the signal.
-    }
+  try {
+    await command("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"]);
+  } catch (error) {
+    if (error.message === "lsof exited 1") return;
+    throw error;
   }
-
-  await delay(500);
+  throw new Error(`Port ${port} is occupied; no listener was terminated.`);
 }

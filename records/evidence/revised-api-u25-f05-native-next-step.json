@@ -1,0 +1,179 @@
+{
+  "checkpoint": "f05 first iOS camera smoke proposal",
+  "status": "Prepared; execution awaiting owner approval",
+  "date": "2026-10-27",
+  "candidate": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "unchanged": true
+  },
+  "bootEvidence": {
+    "record": "revised-api-u25-f05-ios-readiness-attempt-04.json",
+    "resultSha256": "59082236c730465706abcf7ee0f2c3b7f9fafea742b6a2d8de78626219b4ce6a",
+    "conclusion": "Basic boot capability established: available assigned target, successful boot and bootstatus, DeviceHub open, final available Booted inventory. Historical failed validator rejected only mutable lastUsage. Authorized shutdown passed; current host state not queried.",
+    "historicalStatusUnchanged": true,
+    "readinessRetryRequired": false
+  },
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "ownership": "One exclusive native worker; both iOS engines sequential; no independent retry or code changes",
+    "coordinator": "Preparation, independent audit, diagnosis and acceptance decision remain with stronger coordinator"
+  },
+  "environment": {
+    "harness": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+    "prependPath": [
+      "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/runtime-bin",
+      "/opt/homebrew/bin"
+    ],
+    "TF04_IOS_UDID": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "BUNDLE_PATH": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems",
+    "MAPBOX_ACCESS_TOKEN": "Coordinator supplies existing public token without recording value",
+    "runtimeIdentifier": "com.apple.CoreSimulator.SimRuntime.iOS-27-0",
+    "runtimeVersion": "27.0",
+    "runtimeBuild": "24A434",
+    "ports": [8081, 8799]
+  },
+  "commands": [
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": ["bun", "scripts/setup-native-example.mjs", "native-mapbox"],
+      "timeoutSeconds": 900
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox",
+      "argv": ["/opt/homebrew/bin/bundle", "install"],
+      "timeoutSeconds": 1200
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/ios",
+      "argv": ["/opt/homebrew/bin/bundle", "exec", "pod", "install"],
+      "timeoutSeconds": 1200
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": ["bun", "scripts/setup-native-example.mjs", "native-maplibre"],
+      "timeoutSeconds": 900
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-maplibre",
+      "argv": ["/opt/homebrew/bin/bundle", "install"],
+      "timeoutSeconds": 1200
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-maplibre/ios",
+      "argv": ["/opt/homebrew/bin/bundle", "exec", "pod", "install"],
+      "timeoutSeconds": 1200
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "list",
+        "--json"
+      ],
+      "timeoutSeconds": 30
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "boot",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "timeoutSeconds": 20,
+      "condition": "Assigned available target is Shutdown; skip if Booted; other states stop."
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "bootstatus",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "timeoutSeconds": 120
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": ["bun", "scripts/tf04-camera-smoke.mjs", "ios"],
+      "timeoutSeconds": 3600
+    }
+  ],
+  "cleanup": {
+    "processes": "Retain owned child process-group IDs during smoke for outer interruption cleanup; terminate only these groups and selected test applications on assigned UDID; verify owned ports released",
+    "conditionalDeviceCommand": {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "shutdown",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "timeoutSeconds": 20,
+      "condition": "Only if this worker successfully booted assigned target. Never shutdown preexisting Booted target or uncertain boot."
+    }
+  },
+  "inspection": {
+    "generatedNativeProjects": "ios/android absent in both consumers; stop rather than overwrite existing trees. Template Gemfiles exist and are replaced by generator; record generated identity",
+    "engineSelection": "TF04 ios supports no native engine selector; Mapbox then MapLibre",
+    "installedJavaScriptVersions": {
+      "react-native": "0.87.1",
+      "@rnmapbox/maps": "10.3.7",
+      "@maplibre/maplibre-react-native": "11.5.0",
+      "react-native-teleport": "1.2.1",
+      "cli": "20.2.0"
+    },
+    "cliFlagsSource": "Both installed CLI20.2.0 cli-platform-apple/build/commands/runCommand/runOptions.js declares --udid/--no-packager/--port. runOnSimulator uses selected UDID for build/install/launch.",
+    "metroReadySource": "Installed @react-native/community-cli-plugin/dist/commands/start/runServer.js emits Dev server ready.",
+    "generation": "Existing setup generates ios/android/Gemfile with skip-install and install-pods false; generated Android scaffold is not Android execution.",
+    "actualNativeVersions": "Record resolved template/CLI, Gemfile.lock, Podfile.lock, linked SDKs, produced and installed binaries during approved run; do not infer from requested pins.",
+    "credentialSource": "Inspected pinned-peer source found no mandatory Mapbox download-secret prerequisite; report actual credential errors."
+  },
+  "runnerDelta": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/scripts/tf04-camera-smoke.mjs",
+    "baselineSha256": "cd0c856b89b6bd8e141ae7b16d8ee20e02de8caebab7870b9d6e69468bb0a20f",
+    "preparedSha256": "e444f5a53e6d6e07d3f5ad1151fc93c066510d86c0395d90a6295c65bbd25c28",
+    "scope": [
+      "Exact TF04_IOS_UDID for app and TapDriver commands",
+      "Refuse occupied ports without killing listeners",
+      "Stop before MapLibre after first-engine failure",
+      "Detached owned process groups and bounded cleanup on failure/timeout",
+      "Stop selected test app before status collection; await successful build/install/launch before judging",
+      "Cleanup status bind failure; detect Metro/TapDriver spawn/exit errors, including post-start TapDriver exit during build or status watching"
+    ],
+    "publicationPath": "scripts/tf04-camera-smoke.mjs",
+    "baselineFreeze": "input-freeze.json unchanged; explicit runner/test delta only; no full-tree rehash readiness gate",
+    "publicationTestPath": "scripts/tf04-camera-runner.test.mjs"
+  },
+  "routineChecks": {
+    "selfcheck": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/publication/scripts/tf04-camera-runner.test.mjs",
+      "sha256": "e80399d3cf00925d1cc854909f32c72b87bb79fee5505135c3cc5d7c7ea40d30",
+      "command": [
+        "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/runtime-bin/node",
+        "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/publication/scripts/tf04-camera-runner.test.mjs"
+      ],
+      "result": "PASS 18 mocked targeting, ownership, first-failure, build-order, absent-app, post-start input-driver failure, build abort and timeout checks; no host tool executed. The same test against HEAD fails because old freePort signals an unrelated listener."
+    },
+    "formatting": "PASS targeted formatter and final vp check: all five changed files formatted; both scripts lint without warnings/errors",
+    "documentation": "PASS documentation structure: 40 Markdown files, 39 SDK comparison tables, paragraphs, fences and local links. Initial wrong-cwd invocation failed before checking docs; corrected invocation from publication cwd passed.",
+    "independentAudit": {
+      "status": "PASS; no outstanding findings",
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-next-step-audit.json",
+      "sha256": "1796841023ff7fdaf9a7d853a62d0cb7d65716cd2d0b86dfa00793d6a48dd1a8"
+    },
+    "coordinator": "PASS: full source/plan review, 18 mocked runner checks, existing owned-process cleanup regression. Initial restricted cleanup regression failed with EPERM; normal-access rerun passed; no matching dummy parent groups remained. No native tool or acceptance execution.",
+    "indexCorrection": "Updated obsolete startup/PackageKit routing anchors after retiring readiness sections"
+  },
+  "estimate": "45-120 minutes, unmeasured; fresh caches may exceed; bounded command timeouts are limits, not predictions",
+  "stopRules": "First failed command/engine, nonzero, timeout, unexpected target/runtime field or actionable tool error stops. No retry, repair, global tool install or runtime download.",
+  "notRun": [
+    "Simulator/service readiness query or mutation during preparation",
+    "Native generation",
+    "Bundler/Pods installation",
+    "Build/install/launch",
+    "Metro or real input automation",
+    "Android",
+    "Acceptance"
+  ],
+  "laterGates": "Remaining iOS/native scenarios, Android target readiness, manual visual/accessibility outcomes and density closure are separate from this first camera proof."
+}

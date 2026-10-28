@@ -1,6 +1,6 @@
 # API research and evidence
 
-The [current f05 browser outcome](evidence/revised-api-u25-web-attempt-07.json) records all nine approved rows passing, with the partial worker launch error retained in [attempt06](evidence/revised-api-u25-web-attempt-06.json). Native and host-readiness gates remain open in the [sole acceptance proposal](../docs/revised-api-acceptance-plan.md).
+The [current f05 browser outcome](evidence/revised-api-u25-web-attempt-07.json) records all nine approved rows passing, with the partial worker launch error retained in [attempt06](evidence/revised-api-u25-web-attempt-06.json). Basic iOS boot capability is established; the [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the pending first native application smoke.
 
 The [PR19 acceptance impact](evidence/pr19-acceptance-impact.json) records the refreshed f05 archive and prepared nine-row browser packet. Historical f04 browser passes remain separate; native f04 consumers and freezes are superseded pending recreation. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the next permission request.
 
@@ -85,3 +85,25 @@ The [style-query repair evidence](evidence/revised-api-u25-style-query-repair.js
 The [third browser-attempt record](evidence/revised-api-u25-web-attempt-03.json) preserves commands 1-5 passing both web engines, the command-6 Mapbox popup-teardown failure, normal cleanup and unchanged inputs. Raw-wrapper/SDK and actual-scene controls locate stale application popup callbacks from old-map teardown mutating replacement-generation state. The fixture-only guard is implemented with PR48 open, applicable routine checks and independent source audit passed; its browser input freeze supplied the later approved attempts. No facade or upstream change was made. The current browser record owns the completed outcome.
 
 The [popup repair evidence](evidence/revised-api-u25-popup-repair.json) records app-owned callback generation/lifetime filtering, the preserved raw-wrapper semantics, the strengthened driver, applicable routine verification and independently audited PR48 source/candidate inputs. All 29 archive cases passed. Compiled/native outcomes are reused for unchanged library source/dist, not rerun. Its attempt04 proposal is historical; the current browser record owns the completed nine-row outcome. Native execution remains unapproved.
+
+The [current f05 native preparation](evidence/revised-api-u25-f05-native-preparation.json) binds recreated isolated consumers, archive/peer/resolver/Babel/PNG proofs and a fresh input freeze. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the proposed first iOS camera smoke and separate later native coverage. The [next-step record](evidence/revised-api-u25-f05-native-next-step.json) binds its scope; native application acceptance remains unverified.
+
+The [historical f05 simulator startup diagnosis](evidence/revised-api-u25-f05-simctl-diagnosis.json) preserves the first-launch installer investigation and its closed inventory proposal. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#next-approval-mapbox-ios-map-load-and-camera-movement) owns the current application-testing step.
+
+The [historical f05 PackageKit helper assessment](evidence/revised-api-u25-f05-packagekit-idle.json) preserves its bounded quiescence assessment and closed query proposal. Those process/log checks are retired from active readiness; the [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#next-approval-mapbox-ios-map-load-and-camera-movement) owns the next step.
+
+The [closed f05 iOS readiness proposal](evidence/revised-api-u25-f05-ios-readiness-plan-02.json) preserves the approved packet and offline checks for the second attempt. That packet ran once and stopped in preflight; it is historical and does not authorize a retry. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns the refreshed approval scope.
+
+The [second f05 iOS readiness attempt](evidence/revised-api-u25-f05-ios-readiness-attempt-02.json) records a stop in installer-log timestamp parsing after successful Xcode and DeviceHub signature checks. No simulator command or boot ran; diagnosis and a newly approved packet are required before retry.
+
+The [installer-log guard repair](evidence/revised-api-u25-f05-installer-log-guard-fix.json) records the reproduced descriptor false positive, bounded diagnostic correction, offline regressions and the historical packet used in the third readiness attempt. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns the separate approval scope; native readiness remains unverified.
+
+The [third f05 iOS readiness attempt](evidence/revised-api-u25-f05-ios-readiness-attempt-03.json) records a stop at the first process-output guard before simulator commands. No device boot or cleanup ran; diagnosis and refreshed approval are required before retry.
+
+The [process-output guard repair](evidence/revised-api-u25-f05-process-output-guard-fix.json) records a deterministic executable-name false positive, structural process/activity validation and retained offline controls. The third attempt remains closed with its actual matching token unknown. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns the current status and separate approval gate; no host readiness or native acceptance is established.
+
+The [fourth f05 iOS readiness attempt](evidence/revised-api-u25-f05-ios-readiness-attempt-04.json) records successful boot monitoring and DeviceHub launch followed by final runtime equality rejection of a changed usage timestamp. Authorized assigned-device shutdown passed; the packet is closed and no retry ran.
+
+The [first f05 iOS camera attempt](evidence/revised-api-u25-f05-ios-camera-attempt-01.json) records successful Mapbox scaffold generation and a Bundler installation version mismatch at dependency setup. The run stopped before Pods, app builds, simulator actions or either camera flow; no retry or repair ran.
+
+The [minimal Mapbox iOS proposal](evidence/revised-api-u25-f05-mapbox-minimal-plan.json) binds the read-only Bundler diagnosis, process-local correction and single map-load/camera step awaiting one approval. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#next-approval-mapbox-ios-map-load-and-camera-movement) owns the current scope; the larger first-camera proposal is superseded.

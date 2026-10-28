@@ -1,0 +1,79 @@
+{
+  "attempt": "PR53 first iOS camera smoke",
+  "status": "Stopped at first actual command failure",
+  "authorization": "Original approval: Mapbox then MapLibre iOS camera smoke only; no Android execution",
+  "candidate": {
+    "publicationHead": "62a7d78b3eb18e3d598bda054a6da793c4f3ca24",
+    "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "runnerSha256": "e444f5a53e6d6e07d3f5ad1151fc93c066510d86c0395d90a6295c65bbd25c28"
+  },
+  "credentials": {
+    "source": "Inherited execution environment",
+    "presence": "Coordinator confirmed nonempty MAPBOX_ACCESS_TOKEN; value not printed or recorded"
+  },
+  "commands": [
+    {
+      "index": 1,
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": ["bun", "scripts/setup-native-example.mjs", "native-mapbox"],
+      "timeoutSeconds": 900,
+      "exitCode": 0,
+      "durationSecondsApprox": 7,
+      "result": "PASS; React Native 0.87.1 template generated; iOS and Android scaffolds and Gemfile reported written. Dependencies skipped."
+    },
+    {
+      "index": 2,
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox",
+      "argv": ["/opt/homebrew/bin/bundle", "install"],
+      "timeoutSeconds": 1200,
+      "exitCode": 39,
+      "durationSecondsApprox": 4,
+      "firstFailure": "Bundler reports running version4.0.17 differs from its installed gem specification4.0.20.",
+      "boundedOutput": "Fetching gem metadata from https://rubygems.org/.\nThe running version of Bundler (4.0.17) does not match the version of the specification installed for it (4.0.20). This can be caused by reinstalling Ruby without removing previous installation, leaving around an upgraded default version of Bundler. Reinstalling Ruby from scratch should fix the problem."
+    }
+  ],
+  "laterCommands": {
+    "notRun": [3, 4, 5, 6, 7, 8, 9, 10],
+    "reason": "Stopped after command 2 failure; no retry or repair"
+  },
+  "actualVersionsAndArtifacts": {
+    "template": "React Native 0.87.1",
+    "Gemfile": {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/Gemfile",
+      "sha256": "731cb657e8b565a302671772c6cde455dfa19f7c4015b778afec9b7e67da5200",
+      "bundlerVersionRequirement": "None in generated Gemfile"
+    },
+    "GemfileLock": "Not recorded before stop",
+    "PodfileLock": "Not generated",
+    "resolvedOrLinkedSDKs": "Not available",
+    "producedOrInstalledBinaryHashes": "Not available"
+  },
+  "resourceOwnership": {
+    "ports": "Smoke runner never started; no owned ports",
+    "processes": "Commands completed; no live owned command process groups",
+    "simulator": "No simctl command or device action; no worker boot to shut down",
+    "cleanup": "None required; generated partial outputs retained for coordinator review"
+  },
+  "preflightHistory": "preflight.json records an earlier wrong-path lookup. Coordinator then confirmed the inherited token source and authorized continuation from command 1.",
+  "date": "2026-10-28",
+  "checkpoint": "f05 iOS camera attempt01",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium"
+  },
+  "rawWorkerResult": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-camera-attempt-01/result.json",
+    "sha256": "d0a1aab7e655992d3a3f2fef35112dc40a65e6275f8b3097f89a6acaa66672ce"
+  },
+  "coordinatorAudit": {
+    "attribution": "The mismatch is between Bundler running code and its installed gem specification. The generated Gemfile does not specify Bundler4.0.20. Original worker summary incorrectly called this a project requirement.",
+    "scope": "Reviewed emitted output and generated Gemfile only; no Ruby/gem host diagnosis, repair or retry.",
+    "rubyReinstall": "The tool suggested reinstalling Ruby; that suggestion was not executed or independently validated.",
+    "preflight": "Initial missing.env lookup resolved using existing inherited public token before first native command; no credential value recorded."
+  },
+  "remainingGates": [
+    "Diagnose Bundler installation mismatch and prepare reviewed correction/continuation before new execution approval",
+    "iOS Pods/builds/install/launch/camera checks for both engines remain unrun",
+    "Android and broader native acceptance remain separate"
+  ]
+}

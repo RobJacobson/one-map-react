@@ -1,0 +1,135 @@
+{
+  "unit": "U25 f05 native preparation",
+  "status": "Static inputs and iOS-only readiness proposal passed worker verification, independent audit and coordinator review; execution awaits owner approval.",
+  "source": {
+    "commit": "9c67ee3531695ff2c32acce9c012c3bd1ebe61bf",
+    "trackedSourceManifestSha256": "6c3443b2c1992040804f99465b271d69d586aa00f62324c9c27993214bac5470",
+    "trackedFiles": 158,
+    "harnessRoot": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+    "productionSourceChanges": false
+  },
+  "candidate": {
+    "archive": "artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "distFiles": 164,
+    "distDigest": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "versionPeersPatchesRepositoryLocksAPI": "unchanged",
+    "browserOutcome": "records/evidence/revised-api-u25-web-attempt-07.json; all nine rows passed; historical records immutable"
+  },
+  "consumers": {
+    "engines": [
+      "native-mapbox",
+      "native-maplibre"
+    ],
+    "installCommand": [
+      "bun",
+      "install",
+      "--frozen-lockfile",
+      "--ignore-scripts"
+    ],
+    "Bun": "1.4.1 actual bun.native",
+    "Node": "24.22.1",
+    "React": "19.2.3",
+    "ReactNative": "0.87.1",
+    "Teleport": "1.2.1",
+    "CLI": "20.2.0",
+    "RNMapbox": "10.3.7",
+    "MapLibre": "11.5.0",
+    "oppositeNativeSDK": "absent in each consumer",
+    "recoveryFilesVerified": 18,
+    "manifestAndLockBytes": "unchanged",
+    "temporaryVariants": "Each App imports existing mixed native setup with backend guard; each Metro config watches ../mixed",
+    "nativeProjectsGenerated": false
+  },
+  "checks": {
+    "archive": "171 exact member bytes in root and both consumers; 164-file canonical TF07/TF09 dist digest",
+    "patches": "44 expected patched files match independent integrity-verified pristine registry reconstructions using U23-F01-reviewed patches, recovery expected bytes and both actual installations",
+    "resolver": "Actual installed Metro: capture .js selects native helper in four engine/platform rows; generic/web controls with preferNativePlatform=false; missing .js/extensionless errors; mixed native entry plus selected packed dist in four rows; expected engine/opposite absence/watch assertions",
+    "Babel": "Both installed Babel App/selector/retained-screen graphs transform and select tf07-retained",
+    "contractTests": "Thirteen core and six retained contract pure mocked tests pass; no manual outcomes inferred",
+    "PNG": "Pinned pngjs 7.0.0 2x2 encode/decode raw pixel equality",
+    "hostDriver": "Python 3.9.6 offline injected runner: Shutdown/Booted success, first-failure, wrong packet hash, unknown target, owned-only cleanup, boot timeout uncertainty, bounded stderr and incremental ownership checkpoints",
+    "freeze": "All input hashes and direct runtime symlinks reverified",
+    "documentation": "scripts/check-docs.mjs; structural scope only; source/permission accuracy reviewed separately"
+  },
+  "firstRoutineAttempts": [
+    {
+      "scope": "Bun frozen install sandbox",
+      "result": "EPERM writing tempdir; TMPDIR retry same; approved isolated scripts-disabled install outside sandbox passed; no host commands"
+    },
+    {
+      "scope": "Generic resolver control",
+      "result": "Initial preferNativePlatform=true control selected native as designed; corrected generic/web control to false; all final assertions pass"
+    },
+    {
+      "scope": "Bare package resolver proof",
+      "result": "Initial hand-built Metro context omitted package/mainFields hooks; completed actual context; final selected packed entries pass"
+    }
+  ],
+  "inputFreeze": {
+    "entries": 33966,
+    "sha256": "9c70ef930a3aa7362ae22f84ffcc9cd89782b5962761ec1442d85929434b842f",
+    "inventoryPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/input-freeze.json",
+    "algorithm": "Sorted relative path JSON; SHA-256 for every regular file and file symlink target; directory symlink destinations recorded; os.walk does not follow directory symlinks"
+  },
+  "proofs": {
+    "identity-proof.json": "5e07431bffa1b5923f2760a074c48805725149295ecdbe8b538d1bf389c2bb2b",
+    "pristine-peer-proof.json": "e208f9462de1941a6d1864c46816b4fef8523d106577edb21dae5a6f954cb902",
+    "package-png-proof.json": "080ae0d7ac98442042a74eba074e2a572140e591b3f37a81633ed13fac6e26f3",
+    "static-resolution.json": "d7143b7b6bfb5969c61e3406ff646c70fea5ece4e76034ad70d43f83cbbdfe16",
+    "native-mixed-static-proof.json": "cb6179af1782789ee145bd3b0d69a3dfcddc8217d0eaf9f67f5a1423ea9175a9",
+    "retained-static-proof.json": "f9f3de43c33d05718959fd6d2d3ac050c1f16cfe60650653a5bd417dac67da38",
+    "host-file-identity.json": "a3f57b007dc41b113f33157864627354ea89ae110581e34e29dd0fc618c8c435",
+    "ios-readiness-selfcheck.json.log": "3211f88b89493d1971965b914df8455fc2d2d1355b1f2b50be18093a8a3b78cf"
+  },
+  "nextProposal": {
+    "scope": "iOS-only host readiness; approximately five minutes; separate owner approval required",
+    "worker": "gpt-6-luna medium, exclusive device ownership",
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5 iPhone 18 Pro / iOS27.0",
+    "launchPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-launch.json",
+    "launchSha256": "071c0ed57e331f8b236646fa88857af585da46d46f10f78ddc47b84dcacfccc1",
+    "packetPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-packet.json",
+    "packetSha256": "2441888761e882bbee8dbe4c81c484980d3d559c16c65812c622d56ee8912bae",
+    "driverSha256": "757059861a2dd799562265dd3f12078c1f0790384b99d6fdfb0d833eeec11c81",
+    "planSha256": "cd3b146fb6783a6eb51e70b152137ea1c7981086e4734bdfcffaad99061c47a8",
+    "python": {
+      "path": "/usr/bin/python3",
+      "version": "3.9.6",
+      "sha256": "b8763cf250e607a778bb4603cecb5b90338814d0a3dfcba0d57b1de242f610e9"
+    }
+  },
+  "remainingGates": [
+    "Separate iOS host-readiness approval and observed target/service/GUI readiness",
+    "Separate Android tooling/AVD/readiness approval; no download/setup/adb/emulator performed",
+    "Operator and scope disposition",
+    "Generated projects/native dependency locks/codegen/link identities",
+    "Actual produced and installed binary identities",
+    "Separately approved four-environment full native run; 76 manual outcomes",
+    "Per-engine two actual window.scale values, extra density target only by separate approval",
+    "Prepare/review actual identity-aware density-closeout recipe before full native request"
+  ],
+  "notExecuted": [
+    "Any simctl/device query or boot",
+    "GUI launch",
+    "Android download/setup/adb/emulator",
+    "Native generation/Pods/Gradle/Xcodebuild/link/install",
+    "Metro",
+    "Real renderer or manual acceptance"
+  ],
+  "retention": "Only new native JS consumers/dependencies and compact current proofs retained temporarily; pristine reconstruction archives/source removed; historical browser/native heavy inputs remain retired",
+  "audit": {
+    "independentAuditSha256": "15cbe79ce7a5e3a43b2bd4a972a7d34369fa363117a170ce8b6a196ed418d47d",
+    "verdict": "Passed in prepared-input and proposed-readiness scope",
+    "outstandingFindings": [],
+    "coordinatorChecks": [
+      "Exact packet, launch, driver and plan hashes match audited files",
+      "Read-only packet/freeze/Device Hub file identity preflight passes with no subprocesses",
+      "All existing evidence, package manifests, locks and patches unchanged",
+      "Candidate archive unchanged; no host-readiness result exists"
+    ],
+    "protectedMainPaths": 455,
+    "runtimeAcceptance": "Unverified; no host setup or native execution performed"
+  },
+  "workerGitActions": "No worker commit, push or PR; coordinator records audited preparation in review PR."
+}

@@ -1,0 +1,328 @@
+{
+  "checkpoint": "f05 iOS readiness attempt04",
+  "date": "2026-10-27",
+  "status": "FAILED / STOPPED at final runtime-record equality validation",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "exclusiveNativeResources": true
+  },
+  "authorization": "One refreshed PR53 run, stop first failure; cleanup only assigned device newly successfully booted by this run and later failure; no Android/builds/acceptance",
+  "launch": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/launch.json",
+    "sha256": "1c6d2c3dd35d0ff8ee18a7eb05a07432440ffbf58917914e38b16f3ee6290723",
+    "count": 1,
+    "exitCode": 1
+  },
+  "packet": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/packet.json",
+    "sha256": "b2056983407ecdae1ab99a4868e08c29abe4c45042bbf0998e0ca204b7af262f"
+  },
+  "approvedPlan": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/approved-plan.md",
+    "sha256": "7e101f75e5fadb8938d15489521343b7a73bc3272aeab860274cd489405b41d1"
+  },
+  "result": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/result.json",
+    "sha256": "59082236c730465706abcf7ee0f2c3b7f9fafea742b6a2d8de78626219b4ce6a",
+    "startedAtUtc": "2026-10-28T04:55:03.728108+00:00",
+    "finishedAtUtc": "2026-10-28T04:55:36.914583+00:00"
+  },
+  "workerHandoff": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04/worker-handoff-run.json",
+    "sha256": "d76f0bb39a5e3ad3a2ec5d784812b374b636a7476cc548f654703f0c32d8bc48"
+  },
+  "preflight": "All33966 frozen entries and source/tool/archive/plan identities verified; installer log/process/unified log guards passed",
+  "commands": [
+    {
+      "step": "selectedXcode",
+      "argv": ["/usr/bin/xcode-select", "-p"],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 10,
+      "startedAtUtc": "2026-10-28T04:55:09.964415+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "024e83842db917ed79a567b48b5f70bf468a2a914d5dc6df59f9d19c25ad3a0e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 0.005,
+      "finishedAtUtc": "2026-10-28T04:55:09.969619+00:00"
+    },
+    {
+      "step": "signature",
+      "argv": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 15,
+      "startedAtUtc": "2026-10-28T04:55:09.973749+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 0.015,
+      "finishedAtUtc": "2026-10-28T04:55:09.988604+00:00"
+    },
+    {
+      "step": "process",
+      "argv": [
+        "/bin/ps",
+        "-axo",
+        "pid=,ppid=,lstart=,time=,pcpu=,state=,comm="
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 5,
+      "startedAtUtc": "2026-10-28T04:55:11.015069+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "6035c07e7e8569a840113b0c21da13a74a436914a6de0bdd652cd10cc7240384",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "processRowCount": 548,
+      "elapsedSeconds": 0.023,
+      "finishedAtUtc": "2026-10-28T04:55:11.038791+00:00"
+    },
+    {
+      "step": "process",
+      "argv": [
+        "/bin/ps",
+        "-axo",
+        "pid=,ppid=,lstart=,time=,pcpu=,state=,comm="
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 5,
+      "startedAtUtc": "2026-10-28T04:55:21.056266+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "faa01fac0c94e6d90aa8c09600c42e347f08d99f8d91d3dbf4ab7857fc85020a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "processRowCount": 548,
+      "elapsedSeconds": 0.048,
+      "finishedAtUtc": "2026-10-28T04:55:21.104624+00:00"
+    },
+    {
+      "step": "unifiedLog",
+      "argv": [
+        "/usr/bin/log",
+        "show",
+        "--last",
+        "10m",
+        "--style",
+        "compact",
+        "--predicate",
+        "process == \"package_script_service\" OR process == \"system_installd\" OR process == \"installd\""
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 15,
+      "startedAtUtc": "2026-10-28T04:55:22.086298+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "9f56fca152030dba9e8ee76dee4fc8967ab667507b5878f0f9ab819d55b6b9a6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 1.654,
+      "finishedAtUtc": "2026-10-28T04:55:23.740392+00:00"
+    },
+    {
+      "step": "process",
+      "argv": [
+        "/bin/ps",
+        "-axo",
+        "pid=,ppid=,lstart=,time=,pcpu=,state=,comm="
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 5,
+      "startedAtUtc": "2026-10-28T04:55:23.745275+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "4b0cf612c9054265ad3413c6488daa649c212cd5a77195b1959baa2efdf32e77",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "processRowCount": 550,
+      "elapsedSeconds": 0.023,
+      "finishedAtUtc": "2026-10-28T04:55:23.767912+00:00"
+    },
+    {
+      "step": "inventory",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "list",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 30,
+      "startedAtUtc": "2026-10-28T04:55:24.749329+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "0cfa301ead3105ff6ad1b955db9137e0f79fe635e2e992ae4fc620a81cf5a507",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "validJson": true,
+      "elapsedSeconds": 0.372,
+      "finishedAtUtc": "2026-10-28T04:55:25.121936+00:00"
+    },
+    {
+      "step": "boot",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "boot",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 20,
+      "startedAtUtc": "2026-10-28T04:55:25.127582+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 1.083,
+      "finishedAtUtc": "2026-10-28T04:55:26.211474+00:00"
+    },
+    {
+      "step": "bootstatus",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "bootstatus",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 120,
+      "startedAtUtc": "2026-10-28T04:55:26.224247+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "4355e7d39f7be24fad3812671b912f8b15d1a1c4cccb959eb4c51299e15bbcee",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 7.103,
+      "finishedAtUtc": "2026-10-28T04:55:33.328990+00:00"
+    },
+    {
+      "step": "open",
+      "argv": [
+        "/usr/bin/open",
+        "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 15,
+      "startedAtUtc": "2026-10-28T04:55:33.340161+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 0.107,
+      "finishedAtUtc": "2026-10-28T04:55:33.449525+00:00"
+    },
+    {
+      "step": "finalInventory",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "list",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 30,
+      "startedAtUtc": "2026-10-28T04:55:33.459473+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "673a6d654c2c34c2658cbe55d153c635ed013f08d8b715bb4edb6147da025200",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "validJson": true,
+      "elapsedSeconds": 0.174,
+      "finishedAtUtc": "2026-10-28T04:55:33.635404+00:00"
+    },
+    {
+      "step": "cleanup",
+      "argv": [
+        "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "shutdown",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next-04",
+      "timeoutSeconds": 20,
+      "startedAtUtc": "2026-10-28T04:55:33.647438+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 3.259,
+      "finishedAtUtc": "2026-10-28T04:55:36.908638+00:00"
+    }
+  ],
+  "failure": {
+    "phase": "runtime-record equality validation after successful final inventory",
+    "error": "final runtime changed",
+    "onlyChangedRuntimeField": {
+      "lastUsage": {
+        "before": {
+          "arm64": "2026-10-25T00:46:27Z"
+        },
+        "after": {
+          "arm64": "2026-10-28T04:55:25Z"
+        }
+      }
+    },
+    "stableRuntime": {
+      "identifier": "com.apple.CoreSimulator.SimRuntime.iOS-27-0",
+      "version": "27.0",
+      "buildversion": "24A434",
+      "isAvailable": true,
+      "name": "iOS 27.0"
+    },
+    "explanation": "Driver compares entire runtime record. Only lastUsage differs in the retained initial/final runtime entries. No runtime identity/build/availability change observed."
+  },
+  "observedTarget": {
+    "initial": {
+      "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "name": "iPhone 18 Pro",
+      "state": "Shutdown",
+      "isAvailable": true,
+      "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro"
+    },
+    "finalBeforeCleanup": {
+      "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "name": "iPhone 18 Pro",
+      "state": "Booted",
+      "isAvailable": true,
+      "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro"
+    },
+    "initialUnrelatedBootedOrBooting": 0,
+    "finalUnrelatedBootedOrBooting": 0
+  },
+  "ownership": {
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "bootAttempted": true,
+    "newlyBooted": true,
+    "bootOwnershipUncertain": false
+  },
+  "cleanup": {
+    "status": "assigned owned target shutdown command passed",
+    "scope": "Only assigned successfully owned boot",
+    "postShutdownInventory": "Not run; no follow-up host check"
+  },
+  "warnings": "Every recorded subprocess exited0 with empty stderr; no stale-service warning observed in this run",
+  "notRun": [
+    "retry",
+    "follow-up host inspection",
+    "Android",
+    "builds",
+    "app installation",
+    "Metro",
+    "acceptance"
+  ],
+  "coordinatorAudit": "Compared retained runtime entries and exact driver validation; no host follow-up",
+  "remainingGates": [
+    "Review/fix whole-runtime equality against mutable usage metadata, refreshed audited packet and new execution approval",
+    "Final iOS readiness checkpoint remains failed under approved validator; DeviceHub visual/operator confirmation unverified",
+    "Separate Android and native build/install/acceptance approvals"
+  ]
+}
