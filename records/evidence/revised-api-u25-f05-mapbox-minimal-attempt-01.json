@@ -1,0 +1,51 @@
+{
+  "attempt": "f05 minimal Mapbox iOS attempt 01",
+  "status": "stopped at first failure",
+  "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "runnerSha256": "7636988bebc124a4645bb189129d3936dc0f7e9436f353a47fc1e2e11991f251",
+  "environment": {
+    "RUBYLIB": "/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0",
+    "BUNDLE_PATH": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems",
+    "TF04_IOS_UDID": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "mapboxAccessToken": "inherited, present, value not recorded"
+  },
+  "commands": [
+    {
+      "argv": ["/opt/homebrew/bin/bundle", "install"],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox",
+      "exitCode": 0,
+      "durationSeconds": 5.5,
+      "summary": "Installed 9 Gemfile dependencies, 45 gems total, under staged BUNDLE_PATH; CocoaPods 1.15.2 installed."
+    },
+    {
+      "argv": ["/opt/homebrew/bin/bundle", "exec", "pod", "install"],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/ios",
+      "exitCode": 1,
+      "durationSeconds": 0.8,
+      "firstFailure": "Ruby JSON NameError: uninitialized constant JSON::Ext::Generator::GeneratorMethods while loading ActiveSupport/CocoaPods.",
+      "boundedOutput": "bundler: failed to load command: pod (.../ruby-gems/ruby/4.0.0/bin/pod); /opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0/json/common.rb:159:in `JSON.generator=': uninitialized constant JSON::Ext::Generator::GeneratorMethods (NameError); remainder was the Ruby require stack through ActiveSupport 7.2.4 and CocoaPods 1.15.2. No token or secret output."
+    }
+  ],
+  "goalObservation": "Not reached. Commands 3-6 were not run; no target state, boot, app build/install/launch, Metro or camera movement was observed.",
+  "ownershipAndCleanup": "No simulator boot or runner-owned process/port was acquired. The failed pod command exited; no device or port cleanup action was applicable. No global changes, source edits, repairs or retries.",
+  "date": "2026-10-28",
+  "planMergeCommit": "ca2851e145c3cb1d8e9016e785cdf3ae8142be6a",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium"
+  },
+  "rawResult": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/mapbox-minimal-attempt-01/result.json",
+    "sha256": "d6743fb806b79c046c71baed519f52a326154efac2b223359b0578266b596b20"
+  },
+  "resolvedRubyInputs": {
+    "GemfileLockSha256": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+    "bundler": "4.0.20",
+    "cocoapods": "1.15.2",
+    "activesupport": "7.2.4",
+    "json": "3.1.0",
+    "xcodeproj": "1.25.1"
+  },
+  "retention": "Existing generated Mapbox project, installed task-local gems and lock retained for active diagnosis; no regeneration needed.",
+  "coordinatorAudit": "Reviewed command outcomes, bounded error and resolved Gemfile.lock. Ruby JSON failure cause remains unverified; no dependency repair, pod retry or native execution followed."
+}

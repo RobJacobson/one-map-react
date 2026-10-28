@@ -1,0 +1,105 @@
+{
+  "checkpoint": "f05 task-local Ruby JSON startup repair",
+  "date": "2026-10-28",
+  "status": "Implemented; tool startup verified; Pods/native continuation awaiting separate approval",
+  "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "diagnosis": "The previous whole-stdlib RUBYLIB workaround introduced this startup failure: it selected JSON 2.18.0 Ruby sources before bundled JSON 3.1.0 while loading the latter native extension. JSON 2.18.0 common.rb requires GeneratorMethods, which the JSON 3.1.0 extension does not expose. Direct JSON loading reproduces the exact NameError without CocoaPods.",
+  "repair": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path",
+    "contents": "Physical unmodified copy of installed bundler.rb and bundler/ only; excludes JSON and other standard-library sources",
+    "source": "/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0",
+    "files": 340,
+    "totalBytes": 1506462,
+    "manifestSha256": "9a85e1a4270b8bac75d4bcae462149a5e933debf1afb32d2394df96c4f82dbe2",
+    "allFileBytesMatchInstalledSource": true,
+    "reasonForPhysicalCopy": "Symlink paths alias canonical Bundler autoload paths and produced duplicate CLI initialization warnings; physical paths avoid duplicate loading.",
+    "environment": {
+      "RUBYLIB": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path",
+      "BUNDLE_PATH": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems"
+    },
+    "scope": "Task-local files and child-process environment only; no global environment/configuration/tool changes or gem/version changes"
+  },
+  "probes": [
+    {
+      "name": "Original JSON loader failure",
+      "argv": [
+        "/opt/homebrew/bin/bundle",
+        "exec",
+        "ruby",
+        "-e",
+        "begin; require \"json\"; rescue NameError => e; warn \"#{e.class}: #{e.message.lines.first.strip}\"; warn \"JSON Ruby code=#{JSON::VERSION}; gem spec=#{Gem.loaded_specs.fetch(\"json\").version}\"; warn $LOADED_FEATURES.grep(%r{/json/(common\\.rb|ext/generator\\.bundle)$}); exit 1; end; abort \"Expected original failure\""
+      ],
+      "RUBYLIB": "/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "NameError: uninitialized constant JSON::Ext::Generator::GeneratorMethods\nJSON Ruby code=2.18.0; gem spec=3.1.0\n/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0/json/common.rb\n/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems/ruby/4.0.0/gems/json-3.1.0/lib/json/ext/generator.bundle"
+    },
+    {
+      "name": "Plain Bundler subprocess",
+      "argv": ["/opt/homebrew/bin/bundle", "--version"],
+      "RUBYLIB": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path",
+      "exitCode": 0,
+      "stdout": "4.0.20",
+      "stderr": ""
+    },
+    {
+      "name": "Bundler code/specification and metadata index",
+      "argv": [
+        "/opt/homebrew/bin/ruby",
+        "-e",
+        "gem \"bundler\", \"4.0.20\"; require \"bundler\"; require \"bundler/source/metadata\"; abort \"Bundler mismatch\" unless Bundler::VERSION == Gem.loaded_specs.fetch(\"bundler\").version.to_s; Bundler::Source::Metadata.new.specs.each { |s| puts \"#{s.name.inspect}=#{s.version}\" }"
+      ],
+      "RUBYLIB": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path",
+      "exitCode": 0,
+      "stdout": "\"Ruby\\u0000\"=4.0.7\n\"RubyGems\\u0000\"=4.0.17\n\"bundler\"=4.0.20",
+      "stderr": ""
+    },
+    {
+      "name": "Bundled JSON, ActiveSupport, CocoaPods and descendant Ruby startup",
+      "argv": [
+        "/opt/homebrew/bin/bundle",
+        "exec",
+        "ruby",
+        "-e",
+        "require \"json\"; require \"active_support\"; require \"cocoapods\"; abort \"JSON round trip\" unless JSON.parse(JSON.generate({\"ok\" => true})) == {\"ok\" => true}; abort \"Bundler mismatch\" unless Bundler::VERSION == Gem.loaded_specs.fetch(\"bundler\").version.to_s; abort \"JSON mismatch\" unless JSON::VERSION == Gem.loaded_specs.fetch(\"json\").version.to_s; puts \"Bundler=#{Bundler::VERSION}; JSON=#{JSON::VERSION}; ActiveSupport=#{ActiveSupport::VERSION::STRING}; CocoaPods=#{Pod::VERSION}\"; puts $LOADED_FEATURES.grep(%r{/bundler\\.rb$|/json/(common\\.rb|ext/generator\\.bundle)$}); abort \"Child failed\" unless system(RbConfig.ruby, \"-rjson\", \"-e\", %q{abort \"child JSON mismatch\" unless JSON::VERSION == Gem.loaded_specs.fetch(\"json\").version.to_s; puts \"child JSON=#{JSON::VERSION}\"})"
+      ],
+      "RUBYLIB": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path",
+      "exitCode": 0,
+      "stdout": "Bundler=4.0.20; JSON=3.1.0; ActiveSupport=7.2.4; CocoaPods=1.15.2\n/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path/bundler.rb\n/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems/ruby/4.0.0/gems/json-3.1.0/lib/json/common.rb\n/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems/ruby/4.0.0/gems/json-3.1.0/lib/json/ext/generator.bundle\nchild JSON=3.1.0",
+      "stderr": ""
+    },
+    {
+      "name": "CocoaPods executable startup",
+      "argv": ["/opt/homebrew/bin/bundle", "exec", "pod", "--version"],
+      "RUBYLIB": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path",
+      "exitCode": 0,
+      "stdout": "1.15.2",
+      "stderr": ""
+    }
+  ],
+  "probeWorkingDirectory": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/ios",
+  "GemfileLockSha256": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+  "history": "Original failed attempt and minimal plan records remain immutable. bundle install already passed; continuation starts at bundle exec pod install using the existing generated Mapbox project and installed gems.",
+  "notRun": [
+    "bundle install",
+    "pod install",
+    "simctl",
+    "native build/install/launch",
+    "Metro",
+    "renderer/camera acceptance"
+  ],
+  "limitations": "Startup checks do not establish Pods dependency installation, native build compatibility or map/camera acceptance. Full native acceptance remains unverified.",
+  "retention": "Retain the small task-local Bundler copy and installed gems for the active continuation; retire with the native staging workspace after the checkpoint.",
+  "unchangedInputs": {
+    "candidateArchive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "candidateArchiveSha256Verified": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "cameraRunnerSha256Verified": "7636988bebc124a4645bb189129d3936dc0f7e9436f353a47fc1e2e11991f251",
+    "GemfileLockSha256Verified": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912"
+  },
+  "routineVerification": {
+    "formatting": "Explicit four publication file paths formatted with existing primary vp tool; no primary file changed",
+    "documentation": "PASS: 40 Markdown files, 39 SDK comparison tables, paragraph/fence/local-link checks",
+    "gitDiffCheck": "PASS"
+  },
+  "coordinatorAudit": "PASS: independently verified CocoaPods executable startup, matching Bundler/JSON specifications, JSON round trip and ActiveSupport/CocoaPods loading; all exited0 without stderr. Task-local Bundler-only file copies match installed sources, and Gemfile.lock remains unchanged. No dependency install or native retry."
+}
