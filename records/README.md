@@ -92,6 +92,8 @@ The [f05 simulator startup diagnosis](evidence/revised-api-u25-f05-simctl-diagno
 
 The [f05 PackageKit helper assessment](evidence/revised-api-u25-f05-packagekit-idle.json) records observed quiescence, completed-transaction correlation, visibility limits and the newly gated one-query proposal. No simulator query or host change ran; the [acceptance proposal](../docs/revised-api-acceptance-plan.md#read-only-startup-diagnosis-and-proposed-next-query) owns the next approval.
 
-The [next f05 iOS readiness proposal](evidence/revised-api-u25-f05-ios-readiness-plan-02.json) binds the dedicated direct-tool packet and offline checks. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns its conditional boot, warning stops and ownership limits. It is proposed and unrun; new approval is required.
+The [closed f05 iOS readiness proposal](evidence/revised-api-u25-f05-ios-readiness-plan-02.json) preserves the approved packet and offline checks for the second attempt. That packet ran once and stopped in preflight; it is historical and does not authorize a retry. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns the refreshed approval scope.
 
 The [second f05 iOS readiness attempt](evidence/revised-api-u25-f05-ios-readiness-attempt-02.json) records a stop in installer-log timestamp parsing after successful Xcode and DeviceHub signature checks. No simulator command or boot ran; diagnosis and a newly approved packet are required before retry.
+
+The [installer-log guard repair](evidence/revised-api-u25-f05-installer-log-guard-fix.json) records the reproduced descriptor false positive, bounded diagnostic correction, offline regressions and a new unrun readiness packet. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns the separate approval scope; native readiness remains unverified.
