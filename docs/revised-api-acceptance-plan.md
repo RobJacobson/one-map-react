@@ -49,6 +49,8 @@ The proposed retained scope includes application location/UI through TF07 and ca
 
 ## Next approval: first iOS camera smoke
 
+**The approved first camera attempt is closed after a dependency-setup failure; no retry or host repair is authorized.** The [attempt01 record](../records/evidence/revised-api-u25-f05-ios-camera-attempt-01.json) records successful Mapbox project generation, then bundle install exit 39. Bundler reported running code version 4.0.17 versus installed gem specification 4.0.20; the generated Gemfile has no such Bundler version requirement. No Pods, MapLibre generation, app build, simulator or camera command ran. No live owned resources required cleanup. Partial generated Mapbox scaffolds remain for diagnosis. Any correction and continuation require review and new approval; the original generate-from-absent-trees recipe cannot be rerun unchanged over them.
+
 The existing boot evidence is sufficient to move to application testing. Attempt04 passed clean inventory, exact-device boot, bootstatus and DeviceHub open, then observed the assigned available Booted target. Its final validator rejected only the runtime's mutable lastUsage timestamp. The historical failure status and authorized shutdown remain unchanged; no readiness retry or whole-object comparison repair is required.
 
 The proposed scope is one sequential invocation of the existing TF04 iOS camera scenario, Mapbox followed by MapLibre. The driver has no native engine selector. It observes opening/updated camera state, fit bounds, click input and the existing engine-specific double-tap assertion. Stop at the first failed phase or engine. This is the first application proof, with full native coverage still open.
