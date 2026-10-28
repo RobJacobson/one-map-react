@@ -1,0 +1,101 @@
+{
+  "checkpoint": "f05 guarded direct inventory attempt02",
+  "date": "2026-10-27",
+  "status": "Single approved query completed with valid JSON and a stale-service warning; stopped after result",
+  "proposalSha256": "e39e294412462da6a8d701c0d1974028a5453c66baad6ed436e981ca761da77e",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "worker": {
+    "name": "/root/f05_inventory_refined_guard",
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "queryAttempts": 1,
+    "handoffSha256": "24da9c4b739bd5a49bd2101a70a2fb9b9dc523923a8c28769e1cff276e569f4c"
+  },
+  "resultSha256": "67c756bedd74ceb466fe531a51123f1b0bd7b0f407dfcaea7aaa67f0cddd4ad1",
+  "guards": {
+    "classification": "eligible",
+    "toolIdentityChecks": [
+      {
+        "path": "/Applications/Xcode.app/Contents/Developer/usr/bin/simctl",
+        "sha256": "c8e73954e91dc5b6e9d7a84a185f3503368b586558c2b464dbe913e9bf0ab336"
+      },
+      {
+        "path": "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/Info.plist",
+        "sha256": "f112b4113f57bf1a2a6b5b7a5f0254d44ad6bd07c0a84b7e9489b6ec0b7e2674"
+      },
+      {
+        "path": "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+        "sha256": "ae4278fb72ecdbf17675011db81b85235acb1bfeffcfe812d01d87a0f42329ea"
+      }
+    ],
+    "coreSimulatorVersion": "1174.9.2",
+    "freezeEntriesVerified": 33966,
+    "processSamples": 3,
+    "knownHelper": "stable identity, sleeping S, unchanged 0:00.03 CPU, no descendants",
+    "recentUnifiedRelevantEvents": 0,
+    "installerLogSha256": "247f95023ddd61f0bfca43bc81b208bc61a159260fced482d596cf9484c0a435"
+  },
+  "query": {
+    "argv": [
+      "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+      "list",
+      "--json"
+    ],
+    "timeoutSeconds": 30,
+    "exitCode": 0,
+    "elapsedSeconds": 0.695,
+    "validJson": true,
+    "stdoutSha256": "0cfa301ead3105ff6ad1b955db9137e0f79fe635e2e992ae4fc620a81cf5a507",
+    "stderrSha256": "b6ab430348c072ec890c6c38afb1b8e66a35693e4591cc0c177352f26c020267",
+    "stderr": "2026-10-27 18:21:30.718 simctl[66586:2918792] CoreSimulator detected version change.  Framework version (1174.9.2) does not match existing job version (1171.7).  Attempting to remove the stale service in order to add the expected version.\n"
+  },
+  "target": {
+    "name": "iPhone 18 Pro",
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
+    "isAvailable": true,
+    "state": "Shutdown"
+  },
+  "unrelatedBootedOrBooting": 0,
+  "runtimeContext": {
+    "status": "Supplement from existing worker capture only; no host state re-read and no query rerun",
+    "runtimeSummaryGap": {
+      "runtimeIdentifier": "unavailable in retained capture",
+      "runtimeVersion": "unavailable in retained capture",
+      "runtimeAvailability": "unavailable in retained capture",
+      "reason": "The retained result contains selected device identity, device availability and state, but no runtime identifier/version/availability fields. Raw stdout was not retained; its hash alone cannot recover those fields. No inference from prior metadata was used."
+    },
+    "guardCorrection": {
+      "description": "The first local preflight parser incorrectly treated historical install.log request/extraction lines at 17:13:44\u201317:13:47 as newer than the known transaction completion at 17:13:59. No inventory query ran during that first pass. Before the sole query, timestamp correlation was corrected and the complete fresh guard was repeated.",
+      "guardPredicates": "The repeated guard used the approved predicates: exact tool/plist/version/archive/freeze identities; full process snapshots with recursive descendant checks; known helper identity, sleeping state and stable CPU; install.log lifecycle records through EOF; recent filtered unified logs; and immediate process/log recheck before query.",
+      "interpretation": "This was a parser false positive corrected before the sole approved query, not an activity stop bypass."
+    },
+    "preservedOriginalHashes": {
+      "inventoryResultSha256": "67c756bedd74ceb466fe531a51123f1b0bd7b0f407dfcaea7aaa67f0cddd4ad1",
+      "workerHandoffSha256": "24da9c4b739bd5a49bd2101a70a2fb9b9dc523923a8c28769e1cff276e569f4c"
+    }
+  },
+  "coordinatorAudit": {
+    "verdict": "Approved single-query scope completed; inventory availability observed, full readiness unverified",
+    "guardParserCorrection": "Timestamp-correlation correction before the sole query reapplied approved predicates; no live query was retried.",
+    "toolManagedActivity": "simctl reported framework1174.9.2 versus existing service1171.7 and an attempt to remove the stale service. Actual removal/replacement and steady-state health were not checked.",
+    "commandsAfterResult": 0,
+    "runtimeSummaryGap": "Containing runtime identifier/version/availability was not retained. Do not infer it from old metadata; verify during a future separately approved readiness step.",
+    "ownership": "No device ownership acquired. No explicit service cleanup or process termination issued."
+  },
+  "excludedActions": [
+    "Boot/shutdown",
+    "GUI",
+    "Explicit installation/download/import",
+    "Android",
+    "Build/app install",
+    "Metro",
+    "Acceptance",
+    "Retry/follow-up service or device query"
+  ],
+  "remainingGates": [
+    "Review stale-service warning in a future readiness plan",
+    "Verify runtime identity and successful boot/readiness before native execution",
+    "Separate Android and full native execution permissions remain required"
+  ]
+}
