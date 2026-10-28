@@ -17,9 +17,14 @@ if (
 ) {
   throw new Error("TF04_IOS_UDID must identify the assigned simulator.");
 }
+const mapboxBasic = process.argv[3] === "mapbox-basic";
 const corrections = process.argv[3] === "corrections";
-if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
-  throw new Error("The corrections scope requires: web corrections.");
+if (
+  process.argv[3] !== undefined &&
+  !(corrections && group === "web") &&
+  !(mapboxBasic && group === "ios")
+) {
+  throw new Error("Use web corrections or ios mapbox-basic for a scoped run.");
 }
 const webScenario = corrections ? "corrections" : "camera";
 
@@ -245,7 +250,15 @@ if (group === "android" || group === "all") {
   });
 }
 
-if (group === "ios" || group === "all") {
+if (mapboxBasic) {
+  results["mapbox-ios"] = await runNative({
+    directory: "native-mapbox",
+    platform: "ios",
+    applicationId: "org.reactjs.native.example.OneMapMapbox",
+    doubleTap: false,
+    basic: true,
+  });
+} else if (group === "ios" || group === "all") {
   const tapDriver = await startIosTapDriver();
 
   try {
@@ -707,6 +720,7 @@ async function runNative({
   applicationId,
   doubleTap,
   inputDriver,
+  basic = false,
 }) {
   const shell = join(root, "examples", directory);
 
@@ -819,9 +833,10 @@ async function runNative({
       applicationId,
       platform,
       timeout: 600000,
+      basic,
     });
 
-    return judge(status, doubleTap, platform);
+    return judge(status, doubleTap, platform, basic);
   } catch (error) {
     return {
       status: "failed",
@@ -861,6 +876,7 @@ async function watchNative({
   applicationId,
   platform,
   timeout = 180000,
+  basic = false,
 }) {
   const started = Date.now();
   let clicks = 0;
@@ -880,12 +896,17 @@ async function watchNative({
       last = status;
     }
 
-    if (status.includes("phase=await-click") && clicks < 3) {
+    if (basic && (status.includes("fit=ok") || status.includes("done=1"))) {
+      return status;
+    }
+
+    if (!basic && status.includes("phase=await-click") && clicks < 3) {
       clicks += 1;
       await tapMap(platform, applicationId, 1);
     }
 
     if (
+      !basic &&
       status.includes("phase=await-double-tap") &&
       doubleTap &&
       doubleTaps < 4
@@ -947,13 +968,26 @@ async function tapMap(platform, applicationId, times) {
   });
 }
 
-function judge(status, doubleTap, platform = "web") {
+function judge(status, doubleTap, platform = "web", basic = false) {
   const fields = Object.fromEntries(
     status
       .split(" ")
       .map((part) => part.split("="))
       .filter((part) => part.length === 2)
   );
+  if (basic) {
+    const [longitude, latitude] = (fields.center ?? "").split(",").map(Number);
+    const passed =
+      fields.fit === "ok" &&
+      fields.phase === "await-click" &&
+      longitude >= -122.335 &&
+      longitude <= -122.305 &&
+      latitude >= 47.625 &&
+      latitude <= 47.655;
+
+    return { status: passed ? "passed" : "failed", line: status, fields };
+  }
+
   const stopOk = fields.stop === "stayed" || fields.stop === "rejected";
   const cameraOk =
     platform === "web"

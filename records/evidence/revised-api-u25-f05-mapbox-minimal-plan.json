@@ -1,0 +1,144 @@
+{
+  "checkpoint": "f05 minimal Mapbox iOS proposal",
+  "status": "Prepared; correction and native execution awaiting one owner approval",
+  "date": "2026-10-28",
+  "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "harness": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+  "generatedProject": "Reuse existing examples/native-mapbox ios/android scaffolds; no generation or overwrite",
+  "diagnosis": {
+    "ruby": "/opt/homebrew/Cellar/ruby/4.0.7/bin/ruby",
+    "bundleShebang": "/opt/homebrew/Cellar/ruby/4.0.7/bin/ruby",
+    "defaultLoadedCode": "/opt/homebrew/lib/ruby/site_ruby/4.0.0/bundler/version.rb: Bundler 4.0.17",
+    "activatedSpecification": "/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/gems/4.0.0/specifications/default/bundler-4.0.20.gemspec",
+    "exceptionSource": "/opt/homebrew/lib/ruby/site_ruby/4.0.0/bundler/source/metadata.rb:14 compares loaded spec.version to Bundler::VERSION; errors.rb assigns exit status 39",
+    "gemfile": "No Bundler version requirement",
+    "readOnlyReproduction": "require bundler; require bundler/source/metadata; Bundler::Source::Metadata.new.specs reproduces CorruptBundlerInstallError",
+    "matchingInstalledCode": "/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0/bundler/version.rb: Bundler 4.0.20",
+    "readOnlyCorrectionProof": "With proposed RUBYLIB, plain bundle --version returns 4.0.20; explicit gem bundler 4.0.20 then metadata index enumerates Ruby 4.0.7, RubyGems 4.0.20, bundler 4.0.20 without error",
+    "correction": "Worker-process RUBYLIB only; inherited by children; no installation/global mutation",
+    "probes": [
+      {
+        "argv": [
+          "/opt/homebrew/bin/ruby",
+          "-e",
+          "require \"bundler\"; require \"bundler/source/metadata\"; puts \"code=#{Bundler::VERSION}; spec=#{Gem.loaded_specs[\"bundler\"].version}\"; Bundler::Source::Metadata.new.specs"
+        ],
+        "environment": "Default inherited Ruby load order",
+        "observed": "Code 4.0.17, activated spec 4.0.20; exact CorruptBundlerInstallError reproduced without dependency installation"
+      },
+      {
+        "argv": [
+          "/opt/homebrew/bin/ruby",
+          "-e",
+          "gem \"bundler\", \"4.0.20\"; require \"bundler\"; require \"bundler/source/metadata\"; puts \"code=#{Bundler::VERSION}; spec=#{Gem.loaded_specs[\"bundler\"].version}\"; puts $LOADED_FEATURES.grep(/bundler.rb/); Bundler::Source::Metadata.new.specs.each { |s| puts \"metadata=#{s.name}:#{s.version}\" }"
+        ],
+        "environment": {
+          "RUBYLIB": "/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0"
+        },
+        "exitCode": 0,
+        "observed": "Code/spec 4.0.20; bundled standard-library code loaded; metadata index succeeds"
+      },
+      {
+        "argv": ["/opt/homebrew/bin/bundle", "--version"],
+        "environment": {
+          "RUBYLIB": "/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0"
+        },
+        "exitCode": 0,
+        "observed": "4.0.20"
+      }
+    ]
+  },
+  "environment": {
+    "RUBYLIB": "/opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0",
+    "BUNDLE_PATH": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems",
+    "prependPath": [
+      "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/runtime-bin",
+      "/opt/homebrew/bin"
+    ],
+    "TF04_IOS_UDID": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "MAPBOX_ACCESS_TOKEN": "Inherited nonempty environment; never print/copy value"
+  },
+  "commands": [
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox",
+      "argv": ["/opt/homebrew/bin/bundle", "install"],
+      "timeoutSeconds": 1200
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/ios",
+      "argv": ["/opt/homebrew/bin/bundle", "exec", "pod", "install"],
+      "timeoutSeconds": 1200
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": ["xcrun", "simctl", "list", "devices", "--json"],
+      "timeoutSeconds": 30
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": [
+        "xcrun",
+        "simctl",
+        "boot",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "timeoutSeconds": 20,
+      "conditional": "Assigned available target is Shutdown; record ownership only after success"
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": [
+        "xcrun",
+        "simctl",
+        "bootstatus",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "timeoutSeconds": 120
+    },
+    {
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "argv": ["bun", "scripts/tf04-camera-smoke.mjs", "ios", "mapbox-basic"],
+      "timeoutSeconds": 3600
+    }
+  ],
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "rules": "Exclusive native ownership; first failure stops; no retry or source changes"
+  },
+  "observation": {
+    "fixture": "examples/shared/camera-smoke.ts",
+    "sequence": "onLoad -> fitBounds(bounds,duration 500ms) -> renderer onMoveEnd -> fit=ok, phase=await-click",
+    "longitudeInclusive": [-122.335, -122.305],
+    "latitudeInclusive": [47.625, 47.655],
+    "openingLatitude": 47.61,
+    "earlyReturn": "Before tapMap; no TapDriver/XCTest build or input automation",
+    "claim": "One observed map load and fitBounds movement; full TF04/native acceptance unverified"
+  },
+  "ownership": {
+    "ports": [8081, 8799],
+    "cleanup": "Selected app and owned Metro/process groups only; verify owned port release; shutdown only an owned successful boot",
+    "unexpectedFailure": "Stop first actual failure; no independent retries or repairs",
+    "priorBootEvidenceAccepted": true
+  },
+  "estimatedMinutes": [20, 60],
+  "excluded": [
+    "MapLibre",
+    "Android",
+    "project regeneration",
+    "global tool changes",
+    "runtime/OS downloads",
+    "full TF04 suite",
+    "later native scenarios"
+  ],
+  "routineChecks": {
+    "mockedRunner": "node scripts/tf04-camera-runner.test.mjs: PASS 18 existing ownership/targeting/failure checks plus basic-only dispatch and four camera/status cases; no host tool executed",
+    "documentation": "bun scripts/check-docs.mjs: PASS 40 Markdown files and 39 SDK tables",
+    "formatter": "Primary installed vp fmt with primary config and explicit staging file paths: PASS five changed files; initial publication-local config resolution failed because publication has no vite-plus dependency, no files changed by failed invocation",
+    "scope": "No real renderer or native command executed; full routine suite unnecessary for fixture-runner/doc-only change",
+    "coordinatorAudit": "PASS: complete runner/fixture/plan review; independently ran existing18 mocks plus basic dispatch/center/status/no-input checks; independently verified process-local RUBYLIB gives code/spec4.0.20 and successful Bundler metadata enumeration. No dependency installation or native execution."
+  },
+  "preparationExecution": "Read-only Ruby probes and mocked routine tests only; no bundle install, pod install, native build or simctl command",
+  "runnerSha256": "7636988bebc124a4645bb189129d3936dc0f7e9436f353a47fc1e2e11991f251",
+  "runnerTestSha256": "e5d218af0dc5dca252f3b4f7ff960c4e17bd5cf324bbef1c1e134c4beb1c74a9"
+}

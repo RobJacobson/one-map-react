@@ -261,3 +261,53 @@ checks++;
 console.log(
   `PASS ${checks} mocked TF04 runner ownership, targeting, failure and timeout checks; no host tool executed.`
 );
+
+const basicBlock = section("if (mapboxBasic) {", '} else if (group === "ios"');
+const basicInvocations = [];
+await evaluate(`(async () => { ${basicBlock} } })()`, {
+  mapboxBasic: true,
+  results: {},
+  runNative: async (options) => {
+    basicInvocations.push(options);
+    return { status: "passed" };
+  },
+});
+assert.equal(basicInvocations.length, 1);
+assert.equal(basicInvocations[0].directory, "native-mapbox");
+assert.equal(basicInvocations[0].basic, true);
+assert.equal(basicInvocations[0].inputDriver, undefined);
+const watch = evaluate(
+  `(${section("async function watchNative(", "function latestStatus(")})`,
+  {
+    delay: async () => {},
+    tapMap: async () => {
+      throw new Error("Basic camera scope must not tap");
+    },
+  }
+);
+const judgeBasic = evaluate(
+  `(${section("function judge(", "// MapLibre Android")})`,
+  {}
+);
+for (const [status, expected] of [
+  ["TF04 fit=ok center=-122.32000,47.64000 phase=await-click done=0", "passed"],
+  ["TF04 fit=ok center=-122.32000,47.61000 phase=await-click done=0", "failed"],
+  ["TF04 fit=ok center=pending phase=await-click done=0", "failed"],
+  ["TF04 fit=timeout center=pending phase=done done=1", "failed"],
+]) {
+  const observed = await watch({ readStatus: async () => status, basic: true });
+  assert.equal(judgeBasic(observed, false, "ios", true).status, expected);
+}
+console.log(
+  "PASS basic scope selects Mapbox only, requires fitted renderer center and sends no input."
+);
+
+let basicReads = 0;
+await watch({
+  readStatus: async () =>
+    ++basicReads === 1
+      ? "TF04 fit=pending phase=await-click done=0"
+      : "TF04 fit=timeout phase=done done=1",
+  basic: true,
+});
+assert.equal(basicReads, 2);
