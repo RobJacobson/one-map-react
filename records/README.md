@@ -1,6 +1,6 @@
 # API research and evidence
 
-The [current f05 browser outcome](evidence/revised-api-u25-web-attempt-07.json) records all nine approved rows passing, with the partial worker launch error retained in [attempt06](evidence/revised-api-u25-web-attempt-06.json). Native and host-readiness gates remain open in the [sole acceptance proposal](../docs/revised-api-acceptance-plan.md).
+The [current f05 browser outcome](evidence/revised-api-u25-web-attempt-07.json) records all nine approved rows passing, with the partial worker launch error retained in [attempt06](evidence/revised-api-u25-web-attempt-06.json). Basic iOS boot capability is established; the [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the pending first native application smoke.
 
 The [PR19 acceptance impact](evidence/pr19-acceptance-impact.json) records the refreshed f05 archive and prepared nine-row browser packet. Historical f04 browser passes remain separate; native f04 consumers and freezes are superseded pending recreation. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the next permission request.
 
@@ -86,11 +86,11 @@ The [third browser-attempt record](evidence/revised-api-u25-web-attempt-03.json)
 
 The [popup repair evidence](evidence/revised-api-u25-popup-repair.json) records app-owned callback generation/lifetime filtering, the preserved raw-wrapper semantics, the strengthened driver, applicable routine verification and independently audited PR48 source/candidate inputs. All 29 archive cases passed. Compiled/native outcomes are reused for unchanged library source/dist, not rerun. Its attempt04 proposal is historical; the current browser record owns the completed nine-row outcome. Native execution remains unapproved.
 
-The [current f05 native preparation](evidence/revised-api-u25-f05-native-preparation.json) binds recreated isolated consumers, archive/peer/resolver/Babel/PNG proofs and a fresh input freeze. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the proposed next iOS-only host-readiness run and separate future Android/native gates. Host readiness and native runtime acceptance remain unverified.
+The [current f05 native preparation](evidence/revised-api-u25-f05-native-preparation.json) binds recreated isolated consumers, archive/peer/resolver/Babel/PNG proofs and a fresh input freeze. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the proposed first iOS camera smoke and separate later native coverage. The [next-step record](evidence/revised-api-u25-f05-native-next-step.json) binds its scope; native application acceptance remains unverified.
 
-The [f05 simulator startup diagnosis](evidence/revised-api-u25-f05-simctl-diagnosis.json) records read-only first-launch installer evidence and the separately gated inventory-only proposal owned by the [acceptance proposal](../docs/revised-api-acceptance-plan.md#read-only-startup-diagnosis-and-proposed-next-query). Native host readiness remains unverified.
+The [historical f05 simulator startup diagnosis](evidence/revised-api-u25-f05-simctl-diagnosis.json) preserves the first-launch installer investigation and its closed inventory proposal. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#next-approval-first-ios-camera-smoke) owns the current application-testing step.
 
-The [f05 PackageKit helper assessment](evidence/revised-api-u25-f05-packagekit-idle.json) records observed quiescence, completed-transaction correlation, visibility limits and the newly gated one-query proposal. No simulator query or host change ran; the [acceptance proposal](../docs/revised-api-acceptance-plan.md#read-only-startup-diagnosis-and-proposed-next-query) owns the next approval.
+The [historical f05 PackageKit helper assessment](evidence/revised-api-u25-f05-packagekit-idle.json) preserves its bounded quiescence assessment and closed query proposal. Those process/log checks are retired from active readiness; the [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#next-approval-first-ios-camera-smoke) owns the next step.
 
 The [closed f05 iOS readiness proposal](evidence/revised-api-u25-f05-ios-readiness-plan-02.json) preserves the approved packet and offline checks for the second attempt. That packet ran once and stopped in preflight; it is historical and does not authorize a retry. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns the refreshed approval scope.
 
