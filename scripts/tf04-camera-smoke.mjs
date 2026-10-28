@@ -18,13 +18,14 @@ if (
   throw new Error("TF04_IOS_UDID must identify the assigned simulator.");
 }
 const mapboxBasic = process.argv[3] === "mapbox-basic";
+const maplibreBasic = process.argv[3] === "maplibre-basic";
 const corrections = process.argv[3] === "corrections";
 if (
   process.argv[3] !== undefined &&
   !(corrections && group === "web") &&
-  !(mapboxBasic && group === "ios")
+  !((mapboxBasic || maplibreBasic) && (group === "ios" || group === "android"))
 ) {
-  throw new Error("Use web corrections or ios mapbox-basic for a scoped run.");
+  throw new Error("Use web corrections or an ios/android engine-basic scope.");
 }
 const webScenario = corrections ? "corrections" : "camera";
 
@@ -235,7 +236,11 @@ if (group === "web" || group === "all") {
   results["maplibre-web"] = await runWeb("web-maplibre", 4174, "MapLibre web");
 }
 
-if (group === "android" || group === "all") {
+if (
+  (group === "android" || group === "all") &&
+  !mapboxBasic &&
+  !maplibreBasic
+) {
   results["mapbox-android"] = await runNative({
     directory: "native-mapbox",
     platform: "android",
@@ -250,11 +255,17 @@ if (group === "android" || group === "all") {
   });
 }
 
-if (mapboxBasic) {
-  results["mapbox-ios"] = await runNative({
-    directory: "native-mapbox",
-    platform: "ios",
-    applicationId: "org.reactjs.native.example.OneMapMapbox",
+if (mapboxBasic || maplibreBasic) {
+  const engine = maplibreBasic ? "maplibre" : "mapbox";
+  const applicationName = maplibreBasic ? "OneMapMaplibre" : "OneMapMapbox";
+
+  results[`${engine}-${group}`] = await runNative({
+    directory: `native-${engine}`,
+    platform: group,
+    applicationId:
+      group === "ios"
+        ? `org.reactjs.native.example.${applicationName}`
+        : `com.onemap${engine}`,
     doubleTap: false,
     basic: true,
   });
@@ -510,6 +521,27 @@ function debugHostPreference(existing, host) {
   ].join("\n");
 }
 
+async function grantAndroidTransportPermission(applicationId) {
+  const sdk = Number(
+    await command("adb", ["shell", "getprop", "ro.build.version.sdk"])
+  );
+
+  if (!Number.isInteger(sdk) || sdk <= 0) {
+    throw new Error("Invalid Android API level.");
+  }
+
+  // React Native gates loadApp on this grant even when Metro uses adb reverse.
+  if (sdk >= 37) {
+    await command("adb", [
+      "shell",
+      "pm",
+      "grant",
+      applicationId,
+      "android.permission.ACCESS_LOCAL_NETWORK",
+    ]);
+  }
+}
+
 async function startAndroidApp(applicationId) {
   await command("adb", [
     "shell",
@@ -568,22 +600,15 @@ function allowButtonPoint(xml) {
 }
 
 async function readAndroidStatus() {
-  const log = await command("adb", ["logcat", "-d"], {}, 20000).catch(() => "");
+  const log = await command("adb", ["logcat", "-d"], {}, 20000);
   const fromLog = latestStatus(log);
 
   if (fromLog) {
     return fromLog;
   }
 
-  await command("adb", [
-    "shell",
-    "uiautomator",
-    "dump",
-    "/sdcard/ui.xml",
-  ]).catch(() => "");
-  const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]).catch(
-    () => ""
-  );
+  await command("adb", ["shell", "uiautomator", "dump", "/sdcard/ui.xml"]);
+  const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]);
 
   return latestStatus(xml.replaceAll("&#10;", " "));
 }
@@ -723,6 +748,9 @@ async function runNative({
   basic = false,
 }) {
   const shell = join(root, "examples", directory);
+  if (platform === "android" && basic && !process.env.ANDROID_SERIAL) {
+    throw new Error("ANDROID_SERIAL must identify the assigned emulator.");
+  }
 
   await freePort(8081);
   if (platform === "ios") {
@@ -783,25 +811,35 @@ async function runNative({
       await removeAndroidBundle(shell);
       await command(
         "bun",
-        ["run", "android", "--", "--no-packager"],
+        [
+          "run",
+          "android",
+          "--",
+          "--no-packager",
+          ...(basic
+            ? ["--device", process.env.ANDROID_SERIAL, "--active-arch-only"]
+            : []),
+        ],
         { cwd: shell, env: { ...process.env, ONE_MAP_SMOKE: "tf04" } },
         600000
       );
-      const address = await lanAddress();
+      const address = basic ? "localhost" : await lanAddress();
 
       await writeDebugHost(applicationId, `${address}:8081`);
       await command("adb", ["logcat", "-c"]);
+      await grantAndroidTransportPermission(applicationId);
       await startAndroidApp(applicationId);
-      await allowNearbyDevices();
+      if (!basic) await allowNearbyDevices();
 
       const status = await watchNative({
         readStatus: readAndroidStatus,
         doubleTap,
         applicationId,
         platform,
+        basic,
       });
 
-      return judge(status, doubleTap, platform);
+      return judge(status, doubleTap, platform, basic);
     }
 
     await command(
@@ -845,6 +883,9 @@ async function runNative({
     };
   } finally {
     try {
+      if (platform === "android" && basic) {
+        await command("adb", ["shell", "am", "force-stop", applicationId]);
+      }
       if (platform === "ios") {
         await command("xcrun", [
           "simctl",

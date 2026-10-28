@@ -1,0 +1,67 @@
+{
+  "attempt": "U25 F05 minimal Mapbox Android attempt 02",
+  "status": "stopped at first failure",
+  "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "runnerSha256": "96a0cb616da92e7fde8d43f4e47017c9084c3ec8c0c1d8b631e472ae9037ca06",
+  "environment": {
+    "platform": "Android emulator API 37, arm64-v8a, preinstalled google_apis_playstore image",
+    "avd": "Task-owned OneMapU25F05 on emulator-5580; 2G userdata; removed after shutdown",
+    "java": "Android Studio bundled JBR 25.0.3 (installed release metadata)",
+    "androidSdk": "/Users/rob/Library/Android/sdk; preinstalled build-tools 37.0.0 and NDK 27.1.12297006",
+    "hostAccess": "Inherited Mapbox access token present; value not recorded. Emulator reverse mapping tcp:8081 -> tcp:8081 established.",
+    "devicePreflight": "Ports 5580/5581/8081 free; no existing adb targets listed.",
+    "freeDiskGiB": {
+      "before": 10,
+      "afterOwnedCleanup": 11
+    }
+  },
+  "command": {
+    "argv": [
+      "bun",
+      "scripts/tf04-camera-smoke.mjs",
+      "android",
+      "mapbox-basic"
+    ],
+    "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+    "exitCode": 1,
+    "durationSeconds": 283,
+    "firstFailure": "Native smoke ended at: no status",
+    "boundedRunnerOutput": "See runner-output.txt. Metro v0.87.1 reported Dev server ready. No camera status was emitted before the runner exited.",
+    "progress": "Per the awaited React Native CLI completion, native build, install, and launch were reached. The runner's status-watch step ended with no status. Map load and camera assertions were not observed."
+  },
+  "artifact": {
+    "debugApk": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sizeMiB": 62,
+    "sha256": "ddd7d9527e50c5937abf4b2090eb6f56e4f9ad0788196b535372569db6cad485"
+  },
+  "versions": {
+    "reactNative": "0.87 (runner output)",
+    "metro": "0.87.1",
+    "nativeWrapper": "@rnmapbox/maps 10.3.7 (prepared candidate dependency)",
+    "mapboxNativeSdk": "No new identity emitted by the runner output"
+  },
+  "retainedFiles": {
+    "taskGradleHome": "3.3 GiB",
+    "androidProjectGradle": "3.4 MiB",
+    "androidAppBuild": "712 MiB, including APK and build outputs",
+    "cleanup": "Kept task Gradle/dependency cache and generated build outputs as attempt evidence; stopped one Gradle daemon."
+  },
+  "cleanup": {
+    "emulator": "Shut down with adb emu kill; task-owned AVD config and userdata removed after process exit",
+    "metroPort8081": "No listener remained after runner exit",
+    "reverseMapping": "Removed with task-owned emulator shutdown",
+    "adbServer": "Shared adb server left running",
+    "foreignResources": "No unrelated devices, listeners, applications, caches, or SDK files changed"
+  },
+  "provenance": {
+    "runnerOutput": "runner-output.txt",
+    "previousAttempt": "mapbox-android-minimal-attempt-01/result.json retained separately"
+  },
+  "coordinator_review": {
+    "cleanup_authorization": "User explicitly authorized deletion of unused Android37.1 system image. Coordinator removed only that directory; free space increased from1.9GiB to10GiB. Installed Android37.0 image and existing user AVD preserved.",
+    "provenance": "Coordinator independently verified unchanged f05 archive SHA256 and scoped runner SHA256 before dispatch.",
+    "result": "Reviewed runner output reports no status. In source, Android status observation follows successful awaited CLI build/install/launch, debug-host setup and app start. This run establishes build/launch command completion, not successful map loading or camera movement.",
+    "limitation": "No independent installed-APK readback comparison; native SDK binary identity not established. Cause of missing status remains undiagnosed. No retries or additional runtime tests performed.",
+    "cleanup": "Worker reports task emulator shut down and removed, owned Metro port clear and isolated task Gradle daemon stopped. Downloaded dependencies and build outputs retained for active investigation."
+  }
+}
