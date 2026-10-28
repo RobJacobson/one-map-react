@@ -93,3 +93,5 @@ The [f05 simulator startup diagnosis](evidence/revised-api-u25-f05-simctl-diagno
 The [f05 PackageKit helper assessment](evidence/revised-api-u25-f05-packagekit-idle.json) records observed quiescence, completed-transaction correlation, visibility limits and the newly gated one-query proposal. No simulator query or host change ran; the [acceptance proposal](../docs/revised-api-acceptance-plan.md#read-only-startup-diagnosis-and-proposed-next-query) owns the next approval.
 
 The [next f05 iOS readiness proposal](evidence/revised-api-u25-f05-ios-readiness-plan-02.json) binds the dedicated direct-tool packet and offline checks. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md#proposed-next-ios-readiness-run) owns its conditional boot, warning stops and ownership limits. It is proposed and unrun; new approval is required.
+
+The [second f05 iOS readiness attempt](evidence/revised-api-u25-f05-ios-readiness-attempt-02.json) records a stop in installer-log timestamp parsing after successful Xcode and DeviceHub signature checks. No simulator command or boot ran; diagnosis and a newly approved packet are required before retry.

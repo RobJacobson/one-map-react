@@ -1,0 +1,116 @@
+{
+  "checkpoint": "f05 iOS readiness attempt02",
+  "date": "2026-10-27",
+  "status": "FAILED / STOPPED before simulator inventory",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "exclusiveNativeResources": true
+  },
+  "authorization": "One execution of PR53 updated readiness plan, stop first failure; conditional cleanup only newly successful assigned boot and later failure; no Android/builds/acceptance",
+  "launch": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next/launch.json",
+    "sha256": "8a29caa1146f4dd77af3c617a4f4e1e89f664a12bf5ec4602b04e787db8d364c",
+    "count": 1,
+    "exitCode": 1
+  },
+  "packet": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next/packet.json",
+    "sha256": "80e03e336c1ad2faf9e55b5b2b5f4d545267884116b1dbbbd1fc8715eb8c46b3"
+  },
+  "approvedPlan": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next/approved-plan.md",
+    "sha256": "5a192a30a53e1d19aff26d617cc1c471d983f23c0e5d1e828790197ed0334afc"
+  },
+  "result": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next/result.json",
+    "sha256": "db862037ac6da7ae1408caab6c5dd66a907aec51dee8b192c8d28463c73e5bdf",
+    "startedAtUtc": "2026-10-28T03:24:22.304603+00:00",
+    "finishedAtUtc": "2026-10-28T03:24:28.722095+00:00"
+  },
+  "guardVerification": "Driver source/tool/archive/plan bindings and all33966 frozen entries completed before its first host subprocess",
+  "commands": [
+    {
+      "step": "selectedXcode",
+      "argv": [
+        "/usr/bin/xcode-select",
+        "-p"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next",
+      "timeoutSeconds": 10,
+      "startedAtUtc": "2026-10-28T03:24:28.585153+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "024e83842db917ed79a567b48b5f70bf468a2a914d5dc6df59f9d19c25ad3a0e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 0.005,
+      "finishedAtUtc": "2026-10-28T03:24:28.589995+00:00"
+    },
+    {
+      "step": "signature",
+      "argv": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next",
+      "timeoutSeconds": 15,
+      "startedAtUtc": "2026-10-28T03:24:28.594309+00:00",
+      "status": "passed",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBounded": "",
+      "elapsedSeconds": 0.017,
+      "finishedAtUtc": "2026-10-28T03:24:28.611396+00:00"
+    }
+  ],
+  "failure": {
+    "phase": "installer-log activity preflight after successful DeviceHub signature verification",
+    "error": "installer lifecycle timestamp unavailable",
+    "reportedFailedStep": "signature",
+    "attribution": "failedStep retains last subprocess key signature; both recorded subprocesses passed. Source shows installer_log_snapshot raises before any process query or simctl invocation.",
+    "causeUnverified": "Offending installer-log record not retained; no follow-up log read or diagnosis authorized in this run."
+  },
+  "ownership": {
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "bootAttempted": false,
+    "newlyBooted": false,
+    "bootOwnershipUncertain": false
+  },
+  "cleanup": "Not due: no boot attempted or owned",
+  "notRun": [
+    "process samples",
+    "unified-log query",
+    "simulator inventory",
+    "device boot",
+    "bootstatus",
+    "DeviceHub GUI",
+    "final inventory",
+    "cleanup",
+    "Android",
+    "builds",
+    "app installation",
+    "Metro",
+    "acceptance",
+    "retry"
+  ],
+  "audit": "Coordinator inspected result and exact driver control flow; no runtime follow-up",
+  "remainingGates": [
+    "Diagnose installer-log timestamp guard and refresh audited packet before new execution approval",
+    "Complete runtime identity and clean-service/boot readiness",
+    "Separate Android and full native execution approvals"
+  ],
+  "workerHandoff": {
+    "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ios-readiness-next/worker-handoff-run.json",
+    "sha256": "163ad4cc93a21fec7b7446dbaca6d5c064243c0bc0dff4b203c5549c5e89d129"
+  },
+  "routineVerification": {
+    "documentation": "PASS:40 Markdown files/39 comparison tables",
+    "formatting": "PASS",
+    "diffCheck": "PASS"
+  }
+}
