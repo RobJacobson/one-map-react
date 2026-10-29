@@ -1,0 +1,105 @@
+{
+  "attempt": "maplibre-ios-lifetimes-attempt-03",
+  "status": "passed",
+  "scope": "PR59 unchanged f05 single MapLibre iOS lifetime scenario",
+  "provenance": {
+    "pr": 59,
+    "head": "dd79d8c20bf888bf39ed34af27b827961dd18e79",
+    "fixtureSHA256": "ed8fdf0592d63ea2a392687c277d94323ed58ded170e33e0ef1f910befbd2279",
+    "runnerSHA256": "e56285711818b3150e5c3a02eb937812e91abe390459d1e7e182adecd4bb473c",
+    "wrapperSHA256": "3895188a8a180f04760388174bddcd0941d9e7f48ae1d0424759e958c0e7335d",
+    "f05SHA256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276"
+  },
+  "simulator": {
+    "name": "iPhone 18 Pro",
+    "runtime": "iOS 27.0 build 24A434",
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "initialState": "Shutdown",
+    "bootExit": 0,
+    "bootstatusExit": 0,
+    "shutdownExit": 0
+  },
+  "commands": [
+    {
+      "command": "xcrun simctl list devices --json",
+      "exit": 0
+    },
+    {
+      "command": "xcrun simctl boot assigned UUID",
+      "exit": 0
+    },
+    {
+      "command": "xcrun simctl bootstatus assigned UUID",
+      "exit": 0
+    },
+    {
+      "command": "lsof ports 8081,8798,8799 preflight",
+      "exit": 1,
+      "meaning": "all ports free"
+    },
+    {
+      "command": "bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre .",
+      "exit": 0
+    }
+  ],
+  "scenario": {
+    "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=explicitly-cleared vector-style=explicitly-cleared vector-to-geojson=explicitly-cleared geojson-to-vector=explicitly-cleared final-remount=explicitly-cleared error=none phase=done done=1",
+    "fixtureRevisions": [
+      0,
+      1,
+      3,
+      4
+    ],
+    "producedApp": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app"
+  },
+  "identity": {
+    "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+    "version": "1.0",
+    "build": "1",
+    "producedAndInstalledExecutableSHA256": "87b56829e405644038b4b035e04dad26268a5f675e7d440cc2b71cade2f0da92",
+    "producedAndInstalledDebugDylibSHA256": "6f2fbc4d3dafcf9c688c96fb310436f4292d3cd3ae739cafb44c556f47572942",
+    "producedAndInstalledMapLibre": "6.31.0",
+    "Podfile.lock SHA256": "bb68f6237b7b4a02d2c5514d9424ce3327d763e6dadfb6da8d730fc6a2dee93a",
+    "Gemfile.lock SHA256": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+    "Package.resolved original SHA256": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+    "bothPackageResolvedPins": {
+      "identity": "maplibre-gl-native-distribution",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+      "version": "6.31.0",
+      "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683"
+    }
+  },
+  "cleanup": {
+    "runnerExit": 0,
+    "assignedPortsReleased": {
+      "8081": true,
+      "8798": true,
+      "8799": true
+    },
+    "ownedSimulatorShutdown": true,
+    "otherResourcesPreserved": true
+  },
+  "unrun": [],
+  "coordinatorReview": {
+    "outcome": "Approved single native scenario passed. All four native lifetime environments now have passing recorded outcomes; broader native acceptance remains open.",
+    "independentIdentityReceipts": {
+      "produced": {
+        "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+        "sdkVersion": "6.31.0",
+        "executableSha256": "87b56829e405644038b4b035e04dad26268a5f675e7d440cc2b71cade2f0da92",
+        "debugLibrarySha256": "6f2fbc4d3dafcf9c688c96fb310436f4292d3cd3ae739cafb44c556f47572942"
+      },
+      "installed": {
+        "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/72F0A028-E5B1-4181-97BF-83F8804AC07A/OneMapMaplibre.app",
+        "sdkVersion": "6.31.0",
+        "executableSha256": "87b56829e405644038b4b035e04dad26268a5f675e7d440cc2b71cade2f0da92",
+        "debugLibrarySha256": "6f2fbc4d3dafcf9c688c96fb310436f4292d3cd3ae739cafb44c556f47572942"
+      }
+    },
+    "inputs": "Independently verified archive, fixture, runner and wrapper hashes unchanged after run.",
+    "provenance": "Requested vector fixture revisions0,1,3,4 match initial/remount and return-to-vector/final-remount; revision2 is GeoJSON.",
+    "cleanup": "Worker recorded successful owned simulator shutdown and all owned ports released.",
+    "scope": "No additional scenarios, dependency installation, repairs or retries."
+  }
+}
