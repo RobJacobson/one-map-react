@@ -7,6 +7,7 @@ import {
   readFileSync,
   realpathSync,
   rmSync,
+  symlinkSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -264,30 +265,10 @@ for (const failure of ["app", "status", "metro", "bind", null]) {
 
 const iosUdid = "8B7D7CE4-228E-409F-A156-A597D4E448A5";
 const iosDigest = "a".repeat(64);
-for (const mode of [
-  "build",
-  "reuse",
-  "mismatch",
-  "bad-app",
-  "bad-executable",
-  "bad-identifier",
-  "bad-package",
-  "debug-dylib",
-  "missing-app",
-  "not-running",
-  "service-error",
-  "build-error",
-  "install-error",
-  "launch-error",
-  "watch-error",
-  "bind-error",
-]) {
-  const calls = [];
-  const cleanup = [];
-  const nativeFixture = { requests: ["stale"] };
-  let opened = false;
-  let launched = false;
-  const reuse = [
+for (const engine of ["mapbox", "maplibre"]) {
+  const scheme = engine === "mapbox" ? "OneMapMapbox" : "OneMapMaplibre";
+  for (const mode of [
+    "build",
     "reuse",
     "mismatch",
     "bad-app",
@@ -295,140 +276,167 @@ for (const mode of [
     "bad-identifier",
     "bad-package",
     "debug-dylib",
-  ].includes(mode);
-  const run = evaluate(`(${runSource})`, {
-    root: "/harness",
-    join: (...parts) => parts.join("/"),
-    lifetimes: true,
-    scope: "lifetimes",
-    process: {
-      env: {
-        TF06_IOS_UDID: iosUdid,
-        ...(mode === "build"
-          ? { TF06_IOS_BUILD_FOLDER: "/task/ios-build" }
-          : {}),
+    "missing-app",
+    "not-running",
+    "service-error",
+    "build-error",
+    "install-error",
+    "launch-error",
+    "watch-error",
+    "bind-error",
+  ]) {
+    const calls = [];
+    const cleanup = [];
+    const nativeFixture = { requests: ["stale"] };
+    let opened = false;
+    let launched = false;
+    const reuse = [
+      "reuse",
+      "mismatch",
+      "bad-app",
+      "bad-executable",
+      "bad-identifier",
+      "bad-package",
+      "debug-dylib",
+    ].includes(mode);
+    const run = evaluate(`(${runSource})`, {
+      root: "/harness",
+      join: (...parts) => parts.join("/"),
+      lifetimes: true,
+      scope: "lifetimes",
+      process: {
+        env: {
+          TF06_IOS_UDID: iosUdid,
+          ...(mode === "build"
+            ? { TF06_IOS_BUILD_FOLDER: "/task/ios-build" }
+            : {}),
+        },
       },
-    },
-    iosUdid,
-    fixture: nativeFixture,
-    existsSync: () => mode === "debug-dylib",
-    reuseIosDigest: reuse ? iosDigest : undefined,
-    freePort: async () => {},
-    spawn: child,
-    waitFor: async () => {},
-    command: async (file, args) => {
-      calls.push([file, ...args]);
-      assert(!args.includes("booted") && !args.includes("--simulator"));
-      if (file === "xcrun") assert.equal(args[2], iosUdid);
-      if (args.includes("terminate")) {
-        cleanup.push("app");
-        if (!opened) nativeFixture.requests.push("old-app-final-callback");
-        if (!opened && cleanup.length === 1) {
-          if (mode === "service-error")
-            throw new Error("CoreSimulator service unavailable");
-          if (mode === "missing-app")
-            throw new Error("Application is not installed");
-          if (mode === "not-running")
-            throw new Error("Application is not running");
+      iosUdid,
+      fixture: nativeFixture,
+      existsSync: () => mode === "debug-dylib",
+      reuseIosDigest: reuse ? iosDigest : undefined,
+      freePort: async () => {},
+      spawn: child,
+      waitFor: async () => {},
+      command: async (file, args) => {
+        calls.push([file, ...args]);
+        assert(!args.includes("booted") && !args.includes("--simulator"));
+        if (file === "xcrun") assert.equal(args[2], iosUdid);
+        if (args.includes("terminate")) {
+          cleanup.push("app");
+          if (!opened) nativeFixture.requests.push("old-app-final-callback");
+          if (!opened && cleanup.length === 1) {
+            if (mode === "service-error")
+              throw new Error("CoreSimulator service unavailable");
+            if (mode === "missing-app")
+              throw new Error("Application is not installed");
+            if (mode === "not-running")
+              throw new Error("Application is not running");
+          }
         }
-      }
-      if (args.includes("get_app_container"))
-        return mode === "bad-app" ? "/tmp/not-an-app" : "/tmp/Map.app";
-      if (file === "/usr/libexec/PlistBuddy") {
-        if (args[1].includes("CFBundleExecutable"))
-          return mode === "bad-executable" ? "../escape" : "Map";
-        if (args[1].includes("CFBundleIdentifier"))
-          return mode === "bad-identifier" ? "other-app" : "selected-app";
-        if (args[1].includes("CFBundlePackageType"))
-          return mode === "bad-package" ? "BNDL" : "APPL";
-        assert.fail("Unexpected plist request");
-      }
-      if (file === "shasum")
-        return `${mode === "mismatch" ? "b".repeat(64) : iosDigest}  /tmp/Map.app/Map`;
-      assert.notEqual(
-        file,
-        "bun",
-        "Lifetime build/install must check every native exit"
-      );
-      if (file === "xcodebuild") {
-        assert(!reuse, "Reuse must not build");
-        assert.deepEqual(Array.from(args), [
-          "-workspace",
-          "/harness/examples/native-mapbox/ios/OneMapMapbox.xcworkspace",
-          "-scheme",
-          "OneMapMapbox",
-          "-configuration",
-          "Debug",
-          "-destination",
-          `id=${iosUdid}`,
-          "-derivedDataPath",
-          mode === "build"
-            ? "/task/ios-build"
-            : "/harness/examples/native-mapbox/ios/build",
-          "build",
-        ]);
-        if (mode === "build-error") throw new Error(mode);
-      }
-      if (args.includes("install")) {
-        assert(calls.some(([name]) => name === "xcodebuild"));
-        assert.equal(
-          args[3],
-          `${mode === "build" ? "/task/ios-build" : "/harness/examples/native-mapbox/ios/build"}/Build/Products/Debug-iphonesimulator/OneMapMapbox.app`
+        if (args.includes("get_app_container"))
+          return mode === "bad-app" ? "/tmp/not-an-app" : "/tmp/Map.app";
+        if (file === "/usr/libexec/PlistBuddy") {
+          if (args[1].includes("CFBundleExecutable"))
+            return mode === "bad-executable" ? "../escape" : "Map";
+          if (args[1].includes("CFBundleIdentifier"))
+            return mode === "bad-identifier" ? "other-app" : "selected-app";
+          if (args[1].includes("CFBundlePackageType"))
+            return mode === "bad-package" ? "BNDL" : "APPL";
+          assert.fail("Unexpected plist request");
+        }
+        if (file === "shasum")
+          return `${mode === "mismatch" ? "b".repeat(64) : iosDigest}  /tmp/Map.app/Map`;
+        assert.notEqual(
+          file,
+          "bun",
+          "Lifetime build/install must check every native exit"
         );
-        if (mode === "install-error") throw new Error(mode);
-      }
-      if (args.includes("launch")) {
-        if (!reuse) assert(calls.some((call) => call.includes("install")));
-        if (mode === "launch-error") throw new Error(mode);
-        launched = true;
-      }
-      return "";
-    },
-    verifyNativeBinary: (_scope, expected, actual) =>
-      assert.equal(actual, expected),
-    openStatusPort: async () => {
-      assert.equal(cleanup[0], "app", "Stop stale callbacks before collection");
-      assert.equal(nativeFixture.requests.length, 0);
-      opened = true;
-      if (mode === "bind-error") throw new Error(mode);
-      return {
-        read: () => "done=1",
-        close: async () => cleanup.push("status"),
-      };
-    },
-    watchNative: async ({ readStatus }) => {
-      assert(launched);
-      if (mode === "watch-error") throw new Error(mode);
-      return readStatus();
-    },
-    judge: () => ({ status: "passed" }),
-    stopOwnedProcess: async () => cleanup.push("metro"),
-    awaitMetroPortRelease: async () => cleanup.push("port"),
-  });
-  const result = await run({
-    directory: "native-mapbox",
-    platform: "ios",
-    applicationId: "selected-app",
-  });
-  const passed = ["build", "reuse", "missing-app", "not-running"].includes(
-    mode
-  );
-  assert.equal(
-    result.status,
-    passed ? "passed" : "failed",
-    `${mode}: ${JSON.stringify(result)}`
-  );
-  assert(cleanup.includes("metro") && cleanup.includes("port"), mode);
-  if (!passed) assert.equal(launched, mode === "watch-error", mode);
-  if (mode === "build") {
-    assert.equal(
-      result.producedAppPath,
-      "/task/ios-build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app"
+        if (file === "xcodebuild") {
+          assert(!reuse, "Reuse must not build");
+          assert.deepEqual(Array.from(args), [
+            "-workspace",
+            `/harness/examples/native-${engine}/ios/${scheme}.xcworkspace`,
+            "-scheme",
+            scheme,
+            "-configuration",
+            "Debug",
+            "-destination",
+            `id=${iosUdid}`,
+            "-derivedDataPath",
+            mode === "build"
+              ? "/task/ios-build"
+              : `/harness/examples/native-${engine}/ios/build`,
+            "build",
+          ]);
+          if (mode === "build-error") throw new Error(mode);
+        }
+        if (args.includes("install")) {
+          assert(calls.some(([name]) => name === "xcodebuild"));
+          assert.equal(
+            args[3],
+            `${mode === "build" ? "/task/ios-build" : `/harness/examples/native-${engine}/ios/build`}/Build/Products/Debug-iphonesimulator/${scheme}.app`
+          );
+          if (mode === "install-error") throw new Error(mode);
+        }
+        if (args.includes("launch")) {
+          if (!reuse) assert(calls.some((call) => call.includes("install")));
+          if (mode === "launch-error") throw new Error(mode);
+          launched = true;
+        }
+        return "";
+      },
+      verifyNativeBinary: (_scope, expected, actual) =>
+        assert.equal(actual, expected),
+      openStatusPort: async () => {
+        assert.equal(
+          cleanup[0],
+          "app",
+          "Stop stale callbacks before collection"
+        );
+        assert.equal(nativeFixture.requests.length, 0);
+        opened = true;
+        if (mode === "bind-error") throw new Error(mode);
+        return {
+          read: () => "done=1",
+          close: async () => cleanup.push("status"),
+        };
+      },
+      watchNative: async ({ readStatus }) => {
+        assert(launched);
+        if (mode === "watch-error") throw new Error(mode);
+        return readStatus();
+      },
+      judge: () => ({ status: "passed" }),
+      stopOwnedProcess: async () => cleanup.push("metro"),
+      awaitMetroPortRelease: async () => cleanup.push("port"),
+    });
+    const result = await run({
+      directory: `native-${engine}`,
+      platform: "ios",
+      applicationId: "selected-app",
+    });
+    const passed = ["build", "reuse", "missing-app", "not-running"].includes(
+      mode
     );
-    assert.equal(calls.filter(([file]) => file === "xcodebuild").length, 1);
+    assert.equal(
+      result.status,
+      passed ? "passed" : "failed",
+      `${mode}: ${JSON.stringify(result)}`
+    );
+    assert(cleanup.includes("metro") && cleanup.includes("port"), mode);
+    if (!passed) assert.equal(launched, mode === "watch-error", mode);
+    if (mode === "build") {
+      assert.equal(
+        result.producedAppPath,
+        `/task/ios-build/Build/Products/Debug-iphonesimulator/${scheme}.app`
+      );
+      assert.equal(calls.filter(([file]) => file === "xcodebuild").length, 1);
+    }
+    if (mode === "reuse")
+      assert.equal(result.installedExecutableSha256, iosDigest);
   }
-  if (mode === "reuse")
-    assert.equal(result.installedExecutableSha256, iosDigest);
 }
 
 for (const mode of ["busy", "empty", "broken"]) {
@@ -581,41 +589,54 @@ assert.deepEqual(iosInvoked, ["native-mapbox"]);
 const wrapperRoot = realpathSync(
   mkdtempSync(join(tmpdir(), "one-map-ios-env-"))
 );
+const wrapperAlias = `${wrapperRoot}-alias`;
+symlinkSync(wrapperRoot, wrapperAlias);
 try {
-  const wrapper = join(wrapperRoot, "with-ios-env.sh");
-  copyFileSync(new URL("./with-ios-env.sh", import.meta.url), wrapper);
-  const environment = {
-    ...process.env,
-    MAPBOX_ACCESS_TOKEN: "mock-token",
-    TF06_IOS_BINARY_SHA256: "inherited",
-    EXPECTED_ROOT: wrapperRoot,
-  };
-  const checked = spawnSync(
-    "/bin/sh",
-    [
-      wrapper,
+  for (const engine of ["mapbox", "maplibre"]) {
+    const filename =
+      engine === "mapbox" ? "with-ios-env.sh" : "with-maplibre-ios-env.sh";
+    const wrapper = join(wrapperRoot, filename);
+    copyFileSync(new URL(`./${filename}`, import.meta.url), wrapper);
+    const environment = {
+      ...process.env,
+      MAPBOX_ACCESS_TOKEN: "mock-token",
+      TF06_IOS_BINARY_SHA256: "inherited",
+      EXPECTED_ROOT: wrapperRoot,
+    };
+    const checked = spawnSync(
       "/bin/sh",
-      "-c",
-      `
+      [
+        join(wrapperAlias, filename),
+        "/bin/sh",
+        "-c",
+        `
     test "$RUBYLIB" = "$EXPECTED_ROOT/ruby-bundler-load-path" &&
     test "$BUNDLE_PATH" = "$EXPECTED_ROOT/ruby-gems" &&
-    test "$TF06_IOS_BUILD_FOLDER" = "$EXPECTED_ROOT/native-harness/examples/native-mapbox/ios/build" &&
+    test "$TF06_IOS_BUILD_FOLDER" = "$EXPECTED_ROOT/native-harness/examples/native-${engine}/ios/build" &&
     test "$TF06_IOS_UDID" = "${iosUdid}" &&
     test "$MAPBOX_ACCESS_TOKEN" = "mock-token" &&
     test -z "\${TF06_IOS_BINARY_SHA256-}" &&
     case "$PATH" in "$EXPECTED_ROOT/runtime-bin:/opt/homebrew/bin:"*) exit 0;; *) exit 1;; esac
   `,
-    ],
-    { env: environment }
-  );
-  assert.equal(checked.status, 0, checked.stderr.toString());
-  delete environment.MAPBOX_ACCESS_TOKEN;
-  assert.notEqual(
-    spawnSync("/bin/sh", [wrapper, "/usr/bin/true"], { env: environment })
-      .status,
-    0
-  );
+      ],
+      { env: environment }
+    );
+    assert.equal(checked.status, 0, checked.stderr.toString());
+    assert.equal(checked.stdout.toString(), "");
+    assert.equal(checked.stderr.toString(), "");
+    delete environment.MAPBOX_ACCESS_TOKEN;
+    const missingToken = spawnSync("/bin/sh", [wrapper, "/usr/bin/true"], {
+      env: environment,
+    });
+    if (engine === "mapbox") assert.notEqual(missingToken.status, 0);
+    else {
+      assert.equal(missingToken.status, 0);
+      assert.equal(missingToken.stdout.toString(), "");
+      assert.equal(missingToken.stderr.toString(), "");
+    }
+  }
 } finally {
+  rmSync(wrapperAlias);
   rmSync(wrapperRoot, { recursive: true, force: true });
 }
 console.log(
