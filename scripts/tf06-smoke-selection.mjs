@@ -13,16 +13,15 @@ export const selectNativeEngines = (scope, selection = "both") => {
 };
 
 /**
- * Restricts lifetime builds/installations to the assigned Android device and ABI.
+ * Restricts native builds/installations to the assigned Android device and ABI.
  * @param {string} scope - Selected TF06 scope.
  * @param {string | undefined} serial - Explicitly assigned Android device.
  * @returns {string[]} React Native build/run arguments.
  */
 export const androidSmokeArgs = (scope, serial) => {
   const args = ["run", "android", "--", "--no-packager"];
-  if (scope !== "lifetimes") return args;
   if (!serial?.trim())
-    throw new Error("Set ANDROID_SERIAL for native lifetime acceptance.");
+    throw new Error("Set ANDROID_SERIAL for native acceptance.");
   return [...args, "--device", serial, "--active-arch-only"];
 };
 
