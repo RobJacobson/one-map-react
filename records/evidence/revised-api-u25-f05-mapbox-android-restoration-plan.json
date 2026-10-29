@@ -1,0 +1,193 @@
+{
+  "checkpoint": "PR62 isolated Mapbox Android restoration planning",
+  "status": "Restoration plan independently audited; combined restoration and one fresh native attempt await explicit owner approval. Restored inputs and runtime remain unverified.",
+  "kind": "Proposed restoration/run scope, with read-only recovery findings",
+  "scope": "Planning documentation and evidence only. No native staging, executable/native/host changes or dependency installation. Worker did not commit/push; coordinator publishes the audited plan under normal workflow.",
+  "preservedAttempt": "records/evidence/revised-api-u25-f05-mapbox-android-queries-attempt-01.json; interrupted and unverified, not replaced by a pass or failure.",
+  "candidate": {
+    "archive": "artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "regularMembers": 171,
+    "action": "Reuse exact bytes; no repack/version/peer/patch/repository-lock change."
+  },
+  "source": {
+    "pr": 62,
+    "head": "15cd961325f40ba57976fba01ec658d535dac69a",
+    "reviewCheckout": "/private/tmp/one-map-android-restoration-review",
+    "purpose": "Source-only coordinator checkout, no dependencies/generated native project; not restored staging.",
+    "sha256": {
+      "scripts/tf06-queries-smoke.mjs": "996bbf6ad351b029ed33a589769be5e95cedd228a84db1c15ccba3c789f8f216",
+      "scripts/tf06-smoke-selection.mjs": "27434db8d0b33108fb94d97cd06c909ed444d2fea7723e603acd3dd896acdd5f",
+      "scripts/setup-native-example.mjs": "bc99dc4edb3ee3d8d23456bd3a4e51ec88f21eb2249ad15982f16f1649daa6f5",
+      "examples/native-mapbox/package.json": "1bf6d3469daf2e192120944f4859e097dced1bcaf2ce6641777b34f32bbd6878",
+      "examples/native-mapbox/bun.lock": "5dd4deb89ebd9a65fbc6f92021c1313b6fea13fe91a004ef0eabf7557f1e1e5c",
+      "examples/native-mapbox/babel.config.cjs": "1caafe326b1f69ad39c476171bdcad8f2213b824e7518fc89456340cc363ce91",
+      "examples/resolve-shell-deps.cjs": "e417f3b1463e6a91dcaf310543eae70aa49ead6690d326a2366175536a3a6e3c",
+      "scripts/native-mapbox-version.mjs": "97aabd7ae431097eb33cd0bf1a63b38eed84a2979f2ce16f98e774f15991613b",
+      "scripts/native-location-permissions.mjs": "884448ff43d622d197d58596611e69d424dbc39dad6cb30d2c4b8bd856718adf"
+    }
+  },
+  "consumerLock": {
+    "originalDeletedSha256": "3a2cff7f9db0732f10ed2334297d3cde2358ff5c67efcbdcba3596cb5fa77e2c",
+    "recovery": "Original full lock bytes not found in inspected saved command payloads/outputs or durable records. Recorded manifest recovered and exactly matches PR62.",
+    "proposedReplacement": "Existing PR62 examples/native-mapbox/bun.lock, sha256 above; explicit changed disposable input requiring owner approval.",
+    "install": "bun install --frozen-lockfile --ignore-scripts",
+    "constraint": "Stop on frozen-install mismatch; no installConsumerPatch helper, --force, regeneration or semver refresh. Compare actual patched peer bytes and package members afterward.",
+    "versions": {
+      "React": "19.2.3",
+      "RN": "0.87.1",
+      "RNMapbox": "10.3.7",
+      "Teleport": "1.2.1",
+      "CLI": "20.2.0"
+    },
+    "qualification": "PR62 lock freezes its transitive resolutions but differs from deleted harness; unchanged f05 does not imply unchanged dependency tree."
+  },
+  "recoveredSupport": {
+    "transcript": "/Users/rob/.codex/sessions/2026/10/25/rollout-2026-10-25T07-18-44-01a1736d-962c-7591-b6fa-21fe7b7d85c7.jsonl",
+    "line": 30020,
+    "field": "payload.item.aggregated_output",
+    "extraction": "Exact UTF-8 source is embedded below with independently verified length/hash; transcript reference is provenance only. Write executable support files only after owner approval.",
+    "files": {
+      "with-android-env.sh": {
+        "bytes": 515,
+        "sha256": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4",
+        "source": "#!/bin/sh\nset -eu\ntask_root=$(CDPATH= cd \"$(dirname \"$0\")\" && pwd -P)\nexport ANDROID_HOME=/Users/rob/Library/Android/sdk\nexport ANDROID_SDK_ROOT=\"$ANDROID_HOME\"\nexport ANDROID_AVD_HOME=\"$task_root/android-avd\"\nexport ANDROID_SERIAL=emulator-5580\nexport GRADLE_USER_HOME=\"$task_root/android-gradle\"\nexport JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\"\nexport PATH=\"$task_root/runtime-bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$JAVA_HOME/bin:/opt/homebrew/bin:$PATH\"\nexec \"$@\"\n"
+      },
+      "create-lifetime-task-avd.py": {
+        "bytes": 973,
+        "sha256": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38",
+        "source": "from pathlib import Path\n\nbase = Path(__file__).resolve().parent / \"android-avd\"\nname = \"OneMapU25F05\"\navd = base / (name + \".avd\")\nmetadata = base / (name + \".ini\")\nassert not avd.exists() and not metadata.exists(), \"Task AVD already exists\"\nsource = Path(\"/Users/rob/.android/avd/Medium_Phone.avd/config.ini\")\nvalues = dict(line.split(\"=\", 1) for line in source.read_text().splitlines() if \"=\" in line)\nvalues.update({\"AvdId\": name, \"avd.ini.displayname\": name, \"disk.dataPartition.size\": \"2G\", \"sdcard.size\": \"128M\", \"hw.ramSize\": \"2048\", \"fastboot.forceFastBoot\": \"no\", \"fastboot.forceColdBoot\": \"yes\", \"fastboot.forceChosenSnapshotBoot\": \"no\", \"image.sysdir.1\": \"system-images/android-37.0/google_apis_playstore/arm64-v8a/\", \"target\": \"android-37.0\"})\navd.mkdir(parents=True)\n(avd / \"config.ini\").write_text(\"\".join(key + \"=\" + value + \"\\n\" for key, value in values.items()))\nmetadata.write_text(\"avd.ini.encoding=UTF-8\\npath=\" + str(avd) + \"\\ntarget=android-37.0\\n\")\n"
+      },
+      "launch-lifetime-emulator.py": {
+        "bytes": 659,
+        "sha256": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24",
+        "source": "import json\nimport subprocess\nimport sys\nfrom pathlib import Path\n\nlog_path = Path(sys.argv[1])\narguments = [\"emulator\", \"-avd\", \"OneMapU25F05\", \"-port\", \"5580\", \"-no-window\", \"-no-audio\", \"-no-snapshot\", \"-no-boot-anim\", \"-memory\", \"2048\", \"-gpu\", \"auto\"]\nwith log_path.open(\"xb\") as output:\n    process = subprocess.Popen(arguments, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)\n    try:\n        exit_code = process.wait(timeout=1)\n    except subprocess.TimeoutExpired:\n        print(json.dumps({\"pid\": process.pid, \"pgid\": process.pid, \"log\": str(log_path)}))\n    else:\n        raise SystemExit(exit_code or 1)\n"
+      }
+    },
+    "relocation": "Wrapper/setup use their own resolved parent, so exact bytes support proposed durable STAGE."
+  },
+  "retainedRuntime": {
+    "Bun": {
+      "path": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native",
+      "sha256": "4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959"
+    },
+    "Node": {
+      "path": "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node",
+      "sha256": "6f32069480ec14d52b6d7b1f3c7124cfbbc46203abf5ddf5c65b127435f3f329"
+    },
+    "actionAfterApproval": "Recreate runtime-bin/bun and node symlinks to these existing binaries; provide bunx as symlink to pinned bun.native for helper init, verify effective argv/version without native actions. No runtime download required."
+  },
+  "retainedHostFiles": {
+    "sdk": "/Users/rob/Library/Android/sdk",
+    "present": [
+      "platform-tools/adb",
+      "emulator/emulator",
+      "platforms/android-37.0",
+      "build-tools/37.0.0",
+      "ndk/27.1.12297006",
+      "system-images/android-37.0/google_apis_playstore/arm64-v8a/system.img"
+    ],
+    "JBR": "/Applications/Android Studio.app/Contents/jbr/Contents/Home",
+    "sourceAvd": "/Users/rob/.android/avd/Medium_Phone.avd/config.ini",
+    "sourceAvdSha256": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de",
+    "inspection": "Filesystem existence/hash reads only; no SDK/JBR/adb/emulator command. No SDK/image download proposed."
+  },
+  "proposedRestoration": {
+    "stage": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery",
+    "harness": "STAGE/native-harness",
+    "sourceFiles": "PR62 scripts, examples/shared, shell helper files, native-mapbox, mixed/maplibre-web-mapbox-native and tests/fixtures. Do not install other consumers.",
+    "package": "Extract exact f05 package into H/packages/one-map-react; local file dependency and patch paths remain valid.",
+    "generateCommand": "H: /bin/sh ../with-android-env.sh bun scripts/setup-native-example.mjs native-mapbox",
+    "generation": "Existing helper invokes bunx @react-native-community/cli@20.2.0 init OneMapMapbox --version 0.87.1 --directory <owned generator scratch> --pm bun --skip-git-init --skip-install --install-pods false. It copies Android and incidental unused iOS scaffold; discard unused iOS/Gemfile afterward, no Pods/Ruby setup.",
+    "androidChanges": "Reuse helper Maven repo, pinNativeMapboxVersion (11.23.1) and foregroundLocationDeclarations; no Android header patch or added custom transport-permission declaration. Keep tracked Babel config and native resolver.",
+    "mixedVariant": "Remove only adapter named import; prepend import from ../mixed/maplibre-web-mapbox-native/setup.js; add recovered backend guard/log before // Babel. Add path.resolve(__dirname, ../mixed) to Metro watchFolders.",
+    "mixedVariantSha256": "0baa798ba0f274834fb218da5a9ae914dc4776ea09dfa5c3a6a6a12a706fc386",
+    "variantSource": "2026/10/27 rollout15-14-07-01a17f6d-8b12-7ef1-a752-1b53b52376cd.jsonl line117; original Mapbox transform independently reproduced in memory from PR62 and matches.",
+    "originalGeneratedHashes": {
+      "android/build.gradle": "37d9ed929a8edc7d5593a17dcb060bb606d031b5753f1e227d35a590953274c4",
+      "android/app/build.gradle": "22a143d249e8590677e965ac131f09f258d58582f3f8cd018737150214c13dd1"
+    },
+    "downloads": "Reuse existing cached inputs first. After approval, retrieve only exact locked registry inputs, CLI20.2.0/RN0.87.1 template and generated Gradle/Maven/CMake dependencies required by selected build. Record available template version/integrity and generated wrapper/distribution identities; stop on missing SDK or unpinned/changed required input.",
+    "coordinatorGate": "Verify generated root/app Gradle hashes against original, all package members, reviewed patches, frozen replacement lock, pinned direct versions, absence of opposite SDK, Android mixed/packed Metro resolution, Babel transform and PR62 mocked query/selector matrices. No runtime dispatch before this passes.",
+    "receipts": "Write compact durable start/completion records before/after long installs/generation/build, include exact command/input hashes, exit/session identity, owned resources. Final record under records/evidence; no generalized orchestration.",
+    "selectionOperations": {
+      "when": "After owner approval only, in isolated H; require each replacement occurrence exactly once and verify final hashes.",
+      "operations": [
+        {
+          "path": "examples/native-mapbox/App.tsx",
+          "operation": "replaceOnce",
+          "old": "  adapter,\n",
+          "new": ""
+        },
+        {
+          "path": "examples/native-mapbox/App.tsx",
+          "operation": "prepend",
+          "text": "import { adapter } from \"../mixed/maplibre-web-mapbox-native/setup.js\";\n"
+        },
+        {
+          "path": "examples/native-mapbox/App.tsx",
+          "operation": "replaceOnce",
+          "old": "// Babel",
+          "new": "if (adapter.backend !== \"mapbox-native\") {\n  throw new Error(\"Mixed selection resolved the wrong backend\");\n}\nconsole.log(\"U25_NATIVE_SELECTION pair=maplibre-web-mapbox-native backend=\" + adapter.backend);\n\n// Babel"
+        },
+        {
+          "path": "examples/native-mapbox/metro.config.cjs",
+          "operation": "replaceOnce",
+          "old": "    path.resolve(__dirname, \"../shared\"),\n",
+          "new": "    path.resolve(__dirname, \"../shared\"),\n    path.resolve(__dirname, \"../mixed\"),\n"
+        }
+      ],
+      "expectedSha256": {
+        "examples/native-mapbox/App.tsx": "0baa798ba0f274834fb218da5a9ae914dc4776ea09dfa5c3a6a6a12a706fc386",
+        "examples/native-mapbox/metro.config.cjs": "7522eb0828fd4694212bc425efd4270e56175775d2339bef89761cdc619a1786"
+      }
+    },
+    "workspaceIsolation": "Sibling STAGE outside dirty primary workspace prevents ancestor workspace discovery during Bun installation. Coordinator verified sibling absent and no ancestor package.json. All writes to this sibling require approved host access; include exact path in approval scope. No --ignore-workspace flag is assumed."
+  },
+  "proposedRun": {
+    "attempt": "mapbox-android-queries-attempt-02",
+    "worker": "One gpt-6-luna medium, exclusive native resources; coordinator verifies/restores/audits; no worker repairs/Git/retries.",
+    "command": "H: /bin/sh ../with-android-env.sh bun scripts/tf06-queries-smoke.mjs android queries mapbox",
+    "resources": "Task-private OneMapU25F05, emulator-5580 ports5580/5581, Metro/reverse8081, selected app com.onemapmapbox; no8798/8799, LAN or permission clicking.",
+    "sequence": "PR62 historical recipe preflight, recovered AVD setup+launch, bounded180s boot, own reverse8081, exact single runner command, success-only installed APK pull/hash and frozen receipts, owned cleanup. Substitute durable STAGE and attempt02 only.",
+    "pass": "All original TF06 query/cluster/state status criteria unchanged; freshly produced APK must equal exact target installed base.apk. Missing required receipt fails.",
+    "sdkQualification": "11.23.1 root Gradle setting and consuming wrapper prove requested dependency only; independently linked SDK remains unverified unless actual build receipts establish it. No receipt-only Gradle resolve/build.",
+    "limits": "Runner build600s/status240s unchanged, runtime/cleanup1800s; cold build can exceed bound and fail. Stop first failure or timeout; cleanup only, no retry.",
+    "cleanup": "Only acquired app, Metro/process groups, reverse, emulator, private AVD and duplicate pulled APK; stop only task GRADLE_USER_HOME daemon. Preserve unknown processes/listeners/devices, SDK/image/user AVD and unrelated work."
+  },
+  "estimate": "45-90 minutes total proposed, variable cold download/build cost; dependency restoration30min, generator10min, coordinator checks15min, runtime/cleanup30min maximum. Cached5-15min estimate superseded.",
+  "openGaps": [
+    "Original actual consumer lock bytes not recovered; proposed tracked-lock substitution needs explicit approval.",
+    "Resolved original template integrity, generated wrapper/native tree and deleted Gradle dependency cache are not recovered. Regenerate with exact source helper and compare known hashes before run; record new generation identities.",
+    "Replacement frozen install, generated hash equality, patched bytes, static installed-graph checks and native execution have not run.",
+    "Native runtime/installed APK/linked SDK/cleanup outcome of interrupted attempt01 remains unverified."
+  ],
+  "checksPerformed": [
+    "Read repository/doc policies and durable preparation/minimal/lifetime/query records; source-only PR62 helper/manifest/lock/Babel/resolver inspection.",
+    "Rehashed unchanged171-member f05 archive, retained Bun/Node/config files; exact wrapper/setup/launcher source hashes recovered from transcript in memory.",
+    "Tracked manifest matches original; tracked lock differs, so substitution is explicit. Recovered App transform matches original final hash.",
+    "No credentials copied or printed; no raw transcript archived.",
+    "Revised embedded source texts independently match all three support hashes; exact App/Metro operations applied in memory, App matches original0baa hash. No staging files written."
+  ],
+  "notExecuted": [
+    "Dependency install",
+    "Native restoration/staging creation",
+    "SDK/emulator/adb/Gradle/Metro/build/install/renderer command",
+    "Host mutation"
+  ],
+  "routineVerification": {
+    "documentation": "node scripts/check-docs.mjs passed:41 Markdown files,43 SDK comparison tables; structure/links only.",
+    "json": "python3 -m json.tool passed.",
+    "whitespace": "git diff --check for three permitted paths passed.",
+    "contentReview": "Reviewed plan against PR62 helper/runner and original prep/recovery records; history, immutable f05, changed disposable lock and remaining generation/runtime gates distinguished.",
+    "runtime": "Not run; planning-only authorization."
+  },
+  "coordinatorAudit": {
+    "result": "Passed within planning-only restoration and one-fresh-run proposal scope.",
+    "independentVerification": "Verified exact PR62 source hashes, all three embedded support-file lengths/hashes, Python syntax without execution, and App/Metro replacement operations reproducing expected hashes. Rehashed pinned Bun/Node binaries and unchanged171-member f05.",
+    "workspaceSafety": "Durable sibling path is absent and has no ancestor package.json. No installation can target the dirty primary workspace through an ancestor workspace root. Writes to sibling are explicit proposed host-access scope.",
+    "changedInput": "Original disposable consumer lock unrecovered. Explicitly approve existing tracked PR62 lock5dd4deb instead of lost3a2cff7; frozen install only, no refresh. Direct dependency versions and manifest remain pinned. No assertion of unchanged transitive tree or fully reproduced harness.",
+    "generationReview": "Existing pinned source generator reused. Known root/app Gradle hashes, static packed selection/Babel, patched bytes, replacement lock and package receipts must pass before runtime. Record template integrity if available from ordinary generation; absent historical integrity alone does not justify another resolve/build.",
+    "runtimeBoundary": "No restoration, dependency install, emulator/adb/Gradle/build/install/Metro/scene run performed. Proposed one Luna medium worker, first-failure stop and owned cleanup only; fresh APK receipt and linked SDK qualification unchanged."
+  }
+}
