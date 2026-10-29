@@ -125,3 +125,7 @@ The [Mapbox Android lifetime result](evidence/revised-api-u25-f05-mapbox-android
 The [MapLibre iOS lifetime result](evidence/revised-api-u25-f05-maplibre-ios-lifetimes-attempt-03.json) completes the four lifetime environments within their recorded scope, including matching produced/installed code and MapLibre 6.31.0 metadata.
 
 The [MapLibre iOS ordinary query/cluster preparation](evidence/revised-api-u25-f05-maplibre-ios-queries-preparation.json) records the bounded runner/selection change, mocked regressions and retained input identities. The [sole proposal](../docs/revised-api-acceptance-plan.md#current-handoff) owns the separate execution approval; ordinary native queries/clusters remain unverified.
+
+The [MapLibre iOS query/cluster receipt completion](evidence/revised-api-u25-f05-maplibre-ios-queries-receipt-completion.json) closes the previously passing scene with matching lock hashes and package pins. The original worker path error remains recorded; no native rebuild or scene rerun was needed.
+
+The [Mapbox iOS ordinary query/cluster preparation](evidence/revised-api-u25-f05-mapbox-ios-queries-preparation.json) records unchanged retained runner/scene/wrapper identities, CocoaPods lock resolutions and bounded mocked checks. The [sole proposal](../docs/revised-api-acceptance-plan.md#next-approval-mapbox-ios-ordinary-queries-and-clusters) owns the separate audit and execution-approval gates; Mapbox query execution remains unverified.

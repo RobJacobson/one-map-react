@@ -1,0 +1,129 @@
+{
+  "checkpoint": "U25 f05 Mapbox iOS ordinary query/cluster preparation",
+  "status": "Independently audited and inputs frozen; native execution awaiting owner approval",
+  "scope": "Documentation/evidence only. Existing ordinary TF06 scene and checked both-engine iOS runner retained. No production, runner, scene, fixture, peer, patch, lock, version, SDK or harness changes.",
+  "provenance": {
+    "implementationBase": "bfde8e803e5ca881104098588a00ba84c617acca",
+    "branch": "codex/u25-mapbox-ios-queries",
+    "prBase": "Open PR60, codex/u25-maplibre-ios-queries",
+    "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "archiveReadPath": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "installedMapboxDist": "All 164 archive dist members compared byte-for-byte to retained Mapbox consumer; all match.",
+    "retainedFilesSha256": {
+      "scripts/tf06-queries-smoke.mjs": "e417599367f54e68244b28ba18bd63069094548b7e50a090da5c1e2372b7b35b",
+      "scripts/tf06-smoke-selection.mjs": "b68bf6169295e26e5748b00f25205c8d9a34850d42ff907e3e672b0950334081",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "examples/shared/queries-smoke.ts": "aadcd992843f3321c540ed1b9cfb19db32ae822edd2e531e54fe77fb6d1822b7",
+      "examples/shared/queries-map.tsx": "ef9498b977c82c3707c3e2b83d05566a2f907a2b1741cc28601f96caad2e0d6b",
+      "examples/shared/native-queries-screen.tsx": "78b7b0eb158d37c5561c81f615ffb1089d4564c26debd250f92193a7bd4e1a56",
+      "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+      "tests/fixtures/map.json": "8279594359798e3d9e7763242ba0ede1207ad5ae24f84e3d3be1ef241ac21362"
+    },
+    "stagingWrapperSha256": "b1de5f761e4813e9877355dc2db6e5daf95eced6a2bd9bba07c369a4ccbe6604",
+    "retainedLockSha256": {
+      "examples/native-mapbox/ios/Podfile.lock": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874",
+      "examples/native-mapbox/Gemfile.lock": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+      "examples/native-mapbox/ios/Pods/Manifest.lock": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874"
+    }
+  },
+  "retainedInputs": {
+    "mode": "Read-only filesystem inspection only; no host-service/native commands",
+    "present": "Mapbox Pods/Manifest.lock, project/workspace, JavaScript dependencies, task gems/runtime and prior produced OneMapMapbox.app with separate debug dylib",
+    "packageVersions": {
+      "react-native": "0.87.1",
+      "@rnmapbox/maps": "10.3.7",
+      "react-native-teleport": "1.2.1",
+      "one-map-react": "0.1.0-rc.2"
+    },
+    "podResolutions": {
+      "rnmapbox-maps": "10.3.7",
+      "MapboxMaps": "11.23.1",
+      "MapboxCoreMaps": "11.23.1",
+      "MapboxCommon": "24.23.1",
+      "Turf": "4.0.0",
+      "CocoaPods": "1.15.2"
+    },
+    "swiftpm": "No Package.resolved found in retained iOS project/workspace outside Pods/build. CocoaPods pins and hashes are the applicable dependency receipts.",
+    "priorProducedMetadata": "org.reactjs.native.example.OneMapMapbox, executable OneMapMapbox, version1.0/build1; embedded MapboxCoreMaps11.23.1. Prior output is not a substitute for new success-only produced/installed receipts.",
+    "mapboxAccessTokenAvailable": true
+  },
+  "sourceTrace": {
+    "selection": "PR60 selector accepts explicit queries/mapbox while retaining both-engine default and lifetime-only reuse.",
+    "driver": "Ordinary iOS queries use checked xcodebuild/install/launch on assigned UUID and selected workspace/scheme/build folder. Ports checked before Metro acquisition; stale selected app stopped before status binding; owned resources released on failure.",
+    "scene": "Existing NativeQueriesScreen/useQueriesSmoke/QueriesMap with local GeoJSON/background-style fixtures; no MVT fixture or port8798. Known feature IDs, empty/filter/source queries, cluster expansion/leaves/children/pagination, state operations and application-owned explicit recreation/style clearing.",
+    "coverageLimit": "No claim of automatic feature-state clearing or exhaustive cluster ordering; no broader native acceptance."
+  },
+  "routineVerification": {
+    "results": [
+      {
+        "command": "node scripts/tf06-query-runner.test.mjs",
+        "status": "passed"
+      },
+      {
+        "command": "bun scripts/tf06-query-runner.test.mjs",
+        "status": "passed"
+      },
+      {
+        "command": "node scripts/tf06-smoke-selection.test.mjs",
+        "status": "passed"
+      },
+      {
+        "command": "bun scripts/tf06-smoke-selection.test.mjs",
+        "status": "passed"
+      },
+      {
+        "command": "bun run check:docs",
+        "status": "passed"
+      },
+      {
+        "command": "bun run check",
+        "status": "passed;322 formatted files,296 linted files"
+      },
+      {
+        "command": "git diff --check",
+        "status": "passed"
+      }
+    ],
+    "coverage": "Existing actual runNative VM matrix covers both iOS engines, query/lifetime scopes, selected workspace/scheme/build folder/UUID, checked build/install/launch ordering and failures, status/Metro errors, owned cleanup, fail-closed ordinary TF06 fields and lifetime-only reuse. Selector covers defaults/explicit engines/invalid values. Structural docs:40 files,39 comparison tables and local links.",
+    "warning": "Existing Bun moduleSuffixes unsupported warning; all commands exited0.",
+    "limit": "No new tests for prose-only changes; no app-wide typecheck, native tools or acceptance. Coordinator audit recorded below."
+  },
+  "proposedExecution": {
+    "plan": "docs/revised-api-acceptance-plan.md#next-approval-mapbox-ios-ordinary-queries-and-clusters",
+    "cwd": "/private/tmp/one-map-f05/native-harness",
+    "command": "/bin/sh ../with-ios-env.sh bun scripts/tf06-queries-smoke.mjs ios queries mapbox",
+    "worker": "One GPT-6 Luna medium; coordinator audits and freezes inputs; no Git checks, repairs or retries by execution worker.",
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5, iPhone18Pro/iOS27.0 build24A434",
+    "ports": [
+      8081,
+      8799
+    ],
+    "applicationId": "org.reactjs.native.example.OneMapMapbox",
+    "producedAppPath": "/private/tmp/one-map-f05/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+    "route": "One incremental checked build/install/launch; reuse retained Pods/setup. No Pods/dependency installation or clean build.",
+    "estimate": "5-15 minutes, unmeasured for this scene",
+    "boundsSeconds": {
+      "inventory": 30,
+      "boot": 20,
+      "bootstatus": 120,
+      "portCheck": 10,
+      "build": 600,
+      "watch": 600,
+      "outer": 1800
+    },
+    "receipts": "Scene success only: exact-target installed container, APPL/bundle/executable/version/build, executable AND debug-dylib hashes, embedded MapboxCoreMaps11.23.1 metadata, explicit Podfile.lock/app-root Gemfile.lock/Pods Manifest.lock hashes and CocoaPods resolutions.",
+    "failure": "Stop first failure; no retries or identity follow-ups after scene failure. Before scene acquisition preserve app/services; cleanup only successfully acquired boot. Driver releases owned scene resources; outer shutdown only successfully owned boot. Preserve MapLibre outputs and unknown services."
+  },
+  "preservedHistory": [
+    "records/evidence/revised-api-u25-f05-maplibre-ios-queries-attempt-01.json",
+    "records/evidence/revised-api-u25-f05-maplibre-ios-queries-receipt-completion.json"
+  ],
+  "unverified": "No native host inventory, boot, Pods setup, build/install, Metro or renderer/scene execution performed. Actual Mapbox ordinary query/cluster behavior, new produced/installed identities and broader native acceptance remain unverified.",
+  "coordinatorAudit": {
+    "result": "Passed within documentation-only Mapbox iOS query/cluster preparation scope; no remaining findings.",
+    "independentChecks": "Rechecked retained runner, selector, process helper, query scene/fixtures, wrapper and explicit lock hashes. Unchanged archive and164 installed Mapbox consumer dist files independently verified. Token availability checked as boolean only. Existing Node runner and selector mocks passed.",
+    "scopeReview": "Existing checked iOS path selects Mapbox workspace/scheme/application/derived build folder and exact UUID. Commands acquire only8081/8799; first-failure stop and pre-scene/scene ownership boundaries are explicit. App-root Gemfile.lock path is pinned correctly; no nonexistent SwiftPM receipts required.",
+    "changes": "Documentation and evidence only. No executable, harness, package, peer, patch, lock, SDK or credential changes; no new synchronization needed.",
+    "runtimeGate": "One Luna medium worker, proposed5-15minute incremental query/cluster check after separate approval. Native runtime and new produced/installed receipts remain unverified."
+  }
+}

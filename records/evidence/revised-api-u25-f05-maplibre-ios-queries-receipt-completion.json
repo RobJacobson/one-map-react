@@ -1,0 +1,56 @@
+{
+  "status": "passed",
+  "mode": "Read-only filesystem audit; no native commands or scene rerun",
+  "f05ArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "receipts": {
+    "examples/native-maplibre/ios/Podfile.lock": {
+      "path": "/private/tmp/one-map-f05/native-harness/examples/native-maplibre/ios/Podfile.lock",
+      "sha256": "bb68f6237b7b4a02d2c5514d9424ce3327d763e6dadfb6da8d730fc6a2dee93a",
+      "preparedSha256": "bb68f6237b7b4a02d2c5514d9424ce3327d763e6dadfb6da8d730fc6a2dee93a",
+      "hashMatches": true
+    },
+    "examples/native-maplibre/Gemfile.lock": {
+      "path": "/private/tmp/one-map-f05/native-harness/examples/native-maplibre/Gemfile.lock",
+      "sha256": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+      "preparedSha256": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+      "hashMatches": true
+    },
+    "examples/native-maplibre/ios/OneMapMaplibre.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": {
+      "path": "/private/tmp/one-map-f05/native-harness/examples/native-maplibre/ios/OneMapMaplibre.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+      "sha256": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+      "preparedSha256": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+      "hashMatches": true,
+      "pins": [
+        {
+          "identity": "maplibre-gl-native-distribution",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+          "version": "6.31.0",
+          "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683"
+        }
+      ],
+      "pinsMatch": true
+    },
+    "examples/native-maplibre/ios/OneMapMaplibre.xcworkspace/xcshareddata/swiftpm/Package.resolved": {
+      "path": "/private/tmp/one-map-f05/native-harness/examples/native-maplibre/ios/OneMapMaplibre.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+      "sha256": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+      "preparedSha256": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+      "hashMatches": true,
+      "pins": [
+        {
+          "identity": "maplibre-gl-native-distribution",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+          "version": "6.31.0",
+          "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683"
+        }
+      ],
+      "pinsMatch": true
+    }
+  },
+  "checkpoint": "MapLibre iOS ordinary query/cluster receipt completion",
+  "basis": "records/evidence/revised-api-u25-f05-maplibre-ios-queries-attempt-01.json",
+  "authorization": "Owner approved remaining read-only lock/package-pin checks using correct Gemfile.lock path; unchanged f05, no native rebuild or scene rerun.",
+  "conclusion": "The previously passing scene and app-identity receipts plus this successful lock/pin completion close the approved MapLibre iOS query/cluster scope. Original worker path error and stopped-at-first-failure history remain preserved.",
+  "unrun": "No simulator/host-service command, native rebuild, app installation, Metro, scene rerun or additional acceptance scenario performed. Broader native acceptance remains open."
+}
