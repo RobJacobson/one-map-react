@@ -1,0 +1,140 @@
+{
+  "checkpoint": "U25 f05 Mapbox Android ordinary query/cluster preparation",
+  "status": "Independently audited, reviewed runtime scripts synchronized and frozen; native execution awaiting owner approval",
+  "scope": "Runner/selector and existing mocked matrices plus sole acceptance plan/evidence. No production library, scene/fixture, peer/patch/lock/version, harness or host changes.",
+  "provenance": {
+    "implementationBase": "71805c6e259b14b5df3c3eceb5264fc100455cba",
+    "branch": "codex/u25-mapbox-android-queries",
+    "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "archiveReadPath": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "installedMapboxDist": "All 164 archive dist files compared byte-for-byte to retained Mapbox consumer; all match.",
+    "proposedPublicationFilesSha256": {
+      "scripts/tf06-queries-smoke.mjs": "996bbf6ad351b029ed33a589769be5e95cedd228a84db1c15ccba3c789f8f216",
+      "scripts/tf06-smoke-selection.mjs": "27434db8d0b33108fb94d97cd06c909ed444d2fea7723e603acd3dd896acdd5f",
+      "scripts/tf06-query-runner.test.mjs": "a8a89dddb300af4c3e9d9d4c002fcf0774c56f9d933b606a6f723810f88186be",
+      "scripts/tf06-smoke-selection.test.mjs": "272118add1837957a5de5eb1805a9ef3003b944d8e768bc5c24683e8fa21aa36"
+    },
+    "retainedHarnessFilesSha256": {
+      "scripts/tf06-queries-smoke.mjs": "e417599367f54e68244b28ba18bd63069094548b7e50a090da5c1e2372b7b35b",
+      "scripts/tf06-smoke-selection.mjs": "b68bf6169295e26e5748b00f25205c8d9a34850d42ff907e3e672b0950334081",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "examples/shared/queries-smoke.ts": "aadcd992843f3321c540ed1b9cfb19db32ae822edd2e531e54fe77fb6d1822b7",
+      "examples/shared/queries-map.tsx": "ef9498b977c82c3707c3e2b83d05566a2f907a2b1741cc28601f96caad2e0d6b",
+      "examples/shared/native-queries-screen.tsx": "78b7b0eb158d37c5561c81f615ffb1089d4564c26debd250f92193a7bd4e1a56",
+      "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+      "tests/fixtures/map.json": "8279594359798e3d9e7763242ba0ede1207ad5ae24f84e3d3be1ef241ac21362"
+    },
+    "synchronization": "Coordinator synchronized only reviewed runner and selector into retained harness and verified their exact proposed hashes; other retained inputs unchanged.",
+    "retainedDependencyInputsSha256": {
+      "examples/native-mapbox/package.json": "1bf6d3469daf2e192120944f4859e097dced1bcaf2ce6641777b34f32bbd6878",
+      "examples/native-mapbox/bun.lock": "3a2cff7f9db0732f10ed2334297d3cde2358ff5c67efcbdcba3596cb5fa77e2c",
+      "examples/native-mapbox/android/build.gradle": "37d9ed929a8edc7d5593a17dcb060bb606d031b5753f1e227d35a590953274c4",
+      "examples/native-mapbox/android/app/build.gradle": "22a143d249e8590677e965ac131f09f258d58582f3f8cd018737150214c13dd1",
+      "examples/native-mapbox/node_modules/@rnmapbox/maps/package.json": "bc95a6a9a09c0ffff41f3b049b8b15c28975b671208aaae3d6fcc15bb5138861",
+      "examples/native-mapbox/node_modules/@rnmapbox/maps/android/build.gradle": "5608d36ce48cab12a9a082608c6ae8c557793b03491538fcace33a72db519a38"
+    },
+    "stagingFilesSha256": {
+      "with-android-env.sh": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4",
+      "create-lifetime-task-avd.py": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38",
+      "launch-lifetime-emulator.py": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24"
+    },
+    "sourceAvdConfigSha256": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de"
+  },
+  "filesystemInspection": {
+    "mode": "Read-only filesystem only; no adb/emulator/Gradle/host-service invocation",
+    "image": "Existing /Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/system.img present",
+    "taskAvd": "Both android-avd/OneMapU25F05.avd and OneMapU25F05.ini absent",
+    "present": "Retained Mapbox Android project, dependencies, task android-gradle/caches and app/build/outputs/apk/debug/app-debug.apk",
+    "freeSpace": "6.18 GiB measured during filesystem inspection; earlier coordinator observation was5.4GiB. No deletion or host mutation performed.",
+    "mapboxAccessTokenAvailable": true,
+    "packageVersions": {
+      "one-map-react": "0.1.0-rc.2",
+      "@rnmapbox/maps": "10.3.7",
+      "react-native": "0.87.1",
+      "react-native-teleport": "1.2.1"
+    },
+    "nativeSdkIdentity": "Root android/build.gradle configures RNMapboxMapsVersion11.23.1; installed wrapper android/build.gradle consumes it for com.mapbox.maps. Actual linked SDK version not independently established from retained outputs; no new Gradle resolve/build proposed for receipts."
+  },
+  "sourceAudit": {
+    "rootCause": "Queries bypassed explicit Android CLI target/ABI selection, discovered en0 LAN address and clicked nearby-device permission UI. Lifetime route already used the passed selected-device/loopback startup path.",
+    "repair": "Both scopes require nonblank ANDROID_SERIAL before resources; selector always passes explicit --device and --active-arch-only; both configure localhost:8081 and use explicit API-dependent transport grant before launch. Removed unused LAN/click helpers; retained observational UI status fallback.",
+    "deviceOwnership": "command spawn inherits process environment when options.env is undefined; wrapper ANDROID_SERIAL therefore already scopes adb/logcat/configuration/launch/cleanup. No new serial injection abstraction. Only build passes nativeEnv explicitly.",
+    "unchanged": "iOS checked build/install/launch and lifetime-only binary reuse; ordinary status judge and scene; API37+ permission startup ordering/error propagation; driver app/Metro/process cleanup.",
+    "limits": "Actual Android renderer behavior remains unverified. Query scope requires only owned reverse8081 and no fixture8798."
+  },
+  "routineVerification": {
+    "red": [
+      {
+        "command": "node scripts/tf06-query-runner.test.mjs",
+        "result": "Failed before runner repair: queries hit LAN discovery trap and result was failed instead of passed."
+      },
+      {
+        "command": "bun scripts/tf06-smoke-selection.test.mjs",
+        "result": "Failed before selector repair: query args omitted --device emulator-5580 and --active-arch-only."
+      }
+    ],
+    "green": [
+      {
+        "command": "node scripts/tf06-query-runner.test.mjs",
+        "status": "passed"
+      },
+      {
+        "command": "bun scripts/tf06-query-runner.test.mjs",
+        "status": "passed"
+      },
+      {
+        "command": "node scripts/tf06-smoke-selection.test.mjs",
+        "status": "passed"
+      },
+      {
+        "command": "bun scripts/tf06-smoke-selection.test.mjs",
+        "status": "passed"
+      },
+      {
+        "command": "bun run check",
+        "status": "passed"
+      },
+      {
+        "command": "bun run check:docs",
+        "status": "passed"
+      },
+      {
+        "command": "git diff --check",
+        "status": "passed"
+      }
+    ],
+    "coverage": "Existing actual runNative VM matrix extended to queries and lifetimes: API36/37/38, explicit device/ABI, loopback, no permission clicking/LAN lookup, nativeEnv, grant ordering/errors, invalid/getprop/build/status/Metro/cleanup failures and pre-acquisition missing serial. Existing iOS both-engine/scopes, fail-closed status and lifetime-only reuse matrices retained.",
+    "warning": "Existing Bun moduleSuffixes unsupported warning; checks exited0. Initial formatting-only check failed, targeted formatting corrected, final check passed322 formatted/296 linted files.",
+    "remaining": "No additional routine check required for this runner-only change. Native execution and fresh receipts are unverified; no app-wide typecheck, library rebuild or unrelated workspace-link mutation performed."
+  },
+  "proposedExecution": {
+    "plan": "docs/revised-api-acceptance-plan.md#next-approval-mapbox-android-ordinary-queries-and-clusters",
+    "cwd": "/private/tmp/one-map-f05/native-harness",
+    "command": "/bin/sh ../with-android-env.sh bun scripts/tf06-queries-smoke.mjs android queries mapbox",
+    "worker": "One GPT-6 Luna medium; coordinator source audit/input freeze/result review; worker no Git/repairs/retries.",
+    "target": "emulator-5580, task-private OneMapU25F05, existing SDK37.0 arm64-v8a image",
+    "resources": "Private AVD/owned emulator5580+5581, Metro8081 and owned reverse8081, selected app com.onemapmapbox and child groups. No8798 or8799.",
+    "estimate": "5-15minutes with retained cache, ordinary scene unmeasured; passed Android lifetime scene56.8seconds.",
+    "receipts": "Success only: produced app-debug.apk SHA256 equals exact assigned-target installed base.apk SHA256. Recheck frozen dependency/package/build-file inputs. Record linked native SDK as unverified if existing receipts do not establish it; no extra resolve/build.",
+    "cleanup": "Release only acquired app/Metro/processes/reverse/emulator/task AVD/temporary pulled duplicate and task-isolated daemon started by attempt; preserve produced APK/deps/caches/SDK/iOS outputs/unknown devices/listeners. Stop first failure; no independent retry."
+  },
+  "preservedHistory": [
+    "records/evidence/revised-api-u25-f05-mapbox-ios-queries-attempt-01.json",
+    "records/evidence/revised-api-u25-f05-maplibre-ios-queries-attempt-01.json",
+    "records/evidence/revised-api-u25-f05-maplibre-ios-queries-receipt-completion.json"
+  ],
+  "unverified": "No host inventory/setup, emulator, adb, Gradle, native build/install, Metro or renderer scene executed. Android ordinary query/cluster behavior and fresh produced/installed/linked SDK receipts remain unverified; broader native acceptance remains open.",
+  "implementationReview": {
+    "result": "Runner callers, selected-target inheritance, loopback startup/grant ordering and failure/cleanup paths reviewed; production library and iOS path unchanged.",
+    "documentation": "Proposed approval scope traced to runner, passed lifetime recipe and filesystem inputs; all new local links passed structural docs check. Preserved both iOS outcomes and existing dirty handoff content; no competing execution plan.",
+    "pending": "Independent coordinator audit and red/green reproduction, then reviewed runner/selector synchronization and final input freeze before requesting owner execution approval."
+  },
+  "coordinatorAudit": {
+    "result": "Passed within single Mapbox Android query/cluster preparation scope.",
+    "redGreen": "Independently restored pristine PR61 runtime scripts with new regressions: query selector omitted device/ABI; actual mocked query driver failed on LAN lookup. Restored prepared scripts; Node selector/driver matrices passed.",
+    "inspection": "Both scopes reject missing serial before resources, use assigned CLI device/ABI and inherited adb serial, loopback and existing API-dependent permission grant/error handling. Deleted only unreferenced LAN/click helpers; retained status readback and all query assertions. iOS and lifetime reuse behavior preserved.",
+    "inputs": "Unchanged f05 and 164 installed Mapbox dist files independently verified; dependency/build/source hashes, wrapper, setup/launcher and source AVD config matched. Only two reviewed runtime scripts copied.",
+    "scope": "One task-private emulator from existing image, owned reverse8081 and selected app/Metro only. First-failure stop, cleanup ownership, success-only APK receipt and dependency/source checks are explicit. No new native SDK identity claim.",
+    "runtime": "No adb/emulator/Gradle, host setup, native build/install, Metro or renderer execution performed. Separate owner execution approval remains required."
+  }
+}

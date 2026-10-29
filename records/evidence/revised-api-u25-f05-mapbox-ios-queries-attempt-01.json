@@ -1,0 +1,136 @@
+{
+  "appReceipt": {
+    "MapboxCoreMaps": {
+      "build": "11.23.1",
+      "version": "11.23.1"
+    },
+    "build": "1",
+    "bundleId": "org.reactjs.native.example.OneMapMapbox",
+    "debugDylib": "OneMapMapbox.debug.dylib",
+    "debugDylibSha256": "38a5fffbe67cce11309162ff70b1f34e3e336bfd1f1693b0533751b1574294a9",
+    "executable": "OneMapMapbox",
+    "executableSha256": "d7bdefc398fbc2f5483a51364e904cfe8390d89afd5e7322efa53d84a47ca12e",
+    "installedMatch": true,
+    "installedPath": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/811C08CC-F0B5-4D42-8B3B-BB18DE886D50/OneMapMapbox.app",
+    "packageType": "APPL",
+    "version": "1.0"
+  },
+  "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "cleanup": {
+    "command": "/bin/sh ../with-ios-env.sh xcrun simctl shutdown 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "exit": 0,
+    "ports8081and8799": "released; lsof exit 1 with empty output",
+    "simulator": "shutdown by this run"
+  },
+  "commands": [
+    {
+      "command": "/bin/sh ../with-ios-env.sh xcrun simctl list devices --json",
+      "exit": 0,
+      "state": "Shutdown",
+      "targetAvailable": true
+    },
+    {
+      "command": "/bin/sh ../with-ios-env.sh xcrun simctl boot 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "exit": 0
+    },
+    {
+      "command": "/bin/sh ../with-ios-env.sh xcrun simctl bootstatus 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "exit": 0
+    },
+    {
+      "command": "/bin/sh ../with-ios-env.sh lsof -nP -iTCP:8081 -iTCP:8799 -sTCP:LISTEN -t",
+      "exit": 1,
+      "stdout": "empty; both ports free"
+    },
+    {
+      "command": "/bin/sh ../with-ios-env.sh bun scripts/tf06-queries-smoke.mjs ios queries mapbox",
+      "exit": 0
+    }
+  ],
+  "firstFailure": null,
+  "head": "71805c6e259b14b5df3c3eceb5264fc100455cba",
+  "input": "/private/tmp/one-map-f05/mapbox-ios-queries-attempt-01/inputs.json",
+  "locks": {
+    "/private/tmp/one-map-f05/native-harness/examples/native-mapbox/Gemfile.lock": {
+      "matches": true,
+      "sha256": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912"
+    },
+    "/private/tmp/one-map-f05/native-harness/examples/native-mapbox/ios/Podfile.lock": {
+      "matches": true,
+      "sha256": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874"
+    },
+    "/private/tmp/one-map-f05/native-harness/examples/native-mapbox/ios/Pods/Manifest.lock": {
+      "matches": true,
+      "sha256": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874"
+    }
+  },
+  "pr": 61,
+  "resolutions": {
+    "CocoaPods": "1.15.2",
+    "MapboxCommon": "24.23.1",
+    "MapboxCoreMaps": "11.23.1",
+    "MapboxMaps": "11.23.1",
+    "Turf": "4.0.0",
+    "rnmapbox-maps": "10.3.7"
+  },
+  "scenario": {
+    "key": "mapbox-ios",
+    "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=explicitly-cleared cleared-state=explicitly-cleared error=none note=none phase=done done=1",
+    "loaded": "1",
+    "producedAppPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+    "status": "passed"
+  },
+  "scope": "Single approved Mapbox iOS query-and-cluster scene only; not full native acceptance.",
+  "target": {
+    "bootedByThisRun": true,
+    "device": "iPhone 18 Pro",
+    "initialState": "Shutdown",
+    "runtime": "iOS 27.0 build 24A434",
+    "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+  },
+  "unrun": [],
+  "status": "passed",
+  "provenance": {
+    "pr": 61,
+    "head": "71805c6e259b14b5df3c3eceb5264fc100455cba",
+    "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "filesSha256": {
+      "scripts/tf06-queries-smoke.mjs": "e417599367f54e68244b28ba18bd63069094548b7e50a090da5c1e2372b7b35b",
+      "scripts/tf06-smoke-selection.mjs": "b68bf6169295e26e5748b00f25205c8d9a34850d42ff907e3e672b0950334081",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "examples/shared/queries-smoke.ts": "aadcd992843f3321c540ed1b9cfb19db32ae822edd2e531e54fe77fb6d1822b7",
+      "examples/shared/queries-map.tsx": "ef9498b977c82c3707c3e2b83d05566a2f907a2b1741cc28601f96caad2e0d6b",
+      "examples/shared/native-queries-screen.tsx": "78b7b0eb158d37c5561c81f615ffb1089d4564c26debd250f92193a7bd4e1a56",
+      "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+      "tests/fixtures/map.json": "8279594359798e3d9e7763242ba0ede1207ad5ae24f84e3d3be1ef241ac21362"
+    },
+    "wrapperSha256": "b1de5f761e4813e9877355dc2db6e5daf95eced6a2bd9bba07c369a4ccbe6604",
+    "lockSha256": {
+      "examples/native-mapbox/ios/Podfile.lock": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874",
+      "examples/native-mapbox/Gemfile.lock": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+      "examples/native-mapbox/ios/Pods/Manifest.lock": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874"
+    },
+    "scope": "Approved single Mapbox iOS ordinary query/cluster check; reuse existing Pods/setup; stop first failure; owned cleanup only."
+  },
+  "coordinatorReview": {
+    "outcome": "Approved single Mapbox iOS query/cluster scope passed, including all status fields, code/SDK identity and unchanged dependency receipts.",
+    "independentFilesystemVerification": {
+      "produced": {
+        "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+        "executableSha256": "d7bdefc398fbc2f5483a51364e904cfe8390d89afd5e7322efa53d84a47ca12e",
+        "debugLibrarySha256": "38a5fffbe67cce11309162ff70b1f34e3e336bfd1f1693b0533751b1574294a9",
+        "MapboxCoreMaps": "11.23.1"
+      },
+      "installed": {
+        "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/811C08CC-F0B5-4D42-8B3B-BB18DE886D50/OneMapMapbox.app",
+        "executableSha256": "d7bdefc398fbc2f5483a51364e904cfe8390d89afd5e7322efa53d84a47ca12e",
+        "debugLibrarySha256": "38a5fffbe67cce11309162ff70b1f34e3e336bfd1f1693b0533751b1574294a9",
+        "MapboxCoreMaps": "11.23.1"
+      }
+    },
+    "inputs": "Independently rechecked unchanged f05 archive, staged scene/fixture/runner/selector/helper/wrapper and three explicit lock hashes after run.",
+    "cleanup": "Worker recorded released ports8081/8799 and shutdown only of the assigned simulator successfully booted by this run.",
+    "serialization": "Normalized a literal escaped newline appended outside worker JSON; receipt content preserved.",
+    "scopeLimit": "Both iOS query/cluster environments now have passing recorded outcomes; Android query/cluster and broader native acceptance remain open."
+  }
+}

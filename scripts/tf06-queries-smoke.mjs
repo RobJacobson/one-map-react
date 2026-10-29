@@ -272,16 +272,6 @@ async function removeAndroidBundle(shell) {
   ]);
 }
 
-async function lanAddress() {
-  const address = (await command("ipconfig", ["getifaddr", "en0"])).trim();
-
-  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) {
-    throw new Error("en0 has no IPv4 address");
-  }
-
-  return address;
-}
-
 async function writeDebugHost(applicationId, host) {
   const prefs = `shared_prefs/${applicationId}_preferences.xml`;
   const remote = `run-as ${applicationId} sh -c 'cat > ${prefs}'`;
@@ -366,44 +356,6 @@ async function startAndroidApp(applicationId) {
   ]);
 }
 
-async function allowNearbyDevices() {
-  const started = Date.now();
-
-  while (Date.now() - started < 8000) {
-    await command("adb", ["shell", "uiautomator", "dump", "/sdcard/ui.xml"]);
-    const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]);
-    const point = /nearby devices/i.test(xml) ? allowButtonPoint(xml) : null;
-
-    if (point) {
-      await command("adb", [
-        "shell",
-        "input",
-        "tap",
-        String(point.x),
-        String(point.y),
-      ]);
-      return;
-    }
-
-    await delay(500);
-  }
-}
-
-function allowButtonPoint(xml) {
-  const nodes = xml.match(/<node\b[^>]*>/g) ?? [];
-  const allow = nodes.find((node) => node.includes('text="Allow"'));
-  const bounds = allow?.match(/bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/);
-
-  if (!bounds) {
-    return null;
-  }
-
-  return {
-    x: Math.round((Number(bounds[1]) + Number(bounds[3])) / 2),
-    y: Math.round((Number(bounds[2]) + Number(bounds[4])) / 2),
-  };
-}
-
 async function readAndroidStatus() {
   const log = await command("adb", ["logcat", "-d"], {}, 20000);
   const fromLog = latestStatus(log);
@@ -460,11 +412,7 @@ function openStatusPort() {
 
 async function runNative({ directory, platform, applicationId }) {
   const shell = join(root, "examples", directory);
-  if (
-    platform === "android" &&
-    lifetimes &&
-    !process.env.ANDROID_SERIAL?.trim()
-  )
+  if (platform === "android" && !process.env.ANDROID_SERIAL?.trim())
     throw new Error("ANDROID_SERIAL must identify the assigned emulator.");
 
   await freePort(8081);
@@ -538,12 +486,10 @@ async function runNative({ directory, platform, applicationId }) {
       await removeAndroidBundle(shell);
       await command("bun", androidArgs, { cwd: shell, env: nativeEnv }, 600000);
 
-      const address = lifetimes ? "localhost" : await lanAddress();
-      await writeDebugHost(applicationId, `${address}:8081`);
+      await writeDebugHost(applicationId, "localhost:8081");
       await command("adb", ["logcat", "-c"]);
       await grantAndroidTransportPermission(applicationId);
       await startAndroidApp(applicationId);
-      if (!lifetimes) await allowNearbyDevices();
 
       const status = await watchNative({
         readStatus: () => {

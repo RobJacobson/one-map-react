@@ -40,35 +40,77 @@ const grantSource = () =>
     "async function grantAndroidTransportPermission(",
     "async function startAndroidApp("
   );
-for (const mode of [
-  "pass36",
-  "pass37",
-  "pass38",
-  "invalid-api",
-  "grant-failure",
-  "getprop-failure",
-  "build-failure",
-  "status-failure",
-  "metro-exit",
-  "metro-spawn",
-  "metro-timeout",
-  "metro-poll-exit",
-  "cleanup-failure",
-]) {
-  const sdk =
-    { pass36: "36", pass38: "38", "invalid-api": "invalid" }[mode] ?? "37";
-  const metro = child();
-  const cleanup = [];
-  const calls = [];
-  let installed = false;
-  let configured = false;
-  let granted = false;
-  let launched = false;
-  const command = async (file, args, options) => {
-    calls.push([file, ...args]);
-    assert(!args.includes("input") && !args.includes("uiautomator"));
-    if (file === "bun") {
-      assert.deepEqual(Array.from(args), [
+for (const scope of ["lifetimes", "queries"]) {
+  for (const mode of [
+    "pass36",
+    "pass37",
+    "pass38",
+    "invalid-api",
+    "grant-failure",
+    "getprop-failure",
+    "build-failure",
+    "status-failure",
+    "metro-exit",
+    "metro-spawn",
+    "metro-timeout",
+    "metro-poll-exit",
+    "cleanup-failure",
+  ]) {
+    const sdk =
+      { pass36: "36", pass38: "38", "invalid-api": "invalid" }[mode] ?? "37";
+    const metro = child();
+    const cleanup = [];
+    const calls = [];
+    let installed = false;
+    let configured = false;
+    let granted = false;
+    let launched = false;
+    const command = async (file, args, options) => {
+      calls.push([file, ...args]);
+      assert(!args.includes("input") && !args.includes("uiautomator"));
+      if (file === "bun") {
+        assert.deepEqual(Array.from(args), [
+          "run",
+          "android",
+          "--",
+          "--no-packager",
+          "--device",
+          "emulator-5580",
+          "--active-arch-only",
+        ]);
+        assert.equal(options.env.ANDROID_SERIAL, "emulator-5580");
+        if (mode === "build-failure") throw new Error(mode);
+        installed = true;
+      }
+      if (args.includes("getprop")) {
+        assert(installed && configured && !launched);
+        if (mode === "getprop-failure") throw new Error(mode);
+        return sdk;
+      }
+      if (args.includes("grant")) {
+        assert(installed && configured && !launched);
+        assert(
+          args.includes("com.onemapmapbox") &&
+            args.includes("android.permission.ACCESS_LOCAL_NETWORK")
+        );
+        if (mode === "grant-failure") throw new Error(mode);
+        granted = true;
+      }
+      if (args.includes("force-stop")) {
+        cleanup.push("app");
+        if (mode === "cleanup-failure") throw new Error(mode);
+      }
+      return "";
+    };
+    const grant = evaluate(`(${grantSource()})`, { command });
+    const run = evaluate(`(${runSource})`, {
+      root: "/harness",
+      join: (...parts) => parts.join("/"),
+      lifetimes: scope === "lifetimes",
+      process: { env: { ANDROID_SERIAL: "emulator-5580" } },
+      fixture: scope === "lifetimes" ? { requests: [] } : null,
+      reuseIosDigest: undefined,
+      androidArgs: [
         "run",
         "android",
         "--",
@@ -76,142 +118,125 @@ for (const mode of [
         "--device",
         "emulator-5580",
         "--active-arch-only",
-      ]);
-      assert.equal(options.env.ANDROID_SERIAL, "emulator-5580");
-      if (mode === "build-failure") throw new Error(mode);
-      installed = true;
-    }
-    if (args.includes("getprop")) {
-      assert(installed && configured && !launched);
-      if (mode === "getprop-failure") throw new Error(mode);
-      return sdk;
-    }
-    if (args.includes("grant")) {
-      assert(installed && configured && !launched);
-      assert(
-        args.includes("com.onemapmapbox") &&
-          args.includes("android.permission.ACCESS_LOCAL_NETWORK")
-      );
-      if (mode === "grant-failure") throw new Error(mode);
-      granted = true;
-    }
-    if (args.includes("force-stop")) {
-      cleanup.push("app");
-      if (mode === "cleanup-failure") throw new Error(mode);
-    }
-    return "";
-  };
-  const grant = evaluate(`(${grantSource()})`, { command });
-  const run = evaluate(`(${runSource})`, {
-    root: "/harness",
-    join: (...parts) => parts.join("/"),
-    lifetimes: true,
-    process: { env: { ANDROID_SERIAL: "emulator-5580" } },
-    fixture: { requests: [] },
-    reuseIosDigest: undefined,
-    androidArgs: [
-      "run",
-      "android",
-      "--",
-      "--no-packager",
-      "--device",
-      "emulator-5580",
-      "--active-arch-only",
-    ],
-    freePort: async () => {},
-    command,
-    grantAndroidTransportPermission: grant,
-    spawn: (_file, _args, options) => {
-      assert(options.detached);
-      assert.equal(options.env.TF06_BASE, "http://127.0.0.1:8798");
-      return metro;
-    },
-    lanAddress: async () => assert.fail("Lifetime transport must use loopback"),
-    waitFor: async (ready) => {
-      metro.stdout.emit("data", "Metro on port 8081");
+      ],
+      freePort: async () => {},
+      command,
+      grantAndroidTransportPermission: grant,
+      spawn: (_file, _args, options) => {
+        assert(options.detached);
+        assert.equal(
+          options.env.TF06_BASE,
+          scope === "lifetimes" ? "http://127.0.0.1:8798" : undefined
+        );
+        assert.equal(
+          options.env.ONE_MAP_SMOKE,
+          scope === "lifetimes" ? "tf06-lifetimes" : "tf06"
+        );
+        return metro;
+      },
+      lanAddress: async () =>
+        assert.fail("Android transport must use loopback"),
+      waitFor: async (ready) => {
+        metro.stdout.emit("data", "Metro on port 8081");
+        assert.equal(
+          ready(),
+          false,
+          "A port banner does not establish readiness"
+        );
+        if (mode === "metro-exit") metro.emit("exit", 2);
+        if (mode === "metro-spawn") metro.emit("error", new Error(mode));
+        if (mode === "metro-timeout") throw new Error(mode);
+        if (["metro-exit", "metro-spawn"].includes(mode)) ready();
+        metro.stdout.emit("data", "Dev server ready");
+        assert.equal(ready(), true);
+      },
+      removeAndroidBundle: async () => {},
+      writeDebugHost: async (app, host) => {
+        assert(installed);
+        assert.equal(app, "com.onemapmapbox");
+        assert.equal(host, "localhost:8081");
+        configured = true;
+      },
+      startAndroidApp: async () => {
+        assert(configured && (Number(sdk) < 37 || granted));
+        launched = true;
+      },
+      allowNearbyDevices: async () =>
+        assert.fail("Android scope must not click permissions"),
+      readAndroidStatus: async () => {
+        if (mode === "status-failure") throw new Error(mode);
+        return "done=1";
+      },
+      watchNative: async ({ readStatus }) => {
+        assert(launched);
+        if (mode === "metro-poll-exit") metro.emit("exit", 2);
+        return readStatus();
+      },
+      judge: () => ({ status: "passed" }),
+      stopOwnedProcess: async () => cleanup.push("metro"),
+      awaitMetroPortRelease: async () => cleanup.push("port"),
+    });
+    const pending = run({
+      directory: "native-mapbox",
+      platform: "android",
+      applicationId: "com.onemapmapbox",
+    });
+    if (mode === "cleanup-failure")
+      await assert.rejects(pending, /cleanup-failure/);
+    else {
+      const result = await pending;
       assert.equal(
-        ready(),
-        false,
-        "A port banner does not establish readiness"
+        result.status,
+        mode.startsWith("pass") ? "passed" : "failed",
+        JSON.stringify(result)
       );
-      if (mode === "metro-exit") metro.emit("exit", 2);
-      if (mode === "metro-spawn") metro.emit("error", new Error(mode));
-      if (mode === "metro-timeout") throw new Error(mode);
-      if (["metro-exit", "metro-spawn"].includes(mode)) ready();
-      metro.stdout.emit("data", "Dev server ready");
-      assert.equal(ready(), true);
-    },
-    removeAndroidBundle: async () => {},
-    writeDebugHost: async (app, host) => {
-      assert(installed);
-      assert.equal(app, "com.onemapmapbox");
-      assert.equal(host, "localhost:8081");
-      configured = true;
-    },
-    startAndroidApp: async () => {
-      assert(configured && (Number(sdk) < 37 || granted));
-      launched = true;
-    },
-    allowNearbyDevices: async () =>
-      assert.fail("Lifetime scope must not click permissions"),
-    readAndroidStatus: async () => {
-      if (mode === "status-failure") throw new Error(mode);
-      return "done=1";
-    },
-    watchNative: async ({ readStatus }) => {
-      assert(launched);
-      if (mode === "metro-poll-exit") metro.emit("exit", 2);
-      return readStatus();
-    },
-    judge: () => ({ status: "passed" }),
-    stopOwnedProcess: async () => cleanup.push("metro"),
-    awaitMetroPortRelease: async () => cleanup.push("port"),
-  });
-  const pending = run({
-    directory: "native-mapbox",
-    platform: "android",
-    applicationId: "com.onemapmapbox",
-  });
-  if (mode === "cleanup-failure")
-    await assert.rejects(pending, /cleanup-failure/);
-  else {
-    const result = await pending;
-    assert.equal(
-      result.status,
-      mode.startsWith("pass") ? "passed" : "failed",
-      JSON.stringify(result)
-    );
-    if (mode === "invalid-api")
-      assert.match(result.error, /Invalid Android API/);
+      if (mode === "invalid-api")
+        assert.match(result.error, /Invalid Android API/);
+      if (
+        [
+          "grant-failure",
+          "getprop-failure",
+          "build-failure",
+          "status-failure",
+          "metro-spawn",
+          "metro-timeout",
+        ].includes(mode)
+      )
+        assert.match(result.error, new RegExp(mode));
+    }
+    assert(cleanup.includes("metro") && cleanup.includes("port"), mode);
+    if (
+      [
+        "invalid-api",
+        "grant-failure",
+        "getprop-failure",
+        "build-failure",
+        "metro-exit",
+        "metro-spawn",
+        "metro-timeout",
+      ].includes(mode)
+    )
+      assert.equal(launched, false);
+    if (sdk === "36") assert.equal(granted, false);
   }
-  assert(cleanup.includes("metro") && cleanup.includes("port"), mode);
-  if (
-    [
-      "invalid-api",
-      "grant-failure",
-      "getprop-failure",
-      "build-failure",
-      "metro-exit",
-      "metro-spawn",
-      "metro-timeout",
-    ].includes(mode)
-  )
-    assert.equal(launched, false);
-  if (sdk === "36") assert.equal(granted, false);
 }
 
-const unassignedRun = evaluate(`(${runSource})`, {
-  root: "/harness",
-  join: (...parts) => parts.join("/"),
-  lifetimes: true,
-  process: { env: {} },
-  freePort: async () =>
-    assert.fail("Unassigned lifetime run must fail before acquiring resources"),
-});
-await assert.rejects(
-  unassignedRun({ directory: "native-mapbox", platform: "android" }),
-  /ANDROID_SERIAL/
-);
+for (const scope of ["lifetimes", "queries"]) {
+  const unassignedRun = evaluate(`(${runSource})`, {
+    root: "/harness",
+    join: (...parts) => parts.join("/"),
+    lifetimes: scope === "lifetimes",
+    process: { env: {} },
+    freePort: async () =>
+      assert.fail(
+        "Unassigned Android run must fail before acquiring resources"
+      ),
+  });
+  await assert.rejects(
+    unassignedRun({ directory: "native-mapbox", platform: "android" }),
+    /ANDROID_SERIAL/
+  );
+}
 
 for (const failure of ["app", "status", "metro", "bind", null]) {
   const cleanup = [];
@@ -693,5 +718,5 @@ try {
   rmSync(wrapperRoot, { recursive: true, force: true });
 }
 console.log(
-  "PASS TF06 mocked iOS query/lifetime and Android lifetime startup, selected engine/device, API permission ordering, transport, readiness, errors and owned cleanup; no host tools executed."
+  "PASS TF06 mocked iOS query/lifetime and Android query/lifetime startup, selected engine/device, API permission ordering, transport, readiness, errors and owned cleanup; no host tools executed."
 );
