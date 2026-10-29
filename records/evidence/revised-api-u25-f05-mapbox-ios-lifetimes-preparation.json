@@ -1,0 +1,105 @@
+{
+  "checkpoint": "U25 f05 Mapbox iOS feature-state lifetime preparation",
+  "kind": "planning/reference",
+  "audience": "owner and execution worker",
+  "purpose": "Approve one real Mapbox iOS lifetime run",
+  "nonGoals": "Full native acceptance; other engines/platforms; input; host repair",
+  "status": "Prepared and independently audited; routine checks passed; execution files synchronized and frozen; native execution awaiting owner approval",
+  "scope": {
+    "changed": [
+      "scripts/tf06-queries-smoke.mjs",
+      "scripts/tf06-query-runner.test.mjs",
+      "scripts/with-ios-env.sh",
+      "docs/revised-api-acceptance-plan.md",
+      "records/README.md"
+    ],
+    "unchanged": "f05/library/scene/fixture/peers/versions/locks/native SDK sources. No simulator, host-service, GUI, Metro, Pods/build/install or renderer execution during preparation."
+  },
+  "provenance": {
+    "publicationBase": "32ec402 (PR56 open)",
+    "branch": "codex/u25-mapbox-ios-lifetimes",
+    "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "preparedFilesSha256": {
+      "scripts/tf06-queries-smoke.mjs": "e56285711818b3150e5c3a02eb937812e91abe390459d1e7e182adecd4bb473c",
+      "scripts/tf06-query-runner.test.mjs": "bd8f06673b45ebced43a5483c828815e23cb835f7c284e804d64f5fb547bd225",
+      "scripts/with-ios-env.sh": "b1de5f761e4813e9877355dc2db6e5daf95eced6a2bd9bba07c369a4ccbe6604",
+      "scripts/tf06-smoke-selection.mjs": "2bf6a07aa61e28ced6283066cad4dd860c1a13ec52e73ffe47cc6dcee29919d7",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+      "examples/shared/lifetimes-smoke.ts": "14c58e76e2904e51f4e7e051ed42e087fd5974b8c84386d39115334c2306b39f",
+      "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f"
+    },
+    "harnessTf06BeforeSyncSha256": "03f0c765620567aeeefac5abf98ce131e6afea74021965ec44f489edcaffa8ce",
+    "harnessSync": "Coordinator copied audited driver/regression/wrapper to retained harness, and identical wrapper beside staging runtime/Ruby directories. All matched prepared SHA256 identities before approval request.",
+    "copiedOutcomes": {
+      "revised-api-u25-f05-mapbox-android-lifetimes-attempt-05.json": "15d4e1380f88e4023f2f1e7fa903b55c0220a687913ac0ffed83f60e6e7fa0bc",
+      "revised-api-u25-f05-maplibre-android-lifetimes-attempt-01.json": "fec2f71a47f1b02ddc44cd89124c16b64f564cb50cf7e13b8a282cace516aec7"
+    }
+  },
+  "retainedArtifacts": {
+    "inspection": "Read-only bounded file listing and plist reads, without simctl/host services.",
+    "installedApp": "Assigned simulator data contains OneMapMapbox.app, bundle org.reactjs.native.example.OneMapMapbox, APPL, executable OneMapMapbox, version1.0/build1.",
+    "installedSeparateCode": "OneMapMapbox.debug.dylib is present. Executable-only comparison would not establish compiled app code identity.",
+    "embeddedMapboxCoreMapsVersion": "11.23.1 from installed Frameworks/MapboxCoreMaps.framework/Info.plist; not a trusted produced baseline.",
+    "producedBaseline": "No independently produced Mapbox .app/executable found under retained Mapbox iOS directory or DerivedData; binary reuse is unavailable for this attempt.",
+    "pods": "Both task iOS Pods directories absent after owner-authorized retirement. Retained generated workspace/project, Podfile.lock, Gemfile.lock and task gems remain. Mapbox ios/build about468KiB.",
+    "sourcePins": "ReactNative0.87.1, RNMapbox10.3.7; Podfile/lock MapboxMaps11.23.1; lock CocoaPods1.15.2. No claim of future linked identity.",
+    "disk": "Coordinator measured9.2GiB free after retiring completed Android compilation caches while preserving APKs/downloads. Prior Mapbox Pods about1.6GiB; fresh build demand unmeasured."
+  },
+  "sourceTrace": {
+    "selection": "Existing one-engine ios lifetimes mapbox selection/fail-fast preserved; top-level explicit UUID validation precedes fixture/process acquisition.",
+    "startup": "All iOS build/lookup/launch/terminate calls target one TF06_IOS_UDID. Stop prior selected app before current fixture collection/status listener. Preserve only missing-app/not-running allowances.",
+    "reuse": "Optional single-digest route validates one .app path, safe executable file name, APPL, selected bundle identifier and expected digest before launch, with no build. It rejects a separate executable.debug.dylib because one accepted digest cannot authenticate that code. Wrapper unsets reuse for this fresh-build attempt.",
+    "freshBuild": "Fresh iOS lifetimes uses one checked xcodebuild against existing selected workspace/scheme, Debug, explicit assigned destination and known derivedDataPath; checks exact-UDID install and launch separately. Returns producedAppPath. Ordinary query CLI keeps explicit UDID. Pinned CLI drops custom derivedDataPath on install lookup and ignores simctl install exit status; direct commands close both defects without peer/dependency edits.",
+    "compatibility": "Retained react-native/scripts/cocoapods/new_architecture.rb NewArchitectureHelper.new_arch_enabled returns true; retained RNMapbox podspec consults it. No added compatibility flag.",
+    "judge": "Unchanged TF06L judge requires all query/removal/namespaces checks and explicitly-cleared source/style/family transitions. Destination clearing is scene-owned, not automatic library clearing.",
+    "resources": "Fixture8798 outer finally; status8799, Metro8081 and detached owned subprocess groups nested cleanup; unknown listeners/other devices never killed."
+  },
+  "routineVerification": {
+    "red": "Before fix, added actual runNative VM regression failed because simctl arguments used booted. A second focused regression rejected the inherited CLI build/install route because native install exits were not checked.",
+    "green": [
+      "node scripts/tf06-query-runner.test.mjs",
+      "node scripts/tf06-smoke-selection.test.mjs",
+      "node --check scripts/tf06-queries-smoke.mjs",
+      "/bin/sh -n scripts/with-ios-env.sh",
+      "vp lint scripts/tf06-queries-smoke.mjs scripts/tf06-query-runner.test.mjs",
+      "bun scripts/tf06-query-runner.test.mjs",
+      "node --check scripts/tf06-query-runner.test.mjs",
+      "vp check (322 formatted files; 296 files linted)",
+      "node scripts/check-docs.mjs (40 Markdown files, 39 SDK comparison tables; structural only)",
+      "git diff --check"
+    ],
+    "coverage": "Actual runNative VM iOS fresh build and reuse, exact UDID, stale-stop order, digest/metadata rejection, missing/not-running versus service errors, build/watch/bind failure, nested cleanup; all existing Android regressions retained. Module validation before fixture, iOS failfast, wrapper env/token/no-reuse/short build binding checked without native tools. Direct fresh build verifies exact workspace/scheme/destination/derivedDataPath, exactly one build, produced path and install/launch failure before observation. Separate debug dylib refuses unauthenticated reuse. Stale fixture requests, including final old-app callback, clear only after old-app stop.",
+    "intermediateFailures": [
+      "Mock additions initially omitted scope and over-repeated the service-error stub during cleanup; corrected test setup.",
+      "Wrapper mock initially compared /var temp spelling with canonical /private/var; corrected test root.",
+      "Initial docs check preceded new evidence and reported its missing link; rerun after evidence creation."
+    ],
+    "limitations": "Mocks prove covered orchestration only. No native or renderer execution. No library/type build applicable to runner-only change.",
+    "toolReuse": "Temporary publication/node_modules symlink reused primary tooling without install; removed before worker handoff.",
+    "warnings": "Bun passes with its existing moduleSuffixes-not-supported warning; no TypeScript configuration changed."
+  },
+  "proposedExecution": {
+    "plan": "docs/revised-api-acceptance-plan.md#next-approval-mapbox-ios-feature-state-lifetimes",
+    "route": "Restore locked Pods with /opt/homebrew/bin/bundle exec pod install --deployment, then one fresh runner build; no regeneration/bundle install.",
+    "command": "/bin/sh /private/tmp/one-map-f05/with-ios-env.sh bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+    "cwd": "/private/tmp/one-map-f05/native-harness",
+    "worker": "One GPT-6 Luna medium worker; stronger coordinator audits/results. Stop first failure, no worker repair/retry.",
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5; iPhone18Pro; iOS27.0 build24A434 accepted boot evidence. Conditional boot only if Shutdown; bootstatus without -b; shutdown only owned successful boot; app terminate not uninstall.",
+    "identity": "After successful scene before owned simulator cleanup, validate produced/installed app metadata; compare executable AND OneMapMapbox.debug.dylib digests/presence and embedded MapboxCoreMaps version metadata. No extra build/build-settings command. Identity scope is executable/debug code and recorded framework metadata, not full bundle certification.",
+    "producedApp": "/private/tmp/one-map-f05/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+    "estimatedDuration": "20-60min unmeasured; outer60min; Pods20min; build10min; status10min.",
+    "permission": "Not granted by preparation; every future host/native action requires explicit agreed execution approval.",
+    "nativeBuildCommand": "xcodebuild -workspace H/examples/native-mapbox/ios/OneMapMapbox.xcworkspace -scheme OneMapMapbox -configuration Debug -destination id=8B7D7CE4-228E-409F-A156-A597D4E448A5 -derivedDataPath H/examples/native-mapbox/ios/build build; then checked simctl install/launch exact UDID. No CLI output parser, secondary build or showBuildSettings command."
+  },
+  "coordinatorAudit": {
+    "outcome": "Passed for source, comments, provenance, routine/mocked checks and proposed execution scope. Actual Mapbox iOS lifetime check unverified.",
+    "inspection": "Traced all assigned-UDID startup/reuse/build/install/launch/terminate paths, stale-app and fixture reset ordering, Metro/status/fixture cleanup, actual lifetime judge and SDK metadata limitations.",
+    "cliCorrection": "Independently inspected pinned CLI source: build uses custom derivedDataPath, install lookup omits it, and install/launch subprocess status can be logged without failing caller. Direct checked build/install/launch avoids that defect without modifying CLI or f05.",
+    "binaryCorrection": "Existing installed app contains a separate debug dylib; plan compares loader and actual debug code plus available framework metadata. Single-digest reuse rejects separate dylibs rather than authenticating only a loader.",
+    "independentTests": "Final mocked iOS/Android runner suite, selection regression, documentation structure and diff checks passed. Temporary restore of booted targeting independently failed the iOS startup regression. Lifetime judge unchanged from PR56.",
+    "freeze": "Reviewed file hashes verified while syncing retained harness and stage wrapper. Actual stage wrapper nonsecret environment bindings checked, including canonical Ruby paths and disabled untrusted reuse. f05 archive independently unchanged.",
+    "storage": "Retired only completed task Android compiled transforms/generated jars and remaining app intermediates; preserved APKs, dependency downloads, source, iOS project/gems/locks. Measured9.2GiB free after retirement.",
+    "executionBoundary": "No simulator, host service, Metro, Pods installation, native build/install or renderer run during preparation or audit."
+  }
+}

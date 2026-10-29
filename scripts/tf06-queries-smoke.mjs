@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -36,6 +36,13 @@ if (
 }
 
 const nativeEngines = selectNativeEngines(scope, process.argv[4]);
+const iosUdid = process.env.TF06_IOS_UDID;
+if (
+  (group === "ios" || group === "all") &&
+  !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(iosUdid ?? "")
+) {
+  throw new Error("TF06_IOS_UDID must identify the assigned simulator UUID.");
+}
 const reuseIosDigest = process.env.TF06_IOS_BINARY_SHA256;
 if (reuseIosDigest) {
   if (!lifetimes || group !== "ios" || nativeEngines.length !== 1)
@@ -479,7 +486,7 @@ async function runNative({ directory, platform, applicationId }) {
         }
       : {}),
   };
-  if (fixture) fixture.requests.length = 0;
+  if (fixture && platform === "android") fixture.requests.length = 0;
   const metro = spawn("bun", metroArgs, {
     cwd: shell,
     env: nativeEnv,
@@ -501,24 +508,21 @@ async function runNative({ directory, platform, applicationId }) {
   metro.stderr.on("data", record);
 
   let statusPort = null;
+  let producedAppPath;
 
   try {
     if (platform === "ios") {
       try {
-        await command("xcrun", [
-          "simctl",
-          "terminate",
-          "booted",
-          applicationId,
-        ]);
+        await command("xcrun", ["simctl", "terminate", iosUdid, applicationId]);
       } catch (error) {
         if (
-          !/application\b.*\bnot running|found nothing to terminate|no such process/i.test(
+          !/application\b.*\bnot (?:running|installed)|found nothing to terminate|no such process/i.test(
             error.message
           )
         )
           throw error;
       }
+      if (fixture) fixture.requests.length = 0;
       statusPort = await openStatusPort();
     }
     await waitFor(
@@ -559,11 +563,13 @@ async function runNative({ directory, platform, applicationId }) {
         await command("xcrun", [
           "simctl",
           "get_app_container",
-          "booted",
+          iosUdid,
           applicationId,
           "app",
         ])
       ).trim();
+      if (!/^\/[^\r\n]+\.app$/.test(app))
+        throw new Error("Installed app container must identify one .app path.");
       const executable = (
         await command("/usr/libexec/PlistBuddy", [
           "-c",
@@ -571,13 +577,70 @@ async function runNative({ directory, platform, applicationId }) {
           join(app, "Info.plist"),
         ])
       ).trim();
+      if (!/^[^/\\\r\n]+$/.test(executable) || [".", ".."].includes(executable))
+        throw new Error("Installed app executable must be one file name.");
+      if (existsSync(join(app, `${executable}.debug.dylib`)))
+        throw new Error(
+          "Single-digest reuse cannot verify a separate debug dylib."
+        );
+      const identifier = (
+        await command("/usr/libexec/PlistBuddy", [
+          "-c",
+          "Print:CFBundleIdentifier",
+          join(app, "Info.plist"),
+        ])
+      ).trim();
+      const packageType = (
+        await command("/usr/libexec/PlistBuddy", [
+          "-c",
+          "Print:CFBundlePackageType",
+          join(app, "Info.plist"),
+        ])
+      ).trim();
+      if (identifier !== applicationId || packageType !== "APPL")
+        throw new Error(
+          "Installed app metadata does not match the selected app."
+        );
       const digest = (
         await command("shasum", ["-a", "256", join(app, executable)])
       )
         .trim()
         .split(/\s+/)[0];
       verifyNativeBinary(scope, reuseIosDigest, digest);
-      await command("xcrun", ["simctl", "launch", "booted", applicationId]);
+      await command("xcrun", ["simctl", "launch", iosUdid, applicationId]);
+    } else if (lifetimes) {
+      const scheme =
+        directory === "native-mapbox" ? "OneMapMapbox" : "OneMapMaplibre";
+      const buildFolder =
+        process.env.TF06_IOS_BUILD_FOLDER ?? join(shell, "ios", "build");
+      producedAppPath = join(
+        buildFolder,
+        "Build",
+        "Products",
+        "Debug-iphonesimulator",
+        `${scheme}.app`
+      );
+      // The pinned run-ios CLI ignores install failures and drops its build-folder override on lookup.
+      await command(
+        "xcodebuild",
+        [
+          "-workspace",
+          join(shell, "ios", `${scheme}.xcworkspace`),
+          "-scheme",
+          scheme,
+          "-configuration",
+          "Debug",
+          "-destination",
+          `id=${iosUdid}`,
+          "-derivedDataPath",
+          buildFolder,
+          "build",
+        ],
+        { cwd: shell, env: nativeEnv },
+        600000
+      );
+      await command("xcrun", ["simctl", "install", iosUdid, producedAppPath]);
+      await command("xcrun", ["simctl", "launch", iosUdid, applicationId]);
     } else {
       await command(
         "bun",
@@ -588,8 +651,8 @@ async function runNative({ directory, platform, applicationId }) {
           "--no-packager",
           "--port",
           "8081",
-          "--simulator",
-          "iPhone 18 Pro",
+          "--udid",
+          iosUdid,
         ],
         { cwd: shell, env: nativeEnv },
         600000
@@ -607,6 +670,7 @@ async function runNative({ directory, platform, applicationId }) {
     return {
       ...judge(status),
       ...(fixture ? { fixtureRequests: [...fixture.requests] } : {}),
+      ...(producedAppPath ? { producedAppPath } : {}),
       ...(reuseIosDigest
         ? {
             reusedNativeBuild: true,
@@ -628,11 +692,11 @@ async function runNative({ directory, platform, applicationId }) {
         await command("xcrun", [
           "simctl",
           "terminate",
-          "booted",
+          iosUdid,
           applicationId,
         ]).catch((error) => {
           if (
-            !/application\b.*\bnot running|found nothing to terminate|no such process/i.test(
+            !/application\b.*\bnot (?:running|installed)|found nothing to terminate|no such process/i.test(
               error.message
             )
           )
