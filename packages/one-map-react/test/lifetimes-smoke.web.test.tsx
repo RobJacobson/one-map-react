@@ -13,7 +13,7 @@ import type {
 type Family = "geojson" | "vector";
 
 /** Model renderer generations separately from React commits and retain state on demand. */
-const fixture = (stringIds = false) => {
+const fixture = (stringIds = false, deferredRemoval = false) => {
   let sourceRevision = 0;
   let renderedRevision = 0;
   let family: Family = "vector";
@@ -69,12 +69,17 @@ const fixture = (stringIds = false) => {
   const removeFeatureState = vi.fn(
     async (target: FeatureIdentifier, property?: string) => {
       record("removeFeatureState", target);
-      if (property === undefined) states.delete(key(target));
-      else {
-        const next = { ...states.get(key(target)) };
-        delete next[property];
-        states.set(key(target), next);
-      }
+      const remove = () => {
+        if (property === undefined) states.delete(key(target));
+        else {
+          const next = { ...states.get(key(target)) };
+          delete next[property];
+          states.set(key(target), next);
+        }
+      };
+      // Native SDK reads include pending writes before frame-coalesced deletions.
+      if (deferredRemoval) setTimeout(remove, 0);
+      else remove();
     }
   );
   // This partial handle exercises only the smoke's documented map operations.
@@ -188,9 +193,11 @@ test.each([
       renderer.calls
         .filter((call) => call.method === "removeFeatureState")
         .map((call) => call.revision)
-    ).toEqual([
-      0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
-    ]);
+    ).toEqual(
+      retainState
+        ? [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4]
+        : [0, 0, 2, 2]
+    );
     const transitions = renderer.calls.filter(
       (call) => call.method === "setFeatureState" && call.revision >= 2
     );
@@ -209,6 +216,50 @@ test.each([
     ).toBe(true);
   }
 );
+
+test.each([false, true])(
+  "frame-deferred removal preserves independent keys with retained state=%s",
+  async (retainState) => {
+    const renderer = fixture(false, true);
+    const hook = renderHook(() => {
+      const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
+      const { sourceRevision, family, phase, onStyleLoad } = smoke;
+      useLayoutEffect(() => {
+        if (sourceRevision === 0 || phase === "done") return;
+        renderer.commit(sourceRevision, family, retainState, phase);
+        if (retainState && phase === "to-geojson") {
+          renderer.states.set("geojson/1", { count: 99 });
+          renderer.states.set("geojson/2", { count: 98 });
+        }
+        if (phase === "style") onStyleLoad();
+      }, [sourceRevision, family, phase, onStyleLoad]);
+      return smoke;
+    });
+    act(() => hook.result.current.onLoad());
+    await drive(hook);
+    expect(hook.result.current.phase).toBe("done");
+    expect(hook.result.current.status).toContain("error=none");
+    expect(hook.result.current.status).toContain(
+      "vector-to-geojson=explicitly-cleared"
+    );
+    expect(hook.result.current.status).toContain(
+      "final-remount=explicitly-cleared"
+    );
+  }
+);
+
+test("key removal still fails when it deletes the independent count", async () => {
+  const renderer = fixture();
+  renderer.removeFeatureState.mockImplementation(async () => {
+    renderer.states.clear();
+  });
+  const hook = renderHook(() => useLifetimesSmoke({ mapRef: renderer.mapRef }));
+  act(() => hook.result.current.onLoad());
+  await drive(hook);
+  expect(hook.result.current.status).toContain(
+    "error=Key-removal-also-removed-count."
+  );
+});
 
 test("render generation gates source and state dispatch while native attachment is pending", async () => {
   const renderer = fixture();
