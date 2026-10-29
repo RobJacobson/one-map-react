@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -36,6 +36,13 @@ if (
 }
 
 const nativeEngines = selectNativeEngines(scope, process.argv[4]);
+const iosUdid = process.env.TF06_IOS_UDID;
+if (
+  (group === "ios" || group === "all") &&
+  !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(iosUdid ?? "")
+) {
+  throw new Error("TF06_IOS_UDID must identify the assigned simulator UUID.");
+}
 const reuseIosDigest = process.env.TF06_IOS_BINARY_SHA256;
 if (reuseIosDigest) {
   if (!lifetimes || group !== "ios" || nativeEngines.length !== 1)
@@ -56,7 +63,10 @@ const awaitMetroPortRelease = async () => {
       "-iTCP:8081",
       "-sTCP:LISTEN",
       "-t",
-    ]).catch(() => "");
+    ]).catch((error) => {
+      if (error.message === "lsof exited 1") return "";
+      throw error;
+    });
     if (!listeners.trim()) break;
     if (Date.now() >= releasedBy)
       throw new Error("Owned Metro did not release port 8081.");
@@ -84,6 +94,12 @@ try {
         platform: "android",
         applicationId: `com.onemap${engine}`,
       });
+      if (results[`${engine}-android`].status !== "passed") {
+        console.log(JSON.stringify(results, null, 2));
+        throw new Error(
+          `${engine} android smoke failed; no later engine was started.`
+        );
+      }
     }
   }
 
@@ -94,6 +110,12 @@ try {
         platform: "ios",
         applicationId: `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`,
       });
+      if (results[`${engine}-ios`].status !== "passed") {
+        console.log(JSON.stringify(results, null, 2));
+        throw new Error(
+          `${engine} ios smoke failed; no later engine was started.`
+        );
+      }
     }
   }
 } finally {
@@ -280,7 +302,10 @@ async function writeDebugHost(applicationId, host) {
     applicationId,
     "cat",
     prefs,
-  ]).catch(() => "");
+  ]).catch((error) => {
+    if (/No such file or directory/.test(error.message)) return "";
+    throw error;
+  });
 
   await command("adb", ["shell", remote], {
     input: debugHostPreference(existing, host),
@@ -310,6 +335,27 @@ function debugHostPreference(existing, host) {
   ].join("\n");
 }
 
+async function grantAndroidTransportPermission(applicationId) {
+  const sdk = Number(
+    await command("adb", ["shell", "getprop", "ro.build.version.sdk"])
+  );
+
+  if (!Number.isInteger(sdk) || sdk <= 0) {
+    throw new Error("Invalid Android API level.");
+  }
+
+  // React Native gates loadApp on this grant even when Metro uses adb reverse.
+  if (sdk >= 37) {
+    await command("adb", [
+      "shell",
+      "pm",
+      "grant",
+      applicationId,
+      "android.permission.ACCESS_LOCAL_NETWORK",
+    ]);
+  }
+}
+
 async function startAndroidApp(applicationId) {
   await command("adb", [
     "shell",
@@ -324,17 +370,8 @@ async function allowNearbyDevices() {
   const started = Date.now();
 
   while (Date.now() - started < 8000) {
-    await command("adb", [
-      "shell",
-      "uiautomator",
-      "dump",
-      "/sdcard/ui.xml",
-    ]).catch(() => "");
-    const xml = await command("adb", [
-      "exec-out",
-      "cat",
-      "/sdcard/ui.xml",
-    ]).catch(() => "");
+    await command("adb", ["shell", "uiautomator", "dump", "/sdcard/ui.xml"]);
+    const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]);
     const point = /nearby devices/i.test(xml) ? allowButtonPoint(xml) : null;
 
     if (point) {
@@ -368,22 +405,15 @@ function allowButtonPoint(xml) {
 }
 
 async function readAndroidStatus() {
-  const log = await command("adb", ["logcat", "-d"], {}, 20000).catch(() => "");
+  const log = await command("adb", ["logcat", "-d"], {}, 20000);
   const fromLog = latestStatus(log);
 
   if (fromLog) {
     return fromLog;
   }
 
-  await command("adb", [
-    "shell",
-    "uiautomator",
-    "dump",
-    "/sdcard/ui.xml",
-  ]).catch(() => "");
-  const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]).catch(
-    () => ""
-  );
+  await command("adb", ["shell", "uiautomator", "dump", "/sdcard/ui.xml"]);
+  const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]);
 
   return latestStatus(xml.replaceAll("&#10;", " "));
 }
@@ -430,6 +460,12 @@ function openStatusPort() {
 
 async function runNative({ directory, platform, applicationId }) {
   const shell = join(root, "examples", directory);
+  if (
+    platform === "android" &&
+    lifetimes &&
+    !process.env.ANDROID_SERIAL?.trim()
+  )
+    throw new Error("ANDROID_SERIAL must identify the assigned emulator.");
 
   await freePort(8081);
   if (platform === "ios") await freePort(8799);
@@ -446,14 +482,11 @@ async function runNative({ directory, platform, applicationId }) {
     ONE_MAP_SMOKE: lifetimes ? "tf06-lifetimes" : "tf06",
     ...(lifetimes
       ? {
-          TF06_BASE:
-            platform === "android"
-              ? `http://${await lanAddress()}:8798`
-              : "http://127.0.0.1:8798",
+          TF06_BASE: "http://127.0.0.1:8798",
         }
       : {}),
   };
-  if (fixture) fixture.requests.length = 0;
+  if (fixture && platform === "android") fixture.requests.length = 0;
   const metro = spawn("bun", metroArgs, {
     cwd: shell,
     env: nativeEnv,
@@ -464,24 +497,39 @@ async function runNative({ directory, platform, applicationId }) {
     metroLog += chunk.toString();
   };
 
+  let metroFailure;
+  metro.on("error", (error) => {
+    metroFailure = error;
+  });
+  metro.on("exit", (code) => {
+    metroFailure = new Error(`Metro exited ${code}`);
+  });
   metro.stdout.on("data", record);
   metro.stderr.on("data", record);
 
-  if (platform === "ios") {
-    // Stop a prior run before accepting status from the new installation.
-    await command("xcrun", [
-      "simctl",
-      "terminate",
-      "booted",
-      applicationId,
-    ]).catch(() => undefined);
-  }
   let statusPort = null;
+  let producedAppPath;
 
   try {
-    if (platform === "ios") statusPort = await openStatusPort();
+    if (platform === "ios") {
+      try {
+        await command("xcrun", ["simctl", "terminate", iosUdid, applicationId]);
+      } catch (error) {
+        if (
+          !/application\b.*\bnot (?:running|installed)|found nothing to terminate|no such process/i.test(
+            error.message
+          )
+        )
+          throw error;
+      }
+      if (fixture) fixture.requests.length = 0;
+      statusPort = await openStatusPort();
+    }
     await waitFor(
-      () => metroLog.includes("Dev server ready") || metroLog.includes("8081"),
+      () => {
+        if (metroFailure) throw metroFailure;
+        return metroLog.includes("Dev server ready");
+      },
       60000,
       "Metro"
     );
@@ -490,13 +538,18 @@ async function runNative({ directory, platform, applicationId }) {
       await removeAndroidBundle(shell);
       await command("bun", androidArgs, { cwd: shell, env: nativeEnv }, 600000);
 
-      await writeDebugHost(applicationId, `${await lanAddress()}:8081`);
+      const address = lifetimes ? "localhost" : await lanAddress();
+      await writeDebugHost(applicationId, `${address}:8081`);
       await command("adb", ["logcat", "-c"]);
+      await grantAndroidTransportPermission(applicationId);
       await startAndroidApp(applicationId);
-      await allowNearbyDevices();
+      if (!lifetimes) await allowNearbyDevices();
 
       const status = await watchNative({
-        readStatus: readAndroidStatus,
+        readStatus: () => {
+          if (metroFailure) throw metroFailure;
+          return readAndroidStatus();
+        },
       });
 
       return {
@@ -510,11 +563,13 @@ async function runNative({ directory, platform, applicationId }) {
         await command("xcrun", [
           "simctl",
           "get_app_container",
-          "booted",
+          iosUdid,
           applicationId,
           "app",
         ])
       ).trim();
+      if (!/^\/[^\r\n]+\.app$/.test(app))
+        throw new Error("Installed app container must identify one .app path.");
       const executable = (
         await command("/usr/libexec/PlistBuddy", [
           "-c",
@@ -522,13 +577,70 @@ async function runNative({ directory, platform, applicationId }) {
           join(app, "Info.plist"),
         ])
       ).trim();
+      if (!/^[^/\\\r\n]+$/.test(executable) || [".", ".."].includes(executable))
+        throw new Error("Installed app executable must be one file name.");
+      if (existsSync(join(app, `${executable}.debug.dylib`)))
+        throw new Error(
+          "Single-digest reuse cannot verify a separate debug dylib."
+        );
+      const identifier = (
+        await command("/usr/libexec/PlistBuddy", [
+          "-c",
+          "Print:CFBundleIdentifier",
+          join(app, "Info.plist"),
+        ])
+      ).trim();
+      const packageType = (
+        await command("/usr/libexec/PlistBuddy", [
+          "-c",
+          "Print:CFBundlePackageType",
+          join(app, "Info.plist"),
+        ])
+      ).trim();
+      if (identifier !== applicationId || packageType !== "APPL")
+        throw new Error(
+          "Installed app metadata does not match the selected app."
+        );
       const digest = (
         await command("shasum", ["-a", "256", join(app, executable)])
       )
         .trim()
         .split(/\s+/)[0];
       verifyNativeBinary(scope, reuseIosDigest, digest);
-      await command("xcrun", ["simctl", "launch", "booted", applicationId]);
+      await command("xcrun", ["simctl", "launch", iosUdid, applicationId]);
+    } else if (lifetimes) {
+      const scheme =
+        directory === "native-mapbox" ? "OneMapMapbox" : "OneMapMaplibre";
+      const buildFolder =
+        process.env.TF06_IOS_BUILD_FOLDER ?? join(shell, "ios", "build");
+      producedAppPath = join(
+        buildFolder,
+        "Build",
+        "Products",
+        "Debug-iphonesimulator",
+        `${scheme}.app`
+      );
+      // The pinned run-ios CLI ignores install failures and drops its build-folder override on lookup.
+      await command(
+        "xcodebuild",
+        [
+          "-workspace",
+          join(shell, "ios", `${scheme}.xcworkspace`),
+          "-scheme",
+          scheme,
+          "-configuration",
+          "Debug",
+          "-destination",
+          `id=${iosUdid}`,
+          "-derivedDataPath",
+          buildFolder,
+          "build",
+        ],
+        { cwd: shell, env: nativeEnv },
+        600000
+      );
+      await command("xcrun", ["simctl", "install", iosUdid, producedAppPath]);
+      await command("xcrun", ["simctl", "launch", iosUdid, applicationId]);
     } else {
       await command(
         "bun",
@@ -539,8 +651,8 @@ async function runNative({ directory, platform, applicationId }) {
           "--no-packager",
           "--port",
           "8081",
-          "--simulator",
-          "iPhone 18 Pro",
+          "--udid",
+          iosUdid,
         ],
         { cwd: shell, env: nativeEnv },
         600000
@@ -548,13 +660,17 @@ async function runNative({ directory, platform, applicationId }) {
     }
 
     const status = await watchNative({
-      readStatus: () => statusPort.read(),
+      readStatus: () => {
+        if (metroFailure) throw metroFailure;
+        return statusPort.read();
+      },
       timeout: 600000,
     });
 
     return {
       ...judge(status),
       ...(fixture ? { fixtureRequests: [...fixture.requests] } : {}),
+      ...(producedAppPath ? { producedAppPath } : {}),
       ...(reuseIosDigest
         ? {
             reusedNativeBuild: true,
@@ -569,23 +685,35 @@ async function runNative({ directory, platform, applicationId }) {
       log: metroLog.slice(-1500),
     };
   } finally {
-    if (platform === "android") {
-      await command("adb", ["shell", "am", "force-stop", applicationId]).catch(
-        () => undefined
-      );
+    try {
+      if (platform === "android") {
+        await command("adb", ["shell", "am", "force-stop", applicationId]);
+      } else {
+        await command("xcrun", [
+          "simctl",
+          "terminate",
+          iosUdid,
+          applicationId,
+        ]).catch((error) => {
+          if (
+            !/application\b.*\bnot (?:running|installed)|found nothing to terminate|no such process/i.test(
+              error.message
+            )
+          )
+            throw error;
+        });
+      }
+    } finally {
+      try {
+        await statusPort?.close();
+      } finally {
+        try {
+          await stopOwnedProcess(metro);
+        } finally {
+          await awaitMetroPortRelease();
+        }
+      }
     }
-    if (platform === "ios") {
-      await command("xcrun", [
-        "simctl",
-        "terminate",
-        "booted",
-        applicationId,
-      ]).catch(() => undefined);
-    }
-
-    await statusPort?.close();
-    await stopOwnedProcess(metro);
-    await awaitMetroPortRelease();
   }
 }
 
@@ -780,47 +908,52 @@ function command(file, args, options = {}, timeout = 120000) {
     const child = spawn(file, args, {
       cwd: options.cwd,
       env: options.env,
+      signal: options.signal,
+      detached: true,
       stdio: [options.input === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
-
-    if (options.input !== undefined) {
-      child.stdin.end(options.input);
-    }
+    if (options.input !== undefined) child.stdin.end(options.input);
     let output = "";
+    let stopping = false;
+    const stop = async (error) => {
+      if (stopping) return;
+      stopping = true;
+      clearTimeout(timer);
+      try {
+        await stopOwnedProcess(child);
+        reject(error);
+      } catch (cleanupError) {
+        reject(cleanupError);
+      }
+    };
     const timer = setTimeout(() => {
-      child.kill("SIGTERM");
-      reject(new Error(`${file} timed out`));
+      void stop(new Error(`${file} timed out`));
     }, timeout);
-
     child.stdout.on("data", (chunk) => {
       output += chunk.toString();
     });
     child.stderr.on("data", (chunk) => {
       output += chunk.toString();
     });
-    child.on("error", reject);
+    child.on("error", (error) => {
+      void stop(error);
+    });
     child.on("close", (code) => {
       clearTimeout(timer);
-
-      if (code === 0) {
-        resolve(output);
-        return;
-      }
-
-      reject(new Error(output.slice(-2000) || `${file} exited ${code}`));
+      if (stopping) return;
+      if (code === 0) resolve(output);
+      else
+        void stop(new Error(output.slice(-2000) || `${file} exited ${code}`));
     });
   });
 }
 
 async function freePort(port) {
-  const listed = await command("lsof", [
-    "-nP",
-    `-iTCP:${port}`,
-    "-sTCP:LISTEN",
-    "-t",
-  ]).catch(() => "");
-  if (listed.trim())
-    throw new Error(
-      `Port ${port} is already occupied; stop its owner before acceptance.`
-    );
+  try {
+    await command("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"]);
+  } catch (error) {
+    if (error.message === "lsof exited 1") return;
+    throw error;
+  }
+  throw new Error(`Port ${port} is occupied; no listener was terminated.`);
 }

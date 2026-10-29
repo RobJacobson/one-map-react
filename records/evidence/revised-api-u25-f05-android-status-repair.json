@@ -1,0 +1,80 @@
+{
+  "checkpoint": "U25 f05 Android status harness repair",
+  "status": "Implemented and independently audited; routine checks passed; repaired real Android execution awaiting owner approval",
+  "scope": {
+    "changed": [
+      "scripts/tf04-camera-smoke.mjs",
+      "scripts/tf04-camera-runner.test.mjs",
+      "docs/revised-api-acceptance-plan.md"
+    ],
+    "unchanged": "Frozen f05 package, library/fixture source, manifests, peers, versions, locks and publication patches. No native or renderer tool ran during repair."
+  },
+  "provenance": {
+    "publicationBase": "0da98126e0e996f1927c7383735a5028b9320283",
+    "executedHarnessRunnerSha256": "96a0cb616da92e7fde8d43f4e47017c9084c3ec8c0c1d8b631e472ae9037ca06",
+    "repairedRunnerSha256": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+    "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "retainedDebugApkSha256": "ddd7d9527e50c5937abf4b2090eb6f56e4f9ad0788196b535372569db6cad485",
+    "stagingRoot": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw",
+    "baselineDelta": "Imported the executed scoped runner/test delta from native-harness into the clean publication checkout. This preserves MapLibre iOS and both-engine Android basic selection, assigned-device CLI arguments and owned Android cleanup alongside the new status repair.",
+    "historicalRecords": [
+      "revised-api-u25-f05-mapbox-minimal-attempt-03.json",
+      "revised-api-u25-f05-maplibre-minimal-attempt-02.json",
+      "revised-api-u25-f05-mapbox-android-minimal-attempt-01.json",
+      "revised-api-u25-f05-mapbox-android-minimal-attempt-02.json"
+    ],
+    "preparedHarnessRunnerSha256": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+    "preparedHarnessTestSha256": "6048da01f093c96b8a0fc4351a830b15ab1b146e04168b8f24163cef7b0cd83c"
+  },
+  "diagnosis": {
+    "observed": "Attempt02 awaited successful build/install/launch CLI completion, then watched 180 seconds and ended with Native smoke ended at: no status. Metro was ready without bundle output. This does not establish map load or camera behavior.",
+    "sourceBasis": "Retained generated consumer React Native 0.87.1, inspected locally without native execution.",
+    "activityDelegate": "native-harness/examples/native-mapbox/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/ReactActivityDelegate.java:171-173 invokes requestLocalNetworkAccessIfNeeded before loadApp.",
+    "permissionGate": "native-harness/examples/native-mapbox/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/devsupport/LocalNetworkPermissionUtil.kt:32-47 requests ACCESS_LOCAL_NETWORK for debug API>=37 when missing, then invokes the callback after a response. Host choice does not bypass this startup gate.",
+    "manifest": "native-harness/examples/native-mapbox/android/app/build/intermediates/merged_manifests/debug/processDebugManifest/AndroidManifest.xml:23 already declares ACCESS_LOCAL_NETWORK; line52 permits cleartext. No manifest repair needed.",
+    "rootCause": "The minimal basic path skipped allowNearbyDevices and assumed loopback avoided the startup prompt. This is a source-backed explanation of the missing status, reproduced by the mock startup gate.",
+    "confidenceLimit": "No dialog screenshot, runtime permission dump or actual startup callback trace was captured in the failed run. The source and mocked call path support the diagnosis; the repaired real Android path remains unverified.",
+    "existingPattern": "Primary scripts/tf08-services-smoke.mjs:1516-1529 already grants the same permission after API validation. It was read only.",
+    "androidVersion": "native-harness/examples/native-mapbox/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/util/AndroidVersion.kt:35 defines VERSION_CODE_CINNAMON_BUN as 37."
+  },
+  "repair": {
+    "startup": "Shared Android runNative awaits API query and selected-app grant after build/install and writeDebugHost force-stop/configuration, before final startAndroidApp. API<37 skips grant; invalid API or command rejection yields failed result before observation.",
+    "status": "readAndroidStatus retains logcat-first/UI fallback and propagates logcat, UI dump and UI read errors instead of converting them to missing status.",
+    "ownership": "Basic requires ANDROID_SERIAL, CLI selects that device, adb inherits the same serial, basic sends no input and force-stops the selected app in finally. All paths retain owned Metro cleanup. Full Android retains its existing dialog/input behavior with the shared startup grant.",
+    "acceptanceMeaning": "The basic judge still requires actual fit=ok, phase=await-click and reported center inside fitted bounds. No fixture or expected-coordinate substitution was introduced."
+  },
+  "routineVerification": {
+    "red": "Before adding the startup grant, node scripts/tf04-camera-runner.test.mjs failed in actual extracted runNative: mocked API37 load stayed gated and returned Native smoke ended at: no status instead of passed. Existing 18 mocks and camera basic cases had passed first.",
+    "green": "node scripts/tf04-camera-runner.test.mjs passed: existing 18 ownership/targeting/timeout checks, both iOS engine basic dispatch and Android Mapbox dispatch, four reported-camera cases, pending polling/no input, nine Android startup cases and six status-source cases.",
+    "startupCases": "API36 unchanged, API37 Mapbox basic and API38 MapLibre full grant before launch; invalid/empty API, build/getprop/grant failure stop before observation; watch failure preserves cleanup. Missing Android serial stops before resource acquisition.",
+    "syntax": "node --check passed for runner and runner test.",
+    "processCleanup": "node scripts/native-smoke-process.test.mjs passed using tiny local dummy processes only. Initial restricted run failed with spawn EPERM; the explicitly approved host-access routine rerun passed and process inspection found no dummy residue.",
+    "format": "Targeted repository vp check passed runner/tests: formatting and lint, no warnings/errors. Existing installed tooling was reused through a temporary publication node_modules symlink, then the symlink was removed. No dependencies installed.",
+    "coordinatorRegression": "Coordinator independently removed only the grant-before-launch call in a temporary copy and observed the exact no-status mock failure; the unmodified final suite passed. No host or renderer tools executed in that regression.",
+    "docs": "node scripts/check-docs.mjs passed: 40 Markdown files, 39 SDK comparison tables and local links; git diff --check passed. Editorial/source review is bounded to this change."
+  },
+  "remainingGates": [
+    "Explicit owner approval before one minimal Mapbox Android retry on API37.0/emulator-5580 with reviewed harness and unchanged f05.",
+    "Real Android load/camera behavior, remaining interactions and full native release acceptance unverified."
+  ],
+  "proposalOwner": "docs/revised-api-acceptance-plan.md#next-approval-minimal-mapbox-android-retry",
+  "coordinatorAudit": {
+    "outcome": "Passed within source and routine/mock scope; source-backed startup diagnosis remains to be confirmed in the approved real run.",
+    "review": "Reviewed RN activity startup callback, debug API permission gate, generated merged manifest, full/basic Android startup ordering, selected-device inheritance, old Android behavior, status errors and ownership cleanup. No manifest or production package repair needed.",
+    "independentRedGreen": "Removing only grant-before-launch in temporary reviewed runner reproduced exact no-status failure in runNative mock path. Unmodified final suite passed.",
+    "routineChecks": "Final runner mocked suite, process-group cleanup regression using small dummy processes, documentation structural check and git diff --check passed.",
+    "planCorrections": "Removed unobserved Android opening-latitude assertion and retained 300-second boot wait. Final bounds still use actual renderer-reported fit state.",
+    "freeze": "Copied only audited runner and regression test to execution harness and verified matching bytes before requesting user approval. Frozen archive SHA256 independently unchanged.",
+    "execution": "No emulator, app build/install or acceptance rerun during diagnosis, implementation or audit."
+  },
+  "causalReaudit": {
+    "scope": "Read-only retained source/bytecode inspection and existing mocked runner regression after PR55 commit 6f2e5fb. No emulator, app build, installation, Metro server or real transport ran; no additional implementation defect found in the inspected startup-to-status path.",
+    "cachedBinary": "android-gradle/caches/9.4.1/transforms/c8d737c3c0055e1311341b8104ccc79b/transformed/react-android-0.87.1-debug-runtime.jar",
+    "cachedBinarySha256": "d6ff1f6d7c10c16c4d7a006cb711aaaffc57513ddb932507abf953b3c4652eca",
+    "binaryProof": "Read-only javap inspection confirms com.facebook.react.BuildConfig.DEBUG initializes from Boolean.parseBoolean(\"true\"); ReactBuildConfig.DEBUG reads that field. LocalNetworkPermissionUtil compares SDK_INT against literal 37 and the selected activity permission state. When permission is missing, the loadApp callback runs only after a permission response; no Metro-host/localhost bypass exists in this gate.",
+    "selectedAppChain": "MainActivity extends permission-aware ReactActivity and names OneMapMapbox, matching the app.json/index.js registration and runner applicationId com.onemapmapbox. The merged debug manifest declares ACCESS_LOCAL_NETWORK and android:debuggable=true. writeDebugHost force-stops that app before writing debug_http_host to its default package_preferences file; PackagerConnectionSettings reads the same key/file. The repaired grant then precedes the selected-app final launch. adb commands inherit ANDROID_SERIAL, and the basic CLI passes that device explicitly.",
+    "statusChain": "ONE_MAP_SMOKE=tf04 selects NativeCameraScreen, whose initial status text exists at mount and whose onLoad/onMoveEnd drive reported fit state. Status is read from logcat with UI fallback. Permission grant corrects the upstream loadApp gate itself; removing status-reader catches improves failure diagnostics only.",
+    "verification": "Existing node scripts/tf04-camera-runner.test.mjs passed again with no host tools. Reviewed runner hashes match between publication and execution harness; frozen f05 archive SHA remains unchanged.",
+    "confidenceLimit": "The failed historical run captured no permission dialog, permission-state dump or loadApp callback trace. Compiled dependency/source and mocked red/green establish the startup defect and correction mechanism; attribution of that historical no-status outcome and repaired real Android behavior still require the separately approved runtime rerun."
+  }
+}

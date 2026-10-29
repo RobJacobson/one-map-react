@@ -1,0 +1,97 @@
+{
+  "attempt": "maplibre-minimal-02",
+  "outcome": "passed",
+  "scenario": "single MapLibre iOS camera continuation",
+  "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+  "host_access": "require_escalated explicitly used for each simulator/build execution and owned-resource cleanup",
+  "commands": [
+    {
+      "argv": [
+        "xcrun",
+        "simctl",
+        "list",
+        "devices",
+        "--json"
+      ],
+      "duration_seconds": 2.4,
+      "exit_code": 0,
+      "observation": "Assigned iPhone 18 Pro / iOS 27.0 UDID 8B7D7CE4-228E-409F-A156-A597D4E448A5 was available and Shutdown."
+    },
+    {
+      "argv": [
+        "xcrun",
+        "simctl",
+        "boot",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "duration_seconds": 2.8,
+      "exit_code": 0,
+      "observation": "Boot succeeded; this attempt owns simulator shutdown."
+    },
+    {
+      "argv": [
+        "xcrun",
+        "simctl",
+        "bootstatus",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "duration_seconds": 1.9,
+      "exit_code": 0,
+      "observation": "Device already booted, nothing to do."
+    },
+    {
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "ios",
+        "maplibre-basic"
+      ],
+      "duration_seconds": 149,
+      "exit_code": 0,
+      "result": {
+        "maplibre-ios": {
+          "status": "passed",
+          "fit": "ok",
+          "phase": "await-click",
+          "center": "-122.32000,47.64000",
+          "done": "0"
+        }
+      },
+      "observed_stdout": [
+        "TF04 fit=pending click=pending clickAt=pending stop=pending held=pending command=pending doubletap=pending center=-122.34000,47.61000 note=none phase=await-load done=0",
+        "TF04 fit=pending click=pending clickAt=pending stop=pending held=pending command=pending doubletap=pending center=-122.34000,47.61000 note=none phase=await-fit done=0",
+        "TF04 fit=ok click=pending clickAt=pending stop=pending held=pending command=pending doubletap=pending center=-122.32000,47.64000 note=none phase=await-click done=0"
+      ]
+    }
+  ],
+  "environment_prefix_each_command": "env RUBYLIB=/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path BUNDLE_PATH=/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems PATH=\"/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/runtime-bin:/opt/homebrew/bin:$PATH\" TF04_IOS_UDID=8B7D7CE4-228E-409F-A156-A597D4E448A5",
+  "secrets": "MAPBOX_ACCESS_TOKEN inherited but not printed, copied, or recorded",
+  "provenance": {
+    "package": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "package_sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "runner_sha256": "8f7af53ab8e4e049858b3ee934ebe7edc53538ff333854c411ffba92a1b4271f",
+    "identity_limit": "Package and runner provenance supplied by coordinator; no extra identity or host-readiness gates were run. Build/install output did not provide an additional recorded artifact identity."
+  },
+  "cleanup": {
+    "owned_ports": [
+      8081,
+      8799
+    ],
+    "port_check": "lsof -nP -iTCP:8081 -iTCP:8799 -sTCP:LISTEN returned no listener (exit 1).",
+    "simulator": "Shutdown command succeeded for the assigned simulator booted by this attempt.",
+    "other_devices_or_apps_touched": false,
+    "final_simulator_status": "Shutdown (confirmed by final simctl inventory; device available)"
+  },
+  "not_run": [
+    "Mapbox, Android, full suite, user input, acceptance retries, source edits, dependency installation, pod installation, generation, GUI, TapDriver"
+  ],
+  "failure": null,
+  "coordinator_review": {
+    "provenance": "Coordinator independently verified unchanged f05 archive SHA-256 and reviewed scoped runner SHA-256 immediately before dispatch.",
+    "observations": "Recorded status progresses from opening center -122.34000,47.61000 through await-fit to fit=ok, phase=await-click at -122.32000,47.64000, inside approved bounds.",
+    "scope": "Single real MapLibre iOS build/install/launch, map load and automatic fitBounds observation. No interaction.",
+    "cleanup": "Worker reports normal runner cleanup, empty owned ports and successful shutdown of only assigned simulator booted by this attempt.",
+    "prior_failure": "Attempt01 stopped at inventory run under default restricted permissions. Explicitly approved attempt02 used host access and passed; original failure retained.",
+    "remaining_verification": "No independent produced-versus-installed executable hash comparison or linked-binary SDK verification. Android and full native acceptance remain unverified."
+  }
+}

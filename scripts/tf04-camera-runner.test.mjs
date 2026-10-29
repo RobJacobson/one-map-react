@@ -262,10 +262,15 @@ console.log(
   `PASS ${checks} mocked TF04 runner ownership, targeting, failure and timeout checks; no host tool executed.`
 );
 
-const basicBlock = section("if (mapboxBasic) {", '} else if (group === "ios"');
+const basicBlock = section(
+  "if (mapboxBasic || maplibreBasic) {",
+  '} else if (group === "ios"'
+);
 const basicInvocations = [];
 await evaluate(`(async () => { ${basicBlock} } })()`, {
   mapboxBasic: true,
+  maplibreBasic: false,
+  group: "ios",
   results: {},
   runNative: async (options) => {
     basicInvocations.push(options);
@@ -276,6 +281,26 @@ assert.equal(basicInvocations.length, 1);
 assert.equal(basicInvocations[0].directory, "native-mapbox");
 assert.equal(basicInvocations[0].basic, true);
 assert.equal(basicInvocations[0].inputDriver, undefined);
+const maplibreInvocations = [];
+await evaluate(`(async () => { ${basicBlock} } })()`, {
+  mapboxBasic: false,
+  maplibreBasic: true,
+  group: "ios",
+  results: {},
+  runNative: async (options) => {
+    maplibreInvocations.push(options);
+    return { status: "passed" };
+  },
+});
+assert.equal(maplibreInvocations.length, 1);
+assert.equal(maplibreInvocations[0].directory, "native-maplibre");
+assert.equal(
+  maplibreInvocations[0].applicationId,
+  "org.reactjs.native.example.OneMapMaplibre"
+);
+assert.equal(maplibreInvocations[0].basic, true);
+assert.equal(maplibreInvocations[0].inputDriver, undefined);
+
 const watch = evaluate(
   `(${section("async function watchNative(", "function latestStatus(")})`,
   {
@@ -299,7 +324,7 @@ for (const [status, expected] of [
   assert.equal(judgeBasic(observed, false, "ios", true).status, expected);
 }
 console.log(
-  "PASS basic scope selects Mapbox only, requires fitted renderer center and sends no input."
+  "PASS basic scope selects only the requested engine, requires fitted renderer center and sends no input."
 );
 
 let basicReads = 0;
@@ -311,3 +336,197 @@ await watch({
   basic: true,
 });
 assert.equal(basicReads, 2);
+
+const androidInvocations = [];
+await evaluate(`(async () => { ${basicBlock} } })()`, {
+  mapboxBasic: true,
+  maplibreBasic: false,
+  group: "android",
+  results: {},
+  runNative: async (options) => {
+    androidInvocations.push(options);
+    return { status: "passed" };
+  },
+});
+assert.equal(androidInvocations.length, 1);
+assert.equal(androidInvocations[0].platform, "android");
+assert.equal(androidInvocations[0].directory, "native-mapbox");
+assert.equal(androidInvocations[0].applicationId, "com.onemapmapbox");
+assert.equal(androidInvocations[0].basic, true);
+const permissionSource = section(
+  "async function grantAndroidTransportPermission(",
+  "async function startAndroidApp("
+);
+for (const [sdk, failure, basic, applicationId] of [
+  ["37", "", true, "com.onemapmapbox"],
+  ["36", "", true, "com.onemapmapbox"],
+  ["38", "", false, "com.onemapmaplibre"],
+  ["invalid", "Invalid Android API level", true, "com.onemapmapbox"],
+  ["", "Invalid Android API level", true, "com.onemapmapbox"],
+  ["37", "build failed", true, "com.onemapmapbox"],
+  ["37", "getprop failed", true, "com.onemapmapbox"],
+  ["37", "grant failed", true, "com.onemapmapbox"],
+  ["37", "watch failed", true, "com.onemapmapbox"],
+]) {
+  const calls = [];
+  let installed = false;
+  let configured = false;
+  let granted = false;
+  let mounted = false;
+  let observed = false;
+  let launched = false;
+  const run = evaluate(
+    `(() => { ${permissionSource}; return (${runSource}); })()`,
+    {
+      root: "/harness",
+      join: (...parts) => parts.join("/"),
+      process: { env: { ANDROID_SERIAL: "emulator-5580" } },
+      freePort: async () => {},
+      spawn: () => child(),
+      waitFor: async () => {},
+      removeAndroidBundle: async () => {},
+      command: async (file, args) => {
+        calls.push([file, ...args]);
+        if (file === "bun") {
+          if (basic) {
+            assert(args.includes("--device") && args.includes("emulator-5580"));
+          }
+          if (failure === "build failed") throw new Error(failure);
+          installed = true;
+        }
+        if (args.includes("getprop")) {
+          assert(installed && configured && !launched);
+          if (failure === "getprop failed") throw new Error(failure);
+          return sdk;
+        }
+        if (args.includes("grant")) {
+          assert(installed && configured && !launched);
+          assert.deepEqual(Array.from(args), [
+            "shell",
+            "pm",
+            "grant",
+            applicationId,
+            "android.permission.ACCESS_LOCAL_NETWORK",
+          ]);
+          if (failure === "grant failed") throw new Error(failure);
+          granted = true;
+        }
+        return "";
+      },
+      lanAddress: async () => "192.0.2.1",
+      writeDebugHost: async (app, host) => {
+        assert(installed);
+        assert.equal(app, applicationId);
+        assert.equal(host, basic ? "localhost:8081" : "192.0.2.1:8081");
+        configured = true;
+      },
+      startAndroidApp: async (app) => {
+        assert.equal(app, applicationId);
+        launched = true;
+        mounted = Number(sdk) < 37 || granted;
+      },
+      allowNearbyDevices: async () => assert.equal(basic, false),
+      readAndroidStatus: async () => (mounted ? "fitted" : ""),
+      watchNative: async ({ readStatus, basic: observedBasic }) => {
+        observed = true;
+        assert.equal(observedBasic, basic);
+        if (failure === "watch failed") throw new Error(failure);
+        const status = await readStatus();
+        if (!status) throw new Error("Native smoke ended at: no status");
+        return status;
+      },
+      judge: (status) => {
+        assert.equal(status, "fitted");
+        return { status: "passed" };
+      },
+      stopOwnedProcess: async () => calls.push(["stop-metro"]),
+    }
+  );
+  const result = await run({
+    directory:
+      applicationId === "com.onemapmaplibre"
+        ? "native-maplibre"
+        : "native-mapbox",
+    platform: "android",
+    applicationId,
+    basic,
+  });
+  assert.equal(
+    result.status,
+    failure ? "failed" : "passed",
+    JSON.stringify(result)
+  );
+  if (failure) assert(result.error.includes(failure), result.error);
+  if (failure && failure !== "watch failed") {
+    assert.equal(launched, false);
+    assert.equal(observed, false);
+  }
+  if (sdk === "36") assert.equal(granted, false);
+  if (basic) assert(calls.some((args) => args.includes("force-stop")));
+  assert(calls.some((args) => args[0] === "stop-metro"));
+}
+const unassignedAndroid = evaluate(`(${runSource})`, {
+  root: "/harness",
+  join: (...parts) => parts.join("/"),
+  process: { env: {} },
+  freePort: async () =>
+    assert.fail("Unassigned Android must stop before resources"),
+});
+await assert.rejects(
+  unassignedAndroid({
+    directory: "native-mapbox",
+    platform: "android",
+    basic: true,
+  }),
+  /ANDROID_SERIAL/
+);
+console.log(
+  "PASS Android startup grants API 37+ transport permission before final launch, preserves API 36, propagates failures and cleans owned resources; no host tool executed."
+);
+
+const readStatusSource = section(
+  "async function readAndroidStatus(",
+  "async function startIosTapDriver("
+);
+const parseStatus = evaluate(
+  `(${section("function latestStatus(", "async function tapMap(")})`,
+  {}
+);
+for (const mode of [
+  "log",
+  "ui",
+  "empty",
+  "logcat failure",
+  "dump failure",
+  "read failure",
+]) {
+  const readStatus = evaluate(`(${readStatusSource})`, {
+    latestStatus: parseStatus,
+    command: async (_file, args) => {
+      if (args.includes("logcat")) {
+        if (mode === "logcat failure") throw new Error(mode);
+        return mode === "log" ? "TF04 fit=ok" : "";
+      }
+      if (args.includes("dump") && mode === "dump failure")
+        throw new Error(mode);
+      if (args.includes("exec-out")) {
+        if (mode === "read failure") throw new Error(mode);
+        return mode === "ui" ? 'text="TF04 fit=ok&#10;done=0"' : "";
+      }
+      return "";
+    },
+  });
+  if (mode.includes("failure"))
+    await assert.rejects(readStatus(), new RegExp(mode));
+  else {
+    const expectedStatus = {
+      log: "TF04 fit=ok",
+      ui: "TF04 fit=ok done=0",
+      empty: "",
+    };
+    assert.equal(await readStatus(), expectedStatus[mode]);
+  }
+}
+console.log(
+  "PASS Android status preserves log/UI fallback and propagates adb failures."
+);

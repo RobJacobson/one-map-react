@@ -1,0 +1,95 @@
+{
+  "attempt": "U25 F05 minimal Mapbox Android attempt 01",
+  "status": "stopped at first failure",
+  "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "runnerSha256": "96a0cb616da92e7fde8d43f4e47017c9084c3ec8c0c1d8b631e472ae9037ca06",
+  "environment": {
+    "platform": "Android emulator API 37, arm64-v8a, installed google_apis_playstore image",
+    "avd": "task-owned OneMapU25F05, emulator-5580; 2G user data, removed after exit",
+    "java": "Android Studio bundled JBR; exact version not independently recorded",
+    "androidSdk": "/Users/rob/Library/Android/sdk; preinstalled build-tools 37.0.0 and NDK 27.1.12297006",
+    "hostAccess": "Inherited Mapbox access token present; value not recorded. Emulator reverse mapping tcp:8081 -> tcp:8081 established.",
+    "devicePreflight": "Ports 5580/5581/8081 had no listeners; no existing adb devices were listed before emulator creation."
+  },
+  "commands": [
+    {
+      "argv": [
+        "emulator",
+        "-avd",
+        "OneMapU25F05",
+        "-port",
+        "5580",
+        "-no-window",
+        "-no-audio",
+        "-no-snapshot",
+        "-no-boot-anim",
+        "-memory",
+        "2048",
+        "-gpu",
+        "auto"
+      ],
+      "status": "booted",
+      "durationSeconds": 14.4,
+      "summary": "Used the already installed Android 37 image; boot completed."
+    },
+    {
+      "argv": [
+        "adb",
+        "-s",
+        "emulator-5580",
+        "reverse",
+        "tcp:8081",
+        "tcp:8081"
+      ],
+      "exitCode": 0,
+      "summary": "Reverse mapping established."
+    },
+    {
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "android",
+        "mapbox-basic"
+      ],
+      "cwd": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness",
+      "exitCode": 1,
+      "durationSeconds": 128,
+      "firstFailure": "Runner reported failure from the native Android build/run command: `error: script \"android\" exited with code 1`. The output stack identifies the React Native Android build path but omits the underlying Gradle failure.",
+      "boundedRunnerOutput": "See runner-output.txt. Existing Gradle daemon output at android-gradle/daemon/9.4.1/daemon-45683.out.log records `Execution failed for task ':app:processDebugNavigationResources'`, `Failed to release lock on Artifact transforms cache`, and `java.io.IOException: No space left on device`. The build reports 24 actionable tasks, 24 executed, and BUILD FAILED in 2m 8s.",
+      "goalObservation": "Metro started and became ready. Native build did not complete; app install, launch, onLoad, fitBounds/onMoveEnd, and camera assertions were not reached."
+    }
+  ],
+  "versions": {
+    "reactNative": "0.87.1 (Metro startup output)",
+    "nativeWrapper": "@rnmapbox/maps 10.3.7 (prepared candidate dependency)",
+    "mapboxNativeSdk": "Not established by this failed build"
+  },
+  "cleanup": {
+    "emulator": "Shut down via adb emu kill; task-owned AVD config and user data removed after emulator exit",
+    "reverseMapping": "Removed when task-owned emulator shut down",
+    "metroPort8081": "No listener remained after runner exit",
+    "adbServer": "Shared adb server left running",
+    "foreignProcesses": "No unrelated device, listener, app, or cache was stopped or removed"
+  },
+  "storage": {
+    "freeDiskBeforeGiB": 7.3,
+    "freeDiskAtBuildFailureMiB": 120,
+    "freeDiskAfterOwnedAvdCleanupGiB": 2.0,
+    "taskGradleHomeGiB": 2.2,
+    "androidProjectGradleMiB": 0.43,
+    "androidAppBuildMiB": 0.14,
+    "retention": "Kept task Gradle dependency/cache files and build failure logs as active investigation evidence; no retry or cache deletion performed."
+  },
+  "provenance": {
+    "fullRunnerOutput": "runner-output.txt",
+    "gradleFailureLog": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/android-gradle/daemon/9.4.1/daemon-45683.out.log"
+  },
+  "coordinator_review": {
+    "artifact": "Coordinator independently matched unchanged f05 archive SHA-256 before dispatch.",
+    "failure": "Existing Gradle daemon log confirms processDebugNavigationResources failure, artifact transform cache lock error and No space left on device. No retry performed.",
+    "verification_limit": "Build did not finish. No app install/load/camera observation or independent installed binary identity verification.",
+    "cleanup": "Worker shut down and removed only task AVD, verified Metro released and stopped one isolated task Gradle daemon. Task caches retained for investigation and possible continuation.",
+    "disk_cleanup_completed": "User explicitly approved removal of two completed task iOS Pods trees; free disk increased from4.4GiB to7.3GiB before Android attempt. Source, lockfiles, results and frozen archive preserved.",
+    "further_candidates": "Android37.1 installed system image8.2GiB, existing Medium_Phone saved snapshot3.8GiB; neither needed for this API37.0 run. Both left untouched. Task Gradle cache2.2GiB can be regenerated but useful for resuming."
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "attempt": "U25 Mapbox iOS minimal attempt 03",
+  "status": "passed",
+  "immutable": {
+    "runner_sha256": "7636988bebc124a4645bb189129d3936dc0f7e9436f353a47fc1e2e11991f251",
+    "archive_sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "pr54_merge": "0da98126e0e996f1927c7383735a5028b9320283",
+    "publication": "9e31dba5d3e0823006857067478446b73072be3d"
+  },
+  "environment": {
+    "RUBYLIB": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-bundler-load-path",
+    "BUNDLE_PATH": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/ruby-gems",
+    "PATH_prefix": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/runtime-bin:/opt/homebrew/bin",
+    "TF04_IOS_UDID": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "MAPBOX_ACCESS_TOKEN": "inherited nonempty; value intentionally omitted"
+  },
+  "commands": [
+    {
+      "argv": [
+        "/opt/homebrew/bin/bundle",
+        "exec",
+        "pod",
+        "install"
+      ],
+      "cwd": "H/examples/native-mapbox/ios",
+      "duration_seconds": 68,
+      "exit_code": 0,
+      "result": "Pod installation complete; 88 Podfile dependencies, 91 total pods."
+    },
+    {
+      "argv": [
+        "xcrun",
+        "simctl",
+        "list",
+        "devices",
+        "--json"
+      ],
+      "cwd": "H",
+      "duration_seconds": 2.4,
+      "exit_code": 0,
+      "result": "Assigned iPhone 18 Pro / iOS 27.0 available, Shutdown."
+    },
+    {
+      "argv": [
+        "xcrun",
+        "simctl",
+        "boot",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "cwd": "H",
+      "duration_seconds": 0.64,
+      "exit_code": 0,
+      "result": "Boot succeeded; this attempt owns simulator boot."
+    },
+    {
+      "argv": [
+        "xcrun",
+        "simctl",
+        "bootstatus",
+        "8B7D7CE4-228E-409F-A156-A597D4E448A5"
+      ],
+      "cwd": "H",
+      "duration_seconds": 7,
+      "exit_code": 0,
+      "result": "Boot completed."
+    },
+    {
+      "argv": [
+        "bun",
+        "scripts/tf04-camera-smoke.mjs",
+        "ios",
+        "mapbox-basic"
+      ],
+      "cwd": "H",
+      "duration_seconds": 120,
+      "exit_code": 0,
+      "result": "TF04 fit=ok click=pending clickAt=pending stop=pending held=pending command=pending doubletap=skip center=-122.32000,47.64000 note=none phase=await-click done=0"
+    }
+  ],
+  "resolved_versions": {
+    "Bundler": "4.0.20 (startup validated in prior approved preparation)",
+    "CocoaPods": "1.15.2 (startup validated in prior approved preparation)",
+    "ReactNative": "0.87.1",
+    "rnmapbox_maps": "10.3.7",
+    "MapboxMaps": "11.23.1",
+    "MapboxCoreMaps": "11.23.1",
+    "Hermes": "250829098.0.17",
+    "iOS_runtime": "iOS 27.0 build 24A434 (approved target record)"
+  },
+  "app_identity": {
+    "fixture": "mapbox-basic",
+    "bundle_id": "org.reactjs.native.example.OneMapMapbox",
+    "produced_and_installed_identity_details": "Runner output did not include build UUID or installed app version; no additional build/install inspection was performed."
+  },
+  "ownership_cleanup": {
+    "runner_owned_app_and_process_groups": "runner exited normally and completed its cleanup",
+    "ports_8081_8799": "post-run lsof found no listeners",
+    "simulator": "this attempt booted assigned target; shutdown succeeded after smoke",
+    "unknown_resources_touched": false
+  },
+  "first_failure": null,
+  "not_run": [
+    "MapLibre",
+    "Android",
+    "TapDriver",
+    "full tests",
+    "readiness rituals",
+    "user interaction"
+  ],
+  "raw_logs": "not retained",
+  "coordinator_review": {
+    "artifact_verification": "Coordinator independently matched archive and runner SHA-256 to the reviewed frozen identities before execution.",
+    "runner_review": "Reviewed iOS path awaits the selected-UDID build/install/launch command before observing status; basic judge requires fit=ok, phase=await-click and center in the approved bounds.",
+    "observed_scope": "Single real Mapbox iOS app load and automatic fitBounds movement. Opening camera was observed at -122.34000,47.61000 before final center -122.32000,47.64000.",
+    "identity_limit": "Selected app build/install/launch completed through the runner. No independent produced-versus-installed executable hash comparison or linked-binary SDK verification was performed; this is not full native release acceptance.",
+    "cleanup_review": "Worker reports normal runner cleanup, no listeners on owned ports and successful shutdown of only the simulator booted by this attempt.",
+    "prior_attempt_02": "Stopped at Pods startup because required Ruby environment was omitted by the worker. No device/build/runner commands ran. This successful explicitly approved retry preserves that failure as history.",
+    "unverified": [
+      "MapLibre",
+      "Android",
+      "Full native acceptance",
+      "Remaining camera interactions"
+    ]
+  }
+}
