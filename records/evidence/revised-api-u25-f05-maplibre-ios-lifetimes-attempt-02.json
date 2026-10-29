@@ -1,0 +1,112 @@
+{
+  "attempt": "maplibre-ios-lifetimes-attempt-02",
+  "outcome": "failed-at-first-runtime-scene-checkpoint",
+  "inputIdentity": {
+    "wrapperSha256": "3895188a8a180f04760388174bddcd0941d9e7f48ae1d0424759e958c0e7335d",
+    "runnerSha256": "e56285711818b3150e5c3a02eb937812e91abe390459d1e7e182adecd4bb473c",
+    "f05ArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "pr58Head": "1a0f65618b8388e79e71f315ac4e5ef96d7e6baa"
+  },
+  "steps": [
+    {
+      "command": "/bin/sh ../../../../with-maplibre-ios-env.sh /opt/homebrew/bin/bundle exec pod install --deployment",
+      "cwd": "/private/tmp/one-map-f05/native-harness/examples/native-maplibre/ios",
+      "exit": 0
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl list devices --json",
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "exit": 0,
+      "assignedDevice": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "initialState": "Shutdown",
+      "available": true
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl boot 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "exit": 0,
+      "bootOwnedByAttempt": true
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl bootstatus 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "exit": 0
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre",
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "exit": 1,
+      "durationSecondsApprox": 109,
+      "producedAppPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+      "result": {
+        "loaded": "1",
+        "vector-queries": "ok",
+        "key-remove": "ok",
+        "whole-remove": "ok",
+        "vector-namespaces": "ok",
+        "vector-remount": "explicitly-cleared",
+        "vector-style": "explicitly-cleared",
+        "vector-to-geojson": "pending",
+        "geojson-to-vector": "pending",
+        "final-remount": "pending",
+        "error": "Key-removal-also-removed-count.",
+        "phase": "done",
+        "done": "1"
+      },
+      "fixtureRequestRevisions": [
+        0,
+        1
+      ]
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl shutdown 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "exit": 0,
+      "ownedSimulatorShutdown": true
+    },
+    {
+      "command": "lsof -nP -iTCP:<port> -sTCP:LISTEN for 8081,8798,8799",
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "exit": 0,
+      "result": "all free"
+    }
+  ],
+  "firstFailure": "Key-removal-also-removed-count.",
+  "notRun": [
+    "produced-versus-installed app identity/hashes",
+    "MapLibre.framework metadata",
+    "Podfile.lock and Gemfile.lock comparison",
+    "SwiftPM lock comparison"
+  ],
+  "cleanup": {
+    "ownedSimulator": "shutdown successfully",
+    "ownedPorts": {
+      "8081": "free",
+      "8798": "free",
+      "8799": "free"
+    },
+    "otherAppsPreserved": true
+  },
+  "noSourceChanges": true,
+  "diskAtStart": "6.4GiB",
+  "coordinatorReview": {
+    "outcome": "First actual runtime lifetime failure: key removal also removed the independent count value. Root cause is undiagnosed; no repair or retry performed.",
+    "passedBeforeFailure": [
+      "vector-queries",
+      "key-remove (initial vector case)",
+      "whole-remove (initial vector case)",
+      "vector-namespaces",
+      "vector-remount",
+      "vector-style"
+    ],
+    "incomplete": [
+      "vector-to-geojson",
+      "geojson-to-vector",
+      "final-remount"
+    ],
+    "boundary": "Failure occurred before the vector-to-GeoJSON checkpoint completed. Earlier vector/remount/style results do not certify the remaining transitions.",
+    "cleanup": "Worker shut down only the simulator booted by this attempt and verified all owned service ports clear. Identity and lock follow-ups skipped after scene failure as prescribed.",
+    "provenance": "Coordinator independently verified unchanged f05 archive after the attempt. Native SDK and installed code identity were not independently checked for this failed attempt.",
+    "nextTask": "Diagnose the key-removal failure at the fixture/facade/wrapper/SDK boundary using routine reproductions before proposing a fix and requesting any native retry."
+  }
+}
