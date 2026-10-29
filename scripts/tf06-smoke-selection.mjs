@@ -1,14 +1,14 @@
 /**
  * Selects native engines so scoped retries can release build outputs between runs.
  * @param {string} scope - TF06 query or lifetime scope.
- * @param {string} selection - Both engines or one lifetime engine.
+ * @param {string} selection - Both engines or one query/lifetime engine.
  * @returns {string[]} The native engines to execute sequentially.
  */
 export const selectNativeEngines = (scope, selection = "both") => {
   if (!["both", "mapbox", "maplibre"].includes(selection))
     throw new Error("Use both, mapbox, or maplibre for the native engine.");
-  if (scope !== "lifetimes" && selection !== "both")
-    throw new Error("Single-engine selection requires the lifetime scope.");
+  if (!["queries", "lifetimes"].includes(scope))
+    throw new Error("Use queries or lifetimes for the native scope.");
   return selection === "both" ? ["mapbox", "maplibre"] : [selection];
 };
 

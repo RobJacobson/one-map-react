@@ -11,8 +11,10 @@ assert.deepEqual(selectNativeEngines("lifetimes"), ["mapbox", "maplibre"]);
 assert.deepEqual(selectNativeEngines("lifetimes", "mapbox"), ["mapbox"]);
 assert.deepEqual(selectNativeEngines("lifetimes", "maplibre"), ["maplibre"]);
 assert.throws(() => selectNativeEngines("lifetimes", "unknown"));
-assert.throws(() => selectNativeEngines("queries", "mapbox"));
-assert.throws(() => selectNativeEngines("queries", "maplibre"));
+assert.throws(() => selectNativeEngines("queries", "unknown"));
+assert.throws(() => selectNativeEngines("unknown", "maplibre"));
+assert.deepEqual(selectNativeEngines("queries", "mapbox"), ["mapbox"]);
+assert.deepEqual(selectNativeEngines("queries", "maplibre"), ["maplibre"]);
 assert.deepEqual(androidSmokeArgs("queries"), [
   "run",
   "android",

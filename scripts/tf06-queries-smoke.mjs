@@ -608,7 +608,7 @@ async function runNative({ directory, platform, applicationId }) {
         .split(/\s+/)[0];
       verifyNativeBinary(scope, reuseIosDigest, digest);
       await command("xcrun", ["simctl", "launch", iosUdid, applicationId]);
-    } else if (lifetimes) {
+    } else {
       const scheme =
         directory === "native-mapbox" ? "OneMapMapbox" : "OneMapMaplibre";
       const buildFolder =
@@ -641,22 +641,6 @@ async function runNative({ directory, platform, applicationId }) {
       );
       await command("xcrun", ["simctl", "install", iosUdid, producedAppPath]);
       await command("xcrun", ["simctl", "launch", iosUdid, applicationId]);
-    } else {
-      await command(
-        "bun",
-        [
-          "run",
-          "ios",
-          "--",
-          "--no-packager",
-          "--port",
-          "8081",
-          "--udid",
-          iosUdid,
-        ],
-        { cwd: shell, env: nativeEnv },
-        600000
-      );
     }
 
     const status = await watchNative({

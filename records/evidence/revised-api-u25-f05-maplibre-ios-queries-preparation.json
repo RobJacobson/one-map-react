@@ -1,0 +1,129 @@
+{
+  "checkpoint": "U25 f05 MapLibre iOS ordinary query/cluster preparation",
+  "kind": "planning/reference",
+  "audience": "Owner, coordinator and execution worker",
+  "purpose": "Prepare one separately approved native query/cluster attempt",
+  "nonGoals": "Native execution, new framework, host repair, other native environments, full acceptance",
+  "status": "Independently audited, reviewed harness scripts synchronized and frozen; native execution awaiting owner approval",
+  "scope": {
+    "changed": [
+      "scripts/tf06-queries-smoke.mjs",
+      "scripts/tf06-smoke-selection.mjs",
+      "scripts/tf06-query-runner.test.mjs",
+      "scripts/tf06-smoke-selection.test.mjs",
+      "docs/revised-api-acceptance-plan.md",
+      "records/README.md"
+    ],
+    "preserved": "Coordinator dirty current handoff and attempt03 lifetime result. No first-party library/scene/fixture, peers, patches, locks, versions, SDK sources, wrapper or f05 changes. Primary checkout untouched. No host/native setup, simctl, Pods, native build/install, boot, Metro or renderer execution."
+  },
+  "provenance": {
+    "implementationBase": "dd79d8c20bf888bf39ed34af27b827961dd18e79",
+    "branch": "codex/u25-maplibre-ios-queries",
+    "prBase": "PR59 merged into still-open PR58 branch codex/u25-maplibre-ios-lifetimes; coordinator reconciles before publication",
+    "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "candidateIdentityBasis": "Unchanged approved lifetime attempt03 outcome and coordinator-provided identity; no new package archive produced",
+    "preparedFilesSha256": {
+      "scripts/tf06-queries-smoke.mjs": "e417599367f54e68244b28ba18bd63069094548b7e50a090da5c1e2372b7b35b",
+      "scripts/tf06-smoke-selection.mjs": "b68bf6169295e26e5748b00f25205c8d9a34850d42ff907e3e672b0950334081",
+      "scripts/tf06-query-runner.test.mjs": "fab6da1d1468c8818357851bd9a249780b572f01f7af9371e8acd66cebcb5fee",
+      "scripts/tf06-smoke-selection.test.mjs": "eae77ce54dbb04e39ce80c23751a2bbd1465b4ebfd4f6f92203b8939adf0d72a",
+      "scripts/with-maplibre-ios-env.sh": "3895188a8a180f04760388174bddcd0941d9e7f48ae1d0424759e958c0e7335d",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "examples/shared/queries-smoke.ts": "aadcd992843f3321c540ed1b9cfb19db32ae822edd2e531e54fe77fb6d1822b7",
+      "examples/shared/queries-map.tsx": "ef9498b977c82c3707c3e2b83d05566a2f907a2b1741cc28601f96caad2e0d6b",
+      "examples/shared/native-queries-screen.tsx": "78b7b0eb158d37c5561c81f615ffb1089d4564c26debd250f92193a7bd4e1a56",
+      "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+      "tests/fixtures/map.json": "8279594359798e3d9e7763242ba0ede1207ad5ae24f84e3d3be1ef241ac21362"
+    },
+    "retainedLockSha256": {
+      "examples/native-maplibre/ios/Podfile.lock": "bb68f6237b7b4a02d2c5514d9424ce3327d763e6dadfb6da8d730fc6a2dee93a",
+      "examples/native-maplibre/Gemfile.lock": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+      "examples/native-maplibre/ios/OneMapMaplibre.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+      "examples/native-maplibre/ios/OneMapMaplibre.xcworkspace/xcshareddata/swiftpm/Package.resolved": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117"
+    },
+    "stagingWrapperSha256": "3895188a8a180f04760388174bddcd0941d9e7f48ae1d0424759e958c0e7335d",
+    "harnessSync": "Coordinator synchronized only the two reviewed runtime scripts; scene, fixture, process helper and staging wrapper identities independently matched."
+  },
+  "retainedInputs": {
+    "inspection": "Filesystem-only reads; MapLibre Pods/Manifest.lock, generated workspace, produced app, task wrapper and locks present. No native host-service calls.",
+    "sdkPin": {
+      "identity": "maplibre-gl-native-distribution",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+      "version": "6.31.0",
+      "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683"
+    },
+    "baseline": "Completed lifetime attempt03 produced/installed code and SDK receipts retained independently; query success still requires fresh produced/installed receipts."
+  },
+  "sourceTrace": {
+    "selection": "Both-engine default retained; explicit mapbox/maplibre selection now valid for ordinary queries and lifetimes. Invalid engine/scope rejects. Lifetime-only iOS binary reuse and Android behavior unchanged.",
+    "driver": "Existing checked direct xcodebuild/install/launch path now serves every fresh iOS scope; deleted unsafe ordinary run-ios CLI branch. Same exact UUID, workspace/scheme/derivedDataPath, producedAppPath, status failure propagation and cleanup. No new runner.",
+    "fixture": "Native App ONE_MAP_SMOKE=tf06 selects existing NativeQueriesScreen/useQueriesSmoke/QueriesMap. Local numeric-id GeoJSON routes, clustered points, background-only initial/replacement styles. No network fixture or port8798.",
+    "coverage": "Known-id point/bounds/viewport/empty/source/filter queries, finite cluster expansion, known unique leaves, matching pagination, children, then state and explicit recreation/style clearing. Existing source-generation and empty-clear guards retained; no fixture fix needed.",
+    "ownership": "Before native resource acquisition freePort rejects unknown listeners. Scene stops selected stale app before status bind, uses selected UUID for every app command, propagates status/Metro/build/install/launch failure, and finally releases app/status/Metro and verifies Metro port. Outer worker only owns a simulator boot after successful exit."
+  },
+  "routineVerification": {
+    "red": [
+      "Updated selector test failed before repair: Single-engine selection requires the lifetime scope.",
+      "Expanded actual runNative VM query build failed before repair: Every iOS scope must check each build/install/launch exit, because ordinary branch invoked bun CLI."
+    ],
+    "green": [
+      "node scripts/tf06-query-runner.test.mjs",
+      "bun scripts/tf06-query-runner.test.mjs",
+      "node scripts/tf06-smoke-selection.test.mjs",
+      "bun scripts/tf06-smoke-selection.test.mjs",
+      "bun run check (322 formatted files;296 linted)",
+      "bun run typecheck",
+      "bun run build (library and example package only; no acceptance)",
+      "vp test run packages/one-map-react/test/queries-smoke.web.test.tsx (18 mocked hook tests)",
+      "git diff --check"
+    ],
+    "coverage": "Actual iOS driver VM matrix now covers query and lifetime scopes on both engines, checked build/install/launch ordering, selected environment/workspace/scheme/paths, stale app and status collection, failure and owned cleanup. Lifetime reuse cases remain; query reuse is still rejected. Ordinary judge success plus mutation of each required field verifies fail-closed status. Existing Android startup cases unchanged.",
+    "warnings": "Existing Bun moduleSuffixes warning; existing TypeScript7 experimental API and two retained React Compiler ref diagnostics during library build.",
+    "openRoutineLimit": "typecheck:apps failed before and after ordinary library/example build because sparse isolated checkout has no @one-map/example-map workspace links in node_modules; TS2307 in apps/web/src/app.tsx lines5-6. No manifest/lock/link repair attempted for this runner-only change.",
+    "intermediate": "Documentation check initially rejected the not-yet-created preparation evidence link; final check recorded after evidence creation."
+  },
+  "proposedExecution": {
+    "plan": "docs/revised-api-acceptance-plan.md#next-approval-maplibre-ios-ordinary-queries-and-clusters",
+    "cwd": "/private/tmp/one-map-f05/native-harness",
+    "command": "/bin/sh ../with-maplibre-ios-env.sh bun scripts/tf06-queries-smoke.mjs ios queries maplibre",
+    "worker": "One GPT-6 Luna medium worker, no Git checks/repairs/retries; stronger coordinator audit/input freeze/diagnosis/result review",
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5, iPhone18Pro/iOS27.0 build24A434",
+    "ports": [
+      8081,
+      8799
+    ],
+    "noFixturePort": 8798,
+    "estimate": "5-15 minutes, unmeasured for ordinary scene",
+    "boundsSeconds": {
+      "inventory": 30,
+      "boot": 20,
+      "bootstatus": 120,
+      "portCheck": 10,
+      "build": 600,
+      "watch": 600,
+      "outer": 1800
+    },
+    "receipts": "After scene success only: fresh produced/installed app metadata, executable AND debug-dylib presence/hashes, matching MapLibre6.31.0 embedded metadata, frozen Podfile/Gemfile hashes and semantic SwiftPM pins. No reused-binary receipt shortcut.",
+    "permission": "Preparation grants no native execution. First error stops; no identity follow-ups after scene failure. Before scene acquisition preserve existing app/services and clean only owned successful boot. Scene/outer owned cleanup always required."
+  },
+  "unverified": "Actual ordinary MapLibre iOS query/cluster behavior, next produced/installed identities, other remaining retained native scenarios and full native acceptance.",
+  "coordinatorAudit": {
+    "result": "Passed within single MapLibre iOS ordinary query/cluster preparation scope.",
+    "redGreen": "Independently restored pristine PR59 runtime scripts with new regressions: selector rejected queries/maplibre and actual mocked query path failed on old bun CLI route. Restored new scripts; both runner and selector suites passed.",
+    "inspection": "Both-engine defaults and lifetime reuse restrictions retained; checked iOS build/install/launch shared across fresh scopes. Exact target, status errors, unknown-listener preservation and owned cleanup remain covered. No changes to production library or scene assertions.",
+    "inputs": "Rehashed unchanged f05 archive and compared all164 installed MapLibre consumer dist files byte-for-byte to archive. Verified unchanged query scene/fixtures/helper/wrapper and synchronized two runtime scripts.",
+    "synchronizedScripts": {
+      "scripts/tf06-queries-smoke.mjs": {
+        "previousSha256": "e56285711818b3150e5c3a02eb937812e91abe390459d1e7e182adecd4bb473c",
+        "sha256": "e417599367f54e68244b28ba18bd63069094548b7e50a090da5c1e2372b7b35b"
+      },
+      "scripts/tf06-smoke-selection.mjs": {
+        "previousSha256": "2bf6a07aa61e28ced6283066cad4dd860c1a13ec52e73ffe47cc6dcee29919d7",
+        "sha256": "b68bf6169295e26e5748b00f25205c8d9a34850d42ff907e3e672b0950334081"
+      }
+    },
+    "routineLimit": "App-wide typecheck remains blocked by existing isolated workspace links. Changed files are plain JS runner/test scripts and documentation; project types, focused mocked scene tests and runner regressions passed.",
+    "runtime": "No native host queries, setup, Metro, app builds/installations, boot or renderer execution performed."
+  }
+}
