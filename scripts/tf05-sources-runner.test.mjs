@@ -66,6 +66,7 @@ for (const scope of ["sources"]) {
     "pass37",
     "pass38",
     "pass-reuse",
+    "pass-mapbox-reuse",
     "install-failure",
     "invalid-api",
     "grant-failure",
@@ -78,6 +79,13 @@ for (const scope of ["sources"]) {
     "metro-poll-exit",
     "cleanup-failure",
   ]) {
+    const engine = mode === "pass-mapbox-reuse" ? "mapbox" : "maplibre";
+    const applicationId = `com.onemap${engine}`;
+    const reuseBinary = [
+      "pass-reuse",
+      "pass-mapbox-reuse",
+      "install-failure",
+    ].includes(mode);
     const sdk =
       { pass36: "36", pass38: "38", "invalid-api": "invalid" }[mode] ?? "37";
     const metro = child();
@@ -101,7 +109,7 @@ for (const scope of ["sources"]) {
         installed = true;
       }
       if (file === "bun") {
-        assert(!["pass-reuse", "install-failure"].includes(mode));
+        assert(!reuseBinary);
         assert.deepEqual(Array.from(args), [
           "run",
           "android",
@@ -123,13 +131,14 @@ for (const scope of ["sources"]) {
       if (args.includes("grant")) {
         assert(installed && configured && !launched);
         assert(
-          args.includes("com.onemapmaplibre") &&
+          args.includes(applicationId) &&
             args.includes("android.permission.ACCESS_LOCAL_NETWORK")
         );
         if (mode === "grant-failure") throw new Error(mode);
         granted = true;
       }
       if (args.includes("force-stop")) {
+        assert(args.includes(applicationId));
         cleanup.push("app");
         if (mode === "cleanup-failure") throw new Error(mode);
       }
@@ -143,9 +152,7 @@ for (const scope of ["sources"]) {
       process: { env: { ANDROID_SERIAL: "emulator-5580" } },
       fixture: scope === "lifetimes" ? { requests: [] } : null,
       reuseIosDigest: undefined,
-      androidBinaryDigest: ["pass-reuse", "install-failure"].includes(mode)
-        ? "a".repeat(64)
-        : undefined,
+      androidBinaryDigest: reuseBinary ? "a".repeat(64) : undefined,
       androidBinaryPath: "/approved/app-debug.apk",
       androidArgs: [
         "run",
@@ -160,6 +167,7 @@ for (const scope of ["sources"]) {
       command,
       grantAndroidTransportPermission: grant,
       spawn: (_file, _args, options) => {
+        assert.equal(options.cwd, `/harness/examples/native-${engine}`);
         assert(options.detached);
         assert.equal(options.env.TF05_BASE, "http://127.0.0.1:8798");
         assert.equal(options.env.ONE_MAP_SMOKE, "tf05");
@@ -184,11 +192,12 @@ for (const scope of ["sources"]) {
       removeAndroidBundle: async () => {},
       writeDebugHost: async (app, host) => {
         assert(installed);
-        assert.equal(app, "com.onemapmaplibre");
+        assert.equal(app, applicationId);
         assert.equal(host, "localhost:8081");
         configured = true;
       },
-      startAndroidApp: async () => {
+      startAndroidApp: async (app) => {
+        assert.equal(app, applicationId);
         assert(configured && (Number(sdk) < 37 || granted));
         launched = true;
       },
@@ -208,9 +217,9 @@ for (const scope of ["sources"]) {
       awaitMetroPortRelease: async () => cleanup.push("port"),
     });
     const pending = run({
-      directory: "native-maplibre",
+      directory: `native-${engine}`,
       platform: "android",
-      applicationId: "com.onemapmaplibre",
+      applicationId,
     });
     if (mode === "cleanup-failure")
       await assert.rejects(pending, /cleanup-failure/);
@@ -370,6 +379,8 @@ await assert.rejects(binding(), /bind conflict/);
 for (const [group, selector, digest, actual, succeeds] of [
   ["android", "maplibre", "a".repeat(64), "a".repeat(64), true],
   ["android", "maplibre", "a".repeat(64), "b".repeat(64), false],
+  ["android", "mapbox", "a".repeat(64), "a".repeat(64), true],
+  ["android", "mapbox", "a".repeat(64), "b".repeat(64), false],
   ["android", undefined, "a".repeat(64), "a".repeat(64), false],
   ["ios", undefined, "a".repeat(64), "a".repeat(64), false],
   ["android", "maplibre", "invalid", "invalid", false],
@@ -388,7 +399,7 @@ for (const [group, selector, digest, actual, succeeds] of [
       readFileSync: (path) => {
         assert.equal(
           path,
-          "/harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk"
+          `/harness/examples/native-${selector}/android/app/build/outputs/apk/debug/app-debug.apk`
         );
         return "bytes";
       },

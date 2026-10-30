@@ -1,0 +1,111 @@
+{
+  "checkpoint": "PR67 MapLibre Android source/image lifecycle attempt01",
+  "status": "passed-within-approved-scene-and-reused-APK-identity-scope",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "worker": "gpt-6-luna medium maplibre_android_sources_run",
+  "workerReceipt": {
+    "checkpoint": "PR67 single MapLibre Android TF05 sources/images lifecycle",
+    "result": "passed",
+    "scope": "One existing TF05 scene on unchanged f05; reused retained APK, no rebuild, generation, dependency refresh, or Gradle work.",
+    "scene": {
+      "command": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh env TF05_ANDROID_BINARY_SHA256=c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131 bun /Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf05-sources-smoke.mjs android maplibre",
+      "exitCode": 0,
+      "resultCount": 1,
+      "status": "passed",
+      "line": "TF05 mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+      "fields": {
+        "mounted": "1",
+        "reset": "ok",
+        "data": "updated",
+        "style": "rebuilt",
+        "removed": "clean",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      },
+      "reusedNativeBuild": true,
+      "retainedApkSha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131"
+    },
+    "preflight": {
+      "listenerCheck": "exit 1, empty (expected clear)",
+      "deviceInventory": "exit 0, no attached devices",
+      "freshAttemptDirectory": "created",
+      "avdCreation": "exit 0",
+      "emulatorLaunch": {
+        "exitCode": 0,
+        "pid": 88941,
+        "pgid": 88941,
+        "log": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-sources-attempt-01/emulator.log"
+      },
+      "bootPoll": "exit 0, Assigned emulator boot completed",
+      "reverseInventory": "exit 0, empty",
+      "acquiredReverses": [
+        "tcp:8081",
+        "tcp:8798"
+      ]
+    },
+    "installedIdentity": {
+      "pmPathCommand": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh adb -s emulator-5580 shell pm path com.onemapmaplibre",
+      "returnedBaseApk": "/data/app/~~dNkhytMAN_yVoQQjsQLaJA==/com.onemapmaplibre-ovyEO0o1w1VK0knU2cvQuQ==/base.apk",
+      "pulledTo": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-sources-attempt-01/installed-base.apk",
+      "retainedApk": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+      "retainedAndInstalledSha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+      "pullExitCode": 0
+    },
+    "cleanup": {
+      "fixtureReverseRemoved": "exit 0",
+      "metroReverseRemoved": "exit 0",
+      "selectedAppForceStopped": "exit 0",
+      "emulatorKill": "exit 0",
+      "launcherPidCheck": "PID 88941 absent (exit 1, empty)",
+      "assignedPortCheck": "5580/5581/8081/8798 all released (exit 1, empty)",
+      "removedPrivateAvd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-avd/OneMapU25F05.avd",
+      "removedPrivateAvdConfig": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-avd/OneMapU25F05.ini",
+      "removedPulledDuplicateApk": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-sources-attempt-01/installed-base.apk",
+      "gradleDaemon": "none acquired; no Gradle command performed"
+    },
+    "frozenInputs": "438-file post-run recheck delegated to coordinator; pre-run hashes verified by coordinator.",
+    "limits": "Configured MapLibre SDK coordinate 13.6.1; linked SDK identity unverified. Runtime result is limited to this scene and its reported status fields."
+  },
+  "coordinatorAudit": {
+    "result": "passed",
+    "fields": "Every required TF05 field verified against preparation contract; one selected result, runner exit0 and verified APK reuse.",
+    "identity": "Worker exact target installed-baseAPK SHA equals approved retainedAPK; coordinator independently rehashed retainedAPK within438-file freeze. No native rebuild/generation/Gradle performed.",
+    "frozenInputs": "All438baseline-plus-delta file hashes independently verified unchanged after run.",
+    "cleanup": "Independent lsof returned exit1 empty on5580/5581/8081/8798; private AVD metadata/directory and duplicate APK absent. Worker recorded selected-app/reverse/emulator/process cleanup. No Gradle daemon acquired.",
+    "spaceBeforeDispatchGiB": 8.362
+  },
+  "coverage": {
+    "families": [
+      "vector",
+      "raster",
+      "image",
+      "GeoJSON (two sources)"
+    ],
+    "layers": [
+      "fill",
+      "raster",
+      "line",
+      "circle",
+      "symbol"
+    ],
+    "images": "One registered marker, absent during style handoff and re-registered after style-load.",
+    "mutations": [
+      "Remove line-color paint key",
+      "Update GeoJSON route data",
+      "Replace same-map style",
+      "Remove transient vector and image sources"
+    ],
+    "observations": "Load/style-load callbacks, settle timers, status transitions and error events. No visual-pixel or image readback assertion. Empty vector tile fixture is not vector-content visibility proof."
+  },
+  "remaining": [
+    "Raster-dem and hillshade",
+    "Heatmap and fill-extrusion",
+    "Exhaustive retained source/layer/image contract",
+    "Independent Android linked SDK identity",
+    "Other native engines/platforms and all unrelated UI/interaction/rendering scopes"
+  ],
+  "limitations": "Status/load/style-load/error observations are bounded integration evidence, not pixel visibility, registered-image readback or exhaustive source/layer/image acceptance. Configured13.6.1 remains distinct from independently linked Android SDK identity.",
+  "next": "Prepare the same bounded scene on another existing native environment before requesting separate execution approval; no additional native run authorized by this result."
+}
