@@ -1,0 +1,200 @@
+{
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Existing unchanged TF09 driver checks sorted paths and bytes in both dist copies"
+  },
+  "freeze": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-sources-attempt-01/post-restoration-freeze.json",
+    "sha256": "2ec3355e8e8de917f001abf7cf6d02fcaf3ab034b93dc76224f81106988a9b8f",
+    "verifiedFiles": 695,
+    "mismatches": []
+  },
+  "stagedSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-fixture.mjs": "50b90fa0b06d2b4cc3129084322bcfb232ab3113a003f134dc8c826bc9f7ad15",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/package.json": "85b17f2f852aece03e71edb4ed4d9fddf6a0a8f0b69ac75d7f00b6592d62d37c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitmapper.js": "3f2f720e3a2b4e41cdc03e9f58bb1794bec26dcd1b22568e41ce0b84ab20aeb5",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitpacker.js": "3f7bfabcbc82bedd0cc8551bc210b44dc1fb179fa2ce3b8b1d39fa307d8af204",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/chunkstream.js": "43c5507901554a29c5a29e555aaeb3c3987b84fb3aa8c681c1b30794a477aa85",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/constants.js": "9e3b4f994ac93751e9ccb4d453e85e4f25a0b086a9f24ec92c7dcb06995bdf6c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/crc.js": "57e2328cfa361fb54f1f4b3a59e071c1ccc864095e4f3759a957cd15aa2a8b65",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-pack.js": "500c1b3b34702c895e9e689143f44280687cac363447523679ec13d12bd564f6",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-async.js": "328b6173f1a2a4d91425220a0fa421699552f254006a57ede9f4018ced50a7ee",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-sync.js": "201a08dfab26a2903c0dabcbdfe0406b3fa33d60f59b591878329f590fac48ff",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse.js": "b8aad6f29371f5b13b232643781a7c49f7d36d565136ddda1ed7fbaca987ce2c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/format-normaliser.js": "c73989d85bef5d33ce571095bf0d96927261730d8b0f79c9d48f971fcbdd0be0",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/interlace.js": "3bb5d57153078ff586667e9a9d2c06db993c8ff1638e0521a9883cdeea6e1e3f",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-async.js": "f50df0610749ce7b1a99abbe9e4596df7c16f96efd3848f12dd632b22cb02b45",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-sync.js": "1b516238168a42704e62ba44528406188864a6ddda2ae92d1b91e5e078cdaa2d",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer.js": "b5f9956364c80d67c28d615ace639a5fb4d4d79d3acb235237f3050dca220e03",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/paeth-predictor.js": "48555b909af708593dade8e8df75d18ecdffdb6577e362eac01eae357ef1e0e9",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-async.js": "a0299cad35220de62b7180b1f984b8f77b4c0f419a580fd3c86ea3b3e971ee30",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-sync.js": "266c9fb230b90075022b3f54f5710a9cacb71ca565f83fce66e7cbd1b7e9b507",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser.js": "574e43fea28a28cc6feb7ab62a480a86bb75411ee4bfaba76a7e9d7310b6e94c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png-sync.js": "867b1a78dcd3e45458eb4f0af01acd48f38d3a31225bd7cb8dd8ee3966ab54be",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png.js": "e02cecbd36327829758386dc3f0ca4a36a2339ccb5d5e824ca3556e2c3f89726",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-inflate.js": "08cb8afb79a4c0ab58e94601dab22261daf6638382b211d6a7f6bfbc16d27a0b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-reader.js": "437a99bf1bf739202ae85c3018cd9174d411597cf55e7064c36976de493368f1"
+  },
+  "hostInputSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/launch-lifetime-emulator.py": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24",
+    "/private/tmp/one-map-approved-android-boot-poll.py": "f819d439aa4573070b858e80c7d3a61ca8f7a833f5ca857f3347ba5d39a35956",
+    "/Users/rob/.android/avd/Medium_Phone.avd/config.ini": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/source.properties": "11d49660e8e74661ed0b3164f5141308f7f947d6de037d7f5ca7fc428c825133",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/package.xml": "61527f2f82a09aa711005a29b75dc031d58d5869c4633d8d863623c610a57753"
+  },
+  "resources": {
+    "serial": "emulator-5580",
+    "avd": "OneMapU25F05",
+    "ports": [
+      5580,
+      5581,
+      8081,
+      8798
+    ],
+    "noStatus8799": true,
+    "image": "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a",
+    "imageIdentity": "API37.0 google_apis_playstore arm64-v8a revision7, source.properties/package.xml pinned; no full system.img digest required",
+    "ownership": "Reject assigned listeners/device/private AVD conflicts; preserve shared adb server, SDK image, source AVD and unknown resources. Acquire only private AVD, recorded emulator PID/PGID, selected test app, reverse8081/8798, Metro and fixture groups.",
+    "uncertainLaunch": "Mark launch attempted only inside the launch-helper action after its start receipt. Without validated returned PID/PGID, preserve private AVD and report uncertain ownership, regardless of clear assigned ports; no unknown process is killed.",
+    "avdAcquisition": "Claim created AVD inside helper action after its started checkpoint persists, before helper call so partial creation remains owned."
+  },
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1,
+    "scope": "One fixed reviewed command, require_escalated; no independent probes, repairs or retries. Coordinator owns freeze/artifact review and outcome."
+  },
+  "bounds": {
+    "estimatedMinutes": "5-20; actual MapLibre Android three-scenario cost unmeasured",
+    "commandsSeconds": 30,
+    "launcherSeconds": 10,
+    "bootPollSeconds": 180,
+    "bootOuterSeconds": 190,
+    "installSeconds": 120,
+    "pullSeconds": 60,
+    "readinessSeconds": 60,
+    "sceneSeconds": 600,
+    "cleanup": "Existing bounded Metro/driver process helper; emulator kill20seconds then fallback only on adb failure: recorded negativePGID TERM, real PS wait5seconds, KILL if still live. Always verify owned PID/group exit30seconds and ports5580/5581/8081/8798 before AVD removal. Checkpoint receipt-write errors never abort later cleanup; first failure remains separate."
+  },
+  "nativePeerDeltaVsHead": {
+    "@maplibre/maplibre-react-native": [
+      {
+        "path": "lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts",
+        "sha256": "57c74577f369fed142989b805a5bce1b179a3b7355ecd086a52d261b4024cac8",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/module/components/sources/vector-source/VectorSource.d.ts",
+        "sha256": "7da90c85c534968ed4e1629e0ef86c7099c515f7c249a8bc7c6cad9d318f5916",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/module/index.d.ts",
+        "sha256": "af6bf21835f6ce5593630333f3c340df64df4a48f7ca980dc8546de68de5f9ed",
+        "kind": "declaration"
+      }
+    ]
+  },
+  "peerProvenance": {
+    "expectedFileHashes": "records/evidence/tf09-implementation.json nativePeerDeltaVsHead",
+    "reviewedRetention": "records/evidence/revised-api-u23-native-patch-reconciliation.json patchReconciliation maplibre-native-11.5.0 retains the same three declaration sections unchanged",
+    "reviewedCombinedPatchSha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0",
+    "observed": "All three expected declaration files match selected installed bytes; this inventory is the existing TF09 driver delta, not a full peer-tree certificate"
+  },
+  "checkpoint": "MapLibre Android targeted rendering preparation on unchanged f05",
+  "status": "Preparation passed independent coordinator source and routine audit; execution awaits separate owner approval",
+  "sourceBasis": {
+    "head": "a4d9118",
+    "branch": "codex/u25-maplibre-android-rendering",
+    "basePR": "PR75 OPEN; not merged",
+    "primary": "Read only; unrelated dirty source untouched"
+  },
+  "scope": {
+    "proposed": "One unchanged TF09 android maplibre scene using verified retained APK, no native build",
+    "observations": [
+      "Known rendered feature9009 and explicit unsupported terrain-elevation response",
+      "raster-dem hillshade insertion/removal changes more than100 captured pixels",
+      "Known orange feature more than30 pixels in selected current-map capture"
+    ],
+    "limits": [
+      "Three-scenario automated slice only; broader native acceptance remains open",
+      "Current-map capture is an application observer over selected wrapper, no removed common capture API",
+      "Configured Android SDK coordinates are not independent linked identity; iOS SPM/framework receipts do not establish Android SDK version"
+    ]
+  },
+  "identity": {
+    "retainedApk": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+    "package": "com.onemapmaplibre",
+    "embeddedJavaScriptBundle": false,
+    "apkSdkMetadata": [],
+    "configuredSdk": "org.maplibre.gl:android-sdk-opengl:13.6.1",
+    "sdkLimit": "No sdk_versions or pom.properties in retained APK. Independent linked Android SDK identity remains unverified. iOS6.31.0 is not Android proof.",
+    "futureInstalledProof": "Require sole pm path base.apk, fresh adb pull/hash before flow and after passed scene, exact retained APK hash equality; persist readback hash before duplicate removal"
+  },
+  "storage": {
+    "observedUTC": "2026-10-30T23:12:22.373755+00:00",
+    "availableBytes": 8753348608,
+    "availableGiB": 8.152191162109375,
+    "requiredBytes": 8804682957,
+    "requiredGiB": 8.2,
+    "gatePassed": false,
+    "basis": "Historical cached API37 image required7372.8MB userdata despite helper2G request. Preserve8.2GiB preboot gate and cached image; no shrink experiment, deletion or SDK download authorized.",
+    "limit": "Refresh before dispatch; no deletion, image resize or SDK download authorized.",
+    "risk": "Measured reserve is marginal above8.2GiB; storage growth can close the gate. Refresh before dispatch; no deletion authorized."
+  },
+  "proposedCommand": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/maplibre-android-rendering.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-rendering-attempt-01",
+  "selectedCapture": "Existing native observer calls wrapper.createStaticMapImage({output:\"base64\"}); Android MLRNMapViewModule delegates MLRNMapView map snapshot, BitmapUtils.createBase64 compresses PNG and returns data:image/png;base64. Actual pixels remain unverified.",
+  "notExecuted": [
+    "emulator/adb/Metro/native build/install/SDK download/host setup/acceptance",
+    "No staging mutation, frozen-file changes, deletion, commit or push"
+  ],
+  "coordinatorAudit": {
+    "status": "passed for proposed three-scenario scope",
+    "checks": [
+      "Reviewed shared extraction against original accepted Mapbox launcher: lifecycle, identity, checkpoint acquisition, uncertainty and cleanup behavior preserved",
+      "Independently passed both-engine actual-source Node24 and Bun mocks and fixed-entrypoint checks",
+      "Independently verified695 frozen files,26 observer inputs,7 host inputs,5 prepared files and171 archive members in both package copies",
+      "Independently verified MapLibre APK hash/no embedded bundle, three historical peer declaration hashes and native PNG capture source",
+      "Carried Mapbox outcome and cleanup receipts match original bytes"
+    ],
+    "findingsRemaining": [],
+    "nativeExecution": false,
+    "sdkLimit": "Configured13.6.1 only; independent linked SDK identity unverified"
+  },
+  "routineVerification": {
+    "filesystem": "All695 frozen files,26 observer inputs,7 host inputs,171 archive members in both selected package copies,all3 expected MapLibre declaration deltas, retained APK SHA/no embedded JS/no SDK metadata verified read only",
+    "scope": "Pure filesystem/compiler/resolver/PNG/mock checks; no native or renderer runtime",
+    "nodeAndBunMocks": "Passed pinned Node24.22.1 and Bun1.4.1 actual shared-source orchestration with fake host boundaries for both engines: exact6/3 scenarios, fixed entrypoints and preserved Mapbox default, Mapbox missing/whitespace token and token-free MapLibre, exact target APK/driver/peer evidence, all prior ownership/error regressions including checkpoint-before-create, partial create, uncertain launch preserve AVD, receipt-write failure continues cleanup, stdin EPIPE, offline emulator TERM/KILL fallback and port checks.",
+    "syntax": "Pinned Node --check passed all four changed/new scripts.",
+    "formatterAndLint": "Primary-installed Vite+ scoped check passed four explicit isolated scripts; scoped formatting also passed preparation JSON. Primary source untouched.",
+    "documentation": "Pinned Node scripts/check-docs.mjs passed40Markdown files/39comparison tables; git diff --check passed. Current handoff reviewed against unchanged actual TF09 driver, selected native capture sources and compact receipts.",
+    "fixture": "Existing TF09 local DEM fixture stdlib self-check passed; selected installed pngjs7 decodes256x256 PNG.",
+    "installedResolution": "Actual installed shell Metro resolveRequest resolves ./capture-rendering.js from tf09-scene.tsx to capture-rendering.native.ts on Android.",
+    "babel": "Installed selected Babel compiled App, smoke-target, native-tf09-screen, tf09-scene and native capture helper with ONE_MAP_SMOKE=tf09 fully inlined; no token or transformed code printed.",
+    "firstPreparationFailures": [
+      "Mock adaptation initially retained semicolon in new APK hash object; syntax corrected before Node/Bun passes.",
+      "Disposable pure Babel check initially referenced tf09-native-screen.tsx instead of existing native-tf09-screen.tsx; corrected path and all five transforms passed."
+    ],
+    "mapboxImpact": "Shared extraction only plus fixed engine selection; existing lifecycle/ownership/error behavior preserved and routinely checked for both engines. Accepted historical Mapbox runtime remains attached to its original launcher identity; no runtime pass claimed for refactored launcher.",
+    "coordinator": "Independent final source and routine audit passed; native execution awaits separate explicit owner approval."
+  },
+  "preparedSha256": {
+    "scripts/android-rendering.mjs": "18a85d6c189984835d4df44feba8d59cf5c89b956098c2e819663d3409612253",
+    "scripts/mapbox-android-rendering.mjs": "7aa7bc426bced4fa13089873d14c7a3d763cd9754efcec7659aca7c72588d530",
+    "scripts/maplibre-android-rendering.mjs": "20ac07bd8387c2730f79417a7d79e9eead67fd02ae475e48b9421a3684d63fa8",
+    "scripts/mapbox-android-rendering.test.mjs": "fbcbe21d1edeab14d753ffa31aeb6b1c1e48e0f8c096313604634596215e76f3",
+    "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b"
+  }
+}
