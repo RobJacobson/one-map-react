@@ -1,0 +1,175 @@
+{
+  "checkpoint": "PR73 Mapbox iOS targeted rendering attempt01",
+  "observedAt": "2026-10-30T21:48:27.089788+00:00",
+  "result": "passed",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "appReused": true,
+  "nativeBuildInstallOrDependencyRestoration": false,
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-ios-rendering.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-rendering-attempt-01",
+  "commandExit": 0,
+  "attemptCount": 1,
+  "scene": {
+    "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+    "platform": "ios",
+    "engine": "mapbox",
+    "artifact": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "nativeIdentity": "{\"OneMapMapbox\":\"b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231\",\"OneMapMapbox.debug.dylib\":\"340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46\"}",
+    "outcomes": [
+      {
+        "name": "known rendered feature and initial no-data",
+        "status": "passed",
+        "observation": {
+          "loads": 1,
+          "featureIds": [
+            9009
+          ],
+          "elevation": null
+        }
+      },
+      {
+        "name": "terrain enabled before delayed DEM attachment",
+        "status": "passed",
+        "observation": {
+          "elevation": 2000,
+          "expectedMeters": 2000
+        }
+      },
+      {
+        "name": "explicit terrain clear and projection change",
+        "status": "passed",
+        "observation": {
+          "elevation": 2000
+        }
+      },
+      {
+        "name": "hillshade draws the fixture's slope patch",
+        "status": "passed",
+        "observation": {
+          "changedPixels": 235363
+        }
+      },
+      {
+        "name": "globe projection has independently different viewport output",
+        "status": "passed",
+        "observation": {
+          "changedPixels": 2323951,
+          "projectionReadback": "native pixel comparison"
+        }
+      },
+      {
+        "name": "rendered output contains the known orange feature",
+        "status": "passed",
+        "observation": {
+          "width": 1206,
+          "height": 2622,
+          "orangePixels": 3884
+        }
+      }
+    ]
+  },
+  "identity": {
+    "produced": {
+      "metadata": {
+        "CFBundlePackageType": "APPL",
+        "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+        "CFBundleExecutable": "OneMapMapbox",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1"
+      },
+      "codeSha256": {
+        "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+        "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+      },
+      "frameworkMetadata": {
+        "MapboxCoreMaps": {
+          "CFBundleIdentifier": "com.mapbox.maps",
+          "CFBundleShortVersionString": "11.23.1",
+          "CFBundleVersion": "11.23.1"
+        },
+        "MapboxCommon": {
+          "CFBundleIdentifier": "com.mapbox.common",
+          "CFBundleShortVersionString": "24.23.1",
+          "CFBundleVersion": "24.23.1"
+        }
+      }
+    },
+    "installed": {
+      "metadata": {
+        "CFBundlePackageType": "APPL",
+        "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+        "CFBundleExecutable": "OneMapMapbox",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1"
+      },
+      "codeSha256": {
+        "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+        "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+      },
+      "frameworkMetadata": {
+        "MapboxCoreMaps": {
+          "CFBundleIdentifier": "com.mapbox.maps",
+          "CFBundleShortVersionString": "11.23.1",
+          "CFBundleVersion": "11.23.1"
+        },
+        "MapboxCommon": {
+          "CFBundleIdentifier": "com.mapbox.common",
+          "CFBundleShortVersionString": "24.23.1",
+          "CFBundleVersion": "24.23.1"
+        }
+      }
+    }
+  },
+  "podLockSha256": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874",
+  "coordinatorAudit": {
+    "result": "passed within exact six-scenario Mapbox iOS scope",
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "preparedFiles": 5,
+    "mismatches": [],
+    "producedInstalledEntryPointsAndCode": "matched",
+    "SDKMetadata": "CoreMaps11.23.1;Common24.23.1",
+    "podLocksMatched": true,
+    "portsClear": true,
+    "deviceShutdown": true
+  },
+  "cleanup": [
+    {
+      "name": "assigned app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 48535",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 48488",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8798",
+      "result": "passed"
+    },
+    {
+      "name": "owned simulator shutdown",
+      "result": "passed"
+    }
+  ],
+  "freeGiBAfter": 5.5205841064453125,
+  "rawReceipt": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-rendering-attempt-01/receipt.json",
+  "scopeLimits": [
+    "One Mapbox iOS automatic slice: knownfeature9009 and initial null elevation, delayed DEM terrain2000meters, terrain clear/re-enable/style replacement, hillshade pixels, globe/Mercator pixel difference and known-orange pixels.",
+    "No independent native light readback, registered-image pixel proof, full pixel/layer/density matrix, other native platform, broad camera/input/UI/annotation/multiple-map or service acceptance.",
+    "Matching loader/debug-library hashes, metadata and locks do not certify every bundle resource or entire SDK."
+  ],
+  "storage": "No raw screenshots retained by scene; compact receipts preserved. Retired Pods payloads were not restored."
+}
