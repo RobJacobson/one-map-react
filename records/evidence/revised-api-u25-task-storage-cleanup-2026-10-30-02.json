@@ -1,0 +1,30 @@
+{
+  "action": "Owner-authorized removal of remaining disposable task-owned native payloads",
+  "observedAt": "2026-10-30T21:14:47.442573+00:00",
+  "beforeAvailableBytes": 3935903744,
+  "afterAvailableBytes": 7377125376,
+  "observedAvailableIncreaseGiB": 3.2048873901367188,
+  "afterAvailableGiB": 6.8704833984375,
+  "retiredRoots": [
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/ios/Pods",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/ios/build",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/Pods",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/build"
+  ],
+  "removedPathCount": 129,
+  "preservedFrozenFiles": 695,
+  "preservedObserverInputs": 26,
+  "verifiedProducedApps": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app": {
+      "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+      "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+    },
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app": {
+      "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+      "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+    }
+  },
+  "preserved": "Verified produced and installed apps, Android APKs, f05 archive/package copies, JavaScript deps, runtime tools, Ruby tooling, locks and frozen metadata; active review checkout retained.",
+  "impact": "Pod dependency payloads and redundant native build products retired. Pods folders contain receipt-only placeholders with explicit marker files. Any future native rebuild requires deliberate locked dependency restoration; pending PR72 no-build runtime remains supported.",
+  "notExecuted": "No native build, install, Metro, simulator or acceptance run."
+}
