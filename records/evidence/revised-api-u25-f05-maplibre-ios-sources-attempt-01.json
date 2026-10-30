@@ -1,0 +1,29 @@
+{
+  "checkpoint": "PR69 MapLibre iOS source/image lifecycle attempt01 preflight",
+  "observedAt": "2026-10-30T16:46:27.940591+00:00",
+  "status": "stopped-free-space-gate-before-worker-dispatch",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "verifiedFrozenFiles": 662,
+  "archiveRegularMembersCompared": 171,
+  "candidateCopiesCompared": 2,
+  "preparedAndSelectedHashesMatch": true,
+  "availableBytes": 8330022912,
+  "availableGiB": 7.757938385009766,
+  "requiredBytes": 8589934592,
+  "requiredGiB": 8,
+  "shortfallBytes": 259911680,
+  "firstFailure": "Available disk space below the PR69 eight-GiB pre-restoration planning floor. Stopped before copying reviewed runtime files or dispatching worker.",
+  "nativeResourcesAcquired": [],
+  "cleanup": "None needed; read-only preflight only.",
+  "notRun": [
+    "Worker dispatch",
+    "Ruby/Bundler restoration",
+    "Gem/Pods installation",
+    "Resolved dependency audit",
+    "Simulator inventory/boot",
+    "Native build/install",
+    "Metro or source lifecycle scene"
+  ],
+  "preserved": "f05, all662 frozen inputs, prepared files, selected scaffold, dependencies and existing Android APKs unchanged. No deletion or threshold reduction.",
+  "next": "Free additional space and approve continuation of the same reviewed restoration/single-run scope. No automatic retry."
+}

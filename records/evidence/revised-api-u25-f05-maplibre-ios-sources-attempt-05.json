@@ -1,0 +1,147 @@
+{
+  "checkpoint": "PR69 MapLibre iOS source/image lifecycle attempt05",
+  "observedAt": "2026-10-30T17:27:47.826855+00:00",
+  "result": "passed",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "reusedRestoredDependencies": true,
+  "reinstallOrRegeneration": false,
+  "preflight": {
+    "verifiedFiles": 678,
+    "mismatches": [],
+    "freeGiB": 6.495582580566406,
+    "requiredGiB": 5
+  },
+  "commands": [
+    {
+      "step": "Assigned simulator inventory",
+      "exit": 0,
+      "state": "Shutdown; available"
+    },
+    {
+      "step": "Assigned simulator boot",
+      "exit": 0
+    },
+    {
+      "step": "Bootstatus",
+      "exit": 0
+    },
+    {
+      "step": "Assigned listeners before scene",
+      "exit": 1,
+      "output": "empty; clear"
+    },
+    {
+      "step": "Sole TF05 ios maplibre runner",
+      "exit": 0
+    },
+    {
+      "step": "Installed app container",
+      "exit": 0
+    },
+    {
+      "step": "Assigned listeners after scene",
+      "exit": 1,
+      "output": "empty; clear"
+    },
+    {
+      "step": "Owned simulator shutdown",
+      "exit": 0
+    }
+  ],
+  "scene": {
+    "command": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-maplibre-ios-sources-env.sh bun /private/tmp/one-map-f05-ios/native-harness/scripts/tf05-sources-smoke.mjs ios maplibre",
+    "resultCount": 1,
+    "resultKey": "maplibre-ios",
+    "status": "passed",
+    "fields": "mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+    "workerReportedRuntime": "About3minutes for scene;3minutes30seconds including native cleanup",
+    "retries": 0
+  },
+  "identity": {
+    "produced": {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+      "metadata": {
+        "CFBundlePackageType": "APPL",
+        "CFBundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+        "CFBundleExecutable": "OneMapMaplibre",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1"
+      },
+      "codeSha256": {
+        "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+        "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+      },
+      "frameworkMetadata": {
+        "CFBundleIdentifier": "com.maplibre.mapbox",
+        "CFBundleShortVersionString": "6.31.0",
+        "CFBundleVersion": "6.31.0"
+      }
+    },
+    "installed": {
+      "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/2F6151E0-5FF8-48BA-A4C5-1EB7117C3011/OneMapMaplibre.app",
+      "metadata": {
+        "CFBundlePackageType": "APPL",
+        "CFBundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+        "CFBundleExecutable": "OneMapMaplibre",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1"
+      },
+      "codeSha256": {
+        "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+        "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+      },
+      "frameworkMetadata": {
+        "CFBundleIdentifier": "com.maplibre.mapbox",
+        "CFBundleShortVersionString": "6.31.0",
+        "CFBundleVersion": "6.31.0"
+      }
+    }
+  },
+  "swiftPM": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/ios/OneMapMaplibre.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+    "sha256": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+    "resolved": {
+      "originHash": "e70d3525c8e2819a8b34f22909815dab5c700c25a06c32388f3930f7b3627768",
+      "pins": [
+        {
+          "identity": "maplibre-gl-native-distribution",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+          "state": {
+            "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683",
+            "version": "6.31.0"
+          }
+        }
+      ],
+      "version": 3
+    },
+    "projectDuplicateRequired": false
+  },
+  "coordinatorAudit": {
+    "result": "passed within exercised scope",
+    "producedInstalledMetadataMatch": true,
+    "loaderAndDebugDylibHashesMatch": true,
+    "frameworkMetadataMatch": "MapLibre6.31.0 in produced and installed app",
+    "resolvedRevision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683",
+    "frozenFiles": 678,
+    "mismatches": [],
+    "freezePath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-ios-sources-attempt-02/post-restoration-freeze.json"
+  },
+  "cleanup": {
+    "simulator": "Only assigned8B7D7CE4-228E-409F-A156-A597D4E448A5 was booted and shut down by this worker; coordinator device.plist state1 confirms Shutdown",
+    "ports": "8081/8798/8799 clear; independently verified lsof exit1 with empty output/error",
+    "alias": "Coordinator-owned short alias removed with pathlib; absence independently confirmed",
+    "preserved": "Restored active dependencies, locks, generated workspace and app binary for remaining native acceptance; historical freezes/Android artifacts preserved"
+  },
+  "history": "Attempts01/04 stopped at disk gates; attempt02 completed restoration then stopped at receipt-writer error; attempt03 stopped at invalid utility path. They remain separate records and were not scene runs.",
+  "scopeLimits": [
+    "Four source families and five layer types, one registered image, paint reset, data update, style replacement and transient source removal observed through lifecycle/status assertions.",
+    "Pixel appearance, image readback, remaining families/layers and broader native acceptance remain unverified.",
+    "Matching code hashes and framework metadata do not certify every bundle resource or the entire native SDK."
+  ]
+}
