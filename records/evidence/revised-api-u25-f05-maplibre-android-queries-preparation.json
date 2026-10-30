@@ -1,0 +1,482 @@
+{
+  "checkpoint": "U25 f05 MapLibre Android ordinary queries/clusters preparation",
+  "kind": "planning/reference",
+  "audience": "Owner, coordinator and execution worker",
+  "purpose": "Review restoration and one separately approved ordinary TF06 check",
+  "nonGoals": "Host setup or execution during preparation; other engines/platforms/scenes; package changes",
+  "status": "Worker preparation and independent coordinator planning audit passed; execution awaits owner approval. Missing consumer/install/generation/installed audit/native result remain unverified.",
+  "provenance": {
+    "sourceCheckout": "/private/tmp/one-map-android-restoration-review",
+    "sourceHead": "a51710583981a338feb4c4b1c504cbbdf3215c0b",
+    "sourceBaseline": "15cd961325f40ba57976fba01ec658d535dac69a",
+    "sourcePR": "https://github.com/RobJacobson/one-map-react/pull/63",
+    "stage": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery",
+    "harness": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness",
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "extractedPackage": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+    "exactArchiveMembersCompared": 171,
+    "preservation": "No production, peer, version, patch, lock or archive edits/repack. Preserve approved Mapbox consumer and outputs, existing common helpers and unknown resources."
+  },
+  "sourceInventory": {
+    "method": "Recursive literal relative import/require graph from App/index/Babel/Metro, mixed setup, runner/tests/generator, plus Mapbox helper control. Resolve .js to source .ts/.tsx/native.ts; hash source bytes and compare retained files. Five source contract files are type-only imports in map-fixture.ts; Babel erases them and packed package must remain exact. Inventory is source completeness, not installed Metro proof.",
+    "files": {
+      "examples/inline-smoke-target.cjs": {
+        "sha256": "6feb01f3c7b4056b6e995cf9b7dfc251fd66f7225ad2a4d9070cc21fbeed4b0f",
+        "stage": "present-identical"
+      },
+      "examples/mapbox-token.cjs": {
+        "sha256": "6a00040087135ecb439a434bc3339dce9b0518540286bb28a0133698c3ee3ddc",
+        "stage": "present-identical"
+      },
+      "examples/mixed/mapbox-web-maplibre-native/setup.native.ts": {
+        "sha256": "f922e92868c9f79e90c9f877dff5639b1acd1bed3350dbbfc114d820f354c14c",
+        "stage": "absent"
+      },
+      "examples/mixed/mapbox-web-maplibre-native/setup.ts": {
+        "sha256": "16880934f99060ae63cabc07d5e2b44433acf4764c150c852a1935634c93d291",
+        "stage": "absent"
+      },
+      "examples/native-maplibre/App.tsx": {
+        "sha256": "0c3bd5d5fde037e9f3542326189480a2c524a23ae742c3d6356f9a4e633aec0d",
+        "stage": "absent"
+      },
+      "examples/native-maplibre/app.json": {
+        "sha256": "c18bca56b8d25e74468dccb60edb12cd6ea4241c94295c89f88e0f1115355684",
+        "stage": "absent"
+      },
+      "examples/native-maplibre/babel.config.cjs": {
+        "sha256": "fc4ab418e4825a61fe75ad04c6d944e099b52a69925c4c022d947beb5b3212ee",
+        "stage": "absent"
+      },
+      "examples/native-maplibre/bun.lock": {
+        "sha256": "cb9c8eba082a3b20d50f842c21d14339958415f6786c98f27234b1a565527a19",
+        "stage": "absent"
+      },
+      "examples/native-maplibre/index.js": {
+        "sha256": "e58e53333550097bca178309144ea394926eff3ccf37189df79b9bcc15902f05",
+        "stage": "absent"
+      },
+      "examples/native-maplibre/metro.config.cjs": {
+        "sha256": "c11ecd20a5f22d0020406172c64caf9b9ab09681dd249245f6a43336c0c03c3a",
+        "stage": "absent"
+      },
+      "examples/native-maplibre/package.json": {
+        "sha256": "0f973fc53ad8c1867435eeafd17a78b2c0f894a228c45e17840a68588a62b1b5",
+        "stage": "absent"
+      },
+      "examples/resolve-shell-deps.cjs": {
+        "sha256": "e417f3b1463e6a91dcaf310543eae70aa49ead6690d326a2366175536a3a6e3c",
+        "stage": "present-identical"
+      },
+      "examples/shared/camera-smoke.ts": {
+        "sha256": "41a796349da41ec609f737b14af17b868a39affd0eecec65937b3e4b4ec26eb9",
+        "stage": "present-identical"
+      },
+      "examples/shared/capture-rendering.native.ts": {
+        "sha256": "c17621e8aedc59e559bc96fab38da39fe5af7dfa58a64d02d300958d5805fe31",
+        "stage": "present-identical"
+      },
+      "examples/shared/lifecycle-smoke.ts": {
+        "sha256": "b6ae1b6c4301fcca8b54873e555ca6f496aa1ab22b96b77b3c9e287b3884fcae",
+        "stage": "present-identical"
+      },
+      "examples/shared/lifetimes-map.tsx": {
+        "sha256": "2e2c2c9711019d68772d644ceb1f589f10c85850f9fba3acd3d30507bcdb3f7f",
+        "stage": "present-identical"
+      },
+      "examples/shared/lifetimes-smoke.ts": {
+        "sha256": "ed8fdf0592d63ea2a392687c277d94323ed58ded170e33e0ef1f910befbd2279",
+        "stage": "present-identical"
+      },
+      "examples/shared/location-acquisition.ts": {
+        "sha256": "bf33287a763d415ed5362ff6001e1ead4e5fdd6f67140bad1877fc67f2d6e9fa",
+        "stage": "present-identical"
+      },
+      "examples/shared/maplibre-offline-commands.ts": {
+        "sha256": "c84efcf55bb9bdc402057daf049f37b1e19fc0fcaa51be664487827d6b75058c",
+        "stage": "present-identical"
+      },
+      "examples/shared/maplibre-snapshot.ts": {
+        "sha256": "80aedf8103c7868ccf9ad9104178de775739e4ee61f30d485ccd930fae9ac90c",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-camera-buttons.tsx": {
+        "sha256": "8891194dfdb016b3cb337e99e9d8a9577d9c48af464e719eea549fe89bdc6f50",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-camera-screen.tsx": {
+        "sha256": "57db92fc2eb6fdd85907a0da75196febcaa339f782334ffd87ab1b5837f046e3",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-lifetimes-screen.tsx": {
+        "sha256": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-location-button.tsx": {
+        "sha256": "71d6f63b4e7c2bb201e1c42d2daaf6c53ad6bd01f3a96033fa1c202f45177b2f",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-location.ts": {
+        "sha256": "f3156a095da8053508f5d8d8951f718a896b9cbcb9c6bbabdbe75c2b4d975990",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-popup-bubble.tsx": {
+        "sha256": "1046ef25fc1c21f69be206e3f19b2b6a2c148adc3a05ffc8f3b832b94e942f24",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-queries-screen.tsx": {
+        "sha256": "78b7b0eb158d37c5561c81f615ffb1089d4564c26debd250f92193a7bd4e1a56",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-sources-screen.tsx": {
+        "sha256": "73f74314e2da333d4a9ce04058963775f0d4d52f59f17ffbdc444318d7b5aae2",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-tf07-retained-screen.tsx": {
+        "sha256": "569aecf9dd5287010e568d0ba949e77b622693f20da30e104f19667818e9c41c",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-tf07-screen.tsx": {
+        "sha256": "4f5e254be2b25b308d4bf44feac59bfc09b75c91cedcd295a0a20958bb53c1ba",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-tf08-screen.tsx": {
+        "sha256": "15a440d9cf619446cd07ec3af1c63472288a3762e1ad554cbd0608a9905cb453",
+        "stage": "present-identical"
+      },
+      "examples/shared/native-tf09-screen.tsx": {
+        "sha256": "8e0e55a994872e16d0b6427097fa6ad373142edb677af4ef29c9a39656d08683",
+        "stage": "present-identical"
+      },
+      "examples/shared/offline-pack-index.ts": {
+        "sha256": "936aa92419de45e3ae15ee4af5c8c050d27cb8cacf9c686c0214fadd991354e2",
+        "stage": "present-identical"
+      },
+      "examples/shared/queries-map.tsx": {
+        "sha256": "ef9498b977c82c3707c3e2b83d05566a2f907a2b1741cc28601f96caad2e0d6b",
+        "stage": "present-identical"
+      },
+      "examples/shared/queries-smoke.ts": {
+        "sha256": "aadcd992843f3321c540ed1b9cfb19db32ae822edd2e531e54fe77fb6d1822b7",
+        "stage": "present-identical"
+      },
+      "examples/shared/route-map.tsx": {
+        "sha256": "9afc071795c3881080a0147562d22043221b36f30b65fc80c10761b42c22527b",
+        "stage": "present-identical"
+      },
+      "examples/shared/smoke-target.ts": {
+        "sha256": "f9097227201e0a8658c25d4b34a1b33d4c1d483526493391665db2e55fc86f36",
+        "stage": "present-identical"
+      },
+      "examples/shared/sources-map.tsx": {
+        "sha256": "7973ae80022d1611d6c742a89facc237b27b4454ca9b216d6ca7e65d0874c065",
+        "stage": "present-identical"
+      },
+      "examples/shared/sources-smoke.ts": {
+        "sha256": "da8b6f6455850b8f7cea5ad5ae4049cc1d180f09b4d9f7376557337894aecd6b",
+        "stage": "present-identical"
+      },
+      "examples/shared/tf05-base.ts": {
+        "sha256": "d68bed272d0ce895e7d2727409fcffecc8c72c0f954c4e9dffbc528ac2db9f52",
+        "stage": "present-identical"
+      },
+      "examples/shared/tf06-base.ts": {
+        "sha256": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+        "stage": "present-identical"
+      },
+      "examples/shared/tf07-scene.tsx": {
+        "sha256": "21279dc015f5f8bf3d4daa7754478b3b2d021dcf612b821384ae952f297e09fd",
+        "stage": "present-identical"
+      },
+      "examples/shared/tf08-acceptance-scene.tsx": {
+        "sha256": "a85cf86519ddf0162a3fad66bdd2980ef81cee7c964f30aff9870bf37c0de502",
+        "stage": "present-identical"
+      },
+      "examples/shared/tf09-scene.tsx": {
+        "sha256": "2672c2e38c5312260bedd9fdd84df0dc02b2cfa467095f683f8adbfe345e651e",
+        "stage": "present-identical"
+      },
+      "packages/one-map-react/src/contracts/camera-types.ts": {
+        "sha256": "f12963595c86c5c6baf287309fe8576a16640e4c9edd880c656879968c8db7f2",
+        "stage": "absent-type-only-source; do not copy into packed package"
+      },
+      "packages/one-map-react/src/contracts/layer-types.ts": {
+        "sha256": "4c711c420bba93d6af1daf9ea47917a91b47f7cfe44e00b74a8fa13bbfd3353a",
+        "stage": "absent-type-only-source; do not copy into packed package"
+      },
+      "packages/one-map-react/src/contracts/query-types.ts": {
+        "sha256": "46ba4ce84c06a6f0193d6c2bdb0f33b4dc056f6da80df79354d64790e9dd6a38",
+        "stage": "absent-type-only-source; do not copy into packed package"
+      },
+      "packages/one-map-react/src/contracts/source-types.ts": {
+        "sha256": "0cd1240ef1cec9ce41196d6fbd6f2251a12920e29003a1831a42286cd68e0d2c",
+        "stage": "absent-type-only-source; do not copy into packed package"
+      },
+      "packages/one-map-react/src/contracts/style-types.ts": {
+        "sha256": "dac3932e8c67c20c5f2bfb36744fd374d645f4a80db91f2b6039f176a7b3ec11",
+        "stage": "absent-type-only-source; do not copy into packed package"
+      },
+      "scripts/native-location-permissions.mjs": {
+        "sha256": "884448ff43d622d197d58596611e69d424dbc39dad6cb30d2c4b8bd856718adf",
+        "stage": "present-identical"
+      },
+      "scripts/native-mapbox-version.mjs": {
+        "sha256": "97aabd7ae431097eb33cd0bf1a63b38eed84a2979f2ce16f98e774f15991613b",
+        "stage": "present-identical"
+      },
+      "scripts/native-smoke-process.mjs": {
+        "sha256": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+        "stage": "present-identical"
+      },
+      "scripts/setup-native-example.mjs": {
+        "sha256": "bc99dc4edb3ee3d8d23456bd3a4e51ec88f21eb2249ad15982f16f1649daa6f5",
+        "stage": "present-identical"
+      },
+      "scripts/tf06-lifetimes-fixture.mjs": {
+        "sha256": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+        "stage": "present-identical"
+      },
+      "scripts/tf06-queries-smoke.mjs": {
+        "sha256": "996bbf6ad351b029ed33a589769be5e95cedd228a84db1c15ccba3c789f8f216",
+        "stage": "present-identical"
+      },
+      "scripts/tf06-query-runner.test.mjs": {
+        "sha256": "a8a89dddb300af4c3e9d9d4c002fcf0774c56f9d933b606a6f723810f88186be",
+        "stage": "present-identical"
+      },
+      "scripts/tf06-smoke-selection.mjs": {
+        "sha256": "27434db8d0b33108fb94d97cd06c909ed444d2fea7723e603acd3dd896acdd5f",
+        "stage": "present-identical"
+      },
+      "scripts/tf06-smoke-selection.test.mjs": {
+        "sha256": "272118add1837957a5de5eb1805a9ef3003b944d8e768bc5c24683e8fa21aa36",
+        "stage": "present-identical"
+      },
+      "tests/fixtures/map-fixture.ts": {
+        "sha256": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+        "stage": "present-identical"
+      },
+      "tests/fixtures/map.json": {
+        "sha256": "8279594359798e3d9e7763242ba0ede1207ad5ae24f84e3d3be1ef241ac21362",
+        "stage": "present-identical"
+      }
+    },
+    "missingConsumerAndMixedFiles": [
+      "examples/mixed/mapbox-web-maplibre-native/setup.native.ts",
+      "examples/mixed/mapbox-web-maplibre-native/setup.ts",
+      "examples/native-maplibre/App.tsx",
+      "examples/native-maplibre/app.json",
+      "examples/native-maplibre/babel.config.cjs",
+      "examples/native-maplibre/bun.lock",
+      "examples/native-maplibre/index.js",
+      "examples/native-maplibre/metro.config.cjs",
+      "examples/native-maplibre/package.json"
+    ],
+    "copyAfterApproval": "Copy only the nine absent tracked files, preserving relative paths from sourceCheckout into harness. No replacement of retained scripts/shared/helpers/Mapbox files. Stop if any expected absence/present-identical hash changes. Apply only the App/Metro substitutions below."
+  },
+  "mixedSelection": {
+    "appOperations": [
+      "Require exactly one named-import line \"  adapter,\\n\" and remove it.",
+      "Prepend import { adapter } from \"../mixed/mapbox-web-maplibre-native/setup.js\"; followed by newline.",
+      "Before the unique // Destructive operations are only invoked by the isolated pending acceptance scope. marker insert the exact guard text below."
+    ],
+    "guardText": "if (adapter.backend !== \"maplibre-native\") {\n  throw new Error(\"Mixed selection resolved the wrong backend\");\n}\nconsole.log(\"U25_NATIVE_SELECTION pair=mapbox-web-maplibre-native backend=\" + adapter.backend);\n\n",
+    "appSha256": "db8ec4822c99bc3502b260cd36f4df2a6b3229acfec3a3cb8e453fa03b685f00",
+    "metroOperation": "After the unique path.resolve(__dirname, \"../shared\"), line add four spaces then path.resolve(__dirname, \"../mixed\"), and newline.",
+    "metroSha256": "7522eb0828fd4694212bc425efd4270e56175775d2339bef89761cdc619a1786",
+    "token": "MapLibre App/Babel/query path does not consume MAPBOX_ACCESS_TOKEN. No token preflight or output is required. Existing mapbox-token.cjs retained unchanged as shared control."
+  },
+  "consumerLock": {
+    "chosen": "examples/native-maplibre/bun.lock",
+    "sha256": "cb9c8eba082a3b20d50f842c21d14339958415f6786c98f27234b1a565527a19",
+    "basis": "Existing tracked PR63 source lock, unchanged from PR62 baseline; frozen install only. Original temporary MapLibre lock bytes and exact hash were not recovered from inspected durable preparation/minimal/lifetime records. Historical native-preparation records a whole-harness freeze digest, not recoverable per-file lock bytes.",
+    "disclosure": "Explicit disposable lock substitution requires approval. Do not claim original dependency tree reproduction or unchanged installed harness. No repository lock edit or refresh.",
+    "dependencies": {
+      "@maplibre/maplibre-react-native": "11.5.0",
+      "one-map-react": "file:../../packages/one-map-react",
+      "react": "19.2.3",
+      "react-native": "0.87.1",
+      "react-native-teleport": "1.2.1"
+    },
+    "devDependencies": {
+      "@babel/core": "^7.25.2",
+      "@babel/preset-env": "^7.25.3",
+      "@babel/runtime": "^7.25.0",
+      "@react-native-community/cli": "20.2.0",
+      "@react-native-community/cli-platform-android": "20.2.0",
+      "@react-native-community/cli-platform-ios": "20.2.0",
+      "@react-native/babel-preset": "0.87.1",
+      "@react-native/metro-config": "0.87.1"
+    },
+    "overrides": {
+      "react-dom": "19.2.3"
+    },
+    "patchedDependencies": {
+      "@maplibre/maplibre-react-native@11.5.0": "../../packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch"
+    },
+    "patchSha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0",
+    "installCommand": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh bun install --frozen-lockfile --ignore-scripts",
+    "cwd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre"
+  },
+  "hostSupport": {
+    "sha256": {
+      "with-android-env.sh": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4",
+      "create-lifetime-task-avd.py": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38",
+      "launch-lifetime-emulator.py": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24"
+    },
+    "sourceAuthority": "records/evidence/revised-api-u25-f05-mapbox-android-restoration-plan.json embeds the unchanged support sources. Existing stage files match. No new launcher or timeout framework.",
+    "runtimeLinks": {
+      "bun": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native",
+      "bunx": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native",
+      "node": "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node"
+    },
+    "runtimePins": {
+      "Bun": "1.4.1",
+      "Node": "24.22.1"
+    },
+    "sourceAvdConfig": {
+      "path": "/Users/rob/.android/avd/Medium_Phone.avd/config.ini",
+      "sha256": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de"
+    },
+    "retainedFilesystemInputs": [
+      "android-gradle/caches",
+      "/Users/rob/Library/Android/sdk/platforms/android-37.0",
+      "/Users/rob/Library/Android/sdk/build-tools/37.0.0",
+      "/Users/rob/Library/Android/sdk/ndk/27.1.12297006",
+      "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/system.img",
+      "/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+    ],
+    "bootPoll": {
+      "path": "/private/tmp/one-map-approved-android-boot-poll.py",
+      "sha256": "f819d439aa4573070b858e80c7d3a61ca8f7a833f5ca857f3347ba5d39a35956",
+      "sourceAuthority": "records/evidence/revised-api-u25-f05-mapbox-android-queries-attempt-03-preparation.json bootPoll.source",
+      "command": "/bin/sh ../with-android-env.sh python3 /private/tmp/one-map-approved-android-boot-poll.py",
+      "gate": "Rehash and compile exact multiline source; if temporary file is absent, restore exact embedded source only after approval. Do not inline Python while syntax."
+    }
+  },
+  "generator": {
+    "cwd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness",
+    "command": "/bin/sh ../with-android-env.sh bun scripts/setup-native-example.mjs native-maplibre",
+    "sourceAudit": "Selected key invokes CLI20.2.0 init OneMapMaplibre, RN0.87.1, --skip-install --skip-git-init --install-pods false. Copies Android and incidental iOS/Gemfile, applies existing location declarations. Mapbox Maven/pin branch is skipped. The MapLibre post-install change touches only unused iOS scaffolding; discard that tree/Gemfile, without Ruby/Pods actions.",
+    "downloads": "Approval includes exact frozen registry dependencies, pinned CLI/template and ordinary generated Gradle/Maven/CMake inputs if not cached. No SDK/image install or host repair. Stop for missing SDK or new unpinned required inputs.",
+    "coordinatorGateBeforeNative": [
+      "Record resolved CLI/template version and available integrity from ordinary generation, wrapper/distribution properties and checksums; missing historical template integrity alone does not justify another resolve.",
+      "Inspect generated root/app Gradle, gradle.properties, settings.gradle, wrapper properties/JAR, AndroidManifest and MainActivity/MainApplication. Require applicationId com.onemapmaplibre, expected RN0.87.1 template, recorded ABI configuration (runner uses assigned active architecture), reviewed location declarations and no unintended Mapbox Maven/pin/custom transport edits. Freeze their hashes before native run. No original MapLibre generated-file hash was recovered; do not call the generated tree identical to historical project.",
+      "Frozen lock/manifests/direct dependency versions, all171 selected installed f05 files and patch SHA match. Inspect selected installed patched fields and run read-only git apply --reverse --check with the exact f05 patch from the selected peer root. Retain historical publication pristine proof; no new pristine registry download solely for this gate.",
+      "Opposite @rnmapbox/maps native SDK absent from this consumer; expected selected wrapper11.5.0 present. Mapbox consumer remains unchanged.",
+      "Use this installed MapLibre Metro resolver on Android for mixed setup.js -> setup.native.ts -> one-map-react/maplibre-native -> selected packed dist and common package path. Assert no web backend/opposite native SDK selection; exercise .js fallback/native capture helper and errors as historical resolver proof.",
+      "Using installed MapLibre Babel/config, transform App, smoke-target.ts and entire imported scene graph, including native-queries-screen.tsx (not nonexistent native-tf06-screen.tsx), queries-smoke.ts and QueriesMap. Assert tf06 selection and expected mixed backend guard. Existing preflight used Mapbox Babel only and cannot satisfy this installed-consumer gate.",
+      "Recheck runner/selector/helpers, mixed transformed hashes, all retained input hashes and support/boot poll before dispatch. Coordinator writes compact completion/freeze receipt and reviews first-failure stop before emulator acquisition."
+    ],
+    "installedStaticAudit": {
+      "source": "const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');\nconst h='/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness',shell=h+'/examples/native-maplibre';\nconst cfg=require(shell+'/metro.config.cjs');\nconst ctx={...cfg.resolver,originModulePath:shell+'/App.tsx',preferNativePlatform:true,assetExts:new Set(cfg.resolver.assetExts),sourceExts:cfg.resolver.sourceExts,mainFields:cfg.resolver.resolverMainFields,unstable_enablePackageExports:true,unstable_conditionNames:['require','react-native'],isESMImport:()=>true,getPackage:p=>JSON.parse(fs.readFileSync(p,'utf8')),getPackageForModule:p=>{let d=fs.existsSync(p)&&fs.statSync(p).isDirectory()?p:path.dirname(p);while(d!==path.dirname(d)){if(fs.existsSync(path.join(d,'package.json')))return{rootPath:d,packageJson:JSON.parse(fs.readFileSync(path.join(d,'package.json'),'utf8')),packageRelativePath:path.relative(d,p)};d=path.dirname(d);}return null;},redirectModulePath:p=>p,doesFileExist:p=>fs.existsSync(p)&&fs.statSync(p).isFile(),fileSystemLookup:p=>fs.existsSync(p)?{exists:true,type:fs.statSync(p).isDirectory()?'d':'f',realPath:fs.realpathSync(p)}:{exists:false}};\nconst mixed=cfg.resolver.resolveRequest(ctx,'../mixed/mapbox-web-maplibre-native/setup.js','android');\nassert(mixed.filePath.endsWith('/setup.native.ts'));assert(cfg.watchFolders.some(p=>mixed.filePath.startsWith(p+'/')));\nconst selected=cfg.resolver.resolveRequest({...ctx,originModulePath:mixed.filePath},'one-map-react/maplibre-native','android');assert(selected.filePath.includes('/node_modules/one-map-react/dist/'));assert(!fs.existsSync(shell+'/node_modules/@rnmapbox/maps'));\nprocess.env.ONE_MAP_SMOKE='tf06';\nconst babel=require(shell+'/node_modules/@babel/core');\nfor(const f of [shell+'/App.tsx',h+'/examples/shared/smoke-target.ts',h+'/examples/shared/native-queries-screen.tsx',mixed.filePath]){const out=babel.transformFileSync(f,{configFile:shell+'/babel.config.cjs'});assert(out.code.length>0);}\nconsole.log(JSON.stringify({status:'passed',mixed:mixed.filePath,selected:selected.filePath,babel:'App, selector, scene, mixed setup transformed',oppositeSdk:'absent'}));\n",
+      "sha256": "6306c22dc55d89cb8f07dca29eac761c17ea979d5c52b510f9fa0436b315470f",
+      "method": "Exact previously passing Mapbox installed resolver/Babel audit adapted only to MapLibre shell/selected setup/selected packed entry/opposite SDK and omission of unneeded token. Syntax checked during preparation; execute only after approved installation. Additional frozen-input/generated-file gates above still apply.",
+      "command": "In H: /bin/sh ../with-android-env.sh node /private/tmp/one-map-maplibre-installed-static-audit.cjs",
+      "restore": "Write exact embedded source to command path only after execution approval; do not retype or improvise it."
+    }
+  },
+  "sourceAudit": {
+    "runner": "selectNativeEngines(queries,maplibre) returns one engine. Assigned ANDROID_SERIAL used by explicit --device/active-arch-only build, localhost8081 transport, SDK>=37 checked ACCESS_LOCAL_NETWORK grant and status polling. Ordinary scope has no fixture8798/status8799 listener. Build/status/Metro/cleanup failures propagate; no later engine after failure.",
+    "scene": "NativeQueriesScreen -> useQueriesSmoke + QueriesMap uses local GeoJSON/background styles. Known IDs, finite cluster zoom, unique leaves, consistent pagination, nonempty children and explicit state clears checked. No automatic clearing or exhaustive ordering claim.",
+    "resources": "Single worker owns emulator5580/5581, reverse/Metro8081, private OneMapU25F05, selected app com.onemapmaplibre and only isolated Gradle daemon created by this task."
+  },
+  "routineVerification": {
+    "nodeCommand": "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node --test scripts/tf06-query-runner.test.mjs scripts/tf06-smoke-selection.test.mjs",
+    "cwd": "/private/tmp/one-map-android-restoration-review",
+    "result": "PASS 2 suites, no host tools executed. Actual runner VM startup/transport/API/error/ownership matrices and selector/status field controls pass.",
+    "sourceGraph": "60 unique inventoried files, 46 retained-identical, nine missing consumer/mixed files, five absent type-only source contracts. No unresolved literal relative dependency.",
+    "babel": "PASS 36 TS/TSX graph transformations in memory using existing Mapbox Babel7.29.7/RN preset and reviewed inline-smoke-target plugin with ONE_MAP_SMOKE=tf06. Proposed App and smoke selector assertions pass. Does not prove installed MapLibre dependencies, Metro resolution or native linking.",
+    "package": "PASS archiveSHA and all171 extracted member bytes; no install/build/repack.",
+    "notRun": "No host setup, adb/emulator/Gradle/Metro/native command, dependency install, project generation or acceptance.",
+    "documentation": "PASS node scripts/check-docs.mjs: 41 Markdown files,43 SDK comparison tables; structural scope only. Scoped git diff --check passed. JSON parsed and exact source/transform/hash inventory verified.",
+    "limits": "Preparation audit ready, subject to independent coordinator review. Restored installed-consumer gate, native runtime, fresh APK identity and linked SDK remain pending."
+  },
+  "proposedExecution": {
+    "approval": "Restoration of only absent MapLibre consumer/mixed files, tracked disposable frozen-lock substitution, dependency installation, selected project generation, coordinator gate, then one Android query/cluster scene. No execution authorized by this preparation.",
+    "worker": "One gpt-6-luna at medium reasoning; coordinator owns preparation, independent source audit, static gate, diagnosis and outcome review. Worker performs no Git edits/checks, commit/push, production changes or retries.",
+    "cwd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness",
+    "command": "/bin/sh ../with-android-env.sh bun scripts/tf06-queries-smoke.mjs android queries maplibre",
+    "attemptDirectory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-01",
+    "sequence": [
+      "Create unique attempt evidence directory only after approval. Inventory lsof5580/5581/8081 and adb devices; no assigned listener or emulator-5580 allowed. Preserve unknown resources and stop on conflicts/tool errors.",
+      "In STAGE use unchanged wrapper python3 create-lifetime-task-avd.py, then python3 launch-lifetime-emulator.py with absolute attemptDirectory/emulator.log. Record owned PID/PGID.",
+      "In H invoke exact checked boot-poll command above, requiring device+boot_completed=1 within180sec; no alternate inline polling.",
+      "Check reverse --list then acquire only tcp:8081 -> tcp:8081 on emulator-5580; run sole scene command once.",
+      "After scene success only: adb -s emulator-5580 shell pm path com.onemapmaplibre must return one exact package:/data/app/.../base.apk with no splits. Pull returned absolute path to attemptDirectory/installed-base.apk; shasum -a256 both that absolute path and producedApk below. Require equality.",
+      "Recheck all frozen identities and capture available configured wrapper Gradle SDK coordinate/actual build evidence without another resolve/build. Preserve all TF06 fields and runner results.",
+      "Owned cleanup on success or first failure, with receipt/ports verification. No later scene, repair or retry."
+    ],
+    "producedApk": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+    "requiredResult": {
+      "target": "maplibre-android",
+      "status": "passed",
+      "fields": {
+        "loaded": "1",
+        "point": "ok",
+        "bounds": "ok",
+        "viewport": "ok",
+        "empty": "ok",
+        "source": "ok",
+        "filters": "ok",
+        "pagination": "ok",
+        "cluster-zoom": "ok",
+        "leaves": "ok",
+        "children": "ok",
+        "set-state": "ok",
+        "get-state": "ok",
+        "remove-state": "ok",
+        "whole-state": "ok",
+        "recreated-state": "explicitly-cleared",
+        "cleared-state": "explicitly-cleared",
+        "phase": "done",
+        "error": "none",
+        "done": "1"
+      }
+    },
+    "sdkQualification": "MapLibre wrapper11.5.0 is an approved pin; configured Maven/native SDK identity must be read from restored wrapper/build files after installation. Historical Android linked SDK identity was unverified. A configured coordinate/cache artifact is not linked identity. Capture actual existing build receipt if available; otherwise record linked SDK identity unverified. No extra Gradle resolve/build solely for receipts.",
+    "duration": "Estimated30-60 minutes with network/cache variance; cold build may exceed existing limit and fail. Restore up to30min, generation10min, staticgate15min, runtime+cleanup30min; these upper bounds are not a promise of total duration. Existing runner build600sec/status240sec; inventory30sec/setup30sec/launcher10sec/boot180sec/reverse20sec/success receipts60sec each. Reuse existing bounded command handling; no /usr/bin/timeout or new framework.",
+    "stop": "First failure including restoration, generation, static gate, required receipt, timeout, unexpected input or cleanup. After failure only owned cleanup permitted; no independent retry. Checkpoint exact long command/start/completion/exit/session/owned resources durably."
+  },
+  "cleanup": {
+    "ownedOnly": "Runner force-stops selected app and stops owned Metro/process group, verifying8081 release. Remove only acquired8081 reverse; stop only owned emulator and created isolated Gradle daemon with selected project gradlew --stop through existing wrapper. After confirmed emulator exit/5580,5581,8081 release, remove only created private OneMapU25F05.avd/.ini and pulled duplicateAPK.",
+    "preserve": "SDK/image, source AVD/user configuration, shared caches/dependency downloads, Mapbox project/APK/dependencies, MapLibre produced APK and unknown resources. No process-name blanket kill, host repair or unrelated cleanup.",
+    "retention": "Compact outcome/provenance under records/evidence; raw logs only for active investigation; minimal retention after checkpoint owner review."
+  },
+  "openGates": [
+    "Owner approval including lock substitution/restoration/install/generation/one native attempt",
+    "Restored installed-consumer/generation static gate",
+    "Real TF06 result, fresh produced/installedAPK equality and frozen receipts",
+    "Linked Android SDK independently identified only if actual build receipts support it; otherwise qualified unverified",
+    "Broader native acceptance remains open"
+  ],
+  "coordinatorAudit": {
+    "status": "passed-planning-scope",
+    "independentChecks": [
+      "Verified all60 source inventory file hashes and stated present/absent states against reviewed checkout and retained harness",
+      "Reproduced exact App/Metro transformations and expected hashes independently in memory",
+      "Verified exact existing generator/runner/selector/Babel-helper/resolver bytes, support hashes and tested boot-poll hash",
+      "Rehashed unchanged171-member f05 and selected MapLibre patch",
+      "Reviewed selected engine/device/loopback/API permission/first-failure/cleanup flow and absolute APK receipts",
+      "Preserved approved Mapbox consumer; no restoration/native actions or dependency installs during preparation"
+    ],
+    "corrections": [
+      "Moved stale top failure handoffs under historical entries; explicitly marked retired temporary-harness preparation section historical",
+      "Reused exact prior installed static-audit source with MapLibre-only substitutions; its runtime remains deferred",
+      "Limited patch installation verification to exact frozen patch identity and read-only reverse-application check, reusing recorded publication proof"
+    ],
+    "remaining": [
+      "Owner approval including tracked disposable consumer-lock substitution, dependency installation and generation",
+      "Installed MapLibre audit and generated-input freeze before native dispatch",
+      "One real MapLibre Android result and fresh produced/installed APK equality",
+      "Independent linked SDK identity qualified unverified unless actual build evidence establishes it"
+    ],
+    "routineVerification": {
+      "documentation": "Isolated reviewed branch: documentation structure passed,40Markdown files/39SDK tables; links/fences/paragraph checks only.",
+      "mocked": "Pinned Node24.22.1 --test scripts/tf06-query-runner.test.mjs scripts/tf06-smoke-selection.test.mjs:2tests passed,0failed; no host tools executed.",
+      "staticCommand": "Adapted exact installed resolver/Babel source passes Node --check; actual installed MapLibre proof awaits restoration.",
+      "whitespace": "git diff --check passed in isolated branch."
+    }
+  }
+}

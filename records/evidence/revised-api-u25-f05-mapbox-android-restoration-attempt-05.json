@@ -1,0 +1,27 @@
+{
+  "checkpoint": "PR63 helper continuation05",
+  "status": "stopped-first-failure",
+  "completed": [
+    "Reviewed inline-smoke-target.cjs copied and exact bytes verified",
+    "Installed Metro resolution and opposite-SDK absence checks passed",
+    "Babel transformed actual App and smoke selector before failure"
+  ],
+  "firstFailure": {
+    "error": "Audit requested nonexistent examples/shared/native-tf06-screen.tsx",
+    "classification": "Coordinator audit-script filename error, not missing application input",
+    "actualScene": "examples/shared/native-queries-screen.tsx",
+    "evidence": "Actual App.tsx imports NativeQueriesScreen from ../shared/native-queries-screen.js; TSX file exists"
+  },
+  "preparedCorrection": "Audit script now points at actual imported scene; corrected audit not rerun.",
+  "auditScriptSha256": "398a20693fd9f5bbb71a44dc0ebeb5d79b6ded4fed340f03caa0ce734517142e",
+  "candidate": "f05 unchanged",
+  "notRun": [
+    "Corrected audit",
+    "Mocked runner and selector checks",
+    "Emulator setup",
+    "Native build/install",
+    "Query-and-cluster scene"
+  ],
+  "cleanup": "Failed static process exited. No native resources acquired. Preserve completed install and generation.",
+  "nextApproval": "Complete corrected audit and mocked checks, then one Mapbox Android query-and-cluster run with same Luna medium worker; no reinstall or regeneration."
+}

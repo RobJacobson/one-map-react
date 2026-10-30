@@ -1,0 +1,42 @@
+{
+  "checkpoint": "PR63 runtime links and generation continuation03",
+  "status": "generation-passed-static-audit-failed",
+  "generation": {
+    "status": "passed",
+    "command": [
+      "/bin/sh",
+      "../with-android-env.sh",
+      "bun",
+      "scripts/setup-native-example.mjs",
+      "native-mapbox"
+    ],
+    "timeoutSeconds": 600,
+    "pid": 21650,
+    "exitCode": 0
+  },
+  "coordinatorAudit": {
+    "generatedGradleHashes": "match",
+    "selectionHashes": "match",
+    "sourceHashes": "match",
+    "candidateMembers": 171,
+    "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "status": "passed"
+  },
+  "staticResolution": "Installed Metro selected mixed setup.native.ts and packed one-map-react/mapbox-native; opposite native SDK absent. Babel transform then failed.",
+  "firstFailure": {
+    "command": "Static installed Babel transform",
+    "error": "Cannot find module ../mapbox-token.cjs required by examples/native-mapbox/babel.config.cjs",
+    "rootCause": "Incomplete disposable harness restoration omitted required examples/mapbox-token.cjs shell helper. Source exists unchanged in PR62 review checkout.",
+    "source": "/private/tmp/one-map-android-restoration-review/examples/mapbox-token.cjs",
+    "sourceSha256": "6a00040087135ecb439a434bc3339dce9b0518540286bb28a0133698c3ee3ddc"
+  },
+  "cleanup": "Generator exited0; no emulator, app, reverse, Metro or native build resources acquired. Preserve successful install and generated project for continuation.",
+  "candidate": "Unchanged f05; all171 source and installed files verified byte-for-byte. Approved manifest/lock and reviewed source hashes match.",
+  "nextProposed": "Copy exact reviewed examples/mapbox-token.cjs to isolated harness, complete static Babel and mocked runner/selector audit, then one Mapbox Android queries command with same Luna medium worker. No reinstall or regeneration. Requires owner approval after first-failure stop.",
+  "notRun": [
+    "Emulator setup or boot",
+    "Native build/install",
+    "Query-and-cluster scene",
+    "Remaining static checks after Babel failure"
+  ]
+}

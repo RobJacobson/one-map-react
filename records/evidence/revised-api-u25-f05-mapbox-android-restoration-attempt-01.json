@@ -1,0 +1,38 @@
+{
+  "checkpoint": "PR63 restoration attempt01",
+  "status": "stopped-before-dependency-installation",
+  "firstFailure": "/usr/bin/timeout unavailable (exit 127)",
+  "installStarted": false,
+  "nativeResourcesAcquired": false,
+  "classification": "Worker introduced /usr/bin/timeout, absent on host and not part of approved command. This is an invocation error, not a Bun/dependency/generation result.",
+  "coordinatorFinding": "Worker also extracted archive with an extra package/ nesting. All171 bytes match f05 at that nested location, but local dependency package.json is not yet at required root. Correct layout before any install.",
+  "partialInputs": "Coordinator independently verified source/support inputs, approved manifest/substituted lock and all171 nested archive members. Partial staging retained; no native resources acquired.",
+  "f05Sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "approvedLockSha256": "5dd4deb89ebd9a65fbc6f92021c1313b6fea13fe91a004ef0eabf7557f1e1e5c",
+  "durableWorkerResult": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/restoration-result.json",
+  "continuation": {
+    "status": "prepared, not executed; separate retry approval required",
+    "layoutCorrection": "Move children of owned packages/one-map-react/package into packages/one-map-react; refuse conflicts and remove only empty nested directory.",
+    "argv": [
+      "/bin/sh",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+      "bun",
+      "install",
+      "--frozen-lockfile",
+      "--ignore-scripts"
+    ],
+    "cwd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox",
+    "timeoutSeconds": 1800,
+    "guardProgram": "/usr/bin/python3",
+    "exactContinuationSource": "from pathlib import Path\nimport shutil, subprocess\np=Path('/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react')\nn=p/\"package\"\nassert n.is_dir()\nfor child in n.iterdir():\n    assert not (p/child.name).exists(), str(child)\nfor child in list(n.iterdir()):\n    shutil.move(str(child), str(p/child.name))\nn.rmdir()\nassert (p/\"package.json\").is_file()\nsubprocess.run(['/bin/sh', '/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh', 'bun', 'install', '--frozen-lockfile', '--ignore-scripts'], cwd='/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox', timeout=1800, check=True)\n",
+    "checks": "Continuation Python syntax parsed; subprocess.run dummy interpreter command with timeout2/check=True passed. Layout correction and Bun invocation not executed.",
+    "remainingScope": "Reverify corrected package layout/bytes, continue approved generation/static audit, then one fresh Mapbox Android query only if coordinator audit passes. First-failure stop and owned cleanup remain; no lock refresh, version change or repack."
+  },
+  "notRun": [
+    "Layout correction",
+    "Dependency installation",
+    "Project generation",
+    "Emulator/adb/Gradle/Metro/native build/install/scene",
+    "Continuation retry"
+  ]
+}

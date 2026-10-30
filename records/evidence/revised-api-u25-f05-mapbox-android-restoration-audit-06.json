@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "checks": [
+    "Installed Metro selects mixed setup.native.ts and packed dist/mapbox-native.js; opposite native SDK absent",
+    "Installed Babel transforms App, smoke selector, actual native-queries-screen and mixed setup",
+    "TF06 mocked query runner regression matrix passed; no host tools executed",
+    "TF06 mocked selector checks passed",
+    "Frozen source/support/consumer manifest and approved lock hashes match",
+    "Generated root/app Gradle and App/Metro selection hashes match",
+    "All171 extracted and installed f05 files match archive bytes"
+  ],
+  "worker": "Same android_generation_and_queries_03, gpt-6-luna medium",
+  "runtime": "Dispatched one approved Mapbox Android queries check; result pending",
+  "limits": "Static and mocked checks support dispatch, not native acceptance. PR62 tracked consumer lock substitution remains explicitly approved; unchanged candidate does not imply identical deleted transitive tree."
+}
