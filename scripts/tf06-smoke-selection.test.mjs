@@ -11,25 +11,23 @@ assert.deepEqual(selectNativeEngines("lifetimes"), ["mapbox", "maplibre"]);
 assert.deepEqual(selectNativeEngines("lifetimes", "mapbox"), ["mapbox"]);
 assert.deepEqual(selectNativeEngines("lifetimes", "maplibre"), ["maplibre"]);
 assert.throws(() => selectNativeEngines("lifetimes", "unknown"));
-assert.throws(() => selectNativeEngines("queries", "mapbox"));
-assert.throws(() => selectNativeEngines("queries", "maplibre"));
-assert.deepEqual(androidSmokeArgs("queries"), [
-  "run",
-  "android",
-  "--",
-  "--no-packager",
-]);
-assert.deepEqual(androidSmokeArgs("lifetimes", "emulator-5554"), [
-  "run",
-  "android",
-  "--",
-  "--no-packager",
-  "--device",
-  "emulator-5554",
-  "--active-arch-only",
-]);
-assert.throws(() => androidSmokeArgs("lifetimes"));
-assert.throws(() => androidSmokeArgs("lifetimes", " "));
+assert.throws(() => selectNativeEngines("queries", "unknown"));
+assert.throws(() => selectNativeEngines("unknown", "maplibre"));
+assert.deepEqual(selectNativeEngines("queries", "mapbox"), ["mapbox"]);
+assert.deepEqual(selectNativeEngines("queries", "maplibre"), ["maplibre"]);
+for (const scope of ["queries", "lifetimes"]) {
+  assert.deepEqual(androidSmokeArgs(scope, "emulator-5580"), [
+    "run",
+    "android",
+    "--",
+    "--no-packager",
+    "--device",
+    "emulator-5580",
+    "--active-arch-only",
+  ]);
+  assert.throws(() => androidSmokeArgs(scope));
+  assert.throws(() => androidSmokeArgs(scope, " "));
+}
 const baseline = "a".repeat(64);
 assert.doesNotThrow(() => verifyNativeBinary("lifetimes", baseline, baseline));
 assert.throws(() => verifyNativeBinary("queries", baseline, baseline));

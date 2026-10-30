@@ -1,0 +1,195 @@
+{
+  "checkpoint": "Read-only additional task-owned cleanup assessment after PR65 attempt04 space-gate failure",
+  "status": "insufficient-narrow-task-cleanup-no-deletion-or-retry-authorized",
+  "measuredAtUtc": "2026-10-30T01:07:10.665249+00:00",
+  "sourceReview": {
+    "path": "/private/tmp/one-map-android-restoration-review",
+    "head": "dbcdc7acb66a17e5562de1c7be2b26ee64dd047f",
+    "pullRequest": 65
+  },
+  "scope": "Read-only df/du/lstat/hash/source inspection; only this new evidence record and the acceptance handoff edited. No test suites, deletion, host changes, runtime, adb, emulator or Gradle invocation, build, install or generation.",
+  "priorOutcome": "records/evidence/revised-api-u25-f05-maplibre-android-queries-attempt-04.json",
+  "priorCleanup": "The three approved PR65 generated directories were already deleted. None is proposed again. Attempt04 acquired no native resources.",
+  "space": {
+    "dfOutput": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s1   239362496 204574128   7977124    97% 2302297 79771240    3%   /System/Volumes/Data",
+    "availableBytes": 8168574976,
+    "availableGiB": 7.607578277587891,
+    "requiredBytes": 8804682957,
+    "requiredGiB": 8.200000000186265,
+    "shortfallBytes": 636107981,
+    "shortfallGiB": 0.5924217225983739,
+    "units": "KiB=1024 bytes; MiB=1048576 bytes; GiB=1073741824 bytes; lstat.st_blocks uses512-byte blocks.",
+    "threshold": "Preserve required8.2GiB actual available before AVD creation/boot. Logged userdata floor7372.80MiB plus1GiB margin; total native-build regrowth remains unmeasured."
+  },
+  "inventory": [
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/@rnmapbox/maps/android/build",
+      "files": 1965,
+      "logicalBytes": 12805380,
+      "allocatedUniqueInodeBytes": 17330176,
+      "singleLinkAllocatedBytes": 17330176,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/react-native-teleport/android/build",
+      "files": 210,
+      "logicalBytes": 992517,
+      "allocatedUniqueInodeBytes": 1519616,
+      "singleLinkAllocatedBytes": 1519616,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules",
+      "files": 19359,
+      "logicalBytes": 191292413,
+      "allocatedUniqueInodeBytes": 244666368,
+      "singleLinkAllocatedBytes": 243609600,
+      "maxLinkCount": 2,
+      "symlinks": 33,
+      "multipleLinkAllocatedBytes": 1056768,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/.gradle",
+      "files": 16,
+      "logicalBytes": 3203976,
+      "allocatedUniqueInodeBytes": 3244032,
+      "singleLinkAllocatedBytes": 3244032,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/generated",
+      "files": 7,
+      "logicalBytes": 12273,
+      "allocatedUniqueInodeBytes": 32768,
+      "singleLinkAllocatedBytes": 32768,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/kotlin",
+      "files": 80,
+      "logicalBytes": 468360,
+      "allocatedUniqueInodeBytes": 655360,
+      "singleLinkAllocatedBytes": 655360,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/tmp",
+      "files": 4,
+      "logicalBytes": 74247,
+      "allocatedUniqueInodeBytes": 81920,
+      "singleLinkAllocatedBytes": 81920,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/build",
+      "files": 3,
+      "logicalBytes": 156878,
+      "allocatedUniqueInodeBytes": 163840,
+      "singleLinkAllocatedBytes": 163840,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-gradle/caches/9.4.1/generated-gradle-jars",
+      "files": 2,
+      "logicalBytes": 187809601,
+      "allocatedUniqueInodeBytes": 201502720,
+      "singleLinkAllocatedBytes": 201502720,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-gradle/wrapper/dists",
+      "files": 642,
+      "logicalBytes": 152834055,
+      "allocatedUniqueInodeBytes": 154726400,
+      "singleLinkAllocatedBytes": 154726400,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-gradle/caches/9.4.1",
+      "files": 1129,
+      "logicalBytes": 199299598,
+      "allocatedUniqueInodeBytes": 215625728,
+      "singleLinkAllocatedBytes": 215625728,
+      "maxLinkCount": 1,
+      "freezeIntersections": []
+    }
+  ],
+  "ownership": "All candidate paths are inside the restored task-owned S directory. The selected Mapbox-only cache belongs to the completed Mapbox consumer, separate from current MapLibre consumer paths. Frozen path intersection and content checks supplement ownership, not a claim of exclusive APFS physical extents.",
+  "bestMinimalAvoidRegrowthCandidate": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/@rnmapbox/maps/android/build",
+    "allocatedBytes": 17330176,
+    "reason": "Completed Mapbox-only generated code/classes; not consumed by the selected MapLibre build. Retains APK and dependency sources/downloads.",
+    "recommendation": "Do not delete merely to unblock this retry:17,330,176 allocated bytes is insufficient. No sufficient deletion set is proposed."
+  },
+  "rejectedAlternatives": {
+    "mapboxNodeModules": "244,666,368 allocated bytes;243,609,600 single-link bytes;1,056,768 multiply-linked bytes. No frozen intersection, but removes a completed dependency installation and is still insufficient. Do not confuse nlink1 with unshared APFS extents.",
+    "generatedGradleJars": "201,502,720 allocated bytes; nlink1. Insufficient alone and expected to be regenerated by the same Gradle version, reducing build headroom.",
+    "distribution": "154,726,400 allocated bytes; no nonempty distribution ZIP duplicate, only0-byte .zip.lck/.zip.ok markers and the needed extracted9.4.1 distribution. Removing it triggers restoration/download and is not proposed.",
+    "combinedUpperEstimate": "Mapbox node_modules plus generated-gradle-jars plus entire distribution total600,895,488 allocated bytes before APFS qualifications, below even the prior619,494,605-byte gap; Mapbox generated child caches are already included in node_modules and must not be added again. This is not a recommended deletion set.",
+    "reviewClone": "Specific task-owned review checkout du59620KiB, including Git. Preserve active source/Git review;61,050,880 estimated bytes is insufficient alone and is not a disposable build-cache target."
+  },
+  "reclaimQualification": "Allocated inode blocks and du totals are estimates, not guaranteed available-space recovery. Hardlinks, APFS clone/snapshot sharing and concurrent host use can reduce recovery. No unlink was run to test recovery.",
+  "preserved": {
+    "freezePath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-01/coordinator-freeze.json",
+    "frozenFiles": 436,
+    "freezeMismatches": [],
+    "archivePath": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "mapboxApkPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+    "mapboxApkSha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "other": "Current installed/generated MapLibre consumer, source, locks, patches, f05, produced APKs/outputs, modules-2 downloads, SDK/image, user AVDs, global caches and dirty primary workspace preserved."
+  },
+  "nextGate": "Owner may authorize broader READ-ONLY inspection of other explicitly task-owned completed build workspaces with known provenance, or free about1GiB elsewhere. No other workspace is asserted to exist. Preserve8.2GiB threshold. A concrete adequate additional deletion set and one retry require independent audit and explicit owner approval.",
+  "conditionalRetry": {
+    "status": "Prepared route only; no dispatch until sufficient concrete cleanup and owner approval",
+    "attemptDirectory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-05",
+    "worker": "One GPT-6 Luna worker at medium reasoning; stronger coordinator owns audit, freezing and outcome review.",
+    "environmentWrapper": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+    "createAvdHelper": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py",
+    "launcher": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/launch-lifetime-emulator.py",
+    "emulatorLog": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-05/emulator.log",
+    "bootPoll": "/private/tmp/one-map-approved-android-boot-poll.py",
+    "bootPollSha256": "f819d439aa4573070b858e80c7d3a61ca8f7a833f5ca857f3347ba5d39a35956",
+    "runner": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf06-queries-smoke.mjs",
+    "runnerArguments": [
+      "android",
+      "queries",
+      "maplibre"
+    ],
+    "producedApk": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+    "installedApkPull": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-05/installed-base.apk",
+    "limitsSeconds": {
+      "build": 600,
+      "status": 240,
+      "boot": 180,
+      "runtimeAndCleanup": 1800
+    },
+    "estimate": "20-30 minutes with network/cache variance; build regrowth unmeasured.",
+    "stopRule": "First failure, timeout, identity mismatch or unexpected result ends execution; owned cleanup only, no worker repairs/retries.",
+    "ownership": "Only OneMapU25F05, emulator5580/5581, com.onemapmaplibre, owned Metro/reverse8081/process groups and isolated task Gradle daemon. Preserve shared adb/unknown listeners/devices. After verified emulator exit/ports release remove only newly created AVD and pulled duplicate.",
+    "acceptance": "Same full TF06 fields, successful scene, produced/installed APK SHA-256 equality and unchanged436-file freeze; configured SDK13.6.1 remains distinct from linked identity. No new install/generation or candidate."
+  },
+  "coordinatorAdditionalInspection": "Coordinator reports reading revised-api evidence for recorded one-map staging roots outside currentS/review/primary: none of those historical task roots still exists. No broader user/global-cache scan. Another old acceptance workspace therefore supplies no identified target.",
+  "coordinatorAudit": {
+    "result": "passed-read-only-assessment; no adequate safe deletion/retry proposal",
+    "independentChecks": [
+      "Recomputed recorded available/threshold/shortfall arithmetic",
+      "Independently counted17,330,176 allocated unique regular-file inode bytes in smallest non-regrowing Mapbox-only generated cache; insufficient for recorded shortfall",
+      "Verified all436 frozen files, f05 archive and completed Mapbox APK hashes remain unchanged",
+      "Inspected remaining isolated Gradle cache size breakdown and specific completed Mapbox paths; only insufficient reusable tools/downloads/generated data remain",
+      "Checked durable evidence for other historical task staging roots; none exists outside retained stage/review/primary"
+    ],
+    "scopeLimit": "No global caches, other project workspaces or unrelated user data inspected. No deletions, host mutations, native commands or test runs.",
+    "recommendation": "Do not request approval for a known-insufficient deletion/retry. Recover about1GiB elsewhere or broaden read-only inspection to other generated build caches before proposing a concrete adequate additional cleanup."
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "status": "passed-read-only-post-install-audit",
+  "installedCandidateMembersMatch": 171,
+  "f05Sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "manifestSha256": "1bf6d3469daf2e192120944f4859e097dced1bcaf2ce6641777b34f32bbd6878",
+  "lockSha256": "5dd4deb89ebd9a65fbc6f92021c1313b6fea13fe91a004ef0eabf7557f1e1e5c",
+  "versions": {
+    "react": "19.2.3",
+    "react-native": "0.87.1",
+    "@rnmapbox/maps": "10.3.7",
+    "react-native-teleport": "1.2.1",
+    "@react-native-community/cli": "20.2.0"
+  },
+  "oppositeNativeSDK": "absent",
+  "patchSha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1",
+  "reversePatchCheck": "passed",
+  "method": "Hash approved Bun lock bytes; parse only installed package.json files as strict JSON. No JSON parser applied to Bun JSONC lock.",
+  "nativeExecution": "No generation/emulator/Gradle/Metro/build/install/scene performed."
+}

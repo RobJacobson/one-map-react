@@ -1,0 +1,45 @@
+{
+  "checkpoint": "PR64 MapLibre Android approved continuation after corrected static audit",
+  "status": "static-audit-passed-worker-stopped-before-boot",
+  "previousFailure": "records/evidence/revised-api-u25-f05-maplibre-android-queries-attempt-01.json",
+  "coordinatorAudit": {
+    "installedMetroBabel": "Passed corrected selected entry, common/native/error resolver controls, tf06 selector and36Babel graph transformations.",
+    "frozenInputs": "436 input hashes frozen under stage maplibre-android-queries-attempt-01/coordinator-freeze.json; source, support, approved lock, installed/direct versions, all171installed/extracted f05members, generated Android input inspection and peer reversecheck passed.",
+    "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "configuredSdk": "org.maplibre.gl:android-sdk-opengl:13.6.1; independent linked identity unverified"
+  },
+  "worker": "Same gpt-6-luna medium maplibre_android_queries_run",
+  "workerReport": {
+    "preflight": "lsof assigned ports exit1 empty; adb devices exit0 empty",
+    "firstFailure": "Unrequested helper inspection via sed at H/scripts/create-lifetime-task-avd.py exited1; worker chose wrong path.",
+    "nativeResourcesAcquired": []
+  },
+  "rootCause": "Worker used H/scripts instead of explicit stage root for existing AVD helper. Setup is not missing; coordinator verified reviewed stage helpers and hashes read-only.",
+  "supportVerified": {
+    "with-android-env.sh": {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+      "sha256": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4"
+    },
+    "create-lifetime-task-avd.py": {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py",
+      "sha256": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38"
+    },
+    "launch-lifetime-emulator.py": {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/launch-lifetime-emulator.py",
+      "sha256": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24"
+    }
+  },
+  "cleanup": "None required; no emulator, Metro, reverse, app or Gradle acquired. Successful consumer install/generation retained.",
+  "notRun": [
+    "Private emulator creation/boot",
+    "Native build/install",
+    "MapLibre query-and-cluster scene",
+    "Produced/installed APK comparison"
+  ],
+  "nextApproval": {
+    "scope": "Same single native check, existing setup, unchanged f05 and Luna medium worker; exact stage-qualified commands only, no extra helper discovery/inspection or repairs.",
+    "createCommand": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh python3 /Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py",
+    "launchCommand": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh python3 /Users/rob/code/mapbox-code/one-map-f05-android-recovery/launch-lifetime-emulator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-01/emulator.log",
+    "remaining": "Exact checked boot script, owned reverse8081, sole queries maplibre runner, absolute APK receipts and owned cleanup as approved plan; first-failure stop."
+  }
+}

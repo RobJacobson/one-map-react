@@ -1,28 +1,27 @@
 /**
  * Selects native engines so scoped retries can release build outputs between runs.
  * @param {string} scope - TF06 query or lifetime scope.
- * @param {string} selection - Both engines or one lifetime engine.
+ * @param {string} selection - Both engines or one query/lifetime engine.
  * @returns {string[]} The native engines to execute sequentially.
  */
 export const selectNativeEngines = (scope, selection = "both") => {
   if (!["both", "mapbox", "maplibre"].includes(selection))
     throw new Error("Use both, mapbox, or maplibre for the native engine.");
-  if (scope !== "lifetimes" && selection !== "both")
-    throw new Error("Single-engine selection requires the lifetime scope.");
+  if (!["queries", "lifetimes"].includes(scope))
+    throw new Error("Use queries or lifetimes for the native scope.");
   return selection === "both" ? ["mapbox", "maplibre"] : [selection];
 };
 
 /**
- * Restricts lifetime builds/installations to the assigned Android device and ABI.
+ * Restricts native builds/installations to the assigned Android device and ABI.
  * @param {string} scope - Selected TF06 scope.
  * @param {string | undefined} serial - Explicitly assigned Android device.
  * @returns {string[]} React Native build/run arguments.
  */
 export const androidSmokeArgs = (scope, serial) => {
   const args = ["run", "android", "--", "--no-packager"];
-  if (scope !== "lifetimes") return args;
   if (!serial?.trim())
-    throw new Error("Set ANDROID_SERIAL for native lifetime acceptance.");
+    throw new Error("Set ANDROID_SERIAL for native acceptance.");
   return [...args, "--device", serial, "--active-arch-only"];
 };
 

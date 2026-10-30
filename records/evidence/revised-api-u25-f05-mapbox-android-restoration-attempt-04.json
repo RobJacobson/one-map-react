@@ -1,0 +1,29 @@
+{
+  "status": "stopped-first-failure",
+  "checkpoint": "PR63 helper continuation04",
+  "completed": "Copied exact reviewed mapbox-token.cjs and verified matching bytes.",
+  "failure": "Babel configuration requires missing examples/inline-smoke-target.cjs.",
+  "cause": "Incomplete disposable harness restoration; previous coordinator inspection missed the second direct Babel dependency.",
+  "readOnlyFollowup": {
+    "method": "Recursive relative require/import inventory from Babel, Metro, TF06 runner and its two mocked checks",
+    "inspectedFiles": 11,
+    "missing": [
+      "examples/inline-smoke-target.cjs"
+    ],
+    "limits": "Static literal import inventory only; does not certify dynamic or generated dependencies."
+  },
+  "proposedRepair": {
+    "source": "/private/tmp/one-map-android-restoration-review/examples/inline-smoke-target.cjs",
+    "sha256": "6feb01f3c7b4056b6e995cf9b7dfc251fd66f7225ad2a4d9070cc21fbeed4b0f",
+    "destination": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/inline-smoke-target.cjs",
+    "next": "Copy unchanged helper, complete static audit, then one Mapbox Android check using same Luna medium worker after renewed approval."
+  },
+  "candidate": "f05 unchanged",
+  "cleanup": "No native resources acquired; no process remained from failed static command. Successful installation/generation preserved.",
+  "notRun": [
+    "Emulator",
+    "Native build/install",
+    "Query-and-cluster scene",
+    "Remaining audit checks"
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "checkpoint": "PR64 MapLibre Android ordinary query-and-cluster attempt01",
+  "status": "install-generation-passed-static-audit-stopped",
+  "worker": "gpt-6-luna medium maplibre_android_queries_run",
+  "restorationReceipt": {
+    "status": "install-generation-passed-awaiting-coordinator-audit",
+    "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "sourceFilesCopied": [
+      "examples/mixed/mapbox-web-maplibre-native/setup.native.ts",
+      "examples/mixed/mapbox-web-maplibre-native/setup.ts",
+      "examples/native-maplibre/App.tsx",
+      "examples/native-maplibre/app.json",
+      "examples/native-maplibre/babel.config.cjs",
+      "examples/native-maplibre/bun.lock",
+      "examples/native-maplibre/index.js",
+      "examples/native-maplibre/metro.config.cjs",
+      "examples/native-maplibre/package.json"
+    ],
+    "appSha256": "db8ec4822c99bc3502b260cd36f4df2a6b3229acfec3a3cb8e453fa03b685f00",
+    "metroSha256": "7522eb0828fd4694212bc425efd4270e56175775d2339bef89761cdc619a1786",
+    "consumerLockSha256": "cb9c8eba082a3b20d50f842c21d14339958415f6786c98f27234b1a565527a19",
+    "nativeResourcesAcquired": [],
+    "steps": [
+      {
+        "name": "frozen-install",
+        "cwd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre",
+        "command": [
+          "/bin/sh",
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+          "bun",
+          "install",
+          "--frozen-lockfile",
+          "--ignore-scripts"
+        ],
+        "timeoutSeconds": 1800,
+        "startedAt": "2026-10-30T00:32:48.718659+00:00",
+        "pid": 49159,
+        "exitCode": 0,
+        "finishedAt": "2026-10-30T00:32:50.402465+00:00",
+        "status": "passed"
+      },
+      {
+        "name": "project-generation",
+        "cwd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness",
+        "command": [
+          "/bin/sh",
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+          "bun",
+          "scripts/setup-native-example.mjs",
+          "native-maplibre"
+        ],
+        "timeoutSeconds": 600,
+        "startedAt": "2026-10-30T00:32:50.402878+00:00",
+        "pid": 49169,
+        "exitCode": 0,
+        "finishedAt": "2026-10-30T00:32:53.188334+00:00",
+        "status": "passed"
+      }
+    ]
+  },
+  "firstFailure": {
+    "stage": "Coordinator installed-static selection verifier",
+    "error": "Required selected.filePath to contain /node_modules/one-map-react/dist/",
+    "classification": "Verifier incorrectly excludes extracted frozen package root; no demonstrated candidate or selection defect.",
+    "actualSelectedPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react/dist/maplibre-native.js",
+    "selectedSha256": "d3b045128fc54f9ac1e0378e6994ab1c0dfc9778986ac2901d6eb6f2d1052605",
+    "readOnlyDiagnosis": "Metro selected exact packed MapLibre dist from H/packages/one-map-react. Read-only byte comparison equals installed MapLibre dist; all171 extracted and installed package members already verified against unchanged f05. Diagnostic initially failed on a duplicate JavaScript variable declaration; corrected isolated diagnostic context then returned the selected path. No acceptance retry performed."
+  },
+  "passedChecks": [
+    "Frozen install exit0; approved consumer lock unchanged",
+    "Existing pinned project generator exit0",
+    "All171 extracted/installed f05 members match",
+    "Selected pinned direct versions correct; opposite native SDK absent",
+    "Exact reviewed MapLibre peer patch hash and reverse-application check passed",
+    "Generated Android appID/SDK/NDK/Gradle/manifest source inspection completed"
+  ],
+  "configuredSdk": "org.maplibre.gl:android-sdk-opengl:13.6.1 from installed wrapper defaults; independently linked identity unverified",
+  "correctedVerifier": {
+    "source": "const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');\nconst h='/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness',shell=h+'/examples/native-maplibre';\nconst cfg=require(shell+'/metro.config.cjs');\nconst ctx={...cfg.resolver,originModulePath:shell+'/App.tsx',preferNativePlatform:true,assetExts:new Set(cfg.resolver.assetExts),sourceExts:cfg.resolver.sourceExts,mainFields:cfg.resolver.resolverMainFields,unstable_enablePackageExports:true,unstable_conditionNames:['require','react-native'],isESMImport:()=>true,getPackage:p=>JSON.parse(fs.readFileSync(p,'utf8')),getPackageForModule:p=>{let d=fs.existsSync(p)&&fs.statSync(p).isDirectory()?p:path.dirname(p);while(d!==path.dirname(d)){if(fs.existsSync(path.join(d,'package.json')))return{rootPath:d,packageJson:JSON.parse(fs.readFileSync(path.join(d,'package.json'),'utf8')),packageRelativePath:path.relative(d,p)};d=path.dirname(d);}return null;},redirectModulePath:p=>p,doesFileExist:p=>fs.existsSync(p)&&fs.statSync(p).isFile(),fileSystemLookup:p=>fs.existsSync(p)?{exists:true,type:fs.statSync(p).isDirectory()?'d':'f',realPath:fs.realpathSync(p)}:{exists:false}};\nconst mixed=cfg.resolver.resolveRequest(ctx,'../mixed/mapbox-web-maplibre-native/setup.js','android');\nassert(mixed.filePath.endsWith('/setup.native.ts'));assert(cfg.watchFolders.some(p=>mixed.filePath.startsWith(p+'/')));\nconst selected=cfg.resolver.resolveRequest({...ctx,originModulePath:mixed.filePath},'one-map-react/maplibre-native','android');const expectedEntries=[shell+'/node_modules/one-map-react/dist/maplibre-native.js',h+'/packages/one-map-react/dist/maplibre-native.js'].map(p=>fs.realpathSync(p));assert(expectedEntries.includes(fs.realpathSync(selected.filePath)));assert(fs.readFileSync(selected.filePath).equals(fs.readFileSync(shell+'/node_modules/one-map-react/dist/maplibre-native.js')));assert(!fs.existsSync(shell+'/node_modules/@rnmapbox/maps'));\nprocess.env.ONE_MAP_SMOKE='tf06';\nconst babel=require(shell+'/node_modules/@babel/core');\nfor(const f of [shell+'/App.tsx',h+'/examples/shared/smoke-target.ts',h+'/examples/shared/native-queries-screen.tsx',mixed.filePath]){const out=babel.transformFileSync(f,{configFile:shell+'/babel.config.cjs'});assert(out.code.length>0);}\nconsole.log(JSON.stringify({status:'passed',mixed:mixed.filePath,selected:selected.filePath,babel:'App, selector, scene, mixed setup transformed',oppositeSdk:'absent'}));\n",
+    "sha256": "4e818f192866120e70bac8c2ebd82a97bdef941c9059850ce9c515924d379b39",
+    "path": "/private/tmp/one-map-maplibre-corrected-static-audit.cjs",
+    "change": "Accept exactly installed or extracted frozen dist entry, require byte equality to installed candidate.",
+    "status": "Prepared and syntax checked only; full corrected audit not rerun."
+  },
+  "notRun": [
+    "Full corrected installed Metro/Babel audit",
+    "Remaining generated-input freeze",
+    "Emulator boot",
+    "Native build/install",
+    "Query-and-cluster scene"
+  ],
+  "cleanup": "No emulator, Metro, reverse, Gradle daemon or application acquired. Install/generator exited normally; preserve successful restoration/dependencies/project for continuation.",
+  "nextApproval": "Finish corrected static audit and generated-input freeze, then one MapLibre Android query-and-cluster check with same Luna medium worker; reuse completed install/generation, unchanged f05; first-failure stop and owned cleanup only."
+}

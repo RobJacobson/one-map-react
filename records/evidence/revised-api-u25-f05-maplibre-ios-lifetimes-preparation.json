@@ -1,0 +1,138 @@
+{
+  "checkpoint": "U25 f05 MapLibre iOS feature-state lifetime preparation",
+  "kind": "planning/reference",
+  "audience": "Owner and execution worker",
+  "purpose": "Approve one MapLibre iOS lifetime attempt",
+  "nonGoals": "Full native acceptance; other engines/platforms; input; host repair",
+  "status": "Prepared and independently audited; routine checks passed; reviewed execution wrapper/regression synchronized and frozen; native execution awaiting owner approval",
+  "scope": {
+    "changed": [
+      "scripts/with-maplibre-ios-env.sh",
+      "scripts/tf06-query-runner.test.mjs",
+      "docs/revised-api-acceptance-plan.md",
+      "docs/revised-api-implementation-plan.md",
+      "records/README.md"
+    ],
+    "unchanged": "Shared driver, existing Mapbox wrapper, f05, library, scene, fixture, peers, versions, locks and native SDK sources. Coordinator handoff updates and latest Mapbox iOS outcome preserved. No simulator, host setup, Pods, native build/install, Metro or renderer execution during preparation/audit."
+  },
+  "provenance": {
+    "publicationBase": "49a6d109d0e7af5ecad038ea146fde8e561de4c9; merged PR55/56/57",
+    "branch": "codex/u25-maplibre-ios-lifetimes",
+    "candidateArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "preparedFilesSha256": {
+      "scripts/tf06-queries-smoke.mjs": "e56285711818b3150e5c3a02eb937812e91abe390459d1e7e182adecd4bb473c",
+      "scripts/tf06-query-runner.test.mjs": "2203f230c5f9d2d854df58636a9f24ab5af5e69aa5965c03b539abf84353e535",
+      "scripts/with-ios-env.sh": "b1de5f761e4813e9877355dc2db6e5daf95eced6a2bd9bba07c369a4ccbe6604",
+      "scripts/with-maplibre-ios-env.sh": "3895188a8a180f04760388174bddcd0941d9e7f48ae1d0424759e958c0e7335d",
+      "scripts/tf06-smoke-selection.mjs": "2bf6a07aa61e28ced6283066cad4dd860c1a13ec52e73ffe47cc6dcee29919d7",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+      "examples/shared/lifetimes-smoke.ts": "14c58e76e2904e51f4e7e051ed42e087fd5974b8c84386d39115334c2306b39f",
+      "examples/shared/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f"
+    },
+    "harnessDriverSha256": "e56285711818b3150e5c3a02eb937812e91abe390459d1e7e182adecd4bb473c",
+    "harnessSync": "Coordinator copied reviewed MapLibre wrapper and regression to retained harness and identical wrapper beside staging runtimes. Hashes matched prepared identities; unchanged driver and Mapbox wrapper verified.",
+    "retainedLockSha256": {
+      "examples/native-maplibre/ios/Podfile.lock": "bb68f6237b7b4a02d2c5514d9424ce3327d763e6dadfb6da8d730fc6a2dee93a",
+      "examples/native-maplibre/Gemfile.lock": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+      "examples/native-maplibre/ios/OneMapMaplibre.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+      "examples/native-maplibre/ios/OneMapMaplibre.xcworkspace/xcshareddata/swiftpm/Package.resolved": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117"
+    },
+    "retainedSwiftPackagePins": {
+      "examples/native-maplibre/ios/OneMapMaplibre.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": [
+        {
+          "identity": "maplibre-gl-native-distribution",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+          "state": {
+            "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683",
+            "version": "6.31.0"
+          }
+        }
+      ],
+      "examples/native-maplibre/ios/OneMapMaplibre.xcworkspace/xcshareddata/swiftpm/Package.resolved": [
+        {
+          "identity": "maplibre-gl-native-distribution",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+          "state": {
+            "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683",
+            "version": "6.31.0"
+          }
+        }
+      ]
+    }
+  },
+  "retainedArtifacts": {
+    "inspection": "2026-10-28 bounded read-only filesystem, plist, lock and source reads, with no simctl or host service calls.",
+    "pods": "MapLibre Pods absent; generated project/workspace, Podfile.lock, Gemfile.lock, task gems and JS dependencies retained; MapLibre ios/build 476KiB.",
+    "producedBaseline": "No MapLibre app found under retained MapLibre ios tree; no authenticated produced baseline for reuse.",
+    "selectedInstalledApp": "org.reactjs.native.example.OneMapMaplibre; APPL; executable OneMapMaplibre; version1.0/build1; separate OneMapMaplibre.debug.dylib present. Earlier installed app metadata does not authenticate future produced code.",
+    "otherInstalledApp": "com.onemap.harness.maplibre also present; excluded and preserved.",
+    "nativeSdkLock": "Both project/workspace Package.resolved pin maplibre-gl-native-distribution 6.31.0 revision13e41ab3d77ff5113e7e5d4ee87803b1f81f5683.",
+    "installedNativeSdkMetadata": "Selected existing app Frameworks/MapLibre.framework/Info.plist reports CFBundleShortVersionString and CFBundleVersion6.31.0; no future linked identity claim.",
+    "sourcePins": "MapLibreReactNative11.5.0, ReactNative0.87.1, React19.2.3, Teleport1.2.1; Podfile.lock CocoaPods1.15.2. Native podspec uses exactVersion6.31.0 via SPM.",
+    "disk": "df measured6.2GiB available; existing Mapbox Pods1.6GiB/build1.3GiB preserved. Future build demand unmeasured; no cleanup authorized by preparation."
+  },
+  "sourceTrace": {
+    "selection": "Existing ios lifetimes maplibre selection; explicit TF06_IOS_UDID validation precedes fixture acquisition.",
+    "build": "Existing runNative derives OneMapMaplibre workspace/scheme, performs one checked direct xcodebuild Debug assigned destination/derivedDataPath, then exact-UDID checked install and launch; returns producedAppPath. CLI build/install path not reintroduced.",
+    "wrapper": "Separate MapLibre wrapper binds its own build folder, preserves canonical pwd-P root, narrow RUBYLIB, task BUNDLE_PATH, staged PATH, assigned UUID and unset reuse digest. Any existing token is inherited silently; MapLibre requires no token because its App and Babel configuration do not consume it. Mapbox wrapper and its token requirement remain unchanged.",
+    "podHooks": "Retained Podfile calls $MLRN.post_install, preserves React-Core-prebuilt header search path and react_native_post_install. Podspec adds exact-version SPM dependency to Pods/user target. Restore using deployment mode only; lock changes forbidden.",
+    "state": "createMaplibreFeatureStateMethods resolves current registered source ref on each call, dispatching distinct vector/GeoJSON identifiers. Registry owner guard protects replacement cleanup. Existing lifetime scene removes destination state, verifies empty state and reapplies across source/style/family transitions; no automatic-clearing claim.",
+    "ownership": "Stale selected app termination before fixture-request reset/status bind; exact UUID throughout; owned fixture8798/status8799/Metro8081 and process-group cleanup retained; no unknown listeners killed."
+  },
+  "routineVerification": {
+    "red": "Copied Mapbox wrapper under proposed MapLibre filename. Two-engine test passed driver paths then failed MapLibre wrapper build-folder assertion (exit1, expected0). A second regression required MapLibre missing-token success; it failed against the copied Mapbox token guard, then passed after removing that unrelated guard.",
+    "green": [
+      "node scripts/tf06-query-runner.test.mjs",
+      "bun scripts/tf06-query-runner.test.mjs",
+      "node scripts/tf06-smoke-selection.test.mjs",
+      "bun scripts/tf06-smoke-selection.test.mjs",
+      "node scripts/tf04-camera-runner.test.mjs",
+      "bun scripts/native-smoke-process.test.mjs",
+      "node --check scripts/tf06-query-runner.test.mjs",
+      "node --check scripts/tf06-queries-smoke.mjs",
+      "/bin/sh -n scripts/with-ios-env.sh",
+      "/bin/sh -n scripts/with-maplibre-ios-env.sh",
+      "node scripts/native-smoke-process.test.mjs (coordinator independent host-process proof)",
+      "vp check (322 formatted files; 296 linted)",
+      "node scripts/check-docs.mjs (40 Markdown files,39 SDK comparison tables; structural only)",
+      "git diff --check"
+    ],
+    "coverage": "Actual runNative VM runs all existing iOS success/reuse/failure/cleanup modes for both engines; exact selected workspace/scheme/produced path/install ordering and one build; all existing Android modes retained. Both wrappers checked through symlink alias for canonical root, token forwarding/no output, Mapbox missing-token refusal and MapLibre missing-token success, assigned UUID, PATH/Ruby/gems and unset reuse digest.",
+    "warnings": "Existing Bun moduleSuffixes-not-supported warning; no config changes.",
+    "pending": "Real MapLibre iOS lifetime execution and produced/installed code/SDK receipts await owner approval.",
+    "intermediateFailure": "Additional Node native-smoke-process.test.mjs hit spawn EPERM at signalGroup (/bin/kill child). No host escalation or retry performed; Bun variant passed. Coordinator independently reran Node variant with explicit host process access for dummy processes only; passed, closing that routine check gap."
+  },
+  "proposedExecution": {
+    "plan": "docs/revised-api-acceptance-plan.md#next-approval-maplibre-ios-feature-state-lifetimes",
+    "route": "Locked pod install --deployment then one fresh checked direct build, exact-target install/launch. No regeneration/bundle install/dependency refresh.",
+    "command": "/bin/sh ../with-maplibre-ios-env.sh bun scripts/tf06-queries-smoke.mjs ios lifetimes maplibre",
+    "cwd": "/private/tmp/one-map-f05/native-harness",
+    "worker": "One GPT-6 Luna medium worker; coordinator audit/diagnosis/result review. Stop first failure; no repairs/retry.",
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5; accepted iPhone18Pro/iOS27.0 build24A434 boot evidence; one state query, conditional successful-owned boot, bootstatus without -b.",
+    "identity": "Only after successful scene: exact-target installed container and produced app APPL/bundle/executable/version/build metadata; executable AND debug-dylib presence/hashes; available MapLibre.framework metadata. No second build/showBuildSettings. Scene failure permits cleanup only.",
+    "producedApp": "/private/tmp/one-map-f05/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+    "boundsSeconds": {
+      "pods": 1200,
+      "inventory": 30,
+      "boot": 20,
+      "bootstatus": 120,
+      "build": 600,
+      "watch": 600,
+      "outer": 3600
+    },
+    "estimatedDuration": "20-60min, unmeasured",
+    "permission": "Preparation is not execution authorization. Every future host/native command requires require_escalated within separately approved attempt. Preserve Mapbox outputs and unrelated installed app.",
+    "locks": "After successful scene, require Podfile.lock and Gemfile.lock hashes unchanged. For both SwiftPM files record hashes and require resolved pin sets unchanged (identity/location/kind/version/revision); record formatting or originHash-only changes without failing a passing scene. Dependency identity movement remains failure."
+  },
+  "coordinatorAudit": {
+    "status": "Passed for source, routine/mocked behavior, proposed scope and artifact provenance; no native execution.",
+    "review": "Traced MapLibre selection, concrete build folder/workspace/scheme, checked build/install/launch, exact simulator targeting, stale-app ordering, debug-code identity receipts, local fixture/status/Metro ownership and selected-app cleanup.",
+    "correction": "Removed unrelated Mapbox token requirement from MapLibre wrapper while retaining Mapbox guard. Retained lock hashes as provenance and froze SwiftPM semantic pin identity so formatting/originHash changes do not trigger needless reruns; dependency version/revision movement remains failure.",
+    "independentRegressions": "Temporary wrong-folder and token-required wrapper mutations independently failed actual regression; final Node/Bun suites passed. Coordinator Node dummy-process cleanup proof passed with host process access, closing the restricted EPERM intermediate.",
+    "freeze": "Stage wrapper nonsecret canonical environment checked without any Mapbox token. Reviewed helper and regression synchronized; driver, original Mapbox wrapper, f05 archive and retained locks independently unchanged.",
+    "limits": "Only preparation is complete. Runtime queries/state/transitions, next produced/installed code identity and future linked SDK version remain unverified."
+  }
+}

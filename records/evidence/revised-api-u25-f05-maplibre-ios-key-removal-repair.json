@@ -1,0 +1,89 @@
+{
+  "checkpoint": "MapLibre iOS feature-state lifetime fixture repair",
+  "status": "independently-audited-routine-verified-native-unverified-awaiting-owner-approval",
+  "baseline": {
+    "publicationHead": "1a0f65618b8388e79e71f315ac4e5ef96d7e6baa",
+    "branch": "codex/u25-maplibre-ios-state-ordering",
+    "failedOutcome": "records/evidence/revised-api-u25-f05-maplibre-ios-lifetimes-attempt-02.json",
+    "f05Sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276"
+  },
+  "classification": "Fixture sequencing defect exposed by documented deferred native SDK removal, not a facade/wrapper key-forwarding defect. No production library or peer patch change.",
+  "trace": {
+    "fixture": "examples/shared/lifetimes-smoke.ts used to unconditionally remove each destination feature after transitions, including already-empty state. Its empty-state read could pass before the queued clear applied.",
+    "facade": "packages/one-map-react/src/adapters/maplibre-native/feature-state-methods.ts forwards the current family source ref, feature identifier and selected key unchanged.",
+    "wrapper": "Retained @maplibre/maplibre-react-native 11.5.0 GeoJSONSource.tsx forwards key through NativeGeoJSONSourceModule, MLRNGeoJSONSourceModule.mm and MLRNGeoJSONSource.m to removeFeatureStateForFeatureID:stateKey:. Vector source forwarding was inspected as the control. Wrapper docs explicitly defer removal to the next rendered frame.",
+    "sdk": "ios-v6.31.0 MLNShapeSource.mm and MLNVectorTileSource.mm forward to MLNSource.mm, then renderer SourceFeatureState. getState merges pending writes without applying deletedStates; coalesceChanges merges writes then applies deletions. An empty whole clear stays pending, allowing a later set/get to report count=2 before coalescence deletes it. A subsequent keyed remove does not replace that pending whole clear.",
+    "sdkSourceUrl": "https://github.com/maplibre/maplibre-native/blob/ios-v6.31.0/src/mln/renderer/source_state.cpp",
+    "sdkSourceSha256": "475a901c4c747b07c3ebb0daedd631f2ea562b3abd7937c87b97a5ba66587f9d",
+    "identityLimit": "SDK source is pinned to the 6.31.0 release tag matching retained dependency pins; this diagnosis does not independently authenticate the binary used by the failed attempt."
+  },
+  "sourceBackedProbe": {
+    "command": "/usr/bin/python3 /private/tmp/maplibre-state-probe.py",
+    "temporaryInputs": [
+      "/private/tmp/maplibre-source-state.cpp",
+      "/private/tmp/maplibre-state-probe.py",
+      "/private/tmp/maplibre-state-probe.cpp"
+    ],
+    "method": "Compile all exact pinned SourceFeatureState methods after removing only their include directives. Declare their class and standard-map state types locally; replace feature values with int and stub the unused empty tile list callback and trace macro. No SDK, app, simulator or renderer constructed.",
+    "red": "Original whole-clear-empty -> set(selected=1,count=2) -> get(count=2) -> remove(selected) -> coalesce -> get: selected absent, count absent; assertion abort exit -6.",
+    "green": "Only skip the initially empty whole clear; identical subsequent sequence yields selected absent and count=2, exit 0.",
+    "limit": "Isolated exact SDK state methods prove the queue interaction, not native bridge transport, rendering, source attachment or runtime completion."
+  },
+  "hookRegression": {
+    "file": "packages/one-map-react/test/lifetimes-smoke.web.test.tsx",
+    "red": "Added deterministic deferred-removal fixture cases before source repair. 16 tests passed, empty-destination deferred case failed with exact Key-removal-also-removed-count status at vector-to-geojson.",
+    "green": "18 hook tests pass after skipping empty clears. Covers both empty and retained destinations, full transitions, and a negative control that still rejects count loss.",
+    "modelLimit": "Deferred timer mock models pending-removal timing; it does not substitute for the separate exact native C++ algorithm probe."
+  },
+  "repair": "Read current destination state, assert active ownership, clear only nonempty state, retain existing empty verification and all later independent count/key/namespace assertions. Apply at the shared transition loop covering source remount, style replacement, both family switches and final remount.",
+  "relatedPaths": "Initial key and whole removal remain unconditional because their required selected/count state was just established and asserted. Search found no other equivalent transition clear loop in the isolated checkout.",
+  "routine": {
+    "focused": "35 hook and native feature-state-method unit tests passed.",
+    "allVitest": "43 files, 656 tests passed with temporary config setting only isolated cacheDir; existing jsdom canvas warnings.",
+    "nativeMocks": "8 Jest suites, 231 tests passed; existing SafeAreaView warning.",
+    "typecheck": "All four configured TypeScript projects passed after local package-resolution overlay was prepared. Initial missing local package links failed resolution; no source changes were required to correct setup.",
+    "build": "Both library and example package builds passed; existing two React Compiler render-ref diagnostics retained.",
+    "lintFormat": "Final vp check passed 322 formatting files and 296 lint files after temporary config removal; git diff --check passed.",
+    "fixture": "bun scripts/tf06-lifetimes-fixture.test.mjs passed.",
+    "runner": "node scripts/tf06-query-runner.test.mjs passed mocked startup/transport/cleanup without host tools.",
+    "docs": "Final check:docs passed after coordinator audit and handoff updates; structural scope only.",
+    "environment": "Temporary publication/node_modules overlay references existing primary dependency files read-only and local built package. Vite cache is /private/tmp/one-map-keyrepair-vite-cache. No dependency installation, lock changes or primary source edits.",
+    "invocations": [
+      "node_modules/.bin/vp test run --config keyrepair.vite.config.ts packages/one-map-react/test/lifetimes-smoke.web.test.tsx packages/one-map-react/test/native-feature-state-methods.test.ts",
+      "node_modules/.bin/vp test run --config keyrepair.vite.config.ts",
+      "bun run test:native",
+      "bun run typecheck",
+      "bun run build",
+      "node_modules/.bin/vp check",
+      "bun run check:docs",
+      "bun scripts/tf06-lifetimes-fixture.test.mjs",
+      "node scripts/tf06-query-runner.test.mjs"
+    ],
+    "temporaryConfig": "keyrepair.vite.config.ts spread the unchanged vite.config.ts and set only cacheDir=/private/tmp/one-map-keyrepair-vite-cache; removed after checks."
+  },
+  "sourceSha256": {
+    "examples/shared/lifetimes-smoke.ts": "ed8fdf0592d63ea2a392687c277d94323ed58ded170e33e0ef1f910befbd2279",
+    "packages/one-map-react/test/lifetimes-smoke.web.test.tsx": "dfe68544442d3598d909ed8f95d8c2bf9af51c693a00c2c017c697eae96394e7"
+  },
+  "nextNativeGate": {
+    "scope": "Single MapLibre iOS lifetimes scene after independent audit and owner approval. Reuse f05, retained Pods and dependencies, assigned simulator; one ordinary incremental build/install/launch, success-only identity receipts and owned cleanup. Exact commands, bounds and stop rules in docs/revised-api-acceptance-plan.md.",
+    "harnessSync": "Coordinator copied only reviewed fixture delta and verified its hash, unchanged driver/wrapper and frozen archive.",
+    "expectedDuration": "5-15 minutes, estimate only.",
+    "unrun": "No native host service, build/install/boot or renderer execution during diagnosis/repair. Native repair confirmation and remaining native acceptance remain open."
+  },
+  "coordinatorAudit": {
+    "result": "Passed within inspected fixture/facade/wrapper/SDK ordering scope; no remaining findings.",
+    "independentRedGreen": "Replaced only fixture with pristine PR58 version while retaining regression tests. Deferred empty-destination case reproduced exact Key-removal-also-removed-count status; restored repaired fixture and all18 hook tests passed.",
+    "sdkProbe": "Independently reran exact pinned C++ method probe: original abort exit-6 count absent; skip-empty-clear exit0 count2.",
+    "review": "All five transition branches use shared guard; retained state is still cleared and observed empty, key/count assertions unchanged, cancellation checked after added read and clear. Production source, peer patches, locks and versions unchanged.",
+    "harnessSync": {
+      "path": "examples/shared/lifetimes-smoke.ts",
+      "previousSha256": "14c58e76e2904e51f4e7e051ed42e087fd5974b8c84386d39115334c2306b39f",
+      "sha256": "ed8fdf0592d63ea2a392687c277d94323ed58ded170e33e0ef1f910befbd2279",
+      "driverSha256": "e56285711818b3150e5c3a02eb937812e91abe390459d1e7e182adecd4bb473c",
+      "wrapperSha256": "3895188a8a180f04760388174bddcd0941d9e7f48ae1d0424759e958c0e7335d"
+    },
+    "candidate": "Independently rehashed original f05 archive unchanged.",
+    "runtimeLimit": "No native execution performed. Repaired fixture native confirmation awaits separate approval."
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "checkpoint": "PR65 approved three-folder cleanup and single MapLibre Android attempt04",
+  "status": "stopped-actual-free-space-gate",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "cleanupReceipt": {
+    "status": "stopped-space-gate-failed",
+    "startedAt": "2026-10-30T01:01:13.323805+00:00",
+    "approvedTargets": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/intermediates",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/.cxx",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-gradle/caches/9.4.1/transforms"
+    ],
+    "deleted": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/intermediates",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/.cxx",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-gradle/caches/9.4.1/transforms"
+    ],
+    "nativeResourcesAcquired": [],
+    "availableBytesAfterCleanup": 8185188352,
+    "availableGiBAfterCleanup": 7.6231,
+    "requiredBytes": 8804682957,
+    "requiredGiB": 8.200000000186265
+  },
+  "shortfallBytes": 619494605,
+  "shortfallGiB": 0.5769,
+  "interpretation": "Exactly three approved generated directories removed. Actual recovery below prior estimate; no extra deletions or lower space threshold permitted. APFS sharing and concurrent use were known estimate qualifications; exact discrepancy not diagnosed in this execution scope.",
+  "preserved": "Frozen inputs verified before deletion; none falls within cleanup set. f05, generated MapLibre consumer, dependencies, produced Mapbox APK/outputs, dependency downloads and SDK/image are preserved.",
+  "workerDispatch": "No Luna native worker dispatched because pre-native free-space gate failed.",
+  "notRun": [
+    "Emulator creation/boot",
+    "Native build/install",
+    "Query-and-cluster scene",
+    "APK comparison"
+  ],
+  "cleanup": "No native resources acquired; no additional cleanup needed.",
+  "nextRecommended": "Read-only identification of at least another0.58GiB of disposable task data, then a concrete bounded cleanup/retry proposal; no scope expansion or native retry without approval."
+}

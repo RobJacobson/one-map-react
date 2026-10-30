@@ -1,0 +1,36 @@
+{
+  "checkpoint": "PR63 restoration continuation02",
+  "status": "install-passed-worker-verifier-stopped-no-generation",
+  "workerReceipt": {
+    "status": "completed",
+    "startedAt": "2026-10-29T19:33:19.679168+00:00",
+    "sourceRecord": "/Users/rob/code/mapbox-code/one-map/records/evidence/revised-api-u25-f05-mapbox-android-restoration-attempt-01.json",
+    "sourceSha256": "ec458a289fa7f075beb27f3a90173cdb8020446e22839b2b9febc98eab2fa52b",
+    "installExitCode": 0,
+    "failure": null,
+    "finishedAt": "2026-10-29T19:33:21.547602+00:00",
+    "bunWarning": "warn: dependencies in ../../packages/one-map-react/package.json changed since lockfile was saved (run 'bun install')",
+    "postInstallVerification": {
+      "status": "stopped",
+      "failure": "Verification helper used Python json.loads on Bun lock, which contains trailing commas (JSONC); parser raised JSONDecodeError at line 12 column 41. This is a verifier incompatibility, not evidence that a frozen-install invariant failed. No further checks or fixes performed."
+    }
+  },
+  "coordinatorPostInstallAudit": "records/evidence/revised-api-u25-f05-mapbox-android-post-install-audit.json",
+  "classification": "Worker incorrectly parsed JSONC Bun lock with strict JSON parser. Coordinator read-only audit instead hashes lock and reads installed package.json files; all required package/version/patch receipts pass.",
+  "additionalAuditFinding": "Planned runtime-bin symlinks were not created in first partial restoration. Install wrapper therefore used fallback PATH tools; actual install executable identity was not independently captured. Restore pinned links before generation.",
+  "noInputDrift": "All171 installed candidate files equal unchanged f05; approved manifest/lock and direct dependency versions match; opposite SDK absent; candidate peer patch reverse-check passes.",
+  "continuation": {
+    "status": "prepared, unexecuted; approval required before further restoration/native actions",
+    "exactSource": "from pathlib import Path\nimport hashlib, json, os, signal, subprocess\ns=Path('/Users/rob/code/mapbox-code/one-map-f05-android-recovery')\nh=s/\"native-harness\"\nr=s/\"runtime-bin\"\nr.mkdir(exist_ok=True)\nlinks={'bun': {'path': '/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native', 'sha256': '4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959'}, 'bunx': {'path': '/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.1/bun/bin/bun.native', 'sha256': '4c6a735e82bd9da8403f0ece106730ebe431f50a246826197bf51dc0680eb959'}, 'node': {'path': '/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.1/bin/node', 'sha256': '6f32069480ec14d52b6d7b1f3c7124cfbbc46203abf5ddf5c65b127435f3f329'}}\nfor name, info in links.items():\n    target=Path(info[\"path\"])\n    assert hashlib.sha256(target.read_bytes()).hexdigest()==info[\"sha256\"]\n    link=r/name\n    if link.is_symlink():\n        assert link.resolve()==target.resolve()\n    else:\n        assert not link.exists(), str(link)\n        link.symlink_to(target)\nreceipt=s/\"generation-continuation-03.json\"\nstate={\"status\":\"started\",\"command\":[\"/bin/sh\",\"../with-android-env.sh\",\"bun\",\"scripts/setup-native-example.mjs\",\"native-mapbox\"],\"timeoutSeconds\":600}\nreceipt.write_text(json.dumps(state,indent=2)+\"\\n\")\nchild=subprocess.Popen(state[\"command\"],cwd=h,start_new_session=True)\nstate[\"pid\"]=child.pid\nreceipt.write_text(json.dumps(state,indent=2)+\"\\n\")\ntry:\n    result=child.wait(timeout=600)\nexcept subprocess.TimeoutExpired:\n    os.killpg(child.pid,signal.SIGTERM)\n    try:\n        child.wait(timeout=5)\n    except subprocess.TimeoutExpired:\n        os.killpg(child.pid,signal.SIGKILL)\n        child.wait()\n    state[\"status\"]=\"timeout\"\n    receipt.write_text(json.dumps(state,indent=2)+\"\\n\")\n    raise\nstate[\"exitCode\"]=result\nstate[\"status\"]=\"passed\" if result==0 else \"failed\"\nreceipt.write_text(json.dumps(state,indent=2)+\"\\n\")\nraise SystemExit(result)\n",
+    "action": "Create only missing verified pinned runtime links and run existing generator with standard-library process-group timeout600. No invented timeout binary or lock parser.",
+    "afterGeneration": "Coordinator, not execution worker, performs static generated/input/Babel/Metro audit. Only after coordinator passes that audit may one approved fresh Mapbox query run proceed.",
+    "scope": "Same f05, approved tracked consumer lock and one Luna medium worker; first-failure stop and owned cleanup.",
+    "guardVerification": "Exact guard source exercised with dummy Python child replacing only the generator command and temporary test staging: normal exit0, nonzero7 and timeout/owned-group cleanup passed. No native tool or dependency command invoked."
+  },
+  "notExecuted": [
+    "Runtime-link correction",
+    "Project generation",
+    "Emulator/Gradle/Metro/native build/install/scene",
+    "Further restoration retry"
+  ]
+}

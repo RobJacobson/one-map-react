@@ -1,0 +1,112 @@
+{
+  "attempt": "01",
+  "checkpoint": "PR60 MapLibre iOS ordinary queries and clusters",
+  "commands": [
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl list devices --json",
+      "exit": 0,
+      "assignedDevice": "iPhone 18 Pro / iOS 27.0 / 24A434",
+      "initialState": "Shutdown; available"
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl boot 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "exit": 0,
+      "ownedBoot": true
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl bootstatus 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "exit": 0
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh lsof -nP -iTCP:8081 -iTCP:8799 -sTCP:LISTEN -t",
+      "exit": 1,
+      "stdout": "empty; both ports free"
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh bun scripts/tf06-queries-smoke.mjs ios queries maplibre",
+      "exit": 0,
+      "scenarioStatus": "passed",
+      "line": "TF06 loaded=1 point=ok bounds=ok viewport=ok empty=ok source=ok cluster-zoom=ok leaves=ok children=ok set-state=ok get-state=ok remove-state=ok filters=ok pagination=ok whole-state=ok recreated-state=explicitly-cleared cleared-state=explicitly-cleared error=none note=none phase=done done=1",
+      "producedAppPath": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/one-map-u25-f05-native-avf8woqw/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app"
+    },
+    {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl get_app_container 8B7D7CE4-228E-409F-A156-A597D4E448A5 org.reactjs.native.example.OneMapMaplibre app",
+      "exit": 0,
+      "installedAppPath": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/FC341FDD-D02D-4A9F-BE76-6C1A965B7E42/OneMapMaplibre.app"
+    }
+  ],
+  "appReceipt": {
+    "produced": {
+      "packageType": "APPL",
+      "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+      "executable": "OneMapMaplibre",
+      "version": "1.0",
+      "build": "1",
+      "executableSha256": "87b56829e405644038b4b035e04dad26268a5f675e7d440cc2b71cade2f0da92",
+      "debugDylibPresent": true,
+      "debugDylibSha256": "6f2fbc4d3dafcf9c688c96fb310436f4292d3cd3ae739cafb44c556f47572942",
+      "mapLibreVersion": "6.31.0"
+    },
+    "installed": {
+      "packageType": "APPL",
+      "bundleId": "org.reactjs.native.example.OneMapMaplibre",
+      "executable": "OneMapMaplibre",
+      "version": "1.0",
+      "build": "1",
+      "executableSha256": "87b56829e405644038b4b035e04dad26268a5f675e7d440cc2b71cade2f0da92",
+      "debugDylibPresent": true,
+      "debugDylibSha256": "6f2fbc4d3dafcf9c688c96fb310436f4292d3cd3ae739cafb44c556f47572942",
+      "mapLibreVersion": "6.31.0"
+    },
+    "status": "matching"
+  },
+  "lockReceipts": {
+    "status": "incomplete; first required lock check failed",
+    "expectedPodfileLockSha256": "bb68f6237b7b4a02d2c5514d9424ce3327d763e6dadfb6da8d730fc6a2dee93a",
+    "expectedGemfileLockSha256": "0f204f3b6fc82d89262f474d8fa0187eefbb47b28cdc44645b0132944c77f912",
+    "observedFailure": "examples/native-maplibre/ios/Gemfile.lock missing; lock receipt command exited 1",
+    "swiftPackagePins": "not checked after first failure"
+  },
+  "cleanup": {
+    "shutdownOwnedSimulator": {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh xcrun simctl shutdown 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "exit": 0
+    },
+    "portCheck": {
+      "command": "/bin/sh ../with-maplibre-ios-env.sh lsof -nP -iTCP:8081 -iTCP:8799 -sTCP:LISTEN -t",
+      "exit": 1,
+      "stdout": "empty; ports released"
+    }
+  },
+  "outcome": "scenario passed; acceptance attempt stopped at missing required Gemfile.lock receipt; no retries",
+  "unrun": [
+    "remaining lock hash and Swift package pin receipts after first missing lock",
+    "no further acceptance scenarios"
+  ],
+  "provenance": {
+    "pr": 60,
+    "head": "bfde8e803e5ca881104098588a00ba84c617acca",
+    "archiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "filesSha256": {
+      "scripts/tf06-queries-smoke.mjs": "e417599367f54e68244b28ba18bd63069094548b7e50a090da5c1e2372b7b35b",
+      "scripts/tf06-smoke-selection.mjs": "b68bf6169295e26e5748b00f25205c8d9a34850d42ff907e3e672b0950334081",
+      "scripts/tf06-query-runner.test.mjs": "fab6da1d1468c8818357851bd9a249780b572f01f7af9371e8acd66cebcb5fee",
+      "scripts/tf06-smoke-selection.test.mjs": "eae77ce54dbb04e39ce80c23751a2bbd1465b4ebfd4f6f92203b8939adf0d72a",
+      "scripts/with-maplibre-ios-env.sh": "3895188a8a180f04760388174bddcd0941d9e7f48ae1d0424759e958c0e7335d",
+      "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+      "examples/shared/queries-smoke.ts": "aadcd992843f3321c540ed1b9cfb19db32ae822edd2e531e54fe77fb6d1822b7",
+      "examples/shared/queries-map.tsx": "ef9498b977c82c3707c3e2b83d05566a2f907a2b1741cc28601f96caad2e0d6b",
+      "examples/shared/native-queries-screen.tsx": "78b7b0eb158d37c5561c81f615ffb1089d4564c26debd250f92193a7bd4e1a56",
+      "tests/fixtures/map-fixture.ts": "47874e50f6341c1580faa3ae469f7c4372aa69a9ac0f723a0003dfb73f303093",
+      "tests/fixtures/map.json": "8279594359798e3d9e7763242ba0ede1207ad5ae24f84e3d3be1ef241ac21362"
+    },
+    "scope": "Approved one MapLibre iOS query/cluster check, reuse existing Pods/setup, first-failure stop, owned cleanup only"
+  },
+  "coordinatorReview": {
+    "classification": "Scene and app-identity checks passed; final lock/pin receipt phase incomplete due to worker command path error. This is not recorded as a completed acceptance attempt.",
+    "pathError": "Worker checked examples/native-maplibre/ios/Gemfile.lock. Preparation specifies examples/native-maplibre/Gemfile.lock. The missing-file error does not establish missing dependencies or changed locks.",
+    "verification": "Reviewed complete passing TF06 status, matching produced/installed app receipts and recorded owned cleanup. Independently rehashed unchanged f05 and staged runner/selector.",
+    "stopRule": "No receipt retry, remaining lock/pin checks, host command, app rebuild or additional scenario executed by coordinator after worker reported the failure.",
+    "remaining": "Only read-only lock/pin receipts remain for this scene. Use correct app-root Gemfile.lock path; no native rebuild or scene rerun is needed to collect those receipts."
+  }
+}

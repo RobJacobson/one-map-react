@@ -1,0 +1,27 @@
+{
+  "checkpoint": "PR64 MapLibre Android single query-and-cluster retry03",
+  "status": "stopped-emulator-launch-failure",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "worker": "Same gpt-6-luna medium maplibre_android_queries_run",
+  "scope": "Only prescribed absolute-path commands, first-failure stop, owned cleanup only. No extra discovery/diagnosis or retry.",
+  "workerReceipt": null,
+  "reportedCommandOutcomes": {
+    "assignedPortPreflight": "exit1 empty, expected",
+    "adbDevices": "exit0 empty",
+    "privateAvdCreation": "exit0",
+    "emulatorLauncher": "exit1 with no stdout; no PID/PGID returned",
+    "ownedPrivateAvdRemoval": "exit0"
+  },
+  "firstFailure": "Exact reviewed emulator launcher exited1. Underlying emulator error has not been investigated within this stop-at-first-failure scope.",
+  "interpretation": "The launcher attempts to start emulator, then returns child exit if it exits within its initial1second window. No running/booted emulator was established; do not infer no emulator process was ever invoked.",
+  "cleanup": "Worker removed only OneMapU25F05.avd and .ini created by this attempt. No app, Metro, reverse or build resources acquired.",
+  "preserved": "Completed frozen install/generated project and f05 remain unchanged; no source changes.",
+  "notRun": [
+    "Boot polling",
+    "Reverse mapping",
+    "Native build/install",
+    "Query-and-cluster scene",
+    "APK comparison"
+  ],
+  "nextRecommended": "Inspect the exact task-owned emulator.log and launch receipt read-only to establish why emulator exited, then propose a bounded repair/retry. Do not reinstall, regenerate, rebuild f05 or start another native attempt without approval."
+}

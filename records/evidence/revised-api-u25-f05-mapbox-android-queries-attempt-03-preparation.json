@@ -1,0 +1,13 @@
+{
+  "checkpoint": "Mapbox Android queries attempt03",
+  "status": "approved and dispatched",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "bootPoll": {
+    "source": "import subprocess\nimport time\n\ndef wait_for_boot():\n    deadline = time.monotonic() + 180\n    while time.monotonic() < deadline:\n        state = subprocess.run(['adb', '-s', 'emulator-5580', 'get-state'], capture_output=True, text=True, timeout=min(10, max(0.1, deadline-time.monotonic())))\n        if state.returncode:\n            detail = (state.stdout + state.stderr).strip()\n            if 'offline' not in detail and 'not found' not in detail and 'no devices/emulators found' not in detail:\n                raise RuntimeError('Assigned device state failed: ' + detail)\n        elif state.stdout.strip() == 'device':\n            boot = subprocess.run(['adb', '-s', 'emulator-5580', 'shell', 'getprop', 'sys.boot_completed'], capture_output=True, text=True, timeout=min(10, max(0.1, deadline-time.monotonic())))\n            if boot.returncode:\n                raise RuntimeError('Assigned device boot query failed: ' + (boot.stdout + boot.stderr).strip())\n            if boot.stdout.strip() == '1':\n                print('Assigned emulator boot completed')\n                return\n            if boot.stdout.strip() not in ('', '0'):\n                raise RuntimeError('Unexpected boot property: ' + repr(boot.stdout))\n        elif state.stdout.strip() != 'offline':\n            raise RuntimeError('Unexpected device state: ' + repr(state.stdout))\n        time.sleep(min(2, max(0, deadline-time.monotonic())))\n    raise TimeoutError('Assigned emulator did not boot within 180 seconds')\n\nif __name__ == '__main__':\n    wait_for_boot()\n",
+    "sha256": "f819d439aa4573070b858e80c7d3a61ca8f7a833f5ca857f3347ba5d39a35956",
+    "verification": "Exact source compiled; mocked offline-to-ready, unexpected error and deadline timeout passed; no host tools executed.",
+    "command": "/bin/sh ../with-android-env.sh python3 /private/tmp/one-map-approved-android-boot-poll.py"
+  },
+  "scope": "Same Luna medium worker, one Mapbox Android query-and-cluster check, unchanged f05, first-failure stop, owned cleanup only.",
+  "runtime": "Pending worker result"
+}

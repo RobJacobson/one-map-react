@@ -1,0 +1,36 @@
+{
+  "checkpoint": "PR62 Mapbox Android ordinary query/cluster attempt01",
+  "status": "interrupted-runtime-outcome-unverified",
+  "pr": 62,
+  "head": "15cd961325f40ba57976fba01ec658d535dac69a",
+  "f05ArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "approvedScope": "One Luna medium worker; existing image/dependencies; first-failure stop; owned cleanup only.",
+  "lastWorkerReport": {
+    "preflight": "No conflicting listeners or devices.",
+    "privateAvd": "Created and launched with owned PID/PGID64021; boot completed.",
+    "transport": "Reverse8081 acquired.",
+    "scene": "Exact android queries mapbox command started, session88521. No final scene result recovered."
+  },
+  "transcriptRecovery": {
+    "file": "/Users/rob/.codex/sessions/2026/10/29/rollout-2026-10-29T10-13-06-01a188a6-a8bf-7161-9c99-367883780664.jsonl",
+    "lastRecordedToolOutputUtc": "2026-10-29T17:16:01.821Z",
+    "lastRecordedToolOutput": "Session88521 still active; no output. A later poll invocation has no recorded result.",
+    "limit": "Transcript supports launch and progress only; it does not establish runtime pass/failure or execution of success receipts and cleanup."
+  },
+  "continuationAudit": {
+    "harness": "Both /private/tmp/one-map-f05 and its physical backing directory are absent, including task caches and expected result.json.",
+    "session": "Original session88521 is unavailable; no live worker remains.",
+    "ownedResources": "Read-only process query found no PID64021; lsof found no listeners on5580/5581/8081. No process was killed and no resource deletion was attempted.",
+    "inputs": "Independently rehashed durable f05 unchanged; existing SDK37.0 image and user AVD source config remain present.",
+    "attribution": "Cause/timing of temporary workspace loss is unknown. No claim that the worker performed cleanup."
+  },
+  "unverified": [
+    "Scene completion and status fields",
+    "Produced versus installed APK identity",
+    "Post-run dependency receipts",
+    "Exact linked SDK identity",
+    "Worker-owned cleanup history"
+  ],
+  "nextStep": "Prepare restoration of the missing isolated harness/dependencies/cache setup from reviewed PR62 and unchanged f05, then obtain approval before a fresh native attempt. Do not silently repeat the interrupted command.",
+  "actionsNotTaken": "No emulator launch, adb command, Gradle build, dependency installation, native scene rerun or retry during recovery."
+}

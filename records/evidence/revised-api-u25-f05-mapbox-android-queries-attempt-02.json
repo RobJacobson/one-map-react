@@ -1,0 +1,56 @@
+{
+  "status": "failed-first-failure-stop",
+  "checkpoint": "Mapbox Android query-and-cluster attempt02 after corrected static audit",
+  "staticAudit": "records/evidence/revised-api-u25-f05-mapbox-android-restoration-audit-06.json",
+  "workerReceipt": {
+    "status": "failed-first-command",
+    "attempt": "mapbox-android-queries-attempt-02",
+    "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "startedAt": "2026-10-29T22:08:00.792270+00:00",
+    "preflight": {
+      "listeners5580_5581_8081": "none",
+      "adbDevices": "none",
+      "mapboxToken": "present",
+      "sourceAvdConfigSha256": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de"
+    },
+    "failure": {
+      "stage": "boot-poll",
+      "exitCode": 1,
+      "detail": "Python SyntaxError: compound statement while cannot follow semicolon in python3 -c source; boot polling never started; no boot result established."
+    },
+    "commands": {
+      "preflightExitCode": 0,
+      "createAvdExitCode": 0,
+      "launchEmulatorExitCode": 0,
+      "bootPollExitCode": 1,
+      "adbEmuKillExitCode": 0
+    },
+    "emulator": {
+      "pid": 25219,
+      "pgid": 25219
+    },
+    "cleanup": {
+      "emulatorKill": "succeeded",
+      "privateAvd": "removed",
+      "reverse8081": "not acquired",
+      "selectedApp": "not launched",
+      "metro": "not started",
+      "nativeBuild": "not started",
+      "scene": "not run",
+      "listenerCheck": {
+        "exitCode": 1,
+        "pids": []
+      }
+    },
+    "finishedAt": "2026-10-29T22:08:36.465223+00:00"
+  },
+  "classification": "Worker-generated Python command syntax error before boot observation. Not evidence of an app, SDK, image or candidate defect.",
+  "coordinatorCleanupAudit": {
+    "privateAvdAndMetadata": "absent",
+    "assignedPorts": "lsof exit1, no listeners on5580/5581/8081",
+    "emulatorExit": "worker reports adb emu kill success; port release independently verified"
+  },
+  "candidate": "Unchanged f05; no production, dependency or generated project edits by worker.",
+  "next": "A fresh attempt needs approval. Reuse restored project and installed dependencies; coordinator must supply syntax-checked multiline boot-poll source instead of allowing an improvised one-line command. No reinstall/regeneration.",
+  "unverified": "No native build, installed APK comparison or scene ran."
+}

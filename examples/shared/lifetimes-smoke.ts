@@ -195,8 +195,14 @@ export const useLifetimesSmoke = ({
         } else {
           // State may persist or disappear with the selected renderer lifetime.
           for (const target of targets) {
-            await map.removeFeatureState(target);
+            const state = await map.getFeatureState(target);
             assertActive(signal);
+            // MapLibre iOS can clear later writes; see the frame-deferred
+            // regression in lifetimes-smoke.web.test.tsx.
+            if (Object.keys(state).length > 0) {
+              await map.removeFeatureState(target);
+              assertActive(signal);
+            }
           }
           await assertEmptyState(map, targets, signal);
           if (scene.phase === "remount") {

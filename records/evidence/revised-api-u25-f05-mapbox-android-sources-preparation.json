@@ -1,0 +1,201 @@
+{
+  "checkpoint": "f05 single Mapbox Android TF05 source/image lifecycle preparation",
+  "status": "independently-audited-and-frozen-awaiting-approval-and-fresh-runtime-preflight",
+  "documentPurpose": "Proposed bounded single-engine execution; owner and acceptance coordinator; no broader retained-contract certification.",
+  "reviewCheckout": "/private/tmp/one-map-android-restoration-review",
+  "reviewBase": "ca555a297ad9e208c42a0d477ecd811a4f06fc92",
+  "branch": "codex/u25-mapbox-android-sources",
+  "candidate": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "regularMembers": 171,
+    "comparison": "All 171 archive members byte-match extracted package and both installed native consumer package roots; independently rechecked read-only."
+  },
+  "retainedApk": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "provenance": "revised-api-u25-f05-mapbox-android-queries-attempt-03.json; retained bytes independently rehashed during this preparation.",
+    "embeddedJavaScriptBundle": "Absent: ZIP inventory has no .bundle or embedded assets/index.android.bundle.",
+    "reuse": "Reinstall this exact Debug Metro binary; reset Metro supplies existing TF05 scene. No native rebuild, default build fallback, generation, install of dependencies, download or cache deletion proposed."
+  },
+  "packagedSdkMetadata": [
+    {
+      "entry": "assets/sdk_versions/com.mapbox.common.core",
+      "text": "common/24.23.1\n",
+      "sha256": "26ab6a46e4b8073e92a7e8834e375907584920c97394cf14f7f7c07767143677"
+    },
+    {
+      "entry": "assets/sdk_versions/com.mapbox.maps.core",
+      "text": "sdk/11.23.1\n",
+      "sha256": "17f0f5a0bbfd10f7e61aa41adfadabe574520b47af2f709ada66b237ae646308"
+    },
+    {
+      "entry": "assets/sdk_versions/com.mapbox.maps",
+      "text": "maps-sdk/11.23.1\n",
+      "sha256": "c20df03637bd25728e8aaa9288894038f488545a62f674f6e22968d62ee1e675"
+    }
+  ],
+  "sdkQualification": "Configured Mapbox SDK11.23.1 and independently inspected packaged SDK11.23.1 metadata are recorded. No independent native shared-library or runtime SDK certification.",
+  "inputs": {
+    "baseline": "All 436 files in maplibre-android-queries-attempt-01/coordinator-freeze.json rehashed unchanged. Coordinator must also freeze selected Mapbox consumer/native inputs and APK.",
+    "selectedVersions": {
+      "@rnmapbox/maps": "10.3.7",
+      "react": "19.2.3",
+      "react-native": "0.87.1",
+      "react-native-teleport": "1.2.1",
+      "@react-native-community/cli": "20.2.0"
+    },
+    "oppositeSdk": "Absent from Mapbox consumer; MapLibre consumer independently remains11.5.0 with opposite SDK absent.",
+    "patchSha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1",
+    "patchCheck": "Exact patch rehashed; git apply --reverse --check against installed @rnmapbox/maps passed without mutation.",
+    "selectedHashes": {
+      "examples/native-mapbox/package.json": "1bf6d3469daf2e192120944f4859e097dced1bcaf2ce6641777b34f32bbd6878",
+      "examples/native-mapbox/bun.lock": "5dd4deb89ebd9a65fbc6f92021c1313b6fea13fe91a004ef0eabf7557f1e1e5c",
+      "examples/native-mapbox/android/build.gradle": "37d9ed929a8edc7d5593a17dcb060bb606d031b5753f1e227d35a590953274c4",
+      "examples/native-mapbox/android/app/build.gradle": "22a143d249e8590677e965ac131f09f258d58582f3f8cd018737150214c13dd1",
+      "examples/native-mapbox/android/gradle.properties": "ad5676f42702d1a9f811655c5d041ce13b0936011ef294e69ec6d230b660a985",
+      "examples/native-mapbox/android/settings.gradle": "cbc3547ddcac73c77eac43ed6d55b1b3e5cf2e2fc924c9fbbf0c1ff87d779850",
+      "examples/native-mapbox/android/gradle/wrapper/gradle-wrapper.properties": "70fa201501995e6f45c0c475def71093f8115849344c48322ca997cfddba8534",
+      "examples/native-mapbox/App.tsx": "0baa798ba0f274834fb218da5a9ae914dc4776ea09dfa5c3a6a6a12a706fc386",
+      "examples/native-mapbox/metro.config.cjs": "7522eb0828fd4694212bc425efd4270e56175775d2339bef89761cdc619a1786",
+      "examples/native-mapbox/babel.config.cjs": "1caafe326b1f69ad39c476171bdcad8f2213b824e7518fc89456340cc363ce91",
+      "examples/mixed/maplibre-web-mapbox-native/setup.native.ts": "c802c028688d99269ca7a6bdc08259771553db87ea07565569cb3908ffd40b2c"
+    },
+    "lockQualification": "Approved PR62 disposable lock retained; unchanged f05 does not imply identical deleted historical transitive tree."
+  },
+  "installedBabelProof": {
+    "result": "passed",
+    "method": "Node createRequire from installed Mapbox consumer package.json loads its @babel/core and actual babel.config.cjs; in-memory transforms only.",
+    "checked": [
+      "Actual App.tsx token substitution and NativeSourcesScreen route",
+      "Actual maplibre-web-mapbox-native/setup.native.ts selection",
+      "Actual smoke-target.ts inlines tf05",
+      "Actual tf05-base.ts inlines http://127.0.0.1:8798",
+      "Actual native-sources-screen.tsx, sources-map.tsx and sources-smoke.ts transform"
+    ],
+    "token": "Inherited MAPBOX_ACCESS_TOKEN present; value never printed. Harness repository .env absent. Runtime preflight must require inherited presence and preserve variable into Metro.",
+    "limit": "No native module executed and no Metro server started."
+  },
+  "changeScope": {
+    "changed": [
+      "scripts/tf05-sources-runner.test.mjs",
+      "docs/revised-api-acceptance-plan.md",
+      "records/README.md",
+      "this preparation record"
+    ],
+    "unchanged": [
+      "Production code",
+      "TF05 driver",
+      "Source/image scene and fixtures",
+      "f05 archive",
+      "Peers, patches, locks and versions",
+      "Retained native project, dependencies and APK"
+    ],
+    "reason": "Existing reviewed generic driver already supports Mapbox selection/reuse; only focused test coverage gap required changes. No driver bug found."
+  },
+  "sourceAudit": {
+    "route": "Actual configuration hashes only selected native-mapbox APK before fixture/Metro acquisition; main maps selected mapbox to native-mapbox/com.onemapmapbox, then existing runNative installs verified APK, configures localhost debug host, grants API37+ local-network permission and launches selected app.",
+    "ownership": "Nested cleanup closes fixture, force-stops selected app, stops owned Metro groups and observes port release. Worker separately owns reverses/emulator/private AVD. Stop first failure; no independent repair or retry.",
+    "scope": "Four families: vector, raster, image and two GeoJSON sources; five layers: fill, raster, line, circle, symbol; one registered marker image. Paint-key reset, GeoJSON update, style replacement and transient source removal use existing load/style-load/status/error observations.",
+    "limits": [
+      "No pixel appearance or image readback proof",
+      "Empty vector tile does not prove visible vector contents",
+      "No raster-dem/hillshade, heatmap, fill-extrusion or exhaustive retained-contract claim",
+      "Other native environments and unrelated UI/interaction/rendering scopes remain open"
+    ]
+  },
+  "routineChecks": [
+    {
+      "command": "node scripts/tf05-sources-runner.test.mjs",
+      "result": "passed before and after focused Mapbox cases; VM mocks only, no host/native tools."
+    },
+    {
+      "command": "retained runtime-bin/bun scripts/tf05-sources-runner.test.mjs",
+      "result": "passed; Bun moduleSuffixes warning concerns review tsconfig, not JS VM assertions."
+    },
+    {
+      "command": "node --check scripts/tf05-sources-smoke.mjs",
+      "result": "passed unchanged driver"
+    },
+    {
+      "command": "node scripts/check-docs.mjs",
+      "result": "passed final draft:40 Markdown files,39 SDK comparison tables; structural/local-link checks only."
+    },
+    {
+      "command": "Existing examples/inline-smoke-target.test.mjs",
+      "result": "Unchanged PR67 passing selector result reused; local invocation lacked isolated @babel/core, then stronger actual installed Mapbox Babel proof passed. No dependency install."
+    },
+    {
+      "command": "Formatting and final git diff --check",
+      "result": "vp fmt and fmt --check passed focused runner test (JSON ignored by formatter); JSON parsed successfully; git diff --check passed. Temporary review node_modules symlink to existing primary dependencies used only for formatter and removed in finally."
+    }
+  ],
+  "mockCasesAdded": "Selected Mapbox APK fixed path and digest success/mismatch; Mapbox reuse installs checked APK without build, selects correct Metro consumer directory, debug host, API permission, launch and force-stop app identity. Existing failure/cleanup mocks remain unchanged.",
+  "proposedExecution": {
+    "plan": "docs/revised-api-acceptance-plan.md#proposed-single-mapbox-android-source-scene",
+    "worker": "One gpt-6-luna at medium reasoning; stronger coordinator audit/freeze/diagnosis/result review.",
+    "attemptRoot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-android-sources-attempt-01",
+    "attemptRootAbsent": true,
+    "command": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh env TF05_ANDROID_BINARY_SHA256=ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5 bun /Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf05-sources-smoke.mjs android mapbox",
+    "cwd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness",
+    "resources": "emulator-5580/5581, Metro8081, loopback fixture8798, reverses8081/8798; no8799, LAN discovery, input automation or other engine.",
+    "spaceGateBytes": 8804682957,
+    "readOnlyFreeBytes": 8972206080,
+    "space": "About8.356GiB measured; narrow margin, remeasure before boot. No extra cleanup proposed.",
+    "expectedMinutes": "5-15",
+    "limitsSeconds": {
+      "install": 120,
+      "boot": 180,
+      "status": 240,
+      "runtimeAndCleanup": 1800
+    },
+    "requiredFields": {
+      "mounted": "1",
+      "reset": "ok",
+      "data": "updated",
+      "style": "rebuilt",
+      "removed": "clean",
+      "error": "none",
+      "note": "none",
+      "phase": "done",
+      "done": "1"
+    },
+    "success": "Runner exit0, exactly one passed mapbox-android result, all required fields, retained and installed sole base.apk equal approved SHA, unchanged f05 and all frozen inputs, owned cleanup verified.",
+    "cleanup": "Selected app/Metro/fixture, acquired8081/8798 reverses, owned emulator, newly created android-avd/OneMapU25F05.avd and sibling .ini, pulled duplicate APK only. Preserve shared resources, caches, package and retained APK; no Gradle expected."
+  },
+  "verificationGates": [
+    "Separate explicit owner execution approval for this exact one-engine scenario/binary/command attempt",
+    "Fresh token/space/resource/frozen-input preflight",
+    "Renderer result, installed identity, input and owned-cleanup review"
+  ],
+  "nativeExecution": "No native build, emulator/adb/Metro/Gradle, installation, generation, download or deletion performed during preparation.",
+  "sourceHashes": {
+    "scripts/tf05-sources-smoke.mjs": "2c9d8a70b23046e2d8cad11ae7eac9e70ded5c562926d193d3103f2fa772cad5",
+    "scripts/tf05-sources-runner.test.mjs": "50cb3a777360b6a47e776a2410266acb628252ca04dc2bf412afe9a1cca8674e"
+  },
+  "coordinatorAudit": {
+    "result": "passed",
+    "checks": [
+      "Reviewed focused Mapbox mock changes; existing driver source unchanged",
+      "Pinned Node and Bun TF05 runner regressions independently passed; Bun review-tsconfig moduleSuffixes warning is unrelated to JS VM assertions",
+      "Actual installed Mapbox Metro/Babel independently selects packed mapbox-native, tf05 selector and loopback fixture; App/screen/map/hook transform with placeholdertoken only, no native modules executed",
+      "All436original baseline plus existingTF05runner/MapLibreAPK unchanged; selectedMapbox171installedpackage files byte-matchf05; exactversions/nativeconfigs/patch checked",
+      "Independently inspected exact3sdk_versions APKmetadata entries and their hashes; packagedMaps11.23.1 identified, no independent.so/runtimecertificationclaim",
+      "RetainedAPK SHA and absence of packagedJSbundle independently verified; reviewedpatchreversecheckpassed"
+    ],
+    "freezePath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-android-sources-freeze.json",
+    "frozenFiles": 662,
+    "scope": "Only documentation and focused mock coverage changed. No runner/library/fixture/nativeinput/candidate changes or acceptance execution.",
+    "remaining": "Fresh inheritedtoken/8.2GiB/resource/inputpreflight, one approved no-build native flow and outcome/installedidentity/ownedcleanup audit.",
+    "routineChecks": "Pinned Node+Bun Mapbox/MapLibre runner mocks, JSON/sourcehash/temporarysymlink absence, final documentation40files/39tables and diff whitespace checks passed."
+  },
+  "finalSpaceObservation": {
+    "observedAtUtc": "2026-10-30T04:00:33.138844+00:00",
+    "availableBytes": 8923791360,
+    "availableGiB": 8.3109,
+    "requiredBytes": 8804682957,
+    "passes": true,
+    "action": "Latest recorded measurement passes; space fluctuated below gate during preparation. No additional deletion; fresh8.2GiB passing measurement mandatory beforeboot.",
+    "earlierObservedGiB": 8.149
+  }
+}

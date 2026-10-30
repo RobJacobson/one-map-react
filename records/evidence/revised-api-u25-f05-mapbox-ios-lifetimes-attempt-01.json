@@ -1,0 +1,244 @@
+{
+  "attempt": "PR57 Mapbox iOS feature-state lifetimes",
+  "startedUtc": "2026-10-29T01:42:59Z",
+  "completedUtc": "2026-10-29T01:47:02Z",
+  "provenance": {
+    "wrapperSha256": "b1de5f761e4813e9877355dc2db6e5daf95eced6a2bd9bba07c369a4ccbe6604",
+    "runnerSha256": "e56285711818b3150e5c3a02eb937812e91abe390459d1e7e182adecd4bb473c",
+    "frozenArchiveSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "assignedSimulator": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "diskAvailableBeforeBytesApprox": 11811160064
+  },
+  "commands": [
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh /bin/sh -c 'for p in 8081 8798 8799; do lsof -nP -iTCP:$p -sTCP:LISTEN; s=$?; if [ $s -gt 1 ]; then exit $s; fi; done'",
+      "hostAccess": true,
+      "exit": 0,
+      "result": "All assigned ports free before acquisition."
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness/examples/native-mapbox/ios",
+      "command": "/bin/sh ../../../../with-ios-env.sh /opt/homebrew/bin/bundle exec pod install --deployment",
+      "hostAccess": true,
+      "durationSeconds": 58,
+      "exit": 0,
+      "result": "Locked Pods restored; deployment mode; 91 total pods installed."
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh xcrun simctl list devices --json",
+      "hostAccess": true,
+      "durationSeconds": 3,
+      "exit": 0,
+      "result": "Assigned target available, iPhone 18 Pro / iOS 27.0, Shutdown."
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh xcrun simctl boot 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "hostAccess": true,
+      "durationSeconds": 3,
+      "exit": 0,
+      "ownership": "Boot owned by this attempt."
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh xcrun simctl bootstatus 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "hostAccess": true,
+      "durationSeconds": 5,
+      "exit": 0
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh bun scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+      "hostAccess": true,
+      "durationSeconds": 103,
+      "exit": 0,
+      "result": "Passed; one checked xcodebuild, checked install and launch on the assigned simulator."
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh xcrun simctl get_app_container 8B7D7CE4-228E-409F-A156-A597D4E448A5 org.reactjs.native.example.OneMapMapbox app",
+      "hostAccess": true,
+      "durationSeconds": 2,
+      "exit": 0
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh /usr/bin/python3 - <produced-app-path-from-result> <installed-app-path-from-simctl> (identity comparison)",
+      "hostAccess": true,
+      "durationSeconds": 4,
+      "exit": 0,
+      "result": "Both APPL; bundle id org.reactjs.native.example.OneMapMapbox; executable OneMapMapbox. Produced and installed OneMapMapbox SHA-256 0c9a3e12e992a4c1453fe3f3863a2d1f053070805998456fca952862dfadea1a. Produced and installed OneMapMapbox.debug.dylib SHA-256 8a2b90908426c768fc1c04cc2fc8404ed99b6380b17ae82fd38ae20417dc9525. MapboxCoreMaps version 11.23.1 in both."
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh /bin/sh -c 'for p in 8081 8798 8799; do lsof -nP -iTCP:$p -sTCP:LISTEN; s=$?; if [ $s -gt 1 ]; then exit $s; fi; done'",
+      "hostAccess": true,
+      "durationSeconds": 2,
+      "exit": 0,
+      "result": "Runner released all assigned ports."
+    },
+    {
+      "cwd": "/private/tmp/one-map-f05/native-harness",
+      "command": "/bin/sh ../with-ios-env.sh xcrun simctl shutdown 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "hostAccess": true,
+      "durationSeconds": 7,
+      "exit": 0,
+      "result": "Shutdown only the simulator successfully booted by this attempt."
+    }
+  ],
+  "status": {
+    "loaded": "1",
+    "vector-queries": "ok",
+    "key-remove": "ok",
+    "whole-remove": "ok",
+    "vector-namespaces": "ok",
+    "vector-remount": "explicitly-cleared",
+    "vector-style": "explicitly-cleared",
+    "vector-to-geojson": "explicitly-cleared",
+    "geojson-to-vector": "explicitly-cleared",
+    "final-remount": "explicitly-cleared",
+    "error": "none",
+    "phase": "done",
+    "done": "1"
+  },
+  "fixtureRequests": [
+    {
+      "revision": 0,
+      "z": 11,
+      "x": 328,
+      "y": 715
+    },
+    {
+      "revision": 0,
+      "z": 11,
+      "x": 327,
+      "y": 715
+    },
+    {
+      "revision": 0,
+      "z": 11,
+      "x": 328,
+      "y": 714
+    },
+    {
+      "revision": 0,
+      "z": 11,
+      "x": 327,
+      "y": 714
+    },
+    {
+      "revision": 1,
+      "z": 11,
+      "x": 328,
+      "y": 715
+    },
+    {
+      "revision": 1,
+      "z": 11,
+      "x": 327,
+      "y": 715
+    },
+    {
+      "revision": 1,
+      "z": 11,
+      "x": 328,
+      "y": 714
+    },
+    {
+      "revision": 1,
+      "z": 11,
+      "x": 327,
+      "y": 714
+    },
+    {
+      "revision": 3,
+      "z": 11,
+      "x": 328,
+      "y": 715
+    },
+    {
+      "revision": 3,
+      "z": 11,
+      "x": 327,
+      "y": 715
+    },
+    {
+      "revision": 3,
+      "z": 11,
+      "x": 328,
+      "y": 714
+    },
+    {
+      "revision": 3,
+      "z": 11,
+      "x": 327,
+      "y": 714
+    },
+    {
+      "revision": 4,
+      "z": 11,
+      "x": 328,
+      "y": 715
+    },
+    {
+      "revision": 4,
+      "z": 11,
+      "x": 327,
+      "y": 715
+    },
+    {
+      "revision": 4,
+      "z": 11,
+      "x": 328,
+      "y": 714
+    },
+    {
+      "revision": 4,
+      "z": 11,
+      "x": 327,
+      "y": 714
+    }
+  ],
+  "interpretation": "The scene explicitly clears destination state at each listed transition; this does not establish automatic library clearing.",
+  "firstFailure": null,
+  "notRun": [],
+  "cleanup": {
+    "ownedServicePortsFree": true,
+    "ownedSimulatorShutdown": true,
+    "otherResourcesChanged": false
+  },
+  "limitations": [
+    "No separate native SDK queries beyond MapboxCoreMaps metadata from the produced and installed apps."
+  ],
+  "coordinatorReview": {
+    "outcome": "Passed the approved real Mapbox iOS lifetime check, all required status fields and produced-versus-installed code identity checks against unchanged f05.",
+    "independentFilesystemVerification": "After simulator shutdown, coordinator independently located produced app in the deterministic build directory and single installed app in the assigned simulator data directory. Validated app metadata, loader/debug-library hashes and embedded framework metadata without simulator commands or another build.",
+    "appCodeReceipts": {
+      "OneMapMapbox": {
+        "producedSha256": "0c9a3e12e992a4c1453fe3f3863a2d1f053070805998456fca952862dfadea1a",
+        "installedSha256": "0c9a3e12e992a4c1453fe3f3863a2d1f053070805998456fca952862dfadea1a",
+        "match": true
+      },
+      "OneMapMapbox.debug.dylib": {
+        "producedSha256": "8a2b90908426c768fc1c04cc2fc8404ed99b6380b17ae82fd38ae20417dc9525",
+        "installedSha256": "8a2b90908426c768fc1c04cc2fc8404ed99b6380b17ae82fd38ae20417dc9525",
+        "match": true
+      }
+    },
+    "MapboxCoreMapsVersion": {
+      "produced": "11.23.1",
+      "installed": "11.23.1"
+    },
+    "fixtureRevisions": [
+      0,
+      1,
+      3,
+      4
+    ],
+    "meaning": "Source queries, state removal/namespaces and explicitly cleared/reapplied source/style/family transitions passed. No automatic library state clearing guarantee inferred.",
+    "cleanup": "Worker reports all owned service ports released and shutdown of only the simulator successfully booted by this attempt. No unrelated resources changed.",
+    "scopeLimit": "MapLibre iOS lifetime scene and broader native acceptance remain unverified. Code hashes and recorded framework metadata do not establish full bundle certification."
+  }
+}
