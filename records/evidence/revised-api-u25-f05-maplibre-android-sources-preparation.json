@@ -1,0 +1,188 @@
+{
+  "checkpoint": "f05 single MapLibre Android TF05 sources preparation",
+  "status": "implemented-routinely-verified-independently-audited-and-harness-frozen-awaiting-execution-approval",
+  "reviewCheckout": "/private/tmp/one-map-android-restoration-review",
+  "reviewBase": "93c6e0ff83377ec4e4f06d4cd83b4828d1b6122a",
+  "branch": "codex/u25-maplibre-android-sources",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "retainedApk": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+    "provenance": "revised-api-u25-f05-maplibre-android-queries-attempt-05.json; coordinator independently verified retained bytes and absence of bundled index.android.bundle",
+    "reuse": "Exact retained Debug Metro APK; checked adb install -r -t, no fresh native build claim. TF05 scene is supplied by reset Metro."
+  },
+  "scope": {
+    "changed": [
+      "scripts/tf05-sources-smoke.mjs",
+      "scripts/tf05-sources-runner.test.mjs",
+      "docs/revised-api-acceptance-plan.md",
+      "records/README.md",
+      "this evidence record"
+    ],
+    "unchanged": [
+      "Library/package/archive",
+      "Source and image fixture/hook behavior",
+      "Native code",
+      "Peers, patches, versions, locks",
+      "Existing generated consumer and caches"
+    ],
+    "nativeExecution": "not run; preparation does not authorize any renderer, emulator, Metro, build, installation or retry"
+  },
+  "repair": [
+    "Parse optional android mapbox/maplibre selector, reject unsupported or surplus arguments; require assigned ANDROID_SERIAL before fixture/process acquisition.",
+    "Narrow optional TF05_ANDROID_BINARY_SHA256 requires exactly one Android engine and lowercase SHA-256; hash only the selected-shell output APK with Node before fixture/process acquisition. No caller-controlled APK path.",
+    "Reuse branch installs verified retained APK with checked adb install -r -t and skips build and bundle removal; default branch retains build with explicit --device and --active-arch-only.",
+    "Android fixture binds loopback8798; Metro injects TF05_BASE=http://127.0.0.1:8798 and app debug host localhost:8081. Worker owns reverses8081/8798. No LAN discovery or permission-click automation.",
+    "After installation/configuration, validate API level and grant ACCESS_LOCAL_NETWORK for API37+ before final launch; preserve API36 and propagate getprop/grant/status errors.",
+    "Require Dev server ready; track Metro spawn/exit failures during readiness and status polling; own detached Metro group and force-stop only selected app during cleanup, then verify Metro port release.",
+    "Use existing TF06 command group cleanup/error handling and refuse unknown8081 listeners without killing them; fixture bind errors propagate; selected Android failure stops later engine execution.",
+    "Require all terminal TF05 fields including note=none and phase=done; preserve web sources/corrections selectors and legacy iOS command shape. iOS is outside approval scope and remains unverified."
+  ],
+  "sourceAudit": {
+    "callers": "main -> fixture acquisition -> selected runNative -> Metro/readiness -> install-or-build -> debug host/API grant/final launch -> status judge -> nested app/Metro cleanup -> fixture close. Read selected native screen, SourcesMap, sources-smoke hook, base inlining and wrapper environment.",
+    "resourceFailures": "Bad args/serial/digest precede acquisition. Fixture bind rejects. Busy Metro refuses without termination; main closes fixture. Metro readiness/status failures enter selected cleanup. Failed cleanup still attempts Metro stop and bounded port observation. Worker retains emulator/reverse ownership and cleans on first failure.",
+    "coverage": {
+      "families": [
+        "vector",
+        "raster",
+        "image",
+        "GeoJSON (two sources)"
+      ],
+      "layers": [
+        "fill",
+        "raster",
+        "line",
+        "circle",
+        "symbol"
+      ],
+      "images": "One registered marker, absent during style handoff and re-registered after style-load.",
+      "mutations": [
+        "Remove line-color paint key",
+        "Update GeoJSON route data",
+        "Replace same-map style",
+        "Remove transient vector and image sources"
+      ],
+      "observations": "Load/style-load callbacks, settle timers, status transitions and error events. No visual-pixel or image readback assertion. Empty vector tile fixture is not vector-content visibility proof."
+    },
+    "remaining": [
+      "Raster-dem and hillshade",
+      "Heatmap and fill-extrusion",
+      "Exhaustive retained source/layer/image contract",
+      "Independent Android linked SDK identity",
+      "Other native engines/platforms and all unrelated UI/interaction/rendering scopes"
+    ],
+    "judge": "Hook note is none except phase-timeout; require note=none and phase=done to reject timed-out/nonterminal status. Each field mutation is mocked-regression tested."
+  },
+  "regression": {
+    "before": "New test against HEAD driver in temporary directory failed at supported android maplibre selection: The corrections scope requires: web corrections. Temporary comparison files removed. Earlier initial test failed locating absent grant helper; behavioral configuration regression then moved before helper checks.",
+    "after": "node scripts/tf05-sources-runner.test.mjs passed after repair and final format. VM uses actual driver sections with mocked boundaries; no host/native tool executed by this regression.",
+    "cases": [
+      "Selected Android args and bad/surplus args",
+      "Missing serial before acquisition",
+      "Known SHA, mismatch, invalid SHA, wrong platform and multi-engine reuse rejected before acquisition",
+      "Reuse installs exact APK and skips build; install failure propagates",
+      "Default build serial/active ABI",
+      "API36/37/38 grant and final-launch order",
+      "Invalid API/getprop/grant/build/status failures",
+      "Strict readiness and Metro spawn/exit/timeout/post-readiness failures",
+      "App cleanup failure still stops owned Metro and observes port release",
+      "Command timeout/nonzero/spawn failures stop owned group",
+      "Unknown listener refusal and lsof failures",
+      "Status read log/UI/error paths",
+      "Stop first Android failure and close fixture",
+      "Fixture loopback bind failure propagation",
+      "Every terminal field required by judge"
+    ]
+  },
+  "routineChecks": [
+    {
+      "command": "node scripts/tf05-sources-runner.test.mjs",
+      "result": "passed"
+    },
+    {
+      "command": "node --check scripts/tf05-sources-smoke.mjs",
+      "result": "passed"
+    },
+    {
+      "command": "vp fmt --check scripts/tf05-sources-smoke.mjs scripts/tf05-sources-runner.test.mjs",
+      "result": "passed"
+    },
+    {
+      "command": "vp test run packages/one-map-react/test/maplibre-web.web.test.tsx packages/one-map-react/test/mapbox-web.web.test.tsx -t SourcesMap|image",
+      "result": "158 passed, 104 skipped by explicit filter; two files passed; mocked tests only"
+    },
+    {
+      "command": "node examples/inline-smoke-target.test.mjs",
+      "result": "passed 11 native Babel selector cases and existing TF06 fixture base case; this does not add TF05 base coverage"
+    },
+    {
+      "command": "node scripts/native-smoke-process.test.mjs",
+      "result": "Initial sandbox attempt failed EPERM spawning ps; coordinator separately reran with scoped host access and reported PASS detached web ownership, live/exited leaders, inherited pipes, unrelated survival and idempotence; no renderer/native tools."
+    },
+    {
+      "command": "node scripts/check-docs.mjs",
+      "result": "passed 40 Markdown files and 39 SDK comparison tables; structure and links only"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "routineTooling": "Authorized temporary review node_modules symlink to existing primary dependencies used only for scoped formatter/mocked tests, removed in finally. No install, lock change or primary code/Git mutation. Initial formatter failed loading absent review vite-plus before symlink setup; corrected scoped invocation passed.",
+  "proposedExecution": {
+    "owner": "One gpt-6-luna worker, medium reasoning; coordinator source audit/freeze/diagnosis/result review",
+    "attemptRoot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-sources-attempt-01",
+    "plan": "docs/revised-api-acceptance-plan.md#proposed-single-maplibre-android-source-scene",
+    "spaceGateBytes": 8804682957,
+    "runtimeAndCleanupLimitSeconds": 1800,
+    "bootLimitSeconds": 180,
+    "statusLimitSeconds": 240,
+    "defaultBuildLimitSeconds": 600,
+    "nativeBuild": "excluded from proposed reuse attempt",
+    "requiredFields": {
+      "mounted": "1",
+      "reset": "ok",
+      "data": "updated",
+      "style": "rebuilt",
+      "removed": "clean",
+      "error": "none",
+      "note": "none",
+      "phase": "done",
+      "done": "1"
+    },
+    "identity": "Runner exit0, exactly one passed maplibre-android result; installed sole base.apk SHA equals retained APK and approved digest; unchanged archive and frozen inputs; record cleanup. Configured SDK13.6.1 does not establish independently linked SDK identity.",
+    "cleanup": "Close fixture, selected app force-stop, owned Metro groups and port release; worker removes only acquired8081/8798 reverses, emulator, private AVD and pulled APK duplicate. No Gradle tasks expected; stop only an unexpectedly acquired isolated daemon. Preserve shared adb, unknown resources, retained caches and APK.",
+    "installLimitSeconds": 120,
+    "expectedMinutes": "5-15"
+  },
+  "sourceHashes": {
+    "scripts/tf05-sources-smoke.mjs": "2c9d8a70b23046e2d8cad11ae7eac9e70ded5c562926d193d3103f2fa772cad5",
+    "scripts/tf05-sources-runner.test.mjs": "dca818a01f485e1bf1e411a5eb56dd3f6e4c567a319dd257bb79cf9f8d6b7d48"
+  },
+  "verificationGates": [
+    "Separate explicit owner permission for this exact retained APK/scenario/environment/command attempt",
+    "Actual space/resource/frozen-input preflight",
+    "Renderer execution and result/installed identity/cleanup audit"
+  ],
+  "coordinatorAudit": {
+    "status": "passed-bounded-harness-only-scope",
+    "reviewed": "Actual caller flow, early validation/APK trust boundary, selected Android startup/status/failures, nested cleanup, fixture bind and occupied-port controls; source/map/hook observations and their limits. No production, fixture or peer changes.",
+    "checks": [
+      "Pinned Node TF05 runner + existingTF06runner/selection mocks passed together (3tests)",
+      "Pinned Bun1.4.1 TF05 runner mocks passed; Bun warns moduleSuffixes unsupported in review tsconfig, irrelevant to actual JS VM mocks and installed Babel selection proof",
+      "Existing owned-process cleanup routine passed with scoped hostaccess and tiny local Node children only",
+      "Installed MapLibre Babel proves tf05 selection, loopbackTF05_BASE and actual App/source screen/map/hook transforms; no native modules executed",
+      "Independently verified retained APK SHA and absence of embedded assets/index.android.bundle",
+      "All436baseline files unchanged; only audited TF05driver synchronized; baseline plus runner/APK identities frozen"
+    ],
+    "harnessFreeze": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-sources-freeze.json",
+    "freezeScope": "Existing436-file baseline plus exact reviewed runner and retainedAPK (438files)",
+    "scopeLimits": [
+      "No native acceptance run, emulator, Metro server or installation during preparation",
+      "Only one MapLibre Android TF05scene proposed; default build and iOS paths are not approved",
+      "Four source families/five layer types and status/error lifecycle checks; no pixelreadback or exhaustive contract claim",
+      "Android linked SDK identity remains unverified"
+    ],
+    "corrections": "Replaced unnecessary proposed rebuild with narrow verified retainedAPK reuse. The approved command must bind its SHA explicitly; no fallback build is authorized."
+  }
+}

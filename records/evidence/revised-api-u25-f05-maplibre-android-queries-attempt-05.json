@@ -1,0 +1,123 @@
+{
+  "checkpoint": "f05 MapLibre Android ordinary query-and-cluster attempt05",
+  "status": "passed-within-approved-scene-and-APK-identity-scope",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "worker": "Same gpt-6-luna medium maplibre_android_queries_run",
+  "spaceBeforeDispatchGiB": 12.739,
+  "ownerAction": "Owner reported freeing additional space; coordinator verified threshold before dispatch. No further deletion was performed to obtain space.",
+  "workerReceipt": {
+    "status": "passed",
+    "completedAt": "2026-10-30T02:54:00.014737+00:00",
+    "candidate": "f05 unchanged",
+    "preflight": {
+      "lsof5580_5581_8081": {
+        "exitCode": 1,
+        "output": "empty"
+      },
+      "adb_devices_l": {
+        "exitCode": 0,
+        "output": "no devices"
+      }
+    },
+    "avd": {
+      "createExit": 0,
+      "name": "OneMapU25F05"
+    },
+    "emulator": {
+      "launchExit": 0,
+      "pid": 82687,
+      "pgid": 82687,
+      "log": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-05/emulator.log",
+      "bootPollExit": 0
+    },
+    "reverse": {
+      "listExit": 0,
+      "before": "empty",
+      "acquireExit": 0,
+      "removeExit": 0
+    },
+    "scene": {
+      "command": "bun /Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf06-queries-smoke.mjs android queries maplibre",
+      "exitCode": 0,
+      "fields": {
+        "loaded": "1",
+        "point": "ok",
+        "bounds": "ok",
+        "viewport": "ok",
+        "empty": "ok",
+        "source": "ok",
+        "cluster-zoom": "ok",
+        "leaves": "ok",
+        "children": "ok",
+        "set-state": "ok",
+        "get-state": "ok",
+        "remove-state": "ok",
+        "filters": "ok",
+        "pagination": "ok",
+        "whole-state": "ok",
+        "recreated-state": "explicitly-cleared",
+        "cleared-state": "explicitly-cleared",
+        "error": "none",
+        "note": "none",
+        "phase": "done",
+        "done": "1"
+      }
+    },
+    "apk": {
+      "pmPathExit": 0,
+      "packagePath": "/data/app/~~d6c5nFLl2IIGTVDa1BsueQ==/com.onemapmaplibre-hTayGzuF2z3abi_y4lXzoQ==/base.apk",
+      "pullExit": 0,
+      "produced": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+      "installed": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-05/installed-base.apk",
+      "sha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+      "equal": true
+    },
+    "frozenInputs": {
+      "checked": 436,
+      "mismatches": 0
+    },
+    "sdk": {
+      "configured": "org.maplibre.gl:android-sdk-opengl:13.6.1",
+      "linkedIdentity": "unverified"
+    },
+    "cleanup": {
+      "forceStopExit": 0,
+      "gradleStopExit": 0,
+      "emulatorKillExit": 0,
+      "ownedPidExited": true,
+      "portsReleased": true,
+      "avdDirectoryRemoval": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-avd/OneMapU25F05.avd",
+        "exitCode": 0
+      },
+      "avdIniRemoval": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-avd/OneMapU25F05.ini",
+        "exitCode": 0
+      },
+      "pulledDuplicateRemoval": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-05/installed-base.apk",
+        "exitCode": 0
+      }
+    },
+    "acquired": [
+      "OneMapU25F05 AVD/emulator",
+      "com.onemapmaplibre app",
+      "adb reverse tcp:8081",
+      "task-isolated Gradle daemon"
+    ]
+  },
+  "coordinatorAudit": {
+    "runtime": "All required TF06 fields and runner exit0 passed. One selected MapLibre Android scene only.",
+    "apk": "Fresh produced and exact target installed base.apk SHA match; coordinator independently rehashed preserved producedAPK.",
+    "frozenInputs": "All436frozenfile hashes independently verified unchanged after run.",
+    "cleanup": "Assigned ports empty on independent lsof check. Worker stopped app/reverse/emulator/isolatedGradle. Coordinator initially found private AVD files still present; requested completion of owned cleanup only. Worker removed exactly those two paths; coordinator verified AVD metadata/directory and pulled duplicate absent.",
+    "sdk": "Configured org.maplibre.gl:android-sdk-opengl:13.6.1; independently linked identity unverified. No extra dependency resolution/build."
+  },
+  "history": "Prior failed/blocked attempts01-04 remain unchanged; this approved attempt05 does not erase their outcomes.",
+  "scopeLimitations": [
+    "Cluster checks cover known feature IDs, finite expansion zoom, unique leaves, consistent pagination and nonempty children, not exhaustive ordering.",
+    "Application-owned explicit feature-state clears do not establish automatic library clearing.",
+    "Independent Android linked SDK identity and broader native acceptance remain open."
+  ],
+  "acceptanceProgress": "Allfour native ordinary query/cluster environments now have passing scoped scene and produced/installed app identity outcomes on unchanged f05."
+}

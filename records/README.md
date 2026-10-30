@@ -1,5 +1,7 @@
 # API research and evidence
 
+The [MapLibre Android source-scene preparation](evidence/revised-api-u25-f05-maplibre-android-sources-preparation.json) records the selected TF05 driver repair, retained APK reuse proposal, bounded routine checks and open renderer gate. The [sole acceptance plan](../docs/revised-api-acceptance-plan.md#proposed-single-maplibre-android-source-scene) owns the proposed single attempt; it requires separate explicit execution approval.
+
 The [current handoff and task list](../docs/revised-api-acceptance-plan.md#current-handoff) own acceptance status and the next request. The f05 browser rows and four minimal native checks passed. Lifetimes passed on both Android engines and Mapbox iOS; [the latest iOS result](evidence/revised-api-u25-f05-mapbox-ios-lifetimes-attempt-01.json) records its actual scope. The [MapLibre iOS preparation](evidence/revised-api-u25-f05-maplibre-ios-lifetimes-preparation.json) records the wrapper, routine checks and proposed fresh-build route; execution approval and broader native acceptance remain open. Earlier checkpoint summaries below preserve their historical verification limits.
 
 The [PR19 acceptance impact](evidence/pr19-acceptance-impact.json) records the refreshed f05 archive and prepared nine-row browser packet. Historical f04 browser passes remain separate; native f04 consumers and freezes are superseded pending recreation. The [sole acceptance proposal](../docs/revised-api-acceptance-plan.md) owns the next permission request.

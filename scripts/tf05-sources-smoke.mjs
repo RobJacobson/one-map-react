@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -11,16 +12,79 @@ const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
 const group = process.argv[2] ?? "web";
-const corrections = process.argv[3] === "corrections";
-if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
-  throw new Error("The corrections scope requires: web corrections.");
-}
+const selection = process.argv[3];
+const corrections = selection === "corrections";
+if (!["web", "android", "ios", "all"].includes(group))
+  throw new Error("Use web, android, ios, or all.");
+if (
+  process.argv.length > 4 ||
+  (selection !== undefined &&
+    !(group === "web" && corrections) &&
+    !(group === "android" && ["mapbox", "maplibre"].includes(selection)))
+)
+  throw new Error("Use web corrections or android [mapbox|maplibre] scope.");
+const nativeEngines =
+  group === "android" && selection ? [selection] : ["mapbox", "maplibre"];
+if (
+  (group === "android" || group === "all") &&
+  !process.env.ANDROID_SERIAL?.trim()
+)
+  throw new Error("ANDROID_SERIAL must identify the assigned emulator.");
+const androidArgs = [
+  "run",
+  "android",
+  "--",
+  "--no-packager",
+  "--device",
+  process.env.ANDROID_SERIAL,
+  "--active-arch-only",
+];
 const webScenario = corrections ? "corrections" : "sources";
+const androidBinaryDigest = process.env.TF05_ANDROID_BINARY_SHA256;
+if (
+  androidBinaryDigest !== undefined &&
+  (group !== "android" ||
+    nativeEngines.length !== 1 ||
+    !/^[a-f0-9]{64}$/.test(androidBinaryDigest))
+)
+  throw new Error(
+    "Verified APK reuse requires one Android engine and a lowercase SHA-256 digest."
+  );
+const androidBinaryPath =
+  androidBinaryDigest !== undefined
+    ? join(
+        root,
+        "examples",
+        `native-${nativeEngines[0]}`,
+        "android/app/build/outputs/apk/debug/app-debug.apk"
+      )
+    : undefined;
+if (
+  androidBinaryDigest !== undefined &&
+  createHash("sha256").update(readFileSync(androidBinaryPath)).digest("hex") !==
+    androidBinaryDigest
+)
+  throw new Error("Retained APK digest does not match the approved binary.");
 
-if (!["web", "android", "ios", "all"].includes(group)) {
-  console.error("Use web, android, ios, or all.");
-  process.exit(1);
-}
+/** Bound port-release observation before the next native engine starts. */
+const awaitMetroPortRelease = async () => {
+  const releasedBy = Date.now() + 5000;
+  while (true) {
+    const listeners = await command("lsof", [
+      "-nP",
+      "-iTCP:8081",
+      "-sTCP:LISTEN",
+      "-t",
+    ]).catch((error) => {
+      if (error.message === "lsof exited 1") return "";
+      throw error;
+    });
+    if (!listeners.trim()) break;
+    if (Date.now() >= releasedBy)
+      throw new Error("Owned Metro did not release port 8081.");
+    await delay(100);
+  }
+};
 
 // Runs after every helper below initializes; pngPixel reads a module-level
 // table that top-level execution would reach before its declaration.
@@ -39,16 +103,20 @@ async function main() {
     }
 
     if (group === "android" || group === "all") {
-      results["mapbox-android"] = await runNative({
-        directory: "native-mapbox",
-        platform: "android",
-        applicationId: "com.onemapmapbox",
-      });
-      results["maplibre-android"] = await runNative({
-        directory: "native-maplibre",
-        platform: "android",
-        applicationId: "com.onemapmaplibre",
-      });
+      for (const engine of nativeEngines) {
+        const key = `${engine}-android`;
+        results[key] = await runNative({
+          directory: `native-${engine}`,
+          platform: "android",
+          applicationId: `com.onemap${engine}`,
+        });
+        if (results[key].status !== "passed") {
+          console.log(JSON.stringify(results, null, 2));
+          throw new Error(
+            `${engine} android smoke failed; no later engine was started.`
+          );
+        }
+      }
     }
 
     if (group === "ios" || group === "all") {
@@ -191,16 +259,6 @@ async function removeAndroidBundle(shell) {
   ]);
 }
 
-async function lanAddress() {
-  const address = (await command("ipconfig", ["getifaddr", "en0"])).trim();
-
-  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) {
-    throw new Error("en0 has no IPv4 address");
-  }
-
-  return address;
-}
-
 async function writeDebugHost(applicationId, host) {
   const prefs = `shared_prefs/${applicationId}_preferences.xml`;
   const remote = `run-as ${applicationId} sh -c 'cat > ${prefs}'`;
@@ -221,7 +279,10 @@ async function writeDebugHost(applicationId, host) {
     applicationId,
     "cat",
     prefs,
-  ]).catch(() => "");
+  ]).catch((error) => {
+    if (/No such file or directory/.test(error.message)) return "";
+    throw error;
+  });
 
   await command("adb", ["shell", remote], {
     input: debugHostPreference(existing, host),
@@ -251,6 +312,27 @@ function debugHostPreference(existing, host) {
   ].join("\n");
 }
 
+async function grantAndroidTransportPermission(applicationId) {
+  const sdk = Number(
+    await command("adb", ["shell", "getprop", "ro.build.version.sdk"])
+  );
+
+  if (!Number.isInteger(sdk) || sdk <= 0) {
+    throw new Error("Invalid Android API level.");
+  }
+
+  // React Native gates loadApp on this grant even when Metro uses adb reverse.
+  if (sdk >= 37) {
+    await command("adb", [
+      "shell",
+      "pm",
+      "grant",
+      applicationId,
+      "android.permission.ACCESS_LOCAL_NETWORK",
+    ]);
+  }
+}
+
 async function startAndroidApp(applicationId) {
   await command("adb", [
     "shell",
@@ -261,70 +343,16 @@ async function startAndroidApp(applicationId) {
   ]);
 }
 
-async function allowNearbyDevices() {
-  const started = Date.now();
-
-  while (Date.now() - started < 8000) {
-    await command("adb", [
-      "shell",
-      "uiautomator",
-      "dump",
-      "/sdcard/ui.xml",
-    ]).catch(() => "");
-    const xml = await command("adb", [
-      "exec-out",
-      "cat",
-      "/sdcard/ui.xml",
-    ]).catch(() => "");
-    const point = /nearby devices/i.test(xml) ? allowButtonPoint(xml) : null;
-
-    if (point) {
-      await command("adb", [
-        "shell",
-        "input",
-        "tap",
-        String(point.x),
-        String(point.y),
-      ]);
-      return;
-    }
-
-    await delay(500);
-  }
-}
-
-function allowButtonPoint(xml) {
-  const nodes = xml.match(/<node\b[^>]*>/g) ?? [];
-  const allow = nodes.find((node) => node.includes('text="Allow"'));
-  const bounds = allow?.match(/bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/);
-
-  if (!bounds) {
-    return null;
-  }
-
-  return {
-    x: Math.round((Number(bounds[1]) + Number(bounds[3])) / 2),
-    y: Math.round((Number(bounds[2]) + Number(bounds[4])) / 2),
-  };
-}
-
 async function readAndroidStatus() {
-  const log = await command("adb", ["logcat", "-d"], {}, 20000).catch(() => "");
+  const log = await command("adb", ["logcat", "-d"], {}, 20000);
   const fromLog = latestStatus(log);
 
   if (fromLog) {
     return fromLog;
   }
 
-  await command("adb", [
-    "shell",
-    "uiautomator",
-    "dump",
-    "/sdcard/ui.xml",
-  ]).catch(() => "");
-  const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]).catch(
-    () => ""
-  );
+  await command("adb", ["shell", "uiautomator", "dump", "/sdcard/ui.xml"]);
+  const xml = await command("adb", ["exec-out", "cat", "/sdcard/ui.xml"]);
 
   return latestStatus(xml.replaceAll("&#10;", " "));
 }
@@ -372,16 +400,13 @@ function openStatusPort() {
 async function runNative({ directory, platform, applicationId }) {
   const shell = join(root, "examples", directory);
 
+  if (platform === "android" && !process.env.ANDROID_SERIAL?.trim())
+    throw new Error("ANDROID_SERIAL must identify the assigned emulator.");
   await freePort(8081);
 
   let metroLog = "";
   const metroArgs = ["run", "start", "--", "--port", "8081", "--reset-cache"];
-  // MapLibre Android's HTTP stack times out on the emulator's 10.0.2.2
-  // alias; the host LAN address reaches the fixture server on 0.0.0.0.
-  const fixtureBase =
-    platform === "android"
-      ? `http://${await lanAddress()}:8798`
-      : "http://127.0.0.1:8798";
+  const fixtureBase = "http://127.0.0.1:8798";
   const metroEnv = {
     ...process.env,
     ONE_MAP_SMOKE: "tf05",
@@ -395,43 +420,68 @@ async function runNative({ directory, platform, applicationId }) {
   const metro = spawn("bun", metroArgs, {
     cwd: shell,
     env: metroEnv,
+    detached: true,
     stdio: ["ignore", "pipe", "pipe"],
   });
   const record = (chunk) => {
     metroLog += chunk.toString();
   };
 
+  let metroFailure;
+  metro.on("error", (error) => {
+    metroFailure = error;
+  });
+  metro.on("exit", (code) => {
+    metroFailure = new Error(`Metro exited ${code}`);
+  });
   metro.stdout.on("data", record);
   metro.stderr.on("data", record);
 
-  const statusPort = platform === "ios" ? await openStatusPort() : null;
+  let statusPort = null;
   let build = Promise.resolve();
 
   try {
+    if (platform === "ios") statusPort = await openStatusPort();
     await waitFor(
-      () => metroLog.includes("Dev server ready") || metroLog.includes("8081"),
+      () => {
+        if (metroFailure) throw metroFailure;
+        return metroLog.includes("Dev server ready");
+      },
       60000,
       "Metro"
     );
 
     if (platform === "android") {
-      await removeAndroidBundle(shell);
-      await command(
-        "bun",
-        ["run", "android", "--", "--no-packager"],
-        { cwd: shell, env: metroEnv },
-        600000
-      );
-      const address = await lanAddress();
+      if (androidBinaryDigest) {
+        await command("adb", ["install", "-r", "-t", androidBinaryPath]);
+      } else {
+        await removeAndroidBundle(shell);
+        await command(
+          "bun",
+          androidArgs,
+          { cwd: shell, env: metroEnv },
+          600000
+        );
+      }
 
-      await writeDebugHost(applicationId, `${address}:8081`);
+      await writeDebugHost(applicationId, "localhost:8081");
       await command("adb", ["logcat", "-c"]);
+      await grantAndroidTransportPermission(applicationId);
       await startAndroidApp(applicationId);
-      await allowNearbyDevices();
 
-      const status = await watchNative({ readStatus: readAndroidStatus });
+      const status = await watchNative({
+        readStatus: () => {
+          if (metroFailure) throw metroFailure;
+          return readAndroidStatus();
+        },
+      });
 
-      return judge(status);
+      return {
+        ...judge(status),
+        ...(androidBinaryDigest
+          ? { reusedNativeBuild: true, retainedApkSha256: androidBinaryDigest }
+          : {}),
+      };
     }
 
     build = command(
@@ -474,8 +524,20 @@ async function runNative({ directory, platform, applicationId }) {
       ]).catch(() => undefined);
     }
 
-    await statusPort?.close();
-    metro.kill("SIGTERM");
+    try {
+      if (platform === "android")
+        await command("adb", ["shell", "am", "force-stop", applicationId]);
+    } finally {
+      try {
+        await statusPort?.close();
+      } finally {
+        try {
+          await stopOwnedProcess(metro);
+        } finally {
+          await awaitMetroPortRelease();
+        }
+      }
+    }
   }
 }
 
@@ -537,6 +599,8 @@ function judge(status) {
     fields.style === "rebuilt" &&
     fields.removed === "clean" &&
     fields.error === "none" &&
+    fields.note === "none" &&
+    fields.phase === "done" &&
     fields.done === "1";
 
   return { status: passed ? "passed" : "failed", line: status, fields };
@@ -592,8 +656,7 @@ function protoLength(field, payload) {
 const emptyVectorTile = encodeEmptyVectorTile("land", 4096, 2);
 
 // The scenario loads real images and tiles so renderers draw the sources.
-// TileJSON URLs echo the request Host, so the Android LAN address and the
-// loopback addresses all receive reachable tile URLs.
+// TileJSON URLs echo the request Host so each client receives reachable URLs.
 async function startFixtureServer() {
   const pixel = pngPixel([220, 38, 38, 255]);
   let holdResources = false;
@@ -728,7 +791,7 @@ async function startFixtureServer() {
 
   await new Promise((resolve, reject) => {
     server.once("error", reject);
-    server.listen(8798, "0.0.0.0", resolve);
+    server.listen(8798, group === "android" ? "127.0.0.1" : "0.0.0.0", resolve);
   });
 
   return {
@@ -879,55 +942,54 @@ function command(file, args, options = {}, timeout = 120000) {
     const child = spawn(file, args, {
       cwd: options.cwd,
       env: options.env,
+      signal: options.signal,
+      detached: true,
       stdio: [options.input === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
-
-    if (options.input !== undefined) {
-      child.stdin.end(options.input);
-    }
+    if (options.input !== undefined) child.stdin.end(options.input);
     let output = "";
+    let stopping = false;
+    const stop = async (error) => {
+      if (stopping) return;
+      stopping = true;
+      clearTimeout(timer);
+      try {
+        await stopOwnedProcess(child);
+        reject(error);
+      } catch (cleanupError) {
+        reject(cleanupError);
+      }
+    };
     const timer = setTimeout(() => {
-      child.kill("SIGTERM");
-      reject(new Error(`${file} timed out`));
+      void stop(new Error(`${file} timed out`));
     }, timeout);
-
     child.stdout.on("data", (chunk) => {
       output += chunk.toString();
     });
     child.stderr.on("data", (chunk) => {
       output += chunk.toString();
     });
-    child.on("error", reject);
+    child.on("error", (error) => {
+      void stop(error);
+    });
     child.on("close", (code) => {
       clearTimeout(timer);
-
-      if (code === 0) {
-        resolve(output);
-        return;
-      }
-
-      reject(new Error(output.slice(-2000) || `${file} exited ${code}`));
+      if (stopping) return;
+      if (code === 0) resolve(output);
+      else
+        void stop(new Error(output.slice(-2000) || `${file} exited ${code}`));
     });
   });
 }
 
 async function freePort(port) {
-  const listed = await command("lsof", [
-    "-nP",
-    `-iTCP:${port}`,
-    "-sTCP:LISTEN",
-    "-t",
-  ]).catch(() => "");
-
-  for (const pid of listed.split("\n").filter(Boolean)) {
-    try {
-      process.kill(Number(pid), "SIGTERM");
-    } catch {
-      // The process can exit between the listing and the signal.
-    }
+  try {
+    await command("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"]);
+  } catch (error) {
+    if (error.message === "lsof exited 1") return;
+    throw error;
   }
-
-  await delay(500);
+  throw new Error(`Port ${port} is occupied; no listener was terminated.`);
 }
 
 const runWebCorrections = async (page) => {
