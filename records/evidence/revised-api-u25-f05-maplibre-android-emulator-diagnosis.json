@@ -1,0 +1,80 @@
+{
+  "checkpoint": "PR64 MapLibre Android ordinary queries, emulator retry03 diagnosis",
+  "status": "read-only-diagnosis-complete-repair-and-retry-proposed-unapproved",
+  "scope": "Saved log, helper/image metadata and targeted filesystem reads only. No live reproduction, native command, host mutation, deletion, reinstall, regeneration or build.",
+  "diagnosis": {
+    "logPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-01/emulator.log",
+    "logSha256": "a31099a9e595bddf7c4aa69b222e4620d58d872bafb4d3f6fedd1c52f692a40e",
+    "fatal": "Not enough space to create userdata partition. Available: 5548.63 MB at /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-avd/OneMapU25F05.avd, need 7372.80 MB.",
+    "conclusion": "Emulator exited during userdata allocation because free disk was below its required allocation, after the earlier compatibility disk check passed.",
+    "launcherExplanation": "launch-lifetime-emulator.py redirects both streams to exclusively created emulator.log and returns a child exit during its initial one-second window before printing a PID. The saved fatal explains exit1 with no stdout.",
+    "sizeQualification": "create-lifetime-task-avd.py requests2G, overriding the source AVD10G. Retained API37.0 GooglePlay arm64 image revision7 has data/empty_data_disk and no top-level userdata.img. The log establishes7372.80MB was required; inspected metadata does not establish the internal size-selection formula. Changing the requested partition size is not a proven workaround.",
+    "notReached": [
+      "Boot poll",
+      "Reverse mapping",
+      "Native build/install",
+      "Query scene",
+      "APK identity receipt"
+    ]
+  },
+  "diskObservation": {
+    "observedAtUtc": "2026-10-30T00:56:31Z",
+    "command": "df -k /Users/rob/code/mapbox-code/one-map-f05-android-recovery",
+    "availableKiB": 5865996,
+    "sizeCommand": "du -sk /Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/intermediates /Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/.cxx /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-gradle/caches/9.4.1/transforms",
+    "allocatedKiBByPath": {
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/intermediates": 891412,
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/.cxx": 59892,
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-gradle/caches/9.4.1/transforms": 2091576
+    },
+    "units": "df -k and du -sk counters are1024-byte KiB. EmulatorMB is preserved verbatim; arithmetic conservatively treats it asMiB. All three deletion paths were measured in one du invocation to avoid counting the same hardlink twice within that set.",
+    "estimatedReclaimKiB": 3042880,
+    "estimatedFreeAfterKiB": 8908876,
+    "conservativeRequiredKiB": 7549747.2,
+    "estimatedHeadroomKiB": 1359128.8,
+    "qualification": "Estimated reclaim is not guaranteed on APFS/shared files or against concurrent disk use. Recheck actual free space after approved cleanup. Shared React/Hermes transforms may regrow; native build demand is unmeasured."
+  },
+  "proposedRepair": {
+    "authorization": "Explicit owner approval required before any cleanup or native retry.",
+    "deleteOnly": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/intermediates",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/.cxx",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-gradle/caches/9.4.1/transforms"
+    ],
+    "preserve": "Mapbox produced APK and outputs; current MapLibre consumer/dependencies/generated project; source/locks/patches/f05; task dependency downloads/modules-2 and Gradle distribution; SDK/image; user AVDs and global caches; original emulator.log and coordinator-freeze.json.",
+    "spaceGate": "Recheck actual available bytes. At least the conservative7372.80MiB logged requirement plus1GiB modest operational headroom is needed before launch. If not met, stop and report; do not expand deletion scope. This gate is not proof build space is sufficient.",
+    "precedent": "revised-api-u25-f05-mapbox-ios-lifetimes-preparation.json records retirement of completed task Android compiled transforms/generated jars/app intermediates while preserving APKs/downloads.",
+    "reason": "Completed Mapbox intermediates/.cxx alone reclaim951304KiB and leave6817300KiB, still below the logged partition requirement. Task-isolated generated transforms supply the remaining space without removing downloaded dependencies."
+  },
+  "proposedRetry": {
+    "worker": "One gpt-6-luna worker at medium reasoning, exclusive native resources; coordinator independently audits preparation and outcome.",
+    "source": "/private/tmp/one-map-android-restoration-review, PR64 head554e33d; source unchanged.",
+    "freezePath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-01/coordinator-freeze.json",
+    "freezeSha256": "2f008598b524580fa5d816f1fd5fb7678519cb2be23015b5c68bb3c0d043680d",
+    "newAttemptDirectory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-04",
+    "launcherLog": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-queries-attempt-04/emulator.log",
+    "workingDirectory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness",
+    "sceneCommand": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh bun /Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf06-queries-smoke.mjs android queries maplibre",
+    "bounds": "Estimate20-30 minutes with cache/network variance; runtime plus cleanup is bounded at1800seconds. Existing build600seconds and status240seconds remain unchanged. First failure stops; cleanup only afterward, no independent retries.",
+    "resources": "Only private OneMapU25F05, emulator5580/5581, reverse/Metro8081, com.onemapmaplibre and task-isolated Gradle/process groups. Preserve shared adb and unknown resources.",
+    "criteria": "Retain existing full TF06 ordinary-query fields and post-success absolute produced/installed APK hash comparison; recheck unchanged frozen inputs. Configured SDK13.6.1 is not independently linked identity."
+  },
+  "verification": "JSON parsed and handoff links/absolute paths reviewed; no native tests run. Runtime repair effectiveness and MapLibre query acceptance remain unverified.",
+  "coordinatorAudit": {
+    "status": "passed-within-read-only-diagnosis-and-proposal-scope",
+    "evidence": [
+      "Independently read and verified saved emulator log SHA and exact fatal allocation error",
+      "Reviewed launcher stdout/stderr redirection and early child-exit behavior",
+      "Recomputed combined du/free-space arithmetic with conservative emulator-MB units and explicit APFS/hardlink caveat",
+      "Verified all436frozen input hashes still match; exact proposed3real directories contain none of those files",
+      "Verified completed Mapbox producedAPK SHA remains ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5 and outside deletion set"
+    ],
+    "corrections": [
+      "Use one combined du invocation to avoid counting shared hardlinks twice within selected set",
+      "Do not claim shrinking AVD request solves actual allocation requirement",
+      "No generated-Gradle-jars or dependency-download deletion; only3named paths",
+      "Actual post-cleanup free-space gate required; reclaim and build headroom not guaranteed"
+    ],
+    "execution": "No repair, host mutation, emulator command, native build or test run. User approval remains required."
+  }
+}
