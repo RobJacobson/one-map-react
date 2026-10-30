@@ -1,6 +1,8 @@
 # API research and evidence
 
-The [Mapbox Android source-scene preparation](evidence/revised-api-u25-f05-mapbox-android-sources-preparation.json) records exact retained APK and package identities, installed Mapbox Babel proof, bounded mocked checks and packaged SDK metadata. The [sole proposal](../docs/revised-api-acceptance-plan.md#proposed-single-mapbox-android-source-scene) owns the next single attempt; independent coordinator audit, freeze and explicit execution approval remain required.
+The [MapLibre iOS source-scene preparation](evidence/revised-api-u25-f05-maplibre-ios-sources-preparation.json) records the selected checked-build route, retained scaffold and missing iOS locks, proposed fresh isolated Ruby/Pods restoration and bounded routine checks. The [sole proposal](../docs/revised-api-acceptance-plan.md#proposed-single-maplibre-ios-source-scene) owns restoration, coordinator audit and execution approval.
+
+The [Mapbox Android source-scene preparation](evidence/revised-api-u25-f05-mapbox-android-sources-preparation.json) owns preparation identities. The [passed continuation outcome](evidence/revised-api-u25-f05-mapbox-android-sources-attempt-02.json) closes the bounded runtime scene after the [earlier space-gate stop](evidence/revised-api-u25-f05-mapbox-android-sources-attempt-01.json); neither grants rerun permission.
 
 The [MapLibre Android source-scene preparation](evidence/revised-api-u25-f05-maplibre-android-sources-preparation.json) records the reviewed TF05 driver repair and retained APK reuse proposal. The [passed attempt01 outcome](evidence/revised-api-u25-f05-maplibre-android-sources-attempt-01.json) owns the bounded runtime result; the retained recipe grants no rerun permission.
 

@@ -1,0 +1,138 @@
+{
+  "attempt": "PR68 Mapbox Android TF05 sources, attempt 01",
+  "observedAt": "2026-10-30T04:18:08Z",
+  "result": "passed",
+  "candidate": {
+    "f05Sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "freeze": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-android-sources-freeze.json",
+    "nativeBuild": "reused; no rebuild",
+    "retainedApkSha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "installedBaseApkSha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+  },
+  "preflight": {
+    "freeSpaceBytes": 10812923904,
+    "requiredFreeSpaceBytes": 8804682957,
+    "tokenPresent": true,
+    "assignedListeners": "none (lsof exit 1)",
+    "deviceInventory": "no devices",
+    "reverseInventory": "empty"
+  },
+  "emulator": {
+    "avd": "OneMapU25F05",
+    "pid": 11968,
+    "pgid": 11968,
+    "boot": "passed"
+  },
+  "acquiredReverses": [
+    "tcp:8081",
+    "tcp:8798"
+  ],
+  "scene": {
+    "command": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh env TF05_ANDROID_BINARY_SHA256=ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5 bun /Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf05-sources-smoke.mjs android mapbox",
+    "exit": 0,
+    "passedResultCount": 1,
+    "status": "mapbox-android passed",
+    "reusedNativeBuild": true,
+    "fields": "mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1"
+  },
+  "installedIdentity": {
+    "pmPathCount": 1,
+    "baseApk": "/data/app/~~PeFG22H9C0QLcpluHaKZKw==/com.onemapmapbox-waZQtFrZ5WBJKtsa8_tRmw==/base.apk",
+    "pullExit": 0,
+    "hashCheck": "both matched approved digest"
+  },
+  "cleanup": {
+    "reverse8798": "removed",
+    "reverse8081": "removed",
+    "appForceStop": "exit 0; owned package only",
+    "emulatorKill": "exit 0",
+    "launcherPidExited": true,
+    "assignedPortsFree": true,
+    "privateAvdAndIniRemoved": true,
+    "pulledApkRemoved": true,
+    "preserved": [
+      "emulator.log",
+      "shared adb server",
+      "user devices",
+      "retained APK and caches"
+    ]
+  },
+  "failure": null,
+  "commands": [
+    {
+      "step": "fresh directory",
+      "exit": 0
+    },
+    {
+      "step": "create private AVD",
+      "exit": 0
+    },
+    {
+      "step": "launch emulator",
+      "exit": 0
+    },
+    {
+      "step": "boot poll",
+      "exit": 0
+    },
+    {
+      "step": "reverse inventory",
+      "exit": 0
+    },
+    {
+      "step": "acquire reverse 8081",
+      "exit": 0
+    },
+    {
+      "step": "acquire reverse 8798",
+      "exit": 0
+    },
+    {
+      "step": "TF05 scene",
+      "exit": 0,
+      "wallSeconds": 20.48
+    },
+    {
+      "step": "installed path",
+      "exit": 0
+    },
+    {
+      "step": "pull installed APK",
+      "exit": 0
+    },
+    {
+      "step": "hash retained and pulled APK",
+      "exit": 0
+    },
+    {
+      "step": "cleanup reverses, app, emulator",
+      "exit": 0
+    },
+    {
+      "step": "verify PID and ports released",
+      "exit": 0
+    },
+    {
+      "step": "remove private AVD and duplicate APK",
+      "exit": 0
+    }
+  ],
+  "note": "One failed process-launch attempt used a mistyped work directory during cleanup; no command ran. The exact cleanup action then succeeded. No scene retry or repair occurred.",
+  "checkpoint": "PR68 Mapbox Android source/image lifecycle approved continuation",
+  "priorStoppedPreflight": "records/evidence/revised-api-u25-f05-mapbox-android-sources-attempt-01.json",
+  "numbering": "Permanent outcome attempt02 follows the stopped coordinator preflight; native stage attempt01 was the first and only scene run.",
+  "coordinatorAudit": {
+    "result": "passed",
+    "frozenFilesVerifiedAfterCleanup": 662,
+    "mismatches": [],
+    "emulatorPidExited": true,
+    "assignedPortsFree": true,
+    "privateAvdAndIniAbsent": true,
+    "pulledDuplicateAbsent": true
+  },
+  "scopeLimits": [
+    "Bounded four-family/five-layer lifecycle/status scene only.",
+    "Pixel appearance, image readback, remaining families/layers and broader native acceptance remain unverified.",
+    "Packaged Mapbox SDK metadata is not independent linked native library or runtime certification."
+  ]
+}

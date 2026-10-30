@@ -20,16 +20,29 @@ if (
   process.argv.length > 4 ||
   (selection !== undefined &&
     !(group === "web" && corrections) &&
-    !(group === "android" && ["mapbox", "maplibre"].includes(selection)))
+    !(
+      ["android", "ios"].includes(group) &&
+      ["mapbox", "maplibre"].includes(selection)
+    ))
 )
-  throw new Error("Use web corrections or android [mapbox|maplibre] scope.");
+  throw new Error(
+    "Use web corrections or android/ios [mapbox|maplibre] scope."
+  );
 const nativeEngines =
-  group === "android" && selection ? [selection] : ["mapbox", "maplibre"];
+  ["android", "ios"].includes(group) && selection
+    ? [selection]
+    : ["mapbox", "maplibre"];
 if (
   (group === "android" || group === "all") &&
   !process.env.ANDROID_SERIAL?.trim()
 )
   throw new Error("ANDROID_SERIAL must identify the assigned emulator.");
+const iosUdid = process.env.TF05_IOS_UDID;
+if (
+  (group === "ios" || group === "all") &&
+  !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(iosUdid ?? "")
+)
+  throw new Error("TF05_IOS_UDID must identify the assigned simulator UUID.");
 const androidArgs = [
   "run",
   "android",
@@ -120,16 +133,20 @@ async function main() {
     }
 
     if (group === "ios" || group === "all") {
-      results["mapbox-ios"] = await runNative({
-        directory: "native-mapbox",
-        platform: "ios",
-        applicationId: "org.reactjs.native.example.OneMapMapbox",
-      });
-      results["maplibre-ios"] = await runNative({
-        directory: "native-maplibre",
-        platform: "ios",
-        applicationId: "org.reactjs.native.example.OneMapMaplibre",
-      });
+      for (const engine of nativeEngines) {
+        const key = `${engine}-ios`;
+        results[key] = await runNative({
+          directory: `native-${engine}`,
+          platform: "ios",
+          applicationId: `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`,
+        });
+        if (results[key].status !== "passed") {
+          console.log(JSON.stringify(results, null, 2));
+          throw new Error(
+            `${engine} ios smoke failed; no later engine was started.`
+          );
+        }
+      }
     }
   } finally {
     await fixture.close();
@@ -403,6 +420,7 @@ async function runNative({ directory, platform, applicationId }) {
   if (platform === "android" && !process.env.ANDROID_SERIAL?.trim())
     throw new Error("ANDROID_SERIAL must identify the assigned emulator.");
   await freePort(8081);
+  if (platform === "ios") await freePort(8799);
 
   let metroLog = "";
   const metroArgs = ["run", "start", "--", "--port", "8081", "--reset-cache"];
@@ -438,10 +456,13 @@ async function runNative({ directory, platform, applicationId }) {
   metro.stderr.on("data", record);
 
   let statusPort = null;
-  let build = Promise.resolve();
+  let producedAppPath;
 
   try {
-    if (platform === "ios") statusPort = await openStatusPort();
+    if (platform === "ios") {
+      await terminateIosApp(applicationId);
+      statusPort = await openStatusPort();
+    }
     await waitFor(
       () => {
         if (metroFailure) throw metroFailure;
@@ -484,28 +505,48 @@ async function runNative({ directory, platform, applicationId }) {
       };
     }
 
-    build = command(
-      "bun",
+    const scheme =
+      directory === "native-mapbox" ? "OneMapMapbox" : "OneMapMaplibre";
+    const buildFolder =
+      process.env.TF05_IOS_BUILD_FOLDER ?? join(shell, "ios", "build");
+    producedAppPath = join(
+      buildFolder,
+      "Build",
+      "Products",
+      "Debug-iphonesimulator",
+      `${scheme}.app`
+    );
+    // The pinned run-ios CLI ignores install failures and drops its build-folder override on lookup.
+    await command(
+      "xcodebuild",
       [
-        "run",
-        "ios",
-        "--",
-        "--no-packager",
-        "--port",
-        "8081",
-        "--simulator",
-        "iPhone 18 Pro",
+        "-workspace",
+        join(shell, "ios", `${scheme}.xcworkspace`),
+        "-scheme",
+        scheme,
+        "-configuration",
+        "Debug",
+        "-destination",
+        `id=${iosUdid}`,
+        "-derivedDataPath",
+        buildFolder,
+        "build",
       ],
       { cwd: shell, env: metroEnv },
       600000
     );
+    await command("xcrun", ["simctl", "install", iosUdid, producedAppPath]);
+    await command("xcrun", ["simctl", "launch", iosUdid, applicationId]);
 
     const status = await watchNative({
-      readStatus: () => statusPort.read(),
+      readStatus: () => {
+        if (metroFailure) throw metroFailure;
+        return statusPort.read();
+      },
       timeout: 600000,
     });
 
-    return judge(status);
+    return { ...judge(status), producedAppPath };
   } catch (error) {
     return {
       status: "failed",
@@ -513,20 +554,10 @@ async function runNative({ directory, platform, applicationId }) {
       log: metroLog.slice(-1500),
     };
   } finally {
-    await build.catch(() => undefined);
-
-    if (platform === "ios") {
-      await command("xcrun", [
-        "simctl",
-        "terminate",
-        "booted",
-        applicationId,
-      ]).catch(() => undefined);
-    }
-
     try {
       if (platform === "android")
         await command("adb", ["shell", "am", "force-stop", applicationId]);
+      else await terminateIosApp(applicationId);
     } finally {
       try {
         await statusPort?.close();
@@ -540,6 +571,20 @@ async function runNative({ directory, platform, applicationId }) {
     }
   }
 }
+
+/** Stop only the assigned app; unexpected simulator errors must fail cleanup. */
+const terminateIosApp = async (applicationId) => {
+  await command("xcrun", ["simctl", "terminate", iosUdid, applicationId]).catch(
+    (error) => {
+      if (
+        !/application\b.*\bnot (?:running|installed)|found nothing to terminate|no such process/i.test(
+          error.message
+        )
+      )
+        throw error;
+    }
+  );
+};
 
 async function watchNative({ readStatus, timeout = 240000 }) {
   const started = Date.now();

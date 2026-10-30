@@ -1,0 +1,181 @@
+{
+  "checkpoint": "Single MapLibre iOS TF05 source/image lifecycle preparation",
+  "status": "Independent coordinator preparation audit passed; owner restoration/execution approval pending",
+  "kind": "planning/reference",
+  "audience": "Owner, coordinator and execution worker",
+  "purpose": "Approve bounded fresh iOS restoration and one unchanged source scene",
+  "nonGoals": "Pixels, image readback, remaining families/layers, other engines, full native acceptance",
+  "reviewCheckout": "/private/tmp/one-map-android-restoration-review",
+  "reviewBase": "6123acb",
+  "branchBasis": "codex/u25-maplibre-ios-sources stacked on open PR68 codex/u25-mapbox-android-sources",
+  "scope": {
+    "changed": [
+      "scripts/tf05-sources-smoke.mjs",
+      "scripts/tf05-sources-runner.test.mjs",
+      "scripts/with-maplibre-ios-sources-env.sh",
+      "docs/revised-api-acceptance-plan.md",
+      "records/README.md",
+      "this record"
+    ],
+    "carriedHistory": [
+      "revised-api-u25-f05-mapbox-android-sources-attempt-01.json",
+      "revised-api-u25-f05-mapbox-android-sources-attempt-02.json"
+    ],
+    "unchanged": "Primary dirty checkout, retained staging, f05, library, scene/hook/fixture, peers, versions, patches, locks and native scaffold. No host setup, installation, Pods, simulator, build/install, live Metro or renderer execution."
+  },
+  "preparedSha256": {
+    "scripts/tf05-sources-smoke.mjs": "63c4783ff5cf89ac7d4ff09d69ebdb2e43a5bd537c837e42958b1940dbd0c529",
+    "scripts/tf05-sources-runner.test.mjs": "36820320863ddd005020ea503d2e0aaef26fb7bc72e16d7b18501fe9dd43f8b4",
+    "scripts/with-maplibre-ios-sources-env.sh": "a8b10ffe9db5cc69723bce5a9636d7e46cf36224ae7b681afd2ec2f664837310",
+    "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b"
+  },
+  "staging": {
+    "root": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery",
+    "harness": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness",
+    "futureShortAlias": "/private/tmp/one-map-f05-ios -> /Users/rob/code/mapbox-code/one-map-f05-android-recovery",
+    "retainedSha256": {
+      "package.json": "0f973fc53ad8c1867435eeafd17a78b2c0f894a228c45e17840a68588a62b1b5",
+      "bun.lock": "cb9c8eba082a3b20d50f842c21d14339958415f6786c98f27234b1a565527a19",
+      "App.tsx": "db8ec4822c99bc3502b260cd36f4df2a6b3229acfec3a3cb8e453fa03b685f00",
+      "babel.config.cjs": "fc4ab418e4825a61fe75ad04c6d944e099b52a69925c4c022d947beb5b3212ee",
+      "metro.config.cjs": "7522eb0828fd4694212bc425efd4270e56175775d2339bef89761cdc619a1786",
+      "Gemfile": "731cb657e8b565a302671772c6cde455dfa19f7c4015b778afec9b7e67da5200",
+      "ios/Podfile": "e5a8cceb19d28181365427bdbd0ff7ab7426387423a71f298b124c225e9c7dad",
+      "ios/.xcode.env": "3c02dca07775b31ce4e77dfb3bb660d7c6e577474d65a6216f1ea9bef54e1ca6",
+      "ios/OneMapMaplibre.xcodeproj/project.pbxproj": "145c29c06a2c176aaf1afdd0f46f55a0b28ff63c8bfe7e830fd94d3e9ed871fa",
+      "ios/OneMapMaplibre/AppDelegate.swift": "39734f350d2d74592fe6e3865a6fb49df84be3774e58dbdbf61b5828785376d9",
+      "ios/OneMapMaplibre/Info.plist": "1a4cd1a9896c2afceaf18b5c7a5a4d1f7913361b172c652bbb0d2628ad0ba57f",
+      "node_modules/@maplibre/maplibre-react-native/MapLibreReactNative.podspec": "71fa4ce2ab3840e931192424b79845fb5f9cfe2bc3d2831a8a1f5523569a0f3c"
+    },
+    "sharedSceneSha256": {
+      "examples/shared/native-sources-screen.tsx": "73f74314e2da333d4a9ce04058963775f0d4d52f59f17ffbdc444318d7b5aae2",
+      "examples/shared/sources-smoke.ts": "da8b6f6455850b8f7cea5ad5ae4049cc1d180f09b4d9f7376557337894aecd6b",
+      "examples/shared/sources-map.tsx": "7973ae80022d1611d6c742a89facc237b27b4454ca9b216d6ca7e65d0874c065"
+    },
+    "present": "Selected JS dependencies/consumer and generated iOS scaffold/Podfile. Existing Android tools/cache/package remain read-only preparation inputs.",
+    "missing": [
+      "ios/Podfile.lock",
+      "Gemfile.lock",
+      "ios/Pods",
+      "ios/OneMapMaplibre.xcworkspace",
+      "ios/build",
+      "project/workspace SwiftPM Package.resolved",
+      "S/ruby-gems",
+      "S/ruby-bundler-load-path",
+      "S/with-maplibre-ios-env.sh"
+    ],
+    "lockSearch": "Bounded rg --files in primary/review checkout/retained S plus maxdepth4 known ~/.gem, ~/.bundle, ~/.cocoapods and maxdepth3 /private/tmp. No historical iOS lock bodies recovered. Original /private/tmp/one-map-f05 and backing stage gone. CocoaPods and SwiftPM user cache paths inspected absent; no cache hit claimed. Historical receipts preserve hashes/pins only.",
+    "tools": "Retained runtime-bin Bun1.4.1/Node24.22.1 symlinks present. /opt/homebrew/Cellar/ruby/4.0.7 and its Bundler4.0.20 source retained. Global pod symlink targets1.17.0, not proposed1.15.2. No tool startup or simulator inventory performed.",
+    "simctl": "Filesystem-only inspection: /Applications/Xcode.app/Contents/Developer/usr/bin/simctl requires1174.9.2, reads /Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/Info.plist and runs xcodebuild -runFirstLaunch only if version missing/older. Actual plist1174.9.2 and adjacent Resources/bin/simctl exists/executable. Future preflight rechecks and stops if condition could run host setup; wrapper sets DEVELOPER_DIR to inspected Xcode. No simulator service started."
+  },
+  "candidate": {
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "coordinatorArchiveProof": "All171 regular members match both H/packages/one-map-react and selected installed one-map-react. Reconfirmed read-only by coordinator during this preparation.",
+    "versions": {
+      "React": "19.2.3",
+      "ReactNative": "0.87.1",
+      "MapLibreReactNative": "11.5.0",
+      "Teleport": "1.2.1",
+      "CocoaPodsProposed": "1.15.2",
+      "Ruby": "4.0.7",
+      "Bundler": "4.0.20",
+      "MapLibreNative": "6.31.0",
+      "MapLibreRevision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683"
+    }
+  },
+  "restoration": {
+    "decision": "Reuse existing H selected scaffold/dependencies; no generation/JS install/harness clone. Fresh isolated Ruby/Pods resolution with disclosed new locks, followed by coordinator static audit and freeze before sole build. Do not claim deployment restoration or historical transitive identity.",
+    "futureWrites": [
+      "S/ios-ruby/Gemfile, Gemfile.lock, gems and narrow Bundler-copy load path",
+      "Selected H/examples/native-maplibre/ios generated Pods/workspace/project/locks/build",
+      "Reviewed driver and new wrapper copied by coordinator under explicit hash accounting",
+      "Short alias only when absent"
+    ],
+    "gemfileInputSha256": "731cb657e8b565a302671772c6cde455dfa19f7c4015b778afec9b7e67da5200",
+    "gemfileTransformedSha256": "f768364b7cfbccd14f42d7f05bbdf9928ffe6866aa8ee639e31c776e8e885190",
+    "gemfileOnlySubstitution": "gem 'cocoapods', '>= 1.13', '!= 1.15.0', '!= 1.15.1' -> gem 'cocoapods', '= 1.15.2'",
+    "bundlerWorkaround": "Copy only installed bundler.rb and bundler/ to S/ios-ruby/bundler-load-path, from /opt/homebrew/Cellar/ruby/4.0.7/lib/ruby/4.0.0. Historical revised-api-u25-f05-ruby-json-repair.json owns reason; whole-stdlib RUBYLIB is forbidden.",
+    "auditGate": "Freeze fresh task Gemfile.lock, Podfile.lock and matching Pods/Manifest.lock; inspect all versions/checksums/sources. Require intended direct baseline and no frozen JS/package/input changes. SwiftPM exactVersion6.31.0 originates in retained selected podspec; require expected revision from actual sole-build pin receipts. New unexpected dependency sources/versions or required frozen-input mutations stop.",
+    "downloads": "Task Ruby gems, Pods dependencies and MapLibre exact-version SwiftPM package/build inputs may download after approval. No simulator-runtime or Android SDK/image download, host repair or global gem change.",
+    "gemfileTransformCommand": "from pathlib import Path; import hashlib; src=Path('/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/Gemfile').read_bytes(); assert hashlib.sha256(src).hexdigest() == '731cb657e8b565a302671772c6cde455dfa19f7c4015b778afec9b7e67da5200'; old=b\"gem 'cocoapods', '>= 1.13', '!= 1.15.0', '!= 1.15.1'\"; assert src.count(old) == 1; out=src.replace(old,b\"gem 'cocoapods', '= 1.15.2'\"); assert hashlib.sha256(out).hexdigest() == 'f768364b7cfbccd14f42d7f05bbdf9928ffe6866aa8ee639e31c776e8e885190'; Path('/Users/rob/code/mapbox-code/one-map-f05-android-recovery/ios-ruby/Gemfile').open('xb').write(out)"
+  },
+  "runner": {
+    "route": "ios maplibre only; UUID validated before fixture acquisition; unsupported/surplus args rejected; Android APK reuse/web branches preserved.",
+    "build": "Selected OneMapMaplibre workspace/scheme Debug, explicit destination id, TF05_IOS_BUILD_FOLDER; one awaited checked xcodebuild then checked exact-UUID simctl install and launch. No run-ios or swallowed build failure.",
+    "lifetime": "Refuse unknown8081/8799 listeners. Existing fixture8798 bind conflict rejects. Terminate selected stale app before status binding; accept only known not-running termination errors. Fresh status server; observe Metro spawn/exit failures in readiness and polling. App/status/Metro cleanup nested; fixture closes in main; first engine failure stops later engine.",
+    "producedApp": "/private/tmp/one-map-f05-ios/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app"
+  },
+  "coverage": {
+    "families": [
+      "vector",
+      "raster",
+      "image",
+      "GeoJSON(two sources)"
+    ],
+    "layers": [
+      "fill",
+      "raster",
+      "line",
+      "circle",
+      "symbol"
+    ],
+    "images": "one registered marker image; registration/style rebuild lifecycle only",
+    "status": "mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+    "limits": "Status/load/style/settle-timer observations; no pixel/readback guarantee or exhaustive source/image contract. Raster-dem/hillshade, heatmap and fill-extrusion remain open."
+  },
+  "space": {
+    "initialAvailableKiB": 9839740,
+    "latestAvailableKiB": 9466084,
+    "latestMeasuredUTC": "2026-10-30T04:27:33Z",
+    "proposal": "8GiB available planning floor before restoration; estimated2GiB Pods/codegen +3GiB Xcode/SPM +1GiB Ruby/download +2GiB host reserve. After restoration require5GiB available: estimated3GiB build/SPM +2GiB host reserve before boot. Demand unmeasured, no proof full build fits. Independent of Android8.2GiB allocation gate. No deletion proposed.",
+    "coordinatorAvailableBytes": 9052454912,
+    "coordinatorMeasuredUTC": "2026-10-30T04:31:48.609313+00:00"
+  },
+  "routineVerification": {
+    "red": "Coordinator actual original-HEAD VM proof: ios maplibre rejected at scope parser; old runNative also returned passed while its CLI build promise rejected. New tests pass intended checked route. No claim full new test file executes against old extraction markers.",
+    "green": [
+      "node scripts/tf05-sources-runner.test.mjs",
+      "bun scripts/tf05-sources-runner.test.mjs",
+      "node --check scripts/tf05-sources-smoke.mjs",
+      "/bin/sh -n scripts/with-maplibre-ios-sources-env.sh",
+      "node_modules/.bin/vp check (323 formatted;297 linted)",
+      "Installed selected @babel/core and @react-native/babel-preset in-memory App.tsx/native-sources-screen.tsx/sources-smoke.ts transforms",
+      "node scripts/check-docs.mjs (40Markdown files;39SDK tables; structural/local links only)",
+      "git diff --check",
+      "Final wrapper DEVELOPER_DIR assertion with Node and Bun mocks"
+    ],
+    "mockCoverage": "All existing Android success/API/reuse/failure/cleanup modes; selected iOS success, build/install/launch/status/Metro/stale-termination/status-bind/listener/cleanup failures, exact UUID/paths and single build; both native first-failure dispatches; wrapper canonical Ruby/runtime paths, short build path, no Mapbox token, unset Android digest.",
+    "warnings": "Bun existing moduleSuffixes warning; no configuration changes.",
+    "intermediate": "Initial wrapper temp-directory expected path failed because macOS /var canonicalizes /private/var; test now compares canonical realpath. Initial docs check named missing not-yet-written preparation record; final rerun required. Final full targeted rerun passed Node/Bun mocks, syntax, shell syntax, formatting/lint and docs/local links."
+  },
+  "futureExecution": {
+    "solePlan": "docs/revised-api-acceptance-plan.md#proposed-single-maplibre-ios-source-scene",
+    "command": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-maplibre-ios-sources-env.sh bun /private/tmp/one-map-f05-ios/native-harness/scripts/tf05-sources-smoke.mjs ios maplibre",
+    "cwd": "/private/tmp/one-map-f05-ios/native-harness",
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5; historical iPhone18Pro/iOS27.0 build24A434. Current target availability not queried.",
+    "estimatedDuration": "30-75minutes, unmeasured, fresh resolution/network dependent",
+    "boundsSeconds": {
+      "bundle": 1200,
+      "pods": 1200,
+      "bootstatus": 120,
+      "build": 600,
+      "status": 600,
+      "outerIncludingCleanup": 5400,
+      "inventory": 30
+    },
+    "ownership": "One GPT-6 Luna medium worker owns simulator only if successfully booted, selected app, Metro8081, fixture8798/status8799 and created short alias. Coordinator owns restoration audit/freeze and result review. Unknown listeners/apps/resources preserved.",
+    "permission": "Not authorized by preparation; every future host/tool command must use require_escalated. Stop first failure, no retries/repair.",
+    "identity": "Success-only produced vs installed executable AND debug dylib presence/hashes and metadata, embedded MapLibre6.31.0, canonical workspace SwiftPM pin at expected version/revision, project pin too if present, unchanged fresh Ruby/Pod locks and frozen inputs. Missing required receipt remains open; no duplicate historical pin or second build required.",
+    "cleanup": "Runner closes owned app/status/Metro/fixture; worker checks assigned ports, shuts down only simulator booted by attempt and removes alias only if created. Preserve staging, Android inputs and active iOS locks/deps; compact receipts and essential active-failure logs only."
+  },
+  "unverified": "Restoration resolvability and disk demand, CocoaPods startup, fresh locks/linked SDK identity, simulator availability, iOS source lifecycle runtime, pixels and broader retained native acceptance.",
+  "coordinatorAudit": {
+    "status": "passed within preparation scope",
+    "regressionProof": "Independently reproduced old selector rejection and swallowed failed iOS build returning passed using actual old driver VM; current Node and Bun focused tests pass.",
+    "sourceReview": "Explicit assigned UUID, selected workspace/scheme/derivedDataPath, checked sequential build/install/launch, fresh status collection after selected app termination, Metro failure propagation and nested owned cleanup inspected. Android/web paths preserved.",
+    "inputs": "All prepared/selected source hashes and all662 current frozen inputs independently match. All171 f05 archive members match both selected installed package and shared extracted package. No staging writes or native execution during preparation.",
+    "corrections": "Clarified allowed pinned SDK downloads, explicit Ruby startup version assertion, driver replacement accounting and canonical workspace pin requirement without demanding a duplicate historical project pin.",
+    "remainingGate": "Fresh resolved Ruby/Pod locks and generated workspace must be audited/frozen after approved restoration before simulator/build; runtime and resulting installed identity remain unverified.",
+    "routine": "Pinned Node and Bun runner mocks, documentation structural/local-link check and whitespace check independently pass. Scoped Vite+ formatting/lint passes with temporary primary dependency link, removed finally; initial invocation without that link could not resolve vite-plus. Dependency link is routine tooling only, not acceptance input."
+  }
+}

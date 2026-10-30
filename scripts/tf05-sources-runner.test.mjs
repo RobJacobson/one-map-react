@@ -1,6 +1,16 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { EventEmitter } from "node:events";
-import { readFileSync } from "node:fs";
+import {
+  cpSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { runInNewContext } from "node:vm";
 
 const source = readFileSync(
@@ -23,7 +33,7 @@ const child = () => {
 };
 const runSource = section(
   "async function runNative(",
-  "async function watchNative("
+  "/** Stop only the assigned app"
 );
 const grantSource = () =>
   section(
@@ -32,6 +42,8 @@ const grantSource = () =>
   );
 const configuration = section("const group =", "// Runs after");
 for (const args of [
+  ["ios", "maplibre"],
+  ["ios", "bad"],
   ["android", "bad"],
   ["android", "maplibre", "extra"],
   ["web", "maplibre"],
@@ -49,7 +61,7 @@ for (const args of [
           },
         },
       }),
-    /scope|Use|ANDROID_SERIAL/
+    /scope|Use|ANDROID_SERIAL|TF05_IOS_UDID/
   );
 }
 const selected = evaluate(`${configuration}; ({nativeEngines, androidArgs})`, {
@@ -263,6 +275,175 @@ for (const scope of ["sources"]) {
   }
 }
 
+for (const mode of [
+  "pass",
+  "build-failure",
+  "install-failure",
+  "launch-failure",
+  "status-failure",
+  "metro-poll-exit",
+  "terminate-failure",
+  "cleanup-failure",
+  "status-bind-failure",
+  "port-conflict",
+]) {
+  const metro = child();
+  const calls = [];
+  const cleanup = [];
+  let terminated = 0;
+  let bound = false;
+  let built = false;
+  let installed = false;
+  let launched = false;
+  const udid = "8B7D7CE4-228E-409F-A156-A597D4E448A5";
+  const command = async (file, args) => {
+    calls.push([file, ...args]);
+    if (file === "xcodebuild") {
+      assert(bound && !built && !installed && !launched);
+      assert(
+        args.includes(
+          "/harness/examples/native-maplibre/ios/OneMapMaplibre.xcworkspace"
+        )
+      );
+      assert(args.includes("OneMapMaplibre") && args.includes(`id=${udid}`));
+      assert(args.includes("/short/build"));
+      if (mode === "build-failure") throw new Error(mode);
+      built = true;
+    } else {
+      assert.equal(file, "xcrun");
+      assert.equal(args[0], "simctl");
+      assert.equal(args[2], udid);
+      if (args[1] === "terminate") {
+        terminated++;
+        if (
+          mode === "terminate-failure" ||
+          (mode === "cleanup-failure" && terminated === 2)
+        )
+          throw new Error(mode);
+      }
+      if (args[1] === "install") {
+        assert(built && !launched);
+        assert.equal(
+          args[3],
+          "/short/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app"
+        );
+        if (mode === "install-failure") throw new Error(mode);
+        installed = true;
+      }
+      if (args[1] === "launch") {
+        assert(installed);
+        if (mode === "launch-failure") throw new Error(mode);
+        launched = true;
+      }
+    }
+    return "";
+  };
+  const terminateIosApp = evaluate(
+    section("const terminateIosApp =", "async function watchNative(") +
+      "; terminateIosApp",
+    { command, iosUdid: udid }
+  );
+  const run = evaluate(`(${runSource})`, {
+    root: "/harness",
+    join: (...parts) => parts.join("/"),
+    process: { env: { TF05_IOS_BUILD_FOLDER: "/short/build" } },
+    iosUdid: udid,
+    freePort: async (port) => {
+      if (port === 8799 && mode === "port-conflict") throw new Error(mode);
+    },
+    spawn: () => {
+      assert(mode !== "port-conflict");
+      return metro;
+    },
+    command,
+    terminateIosApp,
+    openStatusPort: async () => {
+      assert.equal(terminated, 1);
+      if (mode === "status-bind-failure") throw new Error(mode);
+      bound = true;
+      return {
+        read: () => "done=1",
+        close: async () => cleanup.push("status"),
+      };
+    },
+    waitFor: async (ready) => {
+      metro.stdout.emit("data", "Dev server ready");
+      assert(ready());
+    },
+    watchNative: async ({ readStatus }) => {
+      assert(launched);
+      if (mode === "status-failure") throw new Error(mode);
+      if (mode === "metro-poll-exit") metro.emit("exit", 2);
+      return readStatus();
+    },
+    judge: () => ({ status: "passed" }),
+    stopOwnedProcess: async () => cleanup.push("metro"),
+    awaitMetroPortRelease: async () => cleanup.push("port"),
+  });
+  const pending = run({
+    directory: "native-maplibre",
+    platform: "ios",
+    applicationId: "org.reactjs.native.example.OneMapMaplibre",
+  });
+  if (["cleanup-failure", "terminate-failure", "port-conflict"].includes(mode))
+    await assert.rejects(pending, new RegExp(mode));
+  else {
+    const result = await pending;
+    assert.equal(result.status, mode === "pass" ? "passed" : "failed", mode);
+    if (mode === "pass")
+      assert.equal(
+        result.producedAppPath,
+        "/short/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app"
+      );
+  }
+  if (mode !== "port-conflict") {
+    assert(cleanup.includes("metro") && cleanup.includes("port"), mode);
+    if (bound) assert(cleanup.includes("status"), mode);
+  }
+  if (
+    [
+      "build-failure",
+      "install-failure",
+      "launch-failure",
+      "terminate-failure",
+      "status-bind-failure",
+      "port-conflict",
+    ].includes(mode)
+  )
+    assert(!launched, mode);
+  assert.equal(
+    calls.filter(([file]) => file === "xcodebuild").length,
+    built || mode === "build-failure" ? 1 : 0
+  );
+}
+for (const message of [
+  "application is not running",
+  "found nothing to terminate",
+  "no such process",
+  "permission denied",
+]) {
+  const terminate = evaluate(
+    section("const terminateIosApp =", "async function watchNative(") +
+      "; terminateIosApp",
+    {
+      command: async () => {
+        throw new Error(message);
+      },
+      iosUdid: "assigned",
+    }
+  );
+  if (message === "permission denied")
+    await assert.rejects(terminate("app"), /permission denied/);
+  else await terminate("app");
+}
+const selectedIos = evaluate(`${configuration}; ({nativeEngines})`, {
+  process: {
+    argv: ["node", "runner", "ios", "maplibre"],
+    env: { TF05_IOS_UDID: "8B7D7CE4-228E-409F-A156-A597D4E448A5" },
+  },
+});
+assert.deepEqual(Array.from(selectedIos.nativeEngines), ["maplibre"]);
+
 const free = section("async function freePort(", "const runWebCorrections");
 for (const message of [null, "lsof exited 1", "permission denied"]) {
   const check = evaluate(`(${free.trim()})`, {
@@ -338,29 +519,31 @@ for (const mode of ["timeout", "nonzero", "spawn-failure"]) {
   assert(stopped);
 }
 
-const main = evaluate(
-  `(${section("async function main()", "async function runWeb(")})`,
-  {
-    group: "android",
-    nativeEngines: ["maplibre", "mapbox"],
-    startFixtureServer: async () => ({
-      close: async () => {
-        closed = true;
+for (const group of ["android", "ios"]) {
+  const main = evaluate(
+    `(${section("async function main()", "async function runWeb(")})`,
+    {
+      group,
+      nativeEngines: ["maplibre", "mapbox"],
+      startFixtureServer: async () => ({
+        close: async () => {
+          closed = true;
+        },
+      }),
+      runNative: async ({ directory }) => {
+        assert.equal(directory, "native-maplibre");
+        calls++;
+        return { status: "failed" };
       },
-    }),
-    runNative: async ({ directory }) => {
-      assert.equal(directory, "native-maplibre");
-      calls++;
-      return { status: "failed" };
-    },
-    console: { log: () => {} },
-  }
-);
-let closed = false;
-let calls = 0;
-await assert.rejects(main(), /no later engine/);
-assert.equal(calls, 1);
-assert(closed);
+      console: { log: () => {} },
+    }
+  );
+  let closed = false;
+  let calls = 0;
+  await assert.rejects(main(), /no later engine/);
+  assert.equal(calls, 1);
+  assert(closed);
+}
 const binding = evaluate(
   `(${section("async function startFixtureServer()", "function pngPixel(")})`,
   {
@@ -391,6 +574,7 @@ for (const [group, selector, digest, actual, succeeds] of [
         argv: ["node", "runner", group, ...(selector ? [selector] : [])],
         env: {
           ANDROID_SERIAL: "emulator-5580",
+          TF05_IOS_UDID: "8B7D7CE4-228E-409F-A156-A597D4E448A5",
           TF05_ANDROID_BINARY_SHA256: digest,
         },
       },
@@ -436,3 +620,46 @@ for (const key of Object.keys(fields))
     "failed",
     key
   );
+
+const wrapperRoot = mkdtempSync(join(tmpdir(), "one-map-tf05-wrapper-"));
+try {
+  const wrapper = join(wrapperRoot, "with-maplibre-ios-sources-env.sh");
+  cpSync(
+    new URL("./with-maplibre-ios-sources-env.sh", import.meta.url),
+    wrapper
+  );
+  symlinkSync(wrapper, join(wrapperRoot, "alias.sh"));
+  const probe = spawnSync(
+    "/bin/sh",
+    [
+      join(wrapperRoot, "alias.sh"),
+      process.execPath,
+      "-e",
+      `
+    const env = process.env;
+    if (env.DEVELOPER_DIR !== "/Applications/Xcode.app/Contents/Developer") process.exit(7);
+    if (env.TF05_IOS_UDID !== "8B7D7CE4-228E-409F-A156-A597D4E448A5") process.exit(1);
+    if (env.TF05_IOS_BUILD_FOLDER !== "/private/tmp/one-map-f05-ios/native-harness/examples/native-maplibre/ios/build") process.exit(2);
+    if (!env.BUNDLE_GEMFILE.endsWith("/ios-ruby/Gemfile") || !env.BUNDLE_PATH.endsWith("/ios-ruby/gems")) process.exit(3);
+    if (!env.RUBYLIB.endsWith("/ios-ruby/bundler-load-path")) process.exit(4);
+    if (env.TF05_ANDROID_BINARY_SHA256) process.exit(5);
+    if (!env.PATH.startsWith(${JSON.stringify(realpathSync(wrapperRoot))} + "/runtime-bin:/opt/homebrew/opt/ruby/bin:")) process.exit(6);
+  `,
+    ],
+    {
+      env: {
+        ...process.env,
+        MAPBOX_ACCESS_TOKEN: "",
+        TF05_ANDROID_BINARY_SHA256: "inherited",
+      },
+      encoding: "utf8",
+    }
+  );
+  assert.equal(probe.status, 0, probe.stderr);
+  assert.equal(probe.stdout, "");
+} finally {
+  rmSync(wrapperRoot, { recursive: true, force: true });
+}
+console.log(
+  "PASS selected iOS checked build/install/launch, assigned UUID, stale status, failure cleanup and wrapper; no host tools executed."
+);

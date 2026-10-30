@@ -1,0 +1,22 @@
+{
+  "checkpoint": "PR68 Mapbox Android source/image lifecycle attempt01 preflight",
+  "status": "stopped-free-space-gate-no-native-dispatch",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "verifiedInputFiles": 662,
+  "inheritedMapboxToken": "present; value not printed",
+  "observedAvailableGiB": 8.117,
+  "requiredGiB": 8.2,
+  "approximateShortfallGiB": 0.083,
+  "firstFailure": "Coordinator actualfree-space check below unchanged required8.2GiB before runtime; no worker dispatched.",
+  "unchanged": "f05, reviewed runner, retained APK and all frozen inputs match. No source/dependency/native changes or cache deletion.",
+  "nativeResourcesAcquired": [],
+  "cleanup": "None required.",
+  "notRun": [
+    "Worker native dispatch",
+    "Private emulator creation/boot",
+    "Retained APK install",
+    "TF05 scene",
+    "Native rebuild (excluded)"
+  ],
+  "next": "Owner can free additional space and approve retry of same no-rebuild scope; roughly85MiB minimum shortfall but more headroom recommended due concurrent space fluctuations. No extra deletion or lower threshold authorized."
+}
