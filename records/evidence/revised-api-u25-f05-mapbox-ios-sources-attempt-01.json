@@ -1,0 +1,184 @@
+{
+  "checkpoint": "PR71 Mapbox iOS source/image lifecycle attempt01",
+  "observedAt": "2026-10-30T20:43:00.391728+00:00",
+  "result": "passed",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1,
+    "phaseContinuation": "Same worker restored Pods, paused for dependency audit, then resumed simulator/build/scene under original approval."
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "preflight": {
+    "existingFrozenFiles": 678,
+    "mismatches": [],
+    "availableGiB": 9.281303405761719,
+    "requiredGiB": 8,
+    "token": "present; value never printed"
+  },
+  "restoration": {
+    "rubyToolingReused": true,
+    "bundleInstall": false,
+    "projectGeneration": false,
+    "bundleCheckExit": 0,
+    "podVersion": "1.15.2",
+    "podInstallExit": 0,
+    "podCount": 91,
+    "podLockMatchesHistorical": true,
+    "dependencyAudit": {
+      "result": "passed",
+      "observedAt": "2026-10-30T20:38:15.320506+00:00",
+      "selectedVersions": {
+        "ReactNative": "0.87.1",
+        "RNMapbox": "10.3.7",
+        "Teleport": "1.2.1",
+        "MapboxMaps": "11.23.1",
+        "MapboxCoreMaps": "11.23.1",
+        "MapboxCommon": "24.23.1",
+        "Turf": "4.0.0",
+        "CocoaPods": "1.15.2"
+      },
+      "podLockSha256": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874",
+      "manifestMatches": true,
+      "historicalPodLockMatches": true,
+      "preRestorationFrozenFiles": 684,
+      "preRestorationMismatches": [],
+      "generatedMutationReview": "Info.plist semantic change exactly RCTNewArchEnabled=true. Project adds privacy manifest resource and RN new-architecture/Hermes build settings; all other frozen inputs unchanged.",
+      "freeBytes": 6447407104,
+      "spaceFloorGiB": 5
+    }
+  },
+  "scene": {
+    "command": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-mapbox-ios-sources-env.sh bun /private/tmp/one-map-f05-ios/native-harness/scripts/tf05-sources-smoke.mjs ios mapbox",
+    "exit": 0,
+    "resultKey": "mapbox-ios",
+    "resultCount": 1,
+    "status": "passed",
+    "fields": "mounted=1 reset=ok data=updated style=rebuilt removed=clean error=none note=none phase=done done=1",
+    "retries": 0
+  },
+  "commands": [
+    {
+      "step": "bundle check",
+      "exit": 0
+    },
+    {
+      "step": "CocoaPods version",
+      "exit": 0
+    },
+    {
+      "step": "Selected Pods install",
+      "exit": 0
+    },
+    {
+      "step": "Assigned simulator inventory",
+      "exit": 0,
+      "initialState": "Shutdown; available"
+    },
+    {
+      "step": "Assigned simulator boot and bootstatus",
+      "exit": 0
+    },
+    {
+      "step": "Assigned listener checks before and after scene",
+      "exit": 1,
+      "output": "empty; clear"
+    },
+    {
+      "step": "Sole Mapbox iOS scene",
+      "exit": 0
+    },
+    {
+      "step": "Installed app container",
+      "exit": 0
+    },
+    {
+      "step": "Owned simulator shutdown",
+      "exit": 0
+    }
+  ],
+  "identity": {
+    "produced": {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+      "metadata": {
+        "CFBundlePackageType": "APPL",
+        "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+        "CFBundleExecutable": "OneMapMapbox",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1"
+      },
+      "codeSha256": {
+        "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+        "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+      },
+      "frameworkMetadata": {
+        "MapboxCoreMaps": {
+          "CFBundleIdentifier": "com.mapbox.maps",
+          "CFBundleShortVersionString": "11.23.1",
+          "CFBundleVersion": "11.23.1"
+        },
+        "MapboxCommon": {
+          "CFBundleIdentifier": "com.mapbox.common",
+          "CFBundleShortVersionString": "24.23.1",
+          "CFBundleVersion": "24.23.1"
+        }
+      }
+    },
+    "installed": {
+      "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/4030A7F3-7E06-4170-96F5-ADE0A2FED943/OneMapMapbox.app",
+      "metadata": {
+        "CFBundlePackageType": "APPL",
+        "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+        "CFBundleExecutable": "OneMapMapbox",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1"
+      },
+      "codeSha256": {
+        "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+        "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+      },
+      "frameworkMetadata": {
+        "MapboxCoreMaps": {
+          "CFBundleIdentifier": "com.mapbox.maps",
+          "CFBundleShortVersionString": "11.23.1",
+          "CFBundleVersion": "11.23.1"
+        },
+        "MapboxCommon": {
+          "CFBundleIdentifier": "com.mapbox.common",
+          "CFBundleShortVersionString": "24.23.1",
+          "CFBundleVersion": "24.23.1"
+        }
+      }
+    }
+  },
+  "coordinatorAudit": {
+    "frozenFiles": 695,
+    "mismatches": [],
+    "portsClear": true,
+    "deviceState": 1,
+    "ownedAliasRemoved": true,
+    "freeGiB": 0.7283973693847656
+  },
+  "freezePath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-sources-attempt-01/post-restoration-freeze.json",
+  "cleanup": {
+    "simulator": "Only assigned8B7D7CE4-228E-409F-A156-A597D4E448A5 booted and shut down; coordinator device.plist state1 confirms Shutdown",
+    "ports": "8081/8798/8799 independently clear",
+    "alias": "Coordinator-owned alias removed; absence verified",
+    "cacheRetirement": {
+      "removed": "Only completed Mapbox iOS compilation/index/module caches and redundant build products outside verified OneMapMapbox.app. Generated Pod code/spec facades, verified app, all695frozeninputs and dependencies preserved.",
+      "removedPathCount": 102,
+      "beforeAvailableGiB": 0.7265815734863281,
+      "afterAvailableGiB": 1.9437828063964844,
+      "observedAvailableIncreaseGiB": 1.2172012329101562,
+      "frozenFilesReverified": 695,
+      "verifiedAppCodePreserved": true
+    },
+    "postRetirementFreeBytes": 2087120896,
+    "futureBuildImpact": "A later rebuild regenerates retired compilation caches/products; verified app and active dependencies remain reusable."
+  },
+  "scopeLimits": [
+    "Bounded lifecycle/status scene: four source families, five layer types, one registered image, paint reset, data update, style replacement and transient source removal.",
+    "Pixel/image readback, remaining families/layers and broader native acceptance remain unverified.",
+    "Matching loader/debug-library hashes and framework metadata do not certify every app resource or the entire native SDK."
+  ]
+}

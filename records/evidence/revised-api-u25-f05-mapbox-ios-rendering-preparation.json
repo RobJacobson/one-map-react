@@ -1,0 +1,272 @@
+{
+  "checkpoint": "Mapbox iOS targeted rendering preparation on unchanged f05",
+  "status": "Independent coordinator preparation audit passed; scoped execution awaiting owner approval",
+  "scope": {
+    "proposed": "One existing TF09 ios mapbox scene using verified installed app and reset Metro; no native build, install, generation, Pods or dependency installation",
+    "observations": [
+      "Known rendered feature9009 and initial null terrain elevation",
+      "Terrain enabled before delayed DEM attachment returns2000meters within5meters",
+      "Terrain clear/re-enable and style replacement restore2000meters",
+      "Hillshade insertion/removal changes more than100 captured pixels",
+      "Globe versus Mercator changes more than200 captured pixels",
+      "Known orange feature exceeds30 captured pixels"
+    ],
+    "limits": [
+      "No full pixels/layer matrix, density, sensors, service, broad camera/input/UI/annotation/multiple-map or other environment acceptance",
+      "Current-map capture is an application observer over selected borrowed wrapper; no removed common capture contract",
+      "Matching executable/debug code and framework metadata do not certify every bundle resource or full SDK"
+    ]
+  },
+  "sourceBasis": {
+    "head": "67db08f",
+    "branch": "codex/u25-mapbox-ios-rendering",
+    "reviewCheckout": "/private/tmp/one-map-android-restoration-review",
+    "primary": "Read only; unrelated dirty migration untouched",
+    "stack": "PR72 codex/u25-maplibre-ios-rendering remains open"
+  },
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Existing unchanged TF09 driver checks sorted paths and bytes in both dist copies"
+  },
+  "freeze": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-sources-attempt-01/post-restoration-freeze.json",
+    "sha256": "2ec3355e8e8de917f001abf7cf6d02fcaf3ab034b93dc76224f81106988a9b8f",
+    "verifiedFiles": 695,
+    "mismatches": []
+  },
+  "stagedSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-fixture.mjs": "50b90fa0b06d2b4cc3129084322bcfb232ab3113a003f134dc8c826bc9f7ad15",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/package.json": "85b17f2f852aece03e71edb4ed4d9fddf6a0a8f0b69ac75d7f00b6592d62d37c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitmapper.js": "3f2f720e3a2b4e41cdc03e9f58bb1794bec26dcd1b22568e41ce0b84ab20aeb5",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitpacker.js": "3f7bfabcbc82bedd0cc8551bc210b44dc1fb179fa2ce3b8b1d39fa307d8af204",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/chunkstream.js": "43c5507901554a29c5a29e555aaeb3c3987b84fb3aa8c681c1b30794a477aa85",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/constants.js": "9e3b4f994ac93751e9ccb4d453e85e4f25a0b086a9f24ec92c7dcb06995bdf6c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/crc.js": "57e2328cfa361fb54f1f4b3a59e071c1ccc864095e4f3759a957cd15aa2a8b65",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-pack.js": "500c1b3b34702c895e9e689143f44280687cac363447523679ec13d12bd564f6",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-async.js": "328b6173f1a2a4d91425220a0fa421699552f254006a57ede9f4018ced50a7ee",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-sync.js": "201a08dfab26a2903c0dabcbdfe0406b3fa33d60f59b591878329f590fac48ff",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse.js": "b8aad6f29371f5b13b232643781a7c49f7d36d565136ddda1ed7fbaca987ce2c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/format-normaliser.js": "c73989d85bef5d33ce571095bf0d96927261730d8b0f79c9d48f971fcbdd0be0",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/interlace.js": "3bb5d57153078ff586667e9a9d2c06db993c8ff1638e0521a9883cdeea6e1e3f",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-async.js": "f50df0610749ce7b1a99abbe9e4596df7c16f96efd3848f12dd632b22cb02b45",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-sync.js": "1b516238168a42704e62ba44528406188864a6ddda2ae92d1b91e5e078cdaa2d",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer.js": "b5f9956364c80d67c28d615ace639a5fb4d4d79d3acb235237f3050dca220e03",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/paeth-predictor.js": "48555b909af708593dade8e8df75d18ecdffdb6577e362eac01eae357ef1e0e9",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-async.js": "a0299cad35220de62b7180b1f984b8f77b4c0f419a580fd3c86ea3b3e971ee30",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-sync.js": "266c9fb230b90075022b3f54f5710a9cacb71ca565f83fce66e7cbd1b7e9b507",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser.js": "574e43fea28a28cc6feb7ab62a480a86bb75411ee4bfaba76a7e9d7310b6e94c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png-sync.js": "867b1a78dcd3e45458eb4f0af01acd48f38d3a31225bd7cb8dd8ee3966ab54be",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png.js": "e02cecbd36327829758386dc3f0ca4a36a2339ccb5d5e824ca3556e2c3f89726",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-inflate.js": "08cb8afb79a4c0ab58e94601dab22261daf6638382b211d6a7f6bfbc16d27a0b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-reader.js": "437a99bf1bf739202ae85c3018cd9174d411597cf55e7064c36976de493368f1"
+  },
+  "nativePeerDeltaVsHead": {
+    "@rnmapbox/maps": [
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+        "sha256": "b82438a4924d3cbca5bf3fec0d80668cc085bd4e6269cb0676fc397aaa1dbe76",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt",
+        "sha256": "4c480e8fd45af183330c7fc1e9d8b6195c8bac1803a69d8723142f854c03c781",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt",
+        "sha256": "fe53f618db8b762f8df77e94a3e66108f0c265d769b8763aa8143220866d7ad1",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXTerrain.swift",
+        "sha256": "bff90e3198ff793d41f5659bb6a5ca2bd7b8ddefa274d6b39ebd3a2e973993b5",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "lib/module/components/MapView.js",
+        "sha256": "b25ad86758a247c4a329971cbe4a200cbda2b217534c2e6d34d8c5f8a7a73732",
+        "kind": "runtime-source-or-module"
+      },
+      {
+        "path": "lib/typescript/src/Mapbox.native.d.ts",
+        "sha256": "e6e3e9376dbb468e22297d98b266def9e75c02ee3c06f3d0baada9ed59f726a0",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/RNMBXModule.d.ts",
+        "sha256": "b2c11d8f42963d8aeafe74ef522cb5472dc1f94e3a9822ed65924e229f73e875",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/components/MapView.d.ts",
+        "sha256": "bd3dd0212d091587a54a0317bc47ff2cfc60f260a741d4b75b73e269bc6ee748",
+        "kind": "declaration"
+      },
+      {
+        "path": "lib/typescript/src/index.native.d.ts",
+        "sha256": "c649d68d1374deb1e1f1c5917dfa2e47309429fa03389078a5fecc43849b3367",
+        "kind": "declaration"
+      },
+      {
+        "path": "src/components/MapView.tsx",
+        "sha256": "dc8bf35680f0a1d99d515988baf0c31ceaa5bc02756b0c1b2a8fdafa64fc5016",
+        "kind": "runtime-source-or-module"
+      }
+    ]
+  },
+  "peerProvenance": {
+    "expectedFileHashes": "Immutable records/evidence/tf09-implementation.json supplies nine unchanged file hashes and historical whole-file hash for reconciled Android MapView",
+    "reviewedRetention": "records/evidence/revised-api-u23-native-patch-reconciliation.json accounts for all ten sections; nine unchanged and Android MapView reviewed P1-P8 delta",
+    "reconciledAndroidMapView": {
+      "file": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+      "oldPatchSha256": "118090860852b786a6681287f52ae3af1af8e0657a7c1853936204afb287a6d4",
+      "reviewedCombinedPatchSha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1",
+      "historicalFileSha256": "3bade8922b05f7dc44cd370387acdec8492eed0ee0e903e85e5a8f9f3166cf54",
+      "reconciledExpectedSha256": "b82438a4924d3cbca5bf3fec0d80668cc085bd4e6269cb0676fc397aaa1dbe76",
+      "proof": "Verified published before/after patches by U23 identities; reversed exact combined hunks, applied historical hunks and matched immutable TF09 whole-file hash; reapplying reviewed combined hunks yields expected installed bytes."
+    },
+    "observed": "All ten expected files match selected installed bytes; existing TF09 delta inventory is not a complete peer-tree certificate"
+  },
+  "identity": {
+    "produced": {
+      "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+      "metadata": {
+        "CFBundlePackageType": "APPL",
+        "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+        "CFBundleExecutable": "OneMapMapbox",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1"
+      },
+      "codeSha256": {
+        "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+        "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+      },
+      "frameworkMetadata": {
+        "MapboxCoreMaps": {
+          "CFBundleIdentifier": "com.mapbox.maps",
+          "CFBundleShortVersionString": "11.23.1",
+          "CFBundleVersion": "11.23.1"
+        },
+        "MapboxCommon": {
+          "CFBundleIdentifier": "com.mapbox.common",
+          "CFBundleShortVersionString": "24.23.1",
+          "CFBundleVersion": "24.23.1"
+        }
+      }
+    },
+    "installed": {
+      "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/4030A7F3-7E06-4170-96F5-ADE0A2FED943/OneMapMapbox.app",
+      "metadata": {
+        "CFBundlePackageType": "APPL",
+        "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+        "CFBundleExecutable": "OneMapMapbox",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1"
+      },
+      "codeSha256": {
+        "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+        "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+      },
+      "frameworkMetadata": {
+        "MapboxCoreMaps": {
+          "CFBundleIdentifier": "com.mapbox.maps",
+          "CFBundleShortVersionString": "11.23.1",
+          "CFBundleVersion": "11.23.1"
+        },
+        "MapboxCommon": {
+          "CFBundleIdentifier": "com.mapbox.common",
+          "CFBundleShortVersionString": "24.23.1",
+          "CFBundleVersion": "24.23.1"
+        }
+      }
+    }
+  },
+  "storage": {
+    "observedAt": "2026-10-30T21:28:15.656873+00:00",
+    "availableBytes": 7114874880,
+    "availableGiB": 6.626243591308594,
+    "proposedMinimumBytes": 1073741824,
+    "rationale": "No-build runtime planning estimate:512MiB transient working room plus512MiB host reserve. Actual runtime growth unmeasured; refresh before dispatch, stop below gate without deletion. Historical5/8GiB build floors do not apply.",
+    "coordinatorAvailableBytes": 7098675200,
+    "coordinatorMeasuredUTC": "2026-10-30T21:32:10.044168+00:00"
+  },
+  "routineVerification": {
+    "nodeAndBunMocks": "Passed under pinned Node24.22.1 and Bun1.4.1 for both closed engines: loader/debug mismatches, SDK metadata/pins/locks, token-presence without token receipt, exclusive output, startup/Metro exit0/timeouts/spawn failures, unknown IPv4/IPv6 listeners, exact/partial/wrong/malformed scene, observer mutation after scene, launch failure, no identity queries after scene failure, owned cleanup and preserved first failure. Unknown engine and whitespace-only Mapbox token rejected before host actions; MapLibre succeeds with empty token environment.",
+    "fixture": "Existing TF09 terrain fixture stdlib self-check passed; installed pngjs7.0.0 decodes256x256 terrain PNG",
+    "installedResolution": "Installed Metro resolver and existing shell resolveRequest choose examples/shared/capture-rendering.native.ts for iOS from tf09-scene.tsx .js import",
+    "babel": "Installed selected Babel transformed App, smoke selector, native TF09 screen, TF09 scene and native capture helper; ONE_MAP_SMOKE=tf09 fully inlined",
+    "scope": "Pure filesystem/resolver/compiler/mocked checks only; no Metro server, simulator, native build/install or renderer transport",
+    "firstPreparationFailures": [
+      "Isolated partial-clone historical patch read attempted promisor lookup and failed with network unavailable; read identical Git object from primary without source or branch changes, verified U23 before-patch identity."
+    ],
+    "formatAndLint": "Primary-installed formatter/linter passed against four explicit isolated launcher/test paths; no primary source writes",
+    "documentation": "node scripts/check-docs.mjs passed40Markdown files/39comparison tables; git diff --check passed"
+  },
+  "proposedCommand": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-ios-rendering.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-rendering-attempt-01",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1,
+    "scope": "Execute one fixed reviewed command with host approval; no repairs/retries. Coordinator verifies frozen/installed identities independently and retains compact outcome."
+  },
+  "resources": {
+    "simulator": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "bundle": "org.reactjs.native.example.OneMapMapbox",
+    "ports": [
+      8081,
+      8798
+    ],
+    "noStatus8799": true,
+    "ownership": "Reject unknown listeners. Boot only assigned Shutdown target, shut down only successful owned boot. Terminate only assigned app, stop only owned process groups. No alias required.",
+    "listenerGate": "lsof all TCP protocols, exit1 plus empty stdout/stderr required; unknown IPv4 or IPv6 listeners preserved"
+  },
+  "bounds": {
+    "estimatedMinutes": "5-20, unmeasured six-scenario existing scene",
+    "bootSeconds": 20,
+    "bootstatusSeconds": 120,
+    "commandsSeconds": 30,
+    "readinessSeconds": 60,
+    "sceneSeconds": 600,
+    "cleanup": "Existing bounded stopOwnedProcess helper plus30second simulator commands;5-20minutes is a planning estimate, not a total deadline. Multiple identity/startup/cleanup phases have separate finite bounds."
+  },
+  "notExecuted": [
+    "Simulator inventory/boot, app launch, Metro, live SDK transport, native build/install, dependency install, Pods, renderer acceptance",
+    "Staging mutation, host setup, deletion"
+  ],
+  "podLocks": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/Podfile.lock": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/Pods/Manifest.lock": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874"
+  },
+  "selectedCapture": "Actual installed Metro resolver chooses capture-rendering.native.ts from tf09-scene.tsx .js import; installed Babel compiles five files with tf09 selector inlined. Native helper borrows RNMapbox takeSnap(false), wraps bare base64 in PNG data URL; selected JS declaration and iOS takeSnapWithWriteToDisk/queryTerrainElevationWithCoordinates signatures inspected without live SDK.",
+  "retiredPayloads": "Owner-authorized cleanup retired large Pods SDK payloads and nonfrozen build outputs. Preserved lock/project/retirement markers, all695 frozen files, verified produced/installed apps, JS dependencies, Ruby tools and runtime-bin support no-build scene. No SDK payload restoration or deletion proposed.",
+  "priorOutcomes": {
+    "maplibreRendering": "revised-api-u25-f05-maplibre-ios-rendering-attempt-01.json",
+    "ownerCleanup": "revised-api-u25-task-storage-cleanup-2026-10-30-02.json"
+  },
+  "preparedSha256": {
+    "scripts/ios-rendering.mjs": "bd95aef7c6f4a6ac9bac7aa8fb9cef7dee1252c8dc5a23cea08a8b39385134d9",
+    "scripts/mapbox-ios-rendering.mjs": "21fac16e16f8ed8daa17c0cdd32aabfa5fefe35dd3837216f4218983ebe386fb",
+    "scripts/maplibre-ios-rendering.mjs": "f163e05afd42666a802beda894515780b26a8c11a2ea25df3e3f86a0605adda4",
+    "scripts/maplibre-ios-rendering.test.mjs": "c8bff95571a1fd28feb2eefc5b35799cdd3e51b8677826c890268307d4184417",
+    "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b"
+  },
+  "maplibreImpact": "Accepted MapLibre rendering outcome remains bound to PR72 original launcher and original prepared hashes. New shared MapLibre path is routine mocked verification only, keeps existing CLI/export shape and no-token success, and would require fresh artifact review/approval before any future runtime run.",
+  "coordinatorAudit": {
+    "result": "passed within no-build Mapbox iOS rendering preparation scope",
+    "sourceReview": "Shared runner preserves the existing MapLibre CLI/export and tested ownership/failure paths; fixed Mapbox entrypoint selects exact app, six scenarios, token gate, CoreMaps/Common metadata and frozen Pod locks. No production/driver/scene/native capture changes.",
+    "routine": "Pinned Node24 and Bun mocks independently pass for both engines, including empty-token MapLibre, missing/whitespace-token Mapbox, code/metadata/SDK/lock errors, unknown listeners, premature Metro exit, timeouts, partial or malformed scenes, post-run observer mutation and cleanup.",
+    "inputs": "Independently verified5preparedfiles,26observerinputs,695frozenfiles,all171archive members in both Mapbox package copies, both produced/installed loader+debug code and metadata, selected SDK versions and10peer expectations.",
+    "peerProof": "Independently reran exact patch reversal/reapplication proof: old and reconciled patch identities match U23, historical whole-file hash matches immutable TF09 record, and derived changed Android MapView expected hash matches installed. Nine other expectations retain original hashes.",
+    "impact": "Prior MapLibre runtime remains bound to its original PR72 code. Extracted shared MapLibre path is mocked only; no new MapLibre runtime or broad acceptance claimed.",
+    "notExecuted": "No simulator, Metro, live SDK transport, build/install, dependency restoration or renderer acceptance during preparation."
+  }
+}

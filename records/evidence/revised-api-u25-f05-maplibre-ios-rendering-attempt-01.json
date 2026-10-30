@@ -1,0 +1,127 @@
+{
+  "checkpoint": "PR72 MapLibre iOS targeted rendering attempt01",
+  "observedAt": "2026-10-30T21:19:33.852040+00:00",
+  "result": "passed",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "appReused": true,
+  "nativeBuildInstallOrDependencyRestoration": false,
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/maplibre-ios-rendering.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-ios-rendering-attempt-01",
+  "commandExit": 0,
+  "attemptCount": 1,
+  "scene": {
+    "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+    "platform": "ios",
+    "engine": "maplibre",
+    "artifact": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "nativeIdentity": "{\"OneMapMaplibre\":\"d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3\",\"OneMapMaplibre.debug.dylib\":\"70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff\"}",
+    "outcomes": [
+      {
+        "name": "known rendered feature and initial no-data",
+        "status": "passed",
+        "observation": {
+          "loads": 1,
+          "featureIds": [
+            9009
+          ],
+          "elevation": null,
+          "unsupported": "Error: queryTerrainElevation is unsupported on MapLibre Native."
+        }
+      },
+      {
+        "name": "hillshade draws the fixture's slope patch",
+        "status": "passed",
+        "observation": {
+          "changedPixels": 342818
+        }
+      },
+      {
+        "name": "rendered output contains the known orange feature",
+        "status": "passed",
+        "observation": {
+          "width": 1206,
+          "height": 2622,
+          "orangePixels": 3900
+        }
+      }
+    ]
+  },
+  "identity": {
+    "produced": {
+      "metadata": "matched",
+      "codeSha256": {
+        "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+        "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+      },
+      "MapLibreVersion": "6.31.0"
+    },
+    "installed": {
+      "metadata": "matched",
+      "codeSha256": {
+        "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+        "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+      },
+      "MapLibreVersion": "6.31.0"
+    }
+  },
+  "swiftPM": {
+    "identity": "maplibre-gl-native-distribution",
+    "kind": "remoteSourceControl",
+    "location": "https://github.com/maplibre/maplibre-gl-native-distribution",
+    "state": {
+      "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683",
+      "version": "6.31.0"
+    }
+  },
+  "coordinatorAudit": {
+    "result": "passed within exact exercised scope",
+    "frozenFiles": 695,
+    "observerFiles": 26,
+    "preparedScripts": 2,
+    "mismatches": [],
+    "installedSelectedMetadataAndBothCodeMembers": "match",
+    "SDKMetadata": "MapLibre6.31.0",
+    "swiftPMPinMatched": true,
+    "portsClear": true,
+    "deviceShutdown": true
+  },
+  "cleanup": [
+    {
+      "name": "assigned app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 34551",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 34038",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8798",
+      "result": "passed"
+    },
+    {
+      "name": "owned simulator shutdown",
+      "result": "passed"
+    }
+  ],
+  "freeGiBAfter": 6.258323669433594,
+  "rawReceipt": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-ios-rendering-attempt-01/receipt.json",
+  "scopeLimits": [
+    "One MapLibre iOS automatic scene only: knownfeature9009 and unsupportedterrain query, raster-dem/hillshade insertion/removal pixel difference, and captured orange-feature pixels.",
+    "No registered-image pixel proof, heatmap/fill-extrusion, full pixel/layer/density matrix, other native environment or broad camera/input/UI/annotation/multiple-map/service acceptance.",
+    "Both app code-member hashes, SDK metadata and selected pin match; this does not certify every bundle resource or entireSDK."
+  ],
+  "storage": "No raw screenshots retained by this scene; compact receipt/outcomes preserved. Pods payloads remain retired and no restore/build was attempted."
+}
