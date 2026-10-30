@@ -1,0 +1,51 @@
+{
+  "checkpoint": "PR69 MapLibre iOS source/image lifecycle continuation attempt03",
+  "observedAt": "2026-10-30T17:05:16.529330+00:00",
+  "status": "stopped-invalid-worker-precheck-utility-path-before-simulator",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "preflight": {
+    "frozenFiles": 678,
+    "mismatches": [],
+    "availableGiB": 7.686328887939453,
+    "requiredGiB": 5
+  },
+  "firstFailure": {
+    "commandContext": "Filesystem CoreSimulator version/executable gate",
+    "exit": 127,
+    "error": "/usr/bin/test not found after reading CoreSimulator version1174.9.2",
+    "classification": "Invalid worker utility path, not an iOS installation or f05 failure. No simulator command ran."
+  },
+  "cleanup": {
+    "workerError": "Coordinator-supplied /usr/bin/unlink also absent; cleanup command exit127.",
+    "coordinatorCompletion": "Python pathlib verified the created alias targeted exactly S, then removed it. Alias absence independently confirmed.",
+    "aliasAbsent": true,
+    "simulatorAcquired": false,
+    "processResourcesAcquired": false
+  },
+  "coordinatorReadOnlyAudit": {
+    "coreSimulatorVersion": "1174.9.2",
+    "installedSimctlPath": "/Library/Developer/PrivateFrameworks/CoreSimulator.framework/Versions/A/Resources/bin/simctl",
+    "installedSimctlFile": true,
+    "installedSimctlExecutable": true,
+    "postCleanupFrozenFiles": 678,
+    "mismatches": []
+  },
+  "notRun": [
+    "Simulator inventory/boot",
+    "Build/install/launch",
+    "Metro and lifecycle scene",
+    "Installed-app identity"
+  ],
+  "nextProposal": {
+    "scope": "Continue directly from assigned simulator inventory with unchanged f05 and restored dependencies; no installation and no repeated filesystem readiness gate.",
+    "ownership": "Coordinator creates/removes short alias with standard Python pathlib; one Luna medium worker runs only prescribed wrapper/native commands and cleans only native resources it acquires.",
+    "startCommand": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-maplibre-ios-sources-env.sh xcrun simctl list devices --json",
+    "remaining": "Assigned simulator conditional boot, listeners, sole ios maplibre TF05 runner command, success-only identity, owned cleanup from reviewed plan.",
+    "approval": "Await explicit continuation approval after this stopped attempt. No automatic retry."
+  }
+}

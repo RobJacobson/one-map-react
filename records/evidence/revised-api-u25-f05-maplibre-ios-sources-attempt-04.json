@@ -1,0 +1,23 @@
+{
+  "checkpoint": "PR69 MapLibre iOS continuation from simulator inventory attempt04",
+  "observedAt": "2026-10-30T17:19:51.328892+00:00",
+  "status": "stopped-coordinator-space-preflight-before-worker-dispatch",
+  "verifiedFrozenFiles": 678,
+  "mismatches": [],
+  "availableBytes": 4973989888,
+  "availableGiB": 4.632389068603516,
+  "requiredBytes": 5368709120,
+  "requiredGiB": 5,
+  "firstFailure": "Coordinator preflight below approved five-GiB continuation floor; assertion stopped before alias creation and worker dispatch.",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "aliasAbsent": true,
+  "resourcesAcquired": [],
+  "cleanup": "None needed.",
+  "notRun": [
+    "Worker dispatch",
+    "Simulator inventory or boot",
+    "Native build/install",
+    "Metro or source scene"
+  ],
+  "next": "Additional disk space and renewed continuation approval needed; no deletion or lowered threshold authorized."
+}

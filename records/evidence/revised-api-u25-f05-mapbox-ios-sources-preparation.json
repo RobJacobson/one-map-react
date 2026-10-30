@@ -1,0 +1,166 @@
+{
+  "checkpoint": "Single Mapbox iOS TF05 source/image lifecycle preparation",
+  "status": "Independent coordinator preparation audit passed; execution requires sufficient storage and owner approval",
+  "kind": "planning/reference",
+  "audience": "Owner, coordinator and execution worker",
+  "purpose": "Review shared locked-tool reuse, fresh selected Pods resolution and one unchanged scene",
+  "nonGoals": "Pixels/image readback, remaining families/layers, other engines and full native acceptance",
+  "reviewCheckout": "/private/tmp/one-map-android-restoration-review",
+  "reviewBase": "9f24961",
+  "branch": "codex/u25-mapbox-ios-sources",
+  "scope": {
+    "changed": [
+      "scripts/tf05-sources-runner.test.mjs",
+      "scripts/with-mapbox-ios-sources-env.sh",
+      "docs/revised-api-acceptance-plan.md",
+      "records/README.md",
+      "this record"
+    ],
+    "carriedHistory": [
+      "revised-api-u25-f05-maplibre-ios-sources-attempt-01.json",
+      "revised-api-u25-f05-maplibre-ios-sources-attempt-02.json",
+      "revised-api-u25-f05-maplibre-ios-sources-attempt-03.json",
+      "revised-api-u25-f05-maplibre-ios-sources-attempt-04.json",
+      "revised-api-u25-f05-maplibre-ios-sources-attempt-05.json"
+    ],
+    "unchanged": "Primary dirty checkout, retained staging,678 baseline inputs, TF05 driver, f05, library/scene/hook/fixtures, peers, patches, versions and locks. No host setup, installation, Pods, build, Metro or simulator execution."
+  },
+  "preparedSha256": {
+    "scripts/tf05-sources-runner.test.mjs": "edb4a23193fb00a29cda9be231060828b44e152273f4b7907e27c4c568bb14bf",
+    "scripts/with-mapbox-ios-sources-env.sh": "c061e232409168c69cb1628a606b9f48ab2c4008e4194de70b92496b2b0b185d",
+    "scripts/tf05-sources-smoke.mjs": "63c4783ff5cf89ac7d4ff09d69ebdb2e43a5bd537c837e42958b1940dbd0c529"
+  },
+  "staging": {
+    "root": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery",
+    "harness": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness",
+    "selectedSha256": {
+      "package.json": "1bf6d3469daf2e192120944f4859e097dced1bcaf2ce6641777b34f32bbd6878",
+      "bun.lock": "5dd4deb89ebd9a65fbc6f92021c1313b6fea13fe91a004ef0eabf7557f1e1e5c",
+      "Gemfile": "731cb657e8b565a302671772c6cde455dfa19f7c4015b778afec9b7e67da5200",
+      "App.tsx": "0baa798ba0f274834fb218da5a9ae914dc4776ea09dfa5c3a6a6a12a706fc386",
+      "babel.config.cjs": "1caafe326b1f69ad39c476171bdcad8f2213b824e7518fc89456340cc363ce91",
+      "metro.config.cjs": "7522eb0828fd4694212bc425efd4270e56175775d2339bef89761cdc619a1786",
+      "ios/Podfile": "d63aadfaaed54cfb5f786e0b0fc448af4b780d3f585d493ca683f41428a52b3c",
+      "ios/.xcode.env": "3c02dca07775b31ce4e77dfb3bb660d7c6e577474d65a6216f1ea9bef54e1ca6",
+      "ios/OneMapMapbox.xcodeproj/project.pbxproj": "8da0e03ecc1b1eba9a0c9681bf490bcb316e82b583eb042e356dae0bfb60a6c2",
+      "ios/OneMapMapbox/Info.plist": "1f85904608edb08c8e2f8ba4c02cd515c6fe5dedcd9c082082ae006f3df5c2e3",
+      "ios/OneMapMapbox/AppDelegate.swift": "72ebb55cbbd6714833a056882823262d3efc7e548a923e8a4b575b46344ea96e",
+      "node_modules/@rnmapbox/maps/rnmapbox-maps.podspec": "c08004c274a275e9408210fb3224afc684c55e8c82bee096d528a83bebaf1cd6"
+    },
+    "present": "Selected JS dependencies, generated Mapbox iOS scaffold/Podfile; shared restored ios-ruby Gemfile/lock/gems/narrow Bundler load path and retained runtime-bin.",
+    "missing": [
+      "Selected ios/Podfile.lock",
+      "Selected ios/Pods",
+      "Selected ios/OneMapMapbox.xcworkspace",
+      "Selected ios/build",
+      "Historical Mapbox iOS lock bodies and original temporary stage"
+    ],
+    "sharedRubySha256": {
+      "Gemfile": "f768364b7cfbccd14f42d7f05bbdf9928ffe6866aa8ee639e31c776e8e885190",
+      "Gemfile.lock": "f817a57aa0cb964b2313e2a2f72e3e798ba0ef94ee36b4397ff629c3a8eda4ab"
+    },
+    "gemfileCompatibility": "Selected Gemfile equals shared task Gemfile after only reviewed CocoaPods1.15.2 pin substitution; no bundle install/new Ruby tool setup proposed.",
+    "tools": "Reused Ruby4.0.7, Bundler4.0.20 and CocoaPods1.15.2 restored and verified by MapLibre attempt02; no startup during this preparation.",
+    "token": "Inherited MAPBOX_ACCESS_TOKEN present; value never printed. Wrapper retention mocked.",
+    "auth": "Installed RNMapbox podspec says deprecated download token no longer required. Cached CoreMaps11.23.1/Common24.23.1 specs have token-free HTTP download URLs. No network/authentication test or cache availability guarantee.",
+    "simulator": "Existing filesystem proof CoreSimulator1174.9.2/executable from completed MapLibre checkpoint reused; no readiness command repeated.",
+    "authSpecSha256": {
+      "/Users/rob/.cocoapods/repos/trunk/Specs/0/6/6/MapboxCoreMaps/11.23.1/MapboxCoreMaps.podspec.json": "ffb6ef5122e751f3bdb864ce4bcefb74b50ecfeaa18cf3309e404829e86cd060",
+      "/Users/rob/.cocoapods/repos/trunk/Specs/6/2/6/MapboxCommon/24.23.1/MapboxCommon.podspec.json": "26bd334f9427351d70f909e70a51fff9364a01a9e98b4f44472c5689a395f4d0"
+    }
+  },
+  "candidate": {
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "archiveProof": "171 regular archive members compared byte-for-byte with H/packages/one-map-react and selected Mapbox installed one-map-react; both match.",
+    "versions": {
+      "React": "19.2.3",
+      "ReactNative": "0.87.1",
+      "RNMapbox": "10.3.7",
+      "Teleport": "1.2.1",
+      "MapboxMaps": "11.23.1",
+      "MapboxCoreMaps": "11.23.1",
+      "MapboxCommon": "24.23.1",
+      "Turf": "4.0.0",
+      "CocoaPods": "1.15.2"
+    }
+  },
+  "freeze": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-ios-sources-attempt-02/post-restoration-freeze.json",
+    "sha256": "a5ef9f17a3064812f3c2f53fa210dcfb94e2ff9133164e489f3c5f03d886976d",
+    "verifiedFiles": 678,
+    "mismatches": [],
+    "proposal": "After audit copy only reviewed wrapper; driver already identical. Preserve678 prior inputs. Save selected Mapbox generated preimages, audit fresh Pod locks/Manifest/workspace/project and expected RN post_install Info.plist RCTNewArchEnabled rewrite; then separately freeze selected generated outputs before build. No staging mutation in preparation."
+  },
+  "restoration": {
+    "command": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-mapbox-ios-sources-env.sh bundle exec pod install",
+    "cwd": "/private/tmp/one-map-f05-ios/native-harness/examples/native-mapbox/ios",
+    "resolution": "Fresh selected Pods resolution, not deployment; historical Mapbox Pod lock body unavailable. Shared Ruby lock remains immutable. Coordinator audits all versions/checksums/sources before native build.",
+    "historicalPodLockSha256": "8fbf35cf242d154c372cb816f4e6c3f309072799ac95c40e2ef128dbdb073874",
+    "historicalReference": "revised-api-u25-f05-mapbox-ios-queries-attempt-01.json",
+    "allowedWrites": "Selected Mapbox generated Pods/locks/workspace/project/build and audited upstream generated plist rewrite; new reviewed wrapper. No library, JS, peers, patches, versions or Android/MapLibre input changes.",
+    "downloads": "Only pinned selected Pods/SDK dependencies after approval; unexpected auth/source/version or required immutable-input mutation stops. No global gems, host setup or simulator runtime download."
+  },
+  "space": {
+    "measuredAtUTC": "2026-10-30T20:25:23.289565+00:00",
+    "availableBytes": 7072227328,
+    "beforePodsRequiredGiB": 8,
+    "beforeBootBuildRequiredGiB": 5,
+    "measurementsKiB": {
+      "sharedRuby": 26284,
+      "retainedMapLibrePods": 1320000,
+      "retainedMapLibreBuild": 701820
+    },
+    "estimate": "8GiB restoration floor:2GiB Pods/codegen+3GiB build/download intermediates+1GiB download/cache allowance+2GiB host reserve. After restoration5GiB:3GiB build+2GiB reserve. Demand unmeasured; shared caches/tools do not prove fit.",
+    "status": "Insufficient current headroom; no deletion, threshold reduction or cleanup candidate authorized.",
+    "coordinatorAvailableBytes": 6790582272,
+    "coordinatorMeasuredUTC": "2026-10-30T20:26:58.506588+00:00"
+  },
+  "routineVerification": {
+    "passed": [
+      "Node runner mocks",
+      "Installed selected Babel transforms for App, TF05 screen and source hook without Metro",
+      "171 archive member comparisons against both package copies",
+      "678 frozen-file hashes",
+      "Selected Gemfile/shared locked-tool compatibility",
+      "Bun runner mocks",
+      "Node JS syntax and shell syntax",
+      "Scoped Vite+ formatting/lint",
+      "Documentation structure/local links (40 Markdown files;39 SDK tables)",
+      "git diff --check",
+      "Configured selected Babel App/screen/hook transforms plus TF05/fixture-base/public-token inlining assertion, no Metro"
+    ],
+    "pending": [],
+    "coverage": "Existing Android/web guards retained; both iOS engines checked workspace/scheme/app paths, exact app id and UUID, install/launch/cleanup, build/install/launch/status/Metro/listener/teardown failures. Wrapper token preserved for Mapbox and empty-token MapLibre operation retained.",
+    "warnings": "Existing Bun moduleSuffixes warning; no configuration change."
+  },
+  "futureExecution": {
+    "solePlan": "docs/revised-api-acceptance-plan.md#proposed-single-mapbox-ios-source-scene",
+    "command": "/bin/sh /Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-mapbox-ios-sources-env.sh bun /private/tmp/one-map-f05-ios/native-harness/scripts/tf05-sources-smoke.mjs ios mapbox",
+    "cwd": "/private/tmp/one-map-f05-ios/native-harness",
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "producedApp": "/private/tmp/one-map-f05-ios/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+    "estimate": "20-60minutes including fresh selected Pods and one build; unmeasured",
+    "limitsSeconds": {
+      "pods": 1200,
+      "inventory": 30,
+      "bootstatus": 120,
+      "build": 600,
+      "status": 600,
+      "totalIncludingCleanup": 5400
+    },
+    "ownership": "Same single Luna medium worker runs selected Pods, pauses for coordinator dependency audit, then continues assigned simctl inventory/conditional owned boot/clear ports/sole scene/success-only installed receipt/cleanup in original approved scope. Coordinator owns alias via pathlib, staging/freeze/audit and permanent outcome.",
+    "identity": "Produced/installed APPL/bundle/executable/version/build metadata, loader AND debug-dylib hashes/presence, MapboxCoreMaps11.23.1 metadata; frozen locks unchanged. Not full bundle certification.",
+    "permission": "No native execution authorized. Every future host command uses require_escalated within explicit scope. Stop first failure, no retry/repair.",
+    "cleanup": "Only owned app/Metro/status/fixture/simulator boot/alias; preserve active restored dependencies/binaries, Android and MapLibre freezes. No stale utility paths or ad hoc Python worker receipt."
+  },
+  "unverified": "Fresh selected Pod resolution/authentication/disk demand, simulator availability, produced/installed Mapbox binary identity and bounded TF05 runtime. Pixels and broader acceptance excluded.",
+  "coordinatorAudit": {
+    "status": "passed within bounded preparation scope",
+    "codeReview": "TF05 driver unchanged. Mapbox wrapper changes only selected build folder while reusing verified tool paths and simulator. Expanded VM matrix verifies selected workspace/scheme/app paths, exact install/launch/terminate target, error propagation and owned cleanup for both engines. Empty-token MapLibre and inherited-token Mapbox checks preserved.",
+    "routine": "Pinned Node and Bun mocks independently pass. Prepared files, selected scaffold/podspec and shared Ruby hashes independently match; shared Gemfile compatibility verified.",
+    "candidate": "Independently compared all171 f05 archive members with shared and selected Mapbox package copies. All678 prior frozen inputs unchanged.",
+    "downloads": "Independently read/hash-checked cached CoreMaps11.23.1 and Common24.23.1 podspecs: HTTPS public api.mapbox.com sources with no embedded credentials or query token. No authentication/network acceptance performed.",
+    "executionReview": "One Luna medium worker restores selected Pods, pauses for coordinator lock/generated-output audit, then continues under the same approved scope. Generated selected Info.plist/project preimages preserved and expected post-install mutations inspected. Coordinator owns alias and durable receipt; no fragile utility paths or ad hoc worker receipt scripts.",
+    "limits": "Fresh selected Pod resolution, actual download/authentication, disk demand, simulator/build/scene and produced/installed identity remain unverified. Preparation does not authorize native execution."
+  }
+}
