@@ -1,0 +1,163 @@
+{
+  "checkpoint": "PR75 Mapbox Android targeted rendering attempt01",
+  "observedAt": "2026-10-30T23:05:48.634133+00:00",
+  "result": "passed",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "apkReused": true,
+  "nativeBuildOrDependencyRestoration": false,
+  "verifiedApkInstalledOnFreshPrivateEmulator": true,
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-rendering.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-android-rendering-attempt-01",
+  "commandExit": 0,
+  "attemptCount": 1,
+  "scene": {
+    "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+    "platform": "android",
+    "engine": "mapbox",
+    "artifact": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "nativeIdentity": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "outcomes": [
+      {
+        "name": "known rendered feature and initial no-data",
+        "status": "passed",
+        "observation": {
+          "loads": 1,
+          "featureIds": [
+            "9009"
+          ],
+          "elevation": null
+        }
+      },
+      {
+        "name": "terrain enabled before delayed DEM attachment",
+        "status": "passed",
+        "observation": {
+          "elevation": 2000,
+          "expectedMeters": 2000
+        }
+      },
+      {
+        "name": "explicit terrain clear and projection change",
+        "status": "passed",
+        "observation": {
+          "elevation": 2000
+        }
+      },
+      {
+        "name": "hillshade draws the fixture's slope patch",
+        "status": "passed",
+        "observation": {
+          "changedPixels": 5614
+        }
+      },
+      {
+        "name": "globe projection has independently different viewport output",
+        "status": "passed",
+        "observation": {
+          "changedPixels": 1897076,
+          "projectionReadback": "native pixel comparison"
+        }
+      },
+      {
+        "name": "rendered output contains the known orange feature",
+        "status": "passed",
+        "observation": {
+          "width": 1080,
+          "height": 2400,
+          "orangePixels": 2992
+        }
+      }
+    ]
+  },
+  "identityReads": [
+    {
+      "phase": "before",
+      "path": "/data/app/~~RXzF9FDecTcCOVxkzmNy9g==/com.onemapmapbox-4XU9Ifoz4gaJ90N6uNrflg==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "after",
+      "path": "/data/app/~~RXzF9FDecTcCOVxkzmNy9g==/com.onemapmapbox-4XU9Ifoz4gaJ90N6uNrflg==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "apkSha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+  "coordinatorAudit": {
+    "result": "passed within exact six-scenario Mapbox Android scope",
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "preparedFiles": 3,
+    "mismatches": [],
+    "retainedInstalledApk": "matching before and after scene",
+    "ownedPidsAbsent": [
+      65818,
+      65979,
+      65927
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8798
+    ],
+    "privateAvdRemoved": true,
+    "freeGiB": 8.640316009521484
+  },
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 65979",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 65927",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8798",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8798",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "scopeLimit": "Exactly six existing TF09 Android Mapbox scenarios. Broader native acceptance and MapLibre Android rendering remain open."
+}

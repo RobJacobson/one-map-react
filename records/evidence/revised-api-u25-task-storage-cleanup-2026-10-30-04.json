@@ -1,0 +1,28 @@
+{
+  "recordedUTC": "2026-10-31T05:49:38.033081+00:00",
+  "authorization": "Owner requested freeing space",
+  "removed": [
+    "/Users/rob/.gradle/.tmp",
+    "/Users/rob/Library/Caches/ms-playwright"
+  ],
+  "allocatedMiBBefore": {
+    "gradleTemporary": 216.6,
+    "playwrightDownloads": 572.3
+  },
+  "reclaimedGiBApprox": 0.77041015625,
+  "availableGiBAfter": 28.390560150146484,
+  "remaining": {
+    "path": "/Users/rob/Library/Caches/dotslash",
+    "allocatedMiB": 769.4296875,
+    "reason": "macOS rejected deleting/changing write permission on cached DevTools app bundles. Left remaining cache in place; no elevated administrator action attempted."
+  },
+  "preservedVerification": {
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "f05Archive": "unchanged"
+  },
+  "scope": "Inactive download cache and Gradle temporary files; source, dependencies, verified native apps/APKs and SDK image preserved",
+  "risk": "Browser download cache would need downloading again for future browser tests; next native rendering check uses none of it.",
+  "nativeExecution": false
+}

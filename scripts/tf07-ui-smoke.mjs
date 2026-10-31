@@ -24,7 +24,9 @@ import {
   nativeUiScenarios,
 } from "./tf07-smoke-contract.mjs";
 
-const root = resolve(import.meta.dirname, "..");
+const root = process.env.TF07_HARNESS_ROOT
+  ? resolve(process.env.TF07_HARNESS_ROOT)
+  : resolve(import.meta.dirname, "..");
 const platform = process.argv[2];
 const engine = process.argv[3] ?? "both";
 const retained = process.argv[4] === "retained";
@@ -72,7 +74,10 @@ const main = async () => {
     );
   }
 
-  console.log(JSON.stringify({ artifact, results }, null, 2));
+  const result = JSON.stringify({ artifact, results }, null, 2);
+  if (process.env.TF07_OUTPUT)
+    writeFileSync(process.env.TF07_OUTPUT, result, { flag: "wx" });
+  console.log(result);
   if (Object.values(results).some((result) => result.status !== "passed"))
     process.exitCode = 1;
 };
@@ -302,14 +307,21 @@ const runNative = async (selectedEngine) => {
       ? `com.onemap${selectedEngine}`
       : `org.reactjs.native.example.OneMap${selectedEngine === "mapbox" ? "Mapbox" : "Maplibre"}`;
   const metroPort = Number(process.env.TF07_METRO_PORT ?? 8081);
-  const iosDevice = process.env.TF07_IOS_UDID ?? "booted";
+  const iosDevice = process.env.TF07_IOS_UDID;
+  if (platform === "ios" && !iosDevice)
+    throw new Error("Set TF07_IOS_UDID to the assigned simulator.");
   const serial = process.env.ANDROID_SERIAL;
   if (platform === "android" && !serial)
     throw new Error("Set ANDROID_SERIAL to the assigned device.");
   const adb = (args) => command("adb", ["-s", serial, ...args]);
   const temporary = mkdtempSync(join(tmpdir(), "one-map-tf07-native-"));
   let metro;
+  let stoppingMetro = false;
   let status;
+  let acquiredApp = false;
+  const acquiredReverses = [];
+  const failures = [];
+  let result;
 
   try {
     await requireFreePort(metroPort);
@@ -318,15 +330,39 @@ const runNative = async (selectedEngine) => {
     if (platform === "android") {
       const installed = (await adb(["shell", "pm", "path", applicationId]))
         .trim()
-        .split("\n")
-        .find((line) => line.endsWith("base.apk"));
-      if (!installed)
-        throw new Error("The selected native app is not installed.");
+        .split(/\r?\n/);
+      assert.equal(installed.length, 1, "Expected one installed base APK.");
+      assert.match(installed[0], /^package:\/data\/app\/[^\s]+\/base\.apk$/);
       const apk = join(temporary, "installed.apk");
-      await adb(["pull", installed.slice("package:".length), apk]);
+      await adb(["pull", installed[0].slice("package:".length), apk]);
       actual = createHash("sha256").update(readFileSync(apk)).digest("hex");
-      await adb(["reverse", "tcp:8081", `tcp:${metroPort}`]);
-      await adb(["reverse", "tcp:8797", "tcp:8797"]);
+      assert.equal(actual, expected, "Installed APK differs from baseline.");
+      const reverses = (await adb(["reverse", "--list"]))
+        .trim()
+        .split(/\r?\n/)
+        .filter(Boolean)
+        .map((line) => line.trim().split(/\s+/));
+      for (const [local, remote] of [
+        [8081, metroPort],
+        [8797, 8797],
+      ]) {
+        const existing = reverses.filter(
+          (fields) => fields[1] === `tcp:${local}`
+        );
+        if (local === 8081 && process.env.TF07_BORROWED_METRO_REVERSE === "1") {
+          assert.equal(existing.length, 1, "Missing borrowed Metro reverse.");
+          assert.equal(
+            existing[0][2],
+            `tcp:${remote}`,
+            "Conflicting borrowed Metro reverse."
+          );
+        } else {
+          assert.equal(existing.length, 0, `Reverse ${local} already exists.`);
+          await adb(["reverse", `tcp:${local}`, `tcp:${remote}`]);
+          acquiredReverses.push(local);
+        }
+      }
+      acquiredApp = true;
       await adb(["shell", "am", "force-stop", applicationId]);
     } else {
       const app = (
@@ -348,6 +384,7 @@ const runNative = async (selectedEngine) => {
       actual = createHash("sha256")
         .update(readFileSync(join(app, executable)))
         .digest("hex");
+      acquiredApp = true;
       await command("xcrun", [
         "simctl",
         "terminate",
@@ -384,28 +421,56 @@ const runNative = async (selectedEngine) => {
       );
     }
     let completed;
+    let nativeFailure;
+    const readManual = () => {
+      if (!manualPath) return;
+      try {
+        const manual = JSON.parse(readFileSync(manualPath, "utf8"));
+        for (const field of [
+          "installedBinarySha256",
+          "libraryDistSha256",
+          "environment",
+          "runId",
+        ])
+          assert.equal(
+            manual?.[field],
+            identity[field],
+            `TF07 report ${field} differs from this run.`
+          );
+        for (const scenario of scenarios) {
+          const outcome = manual.scenarios?.[scenario];
+          assert(
+            ["unverified", "passed", "failed"].includes(outcome),
+            `Invalid TF07 report outcome: ${scenario}.`
+          );
+          assert.notEqual(
+            outcome,
+            "failed",
+            `TF07 physical observation failed: ${scenario}.`
+          );
+        }
+        return manual;
+      } catch (error) {
+        nativeFailure ??= new Error(`TF07 manual report failed: ${error}`);
+      }
+    };
     status = await nativeStatus((observation) => {
+      const manual = readManual();
       if (
-        retained
+        nativeFailure ||
+        (retained
           ? observation?.focusedComplete !== true
-          : !(observation?.generation >= 1)
+          : !(observation?.generation >= 1))
       )
         return;
-      let manual;
-      if (manualPath) {
-        try {
-          manual = JSON.parse(readFileSync(manualPath, "utf8"));
-        } catch {
-          return;
-        }
-        if (
-          !(retained ? nativeRetainedReportReady : nativeUiReportReady)(
-            manual,
-            identity
-          )
+      if (
+        manualPath &&
+        !(retained ? nativeRetainedReportReady : nativeUiReportReady)(
+          manual,
+          identity
         )
-          return;
-      }
+      )
+        return;
       completed = { observation, manual };
     });
     metro = start(
@@ -419,19 +484,45 @@ const runNative = async (selectedEngine) => {
         },
       }
     );
-    await until(
-      async () => (await fetch(`http://127.0.0.1:${metroPort}/status`)).ok,
-      60000
-    );
-    if (platform === "android")
-      await adb([
+    metro.on("error", (error) => {
+      nativeFailure ??= error;
+    });
+    metro.on("exit", (code, signal) => {
+      if (!stoppingMetro)
+        nativeFailure ??= new Error(
+          `TF07 Metro exited before completion: ${code}/${signal}.`
+        );
+    });
+    await until(async () => {
+      if (nativeFailure) return true;
+      const response = await fetch(`http://127.0.0.1:${metroPort}/status`);
+      const body = await response.text();
+      if (!response.ok || body !== "packager-status:running")
+        nativeFailure ??= new Error(
+          "TF07 Metro returned an unexpected packager status."
+        );
+      return true;
+    }, 60000);
+    if (nativeFailure) throw nativeFailure;
+    if (platform === "android") {
+      const launch = await adb([
         "shell",
         "am",
         "start",
+        "-W",
         "-n",
         `${applicationId}/.MainActivity`,
       ]);
-    else
+      assert.match(
+        launch,
+        /Status: ok/,
+        "TF07 selected app launch was not confirmed."
+      );
+      assert(
+        !/Error:|Exception/.test(launch),
+        "TF07 selected app launch failed."
+      );
+    } else
       await command("xcrun", [
         "simctl",
         "launch",
@@ -441,16 +532,20 @@ const runNative = async (selectedEngine) => {
         `127.0.0.1:${metroPort}`,
       ]);
     console.error(
-      `Perform the native touch flow in docs/tf07-ui.md, then press Read renderer. Required observations: ${scenarios.join(", ")}.`
+      `Perform the native touch flow from the approved acceptance plan, then press Read renderer. Required observations: ${scenarios.join(", ")}.`
     );
     console.error(`Native report identity: ${JSON.stringify(identity)}`);
     await until(
-      async () => completed !== undefined,
+      async () => {
+        readManual();
+        return nativeFailure !== undefined || completed !== undefined;
+      },
       Number(process.env.TF07_NATIVE_TIMEOUT_MS ?? 60 * 60 * 1000)
     );
+    if (nativeFailure) throw nativeFailure;
     const { observation, manual } = completed;
 
-    return {
+    result = {
       ...(retained ? judgeNativeRetained : judgeNativeUi)(
         observation,
         manual,
@@ -462,13 +557,38 @@ const runNative = async (selectedEngine) => {
         : {}),
       observation,
     };
+  } catch (error) {
+    failures.push(error);
   } finally {
-    if (metro) await stopOwnedProcess(metro);
-    await status?.close();
-    if (platform === "android")
-      await adb(["reverse", "--remove", "tcp:8797"]).catch(() => undefined);
+    const clean = async (action) => {
+      try {
+        await action();
+      } catch (error) {
+        failures.push(error);
+      }
+    };
+    if (acquiredApp)
+      await clean(() =>
+        platform === "android"
+          ? adb(["shell", "am", "force-stop", applicationId])
+          : command("xcrun", ["simctl", "terminate", iosDevice, applicationId])
+      );
+    stoppingMetro = true;
+    if (metro)
+      await clean(() => {
+        // The batch owns this process group, including descendants after driver exit.
+        if (process.env.TF07_PARENT_PROCESS_GROUP === "1")
+          metro.kill("SIGTERM");
+        else return stopOwnedProcess(metro);
+      });
+    await clean(() => status?.close());
+    for (const port of acquiredReverses.reverse())
+      await clean(() => adb(["reverse", "--remove", `tcp:${port}`]));
     rmSync(temporary, { recursive: true, force: true });
   }
+  if (failures.length)
+    throw new AggregateError(failures, "TF07 flow or owned cleanup failed.");
+  return result;
 };
 
 const nativeStatus = (onObservation) =>
@@ -627,7 +747,7 @@ const until = async (ready, timeout, description = "required observation") => {
 const start = (file, args, options = {}) => {
   const child = spawn(file, args, {
     ...options,
-    detached: true,
+    detached: process.env.TF07_PARENT_PROCESS_GROUP !== "1",
     stdio: "ignore",
   });
   child.on("error", () => undefined);
@@ -636,8 +756,12 @@ const start = (file, args, options = {}) => {
 
 const command = (file, args) =>
   new Promise((resolveCommand, reject) => {
-    const child = spawn(file, args, { stdio: ["ignore", "pipe", "ignore"] });
+    const child = spawn(file, args, { stdio: ["ignore", "pipe", "pipe"] });
     let output = "";
+    let stderr = "";
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
     const timeout = setTimeout(() => {
       child.kill("SIGTERM");
       reject(new Error(`${file} timed out.`));
@@ -652,21 +776,27 @@ const command = (file, args) =>
     child.on("close", (code) => {
       clearTimeout(timeout);
       if (code === 0) resolveCommand(output);
-      else reject(new Error(`${file} exited ${code}.`));
+      else
+        reject(
+          Object.assign(new Error(`${file} exited ${code}.`), {
+            code,
+            stdout: output,
+            stderr,
+          })
+        );
     });
   });
 
 const requireFreePort = async (port) => {
-  const processes = await command("lsof", [
-    "-nP",
-    `-iTCP:${port}`,
-    "-sTCP:LISTEN",
-    "-t",
-  ]).catch(() => "");
-  if (processes.trim())
-    throw new Error(
-      `Port ${port} is occupied; its owner must release it before acceptance.`
-    );
+  try {
+    await command("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"]);
+  } catch (error) {
+    if (error.code === 1 && error.stdout === "" && error.stderr === "") return;
+    throw error;
+  }
+  throw new Error(
+    `Port ${port} is occupied; its owner must release it before acceptance.`
+  );
 };
 
 const directoryDigest = (directoryRoot) => {

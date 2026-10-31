@@ -1,0 +1,42 @@
+{
+  "recordedUTC": "2026-10-30T22:11:51.309689+00:00",
+  "authorization": "Owner requested freeing any available space",
+  "removed": [
+    {
+      "path": "/Users/rob/code/mapbox-code/rnmapbox/example/ios/build",
+      "allocatedBytesBefore": 4326739968
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/rnmapbox/example/android/app/build",
+      "allocatedBytesBefore": 1766748160
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/rnmapbox/example/android/.gradle",
+      "allocatedBytesBefore": 11493376
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/rnmapbox/example/android/build",
+      "allocatedBytesBefore": 184320
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/rnmapbox/example/build",
+      "allocatedBytesBefore": 222191616
+    },
+    {
+      "path": "/Users/rob/code/mapbox-code/rnmapbox/android/build",
+      "allocatedBytesBefore": 22663168
+    }
+  ],
+  "availableBytesBefore": 5845479424,
+  "availableBytesAfter": 12063784960,
+  "availableGiBAfter": 11.235275268554688,
+  "freeSpaceIncreaseBytes": 6218305536,
+  "preservedVerification": {
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "f05Archive": "unchanged"
+  },
+  "scope": "Only ignored, untracked, inactive generated build outputs in the sibling RNMapbox checkout; no source, dependencies, locks, verified f05 APKs/apps, SDK image or user documents removed",
+  "nativeExecution": false
+}
