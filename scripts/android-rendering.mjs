@@ -59,17 +59,25 @@ const root = resolve(import.meta.dirname, "..");
  * @returns Completion after the first outcome and bounded owned cleanup.
  */
 export const run = async (output, engine = "mapbox", scene = "rendering") => {
-  assert(["rendering", "camera"].includes(scene), "Unknown fixed scene.");
+  assert(
+    ["rendering", "camera", "acceptance"].includes(scene),
+    "Unknown fixed scene."
+  );
   assert(
     scene !== "camera" || engine === "mapbox",
     "Camera targets Mapbox only."
   );
-  const camera = scene === "camera";
-  const ports = camera ? [5580, 5581, 8081] : [5580, 5581, 8081, 8798];
+  const batch = scene === "acceptance";
+  const camera = scene === "camera" || batch;
+  const ports = batch
+    ? [5580, 5581, 8081, 8797]
+    : camera
+      ? [5580, 5581, 8081]
+      : [5580, 5581, 8081, 8798];
   assert(Object.hasOwn(targets, engine), "Choose mapbox or maplibre.");
-  const { applicationId, apkSha256, outcomes } = targets[engine];
-  const shell = join(harness, `examples/native-${engine}`);
-  const apk = join(shell, "android/app/build/outputs/apk/debug/app-debug.apk");
+  let { applicationId, apkSha256, outcomes } = targets[engine];
+  let shell = join(harness, `examples/native-${engine}`);
+  let apk = join(shell, "android/app/build/outputs/apk/debug/app-debug.apk");
   assert(output, "Provide a fresh absolute output directory.");
   assert.equal(resolve(output), output);
   mkdirSync(output);
@@ -83,6 +91,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     checkpoints: [],
   };
   const children = [];
+  const stoppingChildren = new Set();
   const reverses = [];
   let emulator;
   let launchAttempted = false;
@@ -128,6 +137,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       ...preparation.stagedSha256,
       ...preparation.hostInputSha256,
       ...preparation.cameraInputSha256,
+      ...preparation.batchInputSha256,
     }))
       assert.equal(sha256(file), hash, `Frozen runtime input changed: ${file}`);
   };
@@ -146,11 +156,15 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       failure ??= error;
     });
     child.on("exit", (code, signal) => {
-      if (code !== 0 || signal)
+      if (!stoppingChildren.has(child) && (code !== 0 || signal))
         failure ??= new Error(`${file} exited: ${code}/${signal}`);
     });
     children.push(child);
     return child;
+  };
+  const stopChild = async (child) => {
+    stoppingChildren.add(child);
+    await stopOwnedProcess(child);
   };
   const until = async (observe, timeout = 60000, checkChildren = true) => {
     const deadline = Date.now() + timeout;
@@ -208,7 +222,9 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     }
     const peerEvidence = join(
       root,
-      `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
+      batch
+        ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
+        : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
@@ -276,157 +292,240 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       await adb(["reverse", `tcp:${port}`, `tcp:${port}`], 20000);
       reverses.push(port);
     }
-    assert.equal(sha256(apk), apkSha256);
-    await checkpoint("install verified APK", () =>
-      adb(["install", "-r", "-t", apk], 120000).then((result) => {
-        assert.match(
-          result,
-          /\bSuccess\b/,
-          "APK installation was not confirmed."
-        );
-        installed = true;
-      })
-    );
-    await identity("before");
-    await adb(["shell", "am", "force-stop", applicationId]);
-    await adb([
-      "shell",
-      "run-as",
-      applicationId,
-      "mkdir",
-      "-p",
-      "shared_prefs",
-    ]);
-    // A fresh private emulator has no user preferences to preserve.
-    const preferences = `<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n<map><string name="debug_http_host">localhost:8081</string></map>\n`;
-    await adb(
-      [
-        "shell",
-        `run-as ${applicationId} sh -c 'cat > shared_prefs/${applicationId}_preferences.xml'`,
-      ],
-      30000,
-      preferences
-    );
-    assert.equal(
-      (
-        await adb([
-          "exec-out",
-          "run-as",
-          applicationId,
-          "cat",
-          `shared_prefs/${applicationId}_preferences.xml`,
-        ])
-      ).trim(),
-      preferences.trim()
-    );
-    const api = Number(
-      (await adb(["shell", "getprop", "ro.build.version.sdk"])).trim()
-    );
-    assert(
-      Number.isInteger(api) && api >= 37,
-      "Expected cached Android API 37 or later."
-    );
-    await adb([
-      "shell",
-      "pm",
-      "grant",
-      applicationId,
-      "android.permission.ACCESS_LOCAL_NETWORK",
-    ]);
-    const metro = start(
-      "/bin/sh",
-      [
-        wrapper,
-        join(recovery, "runtime-bin/bun"),
-        "run",
-        "start",
-        "--reset-cache",
-        "--port",
-        "8081",
-      ],
-      shell,
-      { ONE_MAP_SMOKE: camera ? "tf04" : "tf09" }
-    );
-    metro.once("exit", (code, signal) => {
-      failure ??= new Error(
-        `Metro exited before scene completion: ${code}/${signal}`
-      );
-    });
-    await until(async () =>
-      (
-        await fetch("http://127.0.0.1:8081/status", {
-          signal: AbortSignal.timeout(2000),
+    receipt.rows = batch ? [] : undefined;
+    for (const selectedEngine of batch ? ["mapbox", "maplibre"] : [engine]) {
+      engine = selectedEngine;
+      ({ applicationId, apkSha256, outcomes } = targets[engine]);
+      shell = join(harness, `examples/native-${engine}`);
+      apk = join(shell, "android/app/build/outputs/apk/debug/app-debug.apk");
+      installed = false;
+      assert.equal(sha256(apk), apkSha256);
+      await checkpoint(`install verified ${engine} APK`, () =>
+        adb(["install", "-r", "-t", apk], 120000).then((result) => {
+          assert.match(
+            result,
+            /\bSuccess\b/,
+            "APK installation was not confirmed."
+          );
+          installed = true;
         })
-      )
-        .text()
-        .then((body) => body === "packager-status:running")
-    );
-    let driver;
-    if (!camera) {
-      driver = start(
-        process.execPath,
-        [join(harness, "scripts/tf09-rendering-smoke.mjs"), "android", engine],
-        harness,
-        {
-          TF09_OUTPUT: join(output, "scene.json"),
-          TF09_LIBRARY_SHA256: distSha256,
-          TF09_NATIVE_IDENTITY: apkSha256,
-          TF09_PEER_EVIDENCE: peerEvidence,
-          TF09_RUNTIME_NODE_MODULES: pngRoot,
-        }
       );
-      await until(
-        async () =>
-          (
-            await fetch("http://127.0.0.1:8798/command", {
-              signal: AbortSignal.timeout(2000),
-            })
-          ).ok
-      );
-    }
-    const launch = await checkpoint("launch selected app", () =>
-      adb([
+      await identity(batch ? `${engine}-installed` : "before");
+      await adb(["shell", "am", "force-stop", applicationId]);
+      await adb([
         "shell",
-        "am",
-        "start",
-        "-W",
-        "-n",
-        `${applicationId}/.MainActivity`,
-      ])
-    );
-    assert.match(launch, /Status: ok/);
-    assert(!/Error:|Exception/.test(launch), "Selected app launch failed.");
-    if (camera) {
-      receipt.scene = await observeCamera({
-        adb,
-        execute,
-        until,
-        record: (observation) => {
-          receipt.camera = observation;
-          record();
-        },
-      });
-    } else {
-      await until(
-        () => driver.exitCode !== null || driver.signalCode !== null,
-        600000
+        "run-as",
+        applicationId,
+        "mkdir",
+        "-p",
+        "shared_prefs",
+      ]);
+      // A fresh private emulator has no user preferences to preserve.
+      const preferences = `<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n<map><string name="debug_http_host">localhost:8081</string></map>\n`;
+      await adb(
+        [
+          "shell",
+          `run-as ${applicationId} sh -c 'cat > shared_prefs/${applicationId}_preferences.xml'`,
+        ],
+        30000,
+        preferences
       );
-      assert.equal(driver.exitCode, 0);
-      receipt.scene = JSON.parse(readFileSync(join(output, "scene.json")));
-      assert.equal(receipt.scene.platform, "android");
-      assert.equal(receipt.scene.engine, engine);
-      assert.equal(receipt.scene.artifact, distSha256);
-      assert.equal(receipt.scene.nativeIdentity, apkSha256);
-      assert.deepEqual(
-        receipt.scene.outcomes.map((value) => value.name),
-        outcomes
+      assert.equal(
+        (
+          await adb([
+            "exec-out",
+            "run-as",
+            applicationId,
+            "cat",
+            `shared_prefs/${applicationId}_preferences.xml`,
+          ])
+        ).trim(),
+        preferences.trim()
+      );
+      const api = Number(
+        (await adb(["shell", "getprop", "ro.build.version.sdk"])).trim()
       );
       assert(
-        receipt.scene.outcomes.every((value) => value.status === "passed")
+        Number.isInteger(api) && api >= 37,
+        "Expected cached Android API 37 or later."
       );
+      await adb([
+        "shell",
+        "pm",
+        "grant",
+        applicationId,
+        "android.permission.ACCESS_LOCAL_NETWORK",
+      ]);
+      for (const row of batch ? ["camera", "core", "retained"] : [scene]) {
+        const rowId = `${engine}-android-${row}`;
+        if (batch) {
+          receipt.currentRow = rowId;
+          record();
+        }
+        if (batch) {
+          await identity(`${rowId}-before`);
+          verifyInputs(preparation, freeze);
+        }
+        const rowChildren = children.length;
+        if (row === "core" || row === "retained") {
+          const driver = start(
+            "/bin/sh",
+            [
+              wrapper,
+              process.execPath,
+              join(root, "scripts/tf07-ui-smoke.mjs"),
+              "android",
+              engine,
+              ...(row === "retained" ? ["retained"] : []),
+            ],
+            harness,
+            {
+              TF07_HARNESS_ROOT: harness,
+              TF07_METRO_PORT: "8081",
+              ANDROID_SERIAL: serial,
+              TF07_NATIVE_BINARY_SHA256: apkSha256,
+              TF07_BORROWED_METRO_REVERSE: "1",
+              TF07_PARENT_PROCESS_GROUP: "1",
+              TF07_MANUAL_REPORT: join(output, `${rowId}-manual.json`),
+              TF07_OUTPUT: join(output, `${rowId}-result.json`),
+              TF07_NATIVE_TIMEOUT_MS: "1800000",
+            }
+          );
+          await until(
+            () => driver.exitCode !== null || driver.signalCode !== null,
+            1860000
+          );
+          assert.equal(driver.exitCode, 0, `${rowId} driver failed.`);
+          const result = JSON.parse(
+            readFileSync(join(output, `${rowId}-result.json`))
+          );
+          assert.equal(result.artifact.distSha256, distSha256);
+          assert.deepEqual(Object.keys(result.results), [`${engine}-android`]);
+          const observed = result.results[`${engine}-android`];
+          assert.equal(observed.status, "passed");
+          assert.equal(observed.installedBinarySha256, apkSha256);
+          assert.equal(observed.libraryDistSha256, distSha256);
+          receipt.scene = observed;
+        } else {
+          const metro = start(
+            "/bin/sh",
+            [
+              wrapper,
+              join(recovery, "runtime-bin/bun"),
+              "run",
+              "start",
+              "--reset-cache",
+              "--port",
+              "8081",
+            ],
+            shell,
+            { ONE_MAP_SMOKE: camera ? "tf04" : "tf09" }
+          );
+          metro.once("exit", (code, signal) => {
+            if (!stoppingChildren.has(metro))
+              failure ??= new Error(
+                `Metro exited before scene completion: ${code}/${signal}`
+              );
+          });
+          await until(async () =>
+            (
+              await fetch("http://127.0.0.1:8081/status", {
+                signal: AbortSignal.timeout(2000),
+              })
+            )
+              .text()
+              .then((body) => body === "packager-status:running")
+          );
+          let driver;
+          if (!camera) {
+            driver = start(
+              process.execPath,
+              [
+                join(harness, "scripts/tf09-rendering-smoke.mjs"),
+                "android",
+                engine,
+              ],
+              harness,
+              {
+                TF09_OUTPUT: join(output, "scene.json"),
+                TF09_LIBRARY_SHA256: distSha256,
+                TF09_NATIVE_IDENTITY: apkSha256,
+                TF09_PEER_EVIDENCE: peerEvidence,
+                TF09_RUNTIME_NODE_MODULES: pngRoot,
+              }
+            );
+            await until(
+              async () =>
+                (
+                  await fetch("http://127.0.0.1:8798/command", {
+                    signal: AbortSignal.timeout(2000),
+                  })
+                ).ok
+            );
+          }
+          const launch = await checkpoint("launch selected app", () =>
+            adb([
+              "shell",
+              "am",
+              "start",
+              "-W",
+              "-n",
+              `${applicationId}/.MainActivity`,
+            ])
+          );
+          assert.match(launch, /Status: ok/);
+          assert(
+            !/Error:|Exception/.test(launch),
+            "Selected app launch failed."
+          );
+          if (camera) {
+            receipt.scene = await observeCamera({
+              adb,
+              execute,
+              until,
+              engine,
+              record: (observation) => {
+                receipt.camera = observation;
+                record();
+              },
+            });
+          } else {
+            await until(
+              () => driver.exitCode !== null || driver.signalCode !== null,
+              600000
+            );
+            assert.equal(driver.exitCode, 0);
+            receipt.scene = JSON.parse(
+              readFileSync(join(output, "scene.json"))
+            );
+            assert.equal(receipt.scene.platform, "android");
+            assert.equal(receipt.scene.engine, engine);
+            assert.equal(receipt.scene.artifact, distSha256);
+            assert.equal(receipt.scene.nativeIdentity, apkSha256);
+            assert.deepEqual(
+              receipt.scene.outcomes.map((value) => value.name),
+              outcomes
+            );
+            assert(
+              receipt.scene.outcomes.every((value) => value.status === "passed")
+            );
+          }
+        }
+        await identity(batch ? `${rowId}-after` : "after");
+        verifyInputs(preparation, freeze);
+        if (failure) throw failure;
+        if (batch) {
+          receipt.rows.push({ rowId, status: "passed", scene: receipt.scene });
+          record();
+          await adb(["shell", "am", "force-stop", applicationId]);
+          for (const child of children.slice(rowChildren).reverse())
+            await stopChild(child);
+          children.splice(rowChildren);
+          await requireFreePort(8081, execute);
+          await requireFreePort(8797, execute);
+        }
+      }
     }
-    await identity("after");
-    verifyInputs(preparation, freeze);
     receipt.result = "passed";
   } catch (error) {
     receipt.error = String(error);
@@ -464,9 +563,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         adb(["shell", "am", "force-stop", applicationId])
       );
     for (const child of children.reverse())
-      await cleanup(`owned process ${child.pid}`, () =>
-        stopOwnedProcess(child)
-      );
+      await cleanup(`owned process ${child.pid}`, () => stopChild(child));
     for (const port of reverses.reverse())
       await cleanup(`owned reverse ${port}`, () =>
         adb(["reverse", "--remove", `tcp:${port}`], 20000)

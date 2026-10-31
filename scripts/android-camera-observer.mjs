@@ -10,9 +10,18 @@ print(json.dumps(nodes[0].get('text', '') if nodes else None))
 `;
 
 /** Observes only this attempt's selected Android Text and sends one phase-gated tap. */
-export const observeCamera = async ({ adb, execute, until, record }) => {
+export const observeCamera = async ({
+  adb,
+  execute,
+  until,
+  record,
+  engine = "mapbox",
+}) => {
   const devicePath = `/sdcard/one-map-tf04-${randomUUID()}.xml`;
   const observations = [];
+  assert(["mapbox", "maplibre"].includes(engine));
+  const doubleTap = engine === "maplibre";
+  let doubleTapped = false;
   let tapped = false;
   let seen = false;
   let previousPhase = -1;
@@ -25,6 +34,7 @@ export const observeCamera = async ({ adb, execute, until, record }) => {
     "await-click",
     "await-stop",
     "await-hold",
+    "await-double-tap",
     "done",
   ];
   const size = await adb(["shell", "wm", "size"]);
@@ -47,7 +57,15 @@ export const observeCamera = async ({ adb, execute, until, record }) => {
       await adb(["shell", "uiautomator", "dump", devicePath]);
       const xml = await adb(["exec-out", "cat", devicePath]);
       const text = JSON.parse(
-        await execute("python3", ["-c", statusReader], 30000, xml)
+        await execute(
+          "python3",
+          [
+            "-c",
+            statusReader.replaceAll("com.onemapmapbox", `com.onemap${engine}`),
+          ],
+          30000,
+          xml
+        )
       );
       if (text === null) {
         assert(!seen, "Selected TF04 status disappeared.");
@@ -72,7 +90,7 @@ export const observeCamera = async ({ adb, execute, until, record }) => {
         stop: ["pending", "rejected"],
         held: ["pending", "0"],
         command: ["pending", "applied"],
-        doubletap: ["skip"],
+        doubletap: doubleTap ? ["pending", "timeout"] : ["skip"],
       }))
         assert(allowed.includes(fields[key]), `Failed ${key}: ${text}`);
       assert.equal(fields.note, "none", `Scene error: ${text}`);
@@ -85,7 +103,23 @@ export const observeCamera = async ({ adb, execute, until, record }) => {
         record(result);
         await adb(["shell", "input", "tap", ...tap]);
       }
+      if (fields.phase === "await-double-tap" && !doubleTapped) {
+        assert(doubleTap, "Unexpected double-tap phase.");
+        doubleTapped = true;
+        result.doubleTap = tap;
+        record(result);
+        await adb([
+          "shell",
+          "sh",
+          "-c",
+          `input tap ${tap.join(" ")}; sleep 0.1; input tap ${tap.join(" ")}`,
+        ]);
+      }
       if (fields.phase !== "done") return false;
+      assert(
+        !doubleTap || doubleTapped,
+        "Completion without double-tap input."
+      );
       assert(tapped, "Completion without owned input.");
       for (const [key, value] of Object.entries({
         fit: "ok",
@@ -93,7 +127,7 @@ export const observeCamera = async ({ adb, execute, until, record }) => {
         stop: "rejected",
         held: "0",
         command: "applied",
-        doubletap: "skip",
+        doubletap: doubleTap ? "timeout" : "skip",
         done: "1",
       }))
         assert.equal(fields[key], value, `Unexpected ${key}: ${text}`);
@@ -171,6 +205,7 @@ export const parseStatus = (text) => {
       "await-click",
       "await-stop",
       "await-hold",
+      "await-double-tap",
       "done",
     ].includes(fields.phase),
     "Unknown TF04 phase."

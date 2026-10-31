@@ -1,0 +1,585 @@
+{
+  "checkpoint": "Fixed remaining f05 native platform batches",
+  "status": "Fixed scope and Android preparation passed coordinator audit; Android execution awaiting explicit approval; iOS execution recipe awaits its platform preparation",
+  "sourceBasis": "PR77 b69b846 and existing accepted f05 receipts; isolated preparation branch only",
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Camera launcher verifies695 frozen files before acquisition and after success, including selected package dist copies; preparation compares all171 archive members in both selected package copies. Legacy TF04 and TF09 drivers are not executed."
+  },
+  "freeze": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-sources-attempt-01/post-restoration-freeze.json",
+    "sha256": "2ec3355e8e8de917f001abf7cf6d02fcaf3ab034b93dc76224f81106988a9b8f",
+    "verifiedFiles": 695,
+    "mismatches": []
+  },
+  "stagedSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-fixture.mjs": "50b90fa0b06d2b4cc3129084322bcfb232ab3113a003f134dc8c826bc9f7ad15",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/package.json": "85b17f2f852aece03e71edb4ed4d9fddf6a0a8f0b69ac75d7f00b6592d62d37c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitmapper.js": "3f2f720e3a2b4e41cdc03e9f58bb1794bec26dcd1b22568e41ce0b84ab20aeb5",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitpacker.js": "3f7bfabcbc82bedd0cc8551bc210b44dc1fb179fa2ce3b8b1d39fa307d8af204",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/chunkstream.js": "43c5507901554a29c5a29e555aaeb3c3987b84fb3aa8c681c1b30794a477aa85",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/constants.js": "9e3b4f994ac93751e9ccb4d453e85e4f25a0b086a9f24ec92c7dcb06995bdf6c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/crc.js": "57e2328cfa361fb54f1f4b3a59e071c1ccc864095e4f3759a957cd15aa2a8b65",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-pack.js": "500c1b3b34702c895e9e689143f44280687cac363447523679ec13d12bd564f6",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-async.js": "328b6173f1a2a4d91425220a0fa421699552f254006a57ede9f4018ced50a7ee",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-sync.js": "201a08dfab26a2903c0dabcbdfe0406b3fa33d60f59b591878329f590fac48ff",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse.js": "b8aad6f29371f5b13b232643781a7c49f7d36d565136ddda1ed7fbaca987ce2c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/format-normaliser.js": "c73989d85bef5d33ce571095bf0d96927261730d8b0f79c9d48f971fcbdd0be0",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/interlace.js": "3bb5d57153078ff586667e9a9d2c06db993c8ff1638e0521a9883cdeea6e1e3f",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-async.js": "f50df0610749ce7b1a99abbe9e4596df7c16f96efd3848f12dd632b22cb02b45",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-sync.js": "1b516238168a42704e62ba44528406188864a6ddda2ae92d1b91e5e078cdaa2d",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer.js": "b5f9956364c80d67c28d615ace639a5fb4d4d79d3acb235237f3050dca220e03",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/paeth-predictor.js": "48555b909af708593dade8e8df75d18ecdffdb6577e362eac01eae357ef1e0e9",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-async.js": "a0299cad35220de62b7180b1f984b8f77b4c0f419a580fd3c86ea3b3e971ee30",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-sync.js": "266c9fb230b90075022b3f54f5710a9cacb71ca565f83fce66e7cbd1b7e9b507",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser.js": "574e43fea28a28cc6feb7ab62a480a86bb75411ee4bfaba76a7e9d7310b6e94c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png-sync.js": "867b1a78dcd3e45458eb4f0af01acd48f38d3a31225bd7cb8dd8ee3966ab54be",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png.js": "e02cecbd36327829758386dc3f0ca4a36a2339ccb5d5e824ca3556e2c3f89726",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-inflate.js": "08cb8afb79a4c0ab58e94601dab22261daf6638382b211d6a7f6bfbc16d27a0b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-reader.js": "437a99bf1bf739202ae85c3018cd9174d411597cf55e7064c36976de493368f1"
+  },
+  "hostInputSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/launch-lifetime-emulator.py": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24",
+    "/private/tmp/one-map-approved-android-boot-poll.py": "f819d439aa4573070b858e80c7d3a61ca8f7a833f5ca857f3347ba5d39a35956",
+    "/Users/rob/.android/avd/Medium_Phone.avd/config.ini": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/source.properties": "11d49660e8e74661ed0b3164f5141308f7f947d6de037d7f5ca7fc428c825133",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/package.xml": "61527f2f82a09aa711005a29b75dc031d58d5869c4633d8d863623c610a57753"
+  },
+  "batchInputSha256": {
+    "/private/tmp/one-map-android-restoration-review/scripts/android-acceptance-batch.mjs": "f20effc307ea4850f1326fcbf59d7fec42f930827df735c702b23ed3719fe100",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-rendering.mjs": "708ce8e2cb8c04d4e1d0406458282d7a37d09912a289ea0ddcf9fa226c5fc82a",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-camera-observer.mjs": "c1c589a6d74c1739e386af506f651a6c91b0c0a77e974a96b61c4a5ba2abae44",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-ui-smoke.mjs": "c22f46ae63ebbc9b27a41106761294ca863a976f185f3494ba44454df801166c",
+    "/private/tmp/one-map-android-restoration-review/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-retained-contract.mjs": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf04-camera-smoke.mjs": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-ui-smoke.mjs": "eee588dd20e8d712491045801a194f7d67a0a61f43791ef2df0f61eb2b944a11",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-retained-contract.mjs": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852"
+  },
+  "verifiedBinaries": {
+    "android": {
+      "mapbox": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+        "package": "com.onemapmapbox"
+      },
+      "maplibre": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+        "package": "com.onemapmaplibre"
+      }
+    },
+    "ios": {
+      "mapbox": {
+        "produced": {
+          "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+          "metadata": {
+            "CFBundlePackageType": "APPL",
+            "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+            "CFBundleExecutable": "OneMapMapbox",
+            "CFBundleShortVersionString": "1.0",
+            "CFBundleVersion": "1"
+          },
+          "codeSha256": {
+            "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+            "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+          },
+          "frameworkMetadata": {
+            "MapboxCoreMaps": {
+              "CFBundleIdentifier": "com.mapbox.maps",
+              "CFBundleShortVersionString": "11.23.1",
+              "CFBundleVersion": "11.23.1"
+            },
+            "MapboxCommon": {
+              "CFBundleIdentifier": "com.mapbox.common",
+              "CFBundleShortVersionString": "24.23.1",
+              "CFBundleVersion": "24.23.1"
+            }
+          }
+        },
+        "installed": {
+          "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/4030A7F3-7E06-4170-96F5-ADE0A2FED943/OneMapMapbox.app",
+          "metadata": {
+            "CFBundlePackageType": "APPL",
+            "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+            "CFBundleExecutable": "OneMapMapbox",
+            "CFBundleShortVersionString": "1.0",
+            "CFBundleVersion": "1"
+          },
+          "codeSha256": {
+            "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+            "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+          },
+          "frameworkMetadata": {
+            "MapboxCoreMaps": {
+              "CFBundleIdentifier": "com.mapbox.maps",
+              "CFBundleShortVersionString": "11.23.1",
+              "CFBundleVersion": "11.23.1"
+            },
+            "MapboxCommon": {
+              "CFBundleIdentifier": "com.mapbox.common",
+              "CFBundleShortVersionString": "24.23.1",
+              "CFBundleVersion": "24.23.1"
+            }
+          }
+        }
+      },
+      "maplibre": {
+        "produced": {
+          "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+          "metadata": {
+            "CFBundlePackageType": "APPL",
+            "CFBundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+            "CFBundleExecutable": "OneMapMaplibre",
+            "CFBundleShortVersionString": "1.0",
+            "CFBundleVersion": "1"
+          },
+          "codeSha256": {
+            "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+            "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+          },
+          "frameworkMetadata": {
+            "CFBundleIdentifier": "com.maplibre.mapbox",
+            "CFBundleShortVersionString": "6.31.0",
+            "CFBundleVersion": "6.31.0"
+          }
+        },
+        "installed": {
+          "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/2F6151E0-5FF8-48BA-A4C5-1EB7117C3011/OneMapMaplibre.app",
+          "metadata": {
+            "CFBundlePackageType": "APPL",
+            "CFBundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+            "CFBundleExecutable": "OneMapMaplibre",
+            "CFBundleShortVersionString": "1.0",
+            "CFBundleVersion": "1"
+          },
+          "codeSha256": {
+            "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+            "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+          },
+          "frameworkMetadata": {
+            "CFBundleIdentifier": "com.maplibre.mapbox",
+            "CFBundleShortVersionString": "6.31.0",
+            "CFBundleVersion": "6.31.0"
+          }
+        }
+      }
+    }
+  },
+  "remainingSuiteCount": 12,
+  "platformOrder": [
+    "android",
+    "ios"
+  ],
+  "matrix": [
+    {
+      "id": "mapbox-android-camera",
+      "platform": "android",
+      "engine": "mapbox",
+      "suite": "camera",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [],
+      "passCriteria": "Clean fit/click/stop-rejected/jump readbacks; MapLibre double tap follows selected OS boundary"
+    },
+    {
+      "id": "mapbox-android-core",
+      "platform": "android",
+      "engine": "mapbox",
+      "suite": "core",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [
+        "live-child-button",
+        "nested-scroll",
+        "live-activation",
+        "annotation-activation",
+        "offset-touch-bounds",
+        "popup-follow-dismissal",
+        "map-feature-click",
+        "navigation-location",
+        "style-remount",
+        "host-accessibility",
+        "sdk-ornaments",
+        "camera-target-and-gesture",
+        "marker-prop-rejection"
+      ],
+      "passCriteria": "Fresh identity-bound physical/visual outcomes plus independent renderer judge; every required scenario must pass"
+    },
+    {
+      "id": "mapbox-android-retained",
+      "platform": "android",
+      "engine": "mapbox",
+      "suite": "retained",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [
+        "simultaneous-named-maps",
+        "provider-child-state",
+        "annotation-image-refresh",
+        "resize-orientation",
+        "camera-target-isolation",
+        "touch-density-bounds"
+      ],
+      "passCriteria": "Fresh identity-bound physical/visual outcomes plus independent renderer judge; every required scenario must pass"
+    },
+    {
+      "id": "maplibre-android-camera",
+      "platform": "android",
+      "engine": "maplibre",
+      "suite": "camera",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [],
+      "passCriteria": "Clean fit/click/stop-rejected/jump readbacks; MapLibre double tap follows selected OS boundary"
+    },
+    {
+      "id": "maplibre-android-core",
+      "platform": "android",
+      "engine": "maplibre",
+      "suite": "core",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [
+        "live-child-button",
+        "nested-scroll",
+        "live-activation",
+        "annotation-activation",
+        "offset-touch-bounds",
+        "popup-follow-dismissal",
+        "map-feature-click",
+        "navigation-location",
+        "style-remount",
+        "host-accessibility",
+        "sdk-ornaments",
+        "camera-target-and-gesture",
+        "marker-prop-rejection"
+      ],
+      "passCriteria": "Fresh identity-bound physical/visual outcomes plus independent renderer judge; every required scenario must pass"
+    },
+    {
+      "id": "maplibre-android-retained",
+      "platform": "android",
+      "engine": "maplibre",
+      "suite": "retained",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [
+        "simultaneous-named-maps",
+        "provider-child-state",
+        "annotation-image-refresh",
+        "resize-orientation",
+        "camera-target-isolation",
+        "touch-density-bounds"
+      ],
+      "passCriteria": "Fresh identity-bound physical/visual outcomes plus independent renderer judge; every required scenario must pass"
+    },
+    {
+      "id": "mapbox-ios-camera",
+      "platform": "ios",
+      "engine": "mapbox",
+      "suite": "camera",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [],
+      "passCriteria": "Clean fit/click/stop-rejected/jump readbacks; MapLibre double tap follows selected OS boundary"
+    },
+    {
+      "id": "mapbox-ios-core",
+      "platform": "ios",
+      "engine": "mapbox",
+      "suite": "core",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [
+        "live-child-button",
+        "nested-scroll",
+        "live-activation",
+        "annotation-activation",
+        "offset-touch-bounds",
+        "popup-follow-dismissal",
+        "map-feature-click",
+        "navigation-location",
+        "style-remount",
+        "host-accessibility",
+        "sdk-ornaments",
+        "camera-target-and-gesture",
+        "marker-prop-rejection"
+      ],
+      "passCriteria": "Fresh identity-bound physical/visual outcomes plus independent renderer judge; every required scenario must pass"
+    },
+    {
+      "id": "mapbox-ios-retained",
+      "platform": "ios",
+      "engine": "mapbox",
+      "suite": "retained",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [
+        "simultaneous-named-maps",
+        "provider-child-state",
+        "annotation-image-refresh",
+        "resize-orientation",
+        "camera-target-isolation",
+        "touch-density-bounds"
+      ],
+      "passCriteria": "Fresh identity-bound physical/visual outcomes plus independent renderer judge; every required scenario must pass"
+    },
+    {
+      "id": "maplibre-ios-camera",
+      "platform": "ios",
+      "engine": "maplibre",
+      "suite": "camera",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [],
+      "passCriteria": "Clean fit/click/stop-rejected/jump readbacks; MapLibre double tap follows selected OS boundary"
+    },
+    {
+      "id": "maplibre-ios-core",
+      "platform": "ios",
+      "engine": "maplibre",
+      "suite": "core",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [
+        "live-child-button",
+        "nested-scroll",
+        "live-activation",
+        "annotation-activation",
+        "offset-touch-bounds",
+        "popup-follow-dismissal",
+        "map-feature-click",
+        "navigation-location",
+        "style-remount",
+        "host-accessibility",
+        "sdk-ornaments",
+        "camera-target-and-gesture",
+        "marker-prop-rejection"
+      ],
+      "passCriteria": "Fresh identity-bound physical/visual outcomes plus independent renderer judge; every required scenario must pass"
+    },
+    {
+      "id": "maplibre-ios-retained",
+      "platform": "ios",
+      "engine": "maplibre",
+      "suite": "retained",
+      "status": "awaiting-platform-approval",
+      "reuseNativeBinary": true,
+      "manualObservations": [
+        "simultaneous-named-maps",
+        "provider-child-state",
+        "annotation-image-refresh",
+        "resize-orientation",
+        "camera-target-isolation",
+        "touch-density-bounds"
+      ],
+      "passCriteria": "Fresh identity-bound physical/visual outcomes plus independent renderer judge; every required scenario must pass"
+    }
+  ],
+  "coreOperatorRecipes": {
+    "live-child-button": "Physically tap the live child button; record its counter increment and unchanged map-click counter from fresh renderer reads.",
+    "nested-scroll": "Swipe inside the live child list; observe changed visible list content and unchanged map camera. Use genuine input and visual evidence.",
+    "live-activation": "Tap the non-child live marker body and observe marker-click. Native dragging is removed and is not a success criterion.",
+    "annotation-activation": "Tap the visible annotation and observe annotation-click; do not infer interactive child support from its bitmap.",
+    "offset-touch-bounds": "Toggle offset, activate the visibly displaced child, then reset and activate again. Record actual bounds, touches and scale; no native drag.",
+    "popup-follow-dismissal": "Pan/zoom and observe the bubble attachment; activate its child, dismiss once, reopen and verify teardown/remount adds no stale dismissal.",
+    "map-feature-click": "Physically tap projected point707 with interactiveLayerIds filtering, and repeat after remount. Record actual source-click/map callback data; no retired source bubbling or hitbox API.",
+    "navigation-location": "Use Zoom in/out and Reset north with renderer reads; tap Locate me using the fixture supplied constant coordinate [-122.33,47.62], observe camera and UserLocation. No sensor request.",
+    "style-remount": "Apply style, then remount; require generation>=1, load>=2, known feature and working child/source interactions afterward, with no error/stale callback.",
+    "host-accessibility": "Inspect host and child accessibility labels/roles using the native hierarchy and visible controls. Full VoiceOver/TalkBack audit is excluded.",
+    "sdk-ornaments": "Inspect SDK scale, logo/legal attribution and available attribution interaction; inspect application control placement and empty overlay touches. No deleted common units/width policy.",
+    "camera-target-and-gesture": "Request Target A, physically pan to B, Repeat target with equal values and verify B remains. Request changed Target B and verify camera movement; Clear target and confirm gestures remain usable.",
+    "marker-prop-rejection": "Use all four rejection actions for live/annotation draggable and callback props; observe the intended rejection message, no drag callback, and clear rejection between cases."
+  },
+  "retainedOperatorRecipes": {
+    "simultaneous-named-maps": "Read both actual map instances, touch each known feature and record independent named-map readbacks and finite measured viewports.",
+    "provider-child-state": "Increment both children before and after Theme update; require updated context in both children and retained local counts across resize.",
+    "annotation-image-refresh": "Use Image, observe delayed image load and explicit annotation refresh, inspect resulting bitmap; require image-load/image-refresh and no image-error.",
+    "resize-orientation": "Use Resize both ways, then landscape and portrait on the owned device; find current controls from fresh hierarchy and record valid changed bounds and orientation readbacks.",
+    "camera-target-isolation": "Move only Map A and record its changed center while Map B stays fixed; repeat equal target without rollback, then clear. Verify named children read their own map.",
+    "touch-density-bounds": "Physically activate children/features at their actual current bounds in both layouts; record actual window.scale and logical viewport measurements, with no synthetic callback invocation."
+  },
+  "completedEvidenceReused": {
+    "browser": [
+      "revised-api-u25-web-attempt-07.json"
+    ],
+    "minimal": [
+      "revised-api-u25-f05-mapbox-minimal-attempt-03.json",
+      "revised-api-u25-f05-maplibre-minimal-attempt-02.json",
+      "revised-api-u25-f05-mapbox-android-minimal-attempt-03.json",
+      "revised-api-u25-f05-maplibre-android-minimal-attempt-01.json"
+    ],
+    "lifetimes": [
+      "revised-api-u25-f05-mapbox-ios-lifetimes-attempt-01.json",
+      "revised-api-u25-f05-maplibre-ios-lifetimes-attempt-03.json",
+      "revised-api-u25-f05-mapbox-android-lifetimes-attempt-05.json",
+      "revised-api-u25-f05-maplibre-android-lifetimes-attempt-01.json"
+    ],
+    "queries": [
+      "revised-api-u25-f05-mapbox-ios-queries-attempt-01.json",
+      "revised-api-u25-f05-maplibre-ios-queries-attempt-01.json",
+      "revised-api-u25-f05-maplibre-ios-queries-receipt-completion.json",
+      "revised-api-u25-f05-mapbox-android-queries-attempt-03.json",
+      "revised-api-u25-f05-maplibre-android-queries-attempt-05.json"
+    ],
+    "sources": [
+      "revised-api-u25-f05-mapbox-ios-sources-attempt-01.json",
+      "revised-api-u25-f05-maplibre-ios-sources-attempt-05.json",
+      "revised-api-u25-f05-mapbox-android-sources-attempt-02.json",
+      "revised-api-u25-f05-maplibre-android-sources-attempt-01.json"
+    ],
+    "rendering": [
+      "revised-api-u25-f05-mapbox-ios-rendering-attempt-01.json",
+      "revised-api-u25-f05-maplibre-ios-rendering-attempt-01.json",
+      "revised-api-u25-f05-mapbox-android-rendering-attempt-01.json",
+      "revised-api-u25-f05-maplibre-android-rendering-attempt-01.json"
+    ]
+  },
+  "coverageDispositions": [
+    {
+      "group": "MapSetup/Map/useMap; selection and mixed aliases",
+      "disposition": "Existing frozen package/selection verification and four minimal native runs reused; simultaneous named-map/provider attachment remains in retained rows."
+    },
+    {
+      "group": "Source/Layer/Images, styles and update lifetimes",
+      "disposition": "Four accepted bounded source/image scenes and four targeted rendering scenes reused. Both native adapter tests cover heatmap/fill-extrusion translation; representative real renderer evidence is sufficient under testing-policy.md. No new per-layer pixel suite and no claim of pixel certification for those types.",
+      "routineSources": [
+        "packages/one-map-react/test/mapbox-native.native.test.tsx",
+        "packages/one-map-react/test/maplibre-native.native.test.tsx"
+      ],
+      "policy": "docs/testing-policy.md#select-checks-by-the-change and #test-behavior-at-the-owning-boundary"
+    },
+    {
+      "group": "Queries/clusters/explicit feature state",
+      "disposition": "Four ordinary query/cluster and four lifetime scopes reused; no automatic clearing/replay guarantee is added."
+    },
+    {
+      "group": "Camera, native unchanged targets and gestures",
+      "disposition": "Four camera rows plus core camera-target-and-gesture and retained camera-target-isolation close the remaining changed behavior. Native stop rejects; it does not establish animation cancellation."
+    },
+    {
+      "group": "Marker, portals, providers, offsets, refresh and failure handling",
+      "disposition": "Core and retained recipes own actual activation, nested scrolling, coordinates, host/layout, refresh and replacement. Common native drag success is excluded by contract; explicit rejection is required."
+    },
+    {
+      "group": "UserLocation and migrated screen UI",
+      "disposition": "Core deterministic location action and supplied display, application-owned navigation/popups, SDK ornaments and legal attribution. No common acquisition, native units policy, source bubbling or removed controls are reintroduced."
+    },
+    {
+      "group": "Selected wrapper and raw facilities",
+      "disposition": "Existing surface/peer/package and affected integration evidence reused. Raw SDK services are application-owned; no new general SDK certification, database/offline/capture/sensor campaign. SDK metadata/configuration limitations remain in original receipts."
+    },
+    {
+      "group": "Density",
+      "disposition": "Retained rows record actual window.scale. Existing judgeNativeDensityMatrix requires two distinct positive observed scales per engine across Android+iOS. Android pinned source configuration420dpi corresponds to2.625; iOS expected3 must be actually observed, never inferred. No extra suite row is added. Identical/missing scales fail this explicit closeout gate."
+    },
+    {
+      "group": "Excluded scope",
+      "disposition": "Physical devices, full VoiceOver/TalkBack certification, sensors, removed common services/controls/drag, RNMapbox invalidateAmbientCache/setMaximumAmbientCacheSize remain excluded; retained functionality is not relabeled unsupported."
+    }
+  ],
+  "androidBatch": {
+    "ready": "coordinator-audit-passed; awaiting-owner-execution-approval",
+    "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-batch.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-01",
+    "output": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-01",
+    "rows": [
+      "mapbox-android-camera",
+      "mapbox-android-core",
+      "mapbox-android-retained",
+      "maplibre-android-camera",
+      "maplibre-android-core",
+      "maplibre-android-retained"
+    ],
+    "worker": {
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "count": 1
+    },
+    "estimatedMinutes": "60-120, unmeasured; four operator-driven UI rows dominate",
+    "bounds": {
+      "uiRowMinutes": 30,
+      "uiRowOuterMinutes": 31,
+      "cameraRowSeconds": 90,
+      "batchApproximateMaximumMinutes": 150
+    },
+    "ownership": "One private OneMapU25F05 emulator-5580 per batch,5580/5581, Metro8081, status8797 only during UI rows; install each verified APK once. Outer owns reverse8081; UI driver borrows it and owns only reverse8797. Group-owned child Metro is terminated with its driver; unknown listeners/devices/sourceAVD/sharedadb/SDK remain untouched. No builds, dependencies, fixture8798 or status8799.",
+    "reportProtocol": "Each UI row initializes OUTPUT/<rowId>-manual.json exclusively with binary/dist/environment/runId and unverified scenario slots. Worker acts as physical operator with adb input, fresh UI hierarchy and screenshots/readbacks; observes actual behavior and atomically replaces only this report after each observation. Preserve all identity fields. Add observations keyed by scenario with action, seen result, renderer data or temporary screenshot path; status alone or callback logs alone are insufficient. First failed slot aborts; leave unexercised slots unverified. A passing row requires a final physical Read renderer/Finish focus after all outcomes pass. No synthetic callback events or autofilled passes. Output/<rowId>-result.json and final receipt preserve passed prefix.",
+    "cleanup": "On first failure or completion, stop owned app, driver/Metro groups, acquired reverses, emulator; verify owned process exit and5580/5581/8081/8797 release before removing privateAVD. Preserve uncertain launch. Expected row shutdowns are not new failures; unexpected exits are never cleared. XML temporary files belong only to this attempt.",
+    "failurePolicy": "Stop first failed observation/command/identity/cleanup. No independent repairs or retries. Preserve completed row results; a repair or continuation gets approval for remaining work only."
+  },
+  "iosBatch": {
+    "ready": "fixed-scope-plan; execution recipe and input surface require preparation after Android, before the single iOS execution approval",
+    "rows": [
+      "mapbox-ios-camera",
+      "mapbox-ios-core",
+      "mapbox-ios-retained",
+      "maplibre-ios-camera",
+      "maplibre-ios-core",
+      "maplibre-ios-retained"
+    ],
+    "target": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
+    "reuse": "Verified installed apps and produced code metadata above; no application rebuild, Pods restoration or dependency installation",
+    "operator": "Genuine Simulator input and fresh visual/hierarchy evidence through available computer-use tooling, not a newly built input-driver app. No Simulator/GUI/input readiness was probed in this preparation. If this route cannot exercise a required observation, report it before execution approval rather than invent success.",
+    "ownership": "One exclusive Luna medium worker; keep assigned simulator for six rows, restart Metro only for mode/engine change, cleanup app/processes/ports and only simulator boot owned by that batch.",
+    "estimatedMinutes": "60-120, estimate to validate when exact iOS recipe is prepared",
+    "approval": "One iOS batch execution approval after its worker preparation/audit; not six individual approvals"
+  },
+  "closeout": {
+    "owner": "Coordinator U27 evidence reconciliation, not another native suite",
+    "required": "All12 row results plus reused accepted evidence, actual density judge and explicit scope/identity limits; reconcile migration docs/support matrix, cleanup disposable artifacts and report bounded readiness for owner signoff.",
+    "changeControl": "This is the fixed remaining matrix. New runtime work requires a concrete retained-contract failure or demonstrated coverage gap and an explicit scope change; no open-ended later services/pixel bucket."
+  },
+  "storage": {
+    "observedUTC": "2026-10-31T08:54:22.299038+00:00",
+    "availableBytes": 28428402688,
+    "availableGiB": 26.47601318359375,
+    "androidRequiredBytes": 8804682957,
+    "gatePassed": true
+  },
+  "routineVerification": {
+    "checks": [
+      "Pinned Node24 and Bun actual-source Android batch/rendering/camera tests passed",
+      "Pinned Node24 and Bun TF07 native runner mocks passed, covering owned/borrowed reverses, identity, Metro spawn/exit/readiness/launch/manual failure and parent process-group modes",
+      "Existing native-smoke-process regression passed Node24 with host process access and Bun; no native app/device used",
+      "Worker scoped formatting/lint and syntax passed; coordinator documentation structure and whitespace checks passed",
+      "Independent file proofs:695 frozen,26observer,7host,11batchruntimeinputs; all171archive members bothMapboxcopies, bothAPKs andbothproduced/installediOScodepairs"
+    ],
+    "scope": "Routine isolated mocks, filesystem and source review only; no native acceptance or host/device setup",
+    "firstPreparationFailures": [
+      "Existing process-helper Node test initially hit restricted process access; coordinator reran the same routine test with host process access and it passed."
+    ]
+  },
+  "coordinatorAudit": {
+    "status": "passed for fixed12-row scope and executableAndroidbatch",
+    "corrections": [
+      "Expected row termination could contaminate next row or clear a genuine late Metro failure; scoped stopping ownership and preserved first failure verified by actual-source mocks",
+      "Nested detached Metro could outlive terminated UI driver; batch groups it with driver while standalone ownership stays unchanged",
+      "TF07 failed/manual/foreign/malformed reports could wait for remaining observations; fail-fast polling now stops with unexercised slots unverified",
+      "TF07 native Metro crashes, unexpected packager response and adb launch errors could wait full observation timeout; explicit failure/readiness/launch checks verified"
+    ],
+    "limits": [
+      "No new native run, input/GUI or host-readiness probe occurred",
+      "iOS executable recipe and genuine Simulator input availability require its preparation after Android, before its single execution approval",
+      "Configured MapLibre Android SDK identity and all original receipt limitations remain unchanged"
+    ],
+    "findingsRemaining": []
+  },
+  "notExecuted": [
+    "No native/emulator/adb/simctl/Metro/GUI/acceptance execution",
+    "No f05/peer/lock/version/frozen-source mutation; primary source untouched"
+  ]
+}

@@ -131,3 +131,44 @@ for (const [label, lines, passed, expectedTaps] of [
 console.log(
   "Camera XML/status parsing, phase-gated input and failure bounds passed."
 );
+
+for (const fail of [false, true]) {
+  const lines = [
+    waiting.replace("doubletap=skip", "doubletap=pending"),
+    done
+      .replace("phase=done done=1", "phase=await-double-tap done=0")
+      .replace("doubletap=skip", "doubletap=pending"),
+    done.replace(
+      "doubletap=skip",
+      fail ? "doubletap=zoomed" : "doubletap=timeout"
+    ),
+  ];
+  const calls = [];
+  let index = 0;
+  const result = observeCamera({
+    engine: "maplibre",
+    record() {},
+    adb: async (args) => {
+      calls.push(args);
+      return args.includes("size") ? "Physical size: 1080x2400\n" : "";
+    },
+    execute: async (file, args) => {
+      assert(args[1].includes("com.onemapmaplibre"));
+      assert(!args[1].includes("com.onemapmapbox"));
+      return JSON.stringify(lines[Math.min(index++, lines.length - 1)]);
+    },
+    until: async (observe) => {
+      for (let attempt = 0; attempt < 5; attempt++) if (await observe()) return;
+      throw Error("timeout");
+    },
+  });
+  if (fail) await assert.rejects(result, /Failed doubletap/);
+  else await result;
+  assert.equal(calls.filter((args) => args.includes("tap")).length, 1);
+  assert.equal(
+    calls.filter(
+      (args) => args.includes("-c") && args.at(-1).includes("sleep 0.1")
+    ).length,
+    1
+  );
+}

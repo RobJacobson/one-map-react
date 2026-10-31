@@ -29,10 +29,11 @@ const names = [
   "rendered output contains the known orange feature",
 ];
 
-for (const [engine, camera] of [
+for (const [engine, camera, batch = false] of [
   ["mapbox", false],
   ["maplibre", false],
   ["mapbox", true],
+  ["mapbox", true, true],
 ]) {
   const apkHash = apkHashes[engine];
   const expectedNames =
@@ -80,30 +81,46 @@ for (const [engine, camera] of [
     "malformed",
     "identity-after",
     "observer-after",
+    "late-metro-exit",
     "cleanup",
     "driver-record-cleanup",
     "emulator-adb-failure",
     "emulator-kill-fallback",
     "emulator-exit",
     "release-port",
-  ].filter(
-    (failure) =>
-      !camera ||
-      ![
-        "reverse-conflict",
-        "reverse",
-        "driver",
-        "driver-cleanup",
-        "partial",
-        "wrong-platform",
-        "wrong-engine",
-        "wrong-artifact",
-        "wrong-identity",
-        "failed-scene",
-        "malformed",
-        "driver-record-cleanup",
-      ].includes(failure)
-  )) {
+  ]
+    .filter(
+      (failure) =>
+        !batch ||
+        [
+          null,
+          "identity-before",
+          "identity-after",
+          "observer",
+          "cleanup",
+          "driver",
+          "late-metro-exit",
+        ].includes(failure)
+    )
+    .filter(
+      (failure) =>
+        batch ||
+        !camera ||
+        ![
+          "reverse-conflict",
+          "reverse",
+          "driver",
+          "driver-cleanup",
+          "partial",
+          "wrong-platform",
+          "wrong-engine",
+          "wrong-artifact",
+          "wrong-identity",
+          "failed-scene",
+          "malformed",
+          "driver-record-cleanup",
+        ].includes(failure)
+    )) {
     const commands = [];
     const stopped = [];
     const removed = [];
@@ -118,6 +135,9 @@ for (const [engine, camera] of [
     const signals = [];
     let pulls = 0;
     let statusReads = 0;
+    let activeEngine = engine;
+    let coreRows = 0;
+    let installs = 0;
     const scene = {
       platform: failAt === "wrong-platform" ? "ios" : "android",
       engine:
@@ -159,7 +179,7 @@ for (const [engine, camera] of [
           ? "501 501 S"
           : "";
       if (file === "python3") {
-        const final = statusReads++ > 0;
+        const final = statusReads++ % 2 > 0;
         return JSON.stringify(
           `TF04 fit=ok click=${final ? "hit" : "pending"} clickAt=${final ? "-122.32000,47.64000" : "pending"} stop=${final ? "rejected" : "pending"} held=${final ? "0" : "pending"} command=${final ? "applied" : "pending"} doubletap=skip center=${final ? "-120.00000,45.00000" : "-122.32000,47.64000"} note=none phase=${final ? "done" : "await-click"} done=${final ? "1" : "0"}`
         );
@@ -201,18 +221,22 @@ for (const [engine, camera] of [
         return "";
       }
       if (adb[0] === "install") {
+        activeEngine = adb.at(-1).includes("native-maplibre")
+          ? "maplibre"
+          : engine;
+        installs++;
         assert(
           adb
             .at(-1)
             .endsWith(
-              `examples/native-${engine}/android/app/build/outputs/apk/debug/app-debug.apk`
+              `examples/native-${activeEngine}/android/app/build/outputs/apk/debug/app-debug.apk`
             )
         );
         if (failAt === "install") fail("install failed");
         return "Success";
       }
       if (adb.join(" ").includes("pm path")) {
-        assert.equal(adb.at(-1), `com.onemap${engine}`);
+        assert.equal(adb.at(-1), `com.onemap${activeEngine}`);
         return failAt === "split-apk"
           ? "package:/data/app/one/base.apk\npackage:/data/app/one/split.apk\n"
           : "package:/data/app/one/base.apk\n";
@@ -257,7 +281,9 @@ for (const [engine, camera] of [
     };
     const context = {
       assert,
-      observeCamera,
+      observeCamera: batch
+        ? async () => ({ engine: activeEngine, passed: true })
+        : observeCamera,
       AbortSignal,
       join,
       resolve: (value) => value,
@@ -298,7 +324,10 @@ for (const [engine, camera] of [
         };
       },
       readFileSync: (file) => {
-        if (/android-(rendering|camera)-preparation.json$/.test(file))
+        if (
+          /android-(rendering|camera)-preparation.json$/.test(file) ||
+          file.endsWith("platform-batches-preparation.json")
+        )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
             hostInputSha256: { "/helper": "helper" },
@@ -311,11 +340,34 @@ for (const [engine, camera] of [
             ),
           });
         if (file.endsWith("app-debug.apk"))
-          return failAt === "apk" ? "wrong" : apkHash;
-        if (file.includes("installed-before"))
-          return failAt === "identity-before" ? "wrong" : apkHash;
-        if (file.includes("installed-after"))
-          return failAt === "identity-after" ? "wrong" : apkHash;
+          return failAt === "apk"
+            ? "wrong"
+            : apkHashes[file.includes("native-maplibre") ? "maplibre" : engine];
+        if (file.includes("installed-") && !file.includes("after"))
+          return failAt === "identity-before"
+            ? "wrong"
+            : apkHashes[activeEngine];
+        if (file.includes("installed-") && file.includes("after"))
+          return failAt === "identity-after"
+            ? "wrong"
+            : apkHashes[activeEngine];
+        if (file.endsWith("-result.json"))
+          return JSON.stringify({
+            artifact: { distSha256: distHash },
+            results: {
+              [`${activeEngine}-android`]: {
+                status: "passed",
+                installedBinarySha256: apkHashes[activeEngine],
+                libraryDistSha256: distHash,
+              },
+            },
+          });
+        if (
+          file === "/observer" &&
+          failAt === "late-metro-exit" &&
+          postIdentity
+        )
+          children[0].emit("exit", 1, null);
         if (file === "/observer")
           return failAt === "observer" ||
             (failAt === "observer-after" && postIdentity)
@@ -367,7 +419,15 @@ for (const [engine, camera] of [
           signalCode: null,
         });
         children.push(child);
-        if (children.length === 1) {
+        if (args.some((arg) => arg.endsWith("tf07-ui-smoke.mjs"))) {
+          coreRows++;
+          child.exitCode = failAt === "driver" ? 1 : 0;
+          assert.equal(
+            options.env.TF07_HARNESS_ROOT,
+            "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness"
+          );
+          assert.equal(options.env.TF07_BORROWED_METRO_REVERSE, "1");
+        } else if (batch || children.length === 1) {
           assert.equal(options.env.ONE_MAP_SMOKE, camera ? "tf04" : "tf09");
           assert(args.includes("--reset-cache"));
         } else {
@@ -402,7 +462,10 @@ for (const [engine, camera] of [
         }
         return { text: async () => "packager-status:running" };
       },
-      stopOwnedProcess: async (child) => stopped.push(child.pid),
+      stopOwnedProcess: async (child) => {
+        stopped.push(child.pid);
+        child.emit("exit", null, "SIGTERM");
+      },
       queueMicrotask,
     };
     // Freeze hashing is separate from file reading in the real runner.
@@ -418,7 +481,7 @@ for (const [engine, camera] of [
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -448,8 +511,9 @@ for (const [engine, camera] of [
         "app-launch",
       ].includes(failAt)
     )
-      assert.equal(pulls, 1, failAt);
-    assert.deepEqual(stopped, children.map((child) => child.pid).reverse());
+      if (!batch) assert.equal(pulls, 1, failAt);
+    if (!batch)
+      assert.deepEqual(stopped, children.map((child) => child.pid).reverse());
     if (["emulator-exit", "release-port"].includes(failAt))
       assert(!removed.some((file) => file.endsWith("OneMapU25F05.avd")));
     if (
@@ -533,6 +597,38 @@ for (const [engine, camera] of [
         removed.some((file) => file.endsWith("OneMapU25F05.avd")),
         failAt
       );
+    if (batch) {
+      assert.equal(
+        installs,
+        failAt === null ? 2 : failAt === "observer" ? 0 : 1
+      );
+      if (failAt === null) {
+        assert.equal(receipt.rows.length, 6);
+        assert.equal(coreRows, 4);
+        assert.equal(
+          commands.filter((args) =>
+            args.some((arg) =>
+              String(arg).includes("create-lifetime-task-avd.py")
+            )
+          ).length,
+          1
+        );
+        assert.equal(pulls, 14);
+      }
+      if (failAt === "late-metro-exit") {
+        assert.equal(receipt.rows.length, 0);
+        assert.equal(coreRows, 0);
+      }
+      if (failAt === "driver") {
+        assert.equal(receipt.rows.length, 1);
+        assert.equal(coreRows, 1);
+      }
+      assert(
+        removed.some((file) => file.endsWith("OneMapU25F05.avd")) ||
+          failAt === "observer"
+      );
+      continue;
+    }
     if (failAt === null) {
       assert.equal(pulls, 2);
       if (camera) {
