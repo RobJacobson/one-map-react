@@ -1,0 +1,287 @@
+{
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Camera launcher verifies695 frozen files before acquisition and after success, including selected package dist copies; preparation compares all171 archive members in both selected package copies. Legacy TF04 and TF09 drivers are not executed."
+  },
+  "freeze": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-sources-attempt-01/post-restoration-freeze.json",
+    "sha256": "2ec3355e8e8de917f001abf7cf6d02fcaf3ab034b93dc76224f81106988a9b8f",
+    "verifiedFiles": 695,
+    "mismatches": []
+  },
+  "stagedSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-fixture.mjs": "50b90fa0b06d2b4cc3129084322bcfb232ab3113a003f134dc8c826bc9f7ad15",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/package.json": "85b17f2f852aece03e71edb4ed4d9fddf6a0a8f0b69ac75d7f00b6592d62d37c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitmapper.js": "3f2f720e3a2b4e41cdc03e9f58bb1794bec26dcd1b22568e41ce0b84ab20aeb5",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitpacker.js": "3f7bfabcbc82bedd0cc8551bc210b44dc1fb179fa2ce3b8b1d39fa307d8af204",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/chunkstream.js": "43c5507901554a29c5a29e555aaeb3c3987b84fb3aa8c681c1b30794a477aa85",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/constants.js": "9e3b4f994ac93751e9ccb4d453e85e4f25a0b086a9f24ec92c7dcb06995bdf6c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/crc.js": "57e2328cfa361fb54f1f4b3a59e071c1ccc864095e4f3759a957cd15aa2a8b65",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-pack.js": "500c1b3b34702c895e9e689143f44280687cac363447523679ec13d12bd564f6",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-async.js": "328b6173f1a2a4d91425220a0fa421699552f254006a57ede9f4018ced50a7ee",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-sync.js": "201a08dfab26a2903c0dabcbdfe0406b3fa33d60f59b591878329f590fac48ff",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse.js": "b8aad6f29371f5b13b232643781a7c49f7d36d565136ddda1ed7fbaca987ce2c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/format-normaliser.js": "c73989d85bef5d33ce571095bf0d96927261730d8b0f79c9d48f971fcbdd0be0",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/interlace.js": "3bb5d57153078ff586667e9a9d2c06db993c8ff1638e0521a9883cdeea6e1e3f",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-async.js": "f50df0610749ce7b1a99abbe9e4596df7c16f96efd3848f12dd632b22cb02b45",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-sync.js": "1b516238168a42704e62ba44528406188864a6ddda2ae92d1b91e5e078cdaa2d",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer.js": "b5f9956364c80d67c28d615ace639a5fb4d4d79d3acb235237f3050dca220e03",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/paeth-predictor.js": "48555b909af708593dade8e8df75d18ecdffdb6577e362eac01eae357ef1e0e9",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-async.js": "a0299cad35220de62b7180b1f984b8f77b4c0f419a580fd3c86ea3b3e971ee30",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-sync.js": "266c9fb230b90075022b3f54f5710a9cacb71ca565f83fce66e7cbd1b7e9b507",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser.js": "574e43fea28a28cc6feb7ab62a480a86bb75411ee4bfaba76a7e9d7310b6e94c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png-sync.js": "867b1a78dcd3e45458eb4f0af01acd48f38d3a31225bd7cb8dd8ee3966ab54be",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png.js": "e02cecbd36327829758386dc3f0ca4a36a2339ccb5d5e824ca3556e2c3f89726",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-inflate.js": "08cb8afb79a4c0ab58e94601dab22261daf6638382b211d6a7f6bfbc16d27a0b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-reader.js": "437a99bf1bf739202ae85c3018cd9174d411597cf55e7064c36976de493368f1"
+  },
+  "hostInputSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/launch-lifetime-emulator.py": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24",
+    "/private/tmp/one-map-approved-android-boot-poll.py": "f819d439aa4573070b858e80c7d3a61ca8f7a833f5ca857f3347ba5d39a35956",
+    "/Users/rob/.android/avd/Medium_Phone.avd/config.ini": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/source.properties": "11d49660e8e74661ed0b3164f5141308f7f947d6de037d7f5ca7fc428c825133",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/package.xml": "61527f2f82a09aa711005a29b75dc031d58d5869c4633d8d863623c610a57753"
+  },
+  "verifiedBinaries": {
+    "android": {
+      "mapbox": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+        "package": "com.onemapmapbox"
+      },
+      "maplibre": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+        "package": "com.onemapmaplibre"
+      }
+    },
+    "ios": {
+      "mapbox": {
+        "produced": {
+          "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/ios/build/Build/Products/Debug-iphonesimulator/OneMapMapbox.app",
+          "metadata": {
+            "CFBundlePackageType": "APPL",
+            "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+            "CFBundleExecutable": "OneMapMapbox",
+            "CFBundleShortVersionString": "1.0",
+            "CFBundleVersion": "1"
+          },
+          "codeSha256": {
+            "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+            "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+          },
+          "frameworkMetadata": {
+            "MapboxCoreMaps": {
+              "CFBundleIdentifier": "com.mapbox.maps",
+              "CFBundleShortVersionString": "11.23.1",
+              "CFBundleVersion": "11.23.1"
+            },
+            "MapboxCommon": {
+              "CFBundleIdentifier": "com.mapbox.common",
+              "CFBundleShortVersionString": "24.23.1",
+              "CFBundleVersion": "24.23.1"
+            }
+          }
+        },
+        "installed": {
+          "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/4030A7F3-7E06-4170-96F5-ADE0A2FED943/OneMapMapbox.app",
+          "metadata": {
+            "CFBundlePackageType": "APPL",
+            "CFBundleIdentifier": "org.reactjs.native.example.OneMapMapbox",
+            "CFBundleExecutable": "OneMapMapbox",
+            "CFBundleShortVersionString": "1.0",
+            "CFBundleVersion": "1"
+          },
+          "codeSha256": {
+            "OneMapMapbox": "b967daf157aa88bafb08a545fdbd41c8ab91ba996694e95b6b9383127b4bd231",
+            "OneMapMapbox.debug.dylib": "340888a46351e6f1bf05c056bc06757c815abfde1c3f44b4b6f799ef3bc30d46"
+          },
+          "frameworkMetadata": {
+            "MapboxCoreMaps": {
+              "CFBundleIdentifier": "com.mapbox.maps",
+              "CFBundleShortVersionString": "11.23.1",
+              "CFBundleVersion": "11.23.1"
+            },
+            "MapboxCommon": {
+              "CFBundleIdentifier": "com.mapbox.common",
+              "CFBundleShortVersionString": "24.23.1",
+              "CFBundleVersion": "24.23.1"
+            }
+          }
+        }
+      },
+      "maplibre": {
+        "produced": {
+          "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/ios/build/Build/Products/Debug-iphonesimulator/OneMapMaplibre.app",
+          "metadata": {
+            "CFBundlePackageType": "APPL",
+            "CFBundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+            "CFBundleExecutable": "OneMapMaplibre",
+            "CFBundleShortVersionString": "1.0",
+            "CFBundleVersion": "1"
+          },
+          "codeSha256": {
+            "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+            "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+          },
+          "frameworkMetadata": {
+            "CFBundleIdentifier": "com.maplibre.mapbox",
+            "CFBundleShortVersionString": "6.31.0",
+            "CFBundleVersion": "6.31.0"
+          }
+        },
+        "installed": {
+          "path": "/Users/rob/Library/Developer/CoreSimulator/Devices/8B7D7CE4-228E-409F-A156-A597D4E448A5/data/Containers/Bundle/Application/2F6151E0-5FF8-48BA-A4C5-1EB7117C3011/OneMapMaplibre.app",
+          "metadata": {
+            "CFBundlePackageType": "APPL",
+            "CFBundleIdentifier": "org.reactjs.native.example.OneMapMaplibre",
+            "CFBundleExecutable": "OneMapMaplibre",
+            "CFBundleShortVersionString": "1.0",
+            "CFBundleVersion": "1"
+          },
+          "codeSha256": {
+            "OneMapMaplibre": "d80f726009e71ff5d3c27d4eee23020d7eddb33b0b5a526b31177cb278d67ff3",
+            "OneMapMaplibre.debug.dylib": "70e338d2f3101368f657d885319b904fb195639b8c232532c14e6ff6f71457ff"
+          },
+          "frameworkMetadata": {
+            "CFBundleIdentifier": "com.maplibre.mapbox",
+            "CFBundleShortVersionString": "6.31.0",
+            "CFBundleVersion": "6.31.0"
+          }
+        }
+      }
+    }
+  },
+  "batchInputSha256": {
+    "/private/tmp/one-map-android-restoration-review/scripts/android-acceptance-batch.mjs": "f20effc307ea4850f1326fcbf59d7fec42f930827df735c702b23ed3719fe100",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-rendering.mjs": "c145da6f05c97de22575d4f3d3c21e834c13b64641f53881bf639e657c92135a",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-camera-observer.mjs": "c1c589a6d74c1739e386af506f651a6c91b0c0a77e974a96b61c4a5ba2abae44",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-ui-smoke.mjs": "85d0a53457c396c1841d58b5038257849a66ad3a8e0d5750f51d99355e25b83e",
+    "/private/tmp/one-map-android-restoration-review/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-retained-contract.mjs": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf04-camera-smoke.mjs": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-ui-smoke.mjs": "eee588dd20e8d712491045801a194f7d67a0a61f43791ef2df0f61eb2b944a11",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-retained-contract.mjs": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs": "76ab97c02993e007cde719d0aa945121a67afcaea8c6dd716344b8ad3c5dab53"
+  },
+  "checkpoint": "Android first UI failure diagnosis and fixed five-row continuation preparation",
+  "status": "Passed independent coordinator source/routine audit; separate whole-continuation execution approval pending",
+  "diagnosis": {
+    "result": "Foreground-loss cause unresolved; no production fix is claimed.",
+    "known": [
+      "Exactly one physical input tap at530,1450 inside fresh live-child bounds440,1425..638,1476 preceded home-screen observation.",
+      "Only live-child-button failed; twelve other core observations remain unverified.",
+      "GET /tf07 was null before and after input, expected until a physical Read renderer action.",
+      "Camera Metro termination preceded core start and was expected; no overlapping parent teardown was found in the sequential source path.",
+      "Saved emulator log contains a generic emulator crash-data-store entry, no Android application crash stack."
+    ],
+    "inspected": [
+      "scripts/android-rendering.mjs sequential row teardown/driver/process ownership",
+      "scripts/tf07-ui-smoke.mjs manual failure polling and pre-cleanup capture gap",
+      "examples/shared/native-tf07-screen.tsx child Pressable stopPropagation/activate handler",
+      "examples/shared/tf07-scene.tsx activation callback ownership",
+      "packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx portal/projection/layout ownership"
+    ],
+    "reproductionLimit": "No saved AndroidRuntime/native stack or foreground/task readback survives cleanup. Routine mocks can reproduce missing diagnostics and validate continuation, but cannot reproduce or establish the application foreground-loss cause. A separately approved renderer run is required; no speculative application change."
+  },
+  "priorOutcome": {
+    "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-01.json",
+    "sha256": "38fb7d4b86c6ee4a76bb1551eaa53644325a2949ffbba669218663f641a3e00f",
+    "reusedRows": [
+      "mapbox-android-camera"
+    ],
+    "validation": "Immutable whole-outcome digest, exact one-row completed prefix, passed status, candidate/dist identity validated before host/device acquisition; actual retained APK and695 frozen files validated before acquisition."
+  },
+  "baselineSuiteCount": 12,
+  "remainingSuiteCount": 11,
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-02",
+  "executionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "estimatedMinutes": "60-120, unmeasured; same four operator UI rows and one remaining camera row; row/boot/install/cleanup bounds unchanged",
+  "failurePolicy": "One approval covers all five serial rows; success continues through all five. Stop first failure, preserve original first error, capture bounded diagnostics, perform owned cleanup. No independent retries/repairs or extra microtest.",
+  "resources": "Same one private OneMapU25F05/emulator-5580,5580/5581, Metro8081, UI status8797. Reuse cached setup and unchanged f05 APKs, install each once; no rebuild or frozen-source mutation. Prior camera remains evidence reuse, never executed again by continuation.",
+  "diagnosticCapture": {
+    "boundary": "Failed Android TF07 row, before selected app force-stop, Metro termination and emulator cleanup.",
+    "reads": [
+      "selected application pidof",
+      "assigned emulator activity/task dump",
+      "assigned emulator crash buffer last2000 entries",
+      "assigned emulator main/system last2000 entries filtered to app, ActivityManager/ActivityTaskManager, AndroidRuntime, am_crash/am_kill,libc/DEBUG, ReactNative/ReactNativeJS and Bridgeless"
+    ],
+    "limits": "Each retained read tail bounded128KiB, four reads; command bound30seconds each. UI outer33minutes includes the120second query budget beyond30minute observations. No logcat clearing or other device access. Bounded owned driver stderr tail128KiB stays bound to its originating row. Diagnostics read/write failures remain secondary and do not replace first failure or prevent cleanup; known Mapbox token and token query values are redacted. Driver stderr buffers complete lines before redaction/persistence/printing, flushes on stream end, and omits over128KiB lines with a marker while keeping pending/tail bounded.",
+    "retention": "Raw task-local files only for active investigation; redact secrets before reporting excerpts; compact permanent outcome afterward. Capture can expose why foreground was lost but does not guarantee the cause will be available."
+  },
+  "historicalCompatibility": "Old six-row and three single-scene entrypoints/selectors remain source-compatible and mocked. Their historical preparation records intentionally retain old runtime hashes and reject changed launcher/driver bytes; they are not approved rerun recipes. Only the new fixed continuation selects this current preparation record.",
+  "routineVerification": {
+    "redBefore": [
+      "TF07 actual-source manual failure test failed: Capture failure diagnostics before force-stop.",
+      "Continuation actual-source invocation failed against old fixed scene validation.",
+      "Late old-driver stderr was written to the next row filename before fixed path binding.",
+      "Known Mapbox token split across driver stderr chunks leaked before complete-line buffering; regression failed with Known token split across chunks leaked."
+    ],
+    "passed": [
+      "Pinned Node24.22.1 and Bun1.4.1 actual-source Android launcher tests: original6-row order and1AVD/2installs, fixed5-row continuation order, no repeated Mapbox camera, immutable outcome/prefix rejection before host commands, original render/camera entrypoints and cleanup/firstfailure regressions.",
+      "Pinned Node24.22.1 and Bun1.4.1 actual-source TF07 runner tests: failed manual reports capture before force-stop, bounded logs and ReactNativeJS/Bridgeless retention, token redaction, read/write diagnostic errors preserve original first failure and cleanup; borrowed reverse/process behavior retained.",
+      "Scoped formatter/linter and JavaScript syntax; scoped Markdown links/paragraph structure and git diff whitespace.",
+      "Read-only archive/frozen/observer/host/current-runtime/APK identity proofs.",
+      "Pinned Node/Bun actual-source driver split-known-token/query-token redaction and stream-end flush; per-row filename,128KiB tail and secondary capture-write failure regression remain passed."
+    ],
+    "scope": "Actual-source mocked host boundaries only; no native commands, Metro, app build/install/device/host setup or renderer acceptance.",
+    "preparationFailures": [
+      "Scoped formatter initially could not resolve vite-plus without review-checkout dependencies; temporary primary node_modules symlink enabled unchanged installed tools and was removed afterward. Markdown is ignored by formatter, so scoped structural/link/whitespace checks were used."
+    ],
+    "identityCounts": {
+      "frozen": 695,
+      "observer": 26,
+      "host": 7,
+      "runtime": 12,
+      "archiveMembersPerSelectedCopy": 171,
+      "matchingSelectedCopies": 2,
+      "retainedApks": 2
+    }
+  },
+  "coordinatorAudit": {
+    "status": "passed for five-row continuation and diagnostic repair",
+    "checks": [
+      "Independent pinned Node24/Bun launcher, TF07 runner and camera observer mocks passed",
+      "Old-runner disposable red control fails actual-source pre-force-stop diagnostic regression; current runner passes",
+      "Validated fixed five-row order, immutable accepted-camera prefix and outcome identity; no arbitrary skip",
+      "Reviewed bounded pre-cleanup native/crash/activity/React Native capture, secondary capture failures, row-bound stderr files and complete-line credential redaction",
+      "Independent695 frozen,26observer,7host,12runtime hashes; both APKs, prior outcome and171archive members in both selected copies match"
+    ],
+    "findingsRemaining": [],
+    "applicationRootCause": "unresolved; not reproduced by routine mocks; no production repair claimed",
+    "nativeExecution": false
+  },
+  "storage": {
+    "observedUTC": "2026-10-31T18:12:26.579003+00:00",
+    "availableGiB": 25.149181365966797,
+    "requiredBytes": 8804682957,
+    "gatePassed": true
+  }
+}

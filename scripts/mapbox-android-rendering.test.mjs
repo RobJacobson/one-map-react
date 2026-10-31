@@ -29,11 +29,12 @@ const names = [
   "rendered output contains the known orange feature",
 ];
 
-for (const [engine, camera, batch = false] of [
+for (const [engine, camera, batch = false, continuation = false] of [
   ["mapbox", false],
   ["maplibre", false],
   ["mapbox", true],
   ["mapbox", true, true],
+  ["mapbox", true, true, true],
 ]) {
   const apkHash = apkHashes[engine];
   const expectedNames =
@@ -43,6 +44,7 @@ for (const [engine, camera, batch = false] of [
     null,
     ...(engine === "mapbox" ? ["missing-token", "whitespace-token"] : []),
     "existing-output",
+    ...(continuation ? ["prior-hash", "prior-prefix"] : []),
     "low-space",
     "apk",
     "observer",
@@ -71,6 +73,7 @@ for (const [engine, camera, batch = false] of [
     "readiness",
     "app-launch",
     "driver",
+    "driver-stderr",
     "driver-cleanup",
     "partial",
     "wrong-platform",
@@ -89,6 +92,7 @@ for (const [engine, camera, batch = false] of [
     "emulator-exit",
     "release-port",
   ]
+    .filter((failure) => batch || failure !== "driver-stderr")
     .filter(
       (failure) =>
         !batch ||
@@ -99,7 +103,10 @@ for (const [engine, camera, batch = false] of [
           "observer",
           "cleanup",
           "driver",
+          "driver-stderr",
           "late-metro-exit",
+          "prior-hash",
+          "prior-prefix",
         ].includes(failure)
     )
     .filter(
@@ -120,7 +127,8 @@ for (const [engine, camera, batch = false] of [
           "malformed",
           "driver-record-cleanup",
         ].includes(failure)
-    )) {
+    )
+    .filter((failure) => !continuation || failure !== "late-metro-exit")) {
     const commands = [];
     const stopped = [];
     const removed = [];
@@ -137,7 +145,12 @@ for (const [engine, camera, batch = false] of [
     let statusReads = 0;
     let activeEngine = engine;
     let coreRows = 0;
+    let cameraRows = 0;
+    const cameraEngines = [];
     let installs = 0;
+    const stderrWrites = [];
+    const stderrPrinted = [];
+    let priorDriver;
     const scene = {
       platform: failAt === "wrong-platform" ? "ios" : "android",
       engine:
@@ -282,7 +295,11 @@ for (const [engine, camera, batch = false] of [
     const context = {
       assert,
       observeCamera: batch
-        ? async () => ({ engine: activeEngine, passed: true })
+        ? async () => {
+            cameraRows++;
+            cameraEngines.push(activeEngine);
+            return { engine: activeEngine, passed: true };
+          }
         : observeCamera,
       AbortSignal,
       join,
@@ -299,6 +316,7 @@ for (const [engine, camera, batch = false] of [
                   : "",
         },
         execPath: "/node",
+        stderr: { write: (text) => stderrPrinted.push(text) },
         argv: [],
         kill: (pid, signal) => signals.push([pid, signal]),
       },
@@ -326,12 +344,27 @@ for (const [engine, camera, batch = false] of [
       readFileSync: (file) => {
         if (
           /android-(rendering|camera)-preparation.json$/.test(file) ||
-          file.endsWith("platform-batches-preparation.json")
+          file.endsWith("platform-batches-preparation.json") ||
+          file.endsWith("android-continuation-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
             hostInputSha256: { "/helper": "helper" },
             freeze: { path: "/freeze", sha256: "freeze-hash" },
+          });
+        if (file.endsWith("android-platform-batch-attempt-01.json"))
+          return JSON.stringify({
+            result: "stopped-at-first-ui-failure",
+            candidateSha256:
+              "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+            distSha256: distHash,
+            completedRows: [
+              {
+                rowId:
+                  failAt === "prior-prefix" ? "wrong" : "mapbox-android-camera",
+                status: "passed",
+              },
+            ],
           });
         if (file === "/freeze")
           return JSON.stringify({
@@ -379,6 +412,10 @@ for (const [engine, camera, batch = false] of [
         return file.slice(1);
       },
       writeFileSync: (file, value) => {
+        if (file.endsWith("-driver-stderr.log")) {
+          stderrWrites.push([file, value]);
+          if (failAt === "driver-stderr") fail("diagnostic write failed");
+        }
         if (
           file.endsWith("checkpoint.json") &&
           failAt === "checkpoint-before-create"
@@ -414,6 +451,7 @@ for (const [engine, camera, batch = false] of [
       spawn: (file, args, options) => {
         const child = new EventEmitter();
         Object.assign(child, {
+          stderr: new EventEmitter(),
           pid: 600 + children.length,
           exitCode: null,
           signalCode: null,
@@ -421,7 +459,23 @@ for (const [engine, camera, batch = false] of [
         children.push(child);
         if (args.some((arg) => arg.endsWith("tf07-ui-smoke.mjs"))) {
           coreRows++;
-          child.exitCode = failAt === "driver" ? 1 : 0;
+          launched = true;
+          child.exitCode = ["driver", "driver-stderr"].includes(failAt) ? 1 : 0;
+          const prior = priorDriver;
+          priorDriver = child;
+          queueMicrotask(() => {
+            if (prior) prior.stderr.emit("data", "late previous driver\n");
+            child.stderr.emit("data", "x".repeat(140 * 1024) + "\n");
+            child.stderr.emit("data", "token=redacted-");
+            child.stderr.emit(
+              "data",
+              "test-token\nhttps://example.invalid/?access_"
+            );
+            child.stderr.emit("data", "token=split-private-");
+            child.stderr.emit("data", "value\nflush=redacted-");
+            child.stderr.emit("data", "test-token");
+            child.stderr.emit("end");
+          });
           assert.equal(
             options.env.TF07_HARNESS_ROOT,
             "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness"
@@ -477,11 +531,17 @@ for (const [engine, camera, batch = false] of [
           return this;
         },
         digest: () =>
-          String(content).startsWith('{"files"') ? "freeze-hash" : content,
+          String(content).startsWith('{"result":"stopped-at-first-ui-failure"')
+            ? failAt === "prior-hash"
+              ? "wrong"
+              : "38fb7d4b86c6ee4a76bb1551eaa53644325a2949ffbba669218663f641a3e00f"
+            : String(content).startsWith('{"files"')
+              ? "freeze-hash"
+              : content,
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -523,6 +583,8 @@ for (const [engine, camera, batch = false] of [
         "low-space",
         "apk",
         "observer",
+        "prior-hash",
+        "prior-prefix",
       ].includes(failAt)
     )
       assert.equal(commands.length, 0);
@@ -600,10 +662,65 @@ for (const [engine, camera, batch = false] of [
     if (batch) {
       assert.equal(
         installs,
-        failAt === null ? 2 : failAt === "observer" ? 0 : 1
+        failAt === null
+          ? 2
+          : ["observer", "prior-hash", "prior-prefix"].includes(failAt)
+            ? 0
+            : 1
       );
+      if (failAt === "driver-stderr") {
+        assert.match(receipt.error, /driver failed/);
+        assert(
+          receipt.diagnosticErrors.some((error) =>
+            error.includes("diagnostic write failed")
+          )
+        );
+      }
       if (failAt === null) {
-        assert.equal(receipt.rows.length, 6);
+        assert(stderrWrites.every(([, value]) => value.length <= 128 * 1024));
+        const capture =
+          stderrWrites.map(([, value]) => value).join("\n") +
+          stderrPrinted.join("");
+        assert(
+          !capture.includes("redacted-test-token"),
+          "Known token split across chunks leaked."
+        );
+        assert(
+          !capture.includes("split-private-value"),
+          "Query token split across chunks leaked."
+        );
+        assert(
+          capture.includes("flush=<REDACTED>"),
+          "Flush final complete token on stream end."
+        );
+        const late = stderrWrites.find(([, value]) =>
+          value.includes("late previous driver")
+        );
+        assert(
+          late[0].endsWith("mapbox-android-core-driver-stderr.log"),
+          late[0]
+        );
+        assert.equal(receipt.rows.length, continuation ? 5 : 6);
+        assert.equal(cameraRows, continuation ? 1 : 2);
+        assert.deepEqual(
+          cameraEngines,
+          continuation ? ["maplibre"] : ["mapbox", "maplibre"]
+        );
+        assert.deepEqual(
+          receipt.rows.map(({ rowId }) => rowId),
+          [
+            ...(!continuation ? ["mapbox-android-camera"] : []),
+            "mapbox-android-core",
+            "mapbox-android-retained",
+            "maplibre-android-camera",
+            "maplibre-android-core",
+            "maplibre-android-retained",
+          ]
+        );
+        if (continuation)
+          assert.equal(receipt.reusedRows[0].rowId, "mapbox-android-camera");
+        if (continuation)
+          assert.equal(receipt.rows[0].rowId, "mapbox-android-core");
         assert.equal(coreRows, 4);
         assert.equal(
           commands.filter((args) =>
@@ -613,19 +730,19 @@ for (const [engine, camera, batch = false] of [
           ).length,
           1
         );
-        assert.equal(pulls, 14);
+        assert.equal(pulls, continuation ? 12 : 14);
       }
       if (failAt === "late-metro-exit") {
         assert.equal(receipt.rows.length, 0);
         assert.equal(coreRows, 0);
       }
-      if (failAt === "driver") {
-        assert.equal(receipt.rows.length, 1);
+      if (["driver", "driver-stderr"].includes(failAt)) {
+        assert.equal(receipt.rows.length, continuation ? 0 : 1);
         assert.equal(coreRows, 1);
       }
       assert(
         removed.some((file) => file.endsWith("OneMapU25F05.avd")) ||
-          failAt === "observer"
+          ["observer", "prior-hash", "prior-prefix"].includes(failAt)
       );
       continue;
     }
