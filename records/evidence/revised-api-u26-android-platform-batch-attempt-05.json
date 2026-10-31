@@ -1,0 +1,150 @@
+{
+  "checkpoint": "Android adb-only continuation attempt05",
+  "recordedUTC": "2026-10-31T23:23:04.329937+00:00",
+  "result": "stopped-at-worker-command-syntax-error",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-05",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "nativeBuildOrDependencyRestoration": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "firstFailure": {
+    "classification": "Worker command construction error, not product or device failure",
+    "workerReportedCause": "Python compound try statement placed after semicolon in first bounded hierarchy-read wrapper; parse failed before adb subprocess launch",
+    "physicalObservationPerformed": false,
+    "operatorAdbLaunched": false,
+    "cuaUsed": false,
+    "retryPerformed": false
+  },
+  "manualReport": {
+    "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "environment": "mapbox-android",
+    "runId": "68b9cdf1-5e51-4548-b79b-cbdc256e102e",
+    "scenarios": {
+      "live-child-button": "failed",
+      "nested-scroll": "unverified",
+      "live-activation": "unverified",
+      "annotation-activation": "unverified",
+      "offset-touch-bounds": "unverified",
+      "popup-follow-dismissal": "unverified",
+      "map-feature-click": "unverified",
+      "navigation-location": "unverified",
+      "style-remount": "unverified",
+      "host-accessibility": "unverified",
+      "sdk-ornaments": "unverified",
+      "camera-target-and-gesture": "unverified",
+      "marker-prop-rejection": "unverified"
+    },
+    "observations": {
+      "live-child-button": {
+        "action": "Attempted the first hierarchy read for the core row, but the bounded operator wrapper failed to parse before launching adb.",
+        "seenResult": "Python reported a syntax error at the inline try block; no physical UI observation was made."
+      }
+    }
+  },
+  "identityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~lEpGhENnGsaDTvOVwQbJFg==/com.onemapmapbox-6D1gHtY4h9g6TqFiKXs-Nw==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~lEpGhENnGsaDTvOVwQbJFg==/com.onemapmapbox-6D1gHtY4h9g6TqFiKXs-Nw==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "identityLimit": "Installed Mapbox identity verified before row only; post-row readback not reached. Retained APKs and frozen inputs matched post-run.",
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 6839",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "runtimeInputs": 13,
+    "archiveAndBothApksMatched": true,
+    "ownedPidsAndGroupsAbsent": [
+      6673,
+      6839
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true,
+    "manualReportValidJson": true
+  },
+  "retainedDiagnostics": {
+    "directory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-05",
+    "files": {
+      "checkpoint.json": "24a03b5fd51525dee6ef81f25c48c941fcd214e4d6834c65603054b7be0aaa87",
+      "mapbox-android-core-diagnostics.json": "c45efa9e18b79f8e1bb5de6812da3f8c7062f9d4c4926c4e029caad2e68885e4",
+      "mapbox-android-core-driver-stderr.log": "827a68f0b7722ad6763c1db2e81a89a28daf83794159598139660384375f8a07",
+      "emulator.log": "09d25293b18b925ce02671ffbf51fcc22b19648802be5ac3cb129dc65b72fcb1",
+      "mapbox-android-core-manual.json": "1b58c90e1f1fd12e9fbbef5cae9c84018371d575ec204374644d6ca105fb620c",
+      "receipt.json": "24a03b5fd51525dee6ef81f25c48c941fcd214e4d6834c65603054b7be0aaa87"
+    }
+  },
+  "next": "No retry authorized by this outcome. Any future operator command must use the audited multiline template unchanged and pass syntax validation before device acquisition, rather than rebuilding it as a one-line Python string."
+}

@@ -1,0 +1,144 @@
+{
+  "checkpoint": "Exact adb-only operator commands for proposed Android continuation attempt06",
+  "status": "Implementation and independent source/routine audit passed; native execution awaiting separate owner approval",
+  "recordedUTC": "2026-10-31T23:39:41.198977+00:00",
+  "sourcePreparation": {
+    "path": "records/evidence/revised-api-u26-validated-reports-preparation.json",
+    "sha256": "fcacfa08e548d81d7168f7c816bc0289d8c5727aafc110ec68ef720fc7052337"
+  },
+  "diagnosisPreparation": {
+    "path": "records/evidence/revised-api-u26-android-navigation-retry-preparation.json",
+    "sha256": "a43c75ae2e5b9d86eaa21bafced62a33b94e978358e13aa1338cc784f6f47025"
+  },
+  "history": {
+    "attempt04": {
+      "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-04.json",
+      "sha256": "ce99a182a21b519eb9c233308fe8cec4dab7c99531e023042e60b9de94910ef1",
+      "exactPrimaryCopy": true
+    },
+    "attempt05": {
+      "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-05.json",
+      "sha256": "86ac563cf755f04688c68437c69887b6e112740070b78bf646f777685601ccdd",
+      "exactPrimaryCopy": true
+    }
+  },
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Camera launcher verifies695 frozen files before acquisition and after success, including selected package dist copies; preparation compares all171 archive members in both selected package copies. Legacy TF04 and TF09 drivers are not executed."
+  },
+  "freeze": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-sources-attempt-01/post-restoration-freeze.json",
+    "sha256": "2ec3355e8e8de917f001abf7cf6d02fcaf3ab034b93dc76224f81106988a9b8f",
+    "verifiedFiles": 695,
+    "mismatches": []
+  },
+  "unchangedInputVerification": {
+    "stagedSha256": {
+      "verified": 26,
+      "mismatches": []
+    },
+    "hostInputSha256": {
+      "verified": 7,
+      "mismatches": []
+    },
+    "batchInputSha256": {
+      "verified": 13,
+      "mismatches": []
+    }
+  },
+  "operatorHelperSha256": {
+    "/private/tmp/one-map-android-restoration-review/scripts/android-operator.py": "8628c60f42d4267a7fada9b4312bc4a01f0f2461e8718a56c3b78ae5be642939",
+    "/private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs": "c8cc8d59c637e46fb5771adbb558a7790214bcc2cbd6db25e31f22c78eea38a5"
+  },
+  "regressionSha256": {
+    "/private/tmp/one-map-android-restoration-review/scripts/android-operator.test.py": "c8c19226db2b2ef084b621d3c53f5cf017770e1cad8d07bbe396e51c7bcc2784"
+  },
+  "operatorContract": {
+    "adb": "/Users/rob/Library/Android/sdk/platform-tools/adb",
+    "serial": "emulator-5580",
+    "timeoutSeconds": 30,
+    "checkedExit": true,
+    "shell": false,
+    "invocationsPerCall": 1,
+    "outputBytesPerStream": 131072,
+    "capture": "Temporary files bound captured output memory; print only tail as replacement-decoded text. Screenshot is device screencap file followed by checked pull, never binary stdout.",
+    "errors": "Timeout, nonzero child exit and launch OSError print FAILED and return1. Successful child prints COMPLETE0. START is flushed before launch. No retry."
+  },
+  "exactOperatorCommands": [
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell uiautomator dump /sdcard/one-map-attempt06-hierarchy-001.xml",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell cat /sdcard/one-map-attempt06-hierarchy-001.xml",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell input swipe 100 110 1000 110 450",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell input tap 50 40",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell screencap -p /sdcard/one-map-attempt06-live-child-button.png",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py pull /sdcard/one-map-attempt06-live-child-button.png /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06/live-child-button.png"
+  ],
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06",
+  "outputAbsentAtPreparation": true,
+  "executionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "estimatedMinutes": "60-120, unmeasured; same four operator UI rows and one remaining camera row; row/boot/install/cleanup bounds unchanged",
+  "scope": "Same five serial Android rows, unchanged f05/archive/dist/APKs/frozen/staged/runtime inputs; no CUA, Android Studio, rebuild, install during preparation, dependency restoration or native run. Existing launcher retains approved verified APK installation during future acceptance.",
+  "failurePolicy": "One approval covers all five serial rows; success continues through all five. Stop first failure, preserve original first error, capture bounded diagnostics, perform owned cleanup. No independent retries/repairs or extra microtest.",
+  "routineVerification": {
+    "passed": [
+      "python3 scripts/android-operator.test.py: exact six documented CLI argument vectors execute a fake executable through the actual __main__ entrypoint; XML output parses locally; nonzero, missing executable and real child timeout (test boundary shortened to20ms) fail once; bounded output verified; old semicolon-try command reproduces SyntaxError.",
+      "Pinned Node24 scripts/record-native-ui-observation.test.mjs: unchanged writer filesystem and actual CLI regressions.",
+      "AST compilation and /bin/sh -n for all six exact copyable adb helper commands.",
+      "Read-only freeze695,observer26,host7,runtime13,archive digest and both retained APK hashes match; historical attempt04/05 bytes equal primary.",
+      "Python AST and py_compile for helper/regression in temporary storage; documentation structure/local links and git diff --check.",
+      "Initial numbered hierarchy dump/cat paths agree; operator command tests reject compound shell tokens in reviewed examples. New numbered filenames prevent reading stale output left by a successful dump that did not rewrite its target."
+    ],
+    "nativeExecution": false,
+    "preparationFailures": [
+      "Initial new regression parser included trailing blank output line; corrected test parsing, rerun passed."
+    ]
+  },
+  "remainingGates": [
+    "Separate owner approval before attempt06 native acquisition/execution.",
+    "Actual physical observations and renderer behavior remain unverified; coordinates must use fresh visible bounds."
+  ],
+  "limits": [
+    "This fixes command construction only; no Android or product defect is diagnosed or repaired.",
+    "30second bound covers launched adb child, not outer tool approval/transport. Resume yielded calls rather than redispatch.",
+    "Output memory and printed tails are bounded; temporary capture disk usage is proportional to one operation during its30second limit.",
+    "Only existing launcher owns native diagnostics/process cleanup; helper owns its child and temporary output files."
+  ],
+  "coordinatorAudit": {
+    "status": "passed",
+    "checks": [
+      "Independently passed fake-child execution of all six documented helper invocations through actual CLI entrypoint",
+      "Independently passed nonzero exit, missing executable and real child timeout regressions; exactly one checked shell-free subprocess with30second default asserted",
+      "Old inline compound-statement syntax reproduces SyntaxError; new helper and tests compile; all exact shell invocations pass sh -n",
+      "Independently passed unchanged report writer filesystem/CLI regressions",
+      "Source audit of tempfile ownership, bounded-memory output tails, fixed adb/serial, checked exit, no retry, and fresh hierarchy filenames",
+      "Independent695frozen,26observer,7host,13runtime pins, helper/test hashes, archive and both APKs match; historical outcomes copied exactly",
+      "Documentation structure and whitespace checks passed"
+    ],
+    "corrections": [
+      "Require new numbered hierarchy file for each dump with matching read, preventing accidental stale-file reuse"
+    ],
+    "remainingFindings": [],
+    "nativeExecution": false,
+    "limit": "Fake child and filesystem boundaries only; no device command or acceptance run. Outer approval/transport remains outside subprocess timeout."
+  }
+}
