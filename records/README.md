@@ -1,5 +1,7 @@
 # API research and evidence
 
+The [validated native UI report preparation](evidence/revised-api-u26-validated-reports-preparation.json) records the atomic structured writer, filesystem regressions and proposed attempt03 five-row Android continuation. The [attempt02 outcome](evidence/revised-api-u26-android-platform-batch-attempt-02.json) preserves the malformed worker report failure and partial physical readback. The [sole handoff](../docs/revised-api-acceptance-plan.md#current-handoff) owns the next approval; no new native execution is authorized.
+
 The [MapLibre iOS source-scene preparation](evidence/revised-api-u25-f05-maplibre-ios-sources-preparation.json) records the selected checked-build route, retained scaffold and missing iOS locks, proposed fresh isolated Ruby/Pods restoration and bounded routine checks. The [sole proposal](../docs/revised-api-acceptance-plan.md#proposed-single-maplibre-ios-source-scene) owns restoration, coordinator audit and execution approval.
 
 The [Mapbox Android source-scene preparation](evidence/revised-api-u25-f05-mapbox-android-sources-preparation.json) owns preparation identities. The [passed continuation outcome](evidence/revised-api-u25-f05-mapbox-android-sources-attempt-02.json) closes the bounded runtime scene after the [earlier space-gate stop](evidence/revised-api-u25-f05-mapbox-android-sources-attempt-01.json); neither grants rerun permission.

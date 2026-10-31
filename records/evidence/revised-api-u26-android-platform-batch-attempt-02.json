@@ -1,0 +1,193 @@
+{
+  "checkpoint": "PR80 Android five-row continuation attempt02",
+  "recordedUTC": "2026-10-31T19:32:10.472448+00:00",
+  "result": "stopped-at-worker-report-serialization-error",
+  "commandExit": 1,
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-02",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "nativeBuildOrDependencyRestoration": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "firstFailure": {
+    "classification": "Worker execution error, not a demonstrated application failure",
+    "cause": "Worker serialized the manual JSON object then appended literal backslash+n rather than a newline. Strict parser rejected extra characters at2071; exact serialization confirmed from worker context.",
+    "rawReportPreserved": true,
+    "trailingBytesHex": "5c6e",
+    "repairOrRetryExecuted": false
+  },
+  "partialPhysicalEvidence": {
+    "scenario": "live-child-button",
+    "observed": "App remained foregrounded through tap and Read renderer; child-click1 and feature707 returned with center[-122.34,47.61],zoom11. Coordinator inspected screenshot and saved renderer data.",
+    "forensicJsonPrefix": {
+      "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+      "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+      "environment": "mapbox-android",
+      "runId": "869b46d3-cbff-4707-89fb-e09bcb163666",
+      "scenarios": {
+        "live-child-button": "passed",
+        "nested-scroll": "unverified",
+        "live-activation": "unverified",
+        "annotation-activation": "unverified",
+        "offset-touch-bounds": "unverified",
+        "popup-follow-dismissal": "unverified",
+        "map-feature-click": "unverified",
+        "navigation-location": "unverified",
+        "style-remount": "unverified",
+        "host-accessibility": "unverified",
+        "sdk-ornaments": "unverified",
+        "camera-target-and-gesture": "unverified",
+        "marker-prop-rejection": "unverified"
+      },
+      "observations": {
+        "live-child-button": {
+          "action": "Physically tapped live child button at (530,1450) within fresh hierarchy bounds [440,1425][638,1476], then tapped visible READ RENDERER control at (1022,110).",
+          "seenResult": "App remained foregrounded; native status changed to TF07 child-click; rendered JSON showed child-click=1.",
+          "rendererData": {
+            "events": {
+              "popup-open": 1,
+              "move": 4,
+              "style": 1,
+              "load": 1,
+              "child-click": 1
+            },
+            "positions": {},
+            "center": [
+              -122.34000000000002,
+              47.60999999999999
+            ],
+            "zoom": 11,
+            "features": [
+              {
+                "type": "Feature",
+                "id": "707",
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [
+                    -122.3399949,
+                    47.5799997
+                  ]
+                },
+                "properties": {
+                  "fixture": "tf07"
+                }
+              }
+            ],
+            "generation": 0,
+            "sourcePoint": [
+              205.50000000002788,
+              485.57537949542876
+            ]
+          },
+          "screenshot": "/private/tmp/one-map-android-restoration-review/mapbox-core-after-read.png"
+        }
+      }
+    },
+    "limit": "Prefix decoded only for forensic audit; raw report remains invalid. No completed core pass or repaired manual acceptance is claimed."
+  },
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingSuiteCount": 11,
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "identityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~CBmIOoQPMpd8K9mFU_4CtA==/com.onemapmapbox-BBN0dQaWz7U47h6WYINNTw==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~CBmIOoQPMpd8K9mFU_4CtA==/com.onemapmapbox-BBN0dQaWz7U47h6WYINNTw==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "identityLimit": "Installed Mapbox proof before the failed row only; after-row proof was not reached. Retained APKs/frozen inputs matched post-run.",
+  "coordinatorAudit": {
+    "result": "Saved failure and owned cleanup independently audited",
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "runtimeInputs": 12,
+    "ownedPidsAbsent": [
+      69477,
+      69731
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true,
+    "screenshotReviewed": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-02/mapbox-core-after-read.png",
+    "originalForegroundLoss": "Not reproduced through the verified tap/readback; no root-cause fix established. Later pre-cleanup diagnostics found PID absent/home and empty crash buffer; timing/cause of that later state remain unverified."
+  },
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 69731",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "retainedDiagnostics": {
+    "directory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-02",
+    "files": {
+      "receipt.json": "6ee18fc42e8fbf636bd6c339b60976e539b384201f455da227b05f77747bfcf9",
+      "mapbox-android-core-manual.json": "7d68ea24c76de2c6184c0fc017fb3414299301907eeb3214da1af9e426efdf64",
+      "mapbox-android-core-driver-stderr.log": "e51ddbacdac2b2abfcd6de6e9ce4a543a74f5b37ce090a9c008d4286dd791192",
+      "mapbox-android-core-diagnostics.json": "070710ae2409697e33699824b5b5e6fc3f2c72a18fac3763a142b9975dae5195",
+      "mapbox-core-after-read.png": "dbc19065fbe6fdcb7fd112937ef9bf514bcae34979193e0ab0d0700fb06b2ccc",
+      "emulator.log": "9849e1d70cad75b35d5276c7d7e51e6607953dfc54c80c685e82fab676443e30"
+    }
+  },
+  "next": "Use a prevalidated structured report writer before any separately approved continuation; do not loosen JSON validation, alter raw history or rerun the accepted camera row."
+}
