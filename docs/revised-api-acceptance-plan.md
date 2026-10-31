@@ -18,11 +18,11 @@ The nine browser rows and all four native minimal, lifetime, query/cluster, boun
 
 ### Proposed serial Android continuation
 
-**Attempt03 is proposed, unexecuted.** Attempt02 is closed and its invalid raw report remains unchanged. The [structured writer](../scripts/record-native-ui-observation.mjs) and filesystem regressions repair the worker publication boundary; independent coordinator audit and new whole-continuation approval remain required. The accepted Mapbox camera row is reused.
+**Attempt03 is proposed, unexecuted.** Attempt02 is closed and its invalid raw report remains unchanged. The [structured writer](../scripts/record-native-ui-observation.mjs) and filesystem regressions repair the worker publication boundary; independent coordinator audit passed; new whole-continuation approval remains required. The accepted Mapbox camera row is reused.
 
 The [fixed continuation entrypoint](../scripts/android-acceptance-continuation.mjs) reuses the reviewed Android lifecycle and the existing frozen TF04, TF07 core and retained screens through Metro. The updated [TF07 driver](../scripts/tf07-ui-smoke.mjs) reads the unchanged staged harness through an explicit root binding; it does not use the review checkout as the candidate application. The matrix pins its runtime scripts, both verified APKs, f05 archive/dist, 695 frozen files, 26 observer inputs and seven host inputs. No native application build, dependency installation, SDK download or staging-source change is included.
 
-Report-writing repair and bounded routine verification are recorded in the new preparation; independent coordinator audit is pending. Attempt02 physically observed child activation and renderer readback while the app stayed foregrounded, then stopped on malformed operator JSON. It completed no new suite row. Attempt01 foreground-loss cause remains unresolved; no production fix or full core pass is claimed.
+Report-writing repair, bounded routine verification and passed independent coordinator audit are recorded in the new preparation. Attempt02 physically observed child activation and renderer readback while the app stayed foregrounded, then stopped on malformed operator JSON. It completed no new suite row. Attempt01 foreground-loss cause remains unresolved; no production fix or full core pass is claimed.
 
 After explicit approval for all five remaining Android rows, one exclusive GPT-6 Luna worker at medium reasoning runs exactly once with require_escalated:
 
