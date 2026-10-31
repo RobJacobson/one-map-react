@@ -13,6 +13,7 @@ import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 
+import { observeCamera } from "./android-camera-observer.mjs";
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 
 const recovery = "/Users/rob/code/mapbox-code/one-map-f05-android-recovery";
@@ -54,9 +55,17 @@ const root = resolve(import.meta.dirname, "..");
  * Runs one fixed no-build Android scene and releases only acquired resources.
  * @param output - Fresh absolute directory for the attempt's durable receipts.
  * @param engine - Fixed backend selected by its entrypoint.
+ * @param scene - Fixed rendering or camera sequence selected by its entrypoint.
  * @returns Completion after the first outcome and bounded owned cleanup.
  */
-export const run = async (output, engine = "mapbox") => {
+export const run = async (output, engine = "mapbox", scene = "rendering") => {
+  assert(["rendering", "camera"].includes(scene), "Unknown fixed scene.");
+  assert(
+    scene !== "camera" || engine === "mapbox",
+    "Camera targets Mapbox only."
+  );
+  const camera = scene === "camera";
+  const ports = camera ? [5580, 5581, 8081] : [5580, 5581, 8081, 8798];
   assert(Object.hasOwn(targets, engine), "Choose mapbox or maplibre.");
   const { applicationId, apkSha256, outcomes } = targets[engine];
   const shell = join(harness, `examples/native-${engine}`);
@@ -118,6 +127,7 @@ export const run = async (output, engine = "mapbox") => {
       ...freeze.files,
       ...preparation.stagedSha256,
       ...preparation.hostInputSha256,
+      ...preparation.cameraInputSha256,
     }))
       assert.equal(sha256(file), hash, `Frozen runtime input changed: ${file}`);
   };
@@ -198,7 +208,7 @@ export const run = async (output, engine = "mapbox") => {
     }
     const peerEvidence = join(
       root,
-      `records/evidence/revised-api-u25-f05-${engine}-android-rendering-preparation.json`
+      `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
@@ -210,9 +220,8 @@ export const run = async (output, engine = "mapbox") => {
       receipt.freeBytes >= 8804682957,
       "Android preboot requires 8.2 GiB free; stop without deleting files."
     );
-    createRequire(join(pngRoot, "package.json"))("pngjs");
-    for (const port of [5580, 5581, 8081, 8798])
-      await requireFreePort(port, execute);
+    if (!camera) createRequire(join(pngRoot, "package.json"))("pngjs");
+    for (const port of ports) await requireFreePort(port, execute);
     assert(
       !(await android(["adb", "devices"]))
         .split(/\r?\n/)
@@ -259,7 +268,7 @@ export const run = async (output, engine = "mapbox") => {
       )
     );
     const existingReverses = await adb(["reverse", "--list"]);
-    for (const port of [8081, 8798]) {
+    for (const port of camera ? [8081] : [8081, 8798]) {
       assert(
         !existingReverses.split(/\s+/).includes(`tcp:${port}`),
         `Reverse ${port} already exists.`
@@ -336,7 +345,7 @@ export const run = async (output, engine = "mapbox") => {
         "8081",
       ],
       shell,
-      { ONE_MAP_SMOKE: "tf09" }
+      { ONE_MAP_SMOKE: camera ? "tf04" : "tf09" }
     );
     metro.once("exit", (code, signal) => {
       failure ??= new Error(
@@ -352,26 +361,29 @@ export const run = async (output, engine = "mapbox") => {
         .text()
         .then((body) => body === "packager-status:running")
     );
-    const driver = start(
-      process.execPath,
-      [join(harness, "scripts/tf09-rendering-smoke.mjs"), "android", engine],
-      harness,
-      {
-        TF09_OUTPUT: join(output, "scene.json"),
-        TF09_LIBRARY_SHA256: distSha256,
-        TF09_NATIVE_IDENTITY: apkSha256,
-        TF09_PEER_EVIDENCE: peerEvidence,
-        TF09_RUNTIME_NODE_MODULES: pngRoot,
-      }
-    );
-    await until(
-      async () =>
-        (
-          await fetch("http://127.0.0.1:8798/command", {
-            signal: AbortSignal.timeout(2000),
-          })
-        ).ok
-    );
+    let driver;
+    if (!camera) {
+      driver = start(
+        process.execPath,
+        [join(harness, "scripts/tf09-rendering-smoke.mjs"), "android", engine],
+        harness,
+        {
+          TF09_OUTPUT: join(output, "scene.json"),
+          TF09_LIBRARY_SHA256: distSha256,
+          TF09_NATIVE_IDENTITY: apkSha256,
+          TF09_PEER_EVIDENCE: peerEvidence,
+          TF09_RUNTIME_NODE_MODULES: pngRoot,
+        }
+      );
+      await until(
+        async () =>
+          (
+            await fetch("http://127.0.0.1:8798/command", {
+              signal: AbortSignal.timeout(2000),
+            })
+          ).ok
+      );
+    }
     const launch = await checkpoint("launch selected app", () =>
       adb([
         "shell",
@@ -384,21 +396,35 @@ export const run = async (output, engine = "mapbox") => {
     );
     assert.match(launch, /Status: ok/);
     assert(!/Error:|Exception/.test(launch), "Selected app launch failed.");
-    await until(
-      () => driver.exitCode !== null || driver.signalCode !== null,
-      600000
-    );
-    assert.equal(driver.exitCode, 0);
-    receipt.scene = JSON.parse(readFileSync(join(output, "scene.json")));
-    assert.equal(receipt.scene.platform, "android");
-    assert.equal(receipt.scene.engine, engine);
-    assert.equal(receipt.scene.artifact, distSha256);
-    assert.equal(receipt.scene.nativeIdentity, apkSha256);
-    assert.deepEqual(
-      receipt.scene.outcomes.map((value) => value.name),
-      outcomes
-    );
-    assert(receipt.scene.outcomes.every((value) => value.status === "passed"));
+    if (camera) {
+      receipt.scene = await observeCamera({
+        adb,
+        execute,
+        until,
+        record: (observation) => {
+          receipt.camera = observation;
+          record();
+        },
+      });
+    } else {
+      await until(
+        () => driver.exitCode !== null || driver.signalCode !== null,
+        600000
+      );
+      assert.equal(driver.exitCode, 0);
+      receipt.scene = JSON.parse(readFileSync(join(output, "scene.json")));
+      assert.equal(receipt.scene.platform, "android");
+      assert.equal(receipt.scene.engine, engine);
+      assert.equal(receipt.scene.artifact, distSha256);
+      assert.equal(receipt.scene.nativeIdentity, apkSha256);
+      assert.deepEqual(
+        receipt.scene.outcomes.map((value) => value.name),
+        outcomes
+      );
+      assert(
+        receipt.scene.outcomes.every((value) => value.status === "passed")
+      );
+    }
     await identity("after");
     verifyInputs(preparation, freeze);
     receipt.result = "passed";
@@ -483,7 +509,7 @@ export const run = async (output, engine = "mapbox") => {
     }
     let portsReleased = true;
     if (createdAvd || children.length) {
-      for (const port of [5580, 5581, 8081, 8798]) {
+      for (const port of ports) {
         if (
           !(await cleanup(`released port ${port}`, () =>
             requireFreePort(port, execute)

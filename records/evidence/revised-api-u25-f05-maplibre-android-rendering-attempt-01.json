@@ -1,0 +1,141 @@
+{
+  "checkpoint": "PR76 MapLibre Android targeted rendering attempt01",
+  "observedAt": "2026-10-31T06:55:27.381061+00:00",
+  "result": "passed",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "apkReused": true,
+  "nativeBuildOrDependencyRestoration": false,
+  "verifiedApkInstalledOnFreshPrivateEmulator": true,
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/maplibre-android-rendering.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/maplibre-android-rendering-attempt-01",
+  "commandExit": 0,
+  "attemptCount": 1,
+  "scene": {
+    "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+    "platform": "android",
+    "engine": "maplibre",
+    "artifact": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "nativeIdentity": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+    "outcomes": [
+      {
+        "name": "known rendered feature and initial no-data",
+        "status": "passed",
+        "observation": {
+          "loads": 1,
+          "featureIds": [
+            "9009"
+          ],
+          "elevation": null,
+          "unsupported": "Error: queryTerrainElevation is unsupported on MapLibre Native."
+        }
+      },
+      {
+        "name": "hillshade draws the fixture's slope patch",
+        "status": "passed",
+        "observation": {
+          "changedPixels": 221905
+        }
+      },
+      {
+        "name": "rendered output contains the known orange feature",
+        "status": "passed",
+        "observation": {
+          "width": 1080,
+          "height": 2400,
+          "orangePixels": 2976
+        }
+      }
+    ]
+  },
+  "identityReads": [
+    {
+      "phase": "before",
+      "path": "/data/app/~~ToH3NODAtxjfX6cc7EQk6A==/com.onemapmaplibre-1nMtuv8tlsRXAiLQjd4FTw==/base.apk",
+      "sha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131"
+    },
+    {
+      "phase": "after",
+      "path": "/data/app/~~ToH3NODAtxjfX6cc7EQk6A==/com.onemapmaplibre-1nMtuv8tlsRXAiLQjd4FTw==/base.apk",
+      "sha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131"
+    }
+  ],
+  "apkSha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+  "coordinatorAudit": {
+    "result": "passed within exact three-scenario MapLibre Android scope",
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "preparedFiles": 5,
+    "mismatches": [],
+    "retainedInstalledApk": "matching before and after scene",
+    "ownedPidsAbsent": [
+      33352,
+      33564,
+      33508
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8798
+    ],
+    "privateAvdRemoved": true,
+    "sdkLimit": "Configured org.maplibre.gl:android-sdk-opengl:13.6.1; independent linked Android SDK identity remains unverified."
+  },
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 33564",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 33508",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8798",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8798",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "scopeLimit": "Exactly three existing TF09 Android MapLibre scenarios. Broader native acceptance and independently linked Android SDK identity remain open."
+}

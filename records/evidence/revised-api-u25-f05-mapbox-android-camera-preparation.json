@@ -1,0 +1,179 @@
+{
+  "checkpoint": "Mapbox Android full existing camera-and-click scene preparation, unchanged f05",
+  "status": "Preparation passed independent coordinator audit; native execution awaits separate explicit owner approval",
+  "sourceBasis": {
+    "branch": "codex/u25-mapbox-android-camera-interaction",
+    "baseCommit": "32ae748",
+    "basePR": "PR76 OPEN, stacked on PR75",
+    "primary": "Read only; unrelated dirty source untouched"
+  },
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Camera launcher verifies695 frozen files before acquisition and after success, including selected package dist copies; preparation compares all171 archive members in both selected package copies. Legacy TF04 and TF09 drivers are not executed."
+  },
+  "freeze": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-sources-attempt-01/post-restoration-freeze.json",
+    "sha256": "2ec3355e8e8de917f001abf7cf6d02fcaf3ab034b93dc76224f81106988a9b8f",
+    "verifiedFiles": 695,
+    "mismatches": []
+  },
+  "stagedSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-fixture.mjs": "50b90fa0b06d2b4cc3129084322bcfb232ab3113a003f134dc8c826bc9f7ad15",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/package.json": "85b17f2f852aece03e71edb4ed4d9fddf6a0a8f0b69ac75d7f00b6592d62d37c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitmapper.js": "3f2f720e3a2b4e41cdc03e9f58bb1794bec26dcd1b22568e41ce0b84ab20aeb5",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitpacker.js": "3f7bfabcbc82bedd0cc8551bc210b44dc1fb179fa2ce3b8b1d39fa307d8af204",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/chunkstream.js": "43c5507901554a29c5a29e555aaeb3c3987b84fb3aa8c681c1b30794a477aa85",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/constants.js": "9e3b4f994ac93751e9ccb4d453e85e4f25a0b086a9f24ec92c7dcb06995bdf6c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/crc.js": "57e2328cfa361fb54f1f4b3a59e071c1ccc864095e4f3759a957cd15aa2a8b65",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-pack.js": "500c1b3b34702c895e9e689143f44280687cac363447523679ec13d12bd564f6",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-async.js": "328b6173f1a2a4d91425220a0fa421699552f254006a57ede9f4018ced50a7ee",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-sync.js": "201a08dfab26a2903c0dabcbdfe0406b3fa33d60f59b591878329f590fac48ff",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse.js": "b8aad6f29371f5b13b232643781a7c49f7d36d565136ddda1ed7fbaca987ce2c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/format-normaliser.js": "c73989d85bef5d33ce571095bf0d96927261730d8b0f79c9d48f971fcbdd0be0",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/interlace.js": "3bb5d57153078ff586667e9a9d2c06db993c8ff1638e0521a9883cdeea6e1e3f",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-async.js": "f50df0610749ce7b1a99abbe9e4596df7c16f96efd3848f12dd632b22cb02b45",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-sync.js": "1b516238168a42704e62ba44528406188864a6ddda2ae92d1b91e5e078cdaa2d",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer.js": "b5f9956364c80d67c28d615ace639a5fb4d4d79d3acb235237f3050dca220e03",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/paeth-predictor.js": "48555b909af708593dade8e8df75d18ecdffdb6577e362eac01eae357ef1e0e9",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-async.js": "a0299cad35220de62b7180b1f984b8f77b4c0f419a580fd3c86ea3b3e971ee30",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-sync.js": "266c9fb230b90075022b3f54f5710a9cacb71ca565f83fce66e7cbd1b7e9b507",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser.js": "574e43fea28a28cc6feb7ab62a480a86bb75411ee4bfaba76a7e9d7310b6e94c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png-sync.js": "867b1a78dcd3e45458eb4f0af01acd48f38d3a31225bd7cb8dd8ee3966ab54be",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png.js": "e02cecbd36327829758386dc3f0ca4a36a2339ccb5d5e824ca3556e2c3f89726",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-inflate.js": "08cb8afb79a4c0ab58e94601dab22261daf6638382b211d6a7f6bfbc16d27a0b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-reader.js": "437a99bf1bf739202ae85c3018cd9174d411597cf55e7064c36976de493368f1"
+  },
+  "hostInputSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/launch-lifetime-emulator.py": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24",
+    "/private/tmp/one-map-approved-android-boot-poll.py": "f819d439aa4573070b858e80c7d3a61ca8f7a833f5ca857f3347ba5d39a35956",
+    "/Users/rob/.android/avd/Medium_Phone.avd/config.ini": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/source.properties": "11d49660e8e74661ed0b3164f5141308f7f947d6de037d7f5ca7fc428c825133",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/package.xml": "61527f2f82a09aa711005a29b75dc031d58d5869c4633d8d863623c610a57753"
+  },
+  "cameraInputSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf04-camera-smoke.mjs": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-rendering.mjs": "a420da25c4f0df249f063d8c6ae6ce73d26780d7dabf6432c072524d51ca61a7",
+    "/private/tmp/one-map-android-restoration-review/scripts/mapbox-android-camera.mjs": "7bf43e4e090f805730d7b56d6aa4b5b5ad4c60c1415100519a1c80d76eb12126",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-camera-observer.mjs": "cb73045f53716da831e999d941a2ecdb33e09a6beefa85065dacdcf70859fe25"
+  },
+  "identity": {
+    "retainedApk": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "package": "com.onemapmapbox",
+    "embeddedJavaScriptBundle": false,
+    "sdkMetadata": {
+      "com.mapbox.common.core": "common/24.23.1\n",
+      "com.mapbox.maps.core": "sdk/11.23.1\n",
+      "com.mapbox.maps": "maps-sdk/11.23.1\n"
+    },
+    "futureInstalledProof": "Require sole pm path base.apk, fresh adb pull/hash before flow and after passed scene, exact retained APK hash equality; persist readback hash before duplicate removal",
+    "sdkLimit": "APK sdk_versions metadata identifies reported versions; not a complete independent SDK certificate"
+  },
+  "scope": {
+    "scene": "Existing frozen useCameraSmoke in NativeCameraScreen, ONE_MAP_SMOKE=tf04, Android Mapbox only; no legacy TF04 runner execution",
+    "required": "fit=ok click=hit stop=rejected held=0 command=applied doubletap=skip note=none phase=done done=1; fitted pre-tap center inside [-122.335,-122.305] x [47.625,47.655], click coordinates within0.08degrees per axis of that center, final center within0.5degrees Euclidean distance of[-120,45]",
+    "limits": [
+      "Map click observes geographic coordinate delivery near fitted center, not a feature hit/query",
+      "Native stop rejection observed only; frozen scene catches any rejection without reason. No error-classification or animation-cancellation claim",
+      "jumpTo occurs while native viewState target is supplied; explicit camera target wins in this scene, no native controlled-camera guarantee",
+      "Single automated slice, no double tap, gesture certification, UI/TF07/manual/accessibility/sensors/services or whole SDK certification"
+    ]
+  },
+  "observer": {
+    "status": "Selected com.onemapmapbox tf04-status UI Text through serial-scoped uiautomator, Python stdlib ElementTree; no logcat, no status server",
+    "freshness": "UUID-owned device XML path removed before every dump and in finally; no cached log/status reads; reject duplicate XML nodes and phase regression, require status persistence after first observation",
+    "input": "Read exact wm size (override if present); one tap at width/2,height*0.62 only at await-click after fitted center; no physical-input retry or taps after phase change",
+    "failure": "First failure/timeout aborts. Failed fit/click/stop/command/note/held timeout aborts immediately; strict terminal fields required.90second observation bound."
+  },
+  "resources": {
+    "serial": "emulator-5580",
+    "avd": "OneMapU25F05",
+    "ports": [
+      5580,
+      5581,
+      8081
+    ],
+    "reverses": [
+      8081
+    ],
+    "noFixture8798": true,
+    "noStatus8799": true,
+    "ownership": "Reject assigned listeners/device/private AVD conflicts; preserve shared adb server, SDK image, source AVD and unknown resources. Acquire only private AVD, recorded emulator PID/PGID, selected test app, reverse8081 and Metro group.",
+    "uncertainLaunch": "Mark launch attempted only inside the launch-helper action after its start receipt. Without validated returned PID/PGID, preserve private AVD and report uncertain ownership, regardless of clear assigned ports; no unknown process is killed.",
+    "avdAcquisition": "Claim created AVD inside helper action after its started checkpoint persists, before helper call so partial creation remains owned."
+  },
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1,
+    "scope": "One fixed command after separate explicit owner execution approval; stop first failure, no repairs/probes/retries; coordinator verifies artifacts/outcome"
+  },
+  "bounds": {
+    "estimatedMinutes": "5-15, unmeasured",
+    "sceneSeconds": 90,
+    "prebootRequiredBytes": 8804682957,
+    "cleanup": "Existing reviewed bounded process/emulator/port cleanup, partial acquisition and uncertain ownership rules preserved"
+  },
+  "storage": {
+    "observedUTC": "2026-10-31T07:02:06.540683+00:00",
+    "availableBytes": 24302039040,
+    "availableGiB": 22.633037567138672,
+    "requiredBytes": 8804682957,
+    "gatePassed": true,
+    "limit": "Refresh before dispatch; no deletion or image changes authorized"
+  },
+  "proposedCommand": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-camera.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-android-camera-attempt-01",
+  "routineVerification": {
+    "filesystem": "All695 frozen files,26 observer inputs,7 host inputs,171 archive members in both selected Mapbox package copies and retained APK SHA verified read only; frozen camera scene and native screen are already included in695; all inputs rechecked unchanged after routine verification, APK no embedded bundle and three selected sdk_versions metadata bytes independently rechecked",
+    "scope": "Pure filesystem/parser/compiler/resolver/mock checks only; no native tools or renderer execution",
+    "nodeAndBunMocks": "Passed pinned Node24.22.1 and Bun1.4.1 actual-source shared orchestration for both6/3 rendering branches and fixed Mapbox camera branch, preserved token/default/ownership/error/cleanup cases and all three fixed entrypoints; camera creates only Metro, reverse8081 and no8798 resources",
+    "observer": "Node and Bun passed actual observer tests for ElementTree XML header, malformed/duplicate/wrong-package/testID selection, missing/truncated/duplicate status, missing/disappeared/regressing status, one-tap-only phase gating, fit/target/click observations, failed stop/held/command/note, timeout, and combined scene/cleanup failures preserving first error",
+    "syntax": "Pinned Node --check passed all5 changed/new scripts",
+    "formatterAndLint": "Primary-installed Vite+ scoped formatting/lint passed5 explicit scripts; preparation JSON serialized with two-space indentation (Vite+ excludes evidence JSON). Temporary tool symlink removed after checks; primary source untouched",
+    "documentation": "Pinned Node check-docs passed40Markdown files/39comparison tables; git diff --check passed. Sole plan started once from latest primary accepted MapLibre Android outcome; carried outcome/cleanup evidence copied byte-for-byte",
+    "installedResolution": "Selected actual installed Metro resolves ./camera-smoke.js and ./route-map.js from native-camera-screen.tsx to their shared TypeScript files on Android",
+    "babel": "Selected installed Babel compiled App, smoke-target, native-camera-screen, camera-smoke and route-map with ONE_MAP_SMOKE=tf04 fully inlined, no code/token output",
+    "firstPreparationFailures": [
+      "Static transform check initially required literal spacing around doubleTap:false; corrected whitespace-tolerant assertion then all5 transforms and resolver checks passed",
+      "Lint initially rejected throw in observer finally; cleanup now collects failure and throws after finally, preserving first scene failure; Node/Bun regression and lint passed",
+      "Disposable APK check initially searched for filenames ending in sdk_versions instead of assets/sdk_versions/<SDK>; corrected existing receipt paths and all three metadata reads passed"
+    ],
+    "coordinator": "Independent final source, scope and routine audit passed; actual native execution remains unverified."
+  },
+  "notExecuted": [
+    "emulator/adb/Metro/build/install/SDK download/native acceptance",
+    "No staging mutation, source/scene/production/peers/locks/version/SDK image/app changes, deletion, commit or push"
+  ],
+  "preparedSha256": {
+    "scripts/android-rendering.mjs": "a420da25c4f0df249f063d8c6ae6ce73d26780d7dabf6432c072524d51ca61a7",
+    "scripts/mapbox-android-camera.mjs": "7bf43e4e090f805730d7b56d6aa4b5b5ad4c60c1415100519a1c80d76eb12126",
+    "scripts/android-camera-observer.mjs": "cb73045f53716da831e999d941a2ecdb33e09a6beefa85065dacdcf70859fe25",
+    "scripts/android-camera-observer.test.mjs": "7b4279e0a89145871d86e6eeda337260044ab3e5c25a1321e899391d62249147",
+    "scripts/mapbox-android-rendering.test.mjs": "681673b49d0800cc2313c077141b3310bb2c9b8fadf3aab010a52e49cf7c412a",
+    "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b"
+  },
+  "coordinatorAudit": {
+    "status": "passed for fixed Mapbox Android camera-and-click scope",
+    "checks": [
+      "Reviewed shared lifecycle changes and both rendering paths; resource ownership and cleanup preserved",
+      "Independently passed actual-source lifecycle/entrypoint and camera observer tests on pinned Node24 and Bun",
+      "Independently rechecked695 frozen files,26 observer inputs,7 host inputs,4 camera inputs,6 prepared files and171 archive members in both selected package copies",
+      "Reviewed package/testID-specific XML parsing, monotonic phases, fresh dump ownership, one-tap dispatch, clean status and coordinate tolerances against frozen fixture",
+      "Corrected XML cleanup masking original failure; independent disposable red control restoring masking fails combined-failure regression"
+    ],
+    "findingsRemaining": [],
+    "nativeExecution": false,
+    "limits": "Native stop scene records any rejection without classifying reason; click proves coordinates, not feature query; no gesture, native animation cancellation or full native acceptance claim"
+  }
+}

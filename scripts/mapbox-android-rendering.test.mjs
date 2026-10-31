@@ -4,6 +4,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { runInNewContext } from "node:vm";
 
+import { observeCamera } from "./android-camera-observer.mjs";
+
 const source = readFileSync(
   new URL("./android-rendering.mjs", import.meta.url),
   "utf8"
@@ -27,7 +29,11 @@ const names = [
   "rendered output contains the known orange feature",
 ];
 
-for (const engine of ["mapbox", "maplibre"]) {
+for (const [engine, camera] of [
+  ["mapbox", false],
+  ["maplibre", false],
+  ["mapbox", true],
+]) {
   const apkHash = apkHashes[engine];
   const expectedNames =
     engine === "mapbox" ? names : [names[0], names[3], names[5]];
@@ -80,7 +86,24 @@ for (const engine of ["mapbox", "maplibre"]) {
     "emulator-kill-fallback",
     "emulator-exit",
     "release-port",
-  ]) {
+  ].filter(
+    (failure) =>
+      !camera ||
+      ![
+        "reverse-conflict",
+        "reverse",
+        "driver",
+        "driver-cleanup",
+        "partial",
+        "wrong-platform",
+        "wrong-engine",
+        "wrong-artifact",
+        "wrong-identity",
+        "failed-scene",
+        "malformed",
+        "driver-record-cleanup",
+      ].includes(failure)
+  )) {
     const commands = [];
     const stopped = [];
     const removed = [];
@@ -94,6 +117,7 @@ for (const engine of ["mapbox", "maplibre"]) {
     let cleanupStarted = false;
     const signals = [];
     let pulls = 0;
+    let statusReads = 0;
     const scene = {
       platform: failAt === "wrong-platform" ? "ios" : "android",
       engine:
@@ -134,6 +158,12 @@ for (const engine of ["mapbox", "maplibre"]) {
             !signals.some(([, signal]) => signal === "SIGKILL"))
           ? "501 501 S"
           : "";
+      if (file === "python3") {
+        const final = statusReads++ > 0;
+        return JSON.stringify(
+          `TF04 fit=ok click=${final ? "hit" : "pending"} clickAt=${final ? "-122.32000,47.64000" : "pending"} stop=${final ? "rejected" : "pending"} held=${final ? "0" : "pending"} command=${final ? "applied" : "pending"} doubletap=skip center=${final ? "-120.00000,45.00000" : "-122.32000,47.64000"} note=none phase=${final ? "done" : "await-click"} done=${final ? "1" : "0"}`
+        );
+      }
       const command = args.slice(1);
       if (command[0] === "python3") {
         if (command[1].includes("create-lifetime")) {
@@ -197,6 +227,8 @@ for (const engine of ["mapbox", "maplibre"]) {
         if (failAt === "stdin-epipe") return new Promise(() => {});
         return "";
       }
+      if (adb.join(" ") === "shell wm size") return "Physical size: 1080x2400";
+      if (adb[0] === "exec-out" && adb[1] === "cat") return "xml";
       if (adb[0] === "exec-out")
         return failAt === "debug-read" ? "wrong" : preferences;
       if (adb.join(" ").includes("ro.build.version.sdk"))
@@ -225,6 +257,7 @@ for (const engine of ["mapbox", "maplibre"]) {
     };
     const context = {
       assert,
+      observeCamera,
       AbortSignal,
       join,
       resolve: (value) => value,
@@ -265,7 +298,7 @@ for (const engine of ["mapbox", "maplibre"]) {
         };
       },
       readFileSync: (file) => {
-        if (file.endsWith("rendering-preparation.json"))
+        if (/android-(rendering|camera)-preparation.json$/.test(file))
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
             hostInputSha256: { "/helper": "helper" },
@@ -335,7 +368,7 @@ for (const engine of ["mapbox", "maplibre"]) {
         });
         children.push(child);
         if (children.length === 1) {
-          assert.equal(options.env.ONE_MAP_SMOKE, "tf09");
+          assert.equal(options.env.ONE_MAP_SMOKE, camera ? "tf04" : "tf09");
           assert(args.includes("--reset-cache"));
         } else {
           assert.deepEqual(Array.from(args.slice(-2)), ["android", engine]);
@@ -385,7 +418,7 @@ for (const engine of ["mapbox", "maplibre"]) {
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt"${engine === "mapbox" ? "" : ', "maplibre"'})`,
+      `${source}\nrun("/attempt", "${engine}", "${camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -502,10 +535,20 @@ for (const engine of ["mapbox", "maplibre"]) {
       );
     if (failAt === null) {
       assert.equal(pulls, 2);
+      if (camera) {
+        assert.equal(children.length, 1);
+        assert.equal(commands.filter((args) => args.includes("tap")).length, 1);
+        assert(
+          !commands.some((args) =>
+            args.some((arg) => String(arg).includes("8798"))
+          )
+        );
+      }
       const cleanupNames = receipt.cleanup.map((entry) => entry.name);
       assert(
-        cleanupNames.indexOf("released port 8798") <
-          cleanupNames.indexOf("owned private AVD removal")
+        cleanupNames.indexOf(
+          camera ? "released port 8081" : "released port 8798"
+        ) < cleanupNames.indexOf("owned private AVD removal")
       );
       assert(
         cleanupNames.indexOf("owned emulator process exit") <
@@ -515,21 +558,29 @@ for (const engine of ["mapbox", "maplibre"]) {
     assert(!JSON.stringify(receipt).includes("redacted-test-token"));
   }
 }
-for (const engine of ["mapbox", "maplibre"]) {
+for (const [engine, camera] of [
+  ["mapbox", false],
+  ["maplibre", false],
+  ["mapbox", true],
+]) {
   const entrypoint = readFileSync(
-    new URL(`./${engine}-android-rendering.mjs`, import.meta.url),
+    new URL(
+      `./${engine}-android-${camera ? "camera" : "rendering"}.mjs`,
+      import.meta.url
+    ),
     "utf8"
   )
     .replace(/^import[\s\S]*?from "[^\n]+";\n/gm, "")
     .replaceAll("export const", "const")
     .replace(/if \(\s*process.argv\[1\][\s\S]*$/, "");
   runInNewContext(`${entrypoint}\nrun("/entrypoint");`, {
-    runAndroid: (output, selected) => {
+    runAndroid: (output, selected, scene) => {
       assert.equal(output, "/entrypoint");
       assert.equal(selected, engine);
+      assert.equal(scene, camera ? "camera" : undefined);
     },
   });
 }
 console.log(
-  "Both Android rendering orchestration mocks and fixed entrypoints passed."
+  "Both Android rendering branches and camera orchestration/entrypoint mocks passed."
 );
