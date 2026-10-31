@@ -306,7 +306,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const peerEvidence = join(
       root,
       continuation
-        ? "records/evidence/revised-api-u26-android-continuation-preparation.json"
+        ? "records/evidence/revised-api-u26-validated-reports-preparation.json"
         : batch
           ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
           : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
