@@ -60,14 +60,17 @@ const root = resolve(import.meta.dirname, "..");
  */
 export const run = async (output, engine = "mapbox", scene = "rendering") => {
   assert(
-    ["rendering", "camera", "acceptance"].includes(scene),
+    ["rendering", "camera", "acceptance", "acceptance-continuation"].includes(
+      scene
+    ),
     "Unknown fixed scene."
   );
   assert(
     scene !== "camera" || engine === "mapbox",
     "Camera targets Mapbox only."
   );
-  const batch = scene === "acceptance";
+  const continuation = scene === "acceptance-continuation";
+  const batch = scene === "acceptance" || continuation;
   const camera = scene === "camera" || batch;
   const ports = batch
     ? [5580, 5581, 8081, 8797]
@@ -130,6 +133,18 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
   };
   const verifyInputs = (preparation, freeze) => {
     assert.equal(sha256(apk), apkSha256, "Verified retained APK changed.");
+    if (batch)
+      for (const [selected, target] of Object.entries(targets))
+        assert.equal(
+          sha256(
+            join(
+              harness,
+              `examples/native-${selected}/android/app/build/outputs/apk/debug/app-debug.apk`
+            )
+          ),
+          target.apkSha256,
+          "Verified retained batch APK changed."
+        );
     assert.equal(sha256(preparation.freeze.path), preparation.freeze.sha256);
     assert.equal(Object.keys(freeze.files).length, 695);
     for (const [file, hash] of Object.entries({
@@ -142,16 +157,60 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       assert.equal(sha256(file), hash, `Frozen runtime input changed: ${file}`);
   };
   const start = (file, args, cwd, env = {}) => {
+    const diagnosticDriver = args.some((arg) =>
+      arg.endsWith("tf07-ui-smoke.mjs")
+    );
     const child = spawn(file, args, {
       cwd,
       detached: true,
-      stdio: "inherit",
+      stdio: diagnosticDriver ? ["inherit", "inherit", "pipe"] : "inherit",
       env: {
         ...process.env,
         PATH: `${join(recovery, "runtime-bin")}:${process.env.PATH}`,
         ...env,
       },
     });
+    if (diagnosticDriver) {
+      const logPath = join(output, `${receipt.currentRow}-driver-stderr.log`);
+      let tail = "";
+      let pending = "";
+      let oversized = false;
+      const retainLine = (line) => {
+        const redacted = line
+          .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
+          .replace(/([?&](?:access_token|token)=)[^&\s"']+/gi, "$1<REDACTED>");
+        tail = (tail + redacted).slice(-128 * 1024);
+        process.stderr.write(redacted);
+        try {
+          writeFileSync(logPath, tail);
+        } catch (error) {
+          receipt.diagnosticErrors = [
+            ...(receipt.diagnosticErrors ?? []),
+            String(error).slice(-512),
+          ].slice(-8);
+        }
+      };
+      child.stderr.on("data", (chunk) => {
+        const lines = (pending + chunk).split("\n");
+        pending = lines.pop();
+        for (const line of lines) {
+          retainLine(
+            oversized || line.length > 128 * 1024
+              ? "[Oversized diagnostic line omitted]\n"
+              : `${line}\n`
+          );
+          oversized = false;
+        }
+        if (pending.length > 128 * 1024) {
+          pending = "";
+          oversized = true;
+        }
+      });
+      child.stderr.on("end", () => {
+        if (oversized) retainLine("[Oversized diagnostic line omitted]\n");
+        else if (pending) retainLine(pending);
+      });
+    }
     child.on("error", (error) => {
       failure ??= error;
     });
@@ -220,11 +279,37 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       receipt.tokenPresent = Boolean(process.env.MAPBOX_ACCESS_TOKEN?.trim());
       assert(receipt.tokenPresent, "Mapbox access token is required.");
     }
+    if (continuation) {
+      const priorPath = join(
+        root,
+        "records/evidence/revised-api-u26-android-platform-batch-attempt-01.json"
+      );
+      assert.equal(
+        sha256(priorPath),
+        "38fb7d4b86c6ee4a76bb1551eaa53644325a2949ffbba669218663f641a3e00f",
+        "Prior outcome changed."
+      );
+      const prior = JSON.parse(readFileSync(priorPath));
+      assert.equal(prior.result, "stopped-at-first-ui-failure");
+      assert.equal(
+        prior.candidateSha256,
+        "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276"
+      );
+      assert.equal(prior.distSha256, distSha256);
+      assert.deepEqual(
+        prior.completedRows.map(({ rowId, status }) => ({ rowId, status })),
+        [{ rowId: "mapbox-android-camera", status: "passed" }]
+      );
+      receipt.reusedRows = prior.completedRows;
+      receipt.priorOutcome = { path: priorPath, sha256: sha256(priorPath) };
+    }
     const peerEvidence = join(
       root,
-      batch
-        ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
-        : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
+      continuation
+        ? "records/evidence/revised-api-u26-android-continuation-preparation.json"
+        : batch
+          ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
+          : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
@@ -357,6 +442,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         "android.permission.ACCESS_LOCAL_NETWORK",
       ]);
       for (const row of batch ? ["camera", "core", "retained"] : [scene]) {
+        if (continuation && engine === "mapbox" && row === "camera") continue;
         const rowId = `${engine}-android-${row}`;
         if (batch) {
           receipt.currentRow = rowId;
@@ -389,11 +475,15 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
               TF07_MANUAL_REPORT: join(output, `${rowId}-manual.json`),
               TF07_OUTPUT: join(output, `${rowId}-result.json`),
               TF07_NATIVE_TIMEOUT_MS: "1800000",
+              TF07_ANDROID_DIAGNOSTICS: join(
+                output,
+                `${rowId}-diagnostics.json`
+              ),
             }
           );
           await until(
             () => driver.exitCode !== null || driver.signalCode !== null,
-            1860000
+            1980000
           );
           assert.equal(driver.exitCode, 0, `${rowId} driver failed.`);
           const result = JSON.parse(

@@ -22,6 +22,8 @@ for (const borrowed of [false, true]) {
     "launch",
     "cleanup",
     "manual-failed",
+    "manual-diagnostics-read",
+    "manual-diagnostics-write",
     "manual-identity",
     "manual-json",
     "metro-spawn",
@@ -40,6 +42,7 @@ for (const borrowed of [false, true]) {
     let failed = false;
     let metro;
     let polls = 0;
+    let diagnostics;
     const context = {
       assert,
       platform: "android",
@@ -51,6 +54,8 @@ for (const borrowed of [false, true]) {
           ANDROID_SERIAL: "emulator-5580",
           TF07_NATIVE_BINARY_SHA256: hash,
           TF07_MANUAL_REPORT: "/report",
+          TF07_ANDROID_DIAGNOSTICS: "/diagnostics",
+          MAPBOX_ACCESS_TOKEN: "known-sample-token",
           ...(borrowed
             ? {
                 TF07_BORROWED_METRO_REVERSE: "1",
@@ -76,14 +81,27 @@ for (const borrowed of [false, true]) {
             : JSON.stringify(manual)
           : "apk",
       writeFileSync: (file, value, options) => {
+        if (file === "/diagnostics") {
+          diagnostics = JSON.parse(value);
+          if (failure === "manual-diagnostics-write")
+            throw Error("diagnostic disk failure");
+          assert(!commands.at(-1).includes("force-stop"));
+          return;
+        }
         assert.equal(file, "/report");
         assert.equal(options.flag, "wx");
         manual = JSON.parse(value);
         assert.equal(manual.runId, "fresh-run");
         assert.equal(manual.scenarios["physical-touch"], "unverified");
         manual.scenarios["physical-touch"] =
-          failure === "manual-failed" ? "failed" : "passed";
-        if (failure !== "manual-failed")
+          failure?.startsWith("manual-diagnostics") ||
+          failure === "manual-failed"
+            ? "failed"
+            : "passed";
+        if (
+          failure !== "manual-failed" &&
+          !failure?.startsWith("manual-diagnostics")
+        )
           manual.scenarios["later-touch"] = "passed";
         if (failure === "manual-identity") manual.runId = "other-run";
       },
@@ -142,6 +160,13 @@ for (const borrowed of [false, true]) {
         assert.deepEqual(Array.from(args.slice(0, 2)), ["-s", "emulator-5580"]);
         const parts = Array.from(args.slice(2));
         commands.push(parts);
+        if (
+          (parts.includes("logcat") ||
+            parts.includes("dumpsys") ||
+            parts.includes("pidof")) &&
+          failure === "manual-diagnostics-read"
+        )
+          throw Error("diagnostic transport failure");
         if (parts.join(" ").includes("pm path"))
           return (
             "package:/data/app/owned/base.apk\n" +
@@ -168,6 +193,12 @@ for (const borrowed of [false, true]) {
           throw Error("launch failed");
         if (parts.includes("--remove") && failure === "cleanup")
           throw Error("cleanup failed");
+        if (parts.includes("logcat"))
+          return (
+            "AndroidRuntime https://example.invalid/?access_token=private-query-token\n" +
+            "x".repeat(140 * 1024) +
+            "\nReactNativeJS: application error known-sample-token\nBridgeless: stack frame"
+          );
         return "";
       },
     };
@@ -176,7 +207,10 @@ for (const borrowed of [false, true]) {
     } catch (error) {
       if (failure?.startsWith("manual-")) {
         assert.match(String(error.errors[0]), /TF07 manual report failed/);
-        if (failure === "manual-failed") {
+        if (
+          failure === "manual-failed" ||
+          failure?.startsWith("manual-diagnostics")
+        ) {
           assert.match(String(error.errors[0]), /physical-touch/);
           assert.equal(manual.scenarios["later-touch"], "unverified");
         }
@@ -184,6 +218,34 @@ for (const borrowed of [false, true]) {
       failed = true;
     }
     assert.equal(failed, failure !== null, `${borrowed}/${failure}`);
+    if (failure?.startsWith("manual-")) {
+      assert(diagnostics, "Capture failure diagnostics before force-stop.");
+      assert.equal(diagnostics.applicationId, "com.onemapmapbox");
+      assert.equal(diagnostics.reads.length, 4);
+      assert(!JSON.stringify(diagnostics).includes("private-query-token"));
+      assert(!JSON.stringify(diagnostics).includes("known-sample-token"));
+      if (failure !== "manual-diagnostics-read") {
+        assert(
+          diagnostics.reads
+            .at(-1)
+            .text.includes("ReactNativeJS: application error <REDACTED>")
+        );
+        assert(
+          diagnostics.reads.at(-1).text.includes("Bridgeless: stack frame")
+        );
+      }
+      assert(
+        diagnostics.reads.every(
+          (read) => !read.text || read.text.length <= 128 * 1024
+        )
+      );
+      if (failure === "manual-diagnostics-read")
+        assert(diagnostics.reads.every((read) => read.error));
+      assert(
+        commands.findIndex((parts) => parts.includes("logcat")) <
+          commands.findLastIndex((parts) => parts.includes("force-stop"))
+      );
+    }
     if (failure?.startsWith("metro-") || failure === "readiness-body") {
       assert.equal(polls, failure === "metro-late-exit" ? 2 : 1);
       if (failure !== "metro-late-exit")
@@ -216,6 +278,8 @@ for (const borrowed of [false, true]) {
         "launch",
         "cleanup",
         "manual-failed",
+        "manual-diagnostics-read",
+        "manual-diagnostics-write",
         "manual-identity",
         "manual-json",
       ].includes(failure)

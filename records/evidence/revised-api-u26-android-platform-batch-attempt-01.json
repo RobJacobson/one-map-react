@@ -1,0 +1,248 @@
+{
+  "checkpoint": "PR78 Android platform batch attempt01",
+  "recordedUTC": "2026-10-31T09:09:55.661613+00:00",
+  "result": "stopped-at-first-ui-failure",
+  "commandExit": 1,
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-batch.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-01",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "nativeBuildOrDependencyRestoration": false,
+  "retainedApksReused": true,
+  "completedRows": [
+    {
+      "rowId": "mapbox-android-camera",
+      "status": "passed",
+      "scene": {
+        "observations": [
+          {
+            "text": "TF04 fit=pending click=pending clickAt=pending stop=pending held=pending command=pending doubletap=skip center=pending note=none phase=await-load done=0",
+            "fields": {
+              "fit": "pending",
+              "click": "pending",
+              "clickAt": "pending",
+              "stop": "pending",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "pending",
+              "note": "none",
+              "phase": "await-load",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=pending clickAt=pending stop=pending held=pending command=pending doubletap=skip center=-122.32000,47.64000 note=none phase=await-click done=0",
+            "fields": {
+              "fit": "ok",
+              "click": "pending",
+              "clickAt": "pending",
+              "stop": "pending",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "-122.32000,47.64000",
+              "note": "none",
+              "phase": "await-click",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=hit clickAt=-122.31999,47.63753 stop=rejected held=pending command=pending doubletap=skip center=-120.00000,45.00000 note=none phase=await-hold done=0",
+            "fields": {
+              "fit": "ok",
+              "click": "hit",
+              "clickAt": "-122.31999,47.63753",
+              "stop": "rejected",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "-120.00000,45.00000",
+              "note": "none",
+              "phase": "await-hold",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=hit clickAt=-122.31999,47.63753 stop=rejected held=0 command=applied doubletap=skip center=-120.00000,45.00000 note=none phase=done done=1",
+            "fields": {
+              "fit": "ok",
+              "click": "hit",
+              "clickAt": "-122.31999,47.63753",
+              "stop": "rejected",
+              "held": "0",
+              "command": "applied",
+              "doubletap": "skip",
+              "center": "-120.00000,45.00000",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            }
+          }
+        ],
+        "display": {
+          "width": 1080,
+          "height": 2400
+        },
+        "tap": [
+          "540",
+          "1488"
+        ]
+      }
+    }
+  ],
+  "failedRow": {
+    "id": "mapbox-android-core",
+    "scenario": "live-child-button",
+    "manual": {
+      "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+      "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+      "environment": "mapbox-android",
+      "runId": "b5565113-4714-48c0-9f9f-c452ff9144c8",
+      "scenarios": {
+        "live-child-button": "failed",
+        "nested-scroll": "unverified",
+        "live-activation": "unverified",
+        "annotation-activation": "unverified",
+        "offset-touch-bounds": "unverified",
+        "popup-follow-dismissal": "unverified",
+        "map-feature-click": "unverified",
+        "navigation-location": "unverified",
+        "style-remount": "unverified",
+        "host-accessibility": "unverified",
+        "sdk-ornaments": "unverified",
+        "camera-target-and-gesture": "unverified",
+        "marker-prop-rejection": "unverified"
+      },
+      "observations": {
+        "live-child-button": {
+          "action": "Tapped the visible live child button at emulator coordinates (530,1450), based on fresh hierarchy bounds [440,1425][638,1476].",
+          "seenResult": "The app left the foreground and the launcher home screen appeared immediately; no renderer readback arrived. The child action could not be verified.",
+          "screenshot": "mapbox-core-after-child-tap.png",
+          "hierarchy": "Fresh hierarchy after tap showed the Android home screen and no com.onemapmapbox UI."
+        }
+      }
+    },
+    "classification": "Observed app foreground loss after physical child-button tap; no renderer readback. Root cause and whether application/runtime/operator caused foreground loss are not established by saved evidence. No crash is asserted."
+  },
+  "notRun": [
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingSuiteCount": 11,
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "identityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~AA5uAsbFR2U83Fx0kUVs8g==/com.onemapmapbox-EFnoYDSKUaNzEi--LxecwQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-camera-before",
+      "path": "/data/app/~~AA5uAsbFR2U83Fx0kUVs8g==/com.onemapmapbox-EFnoYDSKUaNzEi--LxecwQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-camera-after",
+      "path": "/data/app/~~AA5uAsbFR2U83Fx0kUVs8g==/com.onemapmapbox-EFnoYDSKUaNzEi--LxecwQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~AA5uAsbFR2U83Fx0kUVs8g==/com.onemapmapbox-EFnoYDSKUaNzEi--LxecwQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "identityLimit": "Mapbox camera has before/after installed APK proof; failed core has only before proof because fail-fast prevented after-scene readback. Frozen file and retained APK post-run proofs matched. MapLibre APK was not installed or run.",
+  "coordinatorAudit": {
+    "result": "passed audit of bounded result, first-failure stop and owned cleanup; Android acceptance incomplete",
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "batchInputs": 11,
+    "screenshotsReviewed": [
+      "mapbox-core-initial.png",
+      "mapbox-core-after-child-tap.png"
+    ],
+    "cameraTarget": [
+      -120,
+      45
+    ],
+    "cameraClickAt": [
+      -122.31999,
+      47.63753
+    ],
+    "cameraNativeStop": "rejected",
+    "ownedPidsAbsent": [
+      50007,
+      50327
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true
+  },
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 50327",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "activeInvestigationArtifacts": {
+    "directory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-01",
+    "files": {
+      "receipt.json": "dc501fba3d6cdc61bd918c78e437ce288acd8493f772d9a57285a2df795637b6",
+      "mapbox-android-core-manual.json": "e1785d223c040a145aa59d4b1a2052ee8304dcfe899482157b5a2a2bde745ef7",
+      "mapbox-core-initial.png": "38cde73e54d42daf5bf550bb475fe2dd88e8ddf464dc08caf98da5140d9d8159",
+      "mapbox-core-after-child-tap.png": "2575e4205af04cb9dfed68ef74649f4fc2f56b610ca8ed5fe3023cf7e5619526",
+      "emulator.log": "b36d667e0f97a28811d6405fc5539b1c8a3f6e5fd61df800d17904727289836a"
+    }
+  },
+  "next": "Diagnose saved first-failure evidence before changes or a separately approved continuation. Preserve camera pass and prior accepted rows; no independent retry."
+}

@@ -567,6 +567,55 @@ const runNative = async (selectedEngine) => {
         failures.push(error);
       }
     };
+    if (
+      failures.length &&
+      acquiredApp &&
+      platform === "android" &&
+      process.env.TF07_ANDROID_DIAGNOSTICS
+    ) {
+      const diagnostics = { applicationId, serial, reads: [] };
+      for (const args of [
+        ["shell", "pidof", applicationId],
+        ["shell", "dumpsys", "activity", "activities"],
+        ["logcat", "-b", "crash", "-d", "-t", "2000"],
+        ["logcat", "-b", "system", "-b", "main", "-d", "-t", "2000"],
+      ]) {
+        try {
+          const text = await adb(args);
+          const relevant = args.includes("main")
+            ? text
+                .split("\n")
+                .filter(
+                  (line) =>
+                    /ActivityManager|ActivityTaskManager|AndroidRuntime|ReactNative|Bridgeless|am_crash|am_kill|libc|DEBUG/i.test(
+                      line
+                    ) || line.includes(applicationId)
+                )
+                .join("\n")
+            : text;
+          const redacted = relevant
+            .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
+            .replace(
+              /([?&](?:access_token|token)=)[^&\s"']+/gi,
+              "$1<REDACTED>"
+            );
+          diagnostics.reads.push({ args, text: redacted.slice(-128 * 1024) });
+        } catch (error) {
+          diagnostics.reads.push({ args, error: String(error) });
+        }
+      }
+      try {
+        writeFileSync(
+          process.env.TF07_ANDROID_DIAGNOSTICS,
+          JSON.stringify(diagnostics, null, 2),
+          { flag: "wx" }
+        );
+      } catch (error) {
+        console.error(
+          `Android failure diagnostics could not be saved: ${error}`
+        );
+      }
+    }
     if (acquiredApp)
       await clean(() =>
         platform === "android"
