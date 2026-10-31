@@ -1,0 +1,276 @@
+{
+  "checkpoint": "PR81 Android five-row continuation attempt03",
+  "recordedUTC": "2026-10-31T23:00:41.663939+00:00",
+  "result": "stopped-at-operator-navigation-stall",
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "nativeBuildOrDependencyRestoration": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "firstFailure": {
+    "scenario": "offset-touch-bounds",
+    "classification": "Incomplete operator procedure after navigation/hierarchy command stalled; no demonstrated application defect",
+    "workerReportedCommand": "Two sequential adb -s emulator-5580 shell input swipe 100 110 1000 110 450 commands, followed by uiautomator dump and hierarchy parse",
+    "limit": "Combined invocation stalled about53seconds; exact hanging subcommand and cause not established. Device still answered get-state. No navigation retry performed.",
+    "interruption": "Worker reported its request to terminate the stalled tool cell was rejected after automatic approval review timed out. Validated failed report then triggered normal driver diagnostics and owned cleanup.",
+    "driverError": "Error: /bin/sh exited: 1/null"
+  },
+  "manualReport": {
+    "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "environment": "mapbox-android",
+    "runId": "317f6c24-ea65-403d-9d1c-c89d4c799f0e",
+    "scenarios": {
+      "live-child-button": "passed",
+      "nested-scroll": "passed",
+      "live-activation": "passed",
+      "annotation-activation": "passed",
+      "offset-touch-bounds": "failed",
+      "popup-follow-dismissal": "unverified",
+      "map-feature-click": "unverified",
+      "navigation-location": "unverified",
+      "style-remount": "unverified",
+      "host-accessibility": "unverified",
+      "sdk-ornaments": "unverified",
+      "camera-target-and-gesture": "unverified",
+      "marker-prop-rejection": "unverified"
+    },
+    "observations": {
+      "live-child-button": {
+        "action": "Tapped the fresh-hierarchy Live marker Child button at bounds [440,1425][638,1476], then physically pressed Read renderer.",
+        "seenResult": "The app remained visible; fresh status read showed TF07 child-click. Renderer events reported child-click=1 and no map-click event; known feature 707 and finite center/zoom were present.",
+        "rendererData": {
+          "events": {
+            "popup-open": 1,
+            "move": 4,
+            "style": 1,
+            "load": 1,
+            "child-click": 1
+          },
+          "featureId": "707",
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03/mapbox-android-core-live-child.png"
+      },
+      "nested-scroll": {
+        "action": "Swiped upward inside the live marker child list, then pressed Read renderer.",
+        "seenResult": "Fresh native hierarchy showed the list entries moved upward within the child area; renderer center and zoom stayed at [-122.34000000000002,47.60999999999999], zoom 11. No map move event was added.",
+        "rendererData": {
+          "events": {
+            "popup-open": 1,
+            "move": 4,
+            "style": 1,
+            "load": 1,
+            "child-click": 1
+          },
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03/mapbox-android-core-nested-scroll.png"
+      },
+      "live-activation": {
+        "action": "Tapped the visible non-child Live marker label at its fresh bounds, then pressed Read renderer.",
+        "seenResult": "The app showed TF07 marker-click and the renderer reported marker-click=1, with the camera unchanged.",
+        "rendererData": {
+          "events": {
+            "child-click": 1,
+            "marker-click": 1,
+            "annotation-click": 1
+          },
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03/mapbox-android-core-live-activation.png"
+      },
+      "annotation-activation": {
+        "action": "Tapped the visible annotation label, then pressed Read renderer.",
+        "seenResult": "The renderer event map added annotation-click=1; marker-click remained 1 and the camera stayed unchanged.",
+        "rendererData": {
+          "events": {
+            "child-click": 1,
+            "marker-click": 1,
+            "annotation-click": 1
+          },
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03/mapbox-android-core-annotation.png"
+      },
+      "offset-touch-bounds": {
+        "action": "Tapped the Live marker child at its fresh offset-mode bounds [503,1393][701,1444]. Renderer later read child-click=2. The follow-up toolbar-navigation adb command stalled before offset reset and second normal-layout tap/readback could be completed.",
+        "seenResult": "Offset placement and the displaced child area were visible, and the offset child tap registered as child-click=2. Reset-layout touch bounds and post-reset activation remain unverified because the owned adb navigation command stalled. This row is failed for incomplete procedure verification; no product defect is concluded.",
+        "rendererData": {
+          "events": {
+            "child-click": 2,
+            "marker-click": 1,
+            "annotation-click": 1
+          },
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03/mapbox-android-core-offset-tap.png"
+      }
+    }
+  },
+  "reportWriterValidation": {
+    "strictJsonParsed": true,
+    "realTrailingNewline": true,
+    "failedScenarioPreserved": true,
+    "passedObservations": [
+      "live-child-button",
+      "nested-scroll",
+      "live-activation",
+      "annotation-activation"
+    ],
+    "unverifiedObservations": [
+      "popup-follow-dismissal",
+      "map-feature-click",
+      "navigation-location",
+      "style-remount",
+      "host-accessibility",
+      "sdk-ornaments",
+      "camera-target-and-gesture",
+      "marker-prop-rejection"
+    ],
+    "historyUnchanged": true
+  },
+  "diagnosticFindings": {
+    "preCleanupAppPid": "3523",
+    "appForeground": true,
+    "limit": "App alive and foregrounded at diagnostic capture; no claim of crash or identified input-stall root cause."
+  },
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingSuiteCount": 11,
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "identityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~i4CdWLtb8JHVk7H2yoHVOA==/com.onemapmapbox-u6clH31xOgAhjwfEbNbuhg==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~i4CdWLtb8JHVk7H2yoHVOA==/com.onemapmapbox-u6clH31xOgAhjwfEbNbuhg==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "identityLimit": "Installed binary verified before row only; after-row readback not reached. Retained APKs and frozen inputs match post-run.",
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 99229",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "status": "Saved report, diagnostic foreground evidence and cleanup independently checked",
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "runtimeInputs": 13,
+    "archiveAndBothApksMatched": true,
+    "ownedPidsAndGroupsAbsent": [
+      99043,
+      99229
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true,
+    "screenshotReviewed": "mapbox-android-core-live-child.png"
+  },
+  "retainedDiagnostics": {
+    "directory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03",
+    "files": {
+      "annotation-activation-observation.json": "6376f844bff14b0c7b555b3236580f786f2aea3cd48bdcb66ad202b054d19e50",
+      "nested-scroll-observation.json": "0c3c9d51335e97650d94f77a9bcb9eb5312d39eb2a340457643c57d92c76f834",
+      "mapbox-android-core-live-activation.png": "7322d12beaabf46d2df004874b6fddf87295c248cba36ab9ce7c9c362f91f818",
+      "mapbox-android-core-before.png": "a89f38725e5afaf11decc20a892151fad7ff56e599e990b06df4c0a8d4ef2994",
+      "checkpoint.json": "3ccd2b0704fd0dd0b20bdf8b7ebba657ccd2e95bf908ea6603156c6f73fb6cfc",
+      "mapbox-android-core-diagnostics.json": "8072783e0de583bd4d4817c8e5da47abcb5bca4a5dfb3bfa603d7c2c3c0f9c56",
+      "mapbox-android-core-live-child.png": "ea7a3acc264ed0929d2e16fabdc5e0dc94d7e580524ddc06c69a35b8d2d69495",
+      "mapbox-android-core-driver-stderr.log": "484ba70a2a2829d91c277d407a25dc73146e315d819596c9b0622017984ea436",
+      "mapbox-android-core-annotation.png": "be802121ac7ff04503214ccd2698af13937c7294b3743e02d79d21b818940861",
+      "emulator.log": "ba191d805d61ad6acd095b3f3085c85feab6e1deed695ced31b3347fbc1fd408",
+      "live-activation-observation.json": "13b2ca5ba66704e20e6aaf023befb8a6b7edd56533718f12e28309fc23af2b83",
+      "mapbox-android-core-offset-layout.png": "25736d868b6153026612680dbc6734bbf312e01403952a3c75fb4d5ab2b2f0b7",
+      "live-child-button-observation.json": "ff8aa9554ade73dbaafe4a49c5853a2c1b7c707613eec806f1b72ef87458339d",
+      "mapbox-android-core-manual.json": "cb26fc4cbe4dd3bcd8d00d08cd763aa71487ce7d238d93b91b37885d8f899890",
+      "mapbox-android-core-offset-tap.png": "395bf1e01ada77b8810ea9f13224e9470499cff3bc1850ea9baf7d09c9d294a8",
+      "mapbox-android-core-nested-scroll.png": "ff96034dcc19c4b3dbe48ef5669bf22a5c2caf76cb9c755bbb194ea0d0fac144",
+      "offset-touch-bounds-observation.json": "cbd51b382fd178b731ed58bf29b66b04266a11f7aebe696f9a179c4e6074e108",
+      "receipt.json": "3ccd2b0704fd0dd0b20bdf8b7ebba657ccd2e95bf908ea6603156c6f73fb6cfc"
+    }
+  },
+  "next": "Read-only diagnosis of the combined input/hierarchy command stall; do not speculate about production defects or retry without separate approval. Keep accepted camera and historical outcomes unchanged."
+}
