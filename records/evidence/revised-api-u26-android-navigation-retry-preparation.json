@@ -1,0 +1,97 @@
+{
+  "checkpoint": "Read-only diagnosis and bounded operator retry plan after Android attempt03",
+  "status": "Worker diagnosis and independent coordinator source/evidence audit passed; native retry awaiting approval",
+  "recordedUTC": "2026-10-31T23:04:03.254722+00:00",
+  "worker": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "role": "Read-only diagnosis and proposed plan"
+  },
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Camera launcher verifies695 frozen files before acquisition and after success, including selected package dist copies; preparation compares all171 archive members in both selected package copies. Legacy TF04 and TF09 drivers are not executed."
+  },
+  "sourceOutcome": "records/evidence/revised-api-u26-android-platform-batch-attempt-03.json",
+  "workerAttestation": {
+    "source": "Original Luna execution worker retained tool-call context, supplied during read-only follow-up",
+    "cell": "g28:48",
+    "call": "Outer functions.exec awaited exec_command(require_escalated), default yield_time; no nested output, result or session_id surfaced",
+    "combinedShell": "Two adb -s emulator-5580 shell input swipe 100 110 1000 110 450 operations separated by semicolons, followed by uiautomator dump with stdout suppressed and conditional hierarchy cat/parse",
+    "waits": "Outer cell yielded at about31seconds; two roughly11second waits returned no output; subsequent wait aborted before dispatch",
+    "terminationReview": "The automatic permission approval review did not finish before its deadline. Do not assume the action is unsafe based on the timeout alone.",
+    "limit": "No proof the nested shell launched, and no proof which subcommand was pending. get-state=device belongs to a separate later invocation."
+  },
+  "conclusions": {
+    "established": [
+      "Operator/tool invocation did not return; combined command had no individual timeouts, exit checks or phase markers",
+      "Saved report contains four passed observations and partial offset child-click2",
+      "Saved diagnostics show PID3523 and Mapbox MainActivity foregrounded; crash buffer empty",
+      "Validated report writer and fail-fast diagnostics/owned cleanup operated correctly"
+    ],
+    "unknown": [
+      "Whether nested shell launched",
+      "If launched, whether swipe, hierarchy dump, read/parse or tool transport blocked",
+      "Any adb, UIAutomator, operating-system or application root cause"
+    ],
+    "productionFixJustified": false,
+    "runnerScope": "tf07-ui-smoke.mjs:538 waits for manual report; its command helper:807 timeout does not wrap operator tool calls"
+  },
+  "smallestChange": "Execution procedure only; no new script, dependency, runner, fixture or production change",
+  "retry": {
+    "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-04",
+    "output": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-04",
+    "rows": [
+      "mapbox-android-core",
+      "mapbox-android-retained",
+      "maplibre-android-camera",
+      "maplibre-android-core",
+      "maplibre-android-retained"
+    ],
+    "reusedRows": [
+      "mapbox-android-camera"
+    ],
+    "worker": {
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "count": 1
+    },
+    "estimatedMinutes": "60-120, unmeasured",
+    "artifactAndRuntimePins": "Reuse unchanged validated-reports-preparation.json:695 frozen,26observer,7host,13runtime pins, exact archive and both verified APKs",
+    "operatorProcedure": [
+      "One checked operation per tool invocation, never a semicolon or pipeline chain",
+      "Real30second subprocess timeout; flushed START and COMPLETE/FAILED; bounded131072byte stdout/stderr excerpts",
+      "One swipe followed by separate hierarchy dump and separate cat, then local XML parse; next input uses fresh bounds",
+      "Use attempt-specific device hierarchy/screenshot filenames and retain only owned paths",
+      "If a tool yields before a result, resume that same call; never dispatch the operation again. Bounded waits do not prove cancellation. A missing START marker or approval timeout is infrastructure failure, not proof of device/app hang",
+      "At first timeout, nonzero exit, transport/approval failure or failed physical observation, stop the attempt. Publish failed observation with validated writer, then existing diagnostics and owned cleanup; no input retry",
+      "Preserve historical partial observations but begin incomplete core row with a fresh driver report/runId; never import old passes into new identity. Completed Mapbox camera remains reused"
+    ],
+    "operatorCommandTemplate": "import subprocess, sys\ncommand = [\"/Users/rob/Library/Android/sdk/platform-tools/adb\", \"-s\", \"emulator-5580\", *sys.argv[1:]]\nprint(\"START\", command, flush=True)\ntry:\n    result = subprocess.run(command, timeout=30, check=True, capture_output=True)\nexcept (subprocess.TimeoutExpired, subprocess.CalledProcessError) as error:\n    print(\"FAILED\", type(error).__name__, flush=True)\n    for captured in (error.stdout, error.stderr):\n        if captured:\n            print(captured[-131072:].decode(\"utf-8\", errors=\"replace\"), flush=True)\n    raise SystemExit(1)\nprint(\"COMPLETE\", result.returncode, flush=True)\nfor captured in (result.stdout, result.stderr):\n    if captured:\n        print(captured[-131072:].decode(\"utf-8\", errors=\"replace\"), flush=True)\n",
+    "scope": "Same five serial Android rows, verified APK installation as existing launcher requires, no build or dependency restoration; no iOS/web or Mapbox camera rerun",
+    "failurePolicy": "One approval covers all five serial rows; success continues through all five. Stop first failure, preserve original first error, capture bounded diagnostics, perform owned cleanup. No independent retries/repairs or extra microtest.",
+    "noNewApprovalFromThisRecord": true
+  },
+  "coordinatorAudit": {
+    "passed": [
+      "Independent saved report JSON/identity review and diagnostic PID/foreground/crash-buffer inspection",
+      "Original-worker transcript separates outer tool wait from unproved process launch",
+      "Source review confirms runner helper does not cover operator invocation",
+      "Independent archive/APK and695/26/7/13hash verification",
+      "Proposed output absent; operator template compiles without invoking subprocess",
+      "No native command, device query, emulator start or native test occurred during diagnosis",
+      "In-memory mocked subprocess template checks passed for success, timeout and nonzero exit; exactly one invocation, real timeout/check flags and phase markers asserted; no actual subprocess or native command launched"
+    ],
+    "remainingGap": "Actual stall not reproduced because this task authorizes read-only diagnosis only. The procedure improves failure attribution and bounds launched commands; it does not claim to fix an identified Android defect."
+  },
+  "storage": {
+    "availableGiB": 14.642570495605469,
+    "requiredBytes": 8804682957
+  }
+}
