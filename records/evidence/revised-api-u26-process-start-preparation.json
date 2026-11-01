@@ -1,0 +1,340 @@
+{
+  "checkpoint": "Android continuation process-start preparation for proposed attempt09",
+  "recordedUTC": "2026-11-01T22:30:26.319823+00:00",
+  "status": "Independent coordinator evidence/routine audit passed; attempt09 requires separate owner approval",
+  "historicalOutcome": {
+    "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-08.json",
+    "sha256": "cb36f60dcbcaf03d532df253da58159482132968f1a2b93b25eadd7aa46de0e2",
+    "additionalWorkerAttestation": {
+      "prefix_rule": [
+        "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node",
+        "/private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs"
+      ],
+      "source": "Coordinator relayed original worker attestation; omitted from immutable attempt08 outcome."
+    }
+  },
+  "readinessPreparation": {
+    "path": "records/evidence/revised-api-u26-operator-readiness-preparation.json",
+    "sha256": "ffee62f98c532200d5a7e0f505b254d82e571546cacbaf333cd30ad47a20bbbe",
+    "selection": "Unchanged launcher continues to select this readiness preparation; process-start evidence is not a replacement runtime preparation."
+  },
+  "scope": "Harmless process-tool probes and invocation documentation only. No acceptance launcher, adb, emulator, Metro, build, install, status request or device action executed.",
+  "diagnosis": {
+    "confirmed": "Attempt08 execution tool reported process creation failure before launcher start. Current worker can start true and pinned Node in the recorded cwd with require_escalated, using both omitted defaults and explicit shell/login.",
+    "hypotheses": [
+      {
+        "hypothesis": "Missing cwd or pinned Node target in present worker context",
+        "result": "Current probes contradict it; original failing tool context cannot be reconstructed."
+      },
+      {
+        "hypothesis": "Implicit default shell/login caused failure",
+        "result": "Not reproduced: omitted-default true and pinned Node both pass; explicit shell/login also pass."
+      },
+      {
+        "hypothesis": "Approval/tool host or original Luna-worker context failed transiently",
+        "result": "Original Luna medium worker independently passed explicit-shell true and pinned Node version probes in the same cwd with host access. Original failing process-start cause remains unresolved."
+      }
+    ],
+    "rootCause": "Unestablished; no reproduced failure supports a causal code fix.",
+    "change": "Explicit /bin/sh, login:false and exact cwd remove implicit invocation defaults. This is a validated invocation recipe, not proof the attempt08 cause is repaired.",
+    "regressionLimit": "No JavaScript regression can reproduce an execution-tool failure before JavaScript starts. Node --check parses the exact entrypoint without executing its imports or launcher."
+  },
+  "probes": [
+    {
+      "tool": "exec_command",
+      "parameters": {
+        "workdir": "/private/tmp/one-map-android-restoration-review",
+        "sandbox_permissions": "require_escalated",
+        "yield_time_ms": 1000,
+        "max_output_tokens": 1500,
+        "cmd": "/usr/bin/true"
+      },
+      "omittedParametersUseToolDefaults": true,
+      "result": {
+        "chunk_id": "393115",
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    {
+      "tool": "exec_command",
+      "parameters": {
+        "workdir": "/private/tmp/one-map-android-restoration-review",
+        "sandbox_permissions": "require_escalated",
+        "yield_time_ms": 1000,
+        "max_output_tokens": 1500,
+        "cmd": "/usr/bin/true",
+        "shell": "/bin/sh",
+        "login": false
+      },
+      "omittedParametersUseToolDefaults": false,
+      "result": {
+        "chunk_id": "5d04d9",
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    {
+      "tool": "exec_command",
+      "parameters": {
+        "workdir": "/private/tmp/one-map-android-restoration-review",
+        "sandbox_permissions": "require_escalated",
+        "yield_time_ms": 1000,
+        "max_output_tokens": 1500,
+        "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node --version",
+        "shell": "/bin/sh",
+        "login": false
+      },
+      "omittedParametersUseToolDefaults": false,
+      "result": {
+        "chunk_id": "b6b179",
+        "exit_code": 0,
+        "output": "v24.22.1\n"
+      }
+    },
+    {
+      "tool": "exec_command",
+      "parameters": {
+        "workdir": "/private/tmp/one-map-android-restoration-review",
+        "sandbox_permissions": "require_escalated",
+        "yield_time_ms": 1000,
+        "max_output_tokens": 1500,
+        "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node --version",
+        "shell": "/bin/sh",
+        "login": false,
+        "prefix_rule": [
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node"
+        ]
+      },
+      "omittedParametersUseToolDefaults": false,
+      "result": {
+        "chunk_id": "ed7ad9",
+        "exit_code": 0,
+        "output": "v24.22.1\n"
+      }
+    },
+    {
+      "tool": "exec_command",
+      "parameters": {
+        "workdir": "/private/tmp/one-map-android-restoration-review",
+        "sandbox_permissions": "require_escalated",
+        "yield_time_ms": 1000,
+        "max_output_tokens": 1500,
+        "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node --version"
+      },
+      "omittedParametersUseToolDefaults": true,
+      "result": {
+        "chunk_id": "682f6b",
+        "exit_code": 0,
+        "output": "v24.22.1\n"
+      }
+    },
+    {
+      "tool": "exec_command",
+      "parameters": {
+        "workdir": "/private/tmp/one-map-android-restoration-review",
+        "sandbox_permissions": "require_escalated",
+        "yield_time_ms": 1000,
+        "max_output_tokens": 1500,
+        "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node --check /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs",
+        "shell": "/bin/sh",
+        "login": false
+      },
+      "omittedParametersUseToolDefaults": false,
+      "result": {
+        "chunk_id": "e82d7f",
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    {
+      "source": "Coordinator-relayed attestation from original Luna medium execution worker",
+      "tool": "exec_command",
+      "parameters": {
+        "cmd": "/usr/bin/true",
+        "workdir": "/private/tmp/one-map-android-restoration-review",
+        "sandbox_permissions": "require_escalated",
+        "shell": "/bin/sh",
+        "login": false,
+        "yield_time_ms": 1000,
+        "max_output_tokens": 500
+      },
+      "result": {
+        "exit_code": 0,
+        "output": "",
+        "wall_time_seconds": 4.2
+      }
+    },
+    {
+      "source": "Coordinator-relayed attestation from original Luna medium execution worker",
+      "tool": "exec_command",
+      "parameters": {
+        "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node --version",
+        "workdir": "/private/tmp/one-map-android-restoration-review",
+        "sandbox_permissions": "require_escalated",
+        "shell": "/bin/sh",
+        "login": false,
+        "yield_time_ms": 1000,
+        "max_output_tokens": 500
+      },
+      "result": {
+        "exit_code": 0,
+        "output": "v24.22.1\n",
+        "wall_time_seconds": 2.1
+      }
+    }
+  ],
+  "unchangedPins": {
+    "batchInputSha256": {
+      "count": 13,
+      "mismatches": []
+    },
+    "operatorHelperSha256": {
+      "count": 2,
+      "mismatches": []
+    },
+    "regressionSha256": {
+      "count": 2,
+      "mismatches": [],
+      "scope": "Two unchanged regression inputs; android-operator.test.py exact-command assertion is updated and pinned separately in this record."
+    }
+  },
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Camera launcher verifies695 frozen files before acquisition and after success, including selected package dist copies; preparation compares all171 archive members in both selected package copies. Legacy TF04 and TF09 drivers are not executed."
+  },
+  "executionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "proposedLauncherToolCall": {
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "sandbox_permissions": "require_escalated",
+    "yield_time_ms": 1000,
+    "max_output_tokens": 1500,
+    "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-09",
+    "shell": "/bin/sh",
+    "login": false
+  },
+  "operatorToolParameters": {
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "sandbox_permissions": "require_escalated",
+    "shell": "/bin/sh",
+    "login": false,
+    "yield_time_ms": 1000,
+    "max_output_tokens": 20000,
+    "cmd": "One exact android-operator.py invocation from the sole acceptance plan, without chaining; python3 resolves through existing PATH. No new interpreter or runtime pin is introduced."
+  },
+  "outputAbsentAtPreparation": true,
+  "unchangedGuards": "300-second local readiness wait, persistent first-failure latch, one serial worker, same five rows, no accepted-camera rerun, no independent retry, existing ownership/cleanup and frozen-input gates.",
+  "remainingGates": [
+    "Fresh storage/frozen/helper/archive/APK preflight and separate owner approval before attempt09 native execution.",
+    "Actual native UI/status/input behavior and original process-creation cause remain unverified."
+  ],
+  "nativeExecution": false,
+  "routineVerification": {
+    "passed": [
+      "Pinned Node --check parses exact continuation entrypoint without execution.",
+      "/bin/sh -n validates exact proposed launcher, seven operator forms and writer form without execution.",
+      "Pinned Node scripts/check-docs.mjs: 40 Markdown files, 39 comparison tables, fences and local links.",
+      "Pinned Node scripts/native-smoke-process.test.mjs with explicit /bin/sh login:false and require_escalated: detached ownership, live/exited leaders, inherited pipes, unrelated survival and idempotent cleanup.",
+      "13 runtime, 2 operator and 2 unchanged regression pins match readiness preparation; this record pins the single updated operator test.",
+      "python3 scripts/android-operator.test.py: all17 methods pass after deriving exact hierarchy filename from documented output attempt number."
+    ],
+    "initialFailure": {
+      "command": "Pinned Node scripts/native-smoke-process.test.mjs using restricted exec and omitted shell/login",
+      "result": "exit1: spawn EPERM from signalGroup ps fallback; same dummy-process regression passes with explicit host access.",
+      "cleanup": "Subsequent host-access process inventory found no remaining setInterval dummy child processes."
+    },
+    "nativeExecution": false
+  },
+  "coordinatorEnvironmentAttestation": {
+    "source": "Coordinator message after independent harmless host-access probes",
+    "parameters": {
+      "workdir": "/private/tmp/one-map-android-restoration-review",
+      "shell": "/bin/sh",
+      "login": false,
+      "sandbox_permissions": "require_escalated"
+    },
+    "checks": [
+      "/usr/bin/true succeeds",
+      "Pinned Node --check exact continuation entrypoint succeeds",
+      "Pinned Node boolean-only process.env check reports mapboxTokenPresent=true; credential value never printed"
+    ],
+    "limit": "Attested results; these are not native renderer execution."
+  },
+  "nonLoginEnvironment": {
+    "checkedToolParameters": {
+      "workdir": "/private/tmp/one-map-android-restoration-review",
+      "shell": "/bin/sh",
+      "login": false,
+      "sandbox_permissions": "require_escalated"
+    },
+    "python3": "/opt/homebrew/bin/python3",
+    "bun": "/Users/rob/.local/share/vite-plus/bin/bun",
+    "source": "command -v checks in explicit nonlogin host context; read-only source inspection of unchanged with-android-env.sh and scripts/android-rendering.mjs",
+    "wrapperBehavior": "Existing wrapper exports SDK/JAVA/serial/task paths and prepends recovery runtime-bin, SDK platform-tools/emulator, JAVA bin and /opt/homebrew/bin to inherited PATH; launcher forwards process.env and prepends runtime-bin for its shell helpers. No shell profile or new setup is required by this inspected path."
+  },
+  "regressionSha256": {
+    "/private/tmp/one-map-android-restoration-review/scripts/android-operator.test.py": "d15036beae09940e7b76ea9e9e6506b0d227637676b508e4ce784e1a96f3b9d6"
+  },
+  "regressionChange": {
+    "path": "/private/tmp/one-map-android-restoration-review/scripts/android-operator.test.py",
+    "priorSha256": "c582124fab628b1fcb8f6382f480c3619d979808753d958adfb648c042819e8f",
+    "sha256": "d15036beae09940e7b76ea9e9e6506b0d227637676b508e4ce784e1a96f3b9d6",
+    "reason": "Exact documented-command regression hardcoded the previous attempt hierarchy filename. Derive the expected filename attempt number from the documented output argument so later approved attempts remain covered.",
+    "redBefore": "python3 scripts/android-operator.test.py OperatorTest.test_exact_documented_adb_commands fails at hardcoded attempt08 suffix against attempt09 recipe.",
+    "greenAfter": "python3 scripts/android-operator.test.py: all17 tests pass,2.875seconds; no device or HTTP transport (fake boundaries only).",
+    "runtimeImpact": "Test assertion only; all13 runtime and2 operator pins unchanged; immutable readiness preparation retained."
+  },
+  "writerToolParameters": {
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "sandbox_permissions": "require_escalated",
+    "shell": "/bin/sh",
+    "login": false,
+    "yield_time_ms": 1000,
+    "max_output_tokens": 1500,
+    "cmd": "One exact pinned-Node record-native-ui-observation.mjs invocation from the sole acceptance plan, without chaining."
+  },
+  "displayBudget": "Launcher and writer use1500 output tokens; operator calls use20000 to retain usable hierarchy XML and status observations. The1500-token harmless probes test process start only; output budget does not establish the original failure cause or guarantee every128KiB helper stream fits tool display.",
+  "coordinatorAudit": {
+    "status": "passed for explicit invocation and device-free verification",
+    "checks": [
+      "Independent harmless /usr/bin/true and pinned Node --check succeed with /bin/sh loginfalse require_escalated from exact review workdir",
+      "Original Luna worker independently succeeded true and pinned Node --version under same explicit process settings",
+      "Required token boolean presence verified under explicit nonlogin settings, value not revealed",
+      "Independent17operator regressions, documentation structure, whitespace and exact command shell syntax checks passed",
+      "Independent695frozen,26observer,7host,13runtime,2operator and current regression pin checks, archive and both APKs match",
+      "Historical attempt08 exactly preserved; proposed attempt09 output absent"
+    ],
+    "corrections": [
+      "Exact-command regression derives hierarchy attempt suffix from documented output rather than hardcoding a prior attempt",
+      "Operator output budget20000 separates full hierarchy/status display from launcher/writer1500 while keeping process-start settings fixed"
+    ],
+    "findingsRemaining": [],
+    "nativeExecution": false,
+    "limits": [
+      "Original process-creation error did not reproduce; no causal default-shell or executable defect claimed",
+      "Harmless process launch and syntax checks establish tool viability, not Android renderer acceptance",
+      "Native execution still requires owner approval; no retry or native test performed"
+    ]
+  }
+}

@@ -311,7 +311,8 @@ class OperatorTest(unittest.TestCase):
         commands = [shlex.split(line) for line in PLAN.read_text().splitlines() if line.startswith("python3 " + str(HELPER) + " ")]
         self.assertEqual(len(commands), 7)
         self.assertEqual(commands[0][-1], commands[1][-1])
-        self.assertTrue(commands[0][-1].endswith("attempt08-hierarchy-001.xml"))
+        attempt_number = Path(commands[0][2]).name.rsplit("-", 1)[1]
+        self.assertEqual(Path(commands[0][-1]).name, f"one-map-attempt{attempt_number}-hierarchy-001.xml")
         for command in commands:
             self.assertEqual(command[3:5], [ROW, SCENARIO])
             if command[5] == "status":
