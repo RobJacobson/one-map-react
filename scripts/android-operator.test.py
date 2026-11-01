@@ -59,6 +59,122 @@ class OperatorTest(unittest.TestCase):
         connection.getresponse.return_value = response
         return connection
 
+    def test_startup_waits_for_assigned_row_and_report_before_boundary(self):
+        self.report.unlink()
+        checkpoint = self.attempt / "checkpoint.json"
+        checkpoint.unlink()
+        connection = self.response(b"null")
+        sleeps = []
+        def advance(seconds):
+            boundary.assert_not_called()
+            adb.assert_not_called()
+            sleeps.append(seconds)
+            if len(sleeps) == 1:
+                checkpoint.write_text(json.dumps({"result": "failed", "checkpoints": []}))
+            elif len(sleeps) == 2:
+                checkpoint.write_text(json.dumps({"result": "failed", "currentRow": ROW}))
+            else:
+                self.report.write_text(json.dumps(self.original))
+        with patch("time.sleep", side_effect=advance), patch("time.monotonic", return_value=0), patch("http.client.HTTPConnection", return_value=connection) as boundary, patch("subprocess.run") as adb:
+            status, output = self.invoke(["status"])
+        self.assertEqual(status, 0, output)
+        self.assertEqual(sleeps, [0.2] * 3)
+        boundary.assert_called_once()
+        connection.request.assert_called_once_with("GET", "/tf07")
+        self.assertFalse(self.latch.exists())
+
+    def test_wait_stops_for_failure_receipt_and_timeout_without_boundary(self):
+        for stop in ("latch", "receipt", "error", "cleanup", "timeout"):
+            with self.subTest(stop=stop):
+                self.setUp()
+                checkpoint = self.attempt / "checkpoint.json"
+                checkpoint.write_text(json.dumps({"result": "failed"}))
+                def advance(seconds):
+                    if stop == "latch": self.latch.write_text('{"error":"original"}')
+                    if stop == "receipt": (self.attempt / "receipt.json").write_text("{}")
+                    if stop in ("error", "cleanup"):
+                        checkpoint.write_text(json.dumps({stop: "stopped"}))
+                clock = [0, 0, 300] if stop == "timeout" else [0, 0]
+                with patch("time.sleep", side_effect=advance), patch("time.monotonic", side_effect=clock), patch("subprocess.run") as adb, patch("http.client.HTTPConnection") as boundary:
+                    status, output = self.invoke(["status"])
+                    self.assertEqual(status, 1, output)
+                    adb.assert_not_called()
+                    boundary.assert_not_called()
+                    saved = self.latch.read_bytes()
+                    self.assertEqual(self.invoke(["adb", "shell", "input", "tap", "50", "40"])[0], 1)
+                    self.assertEqual(self.latch.read_bytes(), saved)
+                if stop == "latch": self.assertEqual(json.loads(saved)["error"], "original")
+                if stop == "timeout": self.assertIn("readiness deadline", json.loads(saved)["error"])
+
+    def test_ready_report_after_deadline_cannot_reach_transport(self):
+        self.report.unlink()
+        def advance(seconds):
+            self.report.write_text(json.dumps(self.original))
+        with patch("time.sleep", side_effect=advance), patch("time.monotonic", side_effect=[0, 0, 299, 301]), patch("subprocess.run") as adb, patch("http.client.HTTPConnection") as boundary:
+            status, output = self.invoke(["status"])
+        self.assertEqual(status, 1, output)
+        self.assertIn("readiness deadline", json.loads(self.latch.read_text())["error"])
+        adb.assert_not_called()
+        boundary.assert_not_called()
+
+    def test_only_completed_previous_row_is_a_transition(self):
+        next_row = "mapbox-android-retained"
+        for completed in (False, True):
+            with self.subTest(completed=completed):
+                self.setUp()
+                next_report = self.attempt / (next_row + "-manual.json")
+                checkpoint = self.attempt / "checkpoint.json"
+                checkpoint.write_text(json.dumps({"currentRow": ROW, "rows": [{"rowId": ROW, "status": "passed"}] if completed else []}))
+                def advance(seconds):
+                    checkpoint.write_text(json.dumps({"currentRow": next_row}))
+                    next_report.write_text(json.dumps(self.original))
+                with patch("time.sleep", side_effect=advance) as sleep, patch("http.client.HTTPConnection", return_value=self.response(b"null")) as boundary:
+                    status, output = self.invoke(["status"], [next_row, SCENARIO])
+                self.assertEqual(status, 0 if completed else 1, output)
+                self.assertEqual(sleep.call_count, 1 if completed else 0)
+                self.assertEqual(boundary.call_count, 1 if completed else 0)
+
+    def test_partial_publication_gets_only_one_poll(self):
+        for repaired in (True, False):
+            with self.subTest(repaired=repaired):
+                self.setUp()
+                self.report.write_text("{")
+                def advance(seconds):
+                    if repaired: self.report.write_text(json.dumps(self.original))
+                with patch("time.sleep", side_effect=advance) as sleep, patch("http.client.HTTPConnection", return_value=self.response(b"null")) as boundary, patch("subprocess.run") as adb:
+                    status, output = self.invoke(["status"])
+                self.assertEqual(status, 0 if repaired else 1, output)
+                sleep.assert_called_once_with(0.2)
+                self.assertEqual(boundary.call_count, 1 if repaired else 0)
+                adb.assert_not_called()
+
+    def test_distinct_checkpoint_publications_each_get_one_poll(self):
+        checkpoint = self.attempt / "checkpoint.json"
+        checkpoint.write_text("{")
+        updates = [json.dumps({"result": "failed"}), "{", json.dumps({"currentRow": ROW})]
+        def advance(seconds):
+            checkpoint.write_text(updates.pop(0))
+        with patch("time.sleep", side_effect=advance) as sleep, patch("http.client.HTTPConnection", return_value=self.response(b"null")) as boundary:
+            status, output = self.invoke(["status"])
+        self.assertEqual(status, 0, output)
+        self.assertEqual(sleep.call_count, 3)
+        boundary.assert_called_once()
+
+    def test_actual_cli_waits_then_runs_one_fake_child(self):
+        script = self.cli_copy()
+        self.report.unlink()
+        (self.attempt / "checkpoint.json").write_text(json.dumps({"result": "failed"}))
+        child = subprocess.Popen([sys.executable, str(script), str(self.attempt), ROW, SCENARIO, "adb", "shell", "input", "tap", "50", "40"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.addCleanup(lambda: child.kill() if child.poll() is None else None)
+        self.assertIn("WAIT row readiness", child.stdout.readline())
+        (self.attempt / "checkpoint.json").write_text(json.dumps({"result": "failed", "currentRow": ROW}))
+        self.report.write_text(json.dumps(self.original))
+        output, error = child.communicate(timeout=5)
+        self.assertEqual(child.returncode, 0, output + error)
+        self.assertEqual(output.count("START"), 1)
+        self.assertEqual(output.count('"-s", "emulator-5580"'), 1)
+        self.assertIn("COMPLETE 0", output)
+
     def test_status_null_and_object_are_normal(self):
         for body in (b"null", b'{"events":{"child-click":1}}'):
             connection = self.response(body)
@@ -195,7 +311,7 @@ class OperatorTest(unittest.TestCase):
         commands = [shlex.split(line) for line in PLAN.read_text().splitlines() if line.startswith("python3 " + str(HELPER) + " ")]
         self.assertEqual(len(commands), 7)
         self.assertEqual(commands[0][-1], commands[1][-1])
-        self.assertTrue(commands[0][-1].endswith("attempt07-hierarchy-001.xml"))
+        self.assertTrue(commands[0][-1].endswith("attempt08-hierarchy-001.xml"))
         for command in commands:
             self.assertEqual(command[3:5], [ROW, SCENARIO])
             if command[5] == "status":

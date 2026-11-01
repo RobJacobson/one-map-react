@@ -1,0 +1,172 @@
+{
+  "checkpoint": "PR84 Android five-row continuation attempt07",
+  "recordedUTC": "2026-11-01T00:30:48.285710+00:00",
+  "result": "stopped-at-first-operator-binding-failure",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "nativeBuildOrDependencyRestoration": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "firstFailure": {
+    "row": "mapbox-android-core",
+    "scenario": "live-child-button",
+    "operation": [
+      "status"
+    ],
+    "error": "ValueError: Row is not the active attempt row."
+  },
+  "workerClarification": {
+    "requiredReadinessChecked": false,
+    "statement": "Worker did not verify driver-created manual report or checkpoint.currentRow before issuing first status call.",
+    "order": [
+      "Launcher dispatched with1secondyield",
+      "Two launcher session polls, approximately5seconds each, returned no output",
+      "First status call rejected inactive-row binding",
+      "Fresh driver report identity output arrived afterward"
+    ],
+    "limit": "No exact wall-clock timestamps captured; worker did not inspect pre-call currentRow/receipt state. Early dispatch is supported; no HTTP or app cause is claimed."
+  },
+  "stopPolicy": {
+    "enforced": true,
+    "laterOperatorCalls": 0,
+    "firstFailurePersisted": true,
+    "driverDetectedLatch": true,
+    "manualReportPublication": "Not attempted because row binding failed before a valid report was bound; latch alone stopped driver through normal diagnostics/cleanup."
+  },
+  "manualReport": {
+    "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "environment": "mapbox-android",
+    "runId": "aec470fd-4788-487f-b2fa-50d646b5b6cd",
+    "scenarios": {
+      "live-child-button": "unverified",
+      "nested-scroll": "unverified",
+      "live-activation": "unverified",
+      "annotation-activation": "unverified",
+      "offset-touch-bounds": "unverified",
+      "popup-follow-dismissal": "unverified",
+      "map-feature-click": "unverified",
+      "navigation-location": "unverified",
+      "style-remount": "unverified",
+      "host-accessibility": "unverified",
+      "sdk-ornaments": "unverified",
+      "camera-target-and-gesture": "unverified",
+      "marker-prop-rejection": "unverified"
+    }
+  },
+  "operatorHttpRequestSent": false,
+  "physicalInputPerformed": false,
+  "identityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~BU9m496pz1QXAyKCe82zvQ==/com.onemapmapbox-4Iy_AEkrGuT7l9JMJ76_JA==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~BU9m496pz1QXAyKCe82zvQ==/com.onemapmapbox-4Iy_AEkrGuT7l9JMJ76_JA==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "identityLimit": "Installed Mapbox before row matches; after-row readback not reached. Frozen/helper/APK post-run audit matched.",
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 21792",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "revisedRuntimeInputs": 13,
+    "operatorInputs": 2,
+    "regressionHashesMatch": true,
+    "archiveAndBothApksMatched": true,
+    "ownedPidsAndGroupsAbsent": [
+      21604,
+      21792
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true,
+    "all13ManualScenariosUnverified": true,
+    "fileTimingNs": {
+      "operator-first-failure.json": 1793492932837805628,
+      "mapbox-android-core-manual.json": 1793492959588802801,
+      "receipt.json": 1793492971526859523
+    }
+  },
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "retainedDiagnostics": {
+    "directory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07",
+    "files": {
+      "checkpoint.json": "b3e1db7081e540715da13ec54dcb773ec5498e54e4551b331873a87a62c7b2bb",
+      "mapbox-android-core-diagnostics.json": "30fea0d589c36d03d36cb0f013b04e15508c2670c945d12916e88a97ce89de7b",
+      "mapbox-android-core-driver-stderr.log": "7b2e6b209c2c1f47e02222e417d5340d4cdb30d5f800a8bc1a8f5cd8db949a44",
+      "emulator.log": "363d2151dcd98a1f2cf6b27862696fce2f84c069ddb296606138cf4b3898f435",
+      "mapbox-android-core-manual.json": "7481f1d4949bdb85c0dde50e823b99affef2aa41b2304626f8533148923d381f",
+      "receipt.json": "b3e1db7081e540715da13ec54dcb773ec5498e54e4551b331873a87a62c7b2bb",
+      "operator-first-failure.json": "551bd05f35402b60b399f51487214652b0d83416b11b3a9218b534f35b5f7983"
+    }
+  },
+  "next": "No retry authorized by this outcome. Establish row readiness before first bound operator call; do not relax inactive-row or failure-latch guards. No status transport or application defect is established."
+}

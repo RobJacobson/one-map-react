@@ -27,6 +27,7 @@ for (const borrowed of [false, true]) {
     "manual-diagnostics-write",
     "manual-identity",
     "manual-json",
+    "status-bind",
     "metro-spawn",
     "metro-exit-zero",
     "metro-exit-one",
@@ -40,6 +41,9 @@ for (const borrowed of [false, true]) {
     const removed = [];
     let onObservation;
     let manual;
+    let statusBound = false;
+    let metroReady = false;
+    let launched = false;
     let failed = false;
     let metro;
     let polls = 0;
@@ -97,6 +101,9 @@ for (const borrowed of [false, true]) {
           return;
         }
         assert.equal(file, "/report");
+        assert(statusBound, "Publish report only after status listener binds.");
+        assert(metroReady, "Publish report only after Metro readiness.");
+        assert(launched, "Publish report only after confirmed app launch.");
         assert.equal(options.flag, "wx");
         manual = JSON.parse(value);
         assert.equal(manual.runId, "fresh-run");
@@ -120,6 +127,10 @@ for (const borrowed of [false, true]) {
       nativeUiReportReady: () => true,
       judgeNativeUi: () => ({ status: "passed" }),
       nativeStatus: async (callback) => {
+        assert.equal(manual, undefined);
+        await Promise.resolve();
+        if (failure === "status-bind") throw Error("status bind failed");
+        statusBound = true;
         onObservation = callback;
         return {
           close: async () => {
@@ -128,6 +139,8 @@ for (const borrowed of [false, true]) {
         };
       },
       start: (file, args, options) => {
+        assert(statusBound);
+        assert.equal(manual, undefined);
         assert.equal(options.cwd, "/frozen-harness/examples/native-mapbox");
         metro = new EventEmitter();
         return Object.assign(metro, {
@@ -161,8 +174,19 @@ for (const borrowed of [false, true]) {
           metro.emit("exit", 1, null);
         if (polls === 2 && failure === "metro-late-exit")
           metro.emit("exit", 1, null);
-        if (!failure?.startsWith("manual-")) onObservation({ generation: 1 });
+        if (polls === 1 || !failure?.startsWith("manual-"))
+          onObservation({ generation: 1 });
         assert(await observe());
+        if (
+          polls === 1 &&
+          ![
+            "metro-spawn",
+            "metro-exit-zero",
+            "metro-exit-one",
+            "readiness-body",
+          ].includes(failure)
+        )
+          metroReady = true;
       },
       command: async (file, args) => {
         assert.equal(file, "adb");
@@ -196,7 +220,10 @@ for (const borrowed of [false, true]) {
           if (failure === "launch-status") return "no launch status";
           if (failure === "launch-error")
             return "Status: ok\nError: Activity missing";
-          if (failure !== "launch") return "Status: ok\n";
+          if (failure !== "launch") {
+            launched = true;
+            return "Status: ok\n";
+          }
         }
         if (parts.includes("start") && failure === "launch")
           throw Error("launch failed");
@@ -242,6 +269,20 @@ for (const borrowed of [false, true]) {
       failed = true;
     }
     assert.equal(failed, failure !== null, `${borrowed}/${failure}`);
+    if (
+      [
+        "status-bind",
+        "metro-spawn",
+        "metro-exit-zero",
+        "metro-exit-one",
+        "readiness-body",
+        "launch",
+        "launch-status",
+        "launch-error",
+      ].includes(failure)
+    )
+      assert.equal(manual, undefined);
+    if (failure === "status-bind") assert.equal(metro, undefined);
     if (failure?.startsWith("manual-")) {
       assert(diagnostics, "Capture failure diagnostics before force-stop.");
       assert.equal(diagnostics.applicationId, "com.onemapmapbox");

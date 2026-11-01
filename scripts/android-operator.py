@@ -18,6 +18,15 @@ STAGE = Path("/Users/rob/code/mapbox-code/one-map-f05-android-recovery")
 WRITER = Path(__file__).with_name("record-native-ui-observation.mjs")
 TIMEOUT_SECONDS = 30
 OUTPUT_BYTES = 131072
+READINESS_SECONDS = 300
+POLL_SECONDS = 0.2
+ROWS = (
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained",
+)
 
 
 def main(arguments):
@@ -48,11 +57,7 @@ def main(arguments):
         row, scenario, operation, *adb_arguments = arguments
         if not re.fullmatch(r"(mapbox|maplibre)-android-(core|retained)", row):
             raise ValueError("Unknown Android UI row.")
-        checkpoint = json.loads((attempt / "checkpoint.json").read_text())
-        if checkpoint.get("currentRow") != row or (attempt / "receipt.json").exists():
-            raise ValueError("Row is not the active attempt row.")
-        candidate_report = attempt / (row + "-manual.json")
-        identity = json.loads(candidate_report.read_text())
+        candidate_report, identity = wait_for_row(attempt, row, latch)
         if identity.get("environment") != row.rsplit("-", 1)[0]:
             raise ValueError("Report environment differs from row.")
         for field in ("installedBinarySha256", "libraryDistSha256"):
@@ -111,6 +116,59 @@ def main(arguments):
             except Exception as secondary:
                 print("SECONDARY failed report publication:", secondary, flush=True)
         return 1
+
+
+def wait_for_row(attempt, row, latch):
+    deadline = None
+    incomplete_json = set()
+    report = attempt / (row + "-manual.json")
+    while True:
+        if latch.exists():
+            raise ValueError("First operator failure already latched: " + latch.read_text())
+        if (attempt / "receipt.json").exists():
+            raise ValueError("Attempt has a final receipt.")
+        if deadline is not None and time.monotonic() >= deadline:
+            raise TimeoutError("Row readiness deadline exceeded.")
+        try:
+            checkpoint_path = attempt / "checkpoint.json"
+            checkpoint = json.loads(checkpoint_path.read_text())
+            incomplete_json.discard(checkpoint_path)
+            if checkpoint.get("error") or checkpoint.get("cleanup"):
+                raise ValueError("Attempt is failing or cleaning up.")
+            if any(
+                entry.get("rowId") == row for entry in checkpoint.get("rows", [])
+            ):
+                raise ValueError("Requested row has already completed.")
+            active = checkpoint.get("currentRow")
+            if active == row:
+                checkpoint_path = report
+                identity = json.loads(report.read_text())
+                incomplete_json.discard(report)
+                if deadline is not None and time.monotonic() >= deadline:
+                    raise TimeoutError("Row readiness deadline exceeded.")
+                return report, identity
+            if active is not None:
+                previous = ROWS[ROWS.index(row) - 1] if ROWS.index(row) else None
+                completed = checkpoint.get("rows", [])
+                if active != previous or not any(
+                    entry.get("rowId") == active and entry.get("status") == "passed"
+                    for entry in completed
+                ):
+                    raise ValueError("Row is not the active attempt row.")
+        except FileNotFoundError:
+            pass
+        except json.JSONDecodeError:
+            # Driver file publication is synchronous but not atomic; allow one poll.
+            if checkpoint_path in incomplete_json:
+                raise
+            incomplete_json.add(checkpoint_path)
+        if deadline is None:
+            deadline = time.monotonic() + READINESS_SECONDS
+            print("WAIT row readiness", row, flush=True)
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("Row readiness deadline exceeded.")
+        time.sleep(min(POLL_SECONDS, remaining))
 
 
 def read_status():

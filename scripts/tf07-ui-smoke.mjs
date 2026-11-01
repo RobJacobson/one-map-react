@@ -405,24 +405,9 @@ const runNative = async (selectedEngine) => {
       runId: randomUUID(),
     };
     const manualPath = process.env.TF07_MANUAL_REPORT;
-    if (manualPath) {
-      writeFileSync(
-        manualPath,
-        JSON.stringify(
-          {
-            ...identity,
-            scenarios: Object.fromEntries(
-              scenarios.map((scenario) => [scenario, "unverified"])
-            ),
-          },
-          null,
-          2
-        ),
-        { flag: "wx" }
-      );
-    }
     let completed;
     let nativeFailure;
+    let observing = false;
     const readManual = () => {
       if (!manualPath) return;
       try {
@@ -464,6 +449,7 @@ const runNative = async (selectedEngine) => {
       }
     };
     status = await nativeStatus((observation) => {
+      if (!observing) return;
       const manual = readManual();
       if (
         nativeFailure ||
@@ -540,6 +526,23 @@ const runNative = async (selectedEngine) => {
         "-RCT_jsLocation",
         `127.0.0.1:${metroPort}`,
       ]);
+    if (manualPath) {
+      writeFileSync(
+        manualPath,
+        JSON.stringify(
+          {
+            ...identity,
+            scenarios: Object.fromEntries(
+              scenarios.map((scenario) => [scenario, "unverified"])
+            ),
+          },
+          null,
+          2
+        ),
+        { flag: "wx" }
+      );
+    }
+    observing = true;
     console.error(
       `Perform the native touch flow from the approved acceptance plan, then press Read renderer. Required observations: ${scenarios.join(", ")}.`
     );
