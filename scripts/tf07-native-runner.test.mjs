@@ -21,6 +21,7 @@ for (const borrowed of [false, true]) {
     "reverse",
     "launch",
     "cleanup",
+    "manual-operator-latch",
     "manual-failed",
     "manual-diagnostics-read",
     "manual-diagnostics-write",
@@ -64,6 +65,11 @@ for (const borrowed of [false, true]) {
             : {}),
         },
       },
+      dirname: () => "/attempt",
+      existsSync: (file) => {
+        assert.equal(file, "/attempt/operator-first-failure.json");
+        return failure === "manual-operator-latch";
+      },
       join: (...parts) => parts.join("/"),
       tmpdir: () => "/tmp",
       mkdtempSync: () => "/tmp/owned",
@@ -75,11 +81,13 @@ for (const borrowed of [false, true]) {
         digest: () => (failure === "identity" ? "b".repeat(64) : hash),
       }),
       readFileSync: (file) =>
-        file === "/report"
-          ? failure === "manual-json"
-            ? "{"
-            : JSON.stringify(manual)
-          : "apk",
+        file === "/attempt/operator-first-failure.json"
+          ? JSON.stringify({ error: "first status connection failure" })
+          : file === "/report"
+            ? failure === "manual-json"
+              ? "{"
+              : JSON.stringify(manual)
+            : "apk",
       writeFileSync: (file, value, options) => {
         if (file === "/diagnostics") {
           diagnostics = JSON.parse(value);
@@ -93,6 +101,7 @@ for (const borrowed of [false, true]) {
         manual = JSON.parse(value);
         assert.equal(manual.runId, "fresh-run");
         assert.equal(manual.scenarios["physical-touch"], "unverified");
+        if (failure === "manual-operator-latch") return;
         manual.scenarios["physical-touch"] =
           failure?.startsWith("manual-diagnostics") ||
           failure === "manual-failed"
@@ -207,6 +216,21 @@ for (const borrowed of [false, true]) {
     } catch (error) {
       if (failure?.startsWith("manual-")) {
         assert.match(String(error.errors[0]), /TF07 manual report failed/);
+        if (failure === "manual-operator-latch") {
+          assert.match(
+            String(error.errors[0]),
+            /first status connection failure/
+          );
+          assert(
+            Object.values(manual.scenarios).every(
+              (value) => value === "unverified"
+            )
+          );
+          assert(
+            polls <= 2,
+            "First failure must not wait for the row timeout."
+          );
+        }
         if (
           failure === "manual-failed" ||
           failure?.startsWith("manual-diagnostics")
