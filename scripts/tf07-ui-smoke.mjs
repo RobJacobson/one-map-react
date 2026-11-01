@@ -319,6 +319,7 @@ const runNative = async (selectedEngine) => {
   let metro;
   let stoppingMetro = false;
   let status;
+  let androidLaunch;
   let acquiredApp = false;
   const acquiredReverses = [];
   const failures = [];
@@ -500,6 +501,7 @@ const runNative = async (selectedEngine) => {
     }, 60000);
     if (nativeFailure) throw nativeFailure;
     if (platform === "android") {
+      androidLaunch = { requestedAtUTC: new Date().toISOString() };
       const launch = await adb([
         "shell",
         "am",
@@ -526,6 +528,15 @@ const runNative = async (selectedEngine) => {
         "-RCT_jsLocation",
         `127.0.0.1:${metroPort}`,
       ]);
+    if (platform === "android" && process.env.TF07_ANDROID_DIAGNOSTICS) {
+      try {
+        const pid = (await adb(["shell", "pidof", applicationId])).trim();
+        androidLaunch.pid = /^[1-9][0-9]*$/.test(pid) ? pid : null;
+      } catch {
+        androidLaunch.pid = null;
+      }
+      androidLaunch.observedAtUTC = new Date().toISOString();
+    }
     if (manualPath) {
       writeFileSync(
         manualPath,
@@ -585,8 +596,45 @@ const runNative = async (selectedEngine) => {
       platform === "android" &&
       process.env.TF07_ANDROID_DIAGNOSTICS
     ) {
-      const diagnostics = { applicationId, serial, reads: [] };
+      const diagnosticText = (value, keepPrefix = false) => {
+        const redacted = String(value)
+          .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
+          .replace(/([?&](?:access_token|token)=)[^&\s"']+/gi, "$1<REDACTED>");
+        const bytes = Buffer.from(redacted);
+        const retained = keepPrefix
+          ? bytes.subarray(0, 128 * 1024)
+          : bytes.subarray(-128 * 1024);
+        return retained.toString("utf8").replace(/^\uFFFD+|\uFFFD+$/g, "");
+      };
+      const diagnostics = {
+        applicationId,
+        serial,
+        launch: androidLaunch,
+        capturedAtUTC: new Date().toISOString(),
+        exitHistoryClassification:
+          "unclassified; correlate PID and timestamps with launch; history may include earlier intentional stops",
+        logWindow:
+          "last 2000 buffer records; filtering and 128KiB retention do not guarantee the full row interval",
+        reads: [],
+      };
       for (const args of [
+        ["shell", "dumpsys", "activity", "exit-info", applicationId],
+        [
+          "logcat",
+          "-b",
+          "events",
+          "-d",
+          "-t",
+          "2000",
+          "-v",
+          "threadtime",
+          "am_proc_died:I",
+          "am_kill:I",
+          "am_crash:I",
+          "am_anr:I",
+          "am_proc_start:I",
+          "*:S",
+        ],
         ["shell", "pidof", applicationId],
         ["shell", "dumpsys", "activity", "activities"],
         ["logcat", "-b", "crash", "-d", "-t", "2000"],
@@ -594,26 +642,47 @@ const runNative = async (selectedEngine) => {
       ]) {
         try {
           const text = await adb(args);
-          const relevant = args.includes("main")
-            ? text
-                .split("\n")
-                .filter(
-                  (line) =>
-                    /ActivityManager|ActivityTaskManager|AndroidRuntime|ReactNative|Bridgeless|am_crash|am_kill|libc|DEBUG/i.test(
-                      line
-                    ) || line.includes(applicationId)
-                )
-                .join("\n")
-            : text;
-          const redacted = relevant
-            .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
-            .replace(
-              /([?&](?:access_token|token)=)[^&\s"']+/gi,
-              "$1<REDACTED>"
-            );
-          diagnostics.reads.push({ args, text: redacted.slice(-128 * 1024) });
+          let relevant = text;
+          if (args.includes("events")) {
+            const isSelectedProcessEvent = (line) => {
+              const event = line.match(
+                /\b(am_proc_died|am_kill|am_crash|am_anr|am_proc_start)\s*:\s*\[([^\]]*)/
+              );
+              if (!event) return false;
+              const fields = event[2].split(",");
+              const processName =
+                fields[event[1] === "am_proc_start" ? 3 : 2]?.trim();
+              return (
+                processName === applicationId ||
+                processName?.startsWith(`${applicationId}:`)
+              );
+            };
+            relevant = text
+              .split("\n")
+              .filter(isSelectedProcessEvent)
+              .join("\n");
+          } else if (args.includes("main")) {
+            relevant = text
+              .split("\n")
+              .filter(
+                (line) =>
+                  /ActivityManager|ActivityTaskManager|AndroidRuntime|ReactNative|Bridgeless|am_crash|am_kill|libc|DEBUG/i.test(
+                    line
+                  ) || line.includes(applicationId)
+              )
+              .join("\n");
+          }
+          // Exit history is newest-first within each UID; logs are chronological.
+          diagnostics.reads.push({
+            args,
+            selection: args.includes("exit-info") ? "prefix" : "tail",
+            text: diagnosticText(relevant, args.includes("exit-info")),
+          });
         } catch (error) {
-          diagnostics.reads.push({ args, error: String(error) });
+          diagnostics.reads.push({
+            args,
+            error: diagnosticText(error),
+          });
         }
       }
       try {
@@ -624,7 +693,7 @@ const runNative = async (selectedEngine) => {
         );
       } catch (error) {
         console.error(
-          `Android failure diagnostics could not be saved: ${error}`
+          `Android failure diagnostics could not be saved: ${diagnosticText(error)}`
         );
       }
     }

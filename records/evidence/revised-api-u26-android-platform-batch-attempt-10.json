@@ -1,0 +1,145 @@
+{
+  "checkpoint": "PR87 toolbar repair followed by owner-authorized Android continuation attempt10",
+  "recordedUTC": "2026-11-01T22:50:04.208248+00:00",
+  "result": "stopped-before-helper-wrong-worker-script-path",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "repair": {
+    "pr": "https://github.com/RobJacobson/one-map-react/pull/87",
+    "independentAudit": "passed",
+    "deviceFreeOperatorTestMethods": 25,
+    "nativeNavigationExercised": false
+  },
+  "firstFailure": {
+    "classification": "Worker command-path deviation before validated helper execution",
+    "actualHelperPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/android-operator.py",
+    "approvedHelperPath": "/private/tmp/one-map-android-restoration-review/scripts/android-operator.py",
+    "exitCode": 2,
+    "row": "mapbox-android-core",
+    "scenario": "live-child-button",
+    "operation": "status",
+    "toolSettings": {
+      "workdir": "/private/tmp/one-map-android-restoration-review",
+      "shell": "/bin/sh",
+      "login": false,
+      "sandbox_permissions": "require_escalated",
+      "yield_time_ms": 1000,
+      "max_output_tokens": 20000
+    }
+  },
+  "stopPolicy": {
+    "retryPerformed": false,
+    "coordinatorDirectedClosure": "Exclusively created first-failure marker because helper had not launched; driver then detected marker and performed diagnostics/owned cleanup. No report override or operator retry.",
+    "operatorAdbOrHttpExecuted": false
+  },
+  "nativeBuildOrDependencyRestoration": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "identityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~4Ecqyul-ps1PIrLqwS0AYg==/com.onemapmapbox-o5_O9vUb7Ux5ZU3dbhoOnQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~4Ecqyul-ps1PIrLqwS0AYg==/com.onemapmapbox-o5_O9vUb7Ux5ZU3dbhoOnQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "identityLimit": "Installed Mapbox baseline before row matches; after-row not reached. Frozen/APK/helper post-run checks passed.",
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 89411",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "runtimeInputs": 13,
+    "operatorInputs": 2,
+    "regressionHashesMatch": true,
+    "archiveAndBothApksMatched": true,
+    "ownedPidsAndGroupsAbsent": [
+      87821,
+      89411
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true
+  },
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "retainedDiagnostics": {
+    "directory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10",
+    "files": {
+      "checkpoint.json": "a4c007c8187d6c78f4f4358207fd5898a4a8b45de8d39d0d7ea5ba88c9298828",
+      "mapbox-android-core-diagnostics.json": "c3e90a2d314f0af4294177ab253812bb78fc121996fb04f8056373542c8cc002",
+      "mapbox-android-core-driver-stderr.log": "2b88521d3fe385937a97d332501cef4be8381518712782a4e415cb565ccf1c1e",
+      "emulator.log": "87cacf20c78e8953bab19adebf5f336fdc42b59e9ebe65ad9ea414d56566ec9e",
+      "mapbox-android-core-manual.json": "a93758c9c789012cbbc3f803cb1d839dea53b49172290049c01acfa6f16b3a3a",
+      "receipt.json": "a4c007c8187d6c78f4f4358207fd5898a4a8b45de8d39d0d7ea5ba88c9298828",
+      "operator-first-failure.json": "c9d79cdb58aeafbfa98bb34cac3886129f2642f01b2f0b30a9a7b01e60f2f2e7"
+    }
+  },
+  "next": "No retry authorized by this closed attempt. Toolbar procedure is fixed and unit-validated but not natively exercised because the worker did not invoke the approved script path."
+}

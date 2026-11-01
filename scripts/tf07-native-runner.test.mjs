@@ -12,7 +12,12 @@ const source = text.slice(
   text.indexOf("const nativeStatus =")
 );
 const hash = "a".repeat(64);
-for (const borrowed of [false, true]) {
+for (const [engine, borrowed] of [
+  ["mapbox", false],
+  ["mapbox", true],
+  ["maplibre", false],
+  ["maplibre", true],
+]) {
   for (const failure of [
     null,
     "identity",
@@ -25,6 +30,8 @@ for (const borrowed of [false, true]) {
     "manual-failed",
     "manual-diagnostics-read",
     "manual-diagnostics-write",
+    "manual-diagnostics-pid-error",
+    "manual-diagnostics-pid-malformed",
     "manual-identity",
     "manual-json",
     "status-bind",
@@ -49,6 +56,7 @@ for (const borrowed of [false, true]) {
     let polls = 0;
     let diagnostics;
     const context = {
+      Buffer,
       assert,
       platform: "android",
       retained: false,
@@ -141,7 +149,7 @@ for (const borrowed of [false, true]) {
       start: (file, args, options) => {
         assert(statusBound);
         assert.equal(manual, undefined);
-        assert.equal(options.cwd, "/frozen-harness/examples/native-mapbox");
+        assert.equal(options.cwd, `/frozen-harness/examples/native-${engine}`);
         metro = new EventEmitter();
         return Object.assign(metro, {
           pid: 77,
@@ -199,7 +207,10 @@ for (const borrowed of [false, true]) {
             parts.includes("pidof")) &&
           failure === "manual-diagnostics-read"
         )
-          throw Error("diagnostic transport failure");
+          throw Error(
+            "🗺".repeat(50000) +
+              " diagnostic transport failure known-sample-token ?token=private-query-token"
+          );
         if (parts.join(" ").includes("pm path"))
           return (
             "package:/data/app/owned/base.apk\n" +
@@ -229,17 +240,67 @@ for (const borrowed of [false, true]) {
           throw Error("launch failed");
         if (parts.includes("--remove") && failure === "cleanup")
           throw Error("cleanup failed");
+        if (parts.includes("exit-info")) {
+          assert.deepEqual(parts, [
+            "shell",
+            "dumpsys",
+            "activity",
+            "exit-info",
+            `com.onemap${engine}`,
+          ]);
+          return (
+            "latest malformed history; pid=999 timestamp=earlier reason=USER_REQUESTED\n" +
+            "🗺".repeat(50000) +
+            "oldest record"
+          );
+        }
+        if (parts.includes("pidof")) {
+          if (failure === "manual-diagnostics-pid-error")
+            throw Error("PID unavailable");
+          return failure === "manual-diagnostics-pid-malformed"
+            ? "not a PID"
+            : "12345\n";
+        }
+        if (parts.includes("events")) {
+          assert.deepEqual(parts, [
+            "logcat",
+            "-b",
+            "events",
+            "-d",
+            "-t",
+            "2000",
+            "-v",
+            "threadtime",
+            "am_proc_died:I",
+            "am_kill:I",
+            "am_crash:I",
+            "am_anr:I",
+            "am_proc_start:I",
+            "*:S",
+          ]);
+          return [
+            `11-01 15:05:43.000 100 100 I am_kill: [0,12345,com.onemap${engine},0,reason known-sample-token]`,
+            `11-01 15:05:43.000 100 100 I am_proc_died: [0,12345,com.onemap${engine},0,0]`,
+            "11-01 15:05:44.000 100 100 I am_kill: [0,777,com.otherapp,0,private unrelated reason]",
+            `11-01 15:05:45.000 100 100 I am_crash: [0,777,com.otherapp,0,message mentions com.onemap${engine}]`,
+            `11-01 15:05:46.000 100 100 I am_proc_start: [0,12346,10001,com.onemap${engine}:worker,activity,com.onemap${engine}/.MainActivity]`,
+            `11-01 15:05:47.000 100 100 I am_anr: [0,12347,com.onemap${engine}evil,0,unrelated prefix]`,
+            "not valid event data",
+          ].join("\n");
+        }
         if (parts.includes("logcat"))
           return (
             "AndroidRuntime https://example.invalid/?access_token=private-query-token\n" +
             "x".repeat(140 * 1024) +
+            "\nReactNativeJS: " +
+            "🗺".repeat(50000) +
             "\nReactNativeJS: application error known-sample-token\nBridgeless: stack frame"
           );
         return "";
       },
     };
     try {
-      await runInNewContext(`${source}\nrunNative("mapbox")`, context);
+      await runInNewContext(`${source}\nrunNative("${engine}")`, context);
     } catch (error) {
       if (failure?.startsWith("manual-")) {
         assert.match(String(error.errors[0]), /TF07 manual report failed/);
@@ -285,8 +346,31 @@ for (const borrowed of [false, true]) {
     if (failure === "status-bind") assert.equal(metro, undefined);
     if (failure?.startsWith("manual-")) {
       assert(diagnostics, "Capture failure diagnostics before force-stop.");
-      assert.equal(diagnostics.applicationId, "com.onemapmapbox");
-      assert.equal(diagnostics.reads.length, 4);
+      assert.equal(diagnostics.applicationId, `com.onemap${engine}`);
+      assert.equal(diagnostics.reads.length, 6);
+      assert.match(diagnostics.exitHistoryClassification, /^unclassified/);
+      assert.match(diagnostics.logWindow, /do not guarantee/);
+      assert(diagnostics.launch.requestedAtUTC);
+      if (failure !== "manual-diagnostics-read") {
+        assert.equal(
+          diagnostics.launch.pid,
+          failure?.includes("-pid-") ? null : "12345"
+        );
+        assert.match(diagnostics.reads[0].text, /latest malformed history/);
+        assert(!diagnostics.reads[0].text.includes("oldest record"));
+        assert.equal(diagnostics.reads[0].selection, "prefix");
+        assert.match(diagnostics.reads[1].text, /am_kill/);
+        assert.match(diagnostics.reads[1].text, /am_proc_died/);
+        assert.match(diagnostics.reads[1].text, /:worker/);
+        assert(!diagnostics.reads[1].text.includes("evil"));
+        assert(!diagnostics.reads[1].text.includes("com.otherapp"));
+        assert(!diagnostics.reads[1].text.includes("not valid"));
+      } else assert.equal(diagnostics.launch.pid, null);
+      const failureReads = commands.slice(
+        commands.findIndex((parts) => parts.includes("exit-info"))
+      );
+      assert(failureReads[1].includes("events"));
+      assert(failureReads[3].includes("activities"));
       assert(!JSON.stringify(diagnostics).includes("private-query-token"));
       assert(!JSON.stringify(diagnostics).includes("known-sample-token"));
       if (failure !== "manual-diagnostics-read") {
@@ -301,7 +385,8 @@ for (const borrowed of [false, true]) {
       }
       assert(
         diagnostics.reads.every(
-          (read) => !read.text || read.text.length <= 128 * 1024
+          (read) =>
+            Buffer.byteLength(read.text ?? read.error ?? "") <= 128 * 1024
         )
       );
       if (failure === "manual-diagnostics-read")
@@ -396,4 +481,26 @@ for (const failure of [null, "empty", "diagnostic", "missing-tool"]) {
   });
   if (failure === "empty") await check;
   else await assert.rejects(check);
+}
+
+const diagnosticSource = text.slice(
+  text.indexOf("      const diagnosticText ="),
+  text.indexOf("      const diagnostics =")
+);
+for (const keepPrefix of [false, true]) {
+  for (const trailingBytes of [0, 1, 2, 3]) {
+    const input =
+      "x".repeat(trailingBytes) + "🗺".repeat(40000) + "x".repeat(trailingBytes);
+    const bounded = runInNewContext(
+      `${diagnosticSource}\ndiagnosticText(input, keepPrefix)`,
+      {
+        Buffer,
+        keepPrefix,
+        input,
+        process: { env: {} },
+      }
+    );
+    assert(Buffer.byteLength(bounded) <= 128 * 1024);
+    assert(!bounded.includes("�"));
+  }
 }
