@@ -3,6 +3,12 @@
 
 ## Current handoff
 
+**Exact operator commands are prepared for attempt06; execution remains unverified.** The [operator preparation](../records/evidence/revised-api-u26-android-operator-preparation.json) pins the new adb-only helper separately from the unchanged thirteen runtime inputs. Independent source audit, mocked and fake-child checks passed for the copyable commands and failure boundaries. The helper replaces reconstructed inline Python for future operator calls. No native run is authorized by this preparation.
+
+**Android continuation attempt05 stopped on a worker command syntax error.** The [audited outcome](../records/evidence/revised-api-u26-android-platform-batch-attempt-05.json) records that the first hierarchy-read wrapper placed a Python compound try statement after a semicolon. Parsing failed before any operator adb command launched. The worker used no CUA or Android Studio, marked the incomplete first observation failed through the validated writer and stopped. No physical observation or new row passed. Independent frozen-input/APK and owned process/port/AVD cleanup checks passed; f05 is unchanged and Mapbox camera was reused without rerun. Five Android and six iOS rows remain incomplete. The command error requires prevalidated operator invocations before device acquisition; this outcome grants no retry permission.
+
+**Android continuation attempt04 stopped before any manual interaction.** The [audited outcome](../records/evidence/revised-api-u26-android-platform-batch-attempt-04.json) records a worker procedure deviation: it attempted computer-use binding to Android Studio instead of the approved bounded adb commands. That call did not return for about322seconds, and the coordinator interrupted the worker. The validated failed report triggered normal diagnostics and owned cleanup. No operator adb command, screenshot, hierarchy read or renderer observation ran, so the proposed command guard was not exercised and no app defect is established. Independent f05/APK/frozen-input and process/port/AVD checks passed. No new row passed; the Mapbox camera was reused without rerun. Five Android and six iOS rows remain incomplete. Any separately approved retry must use direct bounded adb operations only, with no CUA initialization or Android Studio binding.
+
 **Read-only diagnosis supports a bounded operator retry, not an Android repair.** The [audited diagnosis and retry plan](../records/evidence/revised-api-u26-android-navigation-retry-preparation.json) includes the original worker attestation: the outer tool call returned neither a nested command result nor a session handle. It cannot establish that the shell launched or which operation stalled. The combined swipe/dump/parse sequence had no individual bounds or progress markers. No production or runner change is justified. Proposed attempt04 retains the same five rows, f05, APKs and runtime pins, with one checked operator command per invocation, real 30-second subprocess bounds and start/completion markers. No device command or native test ran during diagnosis. Separate owner approval remains required.
 
 **Android continuation attempt03 stopped at an operator command stall.** The [audited outcome](../records/evidence/revised-api-u26-android-platform-batch-attempt-03.json) records four passed Mapbox core observations and an offset child tap registering child-click=2. A combined toolbar-navigation and hierarchy-read invocation then stalled before reset-layout verification completed. The validated writer published a strict, valid failed observation; the driver stopped and captured diagnostics. Mapbox was alive and foregrounded before cleanup. No full row passed, and the exact stalled subcommand and cause remain unverified. The accepted Mapbox camera was reused without rerun; five Android and six iOS rows remain incomplete. Independent frozen-input/APK and owned process/port/AVD cleanup checks passed. Read-only diagnosis precedes any separately approved retry; do not change production code based on this operational failure.
@@ -22,11 +28,53 @@ The nine browser rows and all four native minimal, lifetime, query/cluster, boun
 
 ### Proposed serial Android continuation
 
-**Proposed attempt04:** after separate approval, use the same audited launcher with the fresh output below. One Luna medium worker owns all five rows; estimate 60-120 minutes. Reuse the passed Mapbox camera and verified APKs without rebuild. Restart the incomplete core row with a fresh report; preserve all historical partial evidence. Follow the exact bounded operator template in the diagnosis record: one operation at a time, one swipe then a fresh hierarchy read, no command chain or independent retry. Any first command, tool or observation failure stops the batch and triggers the existing validated report, diagnostics and owned cleanup. A missing start marker leaves process launch unknown.
+**Proposed attempt06:** after separate owner approval, one exclusive GPT-6 Luna worker at medium reasoning executes the same five serial rows with fresh output below. Estimate 60-120 minutes, with the existing approximately 150 minute outer maximum. Reuse Mapbox camera and verified APKs. No CUA, Android Studio, rebuild, dependency restoration, source mutation or independent retry. First command, tool, transport or observation failure stops the attempt, publishes a failed observation through the unchanged writer, then triggers existing diagnostics and owned cleanup. Resume a yielded tool call until its result; never dispatch it again. Missing START leaves launch unknown.
 
 ```sh
-/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-04
+/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06
 ```
+
+Use the following exact operator invocations individually, only during the approved run. The first two dump and read a fresh hierarchy. Use a new numbered owned device filename for every dump, starting at hierarchy-001.xml and incrementing to hierarchy-002.xml and onward, with the matching cat path. Never reuse a hierarchy filename: a successful UIAutomator exit alone does not prove an old file was replaced. Parse the XML after the COMPLETE line locally and locate the intended node by its text or accessibility label; require visible bounds before input. The swipe and tap below are prevalidated invocation forms, not preapproved target coordinates: replace only numeric coordinates with the current visible target or toolbar bounds, and dump/read again after each input. Never infer a target from stale hierarchy. Do not reconstruct Python or chain operations. Each helper call pins adb and emulator-5580, checks one child exit, uses a 30 second timeout and prints START plus COMPLETE or FAILED with at most 128KiB per output stream.
+
+```sh
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell uiautomator dump /sdcard/one-map-attempt06-hierarchy-001.xml
+```
+
+```sh
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell cat /sdcard/one-map-attempt06-hierarchy-001.xml
+```
+
+```sh
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell input swipe 100 110 1000 110 450
+```
+
+```sh
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell input tap 50 40
+```
+
+Capture screenshots to the owned device file, then pull separately only after COMPLETE. Never route binary screencap stdout through this text helper. Inspect the pulled image before recording visual success. Use new owned names for distinct observations; the examples below identify the first core observation.
+
+```sh
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell screencap -p /sdcard/one-map-attempt06-live-child-button.png
+```
+
+```sh
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py pull /sdcard/one-map-attempt06-live-child-button.png /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06/live-child-button.png
+```
+
+After a physical Read renderer tap using fresh bounds, fetch the existing status endpoint separately. Require a new relevant renderer observation; a prior value or null does not prove the input succeeded. This local read does not send device input.
+
+```sh
+/usr/bin/curl --fail --silent --show-error --max-time 30 http://127.0.0.1:8797/tf07
+```
+
+Write the actual action, observed result and any renderer data/screenshot path to the observation JSON file. Use the existing validated writer invocation below only after that observation passes; replace passed with failed at the first failure. The writer regressions cover real file serialization and CLI publication. Never fabricate a passed observation or modify a live report inline.
+
+```sh
+/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06/mapbox-android-core-manual.json live-child-button passed /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06/live-child-button-observation.json
+```
+
+The other UI rows use their exact fixed row IDs beneath the same attempt06 output. Keep all thirteen core and six retained observation recipes from the fixed matrix. Begin the incomplete core row with its new driver report/runId, never importing historical partial passes. The helper and writer are the only operator helpers; their new preparation pins are additional to the original runtime pins. Recheck these hashes before dispatch. No production or fixture change is proposed, and this preparation does not establish an Android repair.
 
 **Attempt03 is closed after the operator command stall recorded above.** The following recipe preserves its approved scope and grants no rerun permission. Attempt02 is closed and its invalid raw report remains unchanged. The [structured writer](../scripts/record-native-ui-observation.mjs) and filesystem regressions repair the worker publication boundary; independent coordinator audit passed; new whole-continuation approval remains required. The accepted Mapbox camera row is reused.
 
@@ -34,7 +82,7 @@ The [fixed continuation entrypoint](../scripts/android-acceptance-continuation.m
 
 Report-writing repair, bounded routine verification and passed independent coordinator audit are recorded in the new preparation. Attempt02 physically observed child activation and renderer readback while the app stayed foregrounded, then stopped on malformed operator JSON. It completed no new suite row. Attempt01 foreground-loss cause remains unresolved; no production fix or full core pass is claimed.
 
-After explicit approval for all five remaining Android rows, one exclusive GPT-6 Luna worker at medium reasoning runs exactly once with require_escalated:
+The closed attempt03 used this historical invocation; it grants no current execution permission:
 
 ```sh
 /Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03
@@ -52,7 +100,7 @@ Use this single report-writing command template during the approved attempt, rep
 /Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs REPORT_PATH SCENARIO STATUS OBSERVATION_JSON_FILE
 ```
 
-For the first Mapbox core observation, the exact current-attempt paths are:
+The closed attempt03 first-observation paths were:
 
 ```sh
 /Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03/mapbox-android-core-manual.json live-child-button passed /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-03/live-child-button-observation.json
