@@ -3,7 +3,11 @@
 
 ## Current handoff
 
-**Exact operator commands are prepared for attempt06; execution remains unverified.** The [operator preparation](../records/evidence/revised-api-u26-android-operator-preparation.json) pins the new adb-only helper separately from the unchanged thirteen runtime inputs. Independent source audit, mocked and fake-child checks passed for the copyable commands and failure boundaries. The helper replaces reconstructed inline Python for future operator calls. No native run is authorized by this preparation.
+**Android continuation attempt06 is not accepted because the worker continued after the first command failure.** The [audited outcome](../records/evidence/revised-api-u26-android-platform-batch-attempt-06.json) records successful validated adb hierarchy/input operations and native child-click status. A local status request then failed with curl exit7 without explicit host access. The worker should have stopped but continued through toolbar swipes and screenshot capture, including an additional reverse swipe. The app was visible in the retained screenshot before that extra swipe; later hierarchy and diagnostics showed the launcher and no app PID, with an empty crash buffer. No app cause is established, and no full row passed. Raw reports remain unchanged; the coordinator outcome records the omitted first failure and scope deviation. Independent frozen/APK/helper and owned process/port/AVD checks passed. f05 and both APKs are unchanged, and Mapbox camera was not rerun. Five Android and six iOS rows remain incomplete. No retry is authorized by this outcome.
+
+**Operator stop-first-failure repair is prepared for attempt07.** The [new preparation](../records/evidence/revised-api-u26-operator-failfast-preparation.json) pins the bounded adb/status helper, persistent attempt failure latch, driver stop guard and updated launcher separately from unchanged f05/APKs/staged candidate inputs. Routine verification and independent coordinator audit passed; no native run is authorized. Host-access restrictions are a plausible explanation for attempt06 curl exit7, but the cause remains unverified. The driver binds its localhost status server before Metro/app startup, so the failed request does not establish that the server was absent.
+
+**Operator preparation for closed attempt06.** The [operator preparation](../records/evidence/revised-api-u26-android-operator-preparation.json) pins the new adb-only helper separately from the unchanged thirteen runtime inputs. Independent source audit, mocked and fake-child checks passed for the copyable commands and failure boundaries. The helper replaces reconstructed inline Python for future operator calls. No native run is authorized by this preparation.
 
 **Android continuation attempt05 stopped on a worker command syntax error.** The [audited outcome](../records/evidence/revised-api-u26-android-platform-batch-attempt-05.json) records that the first hierarchy-read wrapper placed a Python compound try statement after a semicolon. Parsing failed before any operator adb command launched. The worker used no CUA or Android Studio, marked the incomplete first observation failed through the validated writer and stopped. No physical observation or new row passed. Independent frozen-input/APK and owned process/port/AVD cleanup checks passed; f05 is unchanged and Mapbox camera was reused without rerun. Five Android and six iOS rows remain incomplete. The command error requires prevalidated operator invocations before device acquisition; this outcome grants no retry permission.
 
@@ -28,53 +32,57 @@ The nine browser rows and all four native minimal, lifetime, query/cluster, boun
 
 ### Proposed serial Android continuation
 
-**Proposed attempt06:** after separate owner approval, one exclusive GPT-6 Luna worker at medium reasoning executes the same five serial rows with fresh output below. Estimate 60-120 minutes, with the existing approximately 150 minute outer maximum. Reuse Mapbox camera and verified APKs. No CUA, Android Studio, rebuild, dependency restoration, source mutation or independent retry. First command, tool, transport or observation failure stops the attempt, publishes a failed observation through the unchanged writer, then triggers existing diagnostics and owned cleanup. Resume a yielded tool call until its result; never dispatch it again. Missing START leaves launch unknown.
+**Proposed attempt07:** after separate owner approval, one exclusive GPT-6 Luna worker at medium reasoning executes the same five serial rows with the output below. Estimate 60-120 minutes, with the existing approximately 150 minute outer maximum. Reuse Mapbox camera and verified APKs. No CUA, Android Studio, rebuild, dependency restoration, source mutation or independent retry. First command, tool, transport or observation failure stops the attempt, publishes a failed observation through the unchanged writer, then triggers existing diagnostics and owned cleanup. Resume a yielded tool call until its result; never dispatch it again. Missing START leaves launch unknown.
 
 ```sh
-/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06
+/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07
 ```
 
-Use the following exact operator invocations individually, only during the approved run. The first two dump and read a fresh hierarchy. Use a new numbered owned device filename for every dump, starting at hierarchy-001.xml and incrementing to hierarchy-002.xml and onward, with the matching cat path. Never reuse a hierarchy filename: a successful UIAutomator exit alone does not prove an old file was replaced. Parse the XML after the COMPLETE line locally and locate the intended node by its text or accessibility label; require visible bounds before input. The swipe and tap below are prevalidated invocation forms, not preapproved target coordinates: replace only numeric coordinates with the current visible target or toolbar bounds, and dump/read again after each input. Never infer a target from stale hierarchy. Do not reconstruct Python or chain operations. Each helper call pins adb and emulator-5580, checks one child exit, uses a 30 second timeout and prints START plus COMPLETE or FAILED with at most 128KiB per output stream.
+Use the following exact operator invocations individually, only during the approved run. The first two dump and read a fresh hierarchy. Use a new numbered owned device filename for every dump, starting at hierarchy-001.xml and incrementing to hierarchy-002.xml and onward, with the matching cat path. Never reuse a hierarchy filename: a successful UIAutomator exit alone does not prove an old file was replaced. Once COMPLETE0 confirms success, parse the captured XML locally and locate the intended node by its text or accessibility label; require visible bounds before input. The swipe and tap below are prevalidated invocation forms, not preapproved target coordinates: replace only numeric coordinates with the current visible target or toolbar bounds, and dump/read again after each input. Never infer a target from stale hierarchy. Do not reconstruct Python or chain operations. Each helper call pins adb and emulator-5580, checks one child exit, uses a 30 second child timeout (status uses 30 second socket timeouts and a body deadline) and prints START plus COMPLETE or FAILED with at most 128KiB per output stream.
 
 ```sh
-python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell uiautomator dump /sdcard/one-map-attempt06-hierarchy-001.xml
-```
-
-```sh
-python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell cat /sdcard/one-map-attempt06-hierarchy-001.xml
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07 mapbox-android-core live-child-button adb shell uiautomator dump /sdcard/one-map-attempt07-hierarchy-001.xml
 ```
 
 ```sh
-python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell input swipe 100 110 1000 110 450
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07 mapbox-android-core live-child-button adb shell cat /sdcard/one-map-attempt07-hierarchy-001.xml
 ```
 
 ```sh
-python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell input tap 50 40
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07 mapbox-android-core live-child-button adb shell input swipe 100 110 1000 110 450
+```
+
+```sh
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07 mapbox-android-core live-child-button adb shell input tap 50 40
 ```
 
 Capture screenshots to the owned device file, then pull separately only after COMPLETE. Never route binary screencap stdout through this text helper. Inspect the pulled image before recording visual success. Use new owned names for distinct observations; the examples below identify the first core observation.
 
 ```sh
-python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py shell screencap -p /sdcard/one-map-attempt06-live-child-button.png
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07 mapbox-android-core live-child-button adb shell screencap -p /sdcard/one-map-attempt07-live-child-button.png
 ```
 
 ```sh
-python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py pull /sdcard/one-map-attempt06-live-child-button.png /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06/live-child-button.png
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07 mapbox-android-core live-child-button adb pull /sdcard/one-map-attempt07-live-child-button.png /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07/live-child-button.png
 ```
 
-After a physical Read renderer tap using fresh bounds, fetch the existing status endpoint separately. Require a new relevant renderer observation; a prior value or null does not prove the input succeeded. This local read does not send device input.
+After the driver creates the fresh row report and before the first physical input, run this same validated status command with explicit host access; null is normal and an access failure stops the attempt immediately. After a physical Read renderer tap using fresh bounds, read the existing status endpoint through the same helper. Require a new relevant renderer observation; a prior value or null does not prove the input succeeded. This local read does not send device input.
 
 ```sh
-/usr/bin/curl --fail --silent --show-error --max-time 30 http://127.0.0.1:8797/tf07
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07 mapbox-android-core live-child-button status
 ```
 
 Write the actual action, observed result and any renderer data/screenshot path to the observation JSON file. Use the existing validated writer invocation below only after that observation passes; replace passed with failed at the first failure. The writer regressions cover real file serialization and CLI publication. Never fabricate a passed observation or modify a live report inline.
 
 ```sh
-/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06/mapbox-android-core-manual.json live-child-button passed /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-06/live-child-button-observation.json
+/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07/mapbox-android-core-manual.json live-child-button passed /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-07/live-child-button-observation.json
 ```
 
-The other UI rows use their exact fixed row IDs beneath the same attempt06 output. Keep all thirteen core and six retained observation recipes from the fixed matrix. Begin the incomplete core row with its new driver report/runId, never importing historical partial passes. The helper and writer are the only operator helpers; their new preparation pins are additional to the original runtime pins. Recheck these hashes before dispatch. No production or fixture change is proposed, and this preparation does not establish an Android repair.
+Every operator call, including status reads and the launcher/writer, requires explicit host access (`require_escalated`); the helper cannot grant that access itself. Never use raw curl, raw adb, reconstructed inline Python or CUA/Android Studio as an alternate operator route. The first helper argument is the explicit canonical attempt output path below the fixed staging root; the next two arguments bind the exact active row and the one scenario currently being observed; change those arguments only to another fixed matrix row/scenario as its observation begins. The helper rejects a different/inactive row or finished attempt and reads identity only from its driver-created report. An empty alternate directory cannot reset a latch because it has no active checkpoint and driver-created report. Any later retry still requires separate owner approval.
+
+On the first helper error, operator-first-failure.json preserves its original error and operation before the unchanged validated writer marks only the current scenario failed. Later helper invocations, including a fresh process, refuse adb and HTTP before either boundary. The driver polls that attempt latch as well as the report, so failed report publication still stops the row through existing diagnostics and owned cleanup. Publication errors remain secondary. Connection errors, timeouts, non200 responses, malformed/oversized JSON and nonobject/non-null values fail; a null response before physical Read renderer is normal and proves no observation. No automatic retry or fabricated scenario pass occurs. Single-worker serial ownership remains required. Tool approval/transport failure before the helper launches cannot be latched by the helper: the worker must stop and the coordinator must close the attempt.
+
+The other UI rows use their exact fixed row IDs beneath the same attempt07 output. Keep all thirteen core and six retained observation recipes from the fixed matrix. Begin the incomplete core row with its new driver report/runId, never importing historical partial passes. The helper and writer are the only operator helpers; the new preparation owns their pins and the revised driver/launcher runtime pins. Historical preparation records remain unchanged. Recheck these hashes before dispatch. No production or fixture change is proposed, and this preparation does not establish an Android repair.
 
 **Attempt03 is closed after the operator command stall recorded above.** The following recipe preserves its approved scope and grants no rerun permission. Attempt02 is closed and its invalid raw report remains unchanged. The [structured writer](../scripts/record-native-ui-observation.mjs) and filesystem regressions repair the worker publication boundary; independent coordinator audit passed; new whole-continuation approval remains required. The accepted Mapbox camera row is reused.
 
@@ -115,7 +123,7 @@ Estimate 60-120 minutes for this five-row Android continuation, unmeasured. Each
 
 Failed Android UI rows capture selected-app PID, activity/task state, the last2000 crash-buffer entries, and the last2000 main/system entries filtered for the app and relevant Android runtime/process messages before app, Metro or emulator teardown. Each retained read is capped at128KiB and each query at30seconds. The outer UI bound includes the four-query budget. Capture errors remain secondary; they do not replace the first failure or prevent cleanup. Each owned driver also retains a128KiB stderr tail bound to its original row. Known Mapbox tokens and token query values are redacted in retained diagnostic text. No logcat clearing, other-device query, extra runtime gate or application rebuild is included. Keep raw bounded diagnostics locally only while investigating; redact any further secrets before quoting excerpts. Capture may explain foreground loss but does not itself prove a fix.
 
-The historical six-row batch and three single-scene entrypoints remain source-compatible and covered by routine mocks. Their historical preparation records retain the old runtime hashes and intentionally reject changed launcher/driver bytes. Only this fixed continuation selects the validated-report preparation record; preparation does not authorize a historical rerun. Success continues through all five rows, and the first failure stops the whole attempt with diagnostics and owned cleanup.
+The historical six-row batch and three single-scene entrypoints remain source-compatible and covered by routine mocks. Their historical preparation records retain the old runtime hashes and intentionally reject changed launcher/driver bytes. Only this fixed continuation selects the new operator-failfast preparation record; preparation does not authorize a historical rerun. Success continues through all five rows, and the first failure stops the whole attempt with diagnostics and owned cleanup.
 
 ### Following iOS batch and closeout
 

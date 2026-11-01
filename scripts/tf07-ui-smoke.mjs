@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import {
+  existsSync,
   mkdtempSync,
   readdirSync,
   readFileSync,
@@ -10,7 +11,7 @@ import {
 } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import {
@@ -425,6 +426,14 @@ const runNative = async (selectedEngine) => {
     const readManual = () => {
       if (!manualPath) return;
       try {
+        const operatorFailure = join(
+          dirname(manualPath),
+          "operator-first-failure.json"
+        );
+        if (existsSync(operatorFailure))
+          throw new Error(
+            `Operator stopped: ${readFileSync(operatorFailure, "utf8")}`
+          );
         const manual = JSON.parse(readFileSync(manualPath, "utf8"));
         for (const field of [
           "installedBinarySha256",

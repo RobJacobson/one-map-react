@@ -345,11 +345,12 @@ for (const [engine, camera, batch = false, continuation = false] of [
         if (
           /android-(rendering|camera)-preparation.json$/.test(file) ||
           file.endsWith("platform-batches-preparation.json") ||
-          file.endsWith("validated-reports-preparation.json")
+          file.endsWith("operator-failfast-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
             hostInputSha256: { "/helper": "helper" },
+            operatorHelperSha256: { "/operator": "operator" },
             freeze: { path: "/freeze", sha256: "freeze-hash" },
           });
         if (file.endsWith("android-platform-batch-attempt-01.json"))

@@ -153,6 +153,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       ...preparation.hostInputSha256,
       ...preparation.cameraInputSha256,
       ...preparation.batchInputSha256,
+      ...preparation.operatorHelperSha256,
     }))
       assert.equal(sha256(file), hash, `Frozen runtime input changed: ${file}`);
   };
@@ -306,7 +307,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const peerEvidence = join(
       root,
       continuation
-        ? "records/evidence/revised-api-u26-validated-reports-preparation.json"
+        ? "records/evidence/revised-api-u26-operator-failfast-preparation.json"
         : batch
           ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
           : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
