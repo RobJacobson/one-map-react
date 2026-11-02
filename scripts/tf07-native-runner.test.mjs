@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
 import { EventEmitter } from "node:events";
 import { readFileSync } from "node:fs";
 import { StringDecoder } from "node:string_decoder";
@@ -8,6 +9,38 @@ const text = readFileSync(
   new URL("./tf07-ui-smoke.mjs", import.meta.url),
   "utf8"
 );
+const node = process.versions.bun ? "node" : process.execPath;
+const command = runInNewContext(
+  `${text.slice(text.indexOf("const command ="), text.indexOf("const requireFreePort ="))}; command;`,
+  { spawn, setTimeout, clearTimeout }
+);
+assert.equal(
+  await command(node, [
+    "-e",
+    'process.stdout.write("first"); setTimeout(() => process.stdout.write(" second"), 20);',
+  ]),
+  "first second"
+);
+await assert.rejects(
+  command(node, [
+    "-e",
+    'process.stdout.write("partial output"); process.stderr.write("command failure"); process.exitCode = 7;',
+  ]),
+  (error) => {
+    assert.equal(error.message, `${node} exited 7.`);
+    assert.equal(error.code, 7);
+    assert.equal(error.stdout, "partial output");
+    assert.equal(error.stderr, "command failure");
+    return true;
+  }
+);
+await assert.rejects(command("/one-map-missing-command", []), {
+  code: "ENOENT",
+});
+console.log(
+  "Actual command helper passed Node stdout chunks, nonzero exit diagnostics and spawn failure."
+);
+
 const source = text.slice(
   text.indexOf("const runNative ="),
   text.indexOf("const nativeStatus =")

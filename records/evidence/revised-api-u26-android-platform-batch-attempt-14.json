@@ -1,0 +1,91 @@
+{
+  "checkpoint": "U26 Android five-row continuation attempt14",
+  "recordedUTC": "2026-11-02T00:57:59.962739+00:00",
+  "result": "stopped-at-first-failure-before-resource-acquisition",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "count": 1,
+    "task": "android_terra_attempt14"
+  },
+  "preparation": {
+    "pr": "https://github.com/RobJacobson/one-map-react/pull/89",
+    "commit": "fccafac737748ee25ec6108c009cb8742a8add25",
+    "path": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-bounded-log-preparation.json",
+    "sha256": "89e938dcddf90fe5986a25571af2e6a4be05541e4a591b19c2b5f6380436dfa2"
+  },
+  "command": {
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "sandbox_permissions": "require_escalated",
+    "yield_time_ms": 1000,
+    "max_output_tokens": 1500,
+    "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-14",
+    "shell": "/bin/sh",
+    "login": false
+  },
+  "toolResult": {
+    "exit_code": 1,
+    "output": "",
+    "wall_time_seconds": 0.159771458,
+    "session_id": null
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "firstFailure": {
+    "boundary": "Local preboot free-space assertion after frozen-input verification, before port/device queries, private AVD creation or process launch",
+    "error": "AssertionError [ERR_ASSERTION]: Android preboot requires 8.2 GiB free; stop without deleting files.",
+    "freeBytes": 7494504448,
+    "requiredBytes": 8804682957,
+    "freeGiB": 6.979801177978516,
+    "shortfallGiB": 1.220198822207749
+  },
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "nativeBuildOrDependencyRestoration": false,
+  "nativeDeviceOperation": false,
+  "operatorCommands": 0,
+  "recorderExercised": false,
+  "cleanup": {
+    "resourcesAcquired": false,
+    "required": false,
+    "receiptCheckpoints": [],
+    "receiptCleanup": [],
+    "basis": "Reviewed launcher ordering: disk assertion precedes host port/device checks and every resource acquisition; receipt has no resource identity or acquisition checkpoint. No resource termination/deletion was attempted."
+  },
+  "coordinatorAudit": {
+    "status": "passed",
+    "workerUsedExactApprovedCall": true,
+    "noRetry": true,
+    "receiptAndSourceOrderingReviewed": true,
+    "initialUnknownLaunchResolvedByReceipt": true,
+    "frozenFilesVerified": 695,
+    "stagedInputsVerified": 26,
+    "hostInputsVerified": 7,
+    "runtimeInputsVerified": 13,
+    "operatorInputsVerified": 2,
+    "regressionHashesVerified": 4,
+    "archiveAndBothApksMatched": true,
+    "candidateChanged": false
+  },
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "retainedEvidence": {
+    "receipt": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-14/receipt.json",
+    "sha256": "7c317d9a887ec916a3cfb67a9938534333130ba944def2739293c640c5614063"
+  },
+  "limits": [
+    "No Android scenario or bounded recorder behavior was exercised; prior SIGKILL sender remains unknown.",
+    "Current storage failure is independent of the earlier app termination; no common cause is established."
+  ],
+  "next": "Free at least the1.22GiB shortfall (allow margin), then obtain new approval for a fresh five-row continuation on unchanged f05. Do not retry or lower the8.2GiB gate automatically."
+}

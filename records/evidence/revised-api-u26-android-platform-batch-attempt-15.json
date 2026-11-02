@@ -1,0 +1,102 @@
+{
+  "checkpoint": "U26 Android five-row continuation attempt15",
+  "recordedUTC": "2026-11-02T01:06:47.548514+00:00",
+  "result": "stopped-at-runner-reference-error-before-manual-input",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "task": "android_terra_attempt15"
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "manualObservations": 0,
+  "recorderCoverage": "No recorder artifact; driver failed before recorder setup.",
+  "firstFailure": {
+    "underlying": "ReferenceError: finalized is not defined",
+    "path": "scripts/tf07-ui-smoke.mjs:1119",
+    "origin": "PR89 accidentally added recorder-local state guard to shared command stdout handler; ordinary command output triggers unresolved identifier. Existing source-backed runNative mocks replaced command() and missed actual helper."
+  },
+  "operatorFailure": "Initial validated status helper refused failing/cleaning-up attempt; no device input issued.",
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 48225",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "ownedIds": {
+    "emulator": 48032,
+    "driver": 48225
+  },
+  "nativeRebuild": false,
+  "candidateChanged": false,
+  "coordinatorAudit": {
+    "receiptAndUnderlyingStderrReviewed": true,
+    "fullDiffStrayGuardConfirmed": true,
+    "independentResourceAndHashAudit": {
+      "status": "passed",
+      "ownedPidsGroupsAbsent": [
+        48032,
+        48225
+      ],
+      "portsFree": [
+        5580,
+        5581,
+        8081,
+        8797
+      ],
+      "privateAvdRemoved": true,
+      "frozen695AndStagedHostOperatorPinsMatch": true,
+      "archiveAndBothApksMatch": true
+    }
+  },
+  "retainedEvidence": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-15/receipt.json": "95e6ea65cfb4c4dd725be76d7767d1eeec42ef21dcec6dd30503d3275e15ed5e",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-15/mapbox-android-core-driver-stderr.log": "1de9c5eb31fd5e85ae192f8db4347e8a9a5329f64f5ae4e8003f967d0765590f",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-15/operator-first-failure.json": "f51d5b0d99a3afafd33745d11bfd29da8e79bec080bf0ee4077769ff69c23e8e"
+  },
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "authorization": "User authorized fixing failures and continuing same five-row scope on unchangedf05. No further approval needed for audited runner-only repair/retry; frozen candidate changes or native rebuild remain excluded.",
+  "next": "Remove shared-handler stray guard, add actual-command stdout regression, independently audit and refresh runtime pins, create repair PR, then continue with same Terra worker and fresh output."
+}

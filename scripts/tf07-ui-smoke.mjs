@@ -1116,7 +1116,6 @@ const command = (file, args) =>
       reject(new Error(`${file} timed out.`));
     }, 30000);
     child.stdout.on("data", (chunk) => {
-      if (finalized || closed) return;
       output += chunk;
     });
     child.on("error", (error) => {

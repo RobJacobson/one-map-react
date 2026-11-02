@@ -1,0 +1,67 @@
+{
+  "recordedUTC": "2026-11-02T01:02:38.598870+00:00",
+  "authorization": "User: Free up all available space.",
+  "removed": [
+    {
+      "path": "/Users/rob/.bun/install/cache",
+      "result": "removed in initial phase"
+    },
+    {
+      "path": "/Users/rob/.npm/_cacache",
+      "result": "removed in initial phase"
+    },
+    {
+      "path": "/Users/rob/.gradle/wrapper/dists",
+      "result": "removed in initial phase"
+    },
+    {
+      "path": "/Users/rob/.cache/uv",
+      "result": "removed"
+    },
+    {
+      "path": "/private/var/folders/cc/mjmcnnln739f6mxr3r0ky2140000gn/T/metro-cache",
+      "result": "removed"
+    },
+    {
+      "category": "Closed Android attempts01-11 raw screenshots, hierarchy XML and logs",
+      "files": 42
+    },
+    {
+      "path": "/Users/rob/Library/Caches/Codex/Default/Cache",
+      "result": "removed generated HTTP/JavaScript cache only; no session/cookie/profile data"
+    },
+    {
+      "path": "/Users/rob/Library/Caches/Codex/Default/Partitions/codex-browser-app/Cache",
+      "result": "removed generated HTTP/JavaScript cache only; no session/cookie/profile data"
+    },
+    {
+      "path": "/Users/rob/Library/Caches/Codex/Default/Partitions/codex-browser-app/Code Cache",
+      "result": "removed generated HTTP/JavaScript cache only; no session/cookie/profile data"
+    }
+  ],
+  "availableBytesAfter": 9166073856,
+  "protectedTargets": [
+    {
+      "path": "/Users/rob/Library/Caches/dotslash",
+      "reason": "Unused React Native DevTools.app bundles are readonly; deletion and owner-write adjustment returned PermissionError/Operation not permitted. Bundles preserved."
+    }
+  ],
+  "preserved": [
+    "f05 archive and695frozen files",
+    "Both verified APKs and iOS app bundles",
+    "Native consumer dependencies, cached Android image and assigned iOS simulator",
+    "Review checkout and active runtime tooling",
+    "Compact outcome/provenance records and active attempts12-14 evidence"
+  ],
+  "nativeRun": false,
+  "spaceMeasurementLimit": "Initial exact free-byte sample was not persisted; no exact freed-byte claim. Cached hardlinks/APFS clones may limit reclaimed physical space.",
+  "verification": {
+    "frozen695AndAllPreparationPinsMatch": true,
+    "archiveAndBothApksMatch": true,
+    "iosAppBundlesPreserved": true,
+    "activeFailureEvidencePreserved": true,
+    "availableBytes": 9164832768,
+    "androidGateBytes": 8804682957,
+    "androidSpaceGateMet": true
+  }
+}
