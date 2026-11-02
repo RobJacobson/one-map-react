@@ -1,0 +1,391 @@
+{
+  "checkpoint": "PR88 Android five-row continuation attempt13 with exit-history capture",
+  "recordedUTC": "2026-11-02T00:26:24.525635+00:00",
+  "result": "stopped-after-selected-app-sigkill",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "nativeBuildOrDependencyRestoration": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "firstOperatorFailure": {
+    "row": "mapbox-android-core",
+    "scenario": "style-remount",
+    "operation": [
+      "toolbar",
+      "Read renderer"
+    ],
+    "error": "ValueError: Expected one visible fixture toolbar."
+  },
+  "nativeExitEvidence": {
+    "launchedProcess": {
+      "requestedAtUTC": "2026-11-02T00:12:21.958Z",
+      "pid": "3666",
+      "observedAtUTC": "2026-11-02T00:12:26.260Z"
+    },
+    "capturedAtUTC": "2026-11-02T00:25:13.024Z",
+    "selectedPackageExitInfo": "ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)\nLast Timestamp of Persistence Into Persistent Storage: 1969-12-31 16:00:00.000\n  package: com.onemapmapbox\n    Historical Process Exit for uid=10232\n        ApplicationExitInfo #0:\n          timestamp=2026-11-01 16:24:55.499 pid=3666 realUid=10232 packageUid=10232 definingUid=10232 user=0\n          process=com.onemapmapbox reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=9\n          importance=100 pss=0.00 rss=0.00 state=36 bytes trace=null\n          description=null\n          anrInfo=null\n",
+    "selectedProcessEvents": "11-01 16:12:22.829   640   669 I am_proc_start: [0,3666,10232,com.onemapmapbox,next-top-activity,{com.onemapmapbox/com.onemapmapbox.MainActivity}]\n11-01 16:24:55.490   640  2232 I am_proc_died: [0,3666,com.onemapmapbox,0,2]",
+    "pidMatched": true,
+    "exitDeviceTimestamp": "2026-11-01 16:24:55.499",
+    "eventDeathDeviceTimestamp": "11-01 16:24:55.490",
+    "reason": "2 SIGNALED",
+    "status": 9,
+    "interpretation": "Recorded signal9 SIGKILL terminated the launched process before diagnostic capture and owned teardown. Sender and reason remain unknown; memory pressure, self/other process kill or a product defect are not established.",
+    "classificationSource": "Android reported exit reason/status, matched to exact launch PID; no text-based automatic classifier inferred a cause."
+  },
+  "passedPartialObservations": [
+    "live-child-button",
+    "nested-scroll",
+    "live-activation",
+    "annotation-activation",
+    "offset-touch-bounds",
+    "popup-follow-dismissal",
+    "map-feature-click",
+    "navigation-location"
+  ],
+  "manualReport": {
+    "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "environment": "mapbox-android",
+    "runId": "24892c34-fd69-48bd-b26a-bf8d5b7f31cf",
+    "scenarios": {
+      "live-child-button": "passed",
+      "nested-scroll": "passed",
+      "live-activation": "passed",
+      "annotation-activation": "passed",
+      "offset-touch-bounds": "passed",
+      "popup-follow-dismissal": "passed",
+      "map-feature-click": "passed",
+      "navigation-location": "passed",
+      "style-remount": "failed",
+      "host-accessibility": "unverified",
+      "sdk-ornaments": "unverified",
+      "camera-target-and-gesture": "unverified",
+      "marker-prop-rejection": "unverified"
+    },
+    "observations": {
+      "live-child-button": {
+        "action": "Tapped visible live marker child button at (540,1450), then read renderer.",
+        "seenResult": "Renderer reports child-click 1 and no map-click; the child was visible in the screenshot.",
+        "rendererData": {
+          "child-click": 1,
+          "map-click": 0
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/live-child-button.png"
+      },
+      "nested-scroll": {
+        "action": "Swiped within the visible live marker list from (540,1545) to (540,1470).",
+        "seenResult": "Visible list changed from Scroll one to Scroll two and Scroll three; renderer center and zoom stayed unchanged at [-122.34,47.61] and 11.",
+        "rendererData": {
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/nested-scroll.png"
+      },
+      "live-activation": {
+        "action": "Tapped the visible non-child live marker body at (540,1400).",
+        "seenResult": "Fresh renderer reports marker-click 1; child-click remained 1.",
+        "rendererData": {
+          "marker-click": 1,
+          "child-click": 1
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/nested-scroll.png"
+      },
+      "annotation-activation": {
+        "action": "Tapped the visible annotation bitmap at (235,1465).",
+        "seenResult": "Fresh renderer reports annotation-click 1.",
+        "rendererData": {
+          "annotation-click": 1
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/nested-scroll.png"
+      },
+      "offset-touch-bounds": {
+        "action": "Toggled offset, tapped displaced child at (600,1418), reset offset and tapped child at (540,1450).",
+        "seenResult": "Screenshot shows marker bounds approximately [482,1321,722,1548] versus original [419,1353,659,1581]; child-click rose from 1 to 3 with camera unchanged. Device configuration is 420dpi (2.625), not a measured window scale; actual window scale remains pending retained readback.",
+        "rendererData": {
+          "child-click": 3,
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/offset.png"
+      },
+      "popup-follow-dismissal": {
+        "action": "Panned map, activated popup child, dismissed popup, reopened and remounted; then zoomed.",
+        "seenResult": "Popup moved with the map during pan and moved toward the edge on zoom; renderer after remount reported popup-child 1, popup-close 1, popup-open 3 and generation 1, with no extra close.",
+        "rendererData": {
+          "popup-child": 1,
+          "popup-close": 1,
+          "popup-open": 3,
+          "generation": 1
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/popup.png"
+      },
+      "map-feature-click": {
+        "action": "Tapped visible green point at (540,1807), remounted and tapped it again.",
+        "seenResult": "Renderer source-click and map-click each rose from 1 to 2; queried feature id 707 and generation advanced from 2 to 3.",
+        "rendererData": {
+          "source-click": 2,
+          "map-click": 2,
+          "featureId": "707",
+          "generation": 3
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/live-child-button.png"
+      },
+      "navigation-location": {
+        "action": "Tapped Zoom in, Zoom out, Reset north and Locate me using visible controls.",
+        "seenResult": "Renderer zoom changed 11 to 12 to 11; reset north was activated with no bearing readback available. Location event 1 centered [-122.33,47.62] and blue location indicator is visible; fixture coordinate, not GPS.",
+        "rendererData": {
+          "zoom": 11,
+          "location": 1,
+          "center": [
+            -122.33,
+            47.61999999999999
+          ]
+        },
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/location.png"
+      },
+      "style-remount": {
+        "action": "Operator command ['toolbar', 'Read renderer']",
+        "seenResult": "Operator failure; scenario not accepted: ValueError: Expected one visible fixture toolbar."
+      }
+    }
+  },
+  "verificationQualification": {
+    "offsetScale": "Core touch/offset behavior passed from actual bounds/taps and renderer counts; configured420dpi/2.625 was explicitly not presented as measured scale. Actualwindow.scale deferred to planned retained row, which did not run.",
+    "densityGate": "Actual native density remains unverified for this batch; no new measured scale claim."
+  },
+  "stopPolicy": {
+    "firstFailureStopped": true,
+    "laterDeviceInput": false,
+    "retryPerformed": false,
+    "sixDiagnosticReadsBeforeTeardown": true
+  },
+  "identityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~6WWs9OFPqykHB3AfQiQJAQ==/com.onemapmapbox-ueG45K4QHuczuNDlpNDghQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~6WWs9OFPqykHB3AfQiQJAQ==/com.onemapmapbox-ueG45K4QHuczuNDlpNDghQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "identityLimit": "Installed Mapbox baseline verified before core; after-row proof not reached. Frozen/APK/helper hashes independently matched post-run.",
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 20791",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "runtimeInputs": 13,
+    "operatorInputs": 2,
+    "regressionHashesMatch": true,
+    "archiveAndBothApksMatched": true,
+    "ownedPidsAndGroupsAbsent": [
+      20625,
+      20791
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true,
+    "pidMatchedExitAndEventsIndependentlyReviewed": true
+  },
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "retainedDiagnostics": {
+    "directory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13",
+    "files": {
+      "toolbar-016.json": "47ffc943be3c2309a19d52c8bd588bf873415f8101bfeb656d18dd411bb40578",
+      "toolbar-007-hierarchy-006.xml": "2ac9f6e66526b682aa6fecb82119287ead8c39e9a2832d6bfc1a5b92d74d92bb",
+      "toolbar-006-hierarchy-001.xml": "54b05ff9dfd9b9c47bf48743b950bec5b36c7457fb067361c9c8e61a51eda81a",
+      "annotation-activation-observation.json": "6589271e9e13ba2b74e759e8d281402e93bfa6c71f810123806d316d5e75582b",
+      "nested-scroll-observation.json": "84c242ad3e49fbdbd5ee71e387afd031e644585f6f8cae9bc1494ea0e8b1d0db",
+      "toolbar-007-hierarchy-005.xml": "92ad8b1b97410a6dc5390ba22fbb72130ce42e42092715aec1976e9149ce299d",
+      "toolbar-007-hierarchy-004.xml": "eaa0fd247cbccaeef58779c919dddfb5667c4b65ef2fd17be6eaac136c04a318",
+      "toolbar-003-hierarchy-001.xml": "6231f9817fe5a987d7730136d40f5c633b4566f5a97770d435eb23d75899c6c1",
+      "toolbar-020.json": "83e4c89c3e218b25c9f3601cd457f838e7ea2759c3fe40f925f4aeae63b61c57",
+      "map-feature-click-observation.json": "e521d4435be1f21ea3c0ba1031f5ddb36eff6fc0b5857c0a2e1c76b9ef0acea7",
+      "toolbar-007-hierarchy-001.xml": "fe4cabb6d9bb7dcc9dc67da7f37800ab71a92591ec651abdc519370cb1119392",
+      "checkpoint.json": "95add2ba325b9e6846439fa3f844901ca0ce34d239775d892ccfb95a36884ca7",
+      "mapbox-android-core-diagnostics.json": "ad26c703a63e5259478f5c6d545a906d982d66e2554ee5d8794735476bfcf865",
+      "mapbox-android-core-driver-stderr.log": "53d6f3db38ab264c1bd4524e2f35ecf3c5009feb11a3fc31bca64931b30e60b8",
+      "toolbar-007-hierarchy-003.xml": "7503bd3018819faab29a7158bfa606205dcd8107dcf1990f2c22217b448b2f5c",
+      "toolbar-017.json": "2377040cb5a53944a4750d8fa81741564d20b743b141455b482dfe45d9889973",
+      "toolbar-007-hierarchy-002.xml": "b7b12e481e8021ba01a6216a6dc3184338a3531a59ccf9fb9eec68a8942c52fe",
+      "toolbar-002-hierarchy-001.xml": "16f56ec3bb609c28c6402442cc9131b117ac1d260d3e4c4460f0f4ad9c486d37",
+      "operator-failure-observation.json": "1c9a5c90ff46f3ad779006130e83eab4121a4965672829923f246791142b4c65",
+      "toolbar-001.json": "71da3da0bc32f9435fb96bc219adee199351bfea7dc5dd3d24680d307218594d",
+      "toolbar-001-hierarchy-003.xml": "e4afbb3181410347ed04b6b04b2ce0b171d368ec28294d0eb5a79396ff021335",
+      "toolbar-005-hierarchy-006.xml": "b9490beb25b699f8d151b2bb2a2831269a705ff31967f541076b53039036c560",
+      "toolbar-018-hierarchy-001.xml": "290799701f3adac3e336c9ccc612dd121a66891ff52e9d25a565d87b781942a3",
+      "toolbar-004-hierarchy-001.xml": "c7159ffb6595f9435f0467ab494021ee67723c5adf311e9fc2c218c49b39e7f9",
+      "toolbar-001-hierarchy-002.xml": "d91a8317ce602346f7e3f5243824422222ec5fa42a56c50f376da32635ca8cd5",
+      "toolbar-006.json": "748d6a95ec3ad65612e05ceb8c44bb1c3e09f416aa0d0c30133f5862ee8d7a72",
+      "emulator.log": "6cd496544531f27ca53b9a7a6cb3f32e93b85d0ff90c745b989f3f1bd482d8e4",
+      "toolbar-005-hierarchy-005.xml": "999e9d3c6aa66af58b0e28ea45ffb4f0ea751c5ff1f74b67ea9e8f41b381d986",
+      "toolbar-018-hierarchy-002.xml": "b64e8f0e9ffe16d94b8743a35558c0b47256174d2514e3c118ff210087d19689",
+      "toolbar-010.json": "39425d885809e4f3dc1fc502ff6e37bc4de4539fc983bca7d0f761e0095df7d5",
+      "toolbar-018-hierarchy-003.xml": "89de1d08e918e56f8ced5a043c7efaba9e0d3f2a177d1962c0c59c972d6c0add",
+      "toolbar-005-hierarchy-004.xml": "aac1820979cdcbb5fd7a491f06c5fa9bc5e3b52adb273f2cc442b099377f8f85",
+      "toolbar-001-hierarchy-001.xml": "cf734a2e0b0b04aa65e71f8ddcd2079d60411258f8bd404cadafc805bbcfd002",
+      "live-activation-observation.json": "adf457b0c0fae8c95483f491007f58ade164840dff43c35c3bcd7bc2b8c87731",
+      "toolbar-001-hierarchy-005.xml": "26a0b566c6302398430a83a22fd78225ae61f5509ebb70a0fb6c849565d67cbf",
+      "toolbar-019-hierarchy-001.xml": "198def4cae6af6a9caf77a6021983ae57d5c1c88136ffb24f05b22e5d5179b4e",
+      "toolbar-018-hierarchy-007.xml": "e44014b1e1e2ce8b4604d5926c822b801293278daedee1f08f1b618ce5957014",
+      "toolbar-018-hierarchy-006.xml": "4ddf5766cd6d1b4fa8ec32f4461d1b66ede3e14dac75149f92950978461b0244",
+      "toolbar-011.json": "c9d71406eb754a33fdfc26b41ec8e79ea2a703a0a8b5574ade87798d8abb9d6a",
+      "toolbar-005-hierarchy-001.xml": "e2540e02e9157564be7a3be6521fb24c6b855569f7e4373c8e0dedecc34dfa74",
+      "toolbar-001-hierarchy-004.xml": "3548cd56611f5a98cf295ca2fe6546874b8ca49b095ed45aaf05ca9f5b2b1fdc",
+      "toolbar-007.json": "9ba104077186a1f94db334a6f83fb09a8840d458b77a0a83e2a1ec7f8804b89a",
+      "toolbar-001-hierarchy-006.xml": "ae8bdcf951e6b3a1ace3970d75cd69248d97337cd52c964c826e7e00b49d2781",
+      "toolbar-005-hierarchy-003.xml": "5819800084491189810cc8a93e125cad531bbfa5cc35d298e1a688b33a24e302",
+      "toolbar-018-hierarchy-004.xml": "da8df68ab4abd05895adf2ceeb450ebcdbe1b309d39609fb77304df626388fcf",
+      "toolbar-018-hierarchy-005.xml": "8255bcd615274d1e1c9d3c1dde3879cd3e7c86d949257a7c9fd676144da7d71d",
+      "toolbar-005-hierarchy-002.xml": "986b66b13491240cc4a9e5bb9eaf5d3cc1d149d24c11882088dacf5200da0c4a",
+      "toolbar-001-hierarchy-007.xml": "3efcbd70fd6a8f3e2bfe86b28ddae09395402deee6fe452227220129181ce90d",
+      "toolbar-015-hierarchy-001.xml": "983c8d5c4dc7e2b99738b0a9b999d775de3514b6b98ca0692fbc9f1496ab3377",
+      "toolbar-014-hierarchy-007.xml": "a790aaebe3ca1199d5e27be596ad11536725e62382a4b27e5c115e758a2472f3",
+      "toolbar-008-hierarchy-006.xml": "e9f36a5ff0d6f3461405893e8c3bb166602102209c24cc5edd8d1a5c77e0653b",
+      "live-child-button-observation.json": "9ae0e1b448e9f92103a4774fd07b27f8a473444f15664528e77fb50d906f9f73",
+      "toolbar-011-hierarchy-004.xml": "d6c33043f31f91d31d0c9b38d5a56ad971d1ec40717677123963a95d51ec6cbd",
+      "toolbar-010-hierarchy-002.xml": "95585f6820df72247d5ad993b0daa5184394073513892b20d186b74f4f2856cd",
+      "popup.png": "aa3c784a839e9416fd32a59d803463c3c86665b0161c51e85c32a0104efec0d9",
+      "toolbar-011-hierarchy-005.xml": "70b9ee5aee5a0e4d829e5a8d9f6566846f5bff7b0eb1c35cee4deb500e500eb2",
+      "toolbar-010-hierarchy-003.xml": "3ae14c6c238d75619e96ed7051a9c45cc63814ab176c4e0d4254330df858aa1f",
+      "toolbar-009-hierarchy-001.xml": "4955abddf7ee0610ffaf129248593c316f0d7005bcaaa4b7420ca286635edd12",
+      "toolbar-008.json": "33c119ace2a8cd988048200da2f402d94d87e99a114cbb9c7068bed9dafb90be",
+      "toolbar-014-hierarchy-006.xml": "bac21f90e7b1c1bc1953fdaafe861073866ad63e5e7615647b5a82d10721ef67",
+      "toolbar-014-hierarchy-004.xml": "19d772eb09e972af97564fe078a490b592d9f2a2e97730b22dc361a32d9767f2",
+      "toolbar-008-hierarchy-005.xml": "2b8eab023771f07221f1924d7981a35835b6e0a7398944fad32b6984028a9808",
+      "toolbar-010-hierarchy-001.xml": "6655aad44d6ade75be14c34def32f7b0320636da82add07e0d9b6ec061cc7542",
+      "toolbar-011-hierarchy-007.xml": "7f69a7cffd7414ee9cd89fcebc62645f84f8993a744ffbe36d1f267a13e9ac99",
+      "toolbar-012.json": "40fe410d1c4cc322bcad1cdac3faef2daa663d6ca092dbff16f178a57060d07d",
+      "live-child-button.png": "445198fd6f85a98b45bfa7d19adc0e06c2b0cd364f585357c64b59720a967cc5",
+      "toolbar-001-hierarchy-008.xml": "e8d310bbb0fe2fdef23c8c092c31e597f90e831a00e390ba4650ec6b21db15e3",
+      "toolbar-011-hierarchy-006.xml": "ca2e76cffa4f67a773fc74c2c24b6a8d1ebf8377e78a5f0210898a807d6ffd53",
+      "nested-scroll.png": "de279657466336e92f848f6d133ea65c883adbc088548b1da2b23f32699da814",
+      "toolbar-009-hierarchy-002.xml": "dbc244657e07272c7523d0073e6f27ba7ef6aea603981519b8a7cc4494dd1f86",
+      "toolbar-008-hierarchy-004.xml": "6ac96a4924891f55a54dd37761822c2ec7678eb7c273d5e04c5cd2f6dcc2da59",
+      "toolbar-004.json": "57e6e0358c72f069b25732cbf373d4259db7141c8d40a283e5278a5bf9f6a4df",
+      "toolbar-014-hierarchy-005.xml": "60dc55e225c61553101c4cdc57c6f30d850c55f2beb632aaaf8ac88dfc2c61a6",
+      "toolbar-014-hierarchy-001.xml": "cfc2d2abca74fb525dd986d5d227b810bbff1517493e37d93ee35ea4c1ac7857",
+      "toolbar-005.json": "85cd1d60b20bb747a4fac692a76f8992bdd08482e94e693208b6acfcf342407c",
+      "toolbar-011-hierarchy-002.xml": "9e71841ab21639c9d9b399faae8120c836d195ec9a802f3b182ce65cd14e633d",
+      "toolbar-010-hierarchy-004.xml": "0a626bbe887693b5d6e3d1b0ea4cb5b29f0b6e138ee77fb3699fe3a58bd4c571",
+      "mapbox-android-core-manual.json": "3687f877388f1a852b0b0cf9d5db8e552d4e7fd81c3f06ae6005edbd88970a4d",
+      "toolbar-013.json": "898bff87a592f8a672c866045fb41112d4f9d4eee39bbb510d4492fbdd8ef877",
+      "toolbar-020-hierarchy-001.xml": "b1c323bc7a48808f3f4f9e4a5eff8597b02780c9242c85a047958dd2a9c2d827",
+      "popup-follow-dismissal-observation.json": "355b3b580deb6d43434f55fc6052e18dbb1845403f7d4f472a3284dad450d890",
+      "toolbar-011-hierarchy-003.xml": "14f971ff5b5c311fb44561321354986262c82e46fdd0cc915a5408d57c8f8c00",
+      "toolbar-010-hierarchy-005.xml": "303daf0a6b15654c0a5358f6595923b3cf41ffc2a2317a669cae40202c2c2d8d",
+      "toolbar-008-hierarchy-001.xml": "4ec7a5bf706bdfd5ef5c3c7e4877712330220409926652cb8e9d1c89012d2f84",
+      "toolbar-009.json": "9faed119f071da248aafb5fc41c768ffdab1f38ce38d735157525e5a85169f67",
+      "toolbar-014-hierarchy-002.xml": "43edd1c12b67563cdc35b9824131e2eb7196b1fa00071ddbafc1969231f890e8",
+      "toolbar-008-hierarchy-003.xml": "4eb41335cceaff61fda1cc0cc555c72a645fc4e6fb87ad2ead25dfc090fbe854",
+      "toolbar-010-hierarchy-007.xml": "2ea3ab8bdac8cc181f694a84fba2d654c2a14f0abecbb029e564dbd6a86074a1",
+      "toolbar-011-hierarchy-001.xml": "31920ebb4019c8b91b4d7c869471c4ff171572b1937741707c54018b57a69d17",
+      "location.png": "52d2b9ffe2c12850329670bb458763948fa1a99ef124b8762988089cbb42ca50",
+      "offset.png": "c5b9b1ec9fa70d47f8067d8f6c760ed8a0e9380484ef9132e7bbf2138b9f86a2",
+      "toolbar-010-hierarchy-006.xml": "dbe14e32a9e5c23d8733481df63b348ddbf64c77c64dfc4f2ef7f247088568f4",
+      "navigation-location-observation.json": "fbf2c578dbe6e4b6bf2bdabebb0994ac2d51e9e25210c3ef4d98772193853ab9",
+      "toolbar-008-hierarchy-002.xml": "2ed30c7643e223a8df76170dcada1f3fa962429e00ef7748ec8bfddef4670713",
+      "toolbar-014-hierarchy-003.xml": "27db21bd2b1ba2895cfc0c22ffc1f01a84f9aa2e8477fc085005171fbd2cbce9",
+      "toolbar-017-hierarchy-001.xml": "ddb929853df6ad749aa23ace31943e9c3b6873c658950a4fe5c8539b8a4c50b7",
+      "toolbar-012-hierarchy-002.xml": "2e428cc1c43f4b19199169a0c33fa9fee5cbbde7666a1b59a6ec5ec2ae4a1266",
+      "toolbar-013-hierarchy-004.xml": "8741328aa67bb0d9b760547c4bd350fb25f356947d77600d6bb73e8cfca75559",
+      "popup-zoom.png": "f8b257195385878305c8729b2d7a815a8a71322ca9db552b45e5eff564eec837",
+      "toolbar-014.json": "56d2bf3176c0c69b2fd663b212dfc506522c6c7748fbca9f0d9aa20a832cc1ac",
+      "toolbar-012-hierarchy-003.xml": "1ed065685f14790955f95359f6f070f4e6dbf871935434078bdfc231a9538478",
+      "toolbar-013-hierarchy-005.xml": "6dae554298c57d379f2d2643b43fce3b638718a56cb90a3ede3bebde5d824997",
+      "toolbar-002.json": "a018e85ced91600335cedb4c117f4f2e9436e1b262b243cbaa7b3f5c07ff1456",
+      "toolbar-013-hierarchy-007.xml": "2c2cccb664a3de03345ab2154016c918ba2d276ee41f3fcbac56fce5d816e608",
+      "toolbar-012-hierarchy-001.xml": "922a9e69cb5d23f20671fd2b8036a61d29e672ff8f3b99e7e533d7d0251a2946",
+      "offset-touch-bounds-observation.json": "e674aa3011134bcc6cb434a6bbda093a2f9146505413595c14f390d4111d4d3b",
+      "toolbar-018.json": "e9781bf71075c8d2d66e16fdf90351bfce5eb16f26c8f0baf396d3611acd9977",
+      "toolbar-013-hierarchy-006.xml": "78f85c9a1b5289458d73a04f1f1271ddc4d16b35ec044222b56788520b368123",
+      "toolbar-016-hierarchy-001.xml": "26fab59305d5aa1713ff90ee4d50e13557aca834a8205a99a3b224181b6792b5",
+      "toolbar-012-hierarchy-004.xml": "d2b77083bc3a5e3035caffc7a49bcf5fe82b101049613a5e32e8b8568ae830d7",
+      "toolbar-013-hierarchy-002.xml": "a75f080556661df6b02c75ac5d1daaef414d5bb15ef5513bf7368d67592697bf",
+      "toolbar-019.json": "b4ee72d81bdf7db3b03ff269d53e50ff6328673682d0733132bd91aa495d74d4",
+      "toolbar-012-hierarchy-005.xml": "823ebd00915e4a1c7f85e50550ec3b5c5045d9c2589f134403f24fc9dcf0e3ce",
+      "toolbar-013-hierarchy-003.xml": "0ebc1aade73f9227dbd46fa78353afc40355aa70855d6f3e6c2a0f26cdf92357",
+      "toolbar-003.json": "bdd64dc28bb91e98677e872e7e96a17e50269de615cab9c7fb87a0fedd78586e",
+      "toolbar-013-hierarchy-001.xml": "3723bdb10f6388b39524b3c0d81a8581440c65471a639bc63b0b64574995e1e4",
+      "toolbar-012-hierarchy-007.xml": "07a99ceea4becb6fa944bb2acaad38598867655d6a5a055119fb230baacf2081",
+      "toolbar-015.json": "ae0103090509f59ff0be42d744516519e767930f9fe59208f590ac867e4448fd",
+      "receipt.json": "95add2ba325b9e6846439fa3f844901ca0ce34d239775d892ccfb95a36884ca7",
+      "toolbar-012-hierarchy-006.xml": "68dbcad75d12be838327f0cbf979be49d853525bed4489ac418ee7bf50f598a5",
+      "operator-first-failure.json": "79117b589d8b54090031c83075904b0bdcfc5fdb9bc89e4244cb46689f6e1670"
+    }
+  },
+  "next": "Read-only diagnosis of why selected PID3666 receivedSIGKILL, using matched exit/event timestamps and saved command/source evidence. Do not attribute low memory or an annotation defect without evidence. No retry authorized by this closed outcome."
+}

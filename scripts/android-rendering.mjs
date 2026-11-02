@@ -307,7 +307,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const peerEvidence = join(
       root,
       continuation
-        ? "records/evidence/revised-api-u26-operator-failfast-preparation.json"
+        ? "records/evidence/revised-api-u26-android-command-output-preparation.json"
         : batch
           ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
           : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
@@ -484,7 +484,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
           );
           await until(
             () => driver.exitCode !== null || driver.signalCode !== null,
-            1980000
+            2100000
           );
           assert.equal(driver.exitCode, 0, `${rowId} driver failed.`);
           const result = JSON.parse(

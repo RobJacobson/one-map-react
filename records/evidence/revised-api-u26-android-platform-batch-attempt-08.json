@@ -1,0 +1,74 @@
+{
+  "checkpoint": "PR85 Android five-row continuation attempt08",
+  "recordedUTC": "2026-11-01T22:26:48.737452+00:00",
+  "result": "not-started-tool-process-creation-error",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-08",
+  "workdir": "/private/tmp/one-map-android-restoration-review",
+  "toolParameters": {
+    "sandbox_permissions": "require_escalated",
+    "shell": "omitted, default",
+    "login": "omitted, default",
+    "yield_time_ms": 1000,
+    "max_output_tokens": 1500
+  },
+  "firstFailure": {
+    "layer": "Execution tool process creation, before launcher process",
+    "exactError": "Rejected(\"Failed to create unified exec process: No such file or directory (os error 2)\")",
+    "cause": "Unverified. Read-only coordinator checks find recorded working directory, Node symlink target, script and /bin/zsh and /bin/sh present; executables accessible.",
+    "retryPerformed": false
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "preflight": {
+    "archiveAndBothApksMatched": true,
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "runtimeInputs": 13,
+    "operatorInputs": 2,
+    "regressionPinsMatched": true,
+    "freeGiB": 14.89333724975586,
+    "outputAbsent": true
+  },
+  "nativeBuildOrDependencyRestoration": false,
+  "launcherStarted": false,
+  "deviceActionPerformed": false,
+  "operatorCallPerformed": false,
+  "completedExecutionRows": [],
+  "reusedRows": [],
+  "preservedPriorAcceptedRows": [
+    "mapbox-android-camera"
+  ],
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "cleanup": {
+    "required": false,
+    "reason": "No process/device acquisition occurred; attempt output was never created."
+  },
+  "coordinatorAudit": {
+    "outputStillAbsent": true,
+    "commandAndWorkdirMatchApprovedPlan": true,
+    "readOnlyCommandFromRecordedWorkdirSucceeded": true,
+    "cwdAndNodeTargetAndScriptExist": true,
+    "defaultShellEnvironment": "/bin/zsh",
+    "knownShellExecutablesPresent": [
+      "/bin/zsh",
+      "/bin/sh"
+    ],
+    "limit": "No retry or isolated reproduction of escalated worker process-start failure performed; no root cause established."
+  },
+  "next": "No retry authorized by this outcome. Diagnose the worker execution-tool process-creation failure before changing native code or rerunning acceptance."
+}

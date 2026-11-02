@@ -12,6 +12,7 @@ import {
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { StringDecoder } from "node:string_decoder";
 
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import {
@@ -319,6 +320,9 @@ const runNative = async (selectedEngine) => {
   let metro;
   let stoppingMetro = false;
   let status;
+  let androidLaunch;
+  let androidRecorder;
+  let diagnostics;
   let acquiredApp = false;
   const acquiredReverses = [];
   const failures = [];
@@ -405,24 +409,9 @@ const runNative = async (selectedEngine) => {
       runId: randomUUID(),
     };
     const manualPath = process.env.TF07_MANUAL_REPORT;
-    if (manualPath) {
-      writeFileSync(
-        manualPath,
-        JSON.stringify(
-          {
-            ...identity,
-            scenarios: Object.fromEntries(
-              scenarios.map((scenario) => [scenario, "unverified"])
-            ),
-          },
-          null,
-          2
-        ),
-        { flag: "wx" }
-      );
-    }
     let completed;
     let nativeFailure;
+    let observing = false;
     const readManual = () => {
       if (!manualPath) return;
       try {
@@ -464,6 +453,7 @@ const runNative = async (selectedEngine) => {
       }
     };
     status = await nativeStatus((observation) => {
+      if (!observing) return;
       const manual = readManual();
       if (
         nativeFailure ||
@@ -514,6 +504,13 @@ const runNative = async (selectedEngine) => {
     }, 60000);
     if (nativeFailure) throw nativeFailure;
     if (platform === "android") {
+      if (process.env.TF07_ANDROID_DIAGNOSTICS)
+        androidRecorder = await startAndroidRecorder(
+          serial,
+          applicationId,
+          () => androidLaunch?.pid
+        );
+      androidLaunch = { requestedAtUTC: new Date().toISOString() };
       const launch = await adb([
         "shell",
         "am",
@@ -540,6 +537,32 @@ const runNative = async (selectedEngine) => {
         "-RCT_jsLocation",
         `127.0.0.1:${metroPort}`,
       ]);
+    if (platform === "android" && process.env.TF07_ANDROID_DIAGNOSTICS) {
+      try {
+        const pid = (await adb(["shell", "pidof", applicationId])).trim();
+        androidLaunch.pid = /^[1-9][0-9]*$/.test(pid) ? pid : null;
+      } catch {
+        androidLaunch.pid = null;
+      }
+      androidLaunch.observedAtUTC = new Date().toISOString();
+    }
+    if (manualPath) {
+      writeFileSync(
+        manualPath,
+        JSON.stringify(
+          {
+            ...identity,
+            scenarios: Object.fromEntries(
+              scenarios.map((scenario) => [scenario, "unverified"])
+            ),
+          },
+          null,
+          2
+        ),
+        { flag: "wx" }
+      );
+    }
+    observing = true;
     console.error(
       `Perform the native touch flow from the approved acceptance plan, then press Read renderer. Required observations: ${scenarios.join(", ")}.`
     );
@@ -582,8 +605,45 @@ const runNative = async (selectedEngine) => {
       platform === "android" &&
       process.env.TF07_ANDROID_DIAGNOSTICS
     ) {
-      const diagnostics = { applicationId, serial, reads: [] };
+      const diagnosticText = (value, keepPrefix = false) => {
+        const redacted = String(value)
+          .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
+          .replace(/([?&](?:access_token|token)=)[^&\s"']+/gi, "$1<REDACTED>");
+        const bytes = Buffer.from(redacted);
+        const retained = keepPrefix
+          ? bytes.subarray(0, 128 * 1024)
+          : bytes.subarray(-128 * 1024);
+        return retained.toString("utf8").replace(/^\uFFFD+|\uFFFD+$/g, "");
+      };
+      diagnostics = {
+        applicationId,
+        serial,
+        launch: androidLaunch,
+        capturedAtUTC: new Date().toISOString(),
+        exitHistoryClassification:
+          "unclassified; correlate PID and timestamps with launch; history may include earlier intentional stops",
+        logWindow:
+          "last 2000 buffer records; filtering and 128KiB retention do not guarantee the full row interval",
+        reads: [],
+      };
       for (const args of [
+        ["shell", "dumpsys", "activity", "exit-info", applicationId],
+        [
+          "logcat",
+          "-b",
+          "events",
+          "-d",
+          "-t",
+          "2000",
+          "-v",
+          "threadtime",
+          "am_proc_died:I",
+          "am_kill:I",
+          "am_crash:I",
+          "am_anr:I",
+          "am_proc_start:I",
+          "*:S",
+        ],
         ["shell", "pidof", applicationId],
         ["shell", "dumpsys", "activity", "activities"],
         ["logcat", "-b", "crash", "-d", "-t", "2000"],
@@ -591,38 +651,64 @@ const runNative = async (selectedEngine) => {
       ]) {
         try {
           const text = await adb(args);
-          const relevant = args.includes("main")
-            ? text
-                .split("\n")
-                .filter(
-                  (line) =>
-                    /ActivityManager|ActivityTaskManager|AndroidRuntime|ReactNative|Bridgeless|am_crash|am_kill|libc|DEBUG/i.test(
-                      line
-                    ) || line.includes(applicationId)
-                )
-                .join("\n")
-            : text;
-          const redacted = relevant
-            .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
-            .replace(
-              /([?&](?:access_token|token)=)[^&\s"']+/gi,
-              "$1<REDACTED>"
-            );
-          diagnostics.reads.push({ args, text: redacted.slice(-128 * 1024) });
+          let relevant = text;
+          if (args.includes("events")) {
+            const isSelectedProcessEvent = (line) => {
+              const event = line.match(
+                /\b(am_proc_died|am_kill|am_crash|am_anr|am_proc_start)\s*:\s*\[([^\]]*)/
+              );
+              if (!event) return false;
+              const fields = event[2].split(",");
+              const processName =
+                fields[event[1] === "am_proc_start" ? 3 : 2]?.trim();
+              return (
+                processName === applicationId ||
+                processName?.startsWith(`${applicationId}:`)
+              );
+            };
+            relevant = text
+              .split("\n")
+              .filter(isSelectedProcessEvent)
+              .join("\n");
+          } else if (args.includes("main")) {
+            relevant = text
+              .split("\n")
+              .filter(
+                (line) =>
+                  /ActivityManager|ActivityTaskManager|AndroidRuntime|ReactNative|Bridgeless|am_crash|am_kill|libc|DEBUG/i.test(
+                    line
+                  ) || line.includes(applicationId)
+              )
+              .join("\n");
+          }
+          // Exit history is newest-first within each UID; logs are chronological.
+          diagnostics.reads.push({
+            args,
+            selection: args.includes("exit-info") ? "prefix" : "tail",
+            text: diagnosticText(relevant, args.includes("exit-info")),
+          });
         } catch (error) {
-          diagnostics.reads.push({ args, error: String(error) });
+          diagnostics.reads.push({
+            args,
+            error: diagnosticText(error),
+          });
         }
       }
+    }
+    if (androidRecorder) {
+      const snapshot = await androidRecorder.stop();
+      if (diagnostics) diagnostics.recorder = snapshot;
+      if (result) result.androidRecorder = snapshot;
+    }
+    if (diagnostics) {
       try {
         writeFileSync(
           process.env.TF07_ANDROID_DIAGNOSTICS,
           JSON.stringify(diagnostics, null, 2),
           { flag: "wx" }
         );
-      } catch (error) {
-        console.error(
-          `Android failure diagnostics could not be saved: ${error}`
-        );
+      } catch {
+        console.error("Android failure diagnostics could not be saved.");
       }
     }
     if (acquiredApp)
@@ -647,6 +733,211 @@ const runNative = async (selectedEngine) => {
   if (failures.length)
     throw new AggregateError(failures, "TF07 flow or owned cleanup failed.");
   return result;
+};
+
+/** Owns one scoped logcat stream; oversized lines are dropped before retention/redaction. */
+const startAndroidRecorder = async (serial, applicationId, launchPid) => {
+  const startedAtUTC = new Date().toISOString();
+  const limit = 128 * 1024;
+  const lineLimit = 16 * 1024;
+  const decoder = new StringDecoder("utf8");
+  const lines = [];
+  const gaps = [];
+  let bytes = 0;
+  let inputBytes = 0;
+  let evictedLines = 0;
+  let oversizedLines = 0;
+  let partial = "";
+  let dropping = false;
+  let stopping = false;
+  let closed = false;
+  let finalized = false;
+  let child;
+  let exit;
+  const gap = (reason) => {
+    if (finalized) return;
+    if (!gaps.includes(reason) && gaps.length < 8) gaps.push(reason);
+  };
+  const retain = (line) => {
+    const tag = line.match(
+      /^\d\d-\d\d \d\d:\d\d:\d\d\.\d+\s+\d+\s+\d+\s+[VDIWEF]\s+(lowmemorykiller|lmkd|ActivityManager)\s*:\s*(.*)/
+    );
+    if (!tag) return;
+    // Package boundaries exclude lookalikes; PID matching uses explicit process fields.
+    const packagePattern = applicationId.replaceAll(".", "\\.");
+    const selectedPackage = new RegExp(
+      `(^|[^\\w.])${packagePattern}(?=[:/\\s),}]|$)`
+    );
+    const pid = launchPid();
+    const selectedPid =
+      pid &&
+      new RegExp(
+        `(?:\\bpid[=: ]+|\\bKilling +|\\bProcess +)${pid}(?=[ :),]|$)`,
+        "i"
+      ).test(tag[2]);
+    if (
+      tag[1] === "ActivityManager" &&
+      !selectedPackage.test(tag[2]) &&
+      !selectedPid
+    )
+      return;
+    const redacted = line
+      .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
+      .replace(/([?&](?:access_token|token)=)[^&\s"']+/gi, "$1<REDACTED>");
+    const size = Buffer.byteLength(redacted);
+    lines.push({ text: redacted, size, timestamp: line.slice(0, 18) });
+    bytes += size;
+    while (bytes > limit) {
+      bytes -= lines.shift().size;
+      evictedLines++;
+    }
+  };
+  const consume = (text) => {
+    for (const fragment of text.split(/(?<=\n)/)) {
+      if (!dropping) {
+        if (
+          Buffer.byteLength(partial) + Buffer.byteLength(fragment) >
+          lineLimit
+        ) {
+          partial = "";
+          dropping = true;
+          oversizedLines++;
+        } else partial += fragment;
+      }
+      if (fragment.endsWith("\n")) {
+        if (!dropping) retain(partial);
+        partial = "";
+        dropping = false;
+      }
+    }
+  };
+  let resolveClosed;
+  const close = new Promise((resolve) => {
+    resolveClosed = resolve;
+  });
+  try {
+    child = spawn(
+      "adb",
+      [
+        "-s",
+        serial,
+        "logcat",
+        "-b",
+        "main",
+        "-b",
+        "system",
+        "-v",
+        "threadtime",
+        "-T",
+        "1",
+        "lowmemorykiller:I",
+        "lmkd:I",
+        "ActivityManager:I",
+        "*:S",
+      ],
+      {
+        detached: process.env.TF07_PARENT_PROCESS_GROUP !== "1",
+        stdio: ["ignore", "pipe", "pipe"],
+      }
+    );
+    child.on("error", () => gap("recorder child error"));
+    child.stdout.on("error", () => gap("recorder stdout error"));
+    child.stderr.on("error", () => gap("recorder stderr error"));
+    child.stderr.on("data", () => gap("recorder stderr output"));
+    child.stdout.on("data", (chunk) => {
+      if (finalized || closed) return;
+      inputBytes += chunk.length;
+      // Decoding bounded slices also bounds split fragments for arbitrary chunk sizes.
+      for (let offset = 0; offset < chunk.length; offset += 4096)
+        consume(decoder.write(chunk.subarray(offset, offset + 4096)));
+    });
+    child.on("exit", (code, signal) => {
+      if (finalized) return;
+      exit = { code, signal };
+      if (!stopping) gap("recorder exited before owned stop");
+    });
+    child.on("close", () => {
+      if (closed || finalized) return;
+      consume(decoder.end());
+      if (!dropping && partial) retain(partial);
+      partial = "";
+      closed = true;
+      resolveClosed();
+    });
+    await new Promise((resolve) => {
+      child.once("spawn", resolve);
+      child.once("error", resolve);
+      child.once("close", resolve);
+    });
+  } catch {
+    gap("recorder startup failed");
+  }
+  return {
+    stop: async () => {
+      stopping = true;
+      if (child) {
+        try {
+          if (process.env.TF07_PARENT_PROCESS_GROUP === "1")
+            child.kill("SIGTERM");
+          else await stopOwnedProcess(child);
+        } catch {
+          gap("recorder termination failed");
+        }
+        let timer;
+        try {
+          await Promise.race([
+            close,
+            new Promise((resolve) => {
+              timer = setTimeout(resolve, 1000);
+            }),
+          ]);
+        } finally {
+          clearTimeout(timer);
+        }
+        if (!closed) {
+          gap("recorder flush deadline exceeded");
+          try {
+            child.kill("SIGKILL");
+          } catch {
+            gap("recorder final termination failed");
+          }
+          try {
+            await Promise.race([
+              close,
+              new Promise((resolve) => {
+                timer = setTimeout(resolve, 1000);
+              }),
+            ]);
+          } finally {
+            clearTimeout(timer);
+          }
+          if (!closed)
+            gap("recorder remained unclosed after final termination");
+        }
+      }
+      finalized = true;
+      return {
+        startedAtUTC,
+        stoppedAtUTC: new Date().toISOString(),
+        coverage:
+          gaps.length || evictedLines || oversizedLines
+            ? "gap"
+            : "scoped stream; buffer rotation and unlogged kills remain possible",
+        gaps,
+        exit,
+        closed,
+        inputBytes,
+        retainedBytes: bytes,
+        limitBytes: limit,
+        evictedLines,
+        oversizedLines,
+        truncated: evictedLines > 0 || oversizedLines > 0,
+        firstRetainedTimestamp: lines[0]?.timestamp ?? null,
+        lastRetainedTimestamp: lines.at(-1)?.timestamp ?? null,
+        text: lines.map((line) => line.text).join(""),
+      };
+    },
+  };
 };
 
 const nativeStatus = (onObservation) =>

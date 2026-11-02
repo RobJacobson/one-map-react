@@ -1,0 +1,77 @@
+{
+  "checkpoint": "Read-only diagnosis after Terra Android attempt12 foreground/process loss",
+  "recordedUTC": "2026-11-01T23:11:38.376407+00:00",
+  "scope": "Saved evidence, original Terra worker clarification and pinned/frozen source inspection only",
+  "worker": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "role": "Read-only diagnosis"
+  },
+  "sourceOutcome": {
+    "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-12.json",
+    "sha256": "e0cc4e2016064f07f6a85c92129045ace330b183a9708e2cece28c223b4cc062",
+    "unchanged": true
+  },
+  "conclusion": "Observed app loss is established; its cause is not. No justified production repair found. Retained diagnostics may omit the relevant shutdown interval.",
+  "historicalClarification": {
+    "field": "sourceOutcome.precedingInput and handoff described fresh hierarchy selected annotation",
+    "correctedEvidence": "Terra selected233,1465 from its just-captured live-activation screenshot, not annotation UI hierarchy bounds. Native annotation bitmap absence from hierarchy is expected. Screenshot independently reviewed and shows tap within visible annotation label.",
+    "historicalOutcomeRewritten": false
+  },
+  "confirmed": [
+    "Three correctly recorded prior partial observations remain supported",
+    "Annotation coordinate inside visible bitmap, away from toolbar, navigation edges and warning toast",
+    "Following Read renderer operation performed fresh dump/cat/removal only; toolbar004receipt swipes0/no targetBounds, so no subsequent toolbar swipe or Read renderer tap preceded app absence",
+    "Pre-cleanup hierarchy/top activity show NexusLauncher and pidof finds no selected app PID; crash buffer empty",
+    "Driver diagnostics precede selected app force-stop and Metro/emulator teardown",
+    "Inspected annotation selection callback route contains no explicit activity finish, back, exit or process-kill operation"
+  ],
+  "timeWindow": {
+    "lastAppScreenshotFileMtimeUTC": "2026-11-01T23:05:34Z",
+    "lastPassedObservationFileMtimeUTC": "2026-11-01T23:05:41.823Z",
+    "failedHierarchyFileMtimeUTC": "2026-11-01T23:06:02.950Z",
+    "launcherVisibleAgeAtDiagnostic": "19s801ms",
+    "inferredLauncherReturnDeviceTime": "Approximately15:05:43",
+    "firstRetainedFilteredMainSystemEntryDeviceTime": "15:05:47.954",
+    "interpretation": "Retained selected main/system lines begin roughly5seconds after inferred launcher return. Tail selection/filtering could omit the process-loss reason. These are approximate bounds, not exact annotation-input timestamps."
+  },
+  "inspectedCallbackRoute": [
+    "Mapbox SDK annotation coordinator selection",
+    "Pinned RNMBXPointAnnotation.doSelect(true) and event construction",
+    "PointAnnotation.tsx _onSelected payload decoding",
+    "f05 mapbox-native/ui.js normalizes event and dispatches mounted callback",
+    "Frozen tf07-scene record(annotation-click) increments observation ref and updates status"
+  ],
+  "sourcePaths": [
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/shared/tf07-scene.tsx",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/shared/native-tf07-screen.tsx",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react/dist/adapters/mapbox-native/ui.js",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/@rnmapbox/maps/src/components/PointAnnotation.tsx",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/annotation/RNMBXPointAnnotation.kt"
+  ],
+  "unknowns": [
+    "Whether annotation selection callback executed before disappearance",
+    "Activity finish, crash, memory-pressure termination or other process-loss cause",
+    "Whether prior foreground-loss attempts share a cause"
+  ],
+  "coordinatorAudit": {
+    "status": "Read-only findings independently reviewed",
+    "checks": [
+      "Saved live-activation screenshot confirms target placement",
+      "Saved toolbar004receipt and launcher hierarchy show no post-annotation toolbar input",
+      "Diagnostics confirm noPID/launcherforeground/emptycrashbuffer beforecleanup",
+      "Retained log start and launcher visible-age fields reviewed",
+      "Frozen fixture callback, adapter dispatch and native selection sources independently inspected"
+    ],
+    "productionFinding": null,
+    "nativeExecution": false
+  },
+  "recommendedNextPreparation": {
+    "change": "Prepare and device-free audit a bounded expansion of existing failure diagnostics: application process-exit history and event buffer, plus a retained window covering the full row interval; timestamp operator calls. Redact credentials and keep original first error/owned cleanup.",
+    "executionScope": "Later separately approved samefive-row Android continuation with one Terra Medium worker, unchanged f05/APKs and accepted Mapbox camera, no rebuild or added microtest series",
+    "permission": "No native execution or diagnostic-code changes authorized by this read-only record; prepare exact repair/checks before requesting a run."
+  },
+  "candidateChanged": false,
+  "nativeRunOrRetry": false,
+  "limitations": "Saved evidence cannot identify the process-loss cause; SDK internals beyond the inspected route and physical/runtime reproduction remain unverified."
+}

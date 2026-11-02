@@ -1,0 +1,183 @@
+{
+  "checkpoint": "PR86 Android five-row continuation attempt09",
+  "recordedUTC": "2026-11-01T22:39:29.819156+00:00",
+  "result": "stopped-at-premature-worker-observation-failure",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-09",
+  "launchParameters": {
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "sandbox_permissions": "require_escalated",
+    "yield_time_ms": 1000,
+    "max_output_tokens": 1500,
+    "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-09",
+    "shell": "/bin/sh",
+    "login": false
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "nativeBuildOrDependencyRestoration": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "firstFailure": {
+    "classification": "Operator prematurely declared incomplete observation failed; no product defect established",
+    "scenario": "live-child-button",
+    "cause": "Worker treated offscreen Read renderer control as unavailable scope, rather than using the already-approved horizontal toolbar navigation through validated adb script.",
+    "workerAcknowledgement": "Worker had published failed observation before coordinator clarified authorized toolbar navigation; no override/retry performed.",
+    "rendererReadAttempted": false,
+    "foregroundLoss": false
+  },
+  "verifiedPartialProgress": {
+    "explicitLauncherProcessStarted": true,
+    "readinessWaitCompleted": true,
+    "initialStatusRequestSucceeded": true,
+    "initialStatusValue": null,
+    "liveChildFreshBounds": "[440,1425][638,1476]",
+    "tap": [
+      539,
+      1450
+    ],
+    "visibleSceneStatus": "TF07 child-click",
+    "postTapStatusValue": null,
+    "limit": "Normal null before physical Read renderer; not evidence of unavailable status transport. No completed physical/renderer observation or suite row accepted."
+  },
+  "manualReport": {
+    "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "environment": "mapbox-android",
+    "runId": "b1fd6ad8-c082-4932-8a37-db3e4bcd400f",
+    "scenarios": {
+      "live-child-button": "failed",
+      "nested-scroll": "unverified",
+      "live-activation": "unverified",
+      "annotation-activation": "unverified",
+      "offset-touch-bounds": "unverified",
+      "popup-follow-dismissal": "unverified",
+      "map-feature-click": "unverified",
+      "navigation-location": "unverified",
+      "style-remount": "unverified",
+      "host-accessibility": "unverified",
+      "sdk-ornaments": "unverified",
+      "camera-target-and-gesture": "unverified",
+      "marker-prop-rejection": "unverified"
+    },
+    "observations": {
+      "live-child-button": {
+        "action": "Physically tapped the fresh hierarchy bounds for the live child button at (539,1450), then captured a screenshot and queried renderer status through the validated helper.",
+        "seenResult": "The app remained foregrounded and displayed TF07 child-click. The helper status still returned null and the on-screen renderer readback was blank, so the required renderer counter and unchanged map-click counter could not be verified.",
+        "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-09/live-child-button.png"
+      }
+    }
+  },
+  "identityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~z7j7pvf0VNCPcUPzyMf7mA==/com.onemapmapbox-1R-wDqePiKpOjsEQQvtclw==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~z7j7pvf0VNCPcUPzyMf7mA==/com.onemapmapbox-1R-wDqePiKpOjsEQQvtclw==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "identityLimit": "Installed Mapbox before row matches; after-row proof not reached. Retained APK/frozen/helper hashes independently match after cleanup.",
+  "diagnosticSummary": {
+    "pidof": "3469",
+    "foreground": "MainActivity resumed/visible at diagnostic capture",
+    "limit": "No app foreground-loss claim; failure was operator decision, not command error or observed contract violation."
+  },
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 83598",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "frozenFiles": 695,
+    "observerInputs": 26,
+    "hostInputs": 7,
+    "runtimeInputs": 13,
+    "operatorInputs": 2,
+    "currentRegressionHashesMatch": true,
+    "archiveAndBothApksMatched": true,
+    "ownedPidsAndGroupsAbsent": [
+      83474,
+      83598
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true,
+    "historicalReportPreserved": true
+  },
+  "remainingExecutionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "retainedDiagnostics": {
+    "directory": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-09",
+    "files": {
+      "checkpoint.json": "8dab1db3a2d587e4458c95a8048667018443d2cea95523379e5f116cfc5852e3",
+      "mapbox-android-core-diagnostics.json": "e887c5202ee10fa5ef5cab24041315f50b67b90130d9d3bfb58bdfbdbd053398",
+      "mapbox-android-core-driver-stderr.log": "0bb083b43a631fc4c5e31a89be7740782f2202e298e17f79c9cb55fcb2f11f35",
+      "emulator.log": "96ea7188073aa0d9960347f8d9abc6daaf7802d2ae6863ccd380599177955782",
+      "live-child-button-observation.json": "a5c4148f20f953c891133bdedadfc0d73dc1b504503d86deef67d36ec3889136",
+      "live-child-button.png": "e45bb01a889ee2635ee46a8297ea60a66020471f15ad6ed17e27f1b508f6ad8e",
+      "mapbox-android-core-manual.json": "1e161526f756a5d695ff95f34c3316d5125de63ac56063c7dc257a83ffd63615",
+      "receipt.json": "8dab1db3a2d587e4458c95a8048667018443d2cea95523379e5f116cfc5852e3"
+    }
+  },
+  "next": "No retry authorized by this outcome. Do not mistake offscreen toolbar controls or pre-read null status for an app failure or scope gap. Required authorized navigation must occur before judging the renderer-read observation; preserve closed failed report."
+}

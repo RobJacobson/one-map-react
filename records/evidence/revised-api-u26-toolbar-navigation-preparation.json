@@ -1,0 +1,303 @@
+{
+  "candidate": {
+    "archive": "/Users/rob/code/mapbox-code/one-map/artifacts/revised-api-u25-f05/one-map-react-0.1.0-rc.2.tgz",
+    "sha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+    "members": 171,
+    "matchingPackageCopies": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/packages/one-map-react",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/node_modules/one-map-react"
+    ],
+    "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "runtimeDistProof": "Camera launcher verifies695 frozen files before acquisition and after success, including selected package dist copies; preparation compares all171 archive members in both selected package copies. Legacy TF04 and TF09 drivers are not executed."
+  },
+  "freeze": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/mapbox-ios-sources-attempt-01/post-restoration-freeze.json",
+    "sha256": "2ec3355e8e8de917f001abf7cf6d02fcaf3ab034b93dc76224f81106988a9b8f",
+    "verifiedFiles": 695,
+    "mismatches": []
+  },
+  "stagedSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-smoke.mjs": "4f03fd882edb813891afaf48cf17ea8802d14f55dc7654093772786d415ba696",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf09-rendering-fixture.mjs": "50b90fa0b06d2b4cc3129084322bcfb232ab3113a003f134dc8c826bc9f7ad15",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/package.json": "85b17f2f852aece03e71edb4ed4d9fddf6a0a8f0b69ac75d7f00b6592d62d37c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitmapper.js": "3f2f720e3a2b4e41cdc03e9f58bb1794bec26dcd1b22568e41ce0b84ab20aeb5",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/bitpacker.js": "3f7bfabcbc82bedd0cc8551bc210b44dc1fb179fa2ce3b8b1d39fa307d8af204",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/chunkstream.js": "43c5507901554a29c5a29e555aaeb3c3987b84fb3aa8c681c1b30794a477aa85",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/constants.js": "9e3b4f994ac93751e9ccb4d453e85e4f25a0b086a9f24ec92c7dcb06995bdf6c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/crc.js": "57e2328cfa361fb54f1f4b3a59e071c1ccc864095e4f3759a957cd15aa2a8b65",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-pack.js": "500c1b3b34702c895e9e689143f44280687cac363447523679ec13d12bd564f6",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-async.js": "328b6173f1a2a4d91425220a0fa421699552f254006a57ede9f4018ced50a7ee",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse-sync.js": "201a08dfab26a2903c0dabcbdfe0406b3fa33d60f59b591878329f590fac48ff",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/filter-parse.js": "b8aad6f29371f5b13b232643781a7c49f7d36d565136ddda1ed7fbaca987ce2c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/format-normaliser.js": "c73989d85bef5d33ce571095bf0d96927261730d8b0f79c9d48f971fcbdd0be0",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/interlace.js": "3bb5d57153078ff586667e9a9d2c06db993c8ff1638e0521a9883cdeea6e1e3f",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-async.js": "f50df0610749ce7b1a99abbe9e4596df7c16f96efd3848f12dd632b22cb02b45",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer-sync.js": "1b516238168a42704e62ba44528406188864a6ddda2ae92d1b91e5e078cdaa2d",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/packer.js": "b5f9956364c80d67c28d615ace639a5fb4d4d79d3acb235237f3050dca220e03",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/paeth-predictor.js": "48555b909af708593dade8e8df75d18ecdffdb6577e362eac01eae357ef1e0e9",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-async.js": "a0299cad35220de62b7180b1f984b8f77b4c0f419a580fd3c86ea3b3e971ee30",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser-sync.js": "266c9fb230b90075022b3f54f5710a9cacb71ca565f83fce66e7cbd1b7e9b507",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/parser.js": "574e43fea28a28cc6feb7ab62a480a86bb75411ee4bfaba76a7e9d7310b6e94c",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png-sync.js": "867b1a78dcd3e45458eb4f0af01acd48f38d3a31225bd7cb8dd8ee3966ab54be",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/png.js": "e02cecbd36327829758386dc3f0ca4a36a2339ccb5d5e824ca3556e2c3f89726",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-inflate.js": "08cb8afb79a4c0ab58e94601dab22261daf6638382b211d6a7f6bfbc16d27a0b",
+    "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/pngjs@7.0.0/node_modules/pngjs/lib/sync-reader.js": "437a99bf1bf739202ae85c3018cd9174d411597cf55e7064c36976de493368f1"
+  },
+  "hostInputSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh": "c1edce14e259e16598218d9eb9a987587355ed3a6821da226c5c12897cf571b4",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py": "4e9fd8955c14eef84083a36095910329f1dd4081aabefd651605655a3fedcc38",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/launch-lifetime-emulator.py": "ca3b4f779378c8f9a8938bb6a7691dc85a533c066d34632def56871d29099d24",
+    "/private/tmp/one-map-approved-android-boot-poll.py": "f819d439aa4573070b858e80c7d3a61ca8f7a833f5ca857f3347ba5d39a35956",
+    "/Users/rob/.android/avd/Medium_Phone.avd/config.ini": "8430bc63e649eec365e0a7587548c7a99b0cbc830b3e910ca0947e8b468c29de",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/source.properties": "11d49660e8e74661ed0b3164f5141308f7f947d6de037d7f5ca7fc428c825133",
+    "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/package.xml": "61527f2f82a09aa711005a29b75dc031d58d5869c4633d8d863623c610a57753"
+  },
+  "priorOutcome": {
+    "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-01.json",
+    "sha256": "38fb7d4b86c6ee4a76bb1551eaa53644325a2949ffbba669218663f641a3e00f",
+    "reusedRows": [
+      "mapbox-android-camera"
+    ],
+    "validation": "Immutable whole-outcome digest, exact one-row completed prefix, passed status, candidate/dist identity validated before host/device acquisition; actual retained APK and695 frozen files validated before acquisition."
+  },
+  "baselineSuiteCount": 12,
+  "remainingSuiteCount": 11,
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "executionRows": [
+    "mapbox-android-core",
+    "mapbox-android-retained",
+    "maplibre-android-camera",
+    "maplibre-android-core",
+    "maplibre-android-retained"
+  ],
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "estimatedMinutes": "60-120, unmeasured; same four operator UI rows and one remaining camera row; row/boot/install/cleanup bounds unchanged",
+  "failurePolicy": "One approval covers all five serial rows; success continues through all five. Stop first failure, preserve original first error, capture bounded diagnostics, perform owned cleanup. No independent retries/repairs or extra microtest.",
+  "resources": "Same one private OneMapU25F05/emulator-5580,5580/5581, Metro8081, UI status8797. Reuse cached setup and unchanged f05 APKs, install each once; no rebuild or frozen-source mutation. Prior camera remains evidence reuse, never executed again by continuation.",
+  "diagnosticCapture": {
+    "boundary": "Failed Android TF07 row, before selected app force-stop, Metro termination and emulator cleanup.",
+    "reads": [
+      "selected application pidof",
+      "assigned emulator activity/task dump",
+      "assigned emulator crash buffer last2000 entries",
+      "assigned emulator main/system last2000 entries filtered to app, ActivityManager/ActivityTaskManager, AndroidRuntime, am_crash/am_kill,libc/DEBUG, ReactNative/ReactNativeJS and Bridgeless"
+    ],
+    "limits": "Each retained read tail bounded128KiB, four reads; command bound30seconds each. UI outer33minutes includes the120second query budget beyond30minute observations. No logcat clearing or other device access. Bounded owned driver stderr tail128KiB stays bound to its originating row. Diagnostics read/write failures remain secondary and do not replace first failure or prevent cleanup; known Mapbox token and token query values are redacted. Driver stderr buffers complete lines before redaction/persistence/printing, flushes on stream end, and omits over128KiB lines with a marker while keeping pending/tail bounded.",
+    "retention": "Raw task-local files only for active investigation; redact secrets before reporting excerpts; compact permanent outcome afterward. Capture can expose why foreground was lost but does not guarantee the cause will be available."
+  },
+  "verifiedBinaries": {
+    "android": {
+      "mapbox": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-mapbox/android/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+        "package": "com.onemapmapbox"
+      },
+      "maplibre": {
+        "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/examples/native-maplibre/android/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+        "package": "com.onemapmaplibre"
+      }
+    }
+  },
+  "batchInputSha256": {
+    "/private/tmp/one-map-android-restoration-review/scripts/android-acceptance-batch.mjs": "f20effc307ea4850f1326fcbf59d7fec42f930827df735c702b23ed3719fe100",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-rendering.mjs": "b00db155eea2784c0fbbde2067acdf425ea3142c5d1d65d4e9b46f2122c0800c",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-camera-observer.mjs": "c1c589a6d74c1739e386af506f651a6c91b0c0a77e974a96b61c4a5ba2abae44",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-ui-smoke.mjs": "37c892fb52058fabd1ef244f5d556b18ae088a655e92cb2246f768e8b4e3b257",
+    "/private/tmp/one-map-android-restoration-review/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-retained-contract.mjs": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf04-camera-smoke.mjs": "13a9c48f32afc8118629f830f5d02c4c7e87d518f77e956a748f018194740e38",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-ui-smoke.mjs": "eee588dd20e8d712491045801a194f7d67a0a61f43791ef2df0f61eb2b944a11",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness/scripts/tf07-retained-contract.mjs": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs": "76ab97c02993e007cde719d0aa945121a67afcaea8c6dd716344b8ad3c5dab53",
+    "/private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs": "c8cc8d59c637e46fb5771adbb558a7790214bcc2cbd6db25e31f22c78eea38a5"
+  },
+  "checkpoint": "Validated Android fixture toolbar navigation for attempt10",
+  "status": "Independent coordinator source/routine/provenance audit passed; owner-authorized five-row continuation may proceed after fresh preflight",
+  "recordedUTC": "2026-11-01T22:45:03.480021+00:00",
+  "history": {
+    "revised-api-u26-validated-reports-preparation.json": {
+      "path": "records/evidence/revised-api-u26-validated-reports-preparation.json",
+      "sha256": "fcacfa08e548d81d7168f7c816bc0289d8c5727aafc110ec68ef720fc7052337"
+    },
+    "revised-api-u26-android-operator-preparation.json": {
+      "path": "records/evidence/revised-api-u26-android-operator-preparation.json",
+      "sha256": "2c0f3d916b01cbd69748fc88e629232721ed898345429a74c76acebaec16f3fc"
+    },
+    "revised-api-u26-android-platform-batch-attempt-06.json": {
+      "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-06.json",
+      "sha256": "ed1fd0721e9973a097522290a737527a2eee0c75a5b065feb99e4204f7da74c1"
+    },
+    "revised-api-u26-operator-failfast-preparation.json": {
+      "path": "records/evidence/revised-api-u26-operator-failfast-preparation.json",
+      "sha256": "76480cbe2f8980a8bd53f20c65bcefbd3a785fca820eb3cc1b0d6988f3ad8bfc"
+    },
+    "revised-api-u26-android-platform-batch-attempt-07.json": {
+      "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-07.json",
+      "sha256": "c4065725f14cd7e0ea2462304304f19b2009c82f058e64477d645c615053c979"
+    },
+    "revised-api-u26-operator-readiness-preparation.json": {
+      "path": "records/evidence/revised-api-u26-operator-readiness-preparation.json",
+      "sha256": "ffee62f98c532200d5a7e0f505b254d82e571546cacbaf333cd30ad47a20bbbe"
+    },
+    "revised-api-u26-process-start-preparation.json": {
+      "path": "records/evidence/revised-api-u26-process-start-preparation.json",
+      "sha256": "6dc74ec7a0ee3c8327a0695d5a623d8b174b513f90e4bfe8fb262145922d647a"
+    },
+    "revised-api-u26-android-platform-batch-attempt-09.json": {
+      "path": "records/evidence/revised-api-u26-android-platform-batch-attempt-09.json",
+      "sha256": "509e65a867fc1233b8d9d9c4d79bb58c57b4916433f764b153318947997751c7"
+    }
+  },
+  "operatorHelperSha256": {
+    "/private/tmp/one-map-android-restoration-review/scripts/android-operator.py": "9983d1b051781e77d7e9e578e500244542c00040b4e2db61abaf40738414f66e",
+    "/private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs": "c8cc8d59c637e46fb5771adbb558a7790214bcc2cbd6db25e31f22c78eea38a5"
+  },
+  "regressionSha256": {
+    "/private/tmp/one-map-android-restoration-review/scripts/android-operator.test.py": "3a1022d694f9286fb61daa0c1b6150e5572660e4ff6396bbaa7953089b14c6a8",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-native-runner.test.mjs": "6834ac60b20f8f425010939c1bf8c999f9bd4e3aa1c84800823bc7a115bfa96d",
+    "/private/tmp/one-map-android-restoration-review/scripts/mapbox-android-rendering.test.mjs": "2f430f1fd319a255cd871c454b311dc2b689ffa535ae477fe73984585be8c209"
+  },
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10",
+  "exactOperatorCommands": [
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10 mapbox-android-core live-child-button adb shell uiautomator dump /sdcard/one-map-attempt10-hierarchy-001.xml",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10 mapbox-android-core live-child-button adb shell cat /sdcard/one-map-attempt10-hierarchy-001.xml",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10 mapbox-android-core live-child-button toolbar \"Read renderer\"",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10 mapbox-android-core live-child-button adb shell input tap 50 40",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10 mapbox-android-core live-child-button adb shell screencap -p /sdcard/one-map-attempt10-live-child-button.png",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10 mapbox-android-core live-child-button adb pull /sdcard/one-map-attempt10-live-child-button.png /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10/live-child-button.png",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10 mapbox-android-core live-child-button status"
+  ],
+  "operatorContract": {
+    "prefix": "OUTPUT ROW SCENARIO status | toolbar LABEL | adb ADB_ARGUMENT...",
+    "ownership": "Canonical Android attempt directory beneath the fixed recovery root, current checkpoint row, no final receipt, existing driver-created report with matching environment, valid digest/run identity and known nonfailed scenario.",
+    "adb": "Fixed adb executable and emulator-5580; one checked shell-free child with30second timeout,128KiB tail per stream and no retry.",
+    "status": "Fixed HTTP GET127.0.0.1:8797/tf07;30second socket timeouts with remaining body deadline and128KiB body cap; only HTTP200 object or null accepted. Null is normal before physical Read renderer and does not prove a pass.",
+    "firstFailure": "Exclusively create attempt-owned operator-first-failure.json before failed-report publication. Preserve original operation/error. Invoke existing validated writer for only current failed scenario; leave identities, other outcomes and observations unchanged. Publication failure is secondary.",
+    "stop": "Every later helper process checks latch before adb/HTTP; TF07 readManual also checks latch, so writer publication failure still stops normal polling and invokes existing diagnostics/owned cleanup. No row may continue after failure.",
+    "hostAccess": "Explicit require_escalated on every acceptance launcher/operator/writer tool call, including status reads. Helper cannot grant host permission. Outer tool failures before helper launch still require worker stop/coordinator intervention.",
+    "singleWorker": "Serial single operator only; no concurrent operator calls, raw curl/adb, reconstructed inline Python or CUA/Android Studio.",
+    "readiness": "Every status/adb call waits locally at most300seconds, polling200ms. No HTTP/adb/input while waiting. Missing checkpoint, unassigned row or missing fresh report is startup. Matching active row and fresh valid driver identity are mandatory; TF07 publishes that wx report only after status listener binding, Metro readiness and confirmed selected app launch; startup status observations are ignored until publication. Failed startup publishes no ready report. Only immediately previous fixed row already passed in checkpoint.rows may remain active during teardown. All other active rows, completed requested row, checkpoint.error/cleanup, receipt or failure latch stop before transport. Initial checkpoint.result=failed is not terminal by itself. One poll of grace per consecutive incomplete-JSON publication episode; malformed identity is never retried. Timeout uses existing first-error latch and driver stop/cleanup path. Requested operation runs once, no HTTP/device retry.",
+    "toolbar": "Row-specific fixed fixture labels, case/outer-whitespace normalized before device access. Fresh unique numbered dump/read locates one selected-app toolbar and matching enabled/clickable button fully inside hierarchy display/toolbar bounds. Fixed source order chooses interior quarter-to-three-quarter swipe in either direction. One gesture then fresh hierarchy; unchanged visible label/bounds, ambiguity, missing middle target,12-swipes/120seconds or command/binding failure stops. Every child is checked with min(30seconds,remaining deadline); initial readiness retains300second bound. Recheck existing latch/checkpoint/final receipt/report identity and observations immediately before each child without internal waiting. One exact visible-center checked tap, then return without any post-tap device command; receipt says input-complete only, never scenario passed. Existing physical/renderer judgment and writer still required. No blind retries or post-failure gestures.",
+    "receipts": "Numbered owned toolbar JSON records run/row/scenario, canonical label, swipe count, target bounds, snapshot paths and failure reason. Bounded XML saved under the owned attempt only during active review; consumed unique device XML removed via checked child. Clean successful raw XML after coordinator audit, retain compact receipt/outcome. Receipt publication failure cannot replace an original navigation failure."
+  },
+  "remainingGates": [
+    "Owner authorized the unchanged five-row continuation after audit; no additional approval is required for that exact scope. Actual native renderer/input behavior remains unverified."
+  ],
+  "unchangedScope": "f05/archive/dist, frozen/staged harness, installed fixture source, both verified APKs, peers, locks and versions unchanged. Only review operator, launcher preparation selection, regressions, sole plan and new preparation changed. Historical preparation/outcome bytes retained. No native/device/Metro/live8797 operation during preparation.",
+  "limits": [
+    "UIAutomator may clip accessibility bounds at viewport edges; wholly out-of-toolbar/display bounds are rejected. Within-viewport hierarchy bounds provide physical input targeting, not full visual correctness.",
+    "Direction derives from pinned fixture label order and one unambiguous selected-app horizontal toolbar; changed fixture layout/order requires separate preparation.",
+    "One serial worker only; existing helper first-failure policy, no retry after failure.",
+    "Actual native toolbar/input/status behavior remains unverified."
+  ],
+  "proposedLauncherToolCall": {
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "sandbox_permissions": "require_escalated",
+    "yield_time_ms": 1000,
+    "max_output_tokens": 1500,
+    "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-acceptance-continuation.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-10",
+    "shell": "/bin/sh",
+    "login": false
+  },
+  "operatorToolParameters": {
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "sandbox_permissions": "require_escalated",
+    "shell": "/bin/sh",
+    "login": false,
+    "yield_time_ms": 1000,
+    "max_output_tokens": 20000,
+    "cmd": "One exact android-operator.py invocation from the sole acceptance plan, without chaining; python3 resolves through existing PATH. No new interpreter or runtime pin is introduced."
+  },
+  "writerToolParameters": {
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "sandbox_permissions": "require_escalated",
+    "shell": "/bin/sh",
+    "login": false,
+    "yield_time_ms": 1000,
+    "max_output_tokens": 1500,
+    "cmd": "One exact pinned-Node record-native-ui-observation.mjs invocation from the sole acceptance plan, without chaining."
+  },
+  "diagnosis": {
+    "confirmed": "Attempt09 child activation succeeded. Worker failed the observation after initial null status and absent offscreen Read renderer, without approved toolbar navigation. Earlier helper only exposed status and arbitrary adb, leaving navigation procedure to worker. New named operation makes existing authorized horizontal navigation concrete. No production, installed fixture, APK or renderer defect established.",
+    "source": "Immutable attempt09 outcome and read-only frozen native-tf07-screen.tsx/native-tf07-retained-screen.tsx; historical real UIAutomator XML supplies Android classes, uppercase content-desc labels and toolbar bounds [0,63][1080,156].",
+    "redBefore": "Historical HEAD helper rejects toolbar Read renderer with Use status or adb ADB_ARGUMENT before any fake device operation; new actual-CLI fake-ADB transcripts verify fresh early/late XML sequence, one interior swipe and one visible-center tap. This proves the procedure boundary, not a causal native app fix."
+  },
+  "routineVerification": {
+    "passed": [
+      "python3 scripts/android-operator.test.py:25 methods including all17 prior regressions, real CLI/fake-ADB fresh transcripts, forward Read renderer then backward offset, case/whitespace labels, visible/no-swipe, clipped bounds exclusion, no-progress/limit/deadline/ambiguous/child/external-latch/receipt/binding failure, terminal tap closing/replacing row without post-tap commands, later-call blocking, secondary receipt/writer error preservation.",
+      "Pinned Node24 Android launcher/continuation orchestration mocks passed with toolbar preparation selection.",
+      "Pinned Node24 TF07 actual-source runner mocks passed unchanged ownership/readiness/latch cleanup.",
+      "Pinned Node24 validated observation writer filesystem/CLI regressions passed.",
+      "Pinned Node24 check-docs:40 Markdown files and39comparison tables; git diff --check passed.",
+      "Python AST and all8 exact launcher/operator shell syntax forms parsed without execution.",
+      "Read-only hashes match695frozen,26staged,7host,13runtime,2operator inputs; archive and both retained APK hashes match."
+    ],
+    "nativeExecution": false,
+    "preparationCorrections": [
+      "Source audit required source-order swipes in both directions so later observations can return to offset/remount after Read renderer.",
+      "Canonicalize label case/outer whitespace and hierarchy label case.",
+      "Keep receipt publication errors secondary to original navigation error.",
+      "Remove post-tap hierarchy to avoid closing/replaced-row race after final Read renderer or Finish focus; terminal actions monitor driver result instead."
+    ]
+  },
+  "outputAbsentAtPreparation": true,
+  "unchangedInputVerification": {
+    "counts": {
+      "frozen": {
+        "count": 695,
+        "mismatches": []
+      },
+      "staged": {
+        "count": 26,
+        "mismatches": []
+      },
+      "host": {
+        "count": 7,
+        "mismatches": []
+      },
+      "runtime": {
+        "count": 13,
+        "mismatches": []
+      },
+      "operator": {
+        "count": 2,
+        "mismatches": []
+      }
+    },
+    "freezeDigestMatches": true,
+    "archiveAndBothApksMatch": true
+  },
+  "coordinatorAudit": {
+    "status": "passed",
+    "checks": [
+      "Independently passed25operator test methods with scripted hierarchy/fake-child CLI transcripts",
+      "ForwardReadrenderer and backwardOffset select direction from source-ordered labels and fresh visible bounds; one checked tap only",
+      "Unknown/clipped/ambiguous target, no-progress/deadline/swipe-limit, command errors, external latch/receipt and changed row block further input",
+      "TerminalReadrenderer/Finishfocus row completion during tap returns input-complete with no post-tap device command",
+      "Case-normalized known labels and titlecase hierarchy nodes accepted; original navigation error survives secondary receipt publication error",
+      "Independent Node24 launcher/TF07 driver/writer regressions passed",
+      "Independent695frozen,26observer,7host,13runtime,2operator and regression pins, archive and both APKs matched; historyexact; outputabsent; exact command shell syntax checked"
+    ],
+    "corrections": [
+      "Use both fresh-state-directed interior scroll directions so earlier toolbar controls remain reachable",
+      "Normalize known label case and preserve original failure when receipt publication also fails",
+      "Remove post-tap device query to avoid racing expected terminal row teardown"
+    ],
+    "findingsRemaining": [],
+    "nativeExecutionDuringPreparation": false,
+    "limits": [
+      "Actual Android navigation remains unverified until authorized execution",
+      "A checked physical tap is input completion only; caller still judges visual/renderer evidence",
+      "No native retry or failed-report override is permitted"
+    ]
+  }
+}

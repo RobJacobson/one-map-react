@@ -59,6 +59,122 @@ class OperatorTest(unittest.TestCase):
         connection.getresponse.return_value = response
         return connection
 
+    def test_startup_waits_for_assigned_row_and_report_before_boundary(self):
+        self.report.unlink()
+        checkpoint = self.attempt / "checkpoint.json"
+        checkpoint.unlink()
+        connection = self.response(b"null")
+        sleeps = []
+        def advance(seconds):
+            boundary.assert_not_called()
+            adb.assert_not_called()
+            sleeps.append(seconds)
+            if len(sleeps) == 1:
+                checkpoint.write_text(json.dumps({"result": "failed", "checkpoints": []}))
+            elif len(sleeps) == 2:
+                checkpoint.write_text(json.dumps({"result": "failed", "currentRow": ROW}))
+            else:
+                self.report.write_text(json.dumps(self.original))
+        with patch("time.sleep", side_effect=advance), patch("time.monotonic", return_value=0), patch("http.client.HTTPConnection", return_value=connection) as boundary, patch("subprocess.run") as adb:
+            status, output = self.invoke(["status"])
+        self.assertEqual(status, 0, output)
+        self.assertEqual(sleeps, [0.2] * 3)
+        boundary.assert_called_once()
+        connection.request.assert_called_once_with("GET", "/tf07")
+        self.assertFalse(self.latch.exists())
+
+    def test_wait_stops_for_failure_receipt_and_timeout_without_boundary(self):
+        for stop in ("latch", "receipt", "error", "cleanup", "timeout"):
+            with self.subTest(stop=stop):
+                self.setUp()
+                checkpoint = self.attempt / "checkpoint.json"
+                checkpoint.write_text(json.dumps({"result": "failed"}))
+                def advance(seconds):
+                    if stop == "latch": self.latch.write_text('{"error":"original"}')
+                    if stop == "receipt": (self.attempt / "receipt.json").write_text("{}")
+                    if stop in ("error", "cleanup"):
+                        checkpoint.write_text(json.dumps({stop: "stopped"}))
+                clock = [0, 0, 300] if stop == "timeout" else [0, 0]
+                with patch("time.sleep", side_effect=advance), patch("time.monotonic", side_effect=clock), patch("subprocess.run") as adb, patch("http.client.HTTPConnection") as boundary:
+                    status, output = self.invoke(["status"])
+                    self.assertEqual(status, 1, output)
+                    adb.assert_not_called()
+                    boundary.assert_not_called()
+                    saved = self.latch.read_bytes()
+                    self.assertEqual(self.invoke(["adb", "shell", "input", "tap", "50", "40"])[0], 1)
+                    self.assertEqual(self.latch.read_bytes(), saved)
+                if stop == "latch": self.assertEqual(json.loads(saved)["error"], "original")
+                if stop == "timeout": self.assertIn("readiness deadline", json.loads(saved)["error"])
+
+    def test_ready_report_after_deadline_cannot_reach_transport(self):
+        self.report.unlink()
+        def advance(seconds):
+            self.report.write_text(json.dumps(self.original))
+        with patch("time.sleep", side_effect=advance), patch("time.monotonic", side_effect=[0, 0, 299, 301]), patch("subprocess.run") as adb, patch("http.client.HTTPConnection") as boundary:
+            status, output = self.invoke(["status"])
+        self.assertEqual(status, 1, output)
+        self.assertIn("readiness deadline", json.loads(self.latch.read_text())["error"])
+        adb.assert_not_called()
+        boundary.assert_not_called()
+
+    def test_only_completed_previous_row_is_a_transition(self):
+        next_row = "mapbox-android-retained"
+        for completed in (False, True):
+            with self.subTest(completed=completed):
+                self.setUp()
+                next_report = self.attempt / (next_row + "-manual.json")
+                checkpoint = self.attempt / "checkpoint.json"
+                checkpoint.write_text(json.dumps({"currentRow": ROW, "rows": [{"rowId": ROW, "status": "passed"}] if completed else []}))
+                def advance(seconds):
+                    checkpoint.write_text(json.dumps({"currentRow": next_row}))
+                    next_report.write_text(json.dumps(self.original))
+                with patch("time.sleep", side_effect=advance) as sleep, patch("http.client.HTTPConnection", return_value=self.response(b"null")) as boundary:
+                    status, output = self.invoke(["status"], [next_row, SCENARIO])
+                self.assertEqual(status, 0 if completed else 1, output)
+                self.assertEqual(sleep.call_count, 1 if completed else 0)
+                self.assertEqual(boundary.call_count, 1 if completed else 0)
+
+    def test_partial_publication_gets_only_one_poll(self):
+        for repaired in (True, False):
+            with self.subTest(repaired=repaired):
+                self.setUp()
+                self.report.write_text("{")
+                def advance(seconds):
+                    if repaired: self.report.write_text(json.dumps(self.original))
+                with patch("time.sleep", side_effect=advance) as sleep, patch("http.client.HTTPConnection", return_value=self.response(b"null")) as boundary, patch("subprocess.run") as adb:
+                    status, output = self.invoke(["status"])
+                self.assertEqual(status, 0 if repaired else 1, output)
+                sleep.assert_called_once_with(0.2)
+                self.assertEqual(boundary.call_count, 1 if repaired else 0)
+                adb.assert_not_called()
+
+    def test_distinct_checkpoint_publications_each_get_one_poll(self):
+        checkpoint = self.attempt / "checkpoint.json"
+        checkpoint.write_text("{")
+        updates = [json.dumps({"result": "failed"}), "{", json.dumps({"currentRow": ROW})]
+        def advance(seconds):
+            checkpoint.write_text(updates.pop(0))
+        with patch("time.sleep", side_effect=advance) as sleep, patch("http.client.HTTPConnection", return_value=self.response(b"null")) as boundary:
+            status, output = self.invoke(["status"])
+        self.assertEqual(status, 0, output)
+        self.assertEqual(sleep.call_count, 3)
+        boundary.assert_called_once()
+
+    def test_actual_cli_waits_then_runs_one_fake_child(self):
+        script = self.cli_copy()
+        self.report.unlink()
+        (self.attempt / "checkpoint.json").write_text(json.dumps({"result": "failed"}))
+        child = subprocess.Popen([sys.executable, str(script), str(self.attempt), ROW, SCENARIO, "adb", "shell", "input", "tap", "50", "40"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.addCleanup(lambda: child.kill() if child.poll() is None else None)
+        self.assertIn("WAIT row readiness", child.stdout.readline())
+        (self.attempt / "checkpoint.json").write_text(json.dumps({"result": "failed", "currentRow": ROW}))
+        self.report.write_text(json.dumps(self.original))
+        output, error = child.communicate(timeout=5)
+        self.assertEqual(child.returncode, 0, output + error)
+        self.assertEqual(output.count("START"), 1)
+        self.assertEqual(output.count('"-s", "emulator-5580"'), 1)
+        self.assertIn("COMPLETE 0", output)
+
     def test_status_null_and_object_are_normal(self):
         for body in (b"null", b'{"events":{"child-click":1}}'):
             connection = self.response(body)
@@ -190,12 +306,191 @@ class OperatorTest(unittest.TestCase):
             self.assertNotIn("START", later.stdout)
             self.assertEqual(self.latch.read_bytes(), saved)
 
+    def toolbar_xml(self, buttons):
+        # Real UIAutomator classes/labels and 1080px toolbar bounds from saved TF07 XML.
+        children = "".join(
+            f'<node class="android.widget.Button" package="com.onemapmapbox" '
+            f'content-desc="{label}" clickable="true" enabled="true" bounds="{bounds}"/>'
+            for label, bounds in buttons
+        )
+        return ('<hierarchy><node bounds="[0,0][1080,2400]">'
+                '<node class="android.widget.HorizontalScrollView" package="com.onemapmapbox" '
+                'bounds="[0,63][1080,156]">' + children + '</node></node></hierarchy>')
+
+    def toolbar_child(self, snapshots, fail=None, after=None):
+        calls = []
+        def run(command, **options):
+            if command[0] != self.globals["ADB"]:
+                raise OSError("writer unavailable")
+            arguments = command[3:]
+            calls.append(arguments)
+            self.assertTrue(options["check"])
+            self.assertFalse(options["shell"])
+            self.assertLessEqual(options["timeout"], 30)
+            if fail is not None and len(calls) == fail:
+                raise subprocess.CalledProcessError(7, command)
+            if arguments[:2] == ["shell", "cat"]:
+                options["stdout"].write(snapshots.pop(0).encode())
+            if after is not None:
+                after(arguments)
+        return calls, run
+
+    def test_toolbar_offscreen_then_visible_and_return_to_earlier_action(self):
+        early = self.toolbar_xml([("REMOUNT", "[0,63][217,156]"), ("OFFSET", "[368,63][543,156]")])
+        late = self.toolbar_xml([("CLEAR REJECTION", "[300,63][700,156]"), ("READ RENDERER", "[700,63][1050,156]")])
+        snapshots = [early, late, late, early]
+        calls, child = self.toolbar_child(snapshots)
+        with patch("subprocess.run", side_effect=child):
+            status, output = self.invoke(["toolbar", "Read renderer"])
+            self.assertEqual(status, 0, output)
+            self.assertFalse(self.latch.exists())
+            status, output = self.invoke(["toolbar", "offset"])
+        self.assertEqual(status, 0, output)
+        inputs = [args for args in calls if args[:2] == ["shell", "input"]]
+        self.assertEqual(inputs, [
+            ["shell", "input", "swipe", "810", "109", "270", "109", "450"],
+            ["shell", "input", "tap", "875", "109"],
+            ["shell", "input", "swipe", "270", "109", "810", "109", "450"],
+            ["shell", "input", "tap", "455", "109"],
+        ])
+        dumps = [args[-1] for args in calls if args[:3] == ["shell", "uiautomator", "dump"]]
+        self.assertEqual(len(set(dumps)), 4)
+        self.assertTrue(all("hierarchy-" in path for path in dumps))
+        self.assertEqual(json.loads(self.report.read_text()), self.original)
+        self.assertEqual(json.loads((self.attempt / "toolbar-001.json").read_text())["swipes"], 1)
+        self.assertNotIn("<hierarchy>", output)
+
+    def test_toolbar_visible_has_no_swipe_and_clipped_target_is_not_tapped(self):
+        visible = self.toolbar_xml([("READ RENDERER", "[700,63][1050,156]")])
+        clipped = self.toolbar_xml([("OFFSET", "[300,63][500,156]"), ("READ RENDERER", "[1000,63][1300,156]")])
+        for snapshots, expected_swipes in (([visible], 0), ([clipped, visible], 1)):
+            self.setUp()
+            calls, child = self.toolbar_child(snapshots)
+            with patch("subprocess.run", side_effect=child):
+                status, output = self.invoke(["toolbar", "Read renderer"])
+            self.assertEqual(status, 0, output)
+            inputs = [args for args in calls if args[:2] == ["shell", "input"]]
+            self.assertEqual(sum(args[2] == "swipe" for args in inputs), expected_swipes)
+            self.assertEqual(inputs[-1], ["shell", "input", "tap", "875", "109"])
+
+    def test_toolbar_failures_latch_and_never_send_later_input(self):
+        early = self.toolbar_xml([("OFFSET", "[300,63][500,156]")])
+        late = self.toolbar_xml([("READ RENDERER", "[700,63][1050,156]")])
+        for failure in ("no-progress", "limit", "deadline", "ambiguous", "child", "external-latch", "receipt", "binding"):
+            with self.subTest(failure=failure):
+                self.setUp()
+                snapshots = [early, early]
+                if failure == "ambiguous":
+                    snapshots = [self.toolbar_xml([("READ RENDERER", "[50,63][300,156]"), ("READ RENDERER", "[400,63][700,156]")])]
+                def after(arguments):
+                    if arguments[:3] != ["shell", "input", "swipe"]: return
+                    if failure == "external-latch": self.latch.write_text('{"error":"external first failure"}')
+                    if failure == "receipt": (self.attempt / "receipt.json").write_text("{}")
+                    if failure == "binding":
+                        identity = dict(self.original, runId="12345678-1234-4234-8234-123456789013")
+                        self.report.write_text(json.dumps(identity))
+                calls, child = self.toolbar_child(snapshots, fail=1 if failure == "child" else None, after=after)
+                self.globals["TOOLBAR_SWIPES"] = 0 if failure == "limit" else 12
+                self.globals["TOOLBAR_SECONDS"] = 0 if failure == "deadline" else 120
+                with patch("subprocess.run", side_effect=child):
+                    status, output = self.invoke(["toolbar", "Read renderer"])
+                    self.assertEqual(status, 1, output)
+                    saved = self.latch.read_bytes()
+                    count = len(calls)
+                    self.assertEqual(self.invoke(["toolbar", "Read renderer"])[0], 1)
+                    self.assertEqual(len(calls), count)
+                self.assertEqual(self.latch.read_bytes(), saved)
+                self.assertFalse(any(args[:3] == ["shell", "input", "tap"] for args in calls))
+                if failure == "external-latch": self.assertEqual(json.loads(saved)["error"], "external first failure")
+                if failure == "child": self.assertIn("CalledProcessError", json.loads(saved)["error"])
+
+    def test_toolbar_terminal_tap_does_not_query_closed_or_replaced_row(self):
+        for transition in ("completed", "next-row", "receipt"):
+            with self.subTest(transition=transition):
+                self.setUp()
+                xml = self.toolbar_xml([("READ RENDERER", "[700,63][1050,156]")])
+                def after(arguments):
+                    if arguments[:3] != ["shell", "input", "tap"]: return
+                    if transition == "receipt": (self.attempt / "receipt.json").write_text("{}")
+                    else:
+                        checkpoint = {"currentRow": "mapbox-android-retained" if transition == "next-row" else ROW,
+                                      "rows": [{"rowId": ROW, "status": "passed"}]}
+                        (self.attempt / "checkpoint.json").write_text(json.dumps(checkpoint))
+                calls, child = self.toolbar_child([xml], after=after)
+                with patch("subprocess.run", side_effect=child):
+                    status, output = self.invoke(["toolbar", "Read renderer"])
+                self.assertEqual(status, 0, output)
+                self.assertFalse(self.latch.exists())
+                self.assertEqual(calls[-1], ["shell", "input", "tap", "875", "109"])
+                self.assertEqual(json.loads((self.attempt / "toolbar-001.json").read_text())["status"], "input-complete")
+
+    def test_toolbar_case_and_whitespace_resolve_fixture_labels(self):
+        xml = self.toolbar_xml([("Offset", "[368,63][543,156]")])
+        calls, child = self.toolbar_child([xml])
+        with patch("subprocess.run", side_effect=child):
+            status, output = self.invoke(["toolbar", "  OFFSET  "])
+        self.assertEqual(status, 0, output)
+        self.assertEqual(json.loads((self.attempt / "toolbar-001.json").read_text())["label"], "offset")
+        self.assertEqual([args for args in calls if args[:2] == ["shell", "input"]],
+                         [["shell", "input", "tap", "455", "109"]])
+
+    def test_toolbar_receipt_failure_preserves_navigation_error(self):
+        original = Path.write_text
+        def write(path, *arguments, **options):
+            if path.name == "toolbar-001.json":
+                raise OSError("receipt unavailable")
+            return original(path, *arguments, **options)
+        calls, child = self.toolbar_child([], fail=1)
+        with patch("subprocess.run", side_effect=child), patch.object(Path, "write_text", write):
+            status, output = self.invoke(["toolbar", "Read renderer"])
+        self.assertEqual(status, 1, output)
+        self.assertIn("SECONDARY toolbar receipt publication", output)
+        self.assertIn("CalledProcessError", json.loads(self.latch.read_text())["error"])
+        self.assertNotIn("receipt unavailable", json.loads(self.latch.read_text())["error"])
+
+    def test_actual_cli_toolbar_uses_fresh_transcripts(self):
+        script = self.cli_copy()
+        early = self.toolbar_xml([("OFFSET", "[368,63][543,156]")])
+        late = self.toolbar_xml([("READ RENDERER", "[700,63][1050,156]")])
+        (self.attempt / "snapshots.json").write_text(json.dumps([early, late]))
+        fake = self.attempt / "fake-adb"
+        fake.write_text(r"""#!/usr/bin/env python3
+import json, pathlib, sys
+root = pathlib.Path(__file__).parent
+args = sys.argv[1:]
+with (root / 'calls.jsonl').open('a') as output:
+    output.write(json.dumps(args) + '\n')
+if args[2:4] == ['shell', 'cat']:
+    path = root / 'snapshots.json'
+    snapshots = json.loads(path.read_text())
+    print(snapshots.pop(0))
+    path.write_text(json.dumps(snapshots))
+""")
+        command = [sys.executable, str(script), str(self.attempt), ROW, SCENARIO, "toolbar", "Read renderer"]
+        result = subprocess.run(command, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = [json.loads(line) for line in (self.attempt / "calls.jsonl").read_text().splitlines()]
+        inputs = [args for args in calls if args[2:4] == ["shell", "input"]]
+        self.assertEqual(inputs, [["-s", "emulator-5580", "shell", "input", "swipe", "810", "109", "270", "109", "450"],
+                                  ["-s", "emulator-5580", "shell", "input", "tap", "875", "109"]])
+        self.assertEqual(json.loads((self.attempt / "snapshots.json").read_text()), [])
+        self.assertFalse(self.latch.exists())
+
+    def test_toolbar_unknown_label_rejects_before_boundary(self):
+        with patch("subprocess.run") as child, patch("http.client.HTTPConnection") as http:
+            status, output = self.invoke(["toolbar", "Unknown"])
+        self.assertEqual(status, 1, output)
+        child.assert_not_called()
+        http.assert_not_called()
+
     def test_exact_documented_adb_commands(self):
         script = self.cli_copy()
         commands = [shlex.split(line) for line in PLAN.read_text().splitlines() if line.startswith("python3 " + str(HELPER) + " ")]
         self.assertEqual(len(commands), 7)
         self.assertEqual(commands[0][-1], commands[1][-1])
-        self.assertTrue(commands[0][-1].endswith("attempt07-hierarchy-001.xml"))
+        self.assertEqual(commands[2][5:], ["toolbar", "Read renderer"])
+        attempt_number = Path(commands[0][2]).name.rsplit("-", 1)[1]
+        self.assertEqual(Path(commands[0][-1]).name, f"one-map-attempt{attempt_number}-hierarchy-001.xml")
         for command in commands:
             self.assertEqual(command[3:5], [ROW, SCENARIO])
             if command[5] == "status":
@@ -212,6 +507,8 @@ class OperatorTest(unittest.TestCase):
                     boundary.assert_called_once_with("127.0.0.1", 8797, timeout=30)
                     connection.request.assert_called_once_with("GET", "/tf07")
                     adb.assert_not_called()
+            elif command[5] == "toolbar":
+                continue  # Actual fresh-XML CLI sequence is exercised separately.
             else:
                 result = subprocess.run([sys.executable, str(script), str(self.attempt), *command[3:]], capture_output=True, text=True, timeout=10)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
