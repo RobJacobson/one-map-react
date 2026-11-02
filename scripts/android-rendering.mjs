@@ -66,6 +66,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       "acceptance",
       "acceptance-continuation",
       "signal-diagnostic",
+      "mapbox-acceptance",
     ].includes(scene),
     "Unknown fixed scene."
   );
@@ -75,11 +76,13 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
   );
   const continuation = scene === "acceptance-continuation";
   const signalDiagnostic = scene === "signal-diagnostic";
+  const mapboxUnit = scene === "mapbox-acceptance";
   assert(
-    !signalDiagnostic || engine === "mapbox",
-    "Signal diagnostic targets Mapbox only."
+    !(signalDiagnostic || mapboxUnit) || engine === "mapbox",
+    "Selected scene targets Mapbox only."
   );
-  const batch = scene === "acceptance" || continuation || signalDiagnostic;
+  const batch =
+    scene === "acceptance" || continuation || signalDiagnostic || mapboxUnit;
   const camera = scene === "camera" || batch;
   const ports = batch
     ? [5580, 5581, 8081, 8797]
@@ -101,6 +104,12 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     apkSha256,
     cleanup: [],
     checkpoints: [],
+    ...(mapboxUnit && {
+      mode: "mapbox-android-unit",
+      scope: ["mapbox-android-core", "mapbox-android-retained"],
+      signalCalibration:
+        "omitted; unsupported event and unresolved application SIGKILL",
+    }),
     ...(signalDiagnostic && {
       mode: "signal-diagnostic",
       scope: ["mapbox-android-core"],
@@ -148,7 +157,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
   };
   const verifyInputs = (preparation, freeze) => {
     assert.equal(sha256(apk), apkSha256, "Verified retained APK changed.");
-    if (batch)
+    if (batch && !mapboxUnit)
       for (const [selected, target] of Object.entries(targets))
         assert.equal(
           sha256(
@@ -295,7 +304,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       receipt.tokenPresent = Boolean(process.env.MAPBOX_ACCESS_TOKEN?.trim());
       assert(receipt.tokenPresent, "Mapbox access token is required.");
     }
-    if (continuation) {
+    if (continuation || mapboxUnit) {
       const priorPath = join(
         root,
         "records/evidence/revised-api-u26-android-platform-batch-attempt-01.json"
@@ -321,13 +330,15 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     }
     const peerEvidence = join(
       root,
-      signalDiagnostic
-        ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
-        : continuation
-          ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
-          : batch
-            ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
-            : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
+      mapboxUnit
+        ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
+        : signalDiagnostic
+          ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
+          : continuation
+            ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
+            : batch
+              ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
+              : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
@@ -336,8 +347,8 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const disk = statfsSync(recovery);
     receipt.freeBytes = disk.bavail * disk.bsize;
     assert(
-      receipt.freeBytes >= 8804682957,
-      "Android preboot requires 8.2 GiB free; stop without deleting files."
+      receipt.freeBytes >= (mapboxUnit ? 12 * 1024 ** 3 : 8804682957),
+      `Android preboot requires ${mapboxUnit ? "12" : "8.2"} GiB free; stop without deleting files.`
     );
     if (!camera) createRequire(join(pngRoot, "package.json"))("pngjs");
     for (const port of ports) await requireFreePort(port, execute);
@@ -396,7 +407,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       reverses.push(port);
     }
     receipt.rows = batch ? [] : undefined;
-    for (const selectedEngine of batch && !signalDiagnostic
+    for (const selectedEngine of batch && !signalDiagnostic && !mapboxUnit
       ? ["mapbox", "maplibre"]
       : [engine]) {
       engine = selectedEngine;
@@ -461,11 +472,13 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         applicationId,
         "android.permission.ACCESS_LOCAL_NETWORK",
       ]);
-      for (const row of signalDiagnostic
-        ? ["core"]
-        : batch
-          ? ["camera", "core", "retained"]
-          : [scene]) {
+      for (const row of mapboxUnit
+        ? ["core", "retained"]
+        : signalDiagnostic
+          ? ["core"]
+          : batch
+            ? ["camera", "core", "retained"]
+            : [scene]) {
         if (continuation && engine === "mapbox" && row === "camera") continue;
         const rowId = `${engine}-android-${row}`;
         if (batch) {
@@ -500,6 +513,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
               TF07_OUTPUT: join(output, `${rowId}-result.json`),
               TF07_NATIVE_TIMEOUT_MS: signalDiagnostic ? "900000" : "1800000",
               ...(signalDiagnostic && { TF07_ANDROID_SIGNAL_OUTPUT: output }),
+              ...(mapboxUnit && { TF07_ANDROID_SIGNAL_OUTPUT: "" }),
               TF07_ANDROID_DIAGNOSTICS: join(
                 output,
                 `${rowId}-diagnostics.json`

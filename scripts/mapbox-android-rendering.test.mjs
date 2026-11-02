@@ -35,6 +35,7 @@ for (const [
   batch = false,
   continuation = false,
   signalDiagnostic = false,
+  mapboxUnit = false,
 ] of [
   ["mapbox", false],
   ["maplibre", false],
@@ -42,6 +43,7 @@ for (const [
   ["mapbox", true, true],
   ["mapbox", true, true, true],
   ["mapbox", true, true, false, true],
+  ["mapbox", true, true, false, false, true],
 ]) {
   const apkHash = apkHashes[engine];
   const expectedNames =
@@ -51,7 +53,8 @@ for (const [
     null,
     ...(engine === "mapbox" ? ["missing-token", "whitespace-token"] : []),
     "existing-output",
-    ...(continuation ? ["prior-hash", "prior-prefix"] : []),
+    ...(continuation || mapboxUnit ? ["prior-hash", "prior-prefix"] : []),
+    ...(mapboxUnit ? ["retained-driver"] : []),
     "low-space",
     "apk",
     "observer",
@@ -114,6 +117,7 @@ for (const [
           "late-metro-exit",
           "prior-hash",
           "prior-prefix",
+          ...(mapboxUnit ? ["low-space", "retained-driver"] : []),
         ].includes(failure)
     )
     .filter(
@@ -136,6 +140,7 @@ for (const [
         ].includes(failure)
     )
     .filter((failure) => !continuation || failure !== "late-metro-exit")
+    .filter((failure) => !mapboxUnit || failure !== "late-metro-exit")
     .filter(
       (failure) =>
         !signalDiagnostic ||
@@ -320,6 +325,9 @@ for (const [
       resolve: (value) => value,
       process: {
         env: {
+          ...(mapboxUnit && {
+            TF07_ANDROID_SIGNAL_OUTPUT: "/inherited-must-not-run",
+          }),
           MAPBOX_ACCESS_TOKEN:
             failAt === "missing-token"
               ? ""
@@ -342,7 +350,12 @@ for (const [
       existsSync: (file) =>
         file.endsWith("scene.json") ? launched : failAt === "avd",
       statfsSync: () => ({
-        bavail: failAt === "low-space" ? 1 : 10 * 1024 ** 3,
+        bavail:
+          failAt === "low-space"
+            ? mapboxUnit
+              ? 11 * 1024 ** 3
+              : 1
+            : 16 * 1024 ** 3,
         bsize: 1,
       }),
       createHash: () => {
@@ -360,7 +373,8 @@ for (const [
           /android-(rendering|camera)-preparation.json$/.test(file) ||
           file.endsWith("platform-batches-preparation.json") ||
           file.endsWith("android-kernel-console-preparation.json") ||
-          file.endsWith("signal-liveness-preparation.json")
+          file.endsWith("signal-liveness-preparation.json") ||
+          file.endsWith("mapbox-android-unit-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
@@ -408,6 +422,8 @@ for (const [
                 status: "passed",
                 installedBinarySha256: apkHashes[activeEngine],
                 libraryDistSha256: distHash,
+                ...(mapboxUnit &&
+                  file.includes("retained") && { density: 2.625 }),
               },
             },
           });
@@ -476,7 +492,11 @@ for (const [
         if (args.some((arg) => arg.endsWith("tf07-ui-smoke.mjs"))) {
           coreRows++;
           launched = true;
-          child.exitCode = ["driver", "driver-stderr"].includes(failAt) ? 1 : 0;
+          child.exitCode =
+            ["driver", "driver-stderr"].includes(failAt) ||
+            (failAt === "retained-driver" && coreRows === 2)
+              ? 1
+              : 0;
           const prior = priorDriver;
           priorDriver = child;
           queueMicrotask(() => {
@@ -500,6 +520,11 @@ for (const [
           if (signalDiagnostic) {
             assert.equal(options.env.TF07_ANDROID_SIGNAL_OUTPUT, "/attempt");
             assert.equal(options.env.TF07_NATIVE_TIMEOUT_MS, "900000");
+          }
+          if (mapboxUnit) {
+            assert.equal(options.env.TF07_ANDROID_SIGNAL_OUTPUT, "");
+            assert.equal(args.includes("retained"), coreRows === 2);
+            assert.equal(options.env.TF07_NATIVE_TIMEOUT_MS, "1800000");
           }
         } else if (batch || children.length === 1) {
           assert.equal(options.env.ONE_MAP_SMOKE, camera ? "tf04" : "tf09");
@@ -561,7 +586,7 @@ for (const [
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -682,9 +707,11 @@ for (const [
     if (batch) {
       assert.equal(
         installs,
-        failAt === null && !signalDiagnostic
+        failAt === null && !signalDiagnostic && !mapboxUnit
           ? 2
-          : ["observer", "prior-hash", "prior-prefix"].includes(failAt)
+          : ["observer", "prior-hash", "prior-prefix", "low-space"].includes(
+                failAt
+              )
             ? 0
             : 1
       );
@@ -723,12 +750,15 @@ for (const [
           );
         assert.equal(
           receipt.rows.length,
-          signalDiagnostic ? 1 : continuation ? 5 : 6
+          mapboxUnit ? 2 : signalDiagnostic ? 1 : continuation ? 5 : 6
         );
-        assert.equal(cameraRows, signalDiagnostic ? 0 : continuation ? 1 : 2);
+        assert.equal(
+          cameraRows,
+          signalDiagnostic || mapboxUnit ? 0 : continuation ? 1 : 2
+        );
         assert.deepEqual(
           cameraEngines,
-          signalDiagnostic
+          signalDiagnostic || mapboxUnit
             ? []
             : continuation
               ? ["maplibre"]
@@ -736,22 +766,35 @@ for (const [
         );
         assert.deepEqual(
           receipt.rows.map(({ rowId }) => rowId),
-          signalDiagnostic
-            ? ["mapbox-android-core"]
-            : [
-                ...(!continuation ? ["mapbox-android-camera"] : []),
-                "mapbox-android-core",
-                "mapbox-android-retained",
-                "maplibre-android-camera",
-                "maplibre-android-core",
-                "maplibre-android-retained",
-              ]
+          mapboxUnit
+            ? ["mapbox-android-core", "mapbox-android-retained"]
+            : signalDiagnostic
+              ? ["mapbox-android-core"]
+              : [
+                  ...(!continuation ? ["mapbox-android-camera"] : []),
+                  "mapbox-android-core",
+                  "mapbox-android-retained",
+                  "maplibre-android-camera",
+                  "maplibre-android-core",
+                  "maplibre-android-retained",
+                ]
         );
-        if (continuation)
+        if (continuation || mapboxUnit)
           assert.equal(receipt.reusedRows[0].rowId, "mapbox-android-camera");
-        if (continuation)
+        if (continuation || mapboxUnit)
           assert.equal(receipt.rows[0].rowId, "mapbox-android-core");
-        assert.equal(coreRows, signalDiagnostic ? 1 : 4);
+        assert.equal(coreRows, mapboxUnit ? 2 : signalDiagnostic ? 1 : 4);
+        if (mapboxUnit) {
+          assert.equal(receipt.mode, "mapbox-android-unit");
+          assert.equal(receipt.rows[1].scene.density, 2.625);
+          assert(
+            !commands.some((call) =>
+              call.some((arg) =>
+                /gradlew|maplibre|signal-calibration/.test(String(arg))
+              )
+            )
+          );
+        }
         if (signalDiagnostic) assert.equal(installs, 1);
         assert.equal(
           commands.filter((args) =>
@@ -761,7 +804,10 @@ for (const [
           ).length,
           1
         );
-        assert.equal(pulls, signalDiagnostic ? 3 : continuation ? 12 : 14);
+        assert.equal(
+          pulls,
+          mapboxUnit ? 5 : signalDiagnostic ? 3 : continuation ? 12 : 14
+        );
       }
       if (failAt === "late-metro-exit") {
         assert.equal(receipt.rows.length, 0);
@@ -770,13 +816,24 @@ for (const [
       if (["driver", "driver-stderr"].includes(failAt)) {
         assert.equal(
           receipt.rows.length,
-          signalDiagnostic || continuation ? 0 : 1
+          signalDiagnostic || continuation || mapboxUnit ? 0 : 1
         );
         assert.equal(coreRows, 1);
       }
+      if (failAt === "retained-driver") {
+        assert.deepEqual(
+          receipt.rows.map(({ rowId }) => rowId),
+          ["mapbox-android-core"]
+        );
+        assert.equal(coreRows, 2);
+        assert.match(receipt.error, /driver failed/);
+        assert.equal(installs, 1);
+      }
       assert(
         removed.some((file) => file.endsWith("OneMapU25F05.avd")) ||
-          ["observer", "prior-hash", "prior-prefix"].includes(failAt)
+          ["observer", "prior-hash", "prior-prefix", "low-space"].includes(
+            failAt
+          )
       );
       continue;
     }
@@ -828,6 +885,19 @@ for (const [engine, camera] of [
     },
   });
 }
+await assert.rejects(
+  runInNewContext(
+    `${source}\nrun('/attempt', 'maplibre', 'mapbox-acceptance')`,
+    {
+      assert,
+      join,
+      mkdirSync: () => {
+        throw Error("Wrong backend acquired resources.");
+      },
+    }
+  ),
+  /targets Mapbox only/
+);
 console.log(
   "Both Android rendering branches and camera orchestration/entrypoint mocks passed."
 );

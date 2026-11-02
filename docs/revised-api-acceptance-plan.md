@@ -2,11 +2,11 @@
 
 ## Current handoff
 
-Prepare the complete **Android Mapbox** acceptance unit under the authoritative [native batch protocol](testing-policy.md#complete-acceptance-units). Account for all retained coverage through valid existing evidence plus the remaining core and retained rows in one batch. The full batch command and resource packet are not yet prepared or independently audited. No new native execution, application launch, calibration or retry is authorized by this process revision.
+The complete **Android Mapbox** unit is conditionally prepared under the authoritative [batch protocol](testing-policy.md#complete-acceptance-units). The [unit packet](../records/evidence/revised-api-u26-mapbox-android-unit-preparation.json) accounts for retained coverage through accepted evidence plus core then retained, reusing camera without rerun. Independent coordinator audit passed; storage readiness and one complete-unit execution approval remain pending. The preparation snapshot has about8.4GiB free against the12GiB planning gate; capacity must be rechecked before dispatch. This is preparation, not executable readiness or a new runtime pass.
 
 The latest [attempt21 outcome](../records/evidence/revised-api-u26-signal-diagnostic-attempt-21.json) stopped in calibration before app launch. Its saved trace reports missing periodic flush configuration and separately marks `signal/signal_generate` unknown; it contains no signal9 or canary-victim signal event. Fixing flush alone does not establish sender capture. The original foreground application SIGKILL remains unresolved. Owned cleanup and unchanged-input checks passed within that outcome's scope.
 
-Next, review the saved blocker evidence within the [30-minute diagnosis limit](testing-policy.md#bounded-blocker-diagnosis). Identify a supported correction or discriminating experiment and resolve or explicitly block the unit. The repeated diagnostic failures require reassessment, not another incremental runtime probe. A standalone runtime diagnostic would need a separate owner exception with its exact question, budget and outcome; it would earn no acceptance credit.
+Bounded saved-evidence diagnosis is closed without a supported causal fix. The original SIGKILL cause remains blocked/unknown. The owner selected the complete Mapbox Android batch on the existing emulator with that prior crash risk explicit and no tracing calibration; this selects the proposal, not execution permission or a waiver. A recurrence stops the unit at its first failure. No further environment-choice question or incremental calibration is proposed.
 
 Keep the [retained requirements](requirements.md#purpose-and-scope), [migration contract](revised-api-proposal.md) and [coverage checklist](api-coverage.md) unchanged. This plan changes execution organization, not the public contract or the meaning of a pass.
 
@@ -29,16 +29,31 @@ The twelve rows are the remaining execution baseline, not a replacement for full
 
 ## Android Mapbox preparation
 
-Preparation is offline and must complete the whole unit before the next execution request. The coordinator owns this work and independent audit; the eventual batch uses one exclusive owner-selected Terra Medium worker.
+The [fixed Mapbox entrypoint](../scripts/mapbox-android-acceptance.mjs) reuses existing resource ownership, recorder and validated operator/writer flows. It installs the retained Mapbox APK once, executes core then retained, preserves earlier passed rows on failure, and never starts camera, MapLibre, a build or tracing calibration. An inherited signal-output flag is cleared for both rows. All thirteen core and six retained recipes, accepted evidence, resolved package/APK metadata, pins and exact operator/writer forms are in the self-contained unit packet.
 
-1. Resolve or explicitly block the foreground SIGKILL using saved evidence first. Record the question, hypothesis, discriminating outcome and diagnosis budget. Consolidate all supported related fixes into one reviewed repair PR rather than alternating small diagnostic PRs and runs.
-2. Reconcile the fixed matrix with the retained contract. Carry forward accepted camera and earlier feature-family evidence; identify all remaining Android Mapbox core and retained observations, identities, density readback and cleanup gates.
-3. Prepare and verify the entire command chain and report flow with device-free regressions. Include actual command errors, remote-process disappearance, readiness, row identity, first-failure reporting and cleanup. Existing individual diagnostic or cross-backend entrypoints do not establish support for the complete unit.
-4. Freeze candidate, resolved dependencies, SDK, selected device/OS, installed APK identity, scripts and fixtures. Reuse verified setup and binaries when applicable. The existing [candidate and fixed input evidence](../records/evidence/revised-api-u26-platform-batches-preparation.json) is the starting point; the new packet must establish its current applicability.
-5. Budget the complete batch using measured peak storage plus explicit headroom and cleanup reserve, expected duration, owned resources and stop conditions. Storage stops in [attempt20](../records/evidence/revised-api-u26-signal-diagnostic-attempt-20.json) and [attempt21 cleanup](../records/evidence/revised-api-u26-attempt21-storage-cleanup.json) are inputs to that budget, not permission to repeatedly free only the immediate shortfall.
-6. Obtain independent audit of one self-contained runnable packet. Then request one owner approval covering required setup, any useful proven existing calibration, both remaining rows, duration, cleanup and explicit retry scope. Do not launch an app or calibration while preparing that request.
+The conditional launcher is shown for audit only. Independent audit passed; dispatch waits for the capacity gate and one complete-unit owner approval:
 
-There is no proposed executable command here yet. Publishing a runnable packet requires actual implementation and routine verification of the complete Android Mapbox route. Historical micro-run commands are not substitutes.
+```sh
+/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-acceptance.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22
+```
+
+The packet owns all nineteen recipes and the execution sequence. These initial core command forms use only the current helper and attempt; they are transport references, not permission to execute or a substitute for that sequence. These are templates: before dispatch, replace both guarded tap placeholders with literal numeric coordinates just observed in the visible child's fresh bounds. Do not rely on variables from a previous tool call or dispatch an uninstantiated template. Use a unique hierarchy filename for each later read. The retained row uses the same packet-bound helper with its own fresh report and six recipes.
+
+```sh
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22 mapbox-android-core live-child-button adb shell uiautomator dump /sdcard/one-map-attempt22-hierarchy-001.xml
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22 mapbox-android-core live-child-button adb shell cat /sdcard/one-map-attempt22-hierarchy-001.xml
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22 mapbox-android-core live-child-button toolbar "Read renderer"
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22 mapbox-android-core live-child-button adb shell input tap "${CHILD_X:?Set fresh child X}" "${CHILD_Y:?Set fresh child Y}"
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22 mapbox-android-core live-child-button adb shell screencap -p /sdcard/one-map-attempt22-live-child-button.png
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22 mapbox-android-core live-child-button adb pull /sdcard/one-map-attempt22-live-child-button.png /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22/live-child-button.png
+python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-22 mapbox-android-core live-child-button status
+```
+
+The new unit requires 12GiB free before dispatch. The packet records current read-only free space and shortfall; the coordinator must recheck capacity outside the launcher and hold without native preflight or output creation until the budget is met. No measured whole-unit peak exists. This is a conservative planning allocation for configured userdata/sdcard, APK/install/cache allowance, host headroom and cleanup reserve, not a measured peak or an explanation of SIGKILL. Historical storage gates remain unchanged. No cleanup is authorized by this preparation.
+
+Estimate 45-75 minutes for both rows, with existing 30-minute manual and 35-minute driver bounds per row, 180-second boot and 120-second installation bounds, bounded command/identity reads and a 100-minute worker allocation including cleanup. That allocation is coordinator supervision, not a new global launcher watchdog. One exclusive owner-selected Terra Medium worker owns the selected unit; the coordinator keeps diagnosis and audit.
+
+With audit complete, request one approval conditional on capacity readiness for required setup, both remaining rows, duration, cleanup and retry scope on the exact frozen candidate/device/SDK. The accepted camera and earlier minimal/lifetime/query/source/rendering evidence retain their original identities and limits. The unit packet does not certify the general SDK or convert the unknown prior failure into a pass. No application, emulator, Metro, installation, calibration or native acceptance ran during preparation.
 
 ## Execution, failure and completion
 
