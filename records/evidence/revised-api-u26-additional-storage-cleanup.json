@@ -1,0 +1,65 @@
+{
+  "recordedUTC": "2026-11-02T01:20:06.578293+00:00",
+  "authorization": "User: Free up space.",
+  "removed": [
+    {
+      "path": "/private/tmp/streamshot-audit-playwright-browsers",
+      "allocatedBytesBefore": 1222328320
+    },
+    {
+      "path": "/Users/rob/Library/Developer/Xcode/DocumentationCache",
+      "allocatedBytesBefore": 535339008
+    },
+    {
+      "path": "/Users/rob/.local/share/vite-plus/js_runtime/node/22.16.0",
+      "allocatedBytesBefore": 186261504
+    },
+    {
+      "path": "/Users/rob/.local/share/vite-plus/js_runtime/node/24.22.0",
+      "allocatedBytesBefore": 209829888
+    },
+    {
+      "path": "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.3",
+      "allocatedBytesBefore": 70496256
+    },
+    {
+      "path": "/Users/rob/.local/share/vite-plus/package_manager/pnpm/10.33.0",
+      "allocatedBytesBefore": 21905408
+    },
+    {
+      "path": "/Users/rob/.local/share/vite-plus/package_manager/pnpm/12.11.2",
+      "allocatedBytesBefore": 41160704
+    },
+    {
+      "path": "/Users/rob/.local/share/vite-plus/package_manager/pnpm/12.14.0",
+      "allocatedBytesBefore": 41922560
+    },
+    {
+      "path": "/Users/rob/.local/share/vite-plus/package_manager/pnpm/12.15.0",
+      "allocatedBytesBefore": 42962944
+    },
+    {
+      "category": "Codex application logs older than7days",
+      "files": 191,
+      "logicalBytes": 96887641
+    }
+  ],
+  "blocked": [],
+  "freeBytesBefore": 7204495360,
+  "freeBytesAfter": 9683759104,
+  "observedFreeBytesIncrease": 2479263744,
+  "measurementLimit": "Concurrent host writes and filesystem sharing can affect observed space; allocated sizes are not an exact reclaimed-byte total.",
+  "preserved": [
+    "All project working directories",
+    "Active Node26.13.0 and task-pinned Node24.22.1/Bun1.4.1",
+    "f05 archive, both APKs/iOS apps and existing native setup",
+    "Current application logs and active SIGKILL evidence"
+  ],
+  "nativeExecution": false,
+  "verification": {
+    "allFrozen695AndPreparationPinsMatch": true,
+    "archiveAndApksMatch": true,
+    "availableBytes": 9879908352,
+    "androidGateMet": true
+  }
+}
