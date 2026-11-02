@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
 import { readFileSync } from "node:fs";
+import { StringDecoder } from "node:string_decoder";
 import { runInNewContext } from "node:vm";
 
 const text = readFileSync(
@@ -20,6 +21,8 @@ for (const [engine, borrowed] of [
 ]) {
   for (const failure of [
     null,
+    "success-recorder-error",
+    "success-recorder-exit",
     "identity",
     "split",
     "conflict",
@@ -28,6 +31,8 @@ for (const [engine, borrowed] of [
     "cleanup",
     "manual-operator-latch",
     "manual-failed",
+    "manual-recorder-error",
+    "manual-recorder-exit",
     "manual-diagnostics-read",
     "manual-diagnostics-write",
     "manual-diagnostics-pid-error",
@@ -55,8 +60,49 @@ for (const [engine, borrowed] of [
     let metro;
     let polls = 0;
     let diagnostics;
+    let recorder;
+    let recorderStopped = false;
     const context = {
       Buffer,
+      StringDecoder,
+      setTimeout,
+      clearTimeout,
+      spawn: (file, args, options) => {
+        assert.equal(file, "adb");
+        assert(!launched);
+        assert(metroReady);
+        assert.equal(options.detached, !borrowed);
+        recorder = Object.assign(new EventEmitter(), {
+          pid: 78,
+          stdout: new EventEmitter(),
+          stderr: new EventEmitter(),
+        });
+        recorder.kill = () => {
+          recorderStopped = true;
+          if (failure?.startsWith("manual-"))
+            assert.equal(
+              commands.filter(
+                (parts) =>
+                  parts.includes("exit-info") ||
+                  parts.includes("logcat") ||
+                  parts.includes("activities")
+              ).length,
+              5
+            );
+          recorder.emit("exit", null, "SIGTERM");
+          recorder.emit("close");
+        };
+        queueMicrotask(() => {
+          recorder.emit("spawn");
+          if (failure?.endsWith("recorder-error"))
+            recorder.emit("error", Error("secret transport"));
+          if (failure?.endsWith("recorder-exit")) {
+            recorder.emit("exit", 1, null);
+            recorder.emit("close");
+          }
+        });
+        return recorder;
+      },
       assert,
       platform: "android",
       retained: false,
@@ -106,6 +152,7 @@ for (const [engine, borrowed] of [
           if (failure === "manual-diagnostics-write")
             throw Error("diagnostic disk failure");
           assert(!commands.at(-1).includes("force-stop"));
+          if (recorder) assert(recorderStopped);
           return;
         }
         assert.equal(file, "/report");
@@ -118,11 +165,13 @@ for (const [engine, borrowed] of [
         assert.equal(manual.scenarios["physical-touch"], "unverified");
         if (failure === "manual-operator-latch") return;
         manual.scenarios["physical-touch"] =
+          failure?.startsWith("manual-recorder") ||
           failure?.startsWith("manual-diagnostics") ||
           failure === "manual-failed"
             ? "failed"
             : "passed";
         if (
+          !failure?.startsWith("manual-recorder") &&
           failure !== "manual-failed" &&
           !failure?.startsWith("manual-diagnostics")
         )
@@ -162,6 +211,10 @@ for (const [engine, borrowed] of [
       },
       stopOwnedProcess: async (child) => {
         stopped.push(child.pid);
+        if (child === recorder) {
+          recorder.kill();
+          return;
+        }
         child.emit("exit", null, "SIGTERM");
       },
       console: { error() {} },
@@ -227,6 +280,7 @@ for (const [engine, borrowed] of [
         )
           throw Error("reverse failed");
         if (parts.includes("start")) {
+          assert(recorder, "Recorder starts before app launch.");
           assert(parts.includes("-W"));
           if (failure === "launch-status") return "no launch status";
           if (failure === "launch-error")
@@ -238,6 +292,7 @@ for (const [engine, borrowed] of [
         }
         if (parts.includes("start") && failure === "launch")
           throw Error("launch failed");
+        if (parts.includes("force-stop") && launched) assert(recorderStopped);
         if (parts.includes("--remove") && failure === "cleanup")
           throw Error("cleanup failed");
         if (parts.includes("exit-info")) {
@@ -300,8 +355,15 @@ for (const [engine, borrowed] of [
       },
     };
     try {
-      await runInNewContext(`${source}\nrunNative("${engine}")`, context);
+      const result = await runInNewContext(
+        `${source}\nrunNative("${engine}")`,
+        context
+      );
+      assert(result.androidRecorder, "Successful row saves recorder status.");
+      if (failure?.startsWith("success-recorder"))
+        assert.equal(result.androidRecorder.coverage, "gap");
     } catch (error) {
+      if (failure === null) throw error;
       if (failure?.startsWith("manual-")) {
         assert.match(String(error.errors[0]), /TF07 manual report failed/);
         if (failure === "manual-operator-latch") {
@@ -329,7 +391,12 @@ for (const [engine, borrowed] of [
       }
       failed = true;
     }
-    assert.equal(failed, failure !== null, `${borrowed}/${failure}`);
+    if (recorder) assert(recorderStopped);
+    assert.equal(
+      failed,
+      failure !== null && !failure?.startsWith("success-recorder"),
+      `${borrowed}/${failure}`
+    );
     if (
       [
         "status-bind",
@@ -346,6 +413,10 @@ for (const [engine, borrowed] of [
     if (failure === "status-bind") assert.equal(metro, undefined);
     if (failure?.startsWith("manual-")) {
       assert(diagnostics, "Capture failure diagnostics before force-stop.");
+      if (failure?.startsWith("manual-recorder")) {
+        assert.equal(diagnostics.recorder.coverage, "gap");
+        assert(diagnostics.recorder.gaps.length);
+      }
       assert.equal(diagnostics.applicationId, `com.onemap${engine}`);
       assert.equal(diagnostics.reads.length, 6);
       assert.match(diagnostics.exitHistoryClassification, /^unclassified/);
@@ -485,7 +556,7 @@ for (const failure of [null, "empty", "diagnostic", "missing-tool"]) {
 
 const diagnosticSource = text.slice(
   text.indexOf("      const diagnosticText ="),
-  text.indexOf("      const diagnostics =")
+  text.indexOf("      diagnostics =")
 );
 for (const keepPrefix of [false, true]) {
   for (const trailingBytes of [0, 1, 2, 3]) {
@@ -504,3 +575,223 @@ for (const keepPrefix of [false, true]) {
     assert(!bounded.includes("�"));
   }
 }
+
+const recorderSource = text.slice(
+  text.indexOf("const startAndroidRecorder ="),
+  text.indexOf("const nativeStatus =")
+);
+for (const engine of ["mapbox", "maplibre"]) {
+  for (const mode of [
+    "normal",
+    "early-exit",
+    "error",
+    "spawn-throw",
+    "flush-error",
+  ]) {
+    const child = Object.assign(new EventEmitter(), {
+      pid: 89,
+      stdout: new EventEmitter(),
+      stderr: new EventEmitter(),
+    });
+    let killed = false;
+    child.kill = () => {
+      killed = true;
+      child.emit("exit", null, "SIGTERM");
+      child.emit("close");
+    };
+    const recorder = await runInNewContext(
+      `${recorderSource}\nstartAndroidRecorder("assigned", "com.onemap${engine}", () => "12345")`,
+      {
+        Buffer,
+        StringDecoder,
+        setTimeout,
+        clearTimeout,
+        process: { env: { MAPBOX_ACCESS_TOKEN: "known-sample-token" } },
+        spawn: (file, args) => {
+          assert.equal(file, "adb");
+          assert.deepEqual(Array.from(args), [
+            "-s",
+            "assigned",
+            "logcat",
+            "-b",
+            "main",
+            "-b",
+            "system",
+            "-v",
+            "threadtime",
+            "-T",
+            "1",
+            "lowmemorykiller:I",
+            "lmkd:I",
+            "ActivityManager:I",
+            "*:S",
+          ]);
+          if (mode === "spawn-throw") throw Error("known-sample-token");
+          queueMicrotask(() => child.emit("spawn"));
+          return child;
+        },
+        stopOwnedProcess: async () => child.kill(),
+      }
+    );
+    const line = (tag, body, second = "01") =>
+      `11-01 16:24:${second}.499 100 101 I ${tag}: ${body}`;
+    const selected = line(
+      "ActivityManager",
+      `Killing 12345:com.onemap${engine}/u0: why 🗺 known-sample-token ?token=private-query-token`
+    );
+    // Single-byte chunks split UTF8 and both credential forms at every possible boundary.
+    for (const byte of Buffer.from(selected + "\n"))
+      child.stdout.emit("data", Buffer.from([byte]));
+    child.stdout.emit(
+      "data",
+      Buffer.from(
+        [
+          line(
+            "ActivityManager",
+            `Killing 999:com.onemap${engine}evil/u0: exclude-lookalike`
+          ),
+          line("ActivityManager", "pid=12345 selected-pid-only"),
+          line("ActivityManager", "pid=123456 unrelated-pid"),
+          line("ActivityManager", "private unrelated message"),
+          line("lowmemorykiller", "kernel-kill-reason"),
+          line("lmkd", "daemon-kill-reason"),
+        ].join("\n") + "\n"
+      )
+    );
+    child.stdout.emit(
+      "data",
+      Buffer.from(
+        line("lmkd", "x".repeat(1024 * 1024) + "?token=secret-tail") + "\n"
+      )
+    );
+    if (mode === "normal") {
+      child.stdout.emit(
+        "data",
+        Buffer.from(
+          Array.from({ length: 5000 }, (_, index) =>
+            line(
+              "lmkd",
+              `bounded-${index} 🗺 known-sample-token ?access_token=secret-${index}`,
+              "02"
+            )
+          ).join("\n") + "\n"
+        )
+      );
+      child.stdout.emit(
+        "data",
+        Buffer.from(
+          line("lmkd", "last unterminated 🗺 ?token=final-secret", "03")
+        )
+      );
+    }
+    if (mode === "early-exit") {
+      child.emit("exit", 1, null);
+      child.emit("close");
+    }
+    if (mode === "error") {
+      child.emit("error", Error("known-sample-token"));
+      child.stdout.emit("error", Error("token=secret"));
+    }
+    if (mode === "flush-error")
+      child.stderr.emit("error", Error("known-sample-token"));
+    const snapshot = await recorder.stop();
+    assert.equal(snapshot.retainedBytes, Buffer.byteLength(snapshot.text));
+    assert(snapshot.retainedBytes <= 128 * 1024);
+    assert.equal(snapshot.oversizedLines, mode === "spawn-throw" ? 0 : 1);
+    assert.equal(snapshot.truncated, mode !== "spawn-throw");
+    assert(!snapshot.text.includes("known-sample-token"));
+    assert(!snapshot.text.includes("private-query-token"));
+    assert(!snapshot.text.includes("secret"));
+    assert(!snapshot.text.includes("�"));
+    assert(!snapshot.text.includes("exclude-lookalike"));
+    assert(!snapshot.text.includes("unrelated"));
+    if (mode === "normal") {
+      assert(snapshot.evictedLines > 0);
+      assert.match(snapshot.text, /last unterminated 🗺 \?token=<REDACTED>$/);
+      assert.equal(snapshot.lastRetainedTimestamp, "11-01 16:24:03.499");
+    } else if (mode !== "spawn-throw") {
+      assert.match(snapshot.text, /kernel-kill-reason/);
+      assert.match(snapshot.text, /daemon-kill-reason/);
+      assert.match(snapshot.text, /selected-pid-only/);
+      assert.match(snapshot.text, /why 🗺 <REDACTED> \?token=<REDACTED>/);
+      assert.equal(snapshot.coverage, "gap");
+      assert(snapshot.gaps.length);
+    }
+    assert.equal(killed, mode !== "spawn-throw");
+  }
+}
+console.log(
+  "Bounded Android recorder chunk/UTF8/token/filter/EOF/exit/error mocks passed for both engines."
+);
+
+for (const mode of ["escalation-close", "never-close", "async-spawn-error"]) {
+  const child = Object.assign(new EventEmitter(), {
+    pid: mode === "async-spawn-error" ? undefined : 90,
+    stdout: new EventEmitter(),
+    stderr: new EventEmitter(),
+  });
+  const signals = [];
+  child.kill = (signal) => {
+    signals.push(signal);
+    if (signal === "SIGKILL" && mode === "escalation-close") {
+      child.stdout.emit(
+        "data",
+        Buffer.from("11-01 16:24:04.499 100 101 I lmkd: final-flushed-line")
+      );
+      child.emit("exit", null, signal);
+      child.emit("close");
+    }
+  };
+  const recorder = await runInNewContext(
+    `${recorderSource}\nstartAndroidRecorder("assigned", "com.onemapmapbox", () => null)`,
+    {
+      Buffer,
+      StringDecoder,
+      setTimeout: (callback) => {
+        queueMicrotask(callback);
+        return 1;
+      },
+      clearTimeout() {},
+      process: { env: { TF07_PARENT_PROCESS_GROUP: "1" } },
+      spawn: () => {
+        queueMicrotask(() => {
+          if (mode === "async-spawn-error") {
+            child.emit("error", Error("unavailable"));
+            child.emit("close");
+          } else child.emit("spawn");
+        });
+        return child;
+      },
+      stopOwnedProcess: () =>
+        assert.fail(
+          "Parent group belongs to batch, never signal it from driver."
+        ),
+    }
+  );
+  const snapshot = await recorder.stop();
+  assert.equal(snapshot.coverage, "gap");
+  if (mode === "async-spawn-error")
+    assert(snapshot.gaps.includes("recorder child error"));
+  else assert.deepEqual(signals, ["SIGTERM", "SIGKILL"]);
+  if (mode === "escalation-close") {
+    assert(snapshot.closed);
+    assert.match(snapshot.text, /final-flushed-line$/);
+  }
+  if (mode === "never-close") {
+    assert(!snapshot.closed);
+    assert(
+      snapshot.gaps.includes(
+        "recorder remained unclosed after final termination"
+      )
+    );
+    const before = JSON.stringify(snapshot);
+    child.stdout.emit("data", Buffer.from("late chunk"));
+    child.emit("error", Error("late error"));
+    child.emit("close");
+    child.emit("exit", 1, null);
+    assert.equal(JSON.stringify(snapshot), before);
+  }
+}
+console.log(
+  "Recorder parent-owned escalation, final flush, unclosed gap and asynchronous spawn failure mocks passed."
+);

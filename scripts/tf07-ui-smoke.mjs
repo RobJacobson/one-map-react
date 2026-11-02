@@ -12,6 +12,7 @@ import {
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { StringDecoder } from "node:string_decoder";
 
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import {
@@ -320,6 +321,8 @@ const runNative = async (selectedEngine) => {
   let stoppingMetro = false;
   let status;
   let androidLaunch;
+  let androidRecorder;
+  let diagnostics;
   let acquiredApp = false;
   const acquiredReverses = [];
   const failures = [];
@@ -501,6 +504,12 @@ const runNative = async (selectedEngine) => {
     }, 60000);
     if (nativeFailure) throw nativeFailure;
     if (platform === "android") {
+      if (process.env.TF07_ANDROID_DIAGNOSTICS)
+        androidRecorder = await startAndroidRecorder(
+          serial,
+          applicationId,
+          () => androidLaunch?.pid
+        );
       androidLaunch = { requestedAtUTC: new Date().toISOString() };
       const launch = await adb([
         "shell",
@@ -606,7 +615,7 @@ const runNative = async (selectedEngine) => {
           : bytes.subarray(-128 * 1024);
         return retained.toString("utf8").replace(/^\uFFFD+|\uFFFD+$/g, "");
       };
-      const diagnostics = {
+      diagnostics = {
         applicationId,
         serial,
         launch: androidLaunch,
@@ -685,16 +694,21 @@ const runNative = async (selectedEngine) => {
           });
         }
       }
+    }
+    if (androidRecorder) {
+      const snapshot = await androidRecorder.stop();
+      if (diagnostics) diagnostics.recorder = snapshot;
+      if (result) result.androidRecorder = snapshot;
+    }
+    if (diagnostics) {
       try {
         writeFileSync(
           process.env.TF07_ANDROID_DIAGNOSTICS,
           JSON.stringify(diagnostics, null, 2),
           { flag: "wx" }
         );
-      } catch (error) {
-        console.error(
-          `Android failure diagnostics could not be saved: ${diagnosticText(error)}`
-        );
+      } catch {
+        console.error("Android failure diagnostics could not be saved.");
       }
     }
     if (acquiredApp)
@@ -719,6 +733,211 @@ const runNative = async (selectedEngine) => {
   if (failures.length)
     throw new AggregateError(failures, "TF07 flow or owned cleanup failed.");
   return result;
+};
+
+/** Owns one scoped logcat stream; oversized lines are dropped before retention/redaction. */
+const startAndroidRecorder = async (serial, applicationId, launchPid) => {
+  const startedAtUTC = new Date().toISOString();
+  const limit = 128 * 1024;
+  const lineLimit = 16 * 1024;
+  const decoder = new StringDecoder("utf8");
+  const lines = [];
+  const gaps = [];
+  let bytes = 0;
+  let inputBytes = 0;
+  let evictedLines = 0;
+  let oversizedLines = 0;
+  let partial = "";
+  let dropping = false;
+  let stopping = false;
+  let closed = false;
+  let finalized = false;
+  let child;
+  let exit;
+  const gap = (reason) => {
+    if (finalized) return;
+    if (!gaps.includes(reason) && gaps.length < 8) gaps.push(reason);
+  };
+  const retain = (line) => {
+    const tag = line.match(
+      /^\d\d-\d\d \d\d:\d\d:\d\d\.\d+\s+\d+\s+\d+\s+[VDIWEF]\s+(lowmemorykiller|lmkd|ActivityManager)\s*:\s*(.*)/
+    );
+    if (!tag) return;
+    // Package boundaries exclude lookalikes; PID matching uses explicit process fields.
+    const packagePattern = applicationId.replaceAll(".", "\\.");
+    const selectedPackage = new RegExp(
+      `(^|[^\\w.])${packagePattern}(?=[:/\\s),}]|$)`
+    );
+    const pid = launchPid();
+    const selectedPid =
+      pid &&
+      new RegExp(
+        `(?:\\bpid[=: ]+|\\bKilling +|\\bProcess +)${pid}(?=[ :),]|$)`,
+        "i"
+      ).test(tag[2]);
+    if (
+      tag[1] === "ActivityManager" &&
+      !selectedPackage.test(tag[2]) &&
+      !selectedPid
+    )
+      return;
+    const redacted = line
+      .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
+      .replace(/([?&](?:access_token|token)=)[^&\s"']+/gi, "$1<REDACTED>");
+    const size = Buffer.byteLength(redacted);
+    lines.push({ text: redacted, size, timestamp: line.slice(0, 18) });
+    bytes += size;
+    while (bytes > limit) {
+      bytes -= lines.shift().size;
+      evictedLines++;
+    }
+  };
+  const consume = (text) => {
+    for (const fragment of text.split(/(?<=\n)/)) {
+      if (!dropping) {
+        if (
+          Buffer.byteLength(partial) + Buffer.byteLength(fragment) >
+          lineLimit
+        ) {
+          partial = "";
+          dropping = true;
+          oversizedLines++;
+        } else partial += fragment;
+      }
+      if (fragment.endsWith("\n")) {
+        if (!dropping) retain(partial);
+        partial = "";
+        dropping = false;
+      }
+    }
+  };
+  let resolveClosed;
+  const close = new Promise((resolve) => {
+    resolveClosed = resolve;
+  });
+  try {
+    child = spawn(
+      "adb",
+      [
+        "-s",
+        serial,
+        "logcat",
+        "-b",
+        "main",
+        "-b",
+        "system",
+        "-v",
+        "threadtime",
+        "-T",
+        "1",
+        "lowmemorykiller:I",
+        "lmkd:I",
+        "ActivityManager:I",
+        "*:S",
+      ],
+      {
+        detached: process.env.TF07_PARENT_PROCESS_GROUP !== "1",
+        stdio: ["ignore", "pipe", "pipe"],
+      }
+    );
+    child.on("error", () => gap("recorder child error"));
+    child.stdout.on("error", () => gap("recorder stdout error"));
+    child.stderr.on("error", () => gap("recorder stderr error"));
+    child.stderr.on("data", () => gap("recorder stderr output"));
+    child.stdout.on("data", (chunk) => {
+      if (finalized || closed) return;
+      inputBytes += chunk.length;
+      // Decoding bounded slices also bounds split fragments for arbitrary chunk sizes.
+      for (let offset = 0; offset < chunk.length; offset += 4096)
+        consume(decoder.write(chunk.subarray(offset, offset + 4096)));
+    });
+    child.on("exit", (code, signal) => {
+      if (finalized) return;
+      exit = { code, signal };
+      if (!stopping) gap("recorder exited before owned stop");
+    });
+    child.on("close", () => {
+      if (closed || finalized) return;
+      consume(decoder.end());
+      if (!dropping && partial) retain(partial);
+      partial = "";
+      closed = true;
+      resolveClosed();
+    });
+    await new Promise((resolve) => {
+      child.once("spawn", resolve);
+      child.once("error", resolve);
+      child.once("close", resolve);
+    });
+  } catch {
+    gap("recorder startup failed");
+  }
+  return {
+    stop: async () => {
+      stopping = true;
+      if (child) {
+        try {
+          if (process.env.TF07_PARENT_PROCESS_GROUP === "1")
+            child.kill("SIGTERM");
+          else await stopOwnedProcess(child);
+        } catch {
+          gap("recorder termination failed");
+        }
+        let timer;
+        try {
+          await Promise.race([
+            close,
+            new Promise((resolve) => {
+              timer = setTimeout(resolve, 1000);
+            }),
+          ]);
+        } finally {
+          clearTimeout(timer);
+        }
+        if (!closed) {
+          gap("recorder flush deadline exceeded");
+          try {
+            child.kill("SIGKILL");
+          } catch {
+            gap("recorder final termination failed");
+          }
+          try {
+            await Promise.race([
+              close,
+              new Promise((resolve) => {
+                timer = setTimeout(resolve, 1000);
+              }),
+            ]);
+          } finally {
+            clearTimeout(timer);
+          }
+          if (!closed)
+            gap("recorder remained unclosed after final termination");
+        }
+      }
+      finalized = true;
+      return {
+        startedAtUTC,
+        stoppedAtUTC: new Date().toISOString(),
+        coverage:
+          gaps.length || evictedLines || oversizedLines
+            ? "gap"
+            : "scoped stream; buffer rotation and unlogged kills remain possible",
+        gaps,
+        exit,
+        closed,
+        inputBytes,
+        retainedBytes: bytes,
+        limitBytes: limit,
+        evictedLines,
+        oversizedLines,
+        truncated: evictedLines > 0 || oversizedLines > 0,
+        firstRetainedTimestamp: lines[0]?.timestamp ?? null,
+        lastRetainedTimestamp: lines.at(-1)?.timestamp ?? null,
+        text: lines.map((line) => line.text).join(""),
+      };
+    },
+  };
 };
 
 const nativeStatus = (onObservation) =>
@@ -897,6 +1116,7 @@ const command = (file, args) =>
       reject(new Error(`${file} timed out.`));
     }, 30000);
     child.stdout.on("data", (chunk) => {
+      if (finalized || closed) return;
       output += chunk;
     });
     child.on("error", (error) => {

@@ -345,7 +345,7 @@ for (const [engine, camera, batch = false, continuation = false] of [
         if (
           /android-(rendering|camera)-preparation.json$/.test(file) ||
           file.endsWith("platform-batches-preparation.json") ||
-          file.endsWith("android-exit-diagnostics-preparation.json")
+          file.endsWith("android-bounded-log-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },

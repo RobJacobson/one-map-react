@@ -1,0 +1,109 @@
+{
+  "checkpoint": "U26 Android attempt13 SIGKILL source diagnosis",
+  "recordedUTC": "2026-11-02T00:40:40.601951+00:00",
+  "scope": "Saved evidence and read-only source inspection; no native commands, host changes, implementation, rebuild or retry.",
+  "worker": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "task": "sigkill_source_diagnosis",
+    "coordinatorAudit": "Independent saved-diagnostic, toolbar-receipt, emulator-log and runner lifecycle inspection passed; upstream fallback verified against Android source."
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "candidateChanged": false,
+  "conclusion": "The selected launched process received SIGKILL before recorded cleanup; sender and motive remain unknown. No production repair is justified by this evidence.",
+  "facts": {
+    "launch": {
+      "requestedAtUTC": "2026-11-02T00:12:21.958Z",
+      "pid": "3666",
+      "observedAtUTC": "2026-11-02T00:12:26.260Z"
+    },
+    "diagnosticCaptureUTC": "2026-11-02T00:25:13.024Z",
+    "death": {
+      "pid": 3666,
+      "uid": 10232,
+      "deviceTimestamp": "2026-11-01 16:24:55.499",
+      "reason": "2 SIGNALED",
+      "status": 9,
+      "eventTimestamp": "11-01 16:24:55.490"
+    },
+    "timingLimit": "PST-to-UTC conversion places death near the remount receipt; host/device clock skew was not measured. Receipt filesystem modification times are not exact tap times.",
+    "workerReportedSequence": [
+      "Style helper completed",
+      "Remount helper completed",
+      "tap 540 1450 completed",
+      "tap 540 1807 completed",
+      "Read renderer failed: expected one visible fixture toolbar"
+    ],
+    "inputTimingLimit": "Absolute times for the two taps are unavailable; their ordering relative to death cannot be established.",
+    "failedReadRenderer": {
+      "swipes": 0,
+      "rendererTap": false
+    },
+    "cleanup": "Captured death predates diagnostics and subsequent owned teardown. Worker reports no kill, stop, timeout or termination before failure. Row deadlines had not elapsed. Host process groups are distinct from guest PID3666.",
+    "emulator": "Saved startup log increases requested RAM2048MB to4096MB and forces API37 software GLES rendering. Neither proves resource exhaustion.",
+    "diagnosticGap": "Retained main/system messages begin16:25:09.761, after death. Last2000 selection and filter can omit causal messages; filter lacks explicit lowmemorykiller/lmkd tags.",
+    "exitInfoLimits": "SIGNALED/status9 can represent a low-memory kill where reporting is unsupported; support was not captured. Zero RSS/PSS is not proof of zero usage. State36bytes is only an app-defined summary length, not its payload."
+  },
+  "sourceInspection": {
+    "worker": "Targeted frozen library dist, shared fixtures, native app, RNMBX Android and React Native devsupport/bridge/runtime searches found no explicit killProcess, System.exit, exitProcess, SIGKILL or kill -9 route. Remount disposes the map; proximity alone does not identify a kill mechanism.",
+    "coordinator": "Reviewed TF07 diagnostic filter/order, startup force-stop versus post-failure force-stop, and native-smoke-process host process-group termination. Inspected raw diagnostic and toolbar018-020 receipts and emulator startup.",
+    "outsideScope": "Opaque native SDK binaries and exhaustive dependency inspection; all possible external or self-kill actors remain unexcluded."
+  },
+  "sources": [
+    {
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/d88b5baa7b5a/core/java/android/app/ApplicationExitInfo.java",
+      "claim": "REASON_SIGNALED/statusSIGKILL fallback for unsupported low-memory reporting."
+    },
+    {
+      "url": "https://android.googlesource.com/platform/system/memory/lmkd/+/refs/heads/main/lmkd.cpp",
+      "inspectedBlob": "3cb458d57dccefadb1327d7caea0026a899fdc05",
+      "claim": "lmkd uses lowmemorykiller log tag; worker inspected kill-message PID/UID/reason fields."
+    }
+  ],
+  "smallestPlan": {
+    "status": "Proposed only; implementation approval requested. Native execution requires a separate approval after implementation and routine audit.",
+    "change": "One recorder in the existing TF07 Android driver, started before selected-app launch. Reuse owned-child lifecycle. No new framework/dependency.",
+    "commandArguments": [
+      "-s",
+      "emulator-5580",
+      "logcat",
+      "-b",
+      "main",
+      "-b",
+      "system",
+      "-v",
+      "threadtime",
+      "-T",
+      "1",
+      "lowmemorykiller:I",
+      "lmkd:I",
+      "ActivityManager:I",
+      "*:S"
+    ],
+    "capture": "Retain relevant LMK and selected-package/PID activity-manager messages in a redacted128KiB byte-bounded ring, with first/last retained timestamps, recorder status and truncation metadata. Scope to selected emulator; pass arguments directly.",
+    "failureAndOwnership": "Preserve first failure. Recorder errors are secondary and reported explicitly. Keep the existing six failure reads before owned recorder/app/process cleanup. Bound recorder lifetime by the row and terminate its owned child on all exits.",
+    "routineChecks": [
+      "Mock startup-before-launch and cleanup ordering on success/failure",
+      "Memory/output bound, UTF8 truncation, redaction and selected-process filtering",
+      "Recorder exit/error preserves original failure and produces an explicit coverage limitation",
+      "Existing both-engine native-driver, launcher, writer and operator regressions; refresh observer hashes, leaving frozen inputs unchanged"
+    ],
+    "futureExecution": "After routine audit and separate approval: same five serial rows with one gpt-6.1-terra medium worker; attempt14 fresh output; unchanged f05/APKs/setup; no CUA, Android Studio, dependency restoration, rebuild or Mapbox camera rerun. Stop first failure, retain completed results, clean only owned resources.",
+    "estimatedExecution": "60-120minutes; existing approximately160minute outer allowance.",
+    "remainingRows": {
+      "android": 5,
+      "ios": 6
+    },
+    "limit": "Recorder improves coverage but cannot guarantee signal-sender identification for kernel or unlogged kills. Do not infer OOM from missing evidence."
+  },
+  "evidenceSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/mapbox-android-core-diagnostics.json": "ad26c703a63e5259478f5c6d545a906d982d66e2554ee5d8794735476bfcf865",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/emulator.log": "6cd496544531f27ca53b9a7a6cb3f32e93b85d0ff90c745b989f3f1bd482d8e4",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/toolbar-018.json": "e9781bf71075c8d2d66e16fdf90351bfce5eb16f26c8f0baf396d3611acd9977",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/toolbar-019.json": "b4ee72d81bdf7db3b03ff269d53e50ff6328673682d0733132bd91aa495d74d4",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/toolbar-020.json": "83e4c89c3e218b25c9f3601cd457f838e7ea2759c3fe40f925f4aeae63b61c57",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-ui-smoke.mjs": "cad03d3fe7e4f3abbf25fe9bca72003db5d2ba434784eede7059b68e7251d1cd",
+    "/private/tmp/one-map-android-restoration-review/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "/Users/rob/code/mapbox-code/one-map/records/evidence/revised-api-u26-android-platform-batch-attempt-13.json": "ace1ae1f29f30d0bd001ada282a7ab85fa656ad7c9e568c91228d2512f0b503e"
+  }
+}
