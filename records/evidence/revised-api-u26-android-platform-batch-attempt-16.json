@@ -1,0 +1,71 @@
+{
+  "checkpoint": "U26 Android five-row continuation attempt16",
+  "recordedUTC": "2026-11-02T01:13:22.066804+00:00",
+  "result": "stopped-at-storage-gate-before-resource-acquisition",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "task": "android_terra_attempt15",
+    "sameWorkerAsAttempt15": true
+  },
+  "repair": {
+    "pr": "https://github.com/RobJacobson/one-map-react/pull/90",
+    "commit": "9ab88a9",
+    "scope": "One-line command-output repair with real Node subprocess regression; independently audited before this attempt"
+  },
+  "preparation": {
+    "path": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-command-output-preparation.json",
+    "sha256": "deb423b6a8ac6ce5e08e1bbbf0fae18c2bd083bf2c2607c6265da4cbacfe8012"
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "candidateChanged": false,
+  "firstFailure": {
+    "error": "AssertionError [ERR_ASSERTION]: Android preboot requires 8.2 GiB free; stop without deleting files.",
+    "freeBytes": 6128271360,
+    "freeGiB": 5.7073974609375,
+    "requiredBytes": 8804682957,
+    "boundary": "Before ports/device inventory, private AVD, emulator/process acquisition or installation"
+  },
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "operatorCommands": 0,
+  "recorderExercised": false,
+  "nativeRebuild": false,
+  "cleanup": {
+    "required": false,
+    "resourcesAcquired": false,
+    "checkpoints": [],
+    "steps": []
+  },
+  "coordinatorAudit": {
+    "status": "passed",
+    "receiptAndLauncherOrderingReviewed": true,
+    "frozen695AllPreparationPinsArchiveAndApksMatch": true,
+    "currentFreeBytes": 6123806720,
+    "cleanupFinding": "No acquisition or cleanup required; attempt15 cleanup independently verified previously"
+  },
+  "storageInvestigation": {
+    "taskStageMiB": 836.5,
+    "reviewCheckoutPreserved": true,
+    "disposableDownloadCachesRemainRemoved": true,
+    "unrelatedTemporaryWorkspaces": "Several multi-hundred-MiB other-project working directories are present; not modified. No claim that they alone caused the free-space change.",
+    "activeToolRuntimes": "Active shared runtimes preserved.",
+    "unexplainedFreeSpaceChange": "Recorded available space fell between attempts; no definitive attribution to a particular process or file.",
+    "safeTaskOwnedCleanupInsufficient": true
+  },
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "authorization": "Owner authorized fixes and continuation on unchangedf05; permission remains for same scope. No need to re-request execution approval solely because external space is restored.",
+  "next": "Restore at least8.2GiB available (about3GiB extra including margin), then use a fresh output directory and same validated repaired script. Do not lower gate or delete unrelated working directories.",
+  "retainedEvidence": {
+    "path": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-16/receipt.json",
+    "sha256": "0189aae5b31d827acfacd47efa54b9d7185915457e173fbc80500a3ef7b96ba5"
+  },
+  "limits": [
+    "No new acceptance row or recorder coverage was exercised",
+    "Original SIGKILL sender remains unresolved; shared command ReferenceError is repaired and routinely verified"
+  ]
+}
