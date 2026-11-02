@@ -13,9 +13,9 @@ LAUNCHER = Path(__file__).with_name("launch-android-lifetime-emulator.py")
 
 
 class LauncherTests(unittest.TestCase):
-    def run_launcher(self, log_path, process):
+    def run_launcher(self, log_path, process, api36=False):
         output = io.StringIO()
-        with patch("sys.argv", [str(LAUNCHER), str(log_path)]), \
+        with patch("sys.argv", [str(LAUNCHER), str(log_path)] + (["--api36"] if api36 else [])), \
                 patch("subprocess.Popen", return_value=process) as spawn, \
                 contextlib.redirect_stdout(output):
             runpy.run_path(str(LAUNCHER), run_name="__main__")
@@ -57,6 +57,18 @@ class LauncherTests(unittest.TestCase):
                     runpy.run_path(str(LAUNCHER), run_name="__main__")
                 spawn.assert_not_called()
             self.assertEqual(log_path.read_bytes(), b"previous")
+
+    def test_api36_uses_only_owned_image_avd_and_selected_memory(self):
+        process = Mock(pid=501)
+        process.wait.side_effect = subprocess.TimeoutExpired("emulator", 1)
+        with tempfile.TemporaryDirectory() as directory:
+            _, spawn = self.run_launcher(Path(directory) / "emulator.log", process, True)
+            arguments = spawn.call_args.args[0]
+            self.assertEqual(arguments[arguments.index("-avd") + 1], "OneMapF05MapboxApi36")
+            self.assertEqual(arguments[arguments.index("-memory") + 1], "3072")
+            self.assertEqual(arguments[arguments.index("-sysdir") + 1],
+                             "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-api36-image")
+            self.assertNotIn("OneMapU25F05", arguments)
 
     def test_early_exit_is_failure_even_for_zero(self):
         for exit_code in (0, 7):

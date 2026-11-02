@@ -35,6 +35,8 @@ for (const [
   batch = false,
   continuation = false,
   signalDiagnostic = false,
+  mapboxUnit = false,
+  api36Unit = false,
 ] of [
   ["mapbox", false],
   ["maplibre", false],
@@ -42,7 +44,10 @@ for (const [
   ["mapbox", true, true],
   ["mapbox", true, true, true],
   ["mapbox", true, true, false, true],
+  ["mapbox", true, true, false, false, true],
+  ["mapbox", true, true, false, false, true, true],
 ]) {
+  const avdName = api36Unit ? "OneMapF05MapboxApi36" : "OneMapU25F05";
   const apkHash = apkHashes[engine];
   const expectedNames =
     engine === "mapbox" ? names : [names[0], names[3], names[5]];
@@ -51,7 +56,19 @@ for (const [
     null,
     ...(engine === "mapbox" ? ["missing-token", "whitespace-token"] : []),
     "existing-output",
-    ...(continuation ? ["prior-hash", "prior-prefix"] : []),
+    ...(continuation || mapboxUnit ? ["prior-hash", "prior-prefix"] : []),
+    ...(mapboxUnit ? ["retained-driver"] : []),
+    ...(api36Unit
+      ? [
+          "device",
+          "image-stage",
+          "image-capacity",
+          "wrong-api",
+          "wrong-abi",
+          "pages-16k",
+          "gles2",
+        ]
+      : []),
     "low-space",
     "apk",
     "observer",
@@ -114,6 +131,18 @@ for (const [
           "late-metro-exit",
           "prior-hash",
           "prior-prefix",
+          ...(mapboxUnit ? ["low-space", "retained-driver"] : []),
+          ...(api36Unit
+            ? [
+                "device",
+                "image-stage",
+                "image-capacity",
+                "wrong-api",
+                "wrong-abi",
+                "pages-16k",
+                "gles2",
+              ]
+            : []),
         ].includes(failure)
     )
     .filter(
@@ -136,6 +165,7 @@ for (const [
         ].includes(failure)
     )
     .filter((failure) => !continuation || failure !== "late-metro-exit")
+    .filter((failure) => !mapboxUnit || failure !== "late-metro-exit")
     .filter(
       (failure) =>
         !signalDiagnostic ||
@@ -146,6 +176,8 @@ for (const [
     const removed = [];
     const children = [];
     let receipt;
+    let latestCheckpoint;
+    const phaseMessages = [];
     let clock = 0;
     let launched = false;
     let postIdentity = false;
@@ -211,6 +243,12 @@ for (const [
       }
       const command = args.slice(1);
       if (command[0] === "python3") {
+        if (command[1].endsWith("/scripts/setup-android-api36.py")) {
+          created = true;
+          assert.equal(command[2], "/attempt");
+          if (failAt === "image-stage") fail("image staging failed");
+          return "";
+        }
         if (command[1].includes("create-lifetime")) {
           created = true;
           if (failAt === "create") fail("create failed");
@@ -219,6 +257,7 @@ for (const [
         if (
           command[1].endsWith("/scripts/launch-android-lifetime-emulator.py")
         ) {
+          assert.equal(command.includes("--api36"), api36Unit);
           if (failAt === "launch-emulator") fail("emulator launch failed");
           if (failAt === "invalid-emulator-identity")
             return JSON.stringify({ pid: 0, pgid: 501 });
@@ -283,7 +322,17 @@ for (const [
       if (adb[0] === "exec-out")
         return failAt === "debug-read" ? "wrong" : preferences;
       if (adb.join(" ").includes("ro.build.version.sdk"))
-        return failAt === "api" ? "invalid" : "37";
+        return failAt === "api"
+          ? "invalid"
+          : api36Unit && failAt !== "wrong-api"
+            ? "36"
+            : "37";
+      if (adb.join(" ").includes("ro.product.cpu.abi"))
+        return failAt === "wrong-abi" ? "x86_64" : "arm64-v8a";
+      if (adb.join(" ").includes("PAGE_SIZE"))
+        return failAt === "pages-16k" ? "16384" : "4096";
+      if (adb.join(" ").includes("ro.opengles.version"))
+        return failAt === "gles2" ? "131072" : "196608";
       if (adb.join(" ").includes("pm grant") && failAt === "grant")
         fail("permission failed");
       if (adb.join(" ").includes("am start")) {
@@ -307,6 +356,21 @@ for (const [
       return "";
     };
     const context = {
+      console: {
+        log: (message) => {
+          if (String(message).startsWith("API36 ")) {
+            const row = String(message).split(" ")[1];
+            assert.equal(latestCheckpoint.currentRow, `mapbox-android-${row}`);
+            assert.equal(
+              latestCheckpoint.rows.at(-1).rowId,
+              row === "core" ? "mapbox-android-camera" : "mapbox-android-core"
+            );
+            assert.equal(latestCheckpoint.rows.at(-1).status, "passed");
+            phaseMessages.push(message);
+          }
+        },
+        error: () => {},
+      },
       assert,
       observeCamera: batch
         ? async () => {
@@ -320,6 +384,9 @@ for (const [
       resolve: (value) => value,
       process: {
         env: {
+          ...(mapboxUnit && {
+            TF07_ANDROID_SIGNAL_OUTPUT: "/inherited-must-not-run",
+          }),
           MAPBOX_ACCESS_TOKEN:
             failAt === "missing-token"
               ? ""
@@ -342,7 +409,16 @@ for (const [
       existsSync: (file) =>
         file.endsWith("scene.json") ? launched : failAt === "avd",
       statfsSync: () => ({
-        bavail: failAt === "low-space" ? 1 : 10 * 1024 ** 3,
+        bavail:
+          failAt === "low-space"
+            ? mapboxUnit
+              ? 11 * 1024 ** 3
+              : 1
+            : failAt === "image-capacity"
+              ? 15 * 1024 ** 3
+              : api36Unit
+                ? 20 * 1024 ** 3
+                : 16 * 1024 ** 3,
         bsize: 1,
       }),
       createHash: () => {
@@ -360,7 +436,9 @@ for (const [
           /android-(rendering|camera)-preparation.json$/.test(file) ||
           file.endsWith("platform-batches-preparation.json") ||
           file.endsWith("android-kernel-console-preparation.json") ||
-          file.endsWith("signal-liveness-preparation.json")
+          file.endsWith("signal-liveness-preparation.json") ||
+          file.endsWith("mapbox-android-unit-preparation.json") ||
+          file.endsWith("mapbox-android-api36-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
@@ -408,6 +486,8 @@ for (const [
                 status: "passed",
                 installedBinarySha256: apkHashes[activeEngine],
                 libraryDistSha256: distHash,
+                ...(mapboxUnit &&
+                  file.includes("retained") && { density: 2.625 }),
               },
             },
           });
@@ -428,6 +508,8 @@ for (const [
         return file.slice(1);
       },
       writeFileSync: (file, value) => {
+        if (file.endsWith("checkpoint.json"))
+          latestCheckpoint = JSON.parse(value);
         if (file.endsWith("-driver-stderr.log")) {
           stderrWrites.push([file, value]);
           if (failAt === "driver-stderr") fail("diagnostic write failed");
@@ -475,8 +557,17 @@ for (const [
         children.push(child);
         if (args.some((arg) => arg.endsWith("tf07-ui-smoke.mjs"))) {
           coreRows++;
+          if (api36Unit)
+            assert.equal(
+              phaseMessages.at(-1),
+              `API36 ${coreRows === 1 ? "core" : "retained"} operator phase starting`
+            );
           launched = true;
-          child.exitCode = ["driver", "driver-stderr"].includes(failAt) ? 1 : 0;
+          child.exitCode =
+            ["driver", "driver-stderr"].includes(failAt) ||
+            (failAt === "retained-driver" && coreRows === 2)
+              ? 1
+              : 0;
           const prior = priorDriver;
           priorDriver = child;
           queueMicrotask(() => {
@@ -500,6 +591,11 @@ for (const [
           if (signalDiagnostic) {
             assert.equal(options.env.TF07_ANDROID_SIGNAL_OUTPUT, "/attempt");
             assert.equal(options.env.TF07_NATIVE_TIMEOUT_MS, "900000");
+          }
+          if (mapboxUnit) {
+            assert.equal(options.env.TF07_ANDROID_SIGNAL_OUTPUT, "");
+            assert.equal(args.includes("retained"), coreRows === 2);
+            assert.equal(options.env.TF07_NATIVE_TIMEOUT_MS, "1800000");
           }
         } else if (batch || children.length === 1) {
           assert.equal(options.env.ONE_MAP_SMOKE, camera ? "tf04" : "tf09");
@@ -561,7 +657,7 @@ for (const [
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -595,7 +691,7 @@ for (const [
     if (!batch)
       assert.deepEqual(stopped, children.map((child) => child.pid).reverse());
     if (["emulator-exit", "release-port"].includes(failAt))
-      assert(!removed.some((file) => file.endsWith("OneMapU25F05.avd")));
+      assert(!removed.some((file) => file.endsWith(avdName + ".avd")));
     if (
       [
         "missing-token",
@@ -622,7 +718,7 @@ for (const [
           )
         )
       );
-      assert(!removed.some((file) => file.includes("OneMapU25F05")));
+      assert(!removed.some((file) => file.includes(avdName)));
       assert(
         !receipt.cleanup.some(
           (entry) => entry.name === "owned private AVD removal"
@@ -642,11 +738,11 @@ for (const [
             entry.name === "uncertain emulator ownership" && entry.error
         )
       );
-      assert(!removed.some((file) => file.includes("OneMapU25F05")));
+      assert(!removed.some((file) => file.includes(avdName)));
       assert.deepEqual(signals, []);
     }
     if (failAt === "create")
-      assert(removed.some((file) => file.endsWith("OneMapU25F05.avd")));
+      assert(removed.some((file) => file.endsWith(avdName + ".avd")));
     if (failAt === "driver-record-cleanup") {
       assert.match(receipt.error, /1 !== 0/);
       assert(receipt.recordErrors.every((error) => error.includes("ENOSPC")));
@@ -676,15 +772,47 @@ for (const [
     }
     if (["spawn", "metro-zero", "driver-cleanup"].includes(failAt))
       assert(
-        removed.some((file) => file.endsWith("OneMapU25F05.avd")),
+        removed.some((file) => file.endsWith(avdName + ".avd")),
         failAt
       );
     if (batch) {
+      if (api36Unit) {
+        assert(
+          !commands.some((call) =>
+            call.includes("android.permission.ACCESS_LOCAL_NETWORK")
+          )
+        );
+        assert(!removed.some((file) => file.includes("OneMapU25F05")));
+        if (["image-stage", "device"].includes(failAt)) {
+          assert.equal(installs, 0);
+          assert.equal(children.length, 0);
+          if (failAt === "device") assert(!created);
+          assert(!removed.some((file) => file.includes(avdName)));
+        }
+      } else if (failAt === null) {
+        assert(
+          commands.some((call) =>
+            call.includes("android.permission.ACCESS_LOCAL_NETWORK")
+          )
+        );
+      }
       assert.equal(
         installs,
-        failAt === null && !signalDiagnostic
+        failAt === null && !signalDiagnostic && !mapboxUnit
           ? 2
-          : ["observer", "prior-hash", "prior-prefix"].includes(failAt)
+          : [
+                "observer",
+                "prior-hash",
+                "prior-prefix",
+                "low-space",
+                "device",
+                "image-capacity",
+                "image-stage",
+                "wrong-api",
+                "wrong-abi",
+                "pages-16k",
+                "gles2",
+              ].includes(failAt)
             ? 0
             : 1
       );
@@ -723,45 +851,98 @@ for (const [
           );
         assert.equal(
           receipt.rows.length,
-          signalDiagnostic ? 1 : continuation ? 5 : 6
+          api36Unit
+            ? 3
+            : mapboxUnit
+              ? 2
+              : signalDiagnostic
+                ? 1
+                : continuation
+                  ? 5
+                  : 6
         );
-        assert.equal(cameraRows, signalDiagnostic ? 0 : continuation ? 1 : 2);
+        assert.equal(
+          cameraRows,
+          api36Unit
+            ? 1
+            : signalDiagnostic || mapboxUnit
+              ? 0
+              : continuation
+                ? 1
+                : 2
+        );
         assert.deepEqual(
           cameraEngines,
-          signalDiagnostic
-            ? []
-            : continuation
-              ? ["maplibre"]
-              : ["mapbox", "maplibre"]
+          api36Unit
+            ? ["mapbox"]
+            : signalDiagnostic || mapboxUnit
+              ? []
+              : continuation
+                ? ["maplibre"]
+                : ["mapbox", "maplibre"]
         );
         assert.deepEqual(
           receipt.rows.map(({ rowId }) => rowId),
-          signalDiagnostic
-            ? ["mapbox-android-core"]
-            : [
-                ...(!continuation ? ["mapbox-android-camera"] : []),
+          api36Unit
+            ? [
+                "mapbox-android-camera",
                 "mapbox-android-core",
                 "mapbox-android-retained",
-                "maplibre-android-camera",
-                "maplibre-android-core",
-                "maplibre-android-retained",
               ]
+            : mapboxUnit
+              ? ["mapbox-android-core", "mapbox-android-retained"]
+              : signalDiagnostic
+                ? ["mapbox-android-core"]
+                : [
+                    ...(!continuation ? ["mapbox-android-camera"] : []),
+                    "mapbox-android-core",
+                    "mapbox-android-retained",
+                    "maplibre-android-camera",
+                    "maplibre-android-core",
+                    "maplibre-android-retained",
+                  ]
         );
-        if (continuation)
+        if ((continuation || mapboxUnit) && !api36Unit)
           assert.equal(receipt.reusedRows[0].rowId, "mapbox-android-camera");
-        if (continuation)
+        if ((continuation || mapboxUnit) && !api36Unit)
           assert.equal(receipt.rows[0].rowId, "mapbox-android-core");
-        assert.equal(coreRows, signalDiagnostic ? 1 : 4);
+        assert.equal(coreRows, mapboxUnit ? 2 : signalDiagnostic ? 1 : 4);
+        if (mapboxUnit) {
+          assert.equal(receipt.mode, "mapbox-android-unit");
+          assert.equal(receipt.rows.at(-1).scene.density, 2.625);
+          assert(
+            !commands.some((call) =>
+              call.some((arg) =>
+                /gradlew|maplibre|signal-calibration/.test(String(arg))
+              )
+            )
+          );
+        }
         if (signalDiagnostic) assert.equal(installs, 1);
         assert.equal(
           commands.filter((args) =>
             args.some((arg) =>
-              String(arg).includes("create-lifetime-task-avd.py")
+              String(arg).includes(
+                api36Unit
+                  ? "setup-android-api36.py"
+                  : "create-lifetime-task-avd.py"
+              )
             )
           ).length,
           1
         );
-        assert.equal(pulls, signalDiagnostic ? 3 : continuation ? 12 : 14);
+        assert.equal(
+          pulls,
+          api36Unit
+            ? 7
+            : mapboxUnit
+              ? 5
+              : signalDiagnostic
+                ? 3
+                : continuation
+                  ? 12
+                  : 14
+        );
       }
       if (failAt === "late-metro-exit") {
         assert.equal(receipt.rows.length, 0);
@@ -770,13 +951,32 @@ for (const [
       if (["driver", "driver-stderr"].includes(failAt)) {
         assert.equal(
           receipt.rows.length,
-          signalDiagnostic || continuation ? 0 : 1
+          api36Unit ? 1 : signalDiagnostic || continuation || mapboxUnit ? 0 : 1
         );
         assert.equal(coreRows, 1);
       }
+      if (failAt === "retained-driver") {
+        assert.deepEqual(
+          receipt.rows.map(({ rowId }) => rowId),
+          api36Unit
+            ? ["mapbox-android-camera", "mapbox-android-core"]
+            : ["mapbox-android-core"]
+        );
+        assert.equal(coreRows, 2);
+        assert.match(receipt.error, /driver failed/);
+        assert.equal(installs, 1);
+      }
       assert(
-        removed.some((file) => file.endsWith("OneMapU25F05.avd")) ||
-          ["observer", "prior-hash", "prior-prefix"].includes(failAt)
+        removed.some((file) => file.endsWith(avdName + ".avd")) ||
+          [
+            "observer",
+            "prior-hash",
+            "prior-prefix",
+            "low-space",
+            "device",
+            "image-capacity",
+            "image-stage",
+          ].includes(failAt)
       );
       continue;
     }
@@ -828,6 +1028,17 @@ for (const [engine, camera] of [
     },
   });
 }
+for (const unit of ["mapbox-acceptance", "mapbox-acceptance-api36"])
+  await assert.rejects(
+    runInNewContext(`${source}\nrun('/attempt', 'maplibre', '${unit}')`, {
+      assert,
+      join,
+      mkdirSync: () => {
+        throw Error("Wrong backend acquired resources.");
+      },
+    }),
+    /targets Mapbox only/
+  );
 console.log(
   "Both Android rendering branches and camera orchestration/entrypoint mocks passed."
 );
