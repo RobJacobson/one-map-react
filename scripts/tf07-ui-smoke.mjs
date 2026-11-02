@@ -339,10 +339,19 @@ const runNative = async (selectedEngine) => {
         .trim()
         .split(/\r?\n/);
       assert.equal(installed.length, 1, "Expected one installed base APK.");
-      assert.match(installed[0], /^package:\/data\/app\/[^\s]+\/base\.apk$/);
-      const apk = join(temporary, "installed.apk");
-      await adb(["pull", installed[0].slice("package:".length), apk]);
-      actual = createHash("sha256").update(readFileSync(apk)).digest("hex");
+      assert.match(
+        installed[0],
+        /^package:\/data\/app\/[A-Za-z0-9_~+./=-]+\/base\.apk$/
+      );
+      const path = installed[0].slice("package:".length);
+      const digest = (
+        await adb(["shell", "/system/bin/toybox", "sha256sum", path])
+      )
+        .trim()
+        .match(/^([a-f0-9]{64})  (\/data\/app\/[^\s]+\/base\.apk)$/);
+      assert(digest, "Malformed installed APK SHA256 output.");
+      assert.equal(digest[2], path, "Installed APK SHA256 path differs.");
+      actual = digest[1];
       assert.equal(actual, expected, "Installed APK differs from baseline.");
       const reverses = (await adb(["reverse", "--list"]))
         .trim()

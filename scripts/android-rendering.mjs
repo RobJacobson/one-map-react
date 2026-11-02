@@ -138,18 +138,40 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       join(output, "checkpoint.json"),
       JSON.stringify(receipt, null, 2)
     );
+  const redact = (value) =>
+    String(value ?? "")
+      .replaceAll(process.env.MAPBOX_ACCESS_TOKEN || "\0", "<REDACTED>")
+      .replace(/([?&](?:access_token|token)=)[^&\s"']+/gi, "$1<REDACTED>");
   const execute = async (file, args, timeout = 30000, input) => {
-    const child = promisify(execFile)(file, args, {
-      timeout,
-      maxBuffer: 1024 * 1024,
-      env: process.env,
-    });
-    if (input === undefined) return (await child).stdout;
-    const inputFailure = new Promise((_, reject) => {
-      child.child.stdin.once("error", reject);
-    });
-    child.child.stdin.end(input);
-    return (await Promise.race([child, inputFailure])).stdout;
+    const started = Date.now();
+    try {
+      const child = promisify(execFile)(file, args, {
+        timeout,
+        maxBuffer: 1024 * 1024,
+        env: process.env,
+      });
+      if (input === undefined) return (await child).stdout;
+      const inputFailure = new Promise((_, reject) => {
+        child.child.stdin.once("error", reject);
+      });
+      child.child.stdin.end(input);
+      return (await Promise.race([child, inputFailure])).stdout;
+    } catch (error) {
+      const failures = (receipt.commandFailures ??= []);
+      if (failures.length < 8)
+        failures.push({
+          file: redact(file),
+          args: args.map(redact),
+          timeoutMs: timeout,
+          elapsedMs: Date.now() - started,
+          code: error.code ?? null,
+          signal: error.signal ?? null,
+          killed: error.killed ?? false,
+          stdout: redact(error.stdout).slice(-4096),
+          stderr: redact(error.stderr).slice(-4096),
+        });
+      throw error;
+    }
   };
   const android = (args, timeout, input) =>
     execute("/bin/sh", [wrapper, ...args], timeout, input);
@@ -284,17 +306,22 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       .trim()
       .split(/\r?\n/);
     assert.equal(paths.length, 1, "Expected one installed base APK.");
-    assert.match(paths[0], /^package:\/data\/app\/[^\s]+\/base\.apk$/);
-    const duplicate = join(output, `installed-${phase}.apk`);
-    await adb(["pull", paths[0].slice(8), duplicate], 60000);
-    const hash = sha256(duplicate);
-    (receipt.identityReads ??= []).push({
-      phase,
-      path: paths[0].slice(8),
-      sha256: hash,
-    });
-    record(); // Persist the readback identity before removing its duplicate.
-    rmSync(duplicate);
+    assert.match(
+      paths[0],
+      /^package:\/data\/app\/[A-Za-z0-9_~+./=-]+\/base\.apk$/
+    );
+    const path = paths[0].slice(8);
+    // Hash installed bytes in place; bulk APK transfer is unnecessary for identity.
+    const digest = (
+      await adb(["shell", "/system/bin/toybox", "sha256sum", path])
+    )
+      .trim()
+      .match(/^([a-f0-9]{64})  (\/data\/app\/[^\s]+\/base\.apk)$/);
+    assert(digest, "Malformed installed APK SHA256 output.");
+    assert.equal(digest[2], path, "Installed APK SHA256 path differs.");
+    const hash = digest[1];
+    (receipt.identityReads ??= []).push({ phase, path, sha256: hash });
+    record();
     assert.equal(hash, apkSha256, "Installed APK differs from verified APK.");
   };
   const isEmulatorRunning = async () => {
@@ -718,7 +745,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     }
     receipt.result = "passed";
   } catch (error) {
-    receipt.error = String(error);
+    receipt.error = redact(error);
     if (existsSync(join(output, "scene.json"))) {
       try {
         receipt.scene = JSON.parse(readFileSync(join(output, "scene.json")));
@@ -734,7 +761,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         receipt.cleanup.push({ name, result: "passed" });
         return true;
       } catch (error) {
-        receipt.cleanup.push({ name, error: String(error) });
+        receipt.cleanup.push({ name, error: redact(error) });
         receipt.result = "failed";
         process.exitCode = 1;
         return false;

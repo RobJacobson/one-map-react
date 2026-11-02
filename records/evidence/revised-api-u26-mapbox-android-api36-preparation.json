@@ -57,7 +57,7 @@
     "/private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs": "c8cc8d59c637e46fb5771adbb558a7790214bcc2cbd6db25e31f22c78eea38a5"
   },
   "checkpoint": "Complete Android Mapbox API36 retained-contract unit preparation",
-  "status": "Offline preparation and independent coordinator audit passed; execution awaits capacity and one complete-unit owner approval; runtime unverified",
+  "status": "Installed-APK verification repair independently audited; complete-unit execution approval pending; native readiness unverified",
   "nativeExecution": false,
   "unit": {
     "platform": "android",
@@ -87,24 +87,25 @@
     "causalStatus": "Original foreground SIGKILL remains BLOCKED/unknown; no supported causal fix is claimed",
     "ownerSelection": "Owner requests one complete Android Mapbox unit on a different supported emulator OS. API36 is the prepared proposal, not execution permission.",
     "risk": "The app may again receive an unattributed signal9. First failure closes the attempt; no self-retry or conversion to a pass.",
-    "diagnosis": "Bounded saved-evidence review concluded without positive sender attribution. Attempts13/17/18 identify victim and signal before cleanup, not sender; only36byte state-summary length survives. Attempt21 is a separate instrumentation failure before app launch: missing periodic flush and unknown signal_generate. Fixing instrumentation is not an app fix. Attempt22 repeated signal9 after one live-child observation, before nested-scroll input; retained never started. A different image is not a supported causal repair.",
+    "diagnosis": "Bounded saved-evidence review concluded without positive sender attribution. Attempts13/17/18 identify victim and signal before cleanup, not sender; only36byte state-summary length survives. Attempt21 is a separate instrumentation failure before app launch: missing periodic flush and unknown signal_generate. Fixing instrumentation is not an app fix. Attempt22 repeated signal9 after one live-child observation, before nested-scroll input; retained never started. A different image is not a supported causal repair. Attempt23 failed during bulk installed-base.apk readback before camera. Lost process metadata prevents attribution to timeout, external signal or ADB nonzero/protocol failure; cleanup offline does not establish an emulator crash. Strict device-side SHA256 eliminates bulk APK transport; no original failure cause is claimed resolved.",
     "references": [
       "records/evidence/revised-api-u26-sigkill-root-cause-review.json",
       "records/evidence/revised-api-u26-android-platform-batch-attempt-18.json",
       "records/evidence/revised-api-u26-signal-diagnostic-attempt-21.json",
-      "records/evidence/revised-api-u26-android-mapbox-unit-attempt-22.json"
+      "records/evidence/revised-api-u26-android-mapbox-unit-attempt-22.json",
+      "records/evidence/revised-api-u26-android-mapbox-api36-attempt-23.json"
     ],
-    "options": "After independent audit, obtain one approval for image setup, API36 runtime preflight and all three rows; hold on insufficient capacity. No further diagnostic or identical API37 retry is proposed."
+    "options": "After audit request one fresh complete API36 camera/core/retained unit approval at attempt24 with verified image reuse. No further native execution authorized."
   },
-  "output": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23",
-  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-api36-acceptance.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23",
+  "output": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24",
+  "command": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-api36-acceptance.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24",
   "proposedLauncherToolCall": {
     "workdir": "/private/tmp/one-map-android-restoration-review",
     "shell": "/bin/sh",
     "login": false,
     "sandbox_permissions": "require_escalated",
     "yield_time_ms": 1000,
-    "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-api36-acceptance.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23",
+    "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-api36-acceptance.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24",
     "max_output_tokens": 1500
   },
   "operatorToolParameters": {
@@ -126,7 +127,7 @@
   "operatorProtocol": {
     "helper": "/private/tmp/one-map-android-restoration-review/scripts/android-operator.py",
     "writer": "/private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs",
-    "output": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23",
+    "output": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24",
     "rowOrder": [
       "mapbox-android-camera",
       "mapbox-android-core",
@@ -136,18 +137,18 @@
     "firstFailure": "Preserve first operator failure latch, close current scenario once, let driver diagnostics and owned cleanup run. No raw adb, reconstructed transport, or retry.",
     "exactInitialCalls": {
       "mapbox-android-core": {
-        "status": "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button status",
-        "readRenderer": "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button toolbar \"Read renderer\""
+        "status": "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button status",
+        "readRenderer": "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button toolbar \"Read renderer\""
       },
       "mapbox-android-retained": {
-        "status": "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-retained simultaneous-named-maps status",
-        "readRenderer": "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-retained simultaneous-named-maps toolbar \"Read focus\""
+        "status": "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-retained simultaneous-named-maps status",
+        "readRenderer": "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-retained simultaneous-named-maps toolbar \"Read focus\""
       }
     },
     "operationArgv": [
       "python3",
       "/private/tmp/one-map-android-restoration-review/scripts/android-operator.py",
-      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24",
       "ROW",
       "SCENARIO",
       "OPERATION",
@@ -156,12 +157,12 @@
     "writerArgv": [
       "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node",
       "/private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs",
-      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23/ROW-manual.json",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/ROW-manual.json",
       "SCENARIO",
       "passed|failed",
-      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23/SCENARIO-observation.json"
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/SCENARIO-observation.json"
     ],
-    "dynamicArguments": "ROW and SCENARIO select only the fixed two manual rows and their exact19recipes below. OPERATION is status, toolbar LABEL or adb ARGUMENTS. Derive coordinates solely from fresh hierarchy/screenshot bounds for the current row; placeholders are not executable constants. Write a JSON observation file with nonempty action/seenResult and optional rendererData/screenshot before each single-scenario writer call. All coordinate/swipe/NNN forms are TEMPLATE ONLY: instantiate from the current fresh hierarchy before the tool call, never dispatch unbound values. The initial hierarchy is one-map-attempt23-hierarchy-001.xml; increment NNN for every subsequent observation. Before dispatch replace both guarded tap placeholders with literal numeric coordinates just observed; never rely on variables from a previous tool call, and never dispatch an uninstantiated template.",
+    "dynamicArguments": "ROW and SCENARIO select only the fixed two manual rows and their exact19recipes below. OPERATION is status, toolbar LABEL or adb ARGUMENTS. Derive coordinates solely from fresh hierarchy/screenshot bounds for the current row; placeholders are not executable constants. Write a JSON observation file with nonempty action/seenResult and optional rendererData/screenshot before each single-scenario writer call. All coordinate/swipe/NNN forms are TEMPLATE ONLY: instantiate from the current fresh hierarchy before the tool call, never dispatch unbound values. The initial hierarchy is one-map-attempt24-hierarchy-001.xml; increment NNN for every subsequent observation. Before dispatch replace both guarded tap placeholders with literal numeric coordinates just observed; never rely on variables from a previous tool call, and never dispatch an uninstantiated template.",
     "toolbarLabels": {
       "core": [
         "remount",
@@ -195,13 +196,13 @@
       "shell",
       "uiautomator",
       "dump",
-      "/sdcard/one-map-attempt23-hierarchy-NNN.xml"
+      "/sdcard/one-map-attempt24-hierarchy-NNN.xml"
     ],
     "hierarchyReadTemplate": [
       "adb",
       "shell",
       "cat",
-      "/sdcard/one-map-attempt23-hierarchy-NNN.xml"
+      "/sdcard/one-map-attempt24-hierarchy-NNN.xml"
     ],
     "input": "Use the helper adb operation for fresh-bound taps/swipes, orientation and screenshots under the approved19recipes. Fixed toolbar operation owns offscreen toolbar navigation. Choose a unique hierarchy filename for every observation.",
     "completion": "All13core observations plus renderer judge, then all6retained observations plus retained judge/Finish focus. Driver results must have exact installed/library/environment identity and no failed or unverified slots; independent reads rather than requested values establish behavior."
@@ -349,9 +350,9 @@
   },
   "batchInputSha256": {
     "/private/tmp/one-map-android-restoration-review/scripts/android-acceptance-batch.mjs": "f20effc307ea4850f1326fcbf59d7fec42f930827df735c702b23ed3719fe100",
-    "/private/tmp/one-map-android-restoration-review/scripts/android-rendering.mjs": "39ecb7ce3c0cbef4938677442e4851d45ebb69423275b75559b0d3f425840867",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-rendering.mjs": "13bbcb130d6c1dbb568e014244f05ce28ba5ea6c46ec0f25cccd2ec218eab463",
     "/private/tmp/one-map-android-restoration-review/scripts/android-camera-observer.mjs": "c1c589a6d74c1739e386af506f651a6c91b0c0a77e974a96b61c4a5ba2abae44",
-    "/private/tmp/one-map-android-restoration-review/scripts/tf07-ui-smoke.mjs": "26650b5e89e157ab1aff791828622f97edaf2d6ff0e402851ff889d788a5035d",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-ui-smoke.mjs": "9e1147dfdb492b08d7bc93458f036f1aa379a77ddf4115fb80415b196fd6df8b",
     "/private/tmp/one-map-android-restoration-review/scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
     "/private/tmp/one-map-android-restoration-review/scripts/tf07-smoke-contract.mjs": "74ca64dd2fb1c4a159e7f59edc213e9ca3d8893e433c61913c6f26682a062d2f",
     "/private/tmp/one-map-android-restoration-review/scripts/tf07-retained-contract.mjs": "f4428fb5902170f57308738bfd44fa7a9a59d2a5aa957835ef199071a98b3852",
@@ -366,16 +367,17 @@
   },
   "regressionSha256": {
     "/private/tmp/one-map-android-restoration-review/scripts/android-operator.test.py": "3a1022d694f9286fb61daa0c1b6150e5572660e4ff6396bbaa7953089b14c6a8",
-    "/private/tmp/one-map-android-restoration-review/scripts/tf07-native-runner.test.mjs": "60bfbca6a27eccae7ea3a4d4844f6a39edcbfc022884be92e1d4eca9eb24ceb7",
-    "/private/tmp/one-map-android-restoration-review/scripts/mapbox-android-rendering.test.mjs": "5c32858af8b1cb0aa34391fd2fd399ae43622a4f788df8d049d003b588b538b6",
+    "/private/tmp/one-map-android-restoration-review/scripts/tf07-native-runner.test.mjs": "1b8d1ee7848cbb7bf8af30324be77a31ae9f9637aeb954653fe33d8231200ac7",
+    "/private/tmp/one-map-android-restoration-review/scripts/mapbox-android-rendering.test.mjs": "ee6bbb4978e592c3a8e9b29a5e244079d1882a5219991fb3af12e2a0a9646271",
     "/private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.test.mjs": "a2291bdcfd413720bd304023f7eb3a6ab8a1f3ee714d068251b1dccb9a76018e",
     "/private/tmp/one-map-android-restoration-review/scripts/launch-android-lifetime-emulator.test.py": "31c7caf00ecc75ad30f7833d6c0c6ad4fce472e811f3fa421496b6fc37c318d7",
-    "/private/tmp/one-map-android-restoration-review/scripts/setup-android-api36.test.py": "18221ffa7dba7c5000e39e278928e2dfbb5e1f134520cc40d634620be021aab6"
+    "/private/tmp/one-map-android-restoration-review/scripts/setup-android-api36.test.py": "18221ffa7dba7c5000e39e278928e2dfbb5e1f134520cc40d634620be021aab6",
+    "/private/tmp/one-map-android-restoration-review/scripts/android-installed-identity.test.mjs": "bd6b11bc709f7fd3ff95446179da2907224b1064d0e509f1ba9c78d54318008c"
   },
   "storage": {
     "measuredWholeUnitPeakAvailable": false,
     "measurementGap": "No measured API36 download/extraction or whole-unit peak exists. Phase budgets are conservative planning bounds, not empirical peaks or a SIGKILL explanation.",
-    "requiredFreeBytes": 17459998649,
+    "requiredFreeBytes": 12884901888,
     "planningBudget": {
       "privateUserdataUpperBytes": 2147483648,
       "sdcardUpperBytes": 134217728,
@@ -384,11 +386,11 @@
       "cleanupReserveBytes": 2147483648
     },
     "meaning": "Conservative12GiB planning capacity, not an empirical peak or a SIGKILL explanation. Configured userdata/sdcard bounds plus install/cache allowance total4GiB, with6GiB host headroom and2GiB cleanup reserve. Historical modes keep their8.2GiB gate.",
-    "currentFreeBytes": 7598362624,
-    "readiness": "Hold without output creation/native acquisition until coordinator read-only check meets fresh-image17459998649bytes or verified-reused-image12884901888bytes. No cleanup or global image deletion is authorized by preparation.",
-    "shortfallBytes": 9861636025,
+    "currentFreeBytes": 23957778432,
+    "readiness": "Revalidate retained image manifest and require fresh12GiB reserve before approved dispatch. Current capacity is a point-in-time observation, not permission.",
+    "shortfallBytes": 0,
     "preDispatchReadOnlyCheck": {
-      "cmd": "python3 -c 'import pathlib, shutil; p=pathlib.Path(\"/Users/rob/code/mapbox-code/one-map-f05-android-recovery\"); required=12*1024**3+(0 if (p/\"android-api36-image\").exists() else 4575096761); free=shutil.disk_usage(p).free; print({\"freeBytes\":free,\"requiredBytes\":required}); assert free>=required,\"Hold: API36 image+batch storage gate\"; assert not (p/\"android-platform-batch-attempt-23\").exists(),\"Hold: output exists\"'",
+      "cmd": "python3 -c 'import pathlib, shutil; p=pathlib.Path(\"/Users/rob/code/mapbox-code/one-map-f05-android-recovery\"); required=12*1024**3+(0 if (p/\"android-api36-image\").exists() else 4575096761); free=shutil.disk_usage(p).free; print({\"freeBytes\":free,\"requiredBytes\":required}); assert free>=required,\"Hold: API36 image+batch storage gate\"; assert not (p/\"android-platform-batch-attempt-24\").exists(),\"Hold: output exists\"'",
       "workdir": "/private/tmp/one-map-android-restoration-review",
       "shell": "/bin/sh",
       "login": false,
@@ -411,7 +413,8 @@
         "freeBytes": 12884901888
       },
       "meaning": "The larger fresh initial gate retains expanded image plus full12GiB batch reserve. Temporary ZIP is deleted before AVD creation. Existing global API37 image is preserved by default."
-    }
+    },
+    "imageReuse": "Reuse retained API36 image only after setup helper checks all28members and hashes. No download when verification succeeds."
   },
   "timing": {
     "estimateMinutes": "60-110 unmeasured, including official image setup, automated camera and both manual rows",
@@ -424,7 +427,8 @@
     "workerAllocationMinutes": 150,
     "limit": "Existing finite phase bounds retained;150minutes is coordinator supervision allocation, not a global launcher watchdog. Reserve cleanup; stop first failure without retry.",
     "imageDownloadSeconds": 1200,
-    "imageSetupMs": 1500000
+    "imageSetupMs": 1500000,
+    "reuseEstimate": "40-90minutes with verified retained image reuse; existing per-stage limits and150minute worker allocation remain conservative upper bounds. No image download expected on successful verification."
   },
   "resources": {
     "serial": "emulator-5580",
@@ -455,19 +459,18 @@
   "routineVerification": {
     "nativeExecuted": false,
     "passed": [
-      "Actual shared-launcher mocks: API36 camera/core/retained order and phase markers after passed prefix; one unchanged APK; no MapLibre/build/calibration; inherited tracing off",
-      "Wrong API/ABI/16K/GLES2 stops before install; capacity/image setup failure stops before emulator acquisition; old API37 permission behavior preserved",
-      "10installer fake-transport/ZIP64/ownership/error tests and4emulator-launcher tests; no real image download/install",
-      "Historical launcher lifecycle/report/error/cleanup and passed-prefix cases remain covered by actual shared-launcher mocks",
-      "Final staged/host/runtime/operator/regression pins,695frozen files,171archive files in both selected package copies, selected APK and4resolved package hashes match; launcher/capacity/operator forms parse without execution; output23absent",
-      "Targeted formatter and lint passed on3changed JavaScript modules; documentation structure41files/39tables and git diff --check passed",
-      "All25operator CLI regressions, actual Node TF07 command/stdout/spawn/recorder lifecycle tests and observation-writer filesystem regressions passed"
+      "Actual command transport regressions: local execFile nonzero/signal/timeout/redaction plus strict installed digest/path/malformed/hash mismatch; no Android tool",
+      "All shared launcher historical/API36 lifecycle, identity-before/after, passed-prefix and cleanup mocks",
+      "Device-free TF07 runner, observation writer,25operator,10API36 setup and4emulator launcher regressions",
+      "Targeted formatter/lint, documentation structure and git diff --check",
+      "Unchanged inherited candidate/dependencies/scope; historical proofs retain their original limits"
     ],
     "pending": [
       "Read-only pre-dispatch capacity check",
       "One complete API36 unit owner approval; runtime remains unverified"
     ],
     "commands": [
+      "node scripts/android-installed-identity.test.mjs",
       "python3 scripts/setup-android-api36.test.py",
       "python3 scripts/launch-android-lifetime-emulator.test.py",
       "runtime-bin/node scripts/mapbox-android-rendering.test.mjs",
@@ -480,25 +483,24 @@
       "git diff --check"
     ]
   },
-  "authorization": "Preparation only. One owner approval after audit covers the official image download/extraction, owned AVD setup, boot/runtime identity, unchanged APK installation, automated camera and all13core+6retained scenarios, duration and owned cleanup. No emulator/adb/Metro/app/calibration/native build/image install ran during preparation. Stop first unexpected failure; no self-retry.",
+  "authorization": "Preparation only. Fresh complete-unit owner approval after audit must cover verified API36 image reuse, AVD/boot identity, unchanged APK installation/strict installed-byte hash, camera then all13core+6retained scenarios, duration/owned cleanup. No native/adb/emulator/build/install/calibration ran during repair. First failure stops; no retry.",
   "coordinatorAudit": {
     "status": "passed",
     "nativeExecution": false,
-    "originalSigkillCauseResolved": false,
     "reviewed": [
-      "official stable API36 image metadata, ZIP64 sizes and hashes",
-      "APK min24/target36 and ARM64 compatibility",
-      "offline4KiB kernel and emulator version requirement",
-      "bounded image staging, validated cache reuse and ownership cleanup",
-      "occupied serial before staging; API/ABI/page/GLES gates before install",
-      "camera/core/retained order and phase marker handoffs",
-      "API37 network grant excluded only from API36 mode",
-      "complete contract reuse limits and fresh-OS camera requirement",
-      "failure, cancellation, completed-prefix and cleanup paths"
+      "Both active installed identity callers: shared launcher before/after all rows and TF07 native driver startup",
+      "Safe sole APK path, exact output filename and pinned SHA256; malformed/nonzero/hash mismatch fail closed",
+      "No bulk APK pull remains in selected call chain; no retries, fallback, extended timeout or weakened identity",
+      "Bounded redacted execFile code/signal/killed/timing/stdout/stderr survive primary failure and owned cleanup",
+      "Complete attempt24 camera/core/retained commands and phase markers; retained image reuse and ownership",
+      "Original attempt23 failure, earlier SIGKILL and runtime readiness remain unresolved/unverified"
     ],
     "independentChecks": [
-      "setup-android-api36.test.py:10passed",
+      "android-installed-identity.test.mjs",
       "mapbox-android-rendering.test.mjs",
+      "tf07-native-runner.test.mjs",
+      "Read-only pinned image ext4/Toybox SHA256 proof replay",
+      "check-docs.mjs",
       "git diff --check"
     ],
     "provenanceMatched": {
@@ -506,23 +508,24 @@
       "host": 6,
       "runtime": 15,
       "operator": 2,
-      "regression": 6,
+      "regression": 7,
       "frozenFiles": 695,
       "archiveMembersPerCopy": 171,
       "packageCopies": 2,
       "selectedApkMatched": true,
-      "imageAndOutputAbsent": true
+      "retainedImagePresent": true,
+      "attempt24OutputAbsent": true
     },
-    "readiness": "Hold before output/image/native acquisition unless capacity gate and owner execution approval are satisfied."
+    "readiness": "Require fresh12GiB storage check and owner approval for complete API36 Mapbox batch. No native run during repair/audit."
   },
   "exactOperatorCommands": [
-    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button adb shell uiautomator dump /sdcard/one-map-attempt23-hierarchy-001.xml",
-    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button adb shell cat /sdcard/one-map-attempt23-hierarchy-001.xml",
-    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button toolbar \"Read renderer\"",
-    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button adb shell input tap \"${CHILD_X:?Set fresh child X}\" \"${CHILD_Y:?Set fresh child Y}\"",
-    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button adb shell screencap -p /sdcard/one-map-attempt23-live-child-button.png",
-    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button adb pull /sdcard/one-map-attempt23-live-child-button.png /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23/live-child-button.png",
-    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-23 mapbox-android-core live-child-button status"
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button adb shell uiautomator dump /sdcard/one-map-attempt24-hierarchy-001.xml",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button adb shell cat /sdcard/one-map-attempt24-hierarchy-001.xml",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button toolbar \"Read renderer\"",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button adb shell input tap \"${CHILD_X:?Set fresh child X}\" \"${CHILD_Y:?Set fresh child Y}\"",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button adb shell screencap -p /sdcard/one-map-attempt24-live-child-button.png",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button adb pull /sdcard/one-map-attempt24-live-child-button.png /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/live-child-button.png",
+    "python3 /private/tmp/one-map-android-restoration-review/scripts/android-operator.py /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24 mapbox-android-core live-child-button status"
   ],
   "compatibility": {
     "source": "https://dl.google.com/android/repository/sys-img/google_apis/sys-img2-3.xml",
@@ -569,5 +572,12 @@
     "freshOutput23Absent": true,
     "shellSyntaxOnly": true,
     "nativeExecuted": false
+  },
+  "installedIdentityVerification": {
+    "method": "adb -s emulator-5580 shell /system/bin/toybox sha256sum EXACT_SOLE_BASE_APK_PATH",
+    "validation": "Unchanged input APK hash; exactly one pm path in safe shell alphabet; exact lower-case64hex digest and matching sole filename; digest equals pinned APK. Shared before/after checks remain. Nonzero/malformed output stops; no pull fallback/retry.",
+    "transportDiagnostics": "First8command failures retain redacted file/args, code, signal, killed, elapsedMs, timeoutMs and last4096characters of stdout/stderr. Timeout-compatible termination is not proven causation.",
+    "boundary": "Installed-byte digest replaces host readback hashing. Tool presence established offline in pinned image; runtime availability and native outcomes unverified.",
+    "samePatternReview": "Shared Android launcher identity and selected TF07 core/retained driver both use strict device-side SHA256. Historical standalone TF08 still pulls APKs outside this packet; no general transport cause is claimed."
   }
 }
