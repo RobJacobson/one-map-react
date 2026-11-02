@@ -21,7 +21,7 @@ The [revised API implementation plan](revised-api-implementation-plan.md) explai
 
 The [patch and peer decision report](revised-api-patch-peer-review.md) preserves the completed pre-repair assessment and eight publication gaps; the owner-approved U23-F01 reconciliation is implemented and independently audited, with exact identities and bounded verification in its evidence record.
 
-The [candidate acceptance proposal](revised-api-acceptance-plan.md) is the single owner for the concrete artifact/environment/command/resource/duration/retry request. Preparation is in progress; renderer and native execution require explicit permission.
+The [current acceptance plan](revised-api-acceptance-plan.md) owns the selected backend unit, coverage matrix and next approval packet under the authoritative [testing policy](testing-policy.md#complete-acceptance-units). The [acceptance history](revised-api-acceptance-history.md) preserves earlier outcomes and recipes for reference only; dispatch uses the audited current packet. The complete Android Mapbox batch is not yet prepared or authorized.
 
 The [TF01 record](tf01-foundation.md) describes backup verification, removal, and foundation checks. The [TF02 record](tf02-shared-map.md) describes the completed shared map and its architecture trace. The [TF02 handoff](tf02-handoff.md) remains the original stage brief. The [Android camera handoff](tf02-android-camera-handoff.md) records why the Mapbox Android opening camera matches the pinned wrapper. The [TF03 record](tf03-reuse.md) describes the completed reuse and lifecycle stage. The [TF04 record](tf04-camera.md) describes the camera, gesture, and interaction implementation. The TF04 renderer smoke passed. Historical S04 acceptance does not certify this replacement.
 

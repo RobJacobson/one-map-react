@@ -1,12 +1,14 @@
 # Instructions for one-map-react documentation
 
+**Acceptance documentation:** Apply the authoritative [complete batch protocol](testing-policy.md#complete-acceptance-units) when preparing, running, diagnosing or resuming acceptance. The [current handoff](revised-api-acceptance-plan.md#current-handoff) owns the selected unit; archived commands grant no execution permission.
+
 Before creating or editing documentation in this directory, read [STYLE_GUIDE.md](STYLE_GUIDE.md) and follow its guidance. Explicit user instructions take precedence.
 
 Follow [coding-style.md](coding-style.md) for code examples and implementation guidance. Repository-wide contributor and agent instructions are in [../AGENTS.md](../AGENTS.md).
 
 Agents must obtain explicit user permission before running acceptance tests and must wait until the checkpoint is close to acceptance. Follow [acceptance timing and user permission](testing-policy.md#acceptance-timing-and-user-permission) when writing execution instructions or handoffs. Do not turn acceptance criteria into instructions to run hour-long suites during routine implementation or refactoring.
 
-Prefer subagents for approved smoke execution under the [smoke worker policy](testing-policy.md#smoke-workers-and-models): GPT-6 Luna (`gpt-6-luna`) at low reasoning for web workers and medium reasoning for native execution. Keep preparation, artifact checks, diagnosis, and acceptance review with the stronger coordinator. Document parallel resource assignments and serialize shared native resources.
+Use the [worker policy](testing-policy.md#smoke-workers-and-models) for approved execution: Luna Low for fixed web work and one exclusive owner-selected Terra Medium worker per complete native unit. Keep preparation, diagnosis and audit with the coordinator; dispatch only the selected unit packet.
 
 ## Agreed project direction
 
