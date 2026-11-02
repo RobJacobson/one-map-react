@@ -1,0 +1,47 @@
+{
+  "checkpoint": "PR94 sender-capture diagnostic attempt20",
+  "recordedUTC": "2026-11-02T04:32:47.883062+00:00",
+  "result": "stopped-at-preboot-storage-gate",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "candidateChanged": false,
+  "nativeBuild": false,
+  "calibrationExecuted": false,
+  "apkInstalled": false,
+  "androidAppLaunched": false,
+  "operatorInputs": 0,
+  "acceptanceRowsExecuted": 0,
+  "firstFailure": "AssertionError [ERR_ASSERTION]: Android preboot requires 8.2 GiB free; stop without deleting files.",
+  "storage": {
+    "availableBytes": 8111497216,
+    "requiredBytes": 8804682957,
+    "shortfallBytes": 693185741
+  },
+  "resourceAcquisition": false,
+  "cleanup": "No resources acquired; no cleanup required. Launcher checkpoints and cleanup arrays are empty.",
+  "evidence": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-20/receipt.json": "7676bc73fced0c90ba8c4e31c0a6e7a367d2935f2f6e080baaf919c64db398bb"
+  },
+  "coordinatorAudit": {
+    "receiptReviewed": true,
+    "sourceOrderingVerified": "Storage assertion precedes port/device queries, AVD creation, process launch, APK installation and tracing.",
+    "pinMapsMatched": {
+      "staged": 26,
+      "host": 7,
+      "runtime": 16,
+      "operator": 2,
+      "regression": 6
+    },
+    "frozenFilesMatched": 695,
+    "archiveAndBothApksMatched": true
+  },
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "originalSigkillCause": "unresolved",
+  "next": "Restore storage headroom, then prepare a fresh output and obtain approval before retry. Attempt20 remains closed; no calibration or application diagnostic result exists."
+}

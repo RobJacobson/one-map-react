@@ -1,0 +1,40 @@
+{
+  "checkpoint": "Owner-approved retry after attempt20 storage failure",
+  "recordedUTC": "2026-11-02T04:34:37.338414+00:00",
+  "preparation": {
+    "path": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-signal-liveness-preparation.json",
+    "sha256": "5a2a717e3bc1fda50855e9600d3dd7496812a690a32aa2cb0858df10bb6acb8a"
+  },
+  "authorization": "Free space, then retry diagnostic with one Terra Medium worker, include calibration, reuse unchanged f05 and verified APK; no rebuild/camera; stop first failure; only owned cleanup.",
+  "output": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-21",
+  "proposedLauncherToolCall": {
+    "cmd": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/android-signal-diagnostic.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-21",
+    "workdir": "/private/tmp/one-map-android-restoration-review",
+    "shell": "/bin/sh",
+    "login": false,
+    "sandbox_permissions": "require_escalated",
+    "yield_time_ms": 1000,
+    "max_output_tokens": 1500
+  },
+  "scope": [
+    "mapbox-android-core"
+  ],
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "unchangedInputAudit": {
+    "pinMapsMatched": {
+      "stagedSha256": 26,
+      "hostInputSha256": 7,
+      "batchInputSha256": 16,
+      "operatorHelperSha256": 2,
+      "regressionSha256": 6
+    },
+    "frozenFilesMatched": 695,
+    "candidateAndBothApksMatched": true
+  },
+  "operatorProtocol": "Use original preparation/handoff commands with attempt21 output and fresh runId. No other scenario scope changed.",
+  "remainingRuntimeVerification": "Calibration and one app core diagnostic remain unverified until this approved run."
+}
