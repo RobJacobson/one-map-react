@@ -307,7 +307,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const peerEvidence = join(
       root,
       continuation
-        ? "records/evidence/revised-api-u26-android-command-output-preparation.json"
+        ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
         : batch
           ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
           : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
@@ -347,7 +347,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         return android(
           [
             "python3",
-            join(recovery, "launch-lifetime-emulator.py"),
+            join(root, "scripts/launch-android-lifetime-emulator.py"),
             join(output, "emulator.log"),
           ],
           10000

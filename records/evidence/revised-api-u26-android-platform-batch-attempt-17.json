@@ -1,0 +1,157 @@
+{
+  "checkpoint": "U26 Android five-row continuation attempt17",
+  "recordedUTC": "2026-11-02T01:31:07.695261+00:00",
+  "result": "stopped-at-first-physical-observation-failure",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "task": "android_terra_attempt15",
+    "sameWorkerAsAttempts15And16": true
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "candidateChanged": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "scenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-activation": "passed",
+    "annotation-activation": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow-dismissal": "failed",
+    "map-feature-click": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "sdk-ornaments": "unverified",
+    "camera-target-and-gesture": "unverified",
+    "marker-prop-rejection": "unverified"
+  },
+  "firstFailure": {
+    "scenario": "popup-follow-dismissal",
+    "observed": "After successful pan input, fresh hierarchy showed Android launcher instead of selected app.",
+    "lastInput": [
+      "input",
+      "swipe",
+      "400",
+      "1900",
+      "600",
+      "1800",
+      "500"
+    ],
+    "inputExitCode": 0,
+    "inputWallTimeSeconds": 0.515911084,
+    "navigationBoundary": "Pan stayed above previously measured bottom navbar2337-2400. No termination/timeout/stop occurred before app disappearance in worker transcript. Exact pan time-of-day absent."
+  },
+  "nativeExitEvidence": {
+    "launch": {
+      "requestedAtUTC": "2026-11-02T01:21:14.669Z",
+      "pid": "3479",
+      "observedAtUTC": "2026-11-02T01:21:17.436Z"
+    },
+    "exitInfo": "ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)\nLast Timestamp of Persistence Into Persistent Storage: 1969-12-31 16:00:00.000\n  package: com.onemapmapbox\n    Historical Process Exit for uid=10232\n        ApplicationExitInfo #0:\n          timestamp=2026-11-01 17:26:35.809 pid=3479 realUid=10232 packageUid=10232 definingUid=10232 user=0\n          process=com.onemapmapbox reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=9\n          importance=100 pss=0.00 rss=0.00 state=36 bytes trace=null\n          description=null\n          anrInfo=null\n",
+    "selectedProcessEvents": "11-01 17:21:14.801   629   658 I am_proc_start: [0,3479,10232,com.onemapmapbox,next-top-activity,{com.onemapmapbox/com.onemapmapbox.MainActivity}]\n11-01 17:26:35.777   629  2016 I am_proc_died: [0,3479,com.onemapmapbox,0,2]",
+    "recorder": {
+      "startedAtUTC": "2026-11-02T01:21:14.666Z",
+      "stoppedAtUTC": "2026-11-02T01:26:59.683Z",
+      "coverage": "scoped stream; buffer rotation and unlogged kills remain possible",
+      "gaps": [],
+      "exit": {
+        "code": null,
+        "signal": "SIGTERM"
+      },
+      "closed": true,
+      "inputBytes": 70284,
+      "retainedBytes": 3073,
+      "limitBytes": 131072,
+      "evictedLines": 0,
+      "oversizedLines": 0,
+      "truncated": false,
+      "firstRetainedTimestamp": "11-01 17:21:14.802",
+      "lastRetainedTimestamp": "11-01 17:26:54.327",
+      "text": "11-01 17:21:14.802   629   658 I ActivityManager: Start proc 3479:com.onemapmapbox/u0a232 for next-top-activity {com.onemapmapbox/com.onemapmapbox.MainActivity}\n11-01 17:21:27.130   629  1157 W ActivityManager: Skipping manifest association check for null package. SourceUid: -1, SourcePkg: null, TargetUid: 10232, TargetPkg: com.onemapmapbox\n11-01 17:21:27.138   629   657 W ActivityManager: Skipping manifest association check for null package. SourceUid: -1, SourcePkg: null, TargetUid: 10232, TargetPkg: com.onemapmapbox\n11-01 17:21:40.522   282   282 I lowmemorykiller: lmkd data connection established\n11-01 17:21:40.560   282   282 I lowmemorykiller: Wakeup counter is reset from 66 to 0\n11-01 17:21:40.560   282   282 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-01 17:21:40.560   282   282 I lowmemorykiller: Properties reinitilized\n11-01 17:21:40.560  4884  4884 I lowmemorykiller: lmkd updated properties successfully\n11-01 17:21:40.560   282   282 I lowmemorykiller: lmkd data connection dropped\n11-01 17:21:40.560   282   282 I lowmemorykiller: closing lmkd data connection\n11-01 17:21:43.308   282   282 I lowmemorykiller: lmkd data connection established\n11-01 17:21:43.335   282   282 I lowmemorykiller: Wakeup counter is reset from 0 to 0\n11-01 17:21:43.335   282   282 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-01 17:21:43.335   282   282 I lowmemorykiller: Properties reinitilized\n11-01 17:21:43.335  5105  5105 I lowmemorykiller: lmkd updated properties successfully\n11-01 17:21:43.335   282   282 I lowmemorykiller: lmkd data connection dropped\n11-01 17:21:43.335   282   282 I lowmemorykiller: closing lmkd data connection\n11-01 17:25:58.867   282   282 I lowmemorykiller: lmkd data connection established\n11-01 17:25:58.899   282   282 I lowmemorykiller: Wakeup counter is reset from 0 to 0\n11-01 17:25:58.899   282   282 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-01 17:25:58.899   282   282 I lowmemorykiller: Properties reinitilized\n11-01 17:25:58.899  6018  6018 I lowmemorykiller: lmkd updated properties successfully\n11-01 17:25:58.899   282   282 I lowmemorykiller: lmkd data connection dropped\n11-01 17:25:58.899   282   282 I lowmemorykiller: closing lmkd data connection\n11-01 17:26:35.777   629  2016 I ActivityManager: Process com.onemapmapbox (pid 3479) has died: fg  TOP \n11-01 17:26:35.816   629   651 W ActivityManager: setHasOverlayUi called on unknown pid: 3479\n11-01 17:26:54.305   282   282 I lowmemorykiller: lmkd data connection established\n11-01 17:26:54.327   282   282 I lowmemorykiller: Wakeup counter is reset from 0 to 0\n11-01 17:26:54.327   282   282 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-01 17:26:54.327   282   282 I lowmemorykiller: Properties reinitilized\n11-01 17:26:54.327  7708  7708 I lowmemorykiller: lmkd updated properties successfully\n11-01 17:26:54.327   282   282 I lowmemorykiller: lmkd data connection dropped\n11-01 17:26:54.327   282   282 I lowmemorykiller: closing lmkd data connection\n"
+    },
+    "interpretation": "MatchedPID3479 receivedSIGKILL while foreground/TOP before diagnostics and owned cleanup; no sender or motive established. Recorder has no kill message. lmkd property reinitialization is not an OOM finding. Empty crash buffer does not exclude kernel or other unlogged kill."
+  },
+  "verificationQualification": "Five partial core observations passed, no complete suite row. Offset input bounds changed and returned; actual window.scale remains pending retained row, not assumed from configured density.",
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 56956",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "ownedIds": {
+    "emulatorPid": 56809,
+    "driverPid": 56956
+  },
+  "coordinatorAudit": {
+    "savedReceiptDiagnosticsAndManualReviewed": true,
+    "annotationBitmapAndTapReviewed": true,
+    "workerTranscriptLastInputReviewed": true,
+    "independentCleanupAndPins": {
+      "status": "passed",
+      "ownedPidsGroupsAbsent": [
+        56809,
+        56956
+      ],
+      "portsFree": [
+        5580,
+        5581,
+        8081,
+        8797
+      ],
+      "privateAvdRemoved": true,
+      "frozen695StagedHostOperatorArchiveBothApksMatch": true
+    }
+  },
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "next": "Audit minimal emulator kernel-console capture using documented-show-kernel flag, preserve existing launch/ownership/setup, then retry same five rows with same Terra worker under owner fix-and-continue authority. No f05/APK rebuild or speculative RAM/GPU change.",
+  "retainedEvidence": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-17/receipt.json": "869ed8b79eff7089507dd6838129db495642891a21e09098d66aa3fbbbfb4345",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-17/mapbox-android-core-diagnostics.json": "8c6d9cecc75d296d5bf420b9ea1904e6cd7ca42bc55e2e2d8ae2e2cde580a402",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-17/mapbox-android-core-manual.json": "428e2c5e0a85fb56a4bc32e0d716da00aa68a7398595fbf6c5abee3294b427da",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-17/popup-follow-dismissal-failure.json": "e2bfb9d7d27eee00fb55b5689ed34e4034f0199fa5aae716f303fa99eca68bc7",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-17/emulator.log": "31f2f66d6ccd170a167282e3f86b543c4b8f8447aa7d179d1c2fe3b86f2e17f9"
+  }
+}

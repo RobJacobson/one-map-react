@@ -204,7 +204,9 @@ for (const [engine, camera, batch = false, continuation = false] of [
           if (failAt === "create") fail("create failed");
           return "";
         }
-        if (command[1].includes("launch-lifetime")) {
+        if (
+          command[1].endsWith("/scripts/launch-android-lifetime-emulator.py")
+        ) {
           if (failAt === "launch-emulator") fail("emulator launch failed");
           if (failAt === "invalid-emulator-identity")
             return JSON.stringify({ pid: 0, pgid: 501 });
@@ -345,7 +347,7 @@ for (const [engine, camera, batch = false, continuation = false] of [
         if (
           /android-(rendering|camera)-preparation.json$/.test(file) ||
           file.endsWith("platform-batches-preparation.json") ||
-          file.endsWith("android-command-output-preparation.json")
+          file.endsWith("android-kernel-console-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
