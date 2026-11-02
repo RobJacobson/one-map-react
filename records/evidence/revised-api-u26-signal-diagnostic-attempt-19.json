@@ -1,0 +1,117 @@
+{
+  "checkpoint": "PR93 Android sender-capture attempt19",
+  "recordedUTC": "2026-11-02T03:54:32.861783+00:00",
+  "result": "stopped-at-calibration-process-identity-failure",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "sameExclusiveWorker": true
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "candidateChanged": false,
+  "nativeBuild": false,
+  "verifiedApkInstalled": true,
+  "androidAppLaunched": false,
+  "operatorInputs": 0,
+  "acceptanceRowsExecuted": 0,
+  "firstFailure": {
+    "underlying": "AssertionError [ERR_ASSERTION]: Owned trace did not stop; duration/owned emulator bound remains.",
+    "secondaryReadiness": "Validated status helper refused a failing/cleaning attempt; no app inputs.",
+    "calibrationActor": {
+      "actor": "3517",
+      "victim": "3520"
+    },
+    "session": {
+      "pid": "3373",
+      "deviceFile": "/data/misc/perfetto-traces/one-map-86345-signal-calibration.pftrace",
+      "hostFile": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-19/signal-calibration.pftrace",
+      "startedAtUTC": "2026-11-02T03:52:11.430Z",
+      "durationMs": 5000,
+      "identity": {
+        "cmdline": "perfetto\u0000--background-wait\u0000--txt\u0000-c\u0000-\u0000-o\u0000/data/misc/perfetto-traces/one-map-86345-signal-calibration.pftrace\u0000",
+        "start": "2931"
+      },
+      "authenticated": true,
+      "coverage": "running-before-stop"
+    },
+    "cleanupError": "AssertionError [ERR_ASSERTION]: Trace PID ownership changed.\n+ actual - expected\n\n  {\n+   cmdline: 'cat: /proc/3373/cmdline: No such file or directory\\n',\n+   start: undefined\n-   cmdline: 'perfetto\\x00--background-wait\\x00--txt\\x00-c\\x00-\\x00-o\\x00/data/misc/perfetto-traces/one-map-86345-signal-calibration.pftrace\\x00',\n-   start: '2931'\n  }\n",
+    "observedDefect": "Process metadata cat error text and undefined starttime were treated as a live process; original app SIGKILL cause is not established by this failure."
+  },
+  "tracePulled": false,
+  "signalAnalysisPerformed": false,
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 86345",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "ownedIds": {
+    "emulatorPid": 86148,
+    "driverPid": 86345
+  },
+  "coordinatorAudit": {
+    "savedCaptureReceiptAndStderrReviewed": true,
+    "independentCleanupAndArtifactCheck": {
+      "ownedProcessesAbsent": true,
+      "portsReleased": {
+        "5580": true,
+        "5581": true,
+        "8081": true,
+        "8797": true
+      },
+      "frozenFilesMatched": true,
+      "frozenFileCount": 695,
+      "archiveMatched": true,
+      "apksMatched": {
+        "mapbox": true,
+        "maplibre": true
+      },
+      "privateAvdAbsent": true
+    }
+  },
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "evidence": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-19/signal-capture.json": "6b446bd4ed1273b205d471903e7c8c104e52ff4dadbc88fb9ca59c59ee12408d",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-19/receipt.json": "26e8e10be850169ee025452948b0e934cfe62d685e3cf8e68d21e4a47ce94c00",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-19/mapbox-android-core-driver-stderr.log": "582ccd64bcfdf9a667b1f4fc4407180ffe23f7d6daaa67240f45bd5699ae6429"
+  },
+  "next": "Fix probe metadata/liveness validation with saved-response regression, independently audit and create repair PR. Obtain approval before any retry; do not claim originalSIGKILL fixed."
+}

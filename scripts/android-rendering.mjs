@@ -322,7 +322,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const peerEvidence = join(
       root,
       signalDiagnostic
-        ? "records/evidence/revised-api-u26-signal-capture-preparation.json"
+        ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
         : continuation
           ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
           : batch

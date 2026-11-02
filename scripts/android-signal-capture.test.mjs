@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { runInNewContext } from "node:vm";
 
 import {
   prepareAndroidSignalCapture,
@@ -24,6 +25,16 @@ assert.equal(
   "3976ef9871626ce28ceb32a36c657505a21f63c02837bb0ea51081412d79f4d7"
 );
 const temporary = mkdtempSync(join(tmpdir(), "one-map-signal-test-"));
+const source = readFileSync(
+  new URL("./android-signal-capture.mjs", import.meta.url),
+  "utf8"
+);
+const identitySource = source.slice(
+  source.indexOf("  const identity ="),
+  source.indexOf("  const stop =")
+);
+const procStat = (pid, state = "S", start = "2931") =>
+  `${pid} (perfetto) ${state} ${Array(18).fill("0").join(" ")} ${start}\n`;
 const fixture = `packet {
  timestamp: 1000000000
  process_tree {
@@ -58,6 +69,51 @@ const encode = (name, text) => {
   return binary;
 };
 try {
+  for (const scenario of [
+    "saved-exit0",
+    "between-reads",
+    "zombie",
+    "malformed-present",
+    "wrong-pid",
+    "invalid-state",
+    "invalid-start",
+    "empty-cmdline",
+    "unreadable-present",
+    "remote-rejected",
+  ]) {
+    const absent = ["saved-exit0", "between-reads", "remote-rejected"].includes(
+      scenario
+    );
+    const identity = runInNewContext(`${identitySource}\nidentity('3373')`, {
+      assert,
+      adb: async (args) => {
+        if (args[1] === "sh") return absent ? "absent\n" : "present\n";
+        if (scenario === "remote-rejected") throw Error("remote cat exited1");
+        if (args.at(-1).endsWith("cmdline")) {
+          if (scenario === "saved-exit0" || scenario === "unreadable-present")
+            return `cat: /proc/3373/cmdline: No such file or directory\n`;
+          return scenario === "empty-cmdline" || scenario === "zombie"
+            ? ""
+            : "perfetto\0--background-wait\0";
+        }
+        if (absent) return "cat: /proc/3373/stat: No such file or directory\n";
+        if (scenario === "malformed-present") return "malformed stat\n";
+        if (scenario === "wrong-pid") return procStat("9999");
+        return procStat(
+          "3373",
+          scenario === "zombie"
+            ? "Z"
+            : scenario === "invalid-state"
+              ? "?"
+              : "S",
+          scenario === "invalid-start" ? "invalid" : "2931"
+        );
+      },
+    });
+    if (absent || scenario === "zombie")
+      assert.equal(await identity, null, scenario);
+    else await assert.rejects(identity, undefined, scenario);
+  }
   const hostCanary = await runSignalCommand("/bin/sh", [
     "-c",
     signalCanaryCommand,
@@ -170,6 +226,11 @@ try {
     "ownership",
     "pull",
     "early-end",
+    "saved-exit0",
+    "disappears-between",
+    "zombie-stop",
+    "pid-reuse",
+    "changed-owner",
     "startup",
   ]) {
     const output = join(temporary, String(failure));
@@ -204,17 +265,35 @@ try {
         };
         return `${session.pid}\n`;
       }
-      if (call[0] === "exec-out") {
+      if (call[0] === "shell" && call[1] === "cat") {
         if (starts === 2 && call[2].endsWith("cmdline")) mainIdentityReads += 1;
         if (failure === "early-end" && mainIdentityReads > 1)
           session.active = false;
-        if (!session.active) throw Error("absent");
+        if (!session.active) {
+          if (failure === "saved-exit0" || failure === "disappears-between")
+            return failure === "disappears-between" &&
+              call[2].endsWith("cmdline")
+              ? session.args.join("\0") + "\0"
+              : `cat: ${call[2]}: No such file or directory\n`;
+          if (failure === "zombie-stop")
+            return call[2].endsWith("cmdline")
+              ? ""
+              : procStat(session.pid, "Z", "123");
+          throw Error("absent");
+        }
         if (call[2].endsWith("cmdline"))
           return (
-            (failure === "ownership" ? ["foreign"] : session.args).join("\0") +
-            "\0"
+            (failure === "ownership" ||
+            (failure === "changed-owner" && mainIdentityReads > 1)
+              ? ["foreign"]
+              : session.args
+            ).join("\0") + "\0"
           );
-        return `${session.pid} (perfetto) S ${Array(18).fill("0").join(" ")} 123\n`;
+        return procStat(
+          session.pid,
+          "S",
+          failure === "pid-reuse" && mainIdentityReads > 1 ? "999" : "123"
+        );
       }
       if (call[1] === "sh" && call[3].startsWith("test -d"))
         return session.active ? "present" : "absent";
@@ -240,7 +319,16 @@ try {
       if (call[1] === "rm") return "";
       throw Error(`Unexpected mocked boundary: ${call}`);
     };
-    if (failure && failure !== "early-end") {
+    const successful = [
+      null,
+      "saved-exit0",
+      "disappears-between",
+      "zombie-stop",
+    ].includes(failure);
+    const stopFailure = ["early-end", "pid-reuse", "changed-owner"].includes(
+      failure
+    );
+    if (!successful && !stopFailure) {
       await assert.rejects(
         prepareAndroidSignalCapture("emulator-5580", output, run)
       );
@@ -255,8 +343,16 @@ try {
       );
       assert.equal(starts, 2);
       const stop = capture.stop("2002");
-      if (failure === "early-end") await assert.rejects(stop, /coverage gap/);
-      else {
+      if (stopFailure) {
+        await assert.rejects(
+          stop,
+          failure === "early-end" ? /coverage gap/ : /ownership changed/
+        );
+        if (failure !== "early-end")
+          assert(
+            !actions.some((call) => call[1] === "kill" && call[3] === "9002")
+          );
+      } else {
         const saved = await stop;
         assert.equal(saved.analysis.events[0].contextTid, 1011);
         assert.equal(saved.coverage, "running-before-stop");

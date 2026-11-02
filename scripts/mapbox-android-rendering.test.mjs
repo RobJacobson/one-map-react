@@ -360,7 +360,7 @@ for (const [
           /android-(rendering|camera)-preparation.json$/.test(file) ||
           file.endsWith("platform-batches-preparation.json") ||
           file.endsWith("android-kernel-console-preparation.json") ||
-          file.endsWith("signal-capture-preparation.json")
+          file.endsWith("signal-liveness-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },

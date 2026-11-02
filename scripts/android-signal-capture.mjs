@@ -160,11 +160,29 @@ export const prepareAndroidSignalCapture = async (
   let current;
   const identity = async (pid) => {
     try {
-      const cmdline = await adb(["exec-out", "cat", `/proc/${pid}/cmdline`]);
-      const stat = await adb(["exec-out", "cat", `/proc/${pid}/stat`]);
-      const fields = stat.slice(stat.lastIndexOf(")") + 2).split(/\s+/);
-      if (fields[0] === "Z") return null;
-      return { cmdline, start: fields[19] };
+      const cmdline = await adb(["shell", "cat", `/proc/${pid}/cmdline`]);
+      const stat = await adb(["shell", "cat", `/proc/${pid}/stat`]);
+      // Validate payloads too: exec-out previously returned remote cat errors with exit0.
+      const parsed = stat.trim().match(/^([1-9][0-9]*) \((.*)\) (\S) (.*)$/s);
+      assert(parsed && parsed[1] === pid, "Invalid trace process stat PID.");
+      assert(
+        "RSDZTtXxKWPI".includes(parsed[3]),
+        "Invalid trace process state."
+      );
+      const start = parsed[4].trim().split(/\s+/)[18];
+      assert.match(
+        start ?? "",
+        /^[0-9]+$/,
+        "Invalid trace process start time."
+      );
+      if (parsed[3] === "Z") return null;
+      assert(
+        cmdline.endsWith("\0") &&
+          cmdline.split("\0")[0] &&
+          !cmdline.includes("\n"),
+        "Invalid trace process command line."
+      );
+      return { cmdline, start };
     } catch (error) {
       const check = await adb([
         "shell",
