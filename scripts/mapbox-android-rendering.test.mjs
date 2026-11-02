@@ -29,12 +29,19 @@ const names = [
   "rendered output contains the known orange feature",
 ];
 
-for (const [engine, camera, batch = false, continuation = false] of [
+for (const [
+  engine,
+  camera,
+  batch = false,
+  continuation = false,
+  signalDiagnostic = false,
+] of [
   ["mapbox", false],
   ["maplibre", false],
   ["mapbox", true],
   ["mapbox", true, true],
   ["mapbox", true, true, true],
+  ["mapbox", true, true, false, true],
 ]) {
   const apkHash = apkHashes[engine];
   const expectedNames =
@@ -128,7 +135,12 @@ for (const [engine, camera, batch = false, continuation = false] of [
           "driver-record-cleanup",
         ].includes(failure)
     )
-    .filter((failure) => !continuation || failure !== "late-metro-exit")) {
+    .filter((failure) => !continuation || failure !== "late-metro-exit")
+    .filter(
+      (failure) =>
+        !signalDiagnostic ||
+        [null, "driver", "identity-before", "cleanup"].includes(failure)
+    )) {
     const commands = [];
     const stopped = [];
     const removed = [];
@@ -347,7 +359,8 @@ for (const [engine, camera, batch = false, continuation = false] of [
         if (
           /android-(rendering|camera)-preparation.json$/.test(file) ||
           file.endsWith("platform-batches-preparation.json") ||
-          file.endsWith("android-kernel-console-preparation.json")
+          file.endsWith("android-kernel-console-preparation.json") ||
+          file.endsWith("signal-capture-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
@@ -484,6 +497,10 @@ for (const [engine, camera, batch = false, continuation = false] of [
             "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/native-harness"
           );
           assert.equal(options.env.TF07_BORROWED_METRO_REVERSE, "1");
+          if (signalDiagnostic) {
+            assert.equal(options.env.TF07_ANDROID_SIGNAL_OUTPUT, "/attempt");
+            assert.equal(options.env.TF07_NATIVE_TIMEOUT_MS, "900000");
+          }
         } else if (batch || children.length === 1) {
           assert.equal(options.env.ONE_MAP_SMOKE, camera ? "tf04" : "tf09");
           assert(args.includes("--reset-cache"));
@@ -544,7 +561,7 @@ for (const [engine, camera, batch = false, continuation = false] of [
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -665,7 +682,7 @@ for (const [engine, camera, batch = false, continuation = false] of [
     if (batch) {
       assert.equal(
         installs,
-        failAt === null
+        failAt === null && !signalDiagnostic
           ? 2
           : ["observer", "prior-hash", "prior-prefix"].includes(failAt)
             ? 0
@@ -699,32 +716,43 @@ for (const [engine, camera, batch = false, continuation = false] of [
         const late = stderrWrites.find(([, value]) =>
           value.includes("late previous driver")
         );
-        assert(
-          late[0].endsWith("mapbox-android-core-driver-stderr.log"),
-          late[0]
+        if (!signalDiagnostic)
+          assert(
+            late[0].endsWith("mapbox-android-core-driver-stderr.log"),
+            late[0]
+          );
+        assert.equal(
+          receipt.rows.length,
+          signalDiagnostic ? 1 : continuation ? 5 : 6
         );
-        assert.equal(receipt.rows.length, continuation ? 5 : 6);
-        assert.equal(cameraRows, continuation ? 1 : 2);
+        assert.equal(cameraRows, signalDiagnostic ? 0 : continuation ? 1 : 2);
         assert.deepEqual(
           cameraEngines,
-          continuation ? ["maplibre"] : ["mapbox", "maplibre"]
+          signalDiagnostic
+            ? []
+            : continuation
+              ? ["maplibre"]
+              : ["mapbox", "maplibre"]
         );
         assert.deepEqual(
           receipt.rows.map(({ rowId }) => rowId),
-          [
-            ...(!continuation ? ["mapbox-android-camera"] : []),
-            "mapbox-android-core",
-            "mapbox-android-retained",
-            "maplibre-android-camera",
-            "maplibre-android-core",
-            "maplibre-android-retained",
-          ]
+          signalDiagnostic
+            ? ["mapbox-android-core"]
+            : [
+                ...(!continuation ? ["mapbox-android-camera"] : []),
+                "mapbox-android-core",
+                "mapbox-android-retained",
+                "maplibre-android-camera",
+                "maplibre-android-core",
+                "maplibre-android-retained",
+              ]
         );
         if (continuation)
           assert.equal(receipt.reusedRows[0].rowId, "mapbox-android-camera");
         if (continuation)
           assert.equal(receipt.rows[0].rowId, "mapbox-android-core");
-        assert.equal(coreRows, 4);
+        assert.equal(coreRows, signalDiagnostic ? 1 : 4);
+        if (signalDiagnostic) assert.equal(installs, 1);
         assert.equal(
           commands.filter((args) =>
             args.some((arg) =>
@@ -733,14 +761,17 @@ for (const [engine, camera, batch = false, continuation = false] of [
           ).length,
           1
         );
-        assert.equal(pulls, continuation ? 12 : 14);
+        assert.equal(pulls, signalDiagnostic ? 3 : continuation ? 12 : 14);
       }
       if (failAt === "late-metro-exit") {
         assert.equal(receipt.rows.length, 0);
         assert.equal(coreRows, 0);
       }
       if (["driver", "driver-stderr"].includes(failAt)) {
-        assert.equal(receipt.rows.length, continuation ? 0 : 1);
+        assert.equal(
+          receipt.rows.length,
+          signalDiagnostic || continuation ? 0 : 1
+        );
         assert.equal(coreRows, 1);
       }
       assert(

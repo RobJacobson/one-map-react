@@ -1,0 +1,57 @@
+{
+  "checkpoint": "SIGKILL read-only tracing-capability phase",
+  "recordedUTC": "2026-11-02T02:20:08.616310+00:00",
+  "result": "passed-capability-registration-query-only",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "sameExclusiveWorker": true
+  },
+  "nativeApplicationExecuted": false,
+  "traceEnabled": false,
+  "appInstalled": false,
+  "metroStarted": false,
+  "acceptanceRowsExecuted": 0,
+  "query": {
+    "status": 0,
+    "stdoutBytes": 7236,
+    "stderrBytes": 0,
+    "service": "Perfetto v54.0",
+    "tracingSessions": 0,
+    "linuxFtraceProducer": "perfetto.traced_probes",
+    "output": "query.json",
+    "limit": "Registration does not establish event enablement or sender attribution."
+  },
+  "cleanup": {
+    "emulatorKill": "passed",
+    "pidAndGroupAbsent": true,
+    "portsReleased": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true
+  },
+  "coordinatorAudit": {
+    "status": "passed",
+    "queryBoundAndContentReviewed": true,
+    "ownedPidGroup71626Absent": true,
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true
+  },
+  "limits": [
+    "Registration does not establish signal_generate can be enabled",
+    "Human --query output was manually inspected, not treated as a stable machine API",
+    "No actor identified and no root-cause fix demonstrated"
+  ],
+  "evidence": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-signal-capability-attempt-01/receipt.json": "750945958a20d2c5f43bedb0733d61b0799d328b3da7da8832837fd9f62f7b57",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-signal-capability-attempt-01/query.json": "ec35f7613dbd7520ea4864cdb2936fabf63b5f9f59ddf983bcd284b51668a0b0"
+  }
+}

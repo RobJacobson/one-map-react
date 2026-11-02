@@ -1,0 +1,26 @@
+{
+  "recordedUTC": "2026-11-02T01:37:33.018996+00:00",
+  "authorization": "Repeated owner request to free space; existing same-scope native continuation permission persists.",
+  "removedRegenerableCaches": [
+    "/Users/rob/.cache/convex",
+    "/Users/rob/.local/share/vite-plus/package_manager/bun/1.4.4",
+    "/Users/rob/.local/share/vite-plus/package_manager/pnpm/12.16.1",
+    "/Users/rob/.local/share/vite-plus/package_manager/npm",
+    "/Users/rob/Library/Caches/Google/Chrome",
+    "/Users/rob/Library/Caches/bun"
+  ],
+  "preserved": [],
+  "freeBytesBefore": 8748224512,
+  "freeBytesAfter": 9143586816,
+  "observedIncreaseBytes": 395362304,
+  "activeRuntimeProtection": "Current process arguments checked before deleting cached package-manager/backend downloads. Node24.22.1/Node26.13.0/Bun1.4.1 and shared artifact runtimes kept. No system swap or project source removed.",
+  "hostMemoryObservation": {
+    "physicalBytes": 17179869184,
+    "swapTotalMiB": 13312,
+    "swapUsedMiB": 12309.69,
+    "newSwapfile11CreationUTC": "2026-11-02T01:21:15.126903+00:00",
+    "cleanupPriorUTC": "2026-11-02T01:20:06.578293+00:00",
+    "qualification": "A1GiB swap file was created after cleanup; this does not establish the guest-app SIGKILL cause."
+  },
+  "nativeExecution": false
+}

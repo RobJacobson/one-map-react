@@ -60,9 +60,13 @@ const root = resolve(import.meta.dirname, "..");
  */
 export const run = async (output, engine = "mapbox", scene = "rendering") => {
   assert(
-    ["rendering", "camera", "acceptance", "acceptance-continuation"].includes(
-      scene
-    ),
+    [
+      "rendering",
+      "camera",
+      "acceptance",
+      "acceptance-continuation",
+      "signal-diagnostic",
+    ].includes(scene),
     "Unknown fixed scene."
   );
   assert(
@@ -70,7 +74,12 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     "Camera targets Mapbox only."
   );
   const continuation = scene === "acceptance-continuation";
-  const batch = scene === "acceptance" || continuation;
+  const signalDiagnostic = scene === "signal-diagnostic";
+  assert(
+    !signalDiagnostic || engine === "mapbox",
+    "Signal diagnostic targets Mapbox only."
+  );
+  const batch = scene === "acceptance" || continuation || signalDiagnostic;
   const camera = scene === "camera" || batch;
   const ports = batch
     ? [5580, 5581, 8081, 8797]
@@ -92,6 +101,12 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     apkSha256,
     cleanup: [],
     checkpoints: [],
+    ...(signalDiagnostic && {
+      mode: "signal-diagnostic",
+      scope: ["mapbox-android-core"],
+      manualObservationLimitMs: 900000,
+      traceLimitMs: 1200000,
+    }),
   };
   const children = [];
   const stoppingChildren = new Set();
@@ -306,11 +321,13 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     }
     const peerEvidence = join(
       root,
-      continuation
-        ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
-        : batch
-          ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
-          : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
+      signalDiagnostic
+        ? "records/evidence/revised-api-u26-signal-capture-preparation.json"
+        : continuation
+          ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
+          : batch
+            ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
+            : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
@@ -379,7 +396,9 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       reverses.push(port);
     }
     receipt.rows = batch ? [] : undefined;
-    for (const selectedEngine of batch ? ["mapbox", "maplibre"] : [engine]) {
+    for (const selectedEngine of batch && !signalDiagnostic
+      ? ["mapbox", "maplibre"]
+      : [engine]) {
       engine = selectedEngine;
       ({ applicationId, apkSha256, outcomes } = targets[engine]);
       shell = join(harness, `examples/native-${engine}`);
@@ -442,7 +461,11 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         applicationId,
         "android.permission.ACCESS_LOCAL_NETWORK",
       ]);
-      for (const row of batch ? ["camera", "core", "retained"] : [scene]) {
+      for (const row of signalDiagnostic
+        ? ["core"]
+        : batch
+          ? ["camera", "core", "retained"]
+          : [scene]) {
         if (continuation && engine === "mapbox" && row === "camera") continue;
         const rowId = `${engine}-android-${row}`;
         if (batch) {
@@ -475,7 +498,8 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
               TF07_PARENT_PROCESS_GROUP: "1",
               TF07_MANUAL_REPORT: join(output, `${rowId}-manual.json`),
               TF07_OUTPUT: join(output, `${rowId}-result.json`),
-              TF07_NATIVE_TIMEOUT_MS: "1800000",
+              TF07_NATIVE_TIMEOUT_MS: signalDiagnostic ? "900000" : "1800000",
+              ...(signalDiagnostic && { TF07_ANDROID_SIGNAL_OUTPUT: output }),
               TF07_ANDROID_DIAGNOSTICS: join(
                 output,
                 `${rowId}-diagnostics.json`
@@ -484,7 +508,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
           );
           await until(
             () => driver.exitCode !== null || driver.signalCode !== null,
-            2100000
+            signalDiagnostic ? 1500000 : 2100000
           );
           assert.equal(driver.exitCode, 0, `${rowId} driver failed.`);
           const result = JSON.parse(
