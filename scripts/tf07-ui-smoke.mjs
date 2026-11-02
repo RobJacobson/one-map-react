@@ -14,6 +14,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 
+import { prepareAndroidSignalCapture } from "./android-signal-capture.mjs";
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import {
   judgeNativeRetained,
@@ -322,6 +323,7 @@ const runNative = async (selectedEngine) => {
   let status;
   let androidLaunch;
   let androidRecorder;
+  let androidSignalCapture;
   let diagnostics;
   let acquiredApp = false;
   const acquiredReverses = [];
@@ -504,6 +506,13 @@ const runNative = async (selectedEngine) => {
     }, 60000);
     if (nativeFailure) throw nativeFailure;
     if (platform === "android") {
+      if (process.env.TF07_ANDROID_SIGNAL_OUTPUT) {
+        assert.equal(selectedEngine, "mapbox");
+        androidSignalCapture = await prepareAndroidSignalCapture(
+          serial,
+          process.env.TF07_ANDROID_SIGNAL_OUTPUT
+        );
+      }
       if (process.env.TF07_ANDROID_DIAGNOSTICS)
         androidRecorder = await startAndroidRecorder(
           serial,
@@ -700,6 +709,8 @@ const runNative = async (selectedEngine) => {
       if (diagnostics) diagnostics.recorder = snapshot;
       if (result) result.androidRecorder = snapshot;
     }
+    if (androidSignalCapture)
+      await clean(() => androidSignalCapture.stop(androidLaunch?.pid));
     if (diagnostics) {
       try {
         writeFileSync(

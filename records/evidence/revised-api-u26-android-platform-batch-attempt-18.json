@@ -1,0 +1,155 @@
+{
+  "checkpoint": "U26 Android five-row continuation attempt18",
+  "recordedUTC": "2026-11-02T01:44:24.918119+00:00",
+  "result": "stopped-at-first-physical-observation-failure",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "sameWorkerAsAttempts15To17": true
+  },
+  "preparation": {
+    "pr": "https://github.com/RobJacobson/one-map-react/pull/92",
+    "commit": "c28b22e",
+    "path": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-kernel-console-preparation.json",
+    "sha256": "f03373abcda1ab48c437af68c5ddd4d01494329ecd1ad8ee613b184362ead47f"
+  },
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "candidateChanged": false,
+  "reusedRows": [
+    "mapbox-android-camera"
+  ],
+  "completedExecutionRows": [],
+  "stoppedRow": "mapbox-android-core",
+  "scenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "failed",
+    "live-activation": "unverified",
+    "annotation-activation": "unverified",
+    "offset-touch-bounds": "unverified",
+    "popup-follow-dismissal": "unverified",
+    "map-feature-click": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "sdk-ornaments": "unverified",
+    "camera-target-and-gesture": "unverified",
+    "marker-prop-rejection": "unverified"
+  },
+  "firstFailure": {
+    "scenario": "nested-scroll",
+    "observed": "Fresh hierarchy showed Android launcher before nested-scroll input; no nested swipe issued."
+  },
+  "exitEvidence": {
+    "launch": {
+      "requestedAtUTC": "2026-11-02T01:38:56.523Z",
+      "pid": "3282",
+      "observedAtUTC": "2026-11-02T01:38:58.320Z"
+    },
+    "exitInfo": "ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)\nLast Timestamp of Persistence Into Persistent Storage: 1969-12-31 16:00:00.000\n  package: com.onemapmapbox\n    Historical Process Exit for uid=10232\n        ApplicationExitInfo #0:\n          timestamp=2026-11-01 17:39:57.102 pid=3282 realUid=10232 packageUid=10232 definingUid=10232 user=0\n          process=com.onemapmapbox reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=9\n          importance=100 pss=0.00 rss=0.00 state=36 bytes trace=null\n          description=null\n          anrInfo=null\n",
+    "events": "11-01 17:38:56.479   635   665 I am_proc_start: [0,3282,10232,com.onemapmapbox,next-top-activity,{com.onemapmapbox/com.onemapmapbox.MainActivity}]\n11-01 17:39:57.097   635  1175 I am_proc_died: [0,3282,com.onemapmapbox,0,2]",
+    "recorderMetadata": {
+      "startedAtUTC": "2026-11-02T01:38:56.521Z",
+      "stoppedAtUTC": "2026-11-02T01:40:39.055Z",
+      "coverage": "scoped stream; buffer rotation and unlogged kills remain possible",
+      "gaps": [],
+      "exit": {
+        "code": null,
+        "signal": "SIGTERM"
+      },
+      "closed": true,
+      "inputBytes": 78409,
+      "retainedBytes": 1900,
+      "limitBytes": 131072,
+      "evictedLines": 0,
+      "oversizedLines": 0,
+      "truncated": false,
+      "firstRetainedTimestamp": "11-01 17:38:56.479",
+      "lastRetainedTimestamp": "11-01 17:39:57.108"
+    },
+    "selectedRecorderText": "11-01 17:38:56.479   635   665 I ActivityManager: Start proc 3282:com.onemapmapbox/u0a232 for next-top-activity {com.onemapmapbox/com.onemapmapbox.MainActivity}\n11-01 17:39:06.415   635  1359 W ActivityManager: Skipping manifest association check for null package. SourceUid: -1, SourcePkg: null, TargetUid: 10232, TargetPkg: com.onemapmapbox\n11-01 17:39:06.569   635   664 W ActivityManager: Skipping manifest association check for null package. SourceUid: -1, SourcePkg: null, TargetUid: 10232, TargetPkg: com.onemapmapbox\n11-01 17:39:27.381   283   283 I lowmemorykiller: lmkd data connection established\n11-01 17:39:27.397   283   283 I lowmemorykiller: Wakeup counter is reset from 100 to 0\n11-01 17:39:27.397   283   283 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-01 17:39:27.397   283   283 I lowmemorykiller: Properties reinitilized\n11-01 17:39:27.397  5308  5308 I lowmemorykiller: lmkd updated properties successfully\n11-01 17:39:27.397   283   283 I lowmemorykiller: lmkd data connection dropped\n11-01 17:39:27.397   283   283 I lowmemorykiller: closing lmkd data connection\n11-01 17:39:31.427   283   283 I lowmemorykiller: lmkd data connection established\n11-01 17:39:31.457   283   283 I lowmemorykiller: Wakeup counter is reset from 0 to 0\n11-01 17:39:31.457   283   283 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-01 17:39:31.457   283   283 I lowmemorykiller: Properties reinitilized\n11-01 17:39:31.457  5483  5483 I lowmemorykiller: lmkd updated properties successfully\n11-01 17:39:31.457   283   283 I lowmemorykiller: lmkd data connection dropped\n11-01 17:39:31.457   283   283 I lowmemorykiller: closing lmkd data connection\n11-01 17:39:57.097   635  1175 I ActivityManager: Process com.onemapmapbox (pid 3282) has died: fg  TOP \n11-01 17:39:57.108   635   658 W ActivityManager: setHasOverlayUi called on unknown pid: 3282\n",
+    "interpretation": "SelectedPID3282 diedSIGKILL whileforeground/TOP before diagnostic capture andcleanup. No sender or motive established."
+  },
+  "kernelConsole": {
+    "verified": true,
+    "bootMarkers": [
+      "[    0.000000][    T0] Booting Linux on physical CPU 0x0000000000 [0x610f0000]",
+      "[    0.000000][    T0] Linux version 6.12.81-android16-6-g4f69fc7b210c-ab16167562-4k (kleaf@build-host) (Android (14043575, +pgo, +bolt, +lto, +mlgo, based on r536225) clang version 19.0.1 (https://android.googlesource.com/toolchain/llvm-project b3a530ec6537146650e42be89f1089e9a3588460), LLD 19.0.1) #1 SMP PREEMPT Tue Aug 25 07:36:40 UTC 2026"
+    ],
+    "consoleBytes": 314387,
+    "oomMatches": [],
+    "qualification": "No recorded OOM/victim-kill line matches selectedPID3282. Unrelatedidmap2dPID583SIGKILL is not selected app evidence. Missing logs do not exclude every kernel or unlogged userspace kill. Existing console file is not byte bounded; raw retained only for active investigation."
+  },
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 60190",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "status": "passed",
+    "ownedPidsGroupsAbsent": [
+      60061,
+      60190
+    ],
+    "portsFree": [
+      5580,
+      5581,
+      8081,
+      8797
+    ],
+    "privateAvdRemoved": true,
+    "frozen695AndAllPreparationPinsMatch": true,
+    "archiveBothApksMatch": true,
+    "savedDiagnosticsAndKernelConsoleReviewed": true
+  },
+  "additionalReadOnlyInspection": {
+    "scope": "Packed APK string inspection for explicit process-kill/CrashReporter/state-summary symbols; no supported SDK-specific crash-report path or causal repair established. Opaque SDK behavior remains unverified. No package member executed or modified.",
+    "notClaimed": "No OOM diagnosis, SDK defect, specific sender or production fix established."
+  },
+  "remainingAndroidSuiteCount": 5,
+  "iosSuiteCount": 6,
+  "remainingSuiteCount": 11,
+  "retainedEvidence": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-18/receipt.json": "46712ee4c89737af1d3a39943b52a4bd3059c1928bff2b9f74341bdb48c2cb2d",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-18/mapbox-android-core-diagnostics.json": "6065038cdfa454f0efd90037cb74b55b5921dc0346afc49774f39af3360dc632",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-18/mapbox-android-core-manual.json": "70cb50d78a211fede6f51e8dea3fc3aac289129f2472749e718ae40b0d948c10",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-18/emulator.log": "aee79a55b92c3d2d895a52c0b558ba225bac1fcccca372c368a6a52888c8e548"
+  },
+  "next": "Preserve active failure evidence. Repeated scoped/system/kernel logging has not identified sender; another identical retry is not a demonstrated repair. Further diagnosis must target a specific observable signal sender or external host constraint; f05/APKs remain unchanged and no rebuild was authorized."
+}

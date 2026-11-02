@@ -80,6 +80,9 @@ for (const [engine, borrowed] of [
     "readiness-body",
     "launch-status",
     "launch-error",
+    ...(engine === "mapbox"
+      ? ["signal-prepare", "signal-stop", "manual-signal-stop"]
+      : []),
   ]) {
     const commands = [];
     const stopped = [];
@@ -95,7 +98,23 @@ for (const [engine, borrowed] of [
     let diagnostics;
     let recorder;
     let recorderStopped = false;
+    let signalStopped = false;
     const context = {
+      prepareAndroidSignalCapture: async () => {
+        assert(metroReady);
+        assert(!launched, "Calibrate before app launch.");
+        if (failure === "signal-prepare") throw Error("calibration failed");
+        return {
+          stop: async () => {
+            signalStopped = true;
+            assert(
+              !commands.at(-1).includes("force-stop"),
+              "Pull trace before app cleanup."
+            );
+            throw Error("signal stop failed");
+          },
+        };
+      },
       Buffer,
       StringDecoder,
       setTimeout,
@@ -148,6 +167,9 @@ for (const [engine, borrowed] of [
           TF07_MANUAL_REPORT: "/report",
           TF07_ANDROID_DIAGNOSTICS: "/diagnostics",
           MAPBOX_ACCESS_TOKEN: "known-sample-token",
+          ...(failure?.includes("signal-") && {
+            TF07_ANDROID_SIGNAL_OUTPUT: "/attempt",
+          }),
           ...(borrowed
             ? {
                 TF07_BORROWED_METRO_REVERSE: "1",
@@ -200,12 +222,14 @@ for (const [engine, borrowed] of [
         manual.scenarios["physical-touch"] =
           failure?.startsWith("manual-recorder") ||
           failure?.startsWith("manual-diagnostics") ||
-          failure === "manual-failed"
+          failure === "manual-failed" ||
+          failure === "manual-signal-stop"
             ? "failed"
             : "passed";
         if (
           !failure?.startsWith("manual-recorder") &&
           failure !== "manual-failed" &&
+          failure !== "manual-signal-stop" &&
           !failure?.startsWith("manual-diagnostics")
         )
           manual.scenarios["later-touch"] = "passed";
@@ -325,7 +349,10 @@ for (const [engine, borrowed] of [
         }
         if (parts.includes("start") && failure === "launch")
           throw Error("launch failed");
-        if (parts.includes("force-stop") && launched) assert(recorderStopped);
+        if (parts.includes("force-stop") && launched) {
+          assert(recorderStopped);
+          if (failure?.includes("signal-")) assert(signalStopped);
+        }
         if (parts.includes("--remove") && failure === "cleanup")
           throw Error("cleanup failed");
         if (parts.includes("exit-info")) {
@@ -425,6 +452,7 @@ for (const [engine, borrowed] of [
       failed = true;
     }
     if (recorder) assert(recorderStopped);
+    if (failure === "signal-prepare") assert(!launched);
     assert.equal(
       failed,
       failure !== null && !failure?.startsWith("success-recorder"),

@@ -1,0 +1,295 @@
+{
+  "checkpoint": "Saved-evidence review of recurring Mapbox Android SIGKILL",
+  "status": "Sender and root cause unresolved; no causal repair implemented; independent coordinator audit pending",
+  "scope": {
+    "reviewRoot": "/private/tmp/one-map-android-restoration-review",
+    "baselineCommit": "c28b22e",
+    "nativeExecution": false,
+    "codeFix": false,
+    "candidateChanged": false,
+    "unrelatedUntrackedFilePreserved": "mapbox-android-core-manual.json"
+  },
+  "evidence": [
+    {
+      "attempt": 13,
+      "diagnostics": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-13/mapbox-android-core-diagnostics.json",
+      "sha256": "ad26c703a63e5259478f5c6d545a906d982d66e2554ee5d8794735476bfcf865",
+      "launch": {
+        "requestedAtUTC": "2026-11-02T00:12:21.958Z",
+        "pid": "3666",
+        "observedAtUTC": "2026-11-02T00:12:26.260Z"
+      },
+      "capturedAtUTC": "2026-11-02T00:25:13.024Z",
+      "exitInfo": "ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)\nLast Timestamp of Persistence Into Persistent Storage: 1969-12-31 16:00:00.000\n  package: com.onemapmapbox\n    Historical Process Exit for uid=10232\n        ApplicationExitInfo #0:\n          timestamp=2026-11-01 16:24:55.499 pid=3666 realUid=10232 packageUid=10232 definingUid=10232 user=0\n          process=com.onemapmapbox reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=9\n          importance=100 pss=0.00 rss=0.00 state=36 bytes trace=null\n          description=null\n          anrInfo=null\n",
+      "observationPhase": "style/remount renderer read",
+      "recorder": null
+    },
+    {
+      "attempt": 17,
+      "diagnostics": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-17/mapbox-android-core-diagnostics.json",
+      "sha256": "8c6d9cecc75d296d5bf420b9ea1904e6cd7ca42bc55e2e2d8ae2e2cde580a402",
+      "launch": {
+        "requestedAtUTC": "2026-11-02T01:21:14.669Z",
+        "pid": "3479",
+        "observedAtUTC": "2026-11-02T01:21:17.436Z"
+      },
+      "capturedAtUTC": "2026-11-02T01:26:59.530Z",
+      "exitInfo": "ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)\nLast Timestamp of Persistence Into Persistent Storage: 1969-12-31 16:00:00.000\n  package: com.onemapmapbox\n    Historical Process Exit for uid=10232\n        ApplicationExitInfo #0:\n          timestamp=2026-11-01 17:26:35.809 pid=3479 realUid=10232 packageUid=10232 definingUid=10232 user=0\n          process=com.onemapmapbox reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=9\n          importance=100 pss=0.00 rss=0.00 state=36 bytes trace=null\n          description=null\n          anrInfo=null\n",
+      "observationPhase": "popup-follow-dismissal",
+      "recorder": {
+        "coverage": "scoped stream; buffer rotation and unlogged kills remain possible",
+        "gaps": [],
+        "truncated": false,
+        "evictedLines": 0,
+        "oversizedLines": 0
+      }
+    },
+    {
+      "attempt": 18,
+      "diagnostics": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-18/mapbox-android-core-diagnostics.json",
+      "sha256": "6065038cdfa454f0efd90037cb74b55b5921dc0346afc49774f39af3360dc632",
+      "launch": {
+        "requestedAtUTC": "2026-11-02T01:38:56.523Z",
+        "pid": "3282",
+        "observedAtUTC": "2026-11-02T01:38:58.320Z"
+      },
+      "capturedAtUTC": "2026-11-02T01:40:38.859Z",
+      "exitInfo": "ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)\nLast Timestamp of Persistence Into Persistent Storage: 1969-12-31 16:00:00.000\n  package: com.onemapmapbox\n    Historical Process Exit for uid=10232\n        ApplicationExitInfo #0:\n          timestamp=2026-11-01 17:39:57.102 pid=3282 realUid=10232 packageUid=10232 definingUid=10232 user=0\n          process=com.onemapmapbox reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=9\n          importance=100 pss=0.00 rss=0.00 state=36 bytes trace=null\n          description=null\n          anrInfo=null\n",
+      "observationPhase": "after passed child button/readback, before nested-scroll input",
+      "recorder": {
+        "coverage": "scoped stream; buffer rotation and unlogged kills remain possible",
+        "gaps": [],
+        "truncated": false,
+        "evictedLines": 0,
+        "oversizedLines": 0
+      }
+    }
+  ],
+  "scopedFindings": [
+    "The same launched PID is recorded SIGNALED/status9 at foreground importance100 in all three exit histories; intentional runner cleanup follows death.",
+    "Attempts17 and18 record foreground TOP death without matching causal LMKD or ActivityManager kill lines. Their scoped recorders report no gaps or truncation; that scope does not establish absence of an unlogged sender.",
+    "Attempt18 kernel console contains no target3282 OOM, seccomp, SELinux, debugger or watchdog cause. Its init SIGKILL messages target other service PIDs; lmkd reinitialization messages do not report an application kill.",
+    "The missing36byte process-state summary is length metadata, not decoded sender evidence. Empty crash buffers do not identify the sender.",
+    "Elapsed launch-to-death differs across attempts: approximately753seconds,321seconds and61seconds. No one annotation, style/remount or nested-scroll action is established as the shared trigger."
+  ],
+  "executionChainAudit": {
+    "files": [
+      "scripts/android-rendering.mjs",
+      "scripts/android-acceptance-batch.mjs",
+      "scripts/android-acceptance-continuation.mjs",
+      "scripts/tf07-ui-smoke.mjs",
+      "scripts/native-smoke-process.mjs",
+      "scripts/android-operator.py",
+      "scripts/launch-android-lifetime-emulator.py",
+      "examples/shared/native-tf07-screen.tsx",
+      "examples/shared/tf07-scene.tsx",
+      "packages/one-map-react/src/adapters/shared/native-ui.tsx",
+      "packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx",
+      "packages/one-map-react/src/adapters/mapbox-native/ui.tsx"
+    ],
+    "hostInputs": [
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin"
+    ],
+    "result": "No demonstrated runner lifetime or explicit application termination route explaining these deaths. Batch row bound2100seconds and inner default3600seconds do not match death times;30second command timers terminate host adb subprocesses. Process-group cleanup operates on owned host processes after failure.",
+    "applicationPath": "Child Pressable activates record/status setState; renderer read invokes getCenter/getZoom/queryRenderedFeatures/project and posts readback. Live markers use react-native-teleport Portal overlays; annotation uses PointAnnotation. Native MainApplication/MainActivity are standard RN templates.",
+    "limits": "Source inspection does not exclude opaque SDK/binary behavior or an external guest sender. No new red-capable native feedback loop ran because native execution is not authorized. A mock injected SIGKILL would not identify the real sender."
+  },
+  "successfulScopeComparison": [
+    {
+      "evidence": "records/evidence/revised-api-u25-f05-mapbox-android-minimal-attempt-03.json",
+      "durationSecondsApprox": 40,
+      "apk": "ddd7d9527e50c5937abf4b2090eb6f56e4f9ad0788196b535372569db6cad485",
+      "scope": "Load and automatic camera only"
+    },
+    {
+      "evidence": "records/evidence/revised-api-u25-f05-mapbox-android-lifetimes-attempt-05.json",
+      "sceneWallSeconds": 56.8,
+      "apk": "ddd7d9527e50c5937abf4b2090eb6f56e4f9ad0788196b535372569db6cad485",
+      "scope": "Automated feature-state lifetime transitions"
+    },
+    {
+      "evidence": [
+        "records/evidence/revised-api-u25-f05-mapbox-android-queries-attempt-03.json",
+        "records/evidence/revised-api-u25-f05-mapbox-android-sources-attempt-02.json",
+        "records/evidence/revised-api-u25-f05-mapbox-android-rendering-attempt-01.json"
+      ],
+      "apk": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+      "scope": "Bounded automated query/source/rendering scopes; source scene20.48seconds; no equivalent TF07 live Portal children, annotation, popup, toolbar and repeated operator hierarchy flow"
+    }
+  ],
+  "rankedHypotheses": [
+    {
+      "rank": 1,
+      "hypothesis": "Guest userspace sender, external or app-local",
+      "prediction": "Raw signal-generation context correlated with victim PID identifies the generating execution context; syscall/callstack evidence may then be needed to identify the initiating actor.",
+      "status": "Unresolved"
+    },
+    {
+      "rank": 2,
+      "hypothesis": "TF07-specific native integration self-termination",
+      "prediction": "Generating context belongs to the app and stack/callsite evidence locates the path. Current saved deaths across different phases do not isolate an integration.",
+      "status": "Unresolved; no justified production or fixture patch"
+    },
+    {
+      "rank": 3,
+      "hypothesis": "Guest kernel memory killing",
+      "prediction": "Signal context and correlated kernel memory evidence establish the relevant OOM path. SI_KERNEL or current task alone is insufficient.",
+      "status": "Unsupported by saved matching causal records; not conclusively excluded"
+    },
+    {
+      "rank": 4,
+      "hypothesis": "Host runner timeout or owned cleanup",
+      "prediction": "A pre-death termination route or matching timeout is demonstrable in actual source/ownership records.",
+      "status": "Countered by inspected timing, lifecycle and guest/host PID boundaries; no reproducing defect found"
+    }
+  ],
+  "offlineCapability": {
+    "source": "Independently read installed gzip kernel and embedded config with Python standard library; no native execution.",
+    "observed": [
+      "kernel-ranchu gzip includes signal_generate and __tracepoint_signal_generate",
+      "Embedded CONFIG_FTRACE=y, CONFIG_TRACEPOINTS=y, CONFIG_EVENT_TRACING=y, CONFIG_BPF_EVENTS=y, CONFIG_IKCONFIG_PROC=y",
+      "Installed API37 image build.type=user and ro.debuggable=0"
+    ],
+    "meaning": "Compiled tracing support is present; shell/traced permission and permitted event availability remain unknown.",
+    "attributionLimit": "Raw FtraceEvent.common_pid is execution-context TID. High-level signal slices may discard that context. Queued or kernel-generated signals require care: execution context is not necessarily the original userspace actor; SI_KERNEL does not imply OOM.",
+    "paths": [
+      "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/kernel-ranchu",
+      "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/build.prop"
+    ],
+    "references": [
+      {
+        "url": "https://android.googlesource.com/platform/external/perfetto/+/621a58d8c5edcf4175ec83de057224eb249575a2/protos/perfetto/trace/perfetto_trace.proto",
+        "claim": "signal_generate event fields include victim PID/comm, signal and code; raw FtraceEvent context must also be retained"
+      },
+      {
+        "url": "https://android.googlesource.com/platform/external/perfetto/+/bae0257cc5901c9368ae25ee1d4acc586390167c/src/trace_processor/importers/ftrace/ftrace_parser.cc",
+        "claim": "ParseSignalGenerate comment warns high-level signal data stores destination only"
+      },
+      {
+        "url": "https://android.googlesource.com/kernel/msm/+/96fbeb973a7e17594a429537201611ca0b395622/include/trace/events/signal.h",
+        "claim": "Generic signal tracepoint semantics only; not an exact running-kernel-version claim"
+      }
+    ],
+    "sha256": {
+      "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/kernel-ranchu": "046b3ff07270585b31ecefe5fd43609508f5832694e87ab75f5f3634981aee63",
+      "/Users/rob/Library/Android/sdk/system-images/android-37.0/google_apis_playstore/arm64-v8a/build.prop": "bfef508ea612ed85f4362e71334bce1b91920d5d9ccb7ec32de5b327c5c85e01"
+    }
+  },
+  "blockingGap": "Saved records identify the victim and signal but not the generating context or initiating sender. No causal fix can be falsifiably claimed without that evidence and a valid reproduction seam.",
+  "proposedCapabilityPhase": {
+    "authorization": "Coordinator authorizes capability-only read-only diagnosis under current find-and-fix request and prior task-owned setup authorization. This starts no app, trace or acceptance flow. Future app-triggered tracing is a separate runtime scope and requires explicit approval.",
+    "estimateMinutes": "2-5, unmeasured",
+    "output": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-signal-capability-attempt-01",
+    "preflight": "Reuse current8.2GiB minimum and frozen/preparation/host pins. Require fresh output, owned ports5580/5581/8081/8797 free, no conflicting assigned serial and both private OneMapU25F05 AVD paths absent; preserve foreign resources.",
+    "calls": [
+      {
+        "file": "/bin/sh",
+        "args": [
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+          "python3",
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/create-lifetime-task-avd.py"
+        ],
+        "purpose": "Create only the existing private AVD"
+      },
+      {
+        "file": "/bin/sh",
+        "args": [
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+          "python3",
+          "/private/tmp/one-map-android-restoration-review/scripts/launch-android-lifetime-emulator.py",
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-signal-capability-attempt-01/emulator.log"
+        ],
+        "purpose": "Launch existing versioned kernel-console helper; retain authenticated PID/PGID"
+      },
+      {
+        "file": "/bin/sh",
+        "args": [
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+          "python3",
+          "/private/tmp/one-map-approved-android-boot-poll.py"
+        ],
+        "purpose": "Existing180second assigned-target boot poll"
+      },
+      {
+        "file": "/bin/sh",
+        "args": [
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+          "adb",
+          "-s",
+          "emulator-5580",
+          "shell",
+          "perfetto",
+          "--query"
+        ],
+        "nodeCall": "execFileSync(file, args, { timeout: 30000, maxBuffer: 131072, encoding: \"utf8\" })",
+        "purpose": "Exactly one bounded query of existing Perfetto data sources/metadata; retain bounded output or error in task receipt"
+      },
+      {
+        "file": "/bin/sh",
+        "args": [
+          "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/with-android-env.sh",
+          "adb",
+          "-s",
+          "emulator-5580",
+          "emu",
+          "kill"
+        ],
+        "purpose": "Owned shutdown; existing authenticated-group fallback and bounded process/port absence checks apply"
+      }
+    ],
+    "cleanup": "Stop at first failure; cleanup acquired resources only. Require owned emulator/group and assigned ports absent, then remove only newly created OneMapU25F05.avd and OneMapU25F05.ini. Uncertain launch ownership preserves AVD for review. Keep compact result; raw log only while essential to active investigation.",
+    "exclusions": [
+      "No app install/build",
+      "No Metro or application scene",
+      "No acceptance rows",
+      "No tracing enablement",
+      "No root/remount/settings or host configuration changes",
+      "No dependency/tool installation",
+      "No retries"
+    ],
+    "limits": "perfetto --query lists data-source and permitted metadata only. Success does not prove signal_generate can be enabled or sender context captured. Use its result to prepare one later targeted signal probe only if supported and separately authorized."
+  },
+  "verification": {
+    "jsonParse": true,
+    "rootCauseFixed": false,
+    "regressionTest": "Not applicable without a demonstrated causal patch; no fabricated mock-signal proof",
+    "passed": [
+      "Documentation structure40Markdown files/39SDK comparison tables, paragraphs, fences and local links",
+      "git diff --check",
+      "JSON parse and exact saved-diagnostic SHA256 values for attempts13,17,18",
+      "Existing AVD creation, versioned kernel launcher and boot-poll source compilation without execution",
+      "Exact direct-argument selected-serial Perfetto query form and fresh output absence"
+    ],
+    "nativeApplicationExecuted": false,
+    "capabilityQueryExecuted": true
+  },
+  "remainingGates": [
+    "Independent coordinator review of this diagnosis and capability proposal",
+    "Coordinator authority review before capability-only dispatch; app trigger/tracing remains separate scope",
+    "Actual sender attribution and demonstrated correction",
+    "Separately authorized remaining native acceptance"
+  ],
+  "coordinatorAudit": {
+    "status": "passed",
+    "rootCauseFixed": false,
+    "noCodePatchClaimed": true,
+    "checks": [
+      "Matched saved diagnostic hashes and victimPID/timing across13/17/18",
+      "Reviewed host/guest signal namespaces, runner timer/cleanup ordering and saved kernel death window",
+      "Independently extracted cached kernel tracepoint strings andCONFIG_FTRACE/TRACEPOINTS/EVENT_TRACING/BPF_EVENTS/IKCONFIG_PROC; verifieduserbuild,debuggable0",
+      "Reviewed Perfetto source showing sender executioncontext versus victim/high-level slice distinction; no unsupportedactor/OOMclaim",
+      "Reviewed bounded direct-argument capability query and existing helper/ownedcleanup forms"
+    ],
+    "limits": [
+      "Saved records do not contain signal sender",
+      "Image tracing capability query has not yet run",
+      "No causal fix or honest regression proof is possible without an attributable path"
+    ]
+  },
+  "capabilityOutcome": {
+    "path": "records/evidence/revised-api-u26-signal-capability-attempt-01.json",
+    "result": "linux.ftrace registration verified, event enablement remains unknown",
+    "nativeApplicationExecuted": false
+  }
+}
