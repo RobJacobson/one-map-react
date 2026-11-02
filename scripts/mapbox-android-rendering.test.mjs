@@ -185,7 +185,7 @@ for (const [
     let preferences;
     let cleanupStarted = false;
     const signals = [];
-    let pulls = 0;
+    let identityChecks = 0;
     let statusReads = 0;
     let activeEngine = engine;
     let coreRows = 0;
@@ -307,10 +307,18 @@ for (const [
           ? "package:/data/app/one/base.apk\npackage:/data/app/one/split.apk\n"
           : "package:/data/app/one/base.apk\n";
       }
-      if (adb[0] === "pull") {
-        pulls++;
-        postIdentity = pulls >= 2;
-        return "pulled";
+      if (
+        adb.join(" ") ===
+        "shell /system/bin/toybox sha256sum /data/app/one/base.apk"
+      ) {
+        identityChecks++;
+        postIdentity = identityChecks >= 2;
+        const hash =
+          (failAt === "identity-before" && !postIdentity) ||
+          (failAt === "identity-after" && postIdentity)
+            ? "0".repeat(64)
+            : apkHashes[activeEngine];
+        return `${hash}  /data/app/one/base.apk\n`;
       }
       if (adb.join(" ").includes("cat >")) {
         if (failAt === "debug-write") fail("debug host write failed");
@@ -470,14 +478,6 @@ for (const [
           return failAt === "apk"
             ? "wrong"
             : apkHashes[file.includes("native-maplibre") ? "maplibre" : engine];
-        if (file.includes("installed-") && !file.includes("after"))
-          return failAt === "identity-before"
-            ? "wrong"
-            : apkHashes[activeEngine];
-        if (file.includes("installed-") && file.includes("after"))
-          return failAt === "identity-after"
-            ? "wrong"
-            : apkHashes[activeEngine];
         if (file.endsWith("-result.json"))
           return JSON.stringify({
             artifact: { distSha256: distHash },
@@ -687,7 +687,7 @@ for (const [
         "app-launch",
       ].includes(failAt)
     )
-      if (!batch) assert.equal(pulls, 1, failAt);
+      if (!batch) assert.equal(identityChecks, 1, failAt);
     if (!batch)
       assert.deepEqual(stopped, children.map((child) => child.pid).reverse());
     if (["emulator-exit", "release-port"].includes(failAt))
@@ -932,7 +932,7 @@ for (const [
           1
         );
         assert.equal(
-          pulls,
+          identityChecks,
           api36Unit
             ? 7
             : mapboxUnit
@@ -981,7 +981,7 @@ for (const [
       continue;
     }
     if (failAt === null) {
-      assert.equal(pulls, 2);
+      assert.equal(identityChecks, 2);
       if (camera) {
         assert.equal(children.length, 1);
         assert.equal(commands.filter((args) => args.includes("tap")).length, 1);

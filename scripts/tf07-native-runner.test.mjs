@@ -58,6 +58,12 @@ for (const [engine, borrowed] of [
     "success-recorder-exit",
     "identity",
     "split",
+    "unsafe-path",
+    "digest-empty",
+    "digest-malformed",
+    "digest-path",
+    "digest-multiple",
+    "digest-nonzero",
     "conflict",
     "reverse",
     "launch",
@@ -321,9 +327,30 @@ for (const [engine, borrowed] of [
             "🗺".repeat(50000) +
               " diagnostic transport failure known-sample-token ?token=private-query-token"
           );
+        assert.notEqual(
+          parts[0],
+          "pull",
+          "Installed identity must not transfer the whole APK."
+        );
+        if (
+          parts.join(" ") ===
+          "shell /system/bin/toybox sha256sum /data/app/owned/base.apk"
+        ) {
+          if (failure === "digest-nonzero")
+            throw Error("sha256sum unavailable");
+          if (failure === "digest-empty") return "";
+          if (failure === "digest-malformed") return "not-a-digest";
+          if (failure === "digest-path")
+            return `${hash}  /data/app/other/base.apk\n`;
+          if (failure === "digest-multiple")
+            return `${hash}  /data/app/owned/base.apk\n${hash}  /data/app/owned/base.apk\n`;
+          return `${failure === "identity" ? "b".repeat(64) : hash}  /data/app/owned/base.apk\n`;
+        }
         if (parts.join(" ").includes("pm path"))
           return (
-            "package:/data/app/owned/base.apk\n" +
+            (failure === "unsafe-path"
+              ? "package:/data/app/owned;id/base.apk\n"
+              : "package:/data/app/owned/base.apk\n") +
             (failure === "split" ? "package:/data/app/owned/split.apk\n" : "")
           );
         if (parts.join(" ") === "reverse --list")
