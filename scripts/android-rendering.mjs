@@ -67,6 +67,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       "acceptance-continuation",
       "signal-diagnostic",
       "mapbox-acceptance",
+      "mapbox-acceptance-api36",
     ].includes(scene),
     "Unknown fixed scene."
   );
@@ -76,7 +77,9 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
   );
   const continuation = scene === "acceptance-continuation";
   const signalDiagnostic = scene === "signal-diagnostic";
-  const mapboxUnit = scene === "mapbox-acceptance";
+  const api36Unit = scene === "mapbox-acceptance-api36";
+  const mapboxUnit = scene === "mapbox-acceptance" || api36Unit;
+  const avdName = api36Unit ? "OneMapF05MapboxApi36" : "OneMapU25F05";
   assert(
     !(signalDiagnostic || mapboxUnit) || engine === "mapbox",
     "Selected scene targets Mapbox only."
@@ -106,10 +109,15 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     checkpoints: [],
     ...(mapboxUnit && {
       mode: "mapbox-android-unit",
-      scope: ["mapbox-android-core", "mapbox-android-retained"],
+      scope: [
+        ...(api36Unit ? ["mapbox-android-camera"] : []),
+        "mapbox-android-core",
+        "mapbox-android-retained",
+      ],
       signalCalibration:
         "omitted; unsupported event and unresolved application SIGKILL",
     }),
+    ...(api36Unit && { environment: "api36-google-apis-revision7-arm64-4k" }),
     ...(signalDiagnostic && {
       mode: "signal-diagnostic",
       scope: ["mapbox-android-core"],
@@ -325,20 +333,23 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         prior.completedRows.map(({ rowId, status }) => ({ rowId, status })),
         [{ rowId: "mapbox-android-camera", status: "passed" }]
       );
-      receipt.reusedRows = prior.completedRows;
+      if (api36Unit) receipt.previousEnvironmentRows = prior.completedRows;
+      else receipt.reusedRows = prior.completedRows;
       receipt.priorOutcome = { path: priorPath, sha256: sha256(priorPath) };
     }
     const peerEvidence = join(
       root,
-      mapboxUnit
-        ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
-        : signalDiagnostic
-          ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
-          : continuation
-            ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
-            : batch
-              ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
-              : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
+      api36Unit
+        ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
+        : mapboxUnit
+          ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
+          : signalDiagnostic
+            ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
+            : continuation
+              ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
+              : batch
+                ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
+                : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
@@ -346,9 +357,16 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     receipt.frozenFiles = 695;
     const disk = statfsSync(recovery);
     receipt.freeBytes = disk.bavail * disk.bsize;
+    const imageNeeded =
+      api36Unit && !existsSync(join(recovery, "android-api36-image"));
+    const requiredBytes =
+      (mapboxUnit ? 12 * 1024 ** 3 : 8804682957) +
+      (imageNeeded ? 4575096761 : 0);
     assert(
-      receipt.freeBytes >= (mapboxUnit ? 12 * 1024 ** 3 : 8804682957),
-      `Android preboot requires ${mapboxUnit ? "12" : "8.2"} GiB free; stop without deleting files.`
+      receipt.freeBytes >= requiredBytes,
+      api36Unit
+        ? `API36 setup and batch require ${requiredBytes} free bytes; stop before staging.`
+        : `Android preboot requires ${mapboxUnit ? "12" : "8.2"} GiB free; stop without deleting files.`
     );
     if (!camera) createRequire(join(pngRoot, "package.json"))("pngjs");
     for (const port of ports) await requireFreePort(port, execute);
@@ -358,17 +376,31 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         .some((line) => line.startsWith(`${serial}\t`)),
       "Assigned emulator already exists."
     );
-    const avd = join(recovery, "android-avd/OneMapU25F05.avd");
-    const ini = join(recovery, "android-avd/OneMapU25F05.ini");
+    const avd = join(recovery, `android-avd/${avdName}.avd`);
+    const ini = join(recovery, `android-avd/${avdName}.ini`);
     assert(!existsSync(avd) && !existsSync(ini), "Task AVD already exists.");
     await checkpoint("create private AVD", () => {
-      // Both paths were absent; even a partial helper failure belongs to this attempt.
+      if (api36Unit)
+        return android(
+          ["python3", join(root, "scripts/setup-android-api36.py"), output],
+          1500000
+        ).then(() => {
+          createdAvd = true;
+        });
+      // The legacy helper does not own its partial cleanup.
       createdAvd = true;
       return android([
         "python3",
         join(recovery, "create-lifetime-task-avd.py"),
       ]);
     });
+    if (api36Unit)
+      assert(
+        !(await android(["adb", "devices"]))
+          .split(/\r?\n/)
+          .some((line) => line.startsWith(`${serial}\t`)),
+        "Assigned emulator already exists."
+      );
     const launched = JSON.parse(
       await checkpoint("launch private emulator", () => {
         launchAttempted = true;
@@ -377,6 +409,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
             "python3",
             join(root, "scripts/launch-android-lifetime-emulator.py"),
             join(output, "emulator.log"),
+            ...(api36Unit ? ["--api36"] : []),
           ],
           10000
         );
@@ -397,6 +430,28 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         190000
       )
     );
+    if (api36Unit) {
+      const api = (
+        await adb(["shell", "getprop", "ro.build.version.sdk"])
+      ).trim();
+      const abi = (
+        await adb(["shell", "getprop", "ro.product.cpu.abi"])
+      ).trim();
+      const pageBytes = (await adb(["shell", "getconf", "PAGE_SIZE"])).trim();
+      const gles = Number(
+        (await adb(["shell", "getprop", "ro.opengles.version"])).trim()
+      );
+      receipt.deviceIdentity = { api, abi, pageBytes, gles };
+      record();
+      assert(
+        api === "36" &&
+          abi === "arm64-v8a" &&
+          pageBytes === "4096" &&
+          Number.isInteger(gles) &&
+          gles >= 196608,
+        "API36 unit requires API36, arm64-v8a, 4K pages and GLES3 before installation."
+      );
+    }
     const existingReverses = await adb(["reverse", "--list"]);
     for (const port of camera ? [8081] : [8081, 8798]) {
       assert(
@@ -462,23 +517,28 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         (await adb(["shell", "getprop", "ro.build.version.sdk"])).trim()
       );
       assert(
-        Number.isInteger(api) && api >= 37,
-        "Expected cached Android API 37 or later."
+        Number.isInteger(api) && (api36Unit ? api === 36 : api >= 37),
+        api36Unit
+          ? "Expected Android API36."
+          : "Expected cached Android API 37 or later."
       );
-      await adb([
-        "shell",
-        "pm",
-        "grant",
-        applicationId,
-        "android.permission.ACCESS_LOCAL_NETWORK",
-      ]);
-      for (const row of mapboxUnit
-        ? ["core", "retained"]
-        : signalDiagnostic
-          ? ["core"]
-          : batch
-            ? ["camera", "core", "retained"]
-            : [scene]) {
+      if (!api36Unit)
+        await adb([
+          "shell",
+          "pm",
+          "grant",
+          applicationId,
+          "android.permission.ACCESS_LOCAL_NETWORK",
+        ]);
+      for (const row of api36Unit
+        ? ["camera", "core", "retained"]
+        : mapboxUnit
+          ? ["core", "retained"]
+          : signalDiagnostic
+            ? ["core"]
+            : batch
+              ? ["camera", "core", "retained"]
+              : [scene]) {
         if (continuation && engine === "mapbox" && row === "camera") continue;
         const rowId = `${engine}-android-${row}`;
         if (batch) {
@@ -491,6 +551,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         }
         const rowChildren = children.length;
         if (row === "core" || row === "retained") {
+          if (api36Unit) console.log(`API36 ${row} operator phase starting`);
           const driver = start(
             "/bin/sh",
             [
@@ -746,11 +807,11 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     }
     if (createdAvd && emulatorStopped && portsReleased)
       await cleanup("owned private AVD removal", async () => {
-        rmSync(join(recovery, "android-avd/OneMapU25F05.avd"), {
+        rmSync(join(recovery, `android-avd/${avdName}.avd`), {
           recursive: true,
           force: true,
         });
-        rmSync(join(recovery, "android-avd/OneMapU25F05.ini"), { force: true });
+        rmSync(join(recovery, `android-avd/${avdName}.ini`), { force: true });
       });
     try {
       writeFileSync(
