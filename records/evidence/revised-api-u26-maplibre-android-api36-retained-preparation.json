@@ -331,7 +331,7 @@
     "/private/tmp/one-map-android-restoration-review/scripts/android-operator.test.py": "07f013404f05dbe2e842251bfe599d551b0b952e1942ef08f9eb55d1e52b926f",
     "/private/tmp/one-map-android-restoration-review/scripts/setup-android-api36.test.py": "18221ffa7dba7c5000e39e278928e2dfbb5e1f134520cc40d634620be021aab6",
     "/private/tmp/one-map-android-restoration-review/scripts/launch-android-lifetime-emulator.test.py": "31c7caf00ecc75ad30f7833d6c0c6ad4fce472e811f3fa421496b6fc37c318d7",
-    "/private/tmp/one-map-android-restoration-review/scripts/api36-retained-observation.test.mjs": "54e0991aa4005f15e6eec94401a5c097fc6d14db81a10fd24b210bba52cfc72c",
+    "/private/tmp/one-map-android-restoration-review/scripts/api36-retained-observation.test.mjs": "6a18876689a41bff1a723a13feaecfed185999ab931b27fa426eefb4b09b2954",
     "/private/tmp/one-map-android-restoration-review/scripts/api36-reused-observations.test.mjs": "7c56262934a2f851cffa0aa3fe869ba48011063fd93ff8f97b16e7b32171ff52",
     "/private/tmp/one-map-android-restoration-review/scripts/fixtures/api36-maplibre-attempt30-rejected-input.json": "818e84f6b230f04c08756893d4302f684d925ff58516e7ac7cbab1d91f458b93"
   },
@@ -619,7 +619,8 @@
     "checks": [
       "Root source review and actual saved31 receipt verified",
       "Root independently reran launcher and exact live-judge regressions",
-      "All preparation pins and695 frozen identities match; startupfree16.6GiB/output32absent"
+      "All preparation pins and695 frozen identities match; startupfree16.6GiB/output32absent",
+      "Coordinator added and executed fourth packet exact live-judge regression after finding it absent from test list"
     ],
     "authorization": "Owner Continue resumes the same approved unchanged MapLibre unit after worker quota interruption; camera/core reused, no new backend/build/calibration"
   },

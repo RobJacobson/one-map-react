@@ -55,6 +55,10 @@ for (const [engine, packetName] of [
     "maplibre",
     "revised-api-u26-maplibre-android-api36-resume-preparation.json",
   ],
+  [
+    "maplibre",
+    "revised-api-u26-maplibre-android-api36-retained-preparation.json",
+  ],
 ]) {
   const packet = JSON.parse(
     readFileSync(new URL(`../records/evidence/${packetName}`, import.meta.url))
