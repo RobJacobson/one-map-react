@@ -48,16 +48,16 @@ console.log(
 );
 
 // Run the exact packet command against the operator stdout envelope, without Android.
-for (const engine of ["mapbox", "maplibre"]) {
+for (const [engine, packetName] of [
+  ["mapbox", "revised-api-u26-mapbox-android-api36-retained-preparation.json"],
+  ["maplibre", "revised-api-u26-maplibre-android-api36-preparation.json"],
+  [
+    "maplibre",
+    "revised-api-u26-maplibre-android-api36-resume-preparation.json",
+  ],
+]) {
   const packet = JSON.parse(
-    readFileSync(
-      new URL(
-        engine === "mapbox"
-          ? "../records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json"
-          : "../records/evidence/revised-api-u26-maplibre-android-api36-preparation.json",
-        import.meta.url
-      )
-    )
+    readFileSync(new URL(`../records/evidence/${packetName}`, import.meta.url))
   );
   const temporary = mkdtempSync(join(tmpdir(), "retained-live-judge-"));
   try {

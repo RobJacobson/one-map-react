@@ -14,6 +14,7 @@ import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 
 import { observeCamera } from "./android-camera-observer.mjs";
+import { loadMaplibreApi36Camera } from "./api36-reused-observations.mjs";
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 
 const recovery = "/Users/rob/code/mapbox-code/one-map-f05-android-recovery";
@@ -70,6 +71,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       "mapbox-acceptance-api36",
       "mapbox-acceptance-api36-resume",
       "maplibre-acceptance-api36",
+      "maplibre-acceptance-api36-resume",
     ].includes(scene),
     "Unknown fixed scene."
   );
@@ -80,7 +82,8 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
   const continuation = scene === "acceptance-continuation";
   const signalDiagnostic = scene === "signal-diagnostic";
   const api36Resume = scene === "mapbox-acceptance-api36-resume";
-  const maplibreUnit = scene === "maplibre-acceptance-api36";
+  const maplibreResume = scene === "maplibre-acceptance-api36-resume";
+  const maplibreUnit = scene === "maplibre-acceptance-api36" || maplibreResume;
   const api36Unit =
     scene === "mapbox-acceptance-api36" || api36Resume || maplibreUnit;
   const mapboxUnit =
@@ -121,7 +124,9 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     ...(selectedUnit && {
       mode: `${engine}-android-unit`,
       scope: [
-        ...(api36Unit && !api36Resume ? [`${engine}-android-camera`] : []),
+        ...(api36Unit && !api36Resume && !maplibreResume
+          ? [`${engine}-android-camera`]
+          : []),
         ...(!api36Resume ? [`${engine}-android-core`] : []),
         `${engine}-android-retained`,
       ],
@@ -399,25 +404,39 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     }
     const peerEvidence = join(
       root,
-      maplibreUnit
-        ? "records/evidence/revised-api-u26-maplibre-android-api36-preparation.json"
-        : api36Resume
-          ? "records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json"
-          : api36Unit
-            ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
-            : mapboxUnit
-              ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
-              : signalDiagnostic
-                ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
-                : continuation
-                  ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
-                  : batch
-                    ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
-                    : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
+      maplibreResume
+        ? "records/evidence/revised-api-u26-maplibre-android-api36-resume-preparation.json"
+        : maplibreUnit
+          ? "records/evidence/revised-api-u26-maplibre-android-api36-preparation.json"
+          : api36Resume
+            ? "records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json"
+            : api36Unit
+              ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
+              : mapboxUnit
+                ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
+                : signalDiagnostic
+                  ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
+                  : continuation
+                    ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
+                    : batch
+                      ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
+                      : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
     verifyInputs(preparation, freeze);
+    if (maplibreResume) {
+      const prior = loadMaplibreApi36Camera({
+        installedBinarySha256: apkSha256,
+        libraryDistSha256: distSha256,
+        environment: "maplibre-android",
+      });
+      receipt.reusedRows = [prior.row];
+      receipt.priorOutcome = {
+        path: prior.outcomePath,
+        sha256: prior.outcomeSha256,
+      };
+    }
     if (api36Resume) {
       assert.deepEqual(preparation.executionRows, ["mapbox-android-retained"]);
       const path = join(
@@ -639,7 +658,9 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       for (const row of api36Unit
         ? api36Resume
           ? ["retained"]
-          : ["camera", "core", "retained"]
+          : maplibreResume
+            ? ["core", "retained"]
+            : ["camera", "core", "retained"]
         : mapboxUnit
           ? ["core", "retained"]
           : signalDiagnostic
@@ -679,6 +700,8 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
               TF07_BORROWED_METRO_REVERSE: "1",
               TF07_PARENT_PROCESS_GROUP: "1",
               TF07_MANUAL_REPORT: join(output, `${rowId}-manual.json`),
+              TF07_REUSE_MAPLIBRE_API36_ATTEMPT30:
+                maplibreResume && row === "core" ? "1" : "",
               TF07_REUSE_API36_ATTEMPT24:
                 api36Resume && row === "core" ? "1" : "",
               TF07_OUTPUT: join(output, `${rowId}-result.json`),

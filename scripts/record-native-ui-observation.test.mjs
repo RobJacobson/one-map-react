@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -198,6 +199,80 @@ try {
     JSON.parse(fs.readFileSync(reportPath)).scenarios[nativeUiScenarios[0]],
     "passed"
   );
+  // Replay the actual operator input only on a temporary report; no acceptance credit.
+  const rejectedInputPath = new URL(
+    "./fixtures/api36-maplibre-attempt30-rejected-input.json",
+    import.meta.url
+  );
+  const rawInput = fs.readFileSync(rejectedInputPath);
+  const syntheticReport = {
+    ...reportFor(nativeUiScenarios),
+    installedBinarySha256:
+      "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+    libraryDistSha256:
+      "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    environment: "maplibre-android",
+    scenarios: Object.fromEntries(
+      nativeUiScenarios.map((name) => [
+        name,
+        name === "marker-prop-rejection" ? "unverified" : "passed",
+      ])
+    ),
+  };
+  const rawReport = Buffer.from(JSON.stringify(syntheticReport));
+  assert.equal(
+    createHash("sha256").update(rawInput).digest("hex"),
+    "818e84f6b230f04c08756893d4302f684d925ff58516e7ac7cbab1d91f458b93"
+  );
+  fs.writeFileSync(reportPath, rawReport);
+  fs.writeFileSync(observationPath, rawInput);
+  const replay = () =>
+    spawnSync(
+      process.execPath,
+      [
+        join(import.meta.dirname, "record-native-ui-observation.mjs"),
+        reportPath,
+        "marker-prop-rejection",
+        "passed",
+        observationPath,
+      ],
+      { encoding: "utf8" }
+    );
+  const rejected = replay();
+  assert.equal(rejected.status, 1);
+  assert.match(rejected.stderr, /Unknown observation field/);
+  assert.deepEqual(fs.readFileSync(reportPath), rawReport);
+  const corrected = JSON.parse(
+    fs.readFileSync(
+      new URL(
+        "../records/evidence/revised-api-u26-maplibre-android-attempt30-corrected-input.json",
+        import.meta.url
+      )
+    )
+  );
+  assert.deepEqual(
+    corrected,
+    (() => {
+      const value = JSON.parse(rawInput);
+      value.rendererData.receipts = value.receipts;
+      delete value.receipts;
+      return value;
+    })()
+  );
+  fs.writeFileSync(observationPath, JSON.stringify(corrected));
+  const accepted = replay();
+  assert.equal(accepted.status, 0, accepted.stderr);
+  const next = JSON.parse(fs.readFileSync(reportPath));
+  const priorIdentity = JSON.parse(rawReport);
+  for (const field of [
+    "installedBinarySha256",
+    "libraryDistSha256",
+    "environment",
+    "runId",
+  ])
+    assert.equal(next[field], priorIdentity[field]);
+  assert.equal(next.scenarios["marker-prop-rejection"], "passed");
+  assert.deepEqual(fs.readFileSync(rejectedInputPath), rawInput);
   console.log("Native UI observation writer filesystem regressions passed.");
 } finally {
   fs.rmSync(directory, { recursive: true, force: true });

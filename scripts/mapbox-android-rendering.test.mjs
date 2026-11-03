@@ -38,6 +38,7 @@ for (const [
   mapboxUnit = false,
   api36Unit = false,
   api36Resume = false,
+  maplibreResume = false,
 ] of [
   ["mapbox", false],
   ["maplibre", false],
@@ -48,6 +49,7 @@ for (const [
   ["mapbox", true, true, false, false, true],
   ["mapbox", true, true, false, false, true, true],
   ["maplibre", true, true, false, false, true, true],
+  ["maplibre", true, true, false, false, true, true, false, true],
   ["mapbox", true, true, false, false, true, true, true],
 ]) {
   const avdName = api36Unit ? "OneMapF05MapboxApi36" : "OneMapU25F05";
@@ -395,12 +397,12 @@ for (const [
               latestCheckpoint.currentRow,
               `${engine}-android-${row}`
             );
-            if (!api36Resume)
+            if (!api36Resume && !maplibreResume)
               assert.equal(
                 latestCheckpoint.rows.at(-1).rowId,
                 `${engine}-android-${row === "core" ? "camera" : "core"}`
               );
-            if (!api36Resume)
+            if (!api36Resume && !maplibreResume)
               assert.equal(latestCheckpoint.rows.at(-1).status, "passed");
             phaseMessages.push(message);
           }
@@ -408,6 +410,11 @@ for (const [
         error: () => {},
       },
       assert,
+      loadMaplibreApi36Camera: () => ({
+        row: { rowId: "maplibre-android-camera", status: "passed" },
+        outcomePath: "/prior",
+        outcomeSha256: "prior-hash",
+      }),
       observeCamera: batch
         ? async () => {
             cameraRows++;
@@ -481,6 +488,7 @@ for (const [
           file.endsWith("mapbox-android-unit-preparation.json") ||
           file.endsWith("mapbox-android-api36-preparation.json") ||
           file.endsWith("maplibre-android-api36-preparation.json") ||
+          file.endsWith("maplibre-android-api36-resume-preparation.json") ||
           file.endsWith("mapbox-android-api36-retained-preparation.json") ||
           file.endsWith("mapbox-android-api36-console-resume-preparation.json")
         )
@@ -644,6 +652,10 @@ for (const [
         if (args.some((arg) => arg.endsWith("tf07-ui-smoke.mjs"))) {
           coreRows++;
           assert.equal(options.env.TF07_REUSE_API36_ATTEMPT24 === "1", false);
+          assert.equal(
+            options.env.TF07_REUSE_MAPLIBRE_API36_ATTEMPT30 === "1",
+            maplibreResume && coreRows === 1
+          );
           if (api36Unit)
             assert.equal(
               phaseMessages.at(-1),
@@ -757,7 +769,7 @@ for (const [
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${engine === "maplibre" && api36Unit ? "maplibre-acceptance-api36" : api36Resume ? "mapbox-acceptance-api36-resume" : api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${maplibreResume ? "maplibre-acceptance-api36-resume" : engine === "maplibre" && api36Unit ? "maplibre-acceptance-api36" : api36Resume ? "mapbox-acceptance-api36-resume" : api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -970,7 +982,7 @@ for (const [
           receipt.rows.length,
           api36Resume
             ? 1
-            : api36Unit && !api36Resume
+            : api36Unit && !api36Resume && !maplibreResume
               ? 3
               : mapboxUnit
                 ? 2
@@ -982,7 +994,7 @@ for (const [
         );
         assert.equal(
           cameraRows,
-          api36Unit && !api36Resume
+          api36Unit && !api36Resume && !maplibreResume
             ? 1
             : signalDiagnostic || mapboxUnit
               ? 0
@@ -992,7 +1004,7 @@ for (const [
         );
         assert.deepEqual(
           cameraEngines,
-          api36Unit && !api36Resume
+          api36Unit && !api36Resume && !maplibreResume
             ? [engine]
             : signalDiagnostic || mapboxUnit
               ? []
@@ -1004,14 +1016,14 @@ for (const [
           receipt.rows.map(({ rowId }) => rowId),
           api36Resume
             ? ["mapbox-android-retained"]
-            : api36Unit && !api36Resume
+            : api36Unit && !api36Resume && !maplibreResume
               ? [
                   `${engine}-android-camera`,
                   `${engine}-android-core`,
                   `${engine}-android-retained`,
                 ]
               : mapboxUnit
-                ? ["mapbox-android-core", "mapbox-android-retained"]
+                ? [`${engine}-android-core`, `${engine}-android-retained`]
                 : signalDiagnostic
                   ? ["mapbox-android-core"]
                   : [
@@ -1061,7 +1073,7 @@ for (const [
           identityChecks,
           api36Resume
             ? 3
-            : api36Unit && !api36Resume
+            : api36Unit && !api36Resume && !maplibreResume
               ? 7
               : mapboxUnit
                 ? 5
@@ -1079,7 +1091,7 @@ for (const [
       if (["driver", "driver-stderr"].includes(failAt)) {
         assert.equal(
           receipt.rows.length,
-          api36Unit && !api36Resume
+          api36Unit && !api36Resume && !maplibreResume
             ? 1
             : signalDiagnostic || continuation || mapboxUnit
               ? 0
@@ -1092,9 +1104,9 @@ for (const [
           receipt.rows.map(({ rowId }) => rowId),
           api36Resume
             ? []
-            : api36Unit && !api36Resume
+            : api36Unit && !api36Resume && !maplibreResume
               ? [`${engine}-android-camera`, `${engine}-android-core`]
-              : ["mapbox-android-core"]
+              : [`${engine}-android-core`]
         );
         assert.equal(coreRows, api36Resume ? 1 : 2);
         assert.match(receipt.error, /driver failed/);

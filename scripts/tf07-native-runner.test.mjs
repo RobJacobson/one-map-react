@@ -54,6 +54,7 @@ for (const [engine, borrowed, reuse = false] of [
   ["mapbox", true, true],
   ["maplibre", false],
   ["maplibre", true],
+  ["maplibre", true, true],
 ]) {
   for (const failure of [
     null,
@@ -206,7 +207,10 @@ for (const [engine, borrowed, reuse = false] of [
       process: {
         env: {
           ANDROID_SERIAL: "emulator-5580",
-          ...(reuse && { TF07_REUSE_API36_ATTEMPT24: "1" }),
+          ...(reuse &&
+            (engine === "mapbox"
+              ? { TF07_REUSE_API36_ATTEMPT24: "1" }
+              : { TF07_REUSE_MAPLIBRE_API36_ATTEMPT30: "1" })),
           TF07_NATIVE_BINARY_SHA256: hash,
           TF07_MANUAL_REPORT: "/report",
           TF07_ANDROID_DIAGNOSTICS: "/diagnostics",
@@ -494,7 +498,7 @@ for (const [engine, borrowed, reuse = false] of [
     };
     try {
       const result = await runInNewContext(
-        `const loadApi36ReusedObservations = () => JSON.parse(${JSON.stringify(JSON.stringify(reused))});\n${source}\nrunNative("${engine}")`,
+        `const loadMaplibreApi36ReusedObservations = () => JSON.parse(${JSON.stringify(JSON.stringify(reused))});\nconst loadApi36ReusedObservations = () => JSON.parse(${JSON.stringify(JSON.stringify(reused))});\n${source}\nrunNative("${engine}")`,
         context
       );
       assert(result.androidRecorder, "Successful row saves recorder status.");

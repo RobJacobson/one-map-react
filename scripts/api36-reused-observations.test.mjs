@@ -4,6 +4,8 @@ import { readFileSync } from "node:fs";
 import {
   api36ReusedScenarios,
   loadApi36ReusedObservations,
+  loadMaplibreApi36Camera,
+  loadMaplibreApi36ReusedObservations,
 } from "./api36-reused-observations.mjs";
 import { judgeNativeUi, nativeUiScenarios } from "./tf07-smoke-contract.mjs";
 
@@ -167,4 +169,51 @@ assert.equal(
     Object.keys(reused)
   ).status,
   "unverified"
+);
+
+const maplibreIdentity = {
+  ...identity,
+  installedBinarySha256:
+    "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+  environment: "maplibre-android",
+};
+const maplibreReused = loadMaplibreApi36ReusedObservations(maplibreIdentity);
+assert.deepEqual(Object.keys(maplibreReused), api36ReusedScenarios);
+assert(!Object.hasOwn(maplibreReused, "marker-prop-rejection"));
+assert.equal(
+  loadMaplibreApi36Camera(maplibreIdentity).row.rowId,
+  "maplibre-android-camera"
+);
+for (const field of [
+  "installedBinarySha256",
+  "libraryDistSha256",
+  "environment",
+  "runId",
+])
+  assert.throws(() =>
+    loadMaplibreApi36ReusedObservations({
+      ...maplibreIdentity,
+      [field]:
+        field === "runId" ? "8ca84053-4355-45bc-8d81-0b213cd34adb" : "wrong",
+    })
+  );
+for (const suffix of ["checkpoint.json", "core-manual.json", "attempt-30.json"])
+  assert.throws(
+    () =>
+      loadMaplibreApi36ReusedObservations(maplibreIdentity, (path) =>
+        path.endsWith(suffix) ? Buffer.from("changed") : readFileSync(path)
+      ),
+    /evidence changed/
+  );
+assert.equal(
+  judgeNativeUi(
+    fresh,
+    { ...manual, ...maplibreIdentity },
+    maplibreIdentity,
+    Object.keys(maplibreReused)
+  ).status,
+  "passed"
+);
+console.log(
+  "MapLibre30 camera and twelve physical receipts are pinned; fresh renderer and marker cases remain required."
 );
