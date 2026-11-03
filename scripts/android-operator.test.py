@@ -635,6 +635,28 @@ if args[2:4] == ['shell', 'cat']:
         self.assertEqual(json.loads((self.attempt / "snapshots.json").read_text()), [])
         self.assertFalse(self.latch.exists())
 
+    def test_retained_top_edge_toolbar_uses_fresh_lower_interior_for_taps_and_swipes(self):
+        saved = Path("/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-27/toolbar-019-hierarchy-001.xml").read_text()
+        self.original["scenarios"] = {"simultaneous-named-maps": "unverified"}
+        self.report = self.attempt / "mapbox-android-retained-manual.json"
+        self.report.write_text(json.dumps(self.original))
+        (self.attempt / "checkpoint.json").write_text(json.dumps({"currentRow": "mapbox-android-retained"}))
+        calls, child = self.toolbar_child([saved])
+        with patch("subprocess.run", side_effect=child):
+            status, output = self.invoke(["toolbar", "Read focus"], ["mapbox-android-retained", "simultaneous-named-maps"])
+        self.assertEqual(status, 0, output)
+        self.assertEqual([args for args in calls if args[:2] == ["shell", "input"]],
+                         [["shell", "input", "tap", "130", "81"]])
+        early = self.toolbar_xml([("READ FOCUS", "[0,0][261,93]")]).replace('[0,63][1080,156]', '[0,0][1080,93]')
+        late = self.toolbar_xml([("IMAGE", "[700,0][1050,93]")]).replace('[0,63][1080,156]', '[0,0][1080,93]')
+        calls, child = self.toolbar_child([early, late])
+        with patch("subprocess.run", side_effect=child):
+            status, output = self.invoke(["toolbar", "Image"], ["mapbox-android-retained", "simultaneous-named-maps"])
+        self.assertEqual(status, 0, output)
+        self.assertEqual([args for args in calls if args[:2] == ["shell", "input"]],
+                         [["shell", "input", "swipe", "810", "81", "270", "81", "450"],
+                          ["shell", "input", "tap", "875", "81"]])
+
     def test_toolbar_unknown_label_rejects_before_boundary(self):
         with patch("subprocess.run") as child, patch("http.client.HTTPConnection") as http:
             status, output = self.invoke(["toolbar", "Unknown"])

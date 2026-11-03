@@ -1,0 +1,773 @@
+{
+  "checkpoint": "PR100 API36 Mapbox attempt27",
+  "recordedUTC": "2026-11-03T20:02:51.930958+00:00",
+  "result": "core-passed-retained-stopped-prematurely-by-worker",
+  "unitStatus": "in-progress-under-owner-fix-and-continue-authorization",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "candidateChanged": false,
+  "inputApkSha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "authorization": "Owner approved PR100 remaining API36 Mapbox, reuse image/passedchecks, no rebuild/calibration; explicitly fix errors and continue until completed.",
+  "completedRows": [
+    {
+      "rowId": "mapbox-android-core",
+      "status": "passed",
+      "scene": {
+        "status": "passed",
+        "execution": "manual-native-touch",
+        "observed": true,
+        "manualComplete": true,
+        "remaining": [],
+        "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+        "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+        "environment": "mapbox-android",
+        "runId": "9a6c9924-0e90-46e3-ac0b-c5397d60eb7e",
+        "observation": {
+          "events": {
+            "popup-open": 1,
+            "move": 12,
+            "style": 1,
+            "load": 1
+          },
+          "positions": {},
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11,
+          "features": [
+            {
+              "type": "Feature",
+              "id": "707",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -122.3399949,
+                  47.5799997
+                ]
+              },
+              "properties": {
+                "fixture": "tf07"
+              }
+            }
+          ],
+          "generation": 0,
+          "sourcePoint": [
+            205.50000000002788,
+            485.57537949542876
+          ]
+        },
+        "reusedObservations": {
+          "live-child-button": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped live child button at (539,1450), within fresh hierarchy bounds [440,1425][638,1476]; read renderer before and after.",
+              "seenResult": "child-click increased from absent (0) to 1; map-click remained absent (0).",
+              "rendererData": {
+                "before": {
+                  "child-click": 0,
+                  "map-click": 0
+                },
+                "after": {
+                  "child-click": 1,
+                  "map-click": 0
+                }
+              }
+            }
+          },
+          "nested-scroll": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Swiped from (539,1545) to (539,1485) within list bounds [440,1476][638,1560], then read renderer and screenshot.",
+              "seenResult": "Hierarchy changed from Scroll one and part of Scroll two to Scroll two and part of Scroll three; screenshot shows Scroll two. Center and zoom remained unchanged.",
+              "rendererData": {
+                "centerBefore": [
+                  -122.34,
+                  47.61
+                ],
+                "centerAfter": [
+                  -122.34,
+                  47.61
+                ],
+                "zoomBefore": 11,
+                "zoomAfter": 11
+              },
+              "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/nested-scroll.png"
+            }
+          },
+          "live-activation": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped live marker body at (539,1399), inside hierarchy bounds [440,1374][638,1425]; read renderer.",
+              "seenResult": "marker-click increased from 0 to 1.",
+              "rendererData": {
+                "markerClickBefore": 0,
+                "markerClickAfter": 1
+              }
+            }
+          },
+          "annotation-activation": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped visible annotation at (234,1465) based on the current screenshot and read renderer.",
+              "seenResult": "annotation-click increased from 0 to 1; no child interaction inferred.",
+              "rendererData": {
+                "annotationClickBefore": 0,
+                "annotationClickAfter": 1
+              },
+              "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/nested-scroll.png"
+            }
+          },
+          "offset-touch-bounds": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Toggled offset, tapped displaced child at (602,1418), reset offset and tapped (539,1450), reading renderer after each.",
+              "seenResult": "Child bounds shifted from [440,1425][638,1476] to [503,1393][701,1444], then returned. child-click advanced 1 to 2 to 3; physical density 420 dpi implies 2.625 pixels per dp.",
+              "rendererData": {
+                "childClick": [
+                  1,
+                  2,
+                  3
+                ],
+                "densityDpi": 420,
+                "densityScale": 2.625
+              }
+            }
+          },
+          "popup-follow-dismissal": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Cleared target, remounted, panned 30px, activated child, closed and reopened popup, remounted and zoomed out from 11 to 10.",
+              "seenResult": "Initially visible popup bounds [694,962][997,1240], moved left to [665,962][968,1240] with center longitude -122.34 to -122.3361939. Child and close each incremented once; popup disappeared and reopened. Remount reset center and increased generation 1 to 2, open 3 to 4 without extra close. Zoom 11 to 10 at constant center/generation moved visible popup toward center to [541,1075][844,1353], with open 4 and close 1 unchanged.",
+              "screenshot": "popup-zoom-out-after.png"
+            }
+          },
+          "map-feature-click": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped projected point 707 before and after remount, using renderer projection and visible green feature.",
+              "seenResult": "Feature 707 was returned by readback; source-click and map-click each advanced from 0 to 1 and then 2 after generation 2 to 3 remount.",
+              "screenshot": "map-feature-click.png"
+            }
+          },
+          "navigation-location": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped Zoom in, Zoom out, Reset north and Locate me using visible controls and renderer reads.",
+              "seenResult": "Zoom changed 11 to 12 to 11; Reset north was tapped with camera center and zoom unchanged (bearing is not in readback). Locate produced location event 1 and centered [-122.33,47.62]; screenshot shows blue location indicator partially behind live marker.",
+              "screenshot": "navigation-location.png"
+            }
+          },
+          "style-remount": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Applied style, remounted, read renderer and tapped live child and projected feature 707.",
+              "seenResult": "Generation 3 to 4; style count 4 to 6 and load 4 to 5; feature 707 returned. Child-click advanced to 1, source-click and map-click 2 to 3; popup close stayed 1."
+            }
+          },
+          "host-accessibility": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Inspected fresh native hierarchy and visible host controls after remount.",
+              "seenResult": "Close popup, popup child button, live child button, Locate me, Zoom in, Zoom out and Reset north are labeled android.widget.Button nodes with positive visible bounds; host map is a ViewGroup. This is a bounded hierarchy inspection, not a TalkBack audit."
+            }
+          },
+          "sdk-ornaments": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Inspected SDK and application controls, tapped attribution and dismissed its dialog, then tapped empty map area.",
+              "seenResult": "Screenshot showed scale, Mapbox logo, attribution and separate Locate/zoom/reset controls. Attribution opened Powered by Mapbox Maps dialog with telemetry and privacy entries. Empty touch advanced map-click 3 to 4 while source-click stayed 3."
+            }
+          },
+          "camera-target-and-gesture": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Requested target A, panned, repeated equal target, requested target B, cleared target and panned again.",
+              "seenResult": "A center [-122.34,47.61]; pan center [-122.3275751,47.61] persisted on repeat. Changed B moved to [-122.32,47.615]. After clear, another pan moved to [-122.307346,47.615]."
+            }
+          }
+        },
+        "androidRecorder": {
+          "startedAtUTC": "2026-11-03T19:53:44.106Z",
+          "stoppedAtUTC": "2026-11-03T19:59:07.166Z",
+          "coverage": "scoped stream; buffer rotation and unlogged kills remain possible",
+          "gaps": [],
+          "exit": {
+            "code": null,
+            "signal": "SIGTERM"
+          },
+          "closed": true,
+          "inputBytes": 31645,
+          "retainedBytes": 2123,
+          "limitBytes": 131072,
+          "evictedLines": 0,
+          "oversizedLines": 0,
+          "truncated": false,
+          "firstRetainedTimestamp": "11-03 11:53:44.793",
+          "lastRetainedTimestamp": "11-03 11:58:51.758",
+          "text": "11-03 11:53:44.793   668   699 I ActivityManager: Start proc 2791:com.onemapmapbox/u0a213 for next-top-activity {com.onemapmapbox/com.onemapmapbox.MainActivity}\n11-03 11:54:03.479   220   220 I lowmemorykiller: Kill 'com.google.android.googlesdksetup' (1232), uid 10178, oom_score_adj 985 to free 99176kB rss, 26496kB swap; reason: low watermark is breached\n11-03 11:54:09.421   220   220 I lowmemorykiller: lmkd data connection established\n11-03 11:54:09.453   220   220 I lowmemorykiller: Wakeup counter is reset from 169 to 0\n11-03 11:54:09.453   220   220 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-03 11:54:09.453   220   220 I lowmemorykiller: Properties reinitilized\n11-03 11:54:09.453  4181  4181 I lowmemorykiller: lmkd updated properties successfully\n11-03 11:54:09.453   220   220 I lowmemorykiller: lmkd data connection dropped\n11-03 11:54:09.453   220   220 I lowmemorykiller: closing lmkd data connection\n11-03 11:54:11.919   220   220 I lowmemorykiller: lmkd data connection established\n11-03 11:54:11.949   220   220 I lowmemorykiller: Wakeup counter is reset from 22 to 0\n11-03 11:54:11.949   220   220 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-03 11:54:11.949   220   220 I lowmemorykiller: Properties reinitilized\n11-03 11:54:11.949  4285  4285 I lowmemorykiller: lmkd updated properties successfully\n11-03 11:54:11.949   220   220 I lowmemorykiller: lmkd data connection dropped\n11-03 11:54:11.949   220   220 I lowmemorykiller: closing lmkd data connection\n11-03 11:58:51.705   220   220 I lowmemorykiller: lmkd data connection established\n11-03 11:58:51.757   220   220 I lowmemorykiller: Wakeup counter is reset from 93 to 0\n11-03 11:58:51.757   220   220 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-03 11:58:51.757   220   220 I lowmemorykiller: Properties reinitilized\n11-03 11:58:51.758  6319  6319 I lowmemorykiller: lmkd updated properties successfully\n11-03 11:58:51.758   220   220 I lowmemorykiller: lmkd data connection dropped\n11-03 11:58:51.758   220   220 I lowmemorykiller: closing lmkd data connection\n"
+        }
+      }
+    }
+  ],
+  "coreResult": {
+    "artifact": {
+      "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5"
+    },
+    "results": {
+      "mapbox-android": {
+        "status": "passed",
+        "execution": "manual-native-touch",
+        "observed": true,
+        "manualComplete": true,
+        "remaining": [],
+        "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+        "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+        "environment": "mapbox-android",
+        "runId": "9a6c9924-0e90-46e3-ac0b-c5397d60eb7e",
+        "observation": {
+          "events": {
+            "popup-open": 1,
+            "move": 12,
+            "style": 1,
+            "load": 1
+          },
+          "positions": {},
+          "center": [
+            -122.34000000000002,
+            47.60999999999999
+          ],
+          "zoom": 11,
+          "features": [
+            {
+              "type": "Feature",
+              "id": "707",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -122.3399949,
+                  47.5799997
+                ]
+              },
+              "properties": {
+                "fixture": "tf07"
+              }
+            }
+          ],
+          "generation": 0,
+          "sourcePoint": [
+            205.50000000002788,
+            485.57537949542876
+          ]
+        },
+        "reusedObservations": {
+          "live-child-button": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped live child button at (539,1450), within fresh hierarchy bounds [440,1425][638,1476]; read renderer before and after.",
+              "seenResult": "child-click increased from absent (0) to 1; map-click remained absent (0).",
+              "rendererData": {
+                "before": {
+                  "child-click": 0,
+                  "map-click": 0
+                },
+                "after": {
+                  "child-click": 1,
+                  "map-click": 0
+                }
+              }
+            }
+          },
+          "nested-scroll": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Swiped from (539,1545) to (539,1485) within list bounds [440,1476][638,1560], then read renderer and screenshot.",
+              "seenResult": "Hierarchy changed from Scroll one and part of Scroll two to Scroll two and part of Scroll three; screenshot shows Scroll two. Center and zoom remained unchanged.",
+              "rendererData": {
+                "centerBefore": [
+                  -122.34,
+                  47.61
+                ],
+                "centerAfter": [
+                  -122.34,
+                  47.61
+                ],
+                "zoomBefore": 11,
+                "zoomAfter": 11
+              },
+              "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/nested-scroll.png"
+            }
+          },
+          "live-activation": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped live marker body at (539,1399), inside hierarchy bounds [440,1374][638,1425]; read renderer.",
+              "seenResult": "marker-click increased from 0 to 1.",
+              "rendererData": {
+                "markerClickBefore": 0,
+                "markerClickAfter": 1
+              }
+            }
+          },
+          "annotation-activation": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped visible annotation at (234,1465) based on the current screenshot and read renderer.",
+              "seenResult": "annotation-click increased from 0 to 1; no child interaction inferred.",
+              "rendererData": {
+                "annotationClickBefore": 0,
+                "annotationClickAfter": 1
+              },
+              "screenshot": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/nested-scroll.png"
+            }
+          },
+          "offset-touch-bounds": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json",
+              "reportSha256": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json",
+              "outcomeSha256": "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c",
+              "runId": "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Toggled offset, tapped displaced child at (602,1418), reset offset and tapped (539,1450), reading renderer after each.",
+              "seenResult": "Child bounds shifted from [440,1425][638,1476] to [503,1393][701,1444], then returned. child-click advanced 1 to 2 to 3; physical density 420 dpi implies 2.625 pixels per dp.",
+              "rendererData": {
+                "childClick": [
+                  1,
+                  2,
+                  3
+                ],
+                "densityDpi": 420,
+                "densityScale": 2.625
+              }
+            }
+          },
+          "popup-follow-dismissal": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Cleared target, remounted, panned 30px, activated child, closed and reopened popup, remounted and zoomed out from 11 to 10.",
+              "seenResult": "Initially visible popup bounds [694,962][997,1240], moved left to [665,962][968,1240] with center longitude -122.34 to -122.3361939. Child and close each incremented once; popup disappeared and reopened. Remount reset center and increased generation 1 to 2, open 3 to 4 without extra close. Zoom 11 to 10 at constant center/generation moved visible popup toward center to [541,1075][844,1353], with open 4 and close 1 unchanged.",
+              "screenshot": "popup-zoom-out-after.png"
+            }
+          },
+          "map-feature-click": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped projected point 707 before and after remount, using renderer projection and visible green feature.",
+              "seenResult": "Feature 707 was returned by readback; source-click and map-click each advanced from 0 to 1 and then 2 after generation 2 to 3 remount.",
+              "screenshot": "map-feature-click.png"
+            }
+          },
+          "navigation-location": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Tapped Zoom in, Zoom out, Reset north and Locate me using visible controls and renderer reads.",
+              "seenResult": "Zoom changed 11 to 12 to 11; Reset north was tapped with camera center and zoom unchanged (bearing is not in readback). Locate produced location event 1 and centered [-122.33,47.62]; screenshot shows blue location indicator partially behind live marker.",
+              "screenshot": "navigation-location.png"
+            }
+          },
+          "style-remount": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Applied style, remounted, read renderer and tapped live child and projected feature 707.",
+              "seenResult": "Generation 3 to 4; style count 4 to 6 and load 4 to 5; feature 707 returned. Child-click advanced to 1, source-click and map-click 2 to 3; popup close stayed 1."
+            }
+          },
+          "host-accessibility": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Inspected fresh native hierarchy and visible host controls after remount.",
+              "seenResult": "Close popup, popup child button, live child button, Locate me, Zoom in, Zoom out and Reset north are labeled android.widget.Button nodes with positive visible bounds; host map is a ViewGroup. This is a bounded hierarchy inspection, not a TalkBack audit."
+            }
+          },
+          "sdk-ornaments": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Inspected SDK and application controls, tapped attribution and dismissed its dialog, then tapped empty map area.",
+              "seenResult": "Screenshot showed scale, Mapbox logo, attribution and separate Locate/zoom/reset controls. Attribution opened Powered by Mapbox Maps dialog with telemetry and privacy entries. Empty touch advanced map-click 3 to 4 while source-click stayed 3."
+            }
+          },
+          "camera-target-and-gesture": {
+            "source": {
+              "reportPath": "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/mapbox-android-core-manual.json",
+              "reportSha256": "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d",
+              "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json",
+              "outcomeSha256": "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21",
+              "runId": "41dce16e-6bb1-4454-bae7-34046a870505",
+              "environment": "api36-google-apis-revision7-arm64-4k"
+            },
+            "observation": {
+              "action": "Requested target A, panned, repeated equal target, requested target B, cleared target and panned again.",
+              "seenResult": "A center [-122.34,47.61]; pan center [-122.3275751,47.61] persisted on repeat. Changed B moved to [-122.32,47.615]. After clear, another pan moved to [-122.307346,47.615]."
+            }
+          }
+        },
+        "androidRecorder": {
+          "startedAtUTC": "2026-11-03T19:53:44.106Z",
+          "stoppedAtUTC": "2026-11-03T19:59:07.166Z",
+          "coverage": "scoped stream; buffer rotation and unlogged kills remain possible",
+          "gaps": [],
+          "exit": {
+            "code": null,
+            "signal": "SIGTERM"
+          },
+          "closed": true,
+          "inputBytes": 31645,
+          "retainedBytes": 2123,
+          "limitBytes": 131072,
+          "evictedLines": 0,
+          "oversizedLines": 0,
+          "truncated": false,
+          "firstRetainedTimestamp": "11-03 11:53:44.793",
+          "lastRetainedTimestamp": "11-03 11:58:51.758",
+          "text": "11-03 11:53:44.793   668   699 I ActivityManager: Start proc 2791:com.onemapmapbox/u0a213 for next-top-activity {com.onemapmapbox/com.onemapmapbox.MainActivity}\n11-03 11:54:03.479   220   220 I lowmemorykiller: Kill 'com.google.android.googlesdksetup' (1232), uid 10178, oom_score_adj 985 to free 99176kB rss, 26496kB swap; reason: low watermark is breached\n11-03 11:54:09.421   220   220 I lowmemorykiller: lmkd data connection established\n11-03 11:54:09.453   220   220 I lowmemorykiller: Wakeup counter is reset from 169 to 0\n11-03 11:54:09.453   220   220 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-03 11:54:09.453   220   220 I lowmemorykiller: Properties reinitilized\n11-03 11:54:09.453  4181  4181 I lowmemorykiller: lmkd updated properties successfully\n11-03 11:54:09.453   220   220 I lowmemorykiller: lmkd data connection dropped\n11-03 11:54:09.453   220   220 I lowmemorykiller: closing lmkd data connection\n11-03 11:54:11.919   220   220 I lowmemorykiller: lmkd data connection established\n11-03 11:54:11.949   220   220 I lowmemorykiller: Wakeup counter is reset from 22 to 0\n11-03 11:54:11.949   220   220 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-03 11:54:11.949   220   220 I lowmemorykiller: Properties reinitilized\n11-03 11:54:11.949  4285  4285 I lowmemorykiller: lmkd updated properties successfully\n11-03 11:54:11.949   220   220 I lowmemorykiller: lmkd data connection dropped\n11-03 11:54:11.949   220   220 I lowmemorykiller: closing lmkd data connection\n11-03 11:58:51.705   220   220 I lowmemorykiller: lmkd data connection established\n11-03 11:58:51.757   220   220 I lowmemorykiller: Wakeup counter is reset from 93 to 0\n11-03 11:58:51.757   220   220 I lowmemorykiller: Using psi monitors for memory pressure detection\n11-03 11:58:51.757   220   220 I lowmemorykiller: Properties reinitilized\n11-03 11:58:51.758  6319  6319 I lowmemorykiller: lmkd updated properties successfully\n11-03 11:58:51.758   220   220 I lowmemorykiller: lmkd data connection dropped\n11-03 11:58:51.758   220   220 I lowmemorykiller: closing lmkd data connection\n"
+        }
+      }
+    }
+  },
+  "coreScenarioStates": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-activation": "passed",
+    "annotation-activation": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow-dismissal": "passed",
+    "map-feature-click": "passed",
+    "navigation-location": "passed",
+    "style-remount": "passed",
+    "host-accessibility": "passed",
+    "sdk-ornaments": "passed",
+    "camera-target-and-gesture": "passed",
+    "marker-prop-rejection": "passed"
+  },
+  "reusedRows": [
+    {
+      "rowId": "mapbox-android-camera",
+      "status": "passed",
+      "scene": {
+        "observations": [
+          {
+            "text": "TF04 fit=pending click=pending clickAt=pending stop=pending held=pending command=pending doubletap=skip center=pending note=none phase=await-load done=0",
+            "fields": {
+              "fit": "pending",
+              "click": "pending",
+              "clickAt": "pending",
+              "stop": "pending",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "pending",
+              "note": "none",
+              "phase": "await-load",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=pending clickAt=pending stop=pending held=pending command=pending doubletap=skip center=-122.32000,47.64000 note=none phase=await-click done=0",
+            "fields": {
+              "fit": "ok",
+              "click": "pending",
+              "clickAt": "pending",
+              "stop": "pending",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "-122.32000,47.64000",
+              "note": "none",
+              "phase": "await-click",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=hit clickAt=-122.31999,47.63753 stop=rejected held=pending command=pending doubletap=skip center=-120.00000,45.00000 note=none phase=await-hold done=0",
+            "fields": {
+              "fit": "ok",
+              "click": "hit",
+              "clickAt": "-122.31999,47.63753",
+              "stop": "rejected",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "-120.00000,45.00000",
+              "note": "none",
+              "phase": "await-hold",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=hit clickAt=-122.31999,47.63753 stop=rejected held=0 command=applied doubletap=skip center=-120.00000,45.00000 note=none phase=done done=1",
+            "fields": {
+              "fit": "ok",
+              "click": "hit",
+              "clickAt": "-122.31999,47.63753",
+              "stop": "rejected",
+              "held": "0",
+              "command": "applied",
+              "doubletap": "skip",
+              "center": "-120.00000,45.00000",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            }
+          }
+        ],
+        "display": {
+          "width": 1080,
+          "height": 2400
+        },
+        "tap": [
+          "540",
+          "1488"
+        ]
+      }
+    }
+  ],
+  "installedIdentityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~2qNC5ZCJdAk1B0sRnMZBaw==/com.onemapmapbox-bPIi2F7x6b54LDP4-ejprQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~2qNC5ZCJdAk1B0sRnMZBaw==/com.onemapmapbox-bPIi2F7x6b54LDP4-ejprQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-after",
+      "path": "/data/app/~~2qNC5ZCJdAk1B0sRnMZBaw==/com.onemapmapbox-bPIi2F7x6b54LDP4-ejprQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-retained-before",
+      "path": "/data/app/~~2qNC5ZCJdAk1B0sRnMZBaw==/com.onemapmapbox-bPIi2F7x6b54LDP4-ejprQ==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "operatorStop": {
+    "classification": "Worker execution mistake, not failed operator command or map assertion",
+    "ReadFocusCommand": "input-complete, exit0",
+    "status": "HTTP200null at first read",
+    "observed": "Known synthetic debugger migration notice as nonmodal banner, toolbar still visible",
+    "workerError": "Interpreted standalone-dismissal restriction as failure on banner presence; manually wrote first-failure latch before any failed command/assertion",
+    "effect": "Driver consumed latch and cleaned up; no retained scenario completed",
+    "actualReadbackCause": "Not established: app read may be asynchronous/stale, or physical toolbar tap may require investigation from fresh complete retained flow. No application defect inferred."
+  },
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 63598",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "receiptCurrentCoreResultManualAndRetainedToolbarReviewed": true,
+    "ownedEmulator54686AndDriver63598Absent": true,
+    "ports5580_5581_8081_8797Released": true
+  },
+  "evidence": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-27/receipt.json": "43d2dd7e7f3de701d96e99f12cca9b45824c02e58c1af6590acffe07659b51db",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-27/mapbox-android-core-result.json": "d2e53293a6e12058b27bdccb0fec581d64e0b7f3d405a02da1be410fc916f436",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-27/mapbox-android-core-manual.json": "5a2cd7328d1a98f0cab003cae530705f2a5408b7e5859100a1e3800996d0322b",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-27/mapbox-android-retained-manual.json": "cd209717b21547d39525f6f4e0487d849c339bd95e96023eaa9d599aaf82ad0b",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-27/operator-first-failure.json": "fbafd5c102fe5d45329c865a8d91aabfe36128ed6091538a32d048405ea470c5",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-27/toolbar-019.json": "061f29903bd358aad7304f831fee1dd11fe3bcb94fa008199d3710d85c461624",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-27/toolbar-019-hierarchy-001.xml": "df91e8c71d4c064adac38627f0c313247e5b859734fccae2d0e40e2feddfbeb2"
+  },
+  "next": "Audit fixed retained-only continuation reusing camera and complete core; then execute all six retained scenarios under existing explicit fix-and-continue authorization. Preserve original premature-stop evidence. No native rebuild or f05 change."
+}

@@ -34,7 +34,7 @@ export const judgeNativeRetained = (observation, manual, identity) => {
   const reads = observations.filter(validRead);
   const current = observations.at(-1);
   const valid = reads.length >= 3 && validRead(current);
-  const themes = ["initial", "updated"].every((theme) =>
+  const themeChecks = ["initial", "updated"].map((theme) =>
     reads.some((read) =>
       ["a", "b"].every(
         (name) =>
@@ -65,7 +65,7 @@ export const judgeNativeRetained = (observation, manual, identity) => {
   const observed =
     observation?.focusedComplete === true &&
     valid &&
-    themes &&
+    themeChecks.every(Boolean) &&
     resized &&
     rotated &&
     isolated &&
@@ -88,6 +88,23 @@ export const judgeNativeRetained = (observation, manual, identity) => {
     execution: "manual-native-touch",
     observed,
     manualComplete,
+    checks: {
+      focusedComplete: observation?.focusedComplete === true,
+      enoughValidReads: reads.length >= 3,
+      currentRead: Boolean(validRead(current)),
+      initialTheme: themeChecks[0],
+      updatedTheme: themeChecks[1],
+      resized: Boolean(resized),
+      rotated: Boolean(rotated),
+      isolated: Boolean(isolated),
+      imageLoad: events["image-load"] >= 1,
+      imageRefresh: events["image-refresh"] >= 1,
+      aFeatureTouch: events["a-feature-touch"] >= 1,
+      bFeatureTouch: events["b-feature-touch"] >= 1,
+      noErrors: !Object.keys(events).some(
+        (name) => name.endsWith("error") && events[name] > 0
+      ),
+    },
     density: current?.window?.scale,
     remaining: nativeRetainedScenarios.filter(
       (name) => manual?.scenarios?.[name] !== "passed"

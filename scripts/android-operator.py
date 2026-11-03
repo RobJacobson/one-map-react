@@ -231,6 +231,12 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
         return run_checked([ADB, "-s", SERIAL, *arguments], quiet=True,
                            timeout=min(TIMEOUT_SECONDS, remaining))
 
+    def input_y(top, bottom):
+        # Android's retained toolbar can start behind the status bar.
+        if row.endswith("-retained") and top == 0:
+            return top + (bottom - top) * 7 // 8
+        return (top + bottom) // 2
+
     def hierarchy():
         index = len(receipt["hierarchies"]) + 1
         name = f"toolbar-{number:03d}-hierarchy-{index:03d}.xml"
@@ -273,7 +279,7 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
             if targets:
                 left, top, right, bottom = targets[0]
                 command(["shell", "input", "tap", str((left + right) // 2),
-                         str((top + bottom) // 2)])
+                         str(input_y(top, bottom))])
                 receipt["targetBounds"] = targets[0]
                 receipt["status"] = "input-complete"
                 break
@@ -292,7 +298,7 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
             else:
                 raise ValueError("Missing target within visible toolbar range.")
             width = right - left
-            y = str((top + bottom) // 2)
+            y = str(input_y(top, bottom))
             command(["shell", "input", "swipe", str(left + width * start // 4), y,
                      str(left + width * end // 4), y, "450"])
             receipt["swipes"] += 1

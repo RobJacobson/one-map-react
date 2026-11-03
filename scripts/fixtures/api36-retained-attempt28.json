@@ -1,0 +1,396 @@
+{
+  "provenance": {
+    "meaning": "Actual attempt28 subset for device-free regression only; synthetic passing controls remain in the test and earn no acceptance.",
+    "sourceSha256": {
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-28/mapbox-android-retained-result.json": "6aa820f83271cf2ea593ee7c39b7dc1ac9145cdd4c0c09934ff4afb6e44ed972",
+      "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-28/mapbox-android-retained-manual.json": "253a2f9dbd3312aa7a605c36efaf31e4414f326a38642c409ee3577552c43551"
+    },
+    "observationIndices": [0, 2, 4, 5, 7, 11],
+    "projection": "Only fields consumed by judgeNativeRetained; source values unchanged."
+  },
+  "observation": {
+    "focusedComplete": true,
+    "observations": [
+      {
+        "sequence": 2,
+        "window": {
+          "width": 411.42857142857144,
+          "height": 914.2857142857143,
+          "scale": 2.625,
+          "fontScale": 1
+        },
+        "short": false,
+        "children": {},
+        "events": {
+          "a-load": 1,
+          "b-load": 1
+        },
+        "a": {
+          "center": [-122.34000000000002, 47.60999999999999],
+          "zoom": 11,
+          "bounds": [0, 74.28570556640625, 411.4285583496094, 560],
+          "point": [205.50000000003547, 280],
+          "features": [
+            {
+              "id": "1707",
+              "properties": {
+                "fixture": "tf07-focus-a"
+              }
+            }
+          ]
+        },
+        "b": {
+          "center": [-122.33, 47.615000000000016],
+          "zoom": 12,
+          "bounds": [0, 634.2857055664062, 411.4285583496094, 280],
+          "point": [205.5, 139.9999999998581],
+          "features": [
+            {
+              "id": "2707",
+              "properties": {
+                "fixture": "tf07-focus-b"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "sequence": 6,
+        "window": {
+          "width": 411.42857142857144,
+          "height": 914.2857142857143,
+          "scale": 2.625,
+          "fontScale": 1
+        },
+        "short": true,
+        "children": {
+          "a": {
+            "theme": "updated",
+            "count": 2,
+            "center": [-122.34000000000002, 47.60999999999999],
+            "zoom": 11
+          },
+          "b": {
+            "theme": "updated",
+            "count": 2,
+            "center": [-122.33, 47.615000000000016],
+            "zoom": 12
+          }
+        },
+        "events": {
+          "a-load": 1,
+          "b-load": 1,
+          "a-feature-touch": 1,
+          "b-feature-touch": 1,
+          "a-child": 2,
+          "b-child": 2
+        },
+        "a": {
+          "center": [-122.34000000000002, 47.60999999999999],
+          "zoom": 11,
+          "bounds": [
+            0, 90.66665649414062, 411.4285583496094, 411.8095397949219
+          ],
+          "point": [205.50000000004826, 206.00000000004826],
+          "features": [
+            {
+              "id": "1707",
+              "properties": {
+                "fixture": "tf07-focus-a"
+              }
+            }
+          ]
+        },
+        "b": {
+          "center": [-122.33, 47.615000000000016],
+          "zoom": 12,
+          "bounds": [
+            0, 502.4761657714844, 411.4285583496094, 411.8094787597656
+          ],
+          "point": [205.50000000004826, 206],
+          "features": [
+            {
+              "id": "2707",
+              "properties": {
+                "fixture": "tf07-focus-b"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "sequence": 9,
+        "window": {
+          "width": 411.42857142857144,
+          "height": 914.2857142857143,
+          "scale": 2.625,
+          "fontScale": 1
+        },
+        "short": false,
+        "children": {
+          "a": {
+            "theme": "updated",
+            "count": 3,
+            "center": [-122.34000000000002, 47.60999999999999],
+            "zoom": 11
+          },
+          "b": {
+            "theme": "updated",
+            "count": 3,
+            "center": [-122.33, 47.615000000000016],
+            "zoom": 12
+          }
+        },
+        "events": {
+          "a-load": 1,
+          "b-load": 1,
+          "a-feature-touch": 2,
+          "b-feature-touch": 2,
+          "a-child": 3,
+          "b-child": 3
+        },
+        "a": {
+          "center": [-122.34000000000002, 47.60999999999999],
+          "zoom": 11,
+          "bounds": [0, 90.66665649414062, 411.4285583496094, 548.952392578125],
+          "point": [205.50000000003615, 274.5],
+          "features": [
+            {
+              "id": "1707",
+              "properties": {
+                "fixture": "tf07-focus-a"
+              }
+            }
+          ]
+        },
+        "b": {
+          "center": [-122.33, 47.615000000000016],
+          "zoom": 12,
+          "bounds": [
+            0, 639.6190795898438, 411.4285583496094, 274.66668701171875
+          ],
+          "point": [205.50000000007225, 137.4999999998555],
+          "features": [
+            {
+              "id": "2707",
+              "properties": {
+                "fixture": "tf07-focus-b"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "sequence": 11,
+        "window": {
+          "width": 914.2857142857143,
+          "height": 411.42857142857144,
+          "scale": 2.625,
+          "fontScale": 1
+        },
+        "short": false,
+        "children": {
+          "a": {
+            "theme": "updated",
+            "count": 3,
+            "center": [-122.34000000000002, 47.60999999999999],
+            "zoom": 11
+          },
+          "b": {
+            "theme": "updated",
+            "count": 3,
+            "center": [-122.33, 47.615000000000016],
+            "zoom": 12
+          }
+        },
+        "events": {
+          "a-load": 1,
+          "b-load": 1,
+          "a-feature-touch": 2,
+          "b-feature-touch": 2,
+          "a-child": 3,
+          "b-child": 3
+        },
+        "a": {
+          "center": [-122.34000000000002, 47.60999999999999],
+          "zoom": 11,
+          "bounds": [
+            0, 90.66665649414062, 609.5238037109375, 320.76190185546875
+          ],
+          "point": [305.0000000000309, 160.5000000000619],
+          "features": [
+            {
+              "id": "1707",
+              "properties": {
+                "fixture": "tf07-focus-a"
+              }
+            }
+          ]
+        },
+        "b": {
+          "center": [-122.33, 47.615000000000016],
+          "zoom": 12,
+          "bounds": [
+            609.5238037109375, 90.66665649414062, 304.76190185546875,
+            320.76190185546875
+          ],
+          "point": [152.5000000000619, 160.5],
+          "features": [
+            {
+              "id": "2707",
+              "properties": {
+                "fixture": "tf07-focus-b"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "sequence": 15,
+        "window": {
+          "width": 411.42857142857144,
+          "height": 914.2857142857143,
+          "scale": 2.625,
+          "fontScale": 1
+        },
+        "short": false,
+        "children": {
+          "a": {
+            "theme": "updated",
+            "count": 3,
+            "center": [-122.34000000000002, 47.60999999999999],
+            "zoom": 11
+          },
+          "b": {
+            "theme": "updated",
+            "count": 3,
+            "center": [-122.33, 47.615000000000016],
+            "zoom": 12
+          }
+        },
+        "events": {
+          "a-load": 1,
+          "b-load": 1,
+          "a-feature-touch": 2,
+          "b-feature-touch": 2,
+          "a-child": 3,
+          "b-child": 3
+        },
+        "a": {
+          "center": [-122.345, 47.61200000000004],
+          "zoom": 11,
+          "bounds": [0, 90.66665649414062, 411.4285583496094, 548.952392578125],
+          "point": [220.06355569803432, 283.1410007701907],
+          "features": [
+            {
+              "id": "1707",
+              "properties": {
+                "fixture": "tf07-focus-a"
+              }
+            }
+          ]
+        },
+        "b": {
+          "center": [-122.33, 47.615000000000016],
+          "zoom": 12,
+          "bounds": [
+            0, 639.6190795898438, 411.4285583496094, 274.66668701171875
+          ],
+          "point": [205.50000000007225, 137.5],
+          "features": [
+            {
+              "id": "2707",
+              "properties": {
+                "fixture": "tf07-focus-b"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "sequence": 21,
+        "window": {
+          "width": 411.42857142857144,
+          "height": 914.2857142857143,
+          "scale": 2.625,
+          "fontScale": 1
+        },
+        "short": false,
+        "children": {
+          "a": {
+            "theme": "updated",
+            "count": 3,
+            "center": [-122.34000000000002, 47.60999999999999],
+            "zoom": 11
+          },
+          "b": {
+            "theme": "updated",
+            "count": 3,
+            "center": [-122.33, 47.615000000000016],
+            "zoom": 12
+          }
+        },
+        "events": {
+          "a-load": 1,
+          "b-load": 1,
+          "a-feature-touch": 2,
+          "b-feature-touch": 2,
+          "a-child": 3,
+          "b-child": 3,
+          "image-load": 1,
+          "image-refresh": 1
+        },
+        "a": {
+          "center": [-122.31967929999999, 47.61200000000004],
+          "zoom": 11,
+          "bounds": [0, 90.66665649414062, 411.4285583496094, 548.952392578125],
+          "point": [146.31167074543964, 283.1410007701907],
+          "features": [
+            {
+              "id": "1707",
+              "properties": {
+                "fixture": "tf07-focus-a"
+              }
+            }
+          ]
+        },
+        "b": {
+          "center": [-122.33, 47.615000000000016],
+          "zoom": 12,
+          "bounds": [
+            0, 639.6190795898438, 411.4285583496094, 274.66668701171875
+          ],
+          "point": [205.50000000007225, 137.5],
+          "features": [
+            {
+              "id": "2707",
+              "properties": {
+                "fixture": "tf07-focus-b"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "manual": {
+    "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "environment": "mapbox-android",
+    "runId": "240aa7bf-1a86-42b5-bbae-4f88436f5209",
+    "scenarios": {
+      "simultaneous-named-maps": "passed",
+      "provider-child-state": "passed",
+      "annotation-image-refresh": "passed",
+      "resize-orientation": "passed",
+      "camera-target-isolation": "passed",
+      "touch-density-bounds": "passed"
+    }
+  },
+  "identity": {
+    "installedBinarySha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+    "libraryDistSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+    "environment": "mapbox-android",
+    "runId": "240aa7bf-1a86-42b5-bbae-4f88436f5209"
+  }
+}
