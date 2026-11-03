@@ -39,6 +39,7 @@ for (const [
   api36Unit = false,
   api36Resume = false,
   maplibreResume = false,
+  maplibreRetained = false,
 ] of [
   ["mapbox", false],
   ["maplibre", false],
@@ -50,6 +51,7 @@ for (const [
   ["mapbox", true, true, false, false, true, true],
   ["maplibre", true, true, false, false, true, true],
   ["maplibre", true, true, false, false, true, true, false, true],
+  ["maplibre", true, true, false, false, true, true, true, false, true],
   ["mapbox", true, true, false, false, true, true, true],
 ]) {
   const avdName = api36Unit ? "OneMapF05MapboxApi36" : "OneMapU25F05";
@@ -72,6 +74,9 @@ for (const [
           "core-proof-identity",
           "core-proof-after",
           "core-proof-scope",
+          "core-proof-observed",
+          "core-proof-manual",
+          "core-proof-remaining",
         ]
       : []),
     ...(api36Unit
@@ -155,6 +160,9 @@ for (const [
                 "core-proof-identity",
                 "core-proof-after",
                 "core-proof-scope",
+                "core-proof-observed",
+                "core-proof-manual",
+                "core-proof-remaining",
               ]
             : []),
           ...(api36Unit
@@ -489,6 +497,7 @@ for (const [
           file.endsWith("mapbox-android-api36-preparation.json") ||
           file.endsWith("maplibre-android-api36-preparation.json") ||
           file.endsWith("maplibre-android-api36-resume-preparation.json") ||
+          file.endsWith("maplibre-android-api36-retained-preparation.json") ||
           file.endsWith("mapbox-android-api36-retained-preparation.json") ||
           file.endsWith("mapbox-android-api36-console-resume-preparation.json")
         )
@@ -499,10 +508,13 @@ for (const [
             freeze: { path: "/freeze", sha256: "freeze-hash" },
             executionRows:
               failAt === "core-proof-scope"
-                ? ["mapbox-android-core"]
-                : ["mapbox-android-retained"],
+                ? [`${engine}-android-core`]
+                : [`${engine}-android-retained`],
           });
-        if (file.endsWith("android-platform-batch-attempt-27/receipt.json"))
+        if (
+          file.endsWith("android-platform-batch-attempt-27/receipt.json") ||
+          file.endsWith("android-platform-batch-attempt-31/receipt.json")
+        )
           return JSON.stringify({
             result: "failed",
             apkSha256: apkHash,
@@ -512,24 +524,26 @@ for (const [
               {
                 rowId:
                   failAt === "core-proof-row"
-                    ? "mapbox-android-retained"
-                    : "mapbox-android-core",
+                    ? `${engine}-android-retained`
+                    : `${engine}-android-core`,
                 status: "passed",
                 scene: {
                   status: "passed",
-                  observed: true,
-                  manualComplete: true,
-                  remaining: [],
+                  runId: "654a874e-519e-46c0-91f1-1055acaa877b",
+                  observed: failAt !== "core-proof-observed",
+                  manualComplete: failAt !== "core-proof-manual",
+                  remaining:
+                    failAt === "core-proof-remaining" ? ["unverified"] : [],
                   installedBinarySha256:
                     failAt === "core-proof-identity" ? "wrong" : apkHash,
                   libraryDistSha256: distHash,
-                  environment: "mapbox-android",
+                  environment: `${engine}-android`,
                 },
               },
             ],
             identityReads: [
-              "mapbox-android-core-before",
-              "mapbox-android-core-after",
+              `${engine}-android-core-before`,
+              `${engine}-android-core-after`,
             ].map((phase) => ({
               phase,
               sha256:
@@ -752,7 +766,9 @@ for (const [
           String(content).startsWith('{"result":"failed","apkSha256"')
             ? failAt === "core-proof-hash"
               ? "wrong"
-              : "43d2dd7e7f3de701d96e99f12cca9b45824c02e58c1af6590acffe07659b51db"
+              : maplibreRetained
+                ? "500b1914deb2152bdfbf3ed52fa9490bb10ea80f4354ffc6ece18f956240a190"
+                : "43d2dd7e7f3de701d96e99f12cca9b45824c02e58c1af6590acffe07659b51db"
             : String(content).startsWith(
                   '{"result":"stopped-at-popup-attachment-observation"'
                 )
@@ -769,7 +785,7 @@ for (const [
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${maplibreResume ? "maplibre-acceptance-api36-resume" : engine === "maplibre" && api36Unit ? "maplibre-acceptance-api36" : api36Resume ? "mapbox-acceptance-api36-resume" : api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${maplibreRetained ? "maplibre-acceptance-api36-retained-resume" : maplibreResume ? "maplibre-acceptance-api36-resume" : engine === "maplibre" && api36Unit ? "maplibre-acceptance-api36" : api36Resume ? "mapbox-acceptance-api36-resume" : api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -795,10 +811,10 @@ for (const [
       continue;
     }
     if (api36Resume && failAt === null) {
-      assert.deepEqual(receipt.scope, ["mapbox-android-retained"]);
+      assert.deepEqual(receipt.scope, [`${engine}-android-retained`]);
       assert.deepEqual(
         receipt.reusedRows.map(({ rowId }) => rowId),
-        ["mapbox-android-camera", "mapbox-android-core"]
+        [`${engine}-android-camera`, `${engine}-android-core`]
       );
       assert.equal(coreRows, 1, "Exactly one retained driver, no core driver.");
     }
@@ -1015,7 +1031,7 @@ for (const [
         assert.deepEqual(
           receipt.rows.map(({ rowId }) => rowId),
           api36Resume
-            ? ["mapbox-android-retained"]
+            ? [`${engine}-android-retained`]
             : api36Unit && !api36Resume && !maplibreResume
               ? [
                   `${engine}-android-camera`,

@@ -1,0 +1,113 @@
+{
+  "result": "retained-observation-timeout-after-worker-usage-limit-interruption",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "distSha256": "f17855848fccf4aad07d2ebc02738d2bb799778ea0bd12070c448cd857251ab5",
+  "inputApkSha256": "c4c0ccf43f9d3b7217f8085827b351f10c5ececfb6a70c603be9f766dd64d131",
+  "environment": "api36-google-apis-revision7-arm64-4k",
+  "reusedRows": [
+    {
+      "rowId": "maplibre-android-camera",
+      "status": "passed",
+      "outcome": "revised-api-u26-android-maplibre-api36-attempt-30.json",
+      "outcomeSha256": "0fc374a6b7037883c71d6446240d4db1fbb482ac39f59c349a1fafa7a5ec8db6"
+    }
+  ],
+  "completedRows": [
+    {
+      "rowId": "maplibre-android-core",
+      "status": "passed",
+      "runId": "654a874e-519e-46c0-91f1-1055acaa877b",
+      "observed": true,
+      "manualComplete": true,
+      "remaining": [],
+      "scope": "Twelve exact prior physical observations30 plus four fresh marker rejection cases and fresh actual known-feature/finite-camera/load/no-error current read; complete core judgment passed."
+    }
+  ],
+  "coreManualScenarios": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-activation": "passed",
+    "annotation-activation": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow-dismissal": "passed",
+    "map-feature-click": "passed",
+    "navigation-location": "passed",
+    "style-remount": "passed",
+    "host-accessibility": "passed",
+    "sdk-ornaments": "passed",
+    "camera-target-and-gesture": "passed",
+    "marker-prop-rejection": "passed"
+  },
+  "retained": {
+    "status": "unverified",
+    "runId": "5fcdf81e-46c0-4f54-bff3-33c1701af453",
+    "scenarios": {
+      "simultaneous-named-maps": "passed",
+      "provider-child-state": "passed",
+      "annotation-image-refresh": "passed",
+      "resize-orientation": "passed",
+      "camera-target-isolation": "unverified",
+      "touch-density-bounds": "unverified"
+    },
+    "finalJudgment": "Not completed; worker usage limit interrupted input, driver later observation timeout. Four partial passed receipts do not complete retained row and are not reused into a new row. All six scenarios and initial/updated/final history must be fresh.",
+    "lastActions": "Target A/Repeat A/Clear A, both children pressed and Read focus; camera-isolation/touch-density final receipts absent. Original user_rotation0 and accelerometer_rotation1 restored."
+  },
+  "failure": {
+    "cause": "Worker usage-limit interruption followed by finite retained observation timeout; no production defect established",
+    "launcherError": "Error: /bin/sh exited: 1/null",
+    "retry": "No independent worker retry; owner Continue resumes same unchanged selected unit after offline preparation/audit."
+  },
+  "cleanup": {
+    "status": "passed",
+    "steps": [
+      {
+        "name": "selected app termination",
+        "result": "passed"
+      },
+      {
+        "name": "owned process 60623",
+        "result": "passed"
+      },
+      {
+        "name": "owned reverse 8081",
+        "result": "passed"
+      },
+      {
+        "name": "owned emulator shutdown",
+        "result": "passed"
+      },
+      {
+        "name": "owned emulator process exit",
+        "result": "passed"
+      },
+      {
+        "name": "released port 5580",
+        "result": "passed"
+      },
+      {
+        "name": "released port 5581",
+        "result": "passed"
+      },
+      {
+        "name": "released port 8081",
+        "result": "passed"
+      },
+      {
+        "name": "released port 8797",
+        "result": "passed"
+      },
+      {
+        "name": "owned private AVD removal",
+        "result": "passed"
+      }
+    ],
+    "coordinatorVerification": "Owner coordinator independently checked assigned ports closed, private AVD absent and all695 frozen hashes unchanged."
+  },
+  "sourceSha256": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-31/receipt.json": "500b1914deb2152bdfbf3ed52fa9490bb10ea80f4354ffc6ece18f956240a190",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-31/maplibre-android-core-result.json": "ae647e0a42819166357ca697dccb1f3ee82dd9f79574577aa1ab228f4987ae9b",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-31/maplibre-android-core-manual.json": "a11dab67a1f7b2c294fdf8b07e7409f708e6a9a5273d983a1761c4ba0f601097",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-31/maplibre-android-retained-manual.json": "7adcfd6c7c05073988a2ce6cfcf36734a5238d5fffe923d7302bf2f217230b33"
+  },
+  "remainingUnit": "MapLibre Android API36 retained only, all six fresh scenarios; camera30/core31 accepted and not rerun."
+}
