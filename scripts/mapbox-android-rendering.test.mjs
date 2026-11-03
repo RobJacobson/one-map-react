@@ -37,6 +37,7 @@ for (const [
   signalDiagnostic = false,
   mapboxUnit = false,
   api36Unit = false,
+  api36Resume = false,
 ] of [
   ["mapbox", false],
   ["maplibre", false],
@@ -46,6 +47,7 @@ for (const [
   ["mapbox", true, true, false, true],
   ["mapbox", true, true, false, false, true],
   ["mapbox", true, true, false, false, true, true],
+  ["mapbox", true, true, false, false, true, true, true],
 ]) {
   const avdName = api36Unit ? "OneMapF05MapboxApi36" : "OneMapU25F05";
   const apkHash = apkHashes[engine];
@@ -369,11 +371,13 @@ for (const [
           if (String(message).startsWith("API36 ")) {
             const row = String(message).split(" ")[1];
             assert.equal(latestCheckpoint.currentRow, `mapbox-android-${row}`);
-            assert.equal(
-              latestCheckpoint.rows.at(-1).rowId,
-              row === "core" ? "mapbox-android-camera" : "mapbox-android-core"
-            );
-            assert.equal(latestCheckpoint.rows.at(-1).status, "passed");
+            if (!api36Resume || row !== "core")
+              assert.equal(
+                latestCheckpoint.rows.at(-1).rowId,
+                row === "core" ? "mapbox-android-camera" : "mapbox-android-core"
+              );
+            if (!api36Resume || row !== "core")
+              assert.equal(latestCheckpoint.rows.at(-1).status, "passed");
             phaseMessages.push(message);
           }
         },
@@ -415,7 +419,11 @@ for (const [
         if (failAt === "existing-output") fail("EEXIST");
       },
       existsSync: (file) =>
-        file.endsWith("scene.json") ? launched : failAt === "avd",
+        file.endsWith("scene.json")
+          ? launched
+          : api36Resume && file.endsWith("android-api36-image")
+            ? failAt !== "image-capacity"
+            : failAt === "avd",
       statfsSync: () => ({
         bavail:
           failAt === "low-space"
@@ -446,13 +454,24 @@ for (const [
           file.endsWith("android-kernel-console-preparation.json") ||
           file.endsWith("signal-liveness-preparation.json") ||
           file.endsWith("mapbox-android-unit-preparation.json") ||
-          file.endsWith("mapbox-android-api36-preparation.json")
+          file.endsWith("mapbox-android-api36-preparation.json") ||
+          file.endsWith("mapbox-android-api36-marker-resume-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
             hostInputSha256: { "/helper": "helper" },
             operatorHelperSha256: { "/operator": "operator" },
             freeze: { path: "/freeze", sha256: "freeze-hash" },
+          });
+        if (file.endsWith("android-mapbox-api36-attempt-24.json"))
+          return JSON.stringify({
+            result: "stopped-at-popup-attachment-observation",
+            candidateSha256:
+              "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+            inputApkSha256: apkHash,
+            completedRows: [
+              { rowId: "mapbox-android-camera", status: "passed" },
+            ],
           });
         if (file.endsWith("android-platform-batch-attempt-01.json"))
           return JSON.stringify({
@@ -557,6 +576,10 @@ for (const [
         children.push(child);
         if (args.some((arg) => arg.endsWith("tf07-ui-smoke.mjs"))) {
           coreRows++;
+          assert.equal(
+            options.env.TF07_REUSE_API36_ATTEMPT24 === "1",
+            api36Resume && coreRows === 1
+          );
           if (api36Unit)
             assert.equal(
               phaseMessages.at(-1),
@@ -647,17 +670,23 @@ for (const [
           return this;
         },
         digest: () =>
-          String(content).startsWith('{"result":"stopped-at-first-ui-failure"')
-            ? failAt === "prior-hash"
-              ? "wrong"
-              : "38fb7d4b86c6ee4a76bb1551eaa53644325a2949ffbba669218663f641a3e00f"
-            : String(content).startsWith('{"files"')
-              ? "freeze-hash"
-              : content,
+          String(content).startsWith(
+            '{"result":"stopped-at-popup-attachment-observation"'
+          )
+            ? "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c"
+            : String(content).startsWith(
+                  '{"result":"stopped-at-first-ui-failure"'
+                )
+              ? failAt === "prior-hash"
+                ? "wrong"
+                : "38fb7d4b86c6ee4a76bb1551eaa53644325a2949ffbba669218663f641a3e00f"
+              : String(content).startsWith('{"files"')
+                ? "freeze-hash"
+                : content,
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${api36Resume ? "mapbox-acceptance-api36-resume" : api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -851,7 +880,7 @@ for (const [
           );
         assert.equal(
           receipt.rows.length,
-          api36Unit
+          api36Unit && !api36Resume
             ? 3
             : mapboxUnit
               ? 2
@@ -863,7 +892,7 @@ for (const [
         );
         assert.equal(
           cameraRows,
-          api36Unit
+          api36Unit && !api36Resume
             ? 1
             : signalDiagnostic || mapboxUnit
               ? 0
@@ -873,7 +902,7 @@ for (const [
         );
         assert.deepEqual(
           cameraEngines,
-          api36Unit
+          api36Unit && !api36Resume
             ? ["mapbox"]
             : signalDiagnostic || mapboxUnit
               ? []
@@ -883,7 +912,7 @@ for (const [
         );
         assert.deepEqual(
           receipt.rows.map(({ rowId }) => rowId),
-          api36Unit
+          api36Unit && !api36Resume
             ? [
                 "mapbox-android-camera",
                 "mapbox-android-core",
@@ -933,7 +962,7 @@ for (const [
         );
         assert.equal(
           identityChecks,
-          api36Unit
+          api36Unit && !api36Resume
             ? 7
             : mapboxUnit
               ? 5
@@ -951,14 +980,18 @@ for (const [
       if (["driver", "driver-stderr"].includes(failAt)) {
         assert.equal(
           receipt.rows.length,
-          api36Unit ? 1 : signalDiagnostic || continuation || mapboxUnit ? 0 : 1
+          api36Unit && !api36Resume
+            ? 1
+            : signalDiagnostic || continuation || mapboxUnit
+              ? 0
+              : 1
         );
         assert.equal(coreRows, 1);
       }
       if (failAt === "retained-driver") {
         assert.deepEqual(
           receipt.rows.map(({ rowId }) => rowId),
-          api36Unit
+          api36Unit && !api36Resume
             ? ["mapbox-android-camera", "mapbox-android-core"]
             : ["mapbox-android-core"]
         );

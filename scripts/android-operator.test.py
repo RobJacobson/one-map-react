@@ -335,6 +335,76 @@ class OperatorTest(unittest.TestCase):
                 after(arguments)
         return calls, run
 
+    def rejection_xml(self):
+        return Path("/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25/toolbar-036-hierarchy-001.xml").read_text()
+
+    def rejection_result_xml(self, label="Reject view draggable"):
+        message = "Native Marker does not support dragging. Use a selected raw native annotation for SDK dragging."
+        return self.toolbar_xml([("READ RENDERER", "[700,63][1050,156]")]).replace(
+            "</hierarchy>", '<node class="android.widget.TextView" package="com.onemapmapbox" '
+            'resource-id="tf07-marker-rejection" bounds="[0,160][1080,400]" text="' + label + ': ' + message + '" /></hierarchy>')
+
+    def test_expected_marker_overlays_dismiss_with_decreasing_count_then_check_boundary_and_toolbar(self):
+        for label in ("Reject view draggable", "Reject view callback", "Reject annotation draggable", "Reject annotation callback"):
+            with self.subTest(label=label):
+                self.setUp()
+                calls, child = self.toolbar_child([self.rejection_xml(), self.rejection_xml().replace("Log 2 of 2", "Log 1 of 1"), self.rejection_result_xml(label)])
+                with patch("subprocess.run", side_effect=child):
+                    status, output = self.invoke(["dismiss-marker-rejection", label], [ROW, "marker-prop-rejection"])
+                self.assertEqual(status, 0, output)
+                self.assertEqual([args for args in calls if args[:2] == ["shell", "input"]],
+                                 [["shell", "input", "tap", "180", "2274"]] * 2)
+                self.assertEqual(json.loads(self.report.read_text()), self.original)
+
+    def test_single_expected_log_dismisses_once_and_validates_fixture(self):
+        calls, child = self.toolbar_child([self.rejection_xml().replace("Log 2 of 2", "Log 1 of 1"), self.rejection_result_xml()])
+        with patch("subprocess.run", side_effect=child):
+            status, output = self.invoke(["dismiss-marker-rejection", "Reject view draggable"], [ROW, "marker-prop-rejection"])
+        self.assertEqual(status, 0, output)
+        self.assertEqual(len([args for args in calls if args[:2] == ["shell", "input"]]), 1)
+
+    def test_marker_overlay_rejects_wrong_identity_controls_and_followup_without_input_retry(self):
+        xml = self.rejection_xml()
+        cases = {
+            "message": xml.replace("Native Marker does not support dragging.", "Unexpected failure."),
+            "package": xml.replace("com.onemapmapbox", "com.foreign"),
+            "boundary": xml.replace("NativeMarkerRejectionBoundary", "OtherBoundary"),
+            "title": xml.replace("Render Error", "Syntax Error"),
+            "counter": xml.replace("Log 2 of 2", "Log 3 of 3"),
+            "not-last": xml.replace("Log 2 of 2", "Log 1 of 2"),
+            "missing": xml.replace('content-desc="Dismiss"', 'content-desc="Other"'),
+            "disabled": xml.replace('content-desc="Dismiss" checkable="false" checked="false" clickable="true" enabled="true"', 'content-desc="Dismiss" checkable="false" checked="false" clickable="true" enabled="false"'),
+            "duplicate": xml.replace('</hierarchy>', '<node class="android.view.ViewGroup" package="com.onemapmapbox" content-desc="Dismiss" clickable="true" enabled="true" bounds="[0,2211][360,2337]" /></hierarchy>'),
+            "clipped": xml.replace('[0,2211][360,2337]', '[0,2211][360,2500]'),
+            "malformed": '<hierarchy>',
+        }
+        for name, snapshot in cases.items():
+            with self.subTest(name=name):
+                self.setUp()
+                calls, child = self.toolbar_child([snapshot])
+                with patch("subprocess.run", side_effect=child):
+                    status, output = self.invoke(["dismiss-marker-rejection", "Reject view draggable"], [ROW, "marker-prop-rejection"])
+                    self.assertEqual(status, 1, output)
+                    saved = self.latch.read_bytes()
+                    self.assertEqual(self.invoke(["dismiss-marker-rejection", "Reject view draggable"], [ROW, "marker-prop-rejection"])[0], 1)
+                self.assertEqual(self.latch.read_bytes(), saved)
+                self.assertFalse(any(args[:2] == ["shell", "input"] for args in calls))
+        for followup in (xml, xml.replace("Log 2 of 2", "Log 1 of 1").replace("Native Marker does not support dragging.", "Unexpected failure."), self.rejection_result_xml("Reject annotation callback"), self.rejection_result_xml().replace("Native Marker", "Unexpected Marker")):
+            self.setUp()
+            calls, child = self.toolbar_child([xml, followup])
+            with patch("subprocess.run", side_effect=child):
+                status, output = self.invoke(["dismiss-marker-rejection", "Reject view draggable"], [ROW, "marker-prop-rejection"])
+            self.assertEqual(status, 1, output)
+            self.assertEqual(len([args for args in calls if args[:2] == ["shell", "input"]]), 1)
+
+    def test_marker_overlay_is_never_handled_for_another_scenario_or_row(self):
+        for prefix in ([ROW, SCENARIO], ["maplibre-android-core", "marker-prop-rejection"], [ROW, "marker-prop-rejection"]):
+            self.setUp()
+            with patch("subprocess.run") as child:
+                status, output = self.invoke(["dismiss-marker-rejection", "wrong" if prefix == [ROW, "marker-prop-rejection"] else "Reject view draggable"], prefix)
+            self.assertEqual(status, 1, output)
+            self.assertFalse(any(call.args[0][0] == self.globals["ADB"] for call in child.call_args_list))
+
     def test_toolbar_offscreen_then_visible_and_return_to_earlier_action(self):
         early = self.toolbar_xml([("REMOUNT", "[0,63][217,156]"), ("OFFSET", "[368,63][543,156]")])
         late = self.toolbar_xml([("CLEAR REJECTION", "[300,63][700,156]"), ("READ RENDERER", "[700,63][1050,156]")])
@@ -483,37 +553,33 @@ if args[2:4] == ['shell', 'cat']:
         child.assert_not_called()
         http.assert_not_called()
 
-    def test_exact_documented_adb_commands(self):
-        script = self.cli_copy()
-        commands = [shlex.split(line) for line in PLAN.read_text().splitlines() if line.startswith("python3 " + str(HELPER) + " ")]
-        self.assertEqual(len(commands), 7)
-        self.assertEqual(commands[0][-1], commands[1][-1])
-        self.assertEqual(commands[2][5:], ["toolbar", "Read renderer"])
-        attempt_number = Path(commands[0][2]).name.rsplit("-", 1)[1]
-        self.assertEqual(Path(commands[0][-1]).name, f"one-map-attempt{attempt_number}-hierarchy-001.xml")
-        for command in commands:
-            self.assertEqual(command[3:5], [ROW, SCENARIO])
-            if command[5] == "status":
-                for body in (b"null", b'{"events":{"child-click":1}}'):
-                    connection = self.response(body)
-                    output = io.StringIO()
-                    argv = [str(script), str(self.attempt), *command[3:]]
-                    with patch.object(sys, "argv", argv), patch("http.client.HTTPConnection", return_value=connection) as boundary, patch("subprocess.run") as adb, contextlib.redirect_stdout(output):
-                        with self.assertRaises(SystemExit) as result:
-                            runpy.run_path(str(script), run_name="__main__")
-                    self.assertEqual(result.exception.code, 0, output.getvalue())
-                    self.assertIn(json.dumps(json.loads(body)), output.getvalue())
-                    self.assertIn("COMPLETE 0", output.getvalue())
-                    boundary.assert_called_once_with("127.0.0.1", 8797, timeout=30)
-                    connection.request.assert_called_once_with("GET", "/tf07")
-                    adb.assert_not_called()
-            elif command[5] == "toolbar":
-                continue  # Actual fresh-XML CLI sequence is exercised separately.
-            else:
-                result = subprocess.run([sys.executable, str(script), str(self.attempt), *command[3:]], capture_output=True, text=True, timeout=10)
-                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                self.assertIn(json.dumps(["-s", "emulator-5580", *command[6:]]), result.stdout)
-                self.assertIn("COMPLETE 0", result.stdout)
+    def test_exact_packet_marker_commands_reach_the_expected_transport(self):
+        packet = json.loads((ROOT / "records/evidence/revised-api-u26-mapbox-android-api36-marker-resume-preparation.json").read_text())
+        protocol = packet["markerRejectionProtocol"]
+        self.assertEqual(len(protocol["cases"]), 4)
+        for case in protocol["cases"]:
+            for field in ("request", "recoverAndVerify", "readRenderer", "status", "clear"):
+                with self.subTest(label=case["label"], field=field):
+                    self.setUp()
+                    command = shlex.split(case[field])
+                    self.assertEqual(command[:2], ["python3", str(HELPER)])
+                    self.assertEqual(command[2], packet["operatorProtocol"]["output"])
+                    self.assertEqual(command[3:5], [ROW, "marker-prop-rejection"])
+                    if field == "recoverAndVerify":
+                        self.assertEqual(command[5:], ["dismiss-marker-rejection", case["label"]])
+                        snapshots = [self.rejection_xml(), self.rejection_xml().replace("Log 2 of 2", "Log 1 of 1"), self.rejection_result_xml(case["label"])]
+                    elif field == "status":
+                        self.assertEqual(command[5:], ["status"])
+                        snapshots = []
+                    else:
+                        expected = case["label"] if field == "request" else "Read renderer" if field == "readRenderer" else "Clear rejection"
+                        self.assertEqual(command[5:], ["toolbar", expected])
+                        snapshots = [self.toolbar_xml([(expected.upper(), "[300,63][1000,156]")])]
+                    calls, child = self.toolbar_child(snapshots)
+                    with patch("subprocess.run", side_effect=child), patch("http.client.HTTPConnection", return_value=self.response(b"null")):
+                        status, output = self.invoke(command[5:], command[3:5])
+                    self.assertEqual(status, 0, output)
+                    self.assertFalse(self.latch.exists())
 
     def test_adb_boundaries_and_bounded_output(self):
         for failure in (subprocess.TimeoutExpired("fake", 30), OSError("missing"), subprocess.CalledProcessError(7, "fake")):

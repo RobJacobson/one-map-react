@@ -29,6 +29,10 @@ TOOLBAR_LABELS = {
     "retained": ("Read focus", "Finish focus", "Theme", "Resize", "Target A",
                  "Repeat A", "Clear A", "Image"),
 }
+REJECTION_LABELS = ("Reject view draggable", "Reject view callback",
+                    "Reject annotation draggable", "Reject annotation callback")
+REJECTION_MESSAGE = ("Native Marker does not support dragging. "
+                     "Use a selected raw native annotation for SDK dragging.")
 TOOLBAR_SWIPES = 12
 TOOLBAR_SECONDS = 120
 ROWS = (
@@ -75,6 +79,11 @@ def main(arguments):
             if label is None:
                 raise ValueError("Unknown toolbar label for this row.")
             adb_arguments = [label]
+        if operation == "dismiss-marker-rejection" and (
+            row != "mapbox-android-core" or scenario != "marker-prop-rejection"
+            or len(adb_arguments) != 1 or adb_arguments[0] not in REJECTION_LABELS
+        ):
+            raise ValueError("Expected the Mapbox core marker rejection case label.")
         candidate_report, identity = wait_for_row(attempt, row, latch)
         if identity.get("environment") != row.rsplit("-", 1)[0]:
             raise ValueError("Report environment differs from row.")
@@ -94,6 +103,9 @@ def main(arguments):
             read_status()
         elif operation == "toolbar":
             activate_toolbar(attempt, row, scenario, identity, adb_arguments[0], latch)
+        elif operation == "dismiss-marker-rejection":
+            activate_toolbar(attempt, row, scenario, identity, adb_arguments[0], latch,
+                             rejection=True)
         elif operation == "adb" and adb_arguments:
             run_checked([ADB, "-s", SERIAL, *adb_arguments])
         else:
@@ -193,7 +205,7 @@ def wait_for_row(attempt, row, latch, ready_only=False):
         time.sleep(min(POLL_SECONDS, remaining))
 
 
-def activate_toolbar(attempt, row, scenario, identity, label, latch):
+def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=False):
     """Reveal a fixture toolbar button using fresh hierarchies, then tap once."""
     print("START toolbar", label, flush=True)
     deadline = time.monotonic() + TOOLBAR_SECONDS
@@ -229,12 +241,32 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch):
         local_path.write_text(xml)
         receipt["hierarchies"].append(str(local_path))
         command(["shell", "rm", device_path])
-        return toolbar_snapshot(xml, row)
+        return xml
 
     try:
+        if rejection:
+            xml = hierarchy()
+            remaining = None
+            receipt["dismissals"] = []
+            for _ in range(2):
+                rectangle, count = marker_rejection_dismiss(xml)
+                if remaining is not None and count != remaining - 1:
+                    raise ValueError("Expected rejection log count to decrease by one.")
+                remaining = count
+                left, top, right, bottom = rectangle
+                command(["shell", "input", "tap", str((left + right) // 2),
+                         str((top + bottom) // 2)])
+                receipt["dismissals"].append({"bounds": rectangle, "logCount": count})
+                xml = hierarchy()
+                if count == 1:
+                    break
+            toolbar_snapshot(xml, row)
+            require_rejection_result(xml, label)
+            receipt["status"] = "rejection-verified"
+            return
         previous = None
         while True:
-            toolbar, buttons, signature = hierarchy()
+            toolbar, buttons, signature = toolbar_snapshot(hierarchy(), row)
             targets = [bounds for name, bounds in buttons if name == label.upper()]
             if len(targets) > 1:
                 raise ValueError("Ambiguous visible toolbar target.")
@@ -276,6 +308,52 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch):
                 raise
             print("SECONDARY toolbar receipt publication:", secondary, flush=True)
         print("TOOLBAR", json.dumps({**receipt, "receipt": str(receipt_path)}), flush=True)
+
+
+def marker_rejection_dismiss(xml):
+    """Match only the saved native Marker render rejection and its visible Dismiss."""
+    root = ET.fromstring(xml)
+    nodes = list(root.iter("node"))
+    package = "com.onemapmapbox"
+    if not nodes or any(node.get("package") != package for node in nodes):
+        raise ValueError("Expected only the Mapbox application hierarchy.")
+    texts = [node.get("text") for node in nodes]
+    if texts.count("Render Error") != 1 or texts.count(REJECTION_MESSAGE) != 1:
+        raise ValueError("Expected exact native Marker Render Error.")
+    if not any(node.get("text") == "<NativeMarkerRejectionBoundary />" for node in nodes):
+        raise ValueError("Missing native Marker rejection boundary.")
+    counters = [re.fullmatch(r"Log ([12]) of ([12])", text or "") for text in texts]
+    counters = [match for match in counters if match is not None]
+    if len(counters) != 1 or counters[0][1] != counters[0][2]:
+        raise ValueError("Expected selected last rejection log of at most two.")
+    count = int(counters[0][1])
+    controls = [node for node in nodes if node.get("content-desc") == "Dismiss"]
+    if len(controls) != 1:
+        raise ValueError("Expected one Dismiss control.")
+    control = controls[0]
+    if (control.get("class") != "android.view.ViewGroup"
+            or control.get("enabled") != "true" or control.get("clickable") != "true"):
+        raise ValueError("Dismiss control is not enabled and clickable.")
+    def rectangle(node):
+        match = re.fullmatch(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.get("bounds", ""))
+        if match is None:
+            raise ValueError("Invalid rejection hierarchy bounds.")
+        return tuple(map(int, match.groups()))
+    display = rectangle(nodes[0])
+    left, top, right, bottom = rectangle(control)
+    if not (display[0] <= left < right <= display[2]
+            and display[1] <= top < bottom <= display[3]):
+        raise ValueError("Dismiss control is not fully visible.")
+    return (left, top, right, bottom), count
+
+
+def require_rejection_result(xml, label):
+    root = ET.fromstring(xml)
+    results = [node for node in root.iter("node")
+               if node.get("resource-id") == "tf07-marker-rejection"
+               and node.get("package") == "com.onemapmapbox"]
+    if len(results) != 1 or results[0].get("text") != label + ": " + REJECTION_MESSAGE:
+        raise ValueError("Expected exact fixture boundary rejection result.")
 
 
 def toolbar_snapshot(xml, row):

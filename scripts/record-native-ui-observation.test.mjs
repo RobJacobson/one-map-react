@@ -65,6 +65,19 @@ try {
     }
   }
 
+  const prior = reportFor(nativeUiScenarios);
+  prior.scenarios["live-child-button"] = "passed";
+  prior.reusedObservations = {
+    "live-child-button": { source: { runId: "prior-run" }, observation },
+  };
+  reset(prior);
+  expectUnchangedFailure(() => record("live-child-button"));
+  record("popup-follow-dismissal");
+  assert.deepEqual(
+    JSON.parse(fs.readFileSync(reportPath)).reusedObservations,
+    prior.reusedObservations
+  );
+
   reset();
   record(undefined, "failed");
   expectUnchangedFailure(() => record());

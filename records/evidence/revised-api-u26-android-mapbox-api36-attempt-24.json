@@ -1,0 +1,226 @@
+{
+  "checkpoint": "PR98 complete API36 Mapbox unit attempt24",
+  "recordedUTC": "2026-11-02T20:26:10.132397+00:00",
+  "result": "stopped-at-popup-attachment-observation",
+  "unitStatus": "blocked",
+  "worker": {
+    "model": "gpt-6.1-terra",
+    "reasoning": "medium",
+    "count": 1
+  },
+  "authorization": "Complete API36 Mapbox on unchangedf05, verified image reuse, no rebuild/calibration, first-failure stop and owned cleanup.",
+  "candidateSha256": "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276",
+  "candidateChanged": false,
+  "inputApkSha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5",
+  "nativeBuild": false,
+  "calibration": false,
+  "completedRows": [
+    {
+      "rowId": "mapbox-android-camera",
+      "status": "passed",
+      "scene": {
+        "observations": [
+          {
+            "text": "TF04 fit=pending click=pending clickAt=pending stop=pending held=pending command=pending doubletap=skip center=pending note=none phase=await-load done=0",
+            "fields": {
+              "fit": "pending",
+              "click": "pending",
+              "clickAt": "pending",
+              "stop": "pending",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "pending",
+              "note": "none",
+              "phase": "await-load",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=pending clickAt=pending stop=pending held=pending command=pending doubletap=skip center=-122.32000,47.64000 note=none phase=await-click done=0",
+            "fields": {
+              "fit": "ok",
+              "click": "pending",
+              "clickAt": "pending",
+              "stop": "pending",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "-122.32000,47.64000",
+              "note": "none",
+              "phase": "await-click",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=hit clickAt=-122.31999,47.63753 stop=rejected held=pending command=pending doubletap=skip center=-120.00000,45.00000 note=none phase=await-hold done=0",
+            "fields": {
+              "fit": "ok",
+              "click": "hit",
+              "clickAt": "-122.31999,47.63753",
+              "stop": "rejected",
+              "held": "pending",
+              "command": "pending",
+              "doubletap": "skip",
+              "center": "-120.00000,45.00000",
+              "note": "none",
+              "phase": "await-hold",
+              "done": "0"
+            }
+          },
+          {
+            "text": "TF04 fit=ok click=hit clickAt=-122.31999,47.63753 stop=rejected held=0 command=applied doubletap=skip center=-120.00000,45.00000 note=none phase=done done=1",
+            "fields": {
+              "fit": "ok",
+              "click": "hit",
+              "clickAt": "-122.31999,47.63753",
+              "stop": "rejected",
+              "held": "0",
+              "command": "applied",
+              "doubletap": "skip",
+              "center": "-120.00000,45.00000",
+              "note": "none",
+              "phase": "done",
+              "done": "1"
+            }
+          }
+        ],
+        "display": {
+          "width": 1080,
+          "height": 2400
+        },
+        "tap": [
+          "540",
+          "1488"
+        ]
+      }
+    }
+  ],
+  "coreScenarioStates": {
+    "live-child-button": "passed",
+    "nested-scroll": "passed",
+    "live-activation": "passed",
+    "annotation-activation": "passed",
+    "offset-touch-bounds": "passed",
+    "popup-follow-dismissal": "failed",
+    "map-feature-click": "unverified",
+    "navigation-location": "unverified",
+    "style-remount": "unverified",
+    "host-accessibility": "unverified",
+    "sdk-ornaments": "unverified",
+    "camera-target-and-gesture": "unverified",
+    "marker-prop-rejection": "unverified"
+  },
+  "firstFailure": {
+    "scenario": "popup-follow-dismissal",
+    "classification": "Physical observation failed; attachment remains unverified, not a confirmed renderer/facade defect",
+    "observation": {
+      "action": "Panned map, activated popup child, dismissed once, reopened, remounted, then tapped Zoom in; inspected settled hierarchy and renderer.",
+      "seenResult": "Pan shifted popup overlay [694,962][997,1240] to [791,1010][1080,1288]. Popup child=1, close=1, open=2 before remount; after remount close stayed 1 and open=3. Zoom rose 11 to 12 at unchanged center, but popup overlay became clipped offscreen at [0,532][151,531]; attachment could not be verified and was unexpected.",
+      "rendererData": {
+        "zoomBefore": 11,
+        "zoomAfter": 12,
+        "centerAfter": [
+          -122.34000000000162,
+          47.61000000000243
+        ],
+        "popupChild": 1,
+        "popupClose": 1,
+        "popupOpenAfterRemount": 3
+      }
+    },
+    "launcherError": "Error: /bin/sh exited: 1/null",
+    "limit": "Accessibility bounds were clipped/offscreen; no post-zoom screenshot captured. Saved toolbar readbacks are stale; compact transcription labels actual returned status values separately. No source cause established."
+  },
+  "remainingCoreCount": 7,
+  "retainedStarted": false,
+  "installedIdentityReads": [
+    {
+      "phase": "mapbox-installed",
+      "path": "/data/app/~~g7cPOQEAIjDY2OquKjDHSQ==/com.onemapmapbox-BdTKtMqaYvXQSugooBZB9w==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-camera-before",
+      "path": "/data/app/~~g7cPOQEAIjDY2OquKjDHSQ==/com.onemapmapbox-BdTKtMqaYvXQSugooBZB9w==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-camera-after",
+      "path": "/data/app/~~g7cPOQEAIjDY2OquKjDHSQ==/com.onemapmapbox-BdTKtMqaYvXQSugooBZB9w==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    },
+    {
+      "phase": "mapbox-android-core-before",
+      "path": "/data/app/~~g7cPOQEAIjDY2OquKjDHSQ==/com.onemapmapbox-BdTKtMqaYvXQSugooBZB9w==/base.apk",
+      "sha256": "ee603d8083769791ce2b9a53a5595a1fa1f5ed6ac4b5705c0010906e49c73eb5"
+    }
+  ],
+  "cleanup": [
+    {
+      "name": "selected app termination",
+      "result": "passed"
+    },
+    {
+      "name": "owned process 53023",
+      "result": "passed"
+    },
+    {
+      "name": "owned reverse 8081",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "owned emulator process exit",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5580",
+      "result": "passed"
+    },
+    {
+      "name": "released port 5581",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8081",
+      "result": "passed"
+    },
+    {
+      "name": "released port 8797",
+      "result": "passed"
+    },
+    {
+      "name": "owned private AVD removal",
+      "result": "passed"
+    }
+  ],
+  "coordinatorAudit": {
+    "savedReceiptManualDiagnosticsAndHierarchyReviewed": true,
+    "stoppedOnFirstReportedFailure": true,
+    "emulatorPid51929AndDriver53023Absent": true,
+    "ports5580_5581_8081_8797NotListening": true,
+    "privateAvdAndIniAbsent": true,
+    "verifiedImageRetained": true,
+    "pinsMatched": 56,
+    "frozenFilesMatched": 695,
+    "inputApkAndArchiveUnchanged": true,
+    "nativeRetry": false
+  },
+  "evidence": {
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/receipt.json": "cddefb4eb0c3c2451905a079b2c71b2d4186c35325c94cc1b716609284b0722a",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-manual.json": "2004a8da2e60faec951575734cd74d1a090cf661b3d6ad0acaa982a70689cf9f",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-diagnostics.json": "a4646c18a2d6b63d2b1aa9f375597118142029893fcae6368ced9b8e799b2261",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/mapbox-android-core-driver-stderr.log": "c659f57cb216fd9ea683ccb618aef07ee1bdad7be56f57671408ec2317ad07a3",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/popup-follow-dismissal-observation.json": "def37c552c9575fcd889e72b725dfa3151ba12743bb9a86c923f5bb2c8c30ec4",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/popup-hierarchy-observation-provenance.json": "3aac651916c9abf4a17b84485a4f2311b4434126042b58180f814e0eac9d209f",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/toolbar-013-hierarchy-007.xml": "ec5903f3f7aa432de391bd68eae9dec57536c1134c15d4d889549ab38b5db78c",
+    "/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-24/toolbar-014-hierarchy-001.xml": "1044bb51a920e66406f7d233033d54efd03feecfb2a1abb8e5a19f22676dae80"
+  },
+  "originalSigkillCauseResolved": false,
+  "freeBytesAfterCleanup": 17026695168,
+  "next": "Review saved popup evidence before any remaining-unit resume proposal. Preserve accepted API36 camera and completed applicable core observations; no camera rerun merely for tooling changes. No further native execution authorized."
+}

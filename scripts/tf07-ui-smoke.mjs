@@ -15,6 +15,7 @@ import { dirname, join, resolve } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 
 import { prepareAndroidSignalCapture } from "./android-signal-capture.mjs";
+import { loadApi36ReusedObservations } from "./api36-reused-observations.mjs";
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import {
   judgeNativeRetained,
@@ -419,6 +420,16 @@ const runNative = async (selectedEngine) => {
       environment: `${selectedEngine}-${platform}`,
       runId: randomUUID(),
     };
+    const reuseApi36 = process.env.TF07_REUSE_API36_ATTEMPT24 === "1";
+    assert(
+      !reuseApi36 ||
+        (platform === "android" && selectedEngine === "mapbox" && !retained),
+      "Attempt24 reuse is core Mapbox Android only."
+    );
+    const reusedObservations = reuseApi36
+      ? loadApi36ReusedObservations(identity)
+      : {};
+    const reusedScenarios = Object.keys(reusedObservations);
     const manualPath = process.env.TF07_MANUAL_REPORT;
     let completed;
     let nativeFailure;
@@ -446,6 +457,17 @@ const runNative = async (selectedEngine) => {
             identity[field],
             `TF07 report ${field} differs from this run.`
           );
+        assert.deepEqual(
+          manual.reusedObservations ?? {},
+          reusedObservations,
+          "Reused observation provenance changed."
+        );
+        for (const scenario of reusedScenarios)
+          assert.equal(
+            manual.scenarios?.[scenario],
+            "passed",
+            "Accepted prior observation changed."
+          );
         for (const scenario of scenarios) {
           const outcome = manual.scenarios?.[scenario];
           assert(
@@ -470,7 +492,10 @@ const runNative = async (selectedEngine) => {
         nativeFailure ||
         (retained
           ? observation?.focusedComplete !== true
-          : !(observation?.generation >= 1))
+          : !(
+              observation?.generation >=
+              (reusedScenarios.includes("style-remount") ? 0 : 1)
+            ))
       )
         return;
       if (
@@ -570,8 +595,12 @@ const runNative = async (selectedEngine) => {
         JSON.stringify(
           {
             ...identity,
+            ...(reuseApi36 && { reusedObservations }),
             scenarios: Object.fromEntries(
-              scenarios.map((scenario) => [scenario, "unverified"])
+              scenarios.map((scenario) => [
+                scenario,
+                reusedScenarios.includes(scenario) ? "passed" : "unverified",
+              ])
             ),
           },
           null,
@@ -599,13 +628,15 @@ const runNative = async (selectedEngine) => {
       ...(retained ? judgeNativeRetained : judgeNativeUi)(
         observation,
         manual,
-        identity
+        identity,
+        reusedScenarios
       ),
       ...identity,
       ...(retained
         ? { nativeTarget: platform === "ios" ? iosDevice : serial }
         : {}),
       observation,
+      ...(reuseApi36 && { reusedObservations }),
     };
   } catch (error) {
     failures.push(error);
