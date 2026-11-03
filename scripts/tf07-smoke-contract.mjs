@@ -29,9 +29,15 @@ export const nativeUiReportReady = (manual, identity) =>
  * @param {object} observation - Readback posted by the actual native fixture.
  * @param {object | undefined} manual - Operator outcomes tied to this build.
  * @param {object} identity - Verified binary, library, environment, and run identity.
+ * @param {string[]} reusedScenarios - Exact prior scenarios validated by the driver; never renderer events from the current run.
  * @returns {object} A pass requires both known-feature readback and manual outcomes.
  */
-export const judgeNativeUi = (observation, manual, identity) => {
+export const judgeNativeUi = (
+  observation,
+  manual,
+  identity,
+  reusedScenarios = []
+) => {
   const events = observation?.events ?? {};
   // Android GeoJSON bridges stringify ids; leave renderer results untouched.
   const hasFixture = observation?.features?.some(
@@ -46,9 +52,12 @@ export const judgeNativeUi = (observation, manual, identity) => {
     observation.center.every(Number.isFinite) &&
     Number.isFinite(observation.zoom) &&
     events.load >= 2 &&
-    events["child-click"] >= 1 &&
-    events["marker-click"] >= 1 &&
-    events["annotation-click"] >= 1 &&
+    (events["child-click"] >= 1 ||
+      reusedScenarios.includes("live-child-button")) &&
+    (events["marker-click"] >= 1 ||
+      reusedScenarios.includes("live-activation")) &&
+    (events["annotation-click"] >= 1 ||
+      reusedScenarios.includes("annotation-activation")) &&
     events["source-click"] >= 2 &&
     events["popup-close"] >= 1 &&
     events.location >= 1 &&

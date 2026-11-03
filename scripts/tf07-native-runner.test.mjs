@@ -46,9 +46,10 @@ const source = text.slice(
   text.indexOf("const nativeStatus =")
 );
 const hash = "a".repeat(64);
-for (const [engine, borrowed] of [
+for (const [engine, borrowed, reuse = false] of [
   ["mapbox", false],
   ["mapbox", true],
+  ["mapbox", true, true],
   ["maplibre", false],
   ["maplibre", true],
 ]) {
@@ -78,6 +79,13 @@ for (const [engine, borrowed] of [
     "manual-diagnostics-pid-malformed",
     "manual-identity",
     "manual-json",
+    ...(reuse
+      ? [
+          "manual-reuse-provenance",
+          "manual-reuse-status",
+          "manual-reuse-observation",
+        ]
+      : []),
     "status-bind",
     "metro-spawn",
     "metro-exit-zero",
@@ -90,6 +98,25 @@ for (const [engine, borrowed] of [
       ? ["signal-prepare", "signal-stop", "manual-signal-stop"]
       : []),
   ]) {
+    if (
+      reuse &&
+      ![
+        null,
+        "manual-identity",
+        "manual-json",
+        "manual-failed",
+        "manual-reuse-provenance",
+        "manual-reuse-status",
+        "manual-reuse-observation",
+      ].includes(failure)
+    )
+      continue;
+    const reused = {
+      "live-child-button": {
+        source: { runId: "old-run" },
+        observation: { action: "old action", seenResult: "old result" },
+      },
+    };
     const commands = [];
     const stopped = [];
     const removed = [];
@@ -165,10 +192,16 @@ for (const [engine, borrowed] of [
       platform: "android",
       retained: false,
       root: "/frozen-harness",
-      scenarios: ["physical-touch", "later-touch"],
+      scenarios: [
+        ...(reuse ? ["live-child-button"] : []),
+        "physical-touch",
+        "later-touch",
+      ],
+
       process: {
         env: {
           ANDROID_SERIAL: "emulator-5580",
+          ...(reuse && { TF07_REUSE_API36_ATTEMPT24: "1" }),
           TF07_NATIVE_BINARY_SHA256: hash,
           TF07_MANUAL_REPORT: "/report",
           TF07_ANDROID_DIAGNOSTICS: "/diagnostics",
@@ -223,6 +256,19 @@ for (const [engine, borrowed] of [
         assert.equal(options.flag, "wx");
         manual = JSON.parse(value);
         assert.equal(manual.runId, "fresh-run");
+        if (reuse) {
+          assert.deepEqual(manual.reusedObservations, reused);
+          assert.equal(manual.scenarios["live-child-button"], "passed");
+        }
+        if (failure === "manual-reuse-provenance")
+          manual.reusedObservations["live-child-button"].source.runId =
+            "forged";
+        if (failure === "manual-reuse-status")
+          manual.scenarios["live-child-button"] = "unverified";
+        if (failure === "manual-reuse-observation")
+          manual.reusedObservations[
+            "live-child-button"
+          ].observation.seenResult = "forged";
         assert.equal(manual.scenarios["physical-touch"], "unverified");
         if (failure === "manual-operator-latch") return;
         manual.scenarios["physical-touch"] =
@@ -443,7 +489,7 @@ for (const [engine, borrowed] of [
     };
     try {
       const result = await runInNewContext(
-        `${source}\nrunNative("${engine}")`,
+        `const loadApi36ReusedObservations = () => JSON.parse(${JSON.stringify(JSON.stringify(reused))});\n${source}\nrunNative("${engine}")`,
         context
       );
       assert(result.androidRecorder, "Successful row saves recorder status.");
@@ -591,6 +637,13 @@ for (const [engine, borrowed] of [
         "manual-diagnostics-write",
         "manual-identity",
         "manual-json",
+        ...(reuse
+          ? [
+              "manual-reuse-provenance",
+              "manual-reuse-status",
+              "manual-reuse-observation",
+            ]
+          : []),
       ].includes(failure)
     ) {
       assert(stopped.includes(77));
@@ -883,3 +936,27 @@ for (const mode of ["escalation-close", "never-close", "async-spawn-error"]) {
 console.log(
   "Recorder parent-owned escalation, final flush, unclosed gap and asynchronous spawn failure mocks passed."
 );
+
+const reuseGuard = text.slice(
+  text.indexOf("    const reuseApi36 ="),
+  text.indexOf("    const manualPath =")
+);
+for (const [platform, selectedEngine, retained, permitted] of [
+  ["android", "mapbox", false, true],
+  ["ios", "mapbox", false, false],
+  ["android", "maplibre", false, false],
+  ["android", "mapbox", true, false],
+]) {
+  const check = () =>
+    runInNewContext(reuseGuard, {
+      assert,
+      platform,
+      selectedEngine,
+      retained,
+      identity: {},
+      process: { env: { TF07_REUSE_API36_ATTEMPT24: "1" } },
+      loadApi36ReusedObservations: () => ({}),
+    });
+  if (permitted) check();
+  else assert.throws(check, /core Mapbox Android only/);
+}

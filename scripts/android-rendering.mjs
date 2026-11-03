@@ -68,6 +68,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       "signal-diagnostic",
       "mapbox-acceptance",
       "mapbox-acceptance-api36",
+      "mapbox-acceptance-api36-resume",
     ].includes(scene),
     "Unknown fixed scene."
   );
@@ -77,7 +78,8 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
   );
   const continuation = scene === "acceptance-continuation";
   const signalDiagnostic = scene === "signal-diagnostic";
-  const api36Unit = scene === "mapbox-acceptance-api36";
+  const api36Resume = scene === "mapbox-acceptance-api36-resume";
+  const api36Unit = scene === "mapbox-acceptance-api36" || api36Resume;
   const mapboxUnit = scene === "mapbox-acceptance" || api36Unit;
   const avdName = api36Unit ? "OneMapF05MapboxApi36" : "OneMapU25F05";
   assert(
@@ -110,7 +112,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     ...(mapboxUnit && {
       mode: "mapbox-android-unit",
       scope: [
-        ...(api36Unit ? ["mapbox-android-camera"] : []),
+        ...(api36Unit && !api36Resume ? ["mapbox-android-camera"] : []),
         "mapbox-android-core",
         "mapbox-android-retained",
       ],
@@ -364,19 +366,43 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       else receipt.reusedRows = prior.completedRows;
       receipt.priorOutcome = { path: priorPath, sha256: sha256(priorPath) };
     }
+    if (api36Resume) {
+      const path = join(
+        root,
+        "records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json"
+      );
+      const hash =
+        "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c";
+      assert.equal(sha256(path), hash, "API36 prior outcome changed.");
+      const prior = JSON.parse(readFileSync(path));
+      assert.equal(
+        prior.candidateSha256,
+        "33828324898408485cd9211cc780f098d1564d90426887ff9fb4b64733913276"
+      );
+      assert.equal(prior.inputApkSha256, apkSha256);
+      assert.equal(prior.result, "stopped-at-popup-attachment-observation");
+      assert.deepEqual(
+        prior.completedRows.map(({ rowId, status }) => ({ rowId, status })),
+        [{ rowId: "mapbox-android-camera", status: "passed" }]
+      );
+      receipt.reusedRows = prior.completedRows;
+      receipt.api36PriorOutcome = { path, sha256: hash };
+    }
     const peerEvidence = join(
       root,
-      api36Unit
-        ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
-        : mapboxUnit
-          ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
-          : signalDiagnostic
-            ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
-            : continuation
-              ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
-              : batch
-                ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
-                : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
+      api36Resume
+        ? "records/evidence/revised-api-u26-mapbox-android-api36-resume-preparation.json"
+        : api36Unit
+          ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
+          : mapboxUnit
+            ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
+            : signalDiagnostic
+              ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
+              : continuation
+                ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
+                : batch
+                  ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
+                  : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
@@ -386,6 +412,10 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     receipt.freeBytes = disk.bavail * disk.bsize;
     const imageNeeded =
       api36Unit && !existsSync(join(recovery, "android-api36-image"));
+    assert(
+      !api36Resume || !imageNeeded,
+      "Resume requires the retained verified API36 image; no download is authorized."
+    );
     const requiredBytes =
       (mapboxUnit ? 12 * 1024 ** 3 : 8804682957) +
       (imageNeeded ? 4575096761 : 0);
@@ -558,7 +588,9 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
           "android.permission.ACCESS_LOCAL_NETWORK",
         ]);
       for (const row of api36Unit
-        ? ["camera", "core", "retained"]
+        ? api36Resume
+          ? ["core", "retained"]
+          : ["camera", "core", "retained"]
         : mapboxUnit
           ? ["core", "retained"]
           : signalDiagnostic
@@ -598,6 +630,8 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
               TF07_BORROWED_METRO_REVERSE: "1",
               TF07_PARENT_PROCESS_GROUP: "1",
               TF07_MANUAL_REPORT: join(output, `${rowId}-manual.json`),
+              TF07_REUSE_API36_ATTEMPT24:
+                api36Resume && row === "core" ? "1" : "",
               TF07_OUTPUT: join(output, `${rowId}-result.json`),
               TF07_NATIVE_TIMEOUT_MS: signalDiagnostic ? "900000" : "1800000",
               ...(signalDiagnostic && { TF07_ANDROID_SIGNAL_OUTPUT: output }),

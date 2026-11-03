@@ -29,6 +29,10 @@ export const recordNativeUiObservation = (
   validateReport(report);
   assert(Object.hasOwn(report.scenarios, scenario), "Unknown scenario.");
   assert(
+    !Object.hasOwn(report.reusedObservations ?? {}, scenario),
+    "A reused observation is immutable; record only remaining scenarios."
+  );
+  assert(
     report.scenarios[scenario] !== "failed" || status === "failed",
     "A failed observation cannot be upgraded."
   );
