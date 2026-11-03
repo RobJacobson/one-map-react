@@ -2,13 +2,17 @@
 
 This policy governs the replacement implementation described in [requirements](requirements.md) and the [stage plan](stage-plan.md). The previous testing plan was retired with the old implementation. Test the facade's forwarding, conversions, added lifecycle behavior, packaging, and advertised compatibility. Upstream libraries own their general regression suites.
 
+## Current acceptance status
+
+Acceptance is deferred until the owner prepares a release or explicitly requests acceptance work. Continue ordinary development with applicable routine checks. Deferred renderer verification is a release gate, not a blocker for unrelated development. Do not prepare new campaign packets, retain frozen workspaces, or run acceptance merely because implementation changed. The [current handoff](revised-api-acceptance-plan.md#current-handoff) links the compact historical checkpoint.
+
 ## Complete acceptance units
 
 This section is the authority for browser and native acceptance preparation, approval, execution, diagnosis and resumption. It supersedes earlier feature-by-feature approvals, cross-backend platform batches and standalone runtime probes as the default workflow. Focused unit/component/command regressions remain routine offline work; they need no acceptance approval.
 
 One acceptance unit binds an immutable candidate, platform, backend, selected device/OS or browser target and resolved SDK/dependency identities. Account for every requirement of the retained contract using valid prior evidence plus every remaining scenario in one declared batch. The scope is the retained one-map-react contract, not general upstream SDK certification. Keep failures visible; do not weaken the contract or its assertions to obtain a pass.
 
-Prepare and finish one platform/backend unit at a time, including future browser acceptance. Parallel acceptance requires an explicit owner exception with isolated resources. Web is currently complete; the remaining order is Android Mapbox, Android MapLibre, iOS Mapbox, then iOS MapLibre. Complete or explicitly block the selected unit before changing backend. A blocker requires its affected requirements, evidence, remaining uncertainty and owner options; it is neither a pass nor permission to skip to another backend. An owner may explicitly redirect work after that report.
+Prepare and finish one platform/backend unit at a time, including future browser acceptance. Parallel acceptance requires an explicit owner exception with isolated resources. At resumption, declare the required unit order from the changed behavior and remaining release verification. Complete or explicitly block the selected unit before changing backend. A blocker requires its affected requirements, evidence, remaining uncertainty and owner options; it is neither a pass nor permission to skip to another backend. An owner may explicitly redirect work after that report.
 
 ### Prepare the complete batch
 
@@ -35,7 +39,7 @@ Start with saved evidence. For each blocker, allow at most 30 minutes of diagnos
 
 A standalone runtime diagnostic requires an explicit owner exception naming its exact question, budget and decisive outcome. It earns no acceptance credit. Keep instrumentation specific to that question; do not build a speculative tracing framework. If the same operational failure recurs after an audited repair, or a failed diagnostic supplies no discriminator, stop the escalation loop and reassess the blocked unit. Further guards, diagnostic PRs and tiny reruns are not the default response.
 
-A unit is complete only when every retained requirement has passed, has valid reused evidence, or has an explicit owner-approved exclusion. Blocked and unverified work remains open. Keep one compact current handoff, the coverage map and immutable outcome/provenance summaries; the [retention rules](#storage-and-tooling) govern temporary evidence.
+A unit is complete only when every retained requirement has passed, has valid reused evidence, or has an explicit owner-approved exclusion. Blocked and unverified work remains open. Keep one compact checkpoint with artifact identity, exercised scope, outcomes and remaining gates; the [retention rules](#storage-and-tooling) govern temporary evidence.
 
 ## Select checks by the change
 
@@ -84,13 +88,13 @@ Workers execute their assigned scope, preserve first-attempt results, and report
 
 Record the revision or artifact, selected versions, environments, scenario scope, result, and whether execution used mocks, real automation, or a manual procedure. Native acceptance must establish that the intended build is installed. Preserve the distinction between code review, declaration checking, and runtime verification.
 
-A changed package hash identifies a different artifact; it does not itself require rerunning every scenario. Keep the original result attached to the artifact actually tested. For an unaffected change, record an impact review and the decision not to rerun the scenario without claiming that the new artifact was executed. A final release candidate gets the required release checks.
+A changed package hash identifies a different artifact; it does not itself require rerunning every scenario. Keep results attached to the artifact actually tested. For an unaffected change, a brief PR note explaining the selected checks is sufficient; do not create another acceptance record or claim that the new artifact was executed. A final release candidate gets the required release checks.
 
 Track implementation completion separately from tests run for the current change. Use passed, failed, deliberately skipped with a reason, or unverified. Do not erase failures with a successful retry. Report the cause or unresolved flakiness and any resulting limitation on acceptance.
 
 ## Storage and tooling
 
-Retain compact outcome/provenance summaries. Keep raw logs and screenshots only for an active investigation or a specific result that needs them. Remove generated consumers, build caches, old binaries, and redundant downloads when a checkpoint ends. Avoid multi-gigabyte evidence directories as a permanent requirement.
+Retain one compact acceptance checkpoint with tested artifact identity, environment, exercised scope, outcome and remaining gates. Keep useful production/routine regressions and their portable fixtures. Use Git history for completed campaigns; do not accumulate per-attempt plans, approval packets, identity manifests, replay proofs or result copies. Keep raw logs and screenshots only while essential to an active investigation. Remove generated consumers, dependencies, build caches, frozen candidate archives, old binaries and redundant downloads when a checkpoint ends or is deferred. An immutable input is required during an approved run, not permanent storage of its workspace.
 
 Reuse ordinary TypeScript, formatting, unit/component, browser, and native test tools. Keep native backend consumer apps separate where selected linking requires it. Reuse fixtures and scenario intent without building a general cross-platform test framework. Add test tooling only when the implemented feature needs it.
 

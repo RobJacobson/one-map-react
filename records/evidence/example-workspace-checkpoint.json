@@ -1,113 +1,5 @@
 {
-  "checkpoint": "example-workspace-native-coexistence",
-  "status": "minimal checkpoint implemented and reviewed; routine checks passed; awaiting explicit native acceptance permission",
-  "createdAtUtc": "2026-10-16T04:21:26.069313+00:00",
-  "sourceSha256": "d8223d9077f49380bfd71acfffc7bf241198bcd86cc200e07fd73135b3e88043",
-  "builtSha256": "55f9c8855271d320440b4c6b14f0f7bab3268fc26f3e8986e28b37064cba0a99",
-  "libraryArchive": {
-    "path": "/tmp/one-map-example-checkpoint/one-map-react-0.1.0-rc.2.tgz",
-    "sha256": "6073ad373019417c5170e28be107d09c0ce66bfa03b7800ceac205160d524713"
-  },
-  "versions": {
-    "bun": "1.4.1",
-    "node": "24.22.0",
-    "vitePlus": "1.1.0",
-    "expo": "57.0.23",
-    "expoCli": "57.0.25",
-    "expoBuildProperties": "57.0.22",
-    "react": "19.2.3",
-    "reactNative": "0.86.3",
-    "rnmapbox": "10.3.8",
-    "maplibreReactNative": "11.5.0",
-    "mapboxGl": "3.32.0",
-    "maplibreGl": "6.13.0",
-    "reactMapGl": "8.1.3"
-  },
-  "nativeSdkPins": {
-    "mapboxIos": "11.23.1",
-    "mapboxAndroid": "11.23.1",
-    "maplibreIos": "6.31.0",
-    "maplibreAndroid": "13.6.1"
-  },
-  "patchesUnchanged": {
-    "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch": "430ef194dfeeefcc8c2e94c507b7dcb68f7633e691e7e75603d13a4061bff3af",
-    "packages/one-map-react/patches/rnmapbox-10.3.8.patch": "aacec1a77c297c5a0ba0d756f6833ae0b1364285dd473a030d98128ebb35cbe7",
-    "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
-    "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch": "118090860852b786a6681287f52ae3af1af8e0657a7c1853936204afb287a6d4"
-  },
-  "review": "Coordinator reviewed package boundaries, camera ownership and stale callbacks, fresh Mapbox Native orientation events, token-free configuration, worker assets, native plugin declarations, and preservation of existing changes. No library runtime source or dependency patches changed.",
-  "routine": {
-    "frozenRootInstall": "passed: no dependency changes",
-    "lintAndFormatting": "passed: zero warnings and errors",
-    "documentation": "passed: 35 Markdown files",
-    "inventory": "passed: 12151 substantiated dispositions; historical records unchanged",
-    "rootTypechecks": "passed: all four existing TypeScript projects",
-    "appAndSharedTypechecks": "passed: shared sources/tests and both apps",
-    "vitest": "passed: 565 tests, including 12 focused example tests",
-    "mockedNative": "passed: 212 Jest tests; existing act warnings recorded by the suite",
-    "standaloneTests": "passed: remaining routine scripts and example configuration fixture",
-    "packageSelections": "passed: 13 isolated package selections",
-    "selectedPeerConsumers": "passed: retained selected/mixed packed consumers",
-    "legacyExampleResolution": "passed: both retained isolated browser consumers",
-    "libraryAndSharedBuilds": "passed",
-    "viteBrowserExport": "passed",
-    "expoBrowserExport": "passed",
-    "browserStaticAssertions": "passed: production panels absent, native registration names absent, Vite worker emitted, Expo worker bytes equal pinned dependency",
-    "runtimeResolution": "passed: one React copy across apps/shared/facade and one React Native copy across Expo/facade"
-  },
-  "routineFailuresPreserved": [
-    "Initial aggregate routine test command stopped at process-cleanup fixture because the sandbox denied process-group operations. Node and Bun process fixtures passed with the required permissions.",
-    "TF08 snapshot sandbox needed to load Babel runtime helpers after native tooling alignment. Its version-specific patch round-trip now selects the installed 10.3.8 patch and passed. No patch bytes were changed."
-  ],
-  "acceptance": {
-    "nativeCoexistence": "unverified; permission not yet granted",
-    "fullEightCombinations": "unverified; scenario migration waits for native gate",
-    "environments": [
-      {
-        "platform": "ios",
-        "device": "iPhone 18 Pro",
-        "os": "iOS 27.0",
-        "udid": "8B7D7CE4-228E-409F-A156-A597D4E448A5",
-        "xcode": "27.0"
-      },
-      {
-        "platform": "android",
-        "avd": "TF07_Acceptance",
-        "systemImage": "android-37.1/google_apis_playstore_ps16k/arm64-v8a",
-        "abi": "arm64-v8a"
-      }
-    ],
-    "applicationId": "com.onemap.example",
-    "estimatedMinutes": [
-      90,
-      180
-    ],
-    "scope": [
-      "One first-attempt native generation/build/install per platform, both SDKs in each binary",
-      "Read back actual linked SDK versions and installed binary identity",
-      "MapLibre Seattle startup with the public token explicitly empty",
-      "Restart Metro with configured public token without rebuilding or reinstalling",
-      "Switch MapLibre -> Mapbox -> MapLibre repeatedly; compare public camera readback after pan, zoom, bearing and pitch within the shared supported range",
-      "Use the existing iOS touch helper or ordinary device controls; Android input/accessibility through adb",
-      "Record failures and stop if a new or modified dependency patch is required; no independent retries"
-    ],
-    "commands": [
-      "bun run verify:example-checkpoint",
-      "EXPO_PUBLIC_ONE_MAP_TEST_MODE=1 bun run --filter @one-map/expo dev",
-      "EXPO_PUBLIC_ONE_MAP_TEST_MODE=1 bun run --filter @one-map/expo ios --device 8B7D7CE4-228E-409F-A156-A597D4E448A5",
-      "EXPO_PUBLIC_ONE_MAP_TEST_MODE=1 bun run --filter @one-map/expo android --device TF07_Acceptance",
-      "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN= EXPO_PUBLIC_ONE_MAP_TEST_MODE=1 bun run --filter @one-map/expo dev",
-      "xcodebuild -project scripts/ios-tap/TapDriver.xcodeproj -scheme TapDriver -destination id=8B7D7CE4-228E-409F-A156-A597D4E448A5 -derivedDataPath /tmp/one-map-example-native-gate/tap-driver test (only if needed for iOS input)"
-    ],
-    "resourcePolicy": "One native worker owns Metro 8081, fixture/input port 8799, both native build directories, simulator/emulator and installations; native runs sequential; existing unrelated installations and data preserved.",
-    "workerPolicy": "Use approved native smoke worker gpt-6-luna at medium reasoning; coordinator owns artifact checks, diagnosis and acceptance review."
-  },
-  "pendingAfterNativeGate": [
-    "Migrate all inventoried scenarios and app runners",
-    "Retire four legacy shells and nested lockfiles",
-    "Verify then update React Native peer compatibility range",
-    "Freeze final candidate and request separate eight-combination acceptance"
-  ],
+  "purpose": "Historical source/build identity fixture for the maintained verifier; not a current acceptance claim.",
   "sourceFiles": {
     ".env.example": "5e5fbe7767d640115a51350efcfe0c4c3f0bef6a661ef63bff5e53604d5fc756",
     ".gitignore": "cd454036287c4f5aa7c35f20b8743e1b5394518bba92f4aa52072e7cfe0bae5c",
@@ -261,6 +153,7 @@
     "tsconfig.test.json": "097b9ee6538dd41c60b5fb7d8ba5634d7580131d2000d2b354c38952746f1b44",
     "vite.config.ts": "8cc330e30fd6e43e33bcf348b50d9f718db7f699d65de6925425871033836382"
   },
+  "sourceSha256": "d8223d9077f49380bfd71acfffc7bf241198bcd86cc200e07fd73135b3e88043",
   "builtFiles": {
     "apps/expo/dist/_expo/static/css/mapbox-gl-ad023486305691cadbeae398d46f3c3d.css": "d411643c3a6a0b924917090b5c6f9b02cdb00f30f167dafc74273af7057f3dc2",
     "apps/expo/dist/_expo/static/css/maplibre-gl-1087f32ac90561d22e082126880c64a5.css": "ddfd372494c5ccc471c33cfea18923a3b0ec7a74966f3426a1be2861427a7c1e",
@@ -475,5 +368,6 @@
     "packages/one-map-react/dist/maplibre-native.js": "290e55dcbc30494c3afe072b91309e01ff2bad484c00280dc56d71fbd1b17ad5",
     "packages/one-map-react/dist/maplibre-web.d.ts": "ded337443082261dea93fedb2011a8fdbc6d66fa45870b5f48c2f4b3e82c8565",
     "packages/one-map-react/dist/maplibre-web.js": "6713464223c8430df14832a2f60236bc2ddcebd1ef55f15c39e5efca5426551b"
-  }
+  },
+  "builtSha256": "55f9c8855271d320440b4c6b14f0f7bab3268fc26f3e8986e28b37064cba0a99"
 }

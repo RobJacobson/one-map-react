@@ -45,7 +45,7 @@ Runtime acceptance is the six-environment smoke below. Generating native `ios/` 
 
 Checkpoint: TF02 shared map implementation. Permission was given for this smoke, then again for Mapbox only. All six environments passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7: longitude 0, latitude 0 on a cold style cache, then Fly north to the route.
 
-Proposed artifact: packed `one-map-react` tarball SHA-256 `b47b647d5a33c46ea074e5eaa5dde43b62d7514f35c5a8d4e21f79befad5104f`, recorded in [the evidence file](../records/evidence/tf02-shared-map.json).
+Proposed artifact: packed `one-map-react` tarball SHA-256 `b47b647d5a33c46ea074e5eaa5dde43b62d7514f35c5a8d4e21f79befad5104f`, recorded in [the evidence file](https://github.com/RobJacobson/one-map-react/blob/7eb042eff97cf405fee61bc4816d79861f532896/records/evidence/tf02-shared-map.json).
 
 Environments: Mapbox web, MapLibre web, Mapbox iOS, Mapbox Android, MapLibre iOS, MapLibre Android.
 
