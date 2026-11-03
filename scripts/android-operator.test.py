@@ -356,6 +356,95 @@ class OperatorTest(unittest.TestCase):
                                  [["shell", "input", "tap", "180", "2274"]] * 2)
                 self.assertEqual(json.loads(self.report.read_text()), self.original)
 
+    def warning_xml(self):
+        return Path("/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-26/toolbar-003-hierarchy-002.xml").read_text()
+
+    def test_actual_cli_saved_marker_then_migration_notice_recovers(self):
+        script = self.cli_copy()
+        saved = Path("/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-26/toolbar-003-hierarchy-001.xml").read_text()
+        (self.attempt / "snapshots.json").write_text(json.dumps([saved, self.warning_xml(), self.rejection_result_xml()]))
+        (self.attempt / "fake-adb").write_text(r"""#!/usr/bin/env python3
+import json, pathlib, sys
+root = pathlib.Path(__file__).parent
+args = sys.argv[1:]
+with (root / 'calls.jsonl').open('a') as output:
+    output.write(json.dumps(args) + '\n')
+if args[2:4] == ['shell', 'cat']:
+    path = root / 'snapshots.json'
+    snapshots = json.loads(path.read_text())
+    print(snapshots.pop(0))
+    path.write_text(json.dumps(snapshots))
+""")
+        command = [sys.executable, str(script), str(self.attempt), ROW, "marker-prop-rejection", "dismiss-marker-rejection", "Reject view draggable"]
+        result = subprocess.run(command, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = [json.loads(line) for line in (self.attempt / "calls.jsonl").read_text().splitlines()]
+        self.assertEqual([args for args in calls if args[2:4] == ["shell", "input"]],
+                         [["-s", "emulator-5580", "shell", "input", "tap", "180", "2274"]] * 2)
+        self.assertEqual(json.loads((self.attempt / "snapshots.json").read_text()), [])
+        self.assertEqual(json.loads(self.report.read_text()), self.original)
+        self.assertEqual(json.loads((self.attempt / "toolbar-001.json").read_text())["status"], "rejection-verified")
+        self.assertFalse(self.latch.exists())
+
+    def test_migration_notice_rejects_unknown_content_identity_controls_and_order(self):
+        xml = self.warning_xml()
+        cases = {
+            "actual-warning": xml.replace("Open debugger to view warnings.", "Unexpected application warning."),
+            "package": xml.replace("com.onemapmapbox", "com.foreign"),
+            "header": xml.replace("Console Warning", "Console Error"),
+            "counter": xml.replace("Log 1 of 1", "Log 1 of 2"),
+            "duplicate": xml.replace("</hierarchy>", '<node package="com.onemapmapbox" text="Open debugger to view warnings." /></hierarchy>'),
+            "unknown-message": xml.replace("</hierarchy>", '<node package="com.onemapmapbox" text="Unexpected warning" /></hierarchy>'),
+            "component-stack": xml.replace("</hierarchy>", '<node package="com.onemapmapbox" text="&lt;OtherComponent /&gt;" /></hierarchy>'),
+            "description": xml.replace('content-desc="Copy"', 'content-desc="Unknown"'),
+            "missing": xml.replace('content-desc="Dismiss"', 'content-desc="Other"'),
+            "disabled": xml.replace('content-desc="Dismiss" checkable="false" checked="false" clickable="true" enabled="true"', 'content-desc="Dismiss" checkable="false" checked="false" clickable="true" enabled="false"'),
+            "clipped": xml.replace('[0,2211][360,2337]', '[0,2211][360,2500]'),
+            "malformed": '<hierarchy>',
+        }
+        for name, followup in cases.items():
+            with self.subTest(name=name):
+                self.setUp()
+                calls, child = self.toolbar_child([self.rejection_xml(), followup])
+                with patch("subprocess.run", side_effect=child):
+                    status, output = self.invoke(["dismiss-marker-rejection", "Reject view draggable"], [ROW, "marker-prop-rejection"])
+                    self.assertEqual(status, 1, output)
+                    saved = self.latch.read_bytes()
+                    count = len(calls)
+                    self.assertEqual(self.invoke(["dismiss-marker-rejection", "Reject view draggable"], [ROW, "marker-prop-rejection"])[0], 1)
+                    self.assertEqual(len(calls), count)
+                self.assertEqual(self.latch.read_bytes(), saved)
+                self.assertEqual(len([args for args in calls if args[:2] == ["shell", "input"]]), 1)
+        self.setUp()
+        calls, child = self.toolbar_child([xml])
+        with patch("subprocess.run", side_effect=child):
+            status, output = self.invoke(["dismiss-marker-rejection", "Reject view draggable"], [ROW, "marker-prop-rejection"])
+        self.assertEqual(status, 1, output)
+        self.assertFalse(any(args[:2] == ["shell", "input"] for args in calls))
+
+    def test_migration_notice_requires_current_row_bounded_progress_and_exact_postcondition(self):
+        for failure in ("repeated", "wrong-result", "binding", "receipt", "external-latch", "deadline", "child"):
+            with self.subTest(failure=failure):
+                self.setUp()
+                end = self.warning_xml() if failure == "repeated" else self.rejection_result_xml("Reject view callback") if failure == "wrong-result" else self.rejection_result_xml()
+                taps = []
+                def after(arguments):
+                    if arguments[:3] != ["shell", "input", "tap"]: return
+                    taps.append(arguments)
+                    if len(taps) != 1: return
+                    if failure == "binding": self.report.write_text(json.dumps(dict(self.original, runId="12345678-1234-4234-8234-123456789013")))
+                    if failure == "receipt": (self.attempt / "receipt.json").write_text("{}")
+                    if failure == "external-latch": self.latch.write_text('{"error":"external first failure"}')
+                calls, child = self.toolbar_child([self.rejection_xml(), self.warning_xml(), end], fail=6 if failure == "child" else None, after=after)
+                self.globals["TOOLBAR_SECONDS"] = 0 if failure == "deadline" else 120
+                with patch("subprocess.run", side_effect=child):
+                    status, output = self.invoke(["dismiss-marker-rejection", "Reject view draggable"], [ROW, "marker-prop-rejection"])
+                self.assertEqual(status, 1, output)
+                self.assertLessEqual(len(taps), 2)
+                if failure in ("binding", "receipt", "external-latch", "child"): self.assertEqual(len(taps), 1)
+                if failure == "deadline": self.assertEqual(len(taps), 0)
+                if failure == "external-latch": self.assertEqual(json.loads(self.latch.read_text())["error"], "external first failure")
+
     def test_single_expected_log_dismisses_once_and_validates_fixture(self):
         calls, child = self.toolbar_child([self.rejection_xml().replace("Log 2 of 2", "Log 1 of 1"), self.rejection_result_xml()])
         with patch("subprocess.run", side_effect=child):
@@ -554,7 +643,7 @@ if args[2:4] == ['shell', 'cat']:
         http.assert_not_called()
 
     def test_exact_packet_marker_commands_reach_the_expected_transport(self):
-        packet = json.loads((ROOT / "records/evidence/revised-api-u26-mapbox-android-api36-marker-resume-preparation.json").read_text())
+        packet = json.loads((ROOT / "records/evidence/revised-api-u26-mapbox-android-api36-console-resume-preparation.json").read_text())
         protocol = packet["markerRejectionProtocol"]
         self.assertEqual(len(protocol["cases"]), 4)
         for case in protocol["cases"]:
@@ -567,7 +656,7 @@ if args[2:4] == ['shell', 'cat']:
                     self.assertEqual(command[3:5], [ROW, "marker-prop-rejection"])
                     if field == "recoverAndVerify":
                         self.assertEqual(command[5:], ["dismiss-marker-rejection", case["label"]])
-                        snapshots = [self.rejection_xml(), self.rejection_xml().replace("Log 2 of 2", "Log 1 of 1"), self.rejection_result_xml(case["label"])]
+                        snapshots = [self.rejection_xml(), self.warning_xml(), self.rejection_result_xml(case["label"])]
                     elif field == "status":
                         self.assertEqual(command[5:], ["status"])
                         snapshots = []
