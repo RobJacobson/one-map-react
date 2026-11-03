@@ -5,6 +5,8 @@ import { readFileSync } from "node:fs";
 import { StringDecoder } from "node:string_decoder";
 import { runInNewContext } from "node:vm";
 
+import { api36ReusedScenarios } from "./api36-reused-observations.mjs";
+
 const text = readFileSync(
   new URL("./tf07-ui-smoke.mjs", import.meta.url),
   "utf8"
@@ -111,12 +113,15 @@ for (const [engine, borrowed, reuse = false] of [
       ].includes(failure)
     )
       continue;
-    const reused = {
-      "live-child-button": {
-        source: { runId: "old-run" },
-        observation: { action: "old action", seenResult: "old result" },
-      },
-    };
+    const reused = Object.fromEntries(
+      api36ReusedScenarios.map((name) => [
+        name,
+        {
+          source: { runId: "old-run" },
+          observation: { action: "old action", seenResult: "old result" },
+        },
+      ])
+    );
     const commands = [];
     const stopped = [];
     const removed = [];
@@ -193,7 +198,7 @@ for (const [engine, borrowed, reuse = false] of [
       retained: false,
       root: "/frozen-harness",
       scenarios: [
-        ...(reuse ? ["live-child-button"] : []),
+        ...(reuse ? api36ReusedScenarios : []),
         "physical-touch",
         "later-touch",
       ],
@@ -345,7 +350,7 @@ for (const [engine, borrowed, reuse = false] of [
         if (polls === 2 && failure === "metro-late-exit")
           metro.emit("exit", 1, null);
         if (polls === 1 || !failure?.startsWith("manual-"))
-          onObservation({ generation: 1 });
+          onObservation({ generation: reuse ? 0 : 1 });
         assert(await observe());
         if (
           polls === 1 &&

@@ -17,9 +17,21 @@ const identity = {
 };
 const reused = loadApi36ReusedObservations(identity);
 assert.deepEqual(Object.keys(reused), api36ReusedScenarios);
-assert(!Object.hasOwn(reused, "popup-follow-dismissal"));
-for (const entry of Object.values(reused)) {
-  assert.equal(entry.source.runId, "54f2120a-9c16-410f-a604-c7d6d37eeb06");
+assert.equal(api36ReusedScenarios.length, 12);
+assert(!Object.hasOwn(reused, "marker-prop-rejection"));
+for (const [index, entry] of Object.values(reused).entries()) {
+  assert.equal(
+    entry.source.runId,
+    index < 5
+      ? "54f2120a-9c16-410f-a604-c7d6d37eeb06"
+      : "41dce16e-6bb1-4454-bae7-34046a870505"
+  );
+  assert(
+    [
+      "54f2120a-9c16-410f-a604-c7d6d37eeb06",
+      "41dce16e-6bb1-4454-bae7-34046a870505",
+    ].includes(entry.source.runId)
+  );
   assert.notEqual(entry.source.runId, identity.runId);
   assert(entry.observation.action);
 }
@@ -38,7 +50,7 @@ for (const field of [
           : "wrong",
     })
   );
-for (const suffix of ["manual.json", "attempt-24.json"])
+for (const suffix of ["manual.json", "attempt-24.json", "attempt-25.json"])
   assert.throws(
     () =>
       loadApi36ReusedObservations(identity, (path) =>
@@ -70,14 +82,19 @@ assert(
   !Object.hasOwn(observation.events, "child-click"),
   "Do not import historical counters."
 );
-for (const field of ["load", "source-click", "popup-close", "location"])
+const fresh = { ...observation, generation: 0, events: { load: 1 } };
+assert.equal(
+  judgeNativeUi(fresh, manual, identity, Object.keys(reused)).status,
+  "passed"
+);
+for (const broken of [
+  { ...fresh, events: { load: 0 } },
+  { ...fresh, events: { load: 1, error: 1 } },
+  { ...fresh, features: [] },
+  { ...fresh, center: [NaN, 0] },
+])
   assert.equal(
-    judgeNativeUi(
-      { ...observation, events: { ...observation.events, [field]: 0 } },
-      manual,
-      identity,
-      Object.keys(reused)
-    ).status,
+    judgeNativeUi(broken, manual, identity, Object.keys(reused)).status,
     "unverified"
   );
 for (const name of nativeUiScenarios.filter(
@@ -94,4 +111,60 @@ for (const name of nativeUiScenarios.filter(
   );
 console.log(
   "Pinned API36 prior evidence, fresh identity, remaining requirements and distinct historical observations passed."
+);
+
+assert.throws(
+  () =>
+    loadApi36ReusedObservations({
+      ...identity,
+      runId: "41dce16e-6bb1-4454-bae7-34046a870505",
+    }),
+  /fresh run identity/
+);
+for (const scenario of [
+  "map-feature-click",
+  "popup-follow-dismissal",
+  "navigation-location",
+  "style-remount",
+])
+  assert.equal(
+    judgeNativeUi(
+      fresh,
+      manual,
+      identity,
+      Object.keys(reused).filter((name) => name !== scenario)
+    ).status,
+    "unverified"
+  );
+
+const ordinary = {
+  ...observation,
+  events: {
+    ...observation.events,
+    "child-click": 1,
+    "marker-click": 1,
+    "annotation-click": 1,
+  },
+};
+assert.equal(judgeNativeUi(ordinary, manual, identity).status, "passed");
+assert.equal(
+  judgeNativeUi({ ...ordinary, generation: 0 }, manual, identity).status,
+  "unverified"
+);
+assert.equal(
+  judgeNativeUi(
+    { ...ordinary, events: { ...ordinary.events, load: 1 } },
+    manual,
+    identity
+  ).status,
+  "unverified"
+);
+assert.equal(
+  judgeNativeUi(
+    { ...fresh, generation: -1 },
+    manual,
+    identity,
+    Object.keys(reused)
+  ).status,
+  "unverified"
 );

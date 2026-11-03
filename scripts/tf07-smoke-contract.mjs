@@ -47,20 +47,23 @@ export const judgeNativeUi = (
   );
   const observed =
     hasFixture &&
-    observation.generation >= 1 &&
+    observation.generation >=
+      (reusedScenarios.includes("style-remount") ? 0 : 1) &&
     observation.center?.length === 2 &&
     observation.center.every(Number.isFinite) &&
     Number.isFinite(observation.zoom) &&
-    events.load >= 2 &&
+    events.load >= (reusedScenarios.includes("style-remount") ? 1 : 2) &&
     (events["child-click"] >= 1 ||
       reusedScenarios.includes("live-child-button")) &&
     (events["marker-click"] >= 1 ||
       reusedScenarios.includes("live-activation")) &&
     (events["annotation-click"] >= 1 ||
       reusedScenarios.includes("annotation-activation")) &&
-    events["source-click"] >= 2 &&
-    events["popup-close"] >= 1 &&
-    events.location >= 1 &&
+    (events["source-click"] >= 2 ||
+      reusedScenarios.includes("map-feature-click")) &&
+    (events["popup-close"] >= 1 ||
+      reusedScenarios.includes("popup-follow-dismissal")) &&
+    (events.location >= 1 || reusedScenarios.includes("navigation-location")) &&
     !events.error;
   const manualComplete =
     /^[a-f0-9]{64}$/.test(identity.installedBinarySha256) &&

@@ -2,13 +2,13 @@
 
 ## Current handoff
 
-**Android Mapbox API36 remains blocked; the remaining-unit resume passed independent audit and awaits execution approval.** [Attempt24](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json) passed camera and five core observations on unchanged f05: live child, nested scroll, live activation, annotation activation and offset/reset touch bounds. Preserve those exact results and the failed popup observation; the other seven core scenarios and all six retained scenarios were not run.
+**The marker-rejection overlay repair passed independent audit; the complete remaining API36 Mapbox batch awaits capacity and execution approval.** [Attempt25](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json) passed seven fresh core observations and reused camera plus five core observations from [attempt24](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json). Camera and twelve core observations remain accepted within their recorded limits. Marker rejection and all six retained scenarios remain unverified.
 
-The [saved-evidence diagnosis and attempt25 packet](../records/evidence/revised-api-u26-mapbox-android-api36-resume-preparation.json) identify an invalid visible-anchor precondition. The fixed popup moves outside the411dp viewport at zoom12; the pinned SDK specifies an offscreen sentinel, consistent with the clipped hierarchy. No production defect is established. The corrected observation keeps the bubble visible during a small pan and zoom11->10, with fresh screenshots and renderer readback before and after each mutation. This is offline source/input proof; popup attachment remains unverified.
+The saved hierarchy shows the deliberate native Marker dragging rejection in React Native's development Render Error overlay, hiding the toolbar. The app stayed alive. The selected React Native0.87.1 inspector can reveal the previous log when one is dismissed. The corrected operator matches each expected error's exact message, application, boundary stack and unique visible Dismiss control, dismisses at most two matching selected logs with decreasing count, then requires the actual fixture toolbar and exact case-specific rejection result. Unknown logs, ambiguous controls or failed recovery stop the unit. The fixture and production rejection behavior are unchanged.
 
-The packet reuses accepted API36 camera and the five exact core observations with pinned provenance, then runs all eight remaining core scenarios and six retained scenarios in one unit. Fresh report identity and renderer events stay separate from historical observations. No new native execution, build, calibration or retry is authorized. Request one complete remaining-unit approval with retained image reuse, a fresh12GiB capacity check,40-90minutes planning allowance and owned cleanup. The selected unit must pass or be explicitly blocked before changing backend.
+The [attempt26 packet](../records/evidence/revised-api-u26-mapbox-android-api36-marker-resume-preparation.json) reuses accepted camera and twelve core observations with exact attempt24/25 provenance, then runs all four marker rejection cases and all six retained scenarios as one remaining unit. Fresh renderer events and identity stay separate from historical observations; no accepted check is rerun merely for this tooling change. Runtime recovery remains unverified. No native run, build, installation, calibration or cleanup occurred during repair.
 
-Owned attempt24 cleanup passed and was independently verified; the verified API36 image is retained. The prior SIGKILL cause remains unresolved and did not recur in attempt24, which stopped with the app alive. The unchanged f05 archive,695 frozen files, APKs, peers and dependencies retain their original evidence identities.
+Verified image reuse requires a fresh12GiB capacity check before dispatch; the packet records the current shortfall. This preparation authorizes no deletion or image download. After audit, request one approval for the complete remaining unit with one Terra Medium worker,25-60minutes and first-failure owned cleanup. Prior outcomes remain immutable, and the earlier SIGKILL cause remains unresolved.
 
 ## Coverage matrix and order
 
@@ -16,7 +16,7 @@ The [fixed baseline matrix](../records/evidence/revised-api-u26-platform-batches
 
 | Order | Immutable platform/backend unit | Camera | Core | Retained | Remaining rows |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Android Mapbox, API36 | Passed attempt24 | Blocked at popup | Not run | 2 |
+| 1 | Android Mapbox, API36 | Passed attempt24 | Blocked at marker rejection | Not run | 2 |
 | 2 | Android MapLibre | Pending | Pending | Pending | 3 |
 | 3 | iOS Mapbox | Pending | Pending | Pending | 3 |
 | 4 | iOS MapLibre | Pending | Pending | Pending | 3 |
@@ -27,25 +27,21 @@ All nine browser rows passed on unchanged f05 within the [recorded browser scope
 
 The twelve rows are the remaining execution baseline, not a replacement for full retained-contract accounting. Before approval, map every retained requirement to valid reused evidence, a remaining scenario or an explicit owner-approved exclusion. A newly demonstrated gap must be resolved in the selected unit's complete packet; it must not be hidden by relabeling the requirement unsupported.
 
-## Prepared Android Mapbox API36 packet
+## Prepared remaining API36 Mapbox batch
 
-The [remaining-unit packet](../records/evidence/revised-api-u26-mapbox-android-api36-resume-preparation.json) is the sole proposed attempt25 dispatch source. It binds the unchanged f05 candidate/APK/SDK/image identities, accepted API36 camera, five accepted core observations, all eight remaining core recipes, all six retained recipes and the full retained-contract coverage map. The historical [attempt24 packet](../records/evidence/revised-api-u26-mapbox-android-api36-preparation.json) describes completed execution; do not relaunch its commands.
-
-The proposed entrypoint is for audit and requires owner approval before execution:
+The [marker-resume packet](../records/evidence/revised-api-u26-mapbox-android-api36-marker-resume-preparation.json) is the sole proposed dispatch source. Earlier [attempt25 commands](../records/evidence/revised-api-u26-mapbox-android-api36-resume-preparation.json) have already run and must not be relaunched. The exact proposed attempt26 entrypoint is:
 
 ```sh
-/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-api36-resume.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-25
+/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-api36-resume.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-26
 ```
 
-Use the packet's exact launcher parameters: `/bin/sh`, login false, yield1000ms. Wait on the returned session with existing `write_stdin` calls bounded at30000ms. Camera is reused. Await `API36 core operator phase starting`, then use the exact core status command. After core passes, await `API36 retained operator phase starting`, then use retained status. Phase markers announce transitions; the helper checks readiness. If the launcher exits first, stop and preserve the failure.
+Use the packet's `/bin/sh`, login false, yield1000ms launch settings. Resume its returned session with bounded30000ms waits, never relaunch. Await `API36 core operator phase starting`, then the exact status and `Read renderer` calls; initial HTTPnull before the first read is expected. Only `marker-prop-rejection` remains pending. After core passes, await `API36 retained operator phase starting`, then retained status and all six retained recipes.
 
-The popup protocol starts from a fresh actual camera read and fully visible bubble. Each mutation names its immediately preceding settled initial/after frame as its before evidence and captures fresh renderer/status and hierarchy afterward. Reuse that before frame only while no intervening camera or UI mutation occurs; otherwise recapture it. Screenshots establish visual pan, remount and zoom attachment; child activation and dismissal use counters plus fresh hierarchy. The reopen screenshot supplies the remount baseline. Replace guarded tap placeholders with numeric coordinates from current visible bounds before dispatch. Zoom out from11to10 at constant center and generation; do not drive the anchor outside the map and infer attachment from clipped accessibility bounds. Child activation, dismissal, reopen and remount assertions remain required, including no stale dismissal after remount.
+For each of the four fixed rejection labels, request the rejection, use the explicit `dismiss-marker-rejection LABEL` command, verify exact boundary result and no drag callback, then clear and verify `No rejection requested`. Record the current marker observation only after all four cases pass. The helper does not suppress errors, minimize the inspector or dismiss unknown logs. All declared operations remain bounded and use the existing first-failure latch.
 
-The driver validates the exact attempt24 outcome/report hashes and candidate/APK/library/environment identity before publishing a fresh report. Accepted prior observations remain immutable under explicit source provenance; historical callback counters are never copied into current renderer events. Fresh known-feature readback, remount/load, source clicks, popup dismissal and location evidence remain required for the current run. The failed popup record cannot be upgraded or rewritten.
+The driver validates exact historical report/outcome hashes and candidate/APK/library/environment identity. Twelve reused observations are immutable and retain original source/run identities. Current completion still requires fresh known-feature, finite camera, load and error-free renderer evidence plus the current marker result; validated prior style/remount coverage avoids an unnecessary remount. Historical callback counters are not copied into current events.
 
-The resume requires the retained verified image and a fresh12GiB capacity reserve. Missing or invalid image blocks dispatch; this packet does not authorize a download. Existing API36/arm64/4096-byte-page/GLES3 checks and strict installed APK digest checks remain. It owns only its private AVD, launcher/driver processes, ports and temporary reports, preserves foreign resources and stops at the first unexpected failure with bounded cleanup.
-
-Allow40-90minutes with verified image reuse. Existing180-second boot,120-second install,30-minute manual and35-minute driver limits remain;150minutes worker allocation reserves cleanup and is coordinator supervision, not a launcher watchdog. No measured whole-unit peak exists; the12GiB planning reserve includes4GiB task allowance,6GiB host headroom and2GiB cleanup reserve. One exclusive owner-selected Terra Medium worker executes the complete remaining unit only after the single approval. Preparation and passing device-free checks grant no runtime acceptance credit.
+The retained verified API36 image, strict installed APK digest, private AVD and owned resource lifecycle are unchanged. Missing or invalid image or capacity blocks dispatch without download. Allow25-60minutes; existing boot/install/manual/driver bounds and12GiB reserve remain. No rebuild, calibration, accepted camera/core rerun, new backend or independent retry is included. One owner approval covers the complete remaining unit after audit.
 
 ## Execution, failure and completion
 

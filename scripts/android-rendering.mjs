@@ -391,7 +391,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const peerEvidence = join(
       root,
       api36Resume
-        ? "records/evidence/revised-api-u26-mapbox-android-api36-resume-preparation.json"
+        ? "records/evidence/revised-api-u26-mapbox-android-api36-marker-resume-preparation.json"
         : api36Unit
           ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
           : mapboxUnit

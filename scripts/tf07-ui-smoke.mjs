@@ -492,7 +492,10 @@ const runNative = async (selectedEngine) => {
         nativeFailure ||
         (retained
           ? observation?.focusedComplete !== true
-          : !(observation?.generation >= 1))
+          : !(
+              observation?.generation >=
+              (reusedScenarios.includes("style-remount") ? 0 : 1)
+            ))
       )
         return;
       if (

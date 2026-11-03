@@ -3,13 +3,20 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-/** Exact attempt24 observations accepted for the unchanged API36 Mapbox unit. */
+/** Exact attempt24/25 observations accepted for the unchanged API36 Mapbox unit. */
 export const api36ReusedScenarios = [
   "live-child-button",
   "nested-scroll",
   "live-activation",
   "annotation-activation",
   "offset-touch-bounds",
+  "popup-follow-dismissal",
+  "map-feature-click",
+  "navigation-location",
+  "style-remount",
+  "host-accessibility",
+  "sdk-ornaments",
+  "camera-target-and-gesture",
 ];
 
 const attempt =
@@ -48,22 +55,66 @@ export const loadApi36ReusedObservations = (identity, read = readFileSync) => {
     "Resume requires a fresh run identity."
   );
   assert.equal(prior.scenarios["popup-follow-dismissal"], "failed");
+  const recentReportPath = reportPath.replace("attempt-24", "attempt-25");
+  const recentReportSha256 =
+    "7e60ab7f5d2ff03d18ff710a62e91f319657d95612adb0451c29403308cd235d";
+  const recentOutcomePath = outcomePath.replace("attempt-24", "attempt-25");
+  const recentOutcomeSha256 =
+    "62cb048cd886313f3539a98cdfa749e9421e437c459cf02a74a0ebd9c8ea4c21";
+  const recentOutcome = readPinned(
+    recentOutcomePath,
+    recentOutcomeSha256,
+    read
+  );
+  const recent = readPinned(recentReportPath, recentReportSha256, read);
+  assert.equal(recentOutcome.candidateSha256, outcome.candidateSha256);
+  assert.equal(recentOutcome.inputApkSha256, identity.installedBinarySha256);
+  assert.equal(
+    recentOutcome.result,
+    "stopped-at-marker-rejection-development-error-overlay"
+  );
+  assert.equal(recent.runId, "41dce16e-6bb1-4454-bae7-34046a870505");
+  assert.notEqual(
+    recent.runId,
+    identity.runId,
+    "Resume requires a fresh run identity."
+  );
+  for (const field of [
+    "installedBinarySha256",
+    "libraryDistSha256",
+    "environment",
+  ])
+    assert.equal(recent[field], identity[field], `Reused ${field} differs.`);
+  assert.equal(recent.scenarios["marker-prop-rejection"], "failed");
   return Object.fromEntries(
-    api36ReusedScenarios.map((scenario) => {
-      assert.equal(prior.scenarios[scenario], "passed");
-      assert(prior.observations[scenario]);
+    api36ReusedScenarios.map((scenario, index) => {
+      const sourceReport = index < 5 ? prior : recent;
+      const source =
+        index < 5
+          ? {
+              reportPath,
+              reportSha256,
+              outcomePath,
+              outcomeSha256,
+              runId: prior.runId,
+            }
+          : {
+              reportPath: recentReportPath,
+              reportSha256: recentReportSha256,
+              outcomePath: recentOutcomePath,
+              outcomeSha256: recentOutcomeSha256,
+              runId: recent.runId,
+            };
+      assert.equal(sourceReport.scenarios[scenario], "passed");
+      assert(sourceReport.observations[scenario]);
       return [
         scenario,
         {
           source: {
-            reportPath,
-            reportSha256,
-            outcomePath,
-            outcomeSha256,
-            runId: prior.runId,
+            ...source,
             environment: "api36-google-apis-revision7-arm64-4k",
           },
-          observation: prior.observations[scenario],
+          observation: sourceReport.observations[scenario],
         },
       ];
     })

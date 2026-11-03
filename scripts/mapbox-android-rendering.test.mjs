@@ -455,7 +455,7 @@ for (const [
           file.endsWith("signal-liveness-preparation.json") ||
           file.endsWith("mapbox-android-unit-preparation.json") ||
           file.endsWith("mapbox-android-api36-preparation.json") ||
-          file.endsWith("mapbox-android-api36-resume-preparation.json")
+          file.endsWith("mapbox-android-api36-marker-resume-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
