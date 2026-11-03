@@ -15,7 +15,10 @@ import { dirname, join, resolve } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 
 import { prepareAndroidSignalCapture } from "./android-signal-capture.mjs";
-import { loadApi36ReusedObservations } from "./api36-reused-observations.mjs";
+import {
+  loadApi36ReusedObservations,
+  loadMaplibreApi36ReusedObservations,
+} from "./api36-reused-observations.mjs";
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import {
   judgeNativeRetained,
@@ -426,9 +429,21 @@ const runNative = async (selectedEngine) => {
         (platform === "android" && selectedEngine === "mapbox" && !retained),
       "Attempt24 reuse is core Mapbox Android only."
     );
-    const reusedObservations = reuseApi36
-      ? loadApi36ReusedObservations(identity)
-      : {};
+    const reuseMaplibreApi36 =
+      process.env.TF07_REUSE_MAPLIBRE_API36_ATTEMPT30 === "1";
+    assert(
+      !reuseMaplibreApi36 ||
+        (!reuseApi36 &&
+          platform === "android" &&
+          selectedEngine === "maplibre" &&
+          !retained),
+      "Attempt30 reuse is core MapLibre Android only."
+    );
+    const reusedObservations = reuseMaplibreApi36
+      ? loadMaplibreApi36ReusedObservations(identity)
+      : reuseApi36
+        ? loadApi36ReusedObservations(identity)
+        : {};
     const reusedScenarios = Object.keys(reusedObservations);
     const manualPath = process.env.TF07_MANUAL_REPORT;
     let completed;
@@ -595,7 +610,7 @@ const runNative = async (selectedEngine) => {
         JSON.stringify(
           {
             ...identity,
-            ...(reuseApi36 && { reusedObservations }),
+            ...((reuseApi36 || reuseMaplibreApi36) && { reusedObservations }),
             scenarios: Object.fromEntries(
               scenarios.map((scenario) => [
                 scenario,
@@ -636,7 +651,7 @@ const runNative = async (selectedEngine) => {
         ? { nativeTarget: platform === "ios" ? iosDevice : serial }
         : {}),
       observation,
-      ...(reuseApi36 && { reusedObservations }),
+      ...((reuseApi36 || reuseMaplibreApi36) && { reusedObservations }),
     };
   } catch (error) {
     failures.push(error);

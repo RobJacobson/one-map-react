@@ -359,11 +359,33 @@ class OperatorTest(unittest.TestCase):
     def warning_xml(self):
         return Path("/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-26/toolbar-003-hierarchy-002.xml").read_text()
 
-    def test_actual_cli_saved_marker_then_migration_notice_recovers(self):
-        script = self.cli_copy()
-        saved = Path("/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-26/toolbar-003-hierarchy-001.xml").read_text()
-        (self.attempt / "snapshots.json").write_text(json.dumps([saved, self.warning_xml(), self.rejection_result_xml()]))
-        (self.attempt / "fake-adb").write_text(r"""#!/usr/bin/env python3
+    def test_actual_cli_marker_and_notice_bind_to_selected_backend_and_result(self):
+        labels = ("Reject view draggable", "Reject view callback",
+                  "Reject annotation draggable", "Reject annotation callback")
+        cases = [("mapbox", labels[0], None)] + [("maplibre", label, None) for label in labels]
+        cases += [("maplibre", labels[0], wrong) for wrong in ("overlay", "notice", "result")]
+        for backend, label, wrong in cases:
+            with self.subTest(backend=backend, label=label, wrong=wrong):
+                self.setUp()
+                row = backend + "-android-core"
+                self.original["environment"] = backend + "-android"
+                self.report.unlink()
+                self.report = self.attempt / (row + "-manual.json")
+                self.report.write_text(json.dumps(self.original))
+                (self.attempt / "checkpoint.json").write_text(json.dumps({"currentRow": row}))
+                script = self.cli_copy()
+                saved = Path("/Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-26/toolbar-003-hierarchy-001.xml").read_text()
+                snapshots = [saved, self.warning_xml(), self.rejection_result_xml(label)]
+                snapshots = [xml.replace("com.onemapmapbox", "com.onemap" + backend) for xml in snapshots]
+                if wrong is not None:
+                    index = ("overlay", "notice", "result").index(wrong)
+                    if wrong == "result":
+                        # Keep the selected toolbar, but reject the other app's boundary result.
+                        snapshots[index] = snapshots[index].replace('class="android.widget.TextView" package="com.onemapmaplibre"', 'class="android.widget.TextView" package="com.onemapmapbox"')
+                    else:
+                        snapshots[index] = snapshots[index].replace("com.onemapmaplibre", "com.onemapmapbox")
+                (self.attempt / "snapshots.json").write_text(json.dumps(snapshots))
+                (self.attempt / "fake-adb").write_text(r"""#!/usr/bin/env python3
 import json, pathlib, sys
 root = pathlib.Path(__file__).parent
 args = sys.argv[1:]
@@ -375,16 +397,32 @@ if args[2:4] == ['shell', 'cat']:
     print(snapshots.pop(0))
     path.write_text(json.dumps(snapshots))
 """)
-        command = [sys.executable, str(script), str(self.attempt), ROW, "marker-prop-rejection", "dismiss-marker-rejection", "Reject view draggable"]
-        result = subprocess.run(command, capture_output=True, text=True, timeout=10)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        calls = [json.loads(line) for line in (self.attempt / "calls.jsonl").read_text().splitlines()]
-        self.assertEqual([args for args in calls if args[2:4] == ["shell", "input"]],
-                         [["-s", "emulator-5580", "shell", "input", "tap", "180", "2274"]] * 2)
-        self.assertEqual(json.loads((self.attempt / "snapshots.json").read_text()), [])
-        self.assertEqual(json.loads(self.report.read_text()), self.original)
-        self.assertEqual(json.loads((self.attempt / "toolbar-001.json").read_text())["status"], "rejection-verified")
-        self.assertFalse(self.latch.exists())
+                command = [sys.executable, str(script), str(self.attempt), row, "marker-prop-rejection", "dismiss-marker-rejection", label]
+                result = subprocess.run(command, capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, 0 if wrong is None else 1, result.stdout + result.stderr)
+                calls = [json.loads(line) for line in (self.attempt / "calls.jsonl").read_text().splitlines()]
+                taps = 2 if wrong is None else ("overlay", "notice", "result").index(wrong)
+                self.assertEqual([args for args in calls if args[2:4] == ["shell", "input"]],
+                                 [["-s", "emulator-5580", "shell", "input", "tap", "180", "2274"]] * taps)
+                report = json.loads(self.report.read_text())
+                if wrong is None:
+                    self.assertEqual(report, self.original)
+                else:
+                    self.assertEqual(report["scenarios"]["marker-prop-rejection"], "failed")
+                    self.assertEqual(report["metadata"], self.original["metadata"])
+                receipt = json.loads((self.attempt / "toolbar-001.json").read_text())
+                self.assertEqual(receipt["status"], "rejection-verified" if wrong is None else "failed")
+                if wrong is None:
+                    self.assertEqual(json.loads((self.attempt / "snapshots.json").read_text()), [])
+                    self.assertFalse(self.latch.exists())
+                else:
+                    saved_latch = self.latch.read_bytes()
+                    saved_calls = (self.attempt / "calls.jsonl").read_bytes()
+                    retry = subprocess.run(command, capture_output=True, text=True, timeout=10)
+                    self.assertEqual(retry.returncode, 1)
+                    self.assertIn("BLOCKED", retry.stdout)
+                    self.assertEqual(self.latch.read_bytes(), saved_latch)
+                    self.assertEqual((self.attempt / "calls.jsonl").read_bytes(), saved_calls)
 
     def test_migration_notice_rejects_unknown_content_identity_controls_and_order(self):
         xml = self.warning_xml()
@@ -487,7 +525,7 @@ if args[2:4] == ['shell', 'cat']:
             self.assertEqual(len([args for args in calls if args[:2] == ["shell", "input"]]), 1)
 
     def test_marker_overlay_is_never_handled_for_another_scenario_or_row(self):
-        for prefix in ([ROW, SCENARIO], ["maplibre-android-core", "marker-prop-rejection"], [ROW, "marker-prop-rejection"]):
+        for prefix in ([ROW, SCENARIO], ["maplibre-android-retained", "marker-prop-rejection"], [ROW, "marker-prop-rejection"]):
             self.setUp()
             with patch("subprocess.run") as child:
                 status, output = self.invoke(["dismiss-marker-rejection", "wrong" if prefix == [ROW, "marker-prop-rejection"] else "Reject view draggable"], prefix)
