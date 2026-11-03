@@ -68,8 +68,8 @@
     "/private/tmp/one-map-android-restoration-review/scripts/record-native-ui-observation.mjs": "26f2e069d5ce6f2578715442d4f192a0ce9f5dad4b3e3601cfeb95c6165d3715"
   },
   "checkpoint": "Remaining Android MapLibre API36 retained-only continuation",
-  "status": "Coordinator audit passed; owner-authorized retained-only continuation ready",
-  "nativeExecution": false,
+  "status": "Executed passed: Android MapLibre API36 unit complete within declared scope",
+  "nativeExecution": true,
   "unit": {
     "platform": "android",
     "backend": "maplibre",
@@ -650,5 +650,13 @@
     "outcomePath": "/private/tmp/one-map-android-restoration-review/records/evidence/revised-api-u26-android-maplibre-api36-attempt-31.json",
     "outcomeSha256": "3317ec5e334434d33854b74a0bb6f51750e8565cb8259b48d96300f79b5390fc",
     "proof": "Pinned receipt row status/observed/manualComplete/remaining[], APK/dist/environment/coreUUID and exact before+after installed-byte identities; all13core manual scenarios passed."
+  },
+  "executionRecord": {
+    "status": "passed",
+    "outcome": "records/evidence/revised-api-u26-android-maplibre-api36-attempt-32.json",
+    "outcomeSha256": "886e73731e2ff3e206f60adce0f4cfa13fc5ed7a845e83c510b41d6a0e9d0a44",
+    "runId": "cfaeefdf-7430-4894-a54c-41fb9ab766eb",
+    "meaning": "Retained-only row32 passed all13renderer checks and six fresh physical scenarios, with camera30/core31 immutable reuse; executed source pins preserved unchanged.",
+    "next": "iOS Mapbox preparation only; no iOS execution authorized."
   }
 }
