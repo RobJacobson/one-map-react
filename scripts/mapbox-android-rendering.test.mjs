@@ -60,6 +60,15 @@ for (const [
     "existing-output",
     ...(continuation || mapboxUnit ? ["prior-hash", "prior-prefix"] : []),
     ...(mapboxUnit ? ["retained-driver"] : []),
+    ...(api36Resume
+      ? [
+          "core-proof-hash",
+          "core-proof-row",
+          "core-proof-identity",
+          "core-proof-after",
+          "core-proof-scope",
+        ]
+      : []),
     ...(api36Unit
       ? [
           "device",
@@ -134,6 +143,15 @@ for (const [
           "prior-hash",
           "prior-prefix",
           ...(mapboxUnit ? ["low-space", "retained-driver"] : []),
+          ...(api36Resume
+            ? [
+                "core-proof-hash",
+                "core-proof-row",
+                "core-proof-identity",
+                "core-proof-after",
+                "core-proof-scope",
+              ]
+            : []),
           ...(api36Unit
             ? [
                 "device",
@@ -371,12 +389,12 @@ for (const [
           if (String(message).startsWith("API36 ")) {
             const row = String(message).split(" ")[1];
             assert.equal(latestCheckpoint.currentRow, `mapbox-android-${row}`);
-            if (!api36Resume || row !== "core")
+            if (!api36Resume)
               assert.equal(
                 latestCheckpoint.rows.at(-1).rowId,
                 row === "core" ? "mapbox-android-camera" : "mapbox-android-core"
               );
-            if (!api36Resume || row !== "core")
+            if (!api36Resume)
               assert.equal(latestCheckpoint.rows.at(-1).status, "passed");
             phaseMessages.push(message);
           }
@@ -455,13 +473,54 @@ for (const [
           file.endsWith("signal-liveness-preparation.json") ||
           file.endsWith("mapbox-android-unit-preparation.json") ||
           file.endsWith("mapbox-android-api36-preparation.json") ||
-          file.endsWith("mapbox-android-api36-marker-resume-preparation.json")
+          file.endsWith("mapbox-android-api36-retained-preparation.json") ||
+          file.endsWith("mapbox-android-api36-console-resume-preparation.json")
         )
           return JSON.stringify({
             stagedSha256: { "/observer": "observer" },
             hostInputSha256: { "/helper": "helper" },
             operatorHelperSha256: { "/operator": "operator" },
             freeze: { path: "/freeze", sha256: "freeze-hash" },
+            executionRows:
+              failAt === "core-proof-scope"
+                ? ["mapbox-android-core"]
+                : ["mapbox-android-retained"],
+          });
+        if (file.endsWith("android-platform-batch-attempt-27/receipt.json"))
+          return JSON.stringify({
+            result: "failed",
+            apkSha256: apkHash,
+            environment: "api36-google-apis-revision7-arm64-4k",
+            frozenFiles: 695,
+            rows: [
+              {
+                rowId:
+                  failAt === "core-proof-row"
+                    ? "mapbox-android-retained"
+                    : "mapbox-android-core",
+                status: "passed",
+                scene: {
+                  status: "passed",
+                  observed: true,
+                  manualComplete: true,
+                  remaining: [],
+                  installedBinarySha256:
+                    failAt === "core-proof-identity" ? "wrong" : apkHash,
+                  libraryDistSha256: distHash,
+                  environment: "mapbox-android",
+                },
+              },
+            ],
+            identityReads: [
+              "mapbox-android-core-before",
+              "mapbox-android-core-after",
+            ].map((phase) => ({
+              phase,
+              sha256:
+                failAt === "core-proof-after" && phase.endsWith("after")
+                  ? "wrong"
+                  : apkHash,
+            })),
           });
         if (file.endsWith("android-mapbox-api36-attempt-24.json"))
           return JSON.stringify({
@@ -576,19 +635,16 @@ for (const [
         children.push(child);
         if (args.some((arg) => arg.endsWith("tf07-ui-smoke.mjs"))) {
           coreRows++;
-          assert.equal(
-            options.env.TF07_REUSE_API36_ATTEMPT24 === "1",
-            api36Resume && coreRows === 1
-          );
+          assert.equal(options.env.TF07_REUSE_API36_ATTEMPT24 === "1", false);
           if (api36Unit)
             assert.equal(
               phaseMessages.at(-1),
-              `API36 ${coreRows === 1 ? "core" : "retained"} operator phase starting`
+              `API36 ${api36Resume || coreRows === 2 ? "retained" : "core"} operator phase starting`
             );
           launched = true;
           child.exitCode =
             ["driver", "driver-stderr"].includes(failAt) ||
-            (failAt === "retained-driver" && coreRows === 2)
+            (failAt === "retained-driver" && coreRows === (api36Resume ? 1 : 2))
               ? 1
               : 0;
           const prior = priorDriver;
@@ -617,7 +673,10 @@ for (const [
           }
           if (mapboxUnit) {
             assert.equal(options.env.TF07_ANDROID_SIGNAL_OUTPUT, "");
-            assert.equal(args.includes("retained"), coreRows === 2);
+            assert.equal(
+              args.includes("retained"),
+              api36Resume || coreRows === 2
+            );
             assert.equal(options.env.TF07_NATIVE_TIMEOUT_MS, "1800000");
           }
         } else if (batch || children.length === 1) {
@@ -670,19 +729,23 @@ for (const [
           return this;
         },
         digest: () =>
-          String(content).startsWith(
-            '{"result":"stopped-at-popup-attachment-observation"'
-          )
-            ? "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c"
+          String(content).startsWith('{"result":"failed","apkSha256"')
+            ? failAt === "core-proof-hash"
+              ? "wrong"
+              : "43d2dd7e7f3de701d96e99f12cca9b45824c02e58c1af6590acffe07659b51db"
             : String(content).startsWith(
-                  '{"result":"stopped-at-first-ui-failure"'
+                  '{"result":"stopped-at-popup-attachment-observation"'
                 )
-              ? failAt === "prior-hash"
-                ? "wrong"
-                : "38fb7d4b86c6ee4a76bb1551eaa53644325a2949ffbba669218663f641a3e00f"
-              : String(content).startsWith('{"files"')
-                ? "freeze-hash"
-                : content,
+              ? "ed5eb01cdfe604650117ebeac924add146ae5c6e1bc092964f34b74f88e9065c"
+              : String(content).startsWith(
+                    '{"result":"stopped-at-first-ui-failure"'
+                  )
+                ? failAt === "prior-hash"
+                  ? "wrong"
+                  : "38fb7d4b86c6ee4a76bb1551eaa53644325a2949ffbba669218663f641a3e00f"
+                : String(content).startsWith('{"files"')
+                  ? "freeze-hash"
+                  : content,
       };
     };
     await runInNewContext(
@@ -702,6 +765,23 @@ for (const [
       failAt === null ? "passed" : "failed",
       `${failAt ?? "success"}: ${receipt.error}`
     );
+    if (failAt?.startsWith("core-proof-")) {
+      assert.equal(
+        commands.length,
+        0,
+        "Invalid core provenance acquired Android resources."
+      );
+      assert.equal(children.length, 0);
+      continue;
+    }
+    if (api36Resume && failAt === null) {
+      assert.deepEqual(receipt.scope, ["mapbox-android-retained"]);
+      assert.deepEqual(
+        receipt.reusedRows.map(({ rowId }) => rowId),
+        ["mapbox-android-camera", "mapbox-android-core"]
+      );
+      assert.equal(coreRows, 1, "Exactly one retained driver, no core driver.");
+    }
     if (
       [
         "partial",
@@ -873,22 +953,24 @@ for (const [
         const late = stderrWrites.find(([, value]) =>
           value.includes("late previous driver")
         );
-        if (!signalDiagnostic)
+        if (!signalDiagnostic && !api36Resume)
           assert(
             late[0].endsWith("mapbox-android-core-driver-stderr.log"),
             late[0]
           );
         assert.equal(
           receipt.rows.length,
-          api36Unit && !api36Resume
-            ? 3
-            : mapboxUnit
-              ? 2
-              : signalDiagnostic
-                ? 1
-                : continuation
-                  ? 5
-                  : 6
+          api36Resume
+            ? 1
+            : api36Unit && !api36Resume
+              ? 3
+              : mapboxUnit
+                ? 2
+                : signalDiagnostic
+                  ? 1
+                  : continuation
+                    ? 5
+                    : 6
         );
         assert.equal(
           cameraRows,
@@ -912,30 +994,35 @@ for (const [
         );
         assert.deepEqual(
           receipt.rows.map(({ rowId }) => rowId),
-          api36Unit && !api36Resume
-            ? [
-                "mapbox-android-camera",
-                "mapbox-android-core",
-                "mapbox-android-retained",
-              ]
-            : mapboxUnit
-              ? ["mapbox-android-core", "mapbox-android-retained"]
-              : signalDiagnostic
-                ? ["mapbox-android-core"]
-                : [
-                    ...(!continuation ? ["mapbox-android-camera"] : []),
-                    "mapbox-android-core",
-                    "mapbox-android-retained",
-                    "maplibre-android-camera",
-                    "maplibre-android-core",
-                    "maplibre-android-retained",
-                  ]
+          api36Resume
+            ? ["mapbox-android-retained"]
+            : api36Unit && !api36Resume
+              ? [
+                  "mapbox-android-camera",
+                  "mapbox-android-core",
+                  "mapbox-android-retained",
+                ]
+              : mapboxUnit
+                ? ["mapbox-android-core", "mapbox-android-retained"]
+                : signalDiagnostic
+                  ? ["mapbox-android-core"]
+                  : [
+                      ...(!continuation ? ["mapbox-android-camera"] : []),
+                      "mapbox-android-core",
+                      "mapbox-android-retained",
+                      "maplibre-android-camera",
+                      "maplibre-android-core",
+                      "maplibre-android-retained",
+                    ]
         );
         if ((continuation || mapboxUnit) && !api36Unit)
           assert.equal(receipt.reusedRows[0].rowId, "mapbox-android-camera");
         if ((continuation || mapboxUnit) && !api36Unit)
           assert.equal(receipt.rows[0].rowId, "mapbox-android-core");
-        assert.equal(coreRows, mapboxUnit ? 2 : signalDiagnostic ? 1 : 4);
+        assert.equal(
+          coreRows,
+          api36Resume ? 1 : mapboxUnit ? 2 : signalDiagnostic ? 1 : 4
+        );
         if (mapboxUnit) {
           assert.equal(receipt.mode, "mapbox-android-unit");
           assert.equal(receipt.rows.at(-1).scene.density, 2.625);
@@ -962,15 +1049,17 @@ for (const [
         );
         assert.equal(
           identityChecks,
-          api36Unit && !api36Resume
-            ? 7
-            : mapboxUnit
-              ? 5
-              : signalDiagnostic
-                ? 3
-                : continuation
-                  ? 12
-                  : 14
+          api36Resume
+            ? 3
+            : api36Unit && !api36Resume
+              ? 7
+              : mapboxUnit
+                ? 5
+                : signalDiagnostic
+                  ? 3
+                  : continuation
+                    ? 12
+                    : 14
         );
       }
       if (failAt === "late-metro-exit") {
@@ -991,11 +1080,13 @@ for (const [
       if (failAt === "retained-driver") {
         assert.deepEqual(
           receipt.rows.map(({ rowId }) => rowId),
-          api36Unit && !api36Resume
-            ? ["mapbox-android-camera", "mapbox-android-core"]
-            : ["mapbox-android-core"]
+          api36Resume
+            ? []
+            : api36Unit && !api36Resume
+              ? ["mapbox-android-camera", "mapbox-android-core"]
+              : ["mapbox-android-core"]
         );
-        assert.equal(coreRows, 2);
+        assert.equal(coreRows, api36Resume ? 1 : 2);
         assert.match(receipt.error, /driver failed/);
         assert.equal(installs, 1);
       }

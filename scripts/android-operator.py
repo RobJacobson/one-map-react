@@ -231,6 +231,12 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
         return run_checked([ADB, "-s", SERIAL, *arguments], quiet=True,
                            timeout=min(TIMEOUT_SECONDS, remaining))
 
+    def input_y(top, bottom):
+        # Android's retained toolbar can start behind the status bar.
+        if row.endswith("-retained") and top == 0:
+            return top + (bottom - top) * 7 // 8
+        return (top + bottom) // 2
+
     def hierarchy():
         index = len(receipt["hierarchies"]) + 1
         name = f"toolbar-{number:03d}-hierarchy-{index:03d}.xml"
@@ -249,7 +255,7 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
             remaining = None
             receipt["dismissals"] = []
             for _ in range(2):
-                rectangle, count = marker_rejection_dismiss(xml)
+                rectangle, count = marker_rejection_dismiss(xml, allow_notice=remaining == 2)
                 if remaining is not None and count != remaining - 1:
                     raise ValueError("Expected rejection log count to decrease by one.")
                 remaining = count
@@ -273,7 +279,7 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
             if targets:
                 left, top, right, bottom = targets[0]
                 command(["shell", "input", "tap", str((left + right) // 2),
-                         str((top + bottom) // 2)])
+                         str(input_y(top, bottom))])
                 receipt["targetBounds"] = targets[0]
                 receipt["status"] = "input-complete"
                 break
@@ -292,7 +298,7 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
             else:
                 raise ValueError("Missing target within visible toolbar range.")
             width = right - left
-            y = str((top + bottom) // 2)
+            y = str(input_y(top, bottom))
             command(["shell", "input", "swipe", str(left + width * start // 4), y,
                      str(left + width * end // 4), y, "450"])
             receipt["swipes"] += 1
@@ -310,18 +316,27 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
         print("TOOLBAR", json.dumps({**receipt, "receipt": str(receipt_path)}), flush=True)
 
 
-def marker_rejection_dismiss(xml):
-    """Match only the saved native Marker render rejection and its visible Dismiss."""
+def marker_rejection_dismiss(xml, allow_notice=False):
+    """Match a Marker rejection, or its following exact RN debugger notice."""
     root = ET.fromstring(xml)
     nodes = list(root.iter("node"))
     package = "com.onemapmapbox"
     if not nodes or any(node.get("package") != package for node in nodes):
         raise ValueError("Expected only the Mapbox application hierarchy.")
     texts = [node.get("text") for node in nodes]
-    if texts.count("Render Error") != 1 or texts.count(REJECTION_MESSAGE) != 1:
-        raise ValueError("Expected exact native Marker Render Error.")
-    if not any(node.get("text") == "<NativeMarkerRejectionBoundary />" for node in nodes):
-        raise ValueError("Missing native Marker rejection boundary.")
+    if allow_notice and "Console Warning" in texts:
+        # RN's Fusebox notice replaces warning bodies; it is not the hidden warning.
+        expected = ["Log 1 of 1", "Console Warning", "Open debugger to view warnings.",
+                    "Dismiss", "Minimize", "Copy"]
+        descriptions = [node.get("content-desc") for node in nodes if node.get("content-desc")]
+        if (sorted(text for text in texts if text) != sorted(expected)
+                or sorted(descriptions) != ["Copy", "Dismiss", "Minimize"]):
+            raise ValueError("Expected only the exact React Native debugger migration notice.")
+    else:
+        if texts.count("Render Error") != 1 or texts.count(REJECTION_MESSAGE) != 1:
+            raise ValueError("Expected exact native Marker Render Error.")
+        if not any(node.get("text") == "<NativeMarkerRejectionBoundary />" for node in nodes):
+            raise ValueError("Missing native Marker rejection boundary.")
     counters = [re.fullmatch(r"Log ([12]) of ([12])", text or "") for text in texts]
     counters = [match for match in counters if match is not None]
     if len(counters) != 1 or counters[0][1] != counters[0][2]:

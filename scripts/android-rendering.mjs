@@ -113,7 +113,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       mode: "mapbox-android-unit",
       scope: [
         ...(api36Unit && !api36Resume ? ["mapbox-android-camera"] : []),
-        "mapbox-android-core",
+        ...(!api36Resume ? ["mapbox-android-core"] : []),
         "mapbox-android-retained",
       ],
       signalCalibration:
@@ -391,7 +391,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const peerEvidence = join(
       root,
       api36Resume
-        ? "records/evidence/revised-api-u26-mapbox-android-api36-marker-resume-preparation.json"
+        ? "records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json"
         : api36Unit
           ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
           : mapboxUnit
@@ -407,6 +407,44 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
     verifyInputs(preparation, freeze);
+    if (api36Resume) {
+      assert.deepEqual(preparation.executionRows, ["mapbox-android-retained"]);
+      const path = join(
+        recovery,
+        "android-platform-batch-attempt-27/receipt.json"
+      );
+      const hash =
+        "43d2dd7e7f3de701d96e99f12cca9b45824c02e58c1af6590acffe07659b51db";
+      assert.equal(sha256(path), hash, "Accepted API36 core receipt changed.");
+      const prior = JSON.parse(readFileSync(path));
+      assert.equal(prior.apkSha256, apkSha256);
+      assert.equal(prior.environment, "api36-google-apis-revision7-arm64-4k");
+      assert.equal(prior.frozenFiles, 695);
+      assert.deepEqual(
+        prior.rows.map(({ rowId, status }) => ({ rowId, status })),
+        [{ rowId: "mapbox-android-core", status: "passed" }]
+      );
+      const core = prior.rows[0].scene;
+      assert.equal(core.status, "passed");
+      assert.equal(core.observed, true);
+      assert.equal(core.manualComplete, true);
+      assert.deepEqual(core.remaining, []);
+      assert.equal(core.installedBinarySha256, apkSha256);
+      assert.equal(core.libraryDistSha256, distSha256);
+      assert.equal(core.environment, "mapbox-android");
+      for (const phase of [
+        "mapbox-android-core-before",
+        "mapbox-android-core-after",
+      ]) {
+        const reads = prior.identityReads.filter(
+          (read) => read.phase === phase
+        );
+        assert.equal(reads.length, 1);
+        assert.equal(reads[0].sha256, apkSha256);
+      }
+      receipt.reusedRows.push(prior.rows[0]);
+      receipt.api36CoreReceipt = { path, sha256: hash };
+    }
     receipt.frozenFiles = 695;
     const disk = statfsSync(recovery);
     receipt.freeBytes = disk.bavail * disk.bsize;
@@ -589,7 +627,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
         ]);
       for (const row of api36Unit
         ? api36Resume
-          ? ["core", "retained"]
+          ? ["retained"]
           : ["camera", "core", "retained"]
         : mapboxUnit
           ? ["core", "retained"]

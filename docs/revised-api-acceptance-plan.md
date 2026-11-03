@@ -2,46 +2,36 @@
 
 ## Current handoff
 
-**The marker-rejection overlay repair passed independent audit; the complete remaining API36 Mapbox batch awaits capacity and execution approval.** [Attempt25](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-25.json) passed seven fresh core observations and reused camera plus five core observations from [attempt24](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-24.json). Camera and twelve core observations remain accepted within their recorded limits. Marker rejection and all six retained scenarios remain unverified.
+**Android Mapbox API36 is complete within the declared retained-contract scope: camera passed attempt24, core passed attempt27 and all six retained scenarios passed attempt29.** The [completed outcome](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-29.json) records all thirteen renderer checks, six current physical receipts, actual scale2.625, matching installed APK identities before and after,695 unchanged frozen files and successful owned cleanup. Accepted camera/core evidence retains its original limits. The [retained packet](../records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json) is completed execution history and grants no further dispatch.
 
-The saved hierarchy shows the deliberate native Marker dragging rejection in React Native's development Render Error overlay, hiding the toolbar. The app stayed alive. The selected React Native0.87.1 inspector can reveal the previous log when one is dismissed. The corrected operator matches each expected error's exact message, application, boundary stack and unique visible Dismiss control, dismisses at most two matching selected logs with decreasing count, then requires the actual fixture toolbar and exact case-specific rejection result. Unknown logs, ambiguous controls or failed recovery stop the unit. The fixture and production rejection behavior are unchanged.
+**Next: prepare the complete Android MapLibre unit.** Preparation must account for every retained requirement using applicable reused evidence, remaining camera/core/retained scenarios and owner exclusions, then supply one immutable packet for independent audit under the [complete batch protocol](testing-policy.md#complete-acceptance-units). This handoff authorizes no backend switch or native execution. Three native units and nine rows remain: Android MapLibre, iOS Mapbox and iOS MapLibre.
 
-The [attempt26 packet](../records/evidence/revised-api-u26-mapbox-android-api36-marker-resume-preparation.json) reuses accepted camera and twelve core observations with exact attempt24/25 provenance, then runs all four marker rejection cases and all six retained scenarios as one remaining unit. Fresh renderer events and identity stay separate from historical observations; no accepted check is rerun merely for this tooling change. Runtime recovery remains unverified. No native run, build, installation, calibration or cleanup occurred during repair.
+The [attempt27 outcome](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-27.json) preserves the accepted core pass and mistaken retained failure latch. The [attempt28 outcome](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-28.json) remains an unverified retained row; missing initial-theme history and stale final child state were not retroactively repaired. Attempt29 supplied fresh initial/updated child history and final matching snapshots. The original application SIGKILL cause remains unresolved; the completed unit does not establish its cause or a fix.
 
-Verified image reuse requires a fresh12GiB capacity check before dispatch; the packet records the current shortfall. This preparation authorizes no deletion or image download. After audit, request one approval for the complete remaining unit with one Terra Medium worker,25-60minutes and first-failure owned cleanup. Prior outcomes remain immutable, and the earlier SIGKILL cause remains unresolved.
+After all four native units, the offline density closeout still requires two distinct positive observed scales per engine and matching artifact identities. A single scale2.625 observation does not close that aggregate gate.
 
 ## Coverage matrix and order
 
-The [fixed baseline matrix](../records/evidence/revised-api-u26-platform-batches-preparation.json) owns the twelve camera/core/retained row IDs, thirteen core recipes, six retained recipes, accepted evidence and scope dispositions. Its historical two-platform dispatch instructions are superseded by the four complete backend units below. The historical baseline remains twelve rows, with one accepted API37 camera row and eleven remaining rows. Selecting API36 reopened Android Mapbox camera for the new OS; attempt24 passed that row, leaving eleven unfinished rows across the selected targets. The old API37 pass remains accurate history.
+The [fixed baseline matrix](../records/evidence/revised-api-u26-platform-batches-preparation.json) owns the twelve camera/core/retained row IDs, thirteen core recipes, six retained recipes, accepted evidence and scope dispositions. Its historical two-platform dispatch instructions are superseded by the four complete backend units below. The historical baseline remains twelve rows, with one accepted API37 camera row and eleven remaining rows. Selecting API36 reopened Android Mapbox camera for the new OS; attempt24 passed that row, leaving eleven unfinished rows across the selected targets. The old API37 pass remains accurate history. Attempt27 completed API36 core and attempt29 completed retained, leaving nine unfinished rows across three native units.
 
-| Order | Immutable platform/backend unit | Camera | Core | Retained | Remaining rows |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Android Mapbox, API36 | Passed attempt24 | Blocked at marker rejection | Not run | 2 |
-| 2 | Android MapLibre | Pending | Pending | Pending | 3 |
-| 3 | iOS Mapbox | Pending | Pending | Pending | 3 |
-| 4 | iOS MapLibre | Pending | Pending | Pending | 3 |
+| Order | Immutable platform/backend unit | Camera           | Core             | Retained         | Remaining rows |
+| ----- | ------------------------------- | ---------------- | ---------------- | ---------------- | -------------- |
+| 1     | Android Mapbox, API36           | Passed attempt24 | Passed attempt27 | Passed attempt29 | 0              |
+| 2     | Android MapLibre                | Pending          | Pending          | Pending          | 3              |
+| 3     | iOS Mapbox                      | Pending          | Pending          | Pending          | 3              |
+| 4     | iOS MapLibre                    | Pending          | Pending          | Pending          | 3              |
 
-The [Android Mapbox camera outcome](../records/evidence/revised-api-u26-android-platform-batch-attempt-01.json) remains accepted. It does not establish an API36 camera pass; attempt24 independently supplied that pass. Partial core observations and calibration runs do not complete a row. Finish or explicitly block Android Mapbox before changing backend; an owner may redirect after the blocker report. Do not interleave features across these units.
+The [Android Mapbox camera outcome](../records/evidence/revised-api-u26-android-platform-batch-attempt-01.json) remains accepted. It does not establish an API36 camera pass; attempt24 independently supplied that pass. Partial core observations and calibration runs do not complete a row. Android Mapbox is complete within its recorded scope. Prepare Android MapLibre next; do not interleave features across the remaining units.
 
 All nine browser rows passed on unchanged f05 within the [recorded browser scope](../records/evidence/revised-api-u25-web-attempt-07.json); web has no pending row. The fixed matrix links the accepted four-environment minimal, lifetime, query/cluster, bounded source/image and targeted rendering evidence. Reuse those results where artifact and behavior remain applicable, retaining their original limits. The API36 packet reviews OS-change impact: reuse unchanged-contract evidence within its original limits, then obtain fresh camera/GL, query, style/replacement, live UI and density observations through the three selected rows. Any new OS-dependent gap blocks the unit; no general SDK certification is implied.
 
 The twelve rows are the remaining execution baseline, not a replacement for full retained-contract accounting. Before approval, map every retained requirement to valid reused evidence, a remaining scenario or an explicit owner-approved exclusion. A newly demonstrated gap must be resolved in the selected unit's complete packet; it must not be hidden by relabeling the requirement unsupported.
 
-## Prepared remaining API36 Mapbox batch
+## Next complete-unit preparation
 
-The [marker-resume packet](../records/evidence/revised-api-u26-mapbox-android-api36-marker-resume-preparation.json) is the sole proposed dispatch source. Earlier [attempt25 commands](../records/evidence/revised-api-u26-mapbox-android-api36-resume-preparation.json) have already run and must not be relaunched. The exact proposed attempt26 entrypoint is:
+Prepare Android MapLibre under the [complete batch protocol](testing-policy.md#prepare-the-complete-batch). Reuse valid frozen-candidate evidence with its original limits; account for the complete retained contract before proposing execution. The packet must bind candidate, resolved dependencies, selected device/OS, all remaining camera/core/retained scenarios, exact commands, ownership, first-failure cleanup, storage and elapsed-time budgets. Independent audit precedes a separate execution decision. No Android MapLibre launch, build, installation or calibration is authorized here.
 
-```sh
-/Users/rob/code/mapbox-code/one-map-f05-android-recovery/runtime-bin/node /private/tmp/one-map-android-restoration-review/scripts/mapbox-android-api36-resume.mjs /Users/rob/code/mapbox-code/one-map-f05-android-recovery/android-platform-batch-attempt-26
-```
-
-Use the packet's `/bin/sh`, login false, yield1000ms launch settings. Resume its returned session with bounded30000ms waits, never relaunch. Await `API36 core operator phase starting`, then the exact status and `Read renderer` calls; initial HTTPnull before the first read is expected. Only `marker-prop-rejection` remains pending. After core passes, await `API36 retained operator phase starting`, then retained status and all six retained recipes.
-
-For each of the four fixed rejection labels, request the rejection, use the explicit `dismiss-marker-rejection LABEL` command, verify exact boundary result and no drag callback, then clear and verify `No rejection requested`. Record the current marker observation only after all four cases pass. The helper does not suppress errors, minimize the inspector or dismiss unknown logs. All declared operations remain bounded and use the existing first-failure latch.
-
-The driver validates exact historical report/outcome hashes and candidate/APK/library/environment identity. Twelve reused observations are immutable and retain original source/run identities. Current completion still requires fresh known-feature, finite camera, load and error-free renderer evidence plus the current marker result; validated prior style/remount coverage avoids an unnecessary remount. Historical callback counters are not copied into current events.
-
-The retained verified API36 image, strict installed APK digest, private AVD and owned resource lifecycle are unchanged. Missing or invalid image or capacity blocks dispatch without download. Allow25-60minutes; existing boot/install/manual/driver bounds and12GiB reserve remain. No rebuild, calibration, accepted camera/core rerun, new backend or independent retry is included. One owner approval covers the complete remaining unit after audit.
+The [completed Android Mapbox outcome](../records/evidence/revised-api-u26-android-mapbox-api36-attempt-29.json) and [completed retained packet](../records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json) preserve its executed inputs and accepted reuse. Historical commands must not be dispatched again from this handoff.
 
 ## Execution, failure and completion
 
