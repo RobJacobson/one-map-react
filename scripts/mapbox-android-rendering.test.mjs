@@ -47,6 +47,7 @@ for (const [
   ["mapbox", true, true, false, true],
   ["mapbox", true, true, false, false, true],
   ["mapbox", true, true, false, false, true, true],
+  ["maplibre", true, true, false, false, true, true],
   ["mapbox", true, true, false, false, true, true, true],
 ]) {
   const avdName = api36Unit ? "OneMapF05MapboxApi36" : "OneMapU25F05";
@@ -58,7 +59,9 @@ for (const [
     null,
     ...(engine === "mapbox" ? ["missing-token", "whitespace-token"] : []),
     "existing-output",
-    ...(continuation || mapboxUnit ? ["prior-hash", "prior-prefix"] : []),
+    ...(continuation || (mapboxUnit && engine === "mapbox")
+      ? ["prior-hash", "prior-prefix"]
+      : []),
     ...(mapboxUnit ? ["retained-driver"] : []),
     ...(api36Resume
       ? [
@@ -388,11 +391,14 @@ for (const [
         log: (message) => {
           if (String(message).startsWith("API36 ")) {
             const row = String(message).split(" ")[1];
-            assert.equal(latestCheckpoint.currentRow, `mapbox-android-${row}`);
+            assert.equal(
+              latestCheckpoint.currentRow,
+              `${engine}-android-${row}`
+            );
             if (!api36Resume)
               assert.equal(
                 latestCheckpoint.rows.at(-1).rowId,
-                row === "core" ? "mapbox-android-camera" : "mapbox-android-core"
+                `${engine}-android-${row === "core" ? "camera" : "core"}`
               );
             if (!api36Resume)
               assert.equal(latestCheckpoint.rows.at(-1).status, "passed");
@@ -422,7 +428,7 @@ for (const [
               ? ""
               : failAt === "whitespace-token"
                 ? "   "
-                : engine === "mapbox"
+                : engine === "mapbox" || mapboxUnit
                   ? "redacted-test-token"
                   : "",
         },
@@ -439,7 +445,8 @@ for (const [
       existsSync: (file) =>
         file.endsWith("scene.json")
           ? launched
-          : api36Resume && file.endsWith("android-api36-image")
+          : (api36Resume || (api36Unit && engine === "maplibre")) &&
+              file.endsWith("android-api36-image")
             ? failAt !== "image-capacity"
             : failAt === "avd",
       statfsSync: () => ({
@@ -473,6 +480,7 @@ for (const [
           file.endsWith("signal-liveness-preparation.json") ||
           file.endsWith("mapbox-android-unit-preparation.json") ||
           file.endsWith("mapbox-android-api36-preparation.json") ||
+          file.endsWith("maplibre-android-api36-preparation.json") ||
           file.endsWith("mapbox-android-api36-retained-preparation.json") ||
           file.endsWith("mapbox-android-api36-console-resume-preparation.json")
         )
@@ -749,7 +757,7 @@ for (const [
       };
     };
     await runInNewContext(
-      `${source}\nrun("/attempt", "${engine}", "${api36Resume ? "mapbox-acceptance-api36-resume" : api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
+      `${source}\nrun("/attempt", "${engine}", "${engine === "maplibre" && api36Unit ? "maplibre-acceptance-api36" : api36Resume ? "mapbox-acceptance-api36-resume" : api36Unit ? "mapbox-acceptance-api36" : mapboxUnit ? "mapbox-acceptance" : signalDiagnostic ? "signal-diagnostic" : continuation ? "acceptance-continuation" : batch ? "acceptance" : camera ? "camera" : "rendering"}")`,
       context
     ).catch((error) => {
       assert.equal(failAt, "existing-output");
@@ -955,7 +963,7 @@ for (const [
         );
         if (!signalDiagnostic && !api36Resume)
           assert(
-            late[0].endsWith("mapbox-android-core-driver-stderr.log"),
+            late[0].endsWith(`${engine}-android-core-driver-stderr.log`),
             late[0]
           );
         assert.equal(
@@ -985,7 +993,7 @@ for (const [
         assert.deepEqual(
           cameraEngines,
           api36Unit && !api36Resume
-            ? ["mapbox"]
+            ? [engine]
             : signalDiagnostic || mapboxUnit
               ? []
               : continuation
@@ -998,9 +1006,9 @@ for (const [
             ? ["mapbox-android-retained"]
             : api36Unit && !api36Resume
               ? [
-                  "mapbox-android-camera",
-                  "mapbox-android-core",
-                  "mapbox-android-retained",
+                  `${engine}-android-camera`,
+                  `${engine}-android-core`,
+                  `${engine}-android-retained`,
                 ]
               : mapboxUnit
                 ? ["mapbox-android-core", "mapbox-android-retained"]
@@ -1024,12 +1032,14 @@ for (const [
           api36Resume ? 1 : mapboxUnit ? 2 : signalDiagnostic ? 1 : 4
         );
         if (mapboxUnit) {
-          assert.equal(receipt.mode, "mapbox-android-unit");
+          assert.equal(receipt.mode, `${engine}-android-unit`);
           assert.equal(receipt.rows.at(-1).scene.density, 2.625);
           assert(
             !commands.some((call) =>
               call.some((arg) =>
-                /gradlew|maplibre|signal-calibration/.test(String(arg))
+                new RegExp(
+                  `gradlew|native-${engine === "mapbox" ? "maplibre" : "mapbox"}|signal-calibration`
+                ).test(String(arg))
               )
             )
           );
@@ -1083,7 +1093,7 @@ for (const [
           api36Resume
             ? []
             : api36Unit && !api36Resume
-              ? ["mapbox-android-camera", "mapbox-android-core"]
+              ? [`${engine}-android-camera`, `${engine}-android-core`]
               : ["mapbox-android-core"]
         );
         assert.equal(coreRows, api36Resume ? 1 : 2);
@@ -1163,6 +1173,33 @@ for (const unit of ["mapbox-acceptance", "mapbox-acceptance-api36"])
     }),
     /targets Mapbox only/
   );
+await assert.rejects(
+  runInNewContext(
+    `${source}\nrun('/attempt', 'mapbox', 'maplibre-acceptance-api36')`,
+    {
+      assert,
+      join,
+      mkdirSync: () => {
+        throw Error("Wrong backend acquired resources.");
+      },
+    }
+  ),
+  /targets MapLibre only/
+);
+const maplibreApi36Entrypoint = readFileSync(
+  new URL("./maplibre-android-api36-acceptance.mjs", import.meta.url),
+  "utf8"
+)
+  .replace(/^import[^\n]+;\n/m, "")
+  .replace("await run", "run");
+await runInNewContext(maplibreApi36Entrypoint, {
+  process: { argv: ["node", "entrypoint", "/entrypoint"] },
+  run: (output, engine, scene) => {
+    assert.equal(output, "/entrypoint");
+    assert.equal(engine, "maplibre");
+    assert.equal(scene, "maplibre-acceptance-api36");
+  },
+});
 console.log(
   "Both Android rendering branches and camera orchestration/entrypoint mocks passed."
 );

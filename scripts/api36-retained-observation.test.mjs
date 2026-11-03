@@ -48,47 +48,80 @@ console.log(
 );
 
 // Run the exact packet command against the operator stdout envelope, without Android.
-const packet = JSON.parse(
-  readFileSync(
-    new URL(
-      "../records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json",
-      import.meta.url
+for (const engine of ["mapbox", "maplibre"]) {
+  const packet = JSON.parse(
+    readFileSync(
+      new URL(
+        engine === "mapbox"
+          ? "../records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json"
+          : "../records/evidence/revised-api-u26-maplibre-android-api36-preparation.json",
+        import.meta.url
+      )
     )
-  )
-);
-const temporary = mkdtempSync(join(tmpdir(), "retained-live-judge-"));
-try {
-  const statusPath = join(temporary, "status.txt");
-  const manualPath = join(temporary, "manual.json");
-  writeFileSync(manualPath, JSON.stringify(manual));
-  const command = packet.liveJudgeCommand
-    .replace(`${packet.output}/retained-status.txt`, statusPath)
-    .replace(
-      `${packet.output}/mapbox-android-retained-manual.json`,
-      manualPath
-    );
-  const invoke = (body, ending = "COMPLETE 0") => {
-    writeFileSync(
-      statusPath,
-      `WAIT row readiness mapbox-android-retained\nSTART status http://127.0.0.1:8797/tf07\n${JSON.stringify(body)}\n${ending}\n`
-    );
-    return spawnSync("/bin/sh", ["-c", command], { encoding: "utf8" });
-  };
-  const live = invoke(saved.observation);
-  assert.equal(live.status, 0, live.stderr);
-  assert.deepEqual(JSON.parse(live.stdout), result);
-  assert.notEqual(invoke(null).status, 0);
-  assert.notEqual(invoke(saved.observation, "FAILED status").status, 0);
-  writeFileSync(
-    manualPath,
-    JSON.stringify({ ...manual, installedBinarySha256: "a".repeat(64) })
   );
-  const tampered = invoke(saved.observation);
-  assert.equal(tampered.status, 0, tampered.stderr);
-  assert.equal(JSON.parse(tampered.stdout).manualComplete, false);
-} finally {
-  rmSync(temporary, { recursive: true, force: true });
+  const temporary = mkdtempSync(join(tmpdir(), "retained-live-judge-"));
+  try {
+    const statusPath = join(temporary, "status.txt");
+    const manualPath = join(temporary, "manual.json");
+    const selectedIdentity = {
+      ...saved,
+      installedBinarySha256: packet.verifiedBinaries.android[engine].sha256,
+      environment: `${engine}-android`,
+    };
+    const selectedManual = {
+      ...manual,
+      installedBinarySha256: selectedIdentity.installedBinarySha256,
+      environment: selectedIdentity.environment,
+    };
+    writeFileSync(manualPath, JSON.stringify(selectedManual));
+    const command = packet.liveJudgeCommand
+      .replace(`${packet.output}/retained-status.txt`, statusPath)
+      .replace(
+        `${packet.output}/${engine}-android-retained-manual.json`,
+        manualPath
+      );
+    const invoke = (body, ending = "COMPLETE 0") => {
+      writeFileSync(
+        statusPath,
+        `WAIT row readiness ${engine}-android-retained\nSTART status http://127.0.0.1:8797/tf07\n${JSON.stringify(body)}\n${ending}\n`
+      );
+      return spawnSync("/bin/sh", ["-c", command], { encoding: "utf8" });
+    };
+    const live = invoke(saved.observation);
+    assert.equal(live.status, 0, live.stderr);
+    assert.deepEqual(
+      JSON.parse(live.stdout),
+      judgeNativeRetained(saved.observation, selectedManual, selectedIdentity)
+    );
+    const beforeFinish = structuredClone(refreshed);
+    delete beforeFinish.observations.at(-1).events["read-error"];
+    beforeFinish.focusedComplete = false;
+    const pendingFinish = invoke(beforeFinish);
+    assert.equal(pendingFinish.status, 0, pendingFinish.stderr);
+    const pendingResult = JSON.parse(pendingFinish.stdout);
+    assert.equal(pendingResult.manualComplete, true);
+    assert.equal(pendingResult.checks.focusedComplete, false);
+    assert(
+      Object.entries(pendingResult.checks).every(
+        ([name, passed]) => name === "focusedComplete" || passed
+      )
+    );
+    assert.notEqual(invoke(null).status, 0);
+    assert.notEqual(invoke(saved.observation, "FAILED status").status, 0);
+    writeFileSync(
+      manualPath,
+      JSON.stringify({
+        ...selectedManual,
+        installedBinarySha256: "a".repeat(64),
+      })
+    );
+    const tampered = invoke(saved.observation);
+    assert.equal(tampered.status, 0, tampered.stderr);
+    assert.equal(JSON.parse(tampered.stdout).manualComplete, false);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
 }
 console.log(
-  "Exact live judge parses operator START/JSON/COMPLETE output and rejects null, failure and identity mismatch."
+  "Both exact packet live judges parses operator START/JSON/COMPLETE output and rejects null, failure and identity mismatch."
 );

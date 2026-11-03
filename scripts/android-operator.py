@@ -80,10 +80,10 @@ def main(arguments):
                 raise ValueError("Unknown toolbar label for this row.")
             adb_arguments = [label]
         if operation == "dismiss-marker-rejection" and (
-            row != "mapbox-android-core" or scenario != "marker-prop-rejection"
+            not row.endswith("-core") or scenario != "marker-prop-rejection"
             or len(adb_arguments) != 1 or adb_arguments[0] not in REJECTION_LABELS
         ):
-            raise ValueError("Expected the Mapbox core marker rejection case label.")
+            raise ValueError("Expected a selected Android core marker rejection case label.")
         candidate_report, identity = wait_for_row(attempt, row, latch)
         if identity.get("environment") != row.rsplit("-", 1)[0]:
             raise ValueError("Report environment differs from row.")
@@ -255,7 +255,7 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
             remaining = None
             receipt["dismissals"] = []
             for _ in range(2):
-                rectangle, count = marker_rejection_dismiss(xml, allow_notice=remaining == 2)
+                rectangle, count = marker_rejection_dismiss(xml, row, allow_notice=remaining == 2)
                 if remaining is not None and count != remaining - 1:
                     raise ValueError("Expected rejection log count to decrease by one.")
                 remaining = count
@@ -267,7 +267,7 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
                 if count == 1:
                     break
             toolbar_snapshot(xml, row)
-            require_rejection_result(xml, label)
+            require_rejection_result(xml, row, label)
             receipt["status"] = "rejection-verified"
             return
         previous = None
@@ -316,13 +316,13 @@ def activate_toolbar(attempt, row, scenario, identity, label, latch, rejection=F
         print("TOOLBAR", json.dumps({**receipt, "receipt": str(receipt_path)}), flush=True)
 
 
-def marker_rejection_dismiss(xml, allow_notice=False):
+def marker_rejection_dismiss(xml, row, allow_notice=False):
     """Match a Marker rejection, or its following exact RN debugger notice."""
     root = ET.fromstring(xml)
     nodes = list(root.iter("node"))
-    package = "com.onemapmapbox"
+    package = "com.onemap" + row.split("-", 1)[0]
     if not nodes or any(node.get("package") != package for node in nodes):
-        raise ValueError("Expected only the Mapbox application hierarchy.")
+        raise ValueError("Expected only the selected application hierarchy.")
     texts = [node.get("text") for node in nodes]
     if allow_notice and "Console Warning" in texts:
         # RN's Fusebox notice replaces warning bodies; it is not the hidden warning.
@@ -362,11 +362,12 @@ def marker_rejection_dismiss(xml, allow_notice=False):
     return (left, top, right, bottom), count
 
 
-def require_rejection_result(xml, label):
+def require_rejection_result(xml, row, label):
     root = ET.fromstring(xml)
+    package = "com.onemap" + row.split("-", 1)[0]
     results = [node for node in root.iter("node")
                if node.get("resource-id") == "tf07-marker-rejection"
-               and node.get("package") == "com.onemapmapbox"]
+               and node.get("package") == package]
     if len(results) != 1 or results[0].get("text") != label + ": " + REJECTION_MESSAGE:
         raise ValueError("Expected exact fixture boundary rejection result.")
 

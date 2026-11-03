@@ -69,6 +69,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       "mapbox-acceptance",
       "mapbox-acceptance-api36",
       "mapbox-acceptance-api36-resume",
+      "maplibre-acceptance-api36",
     ].includes(scene),
     "Unknown fixed scene."
   );
@@ -79,15 +80,23 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
   const continuation = scene === "acceptance-continuation";
   const signalDiagnostic = scene === "signal-diagnostic";
   const api36Resume = scene === "mapbox-acceptance-api36-resume";
-  const api36Unit = scene === "mapbox-acceptance-api36" || api36Resume;
-  const mapboxUnit = scene === "mapbox-acceptance" || api36Unit;
+  const maplibreUnit = scene === "maplibre-acceptance-api36";
+  const api36Unit =
+    scene === "mapbox-acceptance-api36" || api36Resume || maplibreUnit;
+  const mapboxUnit =
+    scene === "mapbox-acceptance" || (api36Unit && !maplibreUnit);
+  const selectedUnit = mapboxUnit || maplibreUnit;
+  assert(
+    !maplibreUnit || engine === "maplibre",
+    "Selected scene targets MapLibre only."
+  );
   const avdName = api36Unit ? "OneMapF05MapboxApi36" : "OneMapU25F05";
   assert(
     !(signalDiagnostic || mapboxUnit) || engine === "mapbox",
     "Selected scene targets Mapbox only."
   );
   const batch =
-    scene === "acceptance" || continuation || signalDiagnostic || mapboxUnit;
+    scene === "acceptance" || continuation || signalDiagnostic || selectedUnit;
   const camera = scene === "camera" || batch;
   const ports = batch
     ? [5580, 5581, 8081, 8797]
@@ -109,12 +118,12 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     apkSha256,
     cleanup: [],
     checkpoints: [],
-    ...(mapboxUnit && {
-      mode: "mapbox-android-unit",
+    ...(selectedUnit && {
+      mode: `${engine}-android-unit`,
       scope: [
-        ...(api36Unit && !api36Resume ? ["mapbox-android-camera"] : []),
-        ...(!api36Resume ? ["mapbox-android-core"] : []),
-        "mapbox-android-retained",
+        ...(api36Unit && !api36Resume ? [`${engine}-android-camera`] : []),
+        ...(!api36Resume ? [`${engine}-android-core`] : []),
+        `${engine}-android-retained`,
       ],
       signalCalibration:
         "omitted; unsupported event and unresolved application SIGKILL",
@@ -189,7 +198,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
   };
   const verifyInputs = (preparation, freeze) => {
     assert.equal(sha256(apk), apkSha256, "Verified retained APK changed.");
-    if (batch && !mapboxUnit)
+    if (batch && !selectedUnit)
       for (const [selected, target] of Object.entries(targets))
         assert.equal(
           sha256(
@@ -390,19 +399,21 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     }
     const peerEvidence = join(
       root,
-      api36Resume
-        ? "records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json"
-        : api36Unit
-          ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
-          : mapboxUnit
-            ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
-            : signalDiagnostic
-              ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
-              : continuation
-                ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
-                : batch
-                  ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
-                  : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
+      maplibreUnit
+        ? "records/evidence/revised-api-u26-maplibre-android-api36-preparation.json"
+        : api36Resume
+          ? "records/evidence/revised-api-u26-mapbox-android-api36-retained-preparation.json"
+          : api36Unit
+            ? "records/evidence/revised-api-u26-mapbox-android-api36-preparation.json"
+            : mapboxUnit
+              ? "records/evidence/revised-api-u26-mapbox-android-unit-preparation.json"
+              : signalDiagnostic
+                ? "records/evidence/revised-api-u26-signal-liveness-preparation.json"
+                : continuation
+                  ? "records/evidence/revised-api-u26-android-kernel-console-preparation.json"
+                  : batch
+                    ? "records/evidence/revised-api-u26-platform-batches-preparation.json"
+                    : `records/evidence/revised-api-u25-f05-${engine}-android-${scene}-preparation.json`
     );
     const preparation = JSON.parse(readFileSync(peerEvidence));
     const freeze = JSON.parse(readFileSync(preparation.freeze.path));
@@ -451,17 +462,17 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
     const imageNeeded =
       api36Unit && !existsSync(join(recovery, "android-api36-image"));
     assert(
-      !api36Resume || !imageNeeded,
+      !(api36Resume || maplibreUnit) || !imageNeeded,
       "Resume requires the retained verified API36 image; no download is authorized."
     );
     const requiredBytes =
-      (mapboxUnit ? 12 * 1024 ** 3 : 8804682957) +
+      (selectedUnit ? 12 * 1024 ** 3 : 8804682957) +
       (imageNeeded ? 4575096761 : 0);
     assert(
       receipt.freeBytes >= requiredBytes,
       api36Unit
         ? `API36 setup and batch require ${requiredBytes} free bytes; stop before staging.`
-        : `Android preboot requires ${mapboxUnit ? "12" : "8.2"} GiB free; stop without deleting files.`
+        : `Android preboot requires ${selectedUnit ? "12" : "8.2"} GiB free; stop without deleting files.`
     );
     if (!camera) createRequire(join(pngRoot, "package.json"))("pngjs");
     for (const port of ports) await requireFreePort(port, execute);
@@ -557,7 +568,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
       reverses.push(port);
     }
     receipt.rows = batch ? [] : undefined;
-    for (const selectedEngine of batch && !signalDiagnostic && !mapboxUnit
+    for (const selectedEngine of batch && !signalDiagnostic && !selectedUnit
       ? ["mapbox", "maplibre"]
       : [engine]) {
       engine = selectedEngine;
@@ -673,7 +684,7 @@ export const run = async (output, engine = "mapbox", scene = "rendering") => {
               TF07_OUTPUT: join(output, `${rowId}-result.json`),
               TF07_NATIVE_TIMEOUT_MS: signalDiagnostic ? "900000" : "1800000",
               ...(signalDiagnostic && { TF07_ANDROID_SIGNAL_OUTPUT: output }),
-              ...(mapboxUnit && { TF07_ANDROID_SIGNAL_OUTPUT: "" }),
+              ...(selectedUnit && { TF07_ANDROID_SIGNAL_OUTPUT: "" }),
               TF07_ANDROID_DIAGNOSTICS: join(
                 output,
                 `${rowId}-diagnostics.json`
