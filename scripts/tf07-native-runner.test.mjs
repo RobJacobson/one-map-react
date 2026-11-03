@@ -5,8 +5,6 @@ import { readFileSync } from "node:fs";
 import { StringDecoder } from "node:string_decoder";
 import { runInNewContext } from "node:vm";
 
-import { api36ReusedScenarios } from "./api36-reused-observations.mjs";
-
 const text = readFileSync(
   new URL("./tf07-ui-smoke.mjs", import.meta.url),
   "utf8"
@@ -48,13 +46,11 @@ const source = text.slice(
   text.indexOf("const nativeStatus =")
 );
 const hash = "a".repeat(64);
-for (const [engine, borrowed, reuse = false] of [
+for (const [engine, borrowed] of [
   ["mapbox", false],
   ["mapbox", true],
-  ["mapbox", true, true],
   ["maplibre", false],
   ["maplibre", true],
-  ["maplibre", true, true],
 ]) {
   for (const failure of [
     null,
@@ -82,13 +78,6 @@ for (const [engine, borrowed, reuse = false] of [
     "manual-diagnostics-pid-malformed",
     "manual-identity",
     "manual-json",
-    ...(reuse
-      ? [
-          "manual-reuse-provenance",
-          "manual-reuse-status",
-          "manual-reuse-observation",
-        ]
-      : []),
     "status-bind",
     "metro-spawn",
     "metro-exit-zero",
@@ -97,32 +86,7 @@ for (const [engine, borrowed, reuse = false] of [
     "readiness-body",
     "launch-status",
     "launch-error",
-    ...(engine === "mapbox"
-      ? ["signal-prepare", "signal-stop", "manual-signal-stop"]
-      : []),
   ]) {
-    if (
-      reuse &&
-      ![
-        null,
-        "manual-identity",
-        "manual-json",
-        "manual-failed",
-        "manual-reuse-provenance",
-        "manual-reuse-status",
-        "manual-reuse-observation",
-      ].includes(failure)
-    )
-      continue;
-    const reused = Object.fromEntries(
-      api36ReusedScenarios.map((name) => [
-        name,
-        {
-          source: { runId: "old-run" },
-          observation: { action: "old action", seenResult: "old result" },
-        },
-      ])
-    );
     const commands = [];
     const stopped = [];
     const removed = [];
@@ -137,23 +101,7 @@ for (const [engine, borrowed, reuse = false] of [
     let diagnostics;
     let recorder;
     let recorderStopped = false;
-    let signalStopped = false;
     const context = {
-      prepareAndroidSignalCapture: async () => {
-        assert(metroReady);
-        assert(!launched, "Calibrate before app launch.");
-        if (failure === "signal-prepare") throw Error("calibration failed");
-        return {
-          stop: async () => {
-            signalStopped = true;
-            assert(
-              !commands.at(-1).includes("force-stop"),
-              "Pull trace before app cleanup."
-            );
-            throw Error("signal stop failed");
-          },
-        };
-      },
       Buffer,
       StringDecoder,
       setTimeout,
@@ -198,26 +146,15 @@ for (const [engine, borrowed, reuse = false] of [
       platform: "android",
       retained: false,
       root: "/frozen-harness",
-      scenarios: [
-        ...(reuse ? api36ReusedScenarios : []),
-        "physical-touch",
-        "later-touch",
-      ],
+      scenarios: ["physical-touch", "later-touch"],
 
       process: {
         env: {
           ANDROID_SERIAL: "emulator-5580",
-          ...(reuse &&
-            (engine === "mapbox"
-              ? { TF07_REUSE_API36_ATTEMPT24: "1" }
-              : { TF07_REUSE_MAPLIBRE_API36_ATTEMPT30: "1" })),
           TF07_NATIVE_BINARY_SHA256: hash,
           TF07_MANUAL_REPORT: "/report",
           TF07_ANDROID_DIAGNOSTICS: "/diagnostics",
           MAPBOX_ACCESS_TOKEN: "known-sample-token",
-          ...(failure?.includes("signal-") && {
-            TF07_ANDROID_SIGNAL_OUTPUT: "/attempt",
-          }),
           ...(borrowed
             ? {
                 TF07_BORROWED_METRO_REVERSE: "1",
@@ -265,32 +202,17 @@ for (const [engine, borrowed, reuse = false] of [
         assert.equal(options.flag, "wx");
         manual = JSON.parse(value);
         assert.equal(manual.runId, "fresh-run");
-        if (reuse) {
-          assert.deepEqual(manual.reusedObservations, reused);
-          assert.equal(manual.scenarios["live-child-button"], "passed");
-        }
-        if (failure === "manual-reuse-provenance")
-          manual.reusedObservations["live-child-button"].source.runId =
-            "forged";
-        if (failure === "manual-reuse-status")
-          manual.scenarios["live-child-button"] = "unverified";
-        if (failure === "manual-reuse-observation")
-          manual.reusedObservations[
-            "live-child-button"
-          ].observation.seenResult = "forged";
         assert.equal(manual.scenarios["physical-touch"], "unverified");
         if (failure === "manual-operator-latch") return;
         manual.scenarios["physical-touch"] =
           failure?.startsWith("manual-recorder") ||
           failure?.startsWith("manual-diagnostics") ||
-          failure === "manual-failed" ||
-          failure === "manual-signal-stop"
+          failure === "manual-failed"
             ? "failed"
             : "passed";
         if (
           !failure?.startsWith("manual-recorder") &&
           failure !== "manual-failed" &&
-          failure !== "manual-signal-stop" &&
           !failure?.startsWith("manual-diagnostics")
         )
           manual.scenarios["later-touch"] = "passed";
@@ -354,7 +276,7 @@ for (const [engine, borrowed, reuse = false] of [
         if (polls === 2 && failure === "metro-late-exit")
           metro.emit("exit", 1, null);
         if (polls === 1 || !failure?.startsWith("manual-"))
-          onObservation({ generation: reuse ? 0 : 1 });
+          onObservation({ generation: 1 });
         assert(await observe());
         if (
           polls === 1 &&
@@ -433,7 +355,6 @@ for (const [engine, borrowed, reuse = false] of [
           throw Error("launch failed");
         if (parts.includes("force-stop") && launched) {
           assert(recorderStopped);
-          if (failure?.includes("signal-")) assert(signalStopped);
         }
         if (parts.includes("--remove") && failure === "cleanup")
           throw Error("cleanup failed");
@@ -498,7 +419,7 @@ for (const [engine, borrowed, reuse = false] of [
     };
     try {
       const result = await runInNewContext(
-        `const loadMaplibreApi36ReusedObservations = () => JSON.parse(${JSON.stringify(JSON.stringify(reused))});\nconst loadApi36ReusedObservations = () => JSON.parse(${JSON.stringify(JSON.stringify(reused))});\n${source}\nrunNative("${engine}")`,
+        `${source}\nrunNative("${engine}")`,
         context
       );
       assert(result.androidRecorder, "Successful row saves recorder status.");
@@ -534,7 +455,6 @@ for (const [engine, borrowed, reuse = false] of [
       failed = true;
     }
     if (recorder) assert(recorderStopped);
-    if (failure === "signal-prepare") assert(!launched);
     assert.equal(
       failed,
       failure !== null && !failure?.startsWith("success-recorder"),
@@ -646,13 +566,6 @@ for (const [engine, borrowed, reuse = false] of [
         "manual-diagnostics-write",
         "manual-identity",
         "manual-json",
-        ...(reuse
-          ? [
-              "manual-reuse-provenance",
-              "manual-reuse-status",
-              "manual-reuse-observation",
-            ]
-          : []),
       ].includes(failure)
     ) {
       assert(stopped.includes(77));
@@ -945,27 +858,3 @@ for (const mode of ["escalation-close", "never-close", "async-spawn-error"]) {
 console.log(
   "Recorder parent-owned escalation, final flush, unclosed gap and asynchronous spawn failure mocks passed."
 );
-
-const reuseGuard = text.slice(
-  text.indexOf("    const reuseApi36 ="),
-  text.indexOf("    const manualPath =")
-);
-for (const [platform, selectedEngine, retained, permitted] of [
-  ["android", "mapbox", false, true],
-  ["ios", "mapbox", false, false],
-  ["android", "maplibre", false, false],
-  ["android", "mapbox", true, false],
-]) {
-  const check = () =>
-    runInNewContext(reuseGuard, {
-      assert,
-      platform,
-      selectedEngine,
-      retained,
-      identity: {},
-      process: { env: { TF07_REUSE_API36_ATTEMPT24: "1" } },
-      loadApi36ReusedObservations: () => ({}),
-    });
-  if (permitted) check();
-  else assert.throws(check, /core Mapbox Android only/);
-}

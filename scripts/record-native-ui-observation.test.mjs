@@ -245,7 +245,7 @@ try {
   const corrected = JSON.parse(
     fs.readFileSync(
       new URL(
-        "../records/evidence/revised-api-u26-maplibre-android-attempt30-corrected-input.json",
+        "./fixtures/api36-maplibre-attempt30-corrected-input.json",
         import.meta.url
       )
     )
