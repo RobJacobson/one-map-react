@@ -88,6 +88,8 @@ Web shells in `examples/web-mapbox` and `examples/web-maplibre` need `bun run bu
 
 ## Project documents
 
+The [project files](FILES.md) show the source layout.
+
 Read the [requirements](docs/requirements.md), [stage plan](docs/stage-plan.md), and [testing policy](docs/testing-policy.md). The [documentation index](docs/README.md) links the API research and style guides. The [TF01 record](docs/tf01-foundation.md) describes the reset; the [TF02 record](docs/tf02-shared-map.md) describes the completed shared map.
 
 The `records/` directory preserves historical inventory and compact checkpoint evidence. No historical implementation code is required to develop this project.

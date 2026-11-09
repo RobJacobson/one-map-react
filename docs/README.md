@@ -31,7 +31,7 @@ The [example workspace checkpoint](examples-workspace.md) describes the new Expo
 
 The [native fitBounds.maxZoom memo](native-fitbounds-maxzoom-memo.md) records the current native rejection and the deferred proposal for upstream support in RNMapbox and MapLibre React Native.
 
-Keep using the [coding guide](coding-style.md) and [documentation style guide](STYLE_GUIDE.md). The coding guide retains formatting, functional programming, naming, public documentation, and cleanup guidance, with local consolidation allowed where it improves readability. Follow [agent instructions](AGENTS.md) when editing these documents.
+Follow the [shared coding style](https://github.com/RobJacobson/react-style-guide/blob/v0.1.0/coding-style.md) and [shared documentation style](https://github.com/RobJacobson/react-style-guide/blob/v0.1.0/documentation-style.md). The [mapping documentation conventions](STYLE_GUIDE.md) add project-specific terminology, comparison, and evidence rules. Follow [agent instructions](AGENTS.md) when editing these documents.
 
 ## Preserved research
 
