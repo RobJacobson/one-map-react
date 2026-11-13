@@ -81,6 +81,8 @@ try {
           process.env[`TF06_${engine.toUpperCase()}_ANDROID_ID`] ??
           `com.onemap${engine}`,
       });
+      if (results[`${engine}-android`].status !== "passed")
+        throw new Error("Native smoke failed; no later engine was started.");
     }
   }
 
@@ -93,6 +95,8 @@ try {
           process.env[`TF06_${engine.toUpperCase()}_IOS_ID`] ??
           `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`,
       });
+      if (results[`${engine}-ios`].status !== "passed")
+        throw new Error("Native smoke failed; no later engine was started.");
     }
   }
 } finally {
@@ -359,6 +363,9 @@ async function runNative({ directory, platform, applicationId }) {
   if (platform === "ios") await freePort(8799);
 
   let metroLog = "";
+  let metroFailure;
+  let stoppingMetro = false;
+  let acquiredApp = false;
   const metroArgs = nativeMetroArgs();
 
   const nativeEnv = nativeEnvironment(
@@ -377,6 +384,15 @@ async function runNative({ directory, platform, applicationId }) {
     metroLog += chunk.toString();
   };
 
+  metro.on("error", (error) => {
+    metroFailure ??= error;
+  });
+  metro.on("exit", (code, signal) => {
+    if (!stoppingMetro)
+      metroFailure ??= new Error(
+        `Metro exited before completion: ${code}/${signal}`
+      );
+  });
   metro.stdout.on("data", record);
   metro.stderr.on("data", record);
 
@@ -392,20 +408,30 @@ async function runNative({ directory, platform, applicationId }) {
   let statusPort = null;
 
   try {
-    if (platform === "ios") statusPort = await openStatusPort();
+    if (platform === "ios" && !statusPort) statusPort = await openStatusPort();
     await waitFor(
-      () => metroLog.includes("Dev server ready") || metroLog.includes("8081"),
+      async () => {
+        if (metroFailure) throw metroFailure;
+        const response = await fetch("http://127.0.0.1:8081/status");
+        return (
+          response.ok && (await response.text()) === "packager-status:running"
+        );
+      },
       60000,
       "Metro"
     );
 
     if (platform === "android") {
+      acquiredApp = true;
       const launched = launchNativeWorkspace({ platform, iosDevice });
       nativePid = launched?.pid;
       await allowNearbyDevices();
 
       const status = await watchNative({
-        readStatus: readAndroidStatus,
+        readStatus: () => {
+          if (metroFailure) throw metroFailure;
+          return readAndroidStatus();
+        },
       });
 
       return {
@@ -414,10 +440,14 @@ async function runNative({ directory, platform, applicationId }) {
       };
     }
 
+    acquiredApp = true;
     launchNativeWorkspace({ platform, iosDevice });
 
     const status = await watchNative({
-      readStatus: () => statusPort.read(),
+      readStatus: () => {
+        if (metroFailure) throw metroFailure;
+        return statusPort.read();
+      },
       timeout: 600000,
     });
 
@@ -432,23 +462,33 @@ async function runNative({ directory, platform, applicationId }) {
       log: metroLog.slice(-1500),
     };
   } finally {
-    if (platform === "android") {
-      await command("adb", ["shell", "am", "force-stop", applicationId]).catch(
-        () => undefined
-      );
+    try {
+      if (acquiredApp) {
+        if (platform === "android")
+          await command("adb", [
+            "-s",
+            process.env.ANDROID_SERIAL,
+            "shell",
+            "am",
+            "force-stop",
+            applicationId,
+          ]);
+        else
+          await command("xcrun", [
+            "simctl",
+            "terminate",
+            iosDevice,
+            applicationId,
+          ]);
+      }
+    } finally {
+      try {
+        await statusPort?.close();
+      } finally {
+        stoppingMetro = true;
+        await stopOwnedProcess(metro);
+      }
     }
-    if (platform === "ios") {
-      await command("xcrun", [
-        "simctl",
-        "terminate",
-        iosDevice,
-        applicationId,
-      ]).catch(() => undefined);
-    }
-
-    await statusPort?.close();
-    await stopOwnedProcess(metro);
-    await awaitMetroPortRelease();
   }
 }
 
@@ -622,7 +662,7 @@ async function waitFor(ready, timeout, label) {
   const started = Date.now();
 
   while (Date.now() - started < timeout) {
-    if (ready()) {
+    if (await ready()) {
       return;
     }
 
@@ -643,47 +683,52 @@ function command(file, args, options = {}, timeout = 120000) {
     const child = spawn(file, args, {
       cwd: options.cwd,
       env: options.env,
+      signal: options.signal,
+      detached: true,
       stdio: [options.input === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
-
-    if (options.input !== undefined) {
-      child.stdin.end(options.input);
-    }
+    if (options.input !== undefined) child.stdin.end(options.input);
     let output = "";
+    let stopping = false;
+    const stop = async (error) => {
+      if (stopping) return;
+      stopping = true;
+      clearTimeout(timer);
+      try {
+        await stopOwnedProcess(child);
+        reject(error);
+      } catch (cleanupError) {
+        reject(cleanupError);
+      }
+    };
     const timer = setTimeout(() => {
-      child.kill("SIGTERM");
-      reject(new Error(`${file} timed out`));
+      void stop(new Error(`${file} timed out`));
     }, timeout);
-
     child.stdout.on("data", (chunk) => {
       output += chunk.toString();
     });
     child.stderr.on("data", (chunk) => {
       output += chunk.toString();
     });
-    child.on("error", reject);
+    child.on("error", (error) => {
+      void stop(error);
+    });
     child.on("close", (code) => {
       clearTimeout(timer);
-
-      if (code === 0) {
-        resolve(output);
-        return;
-      }
-
-      reject(new Error(output.slice(-2000) || `${file} exited ${code}`));
+      if (stopping) return;
+      if (code === 0) resolve(output);
+      else
+        void stop(new Error(output.slice(-2000) || `${file} exited ${code}`));
     });
   });
 }
 
 async function freePort(port) {
-  const listed = await command("lsof", [
-    "-nP",
-    `-iTCP:${port}`,
-    "-sTCP:LISTEN",
-    "-t",
-  ]).catch(() => "");
-  if (listed.trim())
-    throw new Error(
-      `Acceptance port ${port} is already owned; no process was stopped.`
-    );
+  try {
+    await command("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"]);
+  } catch (error) {
+    if (error.message === "lsof exited 1") return;
+    throw error;
+  }
+  throw new Error(`Port ${port} is occupied; no listener was terminated.`);
 }

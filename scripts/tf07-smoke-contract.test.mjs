@@ -35,6 +35,14 @@ const manual = {
   ),
 };
 
+for (const scenario of ["camera-target-and-gesture", "marker-prop-rejection"]) {
+  assert(nativeUiScenarios.includes(scenario));
+  const old = { ...manual, scenarios: { ...manual.scenarios } };
+  delete old.scenarios[scenario];
+  assert.equal(nativeUiReportReady(old, identity), false);
+  assert.equal(judgeNativeUi(observation, old, identity).status, "unverified");
+}
+
 assert.equal(nativeUiReportReady(undefined, identity), false);
 assert.equal(nativeUiReportReady(manual, identity), true);
 assert.equal(

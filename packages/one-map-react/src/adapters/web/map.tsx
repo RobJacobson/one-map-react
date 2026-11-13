@@ -209,28 +209,22 @@ export const createWebMap = <
             ...(paddingValue === undefined ? {} : { padding: paddingValue }),
           };
 
-    // MapLibre's nested viewState also controls canvas size, and present
-    // undefined camera keys override its initial camera (@vis.gl/react-maplibre 8.1.3
-    // utils/transform.ts; regression: "MapLibre camera forwarding preserves absence").
-    const wrapperOptions =
-      wrapper.backend === "maplibre-web"
-        ? Object.fromEntries(
-            Object.entries({
-              ...options,
-              longitude: controlledCamera?.longitude ?? options?.longitude,
-              latitude: controlledCamera?.latitude ?? options?.latitude,
-              zoom: controlledCamera?.zoom ?? options?.zoom,
-              bearing: controlledCamera?.bearing ?? options?.bearing,
-              pitch: controlledCamera?.pitch ?? options?.pitch,
-            }).filter(
-              ([key, value]) =>
-                value !== undefined ||
-                !["longitude", "latitude", "zoom", "bearing", "pitch"].includes(
-                  key
-                )
-            )
-          )
-        : options;
+    const wrapperOptions = { ...options };
+    if (wrapper.backend === "maplibre-web") {
+      // @vis.gl/react-maplibre 8.1.3 utils/transform.ts checks key presence.
+      // Regression: "MapLibre camera forwarding preserves absence".
+      for (const key of [
+        "longitude",
+        "latitude",
+        "zoom",
+        "bearing",
+        "pitch",
+      ] as const) {
+        const value = controlledCamera?.[key] ?? options?.[key];
+        if (value === undefined) delete wrapperOptions[key];
+        else wrapperOptions[key] = value;
+      }
+    }
 
     return (
       <div
@@ -266,6 +260,8 @@ export const createWebMap = <
           }
           mapStyle={mapStyle}
           initialViewState={initialCamera}
+          // MapLibre nested viewState also controls canvas size. Portable camera
+          // fields use top-level props to leave dimensions uncontrolled.
           viewState={
             wrapper.backend === "mapbox-web" ? controlledCamera : undefined
           }
