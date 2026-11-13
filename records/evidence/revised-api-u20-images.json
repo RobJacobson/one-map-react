@@ -1,0 +1,1288 @@
+{
+  "unit": "U20",
+  "status": "Implemented and independently audited within owner-approved scope. Applicable routine and exact packed checks pass with inherited exclusions stated below. Reviewed PR and immediate U21 are authorized; renderer acceptance remains open.",
+  "authorization": "Owner approved the narrow web Images polyfill and explicit user-facing rationale on 2026-10-26. Automatic sequential reviewed PRs through U24 remain authorized. No merge, package publication or acceptance execution.",
+  "scope": {
+    "approved": "small per-entry web Images polyfill; app finishes cleanup before style replacement; distinct reserved names; native normal delegation",
+    "not_added": [
+      "style identity tracking",
+      "automatic replay/retry",
+      "private SDK access",
+      "global coordination",
+      "public exports",
+      "dependencies",
+      "config/peer/patch/lock/version changes"
+    ],
+    "library_lines": {
+      "original": {
+        "before": 338,
+        "after": 153,
+        "delta": -185
+      },
+      "publication": {
+        "before": 337,
+        "after": 153,
+        "delta": -184
+      }
+    },
+    "consumer_disposition": "SourcesMap stages Images absence in a committed render before advancing its declarative style, matches facade sorted style-content equality, waits readiness and preserves latest callback. WebCorrectionsApp keeps fixed emptyStyle/reuseMaps; unused style-loading control/state removed after driver inventory proved no references. Same-renderer correction driver assertions preserved.",
+    "measurement_note": "Final publication baseline is committed main f1eb35b16ed0dcf489646bded75d98735b40f369:337 lines, not the preliminary342-line scope estimate. Original archived baseline338 lines."
+  },
+  "findings": [
+    {
+      "origin": "Coordinator",
+      "issue": "Equal-content new style prop retired Images without a new readiness event.",
+      "repair": "SourcesMap compares sorted declarative style keys; unchanged value retains entries and latest callbacks.",
+      "proof": "Actual SourcesMap regression failed both engines before fix and passes source/compiled."
+    },
+    {
+      "origin": "Coordinator and independent source audit",
+      "issue": "Deferred removal let callback-triggered style replacement precede cleanup.",
+      "repair": "Remove synchronously during addImage callbacks; released entries perform no post-call SDK inspection. Both pinned SDKs insert before data events.",
+      "proof": "Actual SourcesMap reentrant order red style/remove; green remove/style, replacement sprite retained."
+    },
+    {
+      "id": "U20-R1",
+      "severity": "P2",
+      "status": "Fixed and reviewed in both trees",
+      "path": "packages/example-map/src/scenarios/web-corrections-app.tsx",
+      "publicationPath": "examples/shared/web-corrections-app.tsx",
+      "problem": "reuseMaps=false destroys renderer on toggle while unchanged TF04/TF05 correction runners assert same-renderer identity and retain loadImage instrumentation. This breaks retained gesture/image reuse proof.",
+      "evidence": [
+        "scripts/tf04-camera-smoke.mjs:139",
+        "scripts/tf05-sources-smoke.mjs:927",
+        "scripts/tf05-sources-smoke.mjs:950"
+      ],
+      "agreedRepair": "Remove unused style-loading control/mapStyle state, keep constant emptyStyle, restore reuseMaps and remove Map key. Preserve all runner assertions and add actual correction-component toggle regression.",
+      "verification": "Final correction scene uses emptyStyle and reuseMaps with no Map key. Unused style-loading control/state removed. Both runners unchanged. New actual WebCorrectionsApp regression asserts owned image cleanup and identical renderer after map-toggle; writer reports prior false-reuse red then 262 adapter tests green."
+    }
+  ],
+  "fixtureDispositions": [
+    "Retire tests of excluded automatic image restoration, style-event retries and arbitrary mounted cross-style ownership.",
+    "Retain mixed query/gesture/interaction proof and original-only StrictMode/Suspense cases.",
+    "Remove unused style-loading UI/state from correction fixture after confirming no driver references. Keep renderer reuse and all TF04/TF05 driver identity assertions.",
+    "Keep both native Images adapters unchanged; do not suppress normal SDK restoration."
+  ],
+  "artifacts": {
+    "originalHead": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+    "publicationBase": "f1eb35b16ed0dcf489646bded75d98735b40f369",
+    "baseBranch": "main",
+    "branch": "codex/u20-image-style-lifetime",
+    "sourceManifest": [
+      {
+        "original_path": "packages/one-map-react/src/adapters/web/images.tsx",
+        "publication_path": "packages/one-map-react/src/adapters/web/images.tsx",
+        "original": {
+          "before_sha256": "289015b065150798b455da5f5d2216efa1efd1fef8690aa52684debf71a5f4a1",
+          "after_sha256": "23630da76a206bd39228f41e9227f72179ce5d841ccd865d792843b1587d84b4",
+          "before_lines": 338,
+          "after_lines": 153
+        },
+        "publication": {
+          "before_sha256": "4a4e2264833359f9ab35d1052b09c02ce7901453853f4bb77e5016e493e87144",
+          "after_sha256": "23630da76a206bd39228f41e9227f72179ce5d841ccd865d792843b1587d84b4",
+          "before_lines": 337,
+          "after_lines": 153
+        }
+      },
+      {
+        "original_path": "packages/one-map-react/src/adapters/web/contracts.ts",
+        "publication_path": "packages/one-map-react/src/adapters/web/contracts.ts",
+        "original": {
+          "before_sha256": "beeeae6a5465ac6f3c907c529f9577bd72cb1bd58a8cd6528547226a19db7bdf",
+          "after_sha256": "0eb50a72c23233d5fd9f0636a447fa69a7ddf8adbf25d631f674f4c93c16a4cf",
+          "before_lines": 259,
+          "after_lines": 257
+        },
+        "publication": {
+          "before_sha256": "beeeae6a5465ac6f3c907c529f9577bd72cb1bd58a8cd6528547226a19db7bdf",
+          "after_sha256": "0eb50a72c23233d5fd9f0636a447fa69a7ddf8adbf25d631f674f4c93c16a4cf",
+          "before_lines": 259,
+          "after_lines": 257
+        }
+      },
+      {
+        "original_path": "packages/one-map-react/src/adapters/web/use-web-style-load.ts",
+        "publication_path": "packages/one-map-react/src/adapters/web/use-web-style-load.ts",
+        "original": {
+          "before_sha256": "696a10902eb4a0e7e030a92e97379ecc109ea753ea9f858c9c44e47db09ac090",
+          "after_sha256": "9abe4064d8ccb50a338c90436f4ec415b5b827e59d2048da97e515b796da9df8",
+          "before_lines": 56,
+          "after_lines": 56
+        },
+        "publication": {
+          "before_sha256": "696a10902eb4a0e7e030a92e97379ecc109ea753ea9f858c9c44e47db09ac090",
+          "after_sha256": "9abe4064d8ccb50a338c90436f4ec415b5b827e59d2048da97e515b796da9df8",
+          "before_lines": 56,
+          "after_lines": 56
+        }
+      },
+      {
+        "original_path": "packages/one-map-react/src/contracts/images-types.ts",
+        "publication_path": "packages/one-map-react/src/contracts/images-types.ts",
+        "original": {
+          "before_sha256": "4ba45e63f70ee40955a819ff47b06b60c11c15309fca2ada53ce971b7c30b144",
+          "after_sha256": "6b5cf5d24c00c99847ea8144c73387ae6c4a88b5eeb21376f773cce82ebf0ddc",
+          "before_lines": 37,
+          "after_lines": 44
+        },
+        "publication": {
+          "before_sha256": "4ba45e63f70ee40955a819ff47b06b60c11c15309fca2ada53ce971b7c30b144",
+          "after_sha256": "6b5cf5d24c00c99847ea8144c73387ae6c4a88b5eeb21376f773cce82ebf0ddc",
+          "before_lines": 37,
+          "after_lines": 44
+        }
+      },
+      {
+        "original_path": "packages/one-map-react/src/facade/images.tsx",
+        "publication_path": "packages/one-map-react/src/facade/images.tsx",
+        "original": {
+          "before_sha256": "1a7134c936ce3874ec9cc8822b2eb1a7d6ea221d8e9436cc24b0387aaa31d790",
+          "after_sha256": "61b6e912470dea922e5fdecc37d961c034d5d2040db9bee475e626b64eb7e1a0",
+          "before_lines": 24,
+          "after_lines": 25
+        },
+        "publication": {
+          "before_sha256": "1a7134c936ce3874ec9cc8822b2eb1a7d6ea221d8e9436cc24b0387aaa31d790",
+          "after_sha256": "61b6e912470dea922e5fdecc37d961c034d5d2040db9bee475e626b64eb7e1a0",
+          "before_lines": 24,
+          "after_lines": 25
+        }
+      },
+      {
+        "original_path": "packages/example-map/src/scenarios/sources-map.tsx",
+        "publication_path": "examples/shared/sources-map.tsx",
+        "original": {
+          "before_sha256": "33f0f6659d5993661c29bf74ccd765299dcb2b939f4ef5747e9320fff29ecd04",
+          "after_sha256": "8de6ded1e1b8614b692acdcf1fc5e928d04c19e3ba6f3007e324037acd28082f",
+          "before_lines": 115,
+          "after_lines": 153
+        },
+        "publication": {
+          "before_sha256": "9c087b256b47d15bde760f3d668c7a31ca7ce66a11b0be0a6f0a9892a6162377",
+          "after_sha256": "7973ae80022d1611d6c742a89facc237b27b4454ca9b216d6ca7e65d0874c065",
+          "before_lines": 115,
+          "after_lines": 153
+        }
+      },
+      {
+        "original_path": "packages/example-map/src/scenarios/web-corrections-app.tsx",
+        "publication_path": "examples/shared/web-corrections-app.tsx",
+        "original": {
+          "before_sha256": "658e8cdc24391e63a64b02f0d9dea0a3a2f4aa0b56387004dcaac39a24d91ac6",
+          "after_sha256": "f162a3e76ab1987824e6e56d8ca2b3858e6f2d70ba1da0f4847e1851be66985d",
+          "before_lines": 291,
+          "after_lines": 279
+        },
+        "publication": {
+          "before_sha256": "95a2885267fe523bbdbb42d413a6a766d2326d1ac2942b47823498c7eb31d10d",
+          "after_sha256": "b7bd4ef22de932db6bcecf5b35fb8757d8112c38ea19f38cb0b7c6da71d93e46",
+          "before_lines": 294,
+          "after_lines": 282
+        }
+      },
+      {
+        "original_path": "packages/one-map-react/test/web-followup-regressions.tsx",
+        "publication_path": "packages/one-map-react/test/web-followup-regressions.tsx",
+        "original": {
+          "before_sha256": "6a781c479409cf62b824531b47566e6bb3299af969534284d9479584b4aed331",
+          "after_sha256": "b896160495c135a99df517e8ef050f8e9eb6d6f295772b26ccc996ebbe3ce876",
+          "before_lines": 1178,
+          "after_lines": 1308
+        },
+        "publication": {
+          "before_sha256": "57a2b244d9845c04afd4af9a076c3db218f54e07e7694fe5e3750bba9000842e",
+          "after_sha256": "c3c78419beef6a2cae809a06c29fd3d237e8088bb9a73bf1079ab3c5d29a1d9f",
+          "before_lines": 1102,
+          "after_lines": 1257
+        }
+      },
+      {
+        "original_path": "packages/one-map-react/test/mapbox-web.web.test.tsx",
+        "publication_path": "packages/one-map-react/test/mapbox-web.web.test.tsx",
+        "original": {
+          "before_sha256": "2d250373b0096bafa9f25b5397d8d48a28bcae4f64a3ed60d73dcce527aa2922",
+          "after_sha256": "21f27be3a79c4f6ffc5edd3de094271ae49eb12cf3a72c6325124e1378cad7c1",
+          "before_lines": 1587,
+          "after_lines": 1588
+        },
+        "publication": {
+          "before_sha256": "3b0f24623bc53d67d1b75ec2a41321636f42aa306a6bfd478c7c1dfb699d8559",
+          "after_sha256": "1d041e12a4bbacc120b0716999bc2a9587140c2595108945946b8b05646aceb6",
+          "before_lines": 1587,
+          "after_lines": 1588
+        }
+      },
+      {
+        "original_path": "packages/one-map-react/test/maplibre-web.web.test.tsx",
+        "publication_path": "packages/one-map-react/test/maplibre-web.web.test.tsx",
+        "original": {
+          "before_sha256": "c985e9ff4e05e1457ac0e96835fc61d3cfc86c7706c38ab82a58ded54177534b",
+          "after_sha256": "9ef27e8f0dce41fa254329a8e55ab47ed79d2fab80fbef6f685c54127dfa0eda",
+          "before_lines": 1265,
+          "after_lines": 1266
+        },
+        "publication": {
+          "before_sha256": "695cf3ac01f4d887c05fd807aa3b740130ff91835dc85163d732ac71d4467786",
+          "after_sha256": "89eec24c2cd183a340a1d965d8a86bb2060c7f093325f108f40b0a5f164273ad",
+          "before_lines": 1256,
+          "after_lines": 1257
+        }
+      },
+      {
+        "original_path": "packages/one-map-react/test/create-web-map-mock.tsx",
+        "publication_path": "packages/one-map-react/test/create-web-map-mock.tsx",
+        "original": {
+          "before_sha256": "5fb51a6c33aae547d942bca8e288ddd1c364ecbd8d381bd7221d92749e42c8c4",
+          "after_sha256": "58510842b072d4ab868f8e91bd13fbac27443957cae2ad6b16abfdf1d8af1d0e",
+          "before_lines": 662,
+          "after_lines": 676
+        },
+        "publication": {
+          "before_sha256": "5fb51a6c33aae547d942bca8e288ddd1c364ecbd8d381bd7221d92749e42c8c4",
+          "after_sha256": "58510842b072d4ab868f8e91bd13fbac27443957cae2ad6b16abfdf1d8af1d0e",
+          "before_lines": 662,
+          "after_lines": 676
+        }
+      },
+      {
+        "original_path": "scripts/react-compiler.test.mjs",
+        "publication_path": "scripts/react-compiler.test.mjs",
+        "original": {
+          "before_sha256": "7b606be0972bbaaf4dc71e59c1456feff7b8fb9ddef2136582dcf4d7f2cd779e",
+          "after_sha256": "0ecc3c810e3f8e2efe6585069bd732b0fa24f7fc6ecb50057fdf9774af02cbe7",
+          "before_lines": 90,
+          "after_lines": 90
+        },
+        "publication": {
+          "before_sha256": "f828e19f8463f665f8827e623836eb5ff3244d3d6db12f283de5ede73d8d9c2b",
+          "after_sha256": "c807f2d22d01f007056bde2e2f28fb420e9b9d674bc257c57166e3cf71c41d42",
+          "before_lines": 83,
+          "after_lines": 84
+        }
+      }
+    ],
+    "archives": {
+      "original": {
+        "archive": "/private/tmp/one-map-u20-ut08lmbx/original-pack/one-map-react-0.1.0-rc.11.tgz",
+        "sha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+        "members": 171,
+        "distFiles": 164,
+        "distAndReadmeMatched": 165,
+        "allShippedBytesMatchFinalTree": true,
+        "sourceShipped": false
+      },
+      "publication": {
+        "archive": "/private/tmp/one-map-u20-ut08lmbx/publication-pack/one-map-react-0.1.0-rc.2.tgz",
+        "sha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+        "members": 171,
+        "distFiles": 164,
+        "distAndReadmeMatched": 165,
+        "allShippedBytesMatchFinalTree": true,
+        "sourceShipped": false
+      }
+    },
+    "frozenSourceDist": {
+      "original": {
+        "src": {
+          "files": 82,
+          "aggregateSha256": "e7714e077d5b28dd825611c74ca2ddbf455c24582ca2885ccc853efc9c79be71"
+        },
+        "dist": {
+          "files": 164,
+          "aggregateSha256": "3716006b632bc0bae6fac5685f4ab8d83681c8e6c2cf12259488e06b7f93b542"
+        },
+        "readmeSha256": "df3ad1918991e28b33f7e35c0feaaaa6c2ff75649f0df5b86d32fe85f3942d27"
+      },
+      "publication": {
+        "src": {
+          "files": 82,
+          "aggregateSha256": "0bab91bbd0dcb87c4da0dee02b89eba468187a2e5c9ea40d05fdf812cebafdf8"
+        },
+        "dist": {
+          "files": 164,
+          "aggregateSha256": "c8d34fb0b43a47166b39e6f420401d07e7862b7c6be4730d55cf31336746249c"
+        },
+        "readmeSha256": "bd03a0ea638b321523bece210f2c8c71009077eda8f3c45604428ed530ebfb3b"
+      }
+    },
+    "archivedRc11CandidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7",
+    "unchangedPublicBoundary": {
+      "originalRetainedPaths": [
+        "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch",
+        "packages/one-map-react/patches/rnmapbox-10.3.8.patch",
+        "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch",
+        "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
+        "packages/one-map-react/src/maplibre-native.tsx",
+        "packages/one-map-react/src/mapbox-native.tsx",
+        "packages/one-map-react/src/maplibre-web.tsx",
+        "packages/one-map-react/src/mapbox-web.tsx",
+        "packages/one-map-react/src/index.ts",
+        "packages/one-map-react/src/adapters/mapbox-native/index.ts",
+        "packages/one-map-react/src/adapters/maplibre-native/index.ts",
+        "package.json",
+        "bun.lock",
+        "tsconfig.examples.web.json",
+        "tsconfig.test.json",
+        "tsconfig.build.json",
+        "tsconfig.json",
+        "tsconfig.examples.native.json",
+        "vite.config.ts",
+        "vite.compiled.config.ts",
+        "jest.compiled.config.cjs",
+        "jest.config.cjs"
+      ],
+      "imagesPublicSignatureUnchanged": true,
+      "archivedCandidateUnchanged": true
+    },
+    "unchangedNativeAdapterFiles": 31,
+    "sourceOrderingEvidence": {
+      "Mapbox_GL": "3.32.0 Style.addImage inserts then fires data; map.addImage userImage.onAdd also follows insertion. Extracted stage/mapbox-style-style.ts2394-2405 and mapbox-ui-map.ts2695-2734.",
+      "MapLibre_GL": "6.13.0 src/style/style.ts1011-1018 inserts before _afterImageUpdated1051-1055 fires data; src/ui/map.ts3190-3201 onAdd follows style insertion.",
+      "native": "RNMapbox10.3.7/10.3.8 Images native sources identical by SHA256. MapLibre11.5.0 normal Images and missing-image restoration inspected; adapters unchanged.",
+      "source_hash_manifest": "u20-source-hashes.json"
+    }
+  },
+  "checks": {
+    "routine": {
+      "original": {
+        "source_web": {
+          "command": "bunx vp test run",
+          "files": 49,
+          "tests": 698,
+          "result": "pass"
+        },
+        "source_native": {
+          "command": "bunx jest --runInBand",
+          "suites": 9,
+          "tests": 234,
+          "result": "pass",
+          "note": "Native/library behavior unchanged by final correction caller edit."
+        },
+        "types": {
+          "commands": [
+            "bun run typecheck",
+            "bun run typecheck:apps"
+          ],
+          "result": "pass"
+        },
+        "compiled": {
+          "command": "bun run test:compiled",
+          "web_files": 22,
+          "web_tests": 437,
+          "native_suites": 9,
+          "native_tests": 234,
+          "build": "pass",
+          "compiler": [
+            "WebImages",
+            "WebImage"
+          ],
+          "result": "pass",
+          "inherited_compiler_diagnostics": [
+            "mapbox-native/map.tsx: refs during render",
+            "maplibre-native/map.tsx: refs during render"
+          ]
+        },
+        "changed_file_check": {
+          "command": "bunx vp check <12 manifest paths>",
+          "result": "pass",
+          "files": 12,
+          "warnings": 0,
+          "errors": 0
+        },
+        "final_build_note": "Final test:compiled rebuild includes all final caller/source/TSDoc edits, followed by compiler proof."
+      },
+      "publication": {
+        "full_source_attempt": {
+          "command": "bunx vp test run",
+          "passed": 622,
+          "failed": 2,
+          "result": "inherited_failures",
+          "failure_file": "packages/one-map-react/test/wrapper-callbacks.web.test.tsx",
+          "reason": "Installed react-mapbox/react-maplibre fixture imports absent src/components/marker.ts; unchanged and explicitly excluded per coordinator."
+        },
+        "bounded_source_web": {
+          "command": "bunx vp test run --exclude packages/one-map-react/test/wrapper-callbacks.web.test.tsx",
+          "files": 39,
+          "tests": 624,
+          "result": "pass"
+        },
+        "source_native": {
+          "command": "bunx jest --runInBand",
+          "suites": 8,
+          "tests": 231,
+          "result": "pass"
+        },
+        "types": {
+          "command": "bun run typecheck",
+          "result": "pass",
+          "earlier_attempt": "Before initial dist build, selected native declarations were unavailable; build then typecheck passed."
+        },
+        "changed_file_check": {
+          "command": "bunx vp check <12 mapped manifest paths>",
+          "result": "pass",
+          "files": 12,
+          "warnings": 0,
+          "errors": 0
+        },
+        "final_build_compiled": {
+          "commands": [
+            "bun run build",
+            "bunx vp test run --config vite.compiled.config.ts --exclude packages/one-map-react/test/wrapper-callbacks.web.test.tsx",
+            "bunx jest --config jest.compiled.config.cjs --runInBand",
+            "node scripts/react-compiler.test.mjs"
+          ],
+          "build": "pass",
+          "compiled_web_files": 25,
+          "compiled_web_tests": 468,
+          "compiled_native_suites": 8,
+          "compiled_native_tests": 231,
+          "compiler": [
+            "WebImages",
+            "WebImage"
+          ],
+          "result": "pass",
+          "inherited_compiler_diagnostics": [
+            "mapbox-native/map.tsx: refs during render",
+            "maplibre-native/map.tsx: refs during render",
+            "shared/native-marker-overlay.tsx: existing disabled rule",
+            "shared/use-frozen-value.ts: refs during render",
+            "web/map.tsx: refs during render",
+            "facade/map.tsx: refs during render",
+            "facade/use-stable-options.ts: refs during render"
+          ]
+        }
+      },
+      "independent_audit": "Coordinator reports complete; no outstanding substantive findings after correction caller repair."
+    },
+    "redGreen": [
+      {
+        "scenario": "same-name conflict error and no replay",
+        "baseline": "old Images implementation",
+        "red": "4 failures, both engines",
+        "green": "included final source/compiled adapter suites"
+      },
+      {
+        "scenario": "actual SourcesMap cleanup before wrapper style mutation",
+        "baseline": "archived original SourcesMap",
+        "red": "2 failures; owned marker still existed at style mutation",
+        "green": "remove precedes style with same renderer across A/B/A and rapid requests"
+      },
+      {
+        "scenario": "equal-content style prop replacement",
+        "baseline": "first provisional staged consumer used object identity",
+        "red": "2 failures; marker disappeared without new readiness event",
+        "green": "sorted declarative equality preserves registration; latest callback checked"
+      },
+      {
+        "scenario": "SourcesMap style request inside addImage styledata",
+        "baseline": "first provisional per-entry implementation deferred cleanup",
+        "red": "2 failures; event order style then remove",
+        "green": "immediate cleanup removes before style mutation; replacement sprite survives old add return/unmount"
+      },
+      {
+        "scenario": "WebCorrectionsApp retained renderer across map-toggle",
+        "baseline": "provisional caller used reuseMaps=false",
+        "red": "2 failures; reuseMaps false",
+        "green": "actual component reuses same renderer and cleans owned image; unused style button removed"
+      },
+      {
+        "scenario": "owning per-entry component compiler proof",
+        "baseline": "try/finally and short-circuit value blocks inside try caused compiler skips; array-only parent not recognized",
+        "green": "both private WebImages and WebImage selected-component compiler checks pass"
+      }
+    ],
+    "staticWebBuild": {
+      "original": "bunx vp -C apps/web build passed",
+      "publication": "bunx vp -C apps/web build passed",
+      "scope": "Static bundle only; no renderer interaction. Existing bundle-size warnings remain."
+    },
+    "migrationExcerptTypes": {
+      "result": "passed both trees",
+      "command": "tsc --ignoreConfig --noEmit --strict --skipLibCheck --target ES2022 --module ESNext --moduleResolution Bundler --jsx react-jsx --types react example.tsx",
+      "scope": "Exact keyed Map/reuseMaps=false/Images excerpt, supplying declared styles, icons and all five initial camera fields."
+    },
+    "package": {
+      "original": {
+        "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+        "packageCases": [
+          {
+            "scenario": "common",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mapbox-web",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "maplibre-web",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mapbox-native",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "maplibre-native",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "aliases-default",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "aliases-browser",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "aliases-react-native",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "aliases-browser-react-native",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mixed-0-mapbox-web",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mixed-0-maplibre-native",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mixed-1-maplibre-web",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mixed-1-mapbox-native",
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          }
+        ],
+        "peerCases": [
+          {
+            "entry": "mapbox-web",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "mapbox-gl@3.32.0"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0"
+            },
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "lockfileSha256": "07e2c600ac3388623a8add7a027c0b396368c9ba3eb8c549e54cc5d9dfe30d24",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 0,
+            "patchedFilesAggregateSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          {
+            "entry": "maplibre-web",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "maplibre-gl@6.13.0"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0"
+            },
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "lockfileSha256": "b1467fb0bff4b0809c90b2e4829ceea190bb7e3f9354fb95241dfe8801702373",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 0,
+            "patchedFilesAggregateSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          {
+            "entry": "mapbox-native",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "react-native@0.87.1",
+              "@types/react@19.2.18",
+              "@rnmapbox/maps@10.3.7",
+              "react-native-teleport@1.2.2"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "react-native": "0.87.1",
+              "@types/react": "19.2.18",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.2"
+            },
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "lockfileSha256": "714ff0fe932ae0bb50abd325eab25c829aaafa1eba099fcfa0dba6d1aafc8d54",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 31,
+            "patchedFilesAggregateSha256": "aaf1be829111cedf354f89b3dae2dc54893f54e619d2708166a2b882aa608c50"
+          },
+          {
+            "entry": "maplibre-native",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "react-native@0.87.1",
+              "@types/react@19.2.18",
+              "@maplibre/maplibre-react-native@11.5.0",
+              "react-native-teleport@1.2.2",
+              "@types/geojson@7946.0.16"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "react-native": "0.87.1",
+              "@types/react": "19.2.18",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.2",
+              "@types/geojson": "7946.0.16"
+            },
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "lockfileSha256": "506878cd563038032692934d13175adaf4faa45e2c059d371b43228e012f2ad1",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 13,
+            "patchedFilesAggregateSha256": "cb73805eadaf4e4a896ffbc729e24786e0e42bdf5475c576638e2884240e5d27"
+          },
+          {
+            "entry": "mapbox-web",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "mapbox-gl@3.32.0",
+              "react-native@0.87.1",
+              "@maplibre/maplibre-react-native@11.5.0",
+              "react-native-teleport@1.2.2",
+              "@types/geojson@7946.0.16"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0",
+              "react-native": "0.87.1",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.2",
+              "@types/geojson": "7946.0.16"
+            },
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "lockfileSha256": "54c502d306fbf5e293bbb2911a7588c8ff0bd7ca21cd8a4e111efa94fce62376",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 13,
+            "patchedFilesAggregateSha256": "cb73805eadaf4e4a896ffbc729e24786e0e42bdf5475c576638e2884240e5d27"
+          },
+          {
+            "entry": "maplibre-native",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "mapbox-gl@3.32.0",
+              "react-native@0.87.1",
+              "@maplibre/maplibre-react-native@11.5.0",
+              "react-native-teleport@1.2.2",
+              "@types/geojson@7946.0.16"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0",
+              "react-native": "0.87.1",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.2",
+              "@types/geojson": "7946.0.16"
+            },
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "lockfileSha256": "54c502d306fbf5e293bbb2911a7588c8ff0bd7ca21cd8a4e111efa94fce62376",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 13,
+            "patchedFilesAggregateSha256": "cb73805eadaf4e4a896ffbc729e24786e0e42bdf5475c576638e2884240e5d27"
+          },
+          {
+            "entry": "maplibre-web",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "maplibre-gl@6.13.0",
+              "react-native@0.87.1",
+              "@rnmapbox/maps@10.3.7",
+              "react-native-teleport@1.2.2"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0",
+              "react-native": "0.87.1",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.2"
+            },
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "lockfileSha256": "a153aa30d16cdf0b90309096b314ec946b20c07c4ec26c79c4a49828ca0c69ec",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 31,
+            "patchedFilesAggregateSha256": "aaf1be829111cedf354f89b3dae2dc54893f54e619d2708166a2b882aa608c50"
+          },
+          {
+            "entry": "mapbox-native",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "maplibre-gl@6.13.0",
+              "react-native@0.87.1",
+              "@rnmapbox/maps@10.3.7",
+              "react-native-teleport@1.2.2"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0",
+              "react-native": "0.87.1",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.2"
+            },
+            "archiveSha256": "d6df97a9348b5423df67c7636c888162a25d39565b76497ccbeaa6111004c728",
+            "lockfileSha256": "a153aa30d16cdf0b90309096b314ec946b20c07c4ec26c79c4a49828ca0c69ec",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 31,
+            "patchedFilesAggregateSha256": "aaf1be829111cedf354f89b3dae2dc54893f54e619d2708166a2b882aa608c50"
+          }
+        ]
+      },
+      "publication": {
+        "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+        "packageCases": [
+          {
+            "scenario": "common",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mapbox-web",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "maplibre-web",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mapbox-native",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "maplibre-native",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "aliases-default",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "aliases-browser",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "aliases-react-native",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "aliases-browser-react-native",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mixed-0-mapbox-web",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mixed-0-maplibre-native",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mixed-1-maplibre-web",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          },
+          {
+            "scenario": "mixed-1-mapbox-native",
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "react": "19.2.3",
+            "reactTypes": "19.2.18",
+            "lockfileSha256": null,
+            "status": "passed",
+            "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+          }
+        ],
+        "peerCases": [
+          {
+            "entry": "mapbox-web",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "mapbox-gl@3.32.0"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0"
+            },
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "lockfileSha256": "e20199c0a226a513bbef6dabea1eeb5d084198361b1cd58dde212dfbf223f335",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 0,
+            "patchedFilesAggregateSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          {
+            "entry": "maplibre-web",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "maplibre-gl@6.13.0"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0"
+            },
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "lockfileSha256": "47ae5db65ec6500fafa903ccfcc1f4c5c2c853355a98ea7c9711111ebc8141c4",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 0,
+            "patchedFilesAggregateSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          {
+            "entry": "mapbox-native",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "react-native@0.87.1",
+              "@types/react@19.2.18",
+              "@rnmapbox/maps@10.3.7",
+              "react-native-teleport@1.2.1"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "react-native": "0.87.1",
+              "@types/react": "19.2.18",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.1"
+            },
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "lockfileSha256": "66de948290afc7023f03b35ba07ab1a9d709675798e2796dd60bebb28332b02c",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 25,
+            "patchedFilesAggregateSha256": "78efc9b7aee4e8c82b29ed6c350966293f8a701595a12c4ebfbf508cf3b9f56d"
+          },
+          {
+            "entry": "maplibre-native",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "react-native@0.87.1",
+              "@types/react@19.2.18",
+              "@maplibre/maplibre-react-native@11.5.0",
+              "react-native-teleport@1.2.1",
+              "@types/geojson@7946.0.16"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "react-native": "0.87.1",
+              "@types/react": "19.2.18",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.1",
+              "@types/geojson": "7946.0.16"
+            },
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "lockfileSha256": "d3f4a312f0224284c5152c1d6c217b92ad03d4cbc487a7f0e0265f8d551517ec",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 10,
+            "patchedFilesAggregateSha256": "663ed80e0f7d6bc96897e405178a557488980ad469d00059facb73ac02aef3b4"
+          },
+          {
+            "entry": "mapbox-web",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "mapbox-gl@3.32.0",
+              "react-native@0.87.1",
+              "@maplibre/maplibre-react-native@11.5.0",
+              "react-native-teleport@1.2.1",
+              "@types/geojson@7946.0.16"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0",
+              "react-native": "0.87.1",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.1",
+              "@types/geojson": "7946.0.16"
+            },
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "lockfileSha256": "1a0cd19f6c35287e96209292701dee54d5aebd18a408199ec41b053ebb7dc9f4",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 10,
+            "patchedFilesAggregateSha256": "663ed80e0f7d6bc96897e405178a557488980ad469d00059facb73ac02aef3b4"
+          },
+          {
+            "entry": "maplibre-native",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "mapbox-gl@3.32.0",
+              "react-native@0.87.1",
+              "@maplibre/maplibre-react-native@11.5.0",
+              "react-native-teleport@1.2.1",
+              "@types/geojson@7946.0.16"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "mapbox-gl": "3.32.0",
+              "react-native": "0.87.1",
+              "@maplibre/maplibre-react-native": "11.5.0",
+              "react-native-teleport": "1.2.1",
+              "@types/geojson": "7946.0.16"
+            },
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "lockfileSha256": "1a0cd19f6c35287e96209292701dee54d5aebd18a408199ec41b053ebb7dc9f4",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 10,
+            "patchedFilesAggregateSha256": "663ed80e0f7d6bc96897e405178a557488980ad469d00059facb73ac02aef3b4"
+          },
+          {
+            "entry": "maplibre-web",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "maplibre-gl@6.13.0",
+              "react-native@0.87.1",
+              "@rnmapbox/maps@10.3.7",
+              "react-native-teleport@1.2.1"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0",
+              "react-native": "0.87.1",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.1"
+            },
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "lockfileSha256": "0219d1fa5511a2442be63b4c9dc334de1ad77b3c77688470e71cad1b9a24aef0",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 25,
+            "patchedFilesAggregateSha256": "78efc9b7aee4e8c82b29ed6c350966293f8a701595a12c4ebfbf508cf3b9f56d"
+          },
+          {
+            "entry": "mapbox-native",
+            "packages": [
+              "react@19.2.3",
+              "react-dom@19.2.3",
+              "@types/react@19.2.18",
+              "react-map-gl@8.1.3",
+              "maplibre-gl@6.13.0",
+              "react-native@0.87.1",
+              "@rnmapbox/maps@10.3.7",
+              "react-native-teleport@1.2.1"
+            ],
+            "resolvedPeers": {
+              "react": "19.2.3",
+              "react-dom": "19.2.3",
+              "@types/react": "19.2.18",
+              "react-map-gl": "8.1.3",
+              "maplibre-gl": "6.13.0",
+              "react-native": "0.87.1",
+              "@rnmapbox/maps": "10.3.7",
+              "react-native-teleport": "1.2.1"
+            },
+            "archiveSha256": "764b4e649ca9ef8f9dbaf269d7a966e7dd6a51cb572f953a0da2cb2934832cf3",
+            "lockfileSha256": "0219d1fa5511a2442be63b4c9dc334de1ad77b3c77688470e71cad1b9a24aef0",
+            "status": "passed",
+            "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+            "patchedFileCount": 25,
+            "patchedFilesAggregateSha256": "78efc9b7aee4e8c82b29ed6c350966293f8a701595a12c4ebfbf508cf3b9f56d"
+          }
+        ]
+      }
+    },
+    "documentation": {
+      "status": "Passed final source-aligned documentation reconciliation, standard and expanded structural checks in both roots; packed README bytes remain frozen.",
+      "commands": [
+        "node scripts/check-docs.mjs",
+        "node /private/tmp/one-map-u20-ut08lmbx/documentation/check-docs-expanded.mjs"
+      ],
+      "results": {
+        "original": {
+          "standard": {
+            "exit": 0,
+            "markdownFiles": 39,
+            "sdkComparisonTables": 43
+          },
+          "expanded": {
+            "exit": 0,
+            "markdownFiles": 44,
+            "sdkComparisonTables": 43
+          }
+        },
+        "publication": {
+          "standard": {
+            "exit": 0,
+            "markdownFiles": 38,
+            "sdkComparisonTables": 39
+          },
+          "expanded": {
+            "exit": 0,
+            "markdownFiles": 43,
+            "sdkComparisonTables": 39
+          }
+        }
+      },
+      "historicalCoverage": {
+        "original": {
+          "baseline": "U20 original before/docs/api-coverage.md",
+          "rows": 69,
+          "firstThreeCellsIdentical": true,
+          "firstThreeCellsSha256": "3de2f3c2ecf628ad02f098b3bc6428f21012f0ca0328d7166e3e9d2b7f2f506c",
+          "historicalExceptions": []
+        },
+        "publication": {
+          "baseline": "git show f1eb35b16ed0dcf489646bded75d98735b40f369:docs/api-coverage.md; five pre-existing differences from original preserved by coordinator authorization",
+          "rows": 69,
+          "firstThreeCellsIdentical": true,
+          "firstThreeCellsSha256": "7abcf6570e7fd262f728d1e68029c531170c0621f786196f0c832134e98f9b3d",
+          "historicalExceptions": []
+        }
+      },
+      "packedReadmeSha256": {
+        "original": "df3ad1918991e28b33f7e35c0feaaaa6c2ff75649f0df5b86d32fe85f3942d27",
+        "publication": "bd03a0ea638b321523bece210f2c8c71009077eda8f3c45604428ed530ebfb3b"
+      },
+      "review": "Source guide explains named symbol/pattern assets versus ImageSource/Marker, the deliberate react-map-gl component exception, native wrapper delegation/restoration and the narrow web lifetime. Root/package README carry the visible exception and direct cleanup-before-style-change sequence, with after-only key and same-update warnings, conflict/reserved-name policy and keyed Map alternative. Source guide links each tree's SourcesMap staged same-map sequence and describes WebCorrectionsApp as retained same-style loading/unmount/reuse. Current routing records PR31-38 merged, U20 implemented and independently audited, reviewed PR authorized and U21 next/undispatched. Historical acceptance and all 69 coverage rows/first three cells retain their approved per-root baselines.",
+      "limitations": "Documentation commands inspect paragraphs, fences, specified comparison columns and local link/heading targets; remote URLs and runtime behavior were not tested. This worker ran no source tests, builds, renderer acceptance, Metro or native build/install actions. Exact keyed Map excerpt type-check outcomes are recorded separately by the coordinator."
+    }
+  },
+  "audit": {
+    "independent": {
+      "status": "Independent read-only audit complete; no outstanding substantive findings within approved scope",
+      "scope": [
+        "Both-tree web Images/contracts/facade/style hook",
+        "Original versus frozen before/manifest and publication main diff",
+        "SourcesMap and WebCorrectionsApp maintained consumers",
+        "Image regressions and retained mixed query/gesture coverage",
+        "Normative source/layer guide, public declarations, README and migration contract"
+      ],
+      "coreAssessment": {
+        "remainingSubstantiveFindings": 0,
+        "observations": [
+          "Initial readiness listeners start one load per entry and unsubscribe once started; no completed-registration replay.",
+          "Primitive map/name/url/sdf dependencies preserve unchanged entries and isolate updates/removals.",
+          "Post-load collision check preserves sprite/other instance ownership; rejected adds acquire no cleanup ownership.",
+          "Both pinned SDKs install images before synchronous style data callbacks. During add cleanup inspects/removes immediately; released post-call early return precedes all further SDK inspection.",
+          "Late load fulfillment/rejection is suppressed after release; same-map SourcesMap commits Images absence before wrapper style mutation.",
+          "SourcesMap regression covers equal-content inputs, repeated/rapid choices and reentrant add callback style switch.",
+          "Original extra StrictMode/Suspense padding regressions remain; deleted tests concern excluded automatic image replay/cross-style ownership only.",
+          "Original/publication source core matches; consumer differences are maintained import paths. Native adapters/peers/patches/package configuration unchanged in task comparison.",
+          "Corrected correction fixture preserves same-renderer TF04 gesture and TF05 image proof; same-map style replacement remains exercised by staged SourcesMap."
+        ]
+      },
+      "outOfScope": [
+        "Automatic cross-style detection/replay",
+        "Raw mutations of registrations reserved by Images",
+        "Native parity/restoration suppression"
+      ],
+      "reviewedHashesMatch": true
+    },
+    "coordinator": "Inspected core ownership across load/add/remove, failures, release/reuse, collisions, both maintained callers, actual correction drivers, declarations, compiler proof, both-tree manifests, frozen archive bytes and all package cases. Every reported substantive finding is fixed and covered by source/compiled regression evidence."
+  },
+  "openGates": [
+    "Real renderer image behavior and style transitions remain unverified; explicit acceptance permission is required.",
+    "Metro, native builds/installations and physical devices were not run.",
+    "Publication retains two inherited wrapper-callbacks fixture marker.ts import failures. The final bounded source/compiled runs exclude only that file; this does not certify those fixture cases.",
+    "Selected Images compiler proof passes; unrelated inherited compiler diagnostics remain recorded in routine results.",
+    "Arbitrary web style replacement while Images remains mounted, and raw mutation of its reserved image names, are outside the approved contract."
+  ],
+  "cleanup": "Keep compact outcomes, hashes, per-case versions/lock digests, source recovery and provenance. Remove temporary consumers, dependency cache, raw locks/logs, packs and static outputs after reviewed PR and successor setup. No historical renderer evidence is renewed."
+}

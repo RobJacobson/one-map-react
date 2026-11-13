@@ -1,0 +1,221 @@
+diff --git a/start-native-metro.mjs b/start-native-metro.mjs
+new file mode 100644
+--- /dev/null
++++ b/start-native-metro.mjs
+@@ -0,0 +1,14 @@
++import assert from 'node:assert/strict';
++import {spawn} from 'node:child_process';
++import {openSync,writeFileSync} from 'node:fs';
++import {stopOwnedProcess} from '/Users/rob/code/mapbox-code/one-map/scripts/native-smoke-process.mjs';
++const root='/private/tmp/one-map-workspace-acceptance/native',phase=process.argv[2];
++assert(['no-token','token'].includes(phase));process.loadEnvFile(root+'/.env.local');
++const token=process.env.MAPBOX_ACCESS_TOKEN;assert(token?.startsWith('pk.'));
++const log='/private/tmp/one-map-workspace-acceptance/native-metro-'+phase+'.log',fd=openSync(log,'w');
++const child=spawn(process.execPath,[root+'/apps/expo/node_modules/expo/bin/cli','start','--dev-client','--localhost','--port','8081'],{cwd:root+'/apps/expo',detached:true,stdio:['ignore',fd,fd],env:{...process.env,CI:'1',EXPO_NO_TELEMETRY:'1',EXPO_PUBLIC_ONE_MAP_TEST_MODE:'1',EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN:phase==='token'?token:'',NODE_OPTIONS:(process.env.NODE_OPTIONS??'')+' --dns-result-order=ipv4first'}});
++writeFileSync('/private/tmp/one-map-workspace-acceptance/native-metro-owner.json',JSON.stringify({launcherPID:process.pid,metroPID:child.pid,log,phase,cwd:root+'/apps/expo',tokenEnabled:phase==='token'},null,2));
++process.on('SIGTERM',async()=>{await stopOwnedProcess(child);process.exit(0);});
++child.once('error',error=>{console.error(String(error));process.exit(1);});
++child.once('close',code=>process.exit(code??1));
++console.log('Owned native Metro launched; public token enabled:',phase==='token');
+diff --git a/native-fixtures.mjs b/native-fixtures.mjs
+new file mode 100644
+--- /dev/null
++++ b/native-fixtures.mjs
+@@ -0,0 +1,78 @@
++import assert from 'node:assert/strict';
++import {createServer} from 'node:http';
++import {readFileSync,writeFileSync,existsSync} from 'node:fs';
++import {randomUUID} from 'node:crypto';
++const base='/private/tmp/one-map-workspace-acceptance';
++const bundle='org.onemap.acceptance.workspace';
++const style=readFileSync(base+'/style.json');
++const pause=ms=>new Promise(r=>setTimeout(r,ms));
++let mode='ok',slow=true,current;
++const requests=[];
++const send=(res,code,value)=>res.writeHead(code,{'Content-Type':'application/json'}).end(JSON.stringify(value));
++const commandString=(value)=>{
++ if(value.type==='open-development-client')return `button com.apple.springboard Open ${randomUUID()}`;
++ assert(['inspect','button','gesture','tap'].includes(value.type));
++ if(value.type==='button')assert(['MapLibre','MapLibre (selected)','Mapbox','Mapbox (selected)','Read camera','Retry'].includes(value.label),'Unknown button label');
++ if(value.type==='tap'){assert([1,2].includes(value.times),'Explicit tap count required');for(const number of [value.x??0.50,value.y??0.75])assert(Number.isFinite(number)&&number>=0&&number<=1,'Invalid normalized touch bounds');}
++ const payload=value.type==='button'?value.label:value.type==='gesture'?'0.50 0.75 0.70 0.65 0.10':value.type==='tap'?`${value.x??0.50} ${value.y??0.75} ${value.times}`:'';
++ return `${value.type} ${bundle} ${payload} ${randomUUID()}`.replace(/ +/g,' ');
++};
++const execute=async(value)=>{
++ assert(!current,'Input is already in progress');
++ const log=process.env.IOS_DRIVER_LOG;
++ assert(log&&existsSync(log)&&readFileSync(log,'utf8').includes("testDriveTaps]' started"),'Driver output is not connected');
++ const offset=readFileSync(log,'utf8').length,command=commandString(value);
++ try{
++  await new Promise((resolve,reject)=>{
++   const timer=setTimeout(()=>reject(Error('Input receipt timed out')),20000);
++   current={command,done:()=>{clearTimeout(timer);resolve();}};
++  });
++  const deadline=Date.now()+10000;
++  while(Date.now()<deadline){
++   const text=readFileSync(log,'utf8').slice(offset);
++   if(text.includes('ONE_MAP_INPUT_DONE '+command)){
++    const start=text.indexOf('ONE_MAP_AX_BEGIN'),end=text.indexOf('ONE_MAP_AX_END',start);
++    return {command,ax:start>=0&&end>start?text.slice(start+16,end):undefined};
++   }
++   await pause(100);
++  }
++  throw Error('Driver receipt arrived without connected log output');
++ }finally{current=undefined;}
++};
++const styleServer=createServer((req,res)=>{
++ res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Cache-Control','no-store');
++ if(req.url!=='/style.json'){res.writeHead(404).end();return;}
++ const delay=slow?12000:0;slow=false;
++ const status=mode==='fail'?503:200;
++ requests.push({status,delayMs:delay,at:new Date().toISOString()});
++ res.writeHead(status,{'Content-Type':'application/json'});
++ setTimeout(()=>res.end(status===200?style:JSON.stringify({error:'Deliberate native acceptance failure'})),delay);
++});
++const inputServer=createServer(async(req,res)=>{
++ if(req.method==='GET'&&req.url==='/tap'){res.writeHead(200,{'Content-Type':'text/plain'}).end(current?.command??'');return;}
++ if(req.method==='GET'&&req.url==='/state'){send(res,200,{mode,slow,requests});return;}
++ let body='';for await(const part of req){body+=part;if(body.length>8192){send(res,413,{error:'Too large'});return;}}
++ try{
++  if(req.method==='POST'&&req.url==='/done'){
++   assert(body===current?.command,'Input identity mismatch');current.done();res.writeHead(204).end();return;
++  }
++  if(req.method==='POST'&&req.url==='/mode'){
++   const value=JSON.parse(body);assert(['ok','fail'].includes(value.mode));mode=value.mode;if(value.slow!==undefined)slow=value.slow===true;send(res,200,{mode,slow});return;
++  }
++  if(req.method==='POST'&&req.url==='/command'){send(res,200,await execute(JSON.parse(body)));return;}
++  res.writeHead(404).end();
++ }catch(error){send(res,400,{error:String(error)});}
++});
++if(process.argv.includes('--self-check')){
++ assert.throws(()=>commandString({type:'button',label:'Theme updated'}));assert.match(commandString({type:'open-development-client'}),/^button com\.apple\.springboard Open /);
++ assert.throws(()=>commandString({type:'tap'}));assert.throws(()=>commandString({type:'tap',times:1,x:-1}));
++ assert.match(commandString({type:'tap',times:2}),/^tap org\.onemap\.acceptance\.workspace 0\.5 0\.75 2 /);
++ assert.match(commandString({type:'button',label:'Read camera'}),/^button org\.onemap\.acceptance\.workspace Read camera /);
++ console.log('PASS native fixture input guard: verified bundle, known labels, mandatory tap count, unique receipt.');
++}else{
++ await new Promise(r=>styleServer.listen(9040,'127.0.0.1',r));
++ await new Promise(r=>inputServer.listen(8799,'127.0.0.1',r));
++ console.log('Native fixture9040 and input8799 ready; driver output '+process.env.IOS_DRIVER_LOG);
++ const close=()=>{writeFileSync(base+'/native-fixture-receipt.json',JSON.stringify({mode,slow,requests},null,2));styleServer.closeAllConnections();inputServer.closeAllConnections();styleServer.close();inputServer.close();};
++ process.on('SIGTERM',()=>{close();process.exit(0);});
++}
+diff --git a/native-ui.mjs b/native-ui.mjs
+new file mode 100644
+--- /dev/null
++++ b/native-ui.mjs
+@@ -0,0 +1,114 @@
++import assert from 'node:assert/strict';
++import {execFileSync} from 'node:child_process';
++import {readFileSync,writeFileSync} from 'node:fs';
++import {createRequire} from 'node:module';
++import {cameraMatches,initialCamera} from './native/packages/example-map/dist/camera.js';
++const base='/private/tmp/one-map-workspace-acceptance',platform=process.argv[2],scenario=process.argv[3];
++const bundle='org.onemap.acceptance.workspace',serial='emulator-5554';
++const runtime=createRequire('/Users/rob/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/package.json');
++const {PNG}=runtime('pngjs');
++const {mapPixelSummary}=await import('/Users/rob/code/mapbox-code/one-map/scripts/example-workspace-observations.mjs');
++const pause=ms=>new Promise(r=>setTimeout(r,ms));
++const decode=s=>s.replaceAll('&quot;','"').replaceAll('&apos;',"'").replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&');
++const node=(text,id)=>{
++ if(text.includes('<hierarchy'))return text.match(new RegExp(`<node\\b[^>]*resource-id="(?:[^\"]*:id/)?${id}"[^>]*>`))?.[0]??'';
++ return text.split('\n').find(line=>line.includes(`identifier: '${id}'`))??'';
++};
++const label=(text)=>decode(text.match(/\btext="([^"]*)"/)?.[1]??text.match(/\blabel: '([^']*)'/)?.[1]??'');
++const observation=(text)=>{
++ const status=label(node(text,'map-status'));
++ const value=label(node(text,'camera-readback'))||decode(text).match(/\{"longitude":[^}]+\}/)?.[0];
++ const camera=value?JSON.parse(value):undefined;
++ if(camera)assert(['longitude','latitude','zoom','bearing','pitch'].every(field=>Number.isFinite(camera[field])),'Invalid public camera');
++ const generation=Number(label(node(text,'map-generation')));
++ return {status,camera,generation};
++};
++const bounds=(line)=>{
++ const match=line.match(/bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/);assert(match,'Missing measured button bounds');
++ const [x1,y1,x2,y2]=match.slice(1).map(Number);assert(x2>x1&&y2>y1&&x1>=0&&y1>=0,'Invalid touch bounds');return[(x1+x2)/2,(y1+y2)/2];
++};
++const adb=(...args)=>execFileSync('adb',['-s',serial,...args],{encoding:'utf8',timeout:15000,maxBuffer:4*1024*1024});
++const command=async(value)=>{
++ const response=await fetch('http://127.0.0.1:8799/command',{method:'POST',body:JSON.stringify(value),signal:AbortSignal.timeout(35000)});
++ const result=await response.json();assert(response.ok,result.error);return result;
++};
++const inspect=async()=>{
++ if(platform==='ios')return(await command({type:'inspect'})).ax;
++ adb('shell','uiautomator','dump','/sdcard/one-map-workspace.xml');return adb('shell','cat','/sdcard/one-map-workspace.xml');
++};
++const press=async(name)=>{
++ if(platform==='ios'){await command({type:'button',label:name});return;}
++ const text=await inspect(),lines=text.match(/<node\b[^>]*>/g)??[];
++ const target=(name==='Mapbox'||name==='MapLibre')?node(text,'engine-'+name.toLowerCase()):lines.find(line=>label(line)===name||decode(line.match(/content-desc="([^"]*)"/)?.[1]??'')===name);
++ assert(target,`Button not present: ${name}`);assert(!target.includes('enabled="false"'),'Button disabled');
++ const [x,y]=bounds(target);adb('shell','input','tap',String(Math.round(x)),String(Math.round(y)));
++};
++const until=async(read,predicate,label,timeout=45000)=>{
++ const deadline=Date.now()+timeout;let last;
++ while(Date.now()<deadline){last=await read();if(predicate(last))return last;await pause(200);}
++ throw Error(`${label} timed out: ${JSON.stringify(last)}`);
++};
++const state=async()=>observation(await inspect());
++const ready=()=>until(state,value=>value.status==='ready','Map readiness');
++const read=async(expected)=>{
++ await press('Read camera');
++ return until(state,value=>value.status==='ready'&&value.camera&&(!expected||cameraMatches(value.camera,expected)),'Public camera');
++};
++const image=async(name)=>{
++ const path=`${base}/${platform}-${scenario}-${name}.png`;
++ if(platform==='ios'){assert(process.env.IOS_UDID,'Set assigned simulator');execFileSync('xcrun',['simctl','io',process.env.IOS_UDID,'screenshot',path]);}
++ else writeFileSync(path,execFileSync('adb',['-s',serial,'exec-out','screencap','-p'],{maxBuffer:16*1024*1024}));
++ const summary=mapPixelSummary(PNG.sync.read(readFileSync(path)));assert(summary.colors>30,'Basemap detail absent');return{path,...summary};
++};
++const switchTo=async(engine,expected)=>{
++ const before=await state();await press(engine==='mapbox'?'Mapbox':'MapLibre');
++ await until(state,value=>value.generation===before.generation+1&&value.status==='ready','Replacement renderer');
++ return read(expected);
++};
++const mode=async(value)=>{
++ const response=await fetch('http://127.0.0.1:8799/mode',{method:'POST',body:JSON.stringify({mode:value}),signal:AbortSignal.timeout(5000)});assert(response.ok);
++};
++if(platform==='self-check'){
++ const camera=JSON.stringify(initialCamera);
++ const ax=`StaticText, identifier: 'map-status', label: 'ready'\nStaticText, identifier: 'camera-readback', label: '${camera}'\nStaticText, identifier: 'map-generation', label: '3'`;
++ assert.deepEqual(observation(ax),{status:'ready',camera:initialCamera,generation:3});
++ const xml=`<hierarchy><node text="ready" resource-id="map-status"/><node text="${camera.replaceAll('"','&quot;')}" resource-id="camera-readback"/><node text="3" resource-id="map-generation"/></hierarchy>`;
++ assert.deepEqual(observation(xml),observation(ax));assert(node('<hierarchy><node resource-id="engine-mapbox" enabled="false"><node text="Mapbox" enabled="true"/></node></hierarchy>','engine-mapbox').includes('enabled="false"'));assert.throws(()=>bounds('bounds="[0,0][0,0]"'));assert.deepEqual(bounds('bounds="[10,20][30,60]"'),[20,40]);
++ console.log('PASS native UI parser: AX/XML camera, generation, status, measured bounds and invalid touch rejection.');
++}else{
++ assert(['ios','android'].includes(platform));assert(['inspect','token-free','switching','recovery','cold-recovery'].includes(scenario));
++ const output=`${base}/${platform}-${scenario}-result.json`,outcomes=[];
++ try{
++ if(scenario==='inspect'){console.log(JSON.stringify({state:await state(),raw:await inspect()}));process.exit(0);}
++ if(scenario!=='cold-recovery')await ready();
++ if(scenario==='token-free'){
++  const readback=await read(initialCamera),text=await inspect();
++  const mapbox=platform==='ios'?text.split('\n').find(line=>line.includes('Button')&&line.includes("label: 'Mapbox'")):node(text,'engine-mapbox');
++  assert(mapbox&&(/Disabled/i.test(mapbox)||mapbox.includes('enabled="false"')),'Mapbox is not demonstrably disabled');
++  outcomes.push({name:(platform==='ios'?'Delayed token-free':'Token-free')+' Seattle startup and disabled Mapbox',readback,image:await image('maplibre')});
++ }else if(scenario==='switching'){
++  const before=(await read(initialCamera)).camera;
++  if(platform==='ios'){await command({type:'gesture'});await command({type:'tap',times:2});}
++  else{const match=adb('shell','wm','size').match(/(\d+)x(\d+)/);assert(match);const w=Number(match[1]),h=Number(match[2]);adb('shell','input','swipe',String(w*.5),String(h*.75),String(w*.7),String(h*.65),'1100');adb('shell','input','tap',String(w*.5),String(h*.75));adb('shell','input','tap',String(w*.5),String(h*.75));}
++  let previous,count=0;
++  const changed=await until(async()=>{const value=await read();count=previous&&cameraMatches(value.camera,previous)?count+1:0;previous=value.camera;return value;},value=>count>=3&&!cameraMatches(value.camera,before),'Settled real gesture');
++  const pose=changed.camera,reads=[];
++  for(const engine of ['mapbox','maplibre','mapbox','maplibre','mapbox','maplibre']){
++   const readback=await switchTo(engine,pose);reads.push({engine,...readback,image:reads.length<2?await image(engine):undefined});
++  }
++  outcomes.push({name:'Same binary, both engines, real changed camera retained through six switches',pose,reads});
++ }else{
++  let current=await state();
++  // Switching acceptance ends in MapLibre; prepare the opposite engine without changing the pose.
++  if(scenario!=='cold-recovery')await switchTo('mapbox',current.camera);
++  for(const engine of ['maplibre','mapbox']){
++   const coldInitial=scenario==='cold-recovery'&&engine==='maplibre';
++   const previous=coldInitial?{camera:initialCamera}:await read();await mode('fail');if(!coldInitial)await press(engine==='mapbox'?'Mapbox':'MapLibre');
++   const failed=await until(state,value=>value.status==='error','Actual style error');assert((await inspect()).includes('could not load or restore'));
++   await mode('ok');await press('Retry');await ready();const recovered=await read(previous.camera);
++   outcomes.push({name:engine+' actual style503 and retry recovery',failed,recovered,image:await image(engine)});
++  }
++ }
++ writeFileSync(output,JSON.stringify({status:'passed',platform,scenario,outcomes},null,2));console.log(JSON.stringify({status:'passed',output,outcomes}));
++ }catch(error){writeFileSync(output,JSON.stringify({status:'failed',platform,scenario,outcomes,error:String(error)},null,2));throw error;}
++}

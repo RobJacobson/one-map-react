@@ -1,0 +1,315 @@
+{
+  "unit": "U06",
+  "status": "Implemented and audited; applicable routine verification recorded; commit/push/PR authorized by owner workflow.",
+  "authorization": "Owner merged U05 PR24 and released U06 only. No successor unit, merge, renderer acceptance, native app build/install or package publication authorized.",
+  "scope": {
+    "runtime": "Both selected web refs and both selected native refs now retain common MapRef plus asynchronous getWrapperMap. Hand-mirrored advanced methods, inventories/createAdvancedMethods/forwarding helper and facade-owned debug/gesture helper types removed. Cheap raw exports retained.",
+    "callers": "Original maintained mapbox-web/maplibre-web namedRendering and global-state-app migrated. Publication has legacy examples/web-mapbox and examples/web-maplibre callers; no global-state app exists on main. Existing async command adopts namedRendering promise; direct upstream useWrapperMap probes preserved.",
+    "common": "Camera/query/cluster/state/capture conversions, source registries, load guards and error handling unchanged.",
+    "ownership": "Get current wrapper per operation; no readiness waiting. Detached getter rejects asynchronously; already borrowed handles follow upstream lifetime. Web fire/setEventedParent and fields use wrapper.getMap(). React-owned style/source/layer updates remain declarative.",
+    "retiredTests": "Only retired forwarding helper/mirror inventory tests and facade-only validation/detachment expectations removed. Existing getter/current-handle/detachment/common tests remain; representative true-wrapper reads/results/errors/plugin and caller cleanup tests added."
+  },
+  "regressions": {
+    "red": "New selected facade omission regression failed on both pre-U06 web adapters: 2 failures (received mirrored function), 48 skipped.",
+    "green": "Original focused wrapper/selected 19 passed; selected shape omissions and true borrowed wrapper/error/plugin routes pass. Native additions assert absence on actual forwarded refs, while getter/proxy/common regressions remain.",
+    "corrections": [
+      "First new native assertions wrongly inspected Proxy unknown-property behavior; corrected to inspect actual selected ref, without production Proxy changes.",
+      "Publication port initially left retired helper and test as empty files; independent audit found and implementation worker deleted them explicitly before final build/checks.",
+      "First isolated original peer run passed Mapbox web then rejected custom MapLibre fixture event name. Fixture changed to typed idle; final all 8 cases passed on same archive."
+    ]
+  },
+  "artifacts": {
+    "original": {
+      "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+      "basis": "Approved dirty rc.11 working basis; only 27 existing paths changed plus new U06 evidence. Unrelated state preserved.",
+      "snapshotPaths": 1037,
+      "snapshotSha256": "e315062c37920a9d9b90964db17d60e643f8e9d6b2d3aa2977accbddf75a126f",
+      "deltaSha256": "11140c99b3f7fae3e5605fb79d8acb570ed71766a74e4f7befe0f1df7847aeeb",
+      "frozenArchiveSha256": "180e9f74fbbdd4f5ddb8da02ac6fee6ed462e78506099c4c02d294db096bf34a",
+      "candidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7"
+    },
+    "main": {
+      "base": "49021c608e6b3145600e80935c98ff06a22a3d77",
+      "branch": "codex/u06-remove-ref-mirrors",
+      "basis": "Minimal U06 hunks on main rc.2; existing legacy consumers, peer tuples, patches and historical version facts preserved. Temporary per-package overlays keep workspace imports inside clone while reusing third-party dependencies.",
+      "deltaSha256": "dea3bb6ef43b4b6e5e66cced7a217adfd4d537714237f2babdcc8cb8d819237d",
+      "frozenArchiveSha256": "d81af25bd1ca9ea2ab09ca0f5ea2e5a0f599f2b8091ad3dd7326acf35764c2eb"
+    },
+    "archiveAudit": "Both archives: 207 members, no retired helper; every shipped src file and README byte-matched its final tree. No shipped peers/patches/locks/version/support/candidate changes."
+  },
+  "checks": {
+    "original": {
+      "unitWeb": "vp test run: 861 passed / 46 files",
+      "mockedNative": "bun run test:native: 289 passed / 7 suites",
+      "routine": "bun run check, typecheck (4 projects), typecheck:apps (3 projects), build, check:docs passed.",
+      "static": "node scripts/tf09-rendering-fixture.test.mjs and node scripts/tf10-selected-acceptance.test.mjs passed with fake captures/actions; no renderer executed.",
+      "packedCommon": "13 isolated selections passed on frozen archive.",
+      "expandedDocs": "PASS documentation structure: 43 Markdown files, 42 SDK comparison tables, paragraphs, fences and local links."
+    },
+    "main": {
+      "baselineFullUnitWeb": "Before U06 port: 813 passed / 2 failed, wrapper-callbacks.web.test.tsx dynamic marker.ts import vs installed marker.tsx.",
+      "finalFullUnitWeb": "775 passed / 2 failed, same unchanged wrapper-callback imports; no remaining introduced failure. Empty-suite port error fixed before this run.",
+      "boundedUnitWeb": "vp test run --exclude **/wrapper-callbacks.web.test.tsx: 775 passed / 35 files.",
+      "mockedNative": "bun run test:native: 274 passed / 6 suites.",
+      "routine": "bun run check, typecheck (4 projects), typecheck:apps (3 projects), build, check:docs passed.",
+      "static": "node scripts/tf09-rendering-fixture.test.mjs passed; fixture/static checks do not execute renderer.",
+      "packedCommon": "13 isolated selections passed on frozen archive.",
+      "expandedDocs": "PASS documentation structure: 42 Markdown files, 38 SDK comparison tables, paragraphs, fences and local links."
+    }
+  },
+  "selectedPeers": {
+    "scope": "All 8 existing test-peers scenarios per artifact: 4 standalone selected entries and both selected ends of both mixed pairs. Positive true wrapper/native shapes and representative removed-facade negatives. Declaration checks, selected web Node imports, peer install/patch verification only; no native linking or renderer.",
+    "derivation": "Temporary runner changes only root and helper import paths; no filters, extra harness or new repository CLI.",
+    "versions": {
+      "tuple-1": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "tuple-2": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "tuple-3": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-4": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-5": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-6": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-7": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "tuple-8": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-9": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-10": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      }
+    },
+    "executions": [
+      {
+        "artifact": "original",
+        "archiveSha256": "180e9f74fbbdd4f5ddb8da02ac6fee6ed462e78506099c4c02d294db096bf34a",
+        "reportSha256": "88605e4ea8cc48ba52d63a505abaf9f67ddbcdd60a3c586695156fb85464a591",
+        "runnerSha256": "81de62d4fb21cf62a2a329fae6c4100a56009b0b4a0e61bebc7fe3e0bd969e81",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "37ea9dcb3a9ad8f358e29a95ed0ae16ae79eb1006cd3f0351b6e374bd4775804",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "ff58485876ab615f89f593b799f95a4660dd4f6247762131229c57766299619f",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-3",
+            "lockSha256": "98944dc95b74244aad0d0753d626361d86df493aff38a589eb9e59bc8eb7c6f5",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-4",
+            "lockSha256": "4f65d302afbb5280a13e95fbf9fdb9c2021a19a990855e7ad8b9c49041683c6b",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "4240561551c36d0dec795c0ee8bf8581ff66ccd5ee1c64a3984a2dfdb4a3c56a",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "4240561551c36d0dec795c0ee8bf8581ff66ccd5ee1c64a3984a2dfdb4a3c56a",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "0a20ed84f4b831e83d263accaa3595418efcb2143e1ca1b0ca524ddb7264c97b",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "0a20ed84f4b831e83d263accaa3595418efcb2143e1ca1b0ca524ddb7264c97b",
+            "patchedFilesVerified": 31
+          }
+        ]
+      },
+      {
+        "artifact": "main",
+        "archiveSha256": "d81af25bd1ca9ea2ab09ca0f5ea2e5a0f599f2b8091ad3dd7326acf35764c2eb",
+        "reportSha256": "2269256c985ab50d68134d1ebc5b6a8d3766407d7ae4184f9c9f188eb9d792f7",
+        "runnerSha256": "6468d25934faaef57dcfef91992a0a427e947b897fffd69c193b354546571ff8",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "3c92c6b9fb57e7a76fbd53c2aa749441a6d78c0f4d3f5e1e33f5ef2edd981fb3",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "d6a9ff1ec2f5320d691e3fb777200fcc1bd4010232f6cc5f470c99f8d6cf5ecb",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-7",
+            "lockSha256": "a8ddaeabbcf572a5212ce8356b09d005f94aed731e15134533f03f111ebd5548",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-8",
+            "lockSha256": "c2be1a56cf85d64c66c30f890fabddf82c785c06f5f6f46b01e753da9c08137b",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "f59686c981662d536b3d266d1ed09437e85dcb1e872d359538c1764f63c59d20",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "f59686c981662d536b3d266d1ed09437e85dcb1e872d359538c1764f63c59d20",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "d1e72b5c20fc268e52f80695ea3c12eaa483fbb28e847ed1ff6bd6e9ba94b3bc",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "d1e72b5c20fc268e52f80695ea3c12eaa483fbb28e847ed1ff6bd6e9ba94b3bc",
+            "patchedFilesVerified": 25
+          }
+        ]
+      }
+    ],
+    "hostBoundary": "Mocked native host uses installed React Native 0.86.3; isolated declaration tuples use React Native 0.87.1. Neither establishes native linking or renderer compatibility."
+  },
+  "audit": {
+    "independent": "GPT-6.1 Sol medium implementation, documentation and independent review workers; independent reviewer inspected both exact deltas and connected callers, confirmed fixed file deletion and no remaining concrete U06 findings.",
+    "coordinator": "Reviewed source removals/common preservation, async caller/error/cleanup routes, fixture boundaries, declaration negatives, actual publication delta, archive contents and baseline isolation.",
+    "documentation": "69 data rows/checkmarks/first-three-cell substantive text retained in each tree; only two retired helper link destinations pinned to pre-removal main. Status distinguishes working migration from historical candidate/acceptance.",
+    "limits": "Passing mocked/declaration/package checks establish covered behavior only, not renderer readiness or full migration completion."
+  },
+  "openGates": [
+    "Two pre-existing main callback import fixture failures remain outside U06.",
+    "Renderer/browser/Metro/native linking acceptance unverified; no permission granted.",
+    "U07 requires explicit owner release; merge and package publication not authorized."
+  ],
+  "retention": "Keep compact outcome/provenance and recovery delta; remove temporary consumers, archives, overlays, clone and raw logs after PR creation. Consumer cleanup already runs in probe finally; native linking was not attempted."
+}

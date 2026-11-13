@@ -1,0 +1,332 @@
+{
+  "unit": "U08",
+  "status": "Implemented and audited; applicable routine verification recorded; commit/push/PR authorized by owner workflow.",
+  "authorization": "Owner merged U07 PR26 and released U08 only. No U09, merge, renderer/browser/Metro acceptance, native app build/install or package publication authorized.",
+  "scope": {
+    "removed": "Native rollback hook and its movement/load frame scheduling; native map/ref camera command observers and correction-only hook tests.",
+    "retained": "Normal changed-target Camera props and initial state, explicit camera commands, constraints/padding/bounds resets, wrapper attachment/SDK errors, MapLibre mapLoaded guard, selected native location-follow exclusions, capture frame and feature-state flush callbacks. Web controlled behavior is unchanged.",
+    "observations": "Existing private NativeCameraContext shape remains; viewState and observedViewState use native movement observations, seeded from initial state. Controls/scale/compass and positioning overlay read observations rather than the unchanged supplied target. No new controller, cache, queue or ownership. Existing cameraControlled presence flag still protects follow ownership.",
+    "contract": "Target A followed by observed movement B causes no facade rollback while A is unchanged or a fresh equal object. Changed target C, explicit jumpTo(A), later command D and target release remain requests. Mocks establish forwarding and absence of facade correction, not physical native prop application or animation completion."
+  },
+  "fixtures": {
+    "original": "Maintained camera-smoke distinguishes web held=1 from native command-applied/held=0. Tf09 target/command/readback actions and original TF10 native driver now verify observed movement, equal/changed target, explicit reapply, acceptance, release, clamp and persistent command. Original-only correction-overlap scope/onCorrection injection retired; generic observer ref/argument/error/ack tracking and native gesture input retained.",
+    "publication": "Existing legacy examples/shared camera-smoke and Tf04 judge migrated with existing release-fixture tests. Legacy Tf09 adds equal/changed target and explicit reapply options, retaining its original pitch35 and actual SDK center/zoom reads. Main did not contain original TF10 observer/driver/probe/overlap machinery; none imported, and its unaffected rendering runner/compiler owner list remain as before.",
+    "retiredTests": "Only tests belonging to the deleted rollback hook were retired; camera converters, command errors, native constraints/reset, load/attachment/replacement, observations, and web control regressions remain."
+  },
+  "regressions": {
+    "before": "Two deterministic adapter cases failed against old source: each observed user B caused exactly one automatic native jump to unchanged target A.",
+    "after": [
+      "No automatic jump after movement or equal fresh target; changed C and release forwarding retain their conversions.",
+      "Explicit A reapplication while A is still supplied, then command D plus SDK movement D/frame flush produces only public command dispatches.",
+      "Old attachment callbacks/commands after replacement cannot affect the new map; detach and SDK failure remain observable.",
+      "Selected native follow/viewState conflicts and MapLibre pre-load command guard remain.",
+      "Native controls and overlays use observed camera under unchanged target; generic contexts retain their ownership.",
+      "TF04 native applied-command and web-held protocol checks, original native target/command driver self-checks and observer cleanup checks pass."
+    ],
+    "firstAttempts": [
+      "Initial ENOSPC blocked shell preparation and one substantive patch attempt before tests. After storage recovered, 12 cache entries for completed U04-U07 clones were removed; active working cache and unrelated storage preserved. No source loss.",
+      "Initial post-change scale fixture returned 10.01 with observed center11; mock changed to11.01 while retaining observation assertions.",
+      "Initial types found nullable requestAnimationFrame cancellation id and required selected locationOptions fixture fields; null guard and explicit fixture fields corrected."
+    ]
+  },
+  "artifacts": {
+    "original": {
+      "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+      "basis": "Approved dirty rc.11 basis; 42 existing paths changed plus U08 evidence; unrelated state preserved.",
+      "snapshotPaths": 1028,
+      "snapshotSha256": "3e685d8f7ed6ed43f900a2e0ebb17ef2a3e412adc419b096a8cecdc9a5bf518f",
+      "deltaSha256": "f251fd2787494353d30524852364fefca5f414ac81c3652200233f864272caa7",
+      "frozenArchiveSha256": "51e1e0e0fc05131d58cf2773c4ab45a917fc68aebcfffbd32944c4a03a5dd3b9",
+      "candidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7"
+    },
+    "main": {
+      "base": "7d440810570983140735945e69351a1d3d09b275",
+      "branch": "codex/u08-remove-native-camera-rollback",
+      "basis": "Minimal U08 hunks on main rc.2, preserving old consumer paths, main-local U07 AppState fixture, native patches, peer tuples, versions and historical facts. Temporary dependency overlays keep workspace imports in clone while reusing third-party dependencies.",
+      "trackedDeltaSha256": "56ae1175f4b1b4544ddd9676ec524074179767f5d7a03ee27c23162e0388f467",
+      "frozenArchiveSha256": "4e4b4dea4d9a19b98e4344791982cf1519368311bc7ec093b0b69a3eadbf1674"
+    },
+    "archiveAudit": "Both archives have 203 members, no retired rollback hook, and every shipped src/README byte-matches its corresponding final tree. Candidate archive, peers, patches, lockfiles and support records unchanged."
+  },
+  "checks": {
+    "original": {
+      "unitWeb": "857 passed / 45 files",
+      "mockedNative": "292 passed / 7 suites",
+      "compiledNative": "274 passed / 3 affected suites",
+      "compiledWeb": "23 passed / 3 affected files",
+      "routine": "Formatting/lint (333 formatted files and 315 linted files), type checking (four projects), app declarations (three projects), library/example builds, compiler ownership/runtime, expanded docs passed. Build rerun after selected native entry comment-only change.",
+      "cameraStatic": "Fake-driver and generic-observer self-checks, native orientation/getter boundary, camera bounds/pan protocol, rendering fixture, installed RNMapbox 10.3.8 mode stub and extracted Swift/ObjC++ camera-reset stubs passed. No real device input/renderer/app build.",
+      "notRun": "Unchanged SDK Kotlin boundary stub skipped because cached 2.2.0 compiler unavailable; native patches unchanged.",
+      "packedCommon": "13 isolated selections passed on frozen archive."
+    },
+    "main": {
+      "unitWebFull": "773 passed / 2 failed: unchanged wrapper-callbacks marker.ts import vs installed marker.tsx.",
+      "unitWebBounded": "773 passed / 35 files excluding only known wrapper-callbacks fixture.",
+      "baselineEvidence": "Main base tree is identical to U07 commit 6df947e2d40580f4a3c308b9b0fc45a975f482d1 (git diff empty). Prior U06/U07 records establish the same two baseline import failures; fixture and installed source path unchanged.",
+      "mockedNative": "281 passed / 6 suites",
+      "compiledNative": "264 passed / 3 affected suites",
+      "compiledWeb": "22 passed / 2 affected files",
+      "routine": "Formatting/lint, type checking (four projects), app declarations (three projects), library/example builds, compiler ownership/runtime and expanded docs passed.",
+      "packedCommon": "13 isolated selections passed on frozen archive."
+    },
+    "documentationStructure": {
+      "original": "PASS documentation structure: 43 Markdown files, 42 SDK comparison tables, paragraphs, fences and local links.",
+      "main": "PASS documentation structure: 42 Markdown files, 38 SDK comparison tables, paragraphs, fences and local links."
+    }
+  },
+  "selectedPeers": {
+    "scope": "All 8 existing standalone/selected mixed-pair cases per artifact; accumulated common and selected-wrapper/type-boundary proofs retained. Declaration checks, selected web Node imports, peer installation/patch verification only; no native linking or renderer.",
+    "derivation": "Temporary full existing test-peers runner changes only root/helper import paths, with no filtering/new repository harness.",
+    "hostBoundary": "Mocked native uses installed React Native 0.86.3; isolated declarations use React Native 0.87.1. No new support claim.",
+    "versions": {
+      "tuple-1": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "tuple-2": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "tuple-3": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-4": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-5": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-6": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-7": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "tuple-8": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-9": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-10": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      }
+    },
+    "executions": [
+      {
+        "artifact": "original",
+        "archiveSha256": "51e1e0e0fc05131d58cf2773c4ab45a917fc68aebcfffbd32944c4a03a5dd3b9",
+        "reportSha256": "97fdb1511f8991bd51729fc7ad996f00febffae0e91928dd938416b5ae8977bc",
+        "runnerSha256": "16abd4e557fd18814a27e59bb6361ed268a6a9f0d77ad3faf3458f0b60e874ea",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "e66efd371d9467fae91ddc79f4ed89fc534150fbe6679c114cfb50dd1ad07ea7",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "45727b9d30df0c60eec1e03691661fbb5846f2cd7a33e8267cdc973e43872797",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-3",
+            "lockSha256": "aea398b7f18a00a884db8785aee056708ebd659191e93490b3d4bad454d9cc86",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-4",
+            "lockSha256": "51a5f596cb03fd8f411cd1656d200ebf5e81ec23f9c3142a3a157886fca67f8d",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "27d27749d8486c3d5d201e66e245234438e4253f9f80285023de5e6ce8b6a7ae",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "27d27749d8486c3d5d201e66e245234438e4253f9f80285023de5e6ce8b6a7ae",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "2bcab6eb468beb04d69d5f5f08dbe60c5d0980c73b4941b350492eaad9a7aa49",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "2bcab6eb468beb04d69d5f5f08dbe60c5d0980c73b4941b350492eaad9a7aa49",
+            "patchedFilesVerified": 31
+          }
+        ]
+      },
+      {
+        "artifact": "main",
+        "archiveSha256": "4e4b4dea4d9a19b98e4344791982cf1519368311bc7ec093b0b69a3eadbf1674",
+        "reportSha256": "2c64b4cb4483333cdeefd28e4c07c11f00b4278b35a05279550532550ed2406e",
+        "runnerSha256": "33dbee50860cc74e89c8daeaa863a634ba93b886d75adc3648f01c58c5ca40fc",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "ef34dcc0810014bdd255f9f7805a73744b5c860fa5f8b213d2860d53e4878a94",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "1594c8bcb68904f6406234adc84098d6496e677fbf8c8927af557631bd92263f",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-7",
+            "lockSha256": "eb335601f132509bc83ce87d0f6b22168e6a7da978928162a1c98c5c02898a56",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-8",
+            "lockSha256": "4ba4f9b2d284243f483ae041ad6836176173b09d81a4340a6f9ef83c6d6fcad0",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "daa84e79d6a16d9e8762cf22ebf7e61b6e9b58020dd18c353bf2e9fc58abc03e",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "daa84e79d6a16d9e8762cf22ebf7e61b6e9b58020dd18c353bf2e9fc58abc03e",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "abdbe35e10ed6fe7b40b3a84ce6073446e5288d9bc47afc97d82214bb20f238d",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "abdbe35e10ed6fe7b40b3a84ce6073446e5288d9bc47afc97d82214bb20f238d",
+            "patchedFilesVerified": 25
+          }
+        ]
+      }
+    ]
+  },
+  "audit": {
+    "independent": "GPT-6.1 Sol medium implementation/documentation/review workers; reviewer inspected both exact deltas, connected camera/context/fixture consumers, errors/load/replacement guards and original/main fixture differences. No substantive findings remain.",
+    "coordinator": "Reviewed retained Camera conversions/commands and ownership, removal of correction dispatches, observation context, target/release/error/replacement regressions, actual publication checks, archive contents, baseline isolation and provenance.",
+    "documentation": "69 coverage row IDs/checkmarks/first-three substantive cells preserved in each tree except approved historical deleted-link pins. Working behavior remains separate from historical rollback acceptance and unverified current renderer behavior.",
+    "limits": "Props/mocks/compiled checks prove covered translation and facade behavior. Equal native prop value handling, actual gesture/camera application and platform timing remain later renderer gates; missing getters, fit caps and animation completion not newly advertised."
+  },
+  "openGates": [
+    "Two pre-existing main wrapper-callback import fixture failures remain outside U08.",
+    "Actual native camera/gesture, renderer/browser/Metro and native linking acceptance unverified; separate permission required.",
+    "U09 and later units undispatched pending explicit owner release. Merge and publication not authorized."
+  ],
+  "cleanup": "Retain compact outcomes/provenance/recovery; after PR creation remove temporary clone, overlays, consumer installations/locks, archives, raw logs and clone-specific test caches. Peer consumers clean installations in finally."
+}

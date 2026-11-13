@@ -1,0 +1,2714 @@
+--- original/scripts/tf10-native-camera-driver.mjs
++++ isolated/scripts/tf10-native-camera-driver.mjs
+@@ -0,0 +1,285 @@
++import assert from "node:assert/strict";
++import { spawn } from "node:child_process";
++import { createServer } from "node:http";
++import { randomUUID } from "node:crypto";
++import { join } from "node:path";
++
++import { stopOwnedProcess } from "./native-smoke-process.mjs";
++import { nativeControlledCamera as controlledCamera } from "../examples/shared/tf10-native-orientation.ts";
++
++const cameraFields = ["longitude", "latitude", "zoom", "bearing", "pitch"];
++const tolerance = { longitude: 0.02, latitude: 0.02, zoom: 0.1, bearing: 0.5, pitch: 0.5 };
++const delay = (durationMs) => new Promise((resolve) => setTimeout(resolve, durationMs));
++
++/** Runs bounded real native gestures against the TF09 controlled-camera probe. */
++export const runNativeCameraAcceptance = async ({ action, driveGesture }) => {
++  const read = () => action("camera-read");
++  const waitFor = async (description, predicate, timeoutMs = 8000) => {
++    const deadline = Date.now() + timeoutMs;
++    let latest;
++    while (Date.now() < deadline) {
++      latest = await read();
++      assertCameraRead(latest);
++      if (predicate(latest)) return latest;
++      await delay(100);
++    }
++    throw new Error(`${description} timed out: ${JSON.stringify(latest)}`);
++  };
++  const arm = async (value, expectedClamp) => {
++    await action("controlled-camera", value);
++    await waitFor("controlled camera commit", (current) =>
++      current.clamp === expectedClamp &&
++      (value.enabled === false
++        ? current.controlled === undefined
++        : sameCamera(current.controlled, controlledCamera))
++    );
++    return settle("controlled camera readback", (current) =>
++      expectedClamp
++        ? current.controlled && current.clamp && current.zoom >= 3 &&
++          sameCameraExceptZoom(actualCamera(current), current.controlled)
++        : value.enabled === false
++          ? current.controlled === undefined
++          : current.controlled &&
++            sameCamera(actualCamera(current), current.controlled)
++    );
++  };
++  const proposalAfterGesture = (baseline) =>
++    waitFor("real user gesture proposal", (current) =>
++      current.userMoves > baseline.userMoves &&
++      current.lastUserOrigin === "user" && current.lastUserViewState &&
++      !sameCamera(current.lastUserViewState, current.controlled)
++    );
++  const settle = async (label, predicate) => {
++    const deadline = Date.now() + 8000;
++    let latest;
++    let quietSince;
++    let quietMoves;
++    while (Date.now() < deadline) {
++      latest = await read();
++      assertCameraRead(latest);
++      if (!predicate(latest)) {
++        quietSince = undefined;
++        quietMoves = undefined;
++      } else if (quietSince === undefined || quietMoves !== latest.moves) {
++        quietSince = Date.now();
++        quietMoves = latest.moves;
++      } else if (Date.now() - quietSince >= 600) {
++        return latest;
++      }
++      await delay(100);
++    }
++    throw new Error(`${label} did not settle: ${JSON.stringify(latest)}`);
++  };
++
++  const rejectedBefore = await arm({ enabled: true, accept: false }, false);
++  const rejectedGesture = driveGesture("rejected", randomUUID());
++  const rejectedProposal = await proposalAfterGesture(rejectedBefore);
++  await rejectedGesture;
++  const rejected = await settle("rejected proposal", (current) =>
++    sameCamera(actualCamera(current), rejectedBefore.controlled)
++  );
++
++  await arm({ enabled: true, accept: true }, false);
++  const acceptedBefore = await read();
++  const acceptedGesture = driveGesture("accepted", randomUUID());
++  const acceptedMovement = await waitFor("accepted user gesture", (current) =>
++    current.userMoves > acceptedBefore.userMoves &&
++    current.lastUserOrigin === "user" && current.lastUserViewState &&
++    differentPosition(current.lastUserViewState, acceptedBefore)
++  );
++  await acceptedGesture;
++  const accepted = await settle("accepted proposal", (current) =>
++    current.lastUserOrigin === "user" && current.controlled && current.viewState &&
++    sameCamera(current.controlled, current.viewState) &&
++    sameCamera(actualCamera(current), current.controlled)
++  );
++  assert(!sameCamera(accepted.controlled, rejectedBefore.controlled), "accepted gesture did not update controlled state");
++
++  const releasedBefore = await arm({ enabled: false }, false);
++  const releasedGesture = driveGesture("released", randomUUID());
++  await waitFor("released user gesture", (current) =>
++    current.userMoves > releasedBefore.userMoves &&
++    current.lastUserOrigin === "user" && current.lastUserViewState &&
++    differentPosition(current.lastUserViewState, releasedBefore)
++  );
++  await releasedGesture;
++  const released = await settle("released camera", (current) =>
++    current.controlled === undefined && current.viewState &&
++    current.lastUserOrigin === "user" &&
++    sameCamera(actualCamera(current), current.viewState) &&
++    !samePosition(current, releasedBefore)
++  );
++
++  const clampBefore = await arm({ enabled: true, accept: false, clamp: true }, true);
++  assert(clampBefore.zoom >= 3, "minimum zoom was not independently read back");
++  const clampGesture = driveGesture("fresh-after-clamp", randomUUID());
++  const clampProposal = await proposalAfterGesture(clampBefore);
++  await clampGesture;
++  const clamped = await settle("clamped proposal", (current) =>
++    current.clamp && current.zoom >= 3 && current.controlled &&
++    sameCameraExceptZoom(actualCamera(current), current.controlled) &&
++    close(current.zoom, 3, tolerance.zoom)
++  );
++
++  const commandBefore = await arm({ enabled: true, accept: false, clamp: true }, true);
++  const commandAcknowledged = await action("camera-command");
++  assert.equal(commandAcknowledged, true, "public camera command was not acknowledged");
++  const afterCommand = await read();
++  assertCameraRead(afterCommand);
++  assert(sameCamera(afterCommand.controlled, commandBefore.controlled), "public command changed React-owned controlled state");
++  const command = await settle("public command after clamped correction", (current) =>
++    current.clamp && current.controlled && current.zoom >= 3 &&
++    sameCameraExceptZoom(actualCamera(current), current.controlled) &&
++    close(current.zoom, 3, tolerance.zoom)
++  );
++
++  return {
++    status: "passed",
++    observations: {
++      rejected: { proposal: rejectedProposal, settled: rejected },
++      accepted: { movement: acceptedMovement, settled: accepted },
++      released,
++      clamped: { proposal: clampProposal, settled: clamped },
++      commandAfterClamp: {
++        acknowledged: commandAcknowledged,
++        controlled: commandBefore.controlled,
++        afterCommand,
++        settled: command,
++      },
++    },
++    verificationLimits: [
++      "Overlap between command acknowledgment and an active correction is not observable through the public native probe.",
++    ],
++  };
++};
++
++/** Starts a real Android swipe and returns when its input process completes. */
++export const createAndroidGestureDriver = async ({ serial, adb = "adb" }) => {
++  assert(serial, "Set ANDROID_SERIAL to the assigned Android device.");
++  const sizeText = await runCommand(adb, ["-s", serial, "shell", "wm", "size"]);
++  const match = /(\d+)x(\d+)/.exec(sizeText);
++  assert(match, `Could not read Android display size: ${sizeText}`);
++  const width = Number(match[1]);
++  const height = Number(match[2]);
++  const points = [
++    Math.round(width * 0.5),
++    Math.round(height * 0.62),
++    Math.round(width * 0.68),
++    Math.round(height * 0.5),
++    1100,
++  ];
++  return {
++    driveGesture: () => runCommand(adb, ["-s", serial, "shell", "input", "swipe", ...points.map(String)]),
++    close: async () => {},
++  };
++};
++
++/** Starts the existing XCTest TapDriver and routes one real map swipe at a time. */
++export const createIosGestureDriver = async ({ bundleIdentifier, projectRoot, simulatorUDID }) => {
++  assert(bundleIdentifier, "Set TF09_APPLICATION_ID to the assigned iOS bundle identifier.");
++  assert(simulatorUDID, "Set TF09_IOS_UDID to the assigned simulator.");
++  let current;
++  const server = createServer((request, response) => {
++    if (request.method === "GET" && request.url === "/tap") {
++      response.writeHead(200, { "Content-Type": "text/plain" }).end(current?.command ?? "");
++      return;
++    }
++    if (request.method === "POST" && request.url === "/done") {
++      let body = "";
++      request.on("data", (chunk) => (body += chunk));
++      request.on("end", () => {
++        if (body !== current?.command) {
++          response.writeHead(409).end("gesture identity mismatch");
++          return;
++        }
++        response.writeHead(204).end();
++        current.resolve();
++        current = undefined;
++      });
++      return;
++    }
++    response.writeHead(404).end();
++  });
++  await new Promise((resolve, reject) => {
++    server.once("error", reject);
++    server.listen(8799, "127.0.0.1", resolve);
++  });
++  const xcodebuild = spawn("xcodebuild", [
++    "test", "-project", join(projectRoot, "TapDriver.xcodeproj"), "-scheme", "TapDriver",
++    "-destination", `platform=iOS Simulator,id=${simulatorUDID}`,
++    "-derivedDataPath", join(projectRoot, "..", "..", "..", "ios-tf09-tap-driver-derived"),
++    "-only-testing:TapDriverUITests/TapDriver/testDriveTaps",
++  ], { detached: true, stdio: ["ignore", "pipe", "pipe"] });
++  let output = "";
++  xcodebuild.stdout.on("data", (chunk) => (output += chunk));
++  xcodebuild.stderr.on("data", (chunk) => (output += chunk));
++  const close = async () => {
++    server.close();
++    server.closeAllConnections();
++    await stopOwnedProcess(xcodebuild);
++  };
++  try {
++    await waitForDriverStart(xcodebuild, () => output);
++  } catch (error) {
++    await close();
++    throw error;
++  }
++  return {
++    driveGesture: (label, nonce) => new Promise((resolve, reject) => {
++      if (current) {
++        reject(new Error("A native gesture is already in progress."));
++        return;
++      }
++      const command = `gesture ${bundleIdentifier} 0.50 0.62 0.68 0.50 0.10 ${label}-${nonce}`;
++      const timer = setTimeout(() => {
++        current = undefined;
++        reject(new Error("iOS gesture did not finish within 15 seconds."));
++      }, 15000);
++      current = { command, resolve: () => { clearTimeout(timer); resolve(); } };
++    }),
++    close,
++  };
++};
++
++/** Validates an independently returned TF09 map read before comparing cameras. */
++export const assertCameraRead = (read) => {
++  assert(read && Number.isInteger(read.moves) && Number.isInteger(read.ends));
++  assert(Number.isInteger(read.userMoves) && Number.isInteger(read.userEnds));
++  assert(Array.isArray(read.center) && read.center.length === 2);
++  assert(read.center.every(Number.isFinite));
++  assert([read.zoom, read.bearing, read.pitch].every(Number.isFinite));
++  assert(["user", "programmatic", "unknown"].includes(read.origin));
++  assert(read.lastUserOrigin === undefined || read.lastUserOrigin === "user");
++  if (read.controlled) assertFiniteCamera(read.controlled);
++  if (read.viewState) assertFiniteCamera(read.viewState);
++  if (read.lastUserViewState) assertFiniteCamera(read.lastUserViewState);
++};
++
++/** Requires all five portable camera fields to be finite. */
++export const assertFiniteCamera = (camera) => {
++  assert(camera && cameraFields.every((field) => Number.isFinite(camera[field])));
++};
++
++const actualCamera = (read) => ({ longitude: read.center[0], latitude: read.center[1], zoom: read.zoom, bearing: read.bearing, pitch: read.pitch });
++const samePosition = (left, right) => close(left.center[0], right.center[0], tolerance.longitude) && close(left.center[1], right.center[1], tolerance.latitude);
++const differentPosition = (camera, read) => !close(camera.longitude, read.center[0], tolerance.longitude) || !close(camera.latitude, read.center[1], tolerance.latitude);
++const sameCameraExceptZoom = (left, right) => close(left.longitude, right.longitude, tolerance.longitude) && close(left.latitude, right.latitude, tolerance.latitude) && close(left.bearing, right.bearing, tolerance.bearing) && close(left.pitch, right.pitch, tolerance.pitch);
++const close = (left, right, allowed) => Math.abs(left - right) <= allowed;
++const sameCamera = (left, right) => left && right && cameraFields.every((field) => close(left[field], right[field], tolerance[field]));
++const runCommand = (file, args) => new Promise((resolve, reject) => {
++  const child = spawn(file, args, { stdio: ["ignore", "pipe", "pipe"] });
++  let output = "";
++  child.stdout.on("data", (chunk) => (output += chunk));
++  child.stderr.on("data", (chunk) => (output += chunk));
++  child.once("error", reject);
++  child.once("close", (code) => code === 0 ? resolve(output) : reject(new Error(`${file} exited ${code}: ${output.slice(-1000)}`)));
++});
++const waitForDriverStart = async (child, output) => {
++  const deadline = Date.now() + 180000;
++  while (Date.now() < deadline) {
++    if (child.exitCode !== null) throw new Error(`iOS TapDriver exited early: ${output()}`);
++    if (output().includes("testDriveTaps]' started")) return;
++    await delay(200);
++  }
++  throw new Error(`iOS TapDriver did not start: ${output().slice(-1500)}`);
++};
+--- original/scripts/tf10-native-camera-driver.test.mjs
++++ isolated/scripts/tf10-native-camera-driver.test.mjs
+@@ -0,0 +1,135 @@
++import assert from "node:assert/strict";
++import {
++  assertCameraRead,
++  assertFiniteCamera,
++  runNativeCameraAcceptance,
++} from "./tf10-native-camera-driver.mjs";
++
++const base = { longitude: 0, latitude: 0, zoom: 2, bearing: 0, pitch: 0 };
++assertFiniteCamera({ ...base, zoom: 3 });
++assertCameraRead({ moves: 1, ends: 0, origin: "user", userMoves: 1, userEnds: 0, lastUserOrigin: "user", lastUserViewState: base, center: [0, 0], zoom: 3, bearing: 0, pitch: 0, controlled: base, viewState: base });
++assert.throws(() => assertFiniteCamera({ ...base, pitch: Number.NaN }));
++assert.throws(() => assertCameraRead({ moves: 1, ends: 0, origin: "user", userMoves: 0, userEnds: 0, center: [0, 0], zoom: Infinity, bearing: 0, pitch: 0 }));
++assert.throws(() => assertCameraRead({ moves: 1, ends: 0, origin: "fromUserInteraction", userMoves: 0, userEnds: 0, center: [0, 0], zoom: 3, bearing: 0, pitch: 0 }));
++
++const clone = (value) => structuredClone(value);
++const makeRead = (state) => ({
++  ...state.events,
++  controlled: clone(state.controlled),
++  clamp: state.clamp,
++  center: [state.actual.longitude, state.actual.latitude],
++  zoom: state.actual.zoom,
++  bearing: state.actual.bearing,
++  pitch: state.actual.pitch,
++  viewState: clone(state.viewState),
++  userMoves: state.userMoves,
++  userEnds: state.userEnds,
++  lastUserOrigin: state.lastUserOrigin,
++  lastUserViewState: clone(state.lastUserViewState),
++});
++const state = {
++  actual: clone(base),
++  controlled: clone(base),
++  viewState: clone(base),
++  clamp: false,
++  accept: false,
++  events: { moves: 0, ends: 0, origin: "unknown" },
++  userMoves: 0,
++  userEnds: 0,
++  lastUserOrigin: undefined,
++  lastUserViewState: undefined,
++  gestures: [],
++  actions: [],
++};
++const action = async (name, value = {}) => {
++  state.actions.push(name);
++  if (name === "controlled-camera") {
++    state.accept = value.accept === true;
++    state.clamp = value.clamp === true;
++    state.controlled = value.enabled === false ? undefined : clone(base);
++    state.viewState = clone(state.controlled);
++    state.events = { moves: 1, ends: 0, origin: "programmatic" };
++    state.userMoves = 0;
++    state.userEnds = 0;
++    state.lastUserOrigin = undefined;
++    state.lastUserViewState = undefined;
++    state.actual = clone(state.controlled ?? state.actual);
++    if (state.clamp) state.actual.zoom = 3;
++  } else if (name === "camera-command") {
++    state.actual = { longitude: 10, latitude: 10, zoom: 3, bearing: 0, pitch: 0 };
++    queueMicrotask(() => {
++      state.actual = { ...state.controlled, zoom: 3 };
++      state.viewState = clone(state.actual);
++      state.events.moves += 1;
++      state.events.origin = "programmatic";
++    });
++  }
++  return name === "camera-read" ? makeRead(state) : true;
++};
++const driveGesture = (label) => {
++  state.gestures.push(label);
++  const before = clone(state.actual);
++  const proposal = {
++    longitude: before.longitude + 0.25,
++    latitude: before.latitude + 0.15,
++    zoom: state.clamp ? 3 : before.zoom + 0.2,
++    bearing: before.bearing + 2,
++    pitch: before.pitch + 1,
++  };
++  state.events.moves += 1;
++  state.events.ends += 1;
++  state.events.origin = "user";
++  state.viewState = clone(proposal);
++  state.actual = clone(proposal);
++  state.userMoves += 1;
++  state.userEnds += 1;
++  state.lastUserOrigin = "user";
++  state.lastUserViewState = clone(proposal);
++  if (state.accept) {
++    // Deliberately commit before the driver's first observation poll.
++    state.controlled = {
++      ...clone(proposal),
++      longitude: proposal.longitude + 0.08,
++      latitude: proposal.latitude + 0.04,
++    };
++  }
++  if (label !== "released") {
++    // Programmatic feedback arrives before the first poll but retains the actual user event.
++    state.actual = state.controlled
++      ? { ...clone(state.controlled), ...(state.clamp ? { zoom: 3 } : {}) }
++      : clone(state.actual);
++    state.viewState = clone(state.actual);
++    state.events.moves += 1;
++    state.events.origin = "programmatic";
++  } else {
++    // Uncontrolled native inertia can move beyond the last direct user sample.
++    state.actual.longitude += 0.08;
++    state.actual.latitude += 0.04;
++    state.viewState = clone(state.actual);
++    state.events.moves += 1;
++    state.events.origin = "programmatic";
++  }
++  return Promise.resolve();
++};
++const result = await runNativeCameraAcceptance({ action, driveGesture });
++assert.equal(result.status, "passed");
++assert.deepEqual(state.gestures, ["rejected", "accepted", "released", "fresh-after-clamp"]);
++assert.deepEqual(Object.keys(result.observations), ["rejected", "accepted", "released", "clamped", "commandAfterClamp"]);
++assert(result.observations.accepted.settled.controlled.longitude > 0);
++assert.equal(result.observations.accepted.movement.origin, "programmatic");
++assert.equal(result.observations.accepted.movement.lastUserOrigin, "user");
++assert(
++  result.observations.accepted.settled.controlled.longitude >
++    result.observations.accepted.movement.lastUserViewState.longitude
++);
++assert(result.observations.released.controlled === undefined);
++assert.equal(result.observations.clamped.settled.center[0], result.observations.clamped.settled.controlled.longitude);
++assert.equal(result.observations.clamped.settled.zoom, 3);
++assert.equal(result.observations.commandAfterClamp.settled.center[0], 0);
++assert.equal(result.observations.commandAfterClamp.settled.zoom, 3);
++assert.equal(result.observations.commandAfterClamp.controlled.zoom, 2);
++assert.match(result.verificationLimits[0], /Overlap between command acknowledgment/);
++assert(state.events.origin === "programmatic");
++assert(state.actions.lastIndexOf("camera-command") > state.actions.lastIndexOf("controlled-camera"));
++assert(state.actions.at(-1) === "camera-read");
++process.stdout.write("TF10 native camera protocol and race regression self-check passed\n");
+--- original/scripts/tf09-rendering-smoke.mjs
++++ isolated/scripts/tf09-rendering-smoke.mjs
+@@ -14,9 +14,17 @@
+ 
+ import { stopOwnedProcess } from "./native-smoke-process.mjs";
+ import { terrainPng } from "./tf09-rendering-fixture.mjs";
++import {
++  createAndroidGestureDriver,
++  createIosGestureDriver,
++  runNativeCameraAcceptance,
++} from "./tf10-native-camera-driver.mjs";
+ 
+ const root = resolve(import.meta.dirname, "..");
+ const [platform, engine] = process.argv.slice(2);
++const executionScope = process.env.TF09_SCOPE ?? "all";
++assert(["all", "rendering", "camera"].includes(executionScope), "TF09_SCOPE must be all, rendering or camera.");
++assert(platform !== "web" || executionScope !== "camera", "Camera scope is native-only.");
+ assert(
+   ["web", "ios", "android"].includes(platform),
+   "Choose web, ios or android."
+@@ -357,225 +365,250 @@
+       light,
+     };
+   });
+-  if (platform === "web" || engine === "mapbox") {
++
++
++  if (executionScope !== "camera") {
++    if (platform === "web" || engine === "mapbox") {
++      await scenario(
++        "terrain enabled before delayed DEM attachment",
++        async () => {
++          await action("configure", { terrain: true });
++          await action("configure", { terrain: true, dem: true });
++          let read;
++          await until(async () => {
++            read = await action("read");
++            return (
++              typeof read.elevation === "number" &&
++              Math.abs(read.elevation - 2000) < 5
++            );
++          });
++          return { elevation: read.elevation, expectedMeters: 2000 };
++        }
++      );
++      await scenario("explicit terrain clear and projection change", async () => {
++        await action("configure", { dem: true, globe: true });
++        await until(async () => (await action("read")).elevation === null);
++        await action("configure", { dem: true, terrain: true });
++        await until(
++          async () => Math.abs((await action("read")).elevation - 2000) < 5
++        );
++        const previousStyleLoads = (await action("read")).styleLoads;
++        await action("replace-style");
++        await until(
++          async () => (await action("read")).styleLoads > previousStyleLoads
++        );
++        await until(
++          async () => Math.abs((await action("read")).elevation - 2000) < 5
++        );
++        return { elevation: (await action("read")).elevation };
++      });
++    } else await action("configure", { dem: true });
++    if (platform === "web") {
++      await scenario("named selected renderer facilities", async () => {
++        const result = await action("named");
++        assert.deepEqual(result.tf10.dragPan, {
++          before: true,
++          disabled: false,
++          restored: true,
++        });
++        for (const field of ["source", "layer", "canvas", "styleLayer"])
++          assert.equal(result.tf10[field], true, `TF10 selected ${field}`);
++        assert.equal(
++          result.tf10.eventCalls,
++          1,
++          "TF10 on/fire/off removes its listener"
++        );
++        if (engine === "mapbox") {
++          assert.equal(result.scale, 1.2);
++          assert(result.rain);
++          assert(result.snow);
++        } else {
++          assert.equal(result.globalState["rendering-fixture"], 9009);
++          assert(result.sky);
++        }
++        return result;
++      });
++      await scenario(
++        "selected canvas/video/custom insertion, mutable coordinates and teardown",
++        async () => {
++          await until(async () =>
++            page.evaluate("window.__oneMapTf09Media?.().ready")
++          );
++          await action("configure", { dem: false });
++          await action("media", { enabled: true });
++          let inspected;
++          await until(async () => {
++            inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
++            return inspected?.canvas && inspected?.video && inspected?.custom;
++          });
++          await until(async () =>
++            page.evaluate("window.__oneMapTf09Media().frames > 0")
++          );
++          let blue = 0;
++          let green = 0;
++          let magenta = 0;
++          await until(async () => {
++            const image = await decodeCapture();
++            blue = countPixels(
++              image,
++              (r, g, b) => r < 70 && g > 70 && g < 150 && b > 220
++            );
++            green = countPixels(
++              image,
++              (r, g, b) => r < 50 && g > 200 && b > 70 && b < 180
++            );
++            magenta = countPixels(
++              image,
++              (r, g, b) => r > 220 && g < 40 && b > 220
++            );
++            assert(
++              blue > 100 && green > 100 && magenta > 100,
++              `Media/custom output missing: canvas=${blue}, video=${green}, custom=${magenta}; state=${JSON.stringify(await page.evaluate("window.__oneMapTf09Inspect?.().videoState"))}.`
++            );
++            return true;
++          });
++          await action("media", { enabled: true, moved: true });
++          await until(async () => {
++            inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
++            return inspected?.canvasCoordinates?.coordinates?.[0]?.[0] === 5;
++          });
++          await action("media", { enabled: false });
++          await until(async () => {
++            inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
++            return !inspected?.canvas && !inspected?.video && !inspected?.custom;
++          });
++          const counts = await page.evaluate("window.__oneMapTf09Media()");
++          assert.equal(counts.added, counts.removed);
++          return {
++            canvasBluePixels: blue,
++            videoGreenPixels: green,
++            magentaPixels: magenta,
++            callbacks: counts,
++          };
++        }
++      );
++    }
++    await scenario("hillshade draws the fixture's slope patch", async () => {
++      await action("configure", { dem: true, shade: false });
++      let baseline;
++      await until(async () => {
++        baseline = await decodeCapture();
++        // iOS view snapshots encode the background as 30/49/75 rather than web sRGB 23/50/77.
++        const tolerance = platform === "ios" ? 12 : 3;
++        const blue = countPixels(
++          baseline,
++          (r, g, b) =>
++            Math.abs(r - 23) < tolerance &&
++            Math.abs(g - 50) < tolerance &&
++            Math.abs(b - 77) < tolerance
++        );
++        assert(
++          blue > baseline.width * baseline.height * 0.95,
++          `Hillshade baseline not flat: blue=${blue}/${baseline.width * baseline.height}, corner=${[...baseline.data.subarray(0, 4)]}.`
++        );
++        return true;
++      });
++      await action("configure", { dem: true, shade: true });
++      let shaded;
++      await until(async () => {
++        shaded = await decodeCapture();
++        const changed = pixelDifference(shaded, baseline);
++        assert(
++          changed > 100,
++          `Hillshade insertion changed only ${changed} pixels.`
++        );
++        return true;
++      });
++      await action("configure", { dem: true, shade: false });
++      let flat;
++      let changed = 0;
++      await until(async () => {
++        flat = await decodeCapture();
++        assert.equal(flat.data.length, shaded.data.length);
++        changed = pixelDifference(flat, shaded);
++        assert(
++          changed > 100,
++          `Hillshade removal changed only ${changed} pixels.`
++        );
++        return true;
++      });
++      assert(
++        changed > 100,
++        "Hillshade insertion/removal did not alter renderer output."
++      );
++      return { changedPixels: changed };
++    });
++    if (platform === "web" || engine === "mapbox")
++      await scenario(
++        "globe projection has independently different viewport output",
++        async () => {
++          await action("projection-view", { globe: false });
++          const mercator = await decodeCapture();
++          await action("projection-view", { globe: true });
++          if (page)
++            await until(async () => {
++              const read = await page.evaluate("window.__oneMapTf09Inspect?.()");
++              return (
++                (read?.projection?.type ?? read?.projection?.name) === "globe"
++              );
++            });
++          let globe;
++          let changed = 0;
++          await until(async () => {
++            globe = await decodeCapture();
++            changed = pixelDifference(globe, mercator);
++            return changed > 200;
++          });
++          assert(
++            changed > 200,
++            "Projection switch did not change the rendered viewport."
++          );
++          const projectionReadback = page
++            ? await page.evaluate("window.__oneMapTf09Inspect?.().projection")
++            : "native pixel comparison";
++          await action("projection-view", { globe: false });
++          return { changedPixels: changed, projectionReadback };
++        }
++      );
+     await scenario(
+-      "terrain enabled before delayed DEM attachment",
++      "rendered output contains the known orange feature",
+       async () => {
+-        await action("configure", { terrain: true });
+-        await action("configure", { terrain: true, dem: true });
+-        let read;
++        let png;
++        let orange = 0;
+         await until(async () => {
+-          read = await action("read");
+-          return (
+-            typeof read.elevation === "number" &&
+-            Math.abs(read.elevation - 2000) < 5
++          png = await decodeCapture();
++          orange = countPixels(
++            png,
++            (r, g, b) => r > 220 && g > 45 && g < 140 && b < 60
+           );
+-        });
+-        return { elevation: read.elevation, expectedMeters: 2000 };
+-      }
+-    );
+-    await scenario("explicit terrain clear and projection change", async () => {
+-      await action("configure", { dem: true, globe: true });
+-      await until(async () => (await action("read")).elevation === null);
+-      await action("configure", { dem: true, terrain: true });
+-      await until(
+-        async () => Math.abs((await action("read")).elevation - 2000) < 5
+-      );
+-      const previousStyleLoads = (await action("read")).styleLoads;
+-      await action("replace-style");
+-      await until(
+-        async () => (await action("read")).styleLoads > previousStyleLoads
+-      );
+-      await until(
+-        async () => Math.abs((await action("read")).elevation - 2000) < 5
+-      );
+-      return { elevation: (await action("read")).elevation };
+-    });
+-  } else await action("configure", { dem: true });
+-  if (platform === "web") {
+-    await scenario("named selected renderer facilities", async () => {
+-      const result = await action("named");
+-      assert.deepEqual(result.tf10.dragPan, {
+-        before: true,
+-        disabled: false,
+-        restored: true,
+-      });
+-      for (const field of ["source", "layer", "canvas", "styleLayer"])
+-        assert.equal(result.tf10[field], true, `TF10 selected ${field}`);
+-      assert.equal(
+-        result.tf10.eventCalls,
+-        1,
+-        "TF10 on/fire/off removes its listener"
+-      );
+-      if (engine === "mapbox") {
+-        assert.equal(result.scale, 1.2);
+-        assert(result.rain);
+-        assert(result.snow);
+-      } else {
+-        assert.equal(result.globalState["rendering-fixture"], 9009);
+-        assert(result.sky);
+-      }
+-      return result;
+-    });
+-    await scenario(
+-      "selected canvas/video/custom insertion, mutable coordinates and teardown",
+-      async () => {
+-        await until(async () =>
+-          page.evaluate("window.__oneMapTf09Media?.().ready")
+-        );
+-        await action("configure", { dem: false });
+-        await action("media", { enabled: true });
+-        let inspected;
+-        await until(async () => {
+-          inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
+-          return inspected?.canvas && inspected?.video && inspected?.custom;
+-        });
+-        await until(async () =>
+-          page.evaluate("window.__oneMapTf09Media().frames > 0")
+-        );
+-        let blue = 0;
+-        let green = 0;
+-        let magenta = 0;
+-        await until(async () => {
+-          const image = await decodeCapture();
+-          blue = countPixels(
+-            image,
+-            (r, g, b) => r < 70 && g > 70 && g < 150 && b > 220
+-          );
+-          green = countPixels(
+-            image,
+-            (r, g, b) => r < 50 && g > 200 && b > 70 && b < 180
+-          );
+-          magenta = countPixels(
+-            image,
+-            (r, g, b) => r > 220 && g < 40 && b > 220
+-          );
+-          assert(
+-            blue > 100 && green > 100 && magenta > 100,
+-            `Media/custom output missing: canvas=${blue}, video=${green}, custom=${magenta}; state=${JSON.stringify(await page.evaluate("window.__oneMapTf09Inspect?.().videoState"))}.`
+-          );
++          assert(orange > 30, `Known feature not observed: orange=${orange}.`);
+           return true;
+         });
+-        await action("media", { enabled: true, moved: true });
+-        await until(async () => {
+-          inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
+-          return inspected?.canvasCoordinates?.coordinates?.[0]?.[0] === 5;
+-        });
+-        await action("media", { enabled: false });
+-        await until(async () => {
+-          inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
+-          return !inspected?.canvas && !inspected?.video && !inspected?.custom;
+-        });
+-        const counts = await page.evaluate("window.__oneMapTf09Media()");
+-        assert.equal(counts.added, counts.removed);
+-        return {
+-          canvasBluePixels: blue,
+-          videoGreenPixels: green,
+-          magentaPixels: magenta,
+-          callbacks: counts,
+-        };
++        return { width: png.width, height: png.height, orangePixels: orange };
+       }
+     );
+   }
+-  await scenario("hillshade draws the fixture's slope patch", async () => {
+-    await action("configure", { dem: true, shade: false });
+-    let baseline;
+-    await until(async () => {
+-      baseline = await decodeCapture();
+-      // iOS view snapshots encode the background as 30/49/75 rather than web sRGB 23/50/77.
+-      const tolerance = platform === "ios" ? 12 : 3;
+-      const blue = countPixels(
+-        baseline,
+-        (r, g, b) =>
+-          Math.abs(r - 23) < tolerance &&
+-          Math.abs(g - 50) < tolerance &&
+-          Math.abs(b - 77) < tolerance
+-      );
+-      assert(
+-        blue > baseline.width * baseline.height * 0.95,
+-        `Hillshade baseline not flat: blue=${blue}/${baseline.width * baseline.height}, corner=${[...baseline.data.subarray(0, 4)]}.`
+-      );
+-      return true;
++  // Gestures leave controlled camera/clamp state, so run them after rendering.
++  if (platform !== "web" && executionScope !== "rendering") {
++    await scenario("native controlled-camera gestures", async () => {
++      const input =
++        platform === "android"
++          ? await createAndroidGestureDriver({ serial: process.env.ANDROID_SERIAL })
++          : await createIosGestureDriver({
++              bundleIdentifier: process.env.TF09_APPLICATION_ID,
++              projectRoot: join(root, "scripts/ios-tap"),
++              simulatorUDID: process.env.TF09_IOS_UDID,
++            });
++      try {
++        return await runNativeCameraAcceptance({
++          action,
++          driveGesture: input.driveGesture,
++        });
++      } finally {
++        await input.close();
++      }
+     });
+-    await action("configure", { dem: true, shade: true });
+-    let shaded;
+-    await until(async () => {
+-      shaded = await decodeCapture();
+-      const changed = pixelDifference(shaded, baseline);
+-      assert(
+-        changed > 100,
+-        `Hillshade insertion changed only ${changed} pixels.`
+-      );
+-      return true;
+-    });
+-    await action("configure", { dem: true, shade: false });
+-    let flat;
+-    let changed = 0;
+-    await until(async () => {
+-      flat = await decodeCapture();
+-      assert.equal(flat.data.length, shaded.data.length);
+-      changed = pixelDifference(flat, shaded);
+-      assert(
+-        changed > 100,
+-        `Hillshade removal changed only ${changed} pixels.`
+-      );
+-      return true;
+-    });
+-    assert(
+-      changed > 100,
+-      "Hillshade insertion/removal did not alter renderer output."
+-    );
+-    return { changedPixels: changed };
+-  });
+-  if (platform === "web" || engine === "mapbox")
+-    await scenario(
+-      "globe projection has independently different viewport output",
+-      async () => {
+-        await action("projection-view", { globe: false });
+-        const mercator = await decodeCapture();
+-        await action("projection-view", { globe: true });
+-        if (page)
+-          await until(async () => {
+-            const read = await page.evaluate("window.__oneMapTf09Inspect?.()");
+-            return (
+-              (read?.projection?.type ?? read?.projection?.name) === "globe"
+-            );
+-          });
+-        let globe;
+-        let changed = 0;
+-        await until(async () => {
+-          globe = await decodeCapture();
+-          changed = pixelDifference(globe, mercator);
+-          return changed > 200;
+-        });
+-        assert(
+-          changed > 200,
+-          "Projection switch did not change the rendered viewport."
+-        );
+-        const projectionReadback = page
+-          ? await page.evaluate("window.__oneMapTf09Inspect?.().projection")
+-          : "native pixel comparison";
+-        await action("projection-view", { globe: false });
+-        return { changedPixels: changed, projectionReadback };
+-      }
+-    );
+-  await scenario(
+-    "rendered output contains the known orange feature",
+-    async () => {
+-      let png;
+-      let orange = 0;
+-      await until(async () => {
+-        png = await decodeCapture();
+-        orange = countPixels(
+-          png,
+-          (r, g, b) => r > 220 && g > 45 && g < 140 && b < 60
+-        );
+-        assert(orange > 30, `Known feature not observed: orange=${orange}.`);
+-        return true;
+-      });
+-      return { width: png.width, height: png.height, orangePixels: orange };
+-    }
+-  );
++  }
+ } catch (error) {
+   process.exitCode = 1;
+   console.error(String(error));
+@@ -588,6 +621,7 @@
+           "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+         platform,
+         engine,
++        executionScope,
+         artifact: process.env.TF09_LIBRARY_SHA256,
+         nativeIdentity: process.env.TF09_NATIVE_IDENTITY,
+         outcomes,
+--- original/examples/shared/tf09-scene.tsx
++++ isolated/examples/shared/tf09-scene.tsx
+@@ -7,6 +7,11 @@
+   Source,
+ } from "one-map-react";
+ import { type ReactNode, useEffect, useRef, useState } from "react";
++
++import {
++  nativeControlledCamera,
++  readNativeOrientation,
++} from "./tf10-native-orientation.js";
+ 
+ /** Actions exposed only by the targeted renderer acceptance examples. */
+ export interface Tf09Probe {
+@@ -45,6 +50,7 @@
+   readonly named?: (map: MapRef) => unknown;
+ }) => {
+   const ref = useRef<MapRef>(null);
++  const nativeCameraObservation = useRef<ViewState | undefined>(undefined);
+   const [controlled, setControlled] = useState<ViewState | undefined>(
+     undefined
+   );
+@@ -56,7 +62,11 @@
+     ends: number;
+     origin: string;
+     viewState?: ViewState;
+-  }>({ moves: 0, ends: 0, origin: "unknown" });
++    userMoves: number;
++    userEnds: number;
++    lastUserOrigin?: "user";
++    lastUserViewState?: ViewState;
++  }>({ moves: 0, ends: 0, origin: "unknown", userMoves: 0, userEnds: 0 });
+   const controlledTarget = useRef(controlled);
+   useEffect(() => {
+     controlledTarget.current = controlled;
+@@ -80,9 +90,17 @@
+       command: async (action, value = {}) => {
+         if (action === "controlled-camera") {
+           acceptProposals.current = value.accept === true;
+-          setControlled(value.enabled === false ? undefined : camera);
++          setControlled(
++            value.enabled === false ? undefined : nativeControlledCamera
++          );
+           setClamped(value.enabled !== false && value.clamp === true);
+-          cameraObservations.current = { moves: 0, ends: 0, origin: "unknown" };
++          cameraObservations.current = {
++            moves: 0,
++            ends: 0,
++            origin: "unknown",
++            userMoves: 0,
++            userEnds: 0,
++          };
+           return true;
+         }
+         if (action === "configure") {
+@@ -109,6 +127,11 @@
+             clamp: committedClamp.current,
+             center: await map.getCenter(),
+             zoom: await map.getZoom(),
++            ...(await readNativeOrientation(
++              backend,
++              map,
++              nativeCameraObservation.current
++            )),
+           };
+         if (action === "projection-view") {
+           await map.jumpTo({ center: [0, 0], zoom: 0, pitch: 0 });
+@@ -155,15 +178,27 @@
+       viewState={controlled}
+       minZoom={clamped ? 3 : undefined}
+       onMove={(event) => {
++        nativeCameraObservation.current = event.viewState;
+         cameraObservations.current.moves += 1;
+         cameraObservations.current.origin = event.origin;
+         cameraObservations.current.viewState = event.viewState;
++        if (event.origin === "user") {
++          cameraObservations.current.userMoves += 1;
++          cameraObservations.current.lastUserOrigin = event.origin;
++          cameraObservations.current.lastUserViewState = event.viewState;
++        }
+         if (acceptProposals.current) setControlled(event.viewState);
+       }}
+       onMoveEnd={(event) => {
++        nativeCameraObservation.current = event.viewState;
+         cameraObservations.current.ends += 1;
+         cameraObservations.current.origin = event.origin;
+         cameraObservations.current.viewState = event.viewState;
++        if (event.origin === "user") {
++          cameraObservations.current.userEnds += 1;
++          cameraObservations.current.lastUserOrigin = event.origin;
++          cameraObservations.current.lastUserViewState = event.viewState;
++        }
+         if (acceptProposals.current) setControlled(event.viewState);
+       }}
+       captureEnabled
+--- original/scripts/ios-tap/TapDriverUITests/TapDriver.swift
++++ isolated/scripts/ios-tap/TapDriverUITests/TapDriver.swift
+@@ -10,10 +10,11 @@
+     while Date() < deadline {
+       let request = tapRequest()
+ 
+-      if (request.hasPrefix("tap ") || request.hasPrefix("locate ") || request.hasPrefix("drag ") || request.hasPrefix("gesture ") || request.hasPrefix("inspect ") || request.hasPrefix("button ") || request.hasPrefix("scroll ")), request != seen {
++      if (request.hasPrefix("orientation ") || request.hasPrefix("tap ") || request.hasPrefix("locate ") || request.hasPrefix("drag ") || request.hasPrefix("gesture ") || request.hasPrefix("inspect ") || request.hasPrefix("button ") || request.hasPrefix("scroll ")), request != seen {
+         seen = request
+         (app, bundle) = perform(request, current: app, bundle: bundle)
+         print("ONE_MAP_INPUT_DONE \(request)")
++        reportDone(request)
+ 
+         if request.split(separator: " ").last == "once" {
+           return
+@@ -30,6 +31,21 @@
+     bundle: String
+   ) -> (XCUIApplication?, String) {
+     let parts = request.split(separator: " ")
++
++    if parts.count >= 4, parts[0] == "orientation" {
++      let nextBundle = String(parts[1])
++      let app = nextBundle == bundle && current != nil
++        ? current!
++        : XCUIApplication(bundleIdentifier: nextBundle)
++      if app.state != .runningForeground { app.activate() }
++      switch String(parts[2]) {
++      case "landscapeLeft": XCUIDevice.shared.orientation = .landscapeLeft
++      case "portrait": XCUIDevice.shared.orientation = .portrait
++      default: XCTFail("Unsupported acceptance orientation")
++      }
++      print("ONE_MAP_ORIENTATION_FRAME \(app.frame.width) \(app.frame.height)")
++      return (app, nextBundle)
++    }
+ 
+     if parts.count >= 2, parts[0] == "inspect" || parts[0] == "button" || parts[0] == "scroll" {
+       let nextBundle = String(parts[1])
+@@ -112,6 +128,14 @@
+     return (app, nextBundle)
+   }
+ 
++  private func reportDone(_ command: String) {
++    guard let url = URL(string: "http://127.0.0.1:8799/done") else { return }
++    var request = URLRequest(url: url)
++    request.httpMethod = "POST"
++    request.httpBody = command.data(using: .utf8)
++    URLSession.shared.dataTask(with: request).resume()
++  }
++
+   private func tapRequest() -> String {
+     let address = "http://127.0.0.1:8799/tap"
+     guard let url = URL(string: address) else {
+--- original/scripts/tf08-services-smoke.mjs
++++ isolated/scripts/tf08-services-smoke.mjs
+@@ -16,6 +16,7 @@
+ import { fileURLToPath } from "node:url";
+ 
+ import { stopOwnedProcess } from "./native-smoke-process.mjs";
++import { pendingOfflineOperations } from "./tf08-pending-operations.mjs";
+ import {
+   captureInclusion,
+   observeCoveragePixels,
+@@ -60,9 +61,10 @@
+     "pending-merge",
+     "pending-repair",
+     "pending-storage",
++    "pending-operations",
+     "capture-coverage",
+   ].includes(scope),
+-  "Select all, offline, pending, pending-reset, pending-merge, pending-repair, pending-storage or capture-coverage scope."
++  "Select all, offline, pending, pending-reset, pending-merge, pending-repair, pending-storage, pending-operations or capture-coverage scope."
+ );
+ if (scope.startsWith("pending")) {
+   assert(platform !== "web", "Pending scope requires a native platform.");
+@@ -170,6 +172,7 @@
+   }
+   await scenario("known renderer feature", async () => {
+     await until(async () => {
++      if (!(await action("observations"))?.loads) return false;
+       const value = await action("read");
+       lastRendererObservation = {
+         ...pickRead(value),
+@@ -223,6 +226,10 @@
+       return;
+     }
+     if (scope === "pending") {
++      await pendingNativeScenarios();
++      return;
++    }
++    if (scope === "pending-operations") {
+       await pendingNativeScenarios();
+       return;
+     }
+@@ -309,28 +316,29 @@
+ };
+ 
+ const pendingNativeScenarios = async () => {
+-  await scenario(
+-    "independent images at the pending native display density",
+-    async () => {
+-      const device = await action("device-info");
+-      if (platform === "ios")
+-        assert.equal(device.scale, 2, "Use a second, 2x iOS display.");
+-      const image = await action("snapshot", { width: 128, height: 80 });
+-      const pixels = imagePixels(image.uri);
+-      assert.equal(pixels.width, 128);
+-      assert.equal(pixels.height, 80);
+-      assert(pixels.red > 20 && pixels.navy > 1000);
+-      const file = await action("snapshot", {
+-        width: 128,
+-        height: 80,
+-        output: "file",
+-      });
+-      const decoded = imagePixels(await readNativeImage(file.uri));
+-      assert.equal(decoded.width, 128);
+-      assert.equal(decoded.height, 80);
+-      return { device, dataUrl: pixels, file: decoded };
+-    }
+-  );
++  if (scope !== "pending-operations")
++    await scenario(
++      "independent images at the pending native display density",
++      async () => {
++        const device = await action("device-info");
++        if (platform === "ios")
++          assert.equal(device.scale, 2, "Use a second, 2x iOS display.");
++        const image = await action("snapshot", { width: 128, height: 80 });
++        const pixels = imagePixels(image.uri);
++        assert.equal(pixels.width, 128);
++        assert.equal(pixels.height, 80);
++        assert(pixels.red > 20 && pixels.navy > 1000);
++        const file = await action("snapshot", {
++          width: 128,
++          height: 80,
++          output: "file",
++        });
++        const decoded = imagePixels(await readNativeImage(file.uri));
++        assert.equal(decoded.width, 128);
++        assert.equal(decoded.height, 80);
++        return { device, dataUrl: pixels, file: decoded };
++      }
++    );
+   await scenario(
+     "current-map file capture includes rendered content",
+     async () => {
+@@ -342,23 +350,7 @@
+       return pixels;
+     }
+   );
+-  for (const operation of [
+-    "ambient-invalidate",
+-    "ambient-clear",
+-    "ambient-size",
+-    "tile-limit",
+-    "throttle",
+-    ...(engine === "mapbox"
+-      ? [
+-          "quota",
+-          "migrate",
+-          "legacy-list",
+-          "legacy-migrate",
+-          "legacy-limit",
+-          "legacy-reset",
+-        ]
+-      : []),
+-  ]) {
++  for (const operation of pendingOfflineOperations(engine)) {
+     await scenario(`named offline ${operation}`, async () => {
+       const result = await action("named-offline", { operation });
+       assert.deepEqual(
+@@ -1145,7 +1137,7 @@
+         resourcesAvailable = false;
+         await restartNative();
+         await until(
+-          async () => !!(await action("read")).loads,
++          async () => !!(await action("observations"))?.loads,
+           90000,
+           "cold restart local map readiness"
+         );
+@@ -1273,7 +1265,7 @@
+     // The storage shell must create its map before it can receive configuration.
+     await action("configure", { mode: "injected" });
+     await until(
+-      async () => (await action("read")).loads > 0,
++      async () => (await action("observations")).loads > 0,
+       90000,
+       "deferred map mount"
+     );
+@@ -1281,7 +1273,7 @@
+   }
+   await action("configure", { mode, mapStyle });
+   await until(
+-    async () => (await action("read")).loads > before.loads,
++    async () => (await action("observations")).loads > before.loads,
+     90000,
+     "replacement map load"
+   );
+@@ -1975,6 +1967,8 @@
+         ? ["Database import/migration results are recorded separately."]
+         : scope === "pending-storage"
+           ? ["Additional capture results are recorded separately."]
++          : scope === "pending-operations"
++            ? ["The independent 128x80 snapshot and 2x iOS display-scale observations were not exercised."]
+           : [],
+     excludedByOwner: [
+       "physical-device testing",
+--- original/scripts/tf08-pending-operations.mjs
++++ isolated/scripts/tf08-pending-operations.mjs
+@@ -0,0 +1,17 @@
++export const pendingOfflineOperations = (engine) => [
++  ...(engine === "mapbox" ? [] : ["ambient-invalidate"]),
++  "ambient-clear",
++  ...(engine === "mapbox" ? [] : ["ambient-size"]),
++  "tile-limit",
++  "throttle",
++  ...(engine === "mapbox"
++    ? [
++        "quota",
++        "migrate",
++        "legacy-list",
++        "legacy-migrate",
++        "legacy-limit",
++        "legacy-reset",
++      ]
++    : []),
++];
+--- original/scripts/tf08-pending-operations.test.mjs
++++ isolated/scripts/tf08-pending-operations.test.mjs
+@@ -0,0 +1,46 @@
++import assert from "node:assert/strict";
++import { createHash } from "node:crypto";
++import { readFileSync } from "node:fs";
++
++import { pendingOfflineOperations } from "./tf08-pending-operations.mjs";
++
++assert.deepEqual(pendingOfflineOperations("mapbox"), [
++  "ambient-clear",
++  "tile-limit",
++  "throttle",
++  "quota",
++  "migrate",
++  "legacy-list",
++  "legacy-migrate",
++  "legacy-limit",
++  "legacy-reset",
++]);
++assert.deepEqual(pendingOfflineOperations("maplibre"), [
++  "ambient-invalidate",
++  "ambient-clear",
++  "ambient-size",
++  "tile-limit",
++  "throttle",
++]);
++
++const smokeScript = readFileSync("scripts/tf08-services-smoke.mjs", "utf8");
++const nativeScenariosStart = smokeScript.indexOf(
++  "const nativeScenarios = async () => {"
++);
++const nativeScenariosEnd = smokeScript.indexOf(
++  "const nativeOfflineScenarios = async () => {",
++  nativeScenariosStart
++);
++const nativeScenarios = smokeScript.slice(
++  nativeScenariosStart,
++  nativeScenariosEnd
++);
++const nativeScenariosHash = createHash("sha256")
++  .update(nativeScenarios)
++  .digest("hex");
++assert.equal(
++  nativeScenariosHash,
++  "72aea0e80146026c631222aa036b3f6e2c7d6280cc43a0ae9395ad190b0a527c",
++  "The pending-scope adjustment must not change nativeScenarios."
++);
++console.log("TF08 selected pending-operation lists passed.");
+--- original/scripts/tf08-pending-scope.test.mjs
++++ isolated/scripts/tf08-pending-scope.test.mjs
+@@ -9,6 +9,8 @@
+   ["pending-repair", "android", "0", "require an isolated application sandbox"],
+   ["pending-storage", "ios", "0", "require an isolated application sandbox"],
+   ["pending-storage", "web", "1", "requires a native platform"],
++  ["pending-operations", "android", "", "require an isolated application sandbox"],
++  ["pending-operations", "web", "1", "requires a native platform"],
+ ]) {
+   const result = spawnSync(
+     process.execPath,
+--- original/scripts/tf04-camera-smoke.mjs
++++ isolated/scripts/tf04-camera-smoke.mjs
+@@ -7,7 +7,10 @@
+ const chromePath =
+   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+ const root = new URL("..", import.meta.url).pathname;
++const iosDevice = process.env.ONE_MAP_ACCEPTANCE_IOS_UDID ?? "booted";
+ const group = process.argv[2] ?? "web";
++const nativeEngine = process.env.TF04_ENGINE ?? "both";
++if (!["both", "mapbox", "maplibre"].includes(nativeEngine)) throw new Error("Use both, mapbox or maplibre for TF04_ENGINE.");
+ const corrections = process.argv[3] === "corrections";
+ if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
+   throw new Error("The corrections scope requires: web corrections.");
+@@ -222,36 +225,44 @@
+ }
+ 
+ if (group === "android" || group === "all") {
+-  results["mapbox-android"] = await runNative({
+-    directory: "native-mapbox",
+-    platform: "android",
+-    applicationId: "com.onemapmapbox",
+-    doubleTap: false,
+-  });
+-  results["maplibre-android"] = await runNative({
+-    directory: "native-maplibre",
+-    platform: "android",
+-    applicationId: "com.onemapmaplibre",
+-    doubleTap: true,
+-  });
++  if (nativeEngine === "both" || nativeEngine === "mapbox") {
++    results["mapbox-android"] = await runNative({
++      directory: "native-mapbox",
++      platform: "android",
++      applicationId: process.env.TF04_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
++      doubleTap: false,
++    });
++  }
++  if (nativeEngine === "both" || nativeEngine === "maplibre") {
++    results["maplibre-android"] = await runNative({
++      directory: "native-maplibre",
++      platform: "android",
++      applicationId: process.env.TF04_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
++      doubleTap: true,
++    });
++  }
+ }
+ 
+ if (group === "ios" || group === "all") {
+   const tapDriver = await startIosTapDriver();
+ 
+   try {
+-    results["mapbox-ios"] = await runNative({
+-      directory: "native-mapbox",
+-      platform: "ios",
+-      applicationId: "org.reactjs.native.example.OneMapMapbox",
+-      doubleTap: false,
+-    });
+-    results["maplibre-ios"] = await runNative({
+-      directory: "native-maplibre",
+-      platform: "ios",
+-      applicationId: "org.reactjs.native.example.OneMapMaplibre",
+-      doubleTap: true,
+-    });
++    if (nativeEngine === "both" || nativeEngine === "mapbox") {
++      results["mapbox-ios"] = await runNative({
++        directory: "native-mapbox",
++        platform: "ios",
++        applicationId: process.env.TF04_MAPBOX_IOS_ID ?? "org.reactjs.native.example.OneMapMapbox",
++        doubleTap: false,
++      });
++    }
++    if (nativeEngine === "both" || nativeEngine === "maplibre") {
++      results["maplibre-ios"] = await runNative({
++        directory: "native-maplibre",
++        platform: "ios",
++        applicationId: process.env.TF04_MAPLIBRE_IOS_ID ?? "org.reactjs.native.example.OneMapMaplibre",
++        doubleTap: true,
++      });
++    }
+   } finally {
+     tapDriver.kill("SIGTERM");
+   }
+@@ -479,13 +490,14 @@
+   ].join("\n");
+ }
+ 
+-async function startAndroidApp(applicationId) {
++async function startAndroidApp(applicationId, engine) {
++  const activity = process.env[`TF04_${engine.toUpperCase()}_ANDROID_ACTIVITY`] ?? ".MainActivity";
+   await command("adb", [
+     "shell",
+     "am",
+     "start",
+     "-n",
+-    `${applicationId}/.MainActivity`,
++    `${applicationId}/${activity}`,
+   ]);
+ }
+ 
+@@ -565,7 +577,7 @@
+     "booted",
+   ]);
+ 
+-  if (!listed.includes("iPhone 18 Pro")) {
++  if (!listed.includes(iosDevice === "booted" ? "iPhone 18 Pro" : iosDevice)) {
+     throw new Error("iPhone 18 Pro is not booted");
+   }
+ 
+@@ -580,7 +592,7 @@
+       "-scheme",
+       "TapDriver",
+       "-destination",
+-      "platform=iOS Simulator,name=iPhone 18 Pro",
++      iosDevice === "booted" ? "platform=iOS Simulator,name=iPhone 18 Pro" : `platform=iOS Simulator,id=${iosDevice}`,
+       "-only-testing:TapDriverUITests/TapDriver/testDriveTaps",
+     ],
+     { cwd: root, stdio: ["ignore", "pipe", "pipe"] }
+@@ -709,7 +721,7 @@
+ 
+       await writeDebugHost(applicationId, `${address}:8081`);
+       await command("adb", ["logcat", "-c"]);
+-      await startAndroidApp(applicationId);
++      await startAndroidApp(applicationId, directory.replace("native-", ""));
+       await allowNearbyDevices();
+ 
+       const status = await watchNative({
+@@ -722,18 +734,12 @@
+       return judge(status, doubleTap, platform);
+     }
+ 
++    if (iosDevice === "booted") {
++      throw new Error("Isolated acceptance requires an explicit iOS UDID");
++    }
+     build = command(
+-      "bun",
+-      [
+-        "run",
+-        "ios",
+-        "--",
+-        "--no-packager",
+-        "--port",
+-        "8081",
+-        "--simulator",
+-        "iPhone 18 Pro",
+-      ],
++      "xcrun",
++      ["simctl", "launch", "--terminate-running-process", iosDevice, applicationId],
+       { cwd: shell, env: { ...process.env, ONE_MAP_SMOKE: "tf04" } },
+       600000
+     );
+@@ -760,7 +766,7 @@
+       await command("xcrun", [
+         "simctl",
+         "terminate",
+-        "booted",
++        iosDevice,
+         applicationId,
+       ]).catch(() => undefined);
+     }
+--- original/scripts/tf05-sources-smoke.mjs
++++ isolated/scripts/tf05-sources-smoke.mjs
+@@ -8,7 +8,10 @@
+ const chromePath =
+   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+ const root = new URL("..", import.meta.url).pathname;
++const iosDevice = process.env.ONE_MAP_ACCEPTANCE_IOS_UDID ?? "booted";
+ const group = process.argv[2] ?? "web";
++const nativeEngine = process.env.TF05_ENGINE ?? "both";
++if (!["both", "mapbox", "maplibre"].includes(nativeEngine)) throw new Error("Use both, mapbox or maplibre for TF05_ENGINE.");
+ const corrections = process.argv[3] === "corrections";
+ if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
+   throw new Error("The corrections scope requires: web corrections.");
+@@ -37,29 +40,37 @@
+     }
+ 
+     if (group === "android" || group === "all") {
+-      results["mapbox-android"] = await runNative({
+-        directory: "native-mapbox",
+-        platform: "android",
+-        applicationId: "com.onemapmapbox",
+-      });
+-      results["maplibre-android"] = await runNative({
+-        directory: "native-maplibre",
+-        platform: "android",
+-        applicationId: "com.onemapmaplibre",
+-      });
++      if (nativeEngine === "both" || nativeEngine === "mapbox") {
++        results["mapbox-android"] = await runNative({
++          directory: "native-mapbox",
++          platform: "android",
++          applicationId: process.env.TF05_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
++        });
++      }
++      if (nativeEngine === "both" || nativeEngine === "maplibre") {
++        results["maplibre-android"] = await runNative({
++          directory: "native-maplibre",
++          platform: "android",
++          applicationId: process.env.TF05_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
++        });
++      }
+     }
+ 
+     if (group === "ios" || group === "all") {
+-      results["mapbox-ios"] = await runNative({
+-        directory: "native-mapbox",
+-        platform: "ios",
+-        applicationId: "org.reactjs.native.example.OneMapMapbox",
+-      });
+-      results["maplibre-ios"] = await runNative({
+-        directory: "native-maplibre",
+-        platform: "ios",
+-        applicationId: "org.reactjs.native.example.OneMapMaplibre",
+-      });
++      if (nativeEngine === "both" || nativeEngine === "mapbox") {
++        results["mapbox-ios"] = await runNative({
++          directory: "native-mapbox",
++          platform: "ios",
++          applicationId: process.env.TF05_MAPBOX_IOS_ID ?? "org.reactjs.native.example.OneMapMapbox",
++        });
++      }
++      if (nativeEngine === "both" || nativeEngine === "maplibre") {
++        results["maplibre-ios"] = await runNative({
++          directory: "native-maplibre",
++          platform: "ios",
++          applicationId: process.env.TF05_MAPLIBRE_IOS_ID ?? "org.reactjs.native.example.OneMapMaplibre",
++        });
++      }
+     }
+   } finally {
+     await fixture.close();
+@@ -249,13 +260,14 @@
+   ].join("\n");
+ }
+ 
+-async function startAndroidApp(applicationId) {
++async function startAndroidApp(applicationId, engine) {
++  const activity = process.env[`TF05_${engine.toUpperCase()}_ANDROID_ACTIVITY`] ?? ".MainActivity";
+   await command("adb", [
+     "shell",
+     "am",
+     "start",
+     "-n",
+-    `${applicationId}/.MainActivity`,
++    `${applicationId}/${activity}`,
+   ]);
+ }
+ 
+@@ -424,7 +436,7 @@
+ 
+       await writeDebugHost(applicationId, `${address}:8081`);
+       await command("adb", ["logcat", "-c"]);
+-      await startAndroidApp(applicationId);
++      await startAndroidApp(applicationId, directory.replace("native-", ""));
+       await allowNearbyDevices();
+ 
+       const status = await watchNative({ readStatus: readAndroidStatus });
+@@ -432,18 +444,12 @@
+       return judge(status);
+     }
+ 
++    if (iosDevice === "booted") {
++      throw new Error("Isolated acceptance requires an explicit iOS UDID");
++    }
+     build = command(
+-      "bun",
+-      [
+-        "run",
+-        "ios",
+-        "--",
+-        "--no-packager",
+-        "--port",
+-        "8081",
+-        "--simulator",
+-        "iPhone 18 Pro",
+-      ],
++      "xcrun",
++      ["simctl", "launch", "--terminate-running-process", iosDevice, applicationId],
+       { cwd: shell, env: metroEnv },
+       600000
+     );
+@@ -467,7 +473,7 @@
+       await command("xcrun", [
+         "simctl",
+         "terminate",
+-        "booted",
++        iosDevice,
+         applicationId,
+       ]).catch(() => undefined);
+     }
+--- original/scripts/tf06-queries-smoke.mjs
++++ isolated/scripts/tf06-queries-smoke.mjs
+@@ -15,6 +15,7 @@
+ const chromePath =
+   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+ const root = new URL("..", import.meta.url).pathname;
++const iosDevice = process.env.ONE_MAP_ACCEPTANCE_IOS_UDID ?? "booted";
+ const group = process.argv[2] ?? "web";
+ const scope = process.argv[3] ?? "queries";
+ const lifetimes = scope === "lifetimes";
+@@ -82,7 +83,7 @@
+       results[`${engine}-android`] = await runNative({
+         directory: `native-${engine}`,
+         platform: "android",
+-        applicationId: `com.onemap${engine}`,
++        applicationId: process.env[`TF06_${engine.toUpperCase()}_ANDROID_ID`] ?? `com.onemap${engine}`,
+       });
+     }
+   }
+@@ -92,7 +93,7 @@
+       results[`${engine}-ios`] = await runNative({
+         directory: `native-${engine}`,
+         platform: "ios",
+-        applicationId: `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`,
++        applicationId: process.env[`TF06_${engine.toUpperCase()}_IOS_ID`] ?? `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`,
+       });
+     }
+   }
+@@ -310,13 +311,14 @@
+   ].join("\n");
+ }
+ 
+-async function startAndroidApp(applicationId) {
++async function startAndroidApp(applicationId, engine) {
++  const activity = process.env[`TF06_${engine.toUpperCase()}_ANDROID_ACTIVITY`] ?? ".MainActivity";
+   await command("adb", [
+     "shell",
+     "am",
+     "start",
+     "-n",
+-    `${applicationId}/.MainActivity`,
++    `${applicationId}/${activity}`,
+   ]);
+ }
+ 
+@@ -472,7 +474,7 @@
+     await command("xcrun", [
+       "simctl",
+       "terminate",
+-      "booted",
++      iosDevice,
+       applicationId,
+     ]).catch(() => undefined);
+   }
+@@ -492,7 +494,7 @@
+ 
+       await writeDebugHost(applicationId, `${await lanAddress()}:8081`);
+       await command("adb", ["logcat", "-c"]);
+-      await startAndroidApp(applicationId);
++      await startAndroidApp(applicationId, directory.replace("native-", ""));
+       await allowNearbyDevices();
+ 
+       const status = await watchNative({
+@@ -510,7 +512,7 @@
+         await command("xcrun", [
+           "simctl",
+           "get_app_container",
+-          "booted",
++          iosDevice,
+           applicationId,
+           "app",
+         ])
+@@ -528,20 +530,14 @@
+         .trim()
+         .split(/\s+/)[0];
+       verifyNativeBinary(scope, reuseIosDigest, digest);
+-      await command("xcrun", ["simctl", "launch", "booted", applicationId]);
++      await command("xcrun", ["simctl", "launch", iosDevice, applicationId]);
+     } else {
++      if (iosDevice === "booted") {
++        throw new Error("Isolated acceptance requires an explicit iOS UDID");
++      }
+       await command(
+-        "bun",
+-        [
+-          "run",
+-          "ios",
+-          "--",
+-          "--no-packager",
+-          "--port",
+-          "8081",
+-          "--simulator",
+-          "iPhone 18 Pro",
+-        ],
++        "xcrun",
++        ["simctl", "launch", "--terminate-running-process", iosDevice, applicationId],
+         { cwd: shell, env: nativeEnv },
+         600000
+       );
+@@ -578,7 +574,7 @@
+       await command("xcrun", [
+         "simctl",
+         "terminate",
+-        "booted",
++        iosDevice,
+         applicationId,
+       ]).catch(() => undefined);
+     }
+--- original/examples/shared/tf08-acceptance-scene.tsx
++++ isolated/examples/shared/tf08-acceptance-scene.tsx
+@@ -138,6 +138,7 @@
+       action,
+       value = {}
+     ) => {
++      if (action === "observations") return { ...observations.current };
+       if (action === "read") {
+         const map = requireMap();
+         const [center, zoom, features] = await Promise.all([
+@@ -268,7 +269,15 @@
+           status: await pack.status(),
+           progress: [...offlineProgress.current],
+           errors: offlineErrors.current.length,
+-          errorMessages: [...offlineErrors.current],
++          errorMessages: offlineErrors.current.map((error) =>
++            error !== null && typeof error === "object"
++              ? {
++                  name: (error as Error).name,
++                  message: (error as Error).message,
++                  ...error,
++                }
++              : error
++          ),
+         };
+       }
+       if (action === "offline-pause") {
+--- original/examples/shared/tf10-native-orientation.ts
++++ isolated/examples/shared/tf10-native-orientation.ts
+@@ -0,0 +1,36 @@
++import type { MapRef, ViewState } from "one-map-react";
++
++/** Shared test pose; the terrain scene separately starts with pitch 35. */
++export const nativeControlledCamera = {
++  longitude: 0, latitude: 0, zoom: 2, bearing: 0, pitch: 0,
++};
++
++/** RNMapbox exposes orientation in native camera events, without ref getters. */
++export const readNativeOrientation = async (
++  backend: string,
++  map: Pick<MapRef, "getBearing" | "getPitch">,
++  observed: ViewState | undefined
++): Promise<{
++  bearing: number;
++  pitch: number;
++  orientationSource: string;
++}> => {
++  if (backend === "mapbox-native") {
++    if (
++      !observed ||
++      !Number.isFinite(observed.bearing) ||
++      !Number.isFinite(observed.pitch)
++    )
++      throw new Error("A native camera event is required for Mapbox orientation.");
++    return {
++      bearing: observed.bearing,
++      pitch: observed.pitch,
++      orientationSource: "native-camera-event",
++    };
++  }
++  return {
++    bearing: await map.getBearing(),
++    pitch: await map.getPitch(),
++    orientationSource: "native-camera-getters",
++  };
++};
+--- original/scripts/tf10-native-orientation.test.mjs
++++ isolated/scripts/tf10-native-orientation.test.mjs
+@@ -0,0 +1,22 @@
++import assert from "node:assert/strict";
++import { readNativeOrientation } from "../examples/shared/tf10-native-orientation.ts";
++
++let calls = 0;
++const unavailable = {
++  getBearing: async () => { calls++; throw new Error("getBearing() is not available on mapbox-native."); },
++  getPitch: async () => { calls++; throw new Error("getPitch() is not available on mapbox-native."); },
++};
++const actualEvent = { longitude: 10, latitude: 20, zoom: 3, bearing: 17, pitch: 28 };
++assert.deepEqual(await readNativeOrientation("mapbox-native", unavailable, actualEvent), {
++  bearing: 17, pitch: 28, orientationSource: "native-camera-event",
++});
++assert.equal(calls, 0);
++await assert.rejects(readNativeOrientation("mapbox-native", unavailable, undefined), /native camera event is required/);
++await assert.rejects(readNativeOrientation("mapbox-native", unavailable, { ...actualEvent, bearing: NaN }), /native camera event is required/);
++assert.equal(calls, 0);
++assert.deepEqual(await readNativeOrientation("maplibre-native", {
++  getBearing: async () => { calls++; return 40; },
++  getPitch: async () => { calls++; return 50; },
++}, actualEvent), { bearing: 40, pitch: 50, orientationSource: "native-camera-getters" });
++assert.equal(calls, 2);
++console.log("PASS: Mapbox uses actual event orientation without unavailable getters or defaults; MapLibre uses native getters.");
+--- original/examples/shared/native-tf07-focused-screen.tmp.tsx
++++ isolated/examples/shared/native-tf07-focused-screen.tmp.tsx
+@@ -0,0 +1,351 @@
++import {
++  type Adapter,
++  Control,
++  GeolocateControl,
++  Layer,
++  type MapRef,
++  MapSetup,
++  Marker,
++  type MarkerRef,
++  NavigationControl,
++  Map as OneMap,
++  Source,
++  useMap,
++} from "one-map-react";
++import { createContext, useCallback, useContext, useRef, useState } from "react";
++import {
++  Button,
++  Image,
++  Platform,
++  Pressable,
++  SafeAreaView,
++  StatusBar,
++  Text,
++  useWindowDimensions,
++  View,
++} from "react-native";
++
++const Theme = createContext("initial");
++const style = {
++  version: 8 as const,
++  sources: {},
++  layers: [
++    {
++      id: "background",
++      type: "background" as const,
++      paint: { "background-color": "#e2e8f0" },
++    },
++  ],
++};
++const data = (id: number) => ({
++  type: "Feature" as const,
++  id,
++  properties: { fixture: "tf07-focused" },
++  geometry: { type: "Point" as const, coordinates: [-122.34, 47.61] },
++});
++interface FocusProps {
++  readonly adapter: Adapter;
++}
++interface Counts {
++  [name: string]: number;
++}
++const image =
++  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYPj/HwADAgH/5ncLrgAAAABJRU5ErkJggg==";
++const Child = ({
++  name,
++  record,
++}: {
++  readonly name: string;
++  readonly record: (name: string) => void;
++}) => {
++  const theme = useContext(Theme);
++  const [count, setCount] = useState(0);
++  const map = useMap();
++  return (
++    <Pressable
++      accessibilityRole="button"
++      accessibilityLabel={`${name} ${theme} ${count}`}
++      onPress={() => {
++        setCount((c) => c + 1);
++        record(`${name}-click`);
++        void map
++          .getZoom()
++          .then((zoom) => record(`${name}-map-zoom-${Math.round(zoom)}`));
++      }}
++    >
++      <Text>
++        {name} {theme} {count}
++      </Text>
++    </Pressable>
++  );
++};
++/** Additional actual-renderer TF07 cases, separate from the canonical fixture. */
++export const NativeTf07Screen = ({ adapter }: FocusProps) => {
++  const { width, height } = useWindowDimensions();
++  const landscape = width > height;
++  const first = useRef<MapRef>(null);
++  const second = useRef<MapRef>(null);
++  const annotation = useRef<MarkerRef>(null);
++  const counts = useRef<Counts>({});
++  const [status, setStatus] = useState("Focused waiting");
++  const record = useCallback((name: string) => {
++    counts.current[name] = (counts.current[name] ?? 0) + 1;
++    setStatus(name);
++  }, []);
++  const [theme, setTheme] = useState("initial");
++  const [mode, setMode] = useState<"reject" | "delay">("reject");
++  const [locate, setLocate] = useState(true);
++  const [showImage, setShowImage] = useState(false);
++  const [short, setShort] = useState(false);
++  const [stop, setStop] = useState(false);
++  const release = useRef<(() => void) | null>(null);
++  const [readback, setReadback] = useState("");
++  const position = useCallback(async () => {
++    record("provider-call");
++    if (mode === "reject") throw new Error("Expected test rejection");
++    return await new Promise<{ lngLat: readonly [number, number] }>(
++      (resolve) => {
++        release.current = () => resolve({ lngLat: [-122.33, 47.62] });
++      }
++    );
++  }, [mode, record]);
++  const read = async (focusedComplete = false) => {
++    const a = first.current,
++      b = second.current;
++    if (!a || !b) return;
++    const [
++      aCenter,
++      aZoom,
++      bCenter,
++      bZoom,
++      overlap,
++      vector,
++      overlapPoint,
++      vectorPoint,
++    ] = await Promise.all([
++      a.getCenter(),
++      a.getZoom(),
++      b.getCenter(),
++      b.getZoom(),
++      a.queryRenderedFeatures(undefined, {
++        layers: ["focus-low", "focus-high"],
++      }),
++      b.queryRenderedFeatures(undefined, { layers: ["focus-vector"] }),
++      a.project([-122.34, 47.61]),
++      b.project([-122.338, 47.6115]),
++    ]);
++    const observation = {
++      focused: true,
++      focusedComplete,
++      counts: { ...counts.current },
++      mode,
++      theme,
++      locate,
++      short,
++      stop,
++      aCenter,
++      aZoom,
++      bCenter,
++      bZoom,
++      overlap,
++      vector,
++      overlapPoint,
++      vectorPoint,
++    };
++    setReadback(JSON.stringify(observation));
++    await fetch("http://127.0.0.1:8797/tf07", {
++      method: "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify(observation),
++    });
++  };
++  return (
++    <Theme.Provider value={theme}>
++      <MapSetup adapter={adapter}>
++        <SafeAreaView
++          style={{
++            flex: 1,
++            paddingTop:
++              Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) : 0,
++          }}
++        >
++          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
++            {/* eslint-disable react/refs -- This list stores press handlers; map refs are read only when a button is pressed. */}
++            {(
++              [
++                ["Read focus", () => void read()],
++                ["Finish focus", () => void read(true)],
++                ["Theme", () => setTheme("updated")],
++                ["Delay", () => setMode("delay")],
++                ["Drop locate", () => setLocate(false)],
++                ["Resolve", () => release.current?.()],
++                ["Image", () => setTimeout(() => setShowImage(true), 200)],
++                ["Resize", () => setShort((value) => !value)],
++                [
++                  stop ? "Allow overlap" : "Stop overlap",
++                  () => setStop((value) => !value),
++                ],
++              ] as const
++            ).map(([title, onPress]) => (
++              <View
++                key={title}
++                style={{
++                  width: landscape ? "20%" : "33.333333%",
++                  height: 36,
++                  justifyContent: "center",
++                }}
++              >
++                <Button title={title} onPress={onPress} />
++              </View>
++            ))}
++            {/* eslint-enable react/refs */}
++          </View>
++          <Text style={{ height: 48 }} numberOfLines={2}>
++            {status}; provider {mode}; theme {theme}
++          </Text>
++          <Text
++            testID="tf07-focus-readback"
++            style={{ height: 48 }}
++            numberOfLines={2}
++          >
++            {readback}
++          </Text>
++          <View
++            style={{ flex: 1, flexDirection: landscape ? "row" : "column" }}
++          >
++            <OneMap
++              ref={first}
++              mapStyle={style}
++              initialViewState={{
++                longitude: -122.34,
++                latitude: 47.61,
++                zoom: 11,
++                bearing: 0,
++                pitch: 0,
++              }}
++              style={{ flex: landscape || short ? 1 : 2 }}
++              interactiveLayerIds={["focus-low", "focus-high"]}
++              onLoad={() => {
++                record("a-load");
++                void first.current?.jumpTo({
++                  center: [-122.34, 47.61],
++                  zoom: 11,
++                });
++              }}
++              onClick={() => record("a-map-click")}
++              onError={() => record("a-error")}
++            >
++              <Source
++                id="focus-low-source"
++                type="geojson"
++                data={data(707)}
++                onClick={() => record("low-click")}
++              >
++                <Layer
++                  id="focus-low"
++                  type="circle"
++                  paint={{ "circle-color": "#16a34a", "circle-radius": 20 }}
++                />
++              </Source>
++              <Source
++                id="focus-high-source"
++                type="geojson"
++                data={data(708)}
++                onClick={(event) => {
++                  record("high-click");
++                  if (stop) event.stopPropagation();
++                }}
++              >
++                <Layer
++                  id="focus-high"
++                  type="circle"
++                  paint={{ "circle-color": "#dc2626", "circle-radius": 12 }}
++                />
++              </Source>
++              <Marker
++                ref={annotation}
++                id="focus-image"
++                longitude={-122.35}
++                latitude={47.59}
++                renderMode="annotation"
++              >
++                <View style={{ padding: 8, backgroundColor: "white" }}>
++                  <Text>{showImage ? "Image ready" : "Waiting image"}</Text>
++                  {showImage && (
++                    <Image
++                      source={{ uri: image }}
++                      style={{ width: 40, height: 40, backgroundColor: "blue" }}
++                      onError={() => record("image-error")}
++                      onLoad={() => {
++                        record("image-load");
++                        void annotation.current?.refresh().then(
++                          () => record("image-refresh"),
++                          () => record("image-error")
++                        );
++                      }}
++                    />
++                  )}
++                </View>
++              </Marker>
++              <Control position="bottom-right">
++                <Child name="Map A" record={record} />
++              </Control>
++              {locate && (
++                <GeolocateControl
++                  position="top-right"
++                  getCurrentPosition={position}
++                  onError={() => record("provider-error")}
++                  onGeolocate={() => record("provider-location")}
++                />
++              )}
++            </OneMap>
++            <OneMap
++              ref={second}
++              mapStyle={style}
++              initialViewState={{
++                longitude: -122.34,
++                latitude: 47.61,
++                zoom: 12,
++                bearing: 0,
++                pitch: 0,
++              }}
++              minZoom={12}
++              maxZoom={13}
++              style={{ flex: 1 }}
++              interactiveLayerIds={["focus-vector"]}
++              onLoad={() => {
++                record("b-load");
++                void second.current?.jumpTo({
++                  center: [-122.34, 47.61],
++                  zoom: 12,
++                });
++              }}
++              onClick={() => record("b-map-click")}
++              onError={() => record("b-error")}
++            >
++              <Source
++                id="focus-vector-source"
++                type="vector"
++                tiles={["http://127.0.0.1:8798/vt/0/{z}/{x}/{y}.pbf"]}
++                minzoom={11}
++                maxzoom={11}
++                onClick={() => record("vector-click")}
++              >
++                <Layer
++                  id="focus-vector"
++                  type="line"
++                  source-layer="routes"
++                  paint={{ "line-color": "#f97316", "line-width": 16 }}
++                />
++              </Source>
++              <Control position="bottom-right">
++                <Child name="Map B" record={record} />
++              </Control>
++              <NavigationControl position="top-left" showCompass={false} />
++            </OneMap>
++          </View>
++        </SafeAreaView>
++      </MapSetup>
++    </Theme.Provider>
++  );
++};
+--- original/scripts/check-inventory.mjs
++++ isolated/scripts/check-inventory.mjs
+@@ -0,0 +1,118 @@
++import { existsSync, readFileSync } from "node:fs";
++import { resolve } from "node:path";
++import { pathToFileURL } from "node:url";
++
++const ownerExceptions = new Set([
++  "rnmapbox:rnmapbox.offlineManager.OfflineManager.invalidateAmbientCache",
++  "rnmapbox:rnmapbox.offlineManager.OfflineManager.setMaximumAmbientCacheSize",
++]);
++
++/** Checks current coverage identities, alias resolution, local targets and unresolved applicable work. */
++export const checkInventory = (inventory, root) => {
++  const failures = [];
++  const entries = new Map();
++  const fail = (entry, reason) => failures.push(`${entry.id}: ${reason}`);
++  for (const entry of inventory.entries) {
++    if (entries.has(entry.id)) fail(entry, "duplicate ID");
++    entries.set(entry.id, entry);
++  }
++  for (const entry of inventory.entries) {
++    const chain = new Set([entry.id]);
++    let target = entry;
++    while (target.canonicalId) {
++      if (chain.has(target.canonicalId)) {
++        fail(entry, "cyclic canonical alias");
++        break;
++      }
++      chain.add(target.canonicalId);
++      target = entries.get(target.canonicalId);
++      if (!target) {
++        fail(entry, "unresolved canonical alias");
++        break;
++      }
++    }
++    const applicable = Object.values(entry.support ?? {}).some(
++      (cell) => cell.applicable
++    );
++    const excepted =
++      ownerExceptions.has(entry.id) &&
++      /owner.*exclu/i.test(entry.rationale ?? "");
++    if (applicable && entry.implementation !== "implemented" && !excepted) {
++      fail(entry, "unresolved applicable work without owner exception");
++    }
++    const tests = entry.testReferences ?? [];
++    const evidence = entry.evidenceReferences ?? [];
++    const sources = [
++      ...(entry.implementationScope ?? "").matchAll(
++        /(?:packages|scripts|examples)\/[\w./-]+/g
++      ),
++    ].map((match) => match[0].replace(/[.,;:]+$/, ""));
++    for (const [kind, references] of [
++      ["source", sources],
++      ["test", tests],
++      ["evidence", evidence],
++    ]) {
++      const current = references.filter(
++        (reference) => !reference.startsWith("historical:")
++      );
++      if (
++        entry.implementation === "implemented" &&
++        applicable &&
++        !current.length
++      ) {
++        fail(entry, `missing current ${kind} target`);
++      }
++      for (const reference of current) {
++        const file = resolve(root, reference.split("#")[0]);
++        if (!file.startsWith(`${resolve(root)}/`) || !existsSync(file)) {
++          fail(entry, `missing current ${kind} target: ${reference}`);
++        }
++      }
++    }
++    for (const [environment, cell] of Object.entries(entry.support ?? {})) {
++      for (const reference of [
++        ...(cell.tests ?? []),
++        ...(cell.evidence ?? []),
++      ]) {
++        if (
++          !reference.startsWith("historical:") &&
++          (!resolve(root, reference.split("#")[0]).startsWith(
++            `${resolve(root)}/`
++          ) ||
++            !existsSync(resolve(root, reference.split("#")[0])))
++        ) {
++          fail(
++            entry,
++            `${environment} missing current support target: ${reference}`
++          );
++        }
++      }
++      if (
++        entry.implementation === "implemented" &&
++        cell.applicable &&
++        cell.implementation !== "implemented"
++      ) {
++        fail(entry, `${environment} contradicts implemented disposition`);
++      }
++    }
++  }
++  return failures;
++};
++
++if (import.meta.url === pathToFileURL(process.argv[1]).href) {
++  const root = resolve(import.meta.dirname, "..");
++  const inventory = JSON.parse(
++    readFileSync(resolve(root, "records/api-coverage.json"), "utf8")
++  );
++  const failures = checkInventory(inventory, root);
++  if (failures.length) {
++    console.error(failures.slice(0, 30).join("\n"));
++    console.error(
++      `FAIL inventory: ${failures.length} unresolved or invalid targets across ${inventory.entries.length} entries`
++    );
++    process.exitCode = 1;
++  } else
++    console.log(
++      `PASS inventory: ${inventory.entries.length} substantiated dispositions`
++    );
++}
+--- original/scripts/check-inventory.test.mjs
++++ isolated/scripts/check-inventory.test.mjs
+@@ -0,0 +1,115 @@
++import assert from "node:assert/strict";
++import { resolve } from "node:path";
++
++import { checkInventory } from "./check-inventory.mjs";
++
++const root = resolve(import.meta.dirname, "..");
++const entry = {
++  id: "fixture:public-operation",
++  implementation: "implemented",
++  implementationScope: "scripts/check-inventory.mjs",
++  testReferences: ["scripts/check-inventory.test.mjs"],
++  evidenceReferences: ["records/evidence/tf09-coverage.json"],
++  support: {
++    "mapbox-web": {
++      applicable: true,
++      implementation: "implemented",
++      tests: [],
++      evidence: [],
++    },
++  },
++};
++const check = (entries) => checkInventory({ entries }, root);
++assert.deepEqual(check([entry]), []);
++assert.deepEqual(
++  check([
++    {
++      ...entry,
++      implementationScope:
++        "Current owning source: scripts/check-inventory.mjs. Source-backed audit.",
++    },
++  ]),
++  []
++);
++assert.deepEqual(
++  check([entry, { ...entry, id: "fixture:alias", canonicalId: entry.id }]),
++  []
++);
++assert(
++  check([entry, entry]).some((failure) => failure.includes("duplicate ID"))
++);
++assert(
++  check([{ ...entry, canonicalId: "missing" }]).some((failure) =>
++    failure.includes("unresolved canonical")
++  )
++);
++assert(
++  check([
++    { ...entry, canonicalId: "fixture:alias" },
++    { ...entry, id: "fixture:alias", canonicalId: entry.id },
++  ]).some((failure) => failure.includes("cyclic"))
++);
++for (const field of [
++  "implementationScope",
++  "testReferences",
++  "evidenceReferences",
++]) {
++  const missing =
++    field === "implementationScope"
++      ? "packages/missing.ts"
++      : ["packages/missing.ts"];
++  assert(
++    check([{ ...entry, [field]: missing }]).some((failure) =>
++      failure.includes("missing current")
++    )
++  );
++}
++assert(
++  check([{ ...entry, implementation: "pending" }]).some((failure) =>
++    failure.includes("unresolved applicable")
++  )
++);
++assert(
++  check([
++    { ...entry, implementation: "pending", rationale: "deferred by someone" },
++  ]).some((failure) => failure.includes("without owner exception"))
++);
++const excluded = {
++  ...entry,
++  id: "rnmapbox:rnmapbox.offlineManager.OfflineManager.invalidateAmbientCache",
++  implementation: "pending",
++  rationale: "Owner exclusion in docs/requirements.md#purpose-and-scope",
++};
++assert.deepEqual(check([excluded]), []);
++assert.deepEqual(
++  check([
++    {
++      ...entry,
++      testReferences: ["historical:retired.test.ts", ...entry.testReferences],
++    },
++  ]),
++  []
++);
++assert(
++  check([{ ...entry, testReferences: ["historical:retired.test.ts"] }]).some(
++    (failure) => failure.includes("missing current test")
++  )
++);
++assert(
++  check([
++    {
++      ...entry,
++      support: {
++        web: {
++          applicable: true,
++          implementation: "implemented",
++          tests: ["../../package.json"],
++          evidence: [],
++        },
++      },
++    },
++  ]).some((failure) => failure.includes("support target"))
++);
++console.log(
++  "PASS inventory fixtures: identity, aliases, current targets, pending work and narrow owner exceptions"
++);
+--- original/scripts/tf06-smoke-selection.mjs
++++ isolated/scripts/tf06-smoke-selection.mjs
+@@ -1,14 +1,12 @@
+ /**
+  * Selects native engines so scoped retries can release build outputs between runs.
+  * @param {string} scope - TF06 query or lifetime scope.
+- * @param {string} selection - Both engines or one lifetime engine.
++ * @param {string} selection - Both engines or one native engine.
+  * @returns {string[]} The native engines to execute sequentially.
+  */
+ export const selectNativeEngines = (scope, selection = "both") => {
+   if (!["both", "mapbox", "maplibre"].includes(selection))
+     throw new Error("Use both, mapbox, or maplibre for the native engine.");
+-  if (scope !== "lifetimes" && selection !== "both")
+-    throw new Error("Single-engine selection requires the lifetime scope.");
+   return selection === "both" ? ["mapbox", "maplibre"] : [selection];
+ };
+ 
+--- original/scripts/tf06-smoke-selection.test.mjs
++++ isolated/scripts/tf06-smoke-selection.test.mjs
+@@ -11,8 +11,8 @@
+ assert.deepEqual(selectNativeEngines("lifetimes", "mapbox"), ["mapbox"]);
+ assert.deepEqual(selectNativeEngines("lifetimes", "maplibre"), ["maplibre"]);
+ assert.throws(() => selectNativeEngines("lifetimes", "unknown"));
+-assert.throws(() => selectNativeEngines("queries", "mapbox"));
+-assert.throws(() => selectNativeEngines("queries", "maplibre"));
++assert.deepEqual(selectNativeEngines("queries", "mapbox"), ["mapbox"]);
++assert.deepEqual(selectNativeEngines("queries", "maplibre"), ["maplibre"]);
+ assert.deepEqual(androidSmokeArgs("queries"), [
+   "run",
+   "android",
+--- original/scripts/tf07-ui-smoke.mjs
++++ isolated/scripts/tf07-ui-smoke.mjs
+@@ -267,10 +267,10 @@
+     throw new Error(
+       "Set TF07_NATIVE_BINARY_SHA256 to the coordinator's built native executable/APK baseline."
+     );
+-  const applicationId =
++  const applicationId = process.env[`TF07_${selectedEngine.toUpperCase()}_${platform.toUpperCase()}_ID`] ?? (
+     platform === "android"
+       ? `com.onemap${selectedEngine}`
+-      : `org.reactjs.native.example.OneMap${selectedEngine === "mapbox" ? "Mapbox" : "Maplibre"}`;
++      : `org.reactjs.native.example.OneMap${selectedEngine === "mapbox" ? "Mapbox" : "Maplibre"}`);
+   const metroPort = Number(process.env.TF07_METRO_PORT ?? 8081);
+   const iosDevice = process.env.TF07_IOS_UDID ?? "booted";
+   const serial = process.env.ANDROID_SERIAL;
+@@ -385,7 +385,7 @@
+         "am",
+         "start",
+         "-n",
+-        `${applicationId}/.MainActivity`,
++        `${applicationId}/${process.env[`TF07_${selectedEngine.toUpperCase()}_ANDROID_ACTIVITY`] ?? ".MainActivity"}`,
+       ]);
+     else
+       await command("xcrun", [
+--- original/scripts/tf08-patches.test.mjs
++++ isolated/scripts/tf08-patches.test.mjs
+@@ -7,7 +7,6 @@
+   readFileSync,
+   rmSync,
+ } from "node:fs";
+-import { createRequire } from "node:module";
+ import { tmpdir } from "node:os";
+ import { dirname, join, resolve } from "node:path";
+ import { runInNewContext } from "node:vm";
+@@ -17,7 +16,6 @@
+ const root = resolve(import.meta.dirname, "..");
+ const rnRoot = resolve(root, "node_modules/@rnmapbox/maps");
+ const mlRoot = resolve(root, "node_modules/@maplibre/maplibre-react-native");
+-const requireHelper = createRequire(import.meta.url);
+ 
+ // Helpers precede the eager checks so their const bindings are initialized.
+ /** Extracts one native operation so assertions cannot match unrelated methods. */
+@@ -76,7 +74,6 @@
+ runInNewContext(compiled, {
+   exports,
+   require: (name) => {
+-    if (name.startsWith("@babel/runtime/helpers/")) return requireHelper(name);
+     if (name === "react-native")
+       return {
+         NativeModules: {
+@@ -281,19 +278,7 @@
+ );
+ assert.match(resume, /setDownloadState\(OfflineRegion\.STATE_ACTIVE\)/);
+ 
+-const rnVersion = JSON.parse(
+-  readFileSync(join(rnRoot, "package.json"), "utf8")
+-).version;
+-assert(
+-  ["10.3.7", "10.3.8"].includes(rnVersion),
+-  "Unknown RNMapbox patch version."
+-);
+-verifyPeerPatch(
+-  rnRoot,
+-  rnVersion === "10.3.8"
+-    ? "rnmapbox-10.3.8.patch"
+-    : "rnmapbox-10.3.7-tf08.patch"
+-);
++verifyPeerPatch(rnRoot, "rnmapbox-10.3.7-tf08.patch");
+ verifyPeerPatch(mlRoot, "maplibre-native-11.5.0-tf08.patch");
+ console.log(
+   "PASS TF08 peer patches: clean application round trips, RNMapbox zero-zoom constructor execution, and native source assertions for image cleanup/scale and offline download ownership."
+--- original/examples/shared/tf07-focused-web-mapbox.tmp.tsx
++++ isolated/examples/shared/tf07-focused-web-mapbox.tmp.tsx
+@@ -0,0 +1,115 @@
++import {
++  Control,
++  FullscreenControl,
++  GeolocateControl,
++  MapSetup,
++  NavigationControl,
++  Map as OneMap,
++} from "one-map-react";
++import { adapter } from "one-map-react/mapbox-web";
++import { createContext, useContext, useEffect, useRef, useState } from "react";
++import { createRoot } from "react-dom/client";
++
++const Theme = createContext("initial");
++const counts = { load: 0, error: 0, location: 0, calls: 0, clicks: 0 };
++let read = async () => ({});
++let configure = (_action) => {};
++let release = () => {};
++const Child = () => {
++  const theme = useContext(Theme);
++  return (
++    <button type="button" data-focused-theme onClick={() => counts.clicks++}>
++      {theme}
++    </button>
++  );
++};
++const App = () => {
++  const ref = useRef(null);
++  const [mode, setMode] = useState("reject");
++  const [mounted, setMounted] = useState(true);
++  const [theme, setTheme] = useState("initial");
++  useEffect(() => {
++    configure = (action) => {
++      if (action === "delay") setMode("delay");
++      if (action === "remove") setMounted(false);
++      if (action === "restore") setMounted(true);
++      if (action === "theme") setTheme("updated");
++      if (action === "resolve") release();
++    };
++    read = async () => ({
++      ...counts,
++      zoom: await ref.current?.getZoom(),
++      center: await ref.current?.getCenter(),
++    });
++  }, []);
++  const position = async () => {
++    counts.calls++;
++    if (mode === "reject") throw new Error("expected test rejection");
++    return await new Promise((resolve) => {
++      release = () => resolve({ lngLat: [-122.33, 47.62] });
++    });
++  };
++  return (
++    <>
++      <span
++        data-focused-mode
++        style={{ position: "fixed", top: 0, left: 100, zIndex: 10000 }}
++      >
++        {mode}
++      </span>
++      <Theme.Provider value={theme}>
++        <MapSetup adapter={adapter}>
++          <OneMap
++            ref={ref}
++            mapStyle={{
++              version: 8,
++              sources: {},
++              layers: [
++                {
++                  id: "background",
++                  type: "background",
++                  paint: { "background-color": "#e2e8f0" },
++                },
++              ],
++            }}
++            initialViewState={{ longitude: -122.34, latitude: 47.61, zoom: 11 }}
++            style={{ width: "100%", height: "100%" }}
++            onLoad={() => counts.load++}
++          >
++            <NavigationControl />
++            <FullscreenControl />
++            <Control position="bottom-right">
++              <Child />
++            </Control>
++            {mounted && (
++              <GeolocateControl
++                getCurrentPosition={position}
++                onError={() => counts.error++}
++                onGeolocate={() => counts.location++}
++              />
++            )}
++          </OneMap>
++        </MapSetup>
++      </Theme.Provider>
++    </>
++  );
++};
++const container = document.createElement("div");
++container.id = "tf07-focused";
++Object.assign(container.style, {
++  position: "fixed",
++  inset: "0",
++  zIndex: "9999",
++  background: "white",
++});
++document.body.appendChild(container);
++const root = createRoot(container);
++root.render(<App />);
++window.__tf07Focused = {
++  read: () => read(),
++  configure: (action) => configure(action),
++  dispose: () => {
++    root.unmount();
++    container.remove();
++  },
++};
+--- original/examples/shared/tf07-focused-web-maplibre.tmp.tsx
++++ isolated/examples/shared/tf07-focused-web-maplibre.tmp.tsx
+@@ -0,0 +1,115 @@
++import {
++  Control,
++  FullscreenControl,
++  GeolocateControl,
++  MapSetup,
++  NavigationControl,
++  Map as OneMap,
++} from "one-map-react";
++import { adapter } from "one-map-react/maplibre-web";
++import { createContext, useContext, useEffect, useRef, useState } from "react";
++import { createRoot } from "react-dom/client";
++
++const Theme = createContext("initial");
++const counts = { load: 0, error: 0, location: 0, calls: 0, clicks: 0 };
++let read = async () => ({});
++let configure = (_action) => {};
++let release = () => {};
++const Child = () => {
++  const theme = useContext(Theme);
++  return (
++    <button type="button" data-focused-theme onClick={() => counts.clicks++}>
++      {theme}
++    </button>
++  );
++};
++const App = () => {
++  const ref = useRef(null);
++  const [mode, setMode] = useState("reject");
++  const [mounted, setMounted] = useState(true);
++  const [theme, setTheme] = useState("initial");
++  useEffect(() => {
++    configure = (action) => {
++      if (action === "delay") setMode("delay");
++      if (action === "remove") setMounted(false);
++      if (action === "restore") setMounted(true);
++      if (action === "theme") setTheme("updated");
++      if (action === "resolve") release();
++    };
++    read = async () => ({
++      ...counts,
++      zoom: await ref.current?.getZoom(),
++      center: await ref.current?.getCenter(),
++    });
++  }, []);
++  const position = async () => {
++    counts.calls++;
++    if (mode === "reject") throw new Error("expected test rejection");
++    return await new Promise((resolve) => {
++      release = () => resolve({ lngLat: [-122.33, 47.62] });
++    });
++  };
++  return (
++    <>
++      <span
++        data-focused-mode
++        style={{ position: "fixed", top: 0, left: 100, zIndex: 10000 }}
++      >
++        {mode}
++      </span>
++      <Theme.Provider value={theme}>
++        <MapSetup adapter={adapter}>
++          <OneMap
++            ref={ref}
++            mapStyle={{
++              version: 8,
++              sources: {},
++              layers: [
++                {
++                  id: "background",
++                  type: "background",
++                  paint: { "background-color": "#e2e8f0" },
++                },
++              ],
++            }}
++            initialViewState={{ longitude: -122.34, latitude: 47.61, zoom: 11 }}
++            style={{ width: "100%", height: "100%" }}
++            onLoad={() => counts.load++}
++          >
++            <NavigationControl />
++            <FullscreenControl />
++            <Control position="bottom-right">
++              <Child />
++            </Control>
++            {mounted && (
++              <GeolocateControl
++                getCurrentPosition={position}
++                onError={() => counts.error++}
++                onGeolocate={() => counts.location++}
++              />
++            )}
++          </OneMap>
++        </MapSetup>
++      </Theme.Provider>
++    </>
++  );
++};
++const container = document.createElement("div");
++container.id = "tf07-focused";
++Object.assign(container.style, {
++  position: "fixed",
++  inset: "0",
++  zIndex: "9999",
++  background: "white",
++});
++document.body.appendChild(container);
++const root = createRoot(container);
++root.render(<App />);
++window.__tf07Focused = {
++  read: () => read(),
++  configure: (action) => configure(action),
++  dispose: () => {
++    root.unmount();
++    container.remove();
++  },
++};

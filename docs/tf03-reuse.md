@@ -69,7 +69,7 @@ These tests use mocked wrappers. They do not show a browser canvas, a real WebGL
 
 ## Renderer run
 
-Permission covered this stage's smoke: web reuse, a separate external-context case, and native load, remount, and loading-error behavior. It did not cover a TF02 Seattle-route rerun or TF04. The passing pack is SHA-256 `1a6c2970f10f185f5cd82b5bdb160a7c6e51dad04e009c3f65000e42b418d2cf`. The compact record is [tf03-reuse.json](../records/evidence/tf03-reuse.json).
+Permission covered this stage's smoke: web reuse, a separate external-context case, and native load, remount, and loading-error behavior. It did not cover a TF02 Seattle-route rerun or TF04. The passing pack is SHA-256 `1a6c2970f10f185f5cd82b5bdb160a7c6e51dad04e009c3f65000e42b418d2cf`. The compact record is [tf03-reuse.json](https://github.com/RobJacobson/one-map-react/blob/7eb042eff97cf405fee61bc4816d79861f532896/records/evidence/tf03-reuse.json).
 
 Mapbox web and MapLibre web reuse both finished at `loads=2 styles=2 errors=0 canvas=same`, with the blue route still on the reused canvas. The external-context case finished at `loads=2 styles=2 canvas=same context=first`: the first supplied context was painted, and the second context passed on remount was not. The page canvas stayed blank because the context remains bound to the canvas it was created on.
 

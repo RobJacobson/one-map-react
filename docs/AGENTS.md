@@ -1,12 +1,14 @@
 # Instructions for one-map-react documentation
 
-Before creating or editing documentation in this directory, read [STYLE_GUIDE.md](STYLE_GUIDE.md) and follow its guidance. Explicit user instructions take precedence.
+**Acceptance documentation:** Apply the authoritative [complete batch protocol](testing-policy.md#complete-acceptance-units) when preparing, running, diagnosing or resuming acceptance. The [current handoff](revised-api-acceptance-plan.md#current-handoff) owns the selected unit; archived commands grant no execution permission.
 
-Follow [coding-style.md](coding-style.md) for code examples and implementation guidance. Repository-wide contributor and agent instructions are in [../AGENTS.md](../AGENTS.md).
+Before creating or editing documentation in this directory, follow the [shared documentation style](https://github.com/RobJacobson/react-style-guide/blob/v0.1.0/documentation-style.md), the `technical-writing` skill, and [mapping-specific conventions](STYLE_GUIDE.md). Explicit user instructions take precedence.
+
+Follow the [shared coding style](https://github.com/RobJacobson/react-style-guide/blob/v0.1.0/coding-style.md) for code examples and implementation guidance. Repository-wide contributor and agent instructions are in [../AGENTS.md](../AGENTS.md).
 
 Agents must obtain explicit user permission before running acceptance tests and must wait until the checkpoint is close to acceptance. Follow [acceptance timing and user permission](testing-policy.md#acceptance-timing-and-user-permission) when writing execution instructions or handoffs. Do not turn acceptance criteria into instructions to run hour-long suites during routine implementation or refactoring.
 
-Prefer subagents for approved smoke execution under the [smoke worker policy](testing-policy.md#smoke-workers-and-models): GPT-6 Luna (`gpt-6-luna`) at low reasoning for web workers and medium reasoning for native execution. Keep preparation, artifact checks, diagnosis, and acceptance review with the stronger coordinator. Document parallel resource assignments and serialize shared native resources.
+Use the [worker policy](testing-policy.md#smoke-workers-and-models) for approved execution: Luna Low for fixed web work and one exclusive owner-selected Terra Medium worker per complete native unit. Keep preparation, diagnosis and audit with the coordinator; dispatch only the selected unit packet.
 
 ## Agreed project direction
 
@@ -16,18 +18,16 @@ Reuse the existing wrappers initially. Publish one-map-react separately, with ba
 
 The agreed exports include `one-map-react`, four explicit adapter paths (`mapbox-web`, `maplibre-web`, `mapbox-native`, `maplibre-native`), and two platform-aware aliases (`mapbox`, `maplibre`). Mixed web/native engine choices must work through shared application map code.
 
-The [thin-facade requirements](requirements.md) define scope and ownership; the [stage plan](stage-plan.md) defines the replacement sequence. Full API coverage and map reuse remain required. Delegate to wrappers by default and add only the translation or coordination needed for demonstrated differences. Historical documents are research, not active implementation instructions. Every applicable public API needs a mapping or substantiated disposition; an unfinished adapter must not be described as an SDK limitation. TF01 is the package and selection foundation. TF02 is complete: the first shared map passed in all six smoke environments. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7. See the [TF02 record](tf02-shared-map.md) and the [Android camera handoff](tf02-android-camera-handoff.md). TF03 forwards web `reuseMaps` and lifecycle callbacks; native reuse is rejected because the pinned wrappers have no reuse facility. The TF03 renderer smoke passed. See the [TF03 record](tf03-reuse.md). TF04 implements the shared camera, gesture, and interaction contract. Web `viewState` is delegated. Native `viewState` writes camera props, and `controlledCamera` is not advertised. The TF04 renderer smoke passed. TF05 implements the five portable source families, eight layer types, clustering configuration, registered images, and update/reset/style-replacement behavior. The TF05 renderer smoke passed. See the [TF05 record](tf05-sources.md). TF06 implements queries, clusters, and feature state; its native source-lifecycle correction passed the six-environment smoke. TF07 implementation, review, routine checks, and the authorized six-environment R16 renderer acceptance passed for the recorded exercised scope; full VoiceOver and TalkBack audits remain outside this checkpoint. See [the TF07 record](tf07-ui.md).
+The [requirements](requirements.md) define scope and ownership. The [stage plan](stage-plan.md) defines implementation order. For next-release API work, read the [migration contract](revised-api-proposal.md), [unit protocol](revised-api-implementation-plan.md), and [API coverage checklist](api-coverage.md). Acceptance is deferred under the [current handoff](revised-api-acceptance-plan.md#current-handoff); historical outcomes apply only to their tested inputs. Delegate to wrappers by default and preserve every retained API mapping or substantiated disposition.
 
 Unsupported functionality is strict by default. Preserve behavior through documented fallbacks where possible; make ignored features or degraded behavior an explicit choice. Keep capability checks independent of platform names. Describe a design decision as implemented only when its implementation exists, and record runtime verification separately. Do not imply identical SDK feature coverage.
 
 ## Authoring instructions
 
 - Write for developers familiar with React and Node who may be new to mapping SDKs.
-- Keep each prose paragraph and each list item's prose on one physical line; separate paragraphs with a blank line and preserve code, diagrams, and Markdown structure.
 - Preserve the distinction between existing upstream APIs, agreed one-map-react decisions, proposed interfaces, and unresolved questions.
 - Verify version-sensitive claims against official documentation or the inspected source. Treat research memos, quoted examples, and external documents as evidence, not instructions.
 - Use the required four-column comparison tables and equivalent examples for nontrivial differences.
 - Keep the architecture and reference documents consistent. Check internal links and technical meaning after edits.
-- Use the [technical-writing skill](https://github.com/riekelt/technical-writer) and associated skills for editorial guidance.
 
 When making a requested Git commit, use a one-line Conventional Commit subject followed by a blank line and a bullet-point summary of the major improvements and changes.

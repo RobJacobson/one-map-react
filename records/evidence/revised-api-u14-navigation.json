@@ -1,0 +1,715 @@
+{
+  "unit": "U14",
+  "status": "Implemented, independently audited and corrected; applicable routine and packed checks passed within recorded baseline limits. PR then immediate U15 authorized.",
+  "authorization": "Owner authorizes automatic sequential reviewed PRs through U24. U14 stacks on open U13 PR32 atafdc088; U13 stacks on U12 PR31. No merge, tagging, package publication, renderer/native build/install authorization.",
+  "scope": {
+    "removed": "Remove only common NavigationControl/FullscreenControl, their props/adapter fields/selected facade aliases/guards; migrate web examples to raw wrappers and native camera buttons to sibling screen UI.",
+    "retained": "Other four common controls, services, map subscriptions, native marker/portal/setup ownership, camera methods, SDK compass options, raw SDK exports, peers/patches/lockfiles/config remain.",
+    "application": [
+      "Web raw wrapper owns navigation/fullscreen behavior and options; common map camera methods remain.",
+      "Native app owns accessible screen buttons, concrete map ref access, renderer zoom readback, fixture min/max intent, latest intent and concrete attachment guards, unmount invalidation and screen error reporting.",
+      "Native buttons are absolute siblings of OneMap within the measured map host, and Map B sibling buttons in focused native fixture; absolute positioning does not add layout height. They use no common Control or SDK map child UI."
+    ],
+    "contract": "Native common navigation readiness/compass visualization/following readback and FullscreenControl rejection disappear with the removed API. Selected wrapper controls own upstream behavior. Native button min/max/error/latest-intent policy belongs to these fixtures, not a portable replacement controller.",
+    "callerClosure": "Original focused web/native scenarios and existing app/scene mocks migrated. Older publication layout/native App branches preserved; original-only focused/workspace refactors not copied. Existing compiler assertion retires only NativeNavigationControl where present.",
+    "data": "No persistent data or SDK manager mutation. Applications importing the removed controls/types must migrate."
+  },
+  "findings": [
+    {
+      "classification": "Introduced retained-export deletion, found by independent U14 review.",
+      "trigger": "Broad removal range for MapLibre WebFullscreenControl also removed the adjacent raw WrapperGlobeControl/WrapperLogoControl/WrapperTerrainControl re-export block.",
+      "fix": "Restored exact block in both artifacts. Audited explicit export names across root/four selected entries; only intended common/facade names disappeared. Added positive packed probes for raw controls, popup, marker and MapLibre ornaments.",
+      "before": "Independent Bundler declaration probe failed on exactly the three missing names. First TS7 invocation required --ignoreConfig; corrected invocation is the valid red proof.",
+      "after": "Rebuilt declaration probe passes; all isolated peer cases pass. Reviewer independently confirms final AST export scope."
+    },
+    {
+      "classification": "Retained getter verification gap exposed during U14 review.",
+      "trigger": "Retiring navigation UI tests left no direct actual native adapter getZoom assertions. Application buttons mocked that getter and could not prove adapter forwarding or validation.",
+      "closure": "Added actual MapRef getter tests in both adapters and both artifacts for zero, fractional output, exact SDK rejection, invalid NaN, and detach without extra wrapper calls. No camera implementation change.",
+      "verification": "Independent two-test/two-suite getter check passes in each tree; final full source and compiled native suites include these cases."
+    },
+    {
+      "classification": "Introduced static React Compiler warnings during final lint.",
+      "trigger": "Invoking opaque TF07 application render callbacks with refs during render produced four refs warnings per tree.",
+      "fix": "Typed component/JSX boundary; stable module-level native button component and web selected control component. No ref is read during render.",
+      "verification": "Final scoped lint has no warnings; types, affected full web and compiled checks pass. Reviewer checked stable identity and ordinary native sibling layout."
+    }
+  ],
+  "tests": {
+    "retired": [
+      "Native shared navigation ordering, latest read/command failure, user movement cancellation, readiness cycles, compass drawing/pitch, shared constructor guards, native fullscreen rejection surface (no remaining common API).",
+      "Five navigation/fullscreen creation-change rows and their effective-default JSX; retained marker/control/attribution/scale/geolocation rows remain.",
+      "Native adapter settled-camera tests remove only NavigationControl/arrow assertions; observed camera, overlay projection, public movement counts, and teardown remain."
+    ],
+    "retainedAndAdded": [
+      "Both actual native MapRef getter tests cover zero and fractional zoom, exact wrapper error propagation, invalid NaN rejection, and no wrapper call after detach independently of removed UI.",
+      "7 native application button tests cover accessible Zoom in/out/Reset north actions, actual zoom increments and fixture clamp, unavailable map, read/zoom/reset failures, superseded commands, older results/errors after newer intent/replacement/detach/unmount.",
+      "Both actual selected web entries render raw navigation in TF07 and TF08 coverage; original focused web renders raw fullscreen. Existing selected popup and child/provider/close tests retained.",
+      "Packed scripts now reject common/selected facade names and props/Adapter fields while accepting raw wrapper controls, marker, popup and MapLibre ornaments; execution belongs to coordinator."
+    ]
+  },
+  "artifacts": {
+    "original": {
+      "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+      "basis": "Approved dirty rc.11 working state after U13 preserved, with no original commit/reset/clean.",
+      "candidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7",
+      "archiveAudit": {
+        "archiveSha256": "cf95d950a3390448560aff0345324cf55a4e579656181b4a4bb2a8e3c5f0d0b6",
+        "members": 191,
+        "sourceDistReadmeMatched": 185,
+        "commonNavigationFullscreenAbsent": true,
+        "retainedRawExportsPresent": true
+      },
+      "implementationManifestSha256": "ce008a8b30f06bfcb6c44f524901a13e472658cefd4627ab42d0d0991af8159b"
+    },
+    "publication": {
+      "base": "afdc088a2b1765d60647b0e6a1aa4a74172917e9",
+      "baseBranch": "codex/u13-app-popups",
+      "predecessorPr": 32,
+      "branch": "codex/u14-app-navigation",
+      "basis": "Minimal U14 port into predecessor PR tree, retaining older main examples/shared layout, native App branches and peer/patch/version differences.",
+      "archiveAudit": {
+        "archiveSha256": "e881e76142c78aa02c7144c6ac5334a670eb79ca7d6dfd096db1c41eb95b2574",
+        "members": 191,
+        "sourceDistReadmeMatched": 185,
+        "commonNavigationFullscreenAbsent": true,
+        "retainedRawExportsPresent": true
+      },
+      "implementationManifestSha256": "ca0184b2be8c481d2837f701ff26b1e59e321f1d9a638c0178cd41d47ef29caf"
+    },
+    "archiveProof": "Each archive has191 file members; all185 shipped source/dist/README members byte-match its frozen tree. Common navigation/fullscreen runtime exports absent; raw wrapper controls and restored MapLibre ornaments present.",
+    "productionMovement": {
+      "original": {
+        "librarySourceNetLines": -287,
+        "applicationSourceNetLines": 172,
+        "allImplementation": {
+          "files": 31,
+          "added": 579,
+          "removed": 786
+        },
+        "newRuntimeDependencies": 0,
+        "peerPatchChanges": 0
+      },
+      "main": {
+        "librarySourceNetLines": -288,
+        "applicationSourceNetLines": 138,
+        "allImplementation": {
+          "files": 29,
+          "added": 530,
+          "removed": 768
+        },
+        "newRuntimeDependencies": 0,
+        "peerPatchChanges": 0
+      }
+    },
+    "configs": "Root/library package JSON, peers, patches, lockfiles, support/version and archived candidate unchanged. Temporary dependency overlays are not source changes."
+  },
+  "checks": {
+    "executions": {
+      "original": [
+        {
+          "name": "native",
+          "command": [
+            "bunx",
+            "jest",
+            "--runInBand"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "895db67238ababdefb1af4cc1b1930ac4ece03231334109d511dd2f6e704facd"
+        },
+        {
+          "name": "compiled-native",
+          "command": [
+            "bunx",
+            "jest",
+            "--config",
+            "jest.compiled.config.cjs",
+            "--runInBand"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "21c7ac322da666331b4bf5746fa5a393e8b138f35d8a0d2b66df1b615754fce7"
+        },
+        {
+          "name": "compiled-ui",
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run",
+            "--config",
+            "vite.compiled.config.ts",
+            "packages/one-map-react/test/tf07-ui.web.test.tsx",
+            "packages/one-map-react/test/ui-creation.web.test.tsx"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "bd45df36a752849cea27085f3f56ddb4996822ac4aa1df577077be7c5967d96c"
+        },
+        {
+          "name": "compiler",
+          "command": [
+            "node",
+            "scripts/react-compiler.test.mjs"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "a580905426596bfd7282f42d1b072644427814576e9b1b66c67372c414312542"
+        },
+        {
+          "name": "lint",
+          "command": [
+            "bunx",
+            "vp",
+            "check",
+            "<exact frozen implementation manifest file list>"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "76e495b81adc49ce4b29a5b76b56b9558b6a3c20cbb24ec861de8f934d836359"
+        },
+        {
+          "name": "types",
+          "command": [
+            "bun",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+        },
+        {
+          "name": "app-types",
+          "command": [
+            "bun",
+            "run",
+            "typecheck:apps"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962"
+        },
+        {
+          "name": "web",
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "5340b2ff6e22304fabc0db6761882421efb39ff339b2ef2215ed323b0a4529d6"
+        }
+      ],
+      "main": [
+        {
+          "name": "native",
+          "command": [
+            "bunx",
+            "jest",
+            "--runInBand"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "19032d1fc3e43dfdb5308dece059709e42ecd8ea34df02eab52cd351095eb789"
+        },
+        {
+          "name": "compiled-native",
+          "command": [
+            "bunx",
+            "jest",
+            "--config",
+            "jest.compiled.config.cjs",
+            "--runInBand"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "3d78495d83d4a8858f2e4d2a39f2c0c6a636a80596a0760d413d06f55e42450d"
+        },
+        {
+          "name": "compiled-ui",
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run",
+            "--config",
+            "vite.compiled.config.ts",
+            "packages/one-map-react/test/tf07-ui.web.test.tsx",
+            "packages/one-map-react/test/ui-creation.web.test.tsx"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "33d674635ffc7183ef43ae4f64c040f864d50a59d7af21583882150b04d17ec5"
+        },
+        {
+          "name": "compiler",
+          "command": [
+            "node",
+            "scripts/react-compiler.test.mjs"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "a580905426596bfd7282f42d1b072644427814576e9b1b66c67372c414312542"
+        },
+        {
+          "name": "lint",
+          "command": [
+            "bunx",
+            "vp",
+            "check",
+            "<exact frozen implementation manifest file list>"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "6c2225ae4eb7c7a6a6defbb9f0a70e1986df49ba412b6968b7e14f6e200fe1f6"
+        },
+        {
+          "name": "types",
+          "command": [
+            "bun",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+        },
+        {
+          "name": "app-types",
+          "command": [
+            "bun",
+            "run",
+            "typecheck:apps"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962"
+        },
+        {
+          "name": "web",
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run",
+            "--exclude",
+            "**/wrapper-callbacks.web.test.tsx"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "7561d3dca665b779bc0daee609d5f131400052428b530b25394d221b815f30ca"
+        }
+      ]
+    },
+    "counts": {
+      "originalSourceWeb": "48 files / 749 tests",
+      "originalSourceNative": "8 suites / 249 tests",
+      "originalCompiledUi": "2 files / 61 tests",
+      "originalCompiledNative": "8 suites / 249 tests",
+      "mainSourceWebBounded": "38 files / 669 tests; wrapper-callbacks.web.test.tsx deliberately excluded after first failure",
+      "mainSourceNative": "7 suites / 244 tests",
+      "mainCompiledUi": "2 files / 61 tests",
+      "mainCompiledNative": "7 suites / 244 tests"
+    },
+    "otherRoutine": [
+      {
+        "command": "bun run build",
+        "originalLog": "build-original-component-callback.log",
+        "mainLog": "build-main-component-callback.log",
+        "result": "passed; library built before dependent tests/types"
+      },
+      {
+        "command": "bunx vp -C apps/web build --outDir <task>/build-web-original",
+        "log": "original-app-build.log",
+        "result": "passed; static bundle only"
+      },
+      {
+        "command": "bunx vp -C examples/web-mapbox build --outDir <task>/build-web-main-mapbox",
+        "log": "main-mapbox-build-retry.log",
+        "result": "passed after temporary existing plugin overlay"
+      },
+      {
+        "command": "bunx vp -C examples/web-maplibre build --outDir <task>/build-web-main-maplibre",
+        "log": "main-maplibre-build-retry.log",
+        "result": "passed after temporary existing plugin overlay"
+      },
+      {
+        "command": "node <task>/audit-exports.mjs",
+        "log": "export-audit-original.log",
+        "result": "passed; only approved named export removals across root/four selected entries"
+      },
+      {
+        "command": "tsc --ignoreConfig --noEmit --module ESNext --moduleResolution Bundler --jsx react-jsx --strict --skipLibCheck --target ES2022 --lib ES2022,DOM <task>/raw-exports-probe/probe.tsx",
+        "redLog": "raw-exports-red-retry.log",
+        "greenLog": "raw-exports-green-main.log",
+        "result": "red exactly missing three retained ornaments, then green after restoration"
+      }
+    ],
+    "scope": "Compiled web checks are focused UI/creation61 tests per tree, not a fresh full compiled-web suite. Full source web and full mocked/compiled native results are recorded separately. Full accumulated gate remains U24.",
+    "static": {
+      "original": [
+        {
+          "command": [
+            "node",
+            "scripts/tf07-smoke-contract.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "60d2e47bf22f455f8d514d9d7b0d917683b157aba5c9ab4359e476eb8b05dc61"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/tf08-image-observations.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "8a0c439cedb26bb34da597ac361d8affcabcdbd048284b8023c85070629a554e"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/tf08-snapshot-errors.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "34a8af1328277fd5bc1809231bf8094bd19704fb969a617c672519f3a9717009"
+        }
+      ],
+      "main": [
+        {
+          "command": [
+            "node",
+            "scripts/tf07-smoke-contract.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "d66e8f74bf80d32dbb43162a737cbfebc710f2da669209bc6e0dcf2c39556947"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/tf08-image-observations.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "8a0c439cedb26bb34da597ac361d8affcabcdbd048284b8023c85070629a554e"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/tf08-snapshot-errors.test.mjs"
+          ],
+          "exitCode": 0,
+          "sourceSha256": "34a8af1328277fd5bc1809231bf8094bd19704fb969a617c672519f3a9717009"
+        }
+      ]
+    },
+    "packages": "13 package selections and all8 selected-peer cases passed for each exact archive.",
+    "documentation": {
+      "status": "passed",
+      "commands": [
+        "bun run check:docs",
+        "node /private/tmp/one-map-u14-zhv02de6/documentation/check-docs-expanded.mjs",
+        "python3 /private/tmp/one-map-u14-zhv02de6/documentation/check-coverage.py"
+      ],
+      "original": {
+        "local_markdown_files": 39,
+        "expanded_markdown_files": 44,
+        "sdk_comparison_tables": 42
+      },
+      "publication": {
+        "local_markdown_files": 38,
+        "expanded_markdown_files": 43,
+        "sdk_comparison_tables": 38
+      },
+      "coverage_invariant": "All 69 rows preserve IDs, order, checkmarks and first three historical cells against each root documentation before snapshot.",
+      "frozen_package_readme_sha256": {
+        "original": "362a7a9a0fbecf252c46b65c17f1cc28af565ee9ceedf88ef6be14be1b5e2f10",
+        "publication": "6c030dfe8b62a46f0c7b107e82fb5be13b9aea444daf7c0519cdec5719ecc8d0"
+      },
+      "scope": "Structural checks cover paragraphs, fences, comparison tables and local links including U14 evidence. Source review grounds working control removals, retained raw SDK exports, native compass options and camera APIs. No renderer, Metro, native build/install or native screen button touch verification is claimed."
+    },
+    "baseline": "Main full first web run reproduced both inherited wrapper-callback marker.ts imports failing against installed marker.tsx alongside separately repaired mock gaps. Final bounded suite excludes only that unchanged file.",
+    "host": "Node v24.22.1, Bun1.4.1. Mock development RN0.86.3/RNMapbox10.3.8/MapLibre11.5.0 differs from isolated peer tuples; no support/host certification claim."
+  },
+  "firstAttemptFailures": [
+    {
+      "log": "web-original.log",
+      "details": "2 selected popup tests needed WrapperNavigationControl/FullscreenControl mocks after app migration; repaired in existing fixture."
+    },
+    {
+      "log": "typecheck-apps-original.log",
+      "details": "New test mock inferred Promise<undefined>, pending command implementation returns Promise<void>; annotation repaired."
+    },
+    {
+      "log": "web-original-retry.log",
+      "details": "2 newly added TF08 coverage probes needed retained AttributionControl mock because mock maps do not establish common context; repaired."
+    },
+    {
+      "log": "web-main.log",
+      "details": "Same two newly added mock gaps plus 2 known pre-U06 wrapper-callback marker.ts import failures. Mock gaps repaired; only existing wrapper-callback file excluded in bounded final run."
+    },
+    {
+      "log": "raw-exports-red.log",
+      "details": "First standalone TypeScript probe invocation needed TS7 --ignoreConfig; retried explicitly."
+    },
+    {
+      "log": "raw-exports-red-retry.log",
+      "details": "Review found accidental deletion of three raw MapLibre ornament reexports by overly broad removal range. Exact original block restored in both artifacts; independent declaration red/green and explicit export audit verify correction."
+    },
+    {
+      "log": "original-lint-freeze.log",
+      "details": "4 new React refs warnings when invoking app render callback with ref. ComponentType/JSX boundary with stable NativeCameraButtons identity resolved all warnings in final lint."
+    },
+    {
+      "log": "main-lint-freeze.log",
+      "details": "Same 4 callback refs warnings; resolved."
+    },
+    {
+      "log": "main-mapbox-build.log",
+      "details": "Legacy shell could not resolve already-installed @vitejs/plugin-react from temporary publication node_modules. Added temporary symlink to existing 5.0.4 installation, no package/config/dependency change."
+    },
+    {
+      "log": "main-maplibre-build.log",
+      "details": "Same temporary missing plugin overlay; repaired and static bundle passed."
+    }
+  ],
+  "selectedPeers": {
+    "scope": "Eight standalone/mixed selected cases per archive: installs, built declarations, selected web imports and patch-file hashes; no native linking or SDK operations.",
+    "versions": {
+      "tuple-1": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "tuple-2": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "tuple-3": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-4": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-5": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-6": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-7": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "tuple-8": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-9": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-10": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      }
+    },
+    "executions": [
+      {
+        "artifact": "original",
+        "archiveSha256": "cf95d950a3390448560aff0345324cf55a4e579656181b4a4bb2a8e3c5f0d0b6",
+        "reportSha256": "b29ff0fef8e64b879d11aea929c949d27726d6cb4bdbe48881c8e8f7e4f84ab9",
+        "runnerSha256": "e032e59edebe2e70f29a582c1c9f3a50a36fbf2078cb0e6491ed1fd05fef9f53",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "9a52a46b8bee9d67c319badc15afd0840f92d909e579f4e9cfae76398f8ffecf",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "e163a19e1f874609d311cadd4e67c457233978ed83604be1a7b21735eeff6e56",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-3",
+            "lockSha256": "95f4aafcdc1a9d61677bf2c6133ddac14722d216c2b5d7724c424e76162376ca",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-4",
+            "lockSha256": "13cf25920189b50297ee4768b84fd728c3ef50425c1451675fba0702c690dfba",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "0d393331e3991d020bcf15826cba8212f1d7c89b56c8c419e60fdcdbb8004f01",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "0d393331e3991d020bcf15826cba8212f1d7c89b56c8c419e60fdcdbb8004f01",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "f62c377fd3a24e7e249395027917998f9896446c9e2f48d25aee35f1d512f76b",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "f62c377fd3a24e7e249395027917998f9896446c9e2f48d25aee35f1d512f76b",
+            "patchedFilesVerified": 31
+          }
+        ]
+      },
+      {
+        "artifact": "main",
+        "archiveSha256": "e881e76142c78aa02c7144c6ac5334a670eb79ca7d6dfd096db1c41eb95b2574",
+        "reportSha256": "d36d8317ac5295ac229924b1fbcc00c23aea96615703f07ba90f4d0356c1b6ac",
+        "runnerSha256": "3aab80a530d49a08e2cf90332508ef1fd5afc3c87030a53c5ce2ace8bb569d8c",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "e8d70e2f72e3ebdb9e847893262d8ae4c0a8fba63d0aaba978499c42d79ae39a",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "f524f865a957a57c8bec5bbad97b0b0e3a45e073f5d9fe70d9306ff5899a99e2",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-7",
+            "lockSha256": "762500a180c7aec92a2bcf6e673a338d4388594444eeed7323749d00682dc9c2",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-8",
+            "lockSha256": "85f8ae26a8e596ed30139fbcdebdd3a58df770d2510c177935e1ba9152c562e0",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "0951663ec3d3ddbcefcd2c61f94090b5d0b9ae7bc7d901d2dacc7e0fc7cf5044",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "0951663ec3d3ddbcefcd2c61f94090b5d0b9ae7bc7d901d2dacc7e0fc7cf5044",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "f6bde93c3d5907b84991b88500def95e1abba60c9e7b33c4b7dfb52c45d6b6a1",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "f6bde93c3d5907b84991b88500def95e1abba60c9e7b33c4b7dfb52c45d6b6a1",
+            "patchedFilesVerified": 25
+          }
+        ]
+      }
+    ],
+    "cache": "Task-temporary consumers/cache/lock copies removed after PR; compact tuple/lock/patch provenance retained."
+  },
+  "audit": {
+    "workers": "Implementation, documentation and independent review delegated to GPT-6.1 Sol medium.",
+    "review": "Final read-only signoff has no outstanding substantive finding after all corrections; independently verified31 original +29 publication implementation hashes,16 final log hashes,72 focused mocked tests per tree and direct getter checks.",
+    "coordinator": "Inspected actual app pending-intent guards, native overlay/measurement ownership, retained getter implementation and tests, selected export deltas, valid red/green output, final logged counts, fixed archive bytes, unchanged peers/config/candidate and packed outcomes.",
+    "documentation": "All69 historical coverage IDs/order/checkmarks/first-three cells preserved; current source, future target and historical acceptance remain separate."
+  },
+  "openGates": [
+    "Two inherited publication wrapper callback import fixture failures remain outside U14.",
+    "Actual browser wrapper context/fullscreen/camera, native touch/viewport/ornament overlap, Metro and native linking/build/install acceptance remain unverified; separate scoped permission required.",
+    "U15 begins after the reviewed U14 PR. U20 substantial image ownership decisions, U23 patch/peer followups and U24 acceptance gate remain; later units not claimed complete."
+  ],
+  "cleanup": "Retain compact checkpoint provenance and task recovery patches/manifests; remove temporary publication overlays, static bundles, probes, consumers/cache/locks, archives and raw logs after PR. Preserve original head/candidate."
+}

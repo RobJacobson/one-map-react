@@ -1,0 +1,121 @@
+{
+  "checks": [
+    {
+      "scenario": "common",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "mapbox-web",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "maplibre-web",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "mapbox-native",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "maplibre-native",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "aliases-default",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "aliases-browser",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "aliases-react-native",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "aliases-browser-react-native",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "mixed-0-mapbox-web",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "mixed-0-maplibre-native",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "mixed-1-maplibre-web",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    },
+    {
+      "scenario": "mixed-1-mapbox-native",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "react": "19.2.3",
+      "reactTypes": "19.2.18",
+      "lockfileSha256": null,
+      "status": "passed",
+      "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+    }
+  ]
+}

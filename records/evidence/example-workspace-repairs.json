@@ -1,0 +1,1819 @@
+{
+  "checkpoint": "Example workspace codegen, startup and text repairs",
+  "status": "Complete: confirmed codegen, startup-deadline and text issues fixed; regressions, routine, packed consumers, native builds and affected eight-combination minimal acceptance passed.",
+  "authorization": "User explicitly authorized the required dependency patch, regression tests and affected acceptance/retries via GPT6Luna; no approval questions. This overrides the earlier patch stop for this repair.",
+  "historicalEvidence": [
+    "records/evidence/example-workspace-acceptance.json",
+    "records/evidence/example-workspace-native.json"
+  ],
+  "libraryArtifact": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-0.1.0-rc.9.tgz",
+    "sha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+    "bytes": 176809,
+    "mode": "0444",
+    "files": 209
+  },
+  "sourceFiles": {
+    "apps/expo/src/app.tsx": "f513a086653ef6a9196fabefa25f836f183c071001fb856457b2492f01108460",
+    "apps/expo/src/engines.ts": "56f3b7831fa239b6fc9ab28b47e2d93a33c2c5905bad8699d7fa0a7290a5214f",
+    "apps/expo/src/css.d.ts": "35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa",
+    "apps/expo/src/engines.web.ts": "993e129c9b6322fd758f8065d9d248b30470c16ee5eaac7611b4fb65bb123eda",
+    "apps/web/src/app.tsx": "74b1cddf00603052c114eac84d6f87a248aeffc30d468d21dd06f7011c5c0819",
+    "apps/web/src/main.tsx": "1220c183806902641b58e34996bf9eb98fd4f88eedef053688b03ea566b22ce2",
+    "apps/web/src/style.css": "f3ae9faf821694ad5c9a122b5a511764c9aa0ae3c27323a5fb59b7a34e0f970a",
+    "packages/example-map/src/use-example-map.ts": "0bb3cbf78c98fda4852953eb377a90dc2b9f65d42ab3516675e670f70def1c89",
+    "packages/example-map/src/example-map.tsx": "422cc9d5d19a03a8eae3069afee8fc1b23acb3a5452584d9364cb11ff5214c5d",
+    "packages/example-map/src/camera.ts": "108cac7f79a2bf32cef92307a9ae3173fd01d9bc98e90f5f9d39af5e5fe1b483",
+    "packages/example-map/src/public-token.ts": "e4539fc4149e33340ad57101438a076cc23eab6b795a00cd3c348a543098a1c2",
+    "packages/example-map/src/engines.native.ts": "e6e8cc734ab1b43d8e929a417a2825967e68d8d2ec277bb8d4a717048b507942",
+    "packages/example-map/src/engines.web.ts": "2914bd5c7be4c55e3e2a3ade3114ef51689be647114b974aa147e7638e651850",
+    "packages/example-map/src/index.ts": "3f588fc5d60c31c8b318fa7fb1e995151d81959b2b182dbc4c8124966a48601a",
+    "packages/example-map/test/camera.test.ts": "da19471acd0dad003b779005a435afd47d9af46ef0c764ea7bb69bd336a05b1a",
+    "packages/example-map/test/use-example-map.web.test.tsx": "6d712bf4db8a8bc697b6ff64b4461002a9c83f4b8a152861647540d8f4a783a0",
+    "apps/expo/app.config.ts": "96d5d6512f02c9f1f746561e32bd178f2da2485293edfc604d19c276a749380a",
+    "bun.lock": "1a332d414da140395997a5fd93cb7dfa43cd65bd667508e4faa51dc24e02ee65",
+    "package.json": "a0bbf1f1be7306998d594259d586f85bf9300130ea6243c1a0017bf391dae896",
+    "packages/one-map-react/patches/rnmapbox-10.3.8.patch": "0820fdda4708a0b7ecc0818b7a56b2a8e7c43de6195320cabdec56c17db30249",
+    "scripts/example-native-codegen.test.mjs": "75ca59b3e8100994cca1d82a409e2a941bbde3b2a7847e59a8af62ab27148f23",
+    "scripts/example-workspace-web-smoke.mjs": "9f52af986585bdc5df78f84478cc058667ff39ac62c8e6e59f4f9a7b3d765506",
+    "scripts/example-workspace-observations.mjs": "afc204bcbad36c3d9e9b4b4a9eb6d45eb91dc6ed2583088ecf500653e02dfd2a",
+    "scripts/example-workspace-observations.test.mjs": "751c636aa2b23f1d6204e0286c937c1c95f4168a26fd68d505d98e8a2d081e55",
+    "scripts/tf08-patches.test.mjs": "cb31936f99371e8b0b45606734a20c973e0e790b2c81ca0a4bea17894daf6cf7",
+    "scripts/consumer-peer-patches.mjs": "8d2c1a5fef989f3054e623882329299b1209dc4f4b60cf50dbee14ca2f2688a0",
+    "scripts/test-peers.mjs": "32d2243cfac6681e3cf8e93d1cc30c9528a81ffc704aba6961a3d544daa10965"
+  },
+  "fixes": {
+    "native": "Namespace RNMapbox10.3.8 NativeMapViewModule spec as NativeRNMBXMapViewModule; source/compiled JS/declarations, generated-class iOS references and Android base imports updated. Registry/module names and behavior unchanged. Maps metadata follows renamed source. Existing patch repairs preserved.",
+    "startup": "Cold renderer resources get bounded30s loading; onLoad clears that timer before an independent10s camera deadline. Late results after timeout/replacement remain rejected.",
+    "text": "All four universal Expo buttons use label rather than raw custom children on web/iOS/Android."
+  },
+  "regressions": {
+    "beforeFix": "Real pinned native generator reproduced shared NativeMapViewModuleSpec/SpecBase/SpecJSI declarations. Three new controller cases failed on old code (slow initial load, slow switched load, full restore budget after load). Historical actual web text warnings are rejected by new observation guard.",
+    "afterFix": "Native generator classes/protocols disjoint;22 shared example tests pass; guard tests pass; stalled load/restore, retry, stale results, teardown and deadline cleanup retained."
+  },
+  "routine": {
+    "unit": "829 Vitest passed",
+    "nativeMocked": "278 Jest passed",
+    "standalone": "Full aggregate passed including patch round trip and real codegen generator",
+    "types": "Four root TypeScript projects and three app/shared projects passed",
+    "builds": "Library, shared package, Vite and Expo web exports passed",
+    "formatLint": "335 formatted files/309 linted files passed",
+    "packed": "13 isolated publication selections; packed peer consumers passed with RNMapbox10.3.8 patch source/shipped declarations and renames verified",
+    "packedEvidence": [
+      "records/evidence/example-workspace-repair-package.json",
+      "records/evidence/example-workspace-repair-peers.json"
+    ]
+  },
+  "routineFirstAttempts": [
+    {
+      "cause": "Coordinator incorrectly overlapped library build output cleanup with tests importing dist; one test suite could not resolve built package",
+      "resolution": "Build completed before rerun;829 unit tests then passed"
+    },
+    {
+      "cause": "Process self-check hit sandbox EPERM during test-owned group cleanup",
+      "resolution": "Authorized process access used for final full aggregate; passed"
+    }
+  ],
+  "ports": {
+    "native": [
+      8081,
+      9040,
+      8799
+    ],
+    "vite": [
+      5175,
+      6175,
+      9140
+    ],
+    "expoWeb": [
+      8182,
+      6182,
+      9240
+    ]
+  },
+  "testOnlyVariants": {
+    "nativeAppId": "org.onemap.acceptance.workspace",
+    "styleURL": "Only compiled private ExampleMap fixture URL changed to local isolated port; original body, tile/glyph/sprite URLs preserved",
+    "styleSha256": "6010998863b4876911ac9a2d62c9a28d97c8877f6d20cd158b74808572257b60",
+    "slowStyleResponseMs": 12000
+  },
+  "workers": {
+    "native": {
+      "task": "/root/camera_display_native",
+      "model": "gpt-6-luna",
+      "reasoning": "medium"
+    },
+    "vite": {
+      "task": "/root/camera_bounds_web",
+      "model": "gpt-6-luna",
+      "reasoning": "low"
+    },
+    "expoWeb": {
+      "task": "/root/rc6_release_web_newest",
+      "model": "gpt-6-luna",
+      "reasoning": "low"
+    }
+  },
+  "browser": {
+    "vite": {
+      "kind": "vite",
+      "status": "passed",
+      "startedAt": "2026-10-19T20:11:55.709Z",
+      "finishedAt": "2026-10-19T20:12:36.932Z",
+      "root": "/private/tmp/one-map-workspace-acceptance/vite",
+      "ports": {
+        "app": 5175,
+        "debugger": 6175,
+        "fixture": 9140
+      },
+      "fixtureStyleSha256": "6010998863b4876911ac9a2d62c9a28d97c8877f6d20cd158b74808572257b60",
+      "outcomes": [
+        {
+          "name": "token-free MapLibre Seattle startup and disabled Mapbox",
+          "status": "passed",
+          "startedAt": "2026-10-19T20:11:58.435Z",
+          "observation": {
+            "camera": {
+              "longitude": -122.34,
+              "latitude": 47.61,
+              "zoom": 11,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "generation": 0,
+            "image": {
+              "colors": 154,
+              "samples": 26112,
+              "width": 1280,
+              "height": 900,
+              "screenshot": "/private/tmp/one-map-workspace-acceptance/vite-repair-attempt1.json.no-token-maplibre.png",
+              "sha256": "96cfe504414a8dfaa014b515f8003a797d25bbb4943f3a6b513b6965d7a0d4f4"
+            }
+          }
+        },
+        {
+          "name": "both web engines render and retain a changed camera",
+          "status": "passed",
+          "startedAt": "2026-10-19T20:12:24.219Z",
+          "observation": {
+            "pose": {
+              "longitude": -122.39528661196306,
+              "latitude": 47.62249086823658,
+              "zoom": 11,
+              "bearing": 89.18317808078712,
+              "pitch": 60
+            },
+            "maplibre": {
+              "engine": "maplibre",
+              "generation": 2,
+              "camera": {
+                "longitude": -122.39528661196306,
+                "latitude": 47.62249086823658,
+                "zoom": 11,
+                "bearing": 89.18317808078712,
+                "pitch": 60
+              }
+            },
+            "mapbox": {
+              "engine": "mapbox",
+              "generation": 1,
+              "camera": {
+                "longitude": -122.39528661196306,
+                "latitude": 47.62249086823658,
+                "zoom": 11,
+                "bearing": 89.18317808078712,
+                "pitch": 60
+              }
+            },
+            "repeated": [
+              {
+                "engine": "mapbox",
+                "generation": 3,
+                "camera": {
+                  "longitude": -122.39528661196306,
+                  "latitude": 47.62249086823658,
+                  "zoom": 11,
+                  "bearing": 89.18317808078712,
+                  "pitch": 60
+                }
+              },
+              {
+                "engine": "maplibre",
+                "generation": 4,
+                "camera": {
+                  "longitude": -122.39528661196306,
+                  "latitude": 47.62249086823658,
+                  "zoom": 11,
+                  "bearing": 89.18317808078712,
+                  "pitch": 60
+                }
+              },
+              {
+                "engine": "mapbox",
+                "generation": 5,
+                "camera": {
+                  "longitude": -122.39528661196306,
+                  "latitude": 47.62249086823658,
+                  "zoom": 11,
+                  "bearing": 89.18317808078712,
+                  "pitch": 60
+                }
+              },
+              {
+                "engine": "maplibre",
+                "generation": 6,
+                "camera": {
+                  "longitude": -122.39528661196306,
+                  "latitude": 47.62249086823658,
+                  "zoom": 11,
+                  "bearing": 89.18317808078712,
+                  "pitch": 60
+                }
+              }
+            ],
+            "finalCamera": {
+              "longitude": -122.39528661196306,
+              "latitude": 47.62249086823658,
+              "zoom": 11,
+              "bearing": 89.18317808078712,
+              "pitch": 60
+            },
+            "images": {
+              "maplibre": {
+                "colors": 154,
+                "samples": 26112,
+                "width": 1280,
+                "height": 900,
+                "screenshot": "/private/tmp/one-map-workspace-acceptance/vite-repair-attempt1.json.maplibre.png",
+                "sha256": "a4177fbf802093ba53617b79fb5ff78ad790b84254c67deddb544951b303a873"
+              },
+              "mapbox": {
+                "colors": 137,
+                "samples": 26112,
+                "width": 1280,
+                "height": 900,
+                "screenshot": "/private/tmp/one-map-workspace-acceptance/vite-repair-attempt1.json.mapbox.png",
+                "sha256": "571f16eeddbbeee7d9c7d9e21ecd0f7e0ee24d177e3348c68e3b5edc9c6d0e8d"
+              }
+            }
+          }
+        },
+        {
+          "name": "maplibre actual style failure and retry recovery",
+          "status": "passed",
+          "startedAt": "2026-10-19T20:12:34.859Z",
+          "observation": {
+            "camera": {
+              "longitude": -122.34,
+              "latitude": 47.61,
+              "zoom": 11,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "generation": 1,
+            "image": {
+              "colors": 154,
+              "samples": 26112,
+              "width": 1280,
+              "height": 900,
+              "screenshot": "/private/tmp/one-map-workspace-acceptance/vite-repair-attempt1.json.maplibre-recovered.png",
+              "sha256": "6330564d530750e053356798b173e33e225685c6a4a65fe7cab46b39d66095f4"
+            },
+            "message": "The map could not load or restore its camera. Check network access and configuration, then retry.Retry"
+          }
+        },
+        {
+          "name": "mapbox actual style failure and retry recovery",
+          "status": "passed",
+          "startedAt": "2026-10-19T20:12:35.813Z",
+          "observation": {
+            "camera": {
+              "longitude": -122.34,
+              "latitude": 47.61,
+              "zoom": 11,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "generation": 3,
+            "image": {
+              "colors": 157,
+              "samples": 26112,
+              "width": 1280,
+              "height": 900,
+              "screenshot": "/private/tmp/one-map-workspace-acceptance/vite-repair-attempt1.json.mapbox-recovered.png",
+              "sha256": "6f74a2fa5a4db065f756dfe798839d4e66a847a73efabd4cab75f105bd5bf336"
+            },
+            "message": "The map could not load or restore its camera. Check network access and configuration, then retry.Retry"
+          }
+        }
+      ],
+      "requests": [
+        {
+          "status": 200,
+          "delayMs": 12000,
+          "at": "2026-10-19T20:11:58.511Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:24.300Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:27.680Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:28.435Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:28.942Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:29.631Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:30.263Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:30.879Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:34.918Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:35.082Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:35.872Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:36.168Z"
+        }
+      ],
+      "diagnostics": [
+        {
+          "command": [
+            "bun",
+            "run",
+            "dev",
+            "--",
+            "--port",
+            "5175",
+            "--host",
+            "127.0.0.1"
+          ],
+          "cwd": "/private/tmp/one-map-workspace-acceptance/vite/apps/web",
+          "tokenEnabled": false,
+          "log": "/private/tmp/one-map-workspace-acceptance/vite-repair-attempt1.json.no-token.server.log"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "dev",
+            "--",
+            "--port",
+            "5175",
+            "--host",
+            "127.0.0.1"
+          ],
+          "cwd": "/private/tmp/one-map-workspace-acceptance/vite/apps/web",
+          "tokenEnabled": true,
+          "log": "/private/tmp/one-map-workspace-acceptance/vite-repair-attempt1.json.token.server.log"
+        },
+        {
+          "settledGestureCamera": {
+            "longitude": -122.39528661196306,
+            "latitude": 47.62249086823658,
+            "zoom": 11,
+            "bearing": 89.18317808078712,
+            "pitch": 60
+          }
+        }
+      ],
+      "outputSha256": "d56eaf40cc874843320210cd09dcaf103e9e062ea2d51b6a1b9fe6356b775bd4",
+      "consoleSummary": [
+        {
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "count": 3
+        },
+        {
+          "message": "layers[boundary_3].filter[1]: Expected value to be of type number, but found null instead. Falling back to false.",
+          "count": 6
+        },
+        {
+          "message": "layers[highway-shield-non-us].filter[1]: Expected value to be of type number, but found null instead. Falling back to false.",
+          "count": 6
+        },
+        {
+          "message": "layers[highway-shield-us-interstate].filter[1]: Expected value to be of type number, but found null instead. Falling back to false.",
+          "count": 6
+        },
+        {
+          "message": "layers[road_shield_us].filter[1]: Expected value to be of type number, but found null instead. Falling back to false.",
+          "count": 6
+        },
+        {
+          "message": "Failed to evaluate expression \"[\"all\",[\">=\",[\"number\",[\"get\",\"admin_level\"]],3],[\"<=\",[\"number\",[\"get\",\"admin_level\"]],6],[\"!=\",[\"get\",\"maritime\"],1],[\"!=\",[\"get\",\"disputed\"],1],[\"!\",[\"has\",\"claimed_by\"]]]\". The expression [\"get\",\"admin_level\"] evaluated to null but was expected to be of type number.",
+          "count": 7
+        },
+        {
+          "message": "Failed to evaluate expression \"[\"all\",[\"<=\",[\"number\",[\"get\",\"ref_length\"]],6],[\"match\",[\"geometry-type\"],[\"LineString\",\"MultiLineString\"],true,false],[\"match\",[\"get\",\"network\"],[\"us-highway\",\"us-interstate\",\"us-state\"],false,true]]\". The expression [\"get\",\"ref_length\"] evaluated to null but was expected to be of type number.",
+          "count": 8
+        },
+        {
+          "message": "Failed to evaluate expression \"[\"all\",[\"<=\",[\"number\",[\"get\",\"ref_length\"]],6],[\"match\",[\"geometry-type\"],[\"LineString\",\"MultiLineString\"],true,false],[\"match\",[\"get\",\"network\"],\"us-interstate\",true,false]]\". The expression [\"get\",\"ref_length\"] evaluated to null but was expected to be of type number.",
+          "count": 8
+        },
+        {
+          "message": "Failed to evaluate expression \"[\"all\",[\"<=\",[\"number\",[\"get\",\"ref_length\"]],6],[\"match\",[\"geometry-type\"],[\"LineString\",\"MultiLineString\"],true,false],[\"match\",[\"get\",\"network\"],[\"us-highway\",\"us-state\"],true,false]]\". The expression [\"get\",\"ref_length\"] evaluated to null but was expected to be of type number.",
+          "count": 8
+        },
+        {
+          "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+          "count": 2
+        }
+      ],
+      "coordinatorReview": "Actual Seattle map roads, labels and water visible; final Expo buttons show expected native-style labels without invalid raw text."
+    },
+    "expo-web": {
+      "kind": "expo-web",
+      "status": "passed",
+      "startedAt": "2026-10-19T20:12:01.564Z",
+      "finishedAt": "2026-10-19T20:12:39.396Z",
+      "root": "/private/tmp/one-map-workspace-acceptance/expo-web",
+      "ports": {
+        "app": 8182,
+        "debugger": 6182,
+        "fixture": 9240
+      },
+      "fixtureStyleSha256": "6010998863b4876911ac9a2d62c9a28d97c8877f6d20cd158b74808572257b60",
+      "outcomes": [
+        {
+          "name": "token-free MapLibre Seattle startup and disabled Mapbox",
+          "status": "passed",
+          "startedAt": "2026-10-19T20:12:04.009Z",
+          "observation": {
+            "camera": {
+              "longitude": -122.34,
+              "latitude": 47.61,
+              "zoom": 11,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "generation": 0,
+            "image": {
+              "colors": 154,
+              "samples": 26112,
+              "width": 1280,
+              "height": 900,
+              "screenshot": "/private/tmp/one-map-workspace-acceptance/expo-web-repair-attempt1.json.no-token-maplibre.png",
+              "sha256": "3b7a754a0f33f44c6673b5d8e8e9ab6634cc951a89e0b7e4def293351a75706b"
+            }
+          }
+        },
+        {
+          "name": "both web engines render and retain a changed camera",
+          "status": "passed",
+          "startedAt": "2026-10-19T20:12:26.097Z",
+          "observation": {
+            "pose": {
+              "longitude": -122.3953878314071,
+              "latitude": 47.62251542857078,
+              "zoom": 11,
+              "bearing": 89.97895350789052,
+              "pitch": 60
+            },
+            "maplibre": {
+              "engine": "maplibre",
+              "generation": 2,
+              "camera": {
+                "longitude": -122.3953878314071,
+                "latitude": 47.62251542857078,
+                "zoom": 11,
+                "bearing": 89.97895350789052,
+                "pitch": 60
+              }
+            },
+            "mapbox": {
+              "engine": "mapbox",
+              "generation": 1,
+              "camera": {
+                "longitude": -122.3953878314071,
+                "latitude": 47.62251542857078,
+                "zoom": 11,
+                "bearing": 89.97895350789054,
+                "pitch": 60
+              }
+            },
+            "repeated": [
+              {
+                "engine": "mapbox",
+                "generation": 3,
+                "camera": {
+                  "longitude": -122.3953878314071,
+                  "latitude": 47.62251542857078,
+                  "zoom": 11,
+                  "bearing": 89.97895350789054,
+                  "pitch": 60
+                }
+              },
+              {
+                "engine": "maplibre",
+                "generation": 4,
+                "camera": {
+                  "longitude": -122.3953878314071,
+                  "latitude": 47.62251542857078,
+                  "zoom": 11,
+                  "bearing": 89.97895350789052,
+                  "pitch": 60
+                }
+              },
+              {
+                "engine": "mapbox",
+                "generation": 5,
+                "camera": {
+                  "longitude": -122.3953878314071,
+                  "latitude": 47.62251542857078,
+                  "zoom": 11,
+                  "bearing": 89.97895350789054,
+                  "pitch": 60
+                }
+              },
+              {
+                "engine": "maplibre",
+                "generation": 6,
+                "camera": {
+                  "longitude": -122.3953878314071,
+                  "latitude": 47.62251542857078,
+                  "zoom": 11,
+                  "bearing": 89.97895350789052,
+                  "pitch": 60
+                }
+              }
+            ],
+            "finalCamera": {
+              "longitude": -122.3953878314071,
+              "latitude": 47.62251542857078,
+              "zoom": 11,
+              "bearing": 89.97895350789052,
+              "pitch": 60
+            },
+            "images": {
+              "maplibre": {
+                "colors": 154,
+                "samples": 26112,
+                "width": 1280,
+                "height": 900,
+                "screenshot": "/private/tmp/one-map-workspace-acceptance/expo-web-repair-attempt1.json.maplibre.png",
+                "sha256": "5816378e0b344d195fbc8f6f9cf48d963122e5c0b615644cf7ea6cb4456ceec1"
+              },
+              "mapbox": {
+                "colors": 137,
+                "samples": 26112,
+                "width": 1280,
+                "height": 900,
+                "screenshot": "/private/tmp/one-map-workspace-acceptance/expo-web-repair-attempt1.json.mapbox.png",
+                "sha256": "72901bdfda135677df9eef86e4852c12ea53191209f787c236b74e498434927b"
+              }
+            }
+          }
+        },
+        {
+          "name": "maplibre actual style failure and retry recovery",
+          "status": "passed",
+          "startedAt": "2026-10-19T20:12:36.762Z",
+          "observation": {
+            "camera": {
+              "longitude": -122.34,
+              "latitude": 47.61,
+              "zoom": 11,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "generation": 1,
+            "image": {
+              "colors": 154,
+              "samples": 26112,
+              "width": 1280,
+              "height": 900,
+              "screenshot": "/private/tmp/one-map-workspace-acceptance/expo-web-repair-attempt1.json.maplibre-recovered.png",
+              "sha256": "c0e0d7ec5e785368f7661e501621d71e0a485580307b46397ca65534880b72ad"
+            },
+            "message": "The map could not load or restore its camera. Check network access and configuration, then retry."
+          }
+        },
+        {
+          "name": "mapbox actual style failure and retry recovery",
+          "status": "passed",
+          "startedAt": "2026-10-19T20:12:37.772Z",
+          "observation": {
+            "camera": {
+              "longitude": -122.34,
+              "latitude": 47.61,
+              "zoom": 11,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "generation": 3,
+            "image": {
+              "colors": 157,
+              "samples": 26112,
+              "width": 1280,
+              "height": 900,
+              "screenshot": "/private/tmp/one-map-workspace-acceptance/expo-web-repair-attempt1.json.mapbox-recovered.png",
+              "sha256": "c859f2402ed2172d439e5b39708483bbe50bb6a4c997582b694f981025870ef1"
+            },
+            "message": "The map could not load or restore its camera. Check network access and configuration, then retry."
+          }
+        }
+      ],
+      "requests": [
+        {
+          "status": 200,
+          "delayMs": 12000,
+          "at": "2026-10-19T20:12:04.367Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:26.153Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:28.821Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:30.787Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:31.382Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:32.075Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:32.586Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:33.135Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:36.828Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:37.080Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:37.842Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:12:37.943Z"
+        }
+      ],
+      "diagnostics": [
+        {
+          "command": [
+            "node",
+            "/private/tmp/one-map-workspace-acceptance/expo-web/apps/expo/node_modules/expo/bin/cli",
+            "start",
+            "--web",
+            "--localhost",
+            "--port",
+            "8182"
+          ],
+          "cwd": "/private/tmp/one-map-workspace-acceptance/expo-web/apps/expo",
+          "tokenEnabled": false,
+          "log": "/private/tmp/one-map-workspace-acceptance/expo-web-repair-attempt1.json.no-token.server.log"
+        },
+        {
+          "command": [
+            "node",
+            "/private/tmp/one-map-workspace-acceptance/expo-web/apps/expo/node_modules/expo/bin/cli",
+            "start",
+            "--web",
+            "--localhost",
+            "--port",
+            "8182"
+          ],
+          "cwd": "/private/tmp/one-map-workspace-acceptance/expo-web/apps/expo",
+          "tokenEnabled": true,
+          "log": "/private/tmp/one-map-workspace-acceptance/expo-web-repair-attempt1.json.token.server.log"
+        },
+        {
+          "settledGestureCamera": {
+            "longitude": -122.3953878314071,
+            "latitude": 47.62251542857078,
+            "zoom": 11,
+            "bearing": 89.97895350789052,
+            "pitch": 60
+          }
+        }
+      ],
+      "outputSha256": "aecd1bd2b1395e138e3b2c137f23cc4f917303f31bd56af4feccf3767b31c619",
+      "consoleSummary": [
+        {
+          "message": "layers[highway-shield-non-us].filter[1]: Expected value to be of type number, but found null instead. Falling back to false.",
+          "count": 6
+        },
+        {
+          "message": "layers[highway-shield-us-interstate].filter[1]: Expected value to be of type number, but found null instead. Falling back to false.",
+          "count": 6
+        },
+        {
+          "message": "layers[road_shield_us].filter[1]: Expected value to be of type number, but found null instead. Falling back to false.",
+          "count": 6
+        },
+        {
+          "message": "layers[boundary_3].filter[1]: Expected value to be of type number, but found null instead. Falling back to false.",
+          "count": 6
+        },
+        {
+          "message": "Failed to evaluate expression \"[\"all\",[\"<=\",[\"number\",[\"get\",\"ref_length\"]],6],[\"match\",[\"geometry-type\"],[\"LineString\",\"MultiLineString\"],true,false],[\"match\",[\"get\",\"network\"],[\"us-highway\",\"us-interstate\",\"us-state\"],false,true]]\". The expression [\"get\",\"ref_length\"] evaluated to null but was expected to be of type number.",
+          "count": 8
+        },
+        {
+          "message": "Failed to evaluate expression \"[\"all\",[\"<=\",[\"number\",[\"get\",\"ref_length\"]],6],[\"match\",[\"geometry-type\"],[\"LineString\",\"MultiLineString\"],true,false],[\"match\",[\"get\",\"network\"],\"us-interstate\",true,false]]\". The expression [\"get\",\"ref_length\"] evaluated to null but was expected to be of type number.",
+          "count": 8
+        },
+        {
+          "message": "Failed to evaluate expression \"[\"all\",[\"<=\",[\"number\",[\"get\",\"ref_length\"]],6],[\"match\",[\"geometry-type\"],[\"LineString\",\"MultiLineString\"],true,false],[\"match\",[\"get\",\"network\"],[\"us-highway\",\"us-state\"],true,false]]\". The expression [\"get\",\"ref_length\"] evaluated to null but was expected to be of type number.",
+          "count": 8
+        },
+        {
+          "message": "Failed to evaluate expression \"[\"all\",[\">=\",[\"number\",[\"get\",\"admin_level\"]],3],[\"<=\",[\"number\",[\"get\",\"admin_level\"]],6],[\"!=\",[\"get\",\"maritime\"],1],[\"!=\",[\"get\",\"disputed\"],1],[\"!\",[\"has\",\"claimed_by\"]]]\". The expression [\"get\",\"admin_level\"] evaluated to null but was expected to be of type number.",
+          "count": 7
+        },
+        {
+          "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+          "count": 2
+        }
+      ],
+      "coordinatorReview": "Actual Seattle map roads, labels and water visible; final Expo buttons show expected native-style labels without invalid raw text."
+    }
+  },
+  "limits": [
+    "Original intermittent Expo startup receipt had no underlying error captured; confirmed deadline and text defects fixed, controlled slow-start acceptance passed; exact original trigger cannot be retrospectively proven.",
+    "Full legacy scenario migration and physical-device/full-screen-reader audits are outside this repair scope.",
+    "Native coexistence coverage uses Expo57.0.23/RN0.86.3, RNMapbox10.3.8 and MapLibreReactNative11.5.0. The namespace repair is exact-version10.3.8; no additional dual-engine peer combinations or published ReactNative range changes are claimed.",
+    "Android MapLibre13.6.1 retains its upstream10s OkHttp read timeout. A deliberately12s style request fails at that transport boundary and requiresRetry; browser/iOS controlled12s loading passed."
+  ],
+  "archiveImpactReview": {
+    "comparedWithRc8": "Only manifest version and RNMapbox10.3.8 shipped patch changed; library dist/declarations byte-identical. Private app/shared source fixes are captured separately.",
+    "changedPackagedFiles": [
+      "package/package.json",
+      "package/patches/rnmapbox-10.3.8.patch"
+    ]
+  },
+  "coordinatorBinaryReview": {
+    "ios": "Actual linked debug dylib contains disjoint NativeMapViewModuleSpecBase/SpecJSI and NativeRNMBXMapViewModuleSpecBase/SpecJSI classes, together. Verified expected Info.plist ID.",
+    "android": "APK SHA42fd6107d08a730f3a5445eeefc9288612afc246eb522a6d1e0f01ef1a027c0f independently checked; arm64 libmaplibre/libmapbox-maps/libmapbox-common present, both generated classes present in DEX."
+  },
+  "nativeEvidence": "records/evidence/example-workspace-repair-native.json",
+  "nativePreflight": {
+    "installedIdentity": "All15 installed iOS Mach-O hashes match the reviewed build. Correct task bundle ID and foreground process verified.",
+    "transport": "Metro IPv4 127.0.0.1:8081 HTTP200 and healthy iOS Hermes manifest; fixture9040 and input8799 verified. TapDriver started before target launch.",
+    "setupFailure": "XCTest default UI interruption handler cancelled the system Open confirmation before the initial coordinate tap. Driver log proves Cancel was selected, so URL never reached app; not an application failure.",
+    "setupCorrection": "Guarded button com.apple.springboard Open action addresses actual system Open button. Current app launched unchanged.",
+    "readyObservation": {
+      "status": "ready",
+      "generation": 0,
+      "camera": {
+        "longitude": -122.34000000000245,
+        "latitude": 47.61000000000236,
+        "zoom": 11,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "mapboxDisabled": true,
+      "styleResponse": {
+        "status": 200,
+        "delayMs": 12000
+      }
+    },
+    "coordinatorVisualReview": "Actual Seattle roads, labels, water and MapLibre logo visible in iOS native image; expected public camera readback and correct labels.",
+    "androidSlowStyleFailure": {
+      "result": "Unexpected preflight error retained; artificial12s response exceeds SDK network timeout, before scenario commands.",
+      "evidence": "Metro MapLibre Native loading style failed: timeout; actual fixture requests12s then zero-delayretry10.8s later. Actual MapLibre13.6.1 AAR HttpRequestImpl.getOrCreateDefaultClient bytecode uses OkHttpClient.Builder dispatcher/build without timeouts; resolvedOkHttp4.12.0 Builder.readTimeout defaults10000ms.",
+      "classification": "SDK transport budget; no production change warranted. Android normal startup and physicalRetry recovery are required. Browser/iOS12s and unit15s cover shared loading budget independently.",
+      "sdkAarSha256": "0a8ea4f5bfd268e050c72025d0f2952b60861863eba6caf84e19b8da583f3a42",
+      "bytecodeExcerpt": [
+        "HttpRequestImpl.getOrCreateDefaultClient: new OkHttpClient$Builder; dispatcher(getDispatcher()); build()",
+        "OkHttpClient$Builder constructor: sipush10000; putfield readTimeout:I"
+      ],
+      "recovery": "Physically tapped measured Retry after restoring normalfixture; ready generation1 atSeattle. Coordinator image review confirms actual roads, water and labels; exact installed APK unchanged."
+    },
+    "androidButtonCalibration": "Actual Compose parent engine-mapbox is enabled=false; child text node enabled=true. Temporary helper initially inspected text descendant. Corrected lookup and engineinputguard use actual parent resource-id and bounds; self-check reproduces disabledparent/enabledchild distinction. No application change.",
+    "androidCachedStyle503": {
+      "firstAttempt": "Original recovery helper timed out demanding error while ready atgeneration8. ActualMapLibre image still renders the retained style; fixture received repeated503 responses, no fatal maperror inMetro.",
+      "diagnosis": "Cached valid style makes503 revalidation nonfatal; candidate is not demonstrated faulty. Test assertion required uncached fatal load.",
+      "correction": "Clear only isolated testpackage data, keep exact reviewedAPK/tokenMetro and bothADB reverses, then exercise freshMapLibre503/Retry and firstMapbox503/Retry. Candidate unchanged.",
+      "finalResult": "ColdMapLibre and Mapbox503+physicalRetry passed atgenerations0\u21921 and2\u21923, on the same exactreviewedAPK. Cache-preserving case remains separately recorded as ready while503 retries."
+    }
+  },
+  "temporaryHarness": {
+    "native-fixtures.mjs": "3ad7f72c0fca9fdc0993d6a464a2b13b34006dba4aabb9f9e67c6b2e3f0a4fea",
+    "native-ui.mjs": "333c550d37072b9301d425c1cac9bfcb58a44f2da91cd0a1e1d791b3a6b9f81a",
+    "start-native-metro.mjs": "18054dcf06b9693c34ab48e116053191dc275e48ec0b5cc78134162974d12da6"
+  },
+  "nativeRuntime": {
+    "ios": {
+      "token-free": {
+        "status": "passed",
+        "platform": "ios",
+        "scenario": "token-free",
+        "outcomes": [
+          {
+            "name": "Delayed token-free Seattle startup and disabled Mapbox",
+            "readback": {
+              "status": "ready",
+              "camera": {
+                "longitude": -122.34000000000245,
+                "latitude": 47.61000000000236,
+                "zoom": 11,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 0
+            },
+            "image": {
+              "path": "/private/tmp/one-map-workspace-acceptance/ios-token-free-maplibre.png",
+              "colors": 158,
+              "samples": 22650,
+              "width": 750,
+              "height": 1334,
+              "sha256": "a53cf02ea82008c2471c138418f781ef2575909912e8f016639db9422af08d12"
+            }
+          }
+        ]
+      },
+      "switching": {
+        "status": "passed",
+        "platform": "ios",
+        "scenario": "switching",
+        "outcomes": [
+          {
+            "name": "Same binary, both engines, real changed camera retained through six switches",
+            "pose": {
+              "longitude": -122.37238245049113,
+              "latitude": 47.57101825842391,
+              "zoom": 12,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "reads": [
+              {
+                "engine": "mapbox",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3723825,
+                  "latitude": 47.57101829999999,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 1,
+                "image": {
+                  "path": "/private/tmp/one-map-workspace-acceptance/ios-switching-mapbox.png",
+                  "colors": 82,
+                  "samples": 22650,
+                  "width": 750,
+                  "height": 1334,
+                  "sha256": "77d878f47122ce47e562fccd75952ca74f91e83234e81ccccf62cbcf4e58aa86"
+                }
+              },
+              {
+                "engine": "maplibre",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.37238250000365,
+                  "latitude": 47.57101830000383,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 2,
+                "image": {
+                  "path": "/private/tmp/one-map-workspace-acceptance/ios-switching-maplibre.png",
+                  "colors": 88,
+                  "samples": 22650,
+                  "width": 750,
+                  "height": 1334,
+                  "sha256": "187d5e654eed11c169db70a21e2bb71fefab13f42fb5f72bf84ecb3e624bb629"
+                }
+              },
+              {
+                "engine": "mapbox",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3723825,
+                  "latitude": 47.57101829999999,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 3
+              },
+              {
+                "engine": "maplibre",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.37238250000365,
+                  "latitude": 47.57101830000383,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 4
+              },
+              {
+                "engine": "mapbox",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3723825,
+                  "latitude": 47.57101829999999,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 5
+              },
+              {
+                "engine": "maplibre",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.37238250000365,
+                  "latitude": 47.57101830000383,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 6
+              }
+            ]
+          }
+        ]
+      },
+      "recovery": {
+        "status": "passed",
+        "platform": "ios",
+        "scenario": "recovery",
+        "outcomes": [
+          {
+            "name": "maplibre actual style503 and retry recovery",
+            "failed": {
+              "status": "error",
+              "camera": {
+                "longitude": -122.3723825,
+                "latitude": 47.57101829999999,
+                "zoom": 12,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 8
+            },
+            "recovered": {
+              "status": "ready",
+              "camera": {
+                "longitude": -122.37238250000365,
+                "latitude": 47.57101830000383,
+                "zoom": 12,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 9
+            },
+            "image": {
+              "path": "/private/tmp/one-map-workspace-acceptance/ios-recovery-maplibre.png",
+              "colors": 88,
+              "samples": 22650,
+              "width": 750,
+              "height": 1334,
+              "sha256": "cfd8e2ab1dfd3c8812734358e7d719608e7449c6c4e71429c7688883362b0b8c"
+            }
+          },
+          {
+            "name": "mapbox actual style503 and retry recovery",
+            "failed": {
+              "status": "error",
+              "camera": {
+                "longitude": -122.37238250000365,
+                "latitude": 47.57101830000383,
+                "zoom": 12,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 10
+            },
+            "recovered": {
+              "status": "ready",
+              "camera": {
+                "longitude": -122.3723825,
+                "latitude": 47.57101829999999,
+                "zoom": 12,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 11
+            },
+            "image": {
+              "path": "/private/tmp/one-map-workspace-acceptance/ios-recovery-mapbox.png",
+              "colors": 82,
+              "samples": 22650,
+              "width": 750,
+              "height": 1334,
+              "sha256": "27318ddd1c09cf0e26c50a9fc0f24c51c78ae1137df1c2481c3ea639b07bbe52"
+            }
+          }
+        ]
+      },
+      "coordinatorReview": "Reviewed actual readback/generation receipts and recovered images for both SDKs: Seattle initial pose, changed center/zoom through six replacements, actual503 errors then ready with preserved camera; roads/labels/water and engine branding visible. Native run retains zero bearing/pitch; browser run exercised nonzero orientation."
+    },
+    "android": {
+      "token-free": {
+        "status": "passed",
+        "platform": "android",
+        "scenario": "token-free",
+        "outcomes": [
+          {
+            "name": "Token-free Seattle startup and disabled Mapbox",
+            "readback": {
+              "status": "ready",
+              "camera": {
+                "longitude": -122.34000000000002,
+                "latitude": 47.60999999999999,
+                "zoom": 11,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 0
+            },
+            "image": {
+              "path": "/private/tmp/one-map-workspace-acceptance/android-token-free-maplibre.png",
+              "colors": 175,
+              "samples": 58320,
+              "width": 1080,
+              "height": 2400,
+              "sha256": "dea6a61490af11ad13a98fc0ce3ddec55d66d65ee0781d469f1693dd42f24bed"
+            }
+          }
+        ]
+      },
+      "switching": {
+        "status": "passed",
+        "platform": "android",
+        "scenario": "switching",
+        "outcomes": [
+          {
+            "name": "Same binary, both engines, real changed camera retained through six switches",
+            "pose": {
+              "longitude": -122.36698953751926,
+              "latitude": 47.56338725148102,
+              "zoom": 12,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "reads": [
+              {
+                "engine": "mapbox",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3669895,
+                  "latitude": 47.563387299999995,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 1,
+                "image": {
+                  "path": "/private/tmp/one-map-workspace-acceptance/android-switching-mapbox.png",
+                  "colors": 103,
+                  "samples": 58320,
+                  "width": 1080,
+                  "height": 2400,
+                  "sha256": "4f22ba0d1e44c9b235a605c498c3b429f5f79883c2a631784602ee3f5e0386cf"
+                }
+              },
+              {
+                "engine": "maplibre",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3669895,
+                  "latitude": 47.5633873,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 2,
+                "image": {
+                  "path": "/private/tmp/one-map-workspace-acceptance/android-switching-maplibre.png",
+                  "colors": 109,
+                  "samples": 58320,
+                  "width": 1080,
+                  "height": 2400,
+                  "sha256": "09152fb2f4b106f8c4350a9f72f8a3292273d62fea6b21a25d6fc10a2839d760"
+                }
+              },
+              {
+                "engine": "mapbox",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3669895,
+                  "latitude": 47.563387299999995,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 3
+              },
+              {
+                "engine": "maplibre",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3669895,
+                  "latitude": 47.5633873,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 4
+              },
+              {
+                "engine": "mapbox",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3669895,
+                  "latitude": 47.563387299999995,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 5
+              },
+              {
+                "engine": "maplibre",
+                "status": "ready",
+                "camera": {
+                  "longitude": -122.3669895,
+                  "latitude": 47.5633873,
+                  "zoom": 12,
+                  "bearing": 0,
+                  "pitch": 0
+                },
+                "generation": 6
+              }
+            ]
+          }
+        ]
+      },
+      "coldRecovery": {
+        "status": "passed",
+        "platform": "android",
+        "scenario": "cold-recovery",
+        "outcomes": [
+          {
+            "name": "maplibre actual style503 and retry recovery",
+            "failed": {
+              "status": "error",
+              "camera": {
+                "longitude": -122.34,
+                "latitude": 47.61,
+                "zoom": 11,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 0
+            },
+            "recovered": {
+              "status": "ready",
+              "camera": {
+                "longitude": -122.34000000000002,
+                "latitude": 47.60999999999999,
+                "zoom": 11,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 1
+            },
+            "image": {
+              "path": "/private/tmp/one-map-workspace-acceptance/android-cold-recovery-maplibre.png",
+              "colors": 175,
+              "samples": 58320,
+              "width": 1080,
+              "height": 2400,
+              "sha256": "f75a17c0457a313f5674cc884f5c149d6d31d3e79186ba06ec47766f18b1669f"
+            }
+          },
+          {
+            "name": "mapbox actual style503 and retry recovery",
+            "failed": {
+              "status": "error",
+              "camera": {
+                "longitude": -122.34000000000002,
+                "latitude": 47.60999999999999,
+                "zoom": 11,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 2
+            },
+            "recovered": {
+              "status": "ready",
+              "camera": {
+                "longitude": -122.34000000000002,
+                "latitude": 47.60999999999999,
+                "zoom": 11,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "generation": 3
+            },
+            "image": {
+              "path": "/private/tmp/one-map-workspace-acceptance/android-cold-recovery-mapbox.png",
+              "colors": 169,
+              "samples": 58320,
+              "width": 1080,
+              "height": 2400,
+              "sha256": "b94f8825c657f4869c52ed9bef43e836901728fe76f7a122e90022b4b8a1670a"
+            }
+          }
+        ]
+      },
+      "coordinatorReview": "Reviewed actual SDK images and receipts: bothSDKs render changed camera through six replacements; cold storage reset then true503 errors/retry restoreSeattle atgenerations0/1 and2/3. Cold reset changes only testapp storage, not binary. Native bearing/pitch remainzero; browsercases exercisednonzeroorientation.",
+      "uiautomatorQualification": "Two transient null-root messages occurred in guarded passing runs. Serial replacement assertions require new increasing generations and complete matching camera fields; actual SDKimages independently confirm rendering. These messages are retained as test transport diagnostics, not hidden application failures.",
+      "cached503FirstAttempt": {
+        "status": "failed",
+        "platform": "android",
+        "scenario": "recovery",
+        "outcomes": [],
+        "error": "Error: Actual style error timed out: {\"status\":\"ready\",\"camera\":{\"longitude\":-122.3669895,\"latitude\":47.5633873,\"zoom\":12,\"bearing\":0,\"pitch\":0},\"generation\":8}"
+      }
+    },
+    "cached503FixtureSnapshot": {
+      "mode": "fail",
+      "slow": false,
+      "requests": [
+        {
+          "status": 200,
+          "delayMs": 12000,
+          "at": "2026-10-19T20:30:48.690Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:32:45.762Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:02.997Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:05.310Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:07.215Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:08.958Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:10.888Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:12.505Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:22.785Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:24.958Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:25.938Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:28.283Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:29.281Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 12000,
+          "at": "2026-10-19T20:46:32.942Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:46:43.787Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:49:40.966Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:50:21.274Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:52:34.721Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:53:40.777Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:54:06.009Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:54:24.741Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:54:44.443Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:55:01.783Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:55:20.237Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:55:52.060Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:14.671Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:15.840Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:16.889Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:17.944Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:19.972Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:23.994Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:32.041Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:48.097Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:57:20.219Z"
+        }
+      ]
+    },
+    "finalFixtureReceipt": {
+      "mode": "ok",
+      "slow": false,
+      "requests": [
+        {
+          "status": 200,
+          "delayMs": 12000,
+          "at": "2026-10-19T20:30:48.690Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:32:45.762Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:02.997Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:05.310Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:07.215Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:08.958Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:10.888Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:12.505Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:22.785Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:24.958Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:25.938Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:28.283Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:33:29.281Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 12000,
+          "at": "2026-10-19T20:46:32.942Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:46:43.787Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:49:40.966Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:50:21.274Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:52:34.721Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:53:40.777Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:54:06.009Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:54:24.741Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:54:44.443Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:55:01.783Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:55:20.237Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T20:55:52.060Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:14.671Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:15.840Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:16.889Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:17.944Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:19.972Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:23.994Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:32.041Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:56:48.097Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:57:20.219Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:58:34.373Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:58:35.399Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:58:36.462Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:58:37.499Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:58:39.523Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:58:43.555Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:58:51.597Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:59:07.697Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T20:59:39.885Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T21:00:05.490Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T21:00:28.781Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T21:00:29.859Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T21:00:30.993Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T21:00:32.008Z"
+        },
+        {
+          "status": 503,
+          "delayMs": 0,
+          "at": "2026-10-19T21:00:34.021Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T21:00:38.030Z"
+        },
+        {
+          "status": 200,
+          "delayMs": 0,
+          "at": "2026-10-19T21:00:39.318Z"
+        }
+      ]
+    }
+  },
+  "temporaryHarnessArchive": {
+    "path": "records/evidence/example-workspace-repair-native-harness.patch",
+    "sha256": "b3acfd0b97ec254bebfd5afa5bf47db73da5c661a65a0914988ffa107812f438",
+    "purpose": "Exact temporary Metro, fixture and calibrated native UI launcher source; contains no embedded credentials. Self-checks and actual iOS runs passed. Raw build projects and logs will be removed after checkpoint review."
+  },
+  "finalIdentityReview": "Archive SHA/mode and every recorded application, shared package, patch, lock and harness-source identity rechecked unchanged after iOS runtime acceptance.",
+  "recordCreatedAt": "2026-10-19T20:13:55.218581+00:00",
+  "acceptanceStartedAt": "2026-10-19T20:11:55.709Z",
+  "outstandingWithinRequestedScope": [],
+  "finishedAcceptanceAt": "2026-10-19T21:00:52.861743+00:00",
+  "routineLogProvenance": {
+    "types.log": {
+      "sha256": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa",
+      "bytes": 165
+    },
+    "expo-export.log": {
+      "sha256": "4a75dfb46dfe19da44201f3b6e8339a46aaf3bf29ec5a1ad9b9686c77e6da457",
+      "bytes": 938
+    },
+    "routine-tests-final.log": {
+      "sha256": "99d95341bcaf5527ac44f142db8e4f58238bfdc70f4be03e13fc93357cb3c672",
+      "bytes": 12360
+    },
+    "routine-tests-retry.log": {
+      "sha256": "4b493a1f796dcc8881e5aed0e0b489495690a8e550e6f930196c00ebab22882f",
+      "bytes": 7086
+    },
+    "pack.log": {
+      "sha256": "8b5b34b2272ed1f22ad6abf8827f3f3a32027b8c42575bcf1502a28f652665c4",
+      "bytes": 10928
+    },
+    "peers.log": {
+      "sha256": "72c1fbb8a03c72730eecf1c84ae5409f7b3c8a9e89e99bb0894698ba012a57c6",
+      "bytes": 865
+    },
+    "app-types.log": {
+      "sha256": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962",
+      "bytes": 143
+    },
+    "routine-tests.log": {
+      "sha256": "f0a14e90e97e39174a99a2d6bd7b3654761019d1fd94da7a646d38b449cd2a03",
+      "bytes": 4520
+    },
+    "package.log": {
+      "sha256": "9c7385618bf7a090b336dddf4e21fd20d689b7e0e76765b7a1a55b3d4ed7eb1d",
+      "bytes": 472
+    },
+    "build.log": {
+      "sha256": "8c470f36cefaee1f98c50218dcddeca16e5e110c7a12b6b44660a7b497603c87",
+      "bytes": 24698
+    }
+  },
+  "finalDocumentationReview": "README workspace status, workspace narrative, APIcoverage checkbox and currentcandidate pointer reconciled to minimal recorded outcomes; historical failure records preserved. Documentation structure36files/34tables and finalformat/lint335files/309files passed.",
+  "nativeDeviceProcessCleanup": {
+    "status": "completed",
+    "resourcesReleased": true,
+    "verified": {
+      "androidTestPackage": "org.onemap.acceptance.workspace absent from emulator-5554 after uninstall",
+      "adbReverse": "initial list was empty; task-owned tcp:8081 and tcp:9040 mappings and test XML files removed; final reverse list empty",
+      "androidSettings": "emulator-5554 preserved at 1080x2400, density 420, accelerometer_rotation=1, user_rotation=0",
+      "ports": "8081, 9040, and 8799 have no listeners",
+      "ownedProcesses": "task-owned Metro, fixture/input service, and TapDriver stopped; owned PIDs verified absent",
+      "dedicatedSimulator": "1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7 shutdown and deleted",
+      "sharedSimulator": "8B7D7CE4-228E-409F-A156-A597D4E448A5 remains Booted",
+      "androidEmulator": "emulator-5554 and its user data preserved",
+      "tempRoot": "Temporary tree removed after coordinator copied and reviewed outcomes/hashes."
+    },
+    "preserve": [
+      "shared iOS simulator 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "existing Android emulator/user data",
+      "global caches and tools"
+    ],
+    "tempRoot": "Removed by coordinator after compact evidence review."
+  },
+  "nativeEvidenceSha256": "9e9a3a8a44b991904c4e3b60cf08668d87e4d40a359eb56263a19385707d4810",
+  "retention": {
+    "status": "Complete: temporary consumers, dependencies, generated native projects, DerivedData, binaries, browser profiles, logs and screenshots removed. Compact outcomes and provenance plus exact temporary harness source retained. Historical temporary paths identify removed files, not retained attachments.",
+    "temporaryTrees": [
+      "/private/tmp/one-map-workspace-acceptance",
+      "/private/tmp/one-map-workspace-repairs"
+    ],
+    "sizeKiBBeforeRemoval": [
+      "8660056\t/private/tmp/one-map-workspace-acceptance",
+      "884\t/private/tmp/one-map-workspace-repairs"
+    ],
+    "removedAt": "2026-10-19T21:05:10.019789+00:00"
+  },
+  "finalVerification": {
+    "at": "2026-10-19T21:05:42.552521+00:00",
+    "result": "Passed: frozen archive mode/SHA, every recorded source identity, exact archived temporary harness, final native evidence SHA, no embedded credential literals, both temporary trees absent, all9 assigned ports clear, final documentation structure checks."
+  }
+}

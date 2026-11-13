@@ -1,0 +1,332 @@
+{
+  "unit": "U09",
+  "status": "Implemented and audited; applicable routine verification recorded; commit/push/PR authorized by owner workflow.",
+  "authorization": "Owner merged U08 PR27 and released U09 only. No U10, merge, renderer/browser/Metro acceptance, native app build/install or package publication authorized.",
+  "scope": {
+    "removed": "NativeFeatureState reset journals, queues, automatic source/style clears and frame/style reset scheduling; same-ID source remount clearing guarantee and reset-only tests.",
+    "retained": "Explicit state set/get/key removal/whole removal, current source/map lookup, GeoJSON/vector routing, validation, immutable arguments, wrapper result conversion, SDK failures and owner-bound registry cleanup. Cluster/source query registries and capture.frame callbacks remain.",
+    "routing": "RNMapbox state remains map-scoped and accepts style/vector source IDs without requiring a facade GeoJSON registration. Its GeoJSON registry uses current getters for clusters. MapLibre checks the current map and current registered source kind, validates vector sourceLayer and dispatches to the correct current ref.",
+    "lifetime": "Operations dispatch directly before their first wrapper await. No first-party transaction, retry, ordering queue, shadow state or cancellation of already-sent SDK work is promised. Later calls resolve current refs; stale cleanup cannot release replacement registrations. Renderer/wrapper owns state lifetime across source/style changes.",
+    "fixtures": "Query and lifetime scenarios explicitly remove/reapply destination identifiers after source/style generation readiness. Both SDK-retained and naturally-cleared state are tested. Existing query, cluster, error, cancellation and attachment observations remain; no automatic mock clearing masks missing application cleanup."
+  },
+  "finding": {
+    "classification": "Pre-existing result-validation defect found during U09 audit.",
+    "trigger": "featureStateFromWrapper([]) returned an array as FeatureState despite the documented state-object contract.",
+    "fix": "One shared Array.isArray guard rejects top-level arrays on web/native paths; valid object identity, nested arrays, null/undefined normalization and SDK error handling remain. No deeper prototype/schema expansion."
+  },
+  "regressions": {
+    "queueRed": "Two clean before-proof cases fail old queue: SDK set count remains 0 immediately after invocation. Initial harness deferred resolver timing was corrected before clean red run.",
+    "queueGreen": "Direct method and registry checks pass after removal. Final 17 direct-method cases cover current refs, pending operations on same/other source, detached map/source, caller/SDK mutation, captured target/key, SDK failures/malformed results, vector layer validation and map-scoped style state.",
+    "arrayRed": "Five failures before shared guard: three helper array cases and two native malformed-result cases; 54 other focused checks passed.",
+    "arrayGreen": "All 59 focused checks passed after guard, followed by full routine/compiled reruns.",
+    "replacements": "New explicit calls use replacement refs; old cleanup cannot delete replacement registration. Already-dispatched old work may settle according to SDK; tests do not pretend it was canceled.",
+    "firstAttempts": [
+      "Early new method harness deferred resolver was assigned only after queued dispatch and timed out; pending promise moved before dispatch, yielding clean intended red assertions.",
+      "Obsolete automatic-empty/partial-journal expectations were replaced by explicit-clear/no-auto-removal checks, with SDK mutation and error coverage retained.",
+      "Type inference in new source-family test tuple data corrected before final types/formatting checks."
+    ]
+  },
+  "artifacts": {
+    "original": {
+      "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+      "basis": "Approved dirty rc.11 basis; 43 existing paths changed plus new direct-method suite and U09 evidence. Unrelated baseline preserved.",
+      "snapshotPaths": 1029,
+      "snapshotSha256": "351568ba064b1a0c69c2294bec75dad20f8e3efab2eaa7dc1826f4e7b83ff0fd",
+      "trackedRecoveryDeltaSha256": "ecbc87f504f39db18e79d34fd3056ea0f8e4728bc5673a8a39e8d154cc9ba29d",
+      "newMethodTestSha256": "01448616f369cf2a54c32396c455c2bcaad5f22b0da5ed2d1943a9fde7852dfa",
+      "frozenArchiveSha256": "6872696dc81f8e15e34023c981fc520fed218a10c50e2286d41e14554d2798c1",
+      "candidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7"
+    },
+    "main": {
+      "base": "55e9f9268971a731e20e7e3f0658262a90cad182",
+      "branch": "codex/u09-renderer-feature-state-lifetime",
+      "basis": "Minimal U09 hunks on main rc.2, preserving older fixture imports, UI differences and U07 local AppState setup. The main MapLibre tests lack original-only attachment-retry cases; none imported. Three existing examples/shared files receive matching explicit-clear semantics. Temporary per-package overlays keep workspace imports within clone; third-party dependencies reused.",
+      "trackedDeltaSha256": "cd353d6f63ed37cae87b505942f96a623a8d7c77658bf3a602a21518ac6e3c8f",
+      "newMethodTestSha256": "01448616f369cf2a54c32396c455c2bcaad5f22b0da5ed2d1943a9fde7852dfa",
+      "frozenArchiveSha256": "4bd32ea5198c18007d9b5cae55d2769ab524c4abb934bf4b06cd197dbee80164"
+    },
+    "archiveAudit": "Both archives contain 201 members and no removed NativeFeatureState helper. Every shipped src file and README byte-matched its final tree. Candidate archive, peers, native patches, lockfiles and support records remain unchanged.",
+    "patchBoundary": "Original MapLibre patch has an existing Fabric attachment-error repair; main patch does not. Documentation preserves this difference and makes no such main repair claim. No repair was added/removed as part of U09."
+  },
+  "checks": {
+    "original": {
+      "unitWeb": "820 passed / 45 files",
+      "mockedNative": "278 passed / 7 suites",
+      "compiledWeb": "541 passed / 23 files",
+      "compiledNative": "278 passed / 7 suites",
+      "routine": "Formatting/lint, typecheck (four projects), app declarations (three projects), library/example builds, compiler transform/emitted runtime and expanded documentation checks passed.",
+      "static": "TF06 MVT fixture, native selection/smoke-entrypoint checks passed without real renderer execution.",
+      "notRun": "Unchanged native-source-lifetime Kotlin static boundary skipped because cached compiler unavailable; no compiler installation or SDK patch change.",
+      "packedCommon": "13 isolated package selections passed on frozen archive."
+    },
+    "main": {
+      "unitWebFull": "740 passed; two unchanged wrapper-callbacks dynamic marker.ts import failures against installed marker.tsx.",
+      "unitWebBounded": "740 passed / 35 files excluding only known callback fixture.",
+      "baselineEvidence": "Main base tree equals U08 commit ad20043107ab3dbfb62d6136954a0994c738a8e2 (git diff empty); previous records reproduce the same two import failures. Test/dependency paths remain unchanged.",
+      "mockedNative": "271 passed / 6 suites",
+      "compiledWeb": "527 passed / 21 files, excluding known callback import fixture",
+      "compiledNative": "271 passed / 6 suites",
+      "routine": "Formatting/lint, typecheck (four projects), app declarations (three projects), library/example builds, compiler transform/emitted runtime, expanded docs and TF06 MVT fixture passed.",
+      "packedCommon": "13 isolated package selections passed on frozen archive."
+    },
+    "documentationStructure": {
+      "original": "PASS documentation structure: 43 Markdown files, 42 SDK comparison tables, paragraphs, fences and local links.",
+      "main": "PASS documentation structure: 42 Markdown files, 38 SDK comparison tables, paragraphs, fences and local links."
+    }
+  },
+  "selectedPeers": {
+    "scope": "All eight existing cases per artifact: four standalone selected entries and both selected ends of both mixed pairs. Accumulated common/selected boundaries retained; declaration checks, selected web Node imports, peer install and patch verification only. No native linking or renderer.",
+    "derivation": "Existing full test-peers script copied temporarily with only root/helper import paths changed. No filtering or new repository harness.",
+    "hostBoundary": "Native mocks use installed React Native 0.86.3; isolated declarations use React Native 0.87.1. These checks do not establish SDK linking or new support.",
+    "versions": {
+      "tuple-1": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "tuple-2": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "tuple-3": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-4": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-5": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-6": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-7": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "tuple-8": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-9": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-10": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      }
+    },
+    "executions": [
+      {
+        "artifact": "original",
+        "archiveSha256": "6872696dc81f8e15e34023c981fc520fed218a10c50e2286d41e14554d2798c1",
+        "reportSha256": "a7bedb9982d99b74178dd6c1d4731f31811e2b2d5c7fb0d8123800f3fc193046",
+        "runnerSha256": "16abd4e557fd18814a27e59bb6361ed268a6a9f0d77ad3faf3458f0b60e874ea",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "4fd1ee63b6c27a43ca9d2e5f430ca8fc27ba2d0439ac0b0793376c2008dea21a",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "c21818a62b9a71a511ef46d23f4f38d791cb5acee05e2d3a08a2d544dcdc5b46",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-3",
+            "lockSha256": "e5683815db3dccf5b97b651e072b85c85b07e6cffaabfe2f26c5c0379ff048bf",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-4",
+            "lockSha256": "fa286091e6fb13eccfd2cabed64428eedcccc605642f35b0485c7777d502ea01",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "d4dc167942e0fd1c9bbdb4c40255dfe548361fb3ca3d4b38d0e5db52e4855173",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-5",
+            "lockSha256": "d4dc167942e0fd1c9bbdb4c40255dfe548361fb3ca3d4b38d0e5db52e4855173",
+            "patchedFilesVerified": 13
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "2f1b7ba7d9dd47432491ee7fbfc72ea2bc1717cb06afad2e8c1268b9ed5b6d75",
+            "patchedFilesVerified": 31
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-6",
+            "lockSha256": "2f1b7ba7d9dd47432491ee7fbfc72ea2bc1717cb06afad2e8c1268b9ed5b6d75",
+            "patchedFilesVerified": 31
+          }
+        ]
+      },
+      {
+        "artifact": "main",
+        "archiveSha256": "4bd32ea5198c18007d9b5cae55d2769ab524c4abb934bf4b06cd197dbee80164",
+        "reportSha256": "796c15594b7f3a725ae31d85f7057b28e0f240327d95b2f19a2932d79caab278",
+        "runnerSha256": "fb5d299160c7606707a327eeff0c27a10c0957d6525a4476ae5cd779635aa684",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-1",
+            "lockSha256": "c46513580ec8b1ad6fca840b86e71e5bf7a47b480d4d91c6a821221c9c7ed5b6",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-2",
+            "lockSha256": "3859fb9240791d4196695777f2abe02fe38f0f0deb9aae074920def875a8e700",
+            "patchedFilesVerified": 0
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-7",
+            "lockSha256": "2eb7bb39c59d4fafc64d67e633f33951958f63830f17bc1edba0502ff8d93674",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-8",
+            "lockSha256": "31d40adb701154b8c84f01656ed440177cf7cb365a74420356896daf72c98598",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "mapbox-web",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "8697b7537447c3d563d21c1047bb9d362a8e3ad6cfc5e03f21f2e1fa5a378661",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "mapbox-web+maplibre-native",
+            "entry": "maplibre-native",
+            "status": "passed",
+            "versions": "tuple-9",
+            "lockSha256": "8697b7537447c3d563d21c1047bb9d362a8e3ad6cfc5e03f21f2e1fa5a378661",
+            "patchedFilesVerified": 10
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "maplibre-web",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "518af48d31b14e405e8ff8bdc45357329ef2fd5f2da37c8fe94daad4ccc954c2",
+            "patchedFilesVerified": 25
+          },
+          {
+            "scenario": "maplibre-web+mapbox-native",
+            "entry": "mapbox-native",
+            "status": "passed",
+            "versions": "tuple-10",
+            "lockSha256": "518af48d31b14e405e8ff8bdc45357329ef2fd5f2da37c8fe94daad4ccc954c2",
+            "patchedFilesVerified": 25
+          }
+        ]
+      }
+    ]
+  },
+  "audit": {
+    "independent": "GPT-6.1 Sol medium implementation/documentation/review workers. Reviewer inspected exact original and publication source/test/fixture deltas, registry ownership/current lookup, direct operations, array fix, explicit-clearing fixture matrices and manual main adaptation. No actionable findings remain.",
+    "coordinator": "Reproduced array defect, requested shared minimal fix, reviewed argument/SDK/error boundaries, direct dispatch/current refs/cleanup, retained capture frames, source family/namespace behavior, actual routine/compiled/archive checks and baseline isolation.",
+    "documentation": "All 69 coverage row IDs/checkmarks/first-three substantive cells preserved in each tree except approved historical deleted-link pins. Historical reset acceptance remains attached to its original artifacts; current migration and patch differences are explicit.",
+    "limits": "Mock/compiled/declaration checks support only exercised behavior. Actual renderer lifetime, source/style transitions, native bridge timing, Metro/linking and hardware remain unverified; no transaction or cancellation claim added."
+  },
+  "openGates": [
+    "Two pre-existing main callback import fixture failures remain outside U09.",
+    "Renderer feature-state lifetime, native/source/style integration, browser/Metro and native linking acceptance unverified; separate permission required.",
+    "U10 and later units remain undispatched pending explicit owner release. Merge and package publication are not authorized."
+  ],
+  "cleanup": "After PR creation retain compact outcomes/provenance/recovery and remove temporary clone/overlays, generated consumers/lock copies, archives, raw logs and clone-specific test caches. Probes clean installed consumers in finally."
+}

@@ -1,0 +1,2559 @@
+{
+  "unit": "U23-F01",
+  "status": "Implemented and independently audited; routine and frozen-archive checks passed; renderer/native acceptance unverified",
+  "authorization": "Owner approved P1-P8 reconciliation of three publication patch bundles with peers, locks and versions unchanged; reviewed PR then U24; no acceptance execution.",
+  "base": {
+    "originalHead": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+    "publicationHead": "7de2de006f3e7f88318222b42e730488312c0e25",
+    "predecessorPr": 43
+  },
+  "scope": {
+    "publication": "Three combined patches and bounded regression/evidence helpers",
+    "original": "Regression proof inputs and documentation only; original patches unchanged",
+    "unchanged": [
+      "All library/app JS/TSproduction modules",
+      "All package.json/peer ranges/lockfiles/versions/supportmatrix/native pins/appconfig",
+      "All original combinedpatches and both inactivelegacy28linepatches",
+      "Historical U23assessment/evidence"
+    ]
+  },
+  "repairMatrix": {
+    "P1": {
+      "bundles": [
+        "RN10.3.7",
+        "ML11.5"
+      ],
+      "red": [
+        "P1-bounds",
+        "red-additional-P1-ML"
+      ],
+      "green": [
+        "P1-bounds",
+        "P1-upstream-bounds-8"
+      ],
+      "scope": "Actual extracted Swift/Objective-C++ methods plus Android source reset assertions; Kotlin execution skipped without cached compiler; .8 camera source left pristine."
+    },
+    "P2": {
+      "bundles": [
+        "RN10.3.7",
+        "RN10.3.8"
+      ],
+      "red": [
+        "red-lifetime-mapbox",
+        "red-additional-P2-8"
+      ],
+      "green": [
+        "P2-P4-source-lifetime",
+        "P2-source-lifetime-8"
+      ],
+      "scope": "Both set/remove expected-error forwarding and removeFeatureState attached/current-vector-family source boundaries; Kotlin execution skipped."
+    },
+    "P3": {
+      "bundles": [
+        "RN10.3.7",
+        "RN10.3.8"
+      ],
+      "red": [
+        "P3-light",
+        "red-additional-rnmapbox-light-color-8"
+      ],
+      "green": [
+        "P3-light",
+        "P3-light-8"
+      ],
+      "scope": "Actual extracted Swift packed/signed RGBA, alpha and invalid fallback."
+    },
+    "P4": {
+      "bundles": [
+        "ML11.5"
+      ],
+      "red": [
+        "red-lifetime-maplibre"
+      ],
+      "green": [
+        "P2-P4-source-lifetime"
+      ],
+      "scope": "Null view and IllegalViewOperationException settled view_not_attached source boundaries; Kotlin execution skipped."
+    },
+    "P5": {
+      "bundles": [
+        "RN10.3.8"
+      ],
+      "red": [
+        "red-generated-namespace"
+      ],
+      "green": [
+        "green-generated-namespace"
+      ],
+      "scope": "Actual pure Node codegen .86.3 generates three colliding global names before and none after; mandatory renamed source/emitted/types/native protocol/JSI/import/map coherence, runtime module name retained. No native compile/link."
+    },
+    "P6": {
+      "bundles": [
+        "RN10.3.7",
+        "RN10.3.8"
+      ],
+      "red": [
+        "P6-observer",
+        "red-additional-rnmapbox-location-observer-8"
+      ],
+      "green": [
+        "P6-observer",
+        "P6-observer-8"
+      ],
+      "scope": "Actual extracted Swift cached location/heading, updates, remove observer."
+    },
+    "P7": {
+      "bundles": [
+        "RN10.3.7",
+        "RN10.3.8"
+      ],
+      "red": [
+        "P7-offline",
+        "red-additional-rnmapbox-offline-status-8"
+      ],
+      "green": [
+        "P7-offline",
+        "P7-offline-8",
+        "combined7",
+        "combined8"
+      ],
+      "scope": "Actual extracted Swift active/inactive/complete live status before persistence and unknown real errors; Android+Swift source order resolves live status before tileStore."
+    },
+    "P8": {
+      "bundles": [
+        "RN10.3.7",
+        "RN10.3.8"
+      ],
+      "red": [
+        "P8-mode",
+        "red-additional-native-camera-mode-8"
+      ],
+      "green": [
+        "P8-mode",
+        "P8-mode-8"
+      ],
+      "scope": "Actual emitted wrapper-to-extracted-Swift SDK command dispatch: jumpTo/duration0/set aliases, fly, ease. Before jumpTo incorrectly flies; Move alias retained."
+    }
+  },
+  "patchIdentities": [
+    {
+      "name": "rnmapbox-10.3.7-tf08.patch",
+      "sha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1",
+      "lines": 1056,
+      "sections": 31,
+      "hunks": 68,
+      "originalUnchangedSha256": "2951f39a3a1c6190a39f781b9f71cf36946aecb148691a751e4adc1766725b3c"
+    },
+    {
+      "name": "rnmapbox-10.3.8.patch",
+      "sha256": "0b9cdb09c6b39c1b5527678155246e9116a8db71249fd7fd08d9d1fe1288a788",
+      "lines": 1110,
+      "sections": 36,
+      "hunks": 73,
+      "originalUnchangedSha256": "987da5eb58f5d49db078d2387f6a381cb5538a4f785221238fb36c1d7946e59f"
+    },
+    {
+      "name": "maplibre-native-11.5.0-tf08.patch",
+      "sha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0",
+      "lines": 356,
+      "sections": 13,
+      "hunks": 20,
+      "originalUnchangedSha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0"
+    }
+  ],
+  "patchReconciliation": [
+    {
+      "name": "rnmapbox-10.3.7",
+      "patch": "rnmapbox-10.3.7-tf08.patch",
+      "beforeSha256": "118090860852b786a6681287f52ae3af1af8e0657a7c1853936204afb287a6d4",
+      "afterSha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1",
+      "beforeLines": 896,
+      "afterLines": 1056,
+      "beforeSections": 25,
+      "afterSections": 31,
+      "beforeHunks": 56,
+      "afterHunks": 68,
+      "allOldSectionsAccounted": [
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt",
+          "beforeSectionSha256": "d9f892e3b4c6ebd9dbda90d7328a037a23b7e68cd7584de1455d2bc91cea8b6c",
+          "afterSectionSha256": "d9f892e3b4c6ebd9dbda90d7328a037a23b7e68cd7584de1455d2bc91cea8b6c",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -56,6 +56,13 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac",
+            "@@ -76,7 +83,9 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac"
+          ],
+          "newHunks": [
+            "@@ -56,6 +56,13 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac",
+            "@@ -76,7 +83,9 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+          "beforeSectionSha256": "e9b2b54565020cd5de8e843f565bf50d70fc62c820a349da18fa220e4b6a5f87",
+          "afterSectionSha256": "55e52570ef000974108f40e193cbc3ba549d1ad9ae1f698539fbcb62b73c6103",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -1113,7 +1113,7 @@ open class RNMBXMapView(private val mContext: Context, var mManager: RNMBXMapVie"
+          ],
+          "newHunks": [
+            "@@ -24,6 +24,8 @@",
+            "@@ -1113,7 +1115,7 @@",
+            "@@ -1177,6 +1179,13 @@"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt",
+          "beforeSectionSha256": "de4c6f5d5898f5dfc824861fd9a2eaca6ce0a89ce24b2cfdfaeb0d132e0bfb0d",
+          "afterSectionSha256": "de4c6f5d5898f5dfc824861fd9a2eaca6ce0a89ce24b2cfdfaeb0d132e0bfb0d",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -39,6 +39,10 @@ class RNMBXTerrain(context: Context?) : AbstractSourceConsumer(context) {"
+          ],
+          "newHunks": [
+            "@@ -39,6 +39,10 @@ class RNMBXTerrain(context: Context?) : AbstractSourceConsumer(context) {"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt",
+          "beforeSectionSha256": "a3e31894bcf6d845cd61bbfb8b91449367472d92d5a71f04b32698f5baa15de2",
+          "afterSectionSha256": "a3e31894bcf6d845cd61bbfb8b91449367472d92d5a71f04b32698f5baa15de2",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -25,7 +25,7 @@ class RNMBXTerrainManager : ViewGroupManager<RNMBXTerrain>(),"
+          ],
+          "newHunks": [
+            "@@ -25,7 +25,7 @@ class RNMBXTerrainManager : ViewGroupManager<RNMBXTerrain>(),"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt",
+          "beforeSectionSha256": "fa281bde6ac936be0477e220a892d646e04f83727095ef4db2013bb62f06fbbc",
+          "afterSectionSha256": "fa281bde6ac936be0477e220a892d646e04f83727095ef4db2013bb62f06fbbc",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -155,6 +155,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon"
+          ],
+          "newHunks": [
+            "@@ -155,6 +155,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt",
+          "beforeSectionSha256": "9c6ac5730a4efa16e5f0002eaf3bd6c2f51fb6cd0d53505c0597b666915018d8",
+          "afterSectionSha256": "73c0a5fa51e3846623972d92e3b682308b7178d1883e5edf79702305a9e60526",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -46,6 +46,7 @@ enum class TileRegionPackState(val rawValue: String) {",
+            "@@ -105,6 +106,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -180,13 +182,15 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -197,11 +201,25 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -212,11 +230,13 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -245,6 +265,9 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -275,7 +298,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -286,7 +309,14 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -301,7 +331,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -309,6 +339,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -316,6 +347,8 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -399,7 +432,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -467,7 +500,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -561,6 +594,47 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :"
+          ],
+          "newHunks": [
+            "@@ -46,6 +46,7 @@ enum class TileRegionPackState(val rawValue: String) {",
+            "@@ -105,6 +106,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -175,18 +177,27 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -197,11 +208,25 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -212,11 +237,13 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -245,6 +272,9 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -275,7 +305,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -286,7 +316,14 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -301,7 +338,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -309,6 +346,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -316,6 +354,8 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -399,7 +439,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -467,7 +507,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -561,6 +601,47 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt",
+          "beforeSectionSha256": "b3b4f7bd25f334dae33b759d133f8fda3964ec06d903abab552d29fcc26146da",
+          "afterSectionSha256": "b3b4f7bd25f334dae33b759d133f8fda3964ec06d903abab552d29fcc26146da",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -139,7 +139,7 @@ class RNMBXSnapshotModule(private val mContext: ReactApplicationContext) :"
+          ],
+          "newHunks": [
+            "@@ -139,7 +139,7 @@ class RNMBXSnapshotModule(private val mContext: ReactApplicationContext) :"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/Offline/RNMBXOfflineModule.m",
+          "beforeSectionSha256": "c1e15736a1e7a9146479913a799f3b4ce36763fe8ea5bc8c88b7ecc3061b20b9",
+          "afterSectionSha256": "c1e15736a1e7a9146479913a799f3b4ce36763fe8ea5bc8c88b7ecc3061b20b9",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -6,6 +6,10 @@",
+            "@@ -31,4 +35,7 @@ RCT_EXTERN_METHOD(migrateOfflineCache:(RCTPromiseResolveBlock)resolve reject:(RC"
+          ],
+          "newHunks": [
+            "@@ -6,6 +6,10 @@",
+            "@@ -31,4 +35,7 @@ RCT_EXTERN_METHOD(migrateOfflineCache:(RCTPromiseResolveBlock)resolve reject:(RC"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/Offline/RNMBXOfflineModule.swift",
+          "beforeSectionSha256": "bfe878856f49ccef0cb4a82192076098627564389b0e0688ae2fbedf658b7fa3",
+          "afterSectionSha256": "a1483406fd97b12419a5a261e77b1109726ca6adc2aac3b946b09afd5999185a",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -14,6 +14,7 @@ extension Date {",
+            "@@ -98,6 +99,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -208,13 +210,15 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -229,12 +233,26 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -247,6 +265,9 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -275,12 +296,62 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -343,7 +414,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -361,9 +432,16 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -371,6 +449,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -379,6 +458,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -401,7 +481,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -413,6 +493,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -423,31 +504,25 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -516,7 +591,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -605,7 +680,7 @@ class RNMBXOfflineModule: RCTEventEmitter {"
+          ],
+          "newHunks": [
+            "@@ -14,6 +14,7 @@ extension Date {",
+            "@@ -98,6 +99,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -201,6 +203,13 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -208,13 +217,15 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -229,12 +240,26 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -247,6 +272,9 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -275,12 +303,62 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -343,7 +421,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -361,9 +439,16 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -371,6 +456,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -379,6 +465,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -401,7 +488,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -413,6 +500,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -423,31 +511,25 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -516,7 +598,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -605,7 +687,7 @@ class RNMBXOfflineModule: RCTEventEmitter {"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/RNMBXModule.m",
+          "beforeSectionSha256": "782b8c1d6f72a9163bf3ff5bbda5d454029c1895ee959452eb6e7ffc305ea739",
+          "afterSectionSha256": "782b8c1d6f72a9163bf3ff5bbda5d454029c1895ee959452eb6e7ffc305ea739",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -2,6 +2,8 @@"
+          ],
+          "newHunks": [
+            "@@ -2,6 +2,8 @@"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/RNMBXModule.swift",
+          "beforeSectionSha256": "e6cee29a0ce10e6d92538ba533282b5f8884c16e63e2a195412ea29900dd4b64",
+          "afterSectionSha256": "2ab1fc313a0e00caca7c5bbcfced2e2fde8d6b6c5fbbc5cd339a8ccf647a1eb5",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -86,6 +86,13 @@ class RNMBXModule : NSObject {"
+          ],
+          "newHunks": [
+            "@@ -56,7 +56,8 @@ class RNMBXModule : NSObject {",
+            "@@ -86,6 +87,13 @@ class RNMBXModule : NSObject {"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/RNMBXTerrain.swift",
+          "beforeSectionSha256": "dc19d8c6bf861348f68851cd19be941816de74035d5e10a59692b37674a0bbe0",
+          "afterSectionSha256": "dc19d8c6bf861348f68851cd19be941816de74035d5e10a59692b37674a0bbe0",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -17,6 +17,11 @@ public class RNMBXTerrain : RNMBXSingletonLayer, RNMBXMapComponent, RNMBXSourceC"
+          ],
+          "newHunks": [
+            "@@ -17,6 +17,11 @@ public class RNMBXTerrain : RNMBXSingletonLayer, RNMBXMapComponent, RNMBXSourceC"
+          ]
+        },
+        {
+          "path": "lib/module/components/MapView.js",
+          "beforeSectionSha256": "54109fb921a5ed49b39acdf264b97b3e1091abc3c9c204907d4d3de644506e4f",
+          "afterSectionSha256": "54109fb921a5ed49b39acdf264b97b3e1091abc3c9c204907d4d3de644506e4f",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -343,7 +343,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo"
+          ],
+          "newHunks": [
+            "@@ -343,7 +343,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo"
+          ]
+        },
+        {
+          "path": "lib/module/modules/offline/offlineManager.js",
+          "beforeSectionSha256": "83c66ccadb7eed8815af6fad67ef73f7afd7b1dcefb3c57817cd7765c13b646b",
+          "afterSectionSha256": "83c66ccadb7eed8815af6fad67ef73f7afd7b1dcefb3c57817cd7765c13b646b",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -116,22 +116,20 @@ class OfflineManager {",
+            "@@ -157,8 +155,7 @@ class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -116,22 +116,20 @@ class OfflineManager {",
+            "@@ -157,8 +155,7 @@ class OfflineManager {"
+          ]
+        },
+        {
+          "path": "lib/module/modules/offline/offlineManagerLegacy.js",
+          "beforeSectionSha256": "af039ecf2ca4329ec903dafa00340c8c36173e9b03f7d6bb641021f9b1dc550a",
+          "afterSectionSha256": "af039ecf2ca4329ec903dafa00340c8c36173e9b03f7d6bb641021f9b1dc550a",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -121,7 +121,7 @@ class OfflineManagerLegacy {"
+          ],
+          "newHunks": [
+            "@@ -121,7 +121,7 @@ class OfflineManagerLegacy {"
+          ]
+        },
+        {
+          "path": "lib/module/modules/snapshot/SnapshotOptions.js",
+          "beforeSectionSha256": "c8bd23a3d0fecb9f31a9a8c1b29922bea62ee229e6a94aea2fd3f46407d8baf6",
+          "afterSectionSha256": "c8bd23a3d0fecb9f31a9a8c1b29922bea62ee229e6a94aea2fd3f46407d8baf6",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -12,7 +12,7 @@ class SnapshotOptions {"
+          ],
+          "newHunks": [
+            "@@ -12,7 +12,7 @@ class SnapshotOptions {"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/Mapbox.native.d.ts",
+          "beforeSectionSha256": "e71a43ee89137b628d25fccdfe513eb6ccc8d8c1b998b3b86c0f78605fb9a1df",
+          "afterSectionSha256": "e71a43ee89137b628d25fccdfe513eb6ccc8d8c1b998b3b86c0f78605fb9a1df",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -1,4 +1,4 @@"
+          ],
+          "newHunks": [
+            "@@ -1,4 +1,4 @@"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/RNMBXModule.d.ts",
+          "beforeSectionSha256": "e54152baece9990fa93821090765aac75552f135dd55e38289025c644af72f49",
+          "afterSectionSha256": "e54152baece9990fa93821090765aac75552f135dd55e38289025c644af72f49",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -14,19 +14,30 @@ export declare const StyleURL: {"
+          ],
+          "newHunks": [
+            "@@ -14,19 +14,30 @@ export declare const StyleURL: {"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "beforeSectionSha256": "c0624d5a2316e89ec1521c4f5a69bec36ee7f93e99816b6b81017762f5a6b445",
+          "afterSectionSha256": "c0624d5a2316e89ec1521c4f5a69bec36ee7f93e99816b6b81017762f5a6b445",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -547,7 +547,7 @@ declare class MapView extends MapView_base {"
+          ],
+          "newHunks": [
+            "@@ -547,7 +547,7 @@ declare class MapView extends MapView_base {"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/index.native.d.ts",
+          "beforeSectionSha256": "691e0bb7d909e3e079e6a42b83eb0d6faca1e69c591ce864aa63970a8aba4ddf",
+          "afterSectionSha256": "691e0bb7d909e3e079e6a42b83eb0d6faca1e69c591ce864aa63970a8aba4ddf",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -1,4 +1,4 @@"
+          ],
+          "newHunks": [
+            "@@ -1,4 +1,4 @@"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/modules/offline/offlineManager.d.ts",
+          "beforeSectionSha256": "ccb692ceb1fca6e637fd10e751346bd57a9a88f8c5b1a49efe43e49c4f72b15c",
+          "afterSectionSha256": "ccb692ceb1fca6e637fd10e751346bd57a9a88f8c5b1a49efe43e49c4f72b15c",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -107,8 +107,6 @@ declare class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -107,8 +107,6 @@ declare class OfflineManager {"
+          ]
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "beforeSectionSha256": "edbb5f85d231b028728bbac288a62da541f8acf0af121c2b64b21b51cfd65fee",
+          "afterSectionSha256": "edbb5f85d231b028728bbac288a62da541f8acf0af121c2b64b21b51cfd65fee",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -916,12 +916,12 @@ class MapView extends NativeBridgeComponent("
+          ],
+          "newHunks": [
+            "@@ -916,12 +916,12 @@ class MapView extends NativeBridgeComponent("
+          ]
+        },
+        {
+          "path": "src/modules/offline/offlineManager.ts",
+          "beforeSectionSha256": "fe1edb61bc3bc02e6bbecfbecb65c626be93e6953f9f40f6bd1add1a07ea1308",
+          "afterSectionSha256": "fe1edb61bc3bc02e6bbecfbecb65c626be93e6953f9f40f6bd1add1a07ea1308",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -191,22 +191,20 @@ class OfflineManager {",
+            "@@ -232,8 +230,7 @@ class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -191,22 +191,20 @@ class OfflineManager {",
+            "@@ -232,8 +230,7 @@ class OfflineManager {"
+          ]
+        },
+        {
+          "path": "src/modules/offline/offlineManagerLegacy.ts",
+          "beforeSectionSha256": "62ef6782c2577463e0a23c2453290cc13f6cb078a8f9710eedd0e6543e2558ee",
+          "afterSectionSha256": "62ef6782c2577463e0a23c2453290cc13f6cb078a8f9710eedd0e6543e2558ee",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -139,7 +139,7 @@ class OfflineManagerLegacy {"
+          ],
+          "newHunks": [
+            "@@ -139,7 +139,7 @@ class OfflineManagerLegacy {"
+          ]
+        },
+        {
+          "path": "src/modules/snapshot/SnapshotOptions.ts",
+          "beforeSectionSha256": "2c8beab0e7841788611ad2a994b6d7be92d069530896aa14fc76c334237e9e66",
+          "afterSectionSha256": "2c8beab0e7841788611ad2a994b6d7be92d069530896aa14fc76c334237e9e66",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -40,7 +40,7 @@ class SnapshotOptions {"
+          ],
+          "newHunks": [
+            "@@ -40,7 +40,7 @@ class SnapshotOptions {"
+          ]
+        }
+      ],
+      "addedSections": [
+        "ios/RNMBX/RNMBXCustomLocationProvider.swift",
+        "android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt",
+        "ios/RNMBX/RNMBXCamera.swift",
+        "ios/RNMBX/RNMBXCameraComponentView.mm",
+        "android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt",
+        "ios/RNMBX/RNMBXStyleValue.swift"
+      ],
+      "pristineForwardReverseByteEquality": true,
+      "originalIntentOutputByteEquality": true
+    },
+    {
+      "name": "rnmapbox-10.3.8",
+      "patch": "rnmapbox-10.3.8.patch",
+      "beforeSha256": "aacec1a77c297c5a0ba0d756f6833ae0b1364285dd473a030d98128ebb35cbe7",
+      "afterSha256": "0b9cdb09c6b39c1b5527678155246e9116a8db71249fd7fd08d9d1fe1288a788",
+      "beforeLines": 897,
+      "afterLines": 1110,
+      "beforeSections": 25,
+      "afterSections": 36,
+      "beforeHunks": 56,
+      "afterHunks": 73,
+      "allOldSectionsAccounted": [
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt",
+          "beforeSectionSha256": "d9f892e3b4c6ebd9dbda90d7328a037a23b7e68cd7584de1455d2bc91cea8b6c",
+          "afterSectionSha256": "222e95055dbd929cbc0b98caff5f904edad601757614464b434944c5dd3735c4",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -56,6 +56,13 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac",
+            "@@ -76,7 +83,9 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac"
+          ],
+          "newHunks": [
+            "@@ -56,6 +56,13 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac",
+            "@@ -76,7 +83,9 @@ abstract class AbstractEventEmitter<T : ViewGroup>(reactApplicationContext: Reac"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+          "beforeSectionSha256": "b79909886e1e689b85717614852fd0f2143d677ae369b81c458c7d46a6a47c68",
+          "afterSectionSha256": "6dd75ec401288b80fcc463a2749034580b5a91ebe92a24a193537f3f127f05c6",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -1140,7 +1140,7 @@ open class RNMBXMapView(private val mContext: Context, var mManager: RNMBXMapVie"
+          ],
+          "newHunks": [
+            "@@ -27,6 +27,8 @@",
+            "@@ -1140,7 +1142,7 @@",
+            "@@ -1204,6 +1206,13 @@"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt",
+          "beforeSectionSha256": "de4c6f5d5898f5dfc824861fd9a2eaca6ce0a89ce24b2cfdfaeb0d132e0bfb0d",
+          "afterSectionSha256": "9bc305e878979bad078f73a4d0b20a4064b579eeed278707bdb2d275a01f1c9b",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -39,6 +39,10 @@ class RNMBXTerrain(context: Context?) : AbstractSourceConsumer(context) {"
+          ],
+          "newHunks": [
+            "@@ -39,6 +39,10 @@ class RNMBXTerrain(context: Context?) : AbstractSourceConsumer(context) {"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt",
+          "beforeSectionSha256": "a3e31894bcf6d845cd61bbfb8b91449367472d92d5a71f04b32698f5baa15de2",
+          "afterSectionSha256": "8dd58dec20b66f5419730c7bf9ee7b099242343bf1014888f7ad48e92e3ed91b",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -25,7 +25,7 @@ class RNMBXTerrainManager : ViewGroupManager<RNMBXTerrain>(),"
+          ],
+          "newHunks": [
+            "@@ -25,7 +25,7 @@ class RNMBXTerrainManager : ViewGroupManager<RNMBXTerrain>(),"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt",
+          "beforeSectionSha256": "03dca4569e7536a3cab5fa072646d104657dd6f67bb9a6fdc1e3eb48ef6909c0",
+          "afterSectionSha256": "3f25a4366d9a4777b07b63ff8051d21d703a38855535d94fd6c4e6adf4f962db",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -181,6 +181,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon"
+          ],
+          "newHunks": [
+            "@@ -181,6 +181,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt",
+          "beforeSectionSha256": "9c6ac5730a4efa16e5f0002eaf3bd6c2f51fb6cd0d53505c0597b666915018d8",
+          "afterSectionSha256": "386beee6840dffe472ce2c5806fd601d40698b1144c033fc2a7d7593dac7a8f7",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -46,6 +46,7 @@ enum class TileRegionPackState(val rawValue: String) {",
+            "@@ -105,6 +106,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -180,13 +182,15 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -197,11 +201,25 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -212,11 +230,13 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -245,6 +265,9 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -275,7 +298,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -286,7 +309,14 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -301,7 +331,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -309,6 +339,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -316,6 +347,8 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -399,7 +432,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -467,7 +500,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -561,6 +594,47 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :"
+          ],
+          "newHunks": [
+            "@@ -46,6 +46,7 @@ enum class TileRegionPackState(val rawValue: String) {",
+            "@@ -105,6 +106,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -175,18 +177,27 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -197,11 +208,25 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -212,11 +237,13 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -245,6 +272,9 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -275,7 +305,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -286,7 +316,14 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -301,7 +338,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -309,6 +346,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -316,6 +354,8 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -399,7 +439,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -467,7 +507,7 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :",
+            "@@ -561,6 +601,47 @@ class RNMBXOfflineModule(private val mReactContext: ReactApplicationContext) :"
+          ]
+        },
+        {
+          "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt",
+          "beforeSectionSha256": "b3b4f7bd25f334dae33b759d133f8fda3964ec06d903abab552d29fcc26146da",
+          "afterSectionSha256": "2c63c1cd29fedc9103356fb1dc7b9d5878caafda538bd5c930ceccb2cc5de79b",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -139,7 +139,7 @@ class RNMBXSnapshotModule(private val mContext: ReactApplicationContext) :"
+          ],
+          "newHunks": [
+            "@@ -139,7 +139,7 @@ class RNMBXSnapshotModule(private val mContext: ReactApplicationContext) :"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/Offline/RNMBXOfflineModule.m",
+          "beforeSectionSha256": "c1e15736a1e7a9146479913a799f3b4ce36763fe8ea5bc8c88b7ecc3061b20b9",
+          "afterSectionSha256": "f4848c7be32536db500eb49c0a69e61246fe8f8d084b5be6081f5499b664f7d4",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -6,6 +6,10 @@",
+            "@@ -31,4 +35,7 @@ RCT_EXTERN_METHOD(migrateOfflineCache:(RCTPromiseResolveBlock)resolve reject:(RC"
+          ],
+          "newHunks": [
+            "@@ -6,6 +6,10 @@",
+            "@@ -31,4 +35,7 @@ RCT_EXTERN_METHOD(migrateOfflineCache:(RCTPromiseResolveBlock)resolve reject:(RC"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/Offline/RNMBXOfflineModule.swift",
+          "beforeSectionSha256": "bfe878856f49ccef0cb4a82192076098627564389b0e0688ae2fbedf658b7fa3",
+          "afterSectionSha256": "80aded72bb13ff531df6cfbeb72d9d872dbf42014a1f16aec8cf7ed61f225ac5",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -14,6 +14,7 @@ extension Date {",
+            "@@ -98,6 +99,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -208,13 +210,15 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -229,12 +233,26 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -247,6 +265,9 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -275,12 +296,62 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -343,7 +414,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -361,9 +432,16 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -371,6 +449,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -379,6 +458,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -401,7 +481,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -413,6 +493,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -423,31 +504,25 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -516,7 +591,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -605,7 +680,7 @@ class RNMBXOfflineModule: RCTEventEmitter {"
+          ],
+          "newHunks": [
+            "@@ -14,6 +14,7 @@ extension Date {",
+            "@@ -98,6 +99,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -201,6 +203,13 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -208,13 +217,15 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -229,12 +240,26 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -247,6 +272,9 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -275,12 +303,62 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -343,7 +421,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -361,9 +439,16 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -371,6 +456,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -379,6 +465,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -401,7 +488,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -413,6 +500,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -423,31 +511,25 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -516,7 +598,7 @@ class RNMBXOfflineModule: RCTEventEmitter {",
+            "@@ -605,7 +687,7 @@ class RNMBXOfflineModule: RCTEventEmitter {"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/RNMBXModule.m",
+          "beforeSectionSha256": "558d35b86e922feb102b3b551811403b17fd6616e84875411e56e3919a20a8f5",
+          "afterSectionSha256": "ecde42db08b62400108a4a4d3d7384a0ec4fc10840757cbc0767679fd5011c6e",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -2,6 +2,8 @@"
+          ],
+          "newHunks": [
+            "@@ -2,6 +2,8 @@"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/RNMBXModule.swift",
+          "beforeSectionSha256": "bf7fdc2d41b1a1f136bcd03d06acba405a62b9bd3ea5f95bb0f5e66b22623a15",
+          "afterSectionSha256": "36f9ad07467d86d1cc68d3cc4b267bfe6259a9c6e176138c1db15882b412efe9",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -86,6 +86,13 @@ class RNMBXModule : NSObject {"
+          ],
+          "newHunks": [
+            "@@ -56,7 +56,8 @@ class RNMBXModule : NSObject {",
+            "@@ -86,6 +87,13 @@ class RNMBXModule : NSObject {"
+          ]
+        },
+        {
+          "path": "ios/RNMBX/RNMBXTerrain.swift",
+          "beforeSectionSha256": "dc19d8c6bf861348f68851cd19be941816de74035d5e10a59692b37674a0bbe0",
+          "afterSectionSha256": "4632c83dba511e1f5f6a03a94449d7203a7ca22f71dae3fd8a7d28f7f7337cb9",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -17,6 +17,11 @@ public class RNMBXTerrain : RNMBXSingletonLayer, RNMBXMapComponent, RNMBXSourceC"
+          ],
+          "newHunks": [
+            "@@ -17,6 +17,11 @@ public class RNMBXTerrain : RNMBXSingletonLayer, RNMBXMapComponent, RNMBXSourceC"
+          ]
+        },
+        {
+          "path": "lib/module/components/MapView.js",
+          "beforeSectionSha256": "a1b0f057c6c2cb5af8ce1b5241691011b7ea71e5f84c0646f16b438e45e07a4f",
+          "afterSectionSha256": "1a9fe80405add63c03f2325373bb83ec766e2d8df457c818f27298cb2398e6e4",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -345,7 +345,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo"
+          ],
+          "newHunks": [
+            "@@ -4,7 +4,7 @@ import React from 'react';",
+            "@@ -345,7 +345,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo"
+          ]
+        },
+        {
+          "path": "lib/module/modules/offline/offlineManager.js",
+          "beforeSectionSha256": "83c66ccadb7eed8815af6fad67ef73f7afd7b1dcefb3c57817cd7765c13b646b",
+          "afterSectionSha256": "f08fe293a9ce8d2927a7e5b398e8bb7e51ff6bc546fe676b938992201996f005",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -116,22 +116,20 @@ class OfflineManager {",
+            "@@ -157,8 +155,7 @@ class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -116,22 +116,20 @@ class OfflineManager {",
+            "@@ -157,8 +155,7 @@ class OfflineManager {"
+          ]
+        },
+        {
+          "path": "lib/module/modules/offline/offlineManagerLegacy.js",
+          "beforeSectionSha256": "af039ecf2ca4329ec903dafa00340c8c36173e9b03f7d6bb641021f9b1dc550a",
+          "afterSectionSha256": "84f36d0dbd8032eddfefe5bcef29380de0b9250d8b130d79e9d2905dcd77fddf",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -121,7 +121,7 @@ class OfflineManagerLegacy {"
+          ],
+          "newHunks": [
+            "@@ -121,7 +121,7 @@ class OfflineManagerLegacy {"
+          ]
+        },
+        {
+          "path": "lib/module/modules/snapshot/SnapshotOptions.js",
+          "beforeSectionSha256": "c8bd23a3d0fecb9f31a9a8c1b29922bea62ee229e6a94aea2fd3f46407d8baf6",
+          "afterSectionSha256": "1f03b9a57b14c7737456d00cee3069da4fe63245cd73dac9ef8474684b4ac807",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -12,7 +12,7 @@ class SnapshotOptions {"
+          ],
+          "newHunks": [
+            "@@ -12,7 +12,7 @@ class SnapshotOptions {"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/Mapbox.native.d.ts",
+          "beforeSectionSha256": "ae8567a20c99be0ecfa6a963a2ee86d4af04e5ccc9769604d98fbb09a3a72218",
+          "afterSectionSha256": "2945e6057c75710ab7a75eecd25c780db25f8676674ad0a905a842044680b910",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -1,4 +1,4 @@"
+          ],
+          "newHunks": [
+            "@@ -1,4 +1,4 @@"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/RNMBXModule.d.ts",
+          "beforeSectionSha256": "dbd6a4fb30b6943a5f706737dfa78a49226daddfa589c37013e532c55b358c3e",
+          "afterSectionSha256": "47a176c32df7fdf974bf6c0e406265af2c9bfc339e3f8b295cdf0f347e82ab96",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -14,19 +14,31 @@ export declare const StyleURL: {"
+          ],
+          "newHunks": [
+            "@@ -14,19 +14,31 @@ export declare const StyleURL: {"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/components/MapView.d.ts",
+          "beforeSectionSha256": "cd94da84eabde5b2fa9c4e4032760d94f9f24efc42768cf90bb43d9c382c2300",
+          "afterSectionSha256": "61227e24d18a1bbb3a25f698339a6f6da33250a6f04aa2cc4e0a691d2a31f2f1",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -556,7 +556,7 @@ declare class MapView extends MapView_base {"
+          ],
+          "newHunks": [
+            "@@ -556,7 +556,7 @@ declare class MapView extends MapView_base {"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/index.native.d.ts",
+          "beforeSectionSha256": "691e0bb7d909e3e079e6a42b83eb0d6faca1e69c591ce864aa63970a8aba4ddf",
+          "afterSectionSha256": "049022d65bced00367bcc2f2b4bb89b267f9c688a30003ae7e9f44a1444680f0",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -1,4 +1,4 @@"
+          ],
+          "newHunks": [
+            "@@ -1,4 +1,4 @@"
+          ]
+        },
+        {
+          "path": "lib/typescript/src/modules/offline/offlineManager.d.ts",
+          "beforeSectionSha256": "ccb692ceb1fca6e637fd10e751346bd57a9a88f8c5b1a49efe43e49c4f72b15c",
+          "afterSectionSha256": "97e5208c99cd890246507d1e88b45672598a9e42d41e8caa98d3baab3b71c086",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -107,8 +107,6 @@ declare class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -107,8 +107,6 @@ declare class OfflineManager {"
+          ]
+        },
+        {
+          "path": "src/components/MapView.tsx",
+          "beforeSectionSha256": "3bd65b1ab6afb9af66f43ac159203a8b46f97eddb6c2d402b5c2c7bc621d5104",
+          "afterSectionSha256": "103ac1d9d3d37b378f479809a3e7e2f10312d3ba137d350657fa53c3b14b2c88",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -926,12 +926,12 @@ class MapView extends NativeBridgeComponent("
+          ],
+          "newHunks": [
+            "@@ -14,7 +14,7 @@ import debounce from 'debounce';",
+            "@@ -926,12 +926,12 @@ class MapView extends NativeBridgeComponent("
+          ]
+        },
+        {
+          "path": "src/modules/offline/offlineManager.ts",
+          "beforeSectionSha256": "fe1edb61bc3bc02e6bbecfbecb65c626be93e6953f9f40f6bd1add1a07ea1308",
+          "afterSectionSha256": "432dbf466e336794d910af7006c1ddd3745b57323fb1a7c68bdb6592af6efffb",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -191,22 +191,20 @@ class OfflineManager {",
+            "@@ -232,8 +230,7 @@ class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -191,22 +191,20 @@ class OfflineManager {",
+            "@@ -232,8 +230,7 @@ class OfflineManager {"
+          ]
+        },
+        {
+          "path": "src/modules/offline/offlineManagerLegacy.ts",
+          "beforeSectionSha256": "62ef6782c2577463e0a23c2453290cc13f6cb078a8f9710eedd0e6543e2558ee",
+          "afterSectionSha256": "8e6002940c9f73213a5cdbd09cbf0a0843598c67bacd1b3356f2a7a07d85d34b",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -139,7 +139,7 @@ class OfflineManagerLegacy {"
+          ],
+          "newHunks": [
+            "@@ -139,7 +139,7 @@ class OfflineManagerLegacy {"
+          ]
+        },
+        {
+          "path": "src/modules/snapshot/SnapshotOptions.ts",
+          "beforeSectionSha256": "2c8beab0e7841788611ad2a994b6d7be92d069530896aa14fc76c334237e9e66",
+          "afterSectionSha256": "d09ccb131c54b2f8116e1cdc5e10c6908157e479d25ff87e693aba17f14ecd0c",
+          "disposition": "retained existing semantics plus reviewed P1-P8-only source delta",
+          "oldHunks": [
+            "@@ -40,7 +40,7 @@ class SnapshotOptions {"
+          ],
+          "newHunks": [
+            "@@ -40,7 +40,7 @@ class SnapshotOptions {"
+          ]
+        }
+      ],
+      "addedSections": [
+        "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt",
+        "ios/RNMBX/RNMBXCustomLocationProvider.swift",
+        "ios/RNMBX/RNMBXMapViewModule.h",
+        "ios/RNMBX/RNMBXMapViewModule.mm",
+        "lib/module/specs/NativeMapViewModule.js.map",
+        "lib/module/specs/NativeMapViewModule.js",
+        "lib/typescript/src/specs/NativeMapViewModule.d.ts.map",
+        "lib/typescript/src/specs/NativeMapViewModule.d.ts",
+        "src/specs/NativeMapViewModule.ts",
+        "android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt",
+        "ios/RNMBX/RNMBXStyleValue.swift"
+      ],
+      "pristineForwardReverseByteEquality": true,
+      "originalIntentOutputByteEquality": true
+    },
+    {
+      "name": "maplibre-native-11.5.0",
+      "patch": "maplibre-native-11.5.0-tf08.patch",
+      "beforeSha256": "430ef194dfeeefcc8c2e94c507b7dcb68f7633e691e7e75603d13a4061bff3af",
+      "afterSha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0",
+      "beforeLines": 296,
+      "afterLines": 356,
+      "beforeSections": 10,
+      "afterSections": 13,
+      "beforeHunks": 17,
+      "afterHunks": 20,
+      "allOldSectionsAccounted": [
+        {
+          "path": "android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt",
+          "beforeSectionSha256": "a6a1884118eba77003a01dbb53d02fadf6605fac039c3db193eccdfbed7d1aa2",
+          "afterSectionSha256": "a6a1884118eba77003a01dbb53d02fadf6605fac039c3db193eccdfbed7d1aa2",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -78,6 +78,8 @@ class MLRNOfflineModule(",
+            "@@ -545,8 +547,6 @@ class MLRNOfflineModule("
+          ],
+          "newHunks": [
+            "@@ -78,6 +78,8 @@ class MLRNOfflineModule(",
+            "@@ -545,8 +547,6 @@ class MLRNOfflineModule("
+          ]
+        },
+        {
+          "path": "android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt",
+          "beforeSectionSha256": "02b3593d0c6e359dbe0333e9ce108f87dc7d1ad8828eb4934ed5cbabb10d5e63",
+          "afterSectionSha256": "02b3593d0c6e359dbe0333e9ce108f87dc7d1ad8828eb4934ed5cbabb10d5e63",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -57,6 +57,7 @@ class MLRNStaticMapModule(",
+            "@@ -69,8 +70,8 @@ class MLRNStaticMapModule(",
+            "@@ -93,13 +94,8 @@ class MLRNStaticMapModule("
+          ],
+          "newHunks": [
+            "@@ -57,6 +57,7 @@ class MLRNStaticMapModule(",
+            "@@ -69,8 +70,8 @@ class MLRNStaticMapModule(",
+            "@@ -93,13 +94,8 @@ class MLRNStaticMapModule("
+          ]
+        },
+        {
+          "path": "ios/modules/offline/MLRNOfflineModule.mm",
+          "beforeSectionSha256": "6973dcb5b9a17d309619909dbc9225b3f3f7393915305c6d17a67131d7fb46ff",
+          "afterSectionSha256": "6973dcb5b9a17d309619909dbc9225b3f3f7393915305c6d17a67131d7fb46ff",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -158,6 +158,13 @@ static const NSInteger MLRN_MIGRATION_VERSION = 1;",
+            "@@ -221,12 +228,20 @@ static const NSInteger MLRN_MIGRATION_VERSION = 1;"
+          ],
+          "newHunks": [
+            "@@ -158,6 +158,13 @@ static const NSInteger MLRN_MIGRATION_VERSION = 1;",
+            "@@ -221,12 +228,20 @@ static const NSInteger MLRN_MIGRATION_VERSION = 1;"
+          ]
+        },
+        {
+          "path": "ios/modules/static-map/MLRNStaticMapModule.mm",
+          "beforeSectionSha256": "bf8f232733bc7a2dbd0cdb797d03f2f6d5dbb5d2f05632af4c4b41a25ecbb206",
+          "afterSectionSha256": "bf8f232733bc7a2dbd0cdb797d03f2f6d5dbb5d2f05632af4c4b41a25ecbb206",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -76,6 +76,8 @@"
+          ],
+          "newHunks": [
+            "@@ -76,6 +76,8 @@"
+          ]
+        },
+        {
+          "path": "lib/commonjs/modules/offline/OfflineManager.js",
+          "beforeSectionSha256": "72510db3b9231d4d243955dd58a3daaf0912a5be87ffd270d6d2b2fba919583d",
+          "afterSectionSha256": "72510db3b9231d4d243955dd58a3daaf0912a5be87ffd270d6d2b2fba919583d",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -177,6 +177,11 @@ class OfflineManager {",
+            "@@ -219,7 +224,8 @@ class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -177,6 +177,11 @@ class OfflineManager {",
+            "@@ -219,7 +224,8 @@ class OfflineManager {"
+          ]
+        },
+        {
+          "path": "lib/module/modules/offline/OfflineManager.js",
+          "beforeSectionSha256": "8174ac1cb0f4dcd23d2612e1c8a8c4b6464d68bff9d001be791f38c51f9cf023",
+          "afterSectionSha256": "8174ac1cb0f4dcd23d2612e1c8a8c4b6464d68bff9d001be791f38c51f9cf023",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -173,6 +173,11 @@ class OfflineManager {",
+            "@@ -215,7 +220,8 @@ class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -173,6 +173,11 @@ class OfflineManager {",
+            "@@ -215,7 +220,8 @@ class OfflineManager {"
+          ]
+        },
+        {
+          "path": "lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts",
+          "beforeSectionSha256": "95657b2dcdcfbd6f777a450681f06e023d93c7f0b5679488b573326ddd5ad72d",
+          "afterSectionSha256": "95657b2dcdcfbd6f777a450681f06e023d93c7f0b5679488b573326ddd5ad72d",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -4,7 +4,7 @@ import { type ReactNativeElement } from \"react-native\";"
+          ],
+          "newHunks": [
+            "@@ -4,7 +4,7 @@ import { type ReactNativeElement } from \"react-native\";"
+          ]
+        },
+        {
+          "path": "lib/typescript/module/components/sources/vector-source/VectorSource.d.ts",
+          "beforeSectionSha256": "a6a5d6bf0c8c08b457bcef5cc9a73780f873a66d524bf8ebcc837f831a0ce6dd",
+          "afterSectionSha256": "a6a5d6bf0c8c08b457bcef5cc9a73780f873a66d524bf8ebcc837f831a0ce6dd",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -2,7 +2,7 @@ import type { FilterSpecification } from \"@maplibre/maplibre-gl-style-spec\";"
+          ],
+          "newHunks": [
+            "@@ -2,7 +2,7 @@ import type { FilterSpecification } from \"@maplibre/maplibre-gl-style-spec\";"
+          ]
+        },
+        {
+          "path": "lib/typescript/module/index.d.ts",
+          "beforeSectionSha256": "b3953f0b1ec3f5966d7a393875f6c22cb7b12162cd385269e1f5e5ca87c2b8ba",
+          "afterSectionSha256": "b3953f0b1ec3f5966d7a393875f6c22cb7b12162cd385269e1f5e5ca87c2b8ba",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -1,37 +1,37 @@"
+          ],
+          "newHunks": [
+            "@@ -1,37 +1,37 @@"
+          ]
+        },
+        {
+          "path": "src/modules/offline/OfflineManager.ts",
+          "beforeSectionSha256": "1e5d1307e15d7ba26642f24426626b3234d8992578158bb8b8f32175e8c09460",
+          "afterSectionSha256": "1e5d1307e15d7ba26642f24426626b3234d8992578158bb8b8f32175e8c09460",
+          "disposition": "byte-identical section retained",
+          "oldHunks": [
+            "@@ -229,6 +229,11 @@ class OfflineManager {",
+            "@@ -274,7 +279,8 @@ class OfflineManager {"
+          ],
+          "newHunks": [
+            "@@ -229,6 +229,11 @@ class OfflineManager {",
+            "@@ -274,7 +279,8 @@ class OfflineManager {"
+          ]
+        }
+      ],
+      "addedSections": [
+        "android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt",
+        "ios/components/camera/MLRNCamera.m",
+        "android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolver.kt"
+      ],
+      "pristineForwardReverseByteEquality": true,
+      "originalIntentOutputByteEquality": true
+    }
+  ],
+  "pristineSdkIdentities": [
+    {
+      "package": "@rnmapbox/maps",
+      "version": "10.3.7",
+      "tarball": "rnmapbox-10.3.7.tgz",
+      "registryIntegrity": "sha512-ICZIEi+Hp8aX6RsdUQK1PGK9qJ2L5g4YiFT1SUTQ023m5O/VcC/Ys0GKcd5/ABL8onvci3n4uZ8PbjXM1Vs6FA==",
+      "sha256": "9c14adb06158e4032857b71b2b3bf507c7e0749cd7a8acbe888272aee5da085e",
+      "verifiedAgainst": "records/support-matrix.json frozen registryIntegrity"
+    },
+    {
+      "package": "@rnmapbox/maps",
+      "version": "10.3.8",
+      "tarball": "rnmapbox-10.3.8.tgz",
+      "registryIntegrity": "sha512-NtDF0/89syZJ7cXf0DNpB6a6/HqQpwgCUCjpkuLhqLTcgV9ID4zITxJaKzp8N0oxaRXXTf5vTVLlc+ScAZOUSg==",
+      "sha256": "19cb018430f68efd1258c0d6b3759bcb4e2cb00b52c2d31fde15ae45f965ed94",
+      "verifiedAgainst": "records/support-matrix.json frozen registryIntegrity"
+    },
+    {
+      "package": "@maplibre/maplibre-react-native",
+      "version": "11.5.0",
+      "tarball": "maplibre-native-11.5.0.tgz",
+      "registryIntegrity": "sha512-O+iDUY+nrPjT5CHCIwOheJDzKpFhUmQ4Rn9x4mYud4MubVTo5y82nxTII3LVIlbzP1L1fYqFfh4+Umr7UmYFOw==",
+      "sha256": "aad2c019496a8d4df6bb4bafa89dd345c8637222b5ba4d25c3d2433c297e975d",
+      "verifiedAgainst": "records/support-matrix.json frozen registryIntegrity"
+    }
+  ],
+  "productionSourceAndProtectedInputs": {
+    "original": {
+      "protectedFiles": 95,
+      "allUnchanged": true
+    },
+    "publication": {
+      "protectedFiles": 101,
+      "onlyThreeApprovedPatchesChanged": true
+    },
+    "librarySourceFilesPerRoot": 82,
+    "libraryDistFilesPerRoot": 164,
+    "sourceAndDistByteIdenticalToU22": true,
+    "inactiveLegacyPatchUnchanged": true
+  },
+  "checks": {
+    "publication": {
+      "standard": {
+        "command": "bun run check",
+        "formattedFiles": 312,
+        "lintedFiles": 286,
+        "lintWarnings": 0,
+        "lintErrors": 0
+      },
+      "docs": {
+        "command": "bun run check:docs",
+        "markdownFiles": 39,
+        "comparisonTables": 39,
+        "scope": "structure only; docworker owns accuracy/freeze"
+      },
+      "types": {
+        "command": "bun run typecheck",
+        "projects": 4,
+        "status": "passed"
+      },
+      "appTypes": {
+        "command": "bun run typecheck:apps",
+        "projects": 3,
+        "status": "passed"
+      },
+      "source": {
+        "command": "bun run test (network/signal-permitted routine rerun)",
+        "webFiles": 40,
+        "webTests": 624,
+        "nativeSuites": 8,
+        "nativeTests": 231,
+        "status": "passed",
+        "acceptance": false
+      },
+      "build": {
+        "command": "bun run build; final build repeated by bun run test:compiled",
+        "status": "passed"
+      },
+      "compiled": {
+        "command": "bun run test:compiled",
+        "webFiles": 26,
+        "webTests": 468,
+        "nativeSuites": 8,
+        "nativeTests": 231,
+        "compilerNamedComponentsHooks": 9,
+        "compilerModules": 7,
+        "status": "passed"
+      },
+      "focusedSdkProofs": {
+        "finalPassed": 15,
+        "results": [
+          {
+            "case": "P1-bounds",
+            "command": [
+              "node",
+              "scripts/native-camera-bounds-reset.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 2.52,
+            "summary": "PASS actual Swift and Objective-C++ camera methods: set, replace, clear and reapply; unrelated limits preserved."
+          },
+          {
+            "case": "P2-P4-source-lifetime",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "both",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 0.04,
+            "summary": "PASS native explicit-state error/family and absent-Fabric-view source boundaries"
+          },
+          {
+            "case": "P3-light",
+            "command": [
+              "node",
+              "scripts/rnmapbox-light-color.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.55,
+            "summary": "PASS actual Swift light-color conversion: packed and signed RGBA, alpha, and invalid-input fallback"
+          },
+          {
+            "case": "P5-codegen",
+            "command": [
+              "node",
+              "scripts/example-native-codegen.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 0.12,
+            "summary": "PASS dual native codegen: real pinned React Native generator emits no shared module classes or protocols."
+          },
+          {
+            "case": "P6-observer",
+            "command": [
+              "node",
+              "scripts/rnmapbox-location-observer.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.33,
+            "summary": "PASS actual Swift custom location/heading observers: initial replay, updates and removal"
+          },
+          {
+            "case": "P7-offline",
+            "command": [
+              "node",
+              "scripts/rnmapbox-offline-status.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.37,
+            "summary": "PASS actual Swift offline status before persistence, paused/completed progress and genuine SDK failures"
+          },
+          {
+            "case": "P8-mode",
+            "command": [
+              "bun",
+              "scripts/native-camera-mode.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.47,
+            "summary": "PASS 10.3.7: six actual wrapper-to-iOS camera dispatches"
+          },
+          {
+            "case": "combined7",
+            "command": [
+              "bun",
+              "scripts/tf08-patches.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 0.3,
+            "summary": "PASS TF08 peer patches: clean application round trips, RNMapbox zero-zoom constructor execution, and native source assertions for image cleanup/scale and offline download ownership."
+          },
+          {
+            "case": "combined8",
+            "command": [
+              "bun",
+              "scripts/tf08-patches.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 0.28,
+            "summary": "PASS TF08 peer patches: clean application round trips, RNMapbox zero-zoom constructor execution, and native source assertions for image cleanup/scale and offline download ownership."
+          },
+          {
+            "case": "P3-light-8",
+            "command": [
+              "node",
+              "scripts/rnmapbox-light-color.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.48,
+            "summary": "PASS actual Swift light-color conversion: packed and signed RGBA, alpha, and invalid-input fallback"
+          },
+          {
+            "case": "P6-observer-8",
+            "command": [
+              "node",
+              "scripts/rnmapbox-location-observer.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.3,
+            "summary": "PASS actual Swift custom location/heading observers: initial replay, updates and removal"
+          },
+          {
+            "case": "P7-offline-8",
+            "command": [
+              "node",
+              "scripts/rnmapbox-offline-status.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.33,
+            "summary": "PASS actual Swift offline status before persistence, paused/completed progress and genuine SDK failures"
+          },
+          {
+            "case": "P8-mode-8",
+            "command": [
+              "bun",
+              "scripts/native-camera-mode.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.45,
+            "summary": "PASS 10.3.8: six actual wrapper-to-iOS camera dispatches"
+          },
+          {
+            "case": "P2-source-lifetime-8",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 0.04,
+            "summary": "PASS native explicit-state error/family and absent-Fabric-view source boundaries"
+          },
+          {
+            "case": "P1-upstream-bounds-8",
+            "command": [
+              "node",
+              "scripts/native-camera-bounds-reset.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "seconds": 1.68,
+            "summary": "PASS actual Swift and Objective-C++ camera methods: set, replace, clear and reapply; unrelated limits preserved."
+          }
+        ],
+        "setOnlySensitivity": [
+          {
+            "root": "original",
+            "sdkVersion": "10.3.7",
+            "input": "real",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "legacyRegexWouldFalselyPassMutant": null,
+            "output": "PASS native explicit-state error/family and absent-Fabric-view source boundaries\nSKIP native source-lifetime regression: cached Kotlin compiler required.\n"
+          },
+          {
+            "root": "original",
+            "sdkVersion": "10.3.7",
+            "input": "set-only-mutant",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/set-only-mutant",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 1,
+            "legacyRegexWouldFalselyPassMutant": true,
+            "output": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The input did not match the regular expression /this\\.setFeatureState\\([^)]*\\)\\s*\\{\\s*expected ->\\s*callback\\(expected\\)/. Input:\n\n'package com.rnmapbox.rnmbx.v11compat.mapboxmap\\n' +\n  '\\n' +\n  'import android.animation.Animator\\n' +\n  'import android.content.Context\\n' +\n  'import com.mapbox.bindgen.Value\\n' +\n  'import com.mapbox.bindgen.Expected\\n' +\n  'import com.mapbox.bindgen.None\\n' +\n  'import com.mapbox.maps.AsyncOperationResultCallback\\n' +\n  'import com.mapbox.maps.CameraOptions\\n' +\n  'import com.mapbox.maps.MapboxMap\\n' +\n  'import com.mapbox.maps.plugin.animation.MapAnimationOptions\\n' +\n  'import com.mapbox.maps.plugin.animation.easeTo\\n' +\n  'import com.mapbox.maps.plugin.animation.flyTo\\n' +\n  '\\n' +\n  'fun MapboxMap.setFeatureStateCompat(\\n' +\n  '    sourceId: String,\\n' +\n  '    sourceLayerId: String?,\\n' +\n  '    featureId: String,\\n' +\n  '    state: Value,\\n' +\n  '    callback: (Expected<String, None>) -> Unit\\n' +\n  ') {\\n' +\n  '    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { _ ->\\n' +\n  '        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())\\n' +\n  '    }\\n' +\n  '}\\n' +\n  '\\n' +\n  'fun MapboxMap.removeFeatureStateCompat(\\n' +\n  '    sourceId: String,\\n' +\n  '    sourceLayerId: String?,\\n' +\n  '    featureId: String,\\n' +\n  '    stateKey: String?,\\n' +\n  '    callback: (Expected<String, None>) -> Unit\\n' +\n  ')"
+          },
+          {
+            "root": "publication",
+            "sdkVersion": "10.3.7",
+            "input": "real",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "legacyRegexWouldFalselyPassMutant": null,
+            "output": "PASS native explicit-state error/family and absent-Fabric-view source boundaries\nSKIP native source-lifetime regression: cached Kotlin compiler required.\n"
+          },
+          {
+            "root": "publication",
+            "sdkVersion": "10.3.7",
+            "input": "set-only-mutant",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.7/set-only-mutant",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 1,
+            "legacyRegexWouldFalselyPassMutant": true,
+            "output": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The input did not match the regular expression /this\\.setFeatureState\\([^)]*\\)\\s*\\{\\s*expected ->\\s*callback\\(expected\\)/. Input:\n\n'package com.rnmapbox.rnmbx.v11compat.mapboxmap\\n' +\n  '\\n' +\n  'import android.animation.Animator\\n' +\n  'import android.content.Context\\n' +\n  'import com.mapbox.bindgen.Value\\n' +\n  'import com.mapbox.bindgen.Expected\\n' +\n  'import com.mapbox.bindgen.None\\n' +\n  'import com.mapbox.maps.AsyncOperationResultCallback\\n' +\n  'import com.mapbox.maps.CameraOptions\\n' +\n  'import com.mapbox.maps.MapboxMap\\n' +\n  'import com.mapbox.maps.plugin.animation.MapAnimationOptions\\n' +\n  'import com.mapbox.maps.plugin.animation.easeTo\\n' +\n  'import com.mapbox.maps.plugin.animation.flyTo\\n' +\n  '\\n' +\n  'fun MapboxMap.setFeatureStateCompat(\\n' +\n  '    sourceId: String,\\n' +\n  '    sourceLayerId: String?,\\n' +\n  '    featureId: String,\\n' +\n  '    state: Value,\\n' +\n  '    callback: (Expected<String, None>) -> Unit\\n' +\n  ') {\\n' +\n  '    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { _ ->\\n' +\n  '        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())\\n' +\n  '    }\\n' +\n  '}\\n' +\n  '\\n' +\n  'fun MapboxMap.removeFeatureStateCompat(\\n' +\n  '    sourceId: String,\\n' +\n  '    sourceLayerId: String?,\\n' +\n  '    featureId: String,\\n' +\n  '    stateKey: String?,\\n' +\n  '    callback: (Expected<String, None>) -> Unit\\n' +\n  ')"
+          },
+          {
+            "root": "original",
+            "sdkVersion": "10.3.8",
+            "input": "real",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "legacyRegexWouldFalselyPassMutant": null,
+            "output": "PASS native explicit-state error/family and absent-Fabric-view source boundaries\nSKIP native source-lifetime regression: cached Kotlin compiler required.\n"
+          },
+          {
+            "root": "original",
+            "sdkVersion": "10.3.8",
+            "input": "set-only-mutant",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/set-only-mutant",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 1,
+            "legacyRegexWouldFalselyPassMutant": true,
+            "output": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The input did not match the regular expression /this\\.setFeatureState\\([^)]*\\)\\s*\\{\\s*expected ->\\s*callback\\(expected\\)/. Input:\n\n'package com.rnmapbox.rnmbx.v11compat.mapboxmap\\n' +\n  '\\n' +\n  'import android.animation.Animator\\n' +\n  'import android.content.Context\\n' +\n  'import com.mapbox.bindgen.Value\\n' +\n  'import com.mapbox.bindgen.Expected\\n' +\n  'import com.mapbox.bindgen.None\\n' +\n  'import com.mapbox.maps.AsyncOperationResultCallback\\n' +\n  'import com.mapbox.maps.CameraOptions\\n' +\n  'import com.mapbox.maps.MapboxMap\\n' +\n  'import com.mapbox.maps.plugin.animation.MapAnimationOptions\\n' +\n  'import com.mapbox.maps.plugin.animation.easeTo\\n' +\n  'import com.mapbox.maps.plugin.animation.flyTo\\n' +\n  '\\n' +\n  'fun MapboxMap.setFeatureStateCompat(\\n' +\n  '    sourceId: String,\\n' +\n  '    sourceLayerId: String?,\\n' +\n  '    featureId: String,\\n' +\n  '    state: Value,\\n' +\n  '    callback: (Expected<String, None>) -> Unit\\n' +\n  ') {\\n' +\n  '    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { _ ->\\n' +\n  '        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())\\n' +\n  '    }\\n' +\n  '}\\n' +\n  '\\n' +\n  'fun MapboxMap.removeFeatureStateCompat(\\n' +\n  '    sourceId: String,\\n' +\n  '    sourceLayerId: String?,\\n' +\n  '    featureId: String,\\n' +\n  '    stateKey: String?,\\n' +\n  '    callback: (Expected<String, None>) -> Unit\\n' +\n  ')"
+          },
+          {
+            "root": "publication",
+            "sdkVersion": "10.3.8",
+            "input": "real",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 0,
+            "legacyRegexWouldFalselyPassMutant": null,
+            "output": "PASS native explicit-state error/family and absent-Fabric-view source boundaries\nSKIP native source-lifetime regression: cached Kotlin compiler required.\n"
+          },
+          {
+            "root": "publication",
+            "sdkVersion": "10.3.8",
+            "input": "set-only-mutant",
+            "command": [
+              "node",
+              "scripts/native-source-lifetime.test.mjs",
+              "mapbox",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/set-only-mutant",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "exitCode": 1,
+            "legacyRegexWouldFalselyPassMutant": true,
+            "output": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The input did not match the regular expression /this\\.setFeatureState\\([^)]*\\)\\s*\\{\\s*expected ->\\s*callback\\(expected\\)/. Input:\n\n'package com.rnmapbox.rnmbx.v11compat.mapboxmap\\n' +\n  '\\n' +\n  'import android.animation.Animator\\n' +\n  'import android.content.Context\\n' +\n  'import com.mapbox.bindgen.Value\\n' +\n  'import com.mapbox.bindgen.Expected\\n' +\n  'import com.mapbox.bindgen.None\\n' +\n  'import com.mapbox.maps.AsyncOperationResultCallback\\n' +\n  'import com.mapbox.maps.CameraOptions\\n' +\n  'import com.mapbox.maps.MapboxMap\\n' +\n  'import com.mapbox.maps.plugin.animation.MapAnimationOptions\\n' +\n  'import com.mapbox.maps.plugin.animation.easeTo\\n' +\n  'import com.mapbox.maps.plugin.animation.flyTo\\n' +\n  '\\n' +\n  'fun MapboxMap.setFeatureStateCompat(\\n' +\n  '    sourceId: String,\\n' +\n  '    sourceLayerId: String?,\\n' +\n  '    featureId: String,\\n' +\n  '    state: Value,\\n' +\n  '    callback: (Expected<String, None>) -> Unit\\n' +\n  ') {\\n' +\n  '    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { _ ->\\n' +\n  '        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())\\n' +\n  '    }\\n' +\n  '}\\n' +\n  '\\n' +\n  'fun MapboxMap.removeFeatureStateCompat(\\n' +\n  '    sourceId: String,\\n' +\n  '    sourceLayerId: String?,\\n' +\n  '    featureId: String,\\n' +\n  '    stateKey: String?,\\n' +\n  '    callback: (Expected<String, None>) -> Unit\\n' +\n  ')"
+          }
+        ]
+      },
+      "pureCodegen": {
+        "generatorVersion": "@react-native/codegen0.86.3",
+        "hostRNVersion": "0.86.3",
+        "generatorPath": "/Users/rob/code/mapbox-code/one-map/node_modules/.bun/@react-native+codegen@0.86.3+759ce506b1ed1a42/node_modules/@react-native/codegen",
+        "results": [
+          {
+            "label": "red",
+            "command": [
+              "node",
+              "scripts/example-native-codegen.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/publication-before",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/publication-before"
+            ],
+            "cwd": "<U23-F01>/publication",
+            "exitCode": 1,
+            "summary": "node:internal/modules/run_main:107"
+          },
+          {
+            "label": "green",
+            "command": [
+              "node",
+              "scripts/example-native-codegen.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "cwd": "<U23-F01>/publication",
+            "exitCode": 0,
+            "summary": "PASS dual native codegen: real pinned React Native generator emits no shared module classes or protocols."
+          },
+          {
+            "label": "original-green",
+            "command": [
+              "node",
+              "scripts/example-native-codegen.test.mjs",
+              "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+              "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+            ],
+            "cwd": "/Users/rob/code/mapbox-code/one-map",
+            "exitCode": 0,
+            "summary": "PASS dual native codegen: real pinned React Native generator emits no shared module classes or protocols."
+          }
+        ],
+        "scope": "Exact pristine-patched SDK source generation, coherence and symbol intersections; not declared RN0.87.1 linking."
+      },
+      "targetParsers": {
+        "paths": [
+          "scripts/tf08-patches.test.mjs",
+          "scripts/test-peers.mjs",
+          "scripts/consumer-peer-patches.mjs"
+        ],
+        "allUseDestinationSide": true,
+        "testPeers": "Coordinator first .8 endpoint failed evidence hash on pre-rename path after declarations/patch application; only destination-side parser ported from original, coordinator owns exact-archive rerun.",
+        "consumerHelper": "Only prefix coverage/count previously used preimage names; no behavior failure claimed. Destination-side inventory now agrees with original and other readers.",
+        "relevantFixture": "node scripts/tf09-peer-patches.test.mjs passed after parser correction."
+      }
+    },
+    "original": {
+      "changedProofs": [
+        {
+          "command": [
+            "node",
+            "scripts/native-camera-bounds-reset.test.mjs",
+            "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+            "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+          ],
+          "exitCode": 0,
+          "output": "PASS actual Swift and Objective-C++ camera methods: set, replace, clear and reapply; unrelated limits preserved.\nSKIP Kotlin method regression: cached Kotlin 2.2.0 compiler required.\nSDK boundaries are stubbed; renderer acceptance remains separate.\n"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/rnmapbox-location-observer.test.mjs",
+            "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled"
+          ],
+          "exitCode": 0,
+          "output": "PASS actual Swift custom location/heading observers: initial replay, updates and removal\n"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/rnmapbox-offline-status.test.mjs",
+            "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled"
+          ],
+          "exitCode": 0,
+          "output": "PASS actual Swift offline status before persistence, paused/completed progress and genuine SDK failures\n"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/native-source-lifetime.test.mjs",
+            "both",
+            "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+            "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+          ],
+          "exitCode": 0,
+          "output": "PASS native explicit-state error/family and absent-Fabric-view source boundaries\nSKIP native source-lifetime regression: cached Kotlin compiler required.\n"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/example-native-codegen.test.mjs",
+            "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+            "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+          ],
+          "exitCode": 0,
+          "output": "PASS dual native codegen: real pinned React Native generator emits no shared module classes or protocols.\n"
+        },
+        {
+          "command": [
+            "bun",
+            "scripts/tf08-patches.test.mjs",
+            "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+            "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+          ],
+          "exitCode": 0,
+          "output": "PASS TF08 peer patches: clean application round trips, RNMapbox zero-zoom constructor execution, and native source assertions for image cleanup/scale and offline download ownership.\nSCOPE: mocked JavaScript execution and native source checks only; no native compilation, SDK rendering, or device/service acceptance.\n6 |     \"moduleSuffixes\": [\".native\", \"\"],\n        ^\nwarn: moduleSuffixes is not supported yet\n   at /Users/rob/code/mapbox-code/one-map/tsconfig.json:6:5\n"
+        }
+      ],
+      "finalCodegen": {
+        "label": "original-green",
+        "command": [
+          "node",
+          "scripts/example-native-codegen.test.mjs",
+          "<U23-F01>/sdk/rnmapbox-10.3.8/reconciled",
+          "<U23-F01>/sdk/maplibre-native-11.5.0/reconciled"
+        ],
+        "cwd": "/Users/rob/code/mapbox-code/one-map",
+        "exitCode": 0,
+        "output": "PASS dual native codegen: real pinned React Native generator emits no shared module classes or protocols.\n"
+      },
+      "lintChangedProofs": "bunx vp lint six changed scripts passed",
+      "fullRoutine": "Not repeated per coordinator: immutable production inputs match U22; only changed script proofs rerun."
+    },
+    "archive": {
+      "archive": "<U23-F01>/publication-pack/one-map-react-0.1.0-rc.2.tgz",
+      "sha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+      "files": 171,
+      "distFiles": 164,
+      "sourceAndDistByteIdenticalToU22": true,
+      "readmeSha256": "bbdd6ac1dddaa3a7f4beebe7f6c8655d55fe95649d006b408ddbf921c338a116"
+    },
+    "package": {
+      "checks": [
+        {
+          "scenario": "common",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "mapbox-web",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "maplibre-web",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "mapbox-native",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "maplibre-native",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "aliases-default",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "aliases-browser",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "aliases-react-native",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "aliases-browser-react-native",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "mixed-0-mapbox-web",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "mixed-0-maplibre-native",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "mixed-1-maplibre-web",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        },
+        {
+          "scenario": "mixed-1-mapbox-native",
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "react": "19.2.3",
+          "reactTypes": "19.2.18",
+          "lockfileSha256": null,
+          "status": "passed",
+          "scope": "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers"
+        }
+      ]
+    },
+    "minimumPeers": {
+      "checks": [
+        {
+          "entry": "mapbox-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "mapbox-gl@3.32.0"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "mapbox-gl": "3.32.0"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "1f677c9d3c3a3cdbf6070dcea4632042c8bad9a840aeec481f17f6611c32dfe8",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer"
+        },
+        {
+          "entry": "maplibre-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "maplibre-gl@6.13.0"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "maplibre-gl": "6.13.0"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "26ff0e954f3f3ff74e616a0a0fd78157cae871e41ca2f7f7514611212a671aae",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer"
+        },
+        {
+          "entry": "mapbox-native",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "react-native@0.87.1",
+            "@types/react@19.2.18",
+            "@rnmapbox/maps@10.3.7",
+            "react-native-teleport@1.2.1"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "react-native": "0.87.1",
+            "@types/react": "19.2.18",
+            "@rnmapbox/maps": "10.3.7",
+            "react-native-teleport": "1.2.1"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "66b1039679d84abf3921262fe83c83b9ae63414fe99780fddedf219c9553f1a5",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 31,
+          "patchedFilesAggregateSha256": "096346f1057e1d717a49782bd19639560361131ca8b4a1bf59cf07a073784245"
+        },
+        {
+          "entry": "maplibre-native",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "react-native@0.87.1",
+            "@types/react@19.2.18",
+            "@maplibre/maplibre-react-native@11.5.0",
+            "react-native-teleport@1.2.1",
+            "@types/geojson@7946.0.16"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "react-native": "0.87.1",
+            "@types/react": "19.2.18",
+            "@maplibre/maplibre-react-native": "11.5.0",
+            "react-native-teleport": "1.2.1",
+            "@types/geojson": "7946.0.16"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "2c95501c3e009bce2c42e5bcf081368283a86d74ab4743fe5a21cb3766aa1806",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 13,
+          "patchedFilesAggregateSha256": "35b0fe7e46f4cf046604499b81fce766a413d735b56a15574aa5c5df12180deb"
+        },
+        {
+          "entry": "mapbox-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "mapbox-gl@3.32.0",
+            "react-native@0.87.1",
+            "@maplibre/maplibre-react-native@11.5.0",
+            "react-native-teleport@1.2.1",
+            "@types/geojson@7946.0.16"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "mapbox-gl": "3.32.0",
+            "react-native": "0.87.1",
+            "@maplibre/maplibre-react-native": "11.5.0",
+            "react-native-teleport": "1.2.1",
+            "@types/geojson": "7946.0.16"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "94992f992b5cdcce18c8c326c27ee8cc092843afb9d7c6d42e0d0b49ed0a8a23",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 13,
+          "patchedFilesAggregateSha256": "35b0fe7e46f4cf046604499b81fce766a413d735b56a15574aa5c5df12180deb"
+        },
+        {
+          "entry": "maplibre-native",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "mapbox-gl@3.32.0",
+            "react-native@0.87.1",
+            "@maplibre/maplibre-react-native@11.5.0",
+            "react-native-teleport@1.2.1",
+            "@types/geojson@7946.0.16"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "mapbox-gl": "3.32.0",
+            "react-native": "0.87.1",
+            "@maplibre/maplibre-react-native": "11.5.0",
+            "react-native-teleport": "1.2.1",
+            "@types/geojson": "7946.0.16"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "94992f992b5cdcce18c8c326c27ee8cc092843afb9d7c6d42e0d0b49ed0a8a23",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 13,
+          "patchedFilesAggregateSha256": "35b0fe7e46f4cf046604499b81fce766a413d735b56a15574aa5c5df12180deb"
+        },
+        {
+          "entry": "maplibre-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "maplibre-gl@6.13.0",
+            "react-native@0.87.1",
+            "@rnmapbox/maps@10.3.7",
+            "react-native-teleport@1.2.1"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "maplibre-gl": "6.13.0",
+            "react-native": "0.87.1",
+            "@rnmapbox/maps": "10.3.7",
+            "react-native-teleport": "1.2.1"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "8c3e8beb3feacf098f04d19925546c7a3f1436acbf62dd2f418460f905f930c9",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 31,
+          "patchedFilesAggregateSha256": "096346f1057e1d717a49782bd19639560361131ca8b4a1bf59cf07a073784245"
+        },
+        {
+          "entry": "mapbox-native",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "maplibre-gl@6.13.0",
+            "react-native@0.87.1",
+            "@rnmapbox/maps@10.3.7",
+            "react-native-teleport@1.2.1"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "maplibre-gl": "6.13.0",
+            "react-native": "0.87.1",
+            "@rnmapbox/maps": "10.3.7",
+            "react-native-teleport": "1.2.1"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "8c3e8beb3feacf098f04d19925546c7a3f1436acbf62dd2f418460f905f930c9",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 31,
+          "patchedFilesAggregateSha256": "096346f1057e1d717a49782bd19639560361131ca8b4a1bf59cf07a073784245"
+        }
+      ]
+    },
+    "rnmapbox10.3.8Endpoint": {
+      "checks": [
+        {
+          "entry": "mapbox-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "mapbox-gl@3.32.0"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "mapbox-gl": "3.32.0"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "1f677c9d3c3a3cdbf6070dcea4632042c8bad9a840aeec481f17f6611c32dfe8",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer"
+        },
+        {
+          "entry": "maplibre-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "maplibre-gl@6.13.0"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "maplibre-gl": "6.13.0"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "26ff0e954f3f3ff74e616a0a0fd78157cae871e41ca2f7f7514611212a671aae",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer"
+        },
+        {
+          "entry": "mapbox-native",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "react-native@0.87.1",
+            "@types/react@19.2.18",
+            "@rnmapbox/maps@10.3.8",
+            "react-native-teleport@1.2.1"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "react-native": "0.87.1",
+            "@types/react": "19.2.18",
+            "@rnmapbox/maps": "10.3.8",
+            "react-native-teleport": "1.2.1"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "b8bbee30b5f4c8d25eb06833d68b9af8996764fc16f3140560ab6459d545fcc3",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 36,
+          "patchedFilesAggregateSha256": "a1cdcdea09f7889821e73ac63797023a29a47cb0b49212ece1b7cedf9fb783d3"
+        },
+        {
+          "entry": "maplibre-native",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "react-native@0.87.1",
+            "@types/react@19.2.18",
+            "@maplibre/maplibre-react-native@11.5.0",
+            "react-native-teleport@1.2.1",
+            "@types/geojson@7946.0.16"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "react-native": "0.87.1",
+            "@types/react": "19.2.18",
+            "@maplibre/maplibre-react-native": "11.5.0",
+            "react-native-teleport": "1.2.1",
+            "@types/geojson": "7946.0.16"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "2c95501c3e009bce2c42e5bcf081368283a86d74ab4743fe5a21cb3766aa1806",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 13,
+          "patchedFilesAggregateSha256": "35b0fe7e46f4cf046604499b81fce766a413d735b56a15574aa5c5df12180deb"
+        },
+        {
+          "entry": "mapbox-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "mapbox-gl@3.32.0",
+            "react-native@0.87.1",
+            "@maplibre/maplibre-react-native@11.5.0",
+            "react-native-teleport@1.2.1",
+            "@types/geojson@7946.0.16"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "mapbox-gl": "3.32.0",
+            "react-native": "0.87.1",
+            "@maplibre/maplibre-react-native": "11.5.0",
+            "react-native-teleport": "1.2.1",
+            "@types/geojson": "7946.0.16"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "94992f992b5cdcce18c8c326c27ee8cc092843afb9d7c6d42e0d0b49ed0a8a23",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 13,
+          "patchedFilesAggregateSha256": "35b0fe7e46f4cf046604499b81fce766a413d735b56a15574aa5c5df12180deb"
+        },
+        {
+          "entry": "maplibre-native",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "mapbox-gl@3.32.0",
+            "react-native@0.87.1",
+            "@maplibre/maplibre-react-native@11.5.0",
+            "react-native-teleport@1.2.1",
+            "@types/geojson@7946.0.16"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "mapbox-gl": "3.32.0",
+            "react-native": "0.87.1",
+            "@maplibre/maplibre-react-native": "11.5.0",
+            "react-native-teleport": "1.2.1",
+            "@types/geojson": "7946.0.16"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "94992f992b5cdcce18c8c326c27ee8cc092843afb9d7c6d42e0d0b49ed0a8a23",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 13,
+          "patchedFilesAggregateSha256": "35b0fe7e46f4cf046604499b81fce766a413d735b56a15574aa5c5df12180deb"
+        },
+        {
+          "entry": "maplibre-web",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "maplibre-gl@6.13.0",
+            "react-native@0.87.1",
+            "@rnmapbox/maps@10.3.8",
+            "react-native-teleport@1.2.1"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "maplibre-gl": "6.13.0",
+            "react-native": "0.87.1",
+            "@rnmapbox/maps": "10.3.8",
+            "react-native-teleport": "1.2.1"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "871a50e6657951a96025549efecce62f4f21ce67a25a0c90dc95cb7b78d886fb",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 36,
+          "patchedFilesAggregateSha256": "a1cdcdea09f7889821e73ac63797023a29a47cb0b49212ece1b7cedf9fb783d3"
+        },
+        {
+          "entry": "mapbox-native",
+          "packages": [
+            "react@19.2.3",
+            "react-dom@19.2.3",
+            "@types/react@19.2.18",
+            "react-map-gl@8.1.3",
+            "maplibre-gl@6.13.0",
+            "react-native@0.87.1",
+            "@rnmapbox/maps@10.3.8",
+            "react-native-teleport@1.2.1"
+          ],
+          "resolvedPeers": {
+            "react": "19.2.3",
+            "react-dom": "19.2.3",
+            "@types/react": "19.2.18",
+            "react-map-gl": "8.1.3",
+            "maplibre-gl": "6.13.0",
+            "react-native": "0.87.1",
+            "@rnmapbox/maps": "10.3.8",
+            "react-native-teleport": "1.2.1"
+          },
+          "archiveSha256": "263fe8dbe7e923959f8ca297ac4ec1e43a114991935b0ddbb7fdc72fa8851059",
+          "lockfileSha256": "871a50e6657951a96025549efecce62f4f21ce67a25a0c90dc95cb7b78d886fb",
+          "status": "passed",
+          "scope": "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+          "patchedFileCount": 36,
+          "patchedFilesAggregateSha256": "a1cdcdea09f7889821e73ac63797023a29a47cb0b49212ece1b7cedf9fb783d3"
+        }
+      ]
+    },
+    "setErrorSensitivity": [
+      {
+        "root": "original",
+        "sdkVersion": "10.3.7",
+        "input": "real",
+        "exitCode": 0,
+        "legacyRegexWouldFalselyPassMutant": null
+      },
+      {
+        "root": "original",
+        "sdkVersion": "10.3.7",
+        "input": "set-only-mutant",
+        "exitCode": 1,
+        "legacyRegexWouldFalselyPassMutant": true
+      },
+      {
+        "root": "publication",
+        "sdkVersion": "10.3.7",
+        "input": "real",
+        "exitCode": 0,
+        "legacyRegexWouldFalselyPassMutant": null
+      },
+      {
+        "root": "publication",
+        "sdkVersion": "10.3.7",
+        "input": "set-only-mutant",
+        "exitCode": 1,
+        "legacyRegexWouldFalselyPassMutant": true
+      },
+      {
+        "root": "original",
+        "sdkVersion": "10.3.8",
+        "input": "real",
+        "exitCode": 0,
+        "legacyRegexWouldFalselyPassMutant": null
+      },
+      {
+        "root": "original",
+        "sdkVersion": "10.3.8",
+        "input": "set-only-mutant",
+        "exitCode": 1,
+        "legacyRegexWouldFalselyPassMutant": true
+      },
+      {
+        "root": "publication",
+        "sdkVersion": "10.3.8",
+        "input": "real",
+        "exitCode": 0,
+        "legacyRegexWouldFalselyPassMutant": null
+      },
+      {
+        "root": "publication",
+        "sdkVersion": "10.3.8",
+        "input": "set-only-mutant",
+        "exitCode": 1,
+        "legacyRegexWouldFalselyPassMutant": true
+      }
+    ],
+    "diffWhitespace": {
+      "nonPatchDiff": "passed",
+      "patchWarnings": 21,
+      "disposition": "All21 are required unified-diff blank context lines containing one space; no source-added-line whitespace warning. Pristine forward/reverse application passed."
+    },
+    "independentAudit": {
+      "status": "passed",
+      "sha256": "c33593e674f6d851b39a9b15bee167545bf46a49447d50902b4352141c96e5e1",
+      "result": "No outstanding substantive code findings; old/new/original patches independently reconstructed against SHA512-verified pristine SDKs and compared byte-for-byte; all129 previous hunks retained; RN10.3.8 camera files pristine; proof fixes verified.",
+      "limits": [
+        "Kotlin compiler absent; source assertions only for Android",
+        "Node codegen uses installed RN0.86.3; no native linking/build/render verification"
+      ]
+    },
+    "documentation": {
+      "status": "Passed final approved/repaired-state reconciliation, standard/expanded structural checks, frozen README identity and unchanged historical/fence proofs. U23-F01 is implemented and independently audited; reviewed follow-up PR authorized; U24 next after that PR and undispatched. Native acceptance remains unverified.",
+      "commands": [
+        "node scripts/check-docs.mjs",
+        "node /private/tmp/one-map-u23-f01-hffcsxub/documentation/check-docs-expanded.mjs"
+      ],
+      "results": {
+        "original": {
+          "standard": {
+            "exit": 0,
+            "markdownFiles": 40,
+            "sdkComparisonTables": 43
+          },
+          "expanded": {
+            "exit": 0,
+            "markdownFiles": 45,
+            "sdkComparisonTables": 43
+          }
+        },
+        "publication": {
+          "standard": {
+            "exit": 0,
+            "markdownFiles": 39,
+            "sdkComparisonTables": 39
+          },
+          "expanded": {
+            "exit": 0,
+            "markdownFiles": 44,
+            "sdkComparisonTables": 39
+          }
+        }
+      },
+      "historicalCoverage": {
+        "original": {
+          "baseline": "per-root U23-F01 entry snapshot",
+          "rows": 69,
+          "firstThreeCellsIdentical": true,
+          "firstThreeCellsSha256": "3de2f3c2ecf628ad02f098b3bc6428f21012f0ca0328d7166e3e9d2b7f2f506c",
+          "historicalExceptions": []
+        },
+        "publication": {
+          "baseline": "per-root U23-F01 entry snapshot; committed U23 base7de2de0",
+          "rows": 69,
+          "firstThreeCellsIdentical": true,
+          "firstThreeCellsSha256": "7abcf6570e7fd262f728d1e68029c531170c0621f786196f0c832134e98f9b3d",
+          "historicalExceptions": []
+        }
+      },
+      "packedReadmeSha256": {
+        "original": "6e411d9379b7f83ced0f76b7ac9be949e0c2a48e2ef810cd9e539b5af46d78ca",
+        "publication": "bbdd6ac1dddaa3a7f4beebe7f6c8655d55fe95649d006b408ddbf921c338a116"
+      },
+      "historicalU23Evidence": {
+        "original": {
+          "historicalU23EvidenceUnchanged": true,
+          "sha256": "8619ba76538bb36a22c45b87ff153613231e1c825f5b45df1ed1c45414ae3f08"
+        },
+        "publication": {
+          "historicalU23EvidenceUnchanged": true,
+          "sha256": "8619ba76538bb36a22c45b87ff153613231e1c825f5b45df1ed1c45414ae3f08"
+        }
+      },
+      "fenceAndHistoricalReportIdentity": {
+        "original": {
+          "allFencesAcrossSixUserDocumentsUnchanged": 87,
+          "historicalU23ReportBodyPreserved": true,
+          "historicalReportBodySha256": "a7fff1d48aeb4ed2626b3eeb6191645880064145bac25e476be2104c28bed55a",
+          "currentReportSha256": "d9a75c01579349197bdc42832d68aacbbfd335315eedb31c2098ab201d4f4309",
+          "scope": "Fences include upstream, shell and JSON examples; identity proof only, no new type-check result."
+        },
+        "publication": {
+          "allFencesAcrossSixUserDocumentsUnchanged": 87,
+          "historicalU23ReportBodyPreserved": true,
+          "historicalReportBodySha256": "a7fff1d48aeb4ed2626b3eeb6191645880064145bac25e476be2104c28bed55a",
+          "currentReportSha256": "d9a75c01579349197bdc42832d68aacbbfd335315eedb31c2098ab201d4f4309",
+          "scope": "Fences include upstream, shell and JSON examples; identity proof only, no new type-check result."
+        }
+      },
+      "review": "Current routing and the bounded follow-up card record owner approval, P1-P8 implementation/independent audit and the reviewed-PR/U24 sequence. The report adds a separate completed-reconciliation overlay and exact three publication hashes/counts while preserving the entire pre-repair U23 body, matrix/count facts and evidence bytes. Original README identifies unchanged original patches and qualified pristine-output parity; publication README describes the repaired retained behavior. Both keep original peer/minimum metadata, U20 Images rationale/lifetime and U22 current excerpt fences. README prose scopes focused evidence to pristine/static Android, extracted Swift/Objective-C++ methods with stubbed SDK boundaries and Node codegen, with executable Kotlin skipped and native application builds/linking/renderer acceptance unverified. Final audit/current outcome outside frozen README links canonical reconciliation evidence; no new compatibility range or peer policy is claimed.",
+      "limitations": "Documentation commands inspect paragraphs, fences, specified comparison columns and local link/heading targets. Remote URLs and runtime behavior were not tested. All87 fences across six user documents remain unchanged, including upstream, shell and JSON examples; this is not 87 current type passes or any new type-check run. All69 historical IDs/order/checkmarks/first three cells and historical U23 evidence/report body are unchanged. Source/pristine/isolated/archive check outcomes belong to implementation/coordinator evidence; this lane performed no patch/source/config/peer/lock/version edits, source builds/tests, installs, package/peer checks, codegen, native linking, renderer, Metro or native build/install execution."
+    }
+  },
+  "firstAttempts": [
+    {
+      "result": "Pristine pre-repair tests reproduced P1-P8 with per-version and independent MapLibre checks; no native runtime failure inferred."
+    },
+    {
+      "result": "Fresh publication checkout needed library build before source imports/types; 614 executed tests passed before missing-dist imports. Prerequisite build then rerun passed."
+    },
+    {
+      "result": "Sandbox blocked tiny owned Node process signal probe with EPERM; authorized routine escalation passed, no native acceptance process."
+    },
+    {
+      "result": "RN10.3.8 renamed spec exposed a preimage-path bug in TF08 verifier and peer evidence collector. Destination-path parsers corrected; consumer helper aligned. Exact archived endpoint rerun passed."
+    },
+    {
+      "result": "Independent audit found static set-error assertion could cross into the later remove function. Per-call assertions and a set-only swallowed-error sensitivity test now pass."
+    }
+  ],
+  "proofLimitations": {
+    "kotlin": "Executable Kotlin probes skipped: cached compiler absent. Source/order assertions pass; no Kotlin compilation or Android linking claimed.",
+    "codegen": "Actual pure Node generation uses installed RN0.86.3 generator; generated Objective-C/C++ symbols checked. RN0.87.1 isolated declarations checked separately, no native link/build claim.",
+    "swift": "Extracted actual SDK methods executed with stubbed SDK boundaries; no iOS app build or renderer acceptance.",
+    "host": "Development RN0.86.3 is outside declared ^0.87.1 baseline; original Teleport1.2.2 and publication1.2.1 minima remain distinct."
+  },
+  "remainingGates": [
+    "U24 candidate and acceptance preparation",
+    "Native/build/link/renderer/Metro execution requires separate explicit permission; not run"
+  ],
+  "historicalEvidence": {
+    "path": "records/evidence/revised-api-u23-patch-peer-review.json",
+    "sha256": "8619ba76538bb36a22c45b87ff153613231e1c825f5b45df1ed1c45414ae3f08",
+    "unchanged": true
+  },
+  "notExecuted": [
+    "Native Gradle/Xcode/pods app builds/installations",
+    "Browser/GPU renderer, Metro transport, simulator/emulator/device acceptance",
+    "Merge, tag or registry publication"
+  ],
+  "implementationManifest": [
+    {
+      "root": "original",
+      "path": "scripts/native-camera-bounds-reset.test.mjs",
+      "beforeExists": true,
+      "beforeSha256": "1f85b5d426977b282097a59bef8ead97e66508841d7e5f967ccd10185585882f",
+      "afterSha256": "e31cf58ef120fd234cbea8d006ab37911198d4c8d7f4f4bb5e3cd8a385ee599a",
+      "beforeLines": 287,
+      "afterLines": 293
+    },
+    {
+      "root": "original",
+      "path": "scripts/rnmapbox-location-observer.test.mjs",
+      "beforeExists": true,
+      "beforeSha256": "2eb71812879916695d7c12a866ae3b16561b40cca2eb7629d6c98b37bfe7dfc9",
+      "afterSha256": "8aadda9410f8e58bdd1c590728789eaf19edb042a4a96a39496090440823a1db",
+      "beforeLines": 74,
+      "afterLines": 74
+    },
+    {
+      "root": "original",
+      "path": "scripts/rnmapbox-offline-status.test.mjs",
+      "beforeExists": true,
+      "beforeSha256": "9d97673cebe84bf41934859c72536576f6049dfd198152aaec069165c817423c",
+      "afterSha256": "d6efecbe763dd6d080ca81a831e7fca8e6f8e8f5bbae7f59b7ab2f7d0a2bc9f9",
+      "beforeLines": 93,
+      "afterLines": 93
+    },
+    {
+      "root": "original",
+      "path": "scripts/native-source-lifetime.test.mjs",
+      "beforeExists": true,
+      "beforeSha256": "7a07855f2537931e1aec9dda72b0df53cb5b75e059ee483d7c0fef6b146c28a0",
+      "afterSha256": "e1225fb13bbbae9d4e332c0fcdc9a833157c3c2ef24e0c11a24aca7d868bce95",
+      "beforeLines": 164,
+      "afterLines": 234
+    },
+    {
+      "root": "original",
+      "path": "scripts/example-native-codegen.test.mjs",
+      "beforeExists": true,
+      "beforeSha256": "75ca59b3e8100994cca1d82a409e2a941bbde3b2a7847e59a8af62ab27148f23",
+      "afterSha256": "d58b27c1750919728fd7b424351930214ac1d8514c36057f5ce2fa171790a9a5",
+      "beforeLines": 51,
+      "afterLines": 118
+    },
+    {
+      "root": "original",
+      "path": "scripts/tf08-patches.test.mjs",
+      "beforeExists": true,
+      "beforeSha256": "cb31936f99371e8b0b45606734a20c973e0e790b2c81ca0a4bea17894daf6cf7",
+      "afterSha256": "9f94823a7d237cbac50ecb73e1a71e7482b85d12fc722bd015a6e2caba9f4c1f",
+      "beforeLines": 303,
+      "afterLines": 313
+    },
+    {
+      "root": "publication",
+      "path": "scripts/native-camera-bounds-reset.test.mjs",
+      "beforeExists": false,
+      "beforeSha256": null,
+      "afterSha256": "e31cf58ef120fd234cbea8d006ab37911198d4c8d7f4f4bb5e3cd8a385ee599a",
+      "beforeLines": 0,
+      "afterLines": 293
+    },
+    {
+      "root": "publication",
+      "path": "scripts/rnmapbox-light-color.test.mjs",
+      "beforeExists": false,
+      "beforeSha256": null,
+      "afterSha256": "ca3f7e0f3e7169f0341500c7ba4e1716af7aeae2ea6c34fde4ade8e3b6ebe23d",
+      "beforeLines": 0,
+      "afterLines": 77
+    },
+    {
+      "root": "publication",
+      "path": "scripts/rnmapbox-location-observer.test.mjs",
+      "beforeExists": false,
+      "beforeSha256": null,
+      "afterSha256": "8aadda9410f8e58bdd1c590728789eaf19edb042a4a96a39496090440823a1db",
+      "beforeLines": 0,
+      "afterLines": 74
+    },
+    {
+      "root": "publication",
+      "path": "scripts/rnmapbox-offline-status.test.mjs",
+      "beforeExists": false,
+      "beforeSha256": null,
+      "afterSha256": "d6efecbe763dd6d080ca81a831e7fca8e6f8e8f5bbae7f59b7ab2f7d0a2bc9f9",
+      "beforeLines": 0,
+      "afterLines": 93
+    },
+    {
+      "root": "publication",
+      "path": "scripts/native-source-lifetime.test.mjs",
+      "beforeExists": false,
+      "beforeSha256": null,
+      "afterSha256": "e1225fb13bbbae9d4e332c0fcdc9a833157c3c2ef24e0c11a24aca7d868bce95",
+      "beforeLines": 0,
+      "afterLines": 234
+    },
+    {
+      "root": "publication",
+      "path": "scripts/native-camera-mode.test.mjs",
+      "beforeExists": false,
+      "beforeSha256": null,
+      "afterSha256": "f8c88ad623f10e065a1a7eb3b3d704e994dc1f0147a2c6fcfe41cc885dc0504f",
+      "beforeLines": 0,
+      "afterLines": 153
+    },
+    {
+      "root": "publication",
+      "path": "scripts/example-native-codegen.test.mjs",
+      "beforeExists": false,
+      "beforeSha256": null,
+      "afterSha256": "d58b27c1750919728fd7b424351930214ac1d8514c36057f5ce2fa171790a9a5",
+      "beforeLines": 0,
+      "afterLines": 118
+    },
+    {
+      "root": "publication",
+      "path": "scripts/tf08-patches.test.mjs",
+      "beforeExists": true,
+      "beforeSha256": "52e68d69cc57d937f6a1b8b845fc8a8a12264ee14ef5aa8b0a6adf4b8abc9c50",
+      "afterSha256": "9f94823a7d237cbac50ecb73e1a71e7482b85d12fc722bd015a6e2caba9f4c1f",
+      "beforeLines": 303,
+      "afterLines": 313
+    },
+    {
+      "root": "publication",
+      "path": "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
+      "beforeExists": true,
+      "beforeSha256": "118090860852b786a6681287f52ae3af1af8e0657a7c1853936204afb287a6d4",
+      "afterSha256": "807c23c9926fdbf94ab2f716de113707ed2a7c3688d177ea9f2b3ea3ca95d7f1",
+      "beforeLines": 896,
+      "afterLines": 1056
+    },
+    {
+      "root": "publication",
+      "path": "packages/one-map-react/patches/rnmapbox-10.3.8.patch",
+      "beforeExists": true,
+      "beforeSha256": "aacec1a77c297c5a0ba0d756f6833ae0b1364285dd473a030d98128ebb35cbe7",
+      "afterSha256": "0b9cdb09c6b39c1b5527678155246e9116a8db71249fd7fd08d9d1fe1288a788",
+      "beforeLines": 897,
+      "afterLines": 1110
+    },
+    {
+      "root": "publication",
+      "path": "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch",
+      "beforeExists": true,
+      "beforeSha256": "430ef194dfeeefcc8c2e94c507b7dcb68f7633e691e7e75603d13a4061bff3af",
+      "afterSha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0",
+      "beforeLines": 296,
+      "afterLines": 356
+    },
+    {
+      "root": "publication",
+      "path": "scripts/test-peers.mjs",
+      "beforeExists": true,
+      "beforeSha256": "eed16e6d7fb3da36840c7095dc787503397389bcf48ba9e36a1baa8b47e9c02c",
+      "afterSha256": "889f8fa35de29ad14ddc05b25f5fb41fec492e3c82307d4a18a95d8eb91f0ed8",
+      "beforeLines": 619,
+      "afterLines": 619
+    },
+    {
+      "root": "publication",
+      "path": "scripts/consumer-peer-patches.mjs",
+      "beforeExists": true,
+      "beforeSha256": "8d812eb6669b3218ac6a5e10077e9a8866f0337ab4bc003cd9957f55058a3e93",
+      "afterSha256": "8d2c1a5fef989f3054e623882329299b1209dc4f4b60cf50dbee14ca2f2688a0",
+      "beforeLines": 54,
+      "afterLines": 54
+    }
+  ]
+}

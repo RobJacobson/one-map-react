@@ -1,0 +1,30 @@
+{
+  "checks": [
+    {
+      "shell": "mapbox-web",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "peers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "lockfileSha256": "662b7bbd8fdc969256bbf968f58d1a0ed5a977ccb2243a40bba7a19fa8fd2854",
+      "status": "passed",
+      "scope": "Vite production build and selected-engine module isolation; no browser renderer"
+    },
+    {
+      "shell": "maplibre-web",
+      "archiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+      "peers": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "lockfileSha256": "41531ad6a4132c329eca33459f5ab8c6992f8f3d759f80e00aa1ae83a3e57692",
+      "status": "passed",
+      "scope": "Vite production build and selected-engine module isolation; no browser renderer"
+    }
+  ]
+}

@@ -1,0 +1,1307 @@
+{
+  "unit": "U16",
+  "status": "Implemented, independently audited and corrected; routine and packed evidence complete within the stated limits. PR then immediate U17 authorized.",
+  "authorization": "Automatic sequential reviewed PRs through U24, authorized by the owner. U16 stacks on U15 PR34. No merge, tagging, publication, renderer/native build/install permission.",
+  "scope": {
+    "removed": "Remove common GeolocateControl, facade types/aliases/adapter fields and use-geolocation-control follow/coalescing policy; migrate app UI to raw selected web wrapper controls and ordinary native one-shot button; preserve display and intermediate acquisition services.",
+    "retained": "UserLocation validation/display/accuracy and GeolocationPosition, raw SDK pucks/follow and native viewState/locationOptions constraints; all acquisition services/types/useMapServices/MapSetup.locationProvider until U18; Control until U17; source/press contracts until U19. Marker portals, ornament options/refresh and peers/patches/locks/version/candidate remain.",
+    "web": "Raw selected WrapperGeolocateControl uses normal browser geolocation, with no global navigator patch or MapSetup provider interception. showUserLocation=false leaves supplied UserLocation as the app display owner. Source-only browser-driver CDP/Playwright setup owns deterministic position/permission simulation.",
+    "native": {
+      "acquire": "One application-supplied Promise; deterministic fixed/delayed fixture or retained services.location.getCurrentPosition({signal}) until U18. No subscription or follow controller.",
+      "ownership": "Own AbortController, block duplicate activation while pending, abort on component disposal/key replacement; only a current request and concrete map identity can dispatch or notify. TF07 generation, TF08 generation/mode and native focused mode own their button keys.",
+      "errors": "Reject invalid coordinates before dispatch; current acquisition/camera errors reach the app callback and permit retry. Retired acquisition/camera resolutions and failures are ignored.",
+      "display": "App supplies received position to retained UserLocation. Raw web controls set showUserLocation=false so exactly the app-owned display path owns puck/accuracy. Native callback success means camera dispatch acknowledged, not observed completion.",
+      "placement": "TF07 scale top64/left8, compass top148/right8 below three44px camera buttons; location top8/left8. TF08 location top8/right8 and coverage compass top64/right8. Native focused first location top8/right8/compass64right8, second compass104right8 below two44px camera buttons. SDK enablement defaults preserved."
+    },
+    "data": "No live sensor, storage or database operation ran. One-shot app examples use fixed/delayed fixtures or retained explicit service calls until U18; no watch/follow framework relocated."
+  },
+  "findings": [
+    {
+      "classification": "Introduced native TF07 lifetime gap found by coordinator.",
+      "trigger": "Sibling location button could retain pending/disabled state when only keyed map generation changed.",
+      "fix": "Share generation key; TF08 uses generation/mode and focused native mode/removal lifetime.",
+      "proof": "Actual scene Location disposal/remount plus real button key-lifetime abort/stale/fresh-instance tests. Complementary mocked proof, not a renderer scenario."
+    },
+    {
+      "classification": "App placement regressions/exposed avoidance dependencies corrected during migration.",
+      "trigger": "App buttons no longer register common-control heights, so SDK scale or visible compass could share their corners.",
+      "fix": "TF07 scale64/left8, compass148/right8; TF08 right button+coverage compass64/right8; focused first right button+compass64, second compass104 below two44px rows. Defaults preserved, no registry.",
+      "proof": "Actual selected-entry and focused mock forwarding/placement regressions red/green; pixel/touch layout unverified."
+    },
+    {
+      "classification": "Introduced duplicate web display ownership found by coordinator.",
+      "fix": "Raw web controls explicitly disable SDK-owned location display; app callback supplies retained UserLocation.",
+      "proof": "Both actual backend entry tests cover TF07/TF08 option and callback path."
+    },
+    {
+      "classification": "Introduced adjacent raw-export deletion caught by AST audit.",
+      "trigger": "Broad facade-removal range consumed MapLibre raw Globe/Logo/Terrain exports.",
+      "fix": "Restored exact block in both trees and rebuilt.",
+      "proof": "Exact root/four-entry export audit and packed raw positives pass."
+    },
+    {
+      "classification": "Introduced TF08 isolation defect found after initial freeze; earlier signoff superseded.",
+      "origin": "Introduced by U16 moving position state from the keyed common control to the persistent TF08 scene parent. Reconfiguring/remounting the map no longer discarded the previous supplied position, allowing stale common blue geometry into capture baseline or raw native puck coverage.",
+      "fix": "Clear displayPosition for every configure command in both scenes. Omit common UserLocation during native coverage-puck so the raw selected SDK puck is its only display owner even if the application button delivers a fresh fix. Web coverage-puck still accepts a fresh raw-wrapper callback into common supplied display because the raw control has showUserLocation=false.",
+      "red": "Four regression cases failed in each tree because the old coordinate survived coverage-base.",
+      "green": {
+        "original": "11 tests passed in acceptance-scenes.web.test.tsx",
+        "publication": "6 tests passed in app-popup.web.test.tsx"
+      },
+      "proof": "Independent actual mocked scene rerun passes; exactly two scenes and their tests changed.104 library source hashes unchanged between freezes. Source/mock isolation protects the capture oracle; no pixels were observed."
+    }
+  ],
+  "fixtureDispositions": [
+    {
+      "path": "packages/one-map-react/test/tf07-ui.web.test.tsx",
+      "title": "test(\"uses browser geolocation and strips the native provider and zoom\", () =>",
+      "disposition": "replaced_by_raw_selected_wrapper",
+      "replacement": "tf08-controls.web.test.tsx actual Mapbox/MapLibre raw identity/options/callback/setup-override isolation; selected app entry forwarding tests"
+    },
+    {
+      "path": "packages/one-map-react/test/tf07-ui.web.test.tsx",
+      "title": "test(\"injected geolocation ignores repeat presses, centers once, and discards work after teardown\", async () =>",
+      "disposition": "migrated_to_application",
+      "replacement": "app-location.web.test.tsx: one pending request, abort on keyed replacement/unmount, stale acquisition and camera callbacks, current attachment, source/camera failure and retry; notification occurs after dispatch acknowledgement"
+    },
+    {
+      "path": "packages/one-map-react/test/tf07-ui.web.test.tsx",
+      "title": "test(\"TF08 tracking-mode changes release the old SDK control resource\", () =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": null
+    },
+    {
+      "path": "packages/one-map-react/test/tf07-ui.native.test.tsx",
+      "title": "test(\"invalid injected locations report failure without successful notification or camera dispatch\", async () =>",
+      "disposition": "migrated_to_application",
+      "replacement": "app-location.web.test.tsx: invalid application fixes fail before camera dispatch"
+    },
+    {
+      "path": "packages/one-map-react/test/tf07-ui.native.test.tsx",
+      "title": "test(\"injected location coordinates are copied before callbacks and camera dispatch\", async () =>",
+      "disposition": "migrated_to_application",
+      "replacement": "app-location.web.test.tsx: coordinates captured before camera acknowledgement and notification"
+    },
+    {
+      "path": "packages/one-map-react/test/tf07-ui.native.test.tsx",
+      "title": "test(\"injected location centers once and pending work is ignored after teardown\", async () =>",
+      "disposition": "migrated_to_application",
+      "replacement": "app-location.web.test.tsx: one pending request, abort on keyed replacement/unmount, stale acquisition and camera callbacks, current attachment, source/camera failure and retry; notification occurs after dispatch acknowledgement"
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"replacing a selected SDK geolocation provider requires a control remount\", () =>",
+      "disposition": "replaced_by_raw_selected_wrapper",
+      "replacement": "tf08-controls.web.test.tsx actual Mapbox/MapLibre raw identity/options/callback/setup-override isolation; selected app entry forwarding tests"
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test.each([\"mapbox-web\", \"maplibre-web\"] as const)(\n    \"%s default tracking rejects a controlled camera before SDK delegation\",\n    (backend) =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": null
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"explicit tracking follows updates, suspends for gestures, and resumes without a second watch\", async () =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": null
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test.each([\"abort\", \"release\"] as const)(\n    \"%s-triggered unmount suppresses the location failure callback\",\n    async (cleanup) =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": null
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"callback-triggered unmount prevents subsequent camera dispatch\", async () =>",
+      "disposition": "migrated_to_application",
+      "replacement": "app-location.web.test.tsx: one pending request, abort on keyed replacement/unmount, stale acquisition and camera callbacks, current attachment, source/camera failure and retry; notification occurs after dispatch acknowledgement"
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test.each([\"position\", \"error\"] as const)(\n    \"control releases a watch exactly once after synchronous %s unmount\",\n    async (callback) =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": null
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test.each([\"provider\", \"mode\", \"detach\"] as const)(\n    \"resumed camera errors are suppressed after %s replacement\",\n    async (replacement) =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": "No resumed-follow policy remains. App one-shot error/retry and stale camera failure tests preserve the chosen action policy."
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"a current resumed camera failure releases tracking and permits a fresh retry\", async () =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": "No resumed-follow policy remains. App one-shot error/retry and stale camera failure tests preserve the chosen action policy."
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"retrying after a watch failure is not blocked by its pending camera dispatch\", async () =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": "No resumed-follow policy remains. App one-shot error/retry and stale camera failure tests preserve the chosen action policy."
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"terminal errors release tracking and go to the current error callback\", () =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": null
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"an immediate one-shot provider failure reports the error and permits retry\", async () =>",
+      "disposition": "migrated_to_application",
+      "replacement": "app-location.web.test.tsx: one pending request, abort on keyed replacement/unmount, stale acquisition and camera callbacks, current attachment, source/camera failure and retry; notification occurs after dispatch acknowledgement"
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test.each([\n    [\"provider\", \"resolve\"],\n    [\"provider\", \"reject\"],\n    [\"injected\", \"resolve\"],\n    [\"injected\", \"reject\"],\n  ] as const)(\n    \"%s one-shot requests keep centering when an older camera command completes",
+      "disposition": "migrated_to_application",
+      "replacement": "app-location.web.test.tsx: one pending request, abort on keyed replacement/unmount, stale acquisition and camera callbacks, current attachment, source/camera failure and retry; notification occurs after dispatch acknowledgement"
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"tracking coalesces pending camera updates and resumes without another watch\", async () =>",
+      "disposition": "retired_common_follow_policy",
+      "replacement": null
+    },
+    {
+      "path": "packages/one-map-react/test/tf08-controls.web.test.tsx",
+      "title": "test(\"unmounting only the control aborts its owned one-shot acquisition\", async () =>",
+      "disposition": "migrated_to_application",
+      "replacement": "app-location.web.test.tsx: one pending request, abort on keyed replacement/unmount, stale acquisition and camera callbacks, current attachment, source/camera failure and retry; notification occurs after dispatch acknowledgement"
+    },
+    {
+      "fixture": "ui-creation.web.test.tsx GeolocateControl creation/defaults",
+      "disposition": "retired_removed_common_control",
+      "retained": "Marker and Control creation/default guards"
+    },
+    {
+      "fixture": "TF07 shared scene",
+      "disposition": "migrated",
+      "policy": "Native fixed one-shot action; web raw browser acquisition; supplied UserLocation display/accuracy; actual native scene generation keys retire app requests; renderer readback remains independent."
+    },
+    {
+      "fixture": "TF07 native focused",
+      "disposition": "migrated",
+      "policy": "Retains rejection, delayed result, removal/stale result, accessible button, app-supplied display, current map and explicit screen/SDK placements."
+    },
+    {
+      "fixture": "TF07 web focused + workspace-ui-web-smoke.mjs",
+      "disposition": "migrated_and_partly_retired",
+      "migrated": "Raw wrapper browser success/error and control removal/restoration via driver permission/coordinate emulation; portal theme/child click, map host accessibility and fullscreen retained.",
+      "retired": "Facade provider call/settled counters, delay/resolve commands, injected web provider rejection/stale guarantee."
+    },
+    {
+      "fixture": "TF08 scene and services smoke",
+      "disposition": "migrated_and_partly_retired",
+      "migrated": "Explicit one-shot/native or raw browser action, supplied UserLocation and accuracy, actual renderer readback, separate service permission/getCurrentPosition, selected capture/offline/snapshot/image/ornament/puck coverage. Web capture-puck location now comes from driver CDP coordinates and permission, then observed fix readback.",
+      "retired": "Injected watch/emit API and watch/release counts, continuous following, gesture interruption/resume, coalescing, common tracking cleanup oracles."
+    },
+    {
+      "fixture": "Retained service tests",
+      "disposition": "retained_unchanged_or_preserved",
+      "tests": "tf08-controls setup location override/teardown, setup synchronous watch callbacks, per-watch cancellation/disposal, display no acquisition; tf08-location web/native acquisition suites; selected native viewState/locationOptions conflict tests."
+    },
+    {
+      "fixture": "Raw native facilities",
+      "disposition": "retained",
+      "proof": "No native map/backend location implementation changed; raw SDK pucks, follow option types and managers remain. Exact AST export audit and retained source hashes supplement routine mocked tests."
+    },
+    {
+      "fixture": "Compiler/package/peer fixtures",
+      "disposition": "migrated",
+      "policy": "Deleted common hook compiler target retired. Common runtime expectation removes only GeolocateControl; negative common/selected facade declarations added; raw selected geolocation option probes and Mapbox geolocation input probe added; adjacent MapLibre raw control probes retained."
+    }
+  ],
+  "artifacts": {
+    "original": {
+      "head": "1b8d683f7cf6021aefba832d457c5d4b486fc756",
+      "basis": "Approved dirty rc.11 after U15 preserved without commit/reset/clean.",
+      "candidateSha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7",
+      "archiveAudit": {
+        "archiveSha256": "42b0a0c7e5d52f432f53b23276a43944ae252f7f81787e2dbbb7f363109c6b02",
+        "members": 189,
+        "sourceDistReadmeMatched": 183,
+        "deletedControllerAbsent": true,
+        "commonGeolocateAbsentServicesRetained": true,
+        "rawExportsPresent": true,
+        "postCaptureFixByteMatch": true
+      }
+    },
+    "publication": {
+      "base": "c813cbad615e9bccfe4a1212b5acf9aefc27aa05",
+      "baseBranch": "codex/u15-sdk-ornaments",
+      "predecessorPr": 34,
+      "branch": "codex/u16-app-location-ui",
+      "basis": "Minimal port preserving older main layout/native App branches and peer/patch/version differences. Original-only focused/workspace additions not copied.",
+      "archiveAudit": {
+        "archiveSha256": "6c89101b4b09fb84dc90563d4673fb6e20aabcbfb3dae72d6a6d5778a93fa7a0",
+        "members": 189,
+        "sourceDistReadmeMatched": 183,
+        "deletedControllerAbsent": true,
+        "commonGeolocateAbsentServicesRetained": true,
+        "rawExportsPresent": true,
+        "postCaptureFixByteMatch": true
+      }
+    },
+    "sourceFreezeSha256": "e44313ceeed6e184688c6615a068c1fea71610be4570862f6bfad6e39a3209f6",
+    "initialHandoffSha256": "68d130673b961e60f4bd79efb0f703497af1145eefa852be50341afff05bcac7",
+    "correctionHandoffSha256": "3321310fa48b461dbd7eb07f4302ce23163005742e9ca7d9b7b49b012266be8b",
+    "productionMovement": {
+      "original": {
+        "librarySourceNetLines": -486,
+        "applicationSourceNetLines": 200,
+        "allImplementation": {
+          "files": 41,
+          "added": 1093,
+          "removed": 1667
+        },
+        "newRuntimeDependencies": 0,
+        "peerPatchChanges": 0
+      },
+      "main": {
+        "librarySourceNetLines": -465,
+        "applicationSourceNetLines": 190,
+        "allImplementation": {
+          "files": 38,
+          "added": 968,
+          "removed": 1494
+        },
+        "newRuntimeDependencies": 0,
+        "peerPatchChanges": 0
+      }
+    },
+    "archiveProof": "Both archives189 file members; all183 shipped source/dist/README members match final rebuilt tree, including after the app-only correction. Old controller/common export absent, services and raw controls retained.",
+    "unchanged": "Root/library package JSON, peers/patches/locks, support/version and archived candidate unchanged."
+  },
+  "checks": {
+    "beforeLateAppOnlyFix": {
+      "original": [
+        {
+          "command": [
+            "bun",
+            "run",
+            "build"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "7229bbb2e538f436d6fcfcd6c22e741feb7c76a075d3151489ee963ea8e53d24"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "typecheck:apps"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "check"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "e1c278953db343a15b5a24defa9fee7ee54842697236e7e242d0d5b23ecdc30d"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "2a1d14756e18f7a59a84c7cfa539c915e5e5a83503911720c590109de52fbaf4"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "test:native"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "7feb03ed1929ea3356f64db17e3c4c77699fbf0d04cf2558d0f62063d242ead2"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "test:compiled"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "2767754eac3e466da72bf3ac4fafab5ff29f225cd4e1274dce492c3f8040996b"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "-C",
+            "apps/web",
+            "build",
+            "--outDir",
+            "/private/tmp/one-map-u16-62bw0k1n/original-web-bundle"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "13a2da5bde03fcfe4dae31bc9a67b63a346d6052d2c6ef1ddd23ba683e5895d3"
+        }
+      ],
+      "publication": [
+        {
+          "command": [
+            "bun",
+            "run",
+            "build"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "e239de890323155acf4f956f78b2b91f2e6327d2d4956e6b488d43749de4e634"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "typecheck:apps"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "check"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "d9a94124db56bd26311d12eaf0f46cce5c81d406b17e3a11fa2b67852167de26"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run",
+            "--exclude",
+            "packages/one-map-react/test/wrapper-callbacks.web.test.tsx"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "4f3d7f4746411dd8cc35d68eab5fc3963b5f2efeeb8d2d0511e48750a1ec9879"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "test:native"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "9d7acb046af358436185e1da3f1c0c98349ebff8347e0f7725fecc2115aebcae"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run",
+            "--config",
+            "vite.compiled.config.ts",
+            "--exclude",
+            "packages/one-map-react/test/wrapper-callbacks.web.test.tsx"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "1b565d158a2965ff3120f25e7f71035e9cd5bf505d4e136c7984495617444d01"
+        },
+        {
+          "command": [
+            "bunx",
+            "jest",
+            "--config",
+            "jest.compiled.config.cjs",
+            "--runInBand"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "4b073580076b31a17f6c2c35f34defa97fef3bf6377fc5065244b701b8fa0c72"
+        },
+        {
+          "command": [
+            "node",
+            "scripts/react-compiler.test.mjs"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "a580905426596bfd7282f42d1b072644427814576e9b1b66c67372c414312542"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "-C",
+            "examples/web-mapbox",
+            "build",
+            "--outDir",
+            "/private/tmp/one-map-u16-62bw0k1n/publication-web-mapbox-bundle"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "4fc19290958cfef32b98de24ccb85514365b1d76d3674c5654de92111f72213f"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "-C",
+            "examples/web-maplibre",
+            "build",
+            "--outDir",
+            "/private/tmp/one-map-u16-62bw0k1n/publication-web-maplibre-bundle"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "35e6685148330abdb886262e3f13f93b0579d22cdf04ec325020bf01ad5006c8"
+        }
+      ],
+      "originalStatic": [
+        {
+          "command": "bun scripts/inline-fixture-base.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "00d2a983279dd5c1e967f1a5436589ec57621144ea70568dcee9453df6d65728"
+        },
+        {
+          "command": "bun scripts/tf06-lifetimes-fixture.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "95ce9a5d8965f639c4ca39c07c7aaa6735b5876fe8413bac3bcfe60aba4d9760"
+        },
+        {
+          "command": "bun scripts/tf06-smoke-selection.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "f8c8868ca54faeb9e0a79e8d70174be98430a4885e1f39ba01f7123294d20149"
+        },
+        {
+          "command": "bun scripts/tf07-smoke-contract.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "9744b29d4d62b193526cbd9470de6614a46e7196782c9e632c9787bf23b847bb"
+        },
+        {
+          "command": "node scripts/tf07-read-receipts.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "fc8ffc7c12b1bb079a355578cd4d90f2814fca9f6844526dc56f2fac4e5a017e"
+        },
+        {
+          "command": "bun scripts/tf08-patches.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "f90dd514f8bb0b639fb99b4000c9491fa3dc6d9a4c50785728c547b56861750a"
+        },
+        {
+          "command": "bun scripts/native-location-permissions.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "f958d518ca7fff0da68029e82a9b4fe8c8334c61afcb68a2dbdef92591677234"
+        },
+        {
+          "command": "node scripts/tf08-image-observations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "623742901eb5c30644244248d40fe42f089619eb138b3c57e2b6171622ec8553"
+        },
+        {
+          "command": "node scripts/tf08-snapshot-errors.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "d85036b9ba4a01d48f52cec29824cfbe3fddacfd36554ac743d304c8782708f1"
+        },
+        {
+          "command": "node scripts/tf08-final-observations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "5a2f6f219e716ffb99348beb4005beba7f2044c9ee397cd775b742eb8a6d7c25"
+        },
+        {
+          "command": "node scripts/tf08-map-readiness.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "3a97495d641bd2e929ab6e54e5eb236f4c650766b6111bab0143241825b52646"
+        },
+        {
+          "command": "node scripts/tf08-android-transport.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "ed40cb34a741f6db3dce86813e994a9fc8aff4de204798de5e011c953138fc86"
+        },
+        {
+          "command": "node scripts/tf08-coverage-diagnostics.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "fa2a200963963510b804ac5f0eb6d878758bd996445dd293231b95ae9f996043"
+        },
+        {
+          "command": "node scripts/tf08-pending-scope.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "0bec7e600e46158ed52a18abfc3ae689c094fff7bca8779bec767480ed4750e8"
+        },
+        {
+          "command": "node scripts/tf08-offline-observations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "d0fb9f2fd49264b01dae27c97cc76f9adb8b781aa52c4a6dca1c8bdba30e59dd"
+        },
+        {
+          "command": "node scripts/tf08-storage-observations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "4ce5d85edb3c2b483d4438e29969e6b161c4147ea68ea30d9fdfae5e2dc8704b"
+        },
+        {
+          "command": "node scripts/tf08-offline-peers.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "b4fb9acf828f2447665d0112292e7a12ae703ee13c47f065aefe524fa237d096"
+        },
+        {
+          "command": "node scripts/tf08-fused-location-fixture.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "22ad7f6e164f9af6c2aaf899c83b836013948c4bc590a353a8b7f353d07a6ac1"
+        },
+        {
+          "command": "node scripts/lint-policy.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "ad16d5358b0c8371a498c5612e07792dfc0b3f3917dfd30ab1b7ea515c0bc9b0"
+        },
+        {
+          "command": "node scripts/tf09-rendering-fixture.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "1188f28340451c91b941a21b18b5edb84063fb2ef96e275976b14a02966eb947"
+        },
+        {
+          "command": "node scripts/tf09-peer-patches.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "e981d7b6223c97296485aa199236fd97cc63a5605fdb952e4f5dce3182889ae6"
+        },
+        {
+          "command": "bun scripts/package-check-options.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "624af33420b2aef385c96e2dc87fe3f0a21c946aefc9abbbf35d77ead4d5dab7"
+        },
+        {
+          "command": "bun scripts/native-mapbox-version.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "1b83d69a88735923e1023541021263dd9ad07d667d9dc1e520ba6c4d0446c89e"
+        },
+        {
+          "command": "node scripts/example-config.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "cc339f31673b83069aae68c481ddf646a5d452265236a2629ae79f7a6b290b50"
+        },
+        {
+          "command": "node scripts/example-native-codegen.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "803c491c8c4903da8eb71294840b0185ccc581646b37bd243faa3aa9f864553d"
+        },
+        {
+          "command": "node scripts/example-workspace-observations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "f873212cb11b28b17b0eb2afcd9549b305a1a8b5e81de61d37bb1db4b461b406"
+        },
+        {
+          "command": "bun scripts/tf08-pending-operations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "b85ef053cb844a421e9abb751d8a25f66233e1eb2b41b238e88575bc843e046d"
+        },
+        {
+          "command": "bun scripts/tf10-native-orientation.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "8062952eb322596336a19647e68abb6bea42c52133d09cab58366a6998bbc261"
+        },
+        {
+          "command": "bun scripts/tf10-native-camera-driver.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "77de2c76c6fc0723d8e9af72bfc248ecc439921e720ed6f24a11977347290874"
+        },
+        {
+          "command": "node scripts/rnmapbox-location-observer.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "00a5b532bd7ea0f203a335ac3971bd7ead03e7c99a3adf7574d33841d032b596"
+        },
+        {
+          "command": "node scripts/rnmapbox-offline-status.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "ec1a19055142cba9cd98c6dfa091860dc95a9f43e9cc6e2ed92a8eafc2280ebc"
+        },
+        {
+          "command": "node scripts/rnmapbox-light-color.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "229dca77b99b2fedb4566d927d3720f2e5ae86052f4cde2cd64750fc7490b98f"
+        },
+        {
+          "command": "node scripts/native-source-lifetime.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "6cfc02ab913cf3e9ab2c44935462af52215ea2ef330121350bd9e0a82bf2784f"
+        },
+        {
+          "command": "bun scripts/tf10-camera-observer.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "ba7efb7f59f2e6ef1201380da1f22926270ae360b4813893a3010abecbd18d50"
+        },
+        {
+          "command": "node scripts/tf10-camera-bounds.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "1a5396a84248891c3e024ad2f69a49f9937bf5ae1faca20b842241fa0d4939a6"
+        },
+        {
+          "command": "node scripts/tf08-display-scope.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "e133f66dee0d7c240526619555d4bbcdf24251df010ccebb862e8de005b88c3e"
+        },
+        {
+          "command": "node scripts/native-camera-bounds-reset.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "b9c9bade15c13ea06024b9a581a26b9e7dc13d19d209cd016442722bbf225094"
+        },
+        {
+          "command": "bun scripts/native-camera-mode.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "b9e304511f56b430e8e0f7e22da1f5b52080b3ea26d8c99d252e2b05a5806902"
+        },
+        {
+          "command": "node scripts/tf10-selected-acceptance.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "4c64592e16584cedc9bc7e4a248a6d0267cd88ef0efe6991be2a3f6cf3af39ed"
+        },
+        {
+          "command": "node scripts/workspace-smoke-shell.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "08ee4c705cc9f6804a086fb3badca2a35492ee95f6443a5e95de3e9b01914dc4"
+        },
+        {
+          "command": "node scripts/workspace-smoke-entrypoints.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "c7639b09c6011a89dd4cb6b60dba0c0b45d70ace9b32239a3f0f2d2b4abf682f"
+        }
+      ],
+      "publicationStatic": [
+        {
+          "command": "bun examples/mapbox-token.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "18f2b3a78291454269584f4b2b2a8486427b628e74aa5cf9fb60b6136458113a"
+        },
+        {
+          "command": "bun examples/inline-smoke-target.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "8a93d7341a1f6dbb83f712e1358bc2469eaf29d149dfd3025fc64ae343a4b4be"
+        },
+        {
+          "command": "bun scripts/tf06-lifetimes-fixture.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "3788a4f84fc6e599ab5f0c0c9b697a479b82c0a1fca3abc4590d81e64b4cf442"
+        },
+        {
+          "command": "bun scripts/tf06-smoke-selection.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "024822f57683a01904b9728786ab650459b5fd6f72630fcc1ab800d8f40ecce8"
+        },
+        {
+          "command": "bun scripts/tf07-smoke-contract.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "a1f471bd3434c87fc2f02ba17128d9cafa2cc36043f5228e48ff0b02d694d311"
+        },
+        {
+          "command": "bun scripts/tf08-patches.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "7d157ee22f1873f68f67c8c44e9fedda6134e7556e5a7f4ad78cc2b55a4c28b3"
+        },
+        {
+          "command": "bun scripts/native-location-permissions.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "288c1349d395484758af63f7b9827688689bb49dac9ae7a8889c15b0d2109fbe"
+        },
+        {
+          "command": "node scripts/tf08-image-observations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "623742901eb5c30644244248d40fe42f089619eb138b3c57e2b6171622ec8553"
+        },
+        {
+          "command": "node scripts/tf08-snapshot-errors.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "d85036b9ba4a01d48f52cec29824cfbe3fddacfd36554ac743d304c8782708f1"
+        },
+        {
+          "command": "node scripts/tf08-final-observations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "ee52035246ceb80a482d8a466f530511e53ba99c31e885e6e1803040bf720cd7"
+        },
+        {
+          "command": "node scripts/tf08-pending-scope.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "0bec7e600e46158ed52a18abfc3ae689c094fff7bca8779bec767480ed4750e8"
+        },
+        {
+          "command": "node scripts/tf08-offline-observations.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "d0fb9f2fd49264b01dae27c97cc76f9adb8b781aa52c4a6dca1c8bdba30e59dd"
+        },
+        {
+          "command": "node scripts/tf08-offline-peers.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "b4fb9acf828f2447665d0112292e7a12ae703ee13c47f065aefe524fa237d096"
+        },
+        {
+          "command": "node scripts/tf08-fused-location-fixture.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "22ad7f6e164f9af6c2aaf899c83b836013948c4bc590a353a8b7f353d07a6ac1"
+        },
+        {
+          "command": "node scripts/lint-policy.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "ad16d5358b0c8371a498c5612e07792dfc0b3f3917dfd30ab1b7ea515c0bc9b0"
+        },
+        {
+          "command": "node scripts/tf09-rendering-fixture.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "686defb7aa3a2cbf61584307e419eee75599467b1320e239e6521956e117663d"
+        },
+        {
+          "command": "node scripts/tf09-peer-patches.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "e981d7b6223c97296485aa199236fd97cc63a5605fdb952e4f5dce3182889ae6"
+        },
+        {
+          "command": "bun scripts/package-check-options.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "9defd5f055f4cc80cdddc435d23adeccf6d99b074778933a33b90bbb607e79c9"
+        },
+        {
+          "command": "bun scripts/native-mapbox-version.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "9cf6c73ca0665cb0817c214c588ad7ef4853963028f4d65743a494bdf1eb9ac3"
+        },
+        {
+          "command": "node scripts/example-config.test.mjs",
+          "exitCode": 0,
+          "temporaryLogSha256": "cc339f31673b83069aae68c481ddf646a5d452265236a2629ae79f7a6b290b50"
+        }
+      ],
+      "boundedProcessUnit": [
+        {
+          "command": [
+            "node",
+            "scripts/native-smoke-process.test.mjs"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "43391a8382fa3cfea66c183a85ef724e9c033e0da80522f3b4488797bdc21185"
+        },
+        {
+          "command": [
+            "bun",
+            "scripts/native-smoke-process.test.mjs"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "91a12fbfe7c764f0ad2e348c8ad8c09a1965a9297d524dbf9642a0eeccf8f000"
+        }
+      ]
+    },
+    "countsBeforeFix": {
+      "originalSource": "49 files / 716 tests",
+      "originalNative": "9 suites / 239 tests",
+      "originalCompiled": "22 web files / 451 tests; 9 native suites / 239 tests; compiler checks pass",
+      "publicationSource": "40 files / 638 tests, excludes only the known baseline wrapper-callbacks.web.test.tsx file",
+      "publicationNative": "8 suites / 236 tests",
+      "publicationCompiled": "25 web files / 467 tests, same baseline exclusion; 8 native suites / 236 tests; compiler checks pass",
+      "originalStatic": "41 commands pass plus both node/bun process cleanup unit tests pass with bounded sandbox escalation",
+      "publicationStatic": "20 commands pass; process cleanup implementation/test source same as original proof"
+    },
+    "afterLateAppOnlyFix": {
+      "original": [
+        {
+          "command": [
+            "bun",
+            "run",
+            "build"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "7c862aebcaf50801905c1161c0d78fffd7f0160233f89741a545be2f27f9999c"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "typecheck:apps"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "check"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "68ae02d40d48b3f310729eb3dcebd80af101d281a35b48e835682fc40537c29a"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run",
+            "packages/example-map/test/acceptance-scenes.web.test.tsx"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "26a656edefc61381acdf6c3167e9fe452278706e650ec83e289dd3e548903b73"
+        }
+      ],
+      "publication": [
+        {
+          "command": [
+            "bun",
+            "run",
+            "build"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "5c3e290fbe8cbb505d70d46fe85b81281028df2e4a53a2e21b9d0252fa28317d"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "12590f784e83dbe4dfed17a6af82286100fc8329c63b6bc1a324bc22389ecfaa"
+        },
+        {
+          "command": [
+            "bun",
+            "run",
+            "typecheck:apps"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "b07792aad394df605ff0626ccb4a53dcfedec232e258be509ceb8467302f0962"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "check"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "f1420e4dd788206a4cfc93f0719723a82d7036ffa13863dac8df6e3901121138"
+        },
+        {
+          "command": [
+            "bunx",
+            "vp",
+            "test",
+            "run",
+            "packages/one-map-react/test/app-popup.web.test.tsx"
+          ],
+          "exitCode": 0,
+          "temporaryLogSha256": "e89adb0336ee105c64eba93d1010ddbe96026ac84a9f94c0a72c4965ce096aff"
+        }
+      ]
+    },
+    "targetedAfterFix": {
+      "original": "11 tests passed in acceptance-scenes.web.test.tsx",
+      "publication": "6 tests passed in app-popup.web.test.tsx"
+    },
+    "phaseBoundary": "Full source/native/compiled counts precede capture isolation repair. Targeted scene regressions, build, source/test/example and app types, lint pass after repair. Full suites not repeated; unchanged library plus renewed byte-match retain archive/peer proof. No summed aggregate claimed.",
+    "harnessBoundary": "Post-restoration rebuilt package and full applicable routine checks cover frozen package/application source. A subsequent source-only harness closure replaced the last capture-puck emit call with CDP setup; all 41 original and 20 publication static commands passed again. No renderer was launched.",
+    "packages": "13 package selections and8 peer cases passed per exact archive.",
+    "baseline": "Only unchanged main wrapper-callback marker.ts-vs-installed-marker.tsx fixture excluded in bounded source/compiled runs; two inherited failures remain visible. New app/test failures repaired separately.",
+    "documentation": {
+      "status": "passed",
+      "scope": "Documentation-local and expanded structure/link checks plus manual source, migration-boundary and historical-record review; no renderer or native execution.",
+      "commands": [
+        "node scripts/check-docs.mjs",
+        "node /private/tmp/one-map-u16-62bw0k1n/documentation/check-docs-expanded.mjs",
+        "python3 /private/tmp/one-map-u16-62bw0k1n/documentation/verify-documentation.py"
+      ],
+      "original": {
+        "localMarkdownFiles": 39,
+        "expandedMarkdownFiles": 44,
+        "sdkComparisonTables": 43,
+        "changedDocumentationOwners": 18
+      },
+      "publication": {
+        "localMarkdownFiles": 38,
+        "expandedMarkdownFiles": 43,
+        "sdkComparisonTables": 39,
+        "changedDocumentationOwners": 18
+      },
+      "historicalCoverage": {
+        "rows": 69,
+        "idsOrderCheckboxesAndFirstThreeCells": "unchanged in both roots"
+      },
+      "frozenPackageReadmeSha256": {
+        "original": "21621004415ebe998a348ff5d88e850d5d3e158150bde1fbd9bc6666d0ea6b69",
+        "publication": "4779d7830800daf409f88ed12a71720680b2486d5e20dd8839ad3c6d5849caea"
+      },
+      "reviewedBoundaries": [
+        "Common GeolocateControl/follow removal; raw web control bypasses setup location override and retains browser/wrapper behavior.",
+        "Native application one-shot button owns request cancellation, stale-result suppression, validation, dispatch acknowledgement and errors; no mandatory replacement follow framework.",
+        "Supplied UserLocation display/accuracy, GeolocationPosition, raw SDK pucks/follow and native viewState/locationOptions ownership constraints remain.",
+        "Control remains until U17; location services/setup/acquisition types remain until U18; Source.onClick and UserLocation.onPress remain until U19.",
+        "Retired injected-web/follow fixture policies remain separate from historical acceptance; SDK ornament placement is source/configuration and mocked evidence only.",
+        "Per-root versions, peers, patches and workspace/publication layout remain distinct."
+      ],
+      "limits": "Structural checks do not certify browser geolocation, actual native button touches, ornament pixels, sensors, Metro, native builds/installations or renderer acceptance."
+    },
+    "host": "Node24.22.1/Bun1.4.1; mocked RN0.86.3/RNMapbox10.3.8/MapLibre11.5.0 differs from isolated tuples, no support certification."
+  },
+  "firstAttemptFailures": [
+    {
+      "check": "Initial typecheck before application migration closure",
+      "log": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/original-typecheck-first.log",
+        "sha256": "a38399410bde459fb90678b1efb61c52b2f3230684a219ea466eb5473178b664",
+        "exists": true
+      },
+      "result": "Removed GeolocateControl import errors in pending app migrations; corrected by the app/host/selected-entry migration."
+    },
+    {
+      "check": "Initial focused app regression",
+      "log": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/original-focused-first.log",
+        "sha256": "49c04404d10e7219dda196f45bbb55fa5daa20ce3ec461d6e1d66a9599498248",
+        "exists": true
+      },
+      "result": "Test mock recreated MapRef on every status render, causing intentional stale-map suppression to retire the request. Mock handle stabilized with useImperativeHandle dependencies; test then passes."
+    },
+    {
+      "check": "Concurrent aggregate test and compiled build",
+      "log": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/original-test-complete-first.log",
+        "sha256": "5a48a9b471106dabf0229d38a22f3a3a00948e77688b299f6a84eac7db73998e",
+        "exists": true
+      },
+      "typeLog": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/original-typecheck-final.log",
+        "sha256": "bfec9cbcbd6396c199b07061f7b60efc1e1deca88f8b0e8e3278679a56d58756",
+        "exists": true
+      },
+      "result": "Compiled command cleans/rebuilds dist; overlapping source tests/types saw transient missing selected entry artifacts. Corrected serialization; rebuilt then all final source/type/compiled checks pass."
+    },
+    {
+      "check": "Full original aggregate process test",
+      "log": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/original-test-complete-second.log",
+        "sha256": "f0f732b513be30304b4fbfe1fa9fe79be9e22b89c692efb5d50d6ac6a1c0919b",
+        "exists": true
+      },
+      "result": "Sandbox EPERM while spawning isolated process-cleanup test children. Only node/bun process unit tests rerun with sandbox escalation; both pass; remaining static tests pass individually."
+    },
+    {
+      "check": "Ornament regression red setup",
+      "log": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/original-ornaments-red.log",
+        "sha256": "cb02405dd4fcbfc027d095b4f32f7228f646bc164b867282cd1ed99b321bfcb0",
+        "exists": true
+      },
+      "result": "First test setup imported default app as a named export; corrected without production change. Corrected red run detects missing explicit placements, then app placement fix passes."
+    },
+    {
+      "check": "Ornament true red and green",
+      "red": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/original-ornaments-red-corrected.log",
+        "sha256": "2314b3cae3309eb5578f5bc565c337eb6122f1862bbd7ed5d880b560b0c133e5",
+        "exists": true
+      },
+      "green": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/original-ornaments-green.log",
+        "sha256": "ccbe288c5cce9e0133ac1c9021a3a52a0d6aabdf85cefa24f88575d0609d8d95",
+        "exists": true
+      }
+    },
+    {
+      "check": "Main first source suite",
+      "log": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/publication-web-unit-first.log",
+        "sha256": "43398d350bf59ab0149e451631d980160c60b2ffbcbd0859c1aeb6130f5b349b",
+        "exists": true
+      },
+      "result": "Exactly the two previously recorded marker.ts-vs-installed-marker.tsx callback tests fail in one unchanged baseline file. Bounded final run excludes only that file."
+    },
+    {
+      "check": "Main first native suite",
+      "log": {
+        "path": "/private/tmp/one-map-u16-62bw0k1n/publication-native-unit-first.log",
+        "sha256": "b9384b09733a112f21adb11e969c0edc027ecfe21e2c9b230bf1d5ac9f701e69",
+        "exists": true
+      },
+      "result": "New actual Mapbox entry regression mock omitted main-only setAccessToken. Added mock method; no app initialization behavior changed; final native suite passes."
+    },
+    {
+      "check": "Exact export AST audit",
+      "record": "/private/tmp/one-map-u16-62bw0k1n/export-audit-first-failure.json",
+      "result": "Broad geolocation facade block deletion also removed three adjacent MapLibre raw reexports. Restored all three in both roots and rebuilt; final exact export audit passes."
+    }
+  ],
+  "selectedPeers": {
+    "scope": "Eight standalone/mixed selected cases per archive: installs, built declarations, selected web imports, patch hashes. No native linking or SDK acquisition.",
+    "versions": {
+      "tuple-1": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0"
+      },
+      "tuple-2": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0"
+      },
+      "tuple-3": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-4": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-5": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.2",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-6": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.2"
+      },
+      "tuple-7": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      },
+      "tuple-8": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.87.1",
+        "@types/react": "19.2.18",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-9": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "mapbox-gl": "3.32.0",
+        "react-native": "0.87.1",
+        "@maplibre/maplibre-react-native": "11.5.0",
+        "react-native-teleport": "1.2.1",
+        "@types/geojson": "7946.0.16"
+      },
+      "tuple-10": {
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "@types/react": "19.2.18",
+        "react-map-gl": "8.1.3",
+        "maplibre-gl": "6.13.0",
+        "react-native": "0.87.1",
+        "@rnmapbox/maps": "10.3.7",
+        "react-native-teleport": "1.2.1"
+      }
+    },
+    "executions": [
+      {
+        "artifact": "original",
+        "archiveSha256": "42b0a0c7e5d52f432f53b23276a43944ae252f7f81787e2dbbb7f363109c6b02",
+        "reportSha256": "64b1998d91cc0d782ce0634c78b499fc4671bd328ac56481a0eb5a83f4ff2948",
+        "runnerSha256": "1be390ae3413be9a9b0c5253760297fbfad213538196bc90aa27600423465bf2",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "versions": "tuple-1",
+            "lockSha256": "7cc68744a6156bf25fc254d7f03bb1dd3081fb867e7cc9d74341247a3dea0993",
+            "patchedFilesVerified": 0,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "versions": "tuple-2",
+            "lockSha256": "b732757726f6ce40e49e54ebcd7d4b69f14d9a41b1fd88049c828a0012489f8e",
+            "patchedFilesVerified": 0,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "versions": "tuple-3",
+            "lockSha256": "a69b241b316524bbd037ff569a9017dde380f6f049aa97a1022ba2aa22f32223",
+            "patchedFilesVerified": 31,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "versions": "tuple-4",
+            "lockSha256": "160622acc4c5359c0b87abf5020472335e7d3769e868a14acde66364a5f775ba",
+            "patchedFilesVerified": 13,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "versions": "tuple-5",
+            "lockSha256": "0ae3a90e52d044c2bf8a6b032deb3e21a6880a4ece832a2f0d07db615af475fa",
+            "patchedFilesVerified": 13,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "versions": "tuple-5",
+            "lockSha256": "0ae3a90e52d044c2bf8a6b032deb3e21a6880a4ece832a2f0d07db615af475fa",
+            "patchedFilesVerified": 13,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "versions": "tuple-6",
+            "lockSha256": "7188b9425b84a6d27a3ab035642722983a0b7dfc7b5031dc087b346af6eef46c",
+            "patchedFilesVerified": 31,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "versions": "tuple-6",
+            "lockSha256": "7188b9425b84a6d27a3ab035642722983a0b7dfc7b5031dc087b346af6eef46c",
+            "patchedFilesVerified": 31,
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "artifact": "main",
+        "archiveSha256": "6c89101b4b09fb84dc90563d4673fb6e20aabcbfb3dae72d6a6d5778a93fa7a0",
+        "reportSha256": "e9cb5233d0060a64fcb4826bd012bb5ea712af322f456fe71fd36ed960eb0e87",
+        "runnerSha256": "d2ae58c0cddd7cd95b2de1e0dcdb4abac11573ce6e176d6638443d0238d70539",
+        "cases": [
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "versions": "tuple-1",
+            "lockSha256": "d8eeed4ff826cec047a5c2e413c78b7acc0df52d5bd02742bdbee6c2940a9d3f",
+            "patchedFilesVerified": 0,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "versions": "tuple-2",
+            "lockSha256": "428c178869bbca49d76d24da6af6677ab9ca5cc2ec0bb2d52b92d4f2413695ac",
+            "patchedFilesVerified": 0,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "versions": "tuple-7",
+            "lockSha256": "d6521842adcfa6aff6bfa5072a6aee80baac3f77037354dedad96c7c15c6f7ce",
+            "patchedFilesVerified": 25,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "versions": "tuple-8",
+            "lockSha256": "76c3fae068b133258a9849b8d47c704734702c9c65e1e51386905d5462e73090",
+            "patchedFilesVerified": 10,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-web",
+            "versions": "tuple-9",
+            "lockSha256": "3abcbf61818bcecd44ef0da64d7fc99cda0d15e1e4792be5c3f06d3181c93b64",
+            "patchedFilesVerified": 10,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-native",
+            "versions": "tuple-9",
+            "lockSha256": "3abcbf61818bcecd44ef0da64d7fc99cda0d15e1e4792be5c3f06d3181c93b64",
+            "patchedFilesVerified": 10,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "maplibre-web",
+            "versions": "tuple-10",
+            "lockSha256": "05d3ca7041802eda0a3db30c1b03fcc2a41aa424c381b0f1790ab2fdac550367",
+            "patchedFilesVerified": 25,
+            "status": "passed"
+          },
+          {
+            "scenario": "standalone",
+            "entry": "mapbox-native",
+            "versions": "tuple-10",
+            "lockSha256": "05d3ca7041802eda0a3db30c1b03fcc2a41aa424c381b0f1790ab2fdac550367",
+            "patchedFilesVerified": 25,
+            "status": "passed"
+          }
+        ]
+      }
+    ],
+    "cache": "Temporary consumers/cache/locks removed; compact tuple/lock/patch provenance retained."
+  },
+  "audit": {
+    "workers": "Implementation, documentation and independent review by GPT-6.1 Sol medium.",
+    "ownership": "22 exact unchanged service/display/native ownership paths verified. Revised freeze41 original/38 publication paths includes explicit null deletion and before hash for the old hook.",
+    "review": "Focused33original/24publication tests and native ornaments2per tree; AST scope,28fixture dispositions and packed13+8 records pass. Final isolation11/6 tests and revised hashes pass; no outstanding substantive finding.",
+    "coordinator": "Traced acquisition/UI/display/camera/reset/replacement ownership, rejected global navigator machinery, corrected corner reservations, duplicate display and capture contamination; verified archives, SDK/config/candidate boundaries and phased outputs.",
+    "documentation": "69 historical coverage IDs/order/checkmarks/first-three cells preserved; future target/current source/historical acceptance separate."
+  },
+  "openGates": [
+    "Two inherited publication callback fixture imports remain outside U16.",
+    "Actual browser geolocation/permissions/wrapper context, sensors/camera/display/ornament pixels/touches, Metro/native linking/build/install and full accessibility acceptance remain unverified; scoped permission required.",
+    "U17 follows reviewed PR. U18 acquisition/services, U20 image ownership scope, U23 peer/patch followups and U24 acceptance gate remain."
+  ],
+  "cleanup": "Retain compact outcomes/provenance and task recovery patches/manifests. Remove temporary checkout/overlays, copies, probes/bundles, consumers/cache/locks, archives/raw logs after PR; preserve original head/candidate."
+}
