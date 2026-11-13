@@ -3,6 +3,11 @@ import {
   publicMapboxToken,
   useExampleMap,
 } from "@one-map/example-map";
+import {
+  webAcceptanceSelection,
+  acceptanceScenarios,
+} from "@one-map/example-map/acceptance-selection";
+import { WebAcceptanceWorkspace } from "@one-map/example-map/acceptance-web";
 import { adapters, configureMapbox } from "@one-map/example-map/web";
 
 const token = publicMapboxToken(
@@ -12,6 +17,25 @@ configureMapbox(token);
 
 /** Conventional DOM shell around the shared map and behavior. */
 export const App = () => {
+  const selection = import.meta.env.DEV
+    ? webAcceptanceSelection(window.location.search)
+    : undefined;
+  if (selection?.scenario) {
+    if (selection.engine === "mapbox" && !token)
+      throw new Error(
+        "Configure a public Mapbox token before Mapbox acceptance."
+      );
+    return (
+      <WebAcceptanceWorkspace
+        engine={selection.engine}
+        scenario={selection.scenario}
+      />
+    );
+  }
+  return <BasemapApp />;
+};
+
+const BasemapApp = () => {
   const model = useExampleMap(adapters, Boolean(token));
   const testMode =
     import.meta.env.DEV &&
@@ -66,8 +90,31 @@ export const App = () => {
           <div>
             <label>
               Scenario{" "}
-              <select aria-label="Scenario" defaultValue="basemap">
+              <select
+                aria-label="Scenario"
+                defaultValue="basemap"
+                onChange={(event) => {
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("scenario", event.target.value);
+                  url.searchParams.set("engine", model.attachment.engine);
+                  window.location.assign(url);
+                }}
+              >
                 <option value="basemap">Basemap and engine switching</option>
+                {acceptanceScenarios
+                  .filter(
+                    (value) =>
+                      value !== "tf08-storage" &&
+                      value !== "tf06-lifetimes" &&
+                      value !== "tf09-model" &&
+                      (value !== "global-state" ||
+                        model.attachment.engine === "maplibre")
+                  )
+                  .map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
               </select>
             </label>
             <button

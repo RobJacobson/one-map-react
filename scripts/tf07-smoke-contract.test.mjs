@@ -142,3 +142,67 @@ for (const field of ["libraryDistSha256", "environment", "runId"]) {
 console.log(
   "PASS TF07 native judgment requires renderer evidence and build-matched manual observations."
 );
+
+const { judgeNativeFocusedUi, nativeFocusedUiScenarios } =
+  await import("./tf07-smoke-contract.mjs");
+const focused = {
+  focused: true,
+  focusedComplete: true,
+  readSequence: 4,
+  aCenter: [-122.34, 47.61],
+  bCenter: [-122.34, 47.61],
+  aZoom: 11,
+  bZoom: 12,
+  aViewport: [0, 100, 375, 300],
+  bViewport: [0, 400, 375, 200],
+  overlap: [{ id: 707 }, { id: "708" }],
+  vector: [{ id: 1 }],
+  theme: "updated",
+  counts: {
+    "high-click": 2,
+    "a-map-click": 2,
+    "vector-click": 1,
+    "image-load": 1,
+    "image-refresh": 1,
+    "provider-call": 3,
+    "provider-error": 1,
+    "provider-location": 1,
+    "Map A-click": 4,
+    "Map B-click": 4,
+  },
+};
+const focusedManual = {
+  ...identity,
+  scenarios: Object.fromEntries(
+    nativeFocusedUiScenarios.map((name) => [name, "passed"])
+  ),
+};
+assert.equal(
+  judgeNativeFocusedUi(focused, focusedManual, identity).status,
+  "passed"
+);
+for (const invalid of [
+  { focusedComplete: false },
+  { aViewport: [0, 0, 0, 0] },
+  { overlap: [] },
+  { vector: [] },
+  { readSequence: 0 },
+  { bZoom: 14 },
+  { theme: "initial" },
+  { counts: { ...focused.counts, "provider-location": 0 } },
+  { counts: { ...focused.counts, "a-map-click": 1 } },
+  { counts: { ...focused.counts, "read-error": 1 } },
+])
+  assert.equal(
+    judgeNativeFocusedUi({ ...focused, ...invalid }, focusedManual, identity)
+      .status,
+    "unverified"
+  );
+assert.equal(
+  judgeNativeFocusedUi(focused, { ...focusedManual, runId: "stale" }, identity)
+    .status,
+  "unverified"
+);
+console.log(
+  "PASS focused UI judgment rejects missing physical outcomes, stale identity, invalid geometry, absent source/features, provider failure, and violated zoom limits."
+);

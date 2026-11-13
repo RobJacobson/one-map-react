@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { forwardRef, type ReactNode } from "react";
 import { expect, vi, test } from "vite-plus/test";
 
-import { acquireLocation } from "../../../examples/shared/location-acquisition.js";
+import { acquireLocation } from "../../example-map/src/scenarios/location-acquisition.js";
 import type { Adapter } from "../src/contracts/adapter.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";

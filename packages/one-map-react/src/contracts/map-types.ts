@@ -75,7 +75,8 @@ export interface MapProps {
    * Limit on where the camera center may pan.
    *
    * The order is southwest then northeast. A west value greater than east
-   * crosses the antimeridian.
+   * crosses the antimeridian. MapLibre iOS applies this to user panning;
+   * imperative camera commands can bypass the constraint.
    */
   readonly maxBounds?: Bounds;
   /**

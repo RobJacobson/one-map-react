@@ -23,7 +23,7 @@ import {
 
 /** Native Mapbox annotations and controls used by the selected adapter. */
 export const mapboxNativeUI = createNativeUI({
-  Marker: NativeMarkerOverlay,
+  Marker: (props) => <NativeMarkerOverlay {...props} backend="mapbox-native" />,
   Annotation: forwardRef<MarkerRef, NativeMarkerHostProps>((props, ref) => (
     <MapboxAnnotationHost {...props} ref={ref} />
   )),

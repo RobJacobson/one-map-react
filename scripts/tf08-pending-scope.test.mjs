@@ -9,6 +9,13 @@ for (const [scope, platform, isolated, message] of [
   ["pending-repair", "android", "0", "require an isolated application sandbox"],
   ["pending-storage", "ios", "0", "require an isolated application sandbox"],
   ["pending-storage", "web", "1", "requires a native platform"],
+  [
+    "pending-operations",
+    "android",
+    "",
+    "require an isolated application sandbox",
+  ],
+  ["pending-operations", "web", "1", "requires a native platform"],
 ]) {
   const result = spawnSync(
     process.execPath,

@@ -19,7 +19,7 @@
     "react-map-gl": "8.1.3",
     "react-native": "0.86.3",
     "react-native-safe-area-context": "5.7.0",
-    "react-native-teleport": "1.2.1",
+    "react-native-teleport": "1.2.2",
     "react-native-web": "0.21.0"
   },
   "devDependencies": {

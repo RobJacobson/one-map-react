@@ -15,6 +15,7 @@ import { dirname, join, resolve } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
+import { startLifetimesFixture } from "./tf06-lifetimes-fixture.mjs";
 import {
   judgeNativeRetained,
   nativeRetainedReportReady,
@@ -22,9 +23,18 @@ import {
 } from "./tf07-retained-contract.mjs";
 import {
   judgeNativeUi,
+  judgeNativeFocusedUi,
+  nativeFocusedUiScenarios,
   nativeUiReportReady,
   nativeUiScenarios,
 } from "./tf07-smoke-contract.mjs";
+import {
+  webShell,
+  webScenarioUrl,
+  nativeEnvironment,
+  nativeMetroArgs,
+  nativeApplicationId,
+} from "./workspace-smoke-shell.mjs";
 
 const root = process.env.TF07_HARNESS_ROOT
   ? resolve(process.env.TF07_HARNESS_ROOT)
@@ -34,7 +44,12 @@ const engine = process.argv[3] ?? "both";
 const retained = process.argv[4] === "retained";
 if (process.argv[4] !== undefined && (!retained || platform === "web"))
   throw new Error("Use retained only for native supplemental observations.");
-const scenarios = retained ? nativeRetainedScenarios : nativeUiScenarios;
+const focused = !retained && process.env.TF07_SCOPE === "focused";
+const requiredUiScenarios = retained
+  ? nativeRetainedScenarios
+  : focused
+    ? nativeFocusedUiScenarios
+    : nativeUiScenarios;
 
 if (
   !["web", "android", "ios"].includes(platform) ||
@@ -55,9 +70,7 @@ const main = async () => {
 
   for (const selectedEngine of selected) {
     const consumer = join(
-      root,
-      "examples",
-      `${platform === "web" ? "web" : "native"}-${selectedEngine}`,
+      platform === "web" ? webShell(root, 0).cwd : join(root, "apps/expo"),
       "node_modules/one-map-react/dist"
     );
     assert.equal(
@@ -89,27 +102,15 @@ const runWeb = async (selectedEngine) => {
   await requireFreePort(port);
   await requireFreePort(port + 1000);
   const profile = mkdtempSync(join(tmpdir(), "one-map-tf07-browser-"));
-  const shell = join(root, "examples", `web-${selectedEngine}`);
-  const vite = start(
-    "bun",
-    [
-      "run",
-      "dev",
-      "--",
-      "--port",
-      String(port),
-      "--strictPort",
-      "--host",
-      "127.0.0.1",
-    ],
-    { cwd: shell }
-  );
+  const web = webShell(root, port);
+  const shell = web.cwd;
+  const vite = start(web.command, web.args, { cwd: shell });
   let browser;
   let page;
 
   try {
     await until(
-      async () => (await fetch(`http://127.0.0.1:${port}/`)).ok,
+      async () => (await fetch(web.base)).ok,
       30000,
       "web server startup"
     );
@@ -122,7 +123,7 @@ const runWeb = async (selectedEngine) => {
         `--user-data-dir=${profile}`,
         "--window-size=1280,800",
         "--no-first-run",
-        `http://127.0.0.1:${port}/?tf07=ui`,
+        webScenarioUrl(root, port, "tf07=ui", selectedEngine),
       ]
     );
     let target;
@@ -304,10 +305,7 @@ const runNative = async (selectedEngine) => {
     throw new Error(
       "Set TF07_NATIVE_BINARY_SHA256 to the coordinator's built native executable/APK baseline."
     );
-  const applicationId =
-    platform === "android"
-      ? `com.onemap${selectedEngine}`
-      : `org.reactjs.native.example.OneMap${selectedEngine === "mapbox" ? "Mapbox" : "Maplibre"}`;
+  const applicationId = nativeApplicationId();
   const metroPort = Number(process.env.TF07_METRO_PORT ?? 8081);
   const iosDevice = process.env.TF07_IOS_UDID;
   if (platform === "ios" && !iosDevice)
@@ -320,6 +318,7 @@ const runNative = async (selectedEngine) => {
   let metro;
   let stoppingMetro = false;
   let status;
+  let vectorFixture;
   let androidLaunch;
   let androidRecorder;
   let diagnostics;
@@ -331,6 +330,10 @@ const runNative = async (selectedEngine) => {
   try {
     await requireFreePort(metroPort);
     await requireFreePort(8797);
+    if (focused) {
+      await requireFreePort(8798);
+      vectorFixture = await startLifetimesFixture();
+    }
     let actual;
     if (platform === "android") {
       const installed = (await adb(["shell", "pm", "path", applicationId]))
@@ -359,6 +362,7 @@ const runNative = async (selectedEngine) => {
       for (const [local, remote] of [
         [8081, metroPort],
         [8797, 8797],
+        ...(focused ? [[8798, 8798]] : []),
       ]) {
         const existing = reverses.filter(
           (fields) => fields[1] === `tcp:${local}`
@@ -395,8 +399,9 @@ const runNative = async (selectedEngine) => {
           join(app, "Info.plist"),
         ])
       ).trim();
+      const debug = join(app, `${executable}.debug.dylib`);
       actual = createHash("sha256")
-        .update(readFileSync(join(app, executable)))
+        .update(readFileSync(existsSync(debug) ? debug : join(app, executable)))
         .digest("hex");
       acquiredApp = true;
       await command("xcrun", [
@@ -444,7 +449,7 @@ const runNative = async (selectedEngine) => {
             identity[field],
             `TF07 report ${field} differs from this run.`
           );
-        for (const scenario of scenarios) {
+        for (const scenario of requiredUiScenarios) {
           const outcome = manual.scenarios?.[scenario];
           assert(
             ["unverified", "passed", "failed"].includes(outcome),
@@ -466,7 +471,7 @@ const runNative = async (selectedEngine) => {
       const manual = readManual();
       if (
         nativeFailure ||
-        (retained
+        (focused || retained
           ? observation?.focusedComplete !== true
           : !(observation?.generation >= 1))
       )
@@ -475,23 +480,20 @@ const runNative = async (selectedEngine) => {
         manualPath &&
         !(retained ? nativeRetainedReportReady : nativeUiReportReady)(
           manual,
-          identity
+          identity,
+          requiredUiScenarios
         )
       )
         return;
       completed = { observation, manual };
     });
-    metro = start(
-      "bun",
-      ["run", "start", "--", "--port", String(metroPort), "--reset-cache"],
-      {
-        cwd: join(root, "examples", `native-${selectedEngine}`),
-        env: {
-          ...process.env,
-          ONE_MAP_SMOKE: retained ? "tf07-retained" : "tf07",
-        },
-      }
-    );
+    metro = start("node", nativeMetroArgs(metroPort), {
+      cwd: join(root, "apps/expo"),
+      env: nativeEnvironment(
+        selectedEngine,
+        retained ? "tf07-retained" : focused ? "tf07-focused" : "tf07"
+      ),
+    });
     metro.on("error", (error) => {
       nativeFailure ??= error;
     });
@@ -512,6 +514,7 @@ const runNative = async (selectedEngine) => {
       return true;
     }, 60000);
     if (nativeFailure) throw nativeFailure;
+    const url = `one-map-example://expo-development-client/?url=${encodeURIComponent(`http://127.0.0.1:${metroPort}`)}&disableOnboarding=1&disableAutoLaunch=1`;
     if (platform === "android") {
       if (process.env.TF07_ANDROID_DIAGNOSTICS)
         androidRecorder = await startAndroidRecorder(
@@ -525,8 +528,11 @@ const runNative = async (selectedEngine) => {
         "am",
         "start",
         "-W",
-        "-n",
-        `${applicationId}/.MainActivity`,
+        "-a",
+        "android.intent.action.VIEW",
+        "-d",
+        `'${url}'`,
+        applicationId,
       ]);
       assert.match(
         launch,
@@ -537,15 +543,17 @@ const runNative = async (selectedEngine) => {
         !/Error:|Exception/.test(launch),
         "TF07 selected app launch failed."
       );
-    } else
+    } else {
       await command("xcrun", [
         "simctl",
         "launch",
         iosDevice,
         applicationId,
-        "-RCT_jsLocation",
-        `127.0.0.1:${metroPort}`,
+        "-EXDevMenuShowFloatingActionButton",
+        "NO",
       ]);
+      await command("xcrun", ["simctl", "openurl", iosDevice, url]);
+    }
     if (platform === "android" && process.env.TF07_ANDROID_DIAGNOSTICS) {
       try {
         const pid = (await adb(["shell", "pidof", applicationId])).trim();
@@ -562,7 +570,7 @@ const runNative = async (selectedEngine) => {
           {
             ...identity,
             scenarios: Object.fromEntries(
-              scenarios.map((scenario) => [scenario, "unverified"])
+              requiredUiScenarios.map((scenario) => [scenario, "unverified"])
             ),
           },
           null,
@@ -573,7 +581,7 @@ const runNative = async (selectedEngine) => {
     }
     observing = true;
     console.error(
-      `Perform the native touch flow from the approved acceptance plan, then press Read renderer. Required observations: ${scenarios.join(", ")}.`
+      `Perform the native touch flow from the approved acceptance plan, then press Read renderer. Required observations: ${requiredUiScenarios.join(", ")}.`
     );
     console.error(`Native report identity: ${JSON.stringify(identity)}`);
     await until(
@@ -587,11 +595,11 @@ const runNative = async (selectedEngine) => {
     const { observation, manual } = completed;
 
     result = {
-      ...(retained ? judgeNativeRetained : judgeNativeUi)(
-        observation,
-        manual,
-        identity
-      ),
+      ...(retained
+        ? judgeNativeRetained(observation, manual, identity)
+        : focused
+          ? judgeNativeFocusedUi(observation, manual, identity)
+          : judgeNativeUi(observation, manual, identity)),
       ...identity,
       ...(retained
         ? { nativeTarget: platform === "ios" ? iosDevice : serial }
@@ -735,6 +743,7 @@ const runNative = async (selectedEngine) => {
         else return stopOwnedProcess(metro);
       });
     await clean(() => status?.close());
+    await clean(() => vectorFixture?.close());
     for (const port of acquiredReverses.reverse())
       await clean(() => adb(["reverse", "--remove", `tcp:${port}`]));
     rmSync(temporary, { recursive: true, force: true });
@@ -952,6 +961,7 @@ const startAndroidRecorder = async (serial, applicationId, launchPid) => {
 const nativeStatus = (onObservation) =>
   new Promise((resolveStatus, reject) => {
     let observation;
+    let readReceipt = 0;
     const server = createServer((request, response) => {
       if (request.method === "GET" && request.url === "/tf07") {
         response
@@ -970,7 +980,7 @@ const nativeStatus = (onObservation) =>
       });
       request.on("end", () => {
         try {
-          observation = JSON.parse(body);
+          observation = { ...JSON.parse(body), readReceipt: ++readReceipt };
           onObservation(observation);
           response.writeHead(204).end();
         } catch {

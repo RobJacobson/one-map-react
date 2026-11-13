@@ -12,11 +12,52 @@ import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+import { webHillshadeSettled } from "./example-workspace-observations.mjs";
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import { terrainPng } from "./tf09-rendering-fixture.mjs";
+import {
+  runCameraBoundsAcceptance,
+  runCameraPanBoundsAcceptance,
+} from "./tf10-camera-bounds.mjs";
+import { modelGlb } from "./tf10-model-fixture.mjs";
+import {
+  createAndroidGestureDriver,
+  createIosGestureDriver,
+  runNativeCameraAcceptance,
+} from "./tf10-native-camera-driver.mjs";
+import {
+  runLightColorAcceptance,
+  runModelAcceptance,
+  runGlobalStateAcceptance,
+} from "./tf10-selected-acceptance.mjs";
+import {
+  nativeEnvironment,
+  nativeMetroArgs,
+  launchNativeWorkspace,
+  webShell,
+  webScenarioUrl,
+} from "./workspace-smoke-shell.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const [platform, engine] = process.argv.slice(2);
+const executionScope = process.env.TF09_SCOPE ?? "all";
+assert(
+  [
+    "model",
+    "light-color",
+    "global-state",
+    "all",
+    "rendering",
+    "camera",
+    "camera-bounds",
+    "camera-bounds-gesture",
+  ].includes(executionScope),
+  "TF09_SCOPE must select all, rendering, camera, camera-bounds, camera-bounds-gesture, model, light-color or global-state."
+);
+assert(
+  platform !== "web" || executionScope !== "camera",
+  "Camera scope is native-only."
+);
 assert(
   ["web", "ios", "android"].includes(platform),
   "Choose web, ios or android."
@@ -32,6 +73,21 @@ if (platform !== "web")
     process.env.TF09_NATIVE_IDENTITY,
     "Set TF09_NATIVE_IDENTITY to independently verified installed binary identity; build/install is a separate authorized preparation step."
   );
+assert(
+  executionScope !== "model" || (engine === "mapbox" && platform !== "web"),
+  "Model scope requires native Mapbox."
+);
+assert(
+  executionScope !== "global-state" ||
+    (engine === "maplibre" && platform === "web"),
+  "Global-state scope requires web MapLibre."
+);
+assert(
+  executionScope !== "light-color" ||
+    (platform === "ios" && engine === "mapbox"),
+  "Light-color scope targets RNMapbox iOS."
+);
+const modelRequests = [];
 const temporary = mkdtempSync(join(tmpdir(), "one-map-rendering-"));
 const children = [];
 const outcomes = [];
@@ -74,10 +130,10 @@ const until = async (observe, timeoutMs = 45000) => {
   throw last ?? new Error("Rendering observation timed out.");
 };
 
-const start = (file, args, cwd = root) => {
+const start = (file, args, cwd = root, env = process.env) => {
   const child = spawn(file, args, {
     cwd,
-    env: { ...process.env, ONE_MAP_SMOKE_CACHE_ROOT: temporary },
+    env: { ...env, ONE_MAP_SMOKE_CACHE_ROOT: temporary },
     stdio: "ignore",
     detached: true,
   });
@@ -92,6 +148,17 @@ const serve = async () => {
     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
     if (request.method === "OPTIONS") {
       response.writeHead(204).end();
+      return;
+    }
+    if (["/model-magenta.glb", "/model-cyan.glb"].includes(request.url)) {
+      const color = request.url.includes("magenta") ? [1, 0, 1] : [0, 1, 1];
+      const bytes = modelGlb(color);
+      modelRequests.push({
+        path: request.url,
+        sha256: createHash("sha256").update(bytes).digest("hex"),
+      });
+      response.setHeader("Content-Type", "model/gltf-binary");
+      response.end(bytes);
       return;
     }
     if (request.url?.startsWith("/dem/")) {
@@ -116,7 +183,11 @@ const serve = async () => {
   });
   await new Promise((done, reject) => {
     server.once("error", reject);
-    server.listen(8798, "127.0.0.1", done);
+    server.listen(
+      Number(process.env.TF09_FIXTURE_PORT ?? 8798),
+      "127.0.0.1",
+      done
+    );
   });
 };
 
@@ -181,41 +252,68 @@ const launchWeb = async () => {
   const port = Number(
     process.env.TF09_WEB_PORT ?? (engine === "mapbox" ? 4291 : 4292)
   );
-  const base = `http://127.0.0.1:${port}`;
-  start(
-    "bun",
-    [
-      "run",
-      "dev",
-      "--",
-      "--port",
-      String(port),
-      "--strictPort",
-      "--host",
-      "127.0.0.1",
-    ],
-    join(root, `examples/web-${engine}`)
-  );
+  const web = webShell(root, port);
+  const base = web.base;
+  start(web.command, web.args, web.cwd);
   await until(async () => (await fetch(base)).ok, 30000);
+  const query =
+    executionScope === "global-state" ? "tf10=global-state" : "tf09=rendering";
   start("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", [
     "--headless=new",
     `--remote-debugging-port=${port + 1000}`,
     `--user-data-dir=${join(temporary, "profile")}`,
     "--window-size=1280,800",
     "--no-first-run",
-    `${base}/?tf09=rendering`,
+    webScenarioUrl(root, port, query, engine),
   ]);
   let target;
   await until(async () => {
     const tabs = await fetch(`http://127.0.0.1:${port + 1000}/json/list`).then(
       (response) => response.json()
     );
-    target = tabs.find((tab) => tab.url.includes("tf09=rendering"));
+    target = tabs.find((tab) => tab.url.includes(query));
     return !!target?.webSocketDebuggerUrl;
   });
   page = await connect(target.webSocketDebuggerUrl);
   await until(async () => page.evaluate("!!window.__oneMapTf09"));
 };
+/** Starts only the owned native Metro server before opening the verified installed app. */
+const launchNative = async () => {
+  const port = Number(process.env.TF09_METRO_PORT ?? 8081);
+  assert(
+    Number.isInteger(port) && port > 0 && port < 65536,
+    "Invalid Metro port."
+  );
+  const probe = createServer();
+  await new Promise((done, reject) => {
+    probe.once("error", reject);
+    probe.listen(port, () => probe.close(done));
+  });
+  start(
+    "node",
+    nativeMetroArgs(port),
+    join(root, "apps/expo"),
+    nativeEnvironment(
+      engine,
+      executionScope === "model" ? "tf09-model" : "tf09"
+    )
+  );
+  await until(async () => {
+    const response = await fetch(`http://127.0.0.1:${port}/status`, {
+      signal: AbortSignal.timeout(3000),
+    });
+    return (
+      response.ok && (await response.text()).includes("packager-status:running")
+    );
+  }, 60000);
+  launchNativeWorkspace({
+    platform,
+    iosDevice: process.env.TF09_IOS_UDID,
+    port,
+    fixturePorts: [Number(process.env.TF09_FIXTURE_PORT ?? 8798)],
+  });
+};
+
 const connect = (url) =>
   new Promise((done, reject) => {
     const socket = new WebSocket(url);
@@ -290,10 +388,8 @@ try {
     process.env.TF09_LIBRARY_SHA256,
     "Frozen library changed."
   );
-  const shell = join(
-    root,
-    `examples/${platform === "web" ? "web" : "native"}-${engine}`
-  );
+  const shell =
+    platform === "web" ? webShell(root, 0).cwd : join(root, "apps/expo");
   assert.equal(
     digest(join(shell, "node_modules/one-map-react/dist")),
     process.env.TF09_LIBRARY_SHA256,
@@ -322,260 +418,473 @@ try {
   }
   await serve();
   if (platform === "web") await launchWeb();
-  await scenario("known rendered feature and initial no-data", async () => {
-    let read;
-    await until(async () => {
-      read = await action("read");
-      assert(
-        read.loads > 0 &&
-          read.features.some((feature) => Number(feature.id) === 9009),
-        `Initial renderer not observed: ${JSON.stringify({
-          loads: read.loads,
-          styleLoads: read.styleLoads,
-          center: read.center,
-          zoom: read.zoom,
-          featureIds: read.features.map((feature) => feature.id),
-          elevation: read.elevation,
-        })}`
-      );
-      return true;
-    }, 90000);
-    if (platform !== "web" && engine === "maplibre")
-      assert.match(read.unsupported, /unsupported/);
-    else assert.equal(read.elevation, null);
-    let light;
-    if (page)
-      await until(async () => {
-        light = await page.evaluate("window.__oneMapTf09Inspect?.().light");
-        return light?.anchor === "map" && light?.intensity === 0.5;
-      });
-    return {
-      loads: read.loads,
-      featureIds: read.features.map((feature) => feature.id),
-      elevation: read.elevation,
-      unsupported: read.unsupported,
-      light,
-    };
-  });
-  if (platform === "web" || engine === "mapbox") {
+  else await launchNative();
+  if (executionScope === "model") {
     await scenario(
-      "terrain enabled before delayed DEM attachment",
+      "selected LocationPuck model rendering, updates and removal",
       async () => {
-        await action("configure", { terrain: true });
-        await action("configure", { terrain: true, dem: true });
-        let read;
-        await until(async () => {
-          read = await action("read");
-          return (
-            typeof read.elevation === "number" &&
-            Math.abs(read.elevation - 2000) < 5
-          );
+        const observed = await runModelAcceptance({
+          action,
+          capture: decodeCapture,
+          until,
         });
-        return { elevation: read.elevation, expectedMeters: 2000 };
-      }
-    );
-    await scenario("explicit terrain clear and projection change", async () => {
-      await action("configure", { dem: true, globe: true });
-      await until(async () => (await action("read")).elevation === null);
-      await action("configure", { dem: true, terrain: true });
-      await until(
-        async () => Math.abs((await action("read")).elevation - 2000) < 5
-      );
-      const previousStyleLoads = (await action("read")).styleLoads;
-      await action("replace-style");
-      await until(
-        async () => (await action("read")).styleLoads > previousStyleLoads
-      );
-      await until(
-        async () => Math.abs((await action("read")).elevation - 2000) < 5
-      );
-      return { elevation: (await action("read")).elevation };
-    });
-  } else await action("configure", { dem: true });
-  if (platform === "web") {
-    await scenario("named selected renderer facilities", async () => {
-      const result = await action("named");
-      assert.deepEqual(result.tf10.dragPan, {
-        before: true,
-        disabled: false,
-        restored: true,
-      });
-      for (const field of ["source", "layer", "canvas", "styleLayer"])
-        assert.equal(result.tf10[field], true, `TF10 selected ${field}`);
-      assert.equal(
-        result.tf10.eventCalls,
-        1,
-        "TF10 on/fire/off removes its listener"
-      );
-      if (engine === "mapbox") {
-        assert.equal(result.scale, 1.2);
-        assert(result.rain);
-        assert(result.snow);
-      } else {
-        assert.equal(result.globalState["rendering-fixture"], 9009);
-        assert(result.sky);
-      }
-      return result;
-    });
-    await scenario(
-      "selected canvas/video/custom insertion, mutable coordinates and teardown",
-      async () => {
-        await until(async () =>
-          page.evaluate("window.__oneMapTf09Media?.().ready")
-        );
-        await action("configure", { dem: false });
-        await action("media", { enabled: true });
-        let inspected;
-        await until(async () => {
-          inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
-          return inspected?.canvas && inspected?.video && inspected?.custom;
-        });
-        await until(async () =>
-          page.evaluate("window.__oneMapTf09Media().frames > 0")
-        );
-        let blue = 0;
-        let green = 0;
-        let magenta = 0;
-        await until(async () => {
-          const image = await decodeCapture();
-          blue = countPixels(
-            image,
-            (r, g, b) => r < 70 && g > 70 && g < 150 && b > 220
-          );
-          green = countPixels(
-            image,
-            (r, g, b) => r < 50 && g > 200 && b > 70 && b < 180
-          );
-          magenta = countPixels(
-            image,
-            (r, g, b) => r > 220 && g < 40 && b > 220
-          );
-          assert(
-            blue > 100 && green > 100 && magenta > 100,
-            `Media/custom output missing: canvas=${blue}, video=${green}, custom=${magenta}; state=${JSON.stringify(await page.evaluate("window.__oneMapTf09Inspect?.().videoState"))}.`
-          );
-          return true;
-        });
-        await action("media", { enabled: true, moved: true });
-        await until(async () => {
-          inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
-          return inspected?.canvasCoordinates?.coordinates?.[0]?.[0] === 5;
-        });
-        await action("media", { enabled: false });
-        await until(async () => {
-          inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
-          return !inspected?.canvas && !inspected?.video && !inspected?.custom;
-        });
-        const counts = await page.evaluate("window.__oneMapTf09Media()");
-        assert.equal(counts.added, counts.removed);
         return {
-          canvasBluePixels: blue,
-          videoGreenPixels: green,
-          magentaPixels: magenta,
-          callbacks: counts,
+          ...observed,
+          modelRequests,
+          assetSha256: {
+            magenta: createHash("sha256")
+              .update(modelGlb([1, 0, 1]))
+              .digest("hex"),
+            cyan: createHash("sha256")
+              .update(modelGlb([0, 1, 1]))
+              .digest("hex"),
+          },
+          observationRegion:
+            "central60percent; cached assets need not be downloaded again",
         };
       }
     );
-  }
-  await scenario("hillshade draws the fixture's slope patch", async () => {
-    await action("configure", { dem: true, shade: false });
-    let baseline;
-    await until(async () => {
-      baseline = await decodeCapture();
-      // iOS view snapshots encode the background as 30/49/75 rather than web sRGB 23/50/77.
-      const tolerance = platform === "ios" ? 12 : 3;
-      const blue = countPixels(
-        baseline,
-        (r, g, b) =>
-          Math.abs(r - 23) < tolerance &&
-          Math.abs(g - 50) < tolerance &&
-          Math.abs(b - 77) < tolerance
-      );
-      assert(
-        blue > baseline.width * baseline.height * 0.95,
-        `Hillshade baseline not flat: blue=${blue}/${baseline.width * baseline.height}, corner=${[...baseline.data.subarray(0, 4)]}.`
-      );
-      return true;
-    });
-    await action("configure", { dem: true, shade: true });
-    let shaded;
-    await until(async () => {
-      shaded = await decodeCapture();
-      const changed = pixelDifference(shaded, baseline);
-      assert(
-        changed > 100,
-        `Hillshade insertion changed only ${changed} pixels.`
-      );
-      return true;
-    });
-    await action("configure", { dem: true, shade: false });
-    let flat;
-    let changed = 0;
-    await until(async () => {
-      flat = await decodeCapture();
-      assert.equal(flat.data.length, shaded.data.length);
-      changed = pixelDifference(flat, shaded);
-      assert(
-        changed > 100,
-        `Hillshade removal changed only ${changed} pixels.`
-      );
-      return true;
-    });
-    assert(
-      changed > 100,
-      "Hillshade insertion/removal did not alter renderer output."
-    );
-    return { changedPixels: changed };
-  });
-  if (platform === "web" || engine === "mapbox")
+  } else if (executionScope === "light-color") {
     await scenario(
-      "globe projection has independently different viewport output",
-      async () => {
-        await action("projection-view", { globe: false });
-        const mercator = await decodeCapture();
-        await action("projection-view", { globe: true });
-        if (page)
-          await until(async () => {
-            const read = await page.evaluate("window.__oneMapTf09Inspect?.()");
-            return (
-              (read?.projection?.type ?? read?.projection?.name) === "globe"
+      "light colors draw independently and survive style replacement",
+      () => runLightColorAcceptance({ action, capture: decodeCapture, until })
+    );
+  } else if (executionScope === "global-state") {
+    await scenario(
+      "selected initial style state, style replacement and null reset",
+      () => runGlobalStateAcceptance({ action, capture: decodeCapture, until })
+    );
+  } else {
+    await scenario("known rendered feature and initial no-data", async () => {
+      let read;
+      await until(async () => {
+        read = await action("read");
+        assert(
+          read.loads > 0 &&
+            read.features.some((feature) => Number(feature.id) === 9009),
+          `Initial renderer not observed: ${JSON.stringify({
+            loads: read.loads,
+            styleLoads: read.styleLoads,
+            center: read.center,
+            zoom: read.zoom,
+            featureIds: read.features.map((feature) => feature.id),
+            elevation: read.elevation,
+          })}`
+        );
+        return true;
+      }, 90000);
+      if (platform !== "web" && engine === "maplibre")
+        assert.match(read.unsupported, /unsupported/);
+      else assert.equal(read.elevation, null);
+      let light;
+      if (page)
+        await until(async () => {
+          light = await page.evaluate("window.__oneMapTf09Inspect?.().light");
+          return light?.anchor === "map" && light?.intensity === 0.5;
+        });
+      return {
+        loads: read.loads,
+        featureIds: read.features.map((feature) => feature.id),
+        elevation: read.elevation,
+        unsupported: read.unsupported,
+        light,
+      };
+    });
+
+    if (executionScope === "camera-bounds") {
+      if (platform === "ios" && engine === "maplibre")
+        outcomes.push({
+          name: "geographic bounds clamp, replace and remove",
+          status: "skipped",
+          reason:
+            "The documented MapLibre iOS maxBounds contract restricts user panning; imperative camera commands can bypass it.",
+          requiredScope: "camera-bounds-gesture",
+        });
+      else
+        await scenario("geographic bounds clamp, replace and remove", () =>
+          runCameraBoundsAcceptance({ action })
+        );
+    }
+    if (executionScope === "camera-bounds-gesture") {
+      await scenario(
+        "geographic bounds constrain real panning and clear on removal",
+        async () => {
+          const input =
+            platform === "android"
+              ? await createAndroidGestureDriver({
+                  serial: process.env.ANDROID_SERIAL,
+                })
+              : platform === "ios"
+                ? await createIosGestureDriver({
+                    bundleIdentifier: process.env.TF09_APPLICATION_ID,
+                    projectRoot: join(root, "scripts/ios-tap"),
+                    simulatorUDID: process.env.TF09_IOS_UDID,
+                  })
+                : {
+                    driveGesture: async () => {
+                      await page.send("Input.dispatchMouseEvent", {
+                        type: "mousePressed",
+                        x: 640,
+                        y: 496,
+                        button: "left",
+                        buttons: 1,
+                        clickCount: 1,
+                      });
+                      try {
+                        for (let step = 1; step <= 12; step += 1) {
+                          await page.send("Input.dispatchMouseEvent", {
+                            type: "mouseMoved",
+                            x: 640 + step * 19.2,
+                            y: 496 - step * 8,
+                            button: "left",
+                            buttons: 1,
+                          });
+                          await new Promise((done) => setTimeout(done, 30));
+                        }
+                      } finally {
+                        await page.send("Input.dispatchMouseEvent", {
+                          type: "mouseReleased",
+                          x: 870.4,
+                          y: 400,
+                          button: "left",
+                          buttons: 0,
+                          clickCount: 1,
+                        });
+                      }
+                    },
+                    close: async () => {},
+                  };
+          try {
+            return await runCameraPanBoundsAcceptance({
+              action,
+              driveGesture: input.driveGesture,
+            });
+          } finally {
+            await input.close();
+          }
+        }
+      );
+    }
+    if (executionScope === "all" || executionScope === "rendering") {
+      if (platform === "web" || engine === "mapbox") {
+        await scenario(
+          "terrain enabled before delayed DEM attachment",
+          async () => {
+            await action("configure", { terrain: true });
+            let beforeDem;
+            await until(async () => {
+              beforeDem = await action("read");
+              return (
+                beforeDem.committed.terrain &&
+                !beforeDem.committed.dem &&
+                beforeDem.elevation === null &&
+                beforeDem.features.some(
+                  (feature) => Number(feature.id) === 9009
+                )
+              );
+            });
+            await action("configure", { terrain: true, dem: true });
+            let read;
+            await until(async () => {
+              read = await action("read");
+              return (
+                typeof read.elevation === "number" &&
+                Math.abs(read.elevation - 2000) < 5
+              );
+            });
+            return {
+              beforeDem: {
+                committed: beforeDem.committed,
+                elevation: beforeDem.elevation,
+                featureIds: beforeDem.features.map((feature) => feature.id),
+              },
+              elevation: read.elevation,
+              expectedMeters: 2000,
+            };
+          }
+        );
+        await scenario(
+          "explicit terrain clear and projection change",
+          async () => {
+            await action("configure", { dem: true, globe: true });
+            await until(async () => (await action("read")).elevation === null);
+            await action("configure", { dem: true, terrain: true });
+            await until(
+              async () => Math.abs((await action("read")).elevation - 2000) < 5
             );
+            const previousStyleLoads = (await action("read")).styleLoads;
+            await action("replace-style");
+            await until(
+              async () => (await action("read")).styleLoads > previousStyleLoads
+            );
+            await until(
+              async () => Math.abs((await action("read")).elevation - 2000) < 5
+            );
+            return { elevation: (await action("read")).elevation };
+          }
+        );
+      } else await action("configure", { dem: true });
+      if (platform === "web") {
+        await scenario("named selected renderer facilities", async () => {
+          const result = await action("named");
+          assert.deepEqual(result.tf10.dragPan, {
+            before: true,
+            disabled: false,
+            restored: true,
           });
-        let globe;
+          for (const field of ["source", "layer", "canvas", "styleLayer"])
+            assert.equal(result.tf10[field], true, `TF10 selected ${field}`);
+          assert.equal(
+            result.tf10.eventCalls,
+            1,
+            "TF10 on/fire/off removes its listener"
+          );
+          if (engine === "mapbox") {
+            assert.equal(result.scale, 1.2);
+            assert(result.rain);
+            assert(result.snow);
+          } else {
+            assert.equal(result.globalState["rendering-fixture"], 9009);
+            assert(result.sky);
+          }
+          return result;
+        });
+        await scenario(
+          "selected canvas/video/custom insertion, mutable coordinates and teardown",
+          async () => {
+            await until(async () =>
+              page.evaluate("window.__oneMapTf09Media?.().ready")
+            );
+            await action("configure", { dem: false });
+            await action("media", { enabled: true });
+            let inspected;
+            await until(async () => {
+              inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
+              return inspected?.canvas && inspected?.video && inspected?.custom;
+            });
+            await until(async () =>
+              page.evaluate("window.__oneMapTf09Media().frames > 0")
+            );
+            let blue = 0;
+            let green = 0;
+            let magenta = 0;
+            await until(async () => {
+              const image = await decodeCapture();
+              blue = countPixels(
+                image,
+                (r, g, b) => r < 70 && g > 70 && g < 150 && b > 220
+              );
+              green = countPixels(
+                image,
+                (r, g, b) => r < 50 && g > 200 && b > 70 && b < 180
+              );
+              magenta = countPixels(
+                image,
+                (r, g, b) => r > 220 && g < 40 && b > 220
+              );
+              assert(
+                blue > 100 && green > 100 && magenta > 100,
+                `Media/custom output missing: canvas=${blue}, video=${green}, custom=${magenta}; state=${JSON.stringify(await page.evaluate("window.__oneMapTf09Inspect?.().videoState"))}.`
+              );
+              return true;
+            });
+            await action("media", { enabled: true, moved: true });
+            await until(async () => {
+              inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
+              return inspected?.canvasCoordinates?.coordinates?.[0]?.[0] === 5;
+            });
+            await action("media", { enabled: false });
+            await until(async () => {
+              inspected = await page.evaluate("window.__oneMapTf09Inspect?.()");
+              return (
+                !inspected?.canvas && !inspected?.video && !inspected?.custom
+              );
+            });
+            const counts = await page.evaluate("window.__oneMapTf09Media()");
+            assert.equal(counts.added, counts.removed);
+            return {
+              canvasBluePixels: blue,
+              videoGreenPixels: green,
+              magentaPixels: magenta,
+              callbacks: counts,
+            };
+          }
+        );
+      }
+      await scenario("hillshade draws the fixture's slope patch", async () => {
+        const settled = [];
+        const configureShade = async (shade) => {
+          const previousIdle = (await action("read")).idle;
+          const previousRenderedFrame = page
+            ? (await page.evaluate("window.__oneMapTf09Inspect()"))
+                .renderedFrames
+            : undefined;
+          await action("configure", { dem: true, shade });
+          await until(async () => {
+            const read = await action("read");
+            if (
+              read.committed.shade !== shade ||
+              !read.committed.dem ||
+              read.committed.terrain ||
+              read.committed.projection !== "mercator" ||
+              (!page && engine === "mapbox" && read.idle <= previousIdle)
+            )
+              return false;
+            const rendered = page
+              ? await page.evaluate("window.__oneMapTf09Inspect()")
+              : undefined;
+            if (
+              page &&
+              !webHillshadeSettled(previousRenderedFrame, rendered, shade)
+            )
+              return false;
+            settled.push({
+              committed: read.committed,
+              idle: read.idle,
+              ...(rendered
+                ? {
+                    rendered: {
+                      shade: rendered.shade,
+                      frameShade: rendered.frameShade,
+                      renderedFrames: rendered.renderedFrames,
+                    },
+                  }
+                : {}),
+            });
+            return true;
+          });
+        };
+        await configureShade(false);
+        let baseline;
+        await until(async () => {
+          baseline = await decodeCapture();
+          // iOS view snapshots encode the background as 30/49/75 rather than web sRGB 23/50/77.
+          const tolerance = platform === "ios" ? 12 : 3;
+          const blue = countPixels(
+            baseline,
+            (r, g, b) =>
+              Math.abs(r - 23) < tolerance &&
+              Math.abs(g - 50) < tolerance &&
+              Math.abs(b - 77) < tolerance
+          );
+          assert(
+            blue > baseline.width * baseline.height * 0.95,
+            `Hillshade baseline not flat: blue=${blue}/${baseline.width * baseline.height}, corner=${[...baseline.data.subarray(0, 4)]}.`
+          );
+          return true;
+        });
+        await configureShade(true);
+        let shaded;
+        await until(async () => {
+          shaded = await decodeCapture();
+          const changed = pixelDifference(shaded, baseline);
+          assert(
+            changed > 100,
+            `Hillshade insertion changed only ${changed} pixels.`
+          );
+          return true;
+        });
+        await configureShade(false);
+        let flat;
         let changed = 0;
         await until(async () => {
-          globe = await decodeCapture();
-          changed = pixelDifference(globe, mercator);
-          return changed > 200;
+          flat = await decodeCapture();
+          assert.equal(flat.data.length, shaded.data.length);
+          changed = pixelDifference(flat, shaded);
+          assert(
+            changed > 100,
+            `Hillshade removal changed only ${changed} pixels.`
+          );
+          return true;
         });
         assert(
-          changed > 200,
-          "Projection switch did not change the rendered viewport."
+          changed > 100,
+          "Hillshade insertion/removal did not alter renderer output."
         );
-        const projectionReadback = page
-          ? await page.evaluate("window.__oneMapTf09Inspect?.().projection")
-          : "native pixel comparison";
-        await action("projection-view", { globe: false });
-        return { changedPixels: changed, projectionReadback };
-      }
-    );
-  await scenario(
-    "rendered output contains the known orange feature",
-    async () => {
-      let png;
-      let orange = 0;
-      await until(async () => {
-        png = await decodeCapture();
-        orange = countPixels(
-          png,
-          (r, g, b) => r > 220 && g > 45 && g < 140 && b < 60
-        );
-        assert(orange > 30, `Known feature not observed: orange=${orange}.`);
-        return true;
+        return { changedPixels: changed, settled };
       });
-      return { width: png.width, height: png.height, orangePixels: orange };
+      if (platform === "web" || engine === "mapbox")
+        await scenario(
+          "globe projection has independently different viewport output",
+          async () => {
+            await action("projection-view", { globe: false });
+            const mercator = await decodeCapture();
+            await action("projection-view", { globe: true });
+            if (page)
+              await until(async () => {
+                const read = await page.evaluate(
+                  "window.__oneMapTf09Inspect?.()"
+                );
+                return (
+                  (read?.projection?.type ?? read?.projection?.name) === "globe"
+                );
+              });
+            let globe;
+            let changed = 0;
+            await until(async () => {
+              globe = await decodeCapture();
+              changed = pixelDifference(globe, mercator);
+              return changed > 200;
+            });
+            assert(
+              changed > 200,
+              "Projection switch did not change the rendered viewport."
+            );
+            const projectionReadback = page
+              ? await page.evaluate("window.__oneMapTf09Inspect?.().projection")
+              : "native pixel comparison";
+            await action("projection-view", { globe: false });
+            return { changedPixels: changed, projectionReadback };
+          }
+        );
+      await scenario(
+        "rendered output contains the known orange feature",
+        async () => {
+          let png;
+          let orange = 0;
+          await until(async () => {
+            png = await decodeCapture();
+            orange = countPixels(
+              png,
+              (r, g, b) => r > 220 && g > 45 && g < 140 && b < 60
+            );
+            assert(
+              orange > 30,
+              `Known feature not observed: orange=${orange}.`
+            );
+            return true;
+          });
+          return { width: png.width, height: png.height, orangePixels: orange };
+        }
+      );
     }
-  );
+    // Gestures leave camera target/clamp state, so run them after rendering.
+    if (
+      platform !== "web" &&
+      (executionScope === "all" || executionScope === "camera")
+    ) {
+      await scenario("native camera targets and gestures", async () => {
+        const input =
+          platform === "android"
+            ? await createAndroidGestureDriver({
+                serial: process.env.ANDROID_SERIAL,
+              })
+            : await createIosGestureDriver({
+                bundleIdentifier: process.env.TF09_APPLICATION_ID,
+                projectRoot: join(root, "scripts/ios-tap"),
+                simulatorUDID: process.env.TF09_IOS_UDID,
+              });
+        try {
+          return await runNativeCameraAcceptance({
+            action,
+            driveGesture: input.driveGesture,
+          });
+        } finally {
+          await input.close();
+        }
+      });
+    }
+  }
 } catch (error) {
   process.exitCode = 1;
   console.error(String(error));
@@ -585,9 +894,12 @@ try {
     JSON.stringify(
       {
         scope:
-          "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+          executionScope === "model" || executionScope === "global-state"
+            ? `targeted selected ${executionScope} acceptance`
+            : "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
         platform,
         engine,
+        executionScope,
         artifact: process.env.TF09_LIBRARY_SHA256,
         nativeIdentity: process.env.TF09_NATIVE_IDENTITY,
         outcomes,

@@ -7,7 +7,10 @@ import { join } from "node:path";
 
 import { recordNativeUiObservation } from "./record-native-ui-observation.mjs";
 import { nativeRetainedScenarios } from "./tf07-retained-contract.mjs";
-import { nativeUiScenarios } from "./tf07-smoke-contract.mjs";
+import {
+  nativeUiScenarios,
+  nativeFocusedUiScenarios,
+} from "./tf07-smoke-contract.mjs";
 
 const directory = fs.mkdtempSync(join(tmpdir(), "native-ui-writer-"));
 const reportPath = join(directory, "report.json");
@@ -51,7 +54,11 @@ try {
   fs.writeFileSync(reportPath, broken);
   expectUnchangedFailure(() => record());
 
-  for (const scenarios of [nativeUiScenarios, nativeRetainedScenarios]) {
+  for (const scenarios of [
+    nativeUiScenarios,
+    nativeRetainedScenarios,
+    nativeFocusedUiScenarios,
+  ]) {
     for (const status of ["passed", "failed"]) {
       const before = reportFor(scenarios);
       reset(before);

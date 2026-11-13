@@ -15,15 +15,12 @@
     }
   },
   "include": [
-    "examples/css-modules.d.ts",
-    "examples/shared/route-map.tsx",
-    "examples/shared/tf08-map.tsx",
-    "examples/shared/web-lifecycle-app.tsx",
-    "examples/shared/web-camera-app.tsx",
-    "examples/shared/camera-smoke.ts",
-    "examples/web-mapbox/src/**/*.tsx",
-    "examples/web-mapbox/env.d.ts",
-    "examples/web-maplibre/src/**/*.tsx",
-    "examples/mixed/**/setup.ts"
+    "packages/example-map/src/scenarios/route-map.tsx",
+    "packages/example-map/src/scenarios/tf08-map.tsx",
+    "packages/example-map/src/scenarios/web-lifecycle-app.tsx",
+    "packages/example-map/src/scenarios/web-camera-app.tsx",
+    "packages/example-map/src/scenarios/camera-smoke.ts",
+    "packages/example-map/test/selection/**/setup.ts",
+    "packages/example-map/src/scenarios/*.tsx"
   ]
 }

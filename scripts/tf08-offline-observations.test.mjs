@@ -54,3 +54,31 @@ assert.deepEqual(unexpectedResetWarnings("maplibre", ["Not implemented"]), [
   "Not implemented",
 ]);
 console.log("TF08 offline observation checks passed.");
+
+const { assertExistingDatabaseRejection } =
+  await import("./tf08-offline-observations.mjs");
+const existing = Buffer.from("existing populated database");
+assert.doesNotThrow(() =>
+  assertExistingDatabaseRejection(
+    "An item with the same name already exists.",
+    existing,
+    Buffer.from(existing)
+  )
+);
+assert.throws(() =>
+  assertExistingDatabaseRejection("operation timed out", existing, existing)
+);
+assert.throws(() =>
+  assertExistingDatabaseRejection(
+    "already exists",
+    existing,
+    Buffer.from("replacement")
+  )
+);
+assert.throws(() =>
+  assertExistingDatabaseRejection(
+    "already exists",
+    Buffer.alloc(0),
+    Buffer.alloc(0)
+  )
+);

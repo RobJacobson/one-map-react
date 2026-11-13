@@ -283,7 +283,7 @@ open && (
 
 The working native composition uses an application-owned bubble inside Marker. The application owns its close button and mounting state; unmounting the bubble emits no close action. Web applications use the selected WrapperPopup export directly, as shown in the [migration examples](revised-api-proposal.md#markers-images-popups-and-controls).
 
-Applications that replace a Map while using a selected web WrapperPopup also own callback lifetime. Parent-map removal can invoke the raw popup close callback before the popup child cleanup detaches its listener. Capture the owning map generation and filter stale open/close callbacks before changing application state, so an old map cannot dismiss a replacement popup. The raw selected wrapper retains its upstream callback semantics; the removed common Popup teardown guarantee does not apply. The maintained [UI fixture](../examples/shared/tf07-scene.tsx) applies that filtering.
+Applications that replace a Map while using a selected web WrapperPopup also own callback lifetime. Parent-map removal can invoke the raw popup close callback before the popup child cleanup detaches its listener. Capture the owning map generation and filter stale open/close callbacks before changing application state, so an old map cannot dismiss a replacement popup. The raw selected wrapper retains its upstream callback semantics; the removed common Popup teardown guarantee does not apply. The maintained [UI fixture](../packages/example-map/src/scenarios/tf07-scene.tsx) applies that filtering.
 
 ```tsx
 import { useState } from "react";

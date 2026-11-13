@@ -2,8 +2,8 @@ import { afterEach, describe, expect, jest, test } from "@jest/globals";
 import { WrapperOfflineManager as Mapbox } from "one-map-react/mapbox-native";
 import { WrapperOfflineManager as Maplibre } from "one-map-react/maplibre-native";
 
-import { createMapboxOfflineCommands } from "../../../examples/shared/mapbox-offline-commands.js";
-import { createMaplibreOfflineCommands } from "../../../examples/shared/maplibre-offline-commands.js";
+import { createMapboxOfflineCommands } from "../../example-map/src/scenarios/mapbox-offline-commands.js";
+import { createMaplibreOfflineCommands } from "../../example-map/src/scenarios/maplibre-offline-commands.js";
 
 jest.mock("one-map-react/mapbox-native", () => ({
   WrapperOfflineManager: {

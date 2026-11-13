@@ -37,8 +37,6 @@ export default defineConfig({
       "**/.codex/**",
       "**/bun.lock",
       "records/**",
-      "examples/*/ios/**",
-      "examples/*/android/**",
       "**/*.md",
     ],
   },
@@ -60,8 +58,6 @@ export default defineConfig({
       "**/.agents/**",
       "**/.codex/**",
       "records/**",
-      "examples/*/ios/**",
-      "examples/*/android/**",
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
@@ -143,6 +139,7 @@ export default defineConfig({
           include: [
             "packages/one-map-react/test/**/*.web.test.tsx",
             "packages/example-map/test/**/*.web.test.tsx",
+            "packages/example-map/test/**/*.web.test.jsx",
           ],
           environment: "jsdom",
           setupFiles: ["./packages/one-map-react/test/setup-web.ts"],

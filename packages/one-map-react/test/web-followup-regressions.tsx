@@ -3,13 +3,13 @@ import { createRef, type ReactNode, StrictMode, Suspense } from "react";
 import { flushSync } from "react-dom";
 import { beforeEach, describe, expect, vi, test } from "vite-plus/test";
 
-import { SourcesMap } from "../../../examples/shared/sources-map.js";
-import { WebCorrectionsApp } from "../../../examples/shared/web-corrections-app.js";
 import {
   emptyStyle,
   initialViewState,
   routes,
-} from "../../../tests/fixtures/map-fixture.js";
+} from "../../example-map/src/scenarios/map-fixture.js";
+import { SourcesMap } from "../../example-map/src/scenarios/sources-map.js";
+import { WebCorrectionsApp } from "../../example-map/src/scenarios/web-corrections-app.js";
 import type { Adapter } from "../src/contracts/adapter.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { ClickEvent } from "../src/contracts/event-types.js";

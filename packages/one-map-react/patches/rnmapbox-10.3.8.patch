@@ -27,41 +27,28 @@ index e51687fb9b6fcafb38b3437bfab8593ecbd28982..e3d2b95859a10e0f489014b671e7d6ae
      }
  
      companion object {
-diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
---- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
-+++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
-@@ -27,6 +27,8 @@
- import com.mapbox.maps.extension.style.layers.Layer
- import com.mapbox.maps.extension.style.layers.generated.*
- import com.mapbox.maps.extension.style.layers.getLayer
-+import com.mapbox.maps.extension.style.sources.getSource
-+import com.mapbox.maps.extension.style.sources.generated.VectorSource
- import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
- import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
- import com.mapbox.maps.extension.style.projection.generated.Projection
-@@ -1140,7 +1142,7 @@
-                 it.putDouble("data", result)
-             }
-         } else {
--            response.error("no elevation data")
-+            response.success { it.putNull("data") }
-         }
-     }
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
+index 38de6c8d52d7334970921a1a7f78624caac052a9..759ad864d097aaec984f42f705573001294b35c0 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
+@@ -6,7 +6,7 @@ import com.facebook.react.bridge.ReadableArray
+ import com.facebook.react.bridge.ReadableMap
+ import com.facebook.react.bridge.WritableMap
+ import com.facebook.react.bridge.WritableNativeMap
+-import com.rnmapbox.rnmbx.NativeMapViewModuleSpec
++import com.rnmapbox.rnmbx.NativeRNMBXMapViewModuleSpec
+ import com.rnmapbox.rnmbx.utils.ConvertUtils
+ import com.rnmapbox.rnmbx.utils.ExpressionParser
+ import com.rnmapbox.rnmbx.utils.ViewRefTag
+@@ -16,7 +16,7 @@ import com.rnmapbox.rnmbx.utils.extensions.toScreenBox
+ import com.rnmapbox.rnmbx.utils.extensions.toScreenCoordinate
+ import com.rnmapbox.rnmbx.utils.extensions.toValueHashMap
  
-@@ -1204,6 +1206,13 @@
-       sourceLayerId: String?,
-       response: CommandResponse
-     ) {
-+        // A JS source ref can precede native replacement of the previous family.
-+        val source = mapView.getMapboxMap().getStyle()?.getSource(sourceId)
-+        if (source == null || (sourceLayerId != null && source !is VectorSource)) {
-+            response.error("source_not_attached")
-+            return
-+        }
-+
-         mapView.getMapboxMap().removeFeatureStateCompat(
-             sourceId,
-             sourceLayerId,
+-class NativeMapViewModule(context: ReactApplicationContext, val viewTagResolver: ViewTagResolver) : NativeMapViewModuleSpec(context) {
++class NativeMapViewModule(context: ReactApplicationContext, val viewTagResolver: ViewTagResolver) : NativeRNMBXMapViewModuleSpec(context) {
+     private fun withMapViewOnUIThread(
+         viewRef: ViewRefTag?,
+         reject: Promise,
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
 index 7b6de8ab94adcd42c6973f999b63f357d0ea98ed..e2347912af3ac0ccc76280a4f140ae9a2ddc720e 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
@@ -643,6 +630,56 @@ index 1253ba14303a7d8929c846cead88929a1d3ab123..239ab6d1e1209aabaa8c4bf4a6dafcfb
          "name": name,
          "percentage": progress.toPercentage(),
          "completedResourceCount": progress.completedResourceCount,
+diff --git a/ios/RNMBX/RNMBXCustomLocationProvider.swift b/ios/RNMBX/RNMBXCustomLocationProvider.swift
+index 79187f4bbca8b6ae8108afb07a7808fbff6e3e50..34bd0c87d30f884fd9e376b45e3dd9acfdab662e 100644
+--- a/ios/RNMBX/RNMBXCustomLocationProvider.swift
++++ b/ios/RNMBX/RNMBXCustomLocationProvider.swift
+@@ -110,6 +110,9 @@ class CustomLocationProvider: LocationProvider & HeadingProvider {
+ 
+   func addLocationObserver(for observer: LocationObserver) {
+     observers.add(observer)
++    if let location = location {
++      observer.onLocationUpdateReceived(for: [location])
++    }
+   }
+ 
+   func removeLocationObserver(for observer: LocationObserver) {
+@@ -135,6 +138,9 @@ class CustomLocationProvider: LocationProvider & HeadingProvider {
+ 
+   func add(headingObserver: HeadingObserver) {
+     headingObservers.add(headingObserver)
++    if let heading = latestHeading {
++      headingObserver.onHeadingUpdate(heading)
++    }
+   }
+ 
+   func remove(headingObserver: HeadingObserver) {
+diff --git a/ios/RNMBX/RNMBXMapViewModule.h b/ios/RNMBX/RNMBXMapViewModule.h
+index a826c22452dddcbf23f26691888cc0f5764a817e..7ce58023115c9eaec292e87c10e889a89b37b8cf 100644
+--- a/ios/RNMBX/RNMBXMapViewModule.h
++++ b/ios/RNMBX/RNMBXMapViewModule.h
+@@ -5,7 +5,7 @@
+ #ifdef __cplusplus
+ #import "rnmapbox_maps_specs.h"
+ 
+-@interface RNMBXMapViewModule : NSObject <NativeMapViewModuleSpec, RNMBXViewResolverDelegate>
++@interface RNMBXMapViewModule : NSObject <NativeRNMBXMapViewModuleSpec, RNMBXViewResolverDelegate>
+ @end
+ 
+ #else
+diff --git a/ios/RNMBX/RNMBXMapViewModule.mm b/ios/RNMBX/RNMBXMapViewModule.mm
+index 8aaf1a08803f8b9f25b722db225c773182f744bc..0b45774c617f895f81ad5baa8e2311894cbb8004 100644
+--- a/ios/RNMBX/RNMBXMapViewModule.mm
++++ b/ios/RNMBX/RNMBXMapViewModule.mm
+@@ -147,7 +147,7 @@ RCT_EXPORT_METHOD(querySourceFeatures:(nonnull NSNumber*)viewRef sourceId:(NSStr
+ - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+     (const facebook::react::ObjCTurboModule::InitParams &)params
+ {
+-    return std::make_shared<facebook::react::NativeMapViewModuleSpecJSI>(params);
++    return std::make_shared<facebook::react::NativeRNMBXMapViewModuleSpecJSI>(params);
+ }
+ 
+ @end
 diff --git a/ios/RNMBX/RNMBXModule.m b/ios/RNMBX/RNMBXModule.m
 index 61978cdae9e8a2f5ccfbbdb26ecc4b6029c0d390..737f3cdf3caaecd0c3576721ae267fb4ddaa3b4f 100644
 --- a/ios/RNMBX/RNMBXModule.m
@@ -787,6 +824,17 @@ index ea91cd61e66c3f01be8800555c61e3e89b11c64b..b6fd036ab6143e2d735c50521d3c5ab4
      this.width = options.width || 50.0;
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
+diff --git a/lib/module/specs/NativeMapViewModule.js.map b/lib/module/specs/NativeMapViewModule.js.map
+index 8032c71737df52f0ced33ebc23e54c7e08803a2c..7eeb6d818239a5b08b40d9f1e57a9410cb4f49a0 100644
+--- a/lib/module/specs/NativeMapViewModule.js.map
++++ b/lib/module/specs/NativeMapViewModule.js.map
+@@ -1 +1 @@
+-{"version":3,"names":["TurboModuleRegistry","getEnforcing"],"sourceRoot":"../../../src","sources":["specs/NativeMapViewModule.ts"],"mappings":";;AACA;;AAEA,SAASA,mBAAmB,QAAQ,cAAc;AAsElD,eAAeA,mBAAmB,CAACC,YAAY,CAAO,oBAAoB,CAAC","ignoreList":[]}
++{"version":3,"names":["TurboModuleRegistry","getEnforcing"],"sourceRoot":"../../../src","sources":["specs/NativeRNMBXMapViewModule.ts"],"mappings":";;AACA;;AAEA,SAASA,mBAAmB,QAAQ,cAAc;AAsElD,eAAeA,mBAAmB,CAACC,YAAY,CAAO,oBAAoB,CAAC","ignoreList":[]}
+diff --git a/lib/module/specs/NativeMapViewModule.js b/lib/module/specs/NativeRNMBXMapViewModule.js
+similarity index 100%
+rename from lib/module/specs/NativeMapViewModule.js
+rename to lib/module/specs/NativeRNMBXMapViewModule.js
 diff --git a/lib/typescript/src/Mapbox.native.d.ts b/lib/typescript/src/Mapbox.native.d.ts
 index 9bffceb17d44a6a4c69769c0f33176e9284121d7..a53f5c00c3e28e9701a0516dcd65b3f5cfddfbc3 100644
 --- a/lib/typescript/src/Mapbox.native.d.ts
@@ -877,6 +925,19 @@ index fd0c239924198386d0bc68b7a1ef9e57e3e01658..cccc14407738a536c779e203df032b3c
       * @example
       * await Mapbox.offlineManager.clearAmbientCache();
       *
+diff --git a/lib/typescript/src/specs/NativeMapViewModule.d.ts.map b/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
+index 3e2e987ea7d08de0806ae41a350d9061e5dfe884..2c4f968b402742e674befc153f81128a1e6677ed 100644
+--- a/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
++++ b/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"NativeMapViewModule.d.ts","sourceRoot":"","sources":["../../../../src/specs/NativeMapViewModule.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"NativeRNMBXMapViewModule.d.ts","sourceRoot":"","sources":["../../../../src/specs/NativeRNMBXMapViewModule.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/lib/typescript/src/specs/NativeMapViewModule.d.ts b/lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts
+similarity index 100%
+rename from lib/typescript/src/specs/NativeMapViewModule.d.ts
+rename to lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts
 diff --git a/src/components/MapView.tsx b/src/components/MapView.tsx
 index d742f1915f81ad3317a97bce81c2a03642d12409..cc99a0b056b88184e8e9dbd10028f0b32b5a7796 100644
 --- a/src/components/MapView.tsx
@@ -971,106 +1032,45 @@ index 766dbd812f0ff0a09172c7c3125e1eef74471f7a..b9791a086e08962a9ef35c80f3b26700
      this.width = options.width || 50.0;
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
-diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
-index 38de6c8d52d7334970921a1a7f78624caac052a9..759ad864d097aaec984f42f705573001294b35c0 100644
---- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
-+++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
-@@ -6,7 +6,7 @@ import com.facebook.react.bridge.ReadableArray
- import com.facebook.react.bridge.ReadableMap
- import com.facebook.react.bridge.WritableMap
- import com.facebook.react.bridge.WritableNativeMap
--import com.rnmapbox.rnmbx.NativeMapViewModuleSpec
-+import com.rnmapbox.rnmbx.NativeRNMBXMapViewModuleSpec
- import com.rnmapbox.rnmbx.utils.ConvertUtils
- import com.rnmapbox.rnmbx.utils.ExpressionParser
- import com.rnmapbox.rnmbx.utils.ViewRefTag
-@@ -16,7 +16,7 @@ import com.rnmapbox.rnmbx.utils.extensions.toScreenBox
- import com.rnmapbox.rnmbx.utils.extensions.toScreenCoordinate
- import com.rnmapbox.rnmbx.utils.extensions.toValueHashMap
- 
--class NativeMapViewModule(context: ReactApplicationContext, val viewTagResolver: ViewTagResolver) : NativeMapViewModuleSpec(context) {
-+class NativeMapViewModule(context: ReactApplicationContext, val viewTagResolver: ViewTagResolver) : NativeRNMBXMapViewModuleSpec(context) {
-     private fun withMapViewOnUIThread(
-         viewRef: ViewRefTag?,
-         reject: Promise,
-diff --git a/ios/RNMBX/RNMBXCustomLocationProvider.swift b/ios/RNMBX/RNMBXCustomLocationProvider.swift
-index 79187f4bbca8b6ae8108afb07a7808fbff6e3e50..34bd0c87d30f884fd9e376b45e3dd9acfdab662e 100644
---- a/ios/RNMBX/RNMBXCustomLocationProvider.swift
-+++ b/ios/RNMBX/RNMBXCustomLocationProvider.swift
-@@ -110,6 +110,9 @@ class CustomLocationProvider: LocationProvider & HeadingProvider {
- 
-   func addLocationObserver(for observer: LocationObserver) {
-     observers.add(observer)
-+    if let location = location {
-+      observer.onLocationUpdateReceived(for: [location])
-+    }
-   }
- 
-   func removeLocationObserver(for observer: LocationObserver) {
-@@ -135,6 +138,9 @@ class CustomLocationProvider: LocationProvider & HeadingProvider {
- 
-   func add(headingObserver: HeadingObserver) {
-     headingObservers.add(headingObserver)
-+    if let heading = latestHeading {
-+      headingObserver.onHeadingUpdate(heading)
-+    }
-   }
- 
-   func remove(headingObserver: HeadingObserver) {
-diff --git a/ios/RNMBX/RNMBXMapViewModule.h b/ios/RNMBX/RNMBXMapViewModule.h
-index a826c22452dddcbf23f26691888cc0f5764a817e..7ce58023115c9eaec292e87c10e889a89b37b8cf 100644
---- a/ios/RNMBX/RNMBXMapViewModule.h
-+++ b/ios/RNMBX/RNMBXMapViewModule.h
-@@ -5,7 +5,7 @@
- #ifdef __cplusplus
- #import "rnmapbox_maps_specs.h"
- 
--@interface RNMBXMapViewModule : NSObject <NativeMapViewModuleSpec, RNMBXViewResolverDelegate>
-+@interface RNMBXMapViewModule : NSObject <NativeRNMBXMapViewModuleSpec, RNMBXViewResolverDelegate>
- @end
- 
- #else
-diff --git a/ios/RNMBX/RNMBXMapViewModule.mm b/ios/RNMBX/RNMBXMapViewModule.mm
-index 8aaf1a08803f8b9f25b722db225c773182f744bc..0b45774c617f895f81ad5baa8e2311894cbb8004 100644
---- a/ios/RNMBX/RNMBXMapViewModule.mm
-+++ b/ios/RNMBX/RNMBXMapViewModule.mm
-@@ -147,7 +147,7 @@ RCT_EXPORT_METHOD(querySourceFeatures:(nonnull NSNumber*)viewRef sourceId:(NSStr
- - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
-     (const facebook::react::ObjCTurboModule::InitParams &)params
- {
--    return std::make_shared<facebook::react::NativeMapViewModuleSpecJSI>(params);
-+    return std::make_shared<facebook::react::NativeRNMBXMapViewModuleSpecJSI>(params);
- }
- 
- @end
-diff --git a/lib/module/specs/NativeMapViewModule.js.map b/lib/module/specs/NativeMapViewModule.js.map
-index 8032c71737df52f0ced33ebc23e54c7e08803a2c..7eeb6d818239a5b08b40d9f1e57a9410cb4f49a0 100644
---- a/lib/module/specs/NativeMapViewModule.js.map
-+++ b/lib/module/specs/NativeMapViewModule.js.map
-@@ -1 +1 @@
--{"version":3,"names":["TurboModuleRegistry","getEnforcing"],"sourceRoot":"../../../src","sources":["specs/NativeMapViewModule.ts"],"mappings":";;AACA;;AAEA,SAASA,mBAAmB,QAAQ,cAAc;AAsElD,eAAeA,mBAAmB,CAACC,YAAY,CAAO,oBAAoB,CAAC","ignoreList":[]}
-+{"version":3,"names":["TurboModuleRegistry","getEnforcing"],"sourceRoot":"../../../src","sources":["specs/NativeRNMBXMapViewModule.ts"],"mappings":";;AACA;;AAEA,SAASA,mBAAmB,QAAQ,cAAc;AAsElD,eAAeA,mBAAmB,CAACC,YAAY,CAAO,oBAAoB,CAAC","ignoreList":[]}
-diff --git a/lib/module/specs/NativeMapViewModule.js b/lib/module/specs/NativeRNMBXMapViewModule.js
-similarity index 100%
-rename from lib/module/specs/NativeMapViewModule.js
-rename to lib/module/specs/NativeRNMBXMapViewModule.js
-diff --git a/lib/typescript/src/specs/NativeMapViewModule.d.ts.map b/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
-index 3e2e987ea7d08de0806ae41a350d9061e5dfe884..2c4f968b402742e674befc153f81128a1e6677ed 100644
---- a/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
-+++ b/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
-@@ -1 +1 @@
--{"version":3,"file":"NativeMapViewModule.d.ts","sourceRoot":"","sources":["../../../../src/specs/NativeMapViewModule.ts"],"names":[],"mappings":"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"}
-\ No newline at end of file
-+{"version":3,"file":"NativeRNMBXMapViewModule.d.ts","sourceRoot":"","sources":["../../../../src/specs/NativeRNMBXMapViewModule.ts"],"names":[],"mappings":"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"}
-\ No newline at end of file
-diff --git a/lib/typescript/src/specs/NativeMapViewModule.d.ts b/lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts
-similarity index 100%
-rename from lib/typescript/src/specs/NativeMapViewModule.d.ts
-rename to lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts
 diff --git a/src/specs/NativeMapViewModule.ts b/src/specs/NativeRNMBXMapViewModule.ts
 similarity index 100%
 rename from src/specs/NativeMapViewModule.ts
 rename to src/specs/NativeRNMBXMapViewModule.ts
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+@@ -27,6 +27,8 @@
+ import com.mapbox.maps.extension.style.layers.Layer
+ import com.mapbox.maps.extension.style.layers.generated.*
+ import com.mapbox.maps.extension.style.layers.getLayer
++import com.mapbox.maps.extension.style.sources.getSource
++import com.mapbox.maps.extension.style.sources.generated.VectorSource
+ import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
+ import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
+ import com.mapbox.maps.extension.style.projection.generated.Projection
+@@ -1140,7 +1142,7 @@
+                 it.putDouble("data", result)
+             }
+         } else {
+-            response.error("no elevation data")
++            response.success { it.putNull("data") }
+         }
+     }
+ 
+@@ -1204,6 +1206,13 @@
+       sourceLayerId: String?,
+       response: CommandResponse
+     ) {
++        // A JS source ref can precede native replacement of the previous family.
++        val source = mapView.getMapboxMap().getStyle()?.getSource(sourceId)
++        if (source == null || (sourceLayerId != null && source !is VectorSource)) {
++            response.error("source_not_attached")
++            return
++        }
++
+         mapView.getMapboxMap().removeFeatureStateCompat(
+             sourceId,
+             sourceLayerId,
 diff --git a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
 --- a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
 +++ b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt

@@ -146,7 +146,11 @@ for (const [engine, borrowed] of [
       platform: "android",
       retained: false,
       root: "/frozen-harness",
-      scenarios: ["physical-touch", "later-touch"],
+      focused: false,
+      requiredUiScenarios: ["physical-touch", "later-touch"],
+      nativeApplicationId: () => `com.onemap${engine}`,
+      nativeMetroArgs: (port) => ["expo-metro", String(port)],
+      nativeEnvironment: (engine, scenario) => ({ engine, scenario }),
 
       process: {
         env: {
@@ -238,7 +242,7 @@ for (const [engine, borrowed] of [
       start: (file, args, options) => {
         assert(statusBound);
         assert.equal(manual, undefined);
-        assert.equal(options.cwd, `/frozen-harness/examples/native-${engine}`);
+        assert.equal(options.cwd, "/frozen-harness/apps/expo");
         metro = new EventEmitter();
         return Object.assign(metro, {
           pid: 77,
@@ -857,4 +861,42 @@ for (const mode of ["escalation-close", "never-close", "async-spawn-error"]) {
 }
 console.log(
   "Recorder parent-owned escalation, final flush, unclosed gap and asynchronous spawn failure mocks passed."
+);
+
+// Focused runs select their own report rows and retain exclusive output creation.
+const focusedConfiguration = text.slice(
+  text.indexOf("const focused ="),
+  text.indexOf("\nif (", text.indexOf("const focused ="))
+);
+const focusedRows = ["focused-row"];
+const selectedRows = runInNewContext(
+  `${focusedConfiguration}; requiredUiScenarios;`,
+  {
+    retained: false,
+    process: { env: { TF07_SCOPE: "focused" } },
+    nativeFocusedUiScenarios: focusedRows,
+    nativeRetainedScenarios: [],
+    nativeUiScenarios: ["core-row"],
+  }
+);
+assert.equal(selectedRows, focusedRows);
+const outputSource = text.slice(
+  text.indexOf("  const result = JSON.stringify({ artifact, results }"),
+  text.indexOf("  if (Object.values(results)")
+);
+let saved;
+runInNewContext(outputSource, {
+  artifact: {},
+  results: {},
+  process: { env: { TF07_OUTPUT: "/output" } },
+  console: { log: () => {} },
+  writeFileSync: (path, value, options) => {
+    assert.equal(path, "/output");
+    assert.equal(options.flag, "wx");
+    saved = JSON.parse(value);
+  },
+});
+assert.deepEqual(saved, { artifact: {}, results: {} });
+console.log(
+  "Focused scenario selection and exclusive TF07 result output passed."
 );

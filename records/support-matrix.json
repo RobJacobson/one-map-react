@@ -1,7 +1,7 @@
 {
   "checkpoint": "TF10",
-  "status": "rc.2 routine and frozen-consumer checks passed; changed-artifact renderer acceptance pending",
-  "inspectedAt": "2026-10-15",
+  "status": "Rc.11 artifact frozen; affected RN0.87.1 native release checks in progress. Unaffected results retain their executed artifact identities.",
+  "inspectedAt": "2026-10-21T17:48:55.020Z",
   "registry": "https://registry.npmjs.org/",
   "peers": [
     {
@@ -148,8 +148,8 @@
     },
     {
       "package": "react-native-teleport",
-      "minimum": "1.2.1",
-      "proposedRange": "^1.2.1",
+      "minimum": "1.2.2",
+      "proposedRange": "^1.2.2",
       "newestStable": "1.2.2",
       "registryIntegrity": {
         "1.2.1": "sha512-vvYMnb/JrPBKbBEym03TWafxL23c2/MDz7zvVciFNJLKZAQ4f5QWJNBO4BgjfMHgeExl9g3X7/Zp7GYH9h7RDA==",
@@ -157,9 +157,10 @@
       },
       "evidence": "records/evidence/tf10-release.json",
       "stableReleasesAdmitted": [
-        "1.2.1",
         "1.2.2"
-      ]
+      ],
+      "minimumReason": "1.2.2 fixes Android reparenting during active transitions and supports RN0.87; rc.3 minimum-peer remount failures retain their original Teleport1.2.1 identities.",
+      "upstreamFix": "https://github.com/kirillzyusko/react-native-teleport/commit/9cebbb23c645c31113cb913cb1f73465d4c8ca96"
     }
   ],
   "versionSets": {
@@ -172,7 +173,7 @@
       "maplibre-gl": "6.13.0",
       "@rnmapbox/maps": "10.3.7",
       "@maplibre/maplibre-react-native": "11.5.0",
-      "react-native-teleport": "1.2.1",
+      "react-native-teleport": "1.2.2",
       "@types/react": "19.2.18"
     },
     "newest": {
@@ -224,6 +225,18 @@
         "maplibre-android"
       ],
       "constraint": "RN0.87.1 embeds React/Fabric19.2.3. Its loose npm React peer does not establish newer renderer compatibility. Native19.3.x is outside this host claim."
+    },
+    "development": {
+      "react": "19.2.3",
+      "react-dom": "19.2.3",
+      "react-native": "0.86.3",
+      "expo": "57.0.23",
+      "sources": [
+        "package.json",
+        "apps/expo/package.json",
+        "jest.config.cjs"
+      ],
+      "scope": "The root mocked-native tests and maintained Expo app use this development host. Their results do not establish renderer acceptance for the declared RN0.87.1 release host or expand the package peer range."
     }
   },
   "nativeSdkDefaults": {
@@ -246,40 +259,43 @@
       "package": "@rnmapbox/maps",
       "version": "10.3.7",
       "file": "patches/rnmapbox-10.3.7-tf08.patch",
-      "sha256": "118090860852b786a6681287f52ae3af1af8e0657a7c1853936204afb287a6d4",
-      "status": "application-owned repair required; native acceptance not renewed",
+      "sha256": "2951f39a3a1c6190a39f781b9f71cf36946aecb148691a751e4adc1766725b3c",
+      "status": "Exact-version application-owned repair required. Frozen rc.11 archive includes source-lifetime and iOS light-color repairs, with Mapbox10.3.8 generated-module namespacing. Prior routine/packed regressions pass; affected RN0.87.1 runtime acceptance is in progress.",
       "upstreamRepairs": "Required repairs are not wholly upstream. Exact version patch retained.",
       "checks": [
         "Bun patchedDependencies clean install from candidate archive",
         "reverse git apply check for every repaired file",
         "source, compiled JavaScript, declaration and native file assertions"
-      ]
+      ],
+      "candidateEvidence": "records/evidence/rc11-release-gates.json"
     },
     {
       "package": "@rnmapbox/maps",
       "version": "10.3.8",
       "file": "patches/rnmapbox-10.3.8.patch",
-      "sha256": "aacec1a77c297c5a0ba0d756f6833ae0b1364285dd473a030d98128ebb35cbe7",
-      "status": "application-owned repair required; native acceptance not renewed",
+      "sha256": "987da5eb58f5d49db078d2387f6a381cb5538a4f785221238fb36c1d7946e59f",
+      "status": "Exact-version application-owned repair required. Frozen rc.11 archive includes source-lifetime and iOS light-color repairs, with Mapbox10.3.8 generated-module namespacing. Prior routine/packed regressions pass; affected RN0.87.1 runtime acceptance is in progress.",
       "upstreamRepairs": "Required repairs are not wholly upstream. Exact version patch retained.",
       "checks": [
         "Bun patchedDependencies clean install from candidate archive",
         "reverse git apply check for every repaired file",
         "source, compiled JavaScript, declaration and native file assertions"
-      ]
+      ],
+      "candidateEvidence": "records/evidence/rc11-release-gates.json"
     },
     {
       "package": "@maplibre/maplibre-react-native",
       "version": "11.5.0",
       "file": "patches/maplibre-native-11.5.0-tf08.patch",
-      "sha256": "430ef194dfeeefcc8c2e94c507b7dcb68f7633e691e7e75603d13a4061bff3af",
-      "status": "application-owned repair required; native acceptance not renewed",
+      "sha256": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0",
+      "status": "Exact-version application-owned repair required. Frozen rc.11 archive includes source-lifetime and iOS light-color repairs, with Mapbox10.3.8 generated-module namespacing. Prior routine/packed regressions pass; affected RN0.87.1 runtime acceptance is in progress.",
       "upstreamRepairs": "Required repairs are not wholly upstream. Exact version patch retained.",
       "checks": [
         "Bun patchedDependencies clean install from candidate archive",
         "reverse git apply check for every repaired file",
         "source, compiled JavaScript, declaration and native file assertions"
-      ]
+      ],
+      "candidateEvidence": "records/evidence/rc11-release-gates.json"
     }
   ],
   "versionBoundaries": [
@@ -292,7 +308,7 @@
         "App-wide setLanguage plus separate normalizeLanguageTag helper",
         "onMapLoadingError optional structured payload; localizeLabels native v11 implementation"
       ],
-      "route": "selected WrapperMapView/WrapperCamera, LocationPuck, version-aware language exports; common normalized camera/padding unchanged"
+      "route": "selected WrapperMapView/WrapperCamera, LocationPuck, version-aware language exports; common normalized camera/padding unchanged; rc.7 selected model rendering, numeric scale/rotation/opacity updates, URI replacement and removal passed on iOS and Android."
     },
     {
       "package": "mapbox-gl",
@@ -310,7 +326,7 @@
         "constructor/setStyle globalState initialization",
         "terrain elevation hold/reconciliation internals"
       ],
-      "route": "selected options and WrapperMap preserve installed declaration and wrapper construction; terrain runtime requires endpoint acceptance"
+      "route": "Selected options and WrapperMap preserve installed declarations and wrapper construction. Rc.6 endpoint terrain acceptance and rc.7 constructor global-state/style-replacement/update/null-reset renderer checks passed."
     },
     {
       "package": "react-native-teleport",
@@ -328,10 +344,10 @@
     "Full VoiceOver/TalkBack audits outside release certification"
   ],
   "releaseGates": {
-    "inventory": "passed12151 substantiated dispositions; two owner exclusions remain pending",
-    "routine": "rc.2 passed553 Vitest and212 Jest tests plus standalone/type/docs/inventory/build checks",
-    "isolatedConsumers": "rc.2 passed frozen minimum/newest16 selected/mixed consumers,26 package selections,4 example builds",
-    "rendererAcceptance": "rc.1 MapLibre web controlled-camera failure recorded; rc.2 repair needs coordinator audit and changed-artifact rerun decision",
+    "inventory": "Grouped API coverage routes reviewed in docs/api-coverage.md; owner exclusions, deferred native fit cap, unadvertised strict controlledCamera capability and separate example-workspace gate remain explicit.",
+    "routine": "Rc.11 routine checks and 1176 unit/component tests passed on the workspace development host recorded under hosts.development; see records/evidence/ios-home-drag-repair.json. Mocked-native results do not establish RN0.87.1 renderer acceptance. Exact-archive consumer results are recorded separately under isolatedConsumers.",
+    "isolatedConsumers": "Frozen rc.11 exact archive passed both recorded endpoint package, peer and example-resolution suites; retained without rerun.",
+    "rendererAcceptance": "Affected RN0.87.1 native release checks in progress; see currentCandidate. Unaffected browser and native scope carries forward by explicit impact review, preserving original artifacts. Latest Expo/RN0.86.3 fixes remain separate scoped evidence.",
     "publication": "not authorized"
   },
   "nativeSdkPin": {
@@ -341,14 +357,24 @@
       "iosPodfile": "$RNMapboxMapsVersion = '= 11.23.1'",
       "androidBuildscriptExt": "RNMapboxMapsVersion = '11.23.1'",
       "source": "scripts/native-mapbox-version.mjs",
-      "acceptance": "authorized; exact linked SDK identity remains unverified pending native builds"
+      "acceptance": "rc.6 RNMapbox10.3.7/10.3.8 iOS builds and installations independently verified with Maps/CoreMaps11.23.1 and Common24.23.1. rc.5 minimum-peer Android and all other historical outcomes retain their original artifacts."
     }
   },
   "nativeBoundaries": [
     "RNMapbox10.3.7 localizeLabels on nativeSDK11 rejects;10.3.8 delegates public v11 implementation. New language helpers also require10.3.8.",
     "MapLibre Native exact ios6.31.0/android13.6.1 registries substantiate Mercator-only and missing terrain/sky/state roots, global-state/interpolate-hcl/lab expressions and newer source/layer keys. See evidence/tf10-native-style-sources.json and current guarded input routes.",
-    "Native controlled camera implementation has focused mocked regression coverage; strict controlledCamera capability remains unavailable pending native gesture acceptance."
+    "Native controlled camera implementation has mocked regressions and recorded scoped gesture coverage; strict controlledCamera capability remains unavailable until its full contract gate is met.",
+    "MapLibre iOS maxBounds constrains user panning through the camera delegate; imperative jumps bypass it. Rc.6 reproduced that known command boundary while paired physical panning and removal passed."
   ],
   "peerMetadata": "records/evidence/tf10-peer-metadata.json",
-  "currentCandidate": "records/evidence/tf10-rc2.json"
+  "currentCandidate": "records/evidence/rc11-release-gates.json",
+  "remainingReleaseAcceptance": "records/evidence/rc11-release-gates.json",
+  "historicalCandidate": "records/evidence/tf10-rc6.json",
+  "currentArtifact": {
+    "version": "0.1.0-rc.11",
+    "archive": "artifacts/one-map-react-0.1.0-rc.11.tgz",
+    "sha256": "aa31e57c256a6339140228e2ae68831acd5ad84a182a89e42b3fa3bcf4c97dd7",
+    "distSha256": "c2e0f31c8369eeb1ecff084daa3f9107cd754b8e208b4a33260d088831546591",
+    "files": 209
+  }
 }

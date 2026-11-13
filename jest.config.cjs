@@ -11,6 +11,9 @@ module.exports = {
     {
       displayName: "native",
       preset: "@react-native/jest-preset",
+      setupFilesAfterEnv: [
+        "<rootDir>/packages/one-map-react/test/setup-native.ts",
+      ],
       testMatch: ["<rootDir>/packages/one-map-react/test/**/*.native.test.tsx"],
       moduleNameMapper: {
         "^react-native-teleport$":

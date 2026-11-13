@@ -22,8 +22,22 @@ const config: ExpoConfig = {
   slug: "one-map-example",
   scheme: "one-map-example",
   version: "1.0.0",
-  ios: { bundleIdentifier: "com.onemap.example", supportsTablet: true },
-  android: { package: "com.onemap.example" },
+  ios: {
+    bundleIdentifier: "com.onemap.example",
+    supportsTablet: true,
+    infoPlist: {
+      NSLocationWhenInUseUsageDescription:
+        "Exercise foreground map location in the development examples.",
+    },
+  },
+  android: {
+    package: "com.onemap.example",
+    permissions: [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION",
+      "ACCESS_LOCAL_NETWORK",
+    ],
+  },
   web: { bundler: "metro", name: "One Map" },
   plugins: [
     ["expo-build-properties", { ios: { enableSceneSupport: true } }],

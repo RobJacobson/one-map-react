@@ -1,11 +1,4 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  jest,
-  test,
-} from "@jest/globals";
+import { afterEach, describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import {
   type ComponentProps,
@@ -240,27 +233,58 @@ const nativeTouch = async (
   await act(async () => node?.props[name](event));
 };
 
-const initialAppState = AppState.currentState;
-const initialAppStateSubscription = jest
-  .mocked(AppState.addEventListener)
-  .getMockImplementation();
-
-beforeEach(() => {
-  // The RN preset models currentState as a function rather than a foreground state.
-  AppState.currentState = "active";
-  jest.mocked(AppState.addEventListener).mockReturnValue({ remove: jest.fn() });
-});
-
 afterEach(() => {
-  AppState.currentState = initialAppState;
-  const subscribe = jest.mocked(AppState.addEventListener).mockReset();
-  if (initialAppStateSubscription)
-    subscribe.mockImplementation(initialAppStateSubscription);
+  jest.restoreAllMocks();
   jest.useRealTimers();
   refresh.mockClear();
 });
 
 describe("TF07 native UI composition", () => {
+  test.each(["mapbox-native", "maplibre-native"] as const)(
+    "%s hides only its SDK's unavailable projection and recovers on camera movement",
+    async (backend) => {
+      const fixture = sessionFixture();
+      const scene = (zoom: number) => (
+        <FixtureSessionProvider
+          value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
+        >
+          <NativeMarkerOverlay
+            backend={backend}
+            id="viewport"
+            lngLat={[10, 20]}
+            anchor="center"
+            offset={[0, 0]}
+          >
+            <Text>Content</Text>
+          </NativeMarkerOverlay>
+        </FixtureSessionProvider>
+      );
+      const view = await render(scene(4));
+      const host = () => view.getByTestId("native-marker-overlay");
+      expect(StyleSheet.flatten(host().props.style).opacity).toBe(1);
+      fixture.project.mockResolvedValue([-1, -1]);
+      await view.rerender(scene(5));
+      await waitFor(() =>
+        expect(StyleSheet.flatten(host().props.style).opacity).toBe(
+          backend === "mapbox-native" ? 0 : 1
+        )
+      );
+      expect(host().props.pointerEvents).toBe(
+        backend === "mapbox-native" ? "none" : "auto"
+      );
+      fixture.project.mockResolvedValue([150, 260]);
+      await view.rerender(scene(6));
+      await waitFor(() =>
+        expect(StyleSheet.flatten(host().props.style)).toMatchObject({
+          opacity: 1,
+          left: 150,
+          top: 260,
+        })
+      );
+      await view.unmount();
+    }
+  );
+
   test("live overlay follows measured anchors, offsets, camera movement, and viewport layout", async () => {
     const fixture = sessionFixture();
     const scene = (

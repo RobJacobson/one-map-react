@@ -5,7 +5,10 @@ import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { nativeRetainedScenarios } from "./tf07-retained-contract.mjs";
-import { nativeUiScenarios } from "./tf07-smoke-contract.mjs";
+import {
+  nativeUiScenarios,
+  nativeFocusedUiScenarios,
+} from "./tf07-smoke-contract.mjs";
 
 /**
  * Atomically records one observed outcome without changing the driver's identity.
@@ -135,10 +138,10 @@ const validateReport = (report) => {
   assert(isObject(report.scenarios), "Missing report scenarios.");
   const names = Object.keys(report.scenarios).sort();
   assert(
-    [nativeUiScenarios, nativeRetainedScenarios].some(
+    [nativeUiScenarios, nativeRetainedScenarios, nativeFocusedUiScenarios].some(
       (known) => JSON.stringify([...known].sort()) === JSON.stringify(names)
     ),
-    "Report must contain exactly the core or retained scenarios."
+    "Report must contain exactly the core, focused or retained scenarios."
   );
   for (const outcome of Object.values(report.scenarios)) {
     assert(

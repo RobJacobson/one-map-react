@@ -4,7 +4,7 @@ import { PermissionsAndroid, Platform } from "react-native";
 import {
   acquireNativeLocation,
   requestNativeLocationPermission,
-} from "../../../examples/shared/native-location.js";
+} from "../../example-map/src/scenarios/native-location.js";
 
 const initialPlatform = Object.getOwnPropertyDescriptor(Platform, "OS");
 

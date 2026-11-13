@@ -14,7 +14,7 @@ import {
   initialViewState,
   replacementStyle,
   routes,
-} from "../../../tests/fixtures/map-fixture.js";
+} from "../../example-map/src/scenarios/map-fixture.js";
 import { NativeCameraContext } from "../src/adapters/shared/native-map-presentation.js";
 import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
 import type { MapRef } from "../src/contracts/camera-types.js";

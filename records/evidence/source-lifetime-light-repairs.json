@@ -1,0 +1,2378 @@
+{
+  "checkpoint": "Native source-lifetime and iOS light-color repairs",
+  "status": "fixed-and-affected-acceptance-verified",
+  "authorization": "User explicitly requests both fixes, regressions and affected acceptance through GPT-6 Luna; test retries authorized without further approval questions.",
+  "startedAt": "2026-10-21T05:24:09.557586+00:00",
+  "baselineArchive": "artifacts/one-map-react-0.1.0-rc.9.tgz",
+  "baselineArchiveSha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+  "baselineFiles": {
+    "packages/one-map-react/src/adapters/shared/native-feature-state.ts": "619904dbc8d9d61b1f4d87369ecee728390d7ff722ef96174fdf108d9099813f",
+    "packages/one-map-react/src/adapters/maplibre-native/source-registry.ts": "047ad45317d8a5806e5e7d9449ee1802c7cd1a2ed441b55d1f37dc28e8197ea4",
+    "packages/one-map-react/patches/rnmapbox-10.3.8.patch": "0820fdda4708a0b7ecc0818b7a56b2a8e7c43de6195320cabdec56c17db30249",
+    "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch": "795b277b66146b5142095e90161cc7e36654787ea5e7872594d51a598aae57c6",
+    "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch": "79c8bb668a01c0b83760a45c4bbf6994e9499765000a113e42d9a38858b92aca",
+    "package.json": "87f982808dd81f89539ecb646220f1fcf134188c0c1e8325326720be908b847c",
+    "packages/one-map-react/package.json": "d1fbbd1789c702fc60d9a6b7534fb4c129f2494affd04d3a8648d4e5e482735c",
+    "bun.lock": "1a332d414da140395997a5fd93cb7dfa43cd65bd667508e4faa51dc24e02ee65"
+  },
+  "regressionRed": {
+    "swiftColor": "Executed extracted actual Swift converter: valid packed RGBA precondition fails; wrapper tests outer dictionary instead of converted numeric value.",
+    "mapboxKotlin": "Executed actual compat set/remove with SDK failure: error was acknowledged as success; exact failure SDK set errors must not be acknowledged as success.",
+    "mapboxFamilyGuard": "After error callback preservation, actual Kotlin regression still failed: Returning vector cleanup must defer until its native source family is attached.",
+    "maplibreNullView": "Actual Kotlin resolver failed to return recognizable view_not_attached for Fabric null.",
+    "maplibreThrownView": "Actual Kotlin resolver test failed: Thrown unpublished-view gap must reject recognizably instead of waiting forever. Source search found no tagAssigned callers.",
+    "journal": "Three actual NativeFeatureState default-classifier regressions failed before repair; automatic gap reported/poisoned returning-family cleanup.",
+    "component": "Both GeoJSON and vector MapLibre component tests failed on view_not_attached before correction."
+  },
+  "sourceFiles": {
+    ".gitignore": "cd833f9ee267b0da78210eb6ce650c37d25afb1bfd3b89b206e0fd2f506643cb",
+    "apps/expo/.claude/settings.json": "1e7be1a32a758be623e4897bcd97715f42c1585f3d7389eaa996c230e8fe9834",
+    "apps/expo/.gitignore": "6a0d1e552b5381880bb70e95e69c3e984709719229f290ee41cb05269da05fd9",
+    "apps/expo/AGENTS.md": "b7d381dd55800d242252e8bf89a40b026586d254e34908210931bc35582396a3",
+    "apps/expo/LICENSE": "fb3ca4a837f5779e83cef89b78253a8949cfb9429c340309f62d0465ec6610b4",
+    "apps/expo/app.config.ts": "77628cbe5c9e33893c682f5c8d759228e82f805a9cfb5524f879eba06122fe43",
+    "apps/expo/babel.config.cjs": "9fa1e12d2563a5387cc809cf5c74413b589491abafc352f85c54d0b9afd334e8",
+    "apps/expo/index.ts": "b5914ba2dcf1c8872db808ceed322dfcc8abf424f5884121faca00ff129029d9",
+    "apps/expo/metro.config.cjs": "4768923afcdef5fbbfe867f79889295a5f9be962c95b3de29812fe469764b65b",
+    "apps/expo/package.json": "4e2808301d7160db17959f08df61dad0b285af66b6ef3a0361b8b8f91549d1e6",
+    "apps/expo/src/acceptance.tsx": "1ceb9da823c853e5dd5889144a42ea59d2abeb4347b79e3af429254c1370ad7f",
+    "apps/expo/src/acceptance.web.tsx": "c3c53f4aa21611548bb47e540486dcaecd87e243e863df4d5050bfadc1312555",
+    "apps/expo/src/app.tsx": "3528c4768e3fb7d6ce88bde9a04e50fc0bc452f90d420873ce85a288ed61dedd",
+    "apps/expo/src/css.d.ts": "35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa",
+    "apps/expo/src/engines.ts": "56f3b7831fa239b6fc9ab28b47e2d93a33c2c5905bad8699d7fa0a7290a5214f",
+    "apps/expo/src/engines.web.ts": "993e129c9b6322fd758f8065d9d248b30470c16ee5eaac7611b4fb65bb123eda",
+    "apps/expo/tsconfig.json": "e2adb5d40ff0e58a4e004a36a1c193edb65017e2d7a01817293a74d60677f42c",
+    "apps/web/index.html": "452490315a1489421a4bc31b10b2961b5d4291477b2a36e87e6b28eca2aa3500",
+    "apps/web/package.json": "0aebd71ba9178dd9cfd7e18ff57a76060dfa6f748c30825bf3b9bdb36adeaae2",
+    "apps/web/src/app.tsx": "32a2b6e456db33854a5d32ac25fd56f33f2a39d03efe088e98eec2e3a4ebb406",
+    "apps/web/src/main.tsx": "1220c183806902641b58e34996bf9eb98fd4f88eedef053688b03ea566b22ce2",
+    "apps/web/src/style.css": "f3ae9faf821694ad5c9a122b5a511764c9aa0ae3c27323a5fb59b7a34e0f970a",
+    "apps/web/tsconfig.json": "0c58ac6d3580f238f12a6e48a2e10c957652f18d7872e2c4054b352409303fc1",
+    "apps/web/vite.config.ts": "92220f0c0125bf09043298b390738bd5580bc7f9098320ce787634fc2762be76",
+    "bun.lock": "a5802d27d4e7eb16b71f36ca45170585377d1d32dd8b157556f20526d0ff1fe6",
+    "package.json": "61a78c8381c21ec644cea929d51f407e15de3872635c92c9341449a49d999d38",
+    "packages/example-map/package.json": "710877dd36fa1765c03143edb6b2b2393e1298f46f873ecdc2a2f358752b5263",
+    "packages/example-map/src/acceptance-controls.web.tsx": "987785decfd94abf1b61eb41082a99eb4eb25d9a04bbcef66c3c77842dbc794a",
+    "packages/example-map/src/acceptance-selection.ts": "4e0404d6bb6df3d894cd606624670736b6bdbcb6ba04b680bc43a996fe79b1eb",
+    "packages/example-map/src/acceptance.native.tsx": "0be6f2b40bb24b37e960e3aa2261f7ca7bb008664964607dd2a278590319e4b8",
+    "packages/example-map/src/acceptance.web.tsx": "3832a42e85e11973570f2dd65ed1282952bd50de55d8dec4069715da8818852b",
+    "packages/example-map/src/camera.ts": "108cac7f79a2bf32cef92307a9ae3173fd01d9bc98e90f5f9d39af5e5fe1b483",
+    "packages/example-map/src/engines.native.ts": "888761c3a53c4e45103c36004eaecabd6a1cf72e4048c49a9f349e154405d377",
+    "packages/example-map/src/engines.web.ts": "2914bd5c7be4c55e3e2a3ade3114ef51689be647114b974aa147e7638e651850",
+    "packages/example-map/src/example-map.tsx": "422cc9d5d19a03a8eae3069afee8fc1b23acb3a5452584d9364cb11ff5214c5d",
+    "packages/example-map/src/index.ts": "3f588fc5d60c31c8b318fa7fb1e995151d81959b2b182dbc4c8124966a48601a",
+    "packages/example-map/src/public-token.ts": "e4539fc4149e33340ad57101438a076cc23eab6b795a00cd3c348a543098a1c2",
+    "packages/example-map/src/scenarios/camera-smoke.ts": "a1371c46d6b18632835ee4b278015c12baeeeb7a7df391b8029334de8372cb8f",
+    "packages/example-map/src/scenarios/global-state-app.tsx": "466e2297d5a178af833eef88b1446618bb5af02b5dba7226addd5699a951db42",
+    "packages/example-map/src/scenarios/lifecycle-smoke.ts": "2d97d55a71f37773d319920504b447175542c8c154945d4c942118ccd9cc46a9",
+    "packages/example-map/src/scenarios/lifetimes-map.tsx": "b9b68a0c1db11179dbf12352ef9fb161084bd4a75e556c6750f50be0238c97e9",
+    "packages/example-map/src/scenarios/lifetimes-smoke.ts": "41f3334ed6ff748bc7b1d98461f3226f5b764f7121d3a08114014ae932704f42",
+    "packages/example-map/src/scenarios/map-fixture.ts": "afeeaeaf9e2e268d3a5725886155f555d1b21356a36e65fdca0845a50bb16494",
+    "packages/example-map/src/scenarios/map.json": "8279594359798e3d9e7763242ba0ede1207ad5ae24f84e3d3be1ef241ac21362",
+    "packages/example-map/src/scenarios/mapbox-native.tsx": "c61d8a0962dc131efa94eba7d01369d4dc73c306c5e661a8c69488b7a61694ac",
+    "packages/example-map/src/scenarios/mapbox-web.tsx": "6031944f09b2ac12a34ef0a4edb7d2fe8db05b74022c794b209b943d70b14b8e",
+    "packages/example-map/src/scenarios/maplibre-native.tsx": "27159f1cc00bdef0fda774b791842ec50082efbf57f7142712fbc66cf28bafb7",
+    "packages/example-map/src/scenarios/maplibre-web.tsx": "16227df92615b881f23cac95fe8d9046302c8858f4c18173e047cdb2da4657ea",
+    "packages/example-map/src/scenarios/native-camera-screen.tsx": "57db92fc2eb6fdd85907a0da75196febcaa339f782334ffd87ab1b5837f046e3",
+    "packages/example-map/src/scenarios/native-lifetimes-screen.tsx": "592d752e049e122ab920c03a38ef12f518bec3a9999d0b568d43b6192ff0784f",
+    "packages/example-map/src/scenarios/native-model-scene.tsx": "05e901165bd192e4815459567c0f65924b7acc289923e83ac15cb74890e199b0",
+    "packages/example-map/src/scenarios/native-queries-screen.tsx": "78b7b0eb158d37c5561c81f615ffb1089d4564c26debd250f92193a7bd4e1a56",
+    "packages/example-map/src/scenarios/native-sources-screen.tsx": "73f74314e2da333d4a9ce04058963775f0d4d52f59f17ffbdc444318d7b5aae2",
+    "packages/example-map/src/scenarios/native-tf07-focused-screen.tsx": "6b2ce006bd87db60fab5e6960906a1baf7f750535f89ab6a37e3341f0a064c3a",
+    "packages/example-map/src/scenarios/native-tf07-screen.tsx": "dc9e6bdb4b1ee8a5932722c0bc0e6ff3d588c29eecf54652cdbc3c29e4e03398",
+    "packages/example-map/src/scenarios/native-tf08-screen.tsx": "0e8f2776897e42b0cf23c32097a635b156432e1a7d7bde5576e1ee244b631b84",
+    "packages/example-map/src/scenarios/native-tf09-screen.tsx": "1adca706c437d1763e09dc359ad1c93836242813558baaa7ffdc3307c8cb37c1",
+    "packages/example-map/src/scenarios/native-viewport.ts": "fff94246a15e90447db16c1ad5be627ec2c89d145c51719119893a541135c5b9",
+    "packages/example-map/src/scenarios/queries-map.tsx": "3020bcf15ef2d1898b912d0fe0dd7a9fda7039c4bf57a86964c8e17fa866a372",
+    "packages/example-map/src/scenarios/queries-smoke.ts": "91830ebbf145ff3533b09c82c5922b2f13b92a6a66521006d98a384238a70202",
+    "packages/example-map/src/scenarios/route-map.tsx": "dc6fd88b44449831ac83c7debe46f171f5eb51d09893f661fdfee3b8222a3bfa",
+    "packages/example-map/src/scenarios/sources-map.tsx": "33f0f6659d5993661c29bf74ccd765299dcb2b939f4ef5747e9320fff29ecd04",
+    "packages/example-map/src/scenarios/sources-smoke.ts": "e84853ee23fc1d084f08ebd0c138b251b8907e16a5afd0a1c802b5e082adce64",
+    "packages/example-map/src/scenarios/tf05-base.ts": "0b481474e667193f0990478dde6689b76d1e2938c0e5f274520c1060d9a5855f",
+    "packages/example-map/src/scenarios/tf06-base.ts": "a9a780b189fd91fc1f3b2c32c3e14fb882c907f3382b55fb7e36fd5023d3aa9e",
+    "packages/example-map/src/scenarios/tf07-scene.tsx": "37a19152a382a0463a6c172446fa1f36bee90314959cef06b21d6bdefe487458",
+    "packages/example-map/src/scenarios/tf08-acceptance-scene.tsx": "f143a69de9b402d267b3662c48821690351b4c946971325f20b1c6ce76efdc36",
+    "packages/example-map/src/scenarios/tf08-map.tsx": "5430fc6f29cc36ee0db714bcd788f2fef2e751d2f37bd8583779c678b4c1d1bf",
+    "packages/example-map/src/scenarios/tf09-scene.tsx": "a21581be76e7a93d2b55644ad572f6db2d0cc4d1ee65a221ff1c7029f73b27cb",
+    "packages/example-map/src/scenarios/tf10-camera-observer.ts": "b74dc6d2bf359b140330af8e640fbb987a0983357821dec72fbb9d7a2992259b",
+    "packages/example-map/src/scenarios/tf10-native-orientation.ts": "ba90f6610f165367ac66e9087a2aaf5ecc2b5fe2a4de4357f5d070c8c7a7be8d",
+    "packages/example-map/src/scenarios/web-camera-app.tsx": "ff2d95b4766fe173f18d13f415ecaf9c419b5b3ea3c0e172bcd700341612d602",
+    "packages/example-map/src/scenarios/web-corrections-app.tsx": "658e8cdc24391e63a64b02f0d9dea0a3a2f4aa0b56387004dcaac39a24d91ac6",
+    "packages/example-map/src/scenarios/web-lifecycle-app.tsx": "1102366cf478e917bfddb791cbeea6fced9297db78a5b1a56f33016435e96a3a",
+    "packages/example-map/src/scenarios/web-queries-app.tsx": "17e7aea5be94608f85913c95010e59581a9e3beed56ce8ef4c55ad9a77d6541f",
+    "packages/example-map/src/scenarios/web-query-regressions.ts": "990cbe2cea61ec81aea1b8c7b2e37c43dfba69fb86c348acd7f26fae4ae94783",
+    "packages/example-map/src/scenarios/web-sources-app.tsx": "358da28bb656c7ad9092b9d135e3c3f51a73f99eaf9b4ec6d8de80774bc2ef28",
+    "packages/example-map/src/scenarios/web-tf07-app.tsx": "fcca846cd709f0da95a90d4973b42a4ec95d47e4dc7f096e007bc8e61e423245",
+    "packages/example-map/src/scenarios/web-tf07-focused.tsx": "8492fdfa8c11b3ab64e22d790a462fa9569917429e895ac1970764039cb76fd7",
+    "packages/example-map/src/scenarios/web-tf08-app.tsx": "1035851d2d7854cb652f937a845f93f258ff21fe9ce14ddd6e239a1490fd2ae3",
+    "packages/example-map/src/scenarios/web-tf09-app.tsx": "73d0156d09b2e472cfc219963e95c62f94f4472ab44748536e35f1983cd46c56",
+    "packages/example-map/src/scenarios/web-tf09-media.tsx": "b015b2430770e10e6ba0be50fc5bc1025cf85eb82db0e87b54c896f72a599382",
+    "packages/example-map/src/use-example-map.ts": "0bb3cbf78c98fda4852953eb377a90dc2b9f65d42ab3516675e670f70def1c89",
+    "packages/example-map/test/acceptance-scenes.web.test.tsx": "96457a3be0cfffbd4b1aa4cd080a71481939291bbddec62b1a51edc8a9c291c9",
+    "packages/example-map/test/acceptance-selection.test.ts": "9c83b275418dd3de265c7eb1b8a28092f601158bb74d599cfd11e5c0e8b5fc0f",
+    "packages/example-map/test/camera.test.ts": "da19471acd0dad003b779005a435afd47d9af46ef0c764ea7bb69bd336a05b1a",
+    "packages/example-map/test/expo-production.web.test.jsx": "b45d7a9a8604f47f0cbf0c209d1ce58bb7bb88f8c15bfad691f0fe91dfc74a0e",
+    "packages/example-map/test/lifecycle-smoke.web.test.tsx": "a4f9a0ac31c0f3b0dc072e268e51a5d58fae558599e3d07dc6313a385c47d66c",
+    "packages/example-map/test/native-focused-location.web.test.tsx": "9f86e19c69e9b83a9a76cadf2c6cdc7b65e5dae0bb973753d8d484498637ef60",
+    "packages/example-map/test/native-startup.web.test.jsx": "0459fb5c1f80986e58f15beb31e53f9ce5d26b008a30f9b83209ea66711c918e",
+    "packages/example-map/test/native-tf08-transport.web.test.tsx": "84fd39dad6446e97dd7cbe2b9b8985f2ba491d0cb7443a84890821842f08bfc3",
+    "packages/example-map/test/native-viewport.test.ts": "751f0efb7c262fedfe7c3ef8a341ce90f9d90400ed1af25efa127ef06935479d",
+    "packages/example-map/test/selection/mapbox-web-maplibre-native/setup.native.ts": "f922e92868c9f79e90c9f877dff5639b1acd1bed3350dbbfc114d820f354c14c",
+    "packages/example-map/test/selection/mapbox-web-maplibre-native/setup.ts": "16880934f99060ae63cabc07d5e2b44433acf4764c150c852a1935634c93d291",
+    "packages/example-map/test/selection/maplibre-web-mapbox-native/setup.native.ts": "c802c028688d99269ca7a6bdc08259771553db87ea07565569cb3908ffd40b2c",
+    "packages/example-map/test/selection/maplibre-web-mapbox-native/setup.ts": "4f88e32ab3c5a6b45e91a180d07059911db2d7ada2272ccb2c108498bd7f23ce",
+    "packages/example-map/test/use-example-map.web.test.tsx": "6d712bf4db8a8bc697b6ff64b4461002a9c83f4b8a152861647540d8f4a783a0",
+    "packages/example-map/tsconfig.json": "27c2b00233e6e36aa7bd639ad0778ea12941d1404c8371b4d3b8a3498f6825ce",
+    "packages/example-map/tsconfig.test.json": "b3a1575c5683d24a12b158b098c23d2ed4cb311f1b9b1136a1833ab37fe9c93e",
+    "packages/example-map/vite.config.ts": "5414a7b0c3cd45100f87a7e38a1184e41ffd402567ce34d3e3b0c5ffa5d84205",
+    "packages/one-map-react/README.md": "6a1c6beebaba4ed7ba11e78176d8d4d1e0611f63f3496f701b6e78090a994409",
+    "packages/one-map-react/package.json": "3ed0f8257b84483b201026b69977d86c7e309161526ea3d35ed6295613511830",
+    "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch": "ae291bf1f563c1c232caa60232b96fbacff479cef2934a448de7c860baa9b7c0",
+    "packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch": "227fabc6365fa95c3aec2512fce4e4503988740ffb1e98f3499b11aa95c96e9c",
+    "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch": "2951f39a3a1c6190a39f781b9f71cf36946aecb148691a751e4adc1766725b3c",
+    "packages/one-map-react/patches/rnmapbox-10.3.8.patch": "987da5eb58f5d49db078d2387f6a381cb5538a4f785221238fb36c1d7946e59f",
+    "packages/one-map-react/src/adapters/mapbox-native/convert-camera.ts": "996337ed77b51e0b644bffb43f23fe115687b34025d53df067b696769127eab3",
+    "packages/one-map-react/src/adapters/mapbox-native/convert-gestures.ts": "4e4065976c981572b036bab8b234cc90e1306eb99d9d1c4ca8477c3ddcaf37e9",
+    "packages/one-map-react/src/adapters/mapbox-native/convert-move-event.ts": "8ad6caf157e51836e0a797967bca89e3335be953c3c76b660416d7175f6da8ce",
+    "packages/one-map-react/src/adapters/mapbox-native/convert-query.ts": "668baaff59861b05e2f4490e62cf968555ec3919c89cd1f85842a5e616e00dca",
+    "packages/one-map-react/src/adapters/mapbox-native/feature-state-methods.ts": "5a7eb0fe3943a185281f0b7c8bcd76cc74b10a687d88a84e828dc32d032cdd84",
+    "packages/one-map-react/src/adapters/mapbox-native/geojson-source-registry.ts": "64de3d1eede8531309e9c9930296d62f063596e5cf6b4273cdd9122efcff42c7",
+    "packages/one-map-react/src/adapters/mapbox-native/gesture-settings.tsx": "8ce5894b7d5cfdda3af6e1bb619067fe56a461fb0dab5d67072ee0f550b01916",
+    "packages/one-map-react/src/adapters/mapbox-native/images.tsx": "a99cc4170f326d228a86b0c9531955b75ae0ef3904d51581b453522871a00c7f",
+    "packages/one-map-react/src/adapters/mapbox-native/index.ts": "208309b65fab7dc0d90f30df6a4855e04f0b2a1fe85b5b46a836694c313b624f",
+    "packages/one-map-react/src/adapters/mapbox-native/label-localization.ts": "587f86ff52c7d661e5d9d13b128f77d2ef2a741b84c00cc455b097089a98e142",
+    "packages/one-map-react/src/adapters/mapbox-native/layers.tsx": "291782b2a59473b853ea6d7afa1181072c71ee8a266e6e13326d3b6644b83275",
+    "packages/one-map-react/src/adapters/mapbox-native/map-ref.ts": "1d877073583c8d2e2b78540d28d51098ba93a7da8b4fa0d4e97dc458fe526353",
+    "packages/one-map-react/src/adapters/mapbox-native/map.tsx": "66158b538e84801457e8fa44115f3950752ac6152fb10f8a48d190ed0c1266a2",
+    "packages/one-map-react/src/adapters/mapbox-native/services.ts": "c7b13341d7ba397dd9e0cc2ec2fbd8c37dcc0f1ee8f2b7e5518767aa9ccdbae4",
+    "packages/one-map-react/src/adapters/mapbox-native/sources.tsx": "a44e76cb7b33e57bbec5fae07eb1ebba35e81e4cab734239a49384729eed9dd8",
+    "packages/one-map-react/src/adapters/mapbox-native/style-props.ts": "8c531ce49e3d904d4b4e6916587a0c0ecc5ac29dd8f7118ca8725c075b894812",
+    "packages/one-map-react/src/adapters/mapbox-native/ui.tsx": "9a56e9e97f88c2e8f903ef2945443e1d0ea07dcff03272b5873ddce1f216fdee",
+    "packages/one-map-react/src/adapters/mapbox-native/use-mapbox-scale-position.ts": "cc4990a14186f9b14cd35600df628b64fce9d1b1e1ccb98ba1bff4a7ef91e6e1",
+    "packages/one-map-react/src/adapters/maplibre-native/convert-camera.ts": "c5f55fec5e7cba13c7ad92498b3f0ec1cc6c753821aab80f17c96ef33c23b768",
+    "packages/one-map-react/src/adapters/maplibre-native/convert-gestures.ts": "d0c2ebb7cc264bf8e808cab7cd5ce1de6dbc3afd906a5b3b99bab14a08c387ed",
+    "packages/one-map-react/src/adapters/maplibre-native/convert-move-event.ts": "c0e4ba31c87f83ba95c3ec3ba9ce8e5de5a33386004e49d366911a0dc45acbd8",
+    "packages/one-map-react/src/adapters/maplibre-native/convert-query.ts": "5c4a0f1b6c72e92ff2177ad6f8d4716f78d2abb64dd1d8f569b338b934c58d66",
+    "packages/one-map-react/src/adapters/maplibre-native/feature-state-methods.ts": "f5b44d8a69b190b5e0a01ba08720a540fd8710d88b0f08c8e9f798093dbe721f",
+    "packages/one-map-react/src/adapters/maplibre-native/images.tsx": "aa5f0240a9899b66f47591b4f435bd4d55348a4a3160a818af6795ae45ff7295",
+    "packages/one-map-react/src/adapters/maplibre-native/index.ts": "41603978a702c90e157d4c39b35d95a693b1e98113e4fa1d2f307ddc6a262d54",
+    "packages/one-map-react/src/adapters/maplibre-native/layers.tsx": "004760560ba9cd474a7fd6c6f92cfc5dff53533324220ddfee3e8639008f196c",
+    "packages/one-map-react/src/adapters/maplibre-native/map-ref.ts": "d76135f9e688d52b1688ad9887ec2ef8a50cf015306809447a7a057f6546a33d",
+    "packages/one-map-react/src/adapters/maplibre-native/map.tsx": "c288cfe128ff32de73fef43674778a24eda52b3837ee084fafb7103d0b3e04bf",
+    "packages/one-map-react/src/adapters/maplibre-native/services.ts": "3dde04992e0ca5859293f443a9af3da4457d01ef267c63da8971744e8c96ee4a",
+    "packages/one-map-react/src/adapters/maplibre-native/source-registry.ts": "be795af27c2c47797b75df930792894ac65c49b969962f0ce8c7f67bf3ddfb51",
+    "packages/one-map-react/src/adapters/maplibre-native/sources.tsx": "9c61138a15beadfcf72f564da774cb516ea0c638fe789c4789fe41d9950a6bc5",
+    "packages/one-map-react/src/adapters/maplibre-native/style-roots.ts": "0f61e7e4f00ad2b7bddf6b04c00a9835939268261190cc89d31261d1fb1123e0",
+    "packages/one-map-react/src/adapters/maplibre-native/ui.tsx": "258bb1482fe5411a1151da230cc271a6126f93a4c2d94e1c5f319eb41275f3b0",
+    "packages/one-map-react/src/adapters/native-map-options.ts": "0440a6f17c72e90a9833030933030c61bff2c3fa879908cec5eccc1afcf7d26b",
+    "packages/one-map-react/src/adapters/native-source-gates.ts": "759994b0969704177d38e4e2e82fc35424f7ae71b19be8a63d3c7f448b3ba80f",
+    "packages/one-map-react/src/adapters/shared/create-location-service.ts": "3b34a3bee3557463c2f507bc640ec8dfad2557349035c279512e2e545ff92957",
+    "packages/one-map-react/src/adapters/shared/feature-values.ts": "e759cbb782d39fbd7246541ffebf159163cf7446631f98763a6988ca43d3cf8a",
+    "packages/one-map-react/src/adapters/shared/image-output.ts": "c6c02376e48f9584b9ad723cf30973f7dba6b18b29c5f1960cae29eb57ec6791",
+    "packages/one-map-react/src/adapters/shared/location-values.ts": "5afbe641c3c5bd9d6c8b113eff9446edc18e20f68b1fc102096cd612cebb4ab8",
+    "packages/one-map-react/src/adapters/shared/map-capture.ts": "af4e77eec86006cf44a9ab88077030d7976509ca25c9909205de7f746e0c4d0a",
+    "packages/one-map-react/src/adapters/shared/missing-camera.ts": "eda29f8f855f767307c1ec6ec499856eda9a9b72169fadcc28619c868c43b9d5",
+    "packages/one-map-react/src/adapters/shared/move-event.ts": "02158aa43776c85317ef2fdc03d5e683fce61126c6169cfed63a0ef92cb4ec57",
+    "packages/one-map-react/src/adapters/shared/native-feature-state.ts": "90016f28c2a9f74ac75a0390724d05db780d3dbb9534022da6d6bd5f4d977a80",
+    "packages/one-map-react/src/adapters/shared/native-location.ts": "5f7a2a13da8640654abecd9f112155c4ec18e99ffb3be2ba98b2baf65f4f3fdd",
+    "packages/one-map-react/src/adapters/shared/native-map-presentation.tsx": "b4c5ca81c18e0218578c63608ac38964be63c43e361b23b6da6efb9715c23ebd",
+    "packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx": "ea35ed01429d4dab90cc515424b8aea3d80db6019a4d87daacf36237a4e4a4b2",
+    "packages/one-map-react/src/adapters/shared/native-ornament-position.ts": "e60af44c712be2119e9c13aa7358addbc98a5847736e00db05754370ed3ff7f1",
+    "packages/one-map-react/src/adapters/shared/native-ui.tsx": "910395a7ab32db8ba8496113abe063488ef910cbf9adf8d570f72ce06165bf2e",
+    "packages/one-map-react/src/adapters/shared/offline-service.ts": "e4b8dfbc53b80615c4390b01e875efde3dfaff92164b725556ef9ca8a961e4a1",
+    "packages/one-map-react/src/adapters/shared/source-hit.ts": "0d673382c9efcea9216e6bea4cedc47e5c07819bc004df266e4c255e406eb0fa",
+    "packages/one-map-react/src/adapters/shared/terrain-values.ts": "c99f86ad80b72d0ddb7fe793b69422817d55708554d9106d8c1a296cd65a1c8d",
+    "packages/one-map-react/src/adapters/shared/use-active-callback.ts": "a821ea2546703b766f525a9c8a2d756ff96b049b1d423c4ddfa9ae5fc5ac05d1",
+    "packages/one-map-react/src/adapters/shared/use-frozen-value.ts": "a9080ca2fbe798d7b20371368fb248cdd4e3996a6644feecc93b43b58147b49d",
+    "packages/one-map-react/src/adapters/shared/use-native-controlled-camera.ts": "88818f97f0077cb5129e9c3c7298a1f4a19389cdd17da2a3ea68a90a226e8c0f",
+    "packages/one-map-react/src/adapters/shared/use-native-marker-drag.ts": "18727cb38a2e56c368df26fd175711baf844725daf9e93f5dff553ae9470f502",
+    "packages/one-map-react/src/adapters/shared/wrapper-values.ts": "65b3bd2273c3e90a4a2350fd58de2d3c5a886882f63036b437fdf3f5de699591",
+    "packages/one-map-react/src/adapters/web/contracts.ts": "512e1e8102725a33b59a0c489baaa3ed8a1c22f08380980408e2ad0dad30a4f1",
+    "packages/one-map-react/src/adapters/web/convert-camera.ts": "50e112fa2a3da318450a437731c056694b03f71d499a42f27d3ff21da3c10312",
+    "packages/one-map-react/src/adapters/web/convert-gestures.ts": "fc7e2a2b8fc384d4f83f434d4c7b20dde68d46252c93468c7eae00851d2c54f7",
+    "packages/one-map-react/src/adapters/web/convert-move-event.ts": "5e3b4d7986597a0886b6b25311847cab78718023d9b177dd91801291ee967ef2",
+    "packages/one-map-react/src/adapters/web/convert-query.ts": "5c8338d516e9b78f9c2a1020960a4b3db53ba896e36a4dad128534726116da05",
+    "packages/one-map-react/src/adapters/web/create-adapter.tsx": "f8e27b1af0d1813d9b9ec61126e77c50d3bc25a0f34957c232599824d4b6cc92",
+    "packages/one-map-react/src/adapters/web/images.tsx": "289015b065150798b455da5f5d2216efa1efd1fef8690aa52684debf71a5f4a1",
+    "packages/one-map-react/src/adapters/web/location.ts": "d99496435cde3292f0358e580a952cbef67146f2e4dc429287996502f1c171a8",
+    "packages/one-map-react/src/adapters/web/map-ref.ts": "0ddc9ab77212e090ac354014c4d2d39c34dc6eea493118ac768d9077ef6cf05e",
+    "packages/one-map-react/src/adapters/web/map.tsx": "c90baad1f4e9b267ccbb347bf6075c2fef99d5530a4915e1ecc598de1639360f",
+    "packages/one-map-react/src/adapters/web/method-forwarders.ts": "88cee8218e0c6adf14846d87f37d14f9b89b25e4b97162c684dd8eceb12aef6d",
+    "packages/one-map-react/src/adapters/web/sources.tsx": "a214acecf7264511ace678110e53af48adc4dafddb663af078044ca3fede9e8c",
+    "packages/one-map-react/src/adapters/web/ui.tsx": "02e41831ef88d1b5e99f3812f1565c2ff35a45b9885440a607bc89e8eaf904cd",
+    "packages/one-map-react/src/adapters/web/use-web-style-load.ts": "696a10902eb4a0e7e030a92e97379ecc109ea753ea9f858c9c44e47db09ac090",
+    "packages/one-map-react/src/contracts/adapter.ts": "32e0b03127bc4871b9fcebc9522163cecb6718f5a3e08b8e5274c0201b6cc2bb",
+    "packages/one-map-react/src/contracts/camera-types.ts": "270176ba2fef5ca2fed892a6c272de2e1b55e6d18530915e66bac726d2918490",
+    "packages/one-map-react/src/contracts/capture-types.ts": "ecfc508d0d648f7ae656799175975e8035f9eddbe297dd1e24d9f9070a40352d",
+    "packages/one-map-react/src/contracts/event-types.ts": "7e7f124bfa7ed84cd6bd2096ee5fa5bc8ce18c55d545bec1868e13d03082f14a",
+    "packages/one-map-react/src/contracts/images-types.ts": "4ba45e63f70ee40955a819ff47b06b60c11c15309fca2ada53ce971b7c30b144",
+    "packages/one-map-react/src/contracts/layer-types.ts": "4c711c420bba93d6af1daf9ea47917a91b47f7cfe44e00b74a8fa13bbfd3353a",
+    "packages/one-map-react/src/contracts/location-types.ts": "e4fe3a8f3b3eb9d8b125317609be21e1d8548de5d2dc10095345bc2a22c10f30",
+    "packages/one-map-react/src/contracts/map-types.ts": "177c288b64521d95598bb3b9e2cff293074e2672e618f7b83f6f16ea8c49e8dc",
+    "packages/one-map-react/src/contracts/offline-types.ts": "96bd41b054f214dff7636ba8726e59e8efdab0c488b919731bc43b8a40758353",
+    "packages/one-map-react/src/contracts/query-types.ts": "c09bb0c4c2a54a2dc9c2b30a3662ac7a32266b9b2c1590d3c0f6d4eb166a75cb",
+    "packages/one-map-react/src/contracts/source-types.ts": "3c20fd860db78450b48fe2aa73c0f7fa6c3d7fcda3cf55542920e0d0312e86a6",
+    "packages/one-map-react/src/contracts/style-types.ts": "dac3932e8c67c20c5f2bfb36744fd374d645f4a80db91f2b6039f176a7b3ec11",
+    "packages/one-map-react/src/contracts/ui-types.ts": "f03292852ea19b6ef9a109528bee53417e401a47898f6d209a685fbd4d1c02bd",
+    "packages/one-map-react/src/facade/images.tsx": "1a7134c936ce3874ec9cc8822b2eb1a7d6ea221d8e9436cc24b0387aaa31d790",
+    "packages/one-map-react/src/facade/layer.tsx": "69c4144b2786f2aa00e8cab800ebc6abc7b8b8cf1c0289aeba700add6e651d5b",
+    "packages/one-map-react/src/facade/map-context.tsx": "c2c02d40b24bf7c1265a7f5bfbe6f7cc884117b7e43b4f82a71e4c3d3ddb8ba4",
+    "packages/one-map-react/src/facade/map-services.ts": "22f8cee795990d529767506624e560f8b38fc37bfc91420347c1a31b3267f57c",
+    "packages/one-map-react/src/facade/map-setup.tsx": "11b10282909833509baf1eaa681866d7fd28413ef87c799802894d96b3288561",
+    "packages/one-map-react/src/facade/map.tsx": "672ff7951ed2f215be3a9d5ad0d8a9205c0ca89aabcdbf478877175ab0f849c0",
+    "packages/one-map-react/src/facade/scope-map-services.ts": "35c44426e73411f6177bc1db209b7926e189438302a2405039f496e38ae33be0",
+    "packages/one-map-react/src/facade/source.tsx": "db73047b10937bc0560b64d6d1e98a5ba008d9edd4381ae91c76d686b573fddc",
+    "packages/one-map-react/src/facade/ui.tsx": "6f6747b8fe74f9fa8eefb13f8cf60487e9e2fe8afb67e3f7c5e2ae4d470aa3e9",
+    "packages/one-map-react/src/facade/use-geolocation-control.ts": "2ba2cfb89d54755f143d479f2e2209daf7ab80d3eb9bcbac9bd7b1db73f43a46",
+    "packages/one-map-react/src/facade/use-map-interactions.ts": "37ba118ba333af8fa706877543b9dab7bdcb06321f6ec11d6337b1494c994cd8",
+    "packages/one-map-react/src/facade/use-stable-options.ts": "cc6550c2ca81ee4c77b88a51a1180c8949e26b92963284565c96564a436dffa8",
+    "packages/one-map-react/src/facade/user-location.tsx": "ae0c69add0494d63cf4cc1d7c19c8056df22ba3fa924245a34e40d034e1d959f",
+    "packages/one-map-react/src/index.ts": "b96b9b088be83dfd86b30ab0e3218506edc90c7694124a4e381bbe8aad961a32",
+    "packages/one-map-react/src/mapbox-native.tsx": "320f9200da1a2442a313f07cf169181de1e47a590eb6fb9e1cf98a8ebbff41ac",
+    "packages/one-map-react/src/mapbox-web.tsx": "f6e1f1ebbbfc886d26e501f5e890ea2de4166f5164a76cef099e63482dd0ad34",
+    "packages/one-map-react/src/maplibre-native.tsx": "b8bb28b2c496ff41ccab51af5beb4d3fd59eaf516a7ed00604f52a54d0b8640b",
+    "packages/one-map-react/src/maplibre-web.tsx": "15a59ca0c5b5677afe419de161262f001cde0a20bfb675a5f8b4ac1973286e61",
+    "packages/one-map-react/test/maplibre-native.native.test.tsx": "5efed53cac213f5e53d0b8afb2d4d0f690ab9a5c854c8118d0019267c23360a2",
+    "packages/one-map-react/test/native-feature-state.test.ts": "da0645ba734d73fb7af198cd8ed39bdb13af68bf4cdfd9034ac9484342b00545",
+    "scripts/android-touch/OneMapTouch.java": "e9db3a932c64faf09289ceff23a27230382165b2157312d731b1970e999119a3",
+    "scripts/android-touch/self-check.mjs": "a575a0ab695c55103af272cc1b570e6cbb1da59c3d322cebe69a4ee0e5b38061",
+    "scripts/check-docs.mjs": "544df7323201c99fbe2de360074c5951bfd66b9864a48529d760c2fefa569570",
+    "scripts/consumer-peer-patches.mjs": "8d2c1a5fef989f3054e623882329299b1209dc4f4b60cf50dbee14ca2f2688a0",
+    "scripts/consumer-shell-imports.mjs": "0f48b73a288dfceae3de062f8c1d0168f5236c02248943685cfc08560b67445f",
+    "scripts/consumer-shell-resolution.cjs": "9abf17305923451e719b66acc8f54fdea5cf24c3c0e53316731b20b11c1bf16a",
+    "scripts/example-config.test.mjs": "05ad5284ee2ef7b01b6122bdf965803aa42b02573ea6d6dfad795b76575f0f37",
+    "scripts/example-native-codegen.test.mjs": "75ca59b3e8100994cca1d82a409e2a941bbde3b2a7847e59a8af62ab27148f23",
+    "scripts/example-workspace-observations.mjs": "7021e1ab6d01679d026671cf142eef1df0adb3d74836bf9477e008ce098b493b",
+    "scripts/example-workspace-observations.test.mjs": "38795467ece5a1b1de0c8ea7e1ebaf872e5acf70b1d004f6f8a9eacea223fef7",
+    "scripts/example-workspace-web-smoke.mjs": "9f52af986585bdc5df78f84478cc058667ff39ac62c8e6e59f4f9a7b3d765506",
+    "scripts/inline-fixture-base.cjs": "7c0e582389b65a1eabb5f2228f3387e5bf72cc4430182380cdc90a8ec38d62be",
+    "scripts/inline-fixture-base.test.mjs": "5dc75ad98de7abae64ea2140fedc927b919d52536d536d7ec7e88c98d5daf1f3",
+    "scripts/ios-tap/TapDriver.xcodeproj/project.pbxproj": "11e2b06d3c924c52f3e2e8e570c48d4233c671df35489b637195fcf8d2209d21",
+    "scripts/ios-tap/TapDriver.xcodeproj/xcshareddata/xcschemes/TapDriver.xcscheme": "4c18ca7921e0e23dbde2efd5882011dd3f23cbb2f195fa506ec72d7674014b9f",
+    "scripts/ios-tap/TapDriver/TapDriverApp.swift": "dbdad43492929bbc5438196bf3720c6c29008b8351aaf87ec0a440958e318620",
+    "scripts/ios-tap/TapDriverUITests/TapDriver.swift": "965cf0ce3dba6349f457a0d6e9efca37d9678c1f02212918322e19e1c5cec623",
+    "scripts/ios-tap/generate-project.rb": "f94e5cf677229b69b3b9732fafe59516e01e7c4e39538520327f5f3e684e98f2",
+    "scripts/lint-policy.test.mjs": "0d46095c202e3428a14faabfd07a535e61c2f8df35a13abb688095c920fc77ad",
+    "scripts/lint-rules.mjs": "833f39f3c484ec5b11922f8b19b80b5741eb71f9cf7b36f4754c8f037c22080c",
+    "scripts/native-camera-bounds-reset.test.mjs": "1f85b5d426977b282097a59bef8ead97e66508841d7e5f967ccd10185585882f",
+    "scripts/native-camera-mode.test.mjs": "f8c88ad623f10e065a1a7eb3b3d704e994dc1f0147a2c6fcfe41cc885dc0504f",
+    "scripts/native-location-permissions.mjs": "884448ff43d622d197d58596611e69d424dbc39dad6cb30d2c4b8bd856718adf",
+    "scripts/native-location-permissions.test.mjs": "c50d2753446695e47eb3a8123e0e3f13ba50f68d0744e9a926e29dd3ba754e42",
+    "scripts/native-mapbox-version.mjs": "97aabd7ae431097eb33cd0bf1a63b38eed84a2979f2ce16f98e774f15991613b",
+    "scripts/native-mapbox-version.test.mjs": "b531aa0659bfa58aaca276bdd509fff04bb3956546c893f045f65b4d12f66d3a",
+    "scripts/native-smoke-process.mjs": "09faef759e0fe9fdda9695b069a2eb1f105a56343143f20d6750c2f3b5bd712b",
+    "scripts/native-smoke-process.test.mjs": "c248b1d4f10c9de7318fbf7b969ad8134a3d395b95d5e1e6869de8cf687534c5",
+    "scripts/native-source-lifetime.test.mjs": "7a07855f2537931e1aec9dda72b0df53cb5b75e059ee483d7c0fef6b146c28a0",
+    "scripts/package-check-options.mjs": "d1fbb118c379bcd2004eb38ef05c67f4217fa073620187cc84ebac8b0a68f7ef",
+    "scripts/package-check-options.test.mjs": "f154f93984e3d1c7cc68e4e95283fa074b1be7d416df637909e87948b6523d3b",
+    "scripts/react-compiler.mjs": "b83f502bd9acac4c427e8020d95e2a40b3d5cbb358d60d5621b054e6d308b5dc",
+    "scripts/react-compiler.test.mjs": "6fc899012dfe28de23cbbe2edd9d6e23aa43d9f27db0e9ab39cea6a57f7d279d",
+    "scripts/rnmapbox-light-color.test.mjs": "ca3f7e0f3e7169f0341500c7ba4e1716af7aeae2ea6c34fde4ade8e3b6ebe23d",
+    "scripts/rnmapbox-location-observer.test.mjs": "2eb71812879916695d7c12a866ae3b16561b40cca2eb7629d6c98b37bfe7dfc9",
+    "scripts/rnmapbox-offline-status.test.mjs": "9d97673cebe84bf41934859c72536576f6049dfd198152aaec069165c817423c",
+    "scripts/test-example-resolution.mjs": "bd570430703ea0632f022e2574cbac452d7020bf626beda2524493c3baf7980b",
+    "scripts/test-package.mjs": "beb48eedf3e6304cba5189d3a568874b8edc906d4e5c6588705c1835a561a8c7",
+    "scripts/test-peers.mjs": "32d2243cfac6681e3cf8e93d1cc30c9528a81ffc704aba6961a3d544daa10965",
+    "scripts/tf04-camera-smoke.mjs": "cfe657e1696626f0e2aa9fc68c54d5cdabf7bb288dfed711425d32f6a77b34d9",
+    "scripts/tf05-sources-smoke.mjs": "8da262d23b6caedc78c806f3e5ecf54110465d6077789c440f4a45fec6ea26ee",
+    "scripts/tf06-lifetimes-fixture.mjs": "dfbb8ee9571a76661fe1c41ab8503199fffe75307275ceff90b1de0e5ff8f43b",
+    "scripts/tf06-lifetimes-fixture.test.mjs": "b860f55bf34e5fb8d195a4d3ee747828ac2812ecc66a0b51903c4861df6e5f00",
+    "scripts/tf06-queries-smoke.mjs": "324007dbe5a19fd3903d0d65e538484a7b19698ff95ed3b849f9abfa4657e15d",
+    "scripts/tf06-smoke-selection.mjs": "d6f47539c5a31088b5f1ba7e199797064f468ffe99d7ad32533d5b6264fd3692",
+    "scripts/tf06-smoke-selection.test.mjs": "36a4058993bb5ad44be77ddfe7c08390e7752e21cd3904e947176ee39dec04ea",
+    "scripts/tf07-read-receipts.test.mjs": "cb003309cf1b226670bdf0645a2df057f71a3318e0f9e997ffc94dcb8b534919",
+    "scripts/tf07-smoke-contract.mjs": "d45124fe40909d0948df1212218948fc9764f28615ce4ce1f29455339a91a221",
+    "scripts/tf07-smoke-contract.test.mjs": "8205ec2b7b90e25f64b63327e38a9086569c810f8ea3c52d54ff11d66c7096f2",
+    "scripts/tf07-ui-smoke.mjs": "626e81e2bfab85baa2914d16cecc6c335a3b08955e78fd757ff5e7530752582b",
+    "scripts/tf08-android-transport.test.mjs": "fa0b000f77b79bbc91d8e3a4670ead4f8db2f6d0629b5a019b104de7c3be0186",
+    "scripts/tf08-coverage-diagnostics.test.mjs": "89cf0c44dd40068ee20b83f8d98185cf7cf79765999aa6c04bcf5184a37d900a",
+    "scripts/tf08-display-scope.test.mjs": "88ade07e2928495c4d002bc7edcf019cdc571206eae15da9cf045a60320e5d01",
+    "scripts/tf08-final-observations.mjs": "2dcbd66952d477e1d28bd64c41374860fb0849c535515e5d420541f2030513b5",
+    "scripts/tf08-final-observations.test.mjs": "ea8f761f9f0aca9894fb124a38327182fa991ddc18d42439dc01f5f97a77b579",
+    "scripts/tf08-fused-location-fixture.mjs": "0741d79ec3bf92566eb8b30c067609d7104a440480a90a7d85fc1a06200dfeb4",
+    "scripts/tf08-fused-location-fixture.test.mjs": "7c5ccf51737a73e67d0f6d95d5cdd1a1ccd611f0349f111176ca942000e981d4",
+    "scripts/tf08-image-observations.mjs": "7ad1f462a5e42cce7f536499b6f37ac781ce1b92cf26e83df4f6bd9ecbdef0b0",
+    "scripts/tf08-image-observations.test.mjs": "8a0c439cedb26bb34da597ac361d8affcabcdbd048284b8023c85070629a554e",
+    "scripts/tf08-map-readiness.test.mjs": "da7c1b663ccc2c65f923017c68390796e8ddfd831501bd127894075f0c1e4dd2",
+    "scripts/tf08-offline-observations.mjs": "969e66cc9d5050e363b5d6e809064d6514bfecb626cf2eab7b6550430e4b3bd0",
+    "scripts/tf08-offline-observations.test.mjs": "2819700b2ba3b17dc3351e6bd1faf1969c1bf7af032aeae6da88979ffc94e4f9",
+    "scripts/tf08-offline-peers.test.mjs": "ba544cbf3a16ec07814c2f32fcd943e5972aea91210b276af01d88c008d36f54",
+    "scripts/tf08-patches.test.mjs": "cb31936f99371e8b0b45606734a20c973e0e790b2c81ca0a4bea17894daf6cf7",
+    "scripts/tf08-pending-operations.mjs": "89fb27fadc28d1aa90ae4ec9c7aaad2d491522a099042df9ad8bfffbbde1ba88",
+    "scripts/tf08-pending-operations.test.mjs": "4217bdb971b1df77d915333ca14ab98bf7304d9285f3b04671c8db7493cd6e55",
+    "scripts/tf08-pending-scope.test.mjs": "9c4502b0554f6703bc1f3514996e80f3c03d1a6c4a344b980d59f4abc7683062",
+    "scripts/tf08-services-smoke.mjs": "3fe43bae3cf264dd60362009c0edf504abf9067b2beab9579cb8c9d04d578754",
+    "scripts/tf08-storage-fixture.py": "cabffaeebd3c016d8e57dbdd5f789bf2501f7e27fa3af43f733e45ac8e4a6467",
+    "scripts/tf08-storage-observations.py": "e6ae36d8b9c7c1f30cc90b828870a8eed9aca1b5a306563716020182e0f8650d",
+    "scripts/tf08-storage-observations.test.mjs": "ff380b32f98a6739070f701a79ef846da6176118cbb7c97002edc6016b260967",
+    "scripts/tf09-peer-patches.test.mjs": "64588df3efebeee645e4dc3ebe9bd4da2ed6de5a80c2d34941ac74989f966cb3",
+    "scripts/tf09-rendering-fixture.mjs": "f481c70aeb33bc75fc9dc78b1921b150138936288ec6892faeeeee28556d34ce",
+    "scripts/tf09-rendering-fixture.test.mjs": "ca06bf8bebe73df52dca119db6e613ac35a67791dd4dfd33a4fe19f801c2d70f",
+    "scripts/tf09-rendering-smoke.mjs": "9b75bca1a51e4cbe419fb58e0ab028fe0a92878163934ca1d72c314087cfe72d",
+    "scripts/tf10-camera-bounds.mjs": "f0d515e3125d74d70d3c08004b2dc5757dd496db195fba0ef287a7b7741ceb22",
+    "scripts/tf10-camera-bounds.test.mjs": "aaa852e14c256d8471bbc6586b5be937b9db42898981dbcf5a6b155c913016ba",
+    "scripts/tf10-camera-observer.test.mjs": "79dafd13b04a1ae32187832032d67d4294c063095b0dfa80ea0fb8e958f367c8",
+    "scripts/tf10-model-fixture.mjs": "37c3a7bd8fb0030e0d4949281270221ea8f9b4741623619d9ba8c785b2be3ed4",
+    "scripts/tf10-native-camera-driver.mjs": "1db6dac08c86b7bf6be9df0473e285f0a752501749ee351a9f1d144800b27df0",
+    "scripts/tf10-native-camera-driver.test.mjs": "6d9bfead3f84b86aa728629efe1f9e1b3bba1785bb65b9e6bf339e20098700e4",
+    "scripts/tf10-native-orientation.test.mjs": "64beefacd20be2df87f2d61ade3661115d9e9ba0a169a01ebc14068110fc96b1",
+    "scripts/tf10-selected-acceptance.mjs": "8b1d58e2fbd2e479a254f220aafb69e0bb74ec63cd4731c205616cab862e3a87",
+    "scripts/tf10-selected-acceptance.test.mjs": "6b0413cc767d745623da039d084c593b26eafe86a97412c49d0c33c783b47437",
+    "scripts/verify-example-checkpoint.mjs": "98d070a0e4f3613b6c14468457a2332aecbe696c89ee8319150e18dec8190a57",
+    "scripts/workspace-lifecycle-smoke.mjs": "47a46797f85f96026691a0e6c69276aeda5f41e570e497b809bd48f67c77e0d0",
+    "scripts/workspace-smoke-entrypoints.test.mjs": "467d581333280864cf809900c815eb5287ed2f654e549e54f2e55706538af83b",
+    "scripts/workspace-smoke-shell.mjs": "a6b67a22aaf641fa12ba87c959eedcd43897e9339256753672ca35609f156445",
+    "scripts/workspace-smoke-shell.test.mjs": "9b6ec69e000bd24559a75eae6424a98c136018c61683bb92cab1ba6a39e817af",
+    "scripts/workspace-ui-web-smoke.mjs": "e202c44a4bf32edea5cc64130c8bd8fa92986d4ef1ce519d4b80a351d7c048ce",
+    "tsconfig.build.json": "70bbfefa716573fa2ff9e1f8d33d8b7c757f6d3a6398912eeafe3dc8310aa201",
+    "tsconfig.examples.native.json": "5f655d5d6113af1182d5a937fb8a2e11dbf59f913da3af879be3d936efa80533",
+    "tsconfig.examples.web.json": "3810ae626fe8fbccd1df23d21148b492cc58bde8c74773984579aee9e798a18f",
+    "tsconfig.json": "aa8a1e799a3cdbe02eec927d8d6e6f48f7f6e0d75592081216020786a0aef130",
+    "tsconfig.test.json": "097b9ee6538dd41c60b5fb7d8ba5634d7580131d2000d2b354c38952746f1b44",
+    "vite.config.ts": "5382cde4a71bac2d14eacbb4599fc8ed4a7e512fd6fecf0c8261e68389a6257c"
+  },
+  "sourceSha256": "d5e15ac9428a6a3001252f95f011f94d06e465cd328645e611e96d48eee29112",
+  "builtFiles": {
+    "packages/example-map/dist/acceptance-controls.web.d.ts": "dc4c39280342c8104170dd08f01f6f18bd46fd6b3ac02a1bba340d6b9c74e1d2",
+    "packages/example-map/dist/acceptance-controls.web.js": "06f1da092c92d758f298fd113445f4b67ea6aa668c34b8812727f9144cf3f61e",
+    "packages/example-map/dist/acceptance-selection.d.ts": "c57938d86f03410c6903a86eb516ad65b63b2385b0d75696799c88c4dd9b6523",
+    "packages/example-map/dist/acceptance-selection.js": "c1aac77161f5963e57b05faa937692217a5c7a6b42b1f3f33f90f3ea498ad1a2",
+    "packages/example-map/dist/acceptance.native.d.ts": "04816d5b7e93808c446746fc73fda1bc7decd12fefd0b878a5aed489693c25f0",
+    "packages/example-map/dist/acceptance.native.js": "f5f313e3769b4c2c9b1236b5224354d4cbe6f101f30c1cac91d67824078833bd",
+    "packages/example-map/dist/acceptance.web.d.ts": "66d921ffdaeeaa13c1e5fe2432a1bb36a620fa16abd453e09d72d8d27fcc513e",
+    "packages/example-map/dist/acceptance.web.js": "9d656486b8cc1e4e3707517f1b54e924cac2445e24baf3eaf6791abdadd3e51c",
+    "packages/example-map/dist/camera.d.ts": "9c57cdc71e5b7027f2cb8ef04123d74a59c4800c817dcc2fcb04ae7fd5d84586",
+    "packages/example-map/dist/camera.js": "5f0273f61cf745377bf94da7521d96e6079b1c442e9a5123723fc8a49ff371e9",
+    "packages/example-map/dist/engines.native.d.ts": "e5c73e50a7eae7d59f6148ddbf5ebb76a1ebdeafa6a69ab6290b75bb5ba72377",
+    "packages/example-map/dist/engines.native.js": "170ba9e3e9b54783c0eb33915ca1dfafead61d51659f775c55cc21bda43ebcc0",
+    "packages/example-map/dist/engines.web.d.ts": "2296f3c4c4f690a3cf6fc16a66710481697169a380d0bfae70703d2f8a1b3478",
+    "packages/example-map/dist/engines.web.js": "0d0abb3c592c32c5df1d5f4853d2712f380b3f8dc78b457da2b3e7d843b86c2e",
+    "packages/example-map/dist/example-map.d.ts": "6822bfa28e2bed16ecdd6a23ceadf0f6d19fa1bb19f56e95d51db9d130ff2d0e",
+    "packages/example-map/dist/example-map.js": "08ee3765b4bd771ae4ec74d9b370e17c2821ee52b2d9308a2f1eb44b92ea4e84",
+    "packages/example-map/dist/index.d.ts": "c4cb42ded102ba40e102dc96dedc3e69f4b415e3e1ca8e1972c5d45fd09beeba",
+    "packages/example-map/dist/index.js": "ac8fe46965e79d85cd7a97d38216948d15b57761d55a0101b2b670510f9712a4",
+    "packages/example-map/dist/public-token.d.ts": "c15d39b38fc9b58fc476e8a8dda4dba75de6ce2a13436fd68fbe9262759890fe",
+    "packages/example-map/dist/public-token.js": "5e4775b8ec77cfc1c3ccc0eaf7447a6acacd1663282cc49632cf28fe252b6add",
+    "packages/example-map/dist/scenarios/camera-smoke.d.ts": "928964050e21b16a379a4479f143053546b3f239377b6e2c06af64c261abee3b",
+    "packages/example-map/dist/scenarios/camera-smoke.js": "053d05a2f7c3607e6e44e790f89e732eb5cf5b402dd7b85e69fbe15766c0103d",
+    "packages/example-map/dist/scenarios/global-state-app.d.ts": "2fdb93c2b7ab9ee954779c2915bc0e7e68392c1af78a5ca73161c8c519da4dbb",
+    "packages/example-map/dist/scenarios/global-state-app.js": "8fdbd20481480a32d03779f55d39e5298c15e0db84451ff8086b799c4d62ae2f",
+    "packages/example-map/dist/scenarios/lifecycle-smoke.d.ts": "f8d4fe57696572991d362088e6eb98cdfe48f24cc54edeb77824615d4aaa2bf1",
+    "packages/example-map/dist/scenarios/lifecycle-smoke.js": "3e50f05560bbf33d8f42a496555af30b074a2ee98b1d43af7c0a3024cbbf9061",
+    "packages/example-map/dist/scenarios/lifetimes-map.d.ts": "698b20577e3f05b1d203433874cc10de98d2923f8542af70063f86a5b206f1cc",
+    "packages/example-map/dist/scenarios/lifetimes-map.js": "59feb7df264ace9a7c09aba7d96d1593abe41a02c5b53f182775e73a61e1c6ee",
+    "packages/example-map/dist/scenarios/lifetimes-smoke.d.ts": "e1cfe670e62e4c6746e28a50317df2fb17afbc83bd8be55b92d4c069c9001669",
+    "packages/example-map/dist/scenarios/lifetimes-smoke.js": "6e11a354a27d92765e7f29add3a23bdd6f32c3ec16bc997dbadacbe802bb49da",
+    "packages/example-map/dist/scenarios/map-fixture.d.ts": "d51d0587a095c35c75b95e1fee4fc79326105a490774b305544c85c5e1cdf236",
+    "packages/example-map/dist/scenarios/map-fixture.js": "189c46c3cb1d18bf33713ff1cb814fe0bcce6fe3ef40983df96f6b406c20580b",
+    "packages/example-map/dist/scenarios/map.js": "2622c6109c5ec392c1229118e05fc8225a70093bb8c38089e6b6ec372b08f489",
+    "packages/example-map/dist/scenarios/mapbox-native.d.ts": "ead32abc75508e3a298f6104bb66f49173e94ef1781f5905756f842f64ccfff7",
+    "packages/example-map/dist/scenarios/mapbox-native.js": "da69874bcd4000d90c392fbc51248868fd16b0f7a5f14d1cdcab78a4cfe63dee",
+    "packages/example-map/dist/scenarios/mapbox-web.d.ts": "053fcafa37940e2ac7b8492e00b6b2817d2b7c0c8e5e3426eab4b2e4bfb06902",
+    "packages/example-map/dist/scenarios/mapbox-web.js": "a74f46f5caafb6b6ac720bea0933c5a3a8f0a81f1870e3c1fcca0a4a38984511",
+    "packages/example-map/dist/scenarios/maplibre-native.d.ts": "3e86fde7c5946d61e4c779f8a3c970a40bb4a3b3a32ccac941174eef62d8c2a1",
+    "packages/example-map/dist/scenarios/maplibre-native.js": "dce69aebbf4bcd8c121d8f1bef70acb16fdd1c55cf94af09e7d674c63aca7b99",
+    "packages/example-map/dist/scenarios/maplibre-web.d.ts": "e98288bf66ae56af4a26780998c0877a9c8e703cf2b451330baf1f0105b13527",
+    "packages/example-map/dist/scenarios/maplibre-web.js": "e7f63a923575227311cbd4ff7876081db1495873128cc367cceb9fdfa51ee1c0",
+    "packages/example-map/dist/scenarios/native-camera-screen.d.ts": "02a420ce5da6e39b08d7ced6497db340985197eadc0dd51ad8a72bc772aca95a",
+    "packages/example-map/dist/scenarios/native-camera-screen.js": "49d3f9c83c8ff2a70a785f4ca8ab259e1d0a486458c5a4c285d890efe748c0d0",
+    "packages/example-map/dist/scenarios/native-lifetimes-screen.d.ts": "321c07ca343be65abdc84fbbdcde52b81161e264099583fcfc72c4def076c202",
+    "packages/example-map/dist/scenarios/native-lifetimes-screen.js": "655302bef8103219ac4c82127592c14213f8604fb0a1f1c074d81d62b08cfa1e",
+    "packages/example-map/dist/scenarios/native-model-scene.d.ts": "ce2f24253cff8256ffe93e37e2f0c4af0af13c1f260368c2980b3c6f41971e25",
+    "packages/example-map/dist/scenarios/native-model-scene.js": "72f4d7945dc4aa92f51db9a491c89c3448db1493435174cc2dc9501728aeb4c4",
+    "packages/example-map/dist/scenarios/native-queries-screen.d.ts": "2830d706b0bcaf02c8bc1ed43db8fae79769fcda3da47a3de1a1db06ff099ea0",
+    "packages/example-map/dist/scenarios/native-queries-screen.js": "dbe31e69abaf50df8f1c9ec154049161be0bcc9cd8ce6b8321c3572144845462",
+    "packages/example-map/dist/scenarios/native-sources-screen.d.ts": "035d9a25d16b500c6a5152ea2489e7b9543e9319562d49c5b012be1caf1ac998",
+    "packages/example-map/dist/scenarios/native-sources-screen.js": "ae191bd4aff2f5070bfbba534880a67f56f1049f7408bbb9c778be35123d2e11",
+    "packages/example-map/dist/scenarios/native-tf07-focused-screen.d.ts": "28edf5d6f3be2657aa04e9284a622dda9f1bce74bc684bfc1e4db475bf50130e",
+    "packages/example-map/dist/scenarios/native-tf07-focused-screen.js": "daff22482e7e70601a17119bbb29925d3e6c843ff640443e4b622b7302281e0a",
+    "packages/example-map/dist/scenarios/native-tf07-screen.d.ts": "98c1827675b7d97d32e6cac1b9abc09a827db33f80a8749d40a4ade0f37e8aef",
+    "packages/example-map/dist/scenarios/native-tf07-screen.js": "d87f884dc22caf756759ef5b010b84c96a35ab046842d4b766b3b10791311db5",
+    "packages/example-map/dist/scenarios/native-tf08-screen.d.ts": "abe40df3ca669ecf85419691b892cad2c702d04ecb0ab3a88fe24eb0d555ed12",
+    "packages/example-map/dist/scenarios/native-tf08-screen.js": "0f8d02ca821a22c8e61129cfdaed2ec98c9684e4266d7a78120766aa17032cbe",
+    "packages/example-map/dist/scenarios/native-tf09-screen.d.ts": "b768672944fb9763e17c61dd7086d7bfdc8186d723f8b0206ab052adfef07fdc",
+    "packages/example-map/dist/scenarios/native-tf09-screen.js": "2678919487e6264ff86051f08022a54aabd9ea328b933a5612a894f60e04f9a2",
+    "packages/example-map/dist/scenarios/native-viewport.d.ts": "cefb9be3e10f6dc4ab9ce121982433f7815dfc8aabd4a82eb6d362c21e1800de",
+    "packages/example-map/dist/scenarios/native-viewport.js": "42f36e7a9a998c0e9172267ff903609d266c279666eff2a80424b33b9df9e6dd",
+    "packages/example-map/dist/scenarios/queries-map.d.ts": "ecb618c7874dc1090bd7cc6c24cf7b741f5bef062e410053a717135dfba0131a",
+    "packages/example-map/dist/scenarios/queries-map.js": "440e9cc63c49392718bd88434e7e588b02313a547e9c571a47baa3e139f34810",
+    "packages/example-map/dist/scenarios/queries-smoke.d.ts": "63e42d656ca61ef8b2333b8d0d578aec6b5088bbdf4c9a2d8ccf964450457d88",
+    "packages/example-map/dist/scenarios/queries-smoke.js": "d90a706d02623d3b327f65ab8eda39baf489a4e0ecb2da9fb46bbce34de9133a",
+    "packages/example-map/dist/scenarios/route-map.d.ts": "c1ce6b5ae151266f58a8075f34d32beae618f923458ee4fa0fffb4c8e6dc4030",
+    "packages/example-map/dist/scenarios/route-map.js": "b0b76d169cea693a165f8d72b562925beefa881bcb88393ba6e9e6fd78e130c2",
+    "packages/example-map/dist/scenarios/sources-map.d.ts": "80227605bfa70b2344d1411f23c994089f309e45459861946e531b048995a028",
+    "packages/example-map/dist/scenarios/sources-map.js": "cf38a96c909ea621fc7460497e912bdbc81fa20429f53051861e2d713c7c0a91",
+    "packages/example-map/dist/scenarios/sources-smoke.d.ts": "69ec612fe949d4dbb91ef44d95a5e51fb2aed6f35b41e30c268c9f1d8be44a9a",
+    "packages/example-map/dist/scenarios/sources-smoke.js": "412147a306c6b408cd14bc2fda2e995430965db23dbc9fdf2e4c0108dbe5cdac",
+    "packages/example-map/dist/scenarios/tf05-base.d.ts": "0866fe167cfb9ab1716128592ac5e12b39eabbfc5db24b3ec46b9dada89d7a90",
+    "packages/example-map/dist/scenarios/tf05-base.js": "d7027fe4f582aed191192cbecbe0356ee28a957fd78d042a6793cc8585bd744e",
+    "packages/example-map/dist/scenarios/tf06-base.d.ts": "033ab4d3d7dd38f4ca5fe3a8e74593edff4094cfd6a44dc2a2a41a6e1070f2fa",
+    "packages/example-map/dist/scenarios/tf06-base.js": "fa8da882a43c0e3f402c6ba721af4372fd2ff09431406cc2f072c48509dc85ed",
+    "packages/example-map/dist/scenarios/tf07-scene.d.ts": "a28d599dfe73481247916117f8a0c05375321341515a5a3984e5ee0ea18fa5e2",
+    "packages/example-map/dist/scenarios/tf07-scene.js": "fb4737126dfd07b8282599f3e1e1ce78f6f3af801dcf958494477cf09665bd57",
+    "packages/example-map/dist/scenarios/tf08-acceptance-scene.d.ts": "355de43b450abe1e812b7a6c83490fa5295517219d5f0d896234ca5d3a0e9370",
+    "packages/example-map/dist/scenarios/tf08-acceptance-scene.js": "3ba04fe8ccf9a42f29943584605a2d5dd10ae929bf0c0bba1f50b6669c73fc84",
+    "packages/example-map/dist/scenarios/tf08-map.d.ts": "8ef1516c2ee04179837c024b25ed251aa800b0c57a4bba0e361e22bd88e147e7",
+    "packages/example-map/dist/scenarios/tf08-map.js": "9e02cd4f369f3b4ad70ec4a7ed69f10eb2097fc59114d1a48b2c1ae16b3a26a6",
+    "packages/example-map/dist/scenarios/tf09-scene.d.ts": "1ac22d1d8c00d78e400db2c200c005d60b9fd27f70c5e8eb607261db19b44529",
+    "packages/example-map/dist/scenarios/tf09-scene.js": "a6d0a57e00620455c311c95f517b7067c78bc1421a70df0e2f4de2afc72648d9",
+    "packages/example-map/dist/scenarios/tf10-camera-observer.d.ts": "d34393bb15e2d2c709c8b7a51d9a7db5550c5466f0e28f9a2a11d1f5da43df8d",
+    "packages/example-map/dist/scenarios/tf10-camera-observer.js": "34dc6bc7efed7c1fc03a481688cd99951094ada21a3200f3f8899674c7096a18",
+    "packages/example-map/dist/scenarios/tf10-native-orientation.d.ts": "d9db0a604dbecbb80717a154a160844a7ffb2a2929733408ea1b9dc1a07dd253",
+    "packages/example-map/dist/scenarios/tf10-native-orientation.js": "525a223d57f0afcde9593930335e077119e57e88b50eba28f1c2eda46de276af",
+    "packages/example-map/dist/scenarios/web-camera-app.d.ts": "02927574f3e35c9e36409cb00f7b272ecfe193735ea63614e8c24d2e924f6350",
+    "packages/example-map/dist/scenarios/web-camera-app.js": "65893576f3d6da96fc288686f1a3947eefb23e641e0ebb214518c061c73d532c",
+    "packages/example-map/dist/scenarios/web-corrections-app.d.ts": "28e2a9bf4315a7cd7dbe53d8b77530bc13b646b9e8f50fa4a2be6999c3a518d6",
+    "packages/example-map/dist/scenarios/web-corrections-app.js": "a29bb08e7b4b7f04a61f1e30c641be681ffaa050e496ff885653dacbfb57708a",
+    "packages/example-map/dist/scenarios/web-lifecycle-app.d.ts": "3e1e1d7d70f714ad69137167ac6a6445cc5ee852334ba93c92191d102fdd2d0a",
+    "packages/example-map/dist/scenarios/web-lifecycle-app.js": "4a4bfc806f345c53cdaed72db0a89885173843daf13a2c23aaa016cdcfe41f54",
+    "packages/example-map/dist/scenarios/web-queries-app.d.ts": "825aa6fc683481adc55de919b1cbb649c3aadce6dcea00f3012658e466b9fac9",
+    "packages/example-map/dist/scenarios/web-queries-app.js": "ecb768e536a0a47ededa01de11613a2f950e2f96264d30535f712a576ca789e1",
+    "packages/example-map/dist/scenarios/web-query-regressions.d.ts": "f90b70101e4bf5300c44df1b4a92a120fd0eac8dbe47c2d04f19062bc75b5e8e",
+    "packages/example-map/dist/scenarios/web-query-regressions.js": "a3e0800618eb015768cad2c373826494411319d64104144684fe5b26397eb373",
+    "packages/example-map/dist/scenarios/web-sources-app.d.ts": "b37191bae218128a686efd9e4be967a4077ad7b6600ebae8b6b67a10de5436a1",
+    "packages/example-map/dist/scenarios/web-sources-app.js": "e84e7222b877fb80268cbf7dd73c00913fb7b343f198cb8ac7d1bd83377377ef",
+    "packages/example-map/dist/scenarios/web-tf07-app.d.ts": "2ed0caf4af83ac9bd12c96e3239fe63054b48f86554df8a6e4c0de4f5122b317",
+    "packages/example-map/dist/scenarios/web-tf07-app.js": "9fdccd0e7d1d3bd3f22509a9711c1899a9fb634e30e6bf16aa7b4cbadb14a9b4",
+    "packages/example-map/dist/scenarios/web-tf07-focused.d.ts": "6013656269d71457dca53d08da25a75663bf9c97273dc452c9a6d64691e130de",
+    "packages/example-map/dist/scenarios/web-tf07-focused.js": "9822995a442a8d5c14d7cf0160f0e5b79b3556be5424f21e1eb1536d0d5054e1",
+    "packages/example-map/dist/scenarios/web-tf08-app.d.ts": "3bfd17261a0da4d56c73bf7c1aa497c13bfd3d3958ee54a31ceb31bd1c1f2871",
+    "packages/example-map/dist/scenarios/web-tf08-app.js": "5b6519c920ab8ce076fd9d0fefba4521d9463457bf2ad19143c0941865516487",
+    "packages/example-map/dist/scenarios/web-tf09-app.d.ts": "551ddfdc2bc1d2ff0a6e704edfb8f995e69534b48796d882a34ef0c44995329b",
+    "packages/example-map/dist/scenarios/web-tf09-app.js": "ef2605fc2929c9d4e0c09fc7463425687ab6627a42c79471a880b368eb85d48a",
+    "packages/example-map/dist/scenarios/web-tf09-media.d.ts": "1a4ab76a04bf597ed88261de4d9e8108a31040bc510db2d48f799034d3e9c75d",
+    "packages/example-map/dist/scenarios/web-tf09-media.js": "dc16376edb4fe3b4517d8601553526ea44a9f0b5cd02727eadfd9854446a2cfc",
+    "packages/example-map/dist/use-example-map.d.ts": "8e93c696f16c227946a9d3aef1bc723e0deffae11268d57882c9328a4549cdfc",
+    "packages/example-map/dist/use-example-map.js": "035bac717f582f6540b27ef8673b28e297bda18bc6ee26a1b36f85d96b45c27d",
+    "packages/one-map-react/dist/adapters/mapbox-native/convert-camera.d.ts": "5013449cf2defdd583a1bab085b91c339da6f18fad249e6598da06bb0a89c32c",
+    "packages/one-map-react/dist/adapters/mapbox-native/convert-camera.js": "ca9167ad48920ea769d0a7897895550b05495245d8bffe2b7f868238fb764e30",
+    "packages/one-map-react/dist/adapters/mapbox-native/convert-gestures.d.ts": "fd1b70251841a54fd2378a2468539fa2b203881cf516ff2fba2e3e1dba6c884a",
+    "packages/one-map-react/dist/adapters/mapbox-native/convert-gestures.js": "1e6f3c23373ce65c60b16ccb9093672900f110f620e8477323a376a770356483",
+    "packages/one-map-react/dist/adapters/mapbox-native/convert-move-event.d.ts": "ec53807ef2e263fe05d9b8e6ad0cd7f5e12fe2bb7d37f5652c4f17861376fe32",
+    "packages/one-map-react/dist/adapters/mapbox-native/convert-move-event.js": "7e069b2c613d31516090f9e13108ba2f084df890f75af0cf71fcc805488a2df9",
+    "packages/one-map-react/dist/adapters/mapbox-native/convert-query.d.ts": "8ddcab5af804d962ab9e85787298b89cc579d05b61000fc5476079165c432bd7",
+    "packages/one-map-react/dist/adapters/mapbox-native/convert-query.js": "9cc618344852247f9e09213348924dc5764bd4a9e662e9ab13e0b288ae3b9b4a",
+    "packages/one-map-react/dist/adapters/mapbox-native/feature-state-methods.d.ts": "a9f6137e4982efa6e953fb565f8de9e7cffc4ad136d677ca13a576400b8a27a6",
+    "packages/one-map-react/dist/adapters/mapbox-native/feature-state-methods.js": "a3a215d1b9e6a443e40028e9c6c0743a0549c083fb148eb48ba34db5fdc0ace7",
+    "packages/one-map-react/dist/adapters/mapbox-native/geojson-source-registry.d.ts": "c9c3a6885639544b21e7f2129e54917561bb3f60b26f2525512ef4093af25871",
+    "packages/one-map-react/dist/adapters/mapbox-native/geojson-source-registry.js": "94892c41f25a348943c9b6d25ae240cb90576721988ea657120819d930ce40b1",
+    "packages/one-map-react/dist/adapters/mapbox-native/gesture-settings.d.ts": "24b985bd2879dc7635a21408aa20ba1318a38133991f88a385d4eb2de3ae2f5a",
+    "packages/one-map-react/dist/adapters/mapbox-native/gesture-settings.js": "e4364efce5ee6370def346d036eb03e989864d5ca9f9fe9d12fd13ee0fddd2e8",
+    "packages/one-map-react/dist/adapters/mapbox-native/images.d.ts": "1770e9f11cf8eed499c94cb53a7c2fc09171839580ea590606537f221c26c061",
+    "packages/one-map-react/dist/adapters/mapbox-native/images.js": "89f09e7c90b92bfe5e58860d079ca5d8259ddb9348dee97ba256379ea2a9f122",
+    "packages/one-map-react/dist/adapters/mapbox-native/index.d.ts": "c75b96f4bbdb294d81e9125445de440325b75cee0394e62c745c45a6a1fb7c78",
+    "packages/one-map-react/dist/adapters/mapbox-native/index.js": "9898c99a95b1c73772b485cae168949ec66f87a58d4a976381098076da4824c8",
+    "packages/one-map-react/dist/adapters/mapbox-native/label-localization.d.ts": "733ecda2824147d593e0156b619427cfb1c33b1682c4b4ef86d59066ba458830",
+    "packages/one-map-react/dist/adapters/mapbox-native/label-localization.js": "eccfe5e195300234494d2396b490f6c850a5ba68760602ac58d909301217fff6",
+    "packages/one-map-react/dist/adapters/mapbox-native/layers.d.ts": "68efb1298e183abc78e519d2bdfe8fbcbf26c1a80a14c937a2495b5382474854",
+    "packages/one-map-react/dist/adapters/mapbox-native/layers.js": "2e8f1b8fe255e04bcb7ad001221ab8309c3ddd35b0b83ae3b96758e41269a30b",
+    "packages/one-map-react/dist/adapters/mapbox-native/map-ref.d.ts": "914ac9140ab35c8e03d9b48caaea62e975c0dc46d6331d00d5565c1e406b4398",
+    "packages/one-map-react/dist/adapters/mapbox-native/map-ref.js": "ff438eaaf98e786c84e1d005e89e18a6102a3053fc729a6a2bc8aaa62a0e8fdf",
+    "packages/one-map-react/dist/adapters/mapbox-native/map.d.ts": "79107a55945f34b12050fc0286dc150a9647695e8fab36cef969e87e873e5cd5",
+    "packages/one-map-react/dist/adapters/mapbox-native/map.js": "b976f3406204ba31d857a0922607d31fee5a334e52b1223e8a43ed5b59bf1163",
+    "packages/one-map-react/dist/adapters/mapbox-native/services.d.ts": "0c9d8514a0b8643b5201d7e33455c09d7e99ada90a93d4f97a7503b516140109",
+    "packages/one-map-react/dist/adapters/mapbox-native/services.js": "0668844bbdb3ba056a71a55d10020b1e44c4c68ff024a936304ebd5fcfed8e50",
+    "packages/one-map-react/dist/adapters/mapbox-native/sources.d.ts": "bc4286c6f8e5dbe5480b393b27242cc7ef782396777f0aec324aad914028f463",
+    "packages/one-map-react/dist/adapters/mapbox-native/sources.js": "5392fa74b6b77430c46b9873f33fc2dd82fbf552c3e6ab05f05961ec898a8adf",
+    "packages/one-map-react/dist/adapters/mapbox-native/style-props.d.ts": "9b23bb3011a65983bb68e8f8142a2f9283dbbf70335864519f60544ca6c95c40",
+    "packages/one-map-react/dist/adapters/mapbox-native/style-props.js": "d54a7de12afe4629b613d3944b7d4a6a9a233a5f5757a31ad10a780af337a3de",
+    "packages/one-map-react/dist/adapters/mapbox-native/ui.d.ts": "7c42743c0660d9c9cbdd6b34b46ffad73bce8954fc9f453187cc957798099b0f",
+    "packages/one-map-react/dist/adapters/mapbox-native/ui.js": "85caa555bedec3df53085d48985d9e60d5b410957dbb62bce840c7235eb0e481",
+    "packages/one-map-react/dist/adapters/mapbox-native/use-mapbox-scale-position.d.ts": "dbc0f82c130e4bbabc6d39d3aa1a4309462df36d5d205f599c7b2586d7d46df0",
+    "packages/one-map-react/dist/adapters/mapbox-native/use-mapbox-scale-position.js": "e8c47253e017547987c8e71b4a14c6e101fb6e33e518382dd20a9705c2fd45dd",
+    "packages/one-map-react/dist/adapters/maplibre-native/convert-camera.d.ts": "6934bea405b958e044608e86aa0bc7724285b778c48453e525747b51c3941729",
+    "packages/one-map-react/dist/adapters/maplibre-native/convert-camera.js": "e60a57f9065057da3d1a78e1ba1590835b318a8b913b9fe3f721f796ccdce387",
+    "packages/one-map-react/dist/adapters/maplibre-native/convert-gestures.d.ts": "83f3ff74500735f9d32a3c032d358cb8e075510f7bf05e4c5b1699128253cc8d",
+    "packages/one-map-react/dist/adapters/maplibre-native/convert-gestures.js": "1ded923e5874da94ebc28781d63b549591aa6a51861ec2bbf433556408323160",
+    "packages/one-map-react/dist/adapters/maplibre-native/convert-move-event.d.ts": "24870930eede345d7a95e1fae89aed9610e22051917ca848e9af671aab644090",
+    "packages/one-map-react/dist/adapters/maplibre-native/convert-move-event.js": "1744eecc7ce982804feb6e6cec5e37e145ce007a009ee992995e074441e754e4",
+    "packages/one-map-react/dist/adapters/maplibre-native/convert-query.d.ts": "8c801c51f2c21494fe5d61055673a5e4f539251d42f81b7df36e94fe05c7d211",
+    "packages/one-map-react/dist/adapters/maplibre-native/convert-query.js": "7fab304b3ccf27d1b249bf11e6c8e1f849947142f24eca9c890f1959378c0f27",
+    "packages/one-map-react/dist/adapters/maplibre-native/feature-state-methods.d.ts": "d9b7ba1e523d3e1a8184297c1135a377aca3887b855b1d283ec03f11a3fa717c",
+    "packages/one-map-react/dist/adapters/maplibre-native/feature-state-methods.js": "0c83019a1153bc84d8580475b950d53c72b5479645b09a4389bdd4b107b15287",
+    "packages/one-map-react/dist/adapters/maplibre-native/images.d.ts": "09fa6990d23d5815453114695fbe9df38a86bf42f1c7e7870893066c79df49fb",
+    "packages/one-map-react/dist/adapters/maplibre-native/images.js": "57ed83def4701636f0743a0055f7bfe34682b00f1ca641747a72a62ee3d80b53",
+    "packages/one-map-react/dist/adapters/maplibre-native/index.d.ts": "c9fc3c788c6507402d4362237f4aeb67be579af4d216cf5b0bc12eef9f8bb0c5",
+    "packages/one-map-react/dist/adapters/maplibre-native/index.js": "a2d03da86615bdb10cecadbcd242f9cb93203d77de3cee32ca79599707a69f0a",
+    "packages/one-map-react/dist/adapters/maplibre-native/layers.d.ts": "2d3e33a5eb704abefc9a179fe3bf52d45537f7e16415cd3615ef0716c7acf65f",
+    "packages/one-map-react/dist/adapters/maplibre-native/layers.js": "17c428f3a1fa9e514bf3e93f9228b17b3330e704744988a8847cf9dd46b3ed0d",
+    "packages/one-map-react/dist/adapters/maplibre-native/map-ref.d.ts": "4976271ba870a5e1f2909eb5d9e0bf8b34ef1b0659785a1edd729f0713b18f9d",
+    "packages/one-map-react/dist/adapters/maplibre-native/map-ref.js": "9b0b0259345e04951d5acd5393ec5cb8d65ea74a5f6c51953b8b782b71ee3bf2",
+    "packages/one-map-react/dist/adapters/maplibre-native/map.d.ts": "35532fc4719b9dc38cd9c5de70f25077d0878dc8ba2571930416d60123218a3c",
+    "packages/one-map-react/dist/adapters/maplibre-native/map.js": "0fb96de22c2da5e654100e41ca6f8029b9bff749ace899d19003dae18e415767",
+    "packages/one-map-react/dist/adapters/maplibre-native/services.d.ts": "3f3c7b1c7353f28182669c8af10892dfb98ce6b4e5ef04c7c98924f4790115a0",
+    "packages/one-map-react/dist/adapters/maplibre-native/services.js": "6c6bc2db44d8d45976760b2aed53e164b8f986a7dc3e89085185af31776eaf4d",
+    "packages/one-map-react/dist/adapters/maplibre-native/source-registry.d.ts": "653df24b6e8e81504fb12bd7703d0b329671a08709c9f5552edab7dac6510b42",
+    "packages/one-map-react/dist/adapters/maplibre-native/source-registry.js": "0ec87988b01f796131a99612dd94fe11c2b124c806ec2a12cd938710c0850a96",
+    "packages/one-map-react/dist/adapters/maplibre-native/sources.d.ts": "707f6ed7c46d22637a92f74dac36a279de84c3bc8e27196addf1d82f74c5d2e6",
+    "packages/one-map-react/dist/adapters/maplibre-native/sources.js": "6425bff6f750d615a13907bdc92f511d34bf1242fdc79bc4eb18e583a47b8558",
+    "packages/one-map-react/dist/adapters/maplibre-native/style-roots.d.ts": "dcd68aa07ea1845ccf577f900f00fa7dff3d77e5ef2c97e36fdd1590d3be9ecc",
+    "packages/one-map-react/dist/adapters/maplibre-native/style-roots.js": "c6b80e95e3377abebd40c7adb66eb53035ca85f02f0ad104214efa3798afd5b8",
+    "packages/one-map-react/dist/adapters/maplibre-native/ui.d.ts": "265f2dbb9a7a36f9bdf7f808dc8919281f226c57ad3d19ba1a459e9318976a93",
+    "packages/one-map-react/dist/adapters/maplibre-native/ui.js": "534bf305804841590ba06138ffacdffb55a747c13fba664a900763273bc63370",
+    "packages/one-map-react/dist/adapters/native-map-options.d.ts": "695d03fc638b287d06690ebdd9a6cfe0ca8b8fc7878648f06a757efe522881e8",
+    "packages/one-map-react/dist/adapters/native-map-options.js": "007b5c8cce133e4ac278840c064fde8aeba7a144b820fa15d45ddb9488ba4a09",
+    "packages/one-map-react/dist/adapters/native-source-gates.d.ts": "03bdd6ed76cffb9528e6e95784a8d152d59e27c04e5fd3bc95655bbfdc5dd1ca",
+    "packages/one-map-react/dist/adapters/native-source-gates.js": "1ecf80e6cd9662ec2919088156b96d42115cbb1f5b714a65ce18d68cab945ec7",
+    "packages/one-map-react/dist/adapters/shared/create-location-service.d.ts": "092a5fd67f52931cbb60cc36b82dd3b4b4020fea4e5df8ab8fa576f6adc9590d",
+    "packages/one-map-react/dist/adapters/shared/create-location-service.js": "95664fccf5d5e7a29cc8c2a7745e15e1e5af7ce38abc8783d52f4fe861fe83f8",
+    "packages/one-map-react/dist/adapters/shared/feature-values.d.ts": "12f6fa52fd85238e45056d69e08a538f7513712de6239e71aa48a165ae88c758",
+    "packages/one-map-react/dist/adapters/shared/feature-values.js": "07a62682aa6bcabcb226a5dda5886d32fe5d110e3c60b645f881b04fa7ec7640",
+    "packages/one-map-react/dist/adapters/shared/image-output.d.ts": "227a646ce1230da295706bd79d3cc1a5802998dfb39b476cb591278518db9276",
+    "packages/one-map-react/dist/adapters/shared/image-output.js": "f7f72311897f5e9db0acee73885325b55d0e72dfd0ec512d4dd5dceb610b1f6f",
+    "packages/one-map-react/dist/adapters/shared/location-values.d.ts": "ce8ad7681071a0b71c798ae832b985faf19a51fe9631d68151fad43b8114ef25",
+    "packages/one-map-react/dist/adapters/shared/location-values.js": "df82afc9176c1ca0b5ab013bced293060f1b0ee4f430dea0583858378626718d",
+    "packages/one-map-react/dist/adapters/shared/map-capture.d.ts": "f2205a0e9c5efc3b80e2c37b4839f79c40671e0c2de059dde343795a3f583354",
+    "packages/one-map-react/dist/adapters/shared/map-capture.js": "3162a90d64d156b3dfe9bd45be0435589631dfda4f13f6e4925d10fb68ce551e",
+    "packages/one-map-react/dist/adapters/shared/missing-camera.d.ts": "968d9b1dd0e3998890e02ed92f74f5b466cb553d4c2ae76a31bd4175ca3b6ada",
+    "packages/one-map-react/dist/adapters/shared/missing-camera.js": "a8ffaad58d7685470ad3f4d590cd451179bab4d0205b74fcaea7a14953d86e78",
+    "packages/one-map-react/dist/adapters/shared/move-event.d.ts": "bc99f02ead0d4069621ddfb10df09d41a8eb644b7e6e7afa93652b23aa1d48bb",
+    "packages/one-map-react/dist/adapters/shared/move-event.js": "a22c87c049fbd52725049082811e43da3b2d2c8d2178d8dd364e045760d85cd3",
+    "packages/one-map-react/dist/adapters/shared/native-feature-state.d.ts": "93aec15989510b780d6da9dddadd96991a1c4a7fc42cfe618fb726fde0094d90",
+    "packages/one-map-react/dist/adapters/shared/native-feature-state.js": "600c822b1ee7a18938fefae6157f635d050105bc1c844043beeaecbe01727fae",
+    "packages/one-map-react/dist/adapters/shared/native-location.d.ts": "c3fdf2d469e50ead98568ac363f22ba56671539b9f4f17f58e8e2016e47c9752",
+    "packages/one-map-react/dist/adapters/shared/native-location.js": "dd482d6f216bb44d1c79f58963b8a9fda5834b55c30c674cfec0514f9815fa90",
+    "packages/one-map-react/dist/adapters/shared/native-map-presentation.d.ts": "e0839c621caf1f733e922008e840b3895f05a279c19640c0ad936a3f4a9aed8a",
+    "packages/one-map-react/dist/adapters/shared/native-map-presentation.js": "d580f41ffc1332af6ae12e160bc709d6999caa388638ebf8f3949ff4a6e60a37",
+    "packages/one-map-react/dist/adapters/shared/native-marker-overlay.d.ts": "4a4130b47a788f6664a40d43e97f3ef2f07e6e0bcffa7bda9b4d1279f2223ffc",
+    "packages/one-map-react/dist/adapters/shared/native-marker-overlay.js": "329344e6d132755a670dfc24abfae0d6213b3f43c886cc06caa17a37ad1a3728",
+    "packages/one-map-react/dist/adapters/shared/native-ornament-position.d.ts": "0820f73bd82fa4368a4dc0296b0bf1d75b5f8832e5d5df405f2a28b587c1468e",
+    "packages/one-map-react/dist/adapters/shared/native-ornament-position.js": "c809a838ae6f17a531bcc52c72ff66203537685688db35f27a64b635c4347121",
+    "packages/one-map-react/dist/adapters/shared/native-ui.d.ts": "7e00918318fb4addb42fe4f5ea34c6ba4354814cf6ace3c6f0a7cbe3a58e3076",
+    "packages/one-map-react/dist/adapters/shared/native-ui.js": "a5ce558ca787ddd4bfc771b13f8b2be63c64fb5a2953a773bae123626cb59fc8",
+    "packages/one-map-react/dist/adapters/shared/offline-service.d.ts": "bee53c28552a20661ab6faa54cf9c9780605690c89fb5272fd119382a08c0007",
+    "packages/one-map-react/dist/adapters/shared/offline-service.js": "9e69c77856610810248f83f38967c3508e4b68ba43f44f65d7b6e6eef184388d",
+    "packages/one-map-react/dist/adapters/shared/source-hit.d.ts": "f48d32dc6498a76e34a7b7d98e27a02ab9f121d75a5073c8b1f98c20b866c210",
+    "packages/one-map-react/dist/adapters/shared/source-hit.js": "cdd095f9f13216051ce8b7773eb59ad0cf8cc75f61d1d3dc8af2cac972d8d849",
+    "packages/one-map-react/dist/adapters/shared/terrain-values.d.ts": "45661740a2734c9d895614aee8c2c338248fa2a0262f980669258fc7a5261c27",
+    "packages/one-map-react/dist/adapters/shared/terrain-values.js": "dbcbfdf6f5d7310df56d2a9c32691e9a6ef227732867c8c81c1d412d9bb45bb0",
+    "packages/one-map-react/dist/adapters/shared/use-active-callback.d.ts": "9e0a7ed823d2a386e8d397748c7e52c246283c2d78f1f059258731838f1abb9a",
+    "packages/one-map-react/dist/adapters/shared/use-active-callback.js": "81d326b43a6ec19d5e3e7bf638285bfa0a7d0391776c44faeb4b627229420578",
+    "packages/one-map-react/dist/adapters/shared/use-frozen-value.d.ts": "32d0fba8c4772ee22c98f072309523b4e283badcf859bd6d84d55454425655d9",
+    "packages/one-map-react/dist/adapters/shared/use-frozen-value.js": "003b19549409217fe4d3bc470f2b5f9b25989fba0bbc23e95df036919addbee0",
+    "packages/one-map-react/dist/adapters/shared/use-native-controlled-camera.d.ts": "f7f856f73ef5c1bf91c13f5fa0f30dd561ded3a14f0a22165c9598a0642602c1",
+    "packages/one-map-react/dist/adapters/shared/use-native-controlled-camera.js": "a97b635fe426e1946e71f6c6329f6bd3e6a8fe213c3c4e3c56310a8bf8a60ad6",
+    "packages/one-map-react/dist/adapters/shared/use-native-marker-drag.d.ts": "67c430aabe02ba4a23377e1fa15b09258518d115d72a63dde78355964fd1b1b5",
+    "packages/one-map-react/dist/adapters/shared/use-native-marker-drag.js": "20f3cc3217117bd41d10c47551196e8d10a4e68881a12c5efa2ed0227a5ad2d3",
+    "packages/one-map-react/dist/adapters/shared/wrapper-values.d.ts": "2d12ddbb0a9fdf3304317c56f93de05009ea65f5dc1af2034ae50ed3fd8b2e44",
+    "packages/one-map-react/dist/adapters/shared/wrapper-values.js": "edbd56401af66abb8fb38a5528f0d2bd6f151c95ec770cfd43a4d09fc7992d83",
+    "packages/one-map-react/dist/adapters/web/contracts.d.ts": "9015cf88783a44825fd2da394e67bf15d2c3b9bff3af7860fce895f500756db5",
+    "packages/one-map-react/dist/adapters/web/contracts.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/adapters/web/convert-camera.d.ts": "047ef1b9b79a768493c9c0d86a66aa1e24ac731bd292acd163d2ad6b1e49bfb3",
+    "packages/one-map-react/dist/adapters/web/convert-camera.js": "266db425fae7438b9640f141cf880210b9437e3b9a67ecb5e381a5ebd5bcbcb8",
+    "packages/one-map-react/dist/adapters/web/convert-gestures.d.ts": "a1fb6591c97e5afac979f9033364e5fb4d9c7c5e87b0babf39ea157ba6b71eb8",
+    "packages/one-map-react/dist/adapters/web/convert-gestures.js": "2da6cd1369f1af8004e25c49f1075c1a574f3cb35f5221cab4527c82343891fa",
+    "packages/one-map-react/dist/adapters/web/convert-move-event.d.ts": "a3756c0a99f8bc4f0404f25156e23dd72f3a64f82f1608e8ee438932cd04e7f9",
+    "packages/one-map-react/dist/adapters/web/convert-move-event.js": "ca9d00c747836d260094960885dd019c00738a3243789e4c616d0d44690bc8c5",
+    "packages/one-map-react/dist/adapters/web/convert-query.d.ts": "22e15b916a330adc3df8aae5130d7d02cfc5f5f16e41e16cfc116fd78fc10e22",
+    "packages/one-map-react/dist/adapters/web/convert-query.js": "e4073d2b953406e925670880a8534b57d79e6dc778099fa98ea00dd357f70960",
+    "packages/one-map-react/dist/adapters/web/create-adapter.d.ts": "3e99fc763739db31c8f4dc6a440fc907eab5da1ad827c93b266c147de75679f0",
+    "packages/one-map-react/dist/adapters/web/create-adapter.js": "4fa8b55b94b9ebb84c6cd47d60434fc6c0ea93a910a5bc52fd1d45c839221c9a",
+    "packages/one-map-react/dist/adapters/web/images.d.ts": "6459c76128f8ab4f42a6e6e4d633c845a4d419ea83cfd8d11b317e499e1d2777",
+    "packages/one-map-react/dist/adapters/web/images.js": "4cb21fb82548a8e836ef856170230a107d343aa72068d5f5be88d36ea8aa6eea",
+    "packages/one-map-react/dist/adapters/web/location.d.ts": "87211c1534043ed6facb31d3806e90c2697d7d65e3d983299bb83c0db888a81f",
+    "packages/one-map-react/dist/adapters/web/location.js": "9103db53a3f5332f3a8a24a92714e1886bd65947ab9456f11508d6aab787bb55",
+    "packages/one-map-react/dist/adapters/web/map-ref.d.ts": "1132bdcbf5078b9791879f5be7a05090e302667fd4e9c7f15acc73b5d0d101c8",
+    "packages/one-map-react/dist/adapters/web/map-ref.js": "f36d3cc1aa01d38e35418ab05a33d7a4009fa7c4712ca93782fa8344f81ec15e",
+    "packages/one-map-react/dist/adapters/web/map.d.ts": "6498b72989dd58ae0cca20d262c1a06b33add5a064db7df39d74608d0909876f",
+    "packages/one-map-react/dist/adapters/web/map.js": "d60b41bc3f6bc7ccfeb6c8e35dc44fae6dc9f3d9a2b41e6e330f2a6459dec290",
+    "packages/one-map-react/dist/adapters/web/method-forwarders.d.ts": "005d53cdb736e1a52fe68355fcf366ea53f0ce2f1deff9a672a6e965c3d7c79c",
+    "packages/one-map-react/dist/adapters/web/method-forwarders.js": "e5131d09a9f006fd6bc6225391138026b34f8f9621ed306bda85247e1762a4a9",
+    "packages/one-map-react/dist/adapters/web/sources.d.ts": "94530bd361d6267fa2965bed2e9b6e3c65750e07dde7d3ad9a58624437e58c4e",
+    "packages/one-map-react/dist/adapters/web/sources.js": "a0aaabf521c6cb9dc50750a3096c986ef93aab1719751340a6302f163a4ec826",
+    "packages/one-map-react/dist/adapters/web/ui.d.ts": "8ab2ad0130ca95a77b85212ea6df1efe8b32226520b1cfd87718245993c36cf7",
+    "packages/one-map-react/dist/adapters/web/ui.js": "109c69f0f3cc69732d062fa062ed092cb4cb02af2f8f059aa49f6b435e1ad912",
+    "packages/one-map-react/dist/adapters/web/use-web-style-load.d.ts": "80bbf6bc505e0bdf9eeee4e684254048dbc470ebeb454fc120f2b79671e11e94",
+    "packages/one-map-react/dist/adapters/web/use-web-style-load.js": "44b622ba514f79f80b29515f9f4792b01f3a9098f16aab8bab4fee43a40072a5",
+    "packages/one-map-react/dist/contracts/adapter.d.ts": "fa7d53c0fe8d0c4c7ec6a5b91038c2617912913d7cef9563fe23513ce52dd93b",
+    "packages/one-map-react/dist/contracts/adapter.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/camera-types.d.ts": "7d53b85a91b1b013b5fb2fd40e95fa0ef86ce6ca83ba9798ed922c3f7ddc221c",
+    "packages/one-map-react/dist/contracts/camera-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/capture-types.d.ts": "7f701996173f787c002a258c681e0a4ac6a3e17cf03421253c97306c060010d9",
+    "packages/one-map-react/dist/contracts/capture-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/event-types.d.ts": "6839993a343004a262a072c1f02542ce3b158a0187062010e30b4695dc2a8986",
+    "packages/one-map-react/dist/contracts/event-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/images-types.d.ts": "db658b4e8af8d1fbe2e1036cdb61033c7aaf1f774b4e6d2cc66984caaff752e5",
+    "packages/one-map-react/dist/contracts/images-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/layer-types.d.ts": "ff73413241b84c069470f32f3dbda8ba7d660caa34df842855119124ddb79fc2",
+    "packages/one-map-react/dist/contracts/layer-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/location-types.d.ts": "7bfd62360b4df9fbcd34b3d8cfa6a9b3e832a3f16d49d9b1c44d64ece152cc7f",
+    "packages/one-map-react/dist/contracts/location-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/map-types.d.ts": "6e2ce23b417bfd7f83bb142a25b71de774de3757716c8d00b8032c0f016aede5",
+    "packages/one-map-react/dist/contracts/map-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/offline-types.d.ts": "95f55f24e21cd2dc0528c2e42a04deb83d9530f53d3f7c14df74d095366e589b",
+    "packages/one-map-react/dist/contracts/offline-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/query-types.d.ts": "45f6dd376ca4ac93c5e3afe3a83d0a849017eead82291a9994b3401c4145cc4b",
+    "packages/one-map-react/dist/contracts/query-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/source-types.d.ts": "52fe638ea348ae56887b04940c999e0c5bfa058b0d067ad4e53edddf34ddf8ff",
+    "packages/one-map-react/dist/contracts/source-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/style-types.d.ts": "7d81d857c899f34e2b670a27a9ebf051217f884d22b7fe75543dc2eefd90c84c",
+    "packages/one-map-react/dist/contracts/style-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/contracts/ui-types.d.ts": "56dc5cf94ed8eb71c8698d700a438e6d3a5846650384a1cbb9d21faf0c26d69d",
+    "packages/one-map-react/dist/contracts/ui-types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+    "packages/one-map-react/dist/facade/images.d.ts": "719634cdbeb11a05389ad7e8c1022255539e4ddbb925f4f28c5dc7d69fd93376",
+    "packages/one-map-react/dist/facade/images.js": "d237157fa4e9951df3a895ceb37b3972ab0a01158c4bfe2876f9f0d48d6a7d17",
+    "packages/one-map-react/dist/facade/layer.d.ts": "d0b79c8671ef55835ece808cd98b97201370d984a964160ce051c709c90f1d5e",
+    "packages/one-map-react/dist/facade/layer.js": "8a06099514fdd2b0dd86c11e32dcff994e53712a8870eaa9cc5821bc9f18f2e3",
+    "packages/one-map-react/dist/facade/map-context.d.ts": "38454b1fcee952979c807e6cdfaa5519428b660631483f2149e09b898955a28c",
+    "packages/one-map-react/dist/facade/map-context.js": "79dfbb06ed85678a8331745ce87fdc29d413ed492b0d8710cd3c2c4c74cb3f6d",
+    "packages/one-map-react/dist/facade/map-services.d.ts": "366802100078a8016335117bcf94071f8762820e9dce9b91e025933b53758088",
+    "packages/one-map-react/dist/facade/map-services.js": "e84e292b5d5540b9c4ec3325f0f3cc90d1dc15b328ef5a1205f5ee22599ca97e",
+    "packages/one-map-react/dist/facade/map-setup.d.ts": "e4a4f159cc0177ac87fc3b0eb17ffa79331a1b320029dfa26162e530975505f0",
+    "packages/one-map-react/dist/facade/map-setup.js": "c2eb9390ea28e486f277724e5159898ad141f59167ff1932f5e9a9994c221b90",
+    "packages/one-map-react/dist/facade/map.d.ts": "04310a425e2fe33235b704b345156af66cba330e351c4880ea36689c43221d30",
+    "packages/one-map-react/dist/facade/map.js": "ee5e185d225ff51a11aac5087dc08c17ad68f3f6143900a5c8d3fe9606a11aa2",
+    "packages/one-map-react/dist/facade/scope-map-services.d.ts": "a0cd98b5b154870a42afdef66c03c4900a379573c95833e807f5bb9d577d0ebb",
+    "packages/one-map-react/dist/facade/scope-map-services.js": "a5c65e40ab9118123e6d3b0bd9c899f903c7a1c9fc76570399d0407e2c765b49",
+    "packages/one-map-react/dist/facade/source.d.ts": "784e76ece80036b909b64dda574121cc7bce0dc739070023c3f3ca9f6adfd3d1",
+    "packages/one-map-react/dist/facade/source.js": "8652e8f0c5ac13063404dfadcc0c5fe46e9d518edb65be237bb2c3a1de2ad3c2",
+    "packages/one-map-react/dist/facade/ui.d.ts": "229525293edcbb0b68aaa6ec9abafbe67a5592de0294754bfaebb2968fb142d5",
+    "packages/one-map-react/dist/facade/ui.js": "9138547a649cf44716116122b7fbd20c3d51a695750f7478961ec68e57be3665",
+    "packages/one-map-react/dist/facade/use-geolocation-control.d.ts": "f1838fc4bcd797e8557c5ba0d0896ff467d5cb8bd4efb7564629a5726010ef19",
+    "packages/one-map-react/dist/facade/use-geolocation-control.js": "8f55da15aa2bc0b5eef2cf0f3ed93347bee965b023fa1256f8e87b5175c1cedb",
+    "packages/one-map-react/dist/facade/use-map-interactions.d.ts": "07d2e47d743e6c9e1f337e8937e1a326bc36b4f357b71fe2d2f2c190f23d5043",
+    "packages/one-map-react/dist/facade/use-map-interactions.js": "07a9a77a86a2ddb900d4243c4868d3816aabc86fe6ca409c5da9db668f8faf28",
+    "packages/one-map-react/dist/facade/use-stable-options.d.ts": "739619e4f5d60bc42cf28274f61f2171172bd98ad1a34fa406881e8c80cf992f",
+    "packages/one-map-react/dist/facade/use-stable-options.js": "d961c744666e1d8de10db63af9befe65f6215882e706384ad245f5b769b23ba6",
+    "packages/one-map-react/dist/facade/user-location.d.ts": "a3a25264d8e77afb5c5bc06228d805699bffc2fd8b986206fd2c69ba58498726",
+    "packages/one-map-react/dist/facade/user-location.js": "bf63f3def507ae413d87ed89cc959e4cfdd047a71a284144e9aa98e4f67d74bf",
+    "packages/one-map-react/dist/index.d.ts": "5e9bd774b7c691bb4e234bf4365ad687921c110e59f12625834bbdd390f9a961",
+    "packages/one-map-react/dist/index.js": "724c64292e8ae61fac48640d782128742731f0615c2f20a984e43ace7bbcf526",
+    "packages/one-map-react/dist/mapbox-native.d.ts": "85c8aa5d78f62e5e8a17d58403701686dcce84127c511ff9de4d8742a11c7224",
+    "packages/one-map-react/dist/mapbox-native.js": "07ae5dcb2d471bc84b9297fbabe0d16ab5815a5a687860fef7064f97556742b2",
+    "packages/one-map-react/dist/mapbox-web.d.ts": "a59198e17fadaff13a7f038295292bc64dbfa4e39b251b702a516ac82eaf8e1d",
+    "packages/one-map-react/dist/mapbox-web.js": "a417984f89122058a0b74de62eb26b22d5388e53accf13de84908851db563959",
+    "packages/one-map-react/dist/maplibre-native.d.ts": "aeb0daebc588429248cadac5352336a32b26ff8da0bc3132f3f81439efb383f2",
+    "packages/one-map-react/dist/maplibre-native.js": "f449744808b8d3925837412e48bdab21f6fb18d19a1e9b1ffac4ed91dbc08e6d",
+    "packages/one-map-react/dist/maplibre-web.d.ts": "9ffc2776bd33d4f25ca145b22fa7a0bb65b7eff67168550f54c04fb081ac16ad",
+    "packages/one-map-react/dist/maplibre-web.js": "3d3e86a29f5765bfece75cc174b6b8bc5244be527be273974a6b56f743bf73a2"
+  },
+  "builtSha256": "a2cc8dd7280641a3349c0b6fabd29405ba9cc49555f269f6ca9826bab43b00a9",
+  "library": {
+    "version": "0.1.0-rc.10",
+    "archive": "artifacts/one-map-react-0.1.0-rc.10.tgz",
+    "sha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+    "distSha256": "102ee764f2f51a2a4e39d503501e6c5a19703fa5e9ccf7f152c155431da0f94a",
+    "files": 209
+  },
+  "nativePeerDeltaVsHead": {
+    "@rnmapbox/maps": [
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/AbstractEventEmitter.kt",
+        "sha256": "310c73d7ccde6d21e2df1b599af9d54ee1cac4329d3285eb530f0adb2e511e34"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt",
+        "sha256": "7d778a3a23199ccc3b2183f8d8e878fe07b62f411059cb2ebb3aa52c13a64ce7"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt",
+        "sha256": "4c480e8fd45af183330c7fc1e9d8b6195c8bac1803a69d8723142f854c03c781"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrainManager.kt",
+        "sha256": "fe53f618db8b762f8df77e94a3e66108f0c265d769b8763aa8143220866d7ad1"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt",
+        "sha256": "68e2229819d9976d9889170bf8a7b67e0c00772650d52527ba095b5101f603ed"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXOfflineModule.kt",
+        "sha256": "2be43ed8605dbb214398f49360222addfd2133b2e719ab89a06d2d7b1b4f7b58"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXSnapshotModule.kt",
+        "sha256": "cdb62d5ac659591f8960430b21dcd519804a37f4d36b7ee42c40f136145d9cfa"
+      },
+      {
+        "path": "ios/RNMBX/Offline/RNMBXOfflineModule.m",
+        "sha256": "748a715bc4f8c072b2817bd32dbf54cd4e60feb56fd28309adce9439c94f7d74"
+      },
+      {
+        "path": "ios/RNMBX/Offline/RNMBXOfflineModule.swift",
+        "sha256": "84e81f0eded7453c296f322f5b1bfb1f42fc5fd0e14721d1c618079ec12039b0"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXCustomLocationProvider.swift",
+        "sha256": "602d8f007dd20cd7035a4fb819b5cc42a7c8cab51de5b90e267297f6831beaea"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXMapViewModule.h",
+        "sha256": "48a11e6bf971e9ac69631ae380508f80c07a4274b0409e165a9d14f034055bac"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXMapViewModule.mm",
+        "sha256": "85b17cfc69ba8298f141f9046e86006c45e88d5a450a58e0f5ffbbda83cffc51"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXModule.m",
+        "sha256": "0f7f81a9fd23832c45bdb63e2e2213a04224cec73eef9584869d6e72e3cd9cfd"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXModule.swift",
+        "sha256": "ec7b4ce716d4f104a8fbf193ca7492c7fc302408c5341b17b77f35ed42e4f8dc"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXTerrain.swift",
+        "sha256": "bff90e3198ff793d41f5659bb6a5ca2bd7b8ddefa274d6b39ebd3a2e973993b5"
+      },
+      {
+        "path": "lib/module/components/MapView.js",
+        "sha256": "73c380f69bcee933f482a7ab4f8c5342e24ff3fac00187e2391fa935c0b280cc"
+      },
+      {
+        "path": "lib/module/modules/offline/offlineManager.js",
+        "sha256": "f2ae28372a9fa88abd64f87eb91aec1a30f63a00da84bb99273eda2ec1180e91"
+      },
+      {
+        "path": "lib/module/modules/offline/offlineManagerLegacy.js",
+        "sha256": "225edc51f8cdf56f3898df93899864c88cc351cf569cf749646e03883eb42a6d"
+      },
+      {
+        "path": "lib/module/modules/snapshot/SnapshotOptions.js",
+        "sha256": "d8f3b962fb118c329c1762aca8ac8861bd32ce55649abe0e6c91299d4a1e615e"
+      },
+      {
+        "path": "lib/module/specs/NativeMapViewModule.js.map",
+        "sha256": "70f36d0abe7015b314e4bd97e2ec9d00d8161aa3eb19039f6e03d3e212ccf138"
+      },
+      {
+        "path": "lib/module/specs/NativeRNMBXMapViewModule.js",
+        "sha256": "22259ff8c5564e02fb9f74b2bb5b99c3d9b3e55d404b99331db7a7bbfa023af5"
+      },
+      {
+        "path": "lib/typescript/src/Mapbox.native.d.ts",
+        "sha256": "eacd1f9f59e1f1f5e0fa2d0ed0b3b1c459af23b288d3e0ba0b6a1bb398d50357"
+      },
+      {
+        "path": "lib/typescript/src/RNMBXModule.d.ts",
+        "sha256": "7605787145e10ad5ff4b1ec9791c29f514f0e143cb17a379fd7e56b38a832f3f"
+      },
+      {
+        "path": "lib/typescript/src/components/MapView.d.ts",
+        "sha256": "bb2f0eeaa8ed5530b581d173b585fc6431fb3bfa95d5f48aaf1f8d22b1f0bc2d"
+      },
+      {
+        "path": "lib/typescript/src/index.native.d.ts",
+        "sha256": "c649d68d1374deb1e1f1c5917dfa2e47309429fa03389078a5fecc43849b3367"
+      },
+      {
+        "path": "lib/typescript/src/modules/offline/offlineManager.d.ts",
+        "sha256": "d3e196f732b8552043ba571609ccd979d0a777ed4dc80ea1dfbff8c1d4630110"
+      },
+      {
+        "path": "lib/typescript/src/specs/NativeMapViewModule.d.ts.map",
+        "sha256": "07920fa4f63d2e11d7d3e313a76cc48fc81cef15b165aac9a8a5685c7e1106e3"
+      },
+      {
+        "path": "lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts",
+        "sha256": "347eac39cf8425e6d0190dee3f314acc3ba03bf0a007004eb899efa07f7416ee"
+      },
+      {
+        "path": "src/components/MapView.tsx",
+        "sha256": "91f18a52eb0117b4b4943028bbc3e4f9824935818e1ad816eb05252ddcece3b0"
+      },
+      {
+        "path": "src/modules/offline/offlineManager.ts",
+        "sha256": "4abcfdac45cbb2128b77e9f7a90298bcfa91b628061e4d4c8d76d4834432d83c"
+      },
+      {
+        "path": "src/modules/offline/offlineManagerLegacy.ts",
+        "sha256": "6c460e2fe55c60a75d3059d7967acfa7d2171058ad36b3a0b92f8c37be18bf4b"
+      },
+      {
+        "path": "src/modules/snapshot/SnapshotOptions.ts",
+        "sha256": "aea851f69e831b075fab237ef17da8455facfe5115dc088011d3bfe933eded80"
+      },
+      {
+        "path": "src/specs/NativeRNMBXMapViewModule.ts",
+        "sha256": "8481a234679c06b851e090751cb1af02689b988176faac2931061e4ef1ef2666"
+      },
+      {
+        "path": "android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt",
+        "sha256": "30aec84aa442a93124e9471668375e9a92b3d04e58d0fafa7145095e91785210"
+      },
+      {
+        "path": "android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt",
+        "sha256": "fd6708da8ee33961a51c147d8128fb73c562d4af1bf971d8815f085f38e8de1c"
+      },
+      {
+        "path": "ios/RNMBX/RNMBXStyleValue.swift",
+        "sha256": "54197fe538ac9def9cecbc2d63535b2cb397456e68f848be77da7ae42c978d10"
+      }
+    ],
+    "@maplibre/maplibre-react-native": [
+      {
+        "path": "android/src/main/java/org/maplibre/reactnative/modules/MLRNOfflineModule.kt",
+        "sha256": "b5b1c67044e1b7f9bba27d98dc86667e2a066a8ddaca1ee91d58f411f1daff78"
+      },
+      {
+        "path": "android/src/main/java/org/maplibre/reactnative/modules/MLRNStaticMapModule.kt",
+        "sha256": "6a65962a72c06b6175809ef9f7773b45cb63eb404304a004362901c6c6974ccd"
+      },
+      {
+        "path": "ios/modules/offline/MLRNOfflineModule.mm",
+        "sha256": "70404ed06ce8e9d7f854cd197606a6898355f53d6efa00094c83220a9ba41ab3"
+      },
+      {
+        "path": "ios/modules/static-map/MLRNStaticMapModule.mm",
+        "sha256": "3e460567839e887d4ac0124562fe87fe59200737de46c9a14a26c7b485a4478b"
+      },
+      {
+        "path": "lib/commonjs/modules/offline/OfflineManager.js",
+        "sha256": "5df4d57b7db6a757593c125befa94cdb7d67922ae7b1f6e6f416a54187b945da"
+      },
+      {
+        "path": "lib/module/modules/offline/OfflineManager.js",
+        "sha256": "1a5c565f7935752b86f6347ea54bb09a68bc75cb20d541f4a64b088f0692ad80"
+      },
+      {
+        "path": "lib/typescript/module/components/sources/geojson-source/GeoJSONSource.d.ts",
+        "sha256": "57c74577f369fed142989b805a5bce1b179a3b7355ecd086a52d261b4024cac8"
+      },
+      {
+        "path": "lib/typescript/module/components/sources/vector-source/VectorSource.d.ts",
+        "sha256": "7da90c85c534968ed4e1629e0ef86c7099c515f7c249a8bc7c6cad9d318f5916"
+      },
+      {
+        "path": "lib/typescript/module/index.d.ts",
+        "sha256": "af6bf21835f6ce5593630333f3c340df64df4a48f7ca980dc8546de68de5f9ed"
+      },
+      {
+        "path": "src/modules/offline/OfflineManager.ts",
+        "sha256": "063fec04deea367ce0e31469d7ebf75ebae7c2bd41e4a1d3a5848869f987447d"
+      },
+      {
+        "path": "android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt",
+        "sha256": "1a3b84a8e7502bd2f5c01bedf4648cba361c2e68b8725ae694fb7f7ac7137efd"
+      },
+      {
+        "path": "ios/components/camera/MLRNCamera.m",
+        "sha256": "7721c57a26df98f4f052e85fe1c857ac608d94268913e394ec3b0f5719b368cd"
+      },
+      {
+        "path": "android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolver.kt",
+        "sha256": "50577e95b54473938c0af80efddacca33d1f818f0865bc23a0a2b876cf9dca61"
+      }
+    ]
+  },
+  "repairs": {
+    "rnmapboxAndroid": "Both supported wrapper patches forward SDK set/remove results unchanged; remove rejects source_not_attached before dispatch while target source is absent or the previous GeoJSON family still occupies a returning vector id.",
+    "maplibreAndroid": "Native resolver reports view_not_attached for null or thrown unpublished Fabric view; thrown requests no longer wait on an unpopulated assignment queue.",
+    "nativeShared": "Default feature-state cleanup recognizes only peer-defined attachment gaps, retaining journal and retrying on later frames. Explicit caller operations still reject; other native failures retain existing poisoning/report-once behavior.",
+    "rnmapboxIos": "Both supported wrapper patches cast converted valueObj, preserving supplied packed RGBA in raw light colors instead of testing the outer dictionary.",
+    "acceptanceFixture": "White extrusion with known feature9010, blue/green/white light updates and style replacement; actual central captured color pixels required, with former colors and edge ornaments rejected."
+  },
+  "routine": {
+    "formatLint": "PASS337 formatted/319 linted; no warnings/errors",
+    "types": "PASS all4 root and3 app/shared projects",
+    "unit": "PASS893 Vitest and280 Jest",
+    "standalone": "PASS complete remainder after sandbox-only process signal denial; initial first-attempt EPERM preserved. No product assertion failure remained.",
+    "nativeRegression": "PASS actual Kotlin peer functions and actual Swift color conversion; native compiler checks against both RNMapbox10.3.7 and10.3.8; MapLibre11.5.0 null/thrown publication gaps; patch reverse/apply roundtrips.",
+    "observer": "PASS Node+Bun light-color pixel observer checks, including rejection of red fallback/stale colors/missing style load/absent known feature; component fixture props and committed-read tests pass.",
+    "build": "PASS normal library/shared package builds",
+    "packedConsumers": [
+      "records/evidence/source-lifetime-light-test-package-minimum.json",
+      "records/evidence/source-lifetime-light-test-peers-minimum.json",
+      "records/evidence/source-lifetime-light-test-example-resolution-minimum.json",
+      "records/evidence/source-lifetime-light-test-package-newest.json",
+      "records/evidence/source-lifetime-light-test-peers-newest.json",
+      "records/evidence/source-lifetime-light-test-example-resolution-newest.json"
+    ],
+    "postRoutineRunnerChange": "Moved new iOS-only scope validation before launch; maintained entrypoints and light observer checks passed; formatting/docs passed."
+  },
+  "preparedConsumer": {
+    "path": "/private/tmp/one-map-lifetime-light-repair/consumer",
+    "appId": "org.onemap.acceptance.lifetime.light.rc10",
+    "archiveFilesVerified": 209,
+    "configDelta": "Only both application identifier literals changed in private app.config.ts; root app config unchanged. Both SDKs use maintained Expo plugins.",
+    "configSha256": "920e0dcfee9c9995206a998d5879cf29d6241d33901ef04ed655f97839e6fedf",
+    "privateTuple": {
+      "expo": "57.0.23",
+      "react": "19.2.3",
+      "reactNative": "0.86.3",
+      "rnmapbox": "10.3.8",
+      "maplibreReactNative": "11.5.0",
+      "mapboxSdk": "11.23.1",
+      "maplibreIos": "6.31.0",
+      "maplibreAndroid": "13.6.1"
+    },
+    "supportBoundary": "Private Expo tuple does not widen declared RN peer ^0.87.1; minimum-peer patches execute compiler regressions and exact packed-consumer checks, while affected app acceptance uses pinned maintained Expo tuple.",
+    "preparationSources": [
+      "https://docs.expo.dev/versions/v57.0.0/",
+      "https://docs.expo.dev/workflow/continuous-native-generation/"
+    ]
+  },
+  "acceptancePlan": {
+    "workerModel": "gpt-6-luna",
+    "reasoning": "medium",
+    "resources": "One exclusive owner of Metro8081, fixture8798, status8799, native build/install dirs, TF07_Acceptance AVD, dedicated iOS simulator A39DDBE0-026A-4444-82D2-C8350515E555. Native runs sequential.",
+    "commands": [
+      "node scripts/tf06-queries-smoke.mjs android lifetimes mapbox (3 fresh runs)",
+      "node scripts/tf06-queries-smoke.mjs android lifetimes maplibre (3 fresh runs)",
+      "node scripts/tf06-queries-smoke.mjs ios lifetimes mapbox",
+      "node scripts/tf06-queries-smoke.mjs ios lifetimes maplibre",
+      "TF09_SCOPE=light-color node scripts/tf09-rendering-smoke.mjs ios mapbox"
+    ],
+    "repeatReason": "Original Android outcomes changed with logging. Three preplanned fresh uninstrumented app/fixture runs per engine check the timing-sensitive replacement sequence.",
+    "excluded": "No full UI/gesture, physical device or screenreader audits solely for these repairs; unrelated prior iOS drag capability gap remains open.",
+    "expectedDuration": "Native rebuilds20\u201360minutes each; affected runtime scopes about15\u201330minutes."
+  },
+  "frozenAt": "2026-10-21T05:43:48.290602+00:00",
+  "privateLaunchers": {
+    "files": {
+      "with-env.mjs": "e00fe069b9a734d6a1d16c9fba5ea927d094ecb066cdde30bde13006edbf27b5",
+      "run-acceptance.mjs": "55136e3a1cf97495182baa43f9472b85b97decebb8338f4c8e340fd8dd5da9df",
+      "wrapper-self-check.mjs": "2c62b1793498f0f50c65ce4293d04e0f050d4f5751fc041a60c5a03faa2b788b"
+    },
+    "selfChecks": "PASS Node and Bun: true exit0/1/signals, iOS debug image selection, frozen private built bytes, fresh receipt names, unsupported scopes and no credentials in owner/exit metadata.",
+    "runtimePng": "Coordinator verified existing pngjs7.0.0 at root node_modules/.bun/pngjs@7.0.0/node_modules; no duplicate tool install."
+  },
+  "acceptanceWorker": {
+    "name": "/root/native_repairs",
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "status": "complete"
+  },
+  "acceptance": {
+    "androidSourceLifetimes": [
+      {
+        "name": "android-mapbox-lifetimes-1",
+        "platform": "android",
+        "engine": "mapbox",
+        "scope": "lifetimes",
+        "startedAt": "2026-10-21T05:56:25.065Z",
+        "endedAt": "2026-10-21T05:56:39.939Z",
+        "code": 0,
+        "signal": null,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "apk": "consumer/apps/expo/android/build/outputs/apk/debug/app-debug.apk",
+          "apkSha256": "d3182960e185d0616e0ffa501485de10d8b92862fc359361e92725a8699c5b53",
+          "installedMatchesBuild": true
+        },
+        "result": {
+          "status": "passed",
+          "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "vector-queries": "ok",
+            "key-remove": "ok",
+            "whole-remove": "ok",
+            "vector-namespaces": "ok",
+            "vector-remount": "cleared",
+            "vector-style": "cleared",
+            "vector-to-geojson": "cleared",
+            "geojson-to-vector": "cleared",
+            "final-remount": "cleared",
+            "error": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "fixtureRequests": [
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            }
+          ]
+        },
+        "rawLogSha256": "cc2a62252c1dc29bf2229deb67c33700fdccbee5c08dee36ce5207d013122174"
+      },
+      {
+        "name": "android-mapbox-lifetimes-2",
+        "platform": "android",
+        "engine": "mapbox",
+        "scope": "lifetimes",
+        "startedAt": "2026-10-21T05:57:00.094Z",
+        "endedAt": "2026-10-21T05:57:11.968Z",
+        "code": 0,
+        "signal": null,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "apk": "consumer/apps/expo/android/build/outputs/apk/debug/app-debug.apk",
+          "apkSha256": "d3182960e185d0616e0ffa501485de10d8b92862fc359361e92725a8699c5b53",
+          "installedMatchesBuild": true
+        },
+        "result": {
+          "status": "passed",
+          "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "vector-queries": "ok",
+            "key-remove": "ok",
+            "whole-remove": "ok",
+            "vector-namespaces": "ok",
+            "vector-remount": "cleared",
+            "vector-style": "cleared",
+            "vector-to-geojson": "cleared",
+            "geojson-to-vector": "cleared",
+            "final-remount": "cleared",
+            "error": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "fixtureRequests": [
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            }
+          ]
+        },
+        "rawLogSha256": "a03365b7e66f632c8ed2fd1286f01b530b52971e166bb9dafdcf1b205f7603f7"
+      },
+      {
+        "name": "android-mapbox-lifetimes-3",
+        "platform": "android",
+        "engine": "mapbox",
+        "scope": "lifetimes",
+        "startedAt": "2026-10-21T05:57:18.787Z",
+        "endedAt": "2026-10-21T05:57:30.507Z",
+        "code": 0,
+        "signal": null,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "apk": "consumer/apps/expo/android/build/outputs/apk/debug/app-debug.apk",
+          "apkSha256": "d3182960e185d0616e0ffa501485de10d8b92862fc359361e92725a8699c5b53",
+          "installedMatchesBuild": true
+        },
+        "result": {
+          "status": "passed",
+          "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "vector-queries": "ok",
+            "key-remove": "ok",
+            "whole-remove": "ok",
+            "vector-namespaces": "ok",
+            "vector-remount": "cleared",
+            "vector-style": "cleared",
+            "vector-to-geojson": "cleared",
+            "geojson-to-vector": "cleared",
+            "final-remount": "cleared",
+            "error": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "fixtureRequests": [
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            }
+          ]
+        },
+        "rawLogSha256": "4ecb6898ab5c05c63a264b751d7b8d16063b71bc5cfd837917fb5d6c2eed01a8"
+      },
+      {
+        "name": "android-maplibre-lifetimes-1",
+        "platform": "android",
+        "engine": "maplibre",
+        "scope": "lifetimes",
+        "startedAt": "2026-10-21T05:57:39.343Z",
+        "endedAt": "2026-10-21T05:57:53.727Z",
+        "code": 0,
+        "signal": null,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "apk": "consumer/apps/expo/android/build/outputs/apk/debug/app-debug.apk",
+          "apkSha256": "d3182960e185d0616e0ffa501485de10d8b92862fc359361e92725a8699c5b53",
+          "installedMatchesBuild": true
+        },
+        "result": {
+          "status": "passed",
+          "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "vector-queries": "ok",
+            "key-remove": "ok",
+            "whole-remove": "ok",
+            "vector-namespaces": "ok",
+            "vector-remount": "cleared",
+            "vector-style": "cleared",
+            "vector-to-geojson": "cleared",
+            "geojson-to-vector": "cleared",
+            "final-remount": "cleared",
+            "error": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "fixtureRequests": [
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            }
+          ]
+        },
+        "rawLogSha256": "465adeb211076e80ac38638ad638998a6243f3b2a5769a3c905b135774f9ad42"
+      },
+      {
+        "name": "android-maplibre-lifetimes-2",
+        "platform": "android",
+        "engine": "maplibre",
+        "scope": "lifetimes",
+        "startedAt": "2026-10-21T05:58:02.034Z",
+        "endedAt": "2026-10-21T05:58:15.916Z",
+        "code": 0,
+        "signal": null,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "apk": "consumer/apps/expo/android/build/outputs/apk/debug/app-debug.apk",
+          "apkSha256": "d3182960e185d0616e0ffa501485de10d8b92862fc359361e92725a8699c5b53",
+          "installedMatchesBuild": true
+        },
+        "result": {
+          "status": "passed",
+          "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "vector-queries": "ok",
+            "key-remove": "ok",
+            "whole-remove": "ok",
+            "vector-namespaces": "ok",
+            "vector-remount": "cleared",
+            "vector-style": "cleared",
+            "vector-to-geojson": "cleared",
+            "geojson-to-vector": "cleared",
+            "final-remount": "cleared",
+            "error": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "fixtureRequests": [
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            }
+          ]
+        },
+        "rawLogSha256": "ff94db652c4f573073643d507cec76d226527b900b9a5ae612ee09d8f865c38a"
+      },
+      {
+        "name": "android-maplibre-lifetimes-3",
+        "platform": "android",
+        "engine": "maplibre",
+        "scope": "lifetimes",
+        "startedAt": "2026-10-21T05:58:24.572Z",
+        "endedAt": "2026-10-21T05:58:39.373Z",
+        "code": 0,
+        "signal": null,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "apk": "consumer/apps/expo/android/build/outputs/apk/debug/app-debug.apk",
+          "apkSha256": "d3182960e185d0616e0ffa501485de10d8b92862fc359361e92725a8699c5b53",
+          "installedMatchesBuild": true
+        },
+        "result": {
+          "status": "passed",
+          "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "vector-queries": "ok",
+            "key-remove": "ok",
+            "whole-remove": "ok",
+            "vector-namespaces": "ok",
+            "vector-remount": "cleared",
+            "vector-style": "cleared",
+            "vector-to-geojson": "cleared",
+            "geojson-to-vector": "cleared",
+            "final-remount": "cleared",
+            "error": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "fixtureRequests": [
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            }
+          ]
+        },
+        "rawLogSha256": "8b3fda7af11c8449d7fe3c54b3c0ad4680f2225d2922335f83c469f847b160da"
+      }
+    ],
+    "iosInitialOnboardingFailure": {
+      "name": "ios-mapbox-lifetimes",
+      "platform": "ios",
+      "engine": "mapbox",
+      "scope": "lifetimes",
+      "startedAt": "2026-10-21T05:59:40.463Z",
+      "endedAt": "2026-10-21T06:09:47.172Z",
+      "code": 1,
+      "signal": null,
+      "binary": {
+        "app": "ios-derived/Build/Products/Debug-iphonesimulator/OneMap.app",
+        "primary": "OneMap",
+        "primarySha256": "0bb2ffc7f2d5b7c60ab0f2cf3ba76ebdcb7a78800036da706b259f806a9fd483",
+        "debug": "OneMap.debug.dylib",
+        "debugSha256": "2128472d94350441ec1a793ff5ba26fe7192c14e0e94611326ba72c866568335",
+        "installedMatchesBuild": true
+      },
+      "reason": "OS first-use Open in One Map confirmation blocked the development-client deeplink. Runner reached configured600s timeout with no scenario status; no product assertion or source-lifetime field was exercised.",
+      "rawLogSha256": "68674fa8caa1f1a7005e4e7486bde0cc098781faea5399f8352d7ef358993b2e",
+      "correction": "Private one-shot XCTest helper accepted observed SpringBoard Open button; reported TEST SUCCEEDED after timeout. Fresh run authorized against unchanged artifact."
+    },
+    "iosSourceLifetimes": [
+      {
+        "name": "ios-mapbox-lifetimes-retry1",
+        "platform": "ios",
+        "engine": "mapbox",
+        "scope": "lifetimes",
+        "startedAt": "2026-10-21T06:10:16.188Z",
+        "endedAt": "2026-10-21T06:10:28.182Z",
+        "code": 0,
+        "signal": null,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "app": "ios-derived/Build/Products/Debug-iphonesimulator/OneMap.app",
+          "primary": "OneMap",
+          "primarySha256": "0bb2ffc7f2d5b7c60ab0f2cf3ba76ebdcb7a78800036da706b259f806a9fd483",
+          "debug": "OneMap.debug.dylib",
+          "debugSha256": "2128472d94350441ec1a793ff5ba26fe7192c14e0e94611326ba72c866568335",
+          "installedMatchesBuild": true
+        },
+        "result": {
+          "status": "passed",
+          "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "vector-queries": "ok",
+            "key-remove": "ok",
+            "whole-remove": "ok",
+            "vector-namespaces": "ok",
+            "vector-remount": "cleared",
+            "vector-style": "cleared",
+            "vector-to-geojson": "cleared",
+            "geojson-to-vector": "cleared",
+            "final-remount": "cleared",
+            "error": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "fixtureRequests": [
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            }
+          ]
+        },
+        "rawLogSha256": "56ee503156788f51b293801d69d7d8f8535105b163540167f923284eff2f6219"
+      },
+      {
+        "name": "ios-maplibre-lifetimes",
+        "platform": "ios",
+        "engine": "maplibre",
+        "scope": "lifetimes",
+        "startedAt": "2026-10-21T06:10:39.220Z",
+        "endedAt": "2026-10-21T06:10:52.923Z",
+        "code": 0,
+        "signal": null,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "app": "ios-derived/Build/Products/Debug-iphonesimulator/OneMap.app",
+          "primary": "OneMap",
+          "primarySha256": "0bb2ffc7f2d5b7c60ab0f2cf3ba76ebdcb7a78800036da706b259f806a9fd483",
+          "debug": "OneMap.debug.dylib",
+          "debugSha256": "2128472d94350441ec1a793ff5ba26fe7192c14e0e94611326ba72c866568335",
+          "installedMatchesBuild": true
+        },
+        "result": {
+          "status": "passed",
+          "line": "TF06L loaded=1 vector-queries=ok key-remove=ok whole-remove=ok vector-namespaces=ok vector-remount=cleared vector-style=cleared vector-to-geojson=cleared geojson-to-vector=cleared final-remount=cleared error=none phase=done done=1",
+          "fields": {
+            "loaded": "1",
+            "vector-queries": "ok",
+            "key-remove": "ok",
+            "whole-remove": "ok",
+            "vector-namespaces": "ok",
+            "vector-remount": "cleared",
+            "vector-style": "cleared",
+            "vector-to-geojson": "cleared",
+            "geojson-to-vector": "cleared",
+            "final-remount": "cleared",
+            "error": "none",
+            "phase": "done",
+            "done": "1"
+          },
+          "fixtureRequests": [
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 0,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 1,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 3,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 715
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 328,
+              "y": 714
+            },
+            {
+              "revision": 4,
+              "z": 11,
+              "x": 327,
+              "y": 714
+            }
+          ]
+        },
+        "rawLogSha256": "3d930dc5fa6f123961c02be08ded06b662fe51880f274d32e5fe58f014fa87c7"
+      }
+    ],
+    "iosInitialLightFixtureFailure": {
+      "exit": {
+        "name": "ios-mapbox-light-color",
+        "platform": "ios",
+        "scope": "light-color",
+        "engine": "mapbox",
+        "args": [
+          "scripts/tf09-rendering-smoke.mjs",
+          "ios",
+          "mapbox"
+        ],
+        "cwd": "/private/tmp/one-map-lifetime-light-repair/consumer",
+        "startedAt": "2026-10-21T06:11:04.988Z",
+        "wrapperPid": 39179,
+        "childPid": 39201,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+        "builtSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+        "binary": {
+          "app": "ios-derived/Build/Products/Debug-iphonesimulator/OneMap.app",
+          "primary": "OneMap",
+          "primarySha256": "0bb2ffc7f2d5b7c60ab0f2cf3ba76ebdcb7a78800036da706b259f806a9fd483",
+          "debug": "OneMap.debug.dylib",
+          "debugSha256": "2128472d94350441ec1a793ff5ba26fe7192c14e0e94611326ba72c866568335",
+          "installedMatchesBuild": true
+        },
+        "endedAt": "2026-10-21T06:11:59.311Z",
+        "code": 1,
+        "signal": null
+      },
+      "result": {
+        "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+        "platform": "ios",
+        "engine": "mapbox",
+        "executionScope": "light-color",
+        "artifact": "102ee764f2f51a2a4e39d503501e6c5a19703fa5e9ccf7f152c155431da0f94a",
+        "nativeIdentity": "{\"app\":\"ios-derived/Build/Products/Debug-iphonesimulator/OneMap.app\",\"primary\":\"OneMap\",\"primarySha256\":\"0bb2ffc7f2d5b7c60ab0f2cf3ba76ebdcb7a78800036da706b259f806a9fd483\",\"debug\":\"OneMap.debug.dylib\",\"debugSha256\":\"2128472d94350441ec1a793ff5ba26fe7192c14e0e94611326ba72c866568335\",\"installedMatchesBuild\":true}",
+        "outcomes": [
+          {
+            "name": "light colors draw independently and survive style replacement",
+            "status": "failed",
+            "error": "AssertionError [ERR_ASSERTION]: Light blue rendered pixels: {\"blue\":0,\"green\":0,\"white\":0}"
+          }
+        ]
+      },
+      "diagnosis": "Fixture calibration only: intensity0.25 keeps shadowed white faces tinted under legacy flat-light shader. At intensity1 an unlit face has zero directional light and complementary0.3-channel ambient floor, so blue can render olive. All original pixel assertions unchanged; library archive/native sources/binaries unchanged.",
+      "imageSha256": "0070c7cfadaffa6b16654657252d095ee17a483066ae6b8c8aac07f1ed47693e"
+    },
+    "iosLightColor": {
+      "exit": {
+        "name": "ios-mapbox-light-color-retry1",
+        "platform": "ios",
+        "scope": "light-color",
+        "engine": "mapbox",
+        "args": [
+          "scripts/tf09-rendering-smoke.mjs",
+          "ios",
+          "mapbox"
+        ],
+        "cwd": "/private/tmp/one-map-lifetime-light-repair/consumer",
+        "startedAt": "2026-10-21T06:15:06.180Z",
+        "wrapperPid": 43223,
+        "childPid": 43233,
+        "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+        "sourceSha256": "d5e15ac9428a6a3001252f95f011f94d06e465cd328645e611e96d48eee29112",
+        "builtSha256": "a2cc8dd7280641a3349c0b6fabd29405ba9cc49555f269f6ca9826bab43b00a9",
+        "binary": {
+          "app": "ios-derived/Build/Products/Debug-iphonesimulator/OneMap.app",
+          "primary": "OneMap",
+          "primarySha256": "0bb2ffc7f2d5b7c60ab0f2cf3ba76ebdcb7a78800036da706b259f806a9fd483",
+          "debug": "OneMap.debug.dylib",
+          "debugSha256": "2128472d94350441ec1a793ff5ba26fe7192c14e0e94611326ba72c866568335",
+          "installedMatchesBuild": true
+        },
+        "endedAt": "2026-10-21T06:15:21.749Z",
+        "code": 0,
+        "signal": null
+      },
+      "result": {
+        "scope": "targeted terrain/projection/light/hillshade integration; advanced extension acceptance remains separately enumerated",
+        "platform": "ios",
+        "engine": "mapbox",
+        "executionScope": "light-color",
+        "artifact": "102ee764f2f51a2a4e39d503501e6c5a19703fa5e9ccf7f152c155431da0f94a",
+        "nativeIdentity": "{\"app\":\"ios-derived/Build/Products/Debug-iphonesimulator/OneMap.app\",\"primary\":\"OneMap\",\"primarySha256\":\"0bb2ffc7f2d5b7c60ab0f2cf3ba76ebdcb7a78800036da706b259f806a9fd483\",\"debug\":\"OneMap.debug.dylib\",\"debugSha256\":\"2128472d94350441ec1a793ff5ba26fe7192c14e0e94611326ba72c866568335\",\"installedMatchesBuild\":true}",
+        "outcomes": [
+          {
+            "name": "light colors draw independently and survive style replacement",
+            "status": "passed",
+            "observation": {
+              "blue": {
+                "pixels": {
+                  "blue": 201600,
+                  "green": 0,
+                  "white": 0
+                },
+                "styleLoads": 1,
+                "featureIds": [
+                  9010,
+                  9010
+                ]
+              },
+              "green": {
+                "pixels": {
+                  "blue": 0,
+                  "green": 201600,
+                  "white": 0
+                },
+                "styleLoads": 1,
+                "featureIds": [
+                  9010,
+                  9010
+                ]
+              },
+              "replaced": {
+                "pixels": {
+                  "blue": 0,
+                  "green": 201600,
+                  "white": 0
+                },
+                "styleLoads": 2,
+                "featureIds": [
+                  9010,
+                  9010
+                ]
+              },
+              "white": {
+                "pixels": {
+                  "blue": 0,
+                  "green": 0,
+                  "white": 201600
+                },
+                "styleLoads": 2,
+                "featureIds": [
+                  9010,
+                  9010
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "harnessRevisions": [
+    {
+      "at": "2026-10-21T06:14:49.198404+00:00",
+      "priorSourceSha256": "1552231f1e2d51ca9102245393cd3ceb510847166e9c2ef2a1be58891a21b19d",
+      "priorBuiltSha256": "536d4ded29acb4a139e0a2987e96b48b3a042992e68f33c69eac024199f5568a",
+      "reason": "Fixture calibration only: intensity0.25 keeps shadowed white faces tinted under legacy flat-light shader. At intensity1 an unlit face has zero directional light and complementary0.3-channel ambient floor, so blue can render olive. All original pixel assertions unchanged; library archive/native sources/binaries unchanged.",
+      "changes": {
+        "sourceFiles": {
+          "packages/example-map/src/scenarios/tf09-scene.tsx": {
+            "before": "362a0a98e2b829155b658b57493752b7a68b612901242c1b8b6c9a0195389ad9",
+            "after": "a21581be76e7a93d2b55644ad572f6db2d0cc4d1ee65a221ff1c7029f73b27cb"
+          },
+          "packages/example-map/test/acceptance-scenes.web.test.tsx": {
+            "before": "fce61509532a96d6f4df23b33fb561eec937e1b6af8299daf49df0c0bcf1bc53",
+            "after": "96457a3be0cfffbd4b1aa4cd080a71481939291bbddec62b1a51edc8a9c291c9"
+          }
+        },
+        "builtFiles": {
+          "packages/example-map/dist/scenarios/tf09-scene.js": {
+            "before": "1a868b3d4ce9ecd95f42fbf144cee9952ef48d6401d903a66d60330c8b8181fa",
+            "after": "a6d0a57e00620455c311c95f517b7067c78bc1421a70df0e2f4de2afc72648d9"
+          }
+        }
+      },
+      "checks": "PASS fixture component3 tests; pixel-observer rejection checks; formatting/lint; all3 app/shared type projects; shared normal build.",
+      "basis": "Inspected installed mapbox-gl3.32.0 fillExtrusionVert shader: NdotL lower bound1-intensity and complementary ambient floor0.3*(1-lightcolor). Native captured olive matched that shadowed-face formula."
+    }
+  ],
+  "currentDisposition": {
+    "fixedAndVerified": [
+      "RNMapbox Android SDK feature-state error forwarding and returning-source attachment guard",
+      "MapLibre Android unpublished Fabric view rejection and later cleanup retry",
+      "Shared native feature-state journal retention during peer-defined attachment gaps",
+      "RNMapbox iOS raw light-color conversion for both supported wrapper patches"
+    ],
+    "nativeAcceptance": "PASS six Android lifetime runs, two iOS lifetime runs, and iOS Mapbox actual blue/green/style-replacement/white light pixels. Eight lifetime runs use original frozen fixture identity; color retry uses recorded calibrated fixture revision with unchanged archive/native images.",
+    "firstAttemptOutcomes": "Android6/6 and iOS MapLibre passed first attempt. iOS Mapbox lifetime initially timed out behind first-use system launch prompt; verified one-shot XCTest input resolved it. Light fixture initially used full contrast on shadowed face; fixture intensity calibrated with pixel assertions unchanged, then passed.",
+    "unverifiedOrExcluded": [
+      "Full native acceptance matrix outside affected scope",
+      "Physical devices and full VoiceOver/TalkBack audits",
+      "Existing iOS canonical interrupted-touch and multiple-pointer drag driver gap",
+      "Two owner-excluded RNMapbox cache operations",
+      "Declared RN peer remains ^0.87.1; runtime used private Expo/RN0.86.3 tuple, exact support-endpoint packed checks and native compiler regressions passed."
+    ],
+    "releaseReady": "Not determined by this scoped repair checkpoint."
+  },
+  "nativeExecution": {
+    "checkpoint": {
+      "sourceSha256": "d5e15ac9428a6a3001252f95f011f94d06e465cd328645e611e96d48eee29112",
+      "builtSha256": "a2cc8dd7280641a3349c0b6fabd29405ba9cc49555f269f6ca9826bab43b00a9",
+      "archiveSha256": "36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec",
+      "distSha256": "102ee764f2f51a2a4e39d503501e6c5a19703fa5e9ccf7f152c155431da0f94a",
+      "verifyCommand": "node scripts/verify-example-checkpoint.mjs records/evidence/source-lifetime-light-repairs.json",
+      "verifyExit": 0
+    },
+    "android": {
+      "device": "TF07_Acceptance / emulator-5554",
+      "initialState": "off; acceptance package absent; display 1080x2400 at 420 dpi",
+      "toolchain": "Android emulator 37.1.11.0; Gradle 9.3.1; buildTools 36.0.0; compile/target SDK 36; min SDK 24; NDK 27.1.12297006",
+      "command": "./gradlew --no-daemon --max-workers=2 --no-parallel --console=plain :app:assembleDebug",
+      "buildExit": 0,
+      "buildDuration": "2m21s",
+      "apk": "consumer/apps/expo/android/build/outputs/apk/debug/app-debug.apk",
+      "apkSha256": "d3182960e185d0616e0ffa501485de10d8b92862fc359361e92725a8699c5b53",
+      "installedMatchesBuild": true,
+      "acceptance": {
+        "mapbox": [
+          "android-mapbox-lifetimes-1",
+          "android-mapbox-lifetimes-2",
+          "android-mapbox-lifetimes-3"
+        ],
+        "maplibre": [
+          "android-maplibre-lifetimes-1",
+          "android-maplibre-lifetimes-2",
+          "android-maplibre-lifetimes-3"
+        ],
+        "allExitCodes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "allCompleteSourceLifetimeAssertionsPassed": true
+      },
+      "cleanup": "Acceptance app uninstalled; dedicated emulator stopped; adb inventory empty; acceptance ports free. Rotation settings were never changed by the worker (raw accelerometer_rotation/user_rotation values were not sampled)."
+    },
+    "ios": {
+      "device": "One Map Migration Acceptance - iPhone SE 3 / A39DDBE0-026A-4444-82D2-C8350515E555",
+      "initialState": "shutdown",
+      "toolchain": "Xcode 27.0 (27A266a); iOS Simulator SDK/runtime 27.0; Expo 57.0.23; React Native 0.86.3; RNMapbox 10.3.8; Mapbox iOS 11.23.1; MapLibre iOS 6.31.0",
+      "podInstallExit": 0,
+      "buildCommand": "xcodebuild -workspace OneMap.xcworkspace -scheme OneMap -configuration Debug -destination 'platform=iOS Simulator,id=A39DDBE0-026A-4444-82D2-C8350515E555' -derivedDataPath /private/tmp/one-map-lifetime-light-repair/ios-derived CODE_SIGNING_ALLOWED=NO build",
+      "buildExit": 0,
+      "primarySha256": "0bb2ffc7f2d5b7c60ab0f2cf3ba76ebdcb7a78800036da706b259f806a9fd483",
+      "debugDylibSha256": "2128472d94350441ec1a793ff5ba26fe7192c14e0e94611326ba72c866568335",
+      "installedMatchesBuild": true,
+      "lifetimeAcceptance": {
+        "ios-mapbox-lifetimes": {
+          "exit": 1,
+          "result": "No status after 600s; initial OS Open-in-app confirmation blocked launch."
+        },
+        "ios-mapbox-lifetimes-retry1": {
+          "exit": 0,
+          "result": "All query, clear, remount, style-replacement, and format-transition assertions passed; error=none."
+        },
+        "ios-maplibre-lifetimes": {
+          "exit": 0,
+          "result": "All query, clear, remount, style-replacement, and format-transition assertions passed; error=none."
+        }
+      },
+      "lightColorAcceptance": {
+        "ios-mapbox-light-color": {
+          "exit": 1,
+          "result": "Fixture intensity 1 yielded olive shaded extrusion; captured blue/green/white counts were all zero."
+        },
+        "ios-mapbox-light-color-retry1": {
+          "exit": 0,
+          "result": "blue=201600; green=201600; green survived style replacement (styleLoads=2); white=201600; feature 9010 observed at every step."
+        }
+      },
+      "oneShotOpenHelper": {
+        "project": "tapdriver-once/TapDriver.xcodeproj",
+        "testSourceSha256": "91ea2953c069aafbc7a376278649085b58b54b409e200fb275e07ab6deaaf5c2",
+        "action": "One UI test tapped the SpringBoard Open button; XCTest output reported 1 test, 0 failures and TEST SUCCEEDED. The runner was removed during cleanup.",
+        "hostBundleId": "com.onemap.tapdriver",
+        "runnerBundleId": "com.onemap.tapdriver.uitests.xctrunner",
+        "cleanup": "The host app ID was absent from the pre-cleanup installed-app query; no host uninstall was needed. The xctrunner bundle installed by this UI test was uninstalled successfully."
+      },
+      "cleanup": "Acceptance app and one-shot UI test runner uninstalled; dedicated simulator shutdown; ports free."
+    }
+  },
+  "finalReview": {
+    "at": "2026-10-21T06:17:28.837757+00:00",
+    "findingsAccountedFor": "All requested Android source-lifetime findings and iOS raw light-color finding fixed, regression tested, and verified by affected real-renderer acceptance.",
+    "preservedFailures": "Initial routine process sandbox denial, iOS launch-prompt timeout, and first light fixture calibration failure are retained as distinct outcomes; no product failure was silently converted to a pass.",
+    "scope": "RNMapbox10.3.7 and10.3.8 compiler/patch/packed checks; real native runtime used RNMapbox10.3.8 and MapLibre11.5.0 on pinned Expo tuple. No claim of renewed full-matrix acceptance.",
+    "finalChecks": "PASS format337/lint319; docs36Markdown/34tables; source/built freeze verification after fixture calibration.",
+    "unchangedPublicArtifact": "Library archive SHA36117e1d7d80b7e6ddfbf2ce453e10a0d71d7873ace4d43ed9e6e586a3f075ec; no native rebuild required for JS-only fixture calibration."
+  },
+  "retention": {
+    "policy": "Keep compact outcome/provenance records and frozen archive; remove resolved-investigation raw logs/screenshots, generated consumer, dependencies, native projects, Pods, binaries and derived data.",
+    "temporaryPath": "/private/tmp/one-map-lifetime-light-repair",
+    "sizeBeforeCleanup": "9.1GiB",
+    "status": "complete-owned-temporary-directory-removed",
+    "rawFileHashes": {
+      "android-mapbox-lifetimes-1.log": "cc2a62252c1dc29bf2229deb67c33700fdccbee5c08dee36ce5207d013122174",
+      "android-mapbox-lifetimes-2.log": "a03365b7e66f632c8ed2fd1286f01b530b52971e166bb9dafdcf1b205f7603f7",
+      "android-mapbox-lifetimes-3.log": "4ecb6898ab5c05c63a264b751d7b8d16063b71bc5cfd837917fb5d6c2eed01a8",
+      "android-maplibre-lifetimes-1.log": "465adeb211076e80ac38638ad638998a6243f3b2a5769a3c905b135774f9ad42",
+      "android-maplibre-lifetimes-2.log": "ff94db652c4f573073643d507cec76d226527b900b9a5ae612ee09d8f865c38a",
+      "android-maplibre-lifetimes-3.log": "8b3fda7af11c8449d7fe3c54b3c0ad4680f2225d2922335f83c469f847b160da",
+      "consumer-install.log": "4ed512cf513d7493ded4c912fca3891132ee64ce24f6255fcddada4ae593fc2e",
+      "consumers-minimum.log": "594804b48cc46fd235cf4f28d0924548994ccfe6f9ca54184ab21acba631a1c1",
+      "consumers-newest.log": "594804b48cc46fd235cf4f28d0924548994ccfe6f9ca54184ab21acba631a1c1",
+      "ios-mapbox-lifetimes-after-open.png": "69299229edb402c3ce6fc9604f2d3829a0436ca0e1d16f7a7eb64d668ea05e4f",
+      "ios-mapbox-lifetimes-current.png": "bfd3f5bc76759f11fc0840bd441320b45eef58c905115d0ab79e683aa4a19b42",
+      "ios-mapbox-lifetimes-retry1.log": "56ee503156788f51b293801d69d7d8f8535105b163540167f923284eff2f6219",
+      "ios-mapbox-lifetimes.log": "68674fa8caa1f1a7005e4e7486bde0cc098781faea5399f8352d7ef358993b2e",
+      "ios-mapbox-light-color-current.png": "0070c7cfadaffa6b16654657252d095ee17a483066ae6b8c8aac07f1ed47693e",
+      "ios-mapbox-light-color-retry1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ios-mapbox-light-color.log": "94cdc67092ba74c5ed79fdf838f1b493c5ba6d124d02520cb08f75a577b32ce3",
+      "ios-maplibre-lifetimes.log": "3d930dc5fa6f123961c02be08ded06b662fe51880f274d32e5fe58f014fa87c7",
+      "pack.log": "b69f9ffd1d1b053baa5c9f30c5680c4799c94ac852ad5c4d412f051ef5cabda7",
+      "routine-remaining.log": "efaaf18f73207a46543137592b79a66eaa7c3701ba4b66deb100cbc571971d2e",
+      "routine.log": "6aecde29a6b353b31356980590420523888d9faa34105ce56ed0116d8e3a39d6"
+    },
+    "nativeResources": "Worker confirmed isolated app/test runner removal, both dedicated devices shutdown, no owned Metro/acceptance processes and ports8081/8798/8799 free. TapDriver host absent; Android rotation settings untouched but initial values not sampled.",
+    "completedAt": "2026-10-21T06:17:54.640308+00:00"
+  },
+  "completedAt": "2026-10-21T06:17:54.640308+00:00",
+  "subsequentDragVerification": {
+    "record": "records/evidence/ios-drag-verification.json",
+    "status": "Missing iOS interrupted-touch/multiple-pointer live-drag subcases passed on both engines against unchanged rc.10; original historical exclusions retained as executed history."
+  }
+}

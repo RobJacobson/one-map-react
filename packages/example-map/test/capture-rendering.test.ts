@@ -4,8 +4,8 @@ import { describe, expect, test, vi } from "vite-plus/test";
 import {
   captureRendering,
   renderingBufferOptions,
-} from "../../../examples/shared/capture-rendering.js";
-import { captureRendering as captureNativeRendering } from "../../../examples/shared/capture-rendering.native.js";
+} from "../src/scenarios/capture-rendering.js";
+import { captureRendering as captureNativeRendering } from "../src/scenarios/capture-rendering.native.js";
 
 const observationMap = (wrapper: object) => {
   const getWrapperMap = vi.fn(async () => wrapper);

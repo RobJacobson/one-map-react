@@ -3,7 +3,7 @@ import { render } from "@testing-library/react-native";
 import type { Adapter } from "one-map-react";
 import { type ReactNode, StrictMode } from "react";
 
-import { NativeTf08Screen } from "../../../examples/shared/native-tf08-screen.js";
+import { NativeTf08Screen } from "../../example-map/src/scenarios/native-tf08-screen.js";
 
 jest.mock("one-map-react", () => ({
   MapSetup: ({ children }: { children: ReactNode }) => children,

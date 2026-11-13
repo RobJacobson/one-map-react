@@ -1,7 +1,7 @@
 import { expect, test, vi } from "vite-plus/test";
 
-import { namedRendering as mapbox } from "../../../examples/web-mapbox/src/app.js";
-import { namedRendering as maplibre } from "../../../examples/web-maplibre/src/app.js";
+import { namedRendering as mapbox } from "../../example-map/src/scenarios/mapbox-web.js";
+import { namedRendering as maplibre } from "../../example-map/src/scenarios/maplibre-web.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 
 test.each([mapbox, maplibre])(

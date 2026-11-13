@@ -18,7 +18,7 @@ import { expect, test, vi } from "vite-plus/test";
 import {
   Tf07Scene,
   type Tf07Probe,
-} from "../../../examples/shared/tf07-scene.js";
+} from "../../example-map/src/scenarios/tf07-scene.js";
 
 type Sdk = Pick<(typeof import("mapbox-gl"))["default"], "Popup" | "Evented">;
 type PopupProps = {

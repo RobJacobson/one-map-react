@@ -12,7 +12,7 @@ import {
   initialViewState,
   replacementStyle,
   routes,
-} from "../../../tests/fixtures/map-fixture.js";
+} from "../../example-map/src/scenarios/map-fixture.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
 import type {
@@ -1224,12 +1224,25 @@ test("portable controlled camera settles repeated MapLibre resize/move feedback 
     padding: { top: 0, bottom: 0, left: 0, right: 0 },
   });
   mounted.rerender(example(undefined, onMove));
-  const released = lastMapProps<Record<string, unknown>>();
-  for (const key of ["longitude", "latitude", "zoom", "bearing", "pitch"]) {
-    expect(released).not.toHaveProperty(key);
+  expect(lastMapProps()).toMatchObject({
+    viewState: undefined,
+    padding: undefined,
+  });
+  for (const field of ["longitude", "latitude", "zoom", "bearing", "pitch"]) {
+    expect(Object.hasOwn(lastMapProps(), field)).toBe(false);
   }
-  expect(released).toMatchObject({ viewState: undefined, padding: undefined });
   expect(mockResize).not.toHaveBeenCalled();
+  mounted.unmount();
+});
+
+test("uncontrolled MapLibre omits camera fields instead of overriding the initial camera with undefined", () => {
+  resetWebMapMock();
+  const mounted = render(example());
+  const props = lastMapProps<Record<string, unknown>>();
+  for (const field of ["longitude", "latitude", "zoom", "bearing", "pitch"]) {
+    expect(Object.hasOwn(props, field)).toBe(false);
+  }
+  expect(props.initialViewState).toMatchObject(initialViewState);
   mounted.unmount();
 });
 

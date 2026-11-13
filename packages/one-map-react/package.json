@@ -1,6 +1,6 @@
 {
   "name": "one-map-react",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.11",
   "description": "A thin React map facade with explicitly selected Mapbox and MapLibre backends.",
   "type": "module",
   "license": "MIT",
@@ -74,7 +74,7 @@
     "maplibre-gl": "^6.13.0",
     "@rnmapbox/maps": "^10.3.7",
     "@maplibre/maplibre-react-native": "^11.5.0",
-    "react-native-teleport": "^1.2.1"
+    "react-native-teleport": "^1.2.2"
   },
   "peerDependenciesMeta": {
     "react-dom": {

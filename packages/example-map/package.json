@@ -15,6 +15,18 @@
     "./native": {
       "types": "./dist/engines.native.d.ts",
       "default": "./dist/engines.native.js"
+    },
+    "./acceptance-selection": {
+      "types": "./dist/acceptance-selection.d.ts",
+      "default": "./dist/acceptance-selection.js"
+    },
+    "./acceptance-web": {
+      "types": "./dist/acceptance-controls.web.d.ts",
+      "default": "./dist/acceptance-controls.web.js"
+    },
+    "./acceptance-native": {
+      "types": "./dist/acceptance.native.d.ts",
+      "default": "./dist/acceptance.native.js"
     }
   },
   "scripts": {

@@ -8,11 +8,11 @@ import {
 } from "react";
 import { afterEach, beforeEach, expect, vi, test } from "vite-plus/test";
 
-import { useQueriesSmoke } from "../../../examples/shared/queries-smoke.js";
+import { useQueriesSmoke } from "../../../packages/example-map/src/scenarios/queries-smoke.js";
 import {
   queryRoutes,
   replacementStyle,
-} from "../../../tests/fixtures/map-fixture.js";
+} from "../../example-map/src/scenarios/map-fixture.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { FeatureState } from "../src/contracts/query-types.js";
 import { sdkFeatureState } from "./sdk-feature-state.js";

@@ -4,6 +4,7 @@ import {
   publicMapboxToken,
   useExampleMap,
 } from "@one-map/example-map";
+import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import {
   SafeAreaProvider,
@@ -13,17 +14,35 @@ import {
 // Metro selects the platform setup before bundling either renderer family.
 import { adapters, configureMapbox } from "./engines";
 
+const developmentAcceptance = __DEV__
+  ? (require("./acceptance") as typeof import("./acceptance"))
+  : undefined;
+
 const token = publicMapboxToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN);
 configureMapbox(token);
 
 /** Expo entry shared by iOS, Android, and its Metro-powered web target. */
-export const App = () => (
-  <SafeAreaProvider>
-    <MapScreen />
-  </SafeAreaProvider>
-);
+export const App = () => {
+  const [acceptance, setAcceptance] = useState(
+    Boolean(developmentAcceptance?.acceptanceRequested)
+  );
+  const Acceptance = developmentAcceptance?.Acceptance;
+  return (
+    <SafeAreaProvider>
+      {acceptance && Acceptance ? (
+        <Acceptance token={token} close={() => setAcceptance(false)} />
+      ) : (
+        <MapScreen openAcceptance={() => setAcceptance(true)} />
+      )}
+    </SafeAreaProvider>
+  );
+};
 
-const MapScreen = () => {
+const MapScreen = ({
+  openAcceptance,
+}: {
+  readonly openAcceptance: () => void;
+}) => {
   const model = useExampleMap(adapters, Boolean(token));
   const insets = useSafeAreaInsets();
   const testMode = __DEV__ && process.env.EXPO_PUBLIC_ONE_MAP_TEST_MODE === "1";
@@ -43,10 +62,8 @@ const MapScreen = () => {
               onPress={() => {
                 void model.selectEngine("maplibre");
               }}
-            >
-              MapLibre
-              {model.attachment.engine === "maplibre" ? " (selected)" : ""}
-            </Button>
+              label={`MapLibre${model.attachment.engine === "maplibre" ? " (selected)" : ""}`}
+            />
             <Button
               variant={
                 model.attachment.engine === "mapbox" ? "filled" : "outlined"
@@ -56,9 +73,8 @@ const MapScreen = () => {
               onPress={() => {
                 void model.selectEngine("mapbox");
               }}
-            >
-              Mapbox{model.attachment.engine === "mapbox" ? " (selected)" : ""}
-            </Button>
+              label={`Mapbox${model.attachment.engine === "mapbox" ? " (selected)" : ""}`}
+            />
           </Row>
         </Host>
         {!token && (
@@ -81,9 +97,8 @@ const MapScreen = () => {
                 onPress={() => {
                   void model.selectEngine(model.attachment.engine);
                 }}
-              >
-                Retry
-              </Button>
+                label="Retry"
+              />
             </Host>
           </View>
         )}
@@ -91,14 +106,16 @@ const MapScreen = () => {
           <View>
             <Text selectable>Scenario: Basemap and engine switching</Text>
             <Host matchContents>
+              <Button label="Acceptance scenarios" onPress={openAcceptance} />
+            </Host>
+            <Host matchContents>
               <Button
                 disabled={disabled}
                 onPress={() => {
                   void model.inspectCamera();
                 }}
-              >
-                Read camera
-              </Button>
+                label="Read camera"
+              />
             </Host>
             <Text selectable testID="camera-readback">
               {JSON.stringify(model.camera)}

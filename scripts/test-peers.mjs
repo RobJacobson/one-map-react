@@ -56,7 +56,7 @@ const peers = {
     "react-native@0.87.1",
     "@types/react@19.2.18",
     "@rnmapbox/maps@10.3.7",
-    "react-native-teleport@1.2.1",
+    "react-native-teleport@1.2.2",
   ],
   "maplibre-native": [
     "react@19.2.3",
@@ -64,7 +64,7 @@ const peers = {
     "react-native@0.87.1",
     "@types/react@19.2.18",
     "@maplibre/maplibre-react-native@11.5.0",
-    "react-native-teleport@1.2.1",
+    "react-native-teleport@1.2.2",
     "@types/geojson@7946.0.16",
   ],
 };
@@ -196,6 +196,14 @@ const checkPeerConsumer = async (archive, entry, packages) => {
     );
   }
 
+  const modelAvailable =
+    entry === "mapbox-native" &&
+    JSON.parse(
+      readFileSync(
+        join(consumer, "node_modules/@rnmapbox/maps/package.json"),
+        "utf8"
+      )
+    ).version === "10.3.8";
   const selectedAssertions = entry.endsWith("web")
     ? `
 import { Map as SelectedMap, Source as SelectedSource, Layer as SelectedLayer, type WebMapRef } from "one-map-react/${entry}";
@@ -259,13 +267,15 @@ selectedRef.setEventedParent(null);`
       ? `
 import type { ComponentRef } from "react";
 import type { MapView as RnmapboxMapView, SnapshotOptions } from "@rnmapbox/maps";
-import { Map as SelectedMap, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef, WrapperOfflineManager, WrapperSnapshotManager, WrapperLocationManager } from "one-map-react/mapbox-native";
+import { Map as SelectedMap, LocationPuck, WrapperMapView, WrapperCamera, WrapperShapeSource, Terrain, Light, Models, RasterArraySource, Viewport, setTelemetryEnabled, type NativeAdvancedMapRef, WrapperOfflineManager, WrapperSnapshotManager, WrapperLocationManager } from "one-map-react/mapbox-native";
 void <WrapperMapView styleJSON={JSON.stringify(style)}><WrapperCamera zoomLevel={0} /><WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} hitbox={{ width: 20, height: 20 }} onPress={() => {}} /></WrapperMapView>;
 void Terrain; void Light; void Models; void RasterArraySource; void Viewport;
 const selectedLocationManager: typeof import("@rnmapbox/maps").locationManager = WrapperLocationManager;
 const addLocationListener: typeof selectedLocationManager.addListener = WrapperLocationManager.addListener;
 const removeLocationListener: typeof selectedLocationManager.removeListener = WrapperLocationManager.removeListener;
 void addLocationListener; void removeLocationListener;
+${modelAvailable ? "" : "// @ts-expect-error The minimum peer has no model puck."}
+void <LocationPuck model={{ uri: 'http://127.0.0.1/model.glb', scale: [1,2,3], rotation: [0,0,90], opacity: 0.5 }} />;
 setTelemetryEnabled(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
 setTelemetryEnabled(42);

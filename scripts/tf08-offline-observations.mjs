@@ -16,6 +16,17 @@ export const assertMissingDatabaseRejection = (message) => {
   );
 };
 
+/** An occupied migration destination must reject without replacing its data. */
+export const assertExistingDatabaseRejection = (message, before, after) => {
+  assert.match(message, /already exists/i);
+  assert(before.length > 0, "Migration destination must contain real data.");
+  assert.deepEqual(
+    after,
+    before,
+    "Rejected migration changed the existing database."
+  );
+};
+
 /** Both SDK log formats describe the same expected database replacement. */
 export const unexpectedResetWarnings = (engine, warnings) =>
   warnings.filter(

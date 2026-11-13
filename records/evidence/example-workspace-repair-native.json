@@ -1,0 +1,664 @@
+{
+  "checkpoint": "Example workspace rc.9 native build acceptance",
+  "status": "Complete: iOS and Android dual-engine workspace acceptance passed; both native engines were loaded from one reviewed binary per OS. The initial Android 12-second delayed MapLibre style response exceeded the resolved SDK transport timeout; normal startup and cold-cache retry recovery passed after the fixture delay was removed. Task-owned cleanup is complete.",
+  "worker": {
+    "model": "gpt-6-luna",
+    "reasoningEffort": "medium",
+    "role": "exclusive native build/device owner"
+  },
+  "frozenArtifact": {
+    "path": "/Users/rob/code/mapbox-code/one-map/artifacts/one-map-react-0.1.0-rc.9.tgz",
+    "sha256": "cdf6e6f06feb6a8863eaee3b66e91bc6626303e02bb73fac82459466810161dc",
+    "bytes": 176809,
+    "files": 209,
+    "mode": "0444"
+  },
+  "preparedConsumer": {
+    "root": "/private/tmp/one-map-workspace-acceptance/native",
+    "app": "/private/tmp/one-map-workspace-acceptance/native/apps/expo",
+    "bundleIdentifier": "org.onemap.acceptance.workspace",
+    "coordinatorVerified": true
+  },
+  "runtimeVersions": {
+    "expo": "57.0.23",
+    "expoCli": "57.0.25",
+    "reactNative": "0.86.3",
+    "react": "19.2.3",
+    "rnmapbox": "10.3.8",
+    "maplibreReactNative": "11.5.0"
+  },
+  "generation": {
+    "command": [
+      "node",
+      "node_modules/expo/bin/cli",
+      "prebuild",
+      "--no-install",
+      "--platform",
+      "all",
+      "--skip-dependency-update",
+      "react,react-native"
+    ],
+    "cwd": "/private/tmp/one-map-workspace-acceptance/native/apps/expo",
+    "startedAt": "2026-10-19T20:12:01.558639+00:00",
+    "finishedAt": "2026-10-19T20:12:02.273302+00:00",
+    "exitCode": 0,
+    "log": "/private/tmp/one-map-workspace-acceptance/rc9-native-prebuild.log",
+    "logSha256": "1dce14a3debe71134c036440b9b769a07de464e924990b2708f7425e95d37489",
+    "environment": {
+      "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "",
+      "CI": "1",
+      "EXPO_NO_TELEMETRY": "1"
+    },
+    "result": "fresh ios/ and android/ generated; package.json unchanged"
+  },
+  "simulator": {
+    "udid": "1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7",
+    "name": "OneMap rc9 Workspace Acceptance iPhone SE 3",
+    "deviceType": "iPhone SE (3rd generation)",
+    "runtime": "iOS 27.0",
+    "state": "Dedicated iPhone SE 3/iOS 27 simulator deleted after acceptance; shared simulator preserved.",
+    "sharedSimulator": "8B7D7CE4-228E-409F-A156-A597D4E448A5 remains Booted"
+  },
+  "ios": {
+    "podInstall": {
+      "command": [
+        "/opt/homebrew/bin/pod",
+        "install",
+        "--project-directory=ios",
+        "--verbose"
+      ],
+      "cwd": "/private/tmp/one-map-workspace-acceptance/native/apps/expo",
+      "startedAt": "2026-10-19T20:12:17.732424+00:00",
+      "finishedAt": "2026-10-19T20:13:14.602908+00:00",
+      "exitCode": 0,
+      "log": "/private/tmp/one-map-workspace-acceptance/rc9-native-ios-pod-install.log",
+      "logSha256": "c9e4ef01b7125e50e5950ac0a518383ad563e1a838e295d126fd5ca4ef2d40d8",
+      "podfileLock": "/private/tmp/one-map-workspace-acceptance/native/apps/expo/ios/Podfile.lock",
+      "podfileLockSha256": "467140d42ad709cb60c8406a3c354853061d55caa9187ec2e5c4f7a93d25b0bc",
+      "podSummary": "99 Podfile dependencies; 102 total pods",
+      "resolvedSDKs": {
+        "MapboxMaps": "11.23.1",
+        "MapboxCoreMaps": "11.23.1",
+        "MapboxCommon": "24.23.1",
+        "Turf": "4.0.0",
+        "MapLibreReactNative": "11.5.0"
+      }
+    },
+    "swiftPackageResolution": {
+      "path": "/private/tmp/one-map-workspace-acceptance/native/apps/expo/ios/OneMap.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+      "sha256": "ee7912e78dd1aac5c65ecc8c7decf5f89326c706559bf3b5b39df7b9aa839117",
+      "pins": [
+        {
+          "identity": "maplibre-gl-native-distribution",
+          "version": "6.31.0",
+          "revision": "13e41ab3d77ff5113e7e5d4ee87803b1f81f5683"
+        }
+      ]
+    },
+    "build": {
+      "command": [
+        "xcodebuild",
+        "-workspace",
+        "ios/OneMap.xcworkspace",
+        "-scheme",
+        "OneMap",
+        "-configuration",
+        "Debug",
+        "-sdk",
+        "iphonesimulator",
+        "-destination",
+        "platform=iOS Simulator,id=1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7",
+        "-derivedDataPath",
+        "/private/tmp/one-map-workspace-acceptance/ios-derived",
+        "-jobs",
+        "4",
+        "ONLY_ACTIVE_ARCH=YES",
+        "ARCHS=arm64",
+        "build"
+      ],
+      "cwd": "/private/tmp/one-map-workspace-acceptance/native/apps/expo",
+      "startedAt": "2026-10-19T20:13:22.221606+00:00",
+      "finishedAt": "2026-10-19T20:16:34.252129+00:00",
+      "exitCode": 0,
+      "log": "/private/tmp/one-map-workspace-acceptance/rc9-native-ios-build.log",
+      "logSha256": "798542e905adc481da8bc5e4c681950fc602119db9c14e6070cf4ffdecad606d",
+      "scheme": "OneMap",
+      "configuration": "Debug",
+      "destination": "iOS 27 simulator arm64",
+      "appPath": "/private/tmp/one-map-workspace-acceptance/ios-derived/Build/Products/Debug-iphonesimulator/OneMap.app",
+      "appFiles": 213,
+      "appBundleIdentifier": "org.onemap.acceptance.workspace",
+      "minimumOS": "16.4",
+      "machOCount": 15,
+      "binaryHashes": [
+        {
+          "path": "OneMap.debug.dylib",
+          "sha256": "9753961ea2c347b932ac7cf4031cea12d81c20e9c765a795796a8c8b0cba9d52",
+          "architectures": "arm64"
+        },
+        {
+          "path": "__preview.dylib",
+          "sha256": "8da22a6ba12b9797fe6c8eb2a26499a8e8e11cf27ae74e6d0c34682421fec79e",
+          "architectures": "arm64"
+        },
+        {
+          "path": "OneMap",
+          "sha256": "9ea572dbffe6e6d432a7ebe250c094b52022e6594ba871153ff7a6981cd7ba25",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/ExpoModulesJSI.framework/ExpoModulesJSI",
+          "sha256": "fab37439470ff520c6f6c705d482533ff4e165940dd0f21bcec5607a08dff384",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/hermesvm.framework/hermesvm",
+          "sha256": "487ab4bb94606eb5aaa590ae32cb1c76c412f2b78bf5cc443b36257fabfb8ae7",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/ExpoFont.framework/ExpoFont",
+          "sha256": "9f9d782bc51e8165e0352d28c2fc73167720848e9dbecffa0c846a621be33dde",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/ExpoModulesCore.framework/ExpoModulesCore",
+          "sha256": "f7f5dea67769a3ad911ae916301028b4f07b047aa63d652d363aec2373835660",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/React.framework/React",
+          "sha256": "4cbf11dbf2d15309a133259d1cb53f11b520cfcfa49223df2e281b0f00bc01d9",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/ReactNativeDependencies.framework/ReactNativeDependencies",
+          "sha256": "82067538e499551b3ba921910f7a96ecb49d314bbd5001fd73ed0c355ac6fc64",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/MapboxCommon.framework/MapboxCommon",
+          "sha256": "0f6d13a749a2db118cd68c24c62549d0c3b2e773155670dea9c5298d03db5680",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/MapLibre.framework/MapLibre",
+          "sha256": "8144a486969cce6baecfd584c7e32ff0680628528e4b042a166d0a94f5d811f0",
+          "architectures": "x86_64 arm64"
+        },
+        {
+          "path": "Frameworks/ExpoModulesWorklets.framework/ExpoModulesWorklets",
+          "sha256": "2497c1b5c5b1aa761f57d69d063fa88675fcf060da5520c644af029c0954e34c",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/Turf.framework/Turf",
+          "sha256": "d7d1189d9f23ce0c4d7f3ad48e49a1f0719f39effc141312ea46ad63e62b8142",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/ExpoFileSystem.framework/ExpoFileSystem",
+          "sha256": "6586a2b752fa3f2a973b1ec09ec71c807f8f88650e88b742cf228e1b534b6c49",
+          "architectures": "arm64"
+        },
+        {
+          "path": "Frameworks/MapboxCoreMaps.framework/MapboxCoreMaps",
+          "sha256": "5ac42efb35c491a0c54ee17cfc58ce117428b25d9297204777d80ba4065a3c0f",
+          "architectures": "arm64"
+        }
+      ],
+      "frameworkVersions": {
+        "MapboxCoreMaps": {
+          "shortVersion": "11.23.1",
+          "bundleVersion": "11.23.1"
+        },
+        "MapboxCommon": {
+          "shortVersion": "24.23.1",
+          "bundleVersion": "24.23.1"
+        },
+        "MapLibre": {
+          "shortVersion": "6.31.0",
+          "bundleVersion": "6.31.0"
+        },
+        "Turf": {
+          "shortVersion": "4.0.0",
+          "bundleVersion": "38"
+        }
+      },
+      "coordinatorReview": "pending; app intentionally not installed"
+    },
+    "linkVerification": "Xcode link completed with MapboxMaps and MapLibreReactNative targets in the same OneMap app; prior duplicate NativeMapViewModuleSpec symbols are renamed on the RNMapbox side in the frozen rc.9 peer.",
+    "coordinatorReview": "Passed: reviewed build and installed app match across all 15 Mach-O files; bundle org.onemap.acceptance.workspace; Mapbox 11.23.1/Common 24.23.1 and MapLibre iOS 6.31.0.",
+    "installation": {
+      "bundleIdentifier": "org.onemap.acceptance.workspace",
+      "simulator": "1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7",
+      "container": "/Users/rob/Library/Developer/CoreSimulator/Devices/1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7/data/Containers/Bundle/Application/31C7813A-E415-476E-BE9E-E22B65100123/OneMap.app",
+      "reviewedInstalledMachOFiles": 15,
+      "byteExact": true
+    }
+  },
+  "android": {
+    "status": "ARM64 dual-engine build and installed APK reviewed; Android token-free, switching, and cold-cache recovery acceptance passed on preserved emulator-5554.",
+    "java": "OpenJDK 17.0.20.1",
+    "existingEmulator": "emulator-5554 arm64-v8a remains connected and unchanged",
+    "taskInspection": {
+      "command": [
+        "./gradlew",
+        "tasks",
+        "--all",
+        "--no-daemon",
+        "--max-workers=2",
+        "--no-parallel",
+        "--console=plain"
+      ],
+      "cwd": "/private/tmp/one-map-workspace-acceptance/native/apps/expo/android",
+      "startedAt": "2026-10-19T20:17:43.858823+00:00",
+      "finishedAt": "2026-10-19T20:18:45.011436+00:00",
+      "exitCode": 0,
+      "log": "/private/tmp/one-map-workspace-acceptance/rc9-native-android-tasks.log",
+      "logSha256": "4352c4643c08c166a06d0e378708294ffa4a004ebb260ba947528870f1aa48e0",
+      "observedTasks": [
+        "app:assembleDebug",
+        "maplibre_maplibre-react-native:assembleDebug",
+        "rnmapbox_maps:assembleDebug"
+      ]
+    },
+    "build": {
+      "command": [
+        "./gradlew",
+        ":app:assembleDebug",
+        "-PreactNativeArchitectures=arm64-v8a",
+        "--no-daemon",
+        "--max-workers=2",
+        "--no-parallel",
+        "--console=plain"
+      ],
+      "cwd": "/private/tmp/one-map-workspace-acceptance/native/apps/expo/android",
+      "startedAt": "2026-10-19T20:18:51.737046+00:00",
+      "finishedAt": "2026-10-19T20:21:43.341370+00:00",
+      "exitCode": 0,
+      "log": "/private/tmp/one-map-workspace-acceptance/rc9-native-android-build.log",
+      "logSha256": "0fffce19be95a36ba89780c2dc91ce1629e7d3e9a3f50fcfc5f4eb425531745c",
+      "apkPath": "/private/tmp/one-map-workspace-acceptance/native/apps/expo/android/app/build/outputs/apk/debug/app-debug.apk",
+      "apkBytes": 108293302,
+      "apkSha256": "42fd6107d08a730f3a5445eeefc9288612afc246eb522a6d1e0f01ef1a027c0f",
+      "manifest": {
+        "applicationId": "org.onemap.acceptance.workspace",
+        "versionCode": "1",
+        "versionName": "1.0.0",
+        "compileSdk": "36",
+        "minSdk": "24",
+        "targetSdk": "36",
+        "abis": [
+          "arm64-v8a"
+        ]
+      },
+      "nativeLibraries": [
+        {
+          "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+          "bytes": 10096,
+          "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6"
+        },
+        {
+          "path": "lib/arm64-v8a/libappmodules.so",
+          "bytes": 7500624,
+          "sha256": "ab0eb0c19d4344546a1aba220ae280246583fa55672d3164436a813ba3c99d53"
+        },
+        {
+          "path": "lib/arm64-v8a/libbarhopper_v3.so",
+          "bytes": 4946720,
+          "sha256": "ec09597e9eb3aee0eb55ae3366da0d4ba416f5aa35a1af0b3811f50ff46743a1"
+        },
+        {
+          "path": "lib/arm64-v8a/libc++_shared.so",
+          "bytes": 1292904,
+          "sha256": "3e852764502d06e0cf1080d532ae7c608b7649d946a3a9d7e84e3d4b7d683214"
+        },
+        {
+          "path": "lib/arm64-v8a/libexpo-modules-core.so",
+          "bytes": 1697960,
+          "sha256": "709b24d5cd93474add6af940748f7fdd7ae40f8db8dcef0aef2d80a9fd8d6c98"
+        },
+        {
+          "path": "lib/arm64-v8a/libfbjni.so",
+          "bytes": 177000,
+          "sha256": "a9e35ba55d3f956920281f519385f8a72475ee24819799cb08375fdd4cce2b22"
+        },
+        {
+          "path": "lib/arm64-v8a/libgifimage.so",
+          "bytes": 318992,
+          "sha256": "9f605249728da7091569772a38a4dde298ed48e1e73fed3da0e4b662ef38715c"
+        },
+        {
+          "path": "lib/arm64-v8a/libhermestooling.so",
+          "bytes": 568000,
+          "sha256": "0aa6fd6e02796b04848b075b0e48d5144e0a9d79078107e7c37f335353517dd6"
+        },
+        {
+          "path": "lib/arm64-v8a/libhermesvm.so",
+          "bytes": 3720184,
+          "sha256": "6ccabd3fb1f96e683b57d8f6f193ef09009d834f49156e499f58fb4454f0fd24"
+        },
+        {
+          "path": "lib/arm64-v8a/libimagepipeline.so",
+          "bytes": 8760,
+          "sha256": "1b377992e4256fa9398ec057722f84a359c7d588e570c8a41f51d930c19ece7d"
+        },
+        {
+          "path": "lib/arm64-v8a/libjsi.so",
+          "bytes": 941304,
+          "sha256": "f1aa2d6187976dacdb9f625c50cf22c3d778fb5a90fb979319135a15f497f08b"
+        },
+        {
+          "path": "lib/arm64-v8a/libmapbox-common.so",
+          "bytes": 6670640,
+          "sha256": "621d6dc02fc75734652a0ba9e9c2810504ea8842d264d057c78af74251ad1f6d"
+        },
+        {
+          "path": "lib/arm64-v8a/libmapbox-maps.so",
+          "bytes": 13258576,
+          "sha256": "b5b0356a9939ac4367e8fa61878ff91a333bb6bb579cdfdddb31d6191dfa0e10"
+        },
+        {
+          "path": "lib/arm64-v8a/libmaplibre.so",
+          "bytes": 10846016,
+          "sha256": "d3a1ab9b9d056d84b93f2aa5f676d20d2d76723952dfcd8bd8d203d6eca6980d"
+        },
+        {
+          "path": "lib/arm64-v8a/libnative-filters.so",
+          "bytes": 23712,
+          "sha256": "4294b57460e70a6351ce7ae2733a79c088c907dfa54673a657227ec5bb669594"
+        },
+        {
+          "path": "lib/arm64-v8a/libnative-imagetranscoder.so",
+          "bytes": 585376,
+          "sha256": "2aed28298a25afd52ac670cf9682398c6c7ba42a57195c01efd565e7ddfe17ca"
+        },
+        {
+          "path": "lib/arm64-v8a/libreact_codegen_TeleportViewSpec.so",
+          "bytes": 200744,
+          "sha256": "929ab2f1d4a1bef477a29a519ed3c2c266426ab6faa3d41c9a2dcece1e24a217"
+        },
+        {
+          "path": "lib/arm64-v8a/libreact_codegen_safeareacontext.so",
+          "bytes": 578432,
+          "sha256": "d7c21bdd9de38a64705dfb57e6b8d4bde9c9adfc121c40ea797bba6eb8b80b78"
+        },
+        {
+          "path": "lib/arm64-v8a/libreactnative.so",
+          "bytes": 23425576,
+          "sha256": "4d3d6653d5e81f49e108cd559eb1c39c9ebcd59596d9ba56652ab58ccf3c4d78"
+        },
+        {
+          "path": "lib/arm64-v8a/libstatic-webp.so",
+          "bytes": 501856,
+          "sha256": "f3e5f9ab4f93f2a0a057285a2de9c93ba0ab59c76c22874d0356493ce283c4c7"
+        },
+        {
+          "path": "lib/arm64-v8a/libzstd-kmp.so",
+          "bytes": 731872,
+          "sha256": "10ec47f13bee884450b0911066019ba7aa6b4164a4c1f8c33c9d30dd3fd8868a"
+        }
+      ]
+    },
+    "runtimeDependencyReport": {
+      "command": [
+        "./gradlew",
+        ":app:dependencies",
+        "--configuration",
+        "debugRuntimeClasspath",
+        "--no-daemon",
+        "--max-workers=2",
+        "--no-parallel",
+        "--console=plain"
+      ],
+      "cwd": "/private/tmp/one-map-workspace-acceptance/native/apps/expo/android",
+      "startedAt": "2026-10-19T20:21:49.893917+00:00",
+      "finishedAt": "2026-10-19T20:21:58.873399+00:00",
+      "exitCode": 0,
+      "log": "/private/tmp/one-map-workspace-acceptance/rc9-native-android-debugRuntimeClasspath.log",
+      "logSha256": "c5b5bebd8f8228a6b81e6acc763da9da955a7b637d483e73859dc77741eb19a7",
+      "resolvedSDKs": {
+        "org.maplibre.gl:android-sdk-opengl": "13.6.1",
+        "com.mapbox.maps:android-ndk27": "11.23.1",
+        "com.mapbox.common:common-ndk27": "24.23.1"
+      }
+    },
+    "coordinatorReview": "Passed: exact APK reviewed and installed bytes matched; 21 arm64-v8a libraries include MapLibre OpenGL 13.6.1, Mapbox Android NDK27 11.23.1 and Common NDK27 24.23.1.",
+    "installation": {
+      "applicationId": "org.onemap.acceptance.workspace",
+      "device": "emulator-5554; existing arm64 API 37 AVD preserved",
+      "baseApk": "/data/app/~~V2_mO4VpKWtU8CnsKHat3g==/org.onemap.acceptance.workspace-dFoQbv49bj-qpK7Y1hhMGw==/base.apk",
+      "sha256": "42fd6107d08a730f3a5445eeefc9288612afc246eb522a6d1e0f01ef1a027c0f",
+      "bytes": 108293302,
+      "installedBytesReviewedExact": true,
+      "initialReverseList": [],
+      "testReversesAdded": [
+        "tcp:8081",
+        "tcp:9040"
+      ]
+    }
+  },
+  "candidateOrProductionChanged": false,
+  "installationOrRuntimeAttempted": true,
+  "tempRoot": "/private/tmp/one-map-workspace-acceptance; build logs and outputs retained for coordinator review",
+  "iosRuntimePreflight": {
+    "status": "historical initial preflight; system Open confirmation was cancelled by XCTest interruption handler; recovered via validated SpringBoard Open button action and all iOS scenarios passed",
+    "simulator": "1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7",
+    "installedContainer": "/Users/rob/Library/Developer/CoreSimulator/Devices/1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7/data/Containers/Bundle/Application/31C7813A-E415-476E-BE9E-E22B65100123/OneMap.app",
+    "installedIdentity": "bundle ID org.onemap.acceptance.workspace; all 15 installed Mach-O hashes equal reviewed build",
+    "metro": {
+      "phase": "no-token",
+      "launcherPid": 30163,
+      "metroPid": 30166,
+      "port": 8081,
+      "statusCheck": "HTTP 200 packager-status:running",
+      "listener": "IPv4 127.0.0.1:8081",
+      "log": "/private/tmp/one-map-workspace-acceptance/native-metro-no-token.log"
+    },
+    "fixture": {
+      "process": "native-fixtures.mjs",
+      "stylePort": 9040,
+      "inputPort": 8799,
+      "driverLogPath": "/private/tmp/one-map-workspace-acceptance/native-ios-driver.log",
+      "stateBeforeScenario": {
+        "mode": "ok",
+        "slow": true,
+        "requests": []
+      }
+    },
+    "tapDriver": {
+      "command": [
+        "xcodebuild",
+        "test",
+        "-project",
+        "/private/tmp/one-map-workspace-acceptance/native/scripts/ios-tap/TapDriver.xcodeproj",
+        "-scheme",
+        "TapDriver",
+        "-destination",
+        "platform=iOS Simulator,id=1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7",
+        "-derivedDataPath",
+        "/private/tmp/one-map-workspace-acceptance/ios-tap-derived",
+        "-jobs",
+        "4",
+        "-parallel-testing-enabled",
+        "NO",
+        "-only-testing:TapDriverUITests/TapDriver/testDriveTaps"
+      ],
+      "log": "/private/tmp/one-map-workspace-acceptance/native-ios-driver.log",
+      "startMarker": "Test Case '-[TapDriverUITests.TapDriver testDriveTaps]' started.",
+      "readyBeforeTargetLaunch": true
+    },
+    "appLaunch": {
+      "commands": [
+        {
+          "command": [
+            "xcrun",
+            "simctl",
+            "launch",
+            "1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7",
+            "org.onemap.acceptance.workspace"
+          ],
+          "startedAt": "2026-10-19T20:24:53.182942+00:00",
+          "finishedAt": "2026-10-19T20:24:53.540542+00:00",
+          "exitCode": 0,
+          "output": "org.onemap.acceptance.workspace: 32313"
+        },
+        {
+          "command": [
+            "xcrun",
+            "simctl",
+            "openurl",
+            "1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7",
+            "one-map-example://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+          ],
+          "startedAt": "2026-10-19T20:24:53.540609+00:00",
+          "finishedAt": "2026-10-19T20:24:53.761712+00:00",
+          "exitCode": 0,
+          "output": ""
+        }
+      ],
+      "log": "/private/tmp/one-map-workspace-acceptance/native-ios-launch.log",
+      "logSha256": "413e0634fd3bd3e6a9cf5f4e80b643636964855396f6edb17dbdddb3cdea3dfb",
+      "foregroundPid": 32313,
+      "foregroundProcess": "UIKitApplication:org.onemap.acceptance.workspace",
+      "foregroundRole": "ui focal",
+      "launchctlState": "running"
+    },
+    "developmentClientDeepLink": "one-map-example://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081",
+    "readOnlyInspect": {
+      "command": [
+        "node",
+        "/private/tmp/one-map-workspace-acceptance/native-ui.mjs",
+        "ios",
+        "inspect"
+      ],
+      "parsedState": {
+        "status": "",
+        "generation": 0
+      },
+      "windowLogicalBounds": "375x667",
+      "rawAxExcerpt": [
+        "Application pid 32313 label 'One Map'",
+        "StaticText label 'Development Build'",
+        "StaticText label 'Searching for development servers...'",
+        "Button label 'Enter URL manually'"
+      ],
+      "observation": "Dev Client server-search screen remains visible after successful simctl openurl; acceptance map content did not load. No scenario action was sent."
+    },
+    "screenshot": {
+      "path": "/private/tmp/one-map-workspace-acceptance/ios-workspace-preflight-initial.png",
+      "sha256": "456b112e66813bce432394254fc6211b70da148cc83be888d9fabfad63bb6905",
+      "pixelWidth": 750,
+      "pixelHeight": 1334,
+      "afterOpenTap": {
+        "path": "/private/tmp/one-map-workspace-acceptance/ios-workspace-preflight-after-open-tap.png",
+        "sha256": "4e6a6802ead36fb64ff0d82eb01c3265d68495dc93434a03b8e69480c76d5e12",
+        "observation": "confirmation dismissed; Dev Client still searching until validated SpringBoard Open action"
+      },
+      "warmLink": {
+        "path": "/private/tmp/one-map-workspace-acceptance/ios-workspace-preflight-warm-link.png",
+        "sha256": "35c2f18229c5b9c872b2915e7d89d80bfc251e5974b92eb5e5bdef775c56f2e0",
+        "observation": "warm URI open did not get past system confirmation; no app failure or scenario input"
+      }
+    },
+    "scopeBoundary": "Preflight only; no map scenario input or runtime assertion run. Preserve app, simulator, Metro, fixture, driver and screenshot for coordinator diagnosis."
+  },
+  "iosRuntime": {
+    "status": "passed; coordinator reviewed token-free startup, six engine switches with retained moved camera, and 503/retry recovery on both engines",
+    "simulator": "1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7; iPhone SE 3, iOS 27.0",
+    "tokenFree": {
+      "result": "/private/tmp/one-map-workspace-acceptance/ios-token-free-result.json",
+      "sha256": "f554fd50c54df69491170a92266b57f50546ae1c4c06501e861b02a216a3147d",
+      "readback": "ready Seattle camera [-122.34,47.61], zoom 11, generation 0; Mapbox disabled; rendered MapLibre image"
+    },
+    "switching": {
+      "result": "/private/tmp/one-map-workspace-acceptance/ios-switching-result.json",
+      "sha256": "0f2f014ef179bfc910ce62e42d44c2f3922446a10b8ef3cf03cc7e71dc2c45f8",
+      "readback": "real pan/double-tap changed camera to [-122.3723825,47.5710183], zoom 12; six Mapbox/MapLibre switches preserved pose, generations 1-6; both engine images rendered"
+    },
+    "recovery": {
+      "result": "/private/tmp/one-map-workspace-acceptance/ios-recovery-result.json",
+      "sha256": "ad0e2e1050b33424a00d5485939069d2bb81c6e845d0bae517fbb2b5d80c866b",
+      "readback": "actual fixture 503 and retry on MapLibre generation 8\u21929 and Mapbox 10\u219211; both recovered ready with rendered images"
+    },
+    "setupDiagnosis": "Initial target-window tap was intercepted by XCTest default interruption handling, which tapped Cancel on the SpringBoard Open confirmation. Retried setup with the validated SpringBoard Open button query; app loaded without changing binary/source. Android/iOS system setup dialogs are not acceptance failures."
+  },
+  "androidRuntime": {
+    "status": "passed; coordinator reviewed normal token-free rendering, same-binary dual-engine switching, and cold-cache failure/retry recovery",
+    "device": "emulator-5554, arm64-v8a, API 37",
+    "tokenFree": {
+      "result": "/private/tmp/one-map-workspace-acceptance/android-token-free-result.json",
+      "sha256": "e758a0d59ffc0c15b03c2650b101e98884b9f9dbd00771bddeb3cc08d88c47ad",
+      "readback": "ready Seattle camera [-122.34,47.61], zoom 11, generation 0; Mapbox explicitly disabled; 175 rendered colors at 1080x2400"
+    },
+    "switching": {
+      "result": "/private/tmp/one-map-workspace-acceptance/android-switching-result.json",
+      "sha256": "c7bb458f5cd8ab47223069662c87b5c02b0749ee7fd54a3148efb871c8e07520",
+      "readback": "real pan/double-tap changed camera to [-122.3669895,47.5633873], zoom 12; six Mapbox/MapLibre switches preserved pose, generations 1-6; both SDK images rendered"
+    },
+    "coldRecovery": {
+      "result": "/private/tmp/one-map-workspace-acceptance/android-cold-recovery-result.json",
+      "sha256": "87cbbaa0f8581e661924508ec113edc043a6d7b1c539ec51dd00d1653de00e62",
+      "readback": "after clearing only isolated app data: MapLibre actual 503 at generation 0\u2192Retry ready 1; Mapbox actual 503 at generation 2\u2192Retry ready 3; both images rendered"
+    },
+    "transportTimeout": {
+      "initialObservation": "The first delayed style fixture response took 12000 ms; MapLibre Android returned loading style failed: timeout before it arrived. Subsequent physically triggered retry at normal fixture latency reached ready Seattle at generation 1.",
+      "scope": "fresh app cache; not the shared acceptance read deadline",
+      "sdkBytecode": "MapLibre 13.6.1 HttpRequestImpl builds OkHttpClient.Builder with dispatcher only; resolved OkHttp 4.12.0 Builder initializes readTimeout to 10000 ms.",
+      "log": "/private/tmp/one-map-workspace-acceptance/android-maplibre-timeout-log.txt",
+      "logSha256": "b2d4d512506295aace34b7b071d63a99339260560a9751b52d4cfd6dc105c07a"
+    },
+    "cachedStyleAttempt": {
+      "result": "/private/tmp/one-map-workspace-acceptance/android-recovery-cached-attempt1.json",
+      "sha256": "618a05f57e710e4dba007930ff51b8f3522868128f1d5c2bb96eca840d8f0efa",
+      "disposition": "not an app failure: existing SDK style remained rendered/ready while 503 responses retried in the background; preserved separately from cold-cache recovery"
+    },
+    "setupAndHarnessNotes": [
+      "The first Android accessibility sample contained a stale hierarchy after a transient UiTestAutomationBridge null-root response; fresh unique XML and screenshots were used for later checks.",
+      "Expo first-launch Continue/Developer Menu overlays were dismissed using measured bounds; no acceptance assertions ran while overlays obscured the app.",
+      "The token-free helper initially inspected the enabled Compose label child instead of disabled engine-mapbox parent. Coordinator corrected the temporary helper to query the parent; self-check passed.",
+      "Two guarded Android runs emitted transient uiautomator null-root diagnostics yet completed with exit 0 and all scenario assertions passed."
+    ]
+  },
+  "runtimeEvidenceFiles": {
+    "androidInstalledApkPulled": {
+      "path": "/private/tmp/one-map-workspace-acceptance/android-installed-base.apk",
+      "sha256": "42fd6107d08a730f3a5445eeefc9288612afc246eb522a6d1e0f01ef1a027c0f",
+      "bytes": 108293302
+    },
+    "androidColdRetryScreenshot": {
+      "path": "/private/tmp/one-map-workspace-acceptance/android-cold-recovery-maplibre.png"
+    },
+    "androidFailureScreenshot": {
+      "path": "/private/tmp/one-map-workspace-acceptance/android-recovery-failed-state.png",
+      "sha256": "feef0c23ec997f5e080c5da4be7b4e75351f0cda5612c20f0af670763070655f"
+    },
+    "finalFixtureState": {
+      "path": "/private/tmp/one-map-workspace-acceptance/native-fixture-final-state.json",
+      "sha256": "c5731531db38e29936bd0f66ddd8708685ebb3564e06816dbbc9590a2124f1f7"
+    }
+  },
+  "cleanup": {
+    "status": "completed",
+    "resourcesReleased": true,
+    "verified": {
+      "androidTestPackage": "org.onemap.acceptance.workspace absent from emulator-5554 after uninstall",
+      "adbReverse": "initial list was empty; task-owned tcp:8081 and tcp:9040 mappings and test XML files removed; final reverse list empty",
+      "androidSettings": "emulator-5554 preserved at 1080x2400, density 420, accelerometer_rotation=1, user_rotation=0",
+      "ports": "8081, 9040, and 8799 have no listeners",
+      "ownedProcesses": "task-owned Metro, fixture/input service, and TapDriver stopped; owned PIDs verified absent",
+      "dedicatedSimulator": "1EF31AC7-3F94-4F2E-94A3-4D1686A17CE7 shutdown and deleted",
+      "sharedSimulator": "8B7D7CE4-228E-409F-A156-A597D4E448A5 remains Booted",
+      "androidEmulator": "emulator-5554 and its user data preserved",
+      "tempRoot": "Temporary tree removed after coordinator copied and reviewed outcomes/hashes."
+    },
+    "preserve": [
+      "shared iOS simulator 8B7D7CE4-228E-409F-A156-A597D4E448A5",
+      "existing Android emulator/user data",
+      "global caches and tools"
+    ],
+    "tempRoot": "Removed by coordinator after compact evidence review."
+  },
+  "rawRetention": "Temporary paths in this record identify removed raw evidence. Compact outcomes, source/build/install/SDK/image/log hashes remain; exact temporary harness source is preserved in example-workspace-repair-native-harness.patch."
+}

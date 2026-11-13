@@ -8,7 +8,7 @@ import {
   initialViewState,
   replacementStyle,
   routes,
-} from "../../../tests/fixtures/map-fixture.js";
+} from "../../example-map/src/scenarios/map-fixture.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
 import type {

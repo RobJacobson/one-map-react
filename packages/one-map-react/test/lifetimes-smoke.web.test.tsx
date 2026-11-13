@@ -2,8 +2,8 @@ import { act, renderHook } from "@testing-library/react";
 import { isValidElement, useLayoutEffect } from "react";
 import { afterEach, beforeEach, expect, vi, test } from "vite-plus/test";
 
-import { LifetimesMap } from "../../../examples/shared/lifetimes-map.js";
-import { useLifetimesSmoke } from "../../../examples/shared/lifetimes-smoke.js";
+import { LifetimesMap } from "../../example-map/src/scenarios/lifetimes-map.js";
+import { useLifetimesSmoke } from "../../example-map/src/scenarios/lifetimes-smoke.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type {
   FeatureIdentifier,

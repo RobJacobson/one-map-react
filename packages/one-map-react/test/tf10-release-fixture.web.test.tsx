@@ -1,7 +1,7 @@
 import { act, render, renderHook } from "@testing-library/react";
 import { expect, test, vi } from "vite-plus/test";
 
-import { useCameraSmoke } from "../../../examples/shared/camera-smoke.js";
+import { useCameraSmoke } from "../../example-map/src/scenarios/camera-smoke.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { MoveEvent } from "../src/contracts/event-types.js";
 
@@ -38,7 +38,7 @@ vi.mock("one-map-react", async () => {
 import {
   Tf09Scene,
   type Tf09Probe,
-} from "../../../examples/shared/tf09-scene.js";
+} from "../../../packages/example-map/src/scenarios/tf09-scene.js";
 
 test("release camera probe tracks targets, accepts movement, reports commands and releases targets", async () => {
   let probe: Tf09Probe | null = null;
@@ -74,7 +74,7 @@ test("release camera probe tracks targets, accepts movement, reports commands an
     center: [0, 0],
     zoom: 2,
     bearing: 0,
-    pitch: 35,
+    pitch: 0,
   });
   await act(async () => {
     await command("controlled-camera", { target: "changed" });
