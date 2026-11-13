@@ -14,6 +14,41 @@ export const observeCoveragePixels = ({ data }) => {
   return result;
 };
 
+/**
+ * Counts native map pixels using the host's measured window frame.
+ * @param image - Decoded physical screenshot pixels.
+ * @param device - Actual pixel scale and logical map-host frame.
+ * @returns Coverage counts excluding the OS status bar and application header.
+ */
+export const observeNativeCoveragePixels = (image, device) => {
+  assert(device?.mapFrame && Number.isFinite(device.scale) && device.scale > 0);
+  const frame = device.mapFrame;
+  const logical = [frame.x, frame.y, frame.width, frame.height];
+  assert(
+    logical.every(Number.isFinite),
+    "Invalid native viewport measurement."
+  );
+  const [x, y, width, height] = logical.map((value) =>
+    Math.round(value * device.scale)
+  );
+  assert(
+    [x, y, width, height].every(Number.isInteger) &&
+      x >= 0 &&
+      y >= 0 &&
+      width > 0 &&
+      height > 0 &&
+      x + width <= image.width &&
+      y + height <= image.height,
+    "Measured native viewport is outside the screenshot."
+  );
+  const data = new Uint8Array(width * height * 4);
+  for (let row = 0; row < height; row += 1) {
+    const offset = ((y + row) * image.width + x) * 4;
+    data.set(image.data.subarray(offset, offset + width * 4), row * width * 4);
+  }
+  return observeCoveragePixels({ data });
+};
+
 /** Inclusion is observed only after independently proving the content is visible. */
 export const captureInclusion = (baseline, live, exported, color) => {
   const liveDelta = live[color] - baseline.live[color];

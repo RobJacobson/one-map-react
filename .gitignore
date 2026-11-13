@@ -5,10 +5,6 @@ coverage/
 .env*
 !.env.example
 .DS_Store
-examples/*/ios/
-examples/*/android/
-examples/*/.bundle/
-examples/*/vendor/bundle/
 .vitest/
 
 apps/expo/ios/

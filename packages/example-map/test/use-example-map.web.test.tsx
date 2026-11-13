@@ -24,6 +24,45 @@ afterEach(() => vi.useRealTimers());
 
 describe("engine handoff", () => {
   it.each(["initial", "switched"] as const)(
+    "permits a slow cold %s renderer to load before restoring its camera",
+    async (phase) => {
+      vi.useFakeTimers();
+      const { result } = renderHook(() => useExampleMap(adapters, true));
+      if (phase === "switched") {
+        result.current.attachMap(cameraMap());
+        await act(async () => result.current.onLoad());
+        await act(async () => result.current.selectEngine("mapbox"));
+      }
+      await act(async () => vi.advanceTimersByTimeAsync(15000));
+      expect(result.current.status).toBe(
+        phase === "initial" ? "loading" : "switching"
+      );
+      result.current.attachMap(cameraMap());
+      await act(async () => result.current.onLoad());
+      expect(result.current.status).toBe("ready");
+      expect(vi.getTimerCount()).toBe(0);
+    }
+  );
+
+  it("gives camera restoration its own deadline after the renderer loads", async () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useExampleMap(adapters, true));
+    await act(async () => vi.advanceTimersByTimeAsync(9000));
+    const map = cameraMap();
+    vi.mocked(map.jumpTo).mockImplementationOnce(
+      () => new Promise((resolve) => setTimeout(resolve, 8000))
+    );
+    result.current.attachMap(map);
+    await act(async () => {
+      const loading = result.current.onLoad();
+      await vi.advanceTimersByTimeAsync(8000);
+      await loading;
+    });
+    expect(result.current.status).toBe("ready");
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it.each(["initial", "switched"] as const)(
     "times out a stalled %s map load and permits retry without reviving the failed attachment",
     async (phase) => {
       vi.useFakeTimers();
@@ -37,7 +76,7 @@ describe("engine handoff", () => {
       result.current.attachMap(map);
       const lateLoad = result.current.onLoad;
 
-      await act(async () => vi.advanceTimersByTimeAsync(9999));
+      await act(async () => vi.advanceTimersByTimeAsync(29999));
       expect(result.current.status).toBe(
         phase === "initial" ? "loading" : "switching"
       );

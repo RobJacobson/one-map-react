@@ -6,15 +6,21 @@ import { join } from "node:path";
 
 import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import { startLifetimesFixture } from "./tf06-lifetimes-fixture.mjs";
+import { selectNativeEngines } from "./tf06-smoke-selection.mjs";
 import {
-  androidSmokeArgs,
-  selectNativeEngines,
-  verifyNativeBinary,
-} from "./tf06-smoke-selection.mjs";
+  webShell,
+  webScenarioUrl,
+  nativeEnvironment,
+  nativeMetroArgs,
+  nativeApplicationId,
+  launchNativeWorkspace,
+} from "./workspace-smoke-shell.mjs";
 
 const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
+const iosDevice = process.env.ONE_MAP_ACCEPTANCE_IOS_UDID ?? "booted";
+let nativePid;
 const group = process.argv[2] ?? "web";
 const scope = process.argv[3] ?? "queries";
 const lifetimes = scope === "lifetimes";
@@ -36,17 +42,6 @@ if (
 }
 
 const nativeEngines = selectNativeEngines(scope, process.argv[4]);
-const reuseIosDigest = process.env.TF06_IOS_BINARY_SHA256;
-if (reuseIosDigest) {
-  if (!lifetimes || group !== "ios" || nativeEngines.length !== 1)
-    throw new Error("Verified binary reuse requires one iOS lifetime engine.");
-  verifyNativeBinary(scope, reuseIosDigest, reuseIosDigest);
-}
-const androidArgs =
-  group === "android" || group === "all"
-    ? androidSmokeArgs(scope, process.env.ANDROID_SERIAL)
-    : null;
-
 /** Bound port-release observation before the next native engine starts. */
 const awaitMetroPortRelease = async () => {
   const releasedBy = Date.now() + 5000;
@@ -82,7 +77,9 @@ try {
       results[`${engine}-android`] = await runNative({
         directory: `native-${engine}`,
         platform: "android",
-        applicationId: `com.onemap${engine}`,
+        applicationId:
+          process.env[`TF06_${engine.toUpperCase()}_ANDROID_ID`] ??
+          `com.onemap${engine}`,
       });
     }
   }
@@ -92,7 +89,9 @@ try {
       results[`${engine}-ios`] = await runNative({
         directory: `native-${engine}`,
         platform: "ios",
-        applicationId: `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`,
+        applicationId:
+          process.env[`TF06_${engine.toUpperCase()}_IOS_ID`] ??
+          `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`,
       });
     }
   }
@@ -107,21 +106,13 @@ if (Object.values(results).some((result) => result.status !== "passed")) {
 }
 
 async function runWeb(directory, port, label) {
-  const shell = join(root, "examples", directory);
-  const vite = spawn(
-    "bun",
-    [
-      "run",
-      "dev",
-      "--",
-      "--port",
-      String(port),
-      "--strictPort",
-      "--host",
-      "127.0.0.1",
-    ],
-    { cwd: shell, stdio: ["ignore", "pipe", "pipe"] }
-  );
+  const web = webShell(root, port);
+  const shell = web.cwd;
+  const vite = spawn(web.command, web.args, {
+    cwd: shell,
+    detached: true,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
   let viteLog = "";
   const record = (chunk) => {
     viteLog += chunk.toString();
@@ -139,13 +130,17 @@ async function runWeb(directory, port, label) {
       `--user-data-dir=${profile}`,
       "--window-size=1280,800",
       "--no-first-run",
-      `http://127.0.0.1:${port}/?tf06=queries`,
+      webScenarioUrl(root, port, "tf06=queries", directory.replace("web-", "")),
     ],
-    { stdio: "ignore" }
+    { detached: true, stdio: "ignore" }
   );
 
   try {
-    await waitFor(() => viteLog.includes("Local:"), 30000, `${label} server`);
+    await waitFor(
+      () => viteLog.includes("Local:") || viteLog.includes("Waiting on"),
+      30000,
+      `${label} server`
+    );
     const page = await attachPage(port + 1000);
     const status = await watchWeb(page, label);
     const ordinary = judge(status);
@@ -192,8 +187,8 @@ async function runWeb(directory, port, label) {
       log: viteLog.slice(-1500),
     };
   } finally {
-    chrome.kill("SIGKILL");
-    vite.kill("SIGTERM");
+    await stopOwnedProcess(chrome);
+    await stopOwnedProcess(vite);
     rmSync(profile, { recursive: true, force: true });
   }
 }
@@ -241,83 +236,6 @@ async function watchWeb(page, label) {
   }
 
   throw new Error(`${label} did not finish`);
-}
-
-async function removeAndroidBundle(shell) {
-  await command("rm", [
-    "-f",
-    join(shell, "android/app/src/main/assets/index.android.bundle"),
-  ]);
-}
-
-async function lanAddress() {
-  const address = (await command("ipconfig", ["getifaddr", "en0"])).trim();
-
-  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) {
-    throw new Error("en0 has no IPv4 address");
-  }
-
-  return address;
-}
-
-async function writeDebugHost(applicationId, host) {
-  const prefs = `shared_prefs/${applicationId}_preferences.xml`;
-  const remote = `run-as ${applicationId} sh -c 'cat > ${prefs}'`;
-
-  await command("adb", ["shell", "am", "force-stop", applicationId]);
-  await command("adb", [
-    "shell",
-    "run-as",
-    applicationId,
-    "mkdir",
-    "-p",
-    "shared_prefs",
-  ]);
-
-  const existing = await command("adb", [
-    "exec-out",
-    "run-as",
-    applicationId,
-    "cat",
-    prefs,
-  ]).catch(() => "");
-
-  await command("adb", ["shell", remote], {
-    input: debugHostPreference(existing, host),
-  });
-}
-
-function debugHostPreference(existing, host) {
-  const entry = `<string name="debug_http_host">${host}</string>`;
-
-  if (existing.includes('name="debug_http_host"')) {
-    return existing.replace(
-      /<string name="debug_http_host">[^<]*<\/string>/,
-      entry
-    );
-  }
-
-  if (existing.includes("</map>")) {
-    return existing.replace("</map>", `    ${entry}\n</map>`);
-  }
-
-  return [
-    "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>",
-    "<map>",
-    `    ${entry}`,
-    "</map>",
-    "",
-  ].join("\n");
-}
-
-async function startAndroidApp(applicationId) {
-  await command("adb", [
-    "shell",
-    "am",
-    "start",
-    "-n",
-    `${applicationId}/.MainActivity`,
-  ]);
 }
 
 async function allowNearbyDevices() {
@@ -368,7 +286,12 @@ function allowButtonPoint(xml) {
 }
 
 async function readAndroidStatus() {
-  const log = await command("adb", ["logcat", "-d"], {}, 20000).catch(() => "");
+  const log = await command(
+    "adb",
+    ["logcat", "-d", "--pid", String(nativePid)],
+    {},
+    20000
+  ).catch(() => "");
   const fromLog = latestStatus(log);
 
   if (fromLog) {
@@ -429,32 +352,22 @@ function openStatusPort() {
 }
 
 async function runNative({ directory, platform, applicationId }) {
-  const shell = join(root, "examples", directory);
+  applicationId = nativeApplicationId();
+  const shell = join(root, "apps/expo");
 
   await freePort(8081);
   if (platform === "ios") await freePort(8799);
 
   let metroLog = "";
-  const metroArgs = ["run", "start", "--", "--port", "8081", "--reset-cache"];
+  const metroArgs = nativeMetroArgs();
 
-  if (platform === "android") {
-    metroArgs.push("--host", "0.0.0.0");
-  }
-
-  const nativeEnv = {
-    ...process.env,
-    ONE_MAP_SMOKE: lifetimes ? "tf06-lifetimes" : "tf06",
-    ...(lifetimes
-      ? {
-          TF06_BASE:
-            platform === "android"
-              ? `http://${await lanAddress()}:8798`
-              : "http://127.0.0.1:8798",
-        }
-      : {}),
-  };
+  const nativeEnv = nativeEnvironment(
+    directory.replace("native-", ""),
+    lifetimes ? "tf06-lifetimes" : "tf06",
+    { TF05_BASE: "http://127.0.0.1:8798", TF06_BASE: "http://127.0.0.1:8798" }
+  );
   if (fixture) fixture.requests.length = 0;
-  const metro = spawn("bun", metroArgs, {
+  const metro = spawn("node", metroArgs, {
     cwd: shell,
     env: nativeEnv,
     detached: true,
@@ -472,7 +385,7 @@ async function runNative({ directory, platform, applicationId }) {
     await command("xcrun", [
       "simctl",
       "terminate",
-      "booted",
+      iosDevice,
       applicationId,
     ]).catch(() => undefined);
   }
@@ -487,12 +400,8 @@ async function runNative({ directory, platform, applicationId }) {
     );
 
     if (platform === "android") {
-      await removeAndroidBundle(shell);
-      await command("bun", androidArgs, { cwd: shell, env: nativeEnv }, 600000);
-
-      await writeDebugHost(applicationId, `${await lanAddress()}:8081`);
-      await command("adb", ["logcat", "-c"]);
-      await startAndroidApp(applicationId);
+      const launched = launchNativeWorkspace({ platform, iosDevice });
+      nativePid = launched?.pid;
       await allowNearbyDevices();
 
       const status = await watchNative({
@@ -505,47 +414,7 @@ async function runNative({ directory, platform, applicationId }) {
       };
     }
 
-    if (reuseIosDigest) {
-      const app = (
-        await command("xcrun", [
-          "simctl",
-          "get_app_container",
-          "booted",
-          applicationId,
-          "app",
-        ])
-      ).trim();
-      const executable = (
-        await command("/usr/libexec/PlistBuddy", [
-          "-c",
-          "Print:CFBundleExecutable",
-          join(app, "Info.plist"),
-        ])
-      ).trim();
-      const digest = (
-        await command("shasum", ["-a", "256", join(app, executable)])
-      )
-        .trim()
-        .split(/\s+/)[0];
-      verifyNativeBinary(scope, reuseIosDigest, digest);
-      await command("xcrun", ["simctl", "launch", "booted", applicationId]);
-    } else {
-      await command(
-        "bun",
-        [
-          "run",
-          "ios",
-          "--",
-          "--no-packager",
-          "--port",
-          "8081",
-          "--simulator",
-          "iPhone 18 Pro",
-        ],
-        { cwd: shell, env: nativeEnv },
-        600000
-      );
-    }
+    launchNativeWorkspace({ platform, iosDevice });
 
     const status = await watchNative({
       readStatus: () => statusPort.read(),
@@ -555,12 +424,6 @@ async function runNative({ directory, platform, applicationId }) {
     return {
       ...judge(status),
       ...(fixture ? { fixtureRequests: [...fixture.requests] } : {}),
-      ...(reuseIosDigest
-        ? {
-            reusedNativeBuild: true,
-            installedExecutableSha256: reuseIosDigest,
-          }
-        : {}),
     };
   } catch (error) {
     return {
@@ -578,7 +441,7 @@ async function runNative({ directory, platform, applicationId }) {
       await command("xcrun", [
         "simctl",
         "terminate",
-        "booted",
+        iosDevice,
         applicationId,
       ]).catch(() => undefined);
     }
@@ -657,7 +520,7 @@ function judge(status) {
     const passed =
       fields.loaded === "1" &&
       operations.every((key) => fields[key] === "ok") &&
-      transitions.every((key) => fields[key] === "cleared") &&
+      transitions.every((key) => fields[key] === "explicitly-cleared") &&
       fields.error === "none" &&
       fields.phase === "done" &&
       fields.done === "1";
@@ -673,14 +536,14 @@ function judge(status) {
     fields.filters === "ok" &&
     fields.pagination === "ok" &&
     fields["whole-state"] === "ok" &&
-    fields["recreated-state"] === "cleared" &&
+    fields["recreated-state"] === "explicitly-cleared" &&
     fields["cluster-zoom"] === "ok" &&
     fields.leaves === "ok" &&
     fields.children === "ok" &&
     fields["set-state"] === "ok" &&
     fields["get-state"] === "ok" &&
     fields["remove-state"] === "ok" &&
-    fields["cleared-state"] === "cleared" &&
+    fields["cleared-state"] === "explicitly-cleared" &&
     fields.error === "none" &&
     fields.done === "1";
 
@@ -821,6 +684,6 @@ async function freePort(port) {
   ]).catch(() => "");
   if (listed.trim())
     throw new Error(
-      `Port ${port} is already occupied; stop its owner before acceptance.`
+      `Acceptance port ${port} is already owned; no process was stopped.`
     );
 }

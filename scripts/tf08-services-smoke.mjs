@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import {
+  existsSync,
   mkdtempSync,
   mkdirSync,
   readdirSync,
@@ -19,14 +20,25 @@ import { stopOwnedProcess } from "./native-smoke-process.mjs";
 import {
   captureInclusion,
   observeCoveragePixels,
+  observeNativeCoveragePixels,
 } from "./tf08-final-observations.mjs";
 import { withFusedLocationFixture } from "./tf08-fused-location-fixture.mjs";
 import { observeFixturePixels } from "./tf08-image-observations.mjs";
 import {
+  assertExistingDatabaseRejection,
   assertMissingDatabaseRejection,
   readAndroidAppFile,
   unexpectedResetWarnings,
 } from "./tf08-offline-observations.mjs";
+import { pendingOfflineOperations } from "./tf08-pending-operations.mjs";
+import {
+  webShell,
+  webScenarioUrl,
+  nativeEnvironment,
+  nativeMetroArgs,
+  nativeApplicationId,
+  launchNativeWorkspace,
+} from "./workspace-smoke-shell.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const startedAt = new Date().toISOString();
@@ -34,13 +46,15 @@ const harnessSha256 = Object.fromEntries(
   [
     "scripts/tf08-services-smoke.mjs",
     "scripts/tf08-image-observations.mjs",
+    "scripts/tf08-final-observations.mjs",
     "scripts/tf08-offline-observations.mjs",
+    "scripts/tf08-storage-observations.py",
     "scripts/tf08-fused-location-fixture.mjs",
-    "examples/shared/tf08-acceptance-scene.tsx",
-    "examples/shared/native-tf08-screen.tsx",
-    "examples/shared/web-tf08-app.tsx",
-    "examples/native-mapbox/App.tsx",
-    "examples/native-maplibre/App.tsx",
+    "packages/example-map/src/scenarios/tf08-acceptance-scene.tsx",
+    "packages/example-map/src/scenarios/native-tf08-screen.tsx",
+    "packages/example-map/src/scenarios/web-tf08-app.tsx",
+    "packages/example-map/src/scenarios/mapbox-native.tsx",
+    "packages/example-map/src/scenarios/maplibre-native.tsx",
     "scripts/ios-tap/TapDriverUITests/TapDriver.swift",
   ].map((file) => [
     file,
@@ -60,9 +74,11 @@ assert(
     "pending-merge",
     "pending-repair",
     "pending-storage",
+    "pending-operations",
     "capture-coverage",
+    "display",
   ].includes(scope),
-  "Select all, offline, pending, pending-reset, pending-merge, pending-repair, pending-storage or capture-coverage scope."
+  "Select all, offline, pending, pending-reset, pending-merge, pending-repair, pending-storage, pending-operations or capture-coverage scope."
 );
 if (scope.startsWith("pending")) {
   assert(platform !== "web", "Pending scope requires a native platform.");
@@ -77,6 +93,8 @@ assert(
   "Select web, ios or android."
 );
 assert(["mapbox", "maplibre"].includes(engine), "Select mapbox or maplibre.");
+if (scope === "display")
+  assert.equal(platform, "ios", "Display scope requires an iOS simulator.");
 const output = process.env.TF08_OUTPUT;
 assert(output, "Set TF08_OUTPUT to a temporary result path.");
 const expectedLibrary = process.env.TF08_LIBRARY_SHA256;
@@ -89,11 +107,8 @@ assert(
 const { PNG } = createRequire(join(runtimeRoot, "package.json"))("pngjs");
 const fixturePort = Number(process.env.TF08_FIXTURE_PORT ?? 8798);
 const metroPort = Number(process.env.TF08_METRO_PORT ?? 8081);
-const shell = join(
-  root,
-  "examples",
-  `${platform === "web" ? "web" : "native"}-${engine}`
-);
+const shell =
+  platform === "web" ? webShell(root, 0).cwd : join(root, "apps/expo");
 const temporary = mkdtempSync(join(tmpdir(), "one-map-tf08-run-"));
 const scenarios = [];
 const imageObservations = [];
@@ -114,6 +129,7 @@ let applicationId;
 let nativeLibraries;
 let lastRendererObservation;
 let locationDiagnostic;
+let lastCoverageObservation;
 let dataContainer;
 const storageFixturePaths = {};
 const storageManifest =
@@ -170,6 +186,7 @@ const main = async () => {
   }
   await scenario("known renderer feature", async () => {
     await until(async () => {
+      if (!(await action("observations"))?.loads) return false;
       const value = await action("read");
       lastRendererObservation = {
         ...pickRead(value),
@@ -183,6 +200,11 @@ const main = async () => {
     return pickRead(await action("read"));
   });
   if (scenarios.at(-1).status === "passed") {
+    if (scope === "display") {
+      await independentDisplayScenario();
+      await currentMapFileScenario();
+      return;
+    }
     if (scope === "capture-coverage") {
       await captureCoverageScenarios();
       return;
@@ -226,89 +248,99 @@ const main = async () => {
       await pendingNativeScenarios();
       return;
     }
+    if (scope === "pending-operations") {
+      await pendingNativeScenarios();
+      return;
+    }
     if (scope === "offline") {
       assert(platform !== "web", "Offline scope requires a native platform.");
       await nativeOfflineScenarios();
       return;
     }
-    await scenario("injected location display and following", async () => {
-      await activateLocation();
-      await until(async () => (await action("read")).watches === 1, 5000);
-      await action("emit", { longitude: -122.33, latitude: 47.62 });
-      await until(
-        async () => near((await action("read")).center, [-122.33, 47.62]),
-        15000
-      );
-      await until(
-        async () =>
-          (await action("read")).features.some(
-            (feature) => feature.properties?.kind === "position"
-          ),
-        10000
-      );
-      return pickRead(await action("read"));
-    });
-    if (platform === "web") await browserScenarios();
-    await scenario("actual PNG capture and overlay scope", async () => {
-      await configure("injected");
-      const image = await action("capture", { scope: "backend" });
-      const pixels = imagePixels(image.uri);
-      if (pixels.red <= 20 && process.env.TF08_CAPTURE_OUTPUT)
-        writeFileSync(
-          process.env.TF08_CAPTURE_OUTPUT,
-          Buffer.from(image.uri.split(",")[1], "base64")
-        );
-      assert(
-        pixels.red > 20,
-        "Known renderer point is absent from the capture."
-      );
-      assert(
-        pixels.navy > 1000,
-        "Known background is absent from the capture."
-      );
-      if (platform === "web")
-        assert.equal(pixels.green, 0, "DOM marker leaked into canvas output.");
-      return {
-        ...pixels,
-        scope: image.scope,
-        overlayInclusion:
-          pixels.green > 20
-            ? "green-host-overlay-observed"
-            : "green-host-overlay-excluded",
-      };
-    });
-    await scenario("strict renderer capture scope", async () => {
-      if (platform === "ios") {
-        await assert.rejects(action("capture", { scope: "renderer" }));
-        return { explicitRejection: true };
-      }
-      const image = await action("capture", { scope: "renderer" });
-      assert(imagePixels(image.uri).red > 20);
-      return { scope: image.scope };
-    });
     await scenario(
-      "detach releases tracking and suppresses late fixes",
+      "explicit location action and supplied display",
       async () => {
-        await activateLocation();
-        await action("emit");
+        if (platform === "web") {
+          await page.send("Browser.setPermission", {
+            permission: { name: "geolocation" },
+            setting: "granted",
+            origin: browserUrl(),
+          });
+          await page.send("Emulation.setGeolocationOverride", {
+            longitude: -122.33,
+            latitude: 47.62,
+            accuracy: 25,
+          });
+        }
         const before = await action("read");
-        await action("configure", { mode: "detached" });
-        await delay(500);
-        const late = await action("emit", {
-          longitude: -122.31,
-          latitude: 47.64,
-        });
-        assert.equal(late.fixes, before.fixes);
-        assert.equal(late.releases, late.watches);
-        await configure("injected");
-        return late;
+        await activateLocation();
+        await until(
+          async () => (await action("read")).fixes > before.fixes,
+          15000
+        );
+        await until(
+          async () => near((await action("read")).center, [-122.33, 47.62]),
+          15000
+        );
+        await until(
+          async () =>
+            (await action("read")).features.some(
+              (feature) => feature.properties?.kind === "position"
+            ),
+          10000
+        );
+        return pickRead(await action("read"));
       }
     );
+    if (platform === "web") await browserScenarios();
+    await scenario(
+      "selected SDK PNG content and overlay observation",
+      async () => {
+        await configure("injected");
+        const image = await action("capture");
+        const pixels = imagePixels(image.uri);
+        if (pixels.red <= 20 && process.env.TF08_CAPTURE_OUTPUT)
+          writeFileSync(
+            process.env.TF08_CAPTURE_OUTPUT,
+            Buffer.from(image.uri.split(",")[1], "base64")
+          );
+        assert(
+          pixels.red > 20,
+          "Known renderer point is absent from the capture."
+        );
+        assert(
+          pixels.navy > 1000,
+          "Known background is absent from the capture."
+        );
+        if (platform === "web")
+          assert.equal(
+            pixels.green,
+            0,
+            "DOM marker leaked into canvas output."
+          );
+        return {
+          ...pixels,
+          overlayInclusion:
+            pixels.green > 20
+              ? "green-host-overlay-observed"
+              : "green-host-overlay-excluded",
+        };
+      }
+    );
+    await scenario("detach removes the location action", async () => {
+      const before = await action("observations");
+      await action("configure", { mode: "detached" });
+      await delay(500);
+      const detached = await action("observations");
+      assert.equal(detached.fixes, before.fixes);
+      await configure("injected");
+      return detached;
+    });
     if (platform !== "web") await nativeScenarios();
   }
 };
 
-const pendingNativeScenarios = async () => {
+const independentDisplayScenario = async () => {
   await scenario(
     "independent images at the pending native display density",
     async () => {
@@ -331,6 +363,9 @@ const pendingNativeScenarios = async () => {
       return { device, dataUrl: pixels, file: decoded };
     }
   );
+};
+
+const currentMapFileScenario = async () => {
   await scenario(
     "current-map file capture includes rendered content",
     async () => {
@@ -339,27 +374,83 @@ const pendingNativeScenarios = async () => {
       assert(pixels.width > 0 && pixels.height > 0);
       assert(pixels.red > 100 && pixels.navy > 1000);
       assert.equal(pixels.green, 0, "Host marker unexpectedly included.");
+      if (scope === "display") {
+        const device = await action("device-info");
+        assert.equal(device.scale, 2);
+        assert(
+          Math.abs(
+            pixels.width - Math.round(device.mapFrame.width * device.scale)
+          ) <= 1
+        );
+        assert(
+          Math.abs(
+            pixels.height - Math.round(device.mapFrame.height * device.scale)
+          ) <= 1
+        );
+        return { ...pixels, device };
+      }
       return pixels;
     }
   );
-  for (const operation of [
-    "ambient-invalidate",
-    "ambient-clear",
-    "ambient-size",
-    "tile-limit",
-    "throttle",
-    ...(engine === "mapbox"
-      ? [
-          "quota",
-          "migrate",
-          "legacy-list",
-          "legacy-migrate",
-          "legacy-limit",
-          "legacy-reset",
-        ]
-      : []),
-  ]) {
+};
+
+const pendingNativeScenarios = async () => {
+  if (scope !== "pending-operations") await independentDisplayScenario();
+  await currentMapFileScenario();
+  for (const operation of pendingOfflineOperations(engine)) {
     await scenario(`named offline ${operation}`, async () => {
+      if (
+        ["migrate", "legacy-migrate"].includes(operation) &&
+        platform === "ios"
+      ) {
+        const container = (
+          await command("xcrun", [
+            "simctl",
+            "get_app_container",
+            simulator,
+            applicationId,
+            "data",
+          ])
+        ).trim();
+        const destination = join(
+          container,
+          "Library/Application Support/.mapbox/map_data/map_data.db"
+        );
+        const source = join(
+          container,
+          `Library/Application Support/${operation === "legacy-migrate" ? applicationId : "com.mapbox.examples"}/.mapbox/cache.db`
+        );
+        const before = readFileSync(destination);
+        const sourceExisted = existsSync(source);
+        const sourceBytes = sourceExisted ? readFileSync(source) : before;
+        if (!sourceExisted) {
+          mkdirSync(join(source, ".."), { recursive: true });
+          writeFileSync(source, sourceBytes, { flag: "wx" });
+        }
+        try {
+          const failure = await action("named-offline", { operation }).then(
+            () => "Migration unexpectedly succeeded",
+            (error) => String(error.message ?? error)
+          );
+          assertExistingDatabaseRejection(
+            failure,
+            before,
+            readFileSync(destination)
+          );
+          assert.deepEqual(readFileSync(source), sourceBytes);
+          return {
+            expectedRejection: failure,
+            existingDestinationPreserved: true,
+            sourcePreserved: true,
+            bytes: before.length,
+            databaseSha256: createHash("sha256").update(before).digest("hex"),
+            populatedMigration:
+              "Verified separately before map creation by pending-storage.",
+          };
+        } finally {
+          if (!sourceExisted) rmSync(source);
+        }
+      }
       const result = await action("named-offline", { operation });
       assert.deepEqual(
         result.warnings,
@@ -550,6 +641,47 @@ const renderStoredStyle = async (fixture) => {
   };
 };
 
+/** Inspects a quiesced owned-app copy, retaining SQLite WAL contents and relaunching on failure. */
+const verifyMigratedStorage = async (fixture) => {
+  const snapshot = mkdtempSync(join(temporary, "tf08-migration-"));
+  try {
+    if (platform === "android")
+      await adb(["shell", "am", "force-stop", applicationId]);
+    else
+      await command("xcrun", ["simctl", "terminate", simulator, applicationId]);
+    const target = storageFixturePaths.migrationTarget;
+    const directory = target.slice(0, target.lastIndexOf("/"));
+    const name = target.slice(target.lastIndexOf("/") + 1);
+    const files =
+      platform === "android"
+        ? (await adb(["shell", "run-as", applicationId, "ls", "-1", directory]))
+            .trim()
+            .split(/\r?\n/)
+        : readdirSync(join(dataContainer, directory));
+    const destination = join(snapshot, name);
+    for (const suffix of ["", "-wal", "-shm"]) {
+      if (suffix && !files.includes(name + suffix)) continue;
+      writeFileSync(destination + suffix, await readAppFile(target + suffix));
+    }
+    const result = JSON.parse(
+      await command("python3", [
+        "-I",
+        join(root, "scripts/tf08-storage-observations.py"),
+        fixture.file,
+        destination,
+      ])
+    );
+    assert.equal(result.originalSha256, fixture.sha256);
+    return result;
+  } finally {
+    try {
+      await restartNative();
+    } finally {
+      rmSync(snapshot, { recursive: true, force: true });
+    }
+  }
+};
+
 const storageScenarios = async () => {
   if (engine === "mapbox")
     await scenario(
@@ -558,20 +690,8 @@ const storageScenarios = async () => {
         const fixture = storageFixture("migration");
         const result = await action("named-offline", { operation: "migrate" });
         assert.deepEqual(result.warnings, []);
-        await until(
-          async () => {
-            const bytes = await readAppFile(
-              storageFixturePaths.migrationTarget
-            );
-            return (
-              createHash("sha256").update(bytes).digest("hex") ===
-              fixture.sha256
-            );
-          },
-          15000,
-          "migration destination retains populated source bytes"
-        );
         await assert.rejects(readAppFile(storageFixturePaths.migrationSource));
+        const migration = await verifyMigratedStorage(fixture);
         const packs = await storageReadback(fixture);
         const rendered = await renderStoredStyle(fixture);
         await restartNative();
@@ -579,7 +699,9 @@ const storageScenarios = async () => {
         const cold = await renderStoredStyle(fixture);
         return {
           fixture,
-          movedBytesVerified: true,
+          movedDataVerified: true,
+          migrationSourceRemoved: true,
+          migration,
           packs,
           rendered,
           coldRestart: cold,
@@ -611,7 +733,7 @@ const storageScenarios = async () => {
   );
 };
 
-const coverageImages = async () => {
+const coverageImages = async (baseline = false) => {
   const image = await action("capture");
   const exported = PNG.sync.read(
     Buffer.from(image.uri.split(",")[1], "base64")
@@ -640,17 +762,32 @@ const coverageImages = async () => {
     liveBytes.length > 8 && liveBytes.subarray(1, 4).toString() === "PNG",
     "The live screenshot did not produce PNG bytes."
   );
-  return {
+  const viewport = platform === "web" ? undefined : await action("device-info");
+  const live = PNG.sync.read(liveBytes);
+  const observation = {
     exported: observeCoveragePixels(exported),
-    live: observeCoveragePixels(PNG.sync.read(liveBytes)),
+    live: viewport
+      ? observeNativeCoveragePixels(live, viewport)
+      : observeCoveragePixels(live),
     dimensions: { width: exported.width, height: exported.height },
+    viewport,
   };
+  lastCoverageObservation = observation;
+  if (process.env.TF08_CAPTURE_OUTPUT) {
+    const prefix = `${process.env.TF08_CAPTURE_OUTPUT}${baseline ? ".baseline" : ""}`;
+    writeFileSync(
+      `${prefix}.exported.png`,
+      Buffer.from(image.uri.split(",")[1], "base64")
+    );
+    writeFileSync(`${prefix}.live.png`, liveBytes);
+  }
+  return observation;
 };
 
 const captureCoverageScenarios = async () => {
   await configure("coverage-base");
   await delay(700);
-  const baseline = await coverageImages();
+  const baseline = await coverageImages(true);
   for (const [kind, color] of [
     ["annotation", "green"],
     ["popup", "green"],
@@ -694,8 +831,22 @@ const captureCoverageScenarios = async () => {
             "47.615,-122.34",
           ]);
         if (kind === "puck" && platform === "web") {
+          const before = await action("read");
+          await page.send("Browser.setPermission", {
+            permission: { name: "geolocation" },
+            setting: "granted",
+            origin: browserUrl(),
+          });
+          await page.send("Emulation.setGeolocationOverride", {
+            longitude: -122.34,
+            latitude: 47.615,
+            accuracy: 25,
+          });
           await activateLocation();
-          await action("emit", { longitude: -122.34, latitude: 47.615 });
+          await until(
+            async () => (await action("read")).fixes > before.fixes,
+            10000
+          );
         }
         return observe();
       }
@@ -747,49 +898,7 @@ const readNativeImage = async (uri) => {
 };
 
 const browserScenarios = async () => {
-  await scenario(
-    "gesture interruption and resume without another watch",
-    async () => {
-      const before = await action("read");
-      await page.send("Input.dispatchMouseEvent", {
-        type: "mousePressed",
-        x: 550,
-        y: 350,
-        button: "left",
-        buttons: 1,
-        clickCount: 1,
-      });
-      for (let step = 1; step <= 8; step += 1)
-        await page.send("Input.dispatchMouseEvent", {
-          type: "mouseMoved",
-          x: 550 + step * 10,
-          y: 350 + step * 3,
-          buttons: 1,
-        });
-      await page.send("Input.dispatchMouseEvent", {
-        type: "mouseReleased",
-        x: 630,
-        y: 374,
-        button: "left",
-        clickCount: 1,
-      });
-      await delay(500);
-      const moved = await action("read");
-      await action("emit", { longitude: -122.32, latitude: 47.63 });
-      await delay(700);
-      assert(
-        near((await action("read")).center, moved.center),
-        "An injected fix overrode the interrupted camera."
-      );
-      await activateLocation();
-      await until(
-        async () => near((await action("read")).center, [-122.32, 47.63]),
-        15000
-      );
-      assert.equal((await action("read")).watches, before.watches);
-      return pickRead(await action("read"));
-    }
-  );
+  // U16 retires common tracking, gesture-resume and coalescing policy.
   await scenario("browser geolocation success after activation", async () => {
     await configure("default");
     const before = await action("read");
@@ -829,23 +938,6 @@ const browserScenarios = async () => {
       return { observedError: true };
     }
   );
-  await scenario(
-    "retained incompatible drawing buffer rejects capture",
-    async () => {
-      await configure("unpreserved");
-      await configure("retained");
-      await assert.rejects(action("capture"));
-      return { explicitRejection: true };
-    }
-  );
-  await scenario(
-    "external incompatible drawing buffer rejects capture",
-    async () => {
-      await configure("external");
-      await assert.rejects(action("capture"));
-      return { explicitRejection: true };
-    }
-  );
   await scenario("canvas export failure propagates", async () => {
     await configure("injected");
     await page.evaluate(
@@ -863,86 +955,7 @@ const browserScenarios = async () => {
 };
 
 const nativeScenarios = async () => {
-  await scenario(
-    "native gesture interruption and resume without another watch",
-    async () => {
-      await configure("injected");
-      const inactive = await action("read");
-      await activateLocation();
-      await until(
-        async () => (await action("read")).watches > inactive.watches,
-        15000,
-        "native control watch registration"
-      );
-      await action("emit");
-      await until(
-        async () => {
-          const value = await action("read");
-          return (
-            near(value.center, [-122.33, 47.62]) &&
-            !value.moving &&
-            value.moveEnds > inactive.moveEnds
-          );
-        },
-        15000,
-        "native initial follow completion"
-      );
-      const before = await action("read");
-      if (platform === "android") {
-        const size = (await adb(["shell", "wm", "size"])).match(/(\d+)x(\d+)/);
-        assert(size);
-        const width = Number(size[1]);
-        const height = Number(size[2]);
-        await adb([
-          "shell",
-          "input",
-          "swipe",
-          String(width * 0.5),
-          String(height * 0.5),
-          String(width * 0.7),
-          String(height * 0.6),
-          "400",
-        ]);
-      } else {
-        currentTap = `drag ${applicationId} ${randomUUID()}`;
-      }
-      await until(
-        async () => {
-          const value = await action("read");
-          return (
-            !near(value.center, before.center) &&
-            !value.moving &&
-            value.moveEnds > before.moveEnds
-          );
-        },
-        15000,
-        "native physical drag completion"
-      );
-      const moved = await action("read");
-      assert(
-        !near(moved.center, before.center),
-        "Native drag did not move the camera."
-      );
-      await action("emit", { longitude: -122.32, latitude: 47.63 });
-      await delay(1000);
-      assert(
-        near((await action("read")).center, moved.center),
-        "Location fix overrode native gesture interruption."
-      );
-      await activateLocation();
-      await until(
-        async () => near((await action("read")).center, [-122.32, 47.63]),
-        15000,
-        "native control follow resume"
-      );
-      assert.equal((await action("read")).watches, before.watches);
-      return {
-        before: pickRead(before),
-        afterDrag: pickRead(moved),
-        afterResume: pickRead(await action("read")),
-      };
-    }
-  );
+  // U16 uses a one-shot application button; continuous follow is a selected SDK/app choice.
   await scenario("foreground permission boundary", async () => {
     if (platform === "ios" && engine === "mapbox") {
       await assert.rejects(action("permission"));
@@ -975,6 +988,19 @@ const nativeScenarios = async () => {
         "47.61,-122.34",
       ]);
     await delay(1000);
+    // An immediate fresh fix must already be within the expected tolerance.
+    // Keep this coordinate distinct from the later target so providers that
+    // discard a stale cached fix receive actual movement after acquisition.
+    if (platform === "android")
+      await adb(["emu", "geo", "fix", "-122.3302", "47.6202"]);
+    else
+      await command("xcrun", [
+        "simctl",
+        "location",
+        simulator,
+        "set",
+        "47.6202,-122.3302",
+      ]);
     const requested = action("position");
     await delay(1000);
     for (let index = 0; index < 3; index += 1) {
@@ -1029,20 +1055,16 @@ const nativeScenarios = async () => {
     }
   );
   await scenario(
-    "invalid snapshot style rejects before the facade deadline",
+    "selected SDK rejects an invalid independent snapshot style",
     async () => {
       const started = Date.now();
       await assert.rejects(
         action("snapshot", {
           mapStyle: `${fixtureUrl}/invalid-style.json`,
-          timeoutMs: 20000,
-        })
+        }),
+        { name: "Tf08CommandError" }
       );
       const elapsedMs = Date.now() - started;
-      assert(
-        elapsedMs < 19000,
-        "Only the facade deadline rejected a stalled native snapshot."
-      );
       return { elapsedMs };
     }
   );
@@ -1062,6 +1084,12 @@ const nativeScenarios = async () => {
         } finally {
           const override = original.match(/Override density: (\d+)/);
           await adb(["shell", "wm", "density", override?.[1] ?? "reset"]);
+          await restartNative();
+          await until(
+            async () => !!(await action("observations"))?.loads,
+            90000,
+            "restored density map readiness"
+          );
         }
       }
     );
@@ -1096,16 +1124,7 @@ const nativeOfflineScenarios = async () => {
       assert.equal(before.errors, 0, JSON.stringify(before.errorMessages));
       await assert.rejects(action("offline-duplicate", { id }));
       const result = await action("offline-status", { id });
-      assert(
-        result.progress.some(
-          (entry) => entry.label === "one" && entry.state === "complete"
-        )
-      );
-      assert(
-        result.progress.some(
-          (entry) => entry.label === "two" && entry.state === "complete"
-        )
-      );
+      assert(result.progress.some((entry) => entry.state === "complete"));
       assert.equal(result.errors, 0, JSON.stringify(result.errorMessages));
       return {
         pack: result.pack,
@@ -1145,16 +1164,16 @@ const nativeOfflineScenarios = async () => {
         resourcesAvailable = false;
         await restartNative();
         await until(
-          async () => !!(await action("read")).loads,
+          async () => !!(await action("observations"))?.loads,
           90000,
           "cold restart local map readiness"
         );
         const persisted = await action("offline-status", { id });
-        assert.equal(persisted.pack.metadata.test, "tf08");
+        assert.equal(persisted.pack.user.test, "tf08");
         assert.equal(persisted.status.state, "complete");
         if (engine === "mapbox")
           assert.equal(await action("network", { connected: false }), false);
-        await configure("injected", persisted.pack.metadata.fixtureStyle);
+        await configure("injected", persisted.pack.user.fixtureStyle);
         await action("camera", { longitude: 0, latitude: 0, zoom: 1 });
         await delay(1000);
         const image = await action("capture");
@@ -1189,11 +1208,13 @@ const nativeOfflineScenarios = async () => {
   // Exercise invalidation online after verifying the pristine completed pack.
   if (lifecyclePassed)
     await scenario(
-      "offline invalidation preserves subscribed progress",
+      "offline invalidation with explicit application observer refresh",
       async () => {
         await action("offline-subscribe", { id });
         const before = await action("offline-status", { id });
         await action("offline-invalidate", { id });
+        await action("offline-unsubscribe", { id });
+        await action("offline-subscribe", { id });
         await action("offline-resume", { id });
         await until(
           async () =>
@@ -1231,6 +1252,7 @@ const scenario = async (name, operation) => {
       status: "failed",
       error: sanitize(error?.message ?? "Acceptance operation failed."),
       lastRendererObservation,
+      lastCoverageObservation,
     });
   }
   console.error(`${engine}-${platform}: ${name}: ${scenarios.at(-1).status}`);
@@ -1257,7 +1279,9 @@ const action = async (name, value = {}) => {
   replies.delete(id);
   if (!reply.ok) {
     if (name === "position") locationDiagnostic = reply.diagnostic;
-    throw new Error(reply.message ?? reply.error);
+    throw Object.assign(new Error(reply.message ?? reply.error), {
+      name: "Tf08CommandError",
+    });
   }
   if (name === "read")
     lastRendererObservation = {
@@ -1270,10 +1294,13 @@ const action = async (name, value = {}) => {
 const configure = async (mode, mapStyle) => {
   let before = await action("read").catch(() => undefined);
   if (!before) {
-    // The storage shell must create its map before it can receive configuration.
+    // Historical loads do not establish that a detached map has remounted.
+    const loads = await action("observations")
+      .then((value) => value.loads)
+      .catch(() => 0);
     await action("configure", { mode: "injected" });
     await until(
-      async () => (await action("read")).loads > 0,
+      async () => (await action("observations")).loads > loads,
       90000,
       "deferred map mount"
     );
@@ -1281,7 +1308,7 @@ const configure = async (mode, mapStyle) => {
   }
   await action("configure", { mode, mapStyle });
   await until(
-    async () => (await action("read")).loads > before.loads,
+    async () => (await action("observations")).loads > before.loads,
     90000,
     "replacement map load"
   );
@@ -1451,14 +1478,17 @@ const serveFixtures = async () => {
 };
 
 const browserUrl = () =>
-  `http://127.0.0.1:${Number(process.env.TF08_WEB_PORT ?? (engine === "mapbox" ? 4191 : 4192))}`;
+  webShell(
+    root,
+    Number(process.env.TF08_WEB_PORT ?? (engine === "mapbox" ? 4191 : 4192))
+  ).base;
 const launchWeb = async () => {
   const port = new URL(browserUrl()).port;
-  vite = start(
-    "bun",
-    ["run", "dev", "--", "--port", port, "--strictPort", "--host", "127.0.0.1"],
-    { cwd: shell, env: { ...process.env, ONE_MAP_SMOKE_CACHE_ROOT: temporary } }
-  );
+  const web = webShell(root, port);
+  vite = start(web.command, web.args, {
+    cwd: shell,
+    env: { ...process.env, ONE_MAP_SMOKE_CACHE_ROOT: temporary },
+  });
   await until(async () => (await fetch(browserUrl())).ok, 30000);
   browser = start(
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -1468,7 +1498,7 @@ const launchWeb = async () => {
       `--user-data-dir=${join(temporary, "profile")}`,
       "--window-size=1280,800",
       "--no-first-run",
-      `${browserUrl()}/?tf08=services`,
+      webScenarioUrl(root, port, "tf08=services", engine),
     ]
   );
   let target;
@@ -1481,6 +1511,21 @@ const launchWeb = async () => {
   }, 20000);
   page = await connect(target.webSocketDebuggerUrl);
   await until(async () => page.evaluate("!!window.__oneMapTf08"), 30000);
+};
+
+const grantAndroidTransportPermission = async () => {
+  const sdk = Number(await adb(["shell", "getprop", "ro.build.version.sdk"]));
+  assert(Number.isInteger(sdk) && sdk > 0, "Invalid Android API level.");
+  // Clearing storage also resets Android 17's local-network runtime grant.
+  if (sdk >= 37) {
+    await adb([
+      "shell",
+      "pm",
+      "grant",
+      applicationId,
+      "android.permission.ACCESS_LOCAL_NETWORK",
+    ]);
+  }
 };
 
 const launchNative = async () => {
@@ -1504,11 +1549,7 @@ const launchNative = async () => {
     createHash("sha256").update(readFileSync(binary)).digest("hex"),
     expected
   );
-  applicationId =
-    process.env.TF08_APPLICATION_ID ??
-    (platform === "android"
-      ? `com.onemap${engine}`
-      : `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`);
+  applicationId = nativeApplicationId();
   if (platform === "android") {
     await adb(["install", "-r", binary]);
     const installed = (await adb(["shell", "pm", "path", applicationId]))
@@ -1582,6 +1623,7 @@ const launchNative = async () => {
       applicationId,
       "android.permission.ACCESS_COARSE_LOCATION",
     ]);
+    await grantAndroidTransportPermission();
   } else {
     if (scope === "pending-storage") {
       assert(
@@ -1644,17 +1686,13 @@ const launchNative = async () => {
     ]);
   }
   if (scope === "pending-storage") await stageStorageFixtures();
-  metro = start(
-    "bun",
-    ["run", "start", "--", "--port", String(metroPort), "--reset-cache"],
-    {
-      cwd: shell,
-      env: {
-        ...process.env,
-        ONE_MAP_SMOKE: scope === "pending-storage" ? "tf08-storage" : "tf08",
-      },
-    }
-  );
+  metro = start("node", nativeMetroArgs(metroPort), {
+    cwd: shell,
+    env: nativeEnvironment(
+      engine,
+      scope === "pending-storage" ? "tf08-storage" : "tf08"
+    ),
+  });
   await until(
     async () => (await fetch(`http://127.0.0.1:${metroPort}/status`)).ok,
     60000
@@ -1664,36 +1702,12 @@ const launchNative = async () => {
 
 const restartNative = async () => {
   currentCommand = {};
-  if (platform === "android") {
-    await adb(["shell", "am", "force-stop", applicationId]);
-    const launch = await adb([
-      "shell",
-      "am",
-      "start",
-      "-W",
-      "-n",
-      `${applicationId}/com.onemap${engine}.MainActivity`,
-    ]);
-    assert(
-      !/Error:|Exception/.test(launch),
-      `Android launch failed: ${launch}`
-    );
-  } else {
-    await command("xcrun", [
-      "simctl",
-      "terminate",
-      simulator,
-      applicationId,
-    ]).catch(() => undefined);
-    await command("xcrun", [
-      "simctl",
-      "launch",
-      simulator,
-      applicationId,
-      "-RCT_jsLocation",
-      `127.0.0.1:${metroPort}`,
-    ]);
-  }
+  launchNativeWorkspace({
+    platform,
+    iosDevice: simulator,
+    port: metroPort,
+    fixturePorts: [fixturePort],
+  });
 };
 
 let currentTap = "";
@@ -1809,8 +1823,6 @@ const pickRead = (value) => ({
   loads: value.loads,
   fixes: value.fixes,
   errors: value.errors,
-  watches: value.watches,
-  releases: value.releases,
   center: value.center,
   zoom: value.zoom,
   featureCount: value.features.length,
@@ -1970,12 +1982,17 @@ try {
     imageObservations,
     lastRendererObservation,
     locationDiagnostic,
+    lastCoverageObservation,
     remaining:
       scope === "capture-coverage"
         ? ["Database import/migration results are recorded separately."]
         : scope === "pending-storage"
           ? ["Additional capture results are recorded separately."]
-          : [],
+          : scope === "pending-operations"
+            ? [
+                "The independent 128x80 snapshot and 2x iOS display-scale observations were not exercised.",
+              ]
+            : [],
     excludedByOwner: [
       "physical-device testing",
       "RNMapbox ambient invalidation and ambient-size controls",

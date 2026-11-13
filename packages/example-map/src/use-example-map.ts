@@ -51,6 +51,9 @@ export const useExampleMap = (
   const busy = useRef(false);
   const active = useRef(true);
   const verification = useRef<AbortController | null>(null);
+  const loadingTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
   const adapter = adapters[attachment.engine];
   const attachMap = useCallback((map: MapRef | null): void => {
     mapRef.current = map;
@@ -81,13 +84,16 @@ export const useExampleMap = (
   const failLoading = useEffectEvent(fail);
   useEffect(() => {
     if (status !== "loading" && status !== "switching") return;
-    const timer = setTimeout(() => failLoading(), 10000);
+    // Cold style resources get a loading budget; restoration has its own shorter deadline.
+    const timer = setTimeout(() => failLoading(), 30000);
+    loadingTimer.current = timer;
     return () => clearTimeout(timer);
   }, [attachment.generation, status]);
 
   const onLoad = async (): Promise<void> => {
     const map = mapRef.current;
     if (!map || !isCurrent() || verification.current?.signal.aborted) return;
+    clearTimeout(loadingTimer.current);
     verification.current?.abort();
     const controller = new AbortController();
     verification.current = controller;

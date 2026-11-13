@@ -1,6 +1,6 @@
 import { deflateSync } from "node:zlib";
 
-/** PNG fixture encodes a flat 1000 meter terrain tile without external services. */
+/** Encodes a 1000-meter sample surface with a synthetic hillshade strip. */
 export const terrainPng = () => {
   const crc32 = (bytes) => {
     let crc = -1;
@@ -29,7 +29,8 @@ export const terrainPng = () => {
   for (let y = 0; y < 256; y += 1)
     for (let x = 0; x < 256; x += 1) {
       const offset = y * 769 + 1 + x * 3;
-      const meters = 1000 + (x >= 80 && x < 120 ? (x - 80) * 30 : 0);
+      // Low-zoom tiles span thousands of kilometers, so shading needs a steep rise.
+      const meters = 1000 + (x >= 80 && x < 120 ? (x - 80) * 3000 : 0);
       const encoded = Math.round((meters + 10000) * 10);
       pixels[offset] = encoded >> 16;
       pixels[offset + 1] = (encoded >> 8) & 255;

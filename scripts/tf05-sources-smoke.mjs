@@ -5,10 +5,25 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { deflateSync } from "node:zlib";
 
+import { stopOwnedProcess } from "./native-smoke-process.mjs";
+import {
+  webShell,
+  webScenarioUrl,
+  nativeEnvironment,
+  nativeMetroArgs,
+  nativeApplicationId,
+  launchNativeWorkspace,
+} from "./workspace-smoke-shell.mjs";
+
 const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
+const iosDevice = process.env.ONE_MAP_ACCEPTANCE_IOS_UDID ?? "booted";
+let nativePid;
 const group = process.argv[2] ?? "web";
+const nativeEngine = process.env.TF05_ENGINE ?? "both";
+if (!["both", "mapbox", "maplibre"].includes(nativeEngine))
+  throw new Error("Use both, mapbox or maplibre for TF05_ENGINE.");
 const corrections = process.argv[3] === "corrections";
 if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
   throw new Error("The corrections scope requires: web corrections.");
@@ -37,29 +52,43 @@ async function main() {
     }
 
     if (group === "android" || group === "all") {
-      results["mapbox-android"] = await runNative({
-        directory: "native-mapbox",
-        platform: "android",
-        applicationId: "com.onemapmapbox",
-      });
-      results["maplibre-android"] = await runNative({
-        directory: "native-maplibre",
-        platform: "android",
-        applicationId: "com.onemapmaplibre",
-      });
+      if (nativeEngine === "both" || nativeEngine === "mapbox") {
+        results["mapbox-android"] = await runNative({
+          directory: "native-mapbox",
+          platform: "android",
+          applicationId:
+            process.env.TF05_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
+        });
+      }
+      if (nativeEngine === "both" || nativeEngine === "maplibre") {
+        results["maplibre-android"] = await runNative({
+          directory: "native-maplibre",
+          platform: "android",
+          applicationId:
+            process.env.TF05_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
+        });
+      }
     }
 
     if (group === "ios" || group === "all") {
-      results["mapbox-ios"] = await runNative({
-        directory: "native-mapbox",
-        platform: "ios",
-        applicationId: "org.reactjs.native.example.OneMapMapbox",
-      });
-      results["maplibre-ios"] = await runNative({
-        directory: "native-maplibre",
-        platform: "ios",
-        applicationId: "org.reactjs.native.example.OneMapMaplibre",
-      });
+      if (nativeEngine === "both" || nativeEngine === "mapbox") {
+        results["mapbox-ios"] = await runNative({
+          directory: "native-mapbox",
+          platform: "ios",
+          applicationId:
+            process.env.TF05_MAPBOX_IOS_ID ??
+            "org.reactjs.native.example.OneMapMapbox",
+        });
+      }
+      if (nativeEngine === "both" || nativeEngine === "maplibre") {
+        results["maplibre-ios"] = await runNative({
+          directory: "native-maplibre",
+          platform: "ios",
+          applicationId:
+            process.env.TF05_MAPLIBRE_IOS_ID ??
+            "org.reactjs.native.example.OneMapMaplibre",
+        });
+      }
     }
   } finally {
     await fixture.close();
@@ -73,21 +102,13 @@ async function main() {
 }
 
 async function runWeb(directory, port, label) {
-  const shell = join(root, "examples", directory);
-  const vite = spawn(
-    "bun",
-    [
-      "run",
-      "dev",
-      "--",
-      "--port",
-      String(port),
-      "--strictPort",
-      "--host",
-      "127.0.0.1",
-    ],
-    { cwd: shell, stdio: ["ignore", "pipe", "pipe"] }
-  );
+  const web = webShell(root, port);
+  const shell = web.cwd;
+  const vite = spawn(web.command, web.args, {
+    cwd: shell,
+    detached: true,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
   let viteLog = "";
   const record = (chunk) => {
     viteLog += chunk.toString();
@@ -105,13 +126,22 @@ async function runWeb(directory, port, label) {
       `--user-data-dir=${profile}`,
       "--window-size=1280,800",
       "--no-first-run",
-      `http://127.0.0.1:${port}/?tf05=${webScenario}`,
+      webScenarioUrl(
+        root,
+        port,
+        `tf05=${webScenario}`,
+        directory.replace("web-", "")
+      ),
     ],
-    { stdio: "ignore" }
+    { detached: true, stdio: "ignore" }
   );
 
   try {
-    await waitFor(() => viteLog.includes("Local:"), 30000, `${label} server`);
+    await waitFor(
+      () => viteLog.includes("Local:") || viteLog.includes("Waiting on"),
+      30000,
+      `${label} server`
+    );
     const page = await attachPage(port + 1000);
     if (corrections) {
       try {
@@ -130,8 +160,8 @@ async function runWeb(directory, port, label) {
       log: viteLog.slice(-1500),
     };
   } finally {
-    chrome.kill("SIGKILL");
-    vite.kill("SIGTERM");
+    await stopOwnedProcess(chrome);
+    await stopOwnedProcess(vite);
     rmSync(profile, { recursive: true, force: true });
   }
 }
@@ -182,83 +212,6 @@ async function watchWeb(page, label) {
   throw new Error(`${label} did not finish`);
 }
 
-async function removeAndroidBundle(shell) {
-  await command("rm", [
-    "-f",
-    join(shell, "android/app/src/main/assets/index.android.bundle"),
-  ]);
-}
-
-async function lanAddress() {
-  const address = (await command("ipconfig", ["getifaddr", "en0"])).trim();
-
-  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) {
-    throw new Error("en0 has no IPv4 address");
-  }
-
-  return address;
-}
-
-async function writeDebugHost(applicationId, host) {
-  const prefs = `shared_prefs/${applicationId}_preferences.xml`;
-  const remote = `run-as ${applicationId} sh -c 'cat > ${prefs}'`;
-
-  await command("adb", ["shell", "am", "force-stop", applicationId]);
-  await command("adb", [
-    "shell",
-    "run-as",
-    applicationId,
-    "mkdir",
-    "-p",
-    "shared_prefs",
-  ]);
-
-  const existing = await command("adb", [
-    "exec-out",
-    "run-as",
-    applicationId,
-    "cat",
-    prefs,
-  ]).catch(() => "");
-
-  await command("adb", ["shell", remote], {
-    input: debugHostPreference(existing, host),
-  });
-}
-
-function debugHostPreference(existing, host) {
-  const entry = `<string name="debug_http_host">${host}</string>`;
-
-  if (existing.includes('name="debug_http_host"')) {
-    return existing.replace(
-      /<string name="debug_http_host">[^<]*<\/string>/,
-      entry
-    );
-  }
-
-  if (existing.includes("</map>")) {
-    return existing.replace("</map>", `    ${entry}\n</map>`);
-  }
-
-  return [
-    "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>",
-    "<map>",
-    `    ${entry}`,
-    "</map>",
-    "",
-  ].join("\n");
-}
-
-async function startAndroidApp(applicationId) {
-  await command("adb", [
-    "shell",
-    "am",
-    "start",
-    "-n",
-    `${applicationId}/.MainActivity`,
-  ]);
-}
-
 async function allowNearbyDevices() {
   const started = Date.now();
 
@@ -307,7 +260,12 @@ function allowButtonPoint(xml) {
 }
 
 async function readAndroidStatus() {
-  const log = await command("adb", ["logcat", "-d"], {}, 20000).catch(() => "");
+  const log = await command(
+    "adb",
+    ["logcat", "-d", "--pid", String(nativePid)],
+    {},
+    20000
+  ).catch(() => "");
   const fromLog = latestStatus(log);
 
   if (fromLog) {
@@ -368,31 +326,22 @@ function openStatusPort() {
 }
 
 async function runNative({ directory, platform, applicationId }) {
-  const shell = join(root, "examples", directory);
+  applicationId = nativeApplicationId();
+  const shell = join(root, "apps/expo");
 
   await freePort(8081);
 
   let metroLog = "";
-  const metroArgs = ["run", "start", "--", "--port", "8081", "--reset-cache"];
-  // MapLibre Android's HTTP stack times out on the emulator's 10.0.2.2
-  // alias; the host LAN address reaches the fixture server on 0.0.0.0.
-  const fixtureBase =
-    platform === "android"
-      ? `http://${await lanAddress()}:8798`
-      : "http://127.0.0.1:8798";
-  const metroEnv = {
-    ...process.env,
-    ONE_MAP_SMOKE: "tf05",
-    TF05_BASE: fixtureBase,
-  };
+  const metroArgs = nativeMetroArgs();
+  const metroEnv = nativeEnvironment(directory.replace("native-", ""), "tf05", {
+    TF05_BASE: "http://127.0.0.1:8798",
+    TF06_BASE: "http://127.0.0.1:8798",
+  });
 
-  if (platform === "android") {
-    metroArgs.push("--host", "0.0.0.0");
-  }
-
-  const metro = spawn("bun", metroArgs, {
+  const metro = spawn("node", metroArgs, {
     cwd: shell,
     env: metroEnv,
+    detached: true,
     stdio: ["ignore", "pipe", "pipe"],
   });
   const record = (chunk) => {
@@ -403,7 +352,6 @@ async function runNative({ directory, platform, applicationId }) {
   metro.stderr.on("data", record);
 
   const statusPort = platform === "ios" ? await openStatusPort() : null;
-  let build = Promise.resolve();
 
   try {
     await waitFor(
@@ -413,18 +361,8 @@ async function runNative({ directory, platform, applicationId }) {
     );
 
     if (platform === "android") {
-      await removeAndroidBundle(shell);
-      await command(
-        "bun",
-        ["run", "android", "--", "--no-packager"],
-        { cwd: shell, env: metroEnv },
-        600000
-      );
-      const address = await lanAddress();
-
-      await writeDebugHost(applicationId, `${address}:8081`);
-      await command("adb", ["logcat", "-c"]);
-      await startAndroidApp(applicationId);
+      const launched = launchNativeWorkspace({ platform, iosDevice });
+      nativePid = launched?.pid;
       await allowNearbyDevices();
 
       const status = await watchNative({ readStatus: readAndroidStatus });
@@ -432,21 +370,10 @@ async function runNative({ directory, platform, applicationId }) {
       return judge(status);
     }
 
-    build = command(
-      "bun",
-      [
-        "run",
-        "ios",
-        "--",
-        "--no-packager",
-        "--port",
-        "8081",
-        "--simulator",
-        "iPhone 18 Pro",
-      ],
-      { cwd: shell, env: metroEnv },
-      600000
-    );
+    if (iosDevice === "booted") {
+      throw new Error("Isolated acceptance requires an explicit iOS UDID");
+    }
+    launchNativeWorkspace({ platform, iosDevice });
 
     const status = await watchNative({
       readStatus: () => statusPort.read(),
@@ -461,19 +388,17 @@ async function runNative({ directory, platform, applicationId }) {
       log: metroLog.slice(-1500),
     };
   } finally {
-    await build.catch(() => undefined);
-
     if (platform === "ios") {
       await command("xcrun", [
         "simctl",
         "terminate",
-        "booted",
+        iosDevice,
         applicationId,
       ]).catch(() => undefined);
     }
 
     await statusPort?.close();
-    metro.kill("SIGTERM");
+    await stopOwnedProcess(metro);
   }
 }
 
@@ -916,16 +841,10 @@ async function freePort(port) {
     "-sTCP:LISTEN",
     "-t",
   ]).catch(() => "");
-
-  for (const pid of listed.split("\n").filter(Boolean)) {
-    try {
-      process.kill(Number(pid), "SIGTERM");
-    } catch {
-      // The process can exit between the listing and the signal.
-    }
-  }
-
-  await delay(500);
+  if (listed.trim())
+    throw new Error(
+      `Acceptance port ${port} is already owned; no process was stopped.`
+    );
 }
 
 const runWebCorrections = async (page) => {

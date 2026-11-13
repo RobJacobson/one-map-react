@@ -2,6 +2,8 @@ import { fileURLToPath } from "node:url";
 
 import { defineConfig } from "vite-plus";
 
+import { wrapperSourceRoots } from "./scripts/wrapper-source-roots.mjs";
+
 export default defineConfig({
   fmt: {
     printWidth: 80,
@@ -35,8 +37,6 @@ export default defineConfig({
       "**/.codex/**",
       "**/bun.lock",
       "records/**",
-      "examples/*/ios/**",
-      "examples/*/android/**",
       "**/*.md",
     ],
   },
@@ -58,8 +58,6 @@ export default defineConfig({
       "**/.agents/**",
       "**/.codex/**",
       "records/**",
-      "examples/*/ios/**",
-      "examples/*/android/**",
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
@@ -114,6 +112,15 @@ export default defineConfig({
         },
       },
       {
+        // Computed SDK imports must also load when linked outside this checkout.
+        server: {
+          fs: {
+            allow: [
+              fileURLToPath(new URL(".", import.meta.url)),
+              ...wrapperSourceRoots,
+            ],
+          },
+        },
         resolve: {
           alias: [
             {
@@ -132,6 +139,7 @@ export default defineConfig({
           include: [
             "packages/one-map-react/test/**/*.web.test.tsx",
             "packages/example-map/test/**/*.web.test.tsx",
+            "packages/example-map/test/**/*.web.test.jsx",
           ],
           environment: "jsdom",
           setupFiles: ["./packages/one-map-react/test/setup-web.ts"],

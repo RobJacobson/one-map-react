@@ -15,8 +15,12 @@ import { runInNewContext } from "node:vm";
 import { transformSync } from "@babel/core";
 
 const root = resolve(import.meta.dirname, "..");
-const rnRoot = resolve(root, "node_modules/@rnmapbox/maps");
-const mlRoot = resolve(root, "node_modules/@maplibre/maplibre-react-native");
+const rnRoot = resolve(
+  process.argv[2] ?? join(root, "node_modules/@rnmapbox/maps")
+);
+const mlRoot = resolve(
+  process.argv[3] ?? join(root, "node_modules/@maplibre/maplibre-react-native")
+);
 const requireHelper = createRequire(import.meta.url);
 
 // Helpers precede the eager checks so their const bindings are initialized.
@@ -32,7 +36,7 @@ const nativeSection = (source, start, end) => {
 const verifyPeerPatch = (peerRoot, filename) => {
   const patchFile = resolve(root, "packages/one-map-react/patches", filename);
   const patch = readFileSync(patchFile, "utf8");
-  const files = [...patch.matchAll(/^diff --git a\/(.+) b\//gm)].map(
+  const files = [...patch.matchAll(/^diff --git a\/.* b\/(.+)$/gm)].map(
     (match) => match[1]
   );
   assert.ok(files.length > 0, `${filename} contains no changes`);
@@ -148,6 +152,12 @@ for (const [file, start, end] of [
   );
   assert.match(status, /_makeRegionStatusPayload\(/);
   assert.match(status, /tileRegionPacks\[name\]\?\.state/);
+  assert(
+    status.indexOf("_makeRegionStatusPayload(pack") >= 0 &&
+      status.indexOf("_makeRegionStatusPayload(pack") <
+        status.search(/tileStore\.(?:getTileRegion|tileRegion)\(/),
+    "Live pack status must resolve before consulting persistent tile regions"
+  );
 }
 
 const mlOffline = readFileSync(

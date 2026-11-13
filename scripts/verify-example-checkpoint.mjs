@@ -5,7 +5,10 @@ import { readFileSync } from "node:fs";
 const root = new URL("../", import.meta.url);
 const record = JSON.parse(
   readFileSync(
-    new URL("records/evidence/example-workspace-checkpoint.json", root),
+    new URL(
+      process.argv[2] ?? "records/evidence/example-workspace-migration.json",
+      root
+    ),
     "utf8"
   )
 );
@@ -33,5 +36,5 @@ for (const [filename, expected] of Object.entries(record.builtFiles)) {
   assert.equal(actual, expected, `Frozen build changed: ${filename}`);
 }
 console.log(
-  `PASS example checkpoint ${record.sourceSha256}: source, built exports, and unchanged patch identities.`
+  `PASS example checkpoint ${record.sourceSha256}: migrated source and normal built exports.`
 );

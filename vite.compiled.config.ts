@@ -2,8 +2,14 @@ import { dirname, resolve } from "node:path";
 
 import { defineConfig } from "vite-plus";
 
+import { wrapperSourceRoots } from "./scripts/wrapper-source-roots.mjs";
+
 /** Reuses web regressions against emitted modules, including their internal contexts. */
 export default defineConfig({
+  // Test-only access to installed wrapper sources, including linked checkouts.
+  server: {
+    fs: { allow: [resolve(import.meta.dirname), ...wrapperSourceRoots] },
+  },
   plugins: [
     {
       name: "compiled-library-tests",

@@ -4,10 +4,25 @@ import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import { stopOwnedProcess } from "./native-smoke-process.mjs";
+import {
+  webShell,
+  webScenarioUrl,
+  nativeEnvironment,
+  nativeMetroArgs,
+  nativeApplicationId,
+  launchNativeWorkspace,
+} from "./workspace-smoke-shell.mjs";
+
 const chromePath =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const root = new URL("..", import.meta.url).pathname;
+const iosDevice = process.env.ONE_MAP_ACCEPTANCE_IOS_UDID ?? "booted";
+let nativePid;
 const group = process.argv[2] ?? "web";
+const nativeEngine = process.env.TF04_ENGINE ?? "both";
+if (!["both", "mapbox", "maplibre"].includes(nativeEngine))
+  throw new Error("Use both, mapbox or maplibre for TF04_ENGINE.");
 const corrections = process.argv[3] === "corrections";
 if (process.argv[3] !== undefined && (!corrections || group !== "web")) {
   throw new Error("The corrections scope requires: web corrections.");
@@ -222,38 +237,51 @@ if (group === "web" || group === "all") {
 }
 
 if (group === "android" || group === "all") {
-  results["mapbox-android"] = await runNative({
-    directory: "native-mapbox",
-    platform: "android",
-    applicationId: "com.onemapmapbox",
-    doubleTap: false,
-  });
-  results["maplibre-android"] = await runNative({
-    directory: "native-maplibre",
-    platform: "android",
-    applicationId: "com.onemapmaplibre",
-    doubleTap: true,
-  });
+  if (nativeEngine === "both" || nativeEngine === "mapbox") {
+    results["mapbox-android"] = await runNative({
+      directory: "native-mapbox",
+      platform: "android",
+      applicationId: process.env.TF04_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
+      doubleTap: false,
+    });
+  }
+  if (nativeEngine === "both" || nativeEngine === "maplibre") {
+    results["maplibre-android"] = await runNative({
+      directory: "native-maplibre",
+      platform: "android",
+      applicationId:
+        process.env.TF04_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
+      doubleTap: true,
+    });
+  }
 }
 
 if (group === "ios" || group === "all") {
   const tapDriver = await startIosTapDriver();
 
   try {
-    results["mapbox-ios"] = await runNative({
-      directory: "native-mapbox",
-      platform: "ios",
-      applicationId: "org.reactjs.native.example.OneMapMapbox",
-      doubleTap: false,
-    });
-    results["maplibre-ios"] = await runNative({
-      directory: "native-maplibre",
-      platform: "ios",
-      applicationId: "org.reactjs.native.example.OneMapMaplibre",
-      doubleTap: true,
-    });
+    if (nativeEngine === "both" || nativeEngine === "mapbox") {
+      results["mapbox-ios"] = await runNative({
+        directory: "native-mapbox",
+        platform: "ios",
+        applicationId:
+          process.env.TF04_MAPBOX_IOS_ID ??
+          "org.reactjs.native.example.OneMapMapbox",
+        doubleTap: false,
+      });
+    }
+    if (nativeEngine === "both" || nativeEngine === "maplibre") {
+      results["maplibre-ios"] = await runNative({
+        directory: "native-maplibre",
+        platform: "ios",
+        applicationId:
+          process.env.TF04_MAPLIBRE_IOS_ID ??
+          "org.reactjs.native.example.OneMapMaplibre",
+        doubleTap: true,
+      });
+    }
   } finally {
-    tapDriver.kill("SIGTERM");
+    await stopOwnedProcess(tapDriver);
   }
 }
 
@@ -264,21 +292,13 @@ if (Object.values(results).some((result) => result.status !== "passed")) {
 }
 
 async function runWeb(directory, port, label) {
-  const shell = join(root, "examples", directory);
-  const vite = spawn(
-    "bun",
-    [
-      "run",
-      "dev",
-      "--",
-      "--port",
-      String(port),
-      "--strictPort",
-      "--host",
-      "127.0.0.1",
-    ],
-    { cwd: shell, stdio: ["ignore", "pipe", "pipe"] }
-  );
+  const web = webShell(root, port);
+  const shell = web.cwd;
+  const vite = spawn(web.command, web.args, {
+    cwd: shell,
+    detached: true,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
   let viteLog = "";
   const record = (chunk) => {
     viteLog += chunk.toString();
@@ -296,13 +316,22 @@ async function runWeb(directory, port, label) {
       `--user-data-dir=${profile}`,
       "--window-size=1280,800",
       "--no-first-run",
-      `http://127.0.0.1:${port}/?tf04=${webScenario}`,
+      webScenarioUrl(
+        root,
+        port,
+        `tf04=${webScenario}`,
+        directory.replace("web-", "")
+      ),
     ],
-    { stdio: "ignore" }
+    { detached: true, stdio: "ignore" }
   );
 
   try {
-    await waitFor(() => viteLog.includes("Local:"), 30000, `${label} server`);
+    await waitFor(
+      () => viteLog.includes("Local:") || viteLog.includes("Waiting on"),
+      30000,
+      `${label} server`
+    );
     const page = await attachPage(port + 1000);
     if (corrections) {
       try {
@@ -321,8 +350,8 @@ async function runWeb(directory, port, label) {
       log: viteLog.slice(-1500),
     };
   } finally {
-    chrome.kill("SIGKILL");
-    vite.kill("SIGTERM");
+    await stopOwnedProcess(chrome);
+    await stopOwnedProcess(vite);
     rmSync(profile, { recursive: true, force: true });
   }
 }
@@ -412,83 +441,6 @@ async function clickPoint(page, x, y) {
   });
 }
 
-async function removeAndroidBundle(shell) {
-  await command("rm", [
-    "-f",
-    join(shell, "android/app/src/main/assets/index.android.bundle"),
-  ]);
-}
-
-async function lanAddress() {
-  const address = (await command("ipconfig", ["getifaddr", "en0"])).trim();
-
-  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) {
-    throw new Error("en0 has no IPv4 address");
-  }
-
-  return address;
-}
-
-async function writeDebugHost(applicationId, host) {
-  const prefs = `shared_prefs/${applicationId}_preferences.xml`;
-  const remote = `run-as ${applicationId} sh -c 'cat > ${prefs}'`;
-
-  await command("adb", ["shell", "am", "force-stop", applicationId]);
-  await command("adb", [
-    "shell",
-    "run-as",
-    applicationId,
-    "mkdir",
-    "-p",
-    "shared_prefs",
-  ]);
-
-  const existing = await command("adb", [
-    "exec-out",
-    "run-as",
-    applicationId,
-    "cat",
-    prefs,
-  ]).catch(() => "");
-
-  await command("adb", ["shell", remote], {
-    input: debugHostPreference(existing, host),
-  });
-}
-
-function debugHostPreference(existing, host) {
-  const entry = `<string name="debug_http_host">${host}</string>`;
-
-  if (existing.includes('name="debug_http_host"')) {
-    return existing.replace(
-      /<string name="debug_http_host">[^<]*<\/string>/,
-      entry
-    );
-  }
-
-  if (existing.includes("</map>")) {
-    return existing.replace("</map>", `    ${entry}\n</map>`);
-  }
-
-  return [
-    "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>",
-    "<map>",
-    `    ${entry}`,
-    "</map>",
-    "",
-  ].join("\n");
-}
-
-async function startAndroidApp(applicationId) {
-  await command("adb", [
-    "shell",
-    "am",
-    "start",
-    "-n",
-    `${applicationId}/.MainActivity`,
-  ]);
-}
-
 async function allowNearbyDevices() {
   const started = Date.now();
 
@@ -537,7 +489,12 @@ function allowButtonPoint(xml) {
 }
 
 async function readAndroidStatus() {
-  const log = await command("adb", ["logcat", "-d"], {}, 20000).catch(() => "");
+  const log = await command(
+    "adb",
+    ["logcat", "-d", "--pid", String(nativePid)],
+    {},
+    20000
+  ).catch(() => "");
   const fromLog = latestStatus(log);
 
   if (fromLog) {
@@ -565,7 +522,7 @@ async function startIosTapDriver() {
     "booted",
   ]);
 
-  if (!listed.includes("iPhone 18 Pro")) {
+  if (!listed.includes(iosDevice === "booted" ? "iPhone 18 Pro" : iosDevice)) {
     throw new Error("iPhone 18 Pro is not booted");
   }
 
@@ -580,10 +537,12 @@ async function startIosTapDriver() {
       "-scheme",
       "TapDriver",
       "-destination",
-      "platform=iOS Simulator,name=iPhone 18 Pro",
+      iosDevice === "booted"
+        ? "platform=iOS Simulator,name=iPhone 18 Pro"
+        : `platform=iOS Simulator,id=${iosDevice}`,
       "-only-testing:TapDriverUITests/TapDriver/testDriveTaps",
     ],
-    { cwd: root, stdio: ["ignore", "pipe", "pipe"] }
+    { cwd: root, detached: true, stdio: ["ignore", "pipe", "pipe"] }
   );
   const record = (chunk) => {
     log += chunk.toString();
@@ -599,7 +558,7 @@ async function startIosTapDriver() {
       "iOS tap driver"
     );
   } catch (error) {
-    driver.kill("SIGTERM");
+    await stopOwnedProcess(driver);
     throw new Error(
       `${error instanceof Error ? error.message : String(error)}\n${log.slice(-1500)}`
     );
@@ -664,20 +623,18 @@ function openStatusPort() {
 }
 
 async function runNative({ directory, platform, applicationId, doubleTap }) {
-  const shell = join(root, "examples", directory);
+  applicationId = nativeApplicationId();
+  const shell = join(root, "apps/expo");
 
   await freePort(8081);
 
   let metroLog = "";
-  const metroArgs = ["run", "start", "--", "--port", "8081", "--reset-cache"];
+  const metroArgs = nativeMetroArgs();
 
-  if (platform === "android") {
-    metroArgs.push("--host", "0.0.0.0");
-  }
-
-  const metro = spawn("bun", metroArgs, {
+  const metro = spawn("node", metroArgs, {
     cwd: shell,
-    env: { ...process.env, ONE_MAP_SMOKE: "tf04" },
+    env: nativeEnvironment(directory.replace("native-", ""), "tf04"),
+    detached: true,
     stdio: ["ignore", "pipe", "pipe"],
   });
   const record = (chunk) => {
@@ -688,7 +645,6 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
   metro.stderr.on("data", record);
 
   const statusPort = platform === "ios" ? await openStatusPort() : null;
-  let build = Promise.resolve();
 
   try {
     await waitFor(
@@ -698,18 +654,8 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
     );
 
     if (platform === "android") {
-      await removeAndroidBundle(shell);
-      await command(
-        "bun",
-        ["run", "android", "--", "--no-packager"],
-        { cwd: shell, env: { ...process.env, ONE_MAP_SMOKE: "tf04" } },
-        600000
-      );
-      const address = await lanAddress();
-
-      await writeDebugHost(applicationId, `${address}:8081`);
-      await command("adb", ["logcat", "-c"]);
-      await startAndroidApp(applicationId);
+      const launched = launchNativeWorkspace({ platform, iosDevice });
+      nativePid = launched?.pid;
       await allowNearbyDevices();
 
       const status = await watchNative({
@@ -722,21 +668,10 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
       return judge(status, doubleTap, platform);
     }
 
-    build = command(
-      "bun",
-      [
-        "run",
-        "ios",
-        "--",
-        "--no-packager",
-        "--port",
-        "8081",
-        "--simulator",
-        "iPhone 18 Pro",
-      ],
-      { cwd: shell, env: { ...process.env, ONE_MAP_SMOKE: "tf04" } },
-      600000
-    );
+    if (iosDevice === "booted") {
+      throw new Error("Isolated acceptance requires an explicit iOS UDID");
+    }
+    launchNativeWorkspace({ platform, iosDevice });
 
     const status = await watchNative({
       readStatus: () => statusPort.read(),
@@ -754,19 +689,17 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
       log: metroLog.slice(-1500),
     };
   } finally {
-    await build.catch(() => undefined);
-
     if (platform === "ios") {
       await command("xcrun", [
         "simctl",
         "terminate",
-        "booted",
+        iosDevice,
         applicationId,
       ]).catch(() => undefined);
     }
 
     await statusPort?.close();
-    metro.kill("SIGTERM");
+    await stopOwnedProcess(metro);
   }
 }
 
@@ -870,16 +803,16 @@ function judge(status, doubleTap, platform = "web") {
       .filter((part) => part.length === 2)
   );
   const stopOk = fields.stop === "stayed" || fields.stop === "rejected";
-  const heldOk =
-    fields.stop === "rejected"
-      ? fields.held === "0" || fields.held === "1"
-      : fields.held === "1";
+  const cameraOk =
+    platform === "web"
+      ? fields.held === "1"
+      : fields.held === "0" && fields.command === "applied";
   const doubleTapOk = doubleTapPassed(fields.doubletap, doubleTap, platform);
   const passed =
     fields.fit === "ok" &&
     fields.click === "hit" &&
     stopOk &&
-    heldOk &&
+    cameraOk &&
     doubleTapOk &&
     fields.done === "1";
 
@@ -1032,14 +965,8 @@ async function freePort(port) {
     "-sTCP:LISTEN",
     "-t",
   ]).catch(() => "");
-
-  for (const pid of listed.split("\n").filter(Boolean)) {
-    try {
-      process.kill(Number(pid), "SIGTERM");
-    } catch {
-      // The process can exit between the listing and the signal.
-    }
-  }
-
-  await delay(500);
+  if (listed.trim())
+    throw new Error(
+      `Acceptance port ${port} is already owned; no process was stopped.`
+    );
 }

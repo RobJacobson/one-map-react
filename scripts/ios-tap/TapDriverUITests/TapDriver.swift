@@ -10,10 +10,11 @@ final class TapDriver: XCTestCase {
     while Date() < deadline {
       let request = tapRequest()
 
-      if (request.hasPrefix("tap ") || request.hasPrefix("locate ") || request.hasPrefix("drag ") || request.hasPrefix("gesture ") || request.hasPrefix("inspect ") || request.hasPrefix("button ") || request.hasPrefix("scroll ")), request != seen {
+      if (request.hasPrefix("onboarding ") || request.hasPrefix("orientation ") || request.hasPrefix("tap ") || request.hasPrefix("locate ") || request.hasPrefix("drag ") || request.hasPrefix("gesture ") || request.hasPrefix("inspect ") || request.hasPrefix("button ") || request.hasPrefix("scroll ")), request != seen {
         seen = request
         (app, bundle) = perform(request, current: app, bundle: bundle)
         print("ONE_MAP_INPUT_DONE \(request)")
+        reportDone(request)
 
         if request.split(separator: " ").last == "once" {
           return
@@ -31,12 +32,36 @@ final class TapDriver: XCTestCase {
   ) -> (XCUIApplication?, String) {
     let parts = request.split(separator: " ")
 
-    if parts.count >= 2, parts[0] == "inspect" || parts[0] == "button" || parts[0] == "scroll" {
+    if parts.count == 3, parts[0] == "onboarding" {
+      let app = XCUIApplication(bundleIdentifier: String(parts[1]))
+      if app.state != .runningForeground { app.activate() }
+      let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+      let open = springboard.buttons["Open"].firstMatch
+      if open.waitForExistence(timeout: 3) { open.tap() }
+      XCTAssertTrue(app.buttons["Read renderer"].firstMatch.waitForExistence(timeout: 30))
+      return (app, String(parts[1]))
+    }
+
+    if parts.count >= 4, parts[0] == "orientation" {
       let nextBundle = String(parts[1])
       let app = nextBundle == bundle && current != nil
         ? current!
         : XCUIApplication(bundleIdentifier: nextBundle)
       if app.state != .runningForeground { app.activate() }
+      switch String(parts[2]) {
+      case "landscapeLeft": XCUIDevice.shared.orientation = .landscapeLeft
+      case "portrait": XCUIDevice.shared.orientation = .portrait
+      default: XCTFail("Unsupported acceptance orientation")
+      }
+      print("ONE_MAP_ORIENTATION_FRAME \(app.frame.width) \(app.frame.height)")
+      return (app, nextBundle)
+    }
+
+    if parts.count >= 2, parts[0] == "inspect" || parts[0] == "button" || parts[0] == "scroll" {
+      let nextBundle = String(parts[1])
+      // App interruption invalidates the prior foreground accessibility snapshot.
+      let app = XCUIApplication(bundleIdentifier: nextBundle)
+      app.activate()
       if parts[0] == "inspect" {
         print("ONE_MAP_AX_BEGIN\n\(app.debugDescription)\nONE_MAP_AX_END")
       } else if parts.count >= 4 {
@@ -110,6 +135,14 @@ final class TapDriver: XCTestCase {
 
     point.tap()
     return (app, nextBundle)
+  }
+
+  private func reportDone(_ command: String) {
+    guard let url = URL(string: "http://127.0.0.1:8799/done") else { return }
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.httpBody = command.data(using: .utf8)
+    URLSession.shared.dataTask(with: request).resume()
   }
 
   private func tapRequest() -> String {

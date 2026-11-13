@@ -13,7 +13,7 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import shellDeps from "../examples/resolve-shell-deps.cjs";
+import shellDeps from "./consumer-shell-resolution.cjs";
 
 const { shellMetroResolver } = shellDeps;
 import {
@@ -60,20 +60,20 @@ try {
     mkdirSync(join(examplesRoot, "shared"), { recursive: true });
     mkdirSync(join(output, "tests/fixtures"), { recursive: true });
     cpSync(
-      join(root, "examples/shared/route-map.tsx"),
+      join(root, "packages/example-map/src/scenarios/route-map.tsx"),
       join(examplesRoot, "shared/route-map.tsx")
     );
     cpSync(
-      join(root, "examples/pin-shell-deps.js"),
+      join(root, "scripts/consumer-shell-imports.mjs"),
       join(examplesRoot, "pin-shell-deps.js")
     );
     cpSync(
-      join(root, "tests/fixtures/map.json"),
-      join(output, "tests/fixtures/map.json")
+      join(root, "packages/example-map/src/scenarios/map.json"),
+      join(examplesRoot, "shared/map.json")
     );
     cpSync(
-      join(root, "tests/fixtures/map-fixture.ts"),
-      join(output, "tests/fixtures/map-fixture.ts")
+      join(root, "packages/example-map/src/scenarios/map-fixture.ts"),
+      join(examplesRoot, "shared/map-fixture.ts")
     );
 
     let archive = options.archive;
