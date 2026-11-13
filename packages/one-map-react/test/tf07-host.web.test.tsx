@@ -5,7 +5,7 @@ import { afterEach, beforeEach, expect, vi, test } from "vite-plus/test";
 import {
   emptyStyle,
   initialViewState,
-} from "../../../tests/fixtures/map-fixture.js";
+} from "../../example-map/src/scenarios/map-fixture.js";
 import type { WebMapProps, WebWrapper } from "../src/adapters/web/contracts.js";
 import { createWebMap } from "../src/adapters/web/map.js";
 import type { ClickEvent } from "../src/contracts/event-types.js";

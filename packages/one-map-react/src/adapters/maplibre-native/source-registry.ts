@@ -5,12 +5,6 @@ import type {
 import type { ComponentRef } from "react";
 import { createContext, useContext } from "react";
 
-import { NativeFeatureState } from "../shared/native-feature-state.js";
-import {
-  toMaplibreFeatureId,
-  toMaplibreVectorFeature,
-} from "./convert-query.js";
-
 /**
  * A registered MapLibre React Native source ref.
  *
@@ -43,36 +37,23 @@ export class MaplibreSourceRegistry {
     { readonly read: () => MaplibreNativeSourceRef | undefined }
   >();
 
-  /** Orders state operations and clears facade-written state on remount. */
-  readonly featureState = new NativeFeatureState(async (identifier) => {
-    const source = this.require(identifier.source);
-
-    await (source.kind === "geojson"
-      ? source.ref.removeFeatureState(toMaplibreFeatureId(identifier))
-      : source.ref.removeFeatureState(toMaplibreVectorFeature(identifier)));
-  });
-
   /**
    * Records the source ref mounted under an id.
    *
    * @param id - Facade source id.
    * @param read - Getter for the current wrapper ref.
-   * @param kind - Actual source family.
    * @returns Cleanup bound to this registration.
    */
   register(
     id: string,
-    read: () => MaplibreNativeSourceRef | undefined,
-    kind: MaplibreNativeSourceRef["kind"]
+    read: () => MaplibreNativeSourceRef | undefined
   ): () => void {
     const owner = { read };
     this.refs.set(id, owner);
-    const releaseState = this.featureState.register(id, kind);
 
     return () => {
       if (this.refs.get(id) === owner) {
         this.refs.delete(id);
-        releaseState();
       }
     };
   }

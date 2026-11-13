@@ -36,176 +36,59 @@ const coordinates: [
 ];
 
 describe.each([
-  ["mapbox", mapbox, mapboxWrapper, "setRain"],
-  ["maplibre", maplibre, maplibreWrapper, "setSky"],
-] as const)("%s selected facilities", (_engine, entry, wrapper, name) => {
-  test("named methods preserve upstream sync results/errors and reject retained calls synchronously after detach", () => {
+  ["mapbox", mapbox, mapboxWrapper],
+  ["maplibre", maplibre, maplibreWrapper],
+] as const)("%s selected facilities", (_engine, entry, wrapper) => {
+  test("selected facade omits advanced method mirrors", () => {
     const mock = wrapper as unknown as MockModule;
     mock.resetWebMapMock();
-    const result = { accepted: true };
-    const operation = vi.fn(() => result);
-    mock.selectedMethods[name] = operation;
     const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
     const mounted = render(
       <MapSetup adapter={entry.adapter}>
         <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
       </MapSetup>
     );
-    const selected = ref.current;
-    if (!selected) throw new Error("No selected map ref.");
-    const call =
-      name === "setRain"
-        ? () => selected.setRain({ density: 0 })
-        : () => selected.setSky({ "sky-color": "#000000" });
-    expect(call()).toBe(result);
-    expect(operation).toHaveBeenCalledTimes(1);
-    operation.mockImplementationOnce(() => {
-      throw new Error("SDK failure");
-    });
-    expect(call).toThrow("SDK failure");
-    mounted.unmount();
-    expect(call).toThrow("not attached");
-    delete mock.selectedMethods[name];
-  });
-
-  test("additional delegates forward arguments and preserve promise identity", () => {
-    const mock = wrapper as unknown as MockModule;
-    mock.resetWebMapMock();
-    const method = _engine === "mapbox" ? "setLanguage" : "setTransformRequest";
-    const argument =
-      _engine === "mapbox" ? "en" : () => ({ url: "fixture://tiles" });
-    const result = Promise.resolve({ accepted: true });
-    const operation = vi.fn(() => result);
-    mock.selectedMethods[method] = operation;
-    const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
-    const mounted = render(
-      <MapSetup adapter={entry.adapter}>
-        <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
-      </MapSetup>
-    );
-    const selected = ref.current;
-    if (!selected) throw new Error("No selected map ref.");
-    const call = () => Reflect.apply(selected[method], selected, [argument]);
-    expect(call()).toBe(result);
-    expect(operation).toHaveBeenCalledWith(argument);
-    operation.mockImplementationOnce(() => {
-      throw new Error("SDK failure");
-    });
-    expect(call).toThrow("SDK failure");
-    mounted.unmount();
-    expect(call).toThrow("not attached");
-    delete mock.selectedMethods[method];
-  });
-
-  test.each([
-    ["on", ["idle", (): void => undefined]],
-    ["off", ["idle", (): void => undefined]],
-    ["once", ["idle"]],
-    [
-      "addControl",
-      [
-        {
-          onAdd: (): HTMLElement => document.createElement("div"),
-          onRemove: (): void => undefined,
-        },
-        "top-left",
-      ],
-    ],
-    ["removeControl", [{}]],
-    ["hasControl", [{}]],
-    ["getCanvas", []],
-    ["getCanvasContainer", []],
-    ["getContainer", []],
-    ["getStyle", []],
-    ["loaded", []],
-    ["isStyleLoaded", []],
-    ["areTilesLoaded", []],
-    ["triggerRepaint", []],
-  ] as const)(
-    "%s preserves arguments, synchronous results, failures and detachment",
-    (method, args) => {
-      const mock = wrapper as unknown as MockModule;
-      mock.resetWebMapMock();
-      const result = { method };
-      const operation = vi.fn(() => result);
-      mock.selectedMethods[method] = operation;
-      const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
-      const mounted = render(
-        <MapSetup adapter={entry.adapter}>
-          <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
-        </MapSetup>
-      );
-      const selected = ref.current;
-      if (!selected) throw new Error("No selected map ref.");
-      const call = () => Reflect.apply(selected[method], selected, args);
-      expect(call()).toBe(result);
-      expect(operation).toHaveBeenCalledWith(...args);
-      const failure = new Error("wrapper operation failed");
-      operation.mockImplementationOnce(() => {
-        throw failure;
-      });
-      expect(call).toThrow(failure);
-      mounted.unmount();
-      expect(call).toThrow("not attached");
-      delete mock.selectedMethods[method];
+    for (const method of [
+      "getStyle",
+      "fire",
+      "getGestureHandler",
+      "getVersion",
+      "getDebugOptions",
+      "getCanvasSource",
+    ]) {
+      expect(Reflect.get(ref.current ?? {}, method)).toBeUndefined();
     }
-  );
+    mounted.unmount();
+  });
 
-  test("selected handler settings keep keyboard panning separate and forward SDK rates", () => {
+  test("borrowed wrapper reads preserve results and errors without facade lifetime guards", async () => {
     const mock = wrapper as unknown as MockModule;
     mock.resetWebMapMock();
+    const result = { version: 8, sources: {}, layers: [] };
+    const operation = vi.fn(() => result);
+    mock.selectedMethods.getStyle = operation;
     const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
     const mounted = render(
       <MapSetup adapter={entry.adapter}>
         <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
       </MapSetup>
     );
-    const renderer = mock.getStyleTarget();
-    if (!renderer || !ref.current) throw new Error("Missing renderer.");
-    const selected = ref.current;
-    const setZoomRate = vi.fn();
-    const setWheelZoomRate = vi.fn();
-    const enableRotation = vi.fn();
-    const disableRotation = vi.fn();
-    const isEnabled = vi.fn(() => true);
-    const isActive = vi.fn(() => false);
-    Object.assign(renderer, {
-      scrollZoom: { setZoomRate, setWheelZoomRate, isEnabled, isActive },
-      keyboard: { enableRotation, disableRotation },
-    });
-    selected.getGestureHandler("scrollZoom").setZoomRate(1 / 100);
-    selected.getGestureHandler("scrollZoom").setWheelZoomRate(1 / 600);
-    selected.getGestureHandler("keyboard").disableRotation();
-    selected.getGestureHandler("keyboard").enableRotation();
-    expect(selected.getGestureHandler("scrollZoom").isEnabled()).toBe(true);
-    expect(selected.getGestureHandler("scrollZoom").isActive()).toBe(false);
-    expect(isEnabled).toHaveBeenCalledTimes(1);
-    expect(isActive).toHaveBeenCalledTimes(1);
-    expect(() =>
-      Reflect.apply(selected.getGestureHandler, selected, ["unknown"])
-    ).toThrow("Unknown gesture handler");
-    expect(setZoomRate).toHaveBeenCalledWith(1 / 100);
-    expect(setWheelZoomRate).toHaveBeenCalledWith(1 / 600);
-    expect(disableRotation).toHaveBeenCalledTimes(1);
-    expect(enableRotation).toHaveBeenCalledTimes(1);
-    const retained = ref.current;
-    const failure = new Error("SDK rate failure");
-    setZoomRate.mockImplementationOnce(() => {
+    const facade = ref.current;
+    if (!facade) throw new Error("No selected map ref.");
+    const borrowed = await facade.getWrapperMap();
+    expect(borrowed.getStyle()).toBe(result);
+    const failure = new Error("wrapper read failed");
+    operation.mockImplementationOnce(() => {
       throw failure;
     });
-    expect(() =>
-      retained.getGestureHandler("scrollZoom").setZoomRate(0)
-    ).toThrow(failure);
+    expect(() => borrowed.getStyle()).toThrow(failure);
     mounted.unmount();
-    expect(() =>
-      retained.getGestureHandler("scrollZoom").setWheelZoomRate(0)
-    ).toThrow("not attached");
-    expect(() => retained.getGestureHandler("keyboard")).toThrow(
-      "not attached"
-    );
+    await expect(facade.getWrapperMap()).rejects.toThrow("not attached");
+    expect(borrowed.getStyle()).toBe(result);
+    delete mock.selectedMethods.getStyle;
   });
 
-  test("plugin event production dispatches through the named SDK route with errors and detach checks", () => {
+  test("plugin events and parent routing use the raw map behind the borrowed wrapper", async () => {
     const mock = wrapper as unknown as MockModule;
     mock.resetWebMapMock();
     const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
@@ -214,63 +97,44 @@ describe.each([
         <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
       </MapSetup>
     );
-    const renderer = mock.getStyleTarget();
-    const selected = ref.current;
-    if (!renderer || !selected) throw new Error("Missing renderer.");
+    const facade = ref.current;
+    if (!facade) throw new Error("No selected map ref.");
+    const borrowed = await facade.getWrapperMap();
+    expect(Reflect.get(borrowed, "fire")).toBeUndefined();
+    expect(Reflect.get(borrowed, "setEventedParent")).toBeUndefined();
+    const renderer = borrowed.getMap();
     const result = { dispatched: true };
     const fire = vi.fn(() => result);
-    Object.assign(renderer, { fire });
+    const setEventedParent = vi.fn(() => result);
+    Object.assign(renderer, { fire, setEventedParent });
     const data = { plugin: "example" };
-    expect(Reflect.apply(selected.fire, selected, ["plugin-event", data])).toBe(
+    expect(Reflect.apply(renderer.fire, renderer, ["plugin-event", data])).toBe(
       result
     );
     expect(fire).toHaveBeenCalledWith("plugin-event", data);
-    const failure = new Error("plugin event failure");
+    expect(
+      Reflect.apply(renderer.setEventedParent, renderer, [null, data])
+    ).toBe(result);
+    expect(setEventedParent).toHaveBeenCalledWith(null, data);
+    const failure = new Error("plugin event failed");
     fire.mockImplementationOnce(() => {
       throw failure;
     });
     expect(() =>
-      Reflect.apply(selected.fire, selected, ["plugin-event", data])
+      Reflect.apply(renderer.fire, renderer, ["plugin-event", data])
+    ).toThrow(failure);
+    setEventedParent.mockImplementationOnce(() => {
+      throw failure;
+    });
+    expect(() =>
+      Reflect.apply(renderer.setEventedParent, renderer, [null, data])
     ).toThrow(failure);
     mounted.unmount();
-    expect(() =>
-      Reflect.apply(selected.fire, selected, ["plugin-event", data])
-    ).toThrow("not attached");
+    await expect(facade.getWrapperMap()).rejects.toThrow("not attached");
+    expect(Reflect.apply(renderer.fire, renderer, ["plugin-event", data])).toBe(
+      result
+    );
   });
-
-  if (entry === maplibre) {
-    test("public MapLibre event-parent routing preserves arguments, result and attachment", () => {
-      const mock = wrapper as unknown as MockModule;
-      mock.resetWebMapMock();
-      const ref = createRef<maplibre.WebMapRef>();
-      const mounted = render(
-        <MapSetup adapter={maplibre.adapter}>
-          <maplibre.Map ref={ref} mapStyle={style} initialViewState={camera} />
-        </MapSetup>
-      );
-      const renderer = mock.getStyleTarget();
-      const selected = ref.current;
-      if (!renderer || !selected) throw new Error("Missing renderer.");
-      const result = { parented: true };
-      const parent = null;
-      const data = { plugin: "example" };
-      const setEventedParent = vi.fn(() => result);
-      Object.assign(renderer, { setEventedParent });
-      expect(
-        Reflect.apply(selected.setEventedParent, selected, [parent, data])
-      ).toBe(result);
-      expect(setEventedParent).toHaveBeenCalledWith(parent, data);
-      const failure = new Error("event-parent failure");
-      setEventedParent.mockImplementationOnce(() => {
-        throw failure;
-      });
-      expect(() => selected.setEventedParent(parent, data)).toThrow(failure);
-      mounted.unmount();
-      expect(() => selected.setEventedParent(parent, data)).toThrow(
-        "not attached"
-      );
-    });
-  }
 
   test("canvas coordinates are mutable, canvas identity requires remount, and teardown stays with wrapper", () => {
     const mock = wrapper as unknown as MockModule;
@@ -382,148 +246,4 @@ test("selected Mapbox layer supplies an id and forwards mutable slot update/rese
   });
   mounted.unmount();
   delete mock.selectedMethods.setSlot;
-});
-
-test.each([
-  [
-    "mapbox",
-    mapbox,
-    mapboxWrapper,
-    [
-      "queryRasterValue",
-      "getVerticalFieldOfView",
-      "setSnow",
-      "setLights",
-      "addImport",
-      "updateImport",
-      "setConfigProperty",
-      "setColorTheme",
-      "getFeaturesetDescriptors",
-      "getIndoorTileOptions",
-      "setLanguage",
-      "setWorldview",
-      "setScaleFactor",
-      "setNearClipOffset",
-      "addModel",
-    ],
-  ],
-  [
-    "maplibre",
-    maplibre,
-    maplibreWrapper,
-    [
-      "setGlobalStateProperty",
-      "refreshTiles",
-      "setFontFaces",
-      "setTransformRequest",
-      "setVerticalFieldOfView",
-      "redraw",
-      "getProjection",
-    ],
-  ],
-] as const)(
-  "%s advanced families preserve arguments and returned SDK values",
-  (_engine, entry, wrapper, names) => {
-    const mock = wrapper as unknown as MockModule;
-    mock.resetWebMapMock();
-    const operations = names.map((name) => {
-      const operation = vi.fn(() => ({ name }));
-      mock.selectedMethods[name] = operation;
-      return [name, operation] as const;
-    });
-    const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
-    const mounted = render(
-      <MapSetup adapter={entry.adapter}>
-        <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
-      </MapSetup>
-    );
-    for (const [name, operation] of operations) {
-      // The selected consumer checks own SDK input typing; this table tests exact forwarding only.
-      const call = Reflect.get(ref.current ?? {}, name) as (
-        ...args: unknown[]
-      ) => unknown;
-      expect(call("argument", 0, undefined)).toEqual({ name });
-      expect(operation).toHaveBeenLastCalledWith("argument", 0, undefined);
-    }
-    mounted.unmount();
-    for (const name of names) delete mock.selectedMethods[name];
-  }
-);
-
-test.each([
-  ["mapbox", mapbox, mapboxWrapper, "3.32.0"],
-  ["maplibre", maplibre, maplibreWrapper, "6.13.0"],
-] as const)(
-  "%s reads the attached SDK version and throws after detach",
-  (_engine, entry, wrapper, version) => {
-    const mock = wrapper as unknown as MockModule;
-    mock.resetWebMapMock();
-    const ref = createRef<mapbox.WebMapRef & maplibre.WebMapRef>();
-    const mounted = render(
-      <MapSetup adapter={entry.adapter}>
-        <entry.Map ref={ref} mapStyle={style} initialViewState={camera} />
-      </MapSetup>
-    );
-    const renderer = mock.getStyleTarget() as unknown as { version: string };
-    renderer.version = version;
-    const selected = ref.current;
-    if (!selected) throw new Error("Missing selected map ref.");
-    expect(selected.getVersion()).toBe(version);
-    mounted.unmount();
-    expect(() => selected.getVersion()).toThrow("not attached");
-  }
-);
-
-test("Mapbox wireframe debug fields read/write explicit false and preserve input", () => {
-  const mock = mapboxWrapper as unknown as MockModule;
-  mock.resetWebMapMock();
-  const ref = createRef<mapbox.WebMapRef>();
-  const mounted = render(
-    <MapSetup adapter={mapbox.adapter}>
-      <mapbox.Map ref={ref} mapStyle={style} initialViewState={camera} />
-    </MapSetup>
-  );
-  const value = Object.freeze({
-    showLayers2DWireframe: true,
-    showLayers3DWireframe: false,
-  });
-  ref.current?.setDebugOptions(value);
-  expect(ref.current?.getDebugOptions()).toMatchObject(value);
-  ref.current?.setDebugOptions({
-    showLayers2DWireframe: false,
-    showLayers3DWireframe: true,
-  });
-  expect(ref.current?.getDebugOptions()).toMatchObject({
-    showLayers2DWireframe: false,
-    showLayers3DWireframe: true,
-  });
-  expect(value).toEqual({
-    showLayers2DWireframe: true,
-    showLayers3DWireframe: false,
-  });
-  mounted.unmount();
-});
-
-test("MapLibre pending-tile cancellation has explicit mutable read/write without losing false", () => {
-  const mock = maplibreWrapper as unknown as MockModule;
-  mock.resetWebMapMock();
-  const ref = createRef<maplibre.WebMapRef>();
-  const mounted = render(
-    <MapSetup adapter={maplibre.adapter}>
-      <maplibre.Map ref={ref} mapStyle={style} initialViewState={camera} />
-    </MapSetup>
-  );
-  const selected = ref.current;
-  if (!selected) throw new Error("Missing selected map ref.");
-  selected.setCancelPendingTileRequestsWhileZooming(false);
-  expect(selected.getCancelPendingTileRequestsWhileZooming()).toBe(false);
-  selected.setCancelPendingTileRequestsWhileZooming(true);
-  expect(selected.getCancelPendingTileRequestsWhileZooming()).toBe(true);
-  mounted.unmount();
-  expect(() =>
-    selected.setCancelPendingTileRequestsWhileZooming(false)
-  ).toThrow("not attached");
-  expect(() => selected.getCancelPendingTileRequestsWhileZooming()).toThrow(
-    "not attached"
-  );
 });

@@ -16,7 +16,6 @@ for (const backend of ["mapbox-native", "maplibre-native"] as const) {
       // Only selection and Layer participate; unrelated adapter operations deliberately fail.
       const adapter = {
         backend,
-        services: { location: {} },
         Layer: () => null,
       } as unknown as Adapter;
       expect(() =>

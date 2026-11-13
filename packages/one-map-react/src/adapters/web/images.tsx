@@ -1,34 +1,21 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import type { Backend } from "../../contracts/adapter.js";
-import type { ImageEntry, ImagesProps } from "../../contracts/images-types.js";
-import type { WebWrapper } from "./contracts.js";
+import type { ImagesProps } from "../../contracts/images-types.js";
+import type { WebImageMap, WebWrapper } from "./contracts.js";
 
-interface ImageRegistration {
+interface WebImageProps {
+  readonly map: WebImageMap | undefined;
+  readonly name: string;
   readonly url: string;
-  readonly sdf?: boolean;
+  readonly sdf: boolean | undefined;
 }
 
-const imageRegistration = (entry: ImageEntry): ImageRegistration =>
-  typeof entry === "string"
-    ? { url: entry }
-    : {
-        url: entry.url,
-        ...(entry.sdf === undefined ? {} : { sdf: entry.sdf }),
-      };
-
-const registrationEquals = (
-  left: ImageRegistration | undefined,
-  right: ImageRegistration
-): boolean =>
-  left !== undefined && left.url === right.url && left.sdf === right.sdf;
-
 /**
- * Builds a web Images component that registers style images on the enclosing
- * react-map-gl map.
+ * Builds a web Images polyfill with independent entry effects.
  *
- * @param wrapper - Selected react-map-gl entry components.
- * @returns An Images component for the web adapter record.
+ * @param wrapper - Selected react-map-gl entry and image loader.
+ * @returns Images for a style whose replacement the application owns.
  */
 export const createWebImages = <
   Name extends Extract<Backend, "mapbox-web" | "maplibre-web">,
@@ -37,299 +24,127 @@ export const createWebImages = <
 ) => {
   const WebImages = ({ images }: ImagesProps) => {
     const map = wrapper.useMap().current?.getMap();
-    const imagesRef = useRef(images);
-    const syncRef = useRef<(next: ImagesProps["images"]) => void>(() => {});
 
-    // Map identity owns the registration session. Image contents sync through
-    // the ref so a new `images` object with the same entries does not remove
-    // and reload every icon.
+    return (
+      <>
+        {Object.entries(images).map(([name, entry]) => (
+          <WebImage
+            key={name}
+            map={map}
+            name={name}
+            url={typeof entry === "string" ? entry : entry.url}
+            sdf={typeof entry === "string" ? undefined : entry.sdf}
+          />
+        ))}
+      </>
+    );
+  };
+
+  const WebImage = ({ map, name, url, sdf }: WebImageProps) => {
     useEffect(() => {
-      if (!map) {
-        return;
-      }
+      if (!map) return;
 
       let released = false;
-      let waitingForStyle = false;
-      let revision = 0;
-      const owned = new Map<string, ImageRegistration>();
-      const inFlight = new Map<string, ImageRegistration>();
-      const pendingRemovals = new Set<string>();
-
-      const reportFailure = (): void => {
-        if (!released)
+      let started = false;
+      let installed = false;
+      let adding = false;
+      const reportFailure = (cleanup = false): void => {
+        if (!released || cleanup)
           map.fire("error", {
             error: new Error("Style image registration failed."),
           });
       };
-
-      // Wait for style completion before starting registration. Image removal
-      // remains available during loading on both pinned renderers; an absent
-      // or destroyed style is guarded at each image-method call.
-      const styleReady = (): boolean => {
+      const remove = (): void => {
+        if (!installed) return;
+        installed = false;
         try {
-          return map.isStyleLoaded() === true;
+          if (!map.hasImage(name)) return;
         } catch {
-          return false;
+          // An absent or destroyed style cannot expose the owned registration.
+          return;
+        }
+        try {
+          map.removeImage(name);
+        } catch {
+          reportFailure(true);
         }
       };
-
-      const readSpriteKey = (): string | undefined => {
-        try {
-          const getSprite = map.getSprite;
-          if (!getSprite) return undefined;
-          return JSON.stringify(getSprite.call(map));
-        } catch {
-          return undefined;
-        }
+      const stopWaiting = (): void => {
+        map.off("styledata", start);
+        map.off("style.load", start);
+        map.off("load", start);
+        map.off("idle", start);
       };
-      let spriteKey = readSpriteKey();
-
-      const register = (name: string, fields: ImageRegistration): void => {
-        if (released || inFlight.has(name) || !styleReady()) {
-          return;
-        }
-
-        let present = false;
-
+      const options = sdf === undefined ? {} : { sdf };
+      const load = async (): Promise<void> => {
         try {
-          present = map.hasImage(name);
-        } catch {
-          return;
-        }
-
-        if (present && registrationEquals(owned.get(name), fields)) {
-          return;
-        }
-
-        // Image methods emit synchronous style events that can replace this request.
-        inFlight.set(name, fields);
-        if (present) {
-          owned.delete(name);
-          try {
-            map.removeImage(name);
-          } catch {
-            if (inFlight.get(name) === fields) inFlight.delete(name);
+          const data = await wrapper.loadWebImage(map, url);
+          if (released) return;
+          if (data == null) {
+            reportFailure();
             return;
           }
-        }
-
-        if (released || inFlight.get(name) !== fields) return;
-
-        void wrapper.loadWebImage(map, fields.url).then(
-          (data) => {
-            if (inFlight.get(name) !== fields) {
-              return;
-            }
-
-            inFlight.delete(name);
-
-            if (released) return;
-            if (data == null) {
-              reportFailure();
-              return;
-            }
-            if (!styleReady()) {
-              waitingForStyle = true;
-              return;
-            }
-
-            const registrationRevision = revision;
-            try {
-              if (map.hasImage(name)) {
-                return;
-              }
-
-              // Cleanup must own the image before addImage can call application code.
-              owned.set(name, fields);
-              const options: { sdf?: boolean } = {};
-              if (fields.sdf !== undefined) options.sdf = fields.sdf;
-              map.addImage(name, data, options);
-            } catch {
-              if (released || revision !== registrationRevision) return;
-              if (owned.get(name) === fields) {
-                removeName(name);
-              }
-              if (revision === registrationRevision) reportFailure();
-            }
-          },
-          () => {
-            if (inFlight.get(name) !== fields) {
-              return;
-            }
-
-            inFlight.delete(name);
-            reportFailure();
-          }
-        );
-      };
-
-      const removeName = (name: string): void => {
-        inFlight.delete(name);
-        owned.delete(name);
-        pendingRemovals.add(name);
-
-        try {
           if (map.hasImage(name)) {
-            map.removeImage(name);
+            reportFailure();
+            return;
           }
-          pendingRemovals.delete(name);
+          if (released) return;
+
+          // SDKs install before styledata; see the reentrant SourcesMap case in
+          // test/web-followup-regressions.tsx for cleanup during addImage.
+          adding = true;
+          let failed = false;
+          try {
+            map.addImage(name, data, options);
+          } catch {
+            failed = true;
+          }
+          adding = false;
+          if (released) return;
+
+          try {
+            installed = map.hasImage(name);
+          } catch {
+            failed = true;
+          }
+          if (failed) remove();
+          if (failed) reportFailure();
+          else if (!installed) reportFailure();
         } catch {
-          // The style no longer exposes the image.
+          reportFailure();
         }
       };
-
-      const sync = (next: ImagesProps["images"]): void => {
-        if (released) return;
-        revision += 1;
-        const currentRevision = revision;
-        const isCurrent = (): boolean =>
-          !released && revision === currentRevision;
-        const nextNames = new Set(Object.keys(next));
-
-        for (const name of new Set([
-          ...owned.keys(),
-          ...inFlight.keys(),
-          ...pendingRemovals,
-        ])) {
-          if (!isCurrent()) return;
-          if (!nextNames.has(name)) {
-            removeName(name);
-          }
-        }
-
-        // Cancel replaced loads even when renderer image methods are unavailable.
-        for (const [name, entry] of Object.entries(next)) {
-          if (!isCurrent()) return;
-          const current = owned.get(name) ?? inFlight.get(name);
-          if (
-            current &&
-            !registrationEquals(current, imageRegistration(entry))
-          ) {
-            removeName(name);
-          }
-        }
-
-        if (!isCurrent()) return;
-        if (!styleReady()) {
-          waitingForStyle = true;
+      const start = (): void => {
+        if (released || started) return;
+        try {
+          if (map.isStyleLoaded() !== true) return;
+        } catch {
           return;
         }
-        waitingForStyle = false;
-        for (const name of pendingRemovals) {
-          if (!isCurrent()) return;
-          removeName(name);
-        }
-
-        for (const [name, entry] of Object.entries(next)) {
-          if (!isCurrent()) return;
-          const fields = imageRegistration(entry);
-          const current = owned.get(name) ?? inFlight.get(name);
-          let present = false;
-
-          try {
-            present = map.hasImage(name);
-          } catch {
-            continue;
-          }
-
-          if (registrationEquals(current, fields) && present) {
-            continue;
-          }
-
-          if (current !== undefined && !registrationEquals(current, fields)) {
-            removeName(name);
-          }
-
-          if (isCurrent()) register(name, fields);
-        }
+        started = true;
+        stopWaiting();
+        void load();
       };
 
-      syncRef.current = sync;
-      sync(imagesRef.current);
-
-      // Ordinary styledata restores only images this session added that the style
-      // dropped. Failed loads and addImage failures are not owned, so tile
-      // activity does not retry them. Deferred registration resumes once tiles
-      // are ready, even when style.load preceded them; see web-followup-regressions.tsx.
-      const restoreOwned = (): void => {
-        if (readSpriteKey() !== spriteKey) {
-          restoreAll();
-          return;
-        }
-        if (released) return;
-        if (!styleReady()) {
-          return;
-        }
-        if (waitingForStyle) {
-          sync(imagesRef.current);
-          return;
-        }
-
-        // eslint-disable-next-line unicorn/no-useless-spread -- Image callbacks can replace entries during restoration.
-        for (const [name, fields] of [...owned]) {
-          if (owned.get(name) !== fields || inFlight.has(name)) {
-            continue;
-          }
-
-          try {
-            if (!map.hasImage(name)) {
-              register(name, fields);
-            }
-          } catch {
-            // The next style.load retries.
-          }
-        }
-      };
-
-      const restoreAll = (): void => {
-        // A replacement style can contain a different sprite under the same name.
-        owned.clear();
-        inFlight.clear();
-        spriteKey = readSpriteKey();
-        if (released) {
-          pendingRemovals.clear();
-          return;
-        }
-        sync(imagesRef.current);
-      };
-
-      map.on("styledata", restoreOwned);
-      map.on("style.load", restoreAll);
-      map.on("load", restoreOwned);
-      map.on("idle", restoreOwned);
+      map.on("styledata", start);
+      map.on("style.load", start);
+      map.on("load", start);
+      map.on("idle", start);
+      start();
 
       return () => {
         released = true;
-        inFlight.clear();
-        syncRef.current = () => {};
-
-        for (const name of new Set([...owned.keys(), ...pendingRemovals])) {
-          if (!owned.has(name) && !pendingRemovals.has(name)) continue;
-          owned.delete(name);
-          pendingRemovals.delete(name);
+        stopWaiting();
+        if (adding) {
           try {
-            if (map.hasImage(name)) {
-              map.removeImage(name);
-            }
+            installed = map.hasImage(name);
           } catch {
-            // An absent or destroyed style must not prevent other removals.
+            // A failed add may release the entry before any image exists.
           }
         }
-
-        // Removal callbacks can replace the style; keep ownership invalidation until cleanup ends.
-        map.off("styledata", restoreOwned);
-        map.off("style.load", restoreAll);
-        map.off("load", restoreOwned);
-        map.off("idle", restoreOwned);
-        owned.clear();
-        pendingRemovals.clear();
+        remove();
       };
-    }, [map]);
-
-    useEffect(() => {
-      imagesRef.current = images;
-      syncRef.current(images);
-    }, [images]);
+    }, [map, name, url, sdf]);
 
     return null;
   };

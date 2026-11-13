@@ -10,13 +10,12 @@ import { Source } from "./source.js";
 export const UserLocation = ({
   position,
   showAccuracyCircle = false,
-  onPress,
 }: UserLocationProps) => {
   const id = `one-map-location-${useId()}`;
   const data = locationGeometry(position, showAccuracyCircle);
   if (!position) return null;
   return (
-    <Source id={id} type="geojson" data={data} onClick={onPress}>
+    <Source id={id} type="geojson" data={data}>
       <Layer
         id={`${id}-accuracy`}
         type="fill"

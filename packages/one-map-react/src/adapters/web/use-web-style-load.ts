@@ -14,9 +14,9 @@ export const useWebStyleLoad = (
   // follows then reports once. reuse() can fire that load before this
   // listener exists and still leave isStyleLoaded() false, so the next
   // idle reports once when the style is loaded. A later mapStyle
-  // replacement re-runs this effect so an in-place style diff that
-  // never emits style.load still reports once the current style is
-  // loaded. The listener is facade-owned, so logical unmount removes
+  // input change re-runs this effect so a no-op SDK diff without
+  // style.load still reports once the current style is loaded. The listener
+  // is facade-owned, so logical unmount removes
   // it even when reuseMaps keeps the renderer.
   useLayoutEffect(() => {
     if (!styleMap) {

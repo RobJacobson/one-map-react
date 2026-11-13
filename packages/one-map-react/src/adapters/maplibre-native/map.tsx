@@ -8,13 +8,11 @@ import {
   type ComponentRef,
   forwardRef,
   useImperativeHandle,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import {
   type NativeSyntheticEvent,
-  Platform,
   type StyleProp,
   View,
   type ViewProps,
@@ -29,18 +27,12 @@ import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
-import { useMapCapture } from "../shared/map-capture.js";
 import {
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
-import { useNativeOrnamentPositions } from "../shared/native-ornament-position.js";
-import {
-  useActiveCallback,
-  useActiveCallbacks,
-} from "../shared/use-active-callback.js";
+import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
-import { useNativeControlledCamera } from "../shared/use-native-controlled-camera.js";
 import { normalizePadding } from "../shared/wrapper-values.js";
 import { mutableFlatBounds, toMaplibreViewState } from "./convert-camera.js";
 import { toMaplibreGestures } from "./convert-gestures.js";
@@ -75,8 +67,6 @@ const MaplibreNativeMapImplementation = forwardRef<
   assertMaplibreStyleRoots(props.mapStyle);
   const session = useNativeMapPresentation();
   validateMaplibreMapOptions(props);
-  const capture = useMapCapture(props.captureEnabled);
-  const ornaments = useNativeOrnamentPositions();
   const {
     mapStyle,
     initialViewState,
@@ -96,7 +86,7 @@ const MaplibreNativeMapImplementation = forwardRef<
     onError,
     reuseMaps,
     gl,
-    interactive: requestedInteractive,
+    interactive,
     dragPan,
     touchZoom,
     touchRotate,
@@ -104,7 +94,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     doubleTapZoom,
     children,
   } = props;
-  const interactive = session.gestureLocked ? false : requestedInteractive;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
   const mapRef = useRef<ComponentRef<typeof MaplibreMap>>(null);
   // onDidFinishLoadingMap is the signal that MapLibre will apply an
@@ -113,24 +102,9 @@ const MaplibreNativeMapImplementation = forwardRef<
   const mapLoaded = useRef(false);
   const sawMove = useRef(false);
   const [sources] = useState(() => new MaplibreSourceRegistry());
-  const styleKey = JSON.stringify(mapStyle);
-  const previousStyle = useRef(styleKey);
-  useLayoutEffect(() => {
-    if (previousStyle.current !== styleKey) {
-      previousStyle.current = styleKey;
-      sources.featureState.resetStyle();
-    }
-  }, [sources, styleKey]);
   const frozenViewState = useFrozenValue(initialViewState);
   // One settled native event can report several callbacks; an earlier one may unmount the map.
   const report = useActiveCallbacks({ onMove, onMoveEnd });
-  // Feature-state resets finish after the native frame callback returns.
-  const reportFeatureStateError = useActiveCallback((error: unknown) =>
-    onError?.({ error })
-  );
-  const flushFeatureState = (): void => {
-    void sources.featureState.flush(reportFeatureStateError);
-  };
   const gestures = toMaplibreGestures({
     interactive,
     dragPan,
@@ -140,7 +114,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     doubleTapZoom,
   });
 
-  const cameraCommandObserver = useRef<(() => void) | undefined>(undefined);
   const [mapHandle] = useState(
     // eslint-disable-next-line react/refs -- This lazy initializer only captures refs; commands dereference them after attachment.
     () =>
@@ -151,38 +124,9 @@ const MaplibreNativeMapImplementation = forwardRef<
         mapRef,
         // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapLoaded,
-        sources,
-        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
-        async (options) => {
-          if (options.scope === "renderer" && Platform.OS === "ios")
-            throw new Error(
-              "Renderer-only capture is unavailable through MapLibre iOS view capture. Use scope backend."
-            );
-          return capture.run(options, async () => {
-            const map = mapRef.current;
-            if (!map) throw new Error("Map is not attached.");
-            return map.createStaticMapImage({
-              output: options.output === "file" ? "file" : "base64",
-            });
-          });
-        },
-        // eslint-disable-next-line react/refs -- Factory captures this callback; only later imperative camera commands read the committed observer.
-        () => cameraCommandObserver.current?.()
+        sources
       )
   );
-  const controlledCamera = useNativeControlledCamera(
-    viewState,
-    mapHandle.jumpTo,
-    () => mapLoaded.current,
-    (error) => onError?.({ error })
-  );
-  const onCameraCommand = controlledCamera.onCommand;
-  useLayoutEffect(() => {
-    cameraCommandObserver.current = onCameraCommand;
-    return () => {
-      cameraCommandObserver.current = undefined;
-    };
-  }, [onCameraCommand]);
   // Descendant control effects must retain the attached ref during prop updates.
   useImperativeHandle(ref, () => mapHandle, [mapHandle]);
 
@@ -210,7 +154,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     if (phase === "change") {
       sawMove.current = true;
       report.onMove(move);
-      controlledCamera.onMove(move);
       return;
     }
 
@@ -220,7 +163,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     }
 
     report.onMoveEnd(move);
-    controlledCamera.onMove(move);
   };
   const controlled = viewState ? toMaplibreViewState(viewState) : undefined;
   const flatMaxBounds =
@@ -233,7 +175,6 @@ const MaplibreNativeMapImplementation = forwardRef<
         onLayout={(event) => {
           const { width, height } = event.nativeEvent.layout;
           session?.setNativeLayout(width, height);
-          capture.layout(width, height);
           props.hostProps?.onLayout?.(event);
         }}
         // Common width strings cross the native host dimension boundary here.
@@ -252,52 +193,20 @@ const MaplibreNativeMapImplementation = forwardRef<
                   }
                 : props.options?.light
             }
-            logoPosition={
-              props.options?.logoPosition ??
-              (ornaments.managed
-                ? ornaments.position("bottom-left")
-                : undefined)
-            }
-            attributionPosition={
-              session.attributionPosition
-                ? ornaments.position(session.attributionPosition)
-                : (props.options?.attributionPosition ??
-                  (ornaments.managed
-                    ? ornaments.position("bottom-right")
-                    : undefined))
-            }
-            compassPosition={
-              props.options?.compassPosition ??
-              (ornaments.managed ? ornaments.position("top-right") : undefined)
-            }
-            {...(session.attributionPosition
-              ? {
-                  attribution: true,
-                }
-              : {})}
             ref={mapRef}
             style={{ flex: 1 }}
             mapStyle={
               mapStyle as ComponentProps<typeof MaplibreMap>["mapStyle"]
             }
             {...gestures}
-            onDidFinishRenderingFrameFully={() => {
-              capture.frame();
-              flushFeatureState();
-            }}
             onDidFinishLoadingMap={() => {
               mapLoaded.current = true;
-              controlledCamera.onLoad();
               onLoad?.();
             }}
             onDidFinishLoadingStyle={() => {
-              sources.featureState.resetStyle();
               onStyleLoad?.();
             }}
             onDidFailLoadingMap={() => {
-              capture.fail(
-                new Error("MapLibre reported a map loading failure.")
-              );
               onError?.({});
             }}
             onRegionWillChange={

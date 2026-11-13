@@ -2,7 +2,6 @@ import type { Camera, MapView } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
 import type { LngLat, MapRef, Point } from "../../contracts/camera-types.js";
-import type { FeatureIdentifier } from "../../contracts/query-types.js";
 import {
   nativeResizeError,
   nativeStopError,
@@ -28,7 +27,6 @@ import {
 } from "./convert-camera.js";
 import {
   toRnmapboxClusterFeature,
-  toRnmapboxFeatureArgs,
   toRnmapboxQueryRect,
   toRnmapboxRenderedQueryArgs,
   toRnmapboxSourceQueryArgs,
@@ -36,9 +34,19 @@ import {
 import { createMapboxFeatureStateMethods } from "./feature-state-methods.js";
 import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
-/** Selected native operations retain the wrapper signatures. */
-export type NativeAdvancedMapRef = MapRef &
-  Pick<ComponentRef<typeof MapView>, "setSourceVisibility">;
+/** Common map operations and access to the selected native wrapper. */
+export type NativeAdvancedMapRef = MapRef & {
+  /**
+   * Borrows the currently attached RNMapbox MapView wrapper.
+   *
+   * @returns The current wrapper handle, without waiting for map load.
+   * @remarks Call again for each operation. Handles retain the wrapper's
+   * lifetime and ownership; facade detachment does not invalidate them or
+   * expose the separate Camera.
+   * @throws Rejects when the MapView is not attached.
+   */
+  readonly getWrapperMap: () => Promise<ComponentRef<typeof MapView>>;
+};
 
 /**
  * Builds the imperative map handle over RNMapbox camera and map refs.
@@ -46,20 +54,14 @@ export type NativeAdvancedMapRef = MapRef &
  * @param cameraRef - Ref to the RNMapbox `Camera` child.
  * @param mapViewRef - Ref to the RNMapbox `MapView`.
  * @param geoJsonSources - Registry of mounted GeoJSON source refs.
- * @param capture - Existing map-capture operation.
- * @param onCameraCommand - Notifies controlled-camera ownership before public command dispatch.
- * @returns The common map ref.
+ * @returns The selected native map ref.
  */
 export const createMapboxMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
-  geoJsonSources: GeoJsonSourceRegistry,
-  capture?: MapRef["capture"],
-  onCameraCommand?: () => void
+  geoJsonSources: GeoJsonSourceRegistry
 ): NativeAdvancedMapRef => ({
-  setSourceVisibility: (
-    ...args: Parameters<ComponentRef<typeof MapView>["setSourceVisibility"]>
-  ) => requireMap(mapViewRef.current).setSourceVisibility(...args),
+  getWrapperMap: async () => requireMap(mapViewRef.current),
 
   queryTerrainElevation: async (coordinate) => {
     validateTerrainCoordinate(coordinate);
@@ -69,40 +71,30 @@ export const createMapboxMapRef = (
       ])
     );
   },
-  capture:
-    capture ??
-    (async () => {
-      throw new Error("Capture is not enabled on this map.");
-    }),
   jumpTo: async (options) => {
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current);
 
-    onCameraCommand?.();
     await camera.setCamera(toRnmapboxStop(options, "none"));
   },
   easeTo: async (options) => {
     const camera = requireCamera(cameraRef.current);
 
-    onCameraCommand?.();
     await camera.setCamera(toRnmapboxStop(options, "easeTo"));
   },
   flyTo: async (options) => {
     const camera = requireCamera(cameraRef.current);
 
-    onCameraCommand?.();
     await camera.setCamera(toRnmapboxStop(options, "flyTo"));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current);
 
-    onCameraCommand?.();
     await camera.setCamera(toRnmapboxFitBoundsStop(bounds, options));
   },
   zoomTo: async (zoom, options) => {
     const camera = requireCamera(cameraRef.current);
 
-    onCameraCommand?.();
     await camera.setCamera(toRnmapboxZoomStop(zoom, options));
   },
   stop: async () => {
@@ -193,29 +185,11 @@ export const createMapboxMapRef = (
       "getClusterChildren"
     );
   },
-  ...createMapboxFeatureStateMethods(
-    () => requireMap(mapViewRef.current),
-    geoJsonSources
-  ),
+  ...createMapboxFeatureStateMethods(() => requireMap(mapViewRef.current)),
   resize: async () => {
     throw nativeResizeError();
   },
 });
-
-/**
- * Removes the whole state of a previously written target after source remount.
- * @param mapViewRef - Current native map ref.
- * @param identifier - Validated native feature-state target.
- */
-export const resetMapboxFeatureState = async (
-  mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
-  identifier: FeatureIdentifier
-): Promise<void> => {
-  const map = requireMap(mapViewRef.current);
-  const [featureId, sourceId, sourceLayerId] =
-    toRnmapboxFeatureArgs(identifier);
-  await map.removeFeatureState(featureId, null, sourceId, sourceLayerId);
-};
 
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null

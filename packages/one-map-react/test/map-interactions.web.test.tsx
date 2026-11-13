@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
+import { startTransition, Suspense } from "react";
 import { expect, test, vi } from "vite-plus/test";
 
 import type { MapRef } from "../src/contracts/camera-types.js";
@@ -17,114 +18,22 @@ const props: MapProps = {
   },
   mapStyle: { version: 8, sources: {}, layers: [] },
 };
-const mountInteractions = () =>
-  renderHook(() =>
-    useMapInteractions(props, "mapbox-native", { current: null })
+test("callback teardown suppresses retained movement and click handlers", async () => {
+  const onMove = vi.fn(() => mounted.unmount());
+  const onClick = vi.fn();
+  const mounted = renderHook(() =>
+    useMapInteractions({ ...props, onMove, onClick }, { current: null })
   );
-
-test.each(["click", "move"] as const)(
-  "%s delivery snapshots registrations and respects disposal",
-  (type) => {
-    const mounted = mountInteractions();
-    const interactions = mounted.result.current;
-    const deliveries: string[] = [];
-    const added = vi.fn(() => deliveries.push("added"));
-    let releaseSelf = () => {};
-    let releaseOther = () => {};
-    const self = () => {
-      deliveries.push("self");
-      releaseSelf();
-      releaseOther();
-      // Bound re-registration so a broken live iterator fails instead of hanging.
-      if (deliveries.length < 3)
-        releaseSelf = interactions.subscribe(type, self);
-      interactions.subscribe(type, added);
-    };
-    releaseSelf = interactions.subscribe(type, self);
-    releaseOther = interactions.subscribe(type, () =>
-      deliveries.push("removed")
-    );
-    interactions.subscribe(type, () => deliveries.push("last"));
-
-    act(() => interactions.emit(type, event));
-    expect(deliveries).toEqual(["self", "last"]);
-    expect(added).not.toHaveBeenCalled();
-    act(() => interactions.emit(type, event));
-    expect(deliveries).toEqual(["self", "last", "last", "self", "added"]);
-  }
-);
-
-test("unmount during delivery suppresses the rest of the snapshot and retained publishers", () => {
-  const mounted = mountInteractions();
   const interactions = mounted.result.current;
-  const later = vi.fn();
-  interactions.subscribe("click", () => mounted.unmount());
-  interactions.subscribe("click", later);
-
-  act(() => interactions.emit("click", event));
-  act(() => interactions.emit("click", event));
-  expect(later).not.toHaveBeenCalled();
-});
-
-test.each(["mapbox-web", "mapbox-native", "maplibre-native"] as const)(
-  "%s source unmount suppresses subsequent map click delivery",
-  async (backend) => {
-    const mapClick = vi.fn();
-    const query = vi.fn<MapRef["queryRenderedFeatures"]>().mockResolvedValue([
-      {
-        type: "Feature",
-        source: "routes",
-        geometry: { type: "Point", coordinates: [1, 2] },
-      },
-    ]);
-    const map = { queryRenderedFeatures: query } as unknown as MapRef;
-    const mounted = renderHook(() =>
-      useMapInteractions({ ...props, onClick: mapClick }, backend, {
-        current: map,
-      })
-    );
-    const interactions = mounted.result.current;
-    interactions.registerSource("routes", () => mounted.unmount(), {});
-
-    await act(async () => {
-      if (backend === "mapbox-web") await interactions.click(event);
-      else interactions.dispatchSource("routes", event);
-    });
-    expect(mapClick).not.toHaveBeenCalled();
-  }
-);
-
-test.each(["map", "source"] as const)(
-  "%s click subscriber unmount suppresses the map callback",
-  async (origin) => {
-    const mapClick = vi.fn();
-    const mounted = renderHook(() =>
-      useMapInteractions({ ...props, onClick: mapClick }, "mapbox-native", {
-        current: null,
-      })
-    );
-    const interactions = mounted.result.current;
-    interactions.registerSource("routes", () => {}, {});
-    interactions.subscribe("click", () => mounted.unmount());
-
-    await act(async () => {
-      if (origin === "map") await interactions.click(event);
-      else interactions.dispatchSource("routes", event);
-    });
-    expect(mapClick).not.toHaveBeenCalled();
-  }
-);
-
-test("duplicate callbacks have independently disposable registrations", () => {
-  const mounted = mountInteractions();
-  const interactions = mounted.result.current;
-  const callback = vi.fn();
-  const release = interactions.subscribe("move", callback);
-  interactions.subscribe("move", callback);
-  release();
-  release();
-  act(() => interactions.emit("move", event));
-  expect(callback).toHaveBeenCalledTimes(1);
+  act(() =>
+    interactions.move({ viewState: props.initialViewState, origin: "user" })
+  );
+  act(() =>
+    interactions.move({ viewState: props.initialViewState, origin: "user" })
+  );
+  await act(async () => interactions.click(event));
+  expect(onMove).toHaveBeenCalledTimes(1);
+  expect(onClick).not.toHaveBeenCalled();
 });
 
 test("custom forwarding proxies retain common queries", async () => {
@@ -140,45 +49,289 @@ test("custom forwarding proxies retain common queries", async () => {
   const mounted = renderHook(() =>
     useMapInteractions(
       { ...props, interactiveLayerIds: ["route-line"] },
-      "mapbox-web",
       { current: map }
     )
   );
-  mounted.result.current.registerSource("routes", () => {}, {});
   await act(async () => mounted.result.current.click(event));
   expect(unknownMethod).not.toHaveBeenCalled();
-  expect(query).toHaveBeenCalledTimes(2);
+  expect(query).toHaveBeenCalledTimes(1);
   expect(query).toHaveBeenLastCalledWith(event.point, {
     layers: ["route-line"],
   });
 });
 
-test.each(["source", "layers"] as const)(
-  "detached %s hit queries report one failure without delivering clicks",
-  async (query) => {
-    const onError = vi.fn();
-    const onClick = vi.fn();
-    const sourceClick = vi.fn();
-    const mounted = renderHook(() =>
-      useMapInteractions(
-        {
-          ...props,
-          onError,
-          onClick,
-          interactiveLayerIds: query === "layers" ? ["route-line"] : undefined,
-        },
-        "mapbox-web",
-        { current: null }
-      )
-    );
-    if (query === "source")
-      mounted.result.current.registerSource("routes", sourceClick, {});
+test("detached filtered clicks report failure without delivering a click", async () => {
+  const onError = vi.fn();
+  const onClick = vi.fn();
+  const mounted = renderHook(() =>
+    useMapInteractions(
+      {
+        ...props,
+        onError,
+        onClick,
+        interactiveLayerIds: ["route-line"],
+      },
+      { current: null }
+    )
+  );
+  await act(async () => mounted.result.current.click(event));
+  expect(onError).toHaveBeenCalledExactlyOnceWith({
+    error: new Error("Map is not attached."),
+  });
+  expect(onClick).not.toHaveBeenCalled();
+});
 
-    await act(async () => mounted.result.current.click(event));
-    expect(onError).toHaveBeenCalledExactlyOnceWith({
-      error: new Error("Map is not attached."),
+test.each(["detach", "replace", "unmount", "current"] as const)(
+  "pending map query %s keeps delivery bound to its concrete owner",
+  async (change) => {
+    let resolve!: (
+      features: Awaited<ReturnType<MapRef["queryRenderedFeatures"]>>
+    ) => void;
+    const query = vi.fn<MapRef["queryRenderedFeatures"]>(
+      () =>
+        new Promise((done) => {
+          resolve = done;
+        })
+    );
+    const original = { queryRenderedFeatures: query } as unknown as MapRef;
+    const ref = { current: original as MapRef | null };
+    const onClick = vi.fn();
+    const updated = vi.fn();
+    const onError = vi.fn();
+    const mounted = renderHook(
+      ({ callback }) =>
+        useMapInteractions(
+          {
+            ...props,
+            onClick: callback,
+            onError,
+            interactiveLayerIds: ["lower", "upper"],
+          },
+          ref
+        ),
+      { initialProps: { callback: onClick } }
+    );
+    const pending = mounted.result.current.click(event);
+    expect(query).toHaveBeenCalledExactlyOnceWith(event.point, {
+      layers: ["lower", "upper"],
+    });
+    if (change === "detach") ref.current = null;
+    if (change === "replace")
+      ref.current = { queryRenderedFeatures: vi.fn() } as unknown as MapRef;
+    if (change === "unmount") mounted.unmount();
+    if (change === "current") mounted.rerender({ callback: updated });
+    const features = [
+      {
+        type: "Feature" as const,
+        geometry: { type: "Point" as const, coordinates: [1, 2] },
+        source: "upper-source",
+        layer: { id: "upper" },
+      },
+      {
+        type: "Feature" as const,
+        geometry: { type: "Point" as const, coordinates: [1, 2] },
+        source: "lower-source",
+        layer: { id: "lower" },
+      },
+    ];
+    await act(async () => {
+      resolve(features);
+      await pending;
     });
     expect(onClick).not.toHaveBeenCalled();
-    expect(sourceClick).not.toHaveBeenCalled();
+    if (change === "current")
+      expect(updated).toHaveBeenCalledExactlyOnceWith({ ...event, features });
+    else expect(updated).not.toHaveBeenCalled();
+    expect(onError).not.toHaveBeenCalled();
   }
 );
+
+test.each([false, true])(
+  "query rejection is observable only for current owner (replaced=%s)",
+  async (replaced) => {
+    let reject!: (error: Error) => void;
+    const query = vi.fn<MapRef["queryRenderedFeatures"]>(
+      () =>
+        new Promise((_done, fail) => {
+          reject = fail;
+        })
+    );
+    const ref = {
+      current: { queryRenderedFeatures: query } as unknown as MapRef,
+    };
+    const onError = vi.fn();
+    const onClick = vi.fn();
+    const mounted = renderHook(() =>
+      useMapInteractions(
+        { ...props, onError, onClick, interactiveLayerIds: ["point"] },
+        ref
+      )
+    );
+    const pending = mounted.result.current.click(event);
+    if (replaced) ref.current = {} as MapRef;
+    const error = new Error("SDK query rejected");
+    await act(async () => {
+      reject(error);
+      await pending;
+    });
+    if (replaced) expect(onError).not.toHaveBeenCalled();
+    else expect(onError).toHaveBeenCalledExactlyOnceWith({ error });
+    expect(onClick).not.toHaveBeenCalled();
+  }
+);
+
+test("simultaneous maps keep feature results and callbacks local", async () => {
+  const firstClick = vi.fn();
+  const secondClick = vi.fn();
+  const firstFeatures = [
+    {
+      type: "Feature" as const,
+      geometry: { type: "Point" as const, coordinates: [1, 2] },
+      source: "first",
+      layer: { id: "a" },
+    },
+  ];
+  const secondFeatures = [
+    {
+      type: "Feature" as const,
+      geometry: { type: "Point" as const, coordinates: [1, 2] },
+      source: "second",
+      layer: { id: "b" },
+    },
+  ];
+  const firstQuery = vi
+    .fn<MapRef["queryRenderedFeatures"]>()
+    .mockResolvedValue(firstFeatures);
+  const secondQuery = vi
+    .fn<MapRef["queryRenderedFeatures"]>()
+    .mockResolvedValue(secondFeatures);
+  const first = renderHook(() =>
+    useMapInteractions(
+      { ...props, onClick: firstClick, interactiveLayerIds: ["a"] },
+      { current: { queryRenderedFeatures: firstQuery } as unknown as MapRef }
+    )
+  );
+  const second = renderHook(() =>
+    useMapInteractions(
+      { ...props, onClick: secondClick, interactiveLayerIds: ["b"] },
+      { current: { queryRenderedFeatures: secondQuery } as unknown as MapRef }
+    )
+  );
+  await act(async () => {
+    await Promise.all([
+      first.result.current.click(event),
+      second.result.current.click(event),
+    ]);
+  });
+  expect(firstClick).toHaveBeenCalledExactlyOnceWith({
+    ...event,
+    features: firstFeatures,
+  });
+  expect(secondClick).toHaveBeenCalledExactlyOnceWith({
+    ...event,
+    features: secondFeatures,
+  });
+});
+
+test.each(["replace", "unmount"] as const)(
+  "a synchronous SDK query %s suppresses its former map callback",
+  async (change) => {
+    const ref = { current: {} as MapRef };
+    const onClick = vi.fn();
+    const query = vi.fn<MapRef["queryRenderedFeatures"]>(() => {
+      if (change === "replace") ref.current = {} as MapRef;
+      else mounted.unmount();
+      return Promise.resolve([]);
+    });
+    ref.current = { queryRenderedFeatures: query } as unknown as MapRef;
+    const mounted = renderHook(() =>
+      useMapInteractions(
+        { ...props, onClick, interactiveLayerIds: ["point"] },
+        ref
+      )
+    );
+    await act(async () => mounted.result.current.click(event));
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  }
+);
+
+test("a suspended transition cannot replace the committed click callback", async () => {
+  let resolve!: (
+    features: Awaited<ReturnType<MapRef["queryRenderedFeatures"]>>
+  ) => void;
+  const query = vi.fn<MapRef["queryRenderedFeatures"]>(
+    () =>
+      new Promise((done) => {
+        resolve = done;
+      })
+  );
+  const ref = {
+    current: { queryRenderedFeatures: query } as unknown as MapRef,
+  };
+  const committed = vi.fn();
+  const suspended = vi.fn();
+  const never = new Promise<void>(() => {});
+  const mounted = renderHook(
+    ({ callback, paused }) => {
+      const interactions = useMapInteractions(
+        { ...props, onClick: callback, interactiveLayerIds: ["point"] },
+        ref
+      );
+      if (paused) throw never;
+      return interactions;
+    },
+    {
+      initialProps: { callback: committed, paused: false },
+      wrapper: ({ children }) => (
+        <Suspense fallback={null}>{children}</Suspense>
+      ),
+    }
+  );
+  const pending = mounted.result.current.click(event);
+  act(() =>
+    startTransition(() =>
+      mounted.rerender({ callback: suspended, paused: true })
+    )
+  );
+  await act(async () => {
+    resolve([]);
+    await pending;
+  });
+  expect(committed).toHaveBeenCalledExactlyOnceWith({ ...event, features: [] });
+  expect(suspended).not.toHaveBeenCalled();
+});
+
+test("a suspended transition cannot replace the committed movement callback", () => {
+  const committed = vi.fn();
+  const suspended = vi.fn();
+  const never = new Promise<void>(() => {});
+  const mounted = renderHook(
+    ({ callback, paused }) => {
+      const interactions = useMapInteractions(
+        { ...props, onMove: callback },
+        { current: null }
+      );
+      if (paused) throw never;
+      return interactions;
+    },
+    {
+      initialProps: { callback: committed, paused: false },
+      wrapper: ({ children }) => (
+        <Suspense fallback={null}>{children}</Suspense>
+      ),
+    }
+  );
+  act(() =>
+    startTransition(() =>
+      mounted.rerender({ callback: suspended, paused: true })
+    )
+  );
+  const movement = {
+    viewState: props.initialViewState,
+    origin: "user" as const,
+  };
+  act(() => mounted.result.current.move(movement));
+  expect(committed).toHaveBeenCalledExactlyOnceWith(movement);
+  expect(suspended).not.toHaveBeenCalled();
+});

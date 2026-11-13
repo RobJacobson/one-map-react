@@ -22,40 +22,17 @@ import {
   useMap,
 } from "react-map-gl/maplibre";
 
-import type { WebWrapper } from "./adapters/web/contracts.js";
 import {
   createWebAdapter,
   type WebForwardedProps,
 } from "./adapters/web/create-adapter.js";
-import { createWebMethodForwarders } from "./adapters/web/method-forwarders.js";
 import type { Adapter } from "./contracts/adapter.js";
 import type { MapRef } from "./contracts/camera-types.js";
 import type { MapProps } from "./contracts/map-types.js";
-import type {
-  AttributionControlProps,
-  ControlProps,
-  FullscreenControlProps,
-  GeolocateControlProps,
-  MarkerProps,
-  MarkerRef,
-  NavigationControlProps,
-  PopupProps,
-  ScaleControlProps,
-} from "./contracts/ui-types.js";
+import type { MarkerProps, MarkerRef } from "./contracts/ui-types.js";
 import { Map as OneMap } from "./facade/map.js";
-import {
-  AttributionControl as OneAttributionControl,
-  Control as OneControl,
-  FullscreenControl as OneFullscreenControl,
-  GeolocateControl as OneGeolocateControl,
-  Marker as OneMarker,
-  NavigationControl as OneNavigationControl,
-  Popup as OnePopup,
-  ScaleControl as OneScaleControl,
-} from "./facade/ui.js";
+import { Marker as OneMarker } from "./facade/ui.js";
 import { useStableOptions } from "./facade/use-stable-options.js";
-
-type WebControlHook = WebWrapper<"maplibre-web">["useControl"];
 
 type MaplibreMapInstance = ReturnType<MaplibreMapRef["getMap"]>;
 
@@ -72,141 +49,16 @@ interface MaplibreClusterCaller {
   ) => Promise<readonly object[]>;
 }
 
-const forwardedMethodNames = [
-  "on",
-  "off",
-  "once",
-  "addControl",
-  "removeControl",
-  "hasControl",
-  "getSource",
-  "getLayer",
-  "getCanvas",
-  "getCanvasContainer",
-  "getContainer",
-  "getStyle",
-  "loaded",
-  "isStyleLoaded",
-  "areTilesLoaded",
-  "triggerRepaint",
-  "getVerticalFieldOfView",
-  "setVerticalFieldOfView",
-  "getTerrain",
-  "getProjection",
-  "getLight",
-  "getStyleUrl",
-  "redraw",
-  "setSky",
-  "getSky",
-  "refreshTiles",
-  "setGlyphs",
-  "getGlyphs",
-  "setFontFaces",
-  "getFontFaces",
-  "getPixelRatio",
-  "setPixelRatio",
-  "getRoll",
-  "setRoll",
-  "getCameraTargetElevation",
-  "getCenterElevation",
-  "setCenterElevation",
-  "setTransformConstrain",
-  "setGlobalStateProperty",
-  "getGlobalState",
-  "setSourceTileLodParams",
-  "setTransformRequest",
-] as const satisfies readonly (keyof MaplibreMapRef)[];
-
 // The react-map-gl components accept the full style-spec surface; the facade
 // converts props before they reach this boundary.
 /** Selects maplibre-web and supplies react-map-gl MapLibre components. */
 export const adapter: Adapter & { readonly backend: "maplibre-web" } =
   createWebAdapter({
     backend: "maplibre-web",
-    createAdvancedMethods: (getHandle) => {
-      const selectedHandle = () => getHandle() as unknown as MaplibreMapRef;
-      return {
-        ...createWebMethodForwarders(selectedHandle, forwardedMethodNames),
-        setEventedParent: (
-          ...args: Parameters<MaplibreMapInstance["setEventedParent"]>
-        ) =>
-          selectedHandle()
-            .getMap()
-            .setEventedParent(...args),
-        fire: ((...args: Parameters<MaplibreMapInstance["fire"]>) =>
-          selectedHandle()
-            .getMap()
-            .fire(...args)) as MaplibreMapInstance["fire"],
-        getGestureHandler: <Name extends keyof WebGestureHandlers>(
-          name: Name
-        ): WebGestureHandlers[Name] => {
-          const map = selectedHandle().getMap();
-          const handlers = {
-            boxZoom: map.boxZoom,
-            doubleClickZoom: map.doubleClickZoom,
-            dragPan: map.dragPan,
-            dragRotate: map.dragRotate,
-            keyboard: map.keyboard,
-            scrollZoom: map.scrollZoom,
-            touchPitch: map.touchPitch,
-            touchZoomRotate: map.touchZoomRotate,
-          };
-          if (!Object.hasOwn(handlers, name))
-            throw new RangeError(`Unknown gesture handler: ${name}`);
-          return handlers[name];
-        },
-        getCancelPendingTileRequestsWhileZooming: (): boolean =>
-          selectedHandle().getMap().cancelPendingTileRequestsWhileZooming,
-        setCancelPendingTileRequestsWhileZooming: (value: boolean): void => {
-          (
-            getHandle() as unknown as MaplibreMapRef
-          ).getMap().cancelPendingTileRequestsWhileZooming = value;
-        },
-        getVersion: (): string => selectedHandle().getMap().version,
-        getCanvasSource: (id: string): import("maplibre-gl").CanvasSource => {
-          const source = selectedHandle().getSource(id);
-          if (!source || source.type !== "canvas")
-            throw new Error(`Source "${id}" is not an attached CanvasSource.`);
-          return source as import("maplibre-gl").CanvasSource;
-        },
-        getVideoSource: (id: string): import("maplibre-gl").VideoSource => {
-          const source = selectedHandle().getSource(id);
-          if (!source || source.type !== "video")
-            throw new Error(`Source "${id}" is not an attached VideoSource.`);
-          return source as import("maplibre-gl").VideoSource;
-        },
-        setDebugOptions: (options: Partial<WebDebugOptions>) => {
-          const map = selectedHandle().getMap();
-          Object.assign(map, options);
-        },
-        getDebugOptions: (): WebDebugOptions => {
-          const map = selectedHandle().getMap();
-          return {
-            showCollisionBoxes: map.showCollisionBoxes,
-            showTileBoundaries: map.showTileBoundaries,
-            showOverdrawInspector: map.showOverdrawInspector,
-            showPadding: map.showPadding,
-            vertices: map.vertices,
-            repaint: map.repaint,
-          };
-        },
-      };
-    },
     Map: MaplibreMap,
     Source: MaplibreSource as ComponentType<WebForwardedProps>,
     Layer: MaplibreLayer as Adapter["Layer"],
     Marker: MaplibreMarker as unknown as ComponentType<WebForwardedProps>,
-    Popup: MaplibrePopup as unknown as ComponentType<WebForwardedProps>,
-    NavigationControl:
-      MaplibreNavigationControl as ComponentType<WebForwardedProps>,
-    AttributionControl:
-      MaplibreAttributionControl as ComponentType<WebForwardedProps>,
-    ScaleControl: MaplibreScaleControl as ComponentType<WebForwardedProps>,
-    GeolocateControl:
-      MaplibreGeolocateControl as ComponentType<WebForwardedProps>,
-    FullscreenControl:
-      MaplibreFullscreenControl as ComponentType<WebForwardedProps>,
-    useControl: useControl as unknown as WebControlHook,
     useMap,
     // MapLibre GL resolves image loads with a { data } response; the shared
     // web surface omits the loader so each entry normalizes its own.
@@ -243,46 +95,19 @@ export {
   useControl,
 };
 
-/** Selected advanced methods retain the pinned wrapper's signatures. */
+/** Common map operations and access to the selected wrapper. */
 export type WebMapRef = MapRef & {
-  /** Bubbles plugin events through the public selected SDK parent facility. */
-  readonly setEventedParent: MaplibreMapInstance["setEventedParent"];
-  /** Public SDK event producer for plugins; dispatch is synchronous and follows SDK event semantics. */
-  readonly fire: MaplibreMapInstance["fire"];
   /**
-   * Selects an attached renderer's public gesture controls and independent state readback.
-   * @param name - SDK gesture handler name.
-   * @returns The renderer-owned public handler; use only while this map remains mounted.
-   * @throws For an unknown handler name or a detached map.
+   * Borrows the currently attached react-map-gl wrapper ref.
+   *
+   * @remarks Call again for each operation to look up the current handle
+   * without waiting for load. Borrowed handles follow upstream lifetime and
+   * ownership; facade detachment does not invalidate them.
+   * @returns The attached wrapper ref, without waiting for renderer readiness.
+   * @throws Rejects when the map is detached.
    */
-  readonly getGestureHandler: <Name extends keyof WebGestureHandlers>(
-    name: Name
-  ) => WebGestureHandlers[Name];
-  /**
-   * Reads whether obsolete loading tiles are cancelled while zooming in.
-   * @returns The attached SDK's current cancellation setting.
-   */
-  readonly getCancelPendingTileRequestsWhileZooming: () => boolean;
-  /**
-   * Updates whether obsolete loading tiles are cancelled while zooming in.
-   * @param value - True cancels previous zoom levels' pending requests.
-   */
-  readonly setCancelPendingTileRequestsWhileZooming: (value: boolean) => void;
-  /**
-   * Reads the attached renderer's pinned SDK version.
-   * @returns SDK version string; throws when detached.
-   */
-  readonly getVersion: () => string;
-  /** Reads the attached CanvasSource with its named media/model operations. */
-  readonly getCanvasSource: (id: string) => import("maplibre-gl").CanvasSource;
-  /** Reads the attached VideoSource with its named media/model operations. */
-  readonly getVideoSource: (id: string) => import("maplibre-gl").VideoSource;
-
-  /** Updates selected renderer diagnostics; settings follow SDK lifetime. */
-  readonly setDebugOptions: (options: Partial<WebDebugOptions>) => void;
-  /** Reads renderer diagnostics. */
-  readonly getDebugOptions: () => WebDebugOptions;
-} & Pick<MaplibreMapRef, (typeof forwardedMethodNames)[number]>;
+  readonly getWrapperMap: () => Promise<MaplibreMapRef>;
+};
 
 /** Map props with DOM presentation forwarded to the map container. */
 export interface WebMapProps extends Omit<MapProps, "mapStyle"> {
@@ -327,87 +152,6 @@ export interface WebMarkerProps extends MarkerProps {
 export const Marker = OneMarker as ForwardRefExoticComponent<
   WebMarkerProps & RefAttributes<MarkerRef>
 >;
-
-/** Popup props with selected wrapper options and DOM content attributes. */
-export interface WebPopupProps extends PopupProps {
-  /** Remaining selected wrapper options; common fields take precedence. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibrePopup>,
-    keyof PopupProps | "ref"
-  >;
-  /** Attributes applied to the popup content host. */
-  readonly hostProps?: HTMLAttributes<HTMLDivElement>;
-}
-/** Popup with selected web options. */
-export const Popup = OnePopup as ComponentType<WebPopupProps>;
-
-/** Custom control props with DOM content attributes. */
-export interface WebControlProps extends ControlProps {
-  /** Attributes applied to the custom control content host. */
-  readonly hostProps?: HTMLAttributes<HTMLDivElement>;
-}
-/** Custom control with DOM content attributes. */
-export const Control = OneControl as ComponentType<WebControlProps>;
-
-/** Navigation control props with selected wrapper options. */
-export interface WebNavigationControlProps extends NavigationControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibreNavigationControl>,
-    keyof NavigationControlProps
-  >;
-}
-/** Navigation control with selected web options. */
-export const NavigationControl =
-  OneNavigationControl as ComponentType<WebNavigationControlProps>;
-
-/** Attribution control props with selected wrapper options. */
-export interface WebAttributionControlProps extends AttributionControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibreAttributionControl>,
-    keyof AttributionControlProps
-  >;
-}
-/** Attribution control with selected web options. */
-export const AttributionControl =
-  OneAttributionControl as ComponentType<WebAttributionControlProps>;
-
-/** Scale control props with selected wrapper options. */
-export interface WebScaleControlProps extends ScaleControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibreScaleControl>,
-    keyof ScaleControlProps
-  >;
-}
-/** Scale control with selected web options. */
-export const ScaleControl =
-  OneScaleControl as ComponentType<WebScaleControlProps>;
-
-/** Geolocation control props with selected browser facilities. */
-export interface WebGeolocateControlProps extends GeolocateControlProps {
-  /** Remaining selected browser options and events. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibreGeolocateControl>,
-    keyof GeolocateControlProps | "ref"
-  >;
-}
-/** Geolocation control with selected web options. */
-export const GeolocateControl =
-  OneGeolocateControl as ComponentType<WebGeolocateControlProps>;
-
-/** Fullscreen control props with selected browser target. */
-export interface WebFullscreenControlProps extends FullscreenControlProps {
-  /** Remaining selected constructor options and CSS presentation. */
-  readonly options?: Omit<
-    ComponentProps<typeof MaplibreFullscreenControl>,
-    keyof FullscreenControlProps
-  >;
-}
-/** Fullscreen control with selected web options. */
-export const FullscreenControl =
-  OneFullscreenControl as ComponentType<WebFullscreenControlProps>;
 
 export {
   GlobeControl as WrapperGlobeControl,
@@ -490,43 +234,3 @@ export {
   prewarm,
   clearPrewarmedResources,
 } from "maplibre-gl";
-
-/** Renderer diagnostic properties, with SDK defaults and units. */
-export type WebDebugOptions = Pick<
-  ReturnType<MaplibreMapRef["getMap"]>,
-  | "showCollisionBoxes"
-  | "showTileBoundaries"
-  | "showOverdrawInspector"
-  | "showPadding"
-  | "vertices"
-  | "repaint"
->;
-
-/** Public gesture controls/readbacks; renderer input dispatch and frame hooks stay private. */
-export type WebGestureHandlers = {
-  readonly [
-    Name in
-      | "boxZoom"
-      | "doubleClickZoom"
-      | "dragPan"
-      | "dragRotate"
-      | "keyboard"
-      | "scrollZoom"
-      | "touchPitch"
-      | "touchZoomRotate"
-  ]: Pick<
-    MaplibreMapInstance[Name],
-    Extract<
-      keyof MaplibreMapInstance[Name],
-      | "enable"
-      | "disable"
-      | "isEnabled"
-      | "isActive"
-      | "isZooming"
-      | "enableRotation"
-      | "disableRotation"
-      | "setZoomRate"
-      | "setWheelZoomRate"
-    >
-  >;
-};

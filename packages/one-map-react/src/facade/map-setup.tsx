@@ -2,22 +2,12 @@ import {
   createContext,
   type ReactNode,
   useContext,
-  useLayoutEffect,
-  useMemo,
   useState,
   useSyncExternalStore,
 } from "react";
 
-import type { Adapter, MapServices } from "../contracts/adapter.js";
+import type { Adapter } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
-import type { LocationService } from "../contracts/location-types.js";
-import { scopeMapServices } from "./scope-map-services.js";
-
-const ServicesContext = createContext<MapServices | null>(null);
-const LocationOverrideContext = createContext<LocationService | undefined>(
-  undefined
-);
-
 interface MapRegistry {
   register(id: string, map: MapRef): () => void;
   get(id: string): MapRef | undefined;
@@ -31,41 +21,21 @@ const MapRegistryContext = createContext<MapRegistry | null>(null);
 export interface MapSetupProps {
   /** Adapter imported from the selected backend entry; changing it requires a new setup key. */
   readonly adapter: Adapter;
-  /** Explicit app permission/acquisition provider; changing it requires a new setup key. */
-  readonly locationProvider?: LocationService;
   /** Shared map components and their surrounding application tree. */
   readonly children?: ReactNode;
 }
 
 /** Provides backend selection and a provider-local named map registry. */
-export const MapSetup = ({
-  adapter,
-  locationProvider,
-  children,
-}: MapSetupProps) => {
+export const MapSetup = ({ adapter, children }: MapSetupProps) => {
   const [registry] = useState(createRegistry);
   const [initialAdapter] = useState(() => adapter);
-  const [initialProvider] = useState(() => locationProvider);
   if (initialAdapter !== adapter)
     throw new Error("MapSetup adapter changed. Remount with a new key.");
-  if (initialProvider !== locationProvider)
-    throw new Error(
-      "MapSetup locationProvider changed. Remount with a new key."
-    );
-  const scoped = useMemo(
-    () => scopeMapServices(adapter.services, locationProvider),
-    [adapter.services, locationProvider]
-  );
-  useLayoutEffect(() => () => scoped.dispose(), [scoped]);
   return (
     <AdapterContext.Provider value={adapter}>
-      <ServicesContext.Provider value={scoped.services}>
-        <LocationOverrideContext.Provider value={locationProvider}>
-          <MapRegistryContext.Provider value={registry}>
-            {children}
-          </MapRegistryContext.Provider>
-        </LocationOverrideContext.Provider>
-      </ServicesContext.Provider>
+      <MapRegistryContext.Provider value={registry}>
+        {children}
+      </MapRegistryContext.Provider>
     </AdapterContext.Provider>
   );
 };
@@ -96,21 +66,6 @@ export const useNamedMap = (id: string | undefined): MapRef | undefined => {
     () => undefined
   );
 };
-
-/** Optional scoped services for directly mounted adapter tests. */
-export const useOptionalSetupServices = (): MapServices | null =>
-  useContext(ServicesContext);
-
-/** Reads scoped services; no attached Map is required. */
-export const useSetupServices = (): MapServices => {
-  const services = useContext(ServicesContext);
-  if (!services) throw new Error("useMapServices requires MapSetup.");
-  return services;
-};
-
-/** Explicit setup override, preserving default browser SDK delegation. */
-export const useLocationOverride = (): LocationService | undefined =>
-  useContext(LocationOverrideContext);
 
 const createRegistry = (): MapRegistry => {
   const maps = new globalThis.Map<string, MapRef>();

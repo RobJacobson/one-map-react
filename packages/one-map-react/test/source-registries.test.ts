@@ -7,11 +7,13 @@ import {
 } from "../src/adapters/maplibre-native/source-registry.js";
 
 test("RNMapbox stale cleanup cannot delete a replacement registration, even with the same ref", () => {
-  const registry = new GeoJsonSourceRegistry(async () => {});
+  const registry = new GeoJsonSourceRegistry();
   // Only identity is relevant; the wrapper methods are not called in this test.
-  const ref = {} as Parameters<GeoJsonSourceRegistry["register"]>[1];
-  const oldCleanup = registry.register("routes", ref);
-  const cleanup = registry.register("routes", ref);
+  const ref = {} as ReturnType<
+    Parameters<GeoJsonSourceRegistry["register"]>[1]
+  >;
+  const oldCleanup = registry.register("routes", () => ref);
+  const cleanup = registry.register("routes", () => ref);
   oldCleanup();
   expect(registry.require("routes")).toBe(ref);
   cleanup();
@@ -21,39 +23,60 @@ test("RNMapbox stale cleanup cannot delete a replacement registration, even with
 test("MapLibre stale cleanup cannot delete a replacement using the same entry", () => {
   const registry = new MaplibreSourceRegistry();
   const entry = { kind: "geojson", ref: {} } as MaplibreNativeSourceRef;
-  const oldCleanup = registry.register("routes", () => entry, "geojson");
-  const cleanup = registry.register("routes", () => entry, "geojson");
+  const oldCleanup = registry.register("routes", () => entry);
+  const cleanup = registry.register("routes", () => entry);
   oldCleanup();
   expect(registry.require("routes")).toBe(entry);
   cleanup();
   expect(() => registry.require("routes")).toThrow("not a mounted");
 });
 
-test.each(
-  (["mapbox", "maplibre"] as const).flatMap((backend) =>
-    (["geojson", "vector"] as const).map((kind) => ({ backend, kind }))
-  )
-)(
-  "$backend $kind releases 10000 unwritten source lifetimes",
-  async ({ backend, kind }) => {
-    const registry =
-      backend === "mapbox"
-        ? new GeoJsonSourceRegistry(async () => {})
-        : new MaplibreSourceRegistry();
-    for (let index = 0; index < 10000; index += 1) {
-      const id = `temporary-${index}`;
-      if (registry instanceof MaplibreSourceRegistry)
-        registry.register(id, () => undefined, kind)();
-      else if (kind === "geojson") registry.register(id, null)();
-      else registry.featureState.register(id, kind)();
+test("RNMapbox cluster lookup reads the current source ref and rejects detachment", () => {
+  const registry = new GeoJsonSourceRegistry();
+  type Ref = ReturnType<Parameters<GeoJsonSourceRegistry["register"]>[1]>;
+  let ref = {} as Ref;
+  registry.register("routes", () => ref);
+  expect(registry.require("routes")).toBe(ref);
+  ref = {} as Ref;
+  expect(registry.require("routes")).toBe(ref);
+  ref = null;
+  expect(() => registry.require("routes")).toThrow("not a mounted");
+});
+
+test("MapLibre lookup reads current source family and rejects detachment", () => {
+  const registry = new MaplibreSourceRegistry();
+  let entry: MaplibreNativeSourceRef | undefined = {
+    kind: "geojson",
+    ref: {},
+  } as MaplibreNativeSourceRef;
+  registry.register("routes", () => entry);
+  expect(registry.requireGeoJson("routes")).toBe(entry.ref);
+  entry = { kind: "vector", ref: {} } as MaplibreNativeSourceRef;
+  expect(registry.require("routes")).toBe(entry);
+  expect(() => registry.requireGeoJson("routes")).toThrow("not a GeoJSON");
+  entry = undefined;
+  expect(() => registry.require("routes")).toThrow("not a mounted");
+});
+
+test.each(["mapbox", "maplibre"] as const)(
+  "%s cleanup leaves unrelated source registrations available",
+  (backend) => {
+    if (backend === "mapbox") {
+      const registry = new GeoJsonSourceRegistry();
+      const ref = {} as NonNullable<
+        ReturnType<Parameters<GeoJsonSourceRegistry["register"]>[1]>
+      >;
+      registry.register("other", () => ref);
+      registry.register("routes", () => ref)();
+      expect(registry.require("other")).toBe(ref);
+      expect(() => registry.require("routes")).toThrow("not a mounted");
+    } else {
+      const registry = new MaplibreSourceRegistry();
+      const entry = { kind: "geojson", ref: {} } as MaplibreNativeSourceRef;
+      registry.register("other", () => entry);
+      registry.register("routes", () => entry)();
+      expect(registry.require("other")).toBe(entry);
+      expect(() => registry.require("routes")).toThrow("not a mounted");
     }
-    await registry.featureState.flush(() => {});
-    // Storage inspection verifies reclamation without adding a production diagnostic API.
-    const history = (
-      registry.featureState as unknown as {
-        sources: ReadonlyMap<string, unknown>;
-      }
-    ).sources;
-    expect(history.size).toBe(0);
   }
 );

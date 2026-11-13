@@ -35,12 +35,19 @@ import {
 import { createMaplibreFeatureStateMethods } from "./feature-state-methods.js";
 import type { MaplibreSourceRegistry } from "./source-registry.js";
 
-/** Selected native operations retain the wrapper signatures. */
-export type NativeAdvancedMapRef = MapRef &
-  Pick<
-    ComponentRef<typeof MaplibreMap>,
-    "setSourceVisibility" | "showAttribution" | "getViewState"
-  >;
+/** Common map operations and access to the selected native wrapper. */
+export type NativeAdvancedMapRef = MapRef & {
+  /**
+   * Borrows the currently attached MapLibre Native Map wrapper.
+   *
+   * @returns The current wrapper handle, without waiting for map load.
+   * @remarks Call again for each operation. Handles retain the wrapper's
+   * lifetime and ownership; facade detachment does not invalidate them or
+   * expose the separate Camera.
+   * @throws Rejects when the Map is not attached.
+   */
+  readonly getWrapperMap: () => Promise<ComponentRef<typeof MaplibreMap>>;
+};
 
 /**
  * Builds the imperative map handle over MapLibre Native camera and map refs.
@@ -50,59 +57,38 @@ export type NativeAdvancedMapRef = MapRef &
  * @param mapLoaded - Ref tracking `onDidFinishLoadingMap`, after which the
  * camera applies imperative stops.
  * @param sources - Registry of mounted GeoJSON and vector source refs.
- * @param capture - Existing map-capture operation.
- * @param onCameraCommand - Notifies controlled-camera ownership before public command dispatch.
- * @returns The common map ref.
+ * @returns The selected native map ref.
  */
 export const createMaplibreMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapRef: { readonly current: ComponentRef<typeof MaplibreMap> | null },
   mapLoaded: { readonly current: boolean },
-  sources: MaplibreSourceRegistry,
-  capture?: MapRef["capture"],
-  onCameraCommand?: () => void
+  sources: MaplibreSourceRegistry
 ): NativeAdvancedMapRef => ({
-  setSourceVisibility: (
-    ...args: Parameters<ComponentRef<typeof MaplibreMap>["setSourceVisibility"]>
-  ) => requireMap(mapRef.current).setSourceVisibility(...args),
-  showAttribution: (
-    ...args: Parameters<ComponentRef<typeof MaplibreMap>["showAttribution"]>
-  ) => requireMap(mapRef.current).showAttribution(...args),
-  getViewState: (
-    ...args: Parameters<ComponentRef<typeof MaplibreMap>["getViewState"]>
-  ) => requireMap(mapRef.current).getViewState(...args),
+  getWrapperMap: async () => requireMap(mapRef.current),
 
   queryTerrainElevation: async () => {
     throw new Error("queryTerrainElevation is unsupported on MapLibre Native.");
   },
-  capture:
-    capture ??
-    (async () => {
-      throw new Error("Capture is not enabled on this map.");
-    }),
   jumpTo: async (options) => {
     rejectJumpTiming(options);
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.jumpTo(toMaplibreCommand(options));
   },
   easeTo: async (options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.easeTo(toMaplibreCommand(options));
   },
   flyTo: async (options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.flyTo(toMaplibreCommand(options));
   },
   fitBounds: async (bounds, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.fitBounds(
       mutableFlatBounds(bounds),
       toMaplibreFitBoundsOptions(options)
@@ -111,7 +97,6 @@ export const createMaplibreMapRef = (
   zoomTo: async (zoom, options) => {
     const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    onCameraCommand?.();
     await camera.zoomTo(zoom, options ? toMaplibreCommand(options) : undefined);
   },
   stop: async () => {
@@ -212,7 +197,9 @@ export const createMaplibreMapRef = (
       "getClusterChildren"
     );
   },
-  ...createMaplibreFeatureStateMethods(sources),
+  ...createMaplibreFeatureStateMethods(sources, () =>
+    requireMap(mapRef.current)
+  ),
   resize: async () => {
     throw nativeResizeError();
   },

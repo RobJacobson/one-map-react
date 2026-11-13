@@ -6,7 +6,7 @@ import {
   emptyStyle,
   initialViewState,
   routes,
-} from "../../../tests/fixtures/map-fixture.js";
+} from "../../example-map/src/scenarios/map-fixture.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";

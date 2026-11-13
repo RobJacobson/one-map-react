@@ -6,8 +6,9 @@ import { useMapEnclosure } from "./map.js";
  * Shared style images that render through the selected adapter.
  *
  * Renders inside {@link Map}; registration waits for style readiness,
- * entries are removed on unmount, and owned entries are re-registered after
- * the style is replaced.
+ * entries update independently and successful registrations are removed on
+ * unmount. Web consumers must finish cleanup before changing the style, then
+ * mount fresh Images after readiness. Native wrappers retain SDK behavior.
  *
  * @param props - Image entries keyed by style image name.
  * @throws When rendered outside {@link Map}.

@@ -48,45 +48,21 @@ export function useMap(id?: string): MapRef | undefined {
   throw new Error("useMap() must render inside Map.");
 }
 
-/** Shared map with scoped UI notifications and named map attachment. */
+/** Shared map with scoped callbacks and named map attachment. */
 // eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
 export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
-  const { Map: AdapterMap, backend } = useSelectedAdapter();
+  const { Map: AdapterMap } = useSelectedAdapter();
   validateMapOptions(props);
 
   useStableOptions("Map", {
     id: props.id,
-    captureEnabled: props.captureEnabled ?? false,
   });
   const { mapRef, proxy } = useMapAttachment(props.id, forwardedRef);
   const [ready, setReady] = useState(false);
-  const { move, subscribe, registerSource, dispatchSource, click } =
-    useMapInteractions(props, backend, mapRef);
-
-  const cameraControlled = props.viewState !== undefined;
+  const { move, click } = useMapInteractions(props, mapRef);
   const session = useMemo<MapSession>(
-    () => ({
-      ref: mapRef,
-      map: proxy,
-      ready,
-      cameraControlled,
-      minZoom: props.minZoom,
-      maxZoom: props.maxZoom,
-      subscribe,
-      registerSource,
-      dispatchSource,
-    }),
-    [
-      mapRef,
-      proxy,
-      ready,
-      cameraControlled,
-      props.minZoom,
-      props.maxZoom,
-      subscribe,
-      registerSource,
-      dispatchSource,
-    ]
+    () => ({ ref: mapRef, map: proxy, ready }),
+    [mapRef, proxy, ready]
   );
   return (
     <MapSessionContext.Provider value={session}>

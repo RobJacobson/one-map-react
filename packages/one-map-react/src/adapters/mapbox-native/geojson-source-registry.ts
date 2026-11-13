@@ -2,9 +2,6 @@ import type { ShapeSource } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 import { createContext, useContext } from "react";
 
-import type { FeatureIdentifier } from "../../contracts/query-types.js";
-import { NativeFeatureState } from "../shared/native-feature-state.js";
-
 /**
  * Registry of mounted RNMapbox GeoJSON source refs, keyed by facade id.
  *
@@ -15,36 +12,25 @@ import { NativeFeatureState } from "../shared/native-feature-state.js";
  * renderer support for duplicate source ids is not promised.
  */
 export class GeoJsonSourceRegistry {
-  readonly featureState: NativeFeatureState;
-
-  /**
-   * @param reset - Whole-state removal through the current map wrapper.
-   */
-  constructor(reset: (identifier: FeatureIdentifier) => Promise<void>) {
-    this.featureState = new NativeFeatureState(reset);
-  }
-
   private readonly refs = new Map<
     string,
-    { readonly ref: ComponentRef<typeof ShapeSource> | null }
+    { readonly read: () => ComponentRef<typeof ShapeSource> | null }
   >();
 
   /**
    * Records the source ref mounted under an id.
    *
    * @param id - Facade source id.
-   * @param ref - RNMapbox `ShapeSource` ref, or `null` while attaching.
+   * @param read - Getter for the current RNMapbox `ShapeSource` ref.
    * @returns Cleanup bound to this registration.
    */
   register(
     id: string,
-    ref: ComponentRef<typeof ShapeSource> | null
+    read: () => ComponentRef<typeof ShapeSource> | null
   ): () => void {
-    const owner = { ref };
-    const releaseState = this.featureState.register(id, "geojson");
+    const owner = { read };
     this.refs.set(id, owner);
     return () => {
-      releaseState();
       if (this.refs.get(id) === owner) {
         this.refs.delete(id);
       }
@@ -59,7 +45,7 @@ export class GeoJsonSourceRegistry {
    * @throws When no facade GeoJSON source is mounted under the id.
    */
   require(id: string): ComponentRef<typeof ShapeSource> {
-    const ref = this.refs.get(id)?.ref;
+    const ref = this.refs.get(id)?.read();
 
     if (!ref) {
       throw new Error(

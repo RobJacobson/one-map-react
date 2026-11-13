@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
 import type { LngLat } from "./camera-types.js";
-import type { SourceClickEvent } from "./event-types.js";
 
 /**
  * GeoJSON geometry accepted by the shared GeoJSON {@link Source}.
@@ -71,13 +70,11 @@ interface SourceBaseProps {
  * GeoJSON source creation options shared by every adapter.
  */
 export interface GeoJsonSourceProps extends SourceBaseProps {
-  /** Mutable callback for rendered features activated from this source. */
-  readonly onClick?: (event: SourceClickEvent) => void;
   /** Selects the GeoJSON source family. */
   readonly type: "geojson";
   /**
    * GeoJSON object or a URL that returns one. Updating `data` redraws the
-   * source without remounting; onClick and selected native hitbox also update.
+   * source without remounting.
    * Renderer source specification options remain creation-only.
    */
   readonly data: GeoJsonData | string;
@@ -127,8 +124,6 @@ export interface GeoJsonSourceProps extends SourceBaseProps {
  * Vector tile source creation options shared by every adapter.
  */
 export interface VectorSourceProps extends SourceBaseProps {
-  /** Mutable callback for rendered features activated from this source. */
-  readonly onClick?: (event: SourceClickEvent) => void;
   /** Selects the vector tile source family. */
   readonly type: "vector";
   /** URL of a TileJSON document. Supply `url` or `tiles`, not both. */

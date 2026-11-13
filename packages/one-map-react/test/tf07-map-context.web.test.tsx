@@ -3,14 +3,13 @@ import {
   forwardRef,
   type ReactNode,
   StrictMode,
-  useImperativeHandle,
   useContext,
+  useImperativeHandle,
 } from "react";
 import { describe, expect, expectTypeOf, vi, test } from "vite-plus/test";
 
 import {
   NativeCameraContext,
-  NativeOverlayContext,
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../src/adapters/shared/native-map-presentation.js";
@@ -52,13 +51,6 @@ const createFixture = () => {
   });
   const adapter = {
     backend: "mapbox-web",
-    services: {
-      location: {
-        requestPermission: vi.fn(),
-        getCurrentPosition: vi.fn(),
-        watchPosition: vi.fn(),
-      },
-    },
     Map: FakeMap,
     Source: ({ children }: { children?: ReactNode }) => <>{children}</>,
   } as unknown as Adapter;
@@ -117,28 +109,19 @@ test.each(
 );
 
 describe("TF07 map-local UI lifetime", () => {
-  test("move subscriber teardown suppresses the map callback and retained movement handler", () => {
+  test("movement callback teardown suppresses its retained handler", () => {
     const fixture = createFixture();
-    const onMove = vi.fn();
-    let session: MapSession | undefined;
-    const SessionProbe = () => {
-      // eslint-disable-next-line react/globals -- Test readback captures the committed map session.
-      session = useMapSession();
-      return null;
-    };
+    const onMove = vi.fn(() => mounted.unmount());
     const mounted = render(
       <MapSetup adapter={fixture.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera} onMove={onMove}>
-          <SessionProbe />
-        </OneMap>
+        <OneMap mapStyle={style} initialViewState={camera} onMove={onMove} />
       </MapSetup>
     );
     const move = fixture.props()?.onMove;
-    session?.subscribe("move", () => mounted.unmount());
 
     act(() => move?.({ viewState: camera, origin: "user" }));
     act(() => move?.({ viewState: camera, origin: "user" }));
-    expect(onMove).not.toHaveBeenCalled();
+    expect(onMove).toHaveBeenCalledTimes(1);
   });
 
   test("enclosing useMap forwards commands after attachment and rejects after teardown", async () => {
@@ -160,39 +143,7 @@ describe("TF07 map-local UI lifetime", () => {
     await expect(observed?.getZoom()).rejects.toThrow("not attached");
   });
 
-  test("source propagation stops map callback and permits mutable callbacks in StrictMode", async () => {
-    const fixture = createFixture();
-    const mapClick = vi.fn();
-    const initial = vi.fn((event: { stopPropagation: () => void }) =>
-      event.stopPropagation()
-    );
-    const updated = vi.fn();
-    const tree = (onClick: typeof initial | typeof updated) => (
-      <StrictMode>
-        <MapSetup adapter={fixture.adapter}>
-          <OneMap mapStyle={style} initialViewState={camera} onClick={mapClick}>
-            <Source
-              id="places"
-              type="geojson"
-              data={{ type: "Point", coordinates: [1, 2] }}
-              onClick={onClick}
-            />
-          </OneMap>
-        </MapSetup>
-      </StrictMode>
-    );
-    const rendered = render(tree(initial));
-    await fixture.click();
-    expect(initial).toHaveBeenCalledTimes(1);
-    expect(mapClick).not.toHaveBeenCalled();
-    rendered.rerender(tree(updated));
-    await fixture.click();
-    expect(updated).toHaveBeenCalledTimes(1);
-    expect(mapClick).toHaveBeenCalledTimes(1);
-    rendered.unmount();
-  });
-
-  test("late query completion does not dispatch source or map callbacks after teardown", async () => {
+  test("late query completion does not dispatch map callbacks after teardown", async () => {
     const fixture = createFixture();
     let resolve: ((features: readonly GeoJsonFeature[]) => void) | undefined;
     fixture.query.mockImplementation(
@@ -201,17 +152,16 @@ describe("TF07 map-local UI lifetime", () => {
           resolve = done;
         })
     );
-    const sourceClick = vi.fn();
     const mapClick = vi.fn();
     const rendered = render(
       <MapSetup adapter={fixture.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera} onClick={mapClick}>
-          <Source
-            id="places"
-            type="vector"
-            url="fixture://places"
-            onClick={sourceClick}
-          />
+        <OneMap
+          mapStyle={style}
+          initialViewState={camera}
+          onClick={mapClick}
+          interactiveLayerIds={["places-layer"]}
+        >
+          <Source id="places" type="vector" url="fixture://places" />
         </OneMap>
       </MapSetup>
     );
@@ -226,7 +176,6 @@ describe("TF07 map-local UI lifetime", () => {
         },
       ]);
     });
-    expect(sourceClick).not.toHaveBeenCalled();
     expect(mapClick).not.toHaveBeenCalled();
   });
 
@@ -242,14 +191,10 @@ describe("TF07 map-local UI lifetime", () => {
           mapStyle={style}
           initialViewState={camera}
           onError={report}
+          interactiveLayerIds={["places-layer"]}
           onClick={mapClick}
         >
-          <Source
-            id="places"
-            type="vector"
-            url="fixture://places"
-            onClick={() => {}}
-          />
+          <Source id="places" type="vector" url="fixture://places" />
         </OneMap>
       </MapSetup>
     );
@@ -257,52 +202,6 @@ describe("TF07 map-local UI lifetime", () => {
     expect(report).toHaveBeenCalledWith({ error });
     expect(mapClick).not.toHaveBeenCalled();
   });
-  test("only the topmost registered source activates independently of map layer filtering", async () => {
-    const fixture = createFixture();
-    const top = vi.fn();
-    const lower = vi.fn();
-    const mapClick = vi.fn();
-    const features = [
-      {
-        type: "Feature" as const,
-        source: "top",
-        geometry: { type: "Point", coordinates: [1, 2] },
-      },
-      {
-        type: "Feature" as const,
-        source: "lower",
-        geometry: { type: "Point", coordinates: [1, 2] },
-      },
-    ];
-    fixture.query.mockResolvedValueOnce(features).mockResolvedValueOnce([]);
-    render(
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap
-          mapStyle={style}
-          initialViewState={camera}
-          interactiveLayerIds={["map-only"]}
-          onClick={mapClick}
-        >
-          <Source
-            id="lower"
-            type="vector"
-            url="fixture://lower"
-            onClick={lower}
-          />
-          <Source id="top" type="vector" url="fixture://top" onClick={top} />
-        </OneMap>
-      </MapSetup>
-    );
-    await fixture.click();
-    expect(top).toHaveBeenCalledTimes(1);
-    expect(lower).not.toHaveBeenCalled();
-    expect(fixture.query).toHaveBeenNthCalledWith(1, hit.point);
-    expect(fixture.query).toHaveBeenNthCalledWith(2, hit.point, {
-      layers: ["map-only"],
-    });
-    expect(mapClick).toHaveBeenCalledWith({ ...hit, features: [] });
-  });
-
   test("named consumers can mount with their map and observe removal and reattachment", async () => {
     const fixture = createFixture();
     let named: MapRef | undefined;
@@ -401,139 +300,6 @@ describe("TF07 map-local UI lifetime", () => {
     expect(observed.mock.calls.at(-1)?.[0].ready).toBe(true);
     await second.click();
     expect(secondClick).toHaveBeenCalledTimes(1);
-  });
-  test("a pending hit cannot activate a keyed replacement Source with the same id", async () => {
-    const fixture = createFixture();
-    let resolve: ((features: readonly GeoJsonFeature[]) => void) | undefined;
-    fixture.query.mockImplementation(
-      () =>
-        new Promise((done) => {
-          resolve = done;
-        })
-    );
-    const original = vi.fn();
-    const replacement = vi.fn();
-    const mapClick = vi.fn();
-    const tree = (generation: number) => (
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera} onClick={mapClick}>
-          <Source
-            key={generation}
-            id="places"
-            type="vector"
-            url="fixture://places"
-            onClick={generation === 0 ? original : replacement}
-          />
-        </OneMap>
-      </MapSetup>
-    );
-    const rendered = render(tree(0));
-    await fixture.click();
-    rendered.rerender(tree(1));
-    await act(async () => {
-      resolve?.([
-        {
-          type: "Feature",
-          source: "places",
-          geometry: { type: "Point", coordinates: [1, 2] },
-        },
-      ]);
-    });
-    expect(original).not.toHaveBeenCalled();
-    expect(replacement).not.toHaveBeenCalled();
-    expect(mapClick).not.toHaveBeenCalled();
-  });
-
-  test("pending hits use the latest callback on the same source attachment", async () => {
-    const fixture = createFixture();
-    let resolve: ((features: readonly GeoJsonFeature[]) => void) | undefined;
-    fixture.query.mockImplementation(
-      () =>
-        new Promise((done) => {
-          resolve = done;
-        })
-    );
-    const original = vi.fn();
-    const updated = vi.fn();
-    const tree = (onClick: typeof original) => (
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          <Source
-            id="places"
-            type="vector"
-            url="fixture://places"
-            onClick={onClick}
-          />
-        </OneMap>
-      </MapSetup>
-    );
-    const rendered = render(tree(original));
-    await fixture.click();
-    rendered.rerender(tree(updated));
-    await act(async () => {
-      resolve?.([
-        {
-          type: "Feature",
-          source: "places",
-          geometry: { type: "Point", coordinates: [1, 2] },
-        },
-      ]);
-    });
-    expect(original).not.toHaveBeenCalled();
-    expect(updated).toHaveBeenCalledTimes(1);
-  });
-
-  test("pending native source propagation is discarded after source replacement", async () => {
-    const fixture = createFixture();
-    const nativeAdapter = {
-      ...fixture.adapter,
-      backend: "maplibre-native" as const,
-    };
-    let session: MapSession | undefined;
-    const SessionProbe = () => {
-      // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
-      session = useMapSession();
-      return null;
-    };
-    let resolve: ((features: readonly GeoJsonFeature[]) => void) | undefined;
-    fixture.query.mockImplementation(
-      () =>
-        new Promise((done) => {
-          resolve = done;
-        })
-    );
-    const mapClick = vi.fn();
-    const sourceClick = vi.fn();
-    const tree = (generation: number) => (
-      <MapSetup adapter={nativeAdapter}>
-        <OneMap
-          mapStyle={style}
-          initialViewState={camera}
-          interactiveLayerIds={["places-layer"]}
-          onClick={mapClick}
-        >
-          <SessionProbe />
-          <Source
-            key={generation}
-            id="places"
-            type="vector"
-            url="fixture://places"
-            onClick={sourceClick}
-          />
-        </OneMap>
-      </MapSetup>
-    );
-    const rendered = render(tree(0));
-    await act(async () => {
-      session?.dispatchSource("places", { ...hit, features: [] });
-    });
-    expect(sourceClick).toHaveBeenCalledTimes(1);
-    rendered.rerender(tree(1));
-    await act(async () => {
-      resolve?.([]);
-    });
-    expect(sourceClick).toHaveBeenCalledTimes(1);
-    expect(mapClick).not.toHaveBeenCalled();
   });
 });
 
@@ -641,13 +407,13 @@ test("native camera observations and controls leave unrelated contexts unchanged
   const controlledAccessRenders = access.mock.calls.length;
   const controlledPresentationRenders = presentation.mock.calls.length;
   mounted.rerender(tree(9));
-  expect(cameraChanged.mock.calls.at(-1)?.[0].zoom).toBe(9);
+  expect(cameraChanged.mock.calls.at(-1)?.[0].zoom).toBe(6);
   expect(access).toHaveBeenCalledTimes(controlledAccessRenders);
   expect(presentation).toHaveBeenCalledTimes(controlledPresentationRenders);
   mounted.unmount();
 });
 
-test("native presentation retains layout, overlay order, attribution and gesture ownership", async () => {
+test("native presentation retains viewport layout and stable setters", async () => {
   const fixture = createFixture();
   const adapter = {
     ...fixture.adapter,
@@ -656,7 +422,7 @@ test("native presentation retains layout, overlay order, attribution and gesture
   };
   const observe = vi.fn();
   const Probe = () => {
-    observe(useNativeMapPresentation(), useContext(NativeOverlayContext));
+    observe(useNativeMapPresentation());
     return null;
   };
   const mounted = render(
@@ -669,39 +435,16 @@ test("native presentation retains layout, overlay order, attribution and gesture
   const initial = observe.mock.calls.at(-1)?.[0];
   await act(async () => {
     initial.setNativeLayout(400, 300);
-    initial.setOverlay("first", "top-right", 20);
-    initial.setOverlay("second", "top-right", 30);
-    initial.setAttributionPosition("top-left");
-    initial.requestGestureLock(true);
   });
   const updated = observe.mock.calls.at(-1)?.[0];
   expect(updated).toMatchObject({
     nativeLayout: { width: 400, height: 300 },
-    gestureLocked: true,
-    attributionPosition: "top-left",
   });
-  expect(updated.setOverlay).toBe(initial.setOverlay);
   expect(updated.setNativeLayout).toBe(initial.setNativeLayout);
-  expect(
-    observe.mock.calls.at(-1)?.[1].map((overlay: { id: string }) => overlay.id)
-  ).toEqual(["first", "second"]);
   const renders = observe.mock.calls.length;
   await act(async () => {
     updated.setNativeLayout(400, 300);
-    updated.setOverlay("first", "top-right", 20);
   });
   expect(observe).toHaveBeenCalledTimes(renders);
-  await act(async () => {
-    updated.setOverlay("first", null);
-    updated.setAttributionPosition(undefined);
-    updated.requestGestureLock(false);
-  });
-  expect(
-    observe.mock.calls.at(-1)?.[1].map((overlay: { id: string }) => overlay.id)
-  ).toEqual(["second"]);
-  expect(observe.mock.calls.at(-1)?.[0]).toMatchObject({
-    gestureLocked: false,
-    attributionPosition: undefined,
-  });
   mounted.unmount();
 });

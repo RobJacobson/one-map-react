@@ -22,11 +22,13 @@ import type { NativeMarkerHostProps } from "./native-ui.js";
  * Native reparenting retains their original React providers and component state.
  */
 export const NativeMarkerOverlay = (
-  props: NativeMarkerHostProps
+  props: NativeMarkerHostProps & {
+    readonly backend?: "mapbox-native" | "maplibre-native";
+  }
 ): ReactElement => {
   const session = useMapSession();
   const presentation = useNativeMapPresentation();
-  const observed = useContext(NativeCameraContext)?.observedViewState;
+  const observed = useContext(NativeCameraContext)?.viewState;
   const name = useId();
   const [point, setPoint] = useState<Point | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -44,7 +46,9 @@ export const NativeMarkerOverlay = (
       if (!map || !session.ready) return;
       try {
         const next = await map.project([longitude, latitude]);
-        if (active) setPoint(next);
+        // Mapbox SDK 11.23.1 returns (-1, -1) outside the viewport.
+        // MapLibre permits ordinary negative pixel coordinates instead.
+        if (active) setPoint(visiblePoint(next, props.backend));
       } catch (error) {
         if (active) {
           setPoint(null);
@@ -63,6 +67,7 @@ export const NativeMarkerOverlay = (
     presentation.nativeLayout,
     longitude,
     latitude,
+    props.backend,
   ]);
 
   const horizontal = props.anchor.includes("left")
@@ -104,3 +109,11 @@ export const NativeMarkerOverlay = (
     </Portal>
   );
 };
+
+const visiblePoint = (
+  point: Point,
+  backend: "mapbox-native" | "maplibre-native" | undefined
+): Point | null =>
+  backend === "mapbox-native" && point[0] === -1 && point[1] === -1
+    ? null
+    : point;

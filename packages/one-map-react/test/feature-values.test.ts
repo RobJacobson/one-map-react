@@ -246,8 +246,15 @@ describe("assertFeatureState", () => {
 });
 
 describe("featureStateFromWrapper", () => {
+  test.each([{ value: [] }, { value: [1] }, { value: [{ selected: true }] }])(
+    "rejects a top-level array result: $value",
+    ({ value }) => {
+      expect(() => featureStateFromWrapper(value)).toThrow("must be an object");
+    }
+  );
+
   test("returns a present state object unchanged", () => {
-    const state = { selected: true };
+    const state = { selected: true, values: [1, 2] };
 
     expect(featureStateFromWrapper(state)).toBe(state);
   });
@@ -285,7 +292,7 @@ test("JSON syntax failures retain their cause", () => {
   }
 });
 
-test("feature-state dispatch copies validated nested values before a queued caller can mutate them", () => {
+test("feature-state dispatch copies validated nested values before a caller can mutate them", () => {
   const state = { nested: { selected: true }, values: [1, { count: 2 }] };
   assertFeatureState(state);
   const copied = mutableFeatureState(state);
