@@ -3,6 +3,7 @@ import { act, render } from "@testing-library/react-native";
 import { createRef, type ComponentRef, type ReactNode, type Ref } from "react";
 
 import {
+  clusteredPoints,
   emptyStyle,
   initialViewState,
   replacementStyle,
@@ -729,7 +730,7 @@ describe("maplibre-native source families", () => {
         <Source
           id="points"
           type="geojson"
-          data={routes}
+          data={clusteredPoints}
           cluster
           clusterRadius={50}
           clusterMinPoints={3}
@@ -743,6 +744,7 @@ describe("maplibre-native source families", () => {
     expect(GeoJSONSourceMock).toHaveBeenCalledWith(
       expect.objectContaining({
         id: "points",
+        data: clusteredPoints,
         cluster: true,
         clusterRadius: 50,
         clusterMinPoints: 3,
@@ -762,6 +764,9 @@ describe("maplibre-native source families", () => {
       render(
         tree(<Source id="b" type="geojson" data={routes} promoteId="route" />)
       )
+    ).rejects.toThrow("promoteId is not available on maplibre-native.");
+    await expect(
+      render(tree(<Source id="c" type="geojson" data={routes} promoteId="" />))
     ).rejects.toThrow("promoteId is not available on maplibre-native.");
   });
 

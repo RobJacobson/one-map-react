@@ -140,6 +140,82 @@ describe("source creation option families", () => {
     ).toThrow('Source "routes" changed the creation option "cluster".');
   });
 
+  test("geojson clusterMinPoints and promoteId are creation options while data may update", () => {
+    const updated = { type: "FeatureCollection", features: [] } as const;
+    const minPointsView = render(
+      tree(
+        <Source
+          id="points"
+          type="geojson"
+          data={routes}
+          cluster
+          clusterMinPoints={3}
+          promoteId="route"
+        />
+      )
+    );
+
+    expect(() =>
+      minPointsView.rerender(
+        tree(
+          <Source
+            id="points"
+            type="geojson"
+            data={updated}
+            cluster
+            clusterMinPoints={3}
+            promoteId="route"
+          />
+        )
+      )
+    ).not.toThrow();
+
+    expect(() =>
+      minPointsView.rerender(
+        tree(
+          <Source
+            id="points"
+            type="geojson"
+            data={updated}
+            cluster
+            clusterMinPoints={4}
+            promoteId="route"
+          />
+        )
+      )
+    ).toThrow(
+      'Source "points" changed the creation option "clusterMinPoints".'
+    );
+
+    const promoteView = render(
+      tree(
+        <Source
+          id="promoted"
+          type="geojson"
+          data={routes}
+          cluster
+          clusterMinPoints={3}
+          promoteId="route"
+        />
+      )
+    );
+
+    expect(() =>
+      promoteView.rerender(
+        tree(
+          <Source
+            id="promoted"
+            type="geojson"
+            data={routes}
+            cluster
+            clusterMinPoints={3}
+            promoteId="other"
+          />
+        )
+      )
+    ).toThrow('Source "promoted" changed the creation option "promoteId".');
+  });
+
   test("image url and coordinates may change without remounting", () => {
     const corners = [
       [-122.5, 47.8],

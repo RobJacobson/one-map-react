@@ -17,7 +17,7 @@ import type {
   VectorSourceProps,
 } from "../../contracts/source-types.js";
 import {
-  rejectNativeGeoJsonOptions,
+  rejectNativeGeoJsonGenerateId,
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
@@ -97,13 +97,7 @@ const MapboxNativeVectorSource = (props: VectorSourceProps) => (
 const toRnmapboxShapeSource = (
   props: GeoJsonSourceProps
 ): ComponentProps<typeof ShapeSource> => {
-  rejectNativeGeoJsonOptions(props, "mapbox-native");
-  rejectProvided(
-    props.clusterMinPoints,
-    "clusterMinPoints",
-    "mapbox-native",
-    "The pinned RNMapbox ShapeSource has no clusterMinPoints prop."
-  );
+  rejectNativeGeoJsonGenerateId(props.generateId, "mapbox-native");
 
   return {
     id: props.id,
@@ -116,8 +110,10 @@ const toRnmapboxShapeSource = (
         }),
     cluster: props.cluster,
     clusterRadius: props.clusterRadius,
+    clusterMinPoints: props.clusterMinPoints,
     clusterMaxZoomLevel: props.clusterMaxZoom,
     clusterProperties: props.clusterProperties,
+    promoteId: props.promoteId,
     maxZoomLevel: props.maxzoom,
     buffer: props.buffer,
     tolerance: props.tolerance,
