@@ -16,7 +16,6 @@ import {
 } from "react-native";
 import { PortalHost, PortalProvider } from "react-native-teleport";
 
-import type { MapRef } from "../../contracts/camera-types.js";
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { NativeLocationOptions } from "../../mapbox-native.js";
@@ -47,7 +46,7 @@ import {
 } from "./geojson-source-registry.js";
 import { useMapboxGestureSettings } from "./gesture-settings.js";
 import { assertLabelLocalization } from "./label-localization.js";
-import { createMapboxMapRef } from "./map-ref.js";
+import { createMapboxMapRef, type NativeAdvancedMapRef } from "./map-ref.js";
 import { mergeGestureSettings, toRnmapboxStyleProps } from "./style-props.js";
 import { useMapboxScalePosition } from "./use-mapbox-scale-position.js";
 
@@ -57,7 +56,7 @@ type RnPressFeature = Parameters<
 
 /** Mapbox-native map that renders RNMapbox `MapView` with a `Camera` child. */
 const MapboxNativeMapImplementation = forwardRef<
-  MapRef,
+  NativeAdvancedMapRef,
   MapProps & {
     locationOptions?: NativeLocationOptions;
     hostProps?: ViewProps;

@@ -20,7 +20,6 @@ import {
 } from "react-native";
 import { PortalHost, PortalProvider } from "react-native-teleport";
 
-import type { MapRef } from "../../contracts/camera-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { NativeLocationOptions } from "../../maplibre-native.js";
 import {
@@ -40,7 +39,7 @@ import {
   clickEventFromMaplibreNative,
   moveEventFromMaplibreNative,
 } from "./convert-move-event.js";
-import { createMaplibreMapRef } from "./map-ref.js";
+import { createMaplibreMapRef, type NativeAdvancedMapRef } from "./map-ref.js";
 import {
   MaplibreSourceContext,
   MaplibreSourceRegistry,
@@ -57,7 +56,7 @@ type MaplibreRegionEvent = Parameters<
 
 /** Maplibre-native map that renders MapLibre React Native `Map` with a `Camera` child. */
 const MaplibreNativeMapImplementation = forwardRef<
-  MapRef,
+  NativeAdvancedMapRef,
   MapProps & {
     locationOptions?: NativeLocationOptions;
     hostProps?: ViewProps;

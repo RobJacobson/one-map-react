@@ -1,3 +1,4 @@
+import type { Backend } from "../contracts/adapter.js";
 import type { LayerProps } from "../contracts/layer-types.js";
 import { useSelectedAdapter } from "./map-setup.js";
 import { useStableOptions } from "./use-stable-options.js";
@@ -16,10 +17,21 @@ import { useStableOptions } from "./use-stable-options.js";
 export const Layer = (props: LayerProps) => {
   const { backend, Layer: AdapterLayer } = useSelectedAdapter();
 
-  useStableOptions(`Layer "${props.id}"`, layerCreationOptions(props));
-  rejectNativeUnsupportedLayout(props, backend);
+  useLayerOptions(props, backend);
 
   return <AdapterLayer {...props} />;
+};
+
+/**
+ * Enforces stable creation inputs and native layout support for a portable layer.
+ *
+ * @param props - Layer props from this render.
+ * @param backend - Backend drawing the layer.
+ * @throws When a creation option changes or a layout field is unsupported.
+ */
+export const useLayerOptions = (props: LayerProps, backend: Backend): void => {
+  useStableOptions(`Layer "${props.id}"`, layerCreationOptions(props));
+  rejectNativeUnsupportedLayout(props, backend);
 };
 
 const layerCreationOptions = (props: LayerProps): Record<string, unknown> => ({
@@ -47,8 +59,8 @@ const NATIVE_UNSUPPORTED_SYMBOL_LAYOUT = [
  * @param backend - Adapter the layer will render through.
  * @throws When a gated symbol layout key is set on a native backend.
  */
-const rejectNativeUnsupportedLayout = (
-  props: LayerProps,
+export const rejectNativeUnsupportedLayout = (
+  props: { readonly type: string; readonly layout?: object },
   backend: string
 ): void => {
   if (backend !== "mapbox-native" && backend !== "maplibre-native") {
@@ -62,7 +74,7 @@ const rejectNativeUnsupportedLayout = (
   const layout = props.layout;
 
   for (const key of NATIVE_UNSUPPORTED_SYMBOL_LAYOUT) {
-    if (layout[key] !== undefined) {
+    if (key in layout && Reflect.get(layout, key) !== undefined) {
       throw new Error(
         `${key} is not available on ${backend}. The pinned native wrapper ` +
           "style map has no entry for it."

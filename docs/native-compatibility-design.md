@@ -2,7 +2,7 @@
 
 The next breaking release should let a React application run the same map screen with stock react-map-gl on web and with RNMapbox or MapLibre React Native on native. The application chooses a backend in its platform imports. one-map-react translates the native calls. The browser gets its components, events, refs, and types directly from react-map-gl.
 
-This is the agreed engineering direction. The four stages below are proposed implementation PRs. The checkout still implements the [four-backend facade](revised-api-proposal.md). Its [acceptance checkpoint](revised-api-acceptance-plan.md#current-handoff) records the scope of earlier runtime evidence.
+The working checkout binds each native entry to its renderer and retains the [four-backend facade](revised-api-proposal.md) for existing callers. The stages below define the transition to stock react-map-gl on web and matching native call shapes. The [coverage checklist](api-coverage.md#native-compatibility-verification) records routine verification. The [acceptance checkpoint](revised-api-acceptance-plan.md#current-handoff) records the scope of earlier runtime evidence.
 
 ## Why change the boundary?
 
@@ -44,7 +44,7 @@ export function VesselMap() {
 }
 ```
 
-Each native entry binds its own map, source, layer, marker, and hook. An enclosing map provides local access through `useMap().current`. An optional `MapProvider` adds lookup by map ID across sibling components. Applications that use backend-specific operations borrow a typed native wrapper handle or import the SDK directly. Helpers with no desktop component equivalent, such as declarative image registration and supplied-location display, belong behind explicit extension imports. A browser app using ordinary react-map-gl should have no dependency on one-map-react. [Upstream map usage](https://visgl.github.io/react-map-gl/docs/api-reference/mapbox/map) and [hook contract](https://visgl.github.io/react-map-gl/docs/api-reference/mapbox/use-map).
+Each native entry binds its own map, source, layer, marker, and hook. The [package guide](../packages/one-map-react/README.md) describes enclosing and named native map access. Applications that use backend-specific operations borrow a typed native wrapper handle or import the SDK directly. Helpers with no desktop component equivalent, such as declarative image registration and supplied-location display, belong behind explicit extension imports. A browser app using ordinary react-map-gl should have no dependency on one-map-react. [Upstream map usage](https://visgl.github.io/react-map-gl/docs/api-reference/mapbox/map) and [hook contract](https://visgl.github.io/react-map-gl/docs/api-reference/mapbox/use-map).
 
 | RNMapbox | MapLibre React Native | react-map-gl | Proposed one-map-react API |
 | --- | --- | --- | --- |

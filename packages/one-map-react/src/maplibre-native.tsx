@@ -1,33 +1,25 @@
-import { forwardRef } from "react";
-
-import type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
-import {
-  assertMaplibreLayerStyle,
-  assertMaplibreStyleRoots,
-} from "./adapters/maplibre-native/style-roots.js";
-export type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
-import {
-  Map as MaplibreMap,
-  Layer as MaplibreLayer,
-} from "@maplibre/maplibre-react-native";
+import { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
 import type { Camera as WrapperCamera } from "@maplibre/maplibre-react-native";
-import type {
-  ComponentProps,
-  ComponentRef,
-  ComponentType,
-  ForwardRefExoticComponent,
-  RefAttributes,
-} from "react";
+import { type ComponentProps, type ComponentRef, forwardRef } from "react";
 import type { ViewProps } from "react-native";
 
+import {
+  adapter,
+  MaplibreNativeMap,
+} from "./adapters/maplibre-native/index.js";
+import type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
+import { assertMaplibreStyleRoots } from "./adapters/maplibre-native/style-roots.js";
 import type { MapProps } from "./contracts/map-types.js";
-import type { SourceProps } from "./contracts/source-types.js";
-import type { MarkerProps, MarkerRef } from "./contracts/ui-types.js";
-import { Map as SharedMap } from "./facade/map.js";
-import { Source as SharedSource } from "./facade/source.js";
-import { Marker as SharedMarker } from "./facade/ui.js";
+import { createNativeMapBinding } from "./facade/native-map.js";
+export type { NativeMarkerProps } from "./facade/native-map.js";
+export type { SourceProps as NativeSourceProps } from "./contracts/source-types.js";
 
 export { adapter } from "./adapters/maplibre-native/index.js";
+export {
+  MaplibreNativeLayer as Layer,
+  type NativeLayerProps,
+} from "./adapters/maplibre-native/index.js";
+export type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
 
 /** Selected native map with typed renderer facilities and host attributes. */
 /** Selected SDK location follow options, applied to the existing camera. */
@@ -64,32 +56,17 @@ export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
     | "onMapLoadingError"
   >;
 }
-/** Selected map retaining shared map context and named access. */
-// eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
-export const Map = SharedMap as ForwardRefExoticComponent<
-  NativeMapProps & RefAttributes<NativeAdvancedMapRef>
->;
-
-/** Selected marker content host, including accessibility and layout attributes. */
-export interface NativeMarkerProps extends Omit<
-  MarkerProps,
-  "draggable" | "onDragStart" | "onDrag" | "onDragEnd"
-> {
-  /** Native shared markers support programmatic coordinates and activation only. */
-  readonly draggable?: false;
-  /** Attributes composed on the marker's owned native child View. */
-  readonly hostProps?: ViewProps;
-}
-/** Selected marker retaining shared geometry and activation. */
-export const Marker = SharedMarker as ForwardRefExoticComponent<
-  NativeMarkerProps & RefAttributes<MarkerRef>
->;
-
-/** Selected source using the shared rendering contract. */
-export type NativeSourceProps = SourceProps;
-
-/** Selected source using the shared rendering contract. */
-export const Source = SharedSource as ComponentType<NativeSourceProps>;
+const {
+  Map: NativeMap,
+  Source,
+  Marker,
+  MapProvider,
+  useMap,
+} = createNativeMapBinding<NativeAdvancedMapRef, NativeMapProps>(
+  MaplibreNativeMap,
+  adapter
+);
+export { NativeMap as Map, MapProvider, Marker, Source, useMap };
 export {
   Callout,
   LayerAnnotation,
@@ -148,9 +125,3 @@ export const WrapperMap = forwardRef<
   assertMaplibreStyleRoots(props.mapStyle);
   return <MaplibreMap {...props} ref={ref} />;
 });
-
-/** Selected complete wrapper layer with explicit pinned-native expression boundaries. */
-export const Layer = (props: ComponentProps<typeof MaplibreLayer>) => {
-  assertMaplibreLayerStyle(props);
-  return <MaplibreLayer {...props} />;
-};

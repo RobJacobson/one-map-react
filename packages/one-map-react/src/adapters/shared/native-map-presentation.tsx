@@ -36,10 +36,13 @@ export const NativeCameraContext = createContext<NativeCameraState | null>(
 );
 
 /** Keeps native layout and camera updates out of the common map-access context. */
-export const withNativeMapPresentation = <Props extends MapProps>(
-  Implementation: ForwardRefExoticComponent<Props & RefAttributes<MapRef>>
-): ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<MapRef>> =>
-  forwardRef<MapRef, Props>((props, ref) => (
+export const withNativeMapPresentation = <
+  Handle extends MapRef,
+  Props extends MapProps,
+>(
+  Implementation: ForwardRefExoticComponent<Props & RefAttributes<Handle>>
+): ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<Handle>> =>
+  forwardRef<Handle, Props>((props, ref) => (
     <NativePresentationProvider>
       <NativeCameraProvider
         initial={props.initialViewState}

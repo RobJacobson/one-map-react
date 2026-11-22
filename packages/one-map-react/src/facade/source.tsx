@@ -13,9 +13,19 @@ import { useStableOptions } from "./use-stable-options.js";
 export const Source = (props: SourceProps) => {
   const { Source: AdapterSource } = useSelectedAdapter();
 
-  useStableOptions(`Source "${props.id}"`, sourceCreationOptions(props));
+  useSourceOptions(props);
 
   return <AdapterSource {...props} />;
+};
+
+/**
+ * Enforces the stable creation inputs for a mounted source.
+ *
+ * @param props - Source props from this render.
+ * @throws When a creation option changes without remounting the source.
+ */
+export const useSourceOptions = (props: SourceProps): void => {
+  useStableOptions(`Source "${props.id}"`, sourceCreationOptions(props));
 };
 
 /**

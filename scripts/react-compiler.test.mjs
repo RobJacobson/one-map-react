@@ -9,7 +9,7 @@ import { reactCompiler } from "./react-compiler.mjs";
 
 // Check the actual component, since another compiled hook in its file proves nothing.
 for (const [relative, names] of [
-  ["facade/map.tsx", ["Map", "useMapAttachment"]],
+  ["facade/map.tsx", ["Map", "MountedMap", "useMapAttachment"]],
   ["facade/user-location.tsx", ["UserLocation"]],
   ["facade/source.tsx", ["Source"]],
   ["facade/use-stable-options.ts", ["useStableOptions"]],

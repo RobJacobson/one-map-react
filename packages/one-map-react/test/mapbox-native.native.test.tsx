@@ -28,6 +28,7 @@ import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
+import { testNativeEntryBinding } from "./native-entry-binding.js";
 
 const mockSetCamera = jest.fn();
 const mockGetCenter = jest.fn(async () => [-122.34, 47.61]);
@@ -271,6 +272,7 @@ import {
   Map as NativeMap,
   type NativeAdvancedMapRef,
 } from "../src/mapbox-native.js";
+import * as nativeEntry from "../src/mapbox-native.js";
 
 const MapViewMock = MapView as unknown as jest.Mock;
 const LineLayerMock = LineLayer as unknown as jest.Mock;
@@ -2546,4 +2548,32 @@ test("selected native location follow rejects a simultaneous viewState target", 
       </MapSetup>
     )
   ).rejects.toThrow("Selected location follow conflicts with viewState.");
+});
+
+describe("mapbox-native entry binding", () => {
+  testNativeEntryBinding(
+    nativeEntry,
+    {
+      geometry: { coordinates: [-122.34, 47.61] },
+      properties: { screenPointX: 23, screenPointY: 41 },
+    },
+    () => {
+      let complete: () => void = () => {
+        throw new Error("Rendered query was never dispatched.");
+      };
+      mockQueryRenderedFeaturesAtPoint.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            complete = () => resolve(queryCollection);
+          })
+      );
+      return () => complete();
+    },
+    mockGetClusterExpansionZoom,
+    () =>
+      expect(LineLayerMock.mock.lastCall?.[0]).toMatchObject({
+        sourceID: "routes",
+        style: { lineWidth: 3 },
+      })
+  );
 });
