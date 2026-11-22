@@ -37,10 +37,10 @@
     "@babel/core": "7.25.2",
     "@babel/runtime": "7.25.0",
     "@jest/globals": "29.7.0",
-    "@maplibre/maplibre-react-native": "11.5.0",
+    "@maplibre/maplibre-react-native": "11.5.1",
     "@react-native/babel-preset": "0.86.3",
     "@react-native/jest-preset": "0.86.3",
-    "@rnmapbox/maps": "10.3.8",
+    "@rnmapbox/maps": "10.3.19",
     "@testing-library/react": "16.3.3",
     "@testing-library/react-native": "14.1.0",
     "@types/geojson": "7946.0.16",
@@ -65,9 +65,8 @@
     "babel-plugin-react-compiler": "1.0.0"
   },
   "patchedDependencies": {
-    "@rnmapbox/maps@10.3.7": "packages/one-map-react/patches/rnmapbox-10.3.7-tf08.patch",
-    "@maplibre/maplibre-react-native@11.5.0": "packages/one-map-react/patches/maplibre-native-11.5.0-tf08.patch",
-    "@rnmapbox/maps@10.3.8": "packages/one-map-react/patches/rnmapbox-10.3.8.patch"
+    "@maplibre/maplibre-react-native@11.5.1": "packages/one-map-react/patches/maplibre-native-11.5.1.patch",
+    "@rnmapbox/maps@10.3.19": "packages/one-map-react/patches/rnmapbox-10.3.19.patch"
   },
   "catalog": {
     "vite": "npm:@voidzero-dev/vite-plus-core@1.1.0",

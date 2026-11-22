@@ -80,7 +80,10 @@ console.log(
   "PASS native explicit-state error/family and absent-Fabric-view source boundaries"
 );
 
-const cache = join(homedir(), ".gradle/caches/modules-2/files-2.1");
+const cache = join(
+  process.env.GRADLE_USER_HOME ?? join(homedir(), ".gradle"),
+  "caches/modules-2/files-2.1"
+);
 const jars = [
   "org.jetbrains.kotlin/kotlin-compiler-embeddable/2.2.0",
   "org.jetbrains.kotlin/kotlin-stdlib/2.2.0",
@@ -142,15 +145,13 @@ class MapboxMap {
 class VectorSource
 class GeoJsonSource
 class Style(var source: Any?) { fun getSource(id: String) = source }
-class MapContainer(val sdk: MapboxMap) { fun getMapboxMap() = sdk }
 class CommandResponse {
   var error: String? = null; var successes = 0
   fun error(value: String) { error = value }
   fun success(body: ()->Unit) { successes++; body() }
 }
 ${section(mapbox + "mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt", "fun MapboxMap.setFeatureStateCompat(", "fun MapboxMap.flyToV11(")}
-class Wrapper(val sdk: MapboxMap) {
-  val mapView = MapContainer(sdk)
+class Wrapper(val mMap: MapboxMap) {
   ${section(mapbox + "java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt", "    fun removeFeatureState(", "    fun match(")}
 }
 open class View

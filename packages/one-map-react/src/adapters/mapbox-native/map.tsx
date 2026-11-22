@@ -47,7 +47,6 @@ import {
   createGeoJsonSourceRegistry,
 } from "./geojson-source-registry.js";
 import { useMapboxGestureSettings } from "./gesture-settings.js";
-import { assertLabelLocalization } from "./label-localization.js";
 import { createMapboxMapRef, type NativeAdvancedMapRef } from "./map-ref.js";
 import { mergeGestureSettings, toRnmapboxStyleProps } from "./style-props.js";
 import { useMapboxScalePosition } from "./use-mapbox-scale-position.js";
@@ -65,7 +64,6 @@ const MapboxNativeMapImplementation = forwardRef<
     options?: Partial<ComponentProps<typeof MapView>>;
   }
 >((props, ref) => {
-  assertLabelLocalization(props.options?.localizeLabels);
   const session = useNativeMapPresentation();
   if (nativeCameraTarget(props) && props.locationOptions?.followUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");

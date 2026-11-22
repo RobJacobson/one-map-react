@@ -1,5 +1,5 @@
 /** Native Mapbox Maps SDK version used by the release consumers on both platforms. */
-export const nativeMapboxSdkVersion = "11.23.1";
+export const nativeMapboxSdkVersion = "11.33.0";
 
 /**
  * Pins native SDK resolution through the wrapper's public Podfile/Gradle settings.

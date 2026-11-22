@@ -1,14 +1,14 @@
-import * as Rnmapbox from "@rnmapbox/maps";
-import { MapView } from "@rnmapbox/maps";
-import type { Camera as WrapperCamera } from "@rnmapbox/maps";
-import { type ComponentProps, type ComponentRef, forwardRef } from "react";
+import {
+  type Camera as WrapperCamera,
+  MapView as WrapperMapView,
+} from "@rnmapbox/maps";
+import type { ComponentProps } from "react";
 import type { ViewProps } from "react-native";
 
 import {
   nativeComponents,
   MapboxNativeMap,
 } from "./adapters/mapbox-native/index.js";
-import { assertLabelLocalization } from "./adapters/mapbox-native/label-localization.js";
 import type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
 import type { LayerProps } from "./contracts/layer-types.js";
 import type { NativeMapInputs } from "./contracts/native-types.js";
@@ -65,7 +65,7 @@ export interface NativeMapProps extends Omit<NativeMapInputs, "mapStyle"> {
   readonly hostProps?: ViewProps;
   /** Selected renderer options; facade-owned fields take precedence. */
   readonly options?: Omit<
-    Partial<ComponentProps<typeof MapView>>,
+    Partial<ComponentProps<typeof WrapperMapView>>,
     | "children"
     | "ref"
     | "style"
@@ -229,6 +229,8 @@ export interface NativeStyleDocument extends StyleDocument {
   readonly transition?: import("./contracts/map-types.js").StyleTransition;
 }
 
+export { WrapperMapView };
+
 /** Complete wrapper composition for selected props and imperative refs. Use WrapperCamera inside WrapperMapView, which owns its camera context. */
 export {
   Camera as WrapperCamera,
@@ -247,53 +249,6 @@ export {
   SymbolLayer as WrapperSymbolLayer,
   RasterLayer as WrapperRasterLayer,
   BackgroundLayer as WrapperBackgroundLayer,
+  setLanguage,
+  normalizeLanguageTag,
 } from "@rnmapbox/maps";
-
-/**
- * Sets app-wide Mapbox label languages through RNMapbox 10.3.8 or newer.
- * @param language - Unmodified language tag, ordered tags, or null for the SDK default.
- * @returns Resolves when the wrapper acknowledges the change.
- * @throws When the installed wrapper predates this operation, or the SDK rejects it.
- */
-export const setLanguage = async (
-  language: string | string[] | null
-): Promise<void> => {
-  if (
-    !("setLanguage" in Rnmapbox) ||
-    typeof Rnmapbox.setLanguage !== "function"
-  ) {
-    throw new Error("setLanguage requires @rnmapbox/maps 10.3.8 or newer.");
-  }
-  await Rnmapbox.setLanguage(language);
-};
-
-/**
- * Normalizes a Mapbox language tag using the installed wrapper's optional helper.
- * @param tag - BCP-47 language tag to normalize; setLanguage itself never rewrites it.
- * @returns The wrapper-normalized tag, including its Chinese-script handling.
- * @throws When the installed wrapper predates this helper.
- */
-export const normalizeLanguageTag = (tag: string): string => {
-  if (
-    !("normalizeLanguageTag" in Rnmapbox) ||
-    typeof Rnmapbox.normalizeLanguageTag !== "function"
-  ) {
-    throw new Error(
-      "normalizeLanguageTag requires @rnmapbox/maps 10.3.8 or newer."
-    );
-  }
-  // The minimum peer lacks this declaration; validate the newer wrapper result at this boundary.
-  const normalized: unknown = Rnmapbox.normalizeLanguageTag(tag);
-  if (typeof normalized !== "string")
-    throw new Error("RNMapbox returned an invalid normalized language tag.");
-  return normalized;
-};
-
-/** Selected wrapper map with v11 localization availability checked before native dispatch. */
-export const WrapperMapView = forwardRef<
-  ComponentRef<typeof MapView>,
-  ComponentProps<typeof MapView>
->((props, ref) => {
-  assertLabelLocalization(props.localizeLabels);
-  return <MapView {...props} ref={ref} />;
-});

@@ -46,8 +46,7 @@ export const NativeMarkerOverlay = (
       if (!map || !session.ready) return;
       try {
         const next = await map.project([longitude, latitude]);
-        // Mapbox SDK 11.23.1 returns (-1, -1) outside the viewport.
-        // MapLibre permits ordinary negative pixel coordinates instead.
+        // Reserve the off-screen (-1, -1) sentinel for Mapbox.
         if (active) setPoint(visiblePoint(next, props.backend));
       } catch (error) {
         if (active) {

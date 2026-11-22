@@ -11,10 +11,10 @@ const podfile =
 const buildGradle =
   "buildscript {\n    ext {\n        minSdkVersion = 24\n    }\n}\n";
 const result = pinNativeMapboxVersion(podfile, buildGradle);
-assert.match(result.podfile, /^\$RNMapboxMapsVersion = '= 11\.23\.1'\n/);
+assert.match(result.podfile, /^\$RNMapboxMapsVersion = '= 11\.33\.0'\n/);
 assert.match(
   result.buildGradle,
-  /ext \{\n        RNMapboxMapsVersion = '11\.23\.1'/
+  /ext \{\n        RNMapboxMapsVersion = '11\.33\.0'/
 );
 assert(result.podfile.endsWith(podfile));
 assert(result.buildGradle.includes("minSdkVersion = 24"));
@@ -33,14 +33,14 @@ assert.throws(
   () => pinNativeMapboxVersion(podfile, "invalid template"),
   /buildscript.ext/
 );
-const matrix = JSON.parse(
+const wrapper = JSON.parse(
   readFileSync(
-    new URL("../records/support-matrix.json", import.meta.url),
+    new URL("../node_modules/@rnmapbox/maps/package.json", import.meta.url),
     "utf8"
   )
 );
-assert.equal(matrix.nativeSdkPin.mapbox.ios, nativeMapboxSdkVersion);
-assert.equal(matrix.nativeSdkPin.mapbox.android, nativeMapboxSdkVersion);
+assert.equal(wrapper.mapbox.ios, `~> ${nativeMapboxSdkVersion}`);
+assert.equal(wrapper.mapbox.android, nativeMapboxSdkVersion);
 const wrapperGradle = readFileSync(
   new URL(
     "../node_modules/@rnmapbox/maps/android/build.gradle",
@@ -54,5 +54,5 @@ assert.match(
   /safeExtGet\("RNMapboxMapsVersion", defaultMapboxMapsVersion\)/
 );
 console.log(
-  "PASS native Mapbox SDK pin: exact public settings, idempotence, replacement, malformed template and support matrix agreement; no native build"
+  "PASS native Mapbox SDK pin: exact public settings, idempotence, replacement, malformed template and installed wrapper agreement; no native build"
 );

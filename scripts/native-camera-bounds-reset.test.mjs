@@ -248,7 +248,10 @@ fun main() {
 }
 `
   );
-  const cache = join(homedir(), ".gradle/caches/modules-2/files-2.1");
+  const cache = join(
+    process.env.GRADLE_USER_HOME ?? join(homedir(), ".gradle"),
+    "caches/modules-2/files-2.1"
+  );
   const jars = [
     "org.jetbrains.kotlin/kotlin-compiler-embeddable/2.2.0",
     "org.jetbrains.kotlin/kotlin-stdlib/2.2.0",

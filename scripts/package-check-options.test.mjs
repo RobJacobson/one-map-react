@@ -12,7 +12,7 @@ const directory = mkdtempSync(join(tmpdir(), "one-map-package-options-"));
 try {
   const file = join(directory, "versions.json");
   const archive = join(directory, "candidate.tgz");
-  writeFileSync(file, JSON.stringify({ "@rnmapbox/maps": "10.3.8" }));
+  writeFileSync(file, JSON.stringify({ "@rnmapbox/maps": "10.3.19" }));
   writeFileSync(archive, "fixture");
   assert.deepEqual(packageCheckOptions([]), {
     archive: undefined,
@@ -36,12 +36,12 @@ try {
   );
   assert.deepEqual(
     selectedVersions(
-      ["@rnmapbox/maps@10.3.7", "react@19.2.3"],
+      ["@rnmapbox/maps@10.3.18", "react@19.2.3"],
       options.versions
     ),
-    ["@rnmapbox/maps@10.3.8", "react@19.2.3"]
+    ["@rnmapbox/maps@10.3.19", "react@19.2.3"]
   );
-  for (const version of ["^10.3.8", "10.3.9-rc.0", "latest"]) {
+  for (const version of ["^10.3.19", "10.3.19-rc.0", "latest"]) {
     writeFileSync(file, JSON.stringify({ "@rnmapbox/maps": version }));
     assert.throws(
       () => packageCheckOptions(["--versions", file]),

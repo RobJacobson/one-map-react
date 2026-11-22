@@ -116,7 +116,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const Host = isAnnotation ? options.Annotation : options.Marker;
       const markerClick = useActiveCallback((event: MarkerEvent): void => {
         props.onClick?.(event);
-        // RNMapbox 10.3.7 toggles selection on taps; reset until it exposes per-tap events.
+        // RNMapbox toggles selection on taps. Reset until it exposes per-tap events.
         if (options.backend === "mapbox-native") {
           setAnnotationRevision((revision) => revision + 1);
         }

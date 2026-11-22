@@ -41,7 +41,7 @@ const config: ExpoConfig = {
   web: { bundler: "metro", name: "One Map" },
   plugins: [
     ["expo-build-properties", { ios: { enableSceneSupport: true } }],
-    ["@rnmapbox/maps", { RNMapboxMapsVersion: "11.23.1" }],
+    ["@rnmapbox/maps", { RNMapboxMapsVersion: "11.33.0" }],
     [
       "@maplibre/maplibre-react-native",
       {

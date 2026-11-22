@@ -1,8 +1,22 @@
 # Patch and peer review decision
 
-**Historical assessment and completed follow-up.** The U23 assessment below records the pre-repair findings, bundle identities and proposed scope. The owner-approved [U23-F01 reconciliation](revised-api-implementation-plan.md#u23-f01-reconcile-retained-publication-repairs) is implemented and independently audited. The [reconciliation evidence](../records/evidence/revised-api-u23-native-patch-reconciliation.json) owns final identities, bounded verification and remaining acceptance gates. The reviewed reconciliation PR44 is open; U24 candidate preparation is implemented and independently audited; a reviewed PR is authorized and acceptance still requires explicit permission.
+## Current native peers
 
-## Current publication reconciliation
+Each one-map-react release targets one exact version of each React Native wrapper. This release targets [RNMapbox 10.3.19](https://github.com/rnmapbox/maps/tree/ab9322d8e3bb1db3f3080049f9de816898c2bef7) and [MapLibre React Native 11.5.1](https://github.com/maplibre/maplibre-react-native/tree/6941f96d1c7bc0e52847663d46935dc43e3ce2ab). The [package guide](../packages/one-map-react/README.md) lists the corresponding patches and SDK pins. Start the next upgrade with pristine npm packages and recheck the behaviors below.
+
+| Area | Repair decision on these versions | Routine evidence |
+| --- | --- | --- |
+| Camera and events | RNMapbox clears removed camera bounds upstream. Its Android event cache still needs per-view keys and cleanup. Its iOS immediate camera mode still needs the constant read by the JS wrapper. MapLibre still needs to clear the previous constraint when bounds are removed on either platform. | [Archive check](../scripts/test-package.mjs), [camera mode dispatch](../scripts/native-camera-mode.test.mjs), [bounds regression](../scripts/native-camera-bounds-reset.test.mjs) |
+| Styles and sources | RNMapbox now decodes Swift light colors upstream. Keep RNMapbox terrain disable and elevation result handling, explicit Android feature-state errors, and MapLibre detached-view rejection. | [Color conversion](../scripts/rnmapbox-light-color.test.mjs), [terrain and declarations](../scripts/tf09-peer-patches.test.mjs), [source lifetimes](../scripts/native-source-lifetime.test.mjs) |
+| Images | RNMapbox iOS removes registered images on view removal upstream. Both peers still need guards against late image writes after replacement or teardown. | [Image ownership and patch verification](../scripts/tf08-patches.test.mjs) |
+| Selected SDK operations | The wrappers still need repairs for offline pack status and storage operations, snapshot handling and RNMapbox custom-location observer replay. These are reachable through the selected native APIs. | [Offline and snapshot coverage](../scripts/tf08-patches.test.mjs), [offline status](../scripts/rnmapbox-offline-status.test.mjs), [location replay](../scripts/rnmapbox-location-observer.test.mjs) |
+| Consumer builds | Both pristine wrappers generate the same map-view protocol names. Keep the RNMapbox codegen rename and the declaration fixes required by isolated NodeNext consumers. | [Dual codegen](../scripts/example-native-codegen.test.mjs), [packed peer checks](../scripts/test-peers.mjs) |
+
+These are source, compiled-method and package checks. Native linking, renderer behavior and service acceptance on the new versions remain open under the [current handoff](revised-api-acceptance-plan.md#current-handoff).
+
+## U23 publication reconciliation
+
+The remaining sections record the earlier U23 publication checkpoint. The [reconciliation evidence](../records/evidence/revised-api-u23-native-patch-reconciliation.json) preserves its exact artifacts and verification scope.
 
 P1-P8 are implemented in the three publication bundles. Pristine forward/reverse application and repaired SDK-output comparison preserve the original version-specific intent and all prior publication section semantics. RNMapbox 10.3.8 keeps its existing bounds-reset behavior. The combined RNMapbox bundles supply per-view event throttling and cache cleanup. See the [historical standalone patch](https://github.com/RobJacobson/one-map-react/blob/d6bda75196298e1bd041cf66933adea60ea4b961/packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch) for the separate file discussed below and the [native wrapper repairs](../packages/one-map-react/README.md) for current installs.
 

@@ -355,6 +355,16 @@ const example = (
   </NativeMap>
 );
 
+test("forwards selected label localization to RNMapbox", async () => {
+  const localizeLabels = { locale: "es", layerIds: ["place-label"] };
+  await render(example(undefined, undefined, { options: { localizeLabels } }));
+
+  expect(lastMapProps<MapProps["options"]>()?.localizeLabels).toBe(
+    localizeLabels
+  );
+  expect(nativeEntry.WrapperMapView).toBe(MapView);
+});
+
 describe("mapbox-native adapter", () => {
   test.each(["selected", "enclosing", "named"] as const)(
     "%s wrapper access follows attachment before load and rejects after detach",
@@ -715,7 +725,7 @@ describe("mapbox-native adapter", () => {
     await act(async () => props.onDidFinishLoadingMap());
     props.onDidFinishLoadingStyle();
     props.onMapLoadingError();
-    // iOS includes tileId and sourceId. Android never calls this prop.
+    // Preserve the wrapper error without exposing its optional tile and source IDs.
     props.onMapLoadingError({
       error: "tile failed",
       tileId: "x:1 y:2 z:3",
