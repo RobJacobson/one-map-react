@@ -1,13 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import {
-  createRef,
-  type ComponentRef,
-  type ReactNode,
-  type Ref,
-  useContext,
-} from "react";
-import { Platform, Text } from "react-native";
+import { createRef, type ComponentRef, type ReactNode, type Ref } from "react";
+import { Platform } from "react-native";
 
 import {
   emptyStyle,
@@ -15,12 +9,11 @@ import {
   replacementStyle,
   routes,
 } from "../../example-map/src/scenarios/map-fixture.js";
-import { NativeCameraContext } from "../src/adapters/shared/native-map-presentation.js";
-import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
+import type { ViewState } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
-import type { ExternalDrawingContext } from "../src/contracts/map-types.js";
-import { Images } from "../src/native-extensions.js";
+import { testNativeCamera } from "./native-camera-cases.js";
 import { testNativeEntryBinding } from "./native-entry-binding.js";
+import { testNativeRendering } from "./native-rendering-cases.js";
 
 const mockSetCamera = jest.fn();
 const mockGetCenter = jest.fn(async () => [-122.34, 47.61]);
@@ -251,7 +244,6 @@ import {
   RasterDemSource,
   RasterLayer,
   RasterSource,
-  Images as RnmapboxImages,
   ShapeSource,
   SymbolLayer,
   VectorSource,
@@ -282,7 +274,6 @@ const VectorSourceMock = VectorSource as unknown as jest.Mock;
 const RasterSourceMock = RasterSource as unknown as jest.Mock;
 const RasterDemSourceMock = RasterDemSource as unknown as jest.Mock;
 const ImageSourceMock = ImageSource as unknown as jest.Mock;
-const ImagesMock = RnmapboxImages as unknown as jest.Mock;
 const layerMocks: Record<string, jest.Mock> = {
   background: BackgroundLayer as unknown as jest.Mock,
   fill: FillLayer as unknown as jest.Mock,
@@ -303,27 +294,6 @@ const lastMapProps = <Props,>(): Props => {
 
   return lastCall[0] as Props;
 };
-
-const drawingContext = (): ExternalDrawingContext => ({
-  canvas: {},
-  drawingBufferWidth: 1,
-  drawingBufferHeight: 1,
-});
-
-test("forwards selected frame observation callbacks without common capture ownership", async () => {
-  const onFrame = jest.fn();
-  await render(
-    <NativeMap
-      mapStyle={emptyStyle}
-      initialViewState={initialViewState}
-      options={{ onDidFinishRenderingFrameFully: onFrame }}
-    />
-  );
-  const props = lastMapProps<{ onDidFinishRenderingFrameFully: () => void }>();
-  expect(props.onDidFinishRenderingFrameFully).toBe(onFrame);
-  await act(async () => props.onDidFinishRenderingFrameFully());
-  expect(onFrame).toHaveBeenCalledTimes(1);
-});
 
 test.each(["document", "url"] as const)(
   "common %s styles clear conflicting selected style fields through replacement",
@@ -695,42 +665,6 @@ describe("mapbox-native adapter", () => {
     }
   });
 
-  test("selected SDK ornament flags and positions update and reset to defaults", async () => {
-    const scene = (enabled: boolean | undefined) => (
-      <NativeMap
-        mapStyle={emptyStyle}
-        initialViewState={initialViewState}
-        options={{
-          attributionEnabled: enabled,
-          logoEnabled: enabled,
-          scaleBarEnabled: enabled,
-          logoPosition:
-            enabled === undefined ? undefined : { bottom: 3, left: 4 },
-          compassPosition:
-            enabled === undefined ? undefined : { top: 7, right: 8 },
-          attributionPosition:
-            enabled === undefined ? undefined : { top: 5, right: 6 },
-        }}
-      />
-    );
-    const view = await render(scene(true));
-    for (const enabled of [true, false, undefined]) {
-      await view.rerender(scene(enabled));
-      expect(lastMapProps()).toMatchObject({
-        attributionEnabled: enabled,
-        logoEnabled: enabled,
-        scaleBarEnabled: enabled,
-        logoPosition:
-          enabled === undefined ? undefined : { bottom: 3, left: 4 },
-        compassPosition:
-          enabled === undefined ? undefined : { top: 7, right: 8 },
-        attributionPosition:
-          enabled === undefined ? undefined : { top: 5, right: 6 },
-      });
-    }
-    await view.unmount();
-  });
-
   test("nested ShapeSource injects sourceID onto the line layer", async () => {
     await render(example());
 
@@ -763,133 +697,6 @@ describe("mapbox-native adapter", () => {
       animationDuration: 1000,
       animationMode: "flyTo",
     });
-  });
-
-  test("onMove receives converted camera fields and stops after unmount", async () => {
-    const onMove = jest.fn();
-    const rendered = await render(example(undefined, onMove));
-    const lastCall = MapViewMock.mock.calls.at(-1);
-
-    if (!lastCall) {
-      throw new Error("MapView was not rendered");
-    }
-
-    const onCameraChanged = (
-      lastCall[0] as { onCameraChanged: (state: object) => void }
-    ).onCameraChanged;
-
-    await act(async () => {
-      onCameraChanged({
-        properties: {
-          center: [-122.34, 47.61],
-          zoom: 11,
-          heading: 4,
-          pitch: 1,
-        },
-        gestures: { isGestureActive: true },
-      });
-    });
-
-    expect(onMove).toHaveBeenCalledWith({
-      viewState: {
-        longitude: -122.34,
-        latitude: 47.61,
-        zoom: 11,
-        bearing: 4,
-        pitch: 1,
-      },
-      origin: "user",
-    });
-
-    const onMapIdle = (lastCall[0] as { onMapIdle: (state: object) => void })
-      .onMapIdle;
-
-    await act(async () => {
-      onMapIdle({
-        properties: {
-          center: [-122.32, 47.64],
-          zoom: 11,
-          heading: 0,
-          pitch: 0,
-        },
-        gestures: { isGestureActive: false },
-      });
-    });
-
-    expect(onMove).toHaveBeenCalledTimes(1);
-
-    await rendered.unmount();
-    await act(async () => {
-      onCameraChanged({
-        properties: {
-          center: [-122.3, 47.6],
-          zoom: 12,
-          heading: 0,
-          pitch: 0,
-        },
-        gestures: { isGestureActive: true },
-      });
-    });
-
-    await act(async () => {
-      onMapIdle({
-        properties: {
-          center: [-122.3, 47.6],
-          zoom: 12,
-          heading: 0,
-          pitch: 0,
-        },
-        gestures: { isGestureActive: false },
-      });
-    });
-
-    expect(onMove).toHaveBeenCalledTimes(1);
-  });
-
-  test("rerender keeps the wrapper map id and a new mount replaces it", async () => {
-    const first = await render(example());
-    const firstId = first.getByTestId("wrapper-map").props.mapId;
-
-    await first.rerender(example());
-
-    expect(first.getByTestId("wrapper-map").props.mapId).toBe(firstId);
-
-    await first.unmount();
-    const second = await render(example());
-
-    expect(second.getByTestId("wrapper-map").props.mapId).not.toBe(firstId);
-  });
-
-  test("reuseMaps is rejected before a map is created", async () => {
-    MapViewMock.mockClear();
-
-    await expect(
-      render(example(undefined, undefined, { reuseMaps: true }))
-    ).rejects.toThrow(
-      "reuseMaps is not available on native maps. Remounting creates a new map."
-    );
-    expect(MapViewMock).not.toHaveBeenCalled();
-  });
-
-  test("gl is rejected before a map is created", async () => {
-    MapViewMock.mockClear();
-
-    await expect(
-      render(example(undefined, undefined, { gl: drawingContext() }))
-    ).rejects.toThrow(
-      "gl is a web drawing context and is not available on native maps."
-    );
-    expect(MapViewMock).not.toHaveBeenCalled();
-  });
-
-  test("resize() is rejected", async () => {
-    const ref = createRef<MapRef>();
-
-    await render(example(ref));
-
-    await expect(ref.current?.resize()).rejects.toThrow(
-      "resize() is not available on native maps. Size follows the host style."
-    );
   });
 
   test("load, style, and error callbacks map to the wrapper and stop after unmount", async () => {
@@ -928,20 +735,6 @@ describe("mapbox-native adapter", () => {
     expect(onLoad).toHaveBeenCalledTimes(1);
     expect(onStyleLoad).toHaveBeenCalledTimes(1);
     expect(onError).toHaveBeenCalledTimes(2);
-  });
-
-  test("a style update is passed to the wrapper", async () => {
-    const rendered = await render(example());
-
-    await rendered.rerender(
-      example(undefined, undefined, {
-        mapStyle: "https://example.com/style.json",
-      })
-    );
-
-    expect(lastMapProps<{ readonly styleURL?: string }>().styleURL).toBe(
-      "https://example.com/style.json"
-    );
   });
 
   test("jumpTo, easeTo, fitBounds, and zoomTo set explicit animation modes", async () => {
@@ -1016,26 +809,6 @@ describe("mapbox-native adapter", () => {
     expect(mockSetCamera).not.toHaveBeenCalled();
   });
 
-  test("getZoom forwards renderer values and errors independently of UI, and rejects after detach", async () => {
-    const ref = createRef<MapRef>();
-    const view = await render(example(ref));
-    const map = ref.current;
-    if (!map) throw new Error("Map ref did not attach.");
-    const calls = mockGetZoom.mock.calls.length;
-    mockGetZoom.mockResolvedValueOnce(0).mockResolvedValueOnce(12.5);
-    await expect(map.getZoom()).resolves.toBe(0);
-    await expect(map.getZoom()).resolves.toBe(12.5);
-    const failure = new Error("Renderer zoom failed");
-    mockGetZoom.mockRejectedValueOnce(failure);
-    await expect(map.getZoom()).rejects.toBe(failure);
-    mockGetZoom.mockResolvedValueOnce(Number.NaN);
-    await expect(map.getZoom()).rejects.toThrow();
-    expect(mockGetZoom.mock.calls.length).toBe(calls + 4);
-    await view.unmount();
-    await expect(map.getZoom()).rejects.toThrow("not attached");
-    expect(mockGetZoom.mock.calls.length).toBe(calls + 4);
-  });
-
   test("getters convert center, visible bounds, and points", async () => {
     const ref = createRef<MapRef>();
 
@@ -1087,118 +860,7 @@ describe("mapbox-native adapter", () => {
     );
   });
 
-  test("native movement does not dispatch an unchanged target, including an equal new object", async () => {
-    const frames = new Map<number, FrameRequestCallback>();
-    let nextFrame = 0;
-    const schedule = jest
-      .spyOn(globalThis, "requestAnimationFrame")
-      .mockImplementation((callback) => {
-        frames.set(++nextFrame, callback);
-        return nextFrame;
-      });
-    const cancel = jest
-      .spyOn(globalThis, "cancelAnimationFrame")
-      .mockImplementation((id) => {
-        if (id != null) frames.delete(id);
-      });
-    const ref = createRef<MapRef>();
-    const target = { ...initialViewState, zoom: 12 };
-    const mounted = await render(
-      example(ref, undefined, { viewState: target })
-    );
-    const flush = async () => {
-      const callbacks = [...frames.values()];
-      frames.clear();
-      await act(async () => {
-        for (const callback of callbacks) callback(0);
-      });
-    };
-    try {
-      await act(async () =>
-        lastMapProps<{
-          onDidFinishLoadingMap: () => void;
-        }>().onDidFinishLoadingMap()
-      );
-      await flush();
-      mockSetCamera.mockClear();
-      const movement = lastMapProps<{
-        onCameraChanged: (event: object) => void;
-      }>().onCameraChanged;
-      const move = async (center: readonly number[], zoom = 4) =>
-        act(async () =>
-          movement({
-            properties: { center, zoom, heading: 30, pitch: 10 },
-            gestures: { isGestureActive: true },
-          })
-        );
-      await move([10, 20]);
-      await flush();
-      expect(mockSetCamera).not.toHaveBeenCalled();
-      await mounted.rerender(
-        example(ref, undefined, { viewState: { ...target } })
-      );
-      await flush();
-      expect(mockSetCamera).not.toHaveBeenCalled();
-      await ref.current?.jumpTo({
-        center: [target.longitude, target.latitude],
-        zoom: target.zoom,
-      });
-      expect(mockSetCamera).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          centerCoordinate: [target.longitude, target.latitude],
-          zoomLevel: target.zoom,
-        })
-      );
-      expect(mockSetCamera).toHaveBeenCalledTimes(1);
-      await ref.current?.jumpTo({ center: [40, 50], zoom: 8 });
-      await move([40, 50], 8);
-      await flush();
-      expect(mockSetCamera).toHaveBeenCalledTimes(2);
-      expect(mockSetCamera).toHaveBeenLastCalledWith(
-        expect.objectContaining({ centerCoordinate: [40, 50], zoomLevel: 8 })
-      );
-      // Props exercise forwarding only; actual native prop application is a renderer gate.
-      await mounted.rerender(
-        example(ref, undefined, { viewState: { ...target, zoom: 13 } })
-      );
-      expect(mounted.getByTestId("wrapper-camera").props.zoomLevel).toBe(13);
-      await mounted.rerender(example(ref));
-      expect(
-        mounted.getByTestId("wrapper-camera").props.zoomLevel
-      ).toBeUndefined();
-      expect(mockSetCamera).toHaveBeenCalledTimes(2);
-      const failure = new Error("camera dispatch failed");
-      mockSetCamera.mockImplementationOnce(() => {
-        throw failure;
-      });
-      await expect(ref.current?.jumpTo({ zoom: 8 })).rejects.toBe(failure);
-      const detached = ref.current;
-      await mounted.unmount();
-      await expect(detached?.jumpTo({ zoom: 8 })).rejects.toThrow(
-        "Map camera is not attached."
-      );
-      const replacement = await render(
-        example(ref, undefined, { viewState: target })
-      );
-      try {
-        const dispatches = mockSetCamera.mock.calls.length;
-        await move([70, 80], 9);
-        await flush();
-        expect(mockSetCamera).toHaveBeenCalledTimes(dispatches);
-        await expect(detached?.jumpTo({ zoom: 8 })).rejects.toThrow(
-          "Map camera is not attached."
-        );
-      } finally {
-        await replacement.unmount();
-      }
-    } finally {
-      await mounted.unmount();
-      schedule.mockRestore();
-      cancel.mockRestore();
-    }
-  });
-
-  test("native viewState targets are written onto the camera", async () => {
+  test("Mapbox camera props apply without animation and preserve initial defaults", async () => {
     const rendered = await render(
       example(undefined, undefined, {
         viewState: { ...initialViewState, zoom: 12 },
@@ -1207,10 +869,6 @@ describe("mapbox-native adapter", () => {
 
     expect(rendered.getByTestId("wrapper-camera").props).toEqual(
       expect.objectContaining({
-        centerCoordinate: [-122.34, 47.61],
-        zoomLevel: 12,
-        heading: 0,
-        pitch: 0,
         animationMode: "none",
         animationDuration: 0,
       })
@@ -1222,7 +880,6 @@ describe("mapbox-native adapter", () => {
       })
     );
 
-    expect(rendered.getByTestId("wrapper-camera").props.zoomLevel).toBe(13);
     expect(
       rendered.getByTestId("wrapper-camera").props.defaultSettings.zoomLevel
     ).toBe(initialViewState.zoom);
@@ -1396,28 +1053,6 @@ describe("mapbox-native source families", () => {
     );
   });
 
-  test("a raster source keeps tileSize", async () => {
-    await render(
-      tree(
-        <Source
-          id="base"
-          type="raster"
-          url="https://example.com/raster.json"
-          tileSize={512}
-        />
-      )
-    );
-
-    expect(RasterSourceMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: "base",
-        url: "https://example.com/raster.json",
-        tileSize: 512,
-      }),
-      undefined
-    );
-  });
-
   test("a raster-dem source rejects attribution and scheme", async () => {
     await expect(
       render(
@@ -1469,85 +1104,6 @@ describe("mapbox-native source families", () => {
     );
   });
 
-  test("an image source forwards four corners", async () => {
-    await render(
-      tree(
-        <Source
-          id="overlay"
-          type="image"
-          url="https://example.com/overlay.png"
-          coordinates={[
-            [-122.5, 47.8],
-            [-122.1, 47.8],
-            [-122.1, 47.4],
-            [-122.5, 47.4],
-          ]}
-        />
-      )
-    );
-
-    expect(ImageSourceMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: "overlay",
-        url: "https://example.com/overlay.png",
-        coordinates: [
-          [-122.5, 47.8],
-          [-122.1, 47.8],
-          [-122.1, 47.4],
-          [-122.5, 47.4],
-        ],
-      }),
-      undefined
-    );
-  });
-
-  test("updated image url and coordinates reach the wrapper", async () => {
-    const rendered = await render(
-      tree(
-        <Source
-          id="overlay"
-          type="image"
-          url="https://example.com/overlay.png"
-          coordinates={[
-            [-122.5, 47.8],
-            [-122.1, 47.8],
-            [-122.1, 47.4],
-            [-122.5, 47.4],
-          ]}
-        />
-      )
-    );
-
-    await rendered.rerender(
-      tree(
-        <Source
-          id="overlay"
-          type="image"
-          url="https://example.com/overlay-b.png"
-          coordinates={[
-            [-122.4, 47.7],
-            [-122.2, 47.7],
-            [-122.2, 47.5],
-            [-122.4, 47.5],
-          ]}
-        />
-      )
-    );
-
-    expect(ImageSourceMock.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({
-        id: "overlay",
-        url: "https://example.com/overlay-b.png",
-        coordinates: [
-          [-122.4, 47.7],
-          [-122.2, 47.7],
-          [-122.2, 47.5],
-          [-122.4, 47.5],
-        ],
-      })
-    );
-  });
-
   test("geojson cluster options use wrapper names", async () => {
     await render(
       tree(
@@ -1596,24 +1152,6 @@ describe("mapbox-native source families", () => {
         tree(<Source id="b" type="geojson" data={routes} promoteId="route" />)
       )
     ).rejects.toThrow("promoteId is not available on mapbox-native.");
-  });
-
-  test("updated geojson data reaches the wrapper", async () => {
-    const updated = {
-      type: "FeatureCollection" as const,
-      features: [],
-    };
-    const rendered = await render(
-      tree(<Source id="routes" type="geojson" data={routes} />)
-    );
-
-    await rendered.rerender(
-      tree(<Source id="routes" type="geojson" data={updated} />)
-    );
-
-    expect(ShapeSourceMock.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({ id: "routes", shape: updated })
-    );
   });
 
   test("geojson url data becomes the wrapper url prop", async () => {
@@ -1682,20 +1220,6 @@ describe("mapbox-native source families", () => {
       "https://example.com/{z}/{x}/{y}.pbf",
     ]);
     expect(forwarded.tileUrlTemplates).not.toBe(tiles);
-  });
-
-  test("changing a creation option throws and asks for a remount", async () => {
-    const rendered = await render(
-      tree(<Source id="points" type="geojson" data={routes} cluster={false} />)
-    );
-
-    await expect(async () =>
-      rendered.rerender(
-        tree(<Source id="points" type="geojson" data={routes} cluster />)
-      )
-    ).rejects.toThrow(
-      'Source "points" changed the creation option "cluster". Remount it with a new React key to recreate the resource.'
-    );
   });
 });
 
@@ -1923,53 +1447,6 @@ describe("mapbox-native layers", () => {
     );
   });
 
-  test("a gated symbol layout key is rejected", async () => {
-    await expect(
-      render(
-        tree(
-          <Source id="routes" type="geojson" data={routes}>
-            <Layer
-              id="gated"
-              type="symbol"
-              layout={{ "icon-overlap": "always" }}
-            />
-          </Source>
-        )
-      )
-    ).rejects.toThrow("icon-overlap is not available on mapbox-native.");
-  });
-
-  test("a later gated symbol layout key is rejected after a valid mount", async () => {
-    const rendered = await render(
-      tree(
-        <Source id="routes" type="geojson" data={routes}>
-          <Layer
-            id="labels"
-            type="symbol"
-            layout={{ "text-field": ["get", "name"] }}
-          />
-        </Source>
-      )
-    );
-
-    await expect(async () =>
-      rendered.rerender(
-        tree(
-          <Source id="routes" type="geojson" data={routes}>
-            <Layer
-              id="labels"
-              type="symbol"
-              layout={{
-                "text-field": ["get", "name"],
-                "icon-overlap": "always",
-              }}
-            />
-          </Source>
-        )
-      )
-    ).rejects.toThrow("icon-overlap is not available on mapbox-native.");
-  });
-
   test("changing the layer type throws and asks for a remount", async () => {
     const rendered = await render(
       tree(
@@ -1990,78 +1467,6 @@ describe("mapbox-native layers", () => {
     ).rejects.toThrow(
       'Layer "route-line" changed the creation option "type". Remount it with a new React key to recreate the resource.'
     );
-  });
-
-  test("changing the injected sourceID throws and asks for a remount", async () => {
-    const rendered = await render(
-      tree(<Layer id="route-line" type="line" sourceID="routes" />)
-    );
-
-    await expect(async () =>
-      rendered.rerender(
-        tree(<Layer id="route-line" type="line" sourceID="other" />)
-      )
-    ).rejects.toThrow(
-      'Layer "route-line" changed the creation option "sourceID".'
-    );
-  });
-});
-
-describe("mapbox-native images", () => {
-  test("entries are forwarded to the wrapper Images", async () => {
-    ImagesMock.mockClear();
-    const view = await render(
-      tree(
-        <Images
-          images={{
-            marker: "https://example.com/marker.png",
-            shield: { url: "https://example.com/shield.png", sdf: true },
-          }}
-        />
-      )
-    );
-
-    const [marker, shield] = view.getAllByTestId("wrapper-images");
-    expect(marker.props.images).toEqual({
-      marker: { url: "https://example.com/marker.png" },
-    });
-    expect(shield.props.images).toEqual({
-      shield: { url: "https://example.com/shield.png", sdf: true },
-    });
-
-    await view.rerender(
-      tree(
-        <Images
-          images={{
-            marker: "https://example.com/new-marker.png",
-            shield: { url: "https://example.com/shield.png", sdf: true },
-          }}
-        />
-      )
-    );
-    const [newMarker, sameShield] = view.getAllByTestId("wrapper-images");
-    expect(newMarker).not.toBe(marker);
-    expect(sameShield).toBe(shield);
-    expect(newMarker.props.images).toEqual({
-      marker: { url: "https://example.com/new-marker.png" },
-    });
-
-    await view.rerender(
-      tree(
-        <Images
-          images={{
-            shield: { url: "https://example.com/shield.png", sdf: true },
-          }}
-        />
-      )
-    );
-    expect(view.getAllByTestId("wrapper-images")).toEqual([shield]);
-  });
-
-  test("images outside a map are rejected", async () => {
-    await expect(
-      render(<Images images={{ marker: "https://example.com/m.png" }} />)
-    ).rejects.toThrow("Images must render inside Map.");
   });
 });
 
@@ -2464,67 +1869,6 @@ test("terrain/light/projection and hillshade use native public components, inclu
 const lastRenderingProps = (component: unknown): Record<string, unknown> =>
   (component as jest.Mock).mock.calls.at(-1)?.[0] as Record<string, unknown>;
 
-test("settled camera updates live overlays without another public move", async () => {
-  const observe = jest.fn();
-  const onMove = jest.fn();
-  const onMoveEnd = jest.fn();
-  const Probe = () => {
-    observe(useContext(NativeCameraContext)?.viewState.bearing);
-    return null;
-  };
-  const view = await render(
-    <NativeMap
-      mapStyle={emptyStyle}
-      initialViewState={initialViewState}
-      viewState={initialViewState}
-      onMove={onMove}
-      onMoveEnd={onMoveEnd}
-    >
-      <Probe />
-
-      <NativeMarkerOverlay
-        id="settled"
-        lngLat={[1, 2]}
-        anchor="top-left"
-        offset={[0, 0]}
-      >
-        <Text>Final position</Text>
-      </NativeMarkerOverlay>
-    </NativeMap>
-  );
-  const events = lastMapProps<{
-    onDidFinishLoadingMap: () => void;
-    onCameraChanged: (event: object) => void;
-    onMapIdle: (event: object) => void;
-  }>();
-  const payload = (bearing: number) => ({
-    properties: { center: [1, 2], zoom: 3, heading: bearing, pitch: 0 },
-    gestures: { isGestureActive: false },
-  });
-  await act(async () => events.onDidFinishLoadingMap());
-  mockGetPointInView.mockResolvedValueOnce([40, 50]);
-  await act(async () => events.onCameraChanged(payload(40)));
-  expect(observe.mock.calls.at(-1)?.[0]).toBe(40);
-  await waitFor(() =>
-    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(40)
-  );
-  mockGetPointInView.mockResolvedValueOnce([60, 70]);
-  await act(async () => events.onMapIdle(payload(0)));
-  expect(observe.mock.calls.at(-1)?.[0]).toBe(0);
-  await waitFor(() =>
-    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(60)
-  );
-  expect(onMove).toHaveBeenCalledTimes(1);
-  expect(onMoveEnd).toHaveBeenCalledTimes(1);
-  await view.unmount();
-  await act(async () => {
-    events.onCameraChanged(payload(80));
-    events.onMapIdle(payload(90));
-  });
-  expect(onMove).toHaveBeenCalledTimes(1);
-  expect(onMoveEnd).toHaveBeenCalledTimes(1);
-});
-
 test("selected native location follow rejects a simultaneous viewState target", async () => {
   await expect(
     render(
@@ -2546,6 +1890,44 @@ test("selected native location follow rejects a simultaneous viewState target", 
 });
 
 describe("mapbox-native entry binding", () => {
+  testNativeCamera(nativeEntry.Map, {
+    captureEvents: () => {
+      const { onCameraChanged, onMapIdle } = lastMapProps<{
+        onCameraChanged(event: object): void;
+        onMapIdle(event: object): void;
+      }>();
+      const payload = (
+        { longitude, latitude, zoom, bearing, pitch }: ViewState,
+        isGestureActive: boolean
+      ) => ({
+        properties: {
+          center: [longitude, latitude],
+          zoom,
+          heading: bearing,
+          pitch,
+        },
+        gestures: { isGestureActive },
+      });
+      return {
+        move: (viewState, isGestureActive) =>
+          onCameraChanged(payload(viewState, isGestureActive)),
+        settle: (viewState) => onMapIdle(payload(viewState, false)),
+      };
+    },
+    jump: mockSetCamera,
+    centerProp: "centerCoordinate",
+    zoomProp: "zoomLevel",
+    bearingProp: "heading",
+    getZoom: mockGetZoom,
+    project: mockGetPointInView,
+  });
+  testNativeRendering(nativeEntry, "mapbox-native", {
+    map: MapViewMock,
+    image: ImageSourceMock,
+    geojson: ShapeSourceMock,
+    raster: RasterSourceMock,
+  });
+
   testNativeEntryBinding(
     nativeEntry,
     "mapbox-native",
@@ -2572,46 +1954,4 @@ describe("mapbox-native entry binding", () => {
         style: { lineWidth: 3 },
       })
   );
-});
-
-test("selected Layer forwards source, transitions and ordering, then resets removed paint", async () => {
-  const scene = (width: number | undefined, beforeId: string | undefined) => (
-    <nativeEntry.Map mapStyle={emptyStyle}>
-      <nativeEntry.Source id="route-data" type="geojson" data={routes} />
-      <nativeEntry.Layer
-        id="route-layer"
-        type="line"
-        source="route-data"
-        beforeId={beforeId}
-        filter={
-          width === undefined
-            ? undefined
-            : ["==", ["geometry-type"], "LineString"]
-        }
-        paint={{
-          "line-width": width,
-          "line-width-transition": { duration: 450 },
-        }}
-      />
-    </nativeEntry.Map>
-  );
-  const view = await render(scene(2, "water"));
-  const original = view.getByTestId("LineLayer");
-  expect(original.props.sourceID).toBe("route-data");
-  expect(original.props.style).toEqual({
-    lineWidth: 2,
-    lineWidthTransition: { duration: 450 },
-  });
-
-  await view.rerender(scene(3, "label"));
-  expect(view.getByTestId("LineLayer")).toBe(original);
-  expect(view.getByTestId("LineLayer").props.belowLayerID).toBe("label");
-  await view.rerender(scene(undefined, undefined));
-  const replacement = view.getByTestId("LineLayer");
-  expect(replacement).not.toBe(original);
-  expect(replacement.props.style).toEqual({
-    lineWidthTransition: { duration: 450 },
-  });
-  expect(replacement.props.belowLayerID).toBeUndefined();
-  expect(replacement.props.filter).toBeUndefined();
 });

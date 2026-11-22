@@ -1,6 +1,6 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import * as nativeEntry from "one-map-react/mapbox-native";
-import { type ReactNode, useEffect } from "react";
+import type { ReactNode } from "react";
 import {
   Layer,
   Map as BrowserMap,
@@ -13,7 +13,7 @@ import { GlobalStateApp } from "../src/scenarios/global-state-app.js";
 import type { NativeLocationButtonProps } from "../src/scenarios/native-location-button.js";
 import { createNativeSceneComponents } from "../src/scenarios/native-scene-components.js";
 import type { WebSceneComponents } from "../src/scenarios/scene-components.js";
-import { Tf07Scene, type Tf07Probe } from "../src/scenarios/tf07-scene.js";
+import { Tf07Scene } from "../src/scenarios/tf07-scene.js";
 import {
   Tf08AcceptanceScene,
   type Tf08AcceptanceProbe,
@@ -299,11 +299,16 @@ test.each([false, true])(
         attach={() => undefined}
       />
     );
+    const markers = fixture.markers.slice(-2);
+    expect(markers).toHaveLength(2);
     if (native) {
+      expect(markers.map((marker) => marker.id)).toEqual(
+        expect.arrayContaining(["tf07-live", "tf07-annotation"])
+      );
       expect(fixture.props.options).toBe(nativeOrnaments);
       expect(scale).not.toHaveBeenCalled();
     } else expect(scale).toHaveBeenCalledWith("metric");
-    for (const marker of fixture.markers.slice(-2)) {
+    for (const marker of markers) {
       expect(marker?.onClick).toBeTypeOf("function");
       for (const name of ["draggable", "onDragStart", "onDrag", "onDragEnd"]) {
         if (native) expect(marker).not.toHaveProperty(name);
@@ -359,41 +364,6 @@ test("TF07 application popup close removes its content and teardown stays silent
   expect(
     report.mock.calls.filter(([event]) => event === "popup-close")
   ).toHaveLength(closeCount);
-});
-
-test("TF07 native scene remount retires its screen location action with the map attachment", async () => {
-  const mountedLocation = vi.fn();
-  const disposedLocation = vi.fn();
-  const Location = () => {
-    useEffect(() => {
-      mountedLocation();
-      return disposedLocation;
-    }, []);
-    return null;
-  };
-  let probe: Tf07Probe | null = null;
-  const mounted = render(
-    <Tf07Scene
-      components={nativeSceneComponents}
-      renderLocation={Location}
-      renderNavigation={() => null}
-      renderPopup={() => null}
-      markerContent={() => null}
-      style={{ width: 400, height: 300 }}
-      report={() => undefined}
-      attach={(value) => {
-        probe = value;
-      }}
-    />
-  );
-  expect(mountedLocation).toHaveBeenCalledTimes(1);
-  await act(async () => {
-    probe?.configure("remount");
-  });
-  expect(disposedLocation).toHaveBeenCalledTimes(1);
-  expect(mountedLocation).toHaveBeenCalledTimes(2);
-  mounted.unmount();
-  expect(disposedLocation).toHaveBeenCalledTimes(2);
 });
 
 test.each(["mapbox-native", "maplibre-native", "mapbox-web", "maplibre-web"])(

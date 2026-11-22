@@ -42,23 +42,6 @@ if (
 }
 
 const nativeEngines = selectNativeEngines(scope, process.argv[4]);
-/** Bound port-release observation before the next native engine starts. */
-const awaitMetroPortRelease = async () => {
-  const releasedBy = Date.now() + 5000;
-  while (true) {
-    const listeners = await command("lsof", [
-      "-nP",
-      "-iTCP:8081",
-      "-sTCP:LISTEN",
-      "-t",
-    ]).catch(() => "");
-    if (!listeners.trim()) break;
-    if (Date.now() >= releasedBy)
-      throw new Error("Owned Metro did not release port 8081.");
-    await delay(100);
-  }
-};
-
 const results = {};
 const fixture = lifetimes ? await startLifetimesFixture() : null;
 
@@ -77,9 +60,6 @@ try {
       results[`${engine}-android`] = await runNative({
         directory: `native-${engine}`,
         platform: "android",
-        applicationId:
-          process.env[`TF06_${engine.toUpperCase()}_ANDROID_ID`] ??
-          `com.onemap${engine}`,
       });
       if (results[`${engine}-android`].status !== "passed")
         throw new Error("Native smoke failed; no later engine was started.");
@@ -91,9 +71,6 @@ try {
       results[`${engine}-ios`] = await runNative({
         directory: `native-${engine}`,
         platform: "ios",
-        applicationId:
-          process.env[`TF06_${engine.toUpperCase()}_IOS_ID`] ??
-          `org.reactjs.native.example.OneMap${engine === "mapbox" ? "Mapbox" : "Maplibre"}`,
       });
       if (results[`${engine}-ios`].status !== "passed")
         throw new Error("Native smoke failed; no later engine was started.");
@@ -322,8 +299,8 @@ function openStatusPort() {
   });
 }
 
-async function runNative({ directory, platform, applicationId }) {
-  applicationId = nativeApplicationId();
+async function runNative({ directory, platform }) {
+  const applicationId = nativeApplicationId();
   const shell = join(root, "apps/expo");
 
   await freePort(8081);
@@ -375,7 +352,7 @@ async function runNative({ directory, platform, applicationId }) {
   let statusPort = null;
 
   try {
-    if (platform === "ios" && !statusPort) statusPort = await openStatusPort();
+    if (platform === "ios") statusPort = await openStatusPort();
     await waitFor(
       async () => {
         if (metroFailure) throw metroFailure;

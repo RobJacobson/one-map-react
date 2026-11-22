@@ -241,7 +241,6 @@ if (group === "android" || group === "all") {
     results["mapbox-android"] = await runNative({
       directory: "native-mapbox",
       platform: "android",
-      applicationId: process.env.TF04_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
       doubleTap: false,
     });
     if (results["mapbox-android"].status !== "passed")
@@ -251,8 +250,6 @@ if (group === "android" || group === "all") {
     results["maplibre-android"] = await runNative({
       directory: "native-maplibre",
       platform: "android",
-      applicationId:
-        process.env.TF04_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
       doubleTap: true,
     });
     if (results["maplibre-android"].status !== "passed")
@@ -268,9 +265,6 @@ if (group === "ios" || group === "all") {
       results["mapbox-ios"] = await runNative({
         directory: "native-mapbox",
         platform: "ios",
-        applicationId:
-          process.env.TF04_MAPBOX_IOS_ID ??
-          "org.reactjs.native.example.OneMapMapbox",
         doubleTap: false,
       });
       if (results["mapbox-ios"].status !== "passed")
@@ -280,9 +274,6 @@ if (group === "ios" || group === "all") {
       results["maplibre-ios"] = await runNative({
         directory: "native-maplibre",
         platform: "ios",
-        applicationId:
-          process.env.TF04_MAPLIBRE_IOS_ID ??
-          "org.reactjs.native.example.OneMapMaplibre",
         doubleTap: true,
       });
       if (results["maplibre-ios"].status !== "passed")
@@ -630,8 +621,8 @@ function openStatusPort() {
   });
 }
 
-async function runNative({ directory, platform, applicationId, doubleTap }) {
-  applicationId = nativeApplicationId();
+async function runNative({ directory, platform, doubleTap }) {
+  const applicationId = nativeApplicationId();
   const shell = join(root, "apps/expo");
 
   await freePort(8081);
@@ -667,7 +658,7 @@ async function runNative({ directory, platform, applicationId, doubleTap }) {
   let statusPort = null;
 
   try {
-    if (platform === "ios" && !statusPort) statusPort = await openStatusPort();
+    if (platform === "ios") statusPort = await openStatusPort();
     await waitFor(
       async () => {
         if (metroFailure) throw metroFailure;
@@ -760,7 +751,6 @@ async function watchNative({
   applicationId,
   platform,
   timeout = 180000,
-  basic = false,
 }) {
   const started = Date.now();
   let clicks = 0;
