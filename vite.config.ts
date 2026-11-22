@@ -46,7 +46,7 @@ export default defineConfig({
       { name: "vite-plus", specifier: "vite-plus/oxlint-plugin" },
       "./scripts/lint-rules.mjs",
     ],
-    // Preserve all four explicit TypeScript projects in the typecheck script.
+    // Run the separate TypeScript projects through the typecheck script.
     options: { typeAware: false, typeCheck: false },
     categories: { correctness: "error" },
     env: { browser: true, node: true, jest: true },

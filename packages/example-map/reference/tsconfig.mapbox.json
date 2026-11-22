@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "moduleSuffixes": [".mapbox", ""]
+  },
+  "files": ["maps.mapbox.ts"],
+  "include": ["VesselMap.tsx"]
+}
