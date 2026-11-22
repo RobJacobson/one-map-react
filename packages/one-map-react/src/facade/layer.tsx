@@ -16,7 +16,20 @@ export const useLayerOptions = (
     `Layer "${props.id ?? props.type}"`,
     layerCreationOptions(props)
   );
-  rejectNativeUnsupportedLayout(props, backend);
+
+  if (props.type !== "symbol" || props.layout === undefined) {
+    return;
+  }
+  const { layout } = props;
+
+  for (const key of NATIVE_UNSUPPORTED_SYMBOL_LAYOUT) {
+    if (key in layout && Reflect.get(layout, key) !== undefined) {
+      throw new Error(
+        `${key} is not available on ${backend}. The pinned native wrapper ` +
+          "style map has no entry for it."
+      );
+    }
+  }
 };
 
 interface LayerOptions {
@@ -47,30 +60,3 @@ const NATIVE_UNSUPPORTED_SYMBOL_LAYOUT = [
   "text-overlap",
   "text-variable-anchor-offset",
 ] as const;
-
-/**
- * Rejects symbol layout keys the pinned native wrappers cannot honor.
- *
- * @param props - Layer props from the current render.
- * @param backend - Adapter the layer will render through.
- * @throws When a gated symbol layout key is set on a native backend.
- */
-export const rejectNativeUnsupportedLayout = (
-  props: { readonly type: string; readonly layout?: object },
-  backend: NativeBackend
-): void => {
-  if (props.type !== "symbol" || props.layout === undefined) {
-    return;
-  }
-
-  const layout = props.layout;
-
-  for (const key of NATIVE_UNSUPPORTED_SYMBOL_LAYOUT) {
-    if (key in layout && Reflect.get(layout, key) !== undefined) {
-      throw new Error(
-        `${key} is not available on ${backend}. The pinned native wrapper ` +
-          "style map has no entry for it."
-      );
-    }
-  }
-};

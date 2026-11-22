@@ -1,11 +1,6 @@
 import { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
 import type { Camera as WrapperCamera } from "@maplibre/maplibre-react-native";
-import {
-  type ComponentProps,
-  type ReactElement,
-  type ComponentRef,
-  forwardRef,
-} from "react";
+import { type ComponentProps, type ComponentRef, forwardRef } from "react";
 import type { ViewProps } from "react-native";
 
 import {
@@ -25,7 +20,6 @@ export type {
   NativePoint,
   NativePointLike,
 } from "./contracts/native-types.js";
-import { useLayerOptions } from "./facade/layer.js";
 import { createNativeMapBinding } from "./facade/native-map.js";
 export type {
   NativeMarkerProps,
@@ -36,20 +30,12 @@ export type {
   SourceProps as NativeSourceProps,
 } from "./contracts/source-types.js";
 
-import {
-  MaplibreNativeLayer,
+export {
+  MaplibreNativeLayer as Layer,
   type NativeLayerProps,
+  type NativeLayerProps as LayerProps,
 } from "./adapters/maplibre-native/index.js";
-export type {
-  NativeLayerProps,
-  NativeLayerProps as LayerProps,
-  NativeMapProps as MapProps,
-};
-/** Renders a style-spec layer through MapLibre Native. */
-export const Layer = (props: NativeLayerProps): ReactElement => {
-  useLayerOptions(props, nativeComponents.backend);
-  return <MaplibreNativeLayer {...props} />;
-};
+export type { NativeMapProps as MapProps };
 export type {
   NativeAdvancedMapRef,
   NativeAdvancedMapRef as MapRef,

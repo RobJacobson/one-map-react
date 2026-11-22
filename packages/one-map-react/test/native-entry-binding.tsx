@@ -17,7 +17,7 @@ import {
 } from "../../example-map/src/scenarios/map-fixture.js";
 import type { NativeBackend } from "../src/contracts/backend.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
-import type { LayerProps } from "../src/contracts/layer-types.js";
+import type { LayerProps, SymbolLayout } from "../src/contracts/layer-types.js";
 import type {
   NativeClickEvent,
   NativeMapInputs,
@@ -26,6 +26,7 @@ import type {
 import type { SourceProps } from "../src/contracts/source-types.js";
 import type { MarkerRef } from "../src/contracts/ui-types.js";
 import { createNativeMapBinding } from "../src/facade/native-map.js";
+import { UserLocation } from "../src/native-extensions.js";
 
 type SelectedHandle = NativeMapRef & { getWrapperMap(): Promise<unknown> };
 type MarkerCoordinates = {
@@ -95,6 +96,55 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     await expect(
       render(<Layer id="symbol" type="symbol" layout={layout} />)
     ).rejects.toThrow(`${field} is not available on ${backend}.`);
+  });
+
+  test("treats undefined as unset and still rejects a falsy symbol option on update", async () => {
+    const view = await render(
+      <Layer id="symbol" type="symbol" layout={{ "text-overlap": undefined }} />
+    );
+    // Exercise a JavaScript value outside the style-spec types.
+    const rawLayout = { "text-overlap": false } as unknown as SymbolLayout;
+    await expect(
+      view.rerender(<Layer id="symbol" type="symbol" layout={rawLayout} />)
+    ).rejects.toThrow(`text-overlap is not available on ${backend}.`);
+  });
+
+  test("a new key permits creation changes while an update keeps the committed source layer", async () => {
+    const scene = (id: string, sourceLayer: string) => (
+      <Layer key={id} id={id} type="line" source-layer={sourceLayer} />
+    );
+    const view = await render(scene("routes", "road"));
+    await view.rerender(scene("bridges", "bridge"));
+    const testId = backend === "mapbox-native" ? "LineLayer" : "Layer";
+    expect(view.getByTestId(testId).props.id).toBe("bridges");
+
+    await expect(view.rerender(scene("bridges", "road"))).rejects.toThrow(
+      'Layer "bridges" changed the creation option "source-layer".'
+    );
+  });
+
+  test("supplied location updates keep its accuracy and dot layers mounted", async () => {
+    const scene = (latitude: number) => (
+      <NativeMap mapStyle={emptyStyle}>
+        <UserLocation
+          position={{ lngLat: [7, latitude], accuracy: 30 }}
+          showAccuracyCircle
+        />
+      </NativeMap>
+    );
+    const view = await render(scene(8));
+    const layerTestId = /^(FillLayer|CircleLayer|Layer)$/;
+    const layers = view.getAllByTestId(layerTestId);
+    expect(layers).toHaveLength(2);
+    const [accuracy, dot] = layers;
+    const sourceProp = backend === "mapbox-native" ? "sourceID" : "source";
+    expect(accuracy.props[sourceProp]).toMatch(/^one-map-location-/);
+    expect(dot.props[sourceProp]).toBe(accuracy.props[sourceProp]);
+
+    await view.rerender(scene(9));
+    const [updatedAccuracy, updatedDot] = view.getAllByTestId(layerTestId);
+    expect(updatedAccuracy).toBe(accuracy);
+    expect(updatedDot).toBe(dot);
   });
 
   test("binds a map, source, layer, and marker without setup", async () => {

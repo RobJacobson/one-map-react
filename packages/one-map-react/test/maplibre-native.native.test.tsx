@@ -1521,6 +1521,41 @@ describe("maplibre-native layers", () => {
       'Layer "route-line" changed the creation option "source".'
     );
   });
+
+  test("creation and symbol validation precede SDK expression validation", async () => {
+    const layout = {
+      "icon-overlap": "always",
+      "text-field": ["number-format", 1, { unit: "meter" }],
+    } as const;
+    const view = await render(<Layer id="labels" type="symbol" />);
+    await expect(
+      view.rerender(<Layer id="other-labels" type="symbol" layout={layout} />)
+    ).rejects.toThrow('Layer "other-labels" changed the creation option "id".');
+    await expect(
+      render(<Layer id="labels" type="symbol" layout={layout} />)
+    ).rejects.toThrow("icon-overlap is not available on maplibre-native.");
+    await expect(
+      render(
+        <Layer
+          id="labels"
+          type="symbol"
+          layout={{ "text-field": layout["text-field"] }}
+        />
+      )
+    ).rejects.toThrow("number-format.unit");
+  });
+
+  test("SDK property validation covers overlap outside portable symbol layout", async () => {
+    const layout = { visibility: "visible", "icon-overlap": "always" } as const;
+    await expect(
+      render(<Layer id="roads" type="line" layout={layout} />)
+    ).rejects.toThrow('Layer property "icon-overlap" is unsupported');
+
+    const style = { iconAllowOverlap: true, textOverlap: false };
+    await expect(
+      render(<Layer id="labels" type="symbol" style={style} />)
+    ).rejects.toThrow('Layer property "textOverlap" is unsupported');
+  });
 });
 
 describe("maplibre-native images", () => {
