@@ -1,5 +1,19 @@
-import type { LngLat, MapLayoutStyle, Point, ViewState } from "one-map-react";
-import type { ComponentType, ReactNode, RefCallback } from "react";
+import type {
+  LngLat,
+  MapLayoutStyle,
+  MapRef,
+  MapStyle,
+  Point,
+  ViewState,
+} from "one-map-react";
+import type { NativeMapProps as MapboxMapProps } from "one-map-react/mapbox-native";
+import type { NativeMapProps as MaplibreMapProps } from "one-map-react/maplibre-native";
+import type {
+  ComponentProps,
+  ComponentType,
+  ReactNode,
+  RefCallback,
+} from "react";
 import type {
   LayerProps as BoxLayerProps,
   MapProps as BoxMapProps,
@@ -156,14 +170,32 @@ export interface WebSceneComponents {
 /** Native bindings supplied by a native-only scenario entry point. */
 export interface NativeSceneComponents {
   readonly platform: "native";
-  readonly Map: typeof import("one-map-react/legacy").Map;
-  readonly Marker: typeof import("one-map-react/legacy").Marker;
-  readonly Source: typeof import("one-map-react/legacy").Source;
-  readonly Layer: typeof import("one-map-react/legacy").Layer;
+  readonly backend: NativeBackend;
+  readonly Map: ComponentType<NativeSceneMapProps>;
+  readonly Marker: ComponentType<
+    ComponentProps<typeof import("one-map-react/mapbox-native").Marker>
+  >;
+  readonly Source: typeof import("one-map-react/mapbox-native").Source;
+  readonly Layer: typeof import("one-map-react/mapbox-native").Layer;
+  readonly MapProvider: typeof import("one-map-react/mapbox-native").MapProvider;
+  readonly useMap: () => Readonly<Record<string, MapRef | undefined>>;
   readonly Images: typeof import("one-map-react/native-extensions").Images;
   readonly UserLocation: typeof import("one-map-react/native-extensions").UserLocation;
   readonly captureRendering: typeof import("./capture-rendering.native.js").captureRendering;
 }
+
+/** Renderer identity used by native command and observation receipts. */
+export type NativeBackend = "mapbox-native" | "maplibre-native";
+
+/** Both native entries accept these props and deliver their selected map ref. */
+type NativeSceneMapProps = Omit<
+  MapboxMapProps,
+  "locationOptions" | "mapStyle" | "options"
+> & {
+  readonly mapStyle: MapStyle;
+  readonly options?: MapboxMapProps["options"] & MaplibreMapProps["options"];
+  readonly ref?: RefCallback<MapRef>;
+};
 
 /**
  * Identifies the stock handle in a scene that also accepts a native attachment.

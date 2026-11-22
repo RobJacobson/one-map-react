@@ -9,10 +9,13 @@ import {
 } from "react";
 import type { ViewProps } from "react-native";
 
-import { adapter, MapboxNativeMap } from "./adapters/mapbox-native/index.js";
+import {
+  nativeComponents,
+  MapboxNativeMap,
+} from "./adapters/mapbox-native/index.js";
 import { assertLabelLocalization } from "./adapters/mapbox-native/label-localization.js";
 import type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
-import type { NativePortableLayerProps } from "./contracts/layer-types.js";
+import type { LayerProps } from "./contracts/layer-types.js";
 import type { NativeMapInputs } from "./contracts/native-types.js";
 export type {
   NativeBounds,
@@ -42,7 +45,6 @@ export type {
   NativeAdvancedMapRef as MapRef,
 } from "./adapters/mapbox-native/map-ref.js";
 export {
-  adapter,
   CameraGestureObserver,
   MapboxGestureSettings,
 } from "./adapters/mapbox-native/index.js";
@@ -93,7 +95,7 @@ const {
   useMap,
 } = createNativeMapBinding<NativeAdvancedMapRef, NativeMapProps>(
   MapboxNativeMap,
-  adapter
+  nativeComponents
 );
 export {
   NativeMap as default,
@@ -105,7 +107,7 @@ export {
 };
 
 /** Style-spec options for an RNMapbox layer. */
-export type NativeLayerProps = NativePortableLayerProps;
+export type NativeLayerProps = LayerProps;
 export type { NativeLayerProps as LayerProps, NativeMapProps as MapProps };
 
 /**
@@ -115,8 +117,8 @@ export type { NativeLayerProps as LayerProps, NativeMapProps as MapProps };
  * @returns The selected layer.
  */
 export const Layer = (props: NativeLayerProps): ReactElement => {
-  useLayerOptions(props, adapter.backend);
-  return <adapter.Layer {...props} />;
+  useLayerOptions(props, nativeComponents.backend);
+  return <nativeComponents.Layer {...props} />;
 };
 
 export { getAnnotationsLayerID, PointAnnotationManager } from "@rnmapbox/maps";

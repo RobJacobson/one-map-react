@@ -9,7 +9,7 @@ import {
 import type { ViewProps } from "react-native";
 
 import {
-  adapter,
+  nativeComponents,
   MaplibreNativeMap,
 } from "./adapters/maplibre-native/index.js";
 import type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
@@ -36,7 +36,6 @@ export type {
   SourceProps as NativeSourceProps,
 } from "./contracts/source-types.js";
 
-export { adapter } from "./adapters/maplibre-native/index.js";
 import {
   MaplibreNativeLayer,
   type NativeLayerProps,
@@ -48,7 +47,7 @@ export type {
 };
 /** Renders a style-spec layer through MapLibre Native. */
 export const Layer = (props: NativeLayerProps): ReactElement => {
-  useLayerOptions(props, adapter.backend);
+  useLayerOptions(props, nativeComponents.backend);
   return <MaplibreNativeLayer {...props} />;
 };
 export type {
@@ -99,7 +98,7 @@ const {
   useMap,
 } = createNativeMapBinding<NativeAdvancedMapRef, NativeMapProps>(
   MaplibreNativeMap,
-  adapter
+  nativeComponents
 );
 export {
   NativeMap as default,

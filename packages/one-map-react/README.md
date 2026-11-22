@@ -18,11 +18,9 @@ bun add @maplibre/maplibre-react-native@11.5.0 @types/geojson@7946.0.16
 
 Apply the [version-specific native repair](#native-patches-and-linking) and rebuild the app. RNMapbox applications call the native entry's `setAccessToken` with their public token. Native live markers use react-native-teleport to keep interactive children in the React tree.
 
-## Migration from the four-backend facade
+## Choose a platform import
 
-This is a breaking change in the development checkout. Keep your previous archive or pinned release while migrating, and use a distinct version when publishing the new API.
-
-Replace the old web `MapSetup` and its adapter with a platform import. The example below selects MapLibre GL JS and RNMapbox independently. Swap either import to choose the other engine on that platform.
+The example below selects MapLibre GL JS on web and RNMapbox on native. Change either import to use the other engine on that platform.
 
 ```ts
 // maps.web.ts
@@ -36,16 +34,16 @@ export { Map, Layer, Marker, Source, MapProvider, useMap } from "one-map-react/m
 
 Import from `./maps` in your screen and mount `<Map>` directly. TypeScript platform files can also re-export `MapRef`, `MapProps`, `SourceProps`, `LayerProps`, and `MarkerProps` with the same names on each platform. Each type describes the selected implementation. Use the same selection for its descendants and hook. The [vessel example](https://github.com/RobJacobson/one-map-react/tree/main/packages/example-map/reference) shares its source, layers, click handling and camera call across all four choices. The host supplies marker controls and a sized map container.
 
-| Previous usage | Replacement |
+| Task | Import or call |
 | --- | --- |
-| Root components and `MapSetup` on web | Stock `react-map-gl/mapbox` or `react-map-gl/maplibre`. The optional `one-map-react/mapbox-web` and `/maplibre-web` paths forward all upstream exports, including the default and types. |
-| A single engine across platforms | Import `one-map-react/mapbox` or `one-map-react/maplibre`. Browser and default resolve upstream. The React Native condition resolves the bound native shim. Browser wins when both conditions are active. |
-| Root components and `MapSetup` on native | Import from the bound native entry. During migration, the root and `one-map-react/legacy` expose the same deprecated, native-only setup and hook. |
-| `WrapperPopup`, `WrapperMarker`, `useWrapperMap`, other browser aliases | Use upstream names such as `Popup`, `Marker`, and `useMap`. Import SDK classes and functions directly from the chosen GL JS package. |
-| Web `options`, `hostProps`, and `getWrapperMap()` | Pass the supported upstream props directly to `Map`. Put DOM attributes on its parent. The ref is already a react-map-gl `MapRef`. Use its `getMap()` to borrow the GL JS instance. |
-| `Images` and `UserLocation` | Import from `one-map-react/native-extensions` within a native map. On web, manage style images through the chosen SDK's load/add/update/remove APIs and reinstall owned images when replacing the style. Draw supplied location with a marker or a GeoJSON source and circle layers. The application owns acquisition and permissions. |
+| Use stock components on web | Import from `react-map-gl/mapbox` or `react-map-gl/maplibre`. The optional `one-map-react/mapbox-web` and `one-map-react/maplibre-web` entries forward the upstream exports. |
+| Use the same engine on both platforms | Import `one-map-react/mapbox` or `one-map-react/maplibre`. The browser and default conditions select stock react-map-gl. The React Native condition selects the native shim. Browser wins when both conditions are active. |
+| Share types across native renderers | Use a type-only import such as `import type { ViewState } from "one-map-react"`. Import components, hooks, and the renderer-specific `MapRef` from your selected entry. |
+| Use a browser popup, marker, or control | Import the component from react-map-gl. Import SDK classes and functions directly from the chosen GL JS package. |
+| Access the browser map instance | Pass upstream options to `Map`. Put DOM attributes on its parent. Call `getMap()` on its ref to access the GL JS instance. |
+| Register images or display a supplied location | Import `Images` and `UserLocation` from `one-map-react/native-extensions` inside a native map. On web, register style images through the chosen SDK and reinstall them after style replacement. Draw a supplied location with a marker or GeoJSON layer. The application owns acquisition and permissions. |
 
-**Clicks and queries.** Pass layer IDs to `interactiveLayerIds` and read upstream results in `onClick`. A browser event already carries the hit features. Replace tuple destructuring with `event.lngLat.lng`, `event.lngLat.lat`, `event.point.x`, and `event.point.y`. Wheel events expose the upstream wheel event. Applications which previously relied on facade errors for unavailable layers can check `map.getLayer(id)` and issue an explicit renderer query when they need that diagnostic.
+**Clicks and queries.** Pass layer IDs to `interactiveLayerIds` and read upstream results in `onClick`. A browser event already carries the hit features. Read coordinates from `event.lngLat.lng`, `event.lngLat.lat`, `event.point.x`, and `event.point.y`. Wheel events expose the upstream wheel event. To check whether a browser style contains a particular layer, call `map.getLayer(id)`.
 
 ```tsx
 <Map interactiveLayerIds={["vessels"]} onClick={event => {
@@ -53,7 +51,7 @@ Import from `./maps` in your screen and mount `<Map>` directly. TypeScript platf
 }} />
 ```
 
-**Camera reads.** Web reads such as `map.getZoom()` are synchronous. Replace `map.getZoom().then(...)` in shared handlers with `const zoom = await map.getZoom()`. Native reads cross the bridge. Use `const center = await map.getCenter()` and read `center.lng` and `center.lat`. Pass an options object to commands, for example `map.flyTo({ center: [-122.45, 47.61], zoom: 12 })`.
+**Camera reads.** Web reads such as `map.getZoom()` are synchronous. In shared handlers, use `const zoom = await map.getZoom()`. Native reads cross the bridge. Use `const center = await map.getCenter()` and read `center.lng` and `center.lat`. Pass an options object to commands, for example `map.flyTo({ center: [-122.45, 47.61], zoom: 12 })`.
 
 **Clusters.** Retrieve the mounted source by ID. Narrow the stock web source to the selected SDK's `GeoJSONSource` (for example, `map.getSource<GeoJSONSource>("vessels")` on Mapbox). With the pinned Mapbox GL JS use `source?.getClusterExpansionZoom(id, callback)`. With MapLibre GL JS use `await source?.getClusterExpansionZoom(id)`. Native source handles accept either form. Check for a missing source after replacement or teardown.
 
@@ -102,7 +100,7 @@ Inside a map, read `useMap().current`. A sibling reads `useMap().harbor` for a m
 
 Native selected maps accept partial initial camera settings, desktop camera commands, and click fields such as `event.lngLat.lng` and `event.point.x`. Await native reads including `getCenter()`, `project()`, and `getBounds()`. Use `map.getSource(id)` to access a mounted GeoJSON source's cluster methods. Both promise and error-first callback calls are supported on native. [Native compatibility contract](https://github.com/RobJacobson/one-map-react/blob/main/docs/revised-api-proposal.md#native-compatibility-contract).
 
-Existing root components inside a selected native map follow that map's adapter. With `MapSetup` alone, explicit IDs remain available to the root hook. When a selected `MapProvider` encloses the map, it owns named lookup through the selected hook. The MapLibre native `Layer` also accepts SDK-specific props, including `afterId`, `layerIndex`, and legacy `style`.
+The MapLibre native `Layer` also accepts SDK-specific props, including `afterId`, `layerIndex`, and `style`.
 
 ## Advanced native APIs
 

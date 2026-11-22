@@ -6,7 +6,6 @@
     "resolveJsonModule": true,
     "paths": {
       "one-map-react": ["./packages/one-map-react/src/index.ts"],
-      "one-map-react/legacy": ["./packages/one-map-react/src/index.ts"],
       "one-map-react/native-extensions": [
         "./packages/one-map-react/src/native-extensions.ts"
       ]
@@ -14,7 +13,6 @@
   },
   "include": [
     "packages/example-map/src/scenarios/route-map.tsx",
-    "packages/example-map/src/scenarios/tf08-map.tsx",
     "packages/example-map/src/scenarios/web-lifecycle-app.tsx",
     "packages/example-map/src/scenarios/web-camera-app.tsx",
     "packages/example-map/src/scenarios/camera-smoke.ts",

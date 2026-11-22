@@ -1,2 +1,9 @@
 // Browser resolution selects the upstream entry directly.
-export { Map } from "react-map-gl/maplibre";
+export {
+  Layer,
+  Map,
+  MapProvider,
+  Marker,
+  Source,
+  useMap,
+} from "react-map-gl/maplibre";

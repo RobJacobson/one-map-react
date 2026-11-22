@@ -1,19 +1,21 @@
-import { useId } from "react";
+import { useContext, useId } from "react";
 
 import { validatePosition } from "../adapters/shared/location-values.js";
 import type { UserLocationProps } from "../contracts/location-types.js";
 import type { GeoJsonFeatureCollection } from "../contracts/source-types.js";
-import { Layer } from "./layer.js";
-import { Source } from "./source.js";
+import { MapSessionContext } from "./map-context.js";
 
 /** Displays supplied coordinates and meter-based accuracy without starting sensors. */
 export const UserLocation = ({
   position,
   showAccuracyCircle = false,
 }: UserLocationProps) => {
+  const session = useContext(MapSessionContext);
   const id = `one-map-location-${useId()}`;
   const data = locationGeometry(position, showAccuracyCircle);
   if (!position) return null;
+  if (!session) throw new Error("UserLocation must render inside Map.");
+  const { Layer, Source } = session.components;
   return (
     <Source id={id} type="geojson" data={data}>
       <Layer

@@ -17,16 +17,8 @@ import {
 } from "../../example-map/src/scenarios/map-fixture.js";
 import { NativeCameraContext } from "../src/adapters/shared/native-map-presentation.js";
 import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
-import type { MapRef } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
-import type {
-  ExternalDrawingContext,
-  MapProps,
-} from "../src/contracts/map-types.js";
-import { Layer } from "../src/facade/layer.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import { Map as OneMap, useMap } from "../src/facade/map.js";
-import { Source } from "../src/facade/source.js";
+import type { ExternalDrawingContext } from "../src/contracts/map-types.js";
 import { Images } from "../src/native-extensions.js";
 import { testNativeEntryBinding } from "./native-entry-binding.js";
 
@@ -271,7 +263,12 @@ import {
 } from "@rnmapbox/maps";
 
 import {
-  adapter,
+  Layer,
+  MapProvider,
+  Source,
+  useMap,
+  type MapProps,
+  type MapRef,
   MapboxGestureSettings,
   Map as NativeMap,
   type NativeAdvancedMapRef,
@@ -316,13 +313,11 @@ const drawingContext = (): ExternalDrawingContext => ({
 test("forwards selected frame observation callbacks without common capture ownership", async () => {
   const onFrame = jest.fn();
   await render(
-    <MapSetup adapter={adapter}>
-      <NativeMap
-        mapStyle={emptyStyle}
-        initialViewState={initialViewState}
-        options={{ onDidFinishRenderingFrameFully: onFrame }}
-      />
-    </MapSetup>
+    <NativeMap
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      options={{ onDidFinishRenderingFrameFully: onFrame }}
+    />
   );
   const props = lastMapProps<{ onDidFinishRenderingFrameFully: () => void }>();
   expect(props.onDidFinishRenderingFrameFully).toBe(onFrame);
@@ -339,16 +334,14 @@ test.each(["document", "url"] as const)(
         ? [emptyStyle, styleURL, replacementStyle]
         : [styleURL, emptyStyle, styleURL];
     const tree = (mapStyle: MapProps["mapStyle"]) => (
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={mapStyle}
-          initialViewState={initialViewState}
-          options={{
-            styleURL: "https://example.test/selected.json",
-            styleJSON: JSON.stringify(replacementStyle),
-          }}
-        />
-      </MapSetup>
+      <NativeMap
+        mapStyle={mapStyle}
+        initialViewState={initialViewState}
+        options={{
+          styleURL: "https://example.test/selected.json",
+          styleJSON: JSON.stringify(replacementStyle),
+        }}
+      />
     );
     const view = await render(tree(styles[0]));
     for (const mapStyle of styles) {
@@ -373,25 +366,23 @@ const example = (
   onMove?: (event: object) => void,
   extra?: Partial<MapProps>
 ) => (
-  <MapSetup adapter={adapter}>
-    <OneMap
-      ref={ref}
-      mapStyle={emptyStyle}
-      initialViewState={initialViewState}
-      style={{ flex: 1 }}
-      onMove={onMove}
-      {...extra}
-    >
-      <Source id="routes" type="geojson" data={routes}>
-        <Layer
-          id="route-line"
-          type="line"
-          paint={{ "line-color": "#2563eb", "line-width": 3 }}
-          layout={{ "line-cap": "round" }}
-        />
-      </Source>
-    </OneMap>
-  </MapSetup>
+  <NativeMap
+    ref={ref}
+    mapStyle={emptyStyle}
+    initialViewState={initialViewState}
+    style={{ flex: 1 }}
+    onMove={onMove}
+    {...extra}
+  >
+    <Source id="routes" type="geojson" data={routes}>
+      <Layer
+        id="route-line"
+        type="line"
+        paint={{ "line-color": "#2563eb", "line-width": 3 }}
+        layout={{ "line-cap": "round" }}
+      />
+    </Source>
+  </NativeMap>
 );
 
 describe("mapbox-native adapter", () => {
@@ -401,27 +392,25 @@ describe("mapbox-native adapter", () => {
       const ref = createRef<NativeAdvancedMapRef>();
       let observed: NativeAdvancedMapRef | undefined;
       const Probe = () => {
-        // The common type omits selected access; exercise its real runtime proxy.
-        // eslint-disable-next-line react/globals -- Capture the attached facade proxy for lifecycle assertions.
-        observed = useMap(access === "named" ? "borrowed" : undefined) as
-          | NativeAdvancedMapRef
-          | undefined;
+        const maps = useMap();
+        // eslint-disable-next-line react/globals -- Capture the handle for lifecycle assertions.
+        observed = access === "named" ? maps.borrowed : maps.current;
         return null;
       };
-      const MapComponent = access === "selected" ? NativeMap : OneMap;
       const loaded = jest.fn();
       const scene = (mapStyle: MapProps["mapStyle"]) => (
-        <MapSetup adapter={adapter}>
-          <MapComponent
+        <MapProvider>
+          {access === "named" && <Probe />}
+          <NativeMap
             id="borrowed"
             ref={ref}
             mapStyle={mapStyle}
             initialViewState={initialViewState}
             onLoad={loaded}
           >
-            {access !== "selected" && <Probe />}
-          </MapComponent>
-        </MapSetup>
+            {access === "enclosing" && <Probe />}
+          </NativeMap>
+        </MapProvider>
       );
       mockSetCamera.mockClear();
       const view = await render(scene(emptyStyle));
@@ -467,13 +456,11 @@ describe("mapbox-native adapter", () => {
   test("Android locks and restores gestures through scalar native props", async () => {
     const platform = jest.replaceProperty(Platform, "OS", "android");
     const scene = (interactive: boolean) => (
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          interactive={interactive}
-        />
-      </MapSetup>
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        interactive={interactive}
+      />
     );
     try {
       const view = await render(scene(false));
@@ -509,14 +496,12 @@ describe("mapbox-native adapter", () => {
     async (zoomEnabled) => {
       const platform = jest.replaceProperty(Platform, "OS", "android");
       const scene = (interactive: boolean) => (
-        <MapSetup adapter={adapter}>
-          <NativeMap
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-            interactive={interactive}
-            options={{ zoomEnabled }}
-          />
-        </MapSetup>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          interactive={interactive}
+          options={{ zoomEnabled }}
+        />
       );
       try {
         const view = await render(scene(false));
@@ -537,20 +522,18 @@ describe("mapbox-native adapter", () => {
   test("Android double-tap options cannot override a temporary gesture lock", async () => {
     const platform = jest.replaceProperty(Platform, "OS", "android");
     const scene = (interactive: boolean) => (
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          interactive={interactive}
-          options={{
-            gestureSettings: {
-              doubleTapToZoomInEnabled: true,
-              doubleTouchToZoomOutEnabled: true,
-              quickZoomEnabled: false,
-            },
-          }}
-        />
-      </MapSetup>
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        interactive={interactive}
+        options={{
+          gestureSettings: {
+            doubleTapToZoomInEnabled: true,
+            doubleTouchToZoomOutEnabled: true,
+            quickZoomEnabled: false,
+          },
+        }}
+      />
     );
     try {
       const view = await render(scene(false));
@@ -580,14 +563,12 @@ describe("mapbox-native adapter", () => {
     async (doubleTapZoom) => {
       const platform = jest.replaceProperty(Platform, "OS", "android");
       const scene = (interactive: boolean) => (
-        <MapSetup adapter={adapter}>
-          <NativeMap
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-            interactive={interactive}
-            doubleTapZoom={doubleTapZoom}
-          />
-        </MapSetup>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          interactive={interactive}
+          doubleTapZoom={doubleTapZoom}
+        />
       );
       try {
         const view = await render(scene(false));
@@ -620,16 +601,14 @@ describe("mapbox-native adapter", () => {
     async (os, enabled) => {
       const platform = jest.replaceProperty(Platform, "OS", os);
       const scene = (top: number) => (
-        <MapSetup adapter={adapter}>
-          <NativeMap
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-            options={{
-              scaleBarPosition: { top, left: 8 },
-              scaleBarEnabled: enabled,
-            }}
-          />
-        </MapSetup>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          options={{
+            scaleBarPosition: { top, left: 8 },
+            scaleBarEnabled: enabled,
+          }}
+        />
       );
       try {
         const view = await render(scene(8));
@@ -674,17 +653,15 @@ describe("mapbox-native adapter", () => {
     const platform = jest.replaceProperty(Platform, "OS", "ios");
     try {
       const view = await render(
-        <MapSetup adapter={adapter}>
-          <NativeMap
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-            hostProps={{ testID: "scale-layout-host" }}
-            options={{
-              scaleBarPosition: { top: 96, left: 8 },
-              scaleBarEnabled: true,
-            }}
-          />
-        </MapSetup>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          hostProps={{ testID: "scale-layout-host" }}
+          options={{
+            scaleBarPosition: { top: 96, left: 8 },
+            scaleBarEnabled: true,
+          }}
+        />
       );
       const before = MapViewMock.mock.calls.length;
       await fireEvent(view.getByTestId("scale-layout-host"), "layout", {
@@ -720,23 +697,21 @@ describe("mapbox-native adapter", () => {
 
   test("selected SDK ornament flags and positions update and reset to defaults", async () => {
     const scene = (enabled: boolean | undefined) => (
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          options={{
-            attributionEnabled: enabled,
-            logoEnabled: enabled,
-            scaleBarEnabled: enabled,
-            logoPosition:
-              enabled === undefined ? undefined : { bottom: 3, left: 4 },
-            compassPosition:
-              enabled === undefined ? undefined : { top: 7, right: 8 },
-            attributionPosition:
-              enabled === undefined ? undefined : { top: 5, right: 6 },
-          }}
-        />
-      </MapSetup>
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        options={{
+          attributionEnabled: enabled,
+          logoEnabled: enabled,
+          scaleBarEnabled: enabled,
+          logoPosition:
+            enabled === undefined ? undefined : { bottom: 3, left: 4 },
+          compassPosition:
+            enabled === undefined ? undefined : { top: 7, right: 8 },
+          attributionPosition:
+            enabled === undefined ? undefined : { top: 5, right: 6 },
+        }}
+      />
     );
     const view = await render(scene(true));
     for (const enabled of [true, false, undefined]) {
@@ -1383,15 +1358,13 @@ describe("mapbox-native adapter", () => {
 });
 
 const tree = (children: ReactNode) => (
-  <MapSetup adapter={adapter}>
-    <OneMap
-      mapStyle={emptyStyle}
-      initialViewState={initialViewState}
-      style={{ flex: 1 }}
-    >
-      {children}
-    </OneMap>
-  </MapSetup>
+  <NativeMap
+    mapStyle={emptyStyle}
+    initialViewState={initialViewState}
+    style={{ flex: 1 }}
+  >
+    {children}
+  </NativeMap>
 );
 
 describe("mapbox-native source families", () => {
@@ -1908,7 +1881,15 @@ describe("mapbox-native layers", () => {
 
   test("expressions pass through and unset keys stay omitted", async () => {
     LineLayerMock.mockClear();
-    const expression = ["interpolate", ["linear"], ["zoom"], 5, 1, 10, 4];
+    const expression = [
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      5,
+      1,
+      10,
+      4,
+    ] as const;
 
     await render(
       tree(
@@ -2079,11 +2060,7 @@ describe("mapbox-native images", () => {
 
   test("images outside a map are rejected", async () => {
     await expect(
-      render(
-        <MapSetup adapter={adapter}>
-          <Images images={{ marker: "https://example.com/m.png" }} />
-        </MapSetup>
-      )
+      render(<Images images={{ marker: "https://example.com/m.png" }} />)
     ).rejects.toThrow("Images must render inside Map.");
   });
 });
@@ -2119,24 +2096,22 @@ describe("mapbox-native queries and feature state", () => {
         revision: number,
         mapStyle = emptyStyle
       ) => (
-        <MapSetup adapter={adapter}>
-          <OneMap
-            ref={ref}
-            mapStyle={mapStyle}
-            initialViewState={initialViewState}
-          >
-            {kind === "geojson" ? (
-              <Source key={revision} id="routes" type="geojson" data={routes} />
-            ) : (
-              <Source
-                key={revision}
-                id="routes"
-                type="vector"
-                url="mapbox://tiles"
-              />
-            )}
-          </OneMap>
-        </MapSetup>
+        <NativeMap
+          ref={ref}
+          mapStyle={mapStyle}
+          initialViewState={initialViewState}
+        >
+          {kind === "geojson" ? (
+            <Source key={revision} id="routes" type="geojson" data={routes} />
+          ) : (
+            <Source
+              key={revision}
+              id="routes"
+              type="vector"
+              url="mapbox://tiles"
+            />
+          )}
+        </NativeMap>
       );
       const target = (kind: "geojson" | "vector") => ({
         source: "routes",
@@ -2424,29 +2399,27 @@ test("native fitBounds maxZoom rejects before camera dispatch", async () => {
 test("terrain/light/projection and hillshade use native public components, including zero and explicit disable", async () => {
   const ref = createRef<MapRef>();
   const mounted = await render(
-    <MapSetup adapter={adapter}>
-      <OneMap
-        ref={ref}
-        mapStyle={emptyStyle}
-        initialViewState={initialViewState}
-        terrain={null}
-        projection="globe"
-        light={{
-          intensity: 0,
-          position: [1, 2, 3],
-          "intensity-transition": { duration: 0 },
+    <NativeMap
+      ref={ref}
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      terrain={null}
+      projection="globe"
+      light={{
+        intensity: 0,
+        position: [1, 2, 3],
+        "intensity-transition": { duration: 0 },
+      }}
+    >
+      <Layer
+        id="shade"
+        type="hillshade"
+        paint={{
+          "hillshade-exaggeration": 0,
+          "hillshade-shadow-color": "#000000",
         }}
-      >
-        <Layer
-          id="shade"
-          type="hillshade"
-          paint={{
-            "hillshade-exaggeration": 0,
-            "hillshade-shadow-color": "#000000",
-          }}
-        />
-      </OneMap>
-    </MapSetup>
+      />
+    </NativeMap>
   );
   expect(lastRenderingProps(RnTerrain).sourceID).toBeUndefined();
   expect(lastRenderingProps(RnLight).style).toMatchObject({
@@ -2467,26 +2440,22 @@ test("terrain/light/projection and hillshade use native public components, inclu
     "bridge failure"
   );
   await mounted.rerender(
-    <MapSetup adapter={adapter}>
-      <OneMap
-        mapStyle={emptyStyle}
-        initialViewState={initialViewState}
-        terrain={{ source: "disabled", exaggeration: 0 }}
-      />
-    </MapSetup>
+    <NativeMap
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      terrain={{ source: "disabled", exaggeration: 0 }}
+    />
   );
   expect(lastRenderingProps(RnTerrain)).toMatchObject({
     sourceID: "disabled",
     style: { exaggeration: 0 },
   });
   await mounted.rerender(
-    <MapSetup adapter={adapter}>
-      <OneMap
-        mapStyle={replacementStyle}
-        initialViewState={initialViewState}
-        terrain={null}
-      />
-    </MapSetup>
+    <NativeMap
+      mapStyle={replacementStyle}
+      initialViewState={initialViewState}
+      terrain={null}
+    />
   );
   expect(lastRenderingProps(RnTerrain).sourceID).toBeUndefined();
   await mounted.unmount();
@@ -2504,26 +2473,24 @@ test("settled camera updates live overlays without another public move", async (
     return null;
   };
   const view = await render(
-    <MapSetup adapter={adapter}>
-      <OneMap
-        mapStyle={emptyStyle}
-        initialViewState={initialViewState}
-        viewState={initialViewState}
-        onMove={onMove}
-        onMoveEnd={onMoveEnd}
-      >
-        <Probe />
+    <NativeMap
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      viewState={initialViewState}
+      onMove={onMove}
+      onMoveEnd={onMoveEnd}
+    >
+      <Probe />
 
-        <NativeMarkerOverlay
-          id="settled"
-          lngLat={[1, 2]}
-          anchor="top-left"
-          offset={[0, 0]}
-        >
-          <Text>Final position</Text>
-        </NativeMarkerOverlay>
-      </OneMap>
-    </MapSetup>
+      <NativeMarkerOverlay
+        id="settled"
+        lngLat={[1, 2]}
+        anchor="top-left"
+        offset={[0, 0]}
+      >
+        <Text>Final position</Text>
+      </NativeMarkerOverlay>
+    </NativeMap>
   );
   const events = lastMapProps<{
     onDidFinishLoadingMap: () => void;
@@ -2561,21 +2528,19 @@ test("settled camera updates live overlays without another public move", async (
 test("selected native location follow rejects a simultaneous viewState target", async () => {
   await expect(
     render(
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          viewState={initialViewState}
-          locationOptions={{
-            followUserLocation: true,
-            followHeading: undefined,
-            followPitch: undefined,
-            followUserMode: undefined,
-            followZoomLevel: undefined,
-            onUserTrackingModeChange: undefined,
-          }}
-        />
-      </MapSetup>
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        viewState={initialViewState}
+        locationOptions={{
+          followUserLocation: true,
+          followHeading: undefined,
+          followPitch: undefined,
+          followUserMode: undefined,
+          followZoomLevel: undefined,
+          onUserTrackingModeChange: undefined,
+        }}
+      />
     )
   ).rejects.toThrow("Selected location follow conflicts with viewState.");
 });
@@ -2583,6 +2548,7 @@ test("selected native location follow rejects a simultaneous viewState target", 
 describe("mapbox-native entry binding", () => {
   testNativeEntryBinding(
     nativeEntry,
+    "mapbox-native",
     {
       geometry: { coordinates: [-122.34, 47.61] },
       properties: { screenPointX: 23, screenPointY: 41 },

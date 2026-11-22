@@ -70,6 +70,59 @@ const evaluate = (directory, name, dependency) => {
   return exports;
 };
 for (const directory of ["src", "dist"]) {
+  test.each(["mapbox-native", "maplibre-native"])(
+    `${directory}: the %s scenario supplies bindings from its selected native entry`,
+    (backend) => {
+      const bindings = {
+        Map: () => null,
+        Source: () => null,
+        Layer: () => null,
+        Marker: () => null,
+        MapProvider: () => null,
+        useMap: () => ({}),
+      };
+      const extensions = {
+        Images: () => null,
+        UserLocation: () => null,
+      };
+      const captureRendering = () => Promise.resolve();
+      const factory = evaluate(
+        directory,
+        "scenarios/native-scene-components.ts",
+        (name) => {
+          if (name === "one-map-react/native-extensions") return extensions;
+          if (name === "./capture-rendering.native.js")
+            return { captureRendering };
+          throw new Error(`Unexpected shared native dependency: ${name}`);
+        }
+      );
+      const NativeCameraScreen = ({ components, doubleTap }) => {
+        expect(components).toEqual({
+          ...bindings,
+          ...extensions,
+          platform: "native",
+          backend,
+          captureRendering,
+        });
+        expect(doubleTap).toBe(backend === "maplibre-native");
+        return createElement("p", null, backend);
+      };
+      const selectedEntry = `one-map-react/${backend}`;
+      const scene = evaluate(directory, `scenarios/${backend}.tsx`, (name) => {
+        if (name === selectedEntry) return bindings;
+        if (name === "react-native")
+          return { StyleSheet: { create: (styles) => styles } };
+        if (name === "./native-scene-components.js") return factory;
+        if (name === "./native-camera-screen.js") return { NativeCameraScreen };
+        if (name.startsWith("./")) return {};
+        throw new Error(`Unexpected scenario dependency: ${name}`);
+      });
+      const view = render(createElement(scene.default, { scenario: "tf04" }));
+      expect(view.getByText(backend)).toBeDefined();
+      view.unmount();
+    }
+  );
+
   test(`${directory}: native map import and absent token do not initialize either SDK; getters select upstream bound maps`, async () => {
     const imports = [];
     const mapbox = {

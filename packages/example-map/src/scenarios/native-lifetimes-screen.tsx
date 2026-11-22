@@ -1,20 +1,19 @@
-import type { Adapter, MapRef } from "one-map-react";
-import { MapSetup } from "one-map-react/legacy";
-import { useRef } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
 import { LifetimesMap } from "./lifetimes-map.js";
 import { useLifetimesSmoke } from "./lifetimes-smoke.js";
+import type { NativeSceneComponents } from "./scene-components.js";
+import { useNativeMapRef } from "./use-native-map-ref.js";
 
 interface NativeLifetimesScreenProps {
-  readonly adapter: Adapter;
+  readonly components: NativeSceneComponents;
 }
 
 /** Native TF06 vector and family lifetime shell; status reports observed state. */
 export const NativeLifetimesScreen = ({
-  adapter,
+  components,
 }: NativeLifetimesScreenProps) => {
-  const mapRef = useRef<MapRef>(null);
+  const [mapRef, attachMap] = useNativeMapRef();
   const smoke = useLifetimesSmoke({
     mapRef,
     statusUrl:
@@ -24,21 +23,20 @@ export const NativeLifetimesScreen = ({
   });
 
   return (
-    <MapSetup adapter={adapter}>
-      <View style={styles.screen}>
-        <Text testID="tf06-lifetimes-status">{smoke.status}</Text>
-        <LifetimesMap
-          ref={mapRef}
-          family={smoke.family}
-          mapStyle={smoke.mapStyle}
-          sourceRevision={smoke.sourceRevision}
-          style={{ flex: 1 }}
-          onLoad={smoke.onLoad}
-          onStyleLoad={smoke.onStyleLoad}
-          onError={smoke.onError}
-        />
-      </View>
-    </MapSetup>
+    <View style={styles.screen}>
+      <Text testID="tf06-lifetimes-status">{smoke.status}</Text>
+      <LifetimesMap
+        components={components}
+        ref={attachMap}
+        family={smoke.family}
+        mapStyle={smoke.mapStyle}
+        sourceRevision={smoke.sourceRevision}
+        style={{ flex: 1 }}
+        onLoad={smoke.onLoad}
+        onStyleLoad={smoke.onStyleLoad}
+        onError={smoke.onError}
+      />
+    </View>
   );
 };
 

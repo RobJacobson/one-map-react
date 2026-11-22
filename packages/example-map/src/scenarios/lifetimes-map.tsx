@@ -1,23 +1,22 @@
-import {
-  Layer,
-  type MapErrorEvent,
-  type MapLayoutStyle,
-  type MapRef,
-  type MapStyle,
-  Map as OneMap,
-  Source,
-} from "one-map-react/legacy";
-import { type Ref, useMemo } from "react";
+import type {
+  MapErrorEvent,
+  MapLayoutStyle,
+  MapRef,
+  MapStyle,
+} from "one-map-react";
+import { type RefCallback, useMemo } from "react";
 
 import { initialViewState, queryRoutes } from "./map-fixture.js";
+import type { NativeSceneComponents } from "./scene-components.js";
 import { tf06Base } from "./tf06-base.js";
 
 interface LifetimesMapProps {
   readonly family: "geojson" | "vector";
+  readonly components: Pick<NativeSceneComponents, "Map" | "Source" | "Layer">;
   readonly mapStyle: MapStyle;
   readonly sourceRevision: number;
   readonly style?: MapLayoutStyle;
-  readonly ref?: Ref<MapRef>;
+  readonly ref?: RefCallback<MapRef>;
   readonly onLoad?: () => void;
   readonly onStyleLoad?: () => void;
   readonly onError?: (event: MapErrorEvent) => void;
@@ -26,6 +25,7 @@ interface LifetimesMapProps {
 /** Native TF06 lifetime scene with a keyed, same-id source in two families. */
 export const LifetimesMap = ({
   family,
+  components: { Map: NativeMap, Source, Layer },
   mapStyle,
   sourceRevision,
   style,
@@ -50,7 +50,7 @@ export const LifetimesMap = ({
   const sourceKey = `${family}-${sourceRevision}`;
 
   return (
-    <OneMap
+    <NativeMap
       ref={ref}
       mapStyle={mapStyle}
       initialViewState={initialViewState}
@@ -91,7 +91,7 @@ export const LifetimesMap = ({
           <Layer id="lifetime-line" type="line" paint={linePaint} />
         </Source>
       )}
-    </OneMap>
+    </NativeMap>
   );
 };
 

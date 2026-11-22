@@ -12,7 +12,7 @@ Use the [worker policy](testing-policy.md#smoke-workers-and-models) for approved
 
 ## Agreed project direction
 
-one-map-react adapts RNMapbox and MapLibre React Native to desktop call shapes. Applications choose the renderer through platform imports. Web applications use stock react-map-gl directly or through the two browser convenience exports. The root and `/legacy` retain native setup for migrating consumers. Keep renderer peers optional and imports isolated across engines. The [package guide](../packages/one-map-react/README.md) describes the current entries.
+one-map-react adapts RNMapbox and MapLibre React Native to desktop call shapes. Applications choose the renderer through platform imports. Web applications use stock react-map-gl directly or through the two browser convenience exports. Use a selected native entry for map components and hooks. The package root exports shared types. Keep renderer peers optional and imports isolated across engines. The [package guide](../packages/one-map-react/README.md) describes the current entries.
 
 The [requirements](requirements.md) define scope and ownership. The [stage plan](stage-plan.md) defines implementation order. For next-release API work, read the [migration contract](revised-api-proposal.md), [unit protocol](revised-api-implementation-plan.md), and [API coverage checklist](api-coverage.md). Acceptance is deferred under the [current handoff](revised-api-acceptance-plan.md#current-handoff); historical outcomes apply only to their tested inputs. Delegate to wrappers by default and preserve every retained API mapping or substantiated disposition.
 

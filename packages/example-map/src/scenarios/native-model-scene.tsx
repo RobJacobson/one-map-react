@@ -1,10 +1,8 @@
-import {
-  Map as OneMap,
-  type MapLayoutStyle,
-  type MapRef,
-} from "one-map-react/legacy";
+import type { MapLayoutStyle } from "one-map-react";
 import {
   CustomLocationProvider,
+  Map as NativeMap,
+  type MapRef,
   LocationPuck,
 } from "one-map-react/mapbox-native";
 import { useEffect, useRef, useState } from "react";
@@ -88,7 +86,7 @@ export const NativeModelScene = ({
     return () => attach(null);
   }, [attach]);
   return (
-    <OneMap
+    <NativeMap
       ref={map}
       mapStyle={{
         version: 8,
@@ -119,6 +117,6 @@ export const NativeModelScene = ({
         puckBearingEnabled={false}
         model={presets[preset]}
       />
-    </OneMap>
+    </NativeMap>
   );
 };

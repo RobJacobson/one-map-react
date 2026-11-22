@@ -512,6 +512,8 @@ NetworkManager.setConnected(42);
   const nativeBindingAssertions = `
 import { Layer as BoundLayer, Marker as BoundMarker, Source as BoundSource, MapProvider, useMap as useSelectedMap } from "one-map-react/${entry}";
 import { useMap as useAliasMap, Map as AliasMap } from "one-map-react/${entry.replace("-native", "")}";
+// @ts-expect-error Native entries bind the backend internally.
+import { adapter } from "one-map-react/${entry}";
 type SelectedTypes = [import("one-map-react/${entry}").MapRef, import("one-map-react/${entry}").MapProps, import("one-map-react/${entry}").LayerProps, import("one-map-react/${entry}").SourceProps, import("one-map-react/${entry}").MarkerProps];
 const nativeTypes: Equal<SelectedTypes, [NativeAdvancedMapRef, import("one-map-react/${entry}").NativeMapProps, import("one-map-react/${entry}").NativeLayerProps, import("one-map-react/${entry}").NativeSourceProps, import("one-map-react/${entry}").NativeMarkerProps]> = true;
 void nativeTypes;
@@ -536,6 +538,10 @@ void <MapProvider><SelectedMap id="harbor" mapStyle={style} initialViewState={{ 
   </BoundSource>
   <SelectedChildren />
 </SelectedMap></MapProvider>;
+// @ts-expect-error Drawing-buffer configuration belongs to the selected wrapper.
+void <SelectedMap mapStyle={style} initialViewState={viewState} captureEnabled />;
+// @ts-expect-error Invalid map props must be rejected.
+void <SelectedMap mapStyle={style} initialViewState={viewState} definitelyNotAMapProp />;
 // @ts-expect-error A circle transition belongs to a circle layer.
 void <BoundLayer id="invalid" type="line" paint={{ "circle-radius-transition": { duration: 450 } }} />;
 // @ts-expect-error A transition's duration is numeric.
@@ -583,18 +589,7 @@ void <SelectedMarker longitude={0} latitude={0} draggable={false} onDrag={() => 
 void <SelectedMarker longitude={0} latitude={0} onDragEnd={() => undefined} />;
 void <RawAnnotation id="raw-drag" ${entry === "mapbox-native" ? "coordinate" : "lngLat"}={[0, 0]} draggable onDragStart={() => undefined} onDrag={() => undefined} onDragEnd={() => undefined}><></></RawAnnotation>;
 `;
-  return `import { Map as OneMap, MapSetup, Source, Layer } from "one-map-react/legacy";
-import { adapter } from "one-map-react/${entry}";
-import type { Adapter } from "one-map-react";
-
-const selected: Adapter = adapter;
-// @ts-expect-error Selected adapters no longer own application acquisition.
-adapter.services;
-void MapSetup;
-void Source;
-void Layer;
-void selected;
-const viewState = {
+  return `const viewState = {
   longitude: -122.34,
   latitude: 47.61,
   zoom: 11,
@@ -605,17 +600,6 @@ const style = { version: 8 as const, sources: {}, layers: [] };
 ${selectedAssertions}
 ${nativeBindingAssertions}
 ${nativeUiAssertions}
-void (
-  <OneMap mapStyle={style} initialViewState={viewState} />
-);
-void (
-  <OneMap
-    mapStyle={style}
-    initialViewState={viewState}
-    // @ts-expect-error Invalid map props must not type-check.
-    definitelyNotAMapProp
-  />
-);
 `;
 };
 

@@ -1,18 +1,18 @@
-import { type Adapter, MapSetup } from "one-map-react/legacy";
 import { useCallback, useEffect, useRef } from "react";
 import { Platform, View } from "react-native";
 
-import { nativeSceneComponents } from "./native-scene-components.js";
+import type { NativeSceneComponents } from "./scene-components.js";
 import { Tf09Scene, type Tf09Probe } from "./tf09-scene.js";
 
 /** Native runner transport; does not start until this acceptance screen mounts. */
 export const NativeTf09Screen = ({
-  adapter,
+  components,
   scene: Scene = Tf09Scene,
 }: {
-  readonly adapter: Adapter;
+  readonly components: NativeSceneComponents;
   readonly scene?: typeof Tf09Scene;
 }) => {
+  const { backend } = components;
   const probe = useRef<Tf09Probe | null>(null);
   const attach = useCallback((value: Tf09Probe | null) => {
     probe.current = value;
@@ -39,7 +39,7 @@ export const NativeTf09Screen = ({
           command.id === previous ||
           !probe.current ||
           command.environment !==
-            `${adapter.backend.replace("-native", "")}-${Platform.OS}`
+            `${backend.replace("-native", "")}-${Platform.OS}`
         )
           return;
         previous = command.id;
@@ -69,17 +69,15 @@ export const NativeTf09Screen = ({
       active = false;
       clearInterval(timer);
     };
-  }, [adapter.backend]);
+  }, [backend]);
   return (
     <View style={{ flex: 1 }}>
-      <MapSetup adapter={adapter}>
-        <Scene
-          components={nativeSceneComponents}
-          backend={adapter.backend}
-          attach={attach}
-          style={{ flex: 1 }}
-        />
-      </MapSetup>
+      <Scene
+        components={components}
+        backend={backend}
+        attach={attach}
+        style={{ flex: 1 }}
+      />
     </View>
   );
 };

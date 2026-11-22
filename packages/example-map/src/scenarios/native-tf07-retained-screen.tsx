@@ -1,15 +1,4 @@
-import {
-  type Adapter,
-  type LngLat,
-  type MapRef,
-  MapSetup,
-  Marker,
-  type MarkerRef,
-  Map as OneMap,
-  Source,
-  Layer,
-  useMap,
-} from "one-map-react/legacy";
+import type { LngLat, MapRef, MarkerRef } from "one-map-react";
 import {
   createContext,
   useCallback,
@@ -31,6 +20,8 @@ import {
 } from "react-native";
 
 import { emptyStyle } from "./map-fixture.js";
+import type { NativeSceneComponents } from "./scene-components.js";
+import { useNativeMapRef } from "./use-native-map-ref.js";
 
 const Theme = createContext("initial");
 const targets = { a: [-122.34, 47.61], b: [-122.33, 47.615] } as const;
@@ -47,19 +38,27 @@ interface ChildRead {
 
 /**
  * Renders two real map/marker attachments with independent observation controls.
- * @param props - The selected native adapter.
+ * @param props - The selected native components.
  * @returns The native screen; readbacks supplement physical observations.
  */
 export const NativeTf07RetainedScreen = ({
-  adapter,
+  components,
 }: {
-  readonly adapter: Adapter;
+  readonly components: NativeSceneComponents;
 }) => {
+  const {
+    Map: NativeMap,
+    Source,
+    Layer,
+    Marker,
+    MapProvider,
+    useMap,
+  } = components;
   const window = useWindowDimensions();
   const active = useRef(false);
   const readSequence = useRef(0);
-  const first = useRef<MapRef>(null);
-  const second = useRef<MapRef>(null);
+  const [first, attachFirst] = useNativeMapRef();
+  const [second, attachSecond] = useNativeMapRef();
   const firstHost = useRef<View>(null);
   const secondHost = useRef<View>(null);
   const annotation = useRef<MarkerRef>(null);
@@ -199,7 +198,7 @@ export const NativeTf07RetainedScreen = ({
 
   return (
     <Theme.Provider value={theme}>
-      <MapSetup adapter={adapter}>
+      <MapProvider>
         <SafeAreaView style={{ flex: 1 }}>
           <ScrollView horizontal style={{ flexGrow: 0, maxHeight: 48 }}>
             <Button
@@ -243,9 +242,9 @@ export const NativeTf07RetainedScreen = ({
                 collapsable={false}
                 style={{ flex: name === "a" && !short ? 2 : 1 }}
               >
-                <OneMap
+                <NativeMap
                   id={`tf07-focus-${name}`}
-                  ref={name === "a" ? first : second}
+                  ref={name === "a" ? attachFirst : attachSecond}
                   mapStyle={emptyStyle}
                   style={{ flex: 1 }}
                   initialViewState={{
@@ -322,6 +321,7 @@ export const NativeTf07RetainedScreen = ({
                     offset={[0, -60]}
                   >
                     <FocusedChild
+                      useMap={useMap}
                       name={name}
                       report={childRead}
                       fail={() => record(`${name}-error`)}
@@ -358,28 +358,30 @@ export const NativeTf07RetainedScreen = ({
                       </View>
                     </Marker>
                   )}
-                </OneMap>
+                </NativeMap>
               </View>
             ))}
           </View>
         </SafeAreaView>
-      </MapSetup>
+      </MapProvider>
     </Theme.Provider>
   );
 };
 
 /** Lives inside each real Marker portal, retaining provider and component state. */
 const FocusedChild = ({
+  useMap,
   name,
   report,
   fail,
 }: {
+  readonly useMap: NativeSceneComponents["useMap"];
   readonly name: MapName;
   readonly report: (name: MapName, value: ChildRead) => void;
   readonly fail: () => void;
 }) => {
   const theme = useContext(Theme);
-  const map = useMap(`tf07-focus-${name}`);
+  const map = useMap()[`tf07-focus-${name}`];
   const currentMap = useRef(map);
   const mounted = useRef(false);
   const sequence = useRef(0);

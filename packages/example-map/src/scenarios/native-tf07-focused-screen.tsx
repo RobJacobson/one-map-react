@@ -1,17 +1,6 @@
-import {
-  type Adapter,
-  type GeolocationPosition,
-  Layer,
-  type MapRef,
-  MapSetup,
-  Marker,
-  type MarkerRef,
-  Map as OneMap,
-  Source,
-} from "one-map-react/legacy";
+import type { GeolocationPosition, MapRef, MarkerRef } from "one-map-react";
 import type { NativeMapProps as MapboxMapProps } from "one-map-react/mapbox-native";
 import type { NativeMapProps as MaplibreMapProps } from "one-map-react/maplibre-native";
-import { UserLocation } from "one-map-react/native-extensions";
 import {
   createContext,
   useCallback,
@@ -35,7 +24,9 @@ import {
 import { NativeCameraButtons } from "./native-camera-buttons.js";
 import { NativeLocationButton } from "./native-location-button.js";
 import { measureNativeViewport } from "./native-viewport.js";
+import type { NativeSceneComponents } from "./scene-components.js";
 import { tf06Base } from "./tf06-base.js";
+import { useNativeMapRef } from "./use-native-map-ref.js";
 
 const firstOrnaments = {
   compassPosition: { top: 64, right: 8 },
@@ -63,7 +54,7 @@ const data = (id: number) => ({
   geometry: { type: "Point" as const, coordinates: [-122.34, 47.61] },
 });
 interface FocusProps {
-  readonly adapter: Adapter;
+  readonly components: NativeSceneComponents;
 }
 interface Counts {
   [name: string]: number;
@@ -106,7 +97,8 @@ const Child = ({
   );
 };
 /** Additional actual-renderer TF07 cases, separate from the canonical fixture. */
-export const NativeTf07FocusedScreen = ({ adapter }: FocusProps) => {
+export const NativeTf07FocusedScreen = ({ components }: FocusProps) => {
+  const { Map: NativeMap, Source, Layer, Marker, UserLocation } = components;
   const windowMetrics = useWindowDimensions();
   const { width, height } = windowMetrics;
   const firstHost = useRef<View>(null);
@@ -124,8 +116,8 @@ export const NativeTf07FocusedScreen = ({ adapter }: FocusProps) => {
     };
   }, []);
   const landscape = width > height;
-  const first = useRef<MapRef>(null);
-  const second = useRef<MapRef>(null);
+  const [first, attachFirst] = useNativeMapRef();
+  const [second, attachSecond] = useNativeMapRef();
   const annotation = useRef<MarkerRef>(null);
   const counts = useRef<Counts>({});
   const [status, setStatus] = useState("Focused waiting");
@@ -211,231 +203,224 @@ export const NativeTf07FocusedScreen = ({ adapter }: FocusProps) => {
   };
   return (
     <Theme.Provider value={theme}>
-      <MapSetup adapter={adapter}>
-        <SafeAreaView
-          style={{
-            flex: 1,
-            paddingTop:
-              Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) : 0,
-          }}
-        >
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            {/* eslint-disable react/refs -- This list stores press handlers; map refs are read only when a button is pressed. */}
-            {(
+      <SafeAreaView
+        style={{
+          flex: 1,
+          paddingTop:
+            Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) : 0,
+        }}
+      >
+        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          {/* eslint-disable react/refs -- This list stores press handlers; map refs are read only when a button is pressed. */}
+          {(
+            [
               [
-                [
-                  "Read focus",
-                  () => void read().catch(() => record("read-error")),
-                ],
-                [
-                  "Finish focus",
-                  () => void read(true).catch(() => record("read-error")),
-                ],
-                ["Theme", () => setTheme("updated")],
-                ["Delay", () => setMode("delay")],
-                ["Drop locate", () => setLocate(false)],
-                ["Restore locate", () => setLocate(true)],
-                ["Resolve", () => release.current?.()],
-                [
-                  "Image",
-                  () => {
-                    clearTimeout(imageTimer.current);
-                    imageTimer.current = setTimeout(
-                      () => setShowImage(true),
-                      200
-                    );
-                  },
-                ],
-                ["Resize", () => setShort((value) => !value)],
-              ] as const
-            ).map(([title, onPress]) => (
-              <View
-                key={title}
-                style={{
-                  width: landscape ? "20%" : "33.333333%",
-                  height: 36,
-                  justifyContent: "center",
-                }}
-              >
-                <Button title={title} onPress={onPress} />
-              </View>
-            ))}
-            {/* eslint-enable react/refs */}
-          </View>
-          <Text style={{ height: 48 }} numberOfLines={2}>
-            {status}; provider {mode}; theme {theme}
-          </Text>
-          <Text
-            testID="tf07-focus-readback"
-            style={{ height: 48 }}
-            numberOfLines={2}
-          >
-            {readback}
-          </Text>
-          <View
-            style={{ flex: 1, flexDirection: landscape ? "row" : "column" }}
-          >
-            <View
-              ref={firstHost}
-              collapsable={false}
-              style={{ flex: landscape || short ? 1 : 2 }}
-            >
-              <OneMap
-                ref={first}
-                {...{ options: firstOrnaments }}
-                mapStyle={style}
-                initialViewState={{
-                  longitude: -122.34,
-                  latitude: 47.61,
-                  zoom: 11,
-                  bearing: 0,
-                  pitch: 0,
-                }}
-                style={{ flex: 1 }}
-                interactiveLayerIds={["focus-low", "focus-high"]}
-                onLoad={() => {
-                  record("a-load");
-                  void first.current?.jumpTo({
-                    center: [-122.34, 47.61],
-                    zoom: 11,
-                  });
-                }}
-                onClick={(event) => {
-                  const id = String(
-                    (
-                      event.features?.[0] as
-                        | { id?: string | number }
-                        | undefined
-                    )?.id
+                "Read focus",
+                () => void read().catch(() => record("read-error")),
+              ],
+              [
+                "Finish focus",
+                () => void read(true).catch(() => record("read-error")),
+              ],
+              ["Theme", () => setTheme("updated")],
+              ["Delay", () => setMode("delay")],
+              ["Drop locate", () => setLocate(false)],
+              ["Restore locate", () => setLocate(true)],
+              ["Resolve", () => release.current?.()],
+              [
+                "Image",
+                () => {
+                  clearTimeout(imageTimer.current);
+                  imageTimer.current = setTimeout(
+                    () => setShowImage(true),
+                    200
                   );
-                  if (id === "708") record("high-click");
-                  if (id === "707") record("low-click");
-                  record("a-map-click");
-                }}
-                onError={() => record("a-error")}
-              >
-                {locate && (
-                  <UserLocation position={displayPosition} showAccuracyCircle />
-                )}
-                <Source id="focus-low-source" type="geojson" data={data(707)}>
-                  <Layer
-                    id="focus-low"
-                    type="circle"
-                    paint={{ "circle-color": "#16a34a", "circle-radius": 20 }}
-                  />
-                </Source>
-                <Source id="focus-high-source" type="geojson" data={data(708)}>
-                  <Layer
-                    id="focus-high"
-                    type="circle"
-                    paint={{ "circle-color": "#dc2626", "circle-radius": 12 }}
-                  />
-                </Source>
-                <Marker
-                  ref={annotation}
-                  id="focus-image"
-                  longitude={-122.35}
-                  latitude={47.59}
-                  renderMode="annotation"
-                >
-                  <View style={{ padding: 8, backgroundColor: "white" }}>
-                    <Text>{showImage ? "Image ready" : "Waiting image"}</Text>
-                    {showImage && (
-                      <Image
-                        source={{ uri: image }}
-                        style={{
-                          width: 40,
-                          height: 40,
-                          backgroundColor: "blue",
-                        }}
-                        onError={() => record("image-error")}
-                        onLoad={() => {
-                          record("image-load");
-                          void annotation.current?.refresh().then(
-                            () => record("image-refresh"),
-                            () => record("image-error")
-                          );
-                        }}
-                      />
-                    )}
-                  </View>
-                </Marker>
-              </OneMap>
-              <View style={{ position: "absolute", bottom: 40, right: 8 }}>
-                <Child name="Map A" mapRef={first} record={record} />
-              </View>
+                },
+              ],
+              ["Resize", () => setShort((value) => !value)],
+            ] as const
+          ).map(([title, onPress]) => (
+            <View
+              key={title}
+              style={{
+                width: landscape ? "20%" : "33.333333%",
+                height: 36,
+                justifyContent: "center",
+              }}
+            >
+              <Button title={title} onPress={onPress} />
+            </View>
+          ))}
+          {/* eslint-enable react/refs */}
+        </View>
+        <Text style={{ height: 48 }} numberOfLines={2}>
+          {status}; provider {mode}; theme {theme}
+        </Text>
+        <Text
+          testID="tf07-focus-readback"
+          style={{ height: 48 }}
+          numberOfLines={2}
+        >
+          {readback}
+        </Text>
+        <View style={{ flex: 1, flexDirection: landscape ? "row" : "column" }}>
+          <View
+            ref={firstHost}
+            collapsable={false}
+            style={{ flex: landscape || short ? 1 : 2 }}
+          >
+            <NativeMap
+              ref={attachFirst}
+              {...{ options: firstOrnaments }}
+              mapStyle={style}
+              initialViewState={{
+                longitude: -122.34,
+                latitude: 47.61,
+                zoom: 11,
+                bearing: 0,
+                pitch: 0,
+              }}
+              style={{ flex: 1 }}
+              interactiveLayerIds={["focus-low", "focus-high"]}
+              onLoad={() => {
+                record("a-load");
+                void first.current?.jumpTo({
+                  center: [-122.34, 47.61],
+                  zoom: 11,
+                });
+              }}
+              onClick={(event) => {
+                const id = String(
+                  (event.features?.[0] as { id?: string | number } | undefined)
+                    ?.id
+                );
+                if (id === "708") record("high-click");
+                if (id === "707") record("low-click");
+                record("a-map-click");
+              }}
+              onError={() => record("a-error")}
+            >
               {locate && (
-                <NativeLocationButton
-                  key={mode}
-                  mapRef={first}
-                  corner="right"
-                  getCurrentPosition={position}
-                  onError={() => record("provider-error")}
-                  onGeolocate={(position) => {
-                    setDisplayPosition(position);
-                    record("provider-location");
-                  }}
-                />
+                <UserLocation position={displayPosition} showAccuracyCircle />
               )}
-            </View>
-            <View ref={secondHost} collapsable={false} style={{ flex: 1 }}>
-              <OneMap
-                ref={second}
-                {...{ options: secondOrnaments }}
-                mapStyle={style}
-                initialViewState={{
-                  longitude: -122.34,
-                  latitude: 47.61,
-                  zoom: 12,
-                  bearing: 0,
-                  pitch: 0,
-                }}
-                minZoom={12}
-                maxZoom={13}
-                style={{ flex: 1 }}
-                interactiveLayerIds={["focus-vector"]}
-                onLoad={() => {
-                  record("b-load");
-                  void second.current?.jumpTo({
-                    center: [-122.34, 47.61],
-                    zoom: 12,
-                  });
-                }}
-                onClick={(event) => {
-                  if (event.features?.length) record("vector-click");
-                  record("b-map-click");
-                }}
-                onError={() => record("b-error")}
+              <Source id="focus-low-source" type="geojson" data={data(707)}>
+                <Layer
+                  id="focus-low"
+                  type="circle"
+                  paint={{ "circle-color": "#16a34a", "circle-radius": 20 }}
+                />
+              </Source>
+              <Source id="focus-high-source" type="geojson" data={data(708)}>
+                <Layer
+                  id="focus-high"
+                  type="circle"
+                  paint={{ "circle-color": "#dc2626", "circle-radius": 12 }}
+                />
+              </Source>
+              <Marker
+                ref={annotation}
+                id="focus-image"
+                longitude={-122.35}
+                latitude={47.59}
+                renderMode="annotation"
               >
-                <Source
-                  id="focus-vector-source"
-                  type="vector"
-                  tiles={[`${tf06Base}/vt/0/{z}/{x}/{y}.pbf`]}
-                  minzoom={11}
-                  maxzoom={11}
-                >
-                  <Layer
-                    id="focus-vector"
-                    type="line"
-                    source-layer="routes"
-                    paint={{ "line-color": "#f97316", "line-width": 16 }}
-                  />
-                </Source>
-              </OneMap>
-              <View style={{ position: "absolute", bottom: 40, right: 8 }}>
-                <Child name="Map B" mapRef={second} record={record} />
-              </View>
-              <NativeCameraButtons
-                mapRef={second}
-                minZoom={12}
-                maxZoom={13}
-                showNorth={false}
-                onError={() => record("b-error")}
-              />
+                <View style={{ padding: 8, backgroundColor: "white" }}>
+                  <Text>{showImage ? "Image ready" : "Waiting image"}</Text>
+                  {showImage && (
+                    <Image
+                      source={{ uri: image }}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        backgroundColor: "blue",
+                      }}
+                      onError={() => record("image-error")}
+                      onLoad={() => {
+                        record("image-load");
+                        void annotation.current?.refresh().then(
+                          () => record("image-refresh"),
+                          () => record("image-error")
+                        );
+                      }}
+                    />
+                  )}
+                </View>
+              </Marker>
+            </NativeMap>
+            <View style={{ position: "absolute", bottom: 40, right: 8 }}>
+              <Child name="Map A" mapRef={first} record={record} />
             </View>
+            {locate && (
+              <NativeLocationButton
+                key={mode}
+                mapRef={first}
+                corner="right"
+                getCurrentPosition={position}
+                onError={() => record("provider-error")}
+                onGeolocate={(position) => {
+                  setDisplayPosition(position);
+                  record("provider-location");
+                }}
+              />
+            )}
           </View>
-        </SafeAreaView>
-      </MapSetup>
+          <View ref={secondHost} collapsable={false} style={{ flex: 1 }}>
+            <NativeMap
+              ref={attachSecond}
+              {...{ options: secondOrnaments }}
+              mapStyle={style}
+              initialViewState={{
+                longitude: -122.34,
+                latitude: 47.61,
+                zoom: 12,
+                bearing: 0,
+                pitch: 0,
+              }}
+              minZoom={12}
+              maxZoom={13}
+              style={{ flex: 1 }}
+              interactiveLayerIds={["focus-vector"]}
+              onLoad={() => {
+                record("b-load");
+                void second.current?.jumpTo({
+                  center: [-122.34, 47.61],
+                  zoom: 12,
+                });
+              }}
+              onClick={(event) => {
+                if (event.features?.length) record("vector-click");
+                record("b-map-click");
+              }}
+              onError={() => record("b-error")}
+            >
+              <Source
+                id="focus-vector-source"
+                type="vector"
+                tiles={[`${tf06Base}/vt/0/{z}/{x}/{y}.pbf`]}
+                minzoom={11}
+                maxzoom={11}
+              >
+                <Layer
+                  id="focus-vector"
+                  type="line"
+                  source-layer="routes"
+                  paint={{ "line-color": "#f97316", "line-width": 16 }}
+                />
+              </Source>
+            </NativeMap>
+            <View style={{ position: "absolute", bottom: 40, right: 8 }}>
+              <Child name="Map B" mapRef={second} record={record} />
+            </View>
+            <NativeCameraButtons
+              mapRef={second}
+              minZoom={12}
+              maxZoom={13}
+              showNorth={false}
+              onError={() => record("b-error")}
+            />
+          </View>
+        </View>
+      </SafeAreaView>
     </Theme.Provider>
   );
 };

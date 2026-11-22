@@ -3,30 +3,10 @@ import type {
   LayerSpecification,
 } from "@maplibre/maplibre-gl-style-spec";
 
-/** Style expression accepted by the legacy facade filter API. */
-export type Expression = readonly unknown[];
-
 /** Style-spec filter expression selecting the features a layer draws. */
 export type FilterExpression = readonly unknown[];
 
-/** A paint or layout value that may be supplied as an expression. */
-export type StyleValue<Value> = Value | Expression;
-
-export type Visibility = "visible" | "none";
-export type AlignmentMap = "map" | "viewport";
-export type AlignmentAuto = "auto" | AlignmentMap;
-export type Overlap = "never" | "always" | "cooperative";
-export type SymbolAnchor =
-  | "center"
-  | "left"
-  | "right"
-  | "top"
-  | "bottom"
-  | "top-left"
-  | "top-right"
-  | "bottom-left"
-  | "bottom-right";
-
+/** Layer families supported by both selected native entries. */
 export type LayerType =
   | "background"
   | "fill"
@@ -35,32 +15,25 @@ export type LayerType =
   | "symbol"
   | "raster"
   | "heatmap"
-  | "fill-extrusion";
+  | "fill-extrusion"
+  | "hillshade";
 
-type RetainedLayer = LayerType | "hillshade";
-type Specification<Type extends RetainedLayer> = Extract<
+type Specification<Type extends LayerType> = Extract<
   LayerSpecification,
   { type: Type }
 >;
 
-// Existing callers can keep readonly expression tuples. Retain the expression
-// discriminants so a typo in an enum or a tuple of constants still fails.
-type ReadonlyValue<
-  Value,
-  Legacy extends boolean,
-> = Value extends ExpressionSpecification
-  ? Legacy extends true
-    ? Expression
-    : readonly [Value[0], ...unknown[]]
+// Keep expression operators so unsupported constant values fail type checking.
+type ReadonlyValue<Value> = Value extends ExpressionSpecification
+  ? readonly [ExpressionSpecification[0], ...unknown[]]
   : Value extends object
-    ? { readonly [Key in keyof Value]: ReadonlyValue<Value[Key], Legacy> }
+    ? { readonly [Key in keyof Value]: ReadonlyValue<Value[Key]> }
     : Value;
 
 type LayerStyle<
-  Type extends RetainedLayer,
+  Type extends LayerType,
   Kind extends "paint" | "layout",
-  Legacy extends boolean = true,
-> = ReadonlyValue<NonNullable<Specification<Type>[Kind]>, Legacy>;
+> = ReadonlyValue<NonNullable<Specification<Type>[Kind]>>;
 
 export type BackgroundPaint = LayerStyle<"background", "paint">;
 export type BackgroundLayout = LayerStyle<"background", "layout">;
@@ -93,13 +66,10 @@ interface LayerBaseProps {
   readonly sourceID?: string;
 }
 
-type LayerFor<
-  Type extends RetainedLayer,
-  Legacy extends boolean = true,
-> = LayerBaseProps & {
+type LayerFor<Type extends LayerType> = LayerBaseProps & {
   readonly type: Type;
-  readonly paint?: LayerStyle<Type, "paint", Legacy>;
-  readonly layout?: LayerStyle<Type, "layout", Legacy>;
+  readonly paint?: LayerStyle<Type, "paint">;
+  readonly layout?: LayerStyle<Type, "layout">;
 } & (Type extends "background"
     ? object
     : {
@@ -120,10 +90,5 @@ export type HillshadeLayerProps = LayerFor<"hillshade">;
 
 /** Family-specific style properties from the pinned style specification. */
 export type LayerProps = {
-  [Type in RetainedLayer]: LayerFor<Type>;
-}[RetainedLayer];
-
-/** Desktop-style native layer props keep recognized expression operators. */
-export type NativePortableLayerProps = {
-  [Type in RetainedLayer]: LayerFor<Type, false>;
-}[RetainedLayer];
+  [Type in LayerType]: LayerFor<Type>;
+}[LayerType];

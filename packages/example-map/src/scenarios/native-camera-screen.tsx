@@ -1,13 +1,12 @@
-import type { Adapter } from "one-map-react";
-import { type MapRef, MapSetup } from "one-map-react/legacy";
-import { useRef } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
 import { useCameraSmoke } from "./camera-smoke.js";
 import { RouteMap } from "./route-map.js";
+import type { NativeSceneComponents } from "./scene-components.js";
+import { useNativeMapRef } from "./use-native-map-ref.js";
 
 interface NativeCameraScreenProps {
-  readonly adapter: Adapter;
+  readonly components: NativeSceneComponents;
   readonly doubleTap: boolean;
 }
 
@@ -18,10 +17,10 @@ interface NativeCameraScreenProps {
  * waiting, and double-taps when `doubletap` is waiting.
  */
 export const NativeCameraScreen = ({
-  adapter,
+  components,
   doubleTap,
 }: NativeCameraScreenProps) => {
-  const mapRef = useRef<MapRef>(null);
+  const [mapRef, attachMap] = useNativeMapRef();
   const smoke = useCameraSmoke({
     mapRef,
     platform: "native",
@@ -30,22 +29,21 @@ export const NativeCameraScreen = ({
   });
 
   return (
-    <MapSetup adapter={adapter}>
-      <View style={styles.screen}>
-        <Text testID="tf04-status">{smoke.status}</Text>
-        <RouteMap
-          ref={mapRef}
-          style={{ flex: 1 }}
-          viewState={smoke.viewState}
-          touchZoom={smoke.touchZoom}
-          doubleTapZoom={smoke.doubleTapZoom}
-          onLoad={smoke.onLoad}
-          onMove={smoke.onMove}
-          onMoveEnd={smoke.onMoveEnd}
-          onClick={smoke.onClick}
-        />
-      </View>
-    </MapSetup>
+    <View style={styles.screen}>
+      <Text testID="tf04-status">{smoke.status}</Text>
+      <RouteMap
+        components={components}
+        ref={attachMap}
+        style={{ flex: 1 }}
+        viewState={smoke.viewState}
+        touchZoom={smoke.touchZoom}
+        doubleTapZoom={smoke.doubleTapZoom}
+        onLoad={smoke.onLoad}
+        onMove={smoke.onMove}
+        onMoveEnd={smoke.onMoveEnd}
+        onClick={smoke.onClick}
+      />
+    </View>
   );
 };
 

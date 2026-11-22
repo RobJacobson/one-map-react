@@ -5,6 +5,8 @@ import { join } from "node:path";
 export const checkNativeLoad = (consumer, entry, peer, run) => {
   // RNMapbox's index re-exports ./Mapbox, which Metro resolves to Mapbox.native.js.
   const sdkFile = entry === "mapbox-native" ? "Mapbox.native.js" : "index.js";
+  const offlineManager =
+    entry === "mapbox-native" ? "offlineManager" : "OfflineManager";
   const sdkEntry = join(consumer, "node_modules", peer, "lib/module", sdkFile);
   const symbols = JSON.parse(
     run(
@@ -50,13 +52,21 @@ registerHooks({
 });
 const concrete = await import("one-map-react/${entry}");
 const alias = await import("one-map-react/${entry.replace("-native", "")}");
-assert.equal(concrete.adapter.backend, ${JSON.stringify(entry)});
+const sdk = await import("${peer}");
 assert.equal(concrete, alias);
 assert.equal(concrete.default, concrete.Map);
-for (const symbol of ["Map", "Source", "Layer", "Marker", "useMap"]) {
+for (const symbol of ["Map", "Source", "Layer", "Marker"]) {
   assert.ok(concrete[symbol], "Missing native export " + symbol);
 }
+assert.equal(typeof concrete.useMap, "function");
 assert.equal(typeof concrete.MapProvider, "function");
+for (const symbol of ["adapter", "MapSetup"]) {
+  assert(!Object.hasOwn(concrete, symbol), "Retired native export " + symbol);
+}
+for (const [name, sdkName] of [["WrapperCamera", "Camera"], ["WrapperImages", "Images"], ["WrapperOfflineManager", ${JSON.stringify(offlineManager)}]]) {
+  assert.ok(sdk[sdkName], "Missing SDK export " + sdkName);
+  assert.equal(concrete[name], sdk[sdkName], name);
+}
 `
   );
   run("node", ["--conditions=react-native", file], consumer);

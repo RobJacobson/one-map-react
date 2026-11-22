@@ -1,4 +1,3 @@
-import { type Adapter, MapSetup, Marker } from "one-map-react/legacy";
 import {
   type ReactNode,
   useCallback,
@@ -17,7 +16,7 @@ import {
 } from "react-native";
 
 import { NativeLocationButton } from "./native-location-button.js";
-import { nativeSceneComponents } from "./native-scene-components.js";
+import type { NativeSceneComponents } from "./scene-components.js";
 import {
   type Tf08AcceptanceProbe,
   Tf08AcceptanceScene,
@@ -36,7 +35,7 @@ export interface Tf08OfflineCommands {
 
 /** Native TF08 shell; the runner sends application actions over local HTTP. */
 export const NativeTf08Screen = ({
-  adapter,
+  components,
   getLocationDiagnostic,
   requestLocationPermission,
   getCurrentPosition,
@@ -47,7 +46,7 @@ export const NativeTf08Screen = ({
   startDetached = false,
   nativePuck,
 }: {
-  readonly adapter: Adapter;
+  readonly components: NativeSceneComponents;
   readonly requestLocationPermission: (
     signal?: AbortSignal
   ) => Promise<unknown>;
@@ -67,6 +66,7 @@ export const NativeTf08Screen = ({
   readonly startDetached?: boolean;
   readonly nativePuck?: ReactNode;
 }) => {
+  const { backend } = components;
   const offlineCommands = useRef<Tf08OfflineCommands | undefined>(undefined);
   useEffect(() => {
     const commands = createOfflineCommands?.();
@@ -119,7 +119,7 @@ export const NativeTf08Screen = ({
           action: string;
           value?: Record<string, unknown>;
         };
-        const environment = `${adapter.backend.replace("-native", "")}-${Platform.OS}`;
+        const environment = `${backend.replace("-native", "")}-${Platform.OS}`;
         if (
           !active ||
           !request.id ||
@@ -220,7 +220,7 @@ export const NativeTf08Screen = ({
       clearInterval(timer);
     };
   }, [
-    adapter.backend,
+    backend,
     getLocationDiagnostic,
     setNetworkConnected,
     offlineOperations,
@@ -228,32 +228,32 @@ export const NativeTf08Screen = ({
     readDevice,
   ]);
   return (
-    <MapSetup adapter={adapter}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Text testID="tf08-status">{status}</Text>
-        <View ref={mapHost} collapsable={false} style={{ flex: 1 }}>
-          {sceneMounted && (
-            <Tf08AcceptanceScene
-              components={nativeSceneComponents}
-              renderLocation={NativeLocationButton}
-              renderCoveragePopup={renderCoveragePopup}
-              backend={adapter.backend}
-              requestLocationPermission={requestLocationPermission}
-              getCurrentPosition={getCurrentPosition}
-              style={{ flex: 1 }}
-              attach={attach}
-              fixtureUrl="http://127.0.0.1:8798"
-              nativePuck={nativePuck}
-              overlay={
-                <View
-                  style={{ width: 40, height: 40, backgroundColor: "#00ff00" }}
-                />
-              }
-            />
-          )}
-        </View>
-      </SafeAreaView>
-    </MapSetup>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Text testID="tf08-status">{status}</Text>
+      <View ref={mapHost} collapsable={false} style={{ flex: 1 }}>
+        {sceneMounted && (
+          <Tf08AcceptanceScene
+            components={components}
+            renderLocation={NativeLocationButton}
+            renderCoveragePopup={(children) =>
+              renderCoveragePopup(components.Marker, children)
+            }
+            backend={backend}
+            requestLocationPermission={requestLocationPermission}
+            getCurrentPosition={getCurrentPosition}
+            style={{ flex: 1 }}
+            attach={attach}
+            fixtureUrl="http://127.0.0.1:8798"
+            nativePuck={nativePuck}
+            overlay={
+              <View
+                style={{ width: 40, height: 40, backgroundColor: "#00ff00" }}
+              />
+            }
+          />
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -288,7 +288,10 @@ const runOfflineOperation = async (
   }
 };
 
-const renderCoveragePopup = (children: ReactNode): ReactNode => (
+const renderCoveragePopup = (
+  Marker: NativeSceneComponents["Marker"],
+  children: ReactNode
+): ReactNode => (
   <Marker longitude={-122.35} latitude={47.61} anchor="bottom">
     <View
       style={{

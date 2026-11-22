@@ -1,22 +1,5 @@
 import type { SourceProps } from "../contracts/source-types.js";
-import { useSelectedAdapter } from "./map-setup.js";
 import { useStableOptions } from "./use-stable-options.js";
-
-/**
- * Shared source that renders the selected adapter's source component.
- *
- * Source creation inputs are stable for the component's lifetime; changing
- * one throws and requires remounting with a new React `key`.
- *
- * @param props - Source family, id, options, and nested layers.
- */
-export const Source = (props: SourceProps) => {
-  const { Source: AdapterSource } = useSelectedAdapter();
-
-  useSourceOptions(props);
-
-  return <AdapterSource {...props} />;
-};
 
 /**
  * Enforces the stable creation inputs for a mounted source.
@@ -39,8 +22,7 @@ export const useSourceOptions = (props: SourceProps): void => {
  * @returns Options passed to {@link useStableOptions}.
  */
 const sourceCreationOptions = (props: SourceProps): Record<string, unknown> => {
-  const { children: _children, ...options } = props;
-  const rest = { ...options };
+  const { children: _children, ...rest } = props;
 
   if (rest.type === "geojson") {
     const { data: _data, ...creation } = rest;

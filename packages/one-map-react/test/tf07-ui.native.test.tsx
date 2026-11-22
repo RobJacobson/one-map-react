@@ -37,7 +37,6 @@ import {
   createNativeUI,
   type NativeMarkerHostProps,
 } from "../src/adapters/shared/native-ui.js";
-import type { Adapter } from "../src/contracts/adapter.js";
 import type {
   MapRef,
   Point,
@@ -45,13 +44,13 @@ import type {
 } from "../src/contracts/camera-types.js";
 import type { MoveEvent } from "../src/contracts/event-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
+import type { NativeMapInputs } from "../src/contracts/native-types.js";
 import type { MarkerRef } from "../src/contracts/ui-types.js";
 import {
   type MapSession,
   MapSessionContext,
 } from "../src/facade/map-context.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import { Marker as SharedMarker } from "../src/facade/ui.js";
+import { createNativeMapBinding } from "../src/facade/native-map.js";
 
 type FixtureSession = MapSession &
   NativeMapPresentation & { readonly viewState: ViewState | null };
@@ -158,6 +157,18 @@ const ui = createNativeUI({
   backend: "mapbox-native",
 });
 
+const MarkerMap = forwardRef<MapRef, NativeMapInputs>(({ children }, _ref) => (
+  <>{children}</>
+));
+const components = {
+  backend: "mapbox-native" as const,
+  Source: () => null,
+  Layer: () => null,
+  Images: () => null,
+  ...ui,
+};
+const { Marker: BoundMarker } = createNativeMapBinding(MarkerMap, components);
+
 const sessionFixture = () => {
   const project = jest.fn(async (): Promise<Point> => [100, 200]);
   const unproject = jest.fn(
@@ -174,6 +185,7 @@ const sessionFixture = () => {
       ref: { current: map },
       map,
       ready: true,
+      components,
       viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
       overlayHostName: "fixture-control-host",
       setNativeLayout: jest.fn(),
@@ -1061,33 +1073,17 @@ describe("TF07 native UI composition", () => {
   });
 });
 
-const creationAdapter = {
-  backend: "mapbox-native",
-  ...ui,
-} as unknown as Adapter;
-const CreationSessionProvider = ({
-  value,
-  children,
-}: {
-  readonly value: FixtureSession;
-  readonly children: ReactNode;
-}) => (
-  <MapSetup adapter={creationAdapter}>
-    <FixtureSessionProvider value={value}>{children}</FixtureSessionProvider>
-  </MapSetup>
-);
-
 test("native creation defaults compare by their effective values", async () => {
   const fixture = sessionFixture();
   const tree = (explicit: boolean) => (
-    <CreationSessionProvider value={fixture.session}>
-      <SharedMarker
+    <FixtureSessionProvider value={fixture.session}>
+      <BoundMarker
         longitude={10}
         latitude={20}
         anchor={explicit ? "bottom" : undefined}
         renderMode={explicit ? "view" : undefined}
       />
-    </CreationSessionProvider>
+    </FixtureSessionProvider>
   );
   const mounted = await render(tree(false));
   await mounted.rerender(tree(true));
@@ -1100,11 +1096,11 @@ test.each([false, true])(
   async (custom) => {
     const fixture = sessionFixture();
     const tree = (anchor?: "top") => (
-      <CreationSessionProvider value={fixture.session}>
-        <SharedMarker longitude={10} latitude={20} anchor={anchor}>
+      <FixtureSessionProvider value={fixture.session}>
+        <BoundMarker longitude={10} latitude={20} anchor={anchor}>
           {custom ? <Text>custom</Text> : undefined}
-        </SharedMarker>
-      </CreationSessionProvider>
+        </BoundMarker>
+      </FixtureSessionProvider>
     );
     const mounted = await render(tree("top"));
     await expect(mounted.rerender(tree())).rejects.toThrow(
@@ -1116,11 +1112,11 @@ test.each([false, true])(
 test("native marker defaults stay frozen when content changes", async () => {
   const fixture = sessionFixture();
   const tree = (custom: boolean, anchor?: "bottom" | "center") => (
-    <CreationSessionProvider value={fixture.session}>
-      <SharedMarker longitude={10} latitude={20} anchor={anchor}>
+    <FixtureSessionProvider value={fixture.session}>
+      <BoundMarker longitude={10} latitude={20} anchor={anchor}>
         {custom ? <Text>custom</Text> : undefined}
-      </SharedMarker>
-    </CreationSessionProvider>
+      </BoundMarker>
+    </FixtureSessionProvider>
   );
   const mounted = await render(tree(false));
   await mounted.rerender(tree(true));
@@ -1136,15 +1132,15 @@ test.each([false, true])(
   async (custom) => {
     const fixture = sessionFixture();
     const tree = (explicit: boolean) => (
-      <CreationSessionProvider value={fixture.session}>
-        <SharedMarker
+      <FixtureSessionProvider value={fixture.session}>
+        <BoundMarker
           longitude={10}
           latitude={20}
           anchor={explicit ? (custom ? "center" : "bottom") : undefined}
         >
           {custom ? <Text>custom</Text> : undefined}
-        </SharedMarker>
-      </CreationSessionProvider>
+        </BoundMarker>
+      </FixtureSessionProvider>
     );
     const mounted = await render(tree(true));
     await mounted.rerender(tree(false));

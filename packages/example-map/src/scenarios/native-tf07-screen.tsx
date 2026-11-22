@@ -1,5 +1,5 @@
-import { type Adapter, MapSetup, Marker } from "one-map-react/legacy";
 import {
+  type ComponentProps,
   type ReactNode,
   useCallback,
   useEffect,
@@ -22,8 +22,8 @@ import {
 import { NativeCameraButtons } from "./native-camera-buttons.js";
 import { NativeLocationButton } from "./native-location-button.js";
 import { NativePopupBubble } from "./native-popup-bubble.js";
-import { nativeSceneComponents } from "./native-scene-components.js";
 import { measureNativeViewport } from "./native-viewport.js";
+import type { NativeSceneComponents } from "./scene-components.js";
 import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
 
 /**
@@ -33,11 +33,13 @@ import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
  * inspect actual camera/features. A status label alone is not a pass.
  */
 export const NativeTf07Screen = ({
-  adapter,
+  components,
   ornaments,
 }: {
-  readonly adapter: Adapter;
-  readonly ornaments: object;
+  readonly components: NativeSceneComponents;
+  readonly ornaments: NonNullable<
+    ComponentProps<NativeSceneComponents["Map"]>["options"]
+  >;
 }) => {
   const mapHost = useRef<View>(null);
   const windowMetrics = useWindowDimensions();
@@ -97,93 +99,91 @@ export const NativeTf07Screen = ({
   };
 
   return (
-    <MapSetup adapter={adapter}>
-      <SafeAreaView
-        style={[
-          styles.screen,
-          Platform.OS === "android" && {
-            paddingTop: StatusBar.currentHeight ?? 0,
-          },
-        ]}
-      >
-        <ScrollView horizontal style={styles.toolbar}>
-          {(["remount", "style", "offset", "popup"] as const).map(
-            (action: Tf07Action) => (
-              <Button
-                key={action}
-                title={action}
-                onPress={() => probeRef.current?.configure(action)}
-              />
-            )
+    <SafeAreaView
+      style={[
+        styles.screen,
+        Platform.OS === "android" && {
+          paddingTop: StatusBar.currentHeight ?? 0,
+        },
+      ]}
+    >
+      <ScrollView horizontal style={styles.toolbar}>
+        {(["remount", "style", "offset", "popup"] as const).map(
+          (action: Tf07Action) => (
+            <Button
+              key={action}
+              title={action}
+              onPress={() => probeRef.current?.configure(action)}
+            />
+          )
+        )}
+        <Button title="Read renderer" onPress={read} />
+      </ScrollView>
+      <Text testID="tf07-status" style={styles.status} numberOfLines={2}>
+        {status}
+      </Text>
+      <Text testID="tf07-readback" style={styles.readback} numberOfLines={3}>
+        {readback}
+      </Text>
+      <Text>Custom control</Text>
+      <View ref={mapHost} collapsable={false} style={{ flex: 1 }}>
+        <Tf07Scene
+          components={components}
+          renderLocation={NativeLocationButton}
+          renderNavigation={NativeCameraButtons}
+          nativeOrnaments={ornaments}
+          renderPopup={(...args) => renderPopup(components.Marker, ...args)}
+          style={{ flex: 1 }}
+          attach={attach}
+          report={(event) => setStatus(`TF07 ${event}`)}
+          markerContent={(kind, activate) => (
+            <View
+              testID={`tf07-${kind}`}
+              style={styles.content}
+              onTouchStart={(event) => {
+                recordTouch(kind, "start");
+                hostTouches.current[`${kind}-max-touches`] = Math.max(
+                  hostTouches.current[`${kind}-max-touches`] ?? 0,
+                  event.nativeEvent.touches.length
+                );
+              }}
+              onTouchEnd={() => recordTouch(kind, "end")}
+              onTouchCancel={() => recordTouch(kind, "cancel")}
+            >
+              <Text>{kind === "live" ? "Live marker" : kind}</Text>
+              {kind !== "annotation" && (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`${kind} child button`}
+                  onPress={(event) => {
+                    event.stopPropagation();
+                    activate();
+                  }}
+                >
+                  <Text>Child button</Text>
+                </Pressable>
+              )}
+              {kind === "live" && (
+                <ScrollView
+                  style={styles.scroll}
+                  nestedScrollEnabled
+                  scrollEventThrottle={16}
+                  onScroll={(event) => {
+                    hostTouches.current["live-scroll-y"] =
+                      event.nativeEvent.contentOffset.y;
+                  }}
+                >
+                  <Text>Scroll one</Text>
+                  <Text>Scroll two</Text>
+                  <Text>Scroll three</Text>
+                  <Text>Scroll four</Text>
+                </ScrollView>
+              )}
+            </View>
           )}
-          <Button title="Read renderer" onPress={read} />
-        </ScrollView>
-        <Text testID="tf07-status" style={styles.status} numberOfLines={2}>
-          {status}
-        </Text>
-        <Text testID="tf07-readback" style={styles.readback} numberOfLines={3}>
-          {readback}
-        </Text>
-        <Text>Custom control</Text>
-        <View ref={mapHost} collapsable={false} style={{ flex: 1 }}>
-          <Tf07Scene
-            components={nativeSceneComponents}
-            renderLocation={NativeLocationButton}
-            renderNavigation={NativeCameraButtons}
-            nativeOrnaments={ornaments}
-            renderPopup={renderPopup}
-            style={{ flex: 1 }}
-            attach={attach}
-            report={(event) => setStatus(`TF07 ${event}`)}
-            markerContent={(kind, activate) => (
-              <View
-                testID={`tf07-${kind}`}
-                style={styles.content}
-                onTouchStart={(event) => {
-                  recordTouch(kind, "start");
-                  hostTouches.current[`${kind}-max-touches`] = Math.max(
-                    hostTouches.current[`${kind}-max-touches`] ?? 0,
-                    event.nativeEvent.touches.length
-                  );
-                }}
-                onTouchEnd={() => recordTouch(kind, "end")}
-                onTouchCancel={() => recordTouch(kind, "cancel")}
-              >
-                <Text>{kind === "live" ? "Live marker" : kind}</Text>
-                {kind !== "annotation" && (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={`${kind} child button`}
-                    onPress={(event) => {
-                      event.stopPropagation();
-                      activate();
-                    }}
-                  >
-                    <Text>Child button</Text>
-                  </Pressable>
-                )}
-                {kind === "live" && (
-                  <ScrollView
-                    style={styles.scroll}
-                    nestedScrollEnabled
-                    scrollEventThrottle={16}
-                    onScroll={(event) => {
-                      hostTouches.current["live-scroll-y"] =
-                        event.nativeEvent.contentOffset.y;
-                    }}
-                  >
-                    <Text>Scroll one</Text>
-                    <Text>Scroll two</Text>
-                    <Text>Scroll three</Text>
-                    <Text>Scroll four</Text>
-                  </ScrollView>
-                )}
-              </View>
-            )}
-          />
-        </View>
-      </SafeAreaView>
-    </MapSetup>
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
 });
 
 const renderPopup = (
+  Marker: NativeSceneComponents["Marker"],
   children: ReactNode,
   onOpen: () => void,
   onClose: () => void

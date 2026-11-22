@@ -40,6 +40,7 @@ const backends = [
   "react-map-gl",
   "mapbox-gl",
   "maplibre-gl",
+  "react-native",
   "@rnmapbox/maps",
   "@maplibre/maplibre-react-native",
   "react-native-teleport",
@@ -52,6 +53,13 @@ const explicit = [
   "maplibre-native",
 ];
 
+const aliasConditions = [
+  [],
+  ["browser"],
+  ["react-native"],
+  ["browser", "react-native"],
+];
+
 const cases = [
   { name: "common", conditions: [], entries: [] },
   ...explicit.map((backend) => ({
@@ -59,16 +67,14 @@ const cases = [
     conditions: [],
     entries: [[backend, backend]],
   })),
-  ...[[], ["browser"], ["react-native"], ["browser", "react-native"]].map(
-    (conditions) => ({
-      name: `aliases-${conditions.join("-") || "default"}`,
-      conditions,
-      entries: ["mapbox", "maplibre"].map((engine) => [
-        engine,
-        `${engine}-${conditions.includes("react-native") && !conditions.includes("browser") ? "native" : "web"}`,
-      ]),
-    })
-  ),
+  ...aliasConditions.map((conditions) => ({
+    name: `aliases-${conditions.join("-") || "default"}`,
+    conditions,
+    entries: ["mapbox", "maplibre"].map((engine) => [
+      engine,
+      `${engine}-${conditions.includes("react-native") && !conditions.includes("browser") ? "native" : "web"}`,
+    ]),
+  })),
   ...[
     ["mapbox-web", "maplibre-native"],
     ["maplibre-web", "mapbox-native"],
@@ -133,7 +139,13 @@ const main = async () => {
     assert(files.includes("package/LICENSE"));
     assert(files.includes("package/README.md"));
     assert(files.includes("package/dist/index.d.ts"));
-    assert(files.includes("package/dist/index.js"));
+    for (const retired of [
+      "package/dist/index.js",
+      "package/dist/facade/map-setup.js",
+      "package/dist/facade/map-setup.d.ts",
+    ]) {
+      assert(!files.includes(retired), `Retired file is packed: ${retired}`);
+    }
     assert(
       files.includes("package/patches/rnmapbox-10.3.7-per-view-events.patch")
     );
@@ -155,13 +167,13 @@ const main = async () => {
     }
 
     console.log(
-      `PASS ${cases.length} isolated package selections: common runtime, declaration graph, and export paths.`
+      `PASS ${cases.length} isolated package selections: type-only root, native extensions, and selected export paths.`
     );
     console.log(
       `PACKAGE SHA-256: ${createHash("sha256").update(readFileSync(archive)).digest("hex")}`
     );
     console.log(
-      "SCOPE: packed publication, common entry without backend types, and selected-entry file resolution; no wrapper installs, Metro, or native builds."
+      "SCOPE: packed publication, root declarations, native extensions, and selected-entry resolution without backend peers."
     );
   } finally {
     rmSync(output, { recursive: true, force: true });
@@ -227,21 +239,26 @@ const checkConsumer = async (archive, scenario) => {
     walkDeclarations(join(installed, "dist/native-extensions.d.ts"), backends);
     writeFileSync(
       join(consumer, "common.mjs"),
-      `import * as common from "one-map-react";
-import * as legacy from "one-map-react/legacy";
+      `import assert from "node:assert/strict";
+import { createRequire } from "node:module";
 import * as extensions from "one-map-react/native-extensions";
-import assert from "node:assert/strict";
-assert.equal(legacy, common);
+const require = createRequire(import.meta.url);
+for (const specifier of ["one-map-react", "one-map-react/legacy"]) {
+  await assert.rejects(import(specifier), { code: "ERR_PACKAGE_PATH_NOT_EXPORTED" });
+  assert.throws(() => require(specifier), { code: "ERR_PACKAGE_PATH_NOT_EXPORTED" });
+}
 assert.deepEqual(Object.keys(extensions).sort(), ["Images", "UserLocation"]);
 assert.equal(typeof extensions.Images, "function");
 assert.equal(typeof extensions.UserLocation, "function");
-console.log(JSON.stringify(Object.keys(common).sort()));
 `
     );
-    assert.equal(
-      run("node", [join(consumer, "common.mjs")], consumer),
-      JSON.stringify(["Layer", "Map", "MapSetup", "Marker", "Source", "useMap"])
-    );
+    for (const conditions of aliasConditions) {
+      run(
+        "node",
+        [...conditions.map(asNodeCondition), join(consumer, "common.mjs")],
+        consumer
+      );
+    }
   }
 
   for (const [entry, backend] of scenario.entries) {
@@ -259,28 +276,20 @@ console.log(JSON.stringify(Object.keys(common).sort()));
   if (scenario.name === "common") {
     writeFileSync(
       join(consumer, "selection.tsx"),
-      `import type { Adapter, Backend, MapRef } from "one-map-react";
-import { Map as OneMap, MapSetup, Source, Layer, Marker, useMap } from "one-map-react";
-import { forwardRef } from "react";
+      `import type { Backend, Bounds, LayerProps, MapProps, MapRef, ViewState } from "one-map-react";
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
-// @ts-expect-error The root layer declarations must resolve the style spec and reject cross-family properties.
-void <Layer id="bad-line" type="line" paint={{ "circle-radius": 3 }} />;
-void <Layer id="routes" type="line" paint={{ "line-width-transition": { duration: 250 } }} />;
-const exactAdapterKeys: Equal<keyof Adapter, "backend" | "Map" | "Source" | "Layer" | "Images" | "Marker"> = true;
-const exactSetupKeys: Equal<keyof import("one-map-react").MapSetupProps, "adapter" | "children"> = true;
-const customAdapter: Adapter = {
-  backend: "mapbox-native",
-  Map: forwardRef<MapRef, import("one-map-react").MapProps>(() => null),
-  Source: () => null,
-  Layer: () => null,
-  Images: () => null,
-  Marker: forwardRef<import("one-map-react").MarkerRef, import("one-map-react").MarkerProps>(() => null),
-};
-const customSetup: import("one-map-react").MapSetupProps = { adapter: customAdapter, children: null };
-void customSetup; void exactAdapterKeys; void exactSetupKeys;
-
-// @ts-expect-error Legacy setup only binds native adapters.
-const webAdapter: Adapter["backend"] = "mapbox-web";
+const rootHasNoValues: Equal<keyof typeof import("one-map-react"), never> = true;
+void rootHasNoValues;
+// @ts-expect-error Adapter objects are private.
+import type { Adapter } from "one-map-react";
+// @ts-expect-error The setup component and its props are retired.
+import type { MapSetupProps } from "one-map-react";
+// @ts-expect-error The legacy entry no longer resolves.
+import type * as Legacy from "one-map-react/legacy";
+// @ts-expect-error The root layer types reject cross-family properties.
+const badLine: LayerProps = { id: "bad-line", type: "line", paint: { "circle-radius": 3 } };
+const routes: LayerProps = { id: "routes", type: "line", paint: { "line-width-transition": { duration: 250 } } };
+void routes;
 declare const commonRef: MapRef;
 // @ts-expect-error Source click events are removed.
 import type { SourceClickEvent } from "one-map-react";
@@ -292,51 +301,22 @@ type RemovedSourceCallback = import("one-map-react").GeoJsonSourceProps["onClick
 type RemovedVectorCallback = import("one-map-react").VectorSourceProps["onClick"];
 // @ts-expect-error Supplied location is display only.
 type RemovedLocationPress = import("one-map-react/native-extensions").UserLocationProps["onPress"];
-// @ts-expect-error Popups are selected wrapper components or application UI.
-import { Popup } from "one-map-react";
 // @ts-expect-error Common popup props are removed.
 import type { PopupProps } from "one-map-react";
-declare const adapterContract: Adapter;
-// @ts-expect-error Applications own custom control layout.
-import { Control } from "one-map-react";
 // @ts-expect-error Common custom control props are removed.
 import type { ControlProps } from "one-map-react";
 // @ts-expect-error Common placement positions are removed.
 import type { ControlPosition } from "one-map-react";
-// @ts-expect-error Custom adapters no longer supply control composition.
-adapterContract.Control;
-// @ts-expect-error Location controls belong to the application or selected wrapper.
-import { GeolocateControl } from "one-map-react";
 // @ts-expect-error Common location control props are removed.
 import type { GeolocateControlProps } from "one-map-react";
-// @ts-expect-error Custom adapters no longer supply a location control.
-adapterContract.GeolocateControl;
-// @ts-expect-error Scale belongs to the selected SDK.
-import { ScaleControl } from "one-map-react";
-// @ts-expect-error Attribution belongs to the selected SDK.
-import { AttributionControl } from "one-map-react";
 // @ts-expect-error Common scale props, including width and units, are removed.
 import type { ScaleControlProps } from "one-map-react";
 // @ts-expect-error Common attribution props are removed.
 import type { AttributionControlProps } from "one-map-react";
-// @ts-expect-error Custom adapters no longer supply scale composition.
-adapterContract.ScaleControl;
-// @ts-expect-error Custom adapters no longer supply attribution composition.
-adapterContract.AttributionControl;
-// @ts-expect-error Custom adapters no longer supply popup composition.
-adapterContract.Popup;
-// @ts-expect-error Applications own camera and browser controls.
-import { NavigationControl } from "one-map-react";
 // @ts-expect-error The common control props are removed.
 import type { NavigationControlProps } from "one-map-react";
-// @ts-expect-error Custom adapters no longer supply this control.
-adapterContract.NavigationControl;
-// @ts-expect-error Applications own camera and browser controls.
-import { FullscreenControl } from "one-map-react";
 // @ts-expect-error The common control props are removed.
 import type { FullscreenControlProps } from "one-map-react";
-// @ts-expect-error Custom adapters no longer supply this control.
-adapterContract.FullscreenControl;
 // @ts-expect-error Offline packs belong to the selected SDK.
 import type { OfflinePack } from "one-map-react";
 // @ts-expect-error Offline creation options belong to the selected SDK.
@@ -355,14 +335,6 @@ import type { LocationPermission } from "one-map-react";
 import type { LocationOptions } from "one-map-react";
 // @ts-expect-error Common acquisition type is removed.
 import type { LocationAbortSignal } from "one-map-react";
-
-// @ts-expect-error Application acquisition no longer uses a common hook.
-import { useMapServices } from "one-map-react";
-// @ts-expect-error Custom adapters no longer own app services.
-adapterContract.services;
-declare const setupProps: import("one-map-react").MapSetupProps;
-// @ts-expect-error Setup no longer owns app acquisition.
-setupProps.locationProvider;
 // @ts-expect-error Common independent image output is removed.
 import type { ImageOutput } from "one-map-react";
 // @ts-expect-error Common independent image result is removed.
@@ -379,17 +351,9 @@ import type { CaptureOptions } from "one-map-react";
 import type { CaptureScope } from "one-map-react";
 // @ts-expect-error Capture-only results are removed from the common package.
 import type { MapCapture } from "one-map-react";
-// @ts-expect-error Wrapper access belongs only to selected web refs.
+// @ts-expect-error Wrapper access belongs to selected refs.
 commonRef.getWrapperMap();
-// @ts-expect-error Common hooks retain the portable ref contract.
-useMap().getWrapperMap();
-const applicationChoice = (adapter: Adapter): Backend => adapter.backend;
-void Marker; void useMap;
-void MapSetup;
-void Source;
-void Layer;
-void applicationChoice;
-const viewState = {
+const viewState: ViewState = {
   longitude: -122.34,
   latitude: 47.61,
   zoom: 11,
@@ -397,21 +361,16 @@ const viewState = {
   pitch: 0,
 };
 const style = { version: 8 as const, sources: {}, layers: [] };
+const bounds: Bounds = [[-123, 47], [-122, 48]];
+const fitted: Promise<void> = commonRef.fitBounds(bounds, { maxZoom: 10 });
+const backend: Backend = "mapbox-native";
+void fitted; void backend;
 // @ts-expect-error Drawing-buffer configuration is a selected wrapper option.
-void <OneMap mapStyle={style} initialViewState={viewState} captureEnabled />;
-void (
-  <OneMap mapStyle={style} initialViewState={viewState} terrain={{ source: "dem", exaggeration: 0 }} projection="mercator" light={{ intensity: 0 }} />
-);
-void (
-  <OneMap
-    mapStyle={style}
-    initialViewState={viewState}
-    // @ts-expect-error Invalid map props must not type-check.
-    definitelyNotAMapProp
-  />
-);
+type RemovedCommonCapture = MapProps["captureEnabled"];
+const mapProps: MapProps = { mapStyle: style, initialViewState: viewState, terrain: { source: "dem", exaggeration: 0 }, projection: "mercator", light: { intensity: 0 } };
+void mapProps;
 // @ts-expect-error An arbitrary backend must not type-check.
-const invalid: Adapter = { backend: "automatic" };
+const invalid: Backend = "automatic";
 `
     );
   } else {
@@ -457,7 +416,7 @@ const invalid: Adapter = { backend: "automatic" };
     );
   }
 
-  for (const peer of [...backends, "react-dom", "react-native"]) {
+  for (const peer of [...backends, "react-dom"]) {
     assert(
       !existsSync(join(consumer, "node_modules", peer)),
       `Unexpected peer: ${peer}`
@@ -484,9 +443,11 @@ const invalid: Adapter = { backend: "automatic" };
       : null,
     status: "passed",
     scope:
-      "common/root host and peer-free selected declaration resolution only; selected/native peer compatibility is checked by test-peers",
+      "type-only root, native extensions, and peer-free selected declaration resolution; test-peers checks backend compatibility",
   });
   rmSync(consumer, { recursive: true, force: true });
 };
+
+const asNodeCondition = (name) => `--conditions=${name}`;
 
 await main();

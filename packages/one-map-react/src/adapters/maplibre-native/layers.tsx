@@ -1,10 +1,7 @@
 import { Layer as MaplibreLayer } from "@maplibre/maplibre-react-native";
 import type { ComponentProps } from "react";
 
-import type {
-  LayerProps,
-  NativePortableLayerProps,
-} from "../../contracts/layer-types.js";
+import type { LayerProps } from "../../contracts/layer-types.js";
 import { rejectNativeUnsupportedLayout } from "../../facade/layer.js";
 import {
   definedStyle,
@@ -14,7 +11,7 @@ import { assertMaplibreLayerStyle } from "./style-roots.js";
 
 /** Style-spec and SDK-specific options for a MapLibre native Layer. */
 export type NativeLayerProps =
-  | NativePortableLayerProps
+  | LayerProps
   | ComponentProps<typeof MaplibreLayer>;
 
 /**
@@ -24,7 +21,7 @@ export type NativeLayerProps =
  * @returns The selected wrapper's layer.
  * @throws When a known layer field or expression is unsupported.
  */
-export const MaplibreNativeLayer = (props: NativeLayerProps | LayerProps) => {
+export const MaplibreNativeLayer = (props: NativeLayerProps) => {
   assertMaplibreLayerStyle(props);
   rejectNativeUnsupportedLayout(props, "maplibre-native");
 
@@ -35,7 +32,7 @@ export const MaplibreNativeLayer = (props: NativeLayerProps | LayerProps) => {
     paint: paintProps,
     layout: layoutProps,
     ...wrapperProps
-  } = props as (NativeLayerProps | LayerProps) & {
+  } = props as NativeLayerProps & {
     readonly sourceID?: string;
   };
   const filter = "filter" in props ? props.filter : undefined;

@@ -9,9 +9,9 @@ import { reactCompiler } from "./react-compiler.mjs";
 
 // Check the actual component, since another compiled hook in its file proves nothing.
 for (const [relative, names] of [
-  ["facade/map.tsx", ["Map", "MountedMap", "useMapAttachment"]],
+  ["facade/map.tsx", ["MountedMap", "useMapAttachment"]],
   ["facade/user-location.tsx", ["UserLocation"]],
-  ["facade/source.tsx", ["Source"]],
+  ["facade/native-map.tsx", ["Source", "NativeMap"]],
   ["facade/use-stable-options.ts", ["useStableOptions"]],
   ["adapters/shared/use-frozen-value.ts", ["useFrozenValue"]],
   ["adapters/shared/native-ui.tsx", ["useNativeMarkerActivation"]],

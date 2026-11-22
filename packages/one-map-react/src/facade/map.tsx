@@ -1,7 +1,5 @@
 import {
   type ComponentType,
-  forwardRef,
-  useContext,
   useCallback,
   type ForwardedRef,
   type ReactElement,
@@ -14,83 +12,25 @@ import {
 } from "react";
 
 import { useActiveCallback } from "../adapters/shared/use-active-callback.js";
-import type { Adapter } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
-import type { ClickEvent } from "../contracts/event-types.js";
 import type { MapProps } from "../contracts/map-types.js";
-import { type MapSession, MapSessionContext } from "./map-context.js";
+import type { NativeMapInputs } from "../contracts/native-types.js";
 import {
-  type MapRegistry,
-  useMapRegistry,
-  useNamedMap,
-  useSelectedAdapter,
-} from "./map-setup.js";
+  type MapSession,
+  MapSessionContext,
+  type NativeComponents,
+} from "./map-context.js";
+import type { MapRegistry } from "./map-registry.js";
 import { useMapInteractions } from "./use-map-interactions.js";
 import { useStableOptions } from "./use-stable-options.js";
 
-/** Whether a shared map encloses the caller. */
-export const useMapEnclosure = (): boolean =>
-  useContext(MapSessionContext) !== null;
-
-/**
- * Returns the enclosing common map ref.
- *
- * @returns A stable ref to the enclosing Map.
- * @throws When the enclosing Map is missing.
- */
-export function useMap(): MapRef;
-/**
- * Reads a named map under the same MapSetup and follows its attachment.
- *
- * @param id - Map ID, or undefined to read the enclosing Map.
- * @returns The map ref, or undefined while a named map is not attached.
- * @throws When named lookup lacks MapSetup, or id is omitted outside a Map.
- */
-export function useMap(id: string | undefined): MapRef | undefined;
-// Overloads keep enclosing access required and named access optional without casts.
-export function useMap(id?: string): MapRef | undefined {
-  const session = useContext(MapSessionContext);
-  const named = useNamedMap(id);
-  if (id !== undefined) return named;
-  if (session) return session.map;
-  throw new Error("useMap() must render inside Map.");
-}
-
-/** Shared map with scoped callbacks and named map attachment. */
-// eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
-export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
-  const adapter = useSelectedAdapter();
-  return (
-    <MountedMap
-      props={props}
-      implementation={adapter.Map}
-      adapter={adapter}
-      forwardedRef={forwardedRef}
-    />
-  );
-});
-
-type MountedMapOptions<Event extends ClickEvent = ClickEvent> = Pick<
-  MapProps,
-  | "id"
-  | "onLoad"
-  | "onMove"
-  | "projection"
-  | "terrain"
-  | "interactiveLayerIds"
-  | "onError"
-> & { readonly onClick?: (event: Event) => void };
-
 interface MountedMapProps<
   Handle extends MapRef,
-  Props,
-  Event extends ClickEvent,
+  Props extends NativeMapInputs,
 > {
-  readonly props: Props & MountedMapOptions<Event>;
-  readonly implementation: ComponentType<
-    Props & MountedMapOptions<Event> & RefAttributes<Handle>
-  >;
-  readonly adapter: Adapter;
+  readonly props: Props;
+  readonly implementation: ComponentType<Props & RefAttributes<Handle>>;
+  readonly components: NativeComponents;
   readonly forwardedRef: ForwardedRef<Handle>;
   readonly register?: MapRegistry<Handle>["register"];
 }
@@ -103,29 +43,22 @@ interface MountedMapProps<
  */
 export const MountedMap = <
   Handle extends MapRef,
-  Props,
-  Event extends ClickEvent,
+  Props extends NativeMapInputs,
 >({
   props,
-  implementation: AdapterMap,
-  adapter,
+  implementation: RendererMap,
+  components,
   forwardedRef,
   register,
-}: MountedMapProps<Handle, Props, Event>): ReactElement => {
+}: MountedMapProps<Handle, Props>): ReactElement => {
   validateMapOptions(props);
 
   useStableOptions("Map", {
     id: props.id,
   });
   const { mapRef, proxy, attach } = useMapAttachment(forwardedRef);
-  const legacyRegistry = useMapRegistry();
-  // The native provider owns unnamed maps under "default". Legacy lookup requires an ID.
-  const registerMap = register ?? legacyRegistry?.register;
-  const id = props.id ?? (register ? "default" : undefined);
-  useLayoutEffect(
-    () => (id === undefined ? undefined : registerMap?.(id, proxy)),
-    [id, registerMap, proxy]
-  );
+  const id = props.id;
+  useLayoutEffect(() => register?.(id, proxy), [id, register, proxy]);
   const [ready, setReady] = useState(false);
   const load = useActiveCallback(() => {
     setReady(true);
@@ -133,12 +66,12 @@ export const MountedMap = <
   });
   const { move, click } = useMapInteractions(props, mapRef);
   const session = useMemo<MapSession>(
-    () => ({ ref: mapRef, map: proxy, ready, adapter }),
-    [mapRef, proxy, ready, adapter]
+    () => ({ ref: mapRef, map: proxy, ready, components }),
+    [mapRef, proxy, ready, components]
   );
   return (
     <MapSessionContext.Provider value={session}>
-      <AdapterMap
+      <RendererMap
         {...props}
         ref={attach}
         onLoad={load}

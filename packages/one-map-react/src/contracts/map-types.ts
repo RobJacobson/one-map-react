@@ -35,7 +35,7 @@ export interface MapLayoutStyle {
 }
 
 /**
- * Props for the shared {@link Map} component.
+ * Shared inputs used by the native maps.
  */
 export interface MapProps {
   /** Terrain override; null disables terrain. Omission leaves SDK style semantics. */
@@ -45,7 +45,7 @@ export interface MapProps {
   /** Legacy extrusion light; omission follows selected SDK reset semantics. */
   readonly light?: LegacyLight;
 
-  /** Optional provider-local identity for useMap(id); changing requires remount. */
+  /** Optional provider-local ID for useMap()[id]. Changing it requires remounting. */
   readonly id?: string;
   /** Layer ids whose rendered feature hits are included with map clicks. */
   readonly interactiveLayerIds?: readonly string[];

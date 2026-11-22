@@ -1,2 +1,9 @@
-/** Application setup selects mapbox on native; shared maps import only the common entry. */
-export { Map } from "one-map-react/mapbox-native";
+// Native resolves bindings from the selected renderer entry.
+export {
+  Layer,
+  Map,
+  MapProvider,
+  Marker,
+  Source,
+  useMap,
+} from "one-map-react/mapbox-native";

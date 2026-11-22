@@ -5,10 +5,11 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import type { Adapter } from "one-map-react";
+import * as nativeEntry from "one-map-react/mapbox-native";
 import type { ReactNode } from "react";
 import { expect, test, vi } from "vite-plus/test";
 
+import { createNativeSceneComponents } from "../src/scenarios/native-scene-components.js";
 import { NativeTf07FocusedScreen } from "../src/scenarios/native-tf07-focused-screen.js";
 
 const fixture = vi.hoisted(() => ({
@@ -23,19 +24,17 @@ const fixture = vi.hoisted(() => ({
   secondZoom: vi.fn(async () => 12),
   dimensions: { width: 400, height: 800, scale: 1, fontScale: 1 },
 }));
-vi.mock("one-map-react/native-extensions", async () => {
-  const legacy = await import("one-map-react/legacy");
-  return {
-    Images: () => null,
-    UserLocation: Reflect.get(legacy, "UserLocation"),
-  };
-});
+vi.mock("one-map-react/native-extensions", () => ({
+  Images: () => null,
+  UserLocation: () => null,
+}));
 
-vi.mock("one-map-react/legacy", async () => {
+vi.mock("one-map-react/mapbox-native", async () => {
   const react = await import("react");
   const Parent = ({ children }: { children?: ReactNode }) => children;
   return {
-    MapSetup: Parent,
+    MapProvider: Parent,
+    useMap: () => ({}),
     Map: react.forwardRef(
       (
         {
@@ -74,9 +73,14 @@ vi.mock("one-map-react/legacy", async () => {
     Source: Parent,
     Marker: Parent,
     Layer: () => null,
-    UserLocation: () => null,
   };
 });
+
+const nativeSceneComponents = createNativeSceneComponents(
+  "mapbox-native",
+  nativeEntry
+);
+
 vi.mock("react-native", async () => {
   const react = await import("react");
   const Parent = ({
@@ -121,9 +125,9 @@ vi.mock("react-native", async () => {
 });
 
 test("focused status updates retain rejection and delayed location ownership; removal retires a stale result", async () => {
-  // The selected backend is irrelevant to this fixture/provider lifecycle regression.
-  const adapter = { backend: "mapbox-native" } as Adapter;
-  const mounted = render(<NativeTf07FocusedScreen adapter={adapter} />);
+  const mounted = render(
+    <NativeTf07FocusedScreen components={nativeSceneComponents} />
+  );
   expect(fixture.mapOptions).toContainEqual({
     compassPosition: { top: 64, right: 8 },
   });
@@ -162,8 +166,9 @@ test("focused status updates retain rejection and delayed location ownership; re
 });
 
 test("screen children retain providers and state across resize and address their own maps", async () => {
-  const adapter = { backend: "mapbox-native" } as Adapter;
-  const mounted = render(<NativeTf07FocusedScreen adapter={adapter} />);
+  const mounted = render(
+    <NativeTf07FocusedScreen components={nativeSceneComponents} />
+  );
   const first = screen.getByRole("button", { name: "Map A initial 0" });
   const second = screen.getByRole("button", { name: "Map B initial 0" });
   for (const map of screen.getAllByTestId("sdk-map")) {
@@ -174,7 +179,9 @@ test("screen children retain providers and state across resize and address their
   await waitFor(() => expect(fixture.firstZoom).toHaveBeenCalledTimes(1));
   expect(fixture.secondZoom).not.toHaveBeenCalled();
   fixture.dimensions = { ...fixture.dimensions, width: 800, height: 400 };
-  mounted.rerender(<NativeTf07FocusedScreen adapter={adapter} />);
+  mounted.rerender(
+    <NativeTf07FocusedScreen components={nativeSceneComponents} />
+  );
   fireEvent.click(screen.getByText("Theme"));
   expect(screen.getByRole("button", { name: "Map A updated 1" })).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Map B updated 0" }));
@@ -192,9 +199,7 @@ test("focused feature activation uses GeoJSON IDs and keeps two map routes indep
   vi.stubGlobal("fetch", fetch);
   try {
     const view = render(
-      <NativeTf07FocusedScreen
-        adapter={{ backend: "mapbox-native" } as Adapter}
-      />
+      <NativeTf07FocusedScreen components={nativeSceneComponents} />
     );
     const feature = (id: number) => ({
       type: "Feature",

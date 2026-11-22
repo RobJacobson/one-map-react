@@ -1,6 +1,10 @@
-import { type MapRef, MapSetup } from "one-map-react/legacy";
 import {
-  adapter,
+  Layer,
+  Map as NativeMap,
+  MapProvider,
+  Marker,
+  Source,
+  useMap,
   type NativeMapProps,
   WrapperLocationManager,
   WrapperOfflineManager,
@@ -9,7 +13,6 @@ import {
   CustomLocationProvider,
   LocationPuck,
 } from "one-map-react/mapbox-native";
-import { useRef } from "react";
 import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
 
 import type { AcceptanceScenario } from "../acceptance-selection.js";
@@ -24,6 +27,7 @@ import {
 } from "./native-location.js";
 import { NativeModelScene } from "./native-model-scene.js";
 import { NativeQueriesScreen } from "./native-queries-screen.js";
+import { createNativeSceneComponents } from "./native-scene-components.js";
 import { NativeSourcesScreen } from "./native-sources-screen.js";
 import { NativeTf07FocusedScreen } from "./native-tf07-focused-screen.js";
 import { NativeTf07RetainedScreen } from "./native-tf07-retained-screen.js";
@@ -31,6 +35,7 @@ import { NativeTf07Screen } from "./native-tf07-screen.js";
 import { NativeTf08Screen } from "./native-tf08-screen.js";
 import { NativeTf09Screen } from "./native-tf09-screen.js";
 import { RouteMap } from "./route-map.js";
+import { useNativeMapRef } from "./use-native-map-ref.js";
 
 /** Uses the wrapper's SDK network switch while keeping test transport available. */
 const setNetworkConnected = (connected: boolean): Promise<boolean> =>
@@ -101,14 +106,25 @@ const getCurrentPosition = (signal?: AbortSignal, timeoutMs?: number) =>
   acquireNativeLocation(WrapperLocationManager, "mapbox", signal, timeoutMs);
 const requestLocationPermission = () => requestNativeLocationPermission();
 
+const components = createNativeSceneComponents("mapbox-native", {
+  Map: NativeMap,
+  Source,
+  Layer,
+  Marker,
+  MapProvider,
+  useMap,
+});
+
 const App = ({ scenario }: { readonly scenario: AcceptanceScenario }) => {
   if (scenario === "tf09-model")
-    return <NativeTf09Screen adapter={adapter} scene={NativeModelScene} />;
-  if (scenario === "tf09") return <NativeTf09Screen adapter={adapter} />;
+    return (
+      <NativeTf09Screen components={components} scene={NativeModelScene} />
+    );
+  if (scenario === "tf09") return <NativeTf09Screen components={components} />;
   if (scenario === "tf08" || scenario === "tf08-storage")
     return (
       <NativeTf08Screen
-        adapter={adapter}
+        components={components}
         createSnapshot={createMapboxSnapshot}
         getCurrentPosition={getCurrentPosition}
         requestLocationPermission={requestLocationPermission}
@@ -128,58 +144,59 @@ const App = ({ scenario }: { readonly scenario: AcceptanceScenario }) => {
       />
     );
   if (scenario === "tf07-retained")
-    return <NativeTf07RetainedScreen adapter={adapter} />;
+    return <NativeTf07RetainedScreen components={components} />;
   if (scenario === "tf07-focused")
-    return <NativeTf07FocusedScreen adapter={adapter} />;
+    return <NativeTf07FocusedScreen components={components} />;
   if (scenario === "tf07")
-    return <NativeTf07Screen adapter={adapter} ornaments={tf07Ornaments} />;
+    return (
+      <NativeTf07Screen components={components} ornaments={tf07Ornaments} />
+    );
   if (scenario === "tf06-lifetimes") {
-    return <NativeLifetimesScreen adapter={adapter} />;
+    return <NativeLifetimesScreen components={components} />;
   }
 
   if (scenario === "tf06") {
-    return <NativeQueriesScreen adapter={adapter} />;
+    return <NativeQueriesScreen components={components} />;
   }
 
   if (scenario === "tf05") {
-    return <NativeSourcesScreen adapter={adapter} />;
+    return <NativeSourcesScreen components={components} />;
   }
 
   if (scenario === "tf04") {
-    return <NativeCameraScreen adapter={adapter} doubleTap={false} />;
+    return <NativeCameraScreen components={components} doubleTap={false} />;
   }
 
   return <LifecycleApp />;
 };
 
 const LifecycleApp = () => {
-  const mapRef = useRef<MapRef>(null);
+  const [mapRef, attachMap] = useNativeMapRef();
   const smoke = useLifecycleSmoke({
     mapRef,
     failureStyleUrl: "http://127.0.0.1:8798/missing-style.json",
   });
 
   return (
-    <MapSetup adapter={adapter}>
-      <View style={styles.screen}>
-        <View style={styles.toolbar}>
-          <Button title="Fly north" onPress={smoke.flyNorth} />
-          <Button title="Remount" onPress={smoke.remount} />
-          <Button title="Bad style" onPress={smoke.failStyle} />
-        </View>
-        <Text testID="tf03-status">{smoke.status}</Text>
-        <RouteMap
-          key={smoke.generation}
-          ref={mapRef}
-          mapStyle={smoke.mapStyle}
-          style={{ flex: 1 }}
-          onLoad={smoke.onLoad}
-          onStyleLoad={smoke.onStyleLoad}
-          onError={smoke.onError}
-          onMove={smoke.onMove}
-        />
+    <View style={styles.screen}>
+      <View style={styles.toolbar}>
+        <Button title="Fly north" onPress={smoke.flyNorth} />
+        <Button title="Remount" onPress={smoke.remount} />
+        <Button title="Bad style" onPress={smoke.failStyle} />
       </View>
-    </MapSetup>
+      <Text testID="tf03-status">{smoke.status}</Text>
+      <RouteMap
+        key={smoke.generation}
+        components={components}
+        ref={attachMap}
+        mapStyle={smoke.mapStyle}
+        style={{ flex: 1 }}
+        onLoad={smoke.onLoad}
+        onStyleLoad={smoke.onStyleLoad}
+        onError={smoke.onError}
+        onMove={smoke.onMove}
+      />
+    </View>
   );
 };
 

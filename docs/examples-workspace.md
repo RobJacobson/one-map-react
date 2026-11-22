@@ -1,6 +1,6 @@
 # Example workspace checkpoint
 
-The Vite shell loads stock react-map-gl. Expo web uses the same browser components. Expo native loads the chosen bound native entry. All shells start with the Seattle basemap and own engine switching, token configuration and camera handoff. The [package migration guide](../packages/one-map-react/README.md) explains the public imports. The [pre-migration example record](https://github.com/RobJacobson/one-map-react/blob/618cf7c5bcb2a72d7d256c9aaebd0b894eadf986/docs/examples-workspace.md) preserves the earlier browser facade and its checks.
+The Vite shell loads stock react-map-gl. Expo web uses the same browser components. Expo native loads the chosen bound native entry. All shells start with the Seattle basemap and own engine switching, token configuration and camera handoff. The [package guide](../packages/one-map-react/README.md) explains the public imports. The [pre-migration example record](https://github.com/RobJacobson/one-map-react/blob/618cf7c5bcb2a72d7d256c9aaebd0b894eadf986/docs/examples-workspace.md) preserves the earlier browser facade and its checks.
 
 ## Development setup
 

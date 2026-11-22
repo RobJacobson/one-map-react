@@ -1,22 +1,21 @@
-import {
-  Layer,
-  type MapErrorEvent,
-  type MapLayoutStyle,
-  type MapRef,
-  type MapStyle,
-  Map as OneMap,
-  Source,
-} from "one-map-react/legacy";
-import { type ReactNode, type Ref } from "react";
+import type {
+  MapErrorEvent,
+  MapLayoutStyle,
+  MapRef,
+  MapStyle,
+} from "one-map-react";
+import { type ReactNode, type RefCallback } from "react";
 
 import { initialViewState } from "./map-fixture.js";
 import { QuerySources } from "./query-sources.js";
+import type { NativeSceneComponents } from "./scene-components.js";
 
 interface QueriesMapProps {
+  readonly components: Pick<NativeSceneComponents, "Map" | "Source" | "Layer">;
   readonly mapStyle: MapStyle;
   readonly sourceRevision: number;
   readonly style?: MapLayoutStyle;
-  readonly ref?: Ref<MapRef>;
+  readonly ref?: RefCallback<MapRef>;
   readonly onLoad?: () => void;
   readonly onStyleLoad?: () => void;
   readonly onError?: (event: MapErrorEvent) => void;
@@ -29,6 +28,7 @@ interface QueriesMapProps {
  * the SDKs' tile encoding and support independent known-feature assertions.
  */
 export const QueriesMap = ({
+  components: { Map: NativeMap, Source, Layer },
   mapStyle,
   sourceRevision,
   style,
@@ -38,7 +38,7 @@ export const QueriesMap = ({
   onError,
   probe,
 }: QueriesMapProps) => (
-  <OneMap
+  <NativeMap
     ref={ref}
     mapStyle={mapStyle}
     initialViewState={initialViewState}
@@ -53,5 +53,5 @@ export const QueriesMap = ({
       Layer={Layer}
       sourceRevision={sourceRevision}
     />
-  </OneMap>
+  </NativeMap>
 );

@@ -1,52 +1,39 @@
 import { act, render, renderHook } from "@testing-library/react";
+import { forwardRef, useImperativeHandle } from "react";
 import { expect, test, vi } from "vite-plus/test";
 
 import { useCameraSmoke } from "../../example-map/src/scenarios/camera-smoke.js";
-import { nativeSceneComponents } from "../../example-map/src/scenarios/native-scene-components.js";
-import type { MapRef } from "../src/contracts/camera-types.js";
-import type { MoveEvent } from "../src/contracts/event-types.js";
-
-const fixture = vi.hoisted(() => ({
-  props: {} as { onMove?: (event: MoveEvent) => void; minZoom?: number },
-  jumpTo: vi.fn(async () => undefined),
-}));
-vi.mock("one-map-react/legacy", async () => {
-  const react = await import("react");
-  return {
-    Map: react.forwardRef(
-      (
-        props: {
-          children?: import("react").ReactNode;
-          onMove?: (event: MoveEvent) => void;
-          minZoom?: number;
-        },
-        ref
-      ) => {
-        fixture.props = props;
-        react.useImperativeHandle(ref, () => ({
-          jumpTo: fixture.jumpTo,
-          getCenter: async () => [0, 0],
-          getZoom: async () => 2,
-        }));
-        return react.createElement("div", {}, props.children);
-      }
-    ),
-    Source: ({ children }: { children?: import("react").ReactNode }) =>
-      children,
-    Layer: () => null,
-    Marker: () => null,
-  };
-});
 import {
   Tf09Scene,
   type Tf09Probe,
-} from "../../../packages/example-map/src/scenarios/tf09-scene.js";
+} from "../../example-map/src/scenarios/tf09-scene.js";
+import type { MapRef } from "../src/contracts/camera-types.js";
+import type { NativeMapInputs } from "../src/contracts/native-types.js";
+import { createNativeSceneFixture } from "./native-scene-fixture.js";
+
+const recordProps = vi.fn<(props: NativeMapInputs) => void>();
+const latestProps = () => recordProps.mock.lastCall?.[0];
+const jumpTo = vi.fn(async () => undefined);
+const Camera = forwardRef<MapRef, NativeMapInputs>((props, ref) => {
+  recordProps(props);
+  useImperativeHandle(
+    ref,
+    () =>
+      ({
+        jumpTo,
+        getCenter: async () => [0, 0],
+        getZoom: async () => 2,
+      }) as unknown as MapRef
+  );
+  return <div>{props.children}</div>;
+});
+const components = createNativeSceneFixture(Camera);
 
 test("release camera probe tracks targets, accepts movement, reports commands and releases targets", async () => {
   let probe: Tf09Probe | null = null;
   const mounted = render(
     <Tf09Scene
-      components={nativeSceneComponents}
+      components={components}
       backend="mapbox-native"
       style={{ width: 400, height: 300 }}
       attach={(value) => {
@@ -65,7 +52,7 @@ test("release camera probe tracks targets, accepts movement, reports commands an
     viewState: { longitude: 10, latitude: 10, zoom: 3, bearing: 0, pitch: 0 },
     origin: "user" as const,
   };
-  act(() => fixture.props.onMove?.(proposal));
+  act(() => latestProps()?.onMove?.(proposal));
   expect(await command("camera-read")).toMatchObject({
     moves: 1,
     viewState: proposal.viewState,
@@ -73,7 +60,7 @@ test("release camera probe tracks targets, accepts movement, reports commands an
     controlled: { longitude: 0 },
   });
   await command("camera-command", { target: "reapply" });
-  expect(fixture.jumpTo).toHaveBeenCalledWith({
+  expect(jumpTo).toHaveBeenCalledWith({
     center: [0, 0],
     zoom: 2,
     bearing: 0,
@@ -88,14 +75,14 @@ test("release camera probe tracks targets, accepts movement, reports commands an
   await act(async () => {
     await command("controlled-camera", { accept: true });
   });
-  act(() => fixture.props.onMove?.(proposal));
+  act(() => latestProps()?.onMove?.(proposal));
   expect(await command("camera-read")).toMatchObject({
     controlled: proposal.viewState,
   });
   await act(async () => {
     await command("controlled-camera", { clamp: true });
   });
-  expect(fixture.props.minZoom).toBe(3);
+  expect(latestProps()?.minZoom).toBe(3);
   expect(await command("camera-read")).toMatchObject({
     clamp: true,
     controlled: { zoom: 2 },
@@ -103,13 +90,13 @@ test("release camera probe tracks targets, accepts movement, reports commands an
   await act(async () => {
     await command("controlled-camera");
   });
-  expect(fixture.props.minZoom).toBeUndefined();
+  expect(latestProps()?.minZoom).toBeUndefined();
   expect(await command("camera-read")).toMatchObject({ clamp: false });
   await act(async () => {
     await command("controlled-camera", { clamp: true });
   });
   await command("camera-command");
-  expect(fixture.jumpTo).toHaveBeenCalledWith({
+  expect(jumpTo).toHaveBeenCalledWith({
     center: [10, 10],
     zoom: 3,
     bearing: 0,
@@ -122,7 +109,7 @@ test("release camera probe tracks targets, accepts movement, reports commands an
     controlled: undefined,
     clamp: false,
   });
-  expect(fixture.props.minZoom).toBeUndefined();
+  expect(latestProps()?.minZoom).toBeUndefined();
   mounted.unmount();
   expect(probe).toBeNull();
 });

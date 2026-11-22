@@ -9,6 +9,9 @@ import type {
   FeatureIdentifier,
   FeatureState,
 } from "../src/contracts/query-types.js";
+import { createNativeSceneFixture } from "./native-scene-fixture.js";
+
+const components = createNativeSceneFixture();
 
 type Family = "geojson" | "vector";
 
@@ -411,6 +414,7 @@ test("style replacement preserves the vector source key, revision and tile URL",
   const hook = renderHook(() => {
     const smoke = useLifetimesSmoke({ mapRef: renderer.mapRef });
     const mapElement = LifetimesMap({
+      components,
       family: smoke.family,
       mapStyle: smoke.mapStyle,
       sourceRevision: smoke.sourceRevision,
