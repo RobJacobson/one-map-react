@@ -1,7 +1,6 @@
-import { type Adapter, MapSetup } from "one-map-react";
-import type { MapRef } from "one-map-react";
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useState, type ComponentType, useRef } from "react";
 
+import type { WebBackend, WebSceneComponents } from "./scene-components.js";
 import { Tf09Scene, type Tf09Probe } from "./tf09-scene.js";
 import { WebTf09Media, type Tf09Media } from "./web-tf09-media.js";
 
@@ -14,16 +13,26 @@ declare global {
 
 /** Browser entry selected by ?tf09=rendering. */
 export const WebTf09App = ({
-  adapter,
+  components,
+  backend,
   renderMedia,
-  probe,
-  named,
+  renderProbe: RenderingProbe,
 }: {
-  readonly adapter: Adapter;
-  readonly renderMedia: (media: Tf09Media) => ReactNode;
-  readonly probe: ReactNode;
-  readonly named: (map: MapRef) => unknown;
+  readonly components: WebSceneComponents;
+  readonly backend: WebBackend;
+  readonly renderMedia: (media: Tf09Media) => import("react").ReactNode;
+  readonly renderProbe: ComponentType<{
+    readonly attachNamed: (read: (() => unknown) | undefined) => void;
+  }>;
 }) => {
+  const namedRef = useRef<(() => unknown) | undefined>(undefined);
+  const attachNamed = useCallback((read: (() => unknown) | undefined) => {
+    namedRef.current = read;
+  }, []);
+  const readNamed = useCallback(() => {
+    if (!namedRef.current) throw new Error("The rendering probe is detached.");
+    return namedRef.current();
+  }, []);
   const [media, setMedia] = useState(false);
   const [moved, setMoved] = useState(false);
   const attach = useCallback((probe: Tf09Probe | null) => {
@@ -41,16 +50,15 @@ export const WebTf09App = ({
     else delete window.__oneMapTf09;
   }, []);
   return (
-    <MapSetup adapter={adapter}>
-      <Tf09Scene
-        backend={adapter.backend}
-        attach={attach}
-        named={named}
-        style={{ width: "100vw", height: "100vh" }}
-      >
-        {probe}
-        <WebTf09Media enabled={media} moved={moved} render={renderMedia} />
-      </Tf09Scene>
-    </MapSetup>
+    <Tf09Scene
+      backend={backend}
+      components={components}
+      attach={attach}
+      named={readNamed}
+      style={{ width: "100vw", height: "100vh" }}
+    >
+      <RenderingProbe attachNamed={attachNamed} />
+      <WebTf09Media enabled={media} moved={moved} render={renderMedia} />
+    </Tf09Scene>
   );
 };

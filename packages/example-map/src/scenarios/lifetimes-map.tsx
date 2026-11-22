@@ -6,7 +6,7 @@ import {
   type MapStyle,
   Map as OneMap,
   Source,
-} from "one-map-react";
+} from "one-map-react/legacy";
 import { type Ref, useMemo } from "react";
 
 import { initialViewState, queryRoutes } from "./map-fixture.js";

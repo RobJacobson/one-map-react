@@ -6,14 +6,11 @@ import {
   type MapStyle,
   Map as OneMap,
   Source,
-} from "one-map-react";
-import { type ReactNode, type Ref, useMemo } from "react";
+} from "one-map-react/legacy";
+import { type ReactNode, type Ref } from "react";
 
-import {
-  clusteredPoints,
-  initialViewState,
-  queryRoutes,
-} from "./map-fixture.js";
+import { initialViewState } from "./map-fixture.js";
+import { QuerySources } from "./query-sources.js";
 
 interface QueriesMapProps {
   readonly mapStyle: MapStyle;
@@ -40,69 +37,21 @@ export const QueriesMap = ({
   onStyleLoad,
   onError,
   probe,
-}: QueriesMapProps) => {
-  const routes = useMemo(
-    () => ({
-      ...queryRoutes,
-      features: queryRoutes.features.map((feature) => ({
-        ...feature,
-        properties: {
-          ...feature.properties,
-          __oneMapSourceRevision: sourceRevision,
-        },
-      })),
-    }),
-    [sourceRevision]
-  );
-
-  return (
-    <OneMap
-      ref={ref}
-      mapStyle={mapStyle}
-      initialViewState={initialViewState}
-      style={style}
-      onLoad={onLoad}
-      onStyleLoad={onStyleLoad}
-      onError={onError}
-    >
-      {probe}
-      <Source
-        key={sourceRevision}
-        id="queries-routes"
-        type="geojson"
-        data={routes}
-      >
-        <Layer
-          id="queries-line"
-          type="line"
-          paint={{
-            "line-color": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              "#dc2626",
-              "#2563eb",
-            ],
-            "line-width": 3,
-          }}
-        />
-      </Source>
-      <Source
-        id="queries-clusters"
-        type="geojson"
-        data={clusteredPoints}
-        cluster
-        clusterRadius={60}
-      >
-        <Layer
-          id="queries-cluster-circles"
-          type="circle"
-          paint={{
-            "circle-color": "#16a34a",
-            "circle-radius": 12,
-          }}
-          filter={["==", ["get", "cluster"], true]}
-        />
-      </Source>
-    </OneMap>
-  );
-};
+}: QueriesMapProps) => (
+  <OneMap
+    ref={ref}
+    mapStyle={mapStyle}
+    initialViewState={initialViewState}
+    style={style}
+    onLoad={onLoad}
+    onStyleLoad={onStyleLoad}
+    onError={onError}
+  >
+    {probe}
+    <QuerySources
+      Source={Source}
+      Layer={Layer}
+      sourceRevision={sourceRevision}
+    />
+  </OneMap>
+);

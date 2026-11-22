@@ -23,11 +23,11 @@ import type {
   ExternalDrawingContext,
   MapProps,
 } from "../src/contracts/map-types.js";
-import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
+import { Images } from "../src/native-extensions.js";
 import { testNativeEntryBinding } from "./native-entry-binding.js";
 
 const mockSetCamera = jest.fn();

@@ -2,7 +2,6 @@ import { expect, test, vi } from "vite-plus/test";
 
 import { namedRendering as mapbox } from "../../example-map/src/scenarios/mapbox-web.js";
 import { namedRendering as maplibre } from "../../example-map/src/scenarios/maplibre-web.js";
-import type { MapRef } from "../src/contracts/camera-types.js";
 
 test.each([mapbox, maplibre])(
   "selected release callback restores gestures and removes only its own listener",
@@ -44,8 +43,10 @@ test.each([mapbox, maplibre])(
     expect(
       (
         await named({
-          getWrapperMap: async () => ({ ...selected, getMap: () => selected }),
-        } as unknown as MapRef)
+          ...selected,
+          getMap: () => selected,
+        } as unknown as Parameters<typeof mapbox>[0] &
+          Parameters<typeof maplibre>[0])
       ).tf10
     ).toEqual({
       dragPan: { before: true, disabled: false, restored: true },

@@ -73,8 +73,11 @@ try {
       ).filePath;
     for (const platform of ["ios", "android"]) {
       const capture = resolve(
-        path.join(root, "packages/example-map/src/scenarios/tf09-scene.tsx"),
-        "./capture-rendering.js",
+        path.join(
+          root,
+          "packages/example-map/src/scenarios/native-scene-components.ts"
+        ),
+        "./capture-rendering.native.js",
         platform
       );
       assert.equal(
@@ -149,10 +152,13 @@ try {
     assert.equal(
       resolve(
         path.join(root, "packages/example-map/src/scenarios/tf09-scene.tsx"),
-        "./capture-rendering.js",
+        "./capture-web-rendering.js",
         "web"
       ),
-      path.join(root, "packages/example-map/src/scenarios/capture-rendering.ts")
+      path.join(
+        root,
+        "packages/example-map/src/scenarios/capture-web-rendering.ts"
+      )
     );
     assert.equal(
       resolve(path.join(temporary, "origin.ts"), "./platform.js", "web"),

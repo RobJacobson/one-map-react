@@ -1,13 +1,11 @@
-import {
-  type Adapter,
-  type ExternalDrawingContext,
-  type MapRef,
-  MapSetup,
-} from "one-map-react";
 import { useEffect, useRef, useState } from "react";
 
-import { initialCamera, readCamera } from "../camera.js";
-import { RouteMap } from "./route-map.js";
+import {
+  coordinateTuple,
+  type SceneMap,
+  type WebSceneComponents,
+} from "./scene-components.js";
+import { WebRouteMap } from "./web-route-map.js";
 
 declare global {
   interface Window {
@@ -20,12 +18,12 @@ declare global {
 }
 
 interface WebLifecycleAppProps {
-  readonly adapter: Adapter;
+  readonly components: WebSceneComponents;
 }
 
 interface DrawingContextRecord {
   readonly canvas: HTMLCanvasElement;
-  readonly gl: ExternalDrawingContext;
+  readonly gl: WebGLRenderingContext;
 }
 
 interface ContextPair {
@@ -57,8 +55,9 @@ interface SmokeReport {
  * with one drawing context, then remounts with another. The reused map
  * should keep the first canvas.
  */
-export const WebLifecycleApp = ({ adapter }: WebLifecycleAppProps) => {
-  const mapRef = useRef<MapRef>(null);
+export const WebLifecycleApp = ({ components }: WebLifecycleAppProps) => {
+  const mapRef = useRef<SceneMap>(null);
+  const styleObserved = useRef<number | undefined>(undefined);
   const firstCanvas = useRef<HTMLCanvasElement | null>(null);
   const advanced = useRef(false);
   const search = smokeSearch();
@@ -77,7 +76,15 @@ export const WebLifecycleApp = ({ adapter }: WebLifecycleAppProps) => {
     const probe = {
       camera: async () => {
         if (!mapRef.current) throw new Error("Lifecycle map is detached.");
-        return readCamera(mapRef.current, adapter.backend, initialCamera);
+        const map = mapRef.current;
+        const [center, zoom, bearing, pitch] = await Promise.all([
+          map.getCenter(),
+          map.getZoom(),
+          map.getBearing(),
+          map.getPitch(),
+        ]);
+        const [longitude, latitude] = coordinateTuple(center);
+        return { longitude, latitude, zoom, bearing, pitch };
       },
       routeFeatures: async () => {
         if (!mapRef.current) throw new Error("Lifecycle map is detached.");
@@ -92,7 +99,7 @@ export const WebLifecycleApp = ({ adapter }: WebLifecycleAppProps) => {
     return () => {
       if (window.__oneMapLifecycle === probe) delete window.__oneMapLifecycle;
     };
-  }, [adapter.backend, generation]);
+  }, [generation]);
 
   useEffect(() => {
     console.log(status);
@@ -170,77 +177,81 @@ export const WebLifecycleApp = ({ adapter }: WebLifecycleAppProps) => {
   };
 
   return (
-    <MapSetup adapter={adapter}>
-      <div
-        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
-      >
-        <div style={{ display: "flex", gap: 8, padding: 8 }}>
-          <button
-            type="button"
-            onClick={() => {
-              void mapRef.current?.flyTo({
-                center: [-122.32, 47.64],
-                duration: 1000,
-              });
-            }}
-          >
-            Fly north
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setGeneration((current) => current + 1);
-            }}
-          >
-            Remount
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const url = new URL(window.location.href);
-              url.searchParams.set("tf03", "reuse");
-              url.searchParams.set("auto", "1");
-              window.location.assign(url);
-            }}
-          >
-            Run reuse
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const url = new URL(window.location.href);
-              url.searchParams.set("tf03", "gl");
-              url.searchParams.set("auto", "1");
-              window.location.assign(url);
-            }}
-          >
-            Run external context
-          </button>
-        </div>
-        <p id="tf03-status" style={{ margin: 0, padding: 8 }}>
-          {status}
-        </p>
-        <RouteMap
-          key={generation}
-          ref={mapRef}
-          reuseMaps={mode === "reuse" || mode === "gl"}
-          gl={gl}
-          style={{ width: "100%", height: "100%", flex: 1 }}
-          onLoad={() => {
-            noteCanvas("loads");
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <div style={{ display: "flex", gap: 8, padding: 8 }}>
+        <button
+          type="button"
+          onClick={() => {
+            void mapRef.current?.flyTo({
+              center: [-122.32, 47.64],
+              duration: 1000,
+            });
           }}
-          onStyleLoad={() => {
-            noteCanvas("styles");
+        >
+          Fly north
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setGeneration((current) => current + 1);
           }}
-          onError={() => {
-            noteCanvas("errors");
+        >
+          Remount
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set("tf03", "reuse");
+            url.searchParams.set("auto", "1");
+            window.location.assign(url);
           }}
-          onMove={(event) => {
-            console.log(event.origin, event.viewState);
+        >
+          Run reuse
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set("tf03", "gl");
+            url.searchParams.set("auto", "1");
+            window.location.assign(url);
           }}
-        />
+        >
+          Run external context
+        </button>
       </div>
-    </MapSetup>
+      <p id="tf03-status" style={{ margin: 0, padding: 8 }}>
+        {status}
+      </p>
+      <WebRouteMap
+        components={components}
+        key={generation}
+        ref={(map) => {
+          mapRef.current = map;
+        }}
+        reuseMaps={mode === "reuse" || mode === "gl"}
+        gl={gl}
+        style={{ width: "100%", height: "100%", flex: 1 }}
+        onLoad={() => {
+          noteCanvas("loads");
+        }}
+        onIdle={() => {
+          if (styleObserved.current === generation) return;
+          styleObserved.current = generation;
+          noteCanvas("styles");
+        }}
+        onError={() => {
+          noteCanvas("errors");
+        }}
+        onMove={(event) => {
+          console.log(
+            event.originalEvent ? "user" : "unknown",
+            event.viewState
+          );
+        }}
+      />
+    </div>
   );
 };
 
@@ -294,7 +305,7 @@ const drawingContext = (
   contexts: ContextPair | null,
   mode: SmokeMode,
   activeContext: "first" | "second"
-): ExternalDrawingContext | undefined => {
+): WebGLRenderingContext | undefined => {
   if (mode !== "gl" || !contexts) {
     return undefined;
   }
@@ -340,7 +351,7 @@ const contextWasPainted = (record: DrawingContextRecord | null): boolean => {
     return false;
   }
 
-  const context = gl as WebGLRenderingContext;
+  const context = gl;
   const pixels = new Uint8Array(4);
 
   context.readPixels(0, 0, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pixels);

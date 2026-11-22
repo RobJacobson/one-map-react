@@ -59,77 +59,59 @@ const RawPopup = (props: {
   );
 };
 
-vi.mock("one-map-react", async (original) => {
-  const actual = await original<typeof import("one-map-react")>();
-  const react = await import("react");
-  const Content = ({ children }: { children?: ReactNode }) => children;
-  const Empty = () => null;
-  return {
-    ...actual,
-    MapSetup: Content,
-    Map: react.forwardRef(({ children }: { children?: ReactNode }, _ref) => (
-      <div>{children}</div>
-    )),
-    Marker: Empty,
-    Source: Content,
-    Layer: Empty,
-
-    UserLocation: Empty,
-  };
-});
-vi.mock("one-map-react/mapbox-web", () => ({
-  adapter: { backend: "mapbox-web" },
+vi.mock("react-map-gl/mapbox", () => ({
   Map: ({ children }: { children?: ReactNode }) => children,
-  WrapperGeolocateControl: (props: Record<string, unknown>) => {
+  Source: ({ children }: { children?: ReactNode }) => children,
+  Layer: () => null,
+  Marker: ({ children }: { children?: ReactNode }) => children,
+  GeolocateControl: (props: Record<string, unknown>) => {
     popup.location.push(props);
     return null;
   },
-  WrapperNavigationControl: (props: Record<string, unknown>) => {
+  NavigationControl: (props: Record<string, unknown>) => {
     popup.navigation.push(props);
     return null;
   },
-  WrapperScaleControl: (props: Record<string, unknown>) => {
+  ScaleControl: (props: Record<string, unknown>) => {
     popup.scale.push(props);
     return null;
   },
-  WrapperAttributionControl: (props: Record<string, unknown>) => {
+  AttributionControl: (props: Record<string, unknown>) => {
     popup.attribution.push(props);
     return null;
   },
-  WrapperFullscreenControl: (props: Record<string, unknown>) => {
+  FullscreenControl: (props: Record<string, unknown>) => {
     popup.fullscreen.push(props);
     return null;
   },
-  WrapperPopup: (props: ComponentProps<typeof RawPopup>) => (
-    <RawPopup {...props} />
-  ),
+  Popup: (props: ComponentProps<typeof RawPopup>) => <RawPopup {...props} />,
 }));
-vi.mock("one-map-react/maplibre-web", () => ({
-  adapter: { backend: "maplibre-web" },
+vi.mock("react-map-gl/maplibre", () => ({
   Map: ({ children }: { children?: ReactNode }) => children,
-  WrapperGeolocateControl: (props: Record<string, unknown>) => {
+  Source: ({ children }: { children?: ReactNode }) => children,
+  Layer: () => null,
+  Marker: ({ children }: { children?: ReactNode }) => children,
+  GeolocateControl: (props: Record<string, unknown>) => {
     popup.location.push(props);
     return null;
   },
-  WrapperNavigationControl: (props: Record<string, unknown>) => {
+  NavigationControl: (props: Record<string, unknown>) => {
     popup.navigation.push(props);
     return null;
   },
-  WrapperScaleControl: (props: Record<string, unknown>) => {
+  ScaleControl: (props: Record<string, unknown>) => {
     popup.scale.push(props);
     return null;
   },
-  WrapperAttributionControl: (props: Record<string, unknown>) => {
+  AttributionControl: (props: Record<string, unknown>) => {
     popup.attribution.push(props);
     return null;
   },
-  WrapperFullscreenControl: (props: Record<string, unknown>) => {
+  FullscreenControl: (props: Record<string, unknown>) => {
     popup.fullscreen.push(props);
     return null;
   },
-  WrapperPopup: (props: ComponentProps<typeof RawPopup>) => (
-    <RawPopup {...props} />
-  ),
+  Popup: (props: ComponentProps<typeof RawPopup>) => <RawPopup {...props} />,
 }));
 
 test.each([MapboxApp, MaplibreApp])(

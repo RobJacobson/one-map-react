@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
   cpSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -13,9 +14,8 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import shellDeps from "./consumer-shell-resolution.cjs";
+import { build } from "vite-plus";
 
-const { shellMetroResolver } = shellDeps;
 import {
   packageCheckOptions,
   selectedVersions,
@@ -53,41 +53,25 @@ const run = (command, args, cwd) => {
 };
 
 try {
-  const examplesRoot = join(output, "examples");
+  let archive = options.archive;
+  if (!archive) {
+    run(
+      "bun",
+      ["pm", "pack", "--destination", output, "--ignore-scripts"],
+      join(root, "packages/one-map-react")
+    );
+    const archives = readdirSync(output).filter((file) =>
+      file.endsWith(".tgz")
+    );
+    assert.equal(archives.length, 1);
+    archive = join(output, archives[0]);
+  }
   for (const engine of ["mapbox", "maplibre"]) {
-    const shellRoot = join(examplesRoot, `web-${engine}`);
-    mkdirSync(join(shellRoot, "src"), { recursive: true });
-    mkdirSync(join(examplesRoot, "shared"), { recursive: true });
-    mkdirSync(join(output, "tests/fixtures"), { recursive: true });
-    cpSync(
-      join(root, "packages/example-map/src/scenarios/route-map.tsx"),
-      join(examplesRoot, "shared/route-map.tsx")
-    );
-    cpSync(
-      join(root, "scripts/consumer-shell-imports.mjs"),
-      join(examplesRoot, "pin-shell-deps.js")
-    );
-    cpSync(
-      join(root, "packages/example-map/src/scenarios/map.json"),
-      join(examplesRoot, "shared/map.json")
-    );
-    cpSync(
-      join(root, "packages/example-map/src/scenarios/map-fixture.ts"),
-      join(examplesRoot, "shared/map-fixture.ts")
-    );
-
-    let archive = options.archive;
-    if (!archive) {
-      run(
-        "bun",
-        ["pm", "pack", "--destination", output, "--ignore-scripts"],
-        join(root, "packages/one-map-react")
-      );
-      const archives = readdirSync(output).filter((name) =>
-        name.endsWith(".tgz")
-      );
-      assert.equal(archives.length, 1);
-      archive = join(output, archives[0]);
+    const shellRoot = join(output, engine);
+    mkdirSync(shellRoot);
+    const reference = join(root, "packages/example-map/reference");
+    for (const file of ["VesselMap.tsx", "vessel-fixture.ts"]) {
+      cpSync(join(reference, file), join(shellRoot, file));
     }
 
     writeFileSync(
@@ -102,9 +86,10 @@ try {
       "bun",
       [
         "add",
-        archive,
         ...selectedVersions(
           [
+            "@types/react@19.2.18",
+            "@types/geojson@7946.0.16",
             "react@19.2.3",
             "react-dom@19.2.3",
             "react-map-gl@8.1.3",
@@ -120,55 +105,75 @@ try {
       shellRoot
     );
 
-    const metro = shellMetroResolver(shellRoot);
-    assert.equal(metro.disableHierarchicalLookup, true);
-    assert.deepEqual(metro.nodeModulesPaths, [join(shellRoot, "node_modules")]);
-
     writeFileSync(
-      join(shellRoot, "src/main.tsx"),
-      `import { createRoot } from "react-dom/client";
-import { MapSetup } from "one-map-react";
-import { adapter } from "one-map-react/${engine}-web";
-import { RouteMap } from "../../shared/route-map";
-
-createRoot(document.getElementById("root")).render(
-  <MapSetup adapter={adapter}>
-    <RouteMap style={{ width: 400, height: 300 }} />
-  </MapSetup>
-);
+      join(shellRoot, "index.html"),
+      '<main id="root"></main><script type="module" src="/main.tsx"></script>'
+    );
+    writeFileSync(
+      join(shellRoot, "main.tsx"),
+      `
+import { createRoot } from "react-dom/client";
+import { VesselMap } from "./VesselMap";
+createRoot(document.getElementById("root")).render(<VesselMap Controls={() => null} MarkerContent={() => null} />);
 `
     );
     writeFileSync(
-      join(shellRoot, "index.html"),
-      `<!doctype html><html><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>`
+      join(shellRoot, "tsconfig.json"),
+      JSON.stringify({
+        compilerOptions: {
+          module: "ESNext",
+          moduleResolution: "Bundler",
+          target: "ES2022",
+          jsx: "react-jsx",
+          strict: true,
+          noEmit: true,
+          skipLibCheck: true,
+        },
+        files: ["VesselMap.tsx"],
+      })
     );
-    writeFileSync(
-      join(shellRoot, "vite.config.ts"),
-      `import path from "node:path";
-import { fileURLToPath } from "node:url";
+    for (const stock of [true, false]) {
+      if (stock) {
+        assert(!existsSync(join(shellRoot, "node_modules/one-map-react")));
+        cpSync(
+          join(reference, engine === "mapbox" ? "maps.mapbox.ts" : "maps.ts"),
+          join(shellRoot, "maps.ts")
+        );
+      } else {
+        run("bun", ["add", archive], shellRoot);
+        writeFileSync(
+          join(shellRoot, "maps.ts"),
+          `export * from "one-map-react/${engine}";`
+        );
+      }
+      writeFileSync(
+        join(shellRoot, "vite.config.ts"),
+        `
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite-plus";
-import { pinBareImportsToShell } from "../pin-shell-deps.js";
-
-const shellRoot = path.dirname(fileURLToPath(import.meta.url));
-
 export default defineConfig({
-  plugins: [pinBareImportsToShell(shellRoot), react(), {
+  plugins: [react(), {
     name: "selected-engine-isolation",
     generateBundle() {
-      for (const id of this.getModuleIds()) {
-        if (id.includes("/${engine === "mapbox" ? "maplibre-gl" : "mapbox-gl"}/") || id.includes("/@rnmapbox/") || id.includes("/@maplibre/maplibre-react-native/")) {
-          throw new Error("Unselected engine in bundle: " + id);
-        }
+      const modules = [...this.getModuleIds()];
+      if (!modules.some(id => id.includes("/${engine}-gl/"))) throw new Error("Missing selected SDK");
+      const forbidden = ${JSON.stringify([engine === "mapbox" ? "maplibre-gl" : "mapbox-gl", "@rnmapbox/maps", "@maplibre/maplibre-react-native", ...(stock ? ["one-map-react"] : [])])};
+      for (const id of modules) {
+        if (forbidden.some(pkg => id.includes("/" + pkg + "/"))) throw new Error("Unexpected module: " + id);
       }
-    },
+    }
   }],
   build: { minify: false },
 });
 `
-    );
-
-    run("bunx", ["vp", "build"], shellRoot);
+      );
+      run(
+        join(root, "node_modules/.bin/tsc"),
+        ["-p", "tsconfig.json"],
+        shellRoot
+      );
+      run("bunx", ["vp", "build"], shellRoot);
+    }
     const peers = {};
     for (const peer of [
       "react",
@@ -190,12 +195,45 @@ export default defineConfig({
       lockfileSha256: sha256(join(shellRoot, "bun.lock")),
       status: "passed",
       scope:
-        "Vite production build and selected-engine module isolation; no browser renderer",
+        "Direct stock and packed alias TypeScript and Vite builds, with selected-engine isolation; no browser renderer",
     });
     console.log(
       `PASS ${engine} shared example: frozen package, selected install and bundle isolation.`
     );
   }
+  // Include development routes, where native imports in a shared scene can
+  // survive even when the production basemap renders stock components.
+  await build({
+    root: join(root, "apps/web"),
+    define: { "import.meta.env.DEV": "true" },
+    build: { write: false, minify: false },
+    logLevel: "error",
+    plugins: [
+      {
+        name: "verify-stock-browser-scenes",
+        generateBundle() {
+          const ids = [...this.getModuleIds()];
+          assert(
+            ids.some((id) => id.endsWith("/scenarios/web-queries-app.js")),
+            "Missing web development scenarios"
+          );
+          for (const id of ids) {
+            assert(
+              ![
+                "/one-map-react/",
+                "/@rnmapbox/maps/",
+                "/@maplibre/maplibre-react-native/",
+              ].some((path) => id.includes(path)),
+              `Browser scenario imported native code: ${id}`
+            );
+          }
+        },
+      },
+    ],
+  });
+  console.log(
+    "PASS maintained Vite basemap and development routes load stock browser components without the native shim."
+  );
 } finally {
   if (options.evidence)
     writeFileSync(

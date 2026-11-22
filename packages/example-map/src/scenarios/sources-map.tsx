@@ -1,22 +1,23 @@
-import {
-  type GeoJsonFeatureCollection,
-  Images,
-  Layer,
-  type MapErrorEvent,
-  type MapLayoutStyle,
-  type MapStyle,
-  Map as OneMap,
-  Source,
-} from "one-map-react";
-import { useEffect, useState } from "react";
+import type { FeatureCollection } from "geojson";
+import type { MapLayoutStyle } from "one-map-react";
+import { useCallback, useEffect, useState } from "react";
 
 import { initialViewState, markers } from "./map-fixture.js";
+import {
+  isBrowserMap,
+  type NativeSceneComponents,
+  type SceneStyle,
+  type WebSceneComponents,
+  type WebSceneMap,
+} from "./scene-components.js";
+import { useWebStyleImage } from "./web-style-image.js";
 
 interface SourcesMapProps {
   /** Fixture server base URL for tile, overlay, and marker image URLs. */
   readonly base: string;
-  readonly mapStyle: MapStyle;
-  readonly routeData: GeoJsonFeatureCollection;
+  readonly mapStyle: SceneStyle;
+  readonly components: WebSceneComponents | NativeSceneComponents;
+  readonly routeData: FeatureCollection;
   /** Line paint color while set; `undefined` removes the paint key. */
   readonly lineColor: string | undefined;
   /** Whether the vector and image sources are mounted. */
@@ -24,16 +25,21 @@ interface SourcesMapProps {
   readonly style?: MapLayoutStyle;
   readonly onLoad?: () => void;
   readonly onStyleLoad?: () => void;
-  readonly onError?: (event: MapErrorEvent) => void;
+  readonly onError?: (event: { readonly error?: unknown }) => void;
 }
 
 /** Image source corners around the Seattle fixture camera. */
-const overlayCorners = [
+const overlayCorners: [
+  [number, number],
+  [number, number],
+  [number, number],
+  [number, number],
+] = [
   [-122.45, 47.7],
   [-122.2, 47.7],
   [-122.2, 47.5],
   [-122.45, 47.5],
-] as const;
+];
 
 /**
  * Shared TF05 scene: vector, raster, image, and two GeoJSON sources under
@@ -41,6 +47,7 @@ const overlayCorners = [
  */
 export const SourcesMap = ({
   base,
+  components,
   mapStyle,
   routeData,
   lineColor,
@@ -50,6 +57,12 @@ export const SourcesMap = ({
   onStyleLoad,
   onError,
 }: SourcesMapProps) => {
+  const { Map: MapView, Layer, Source } = components;
+  const native = components.platform === "native";
+  const [browserMap, setBrowserMap] = useState<WebSceneMap | null>(null);
+  const attachBrowserMap = useCallback((map: unknown) => {
+    setBrowserMap(isBrowserMap(map) ? map : null);
+  }, []);
   const [mountedStyle, setMountedStyle] = useState(mapStyle);
   const [imagesReady, setImagesReady] = useState(false);
   const mountedStyleKey = styleContentKey(mountedStyle);
@@ -63,21 +76,37 @@ export const SourcesMap = ({
     setMountedStyle(mapStyle);
   }, [mapStyle, mountedStyleKey, requestedStyleKey]);
 
+  const observeStyle = () => {
+    if (imagesReady || mountedStyleKey !== requestedStyleKey) return;
+    setImagesReady(true);
+    onStyleLoad?.();
+  };
+  const registerImage = imagesReady && mountedStyleKey === requestedStyleKey;
+  useWebStyleImage(
+    registerImage ? browserMap : null,
+    "marker",
+    `${base}/marker.png`,
+    (error) => {
+      onError?.({ error });
+    }
+  );
+
   return (
-    <OneMap
+    <MapView
       mapStyle={mountedStyle}
       initialViewState={initialViewState}
       style={style}
       onLoad={onLoad}
-      onStyleLoad={() => {
-        if (mountedStyleKey !== requestedStyleKey) return;
-        setImagesReady(true);
-        onStyleLoad?.();
-      }}
+      {...(!native
+        ? {
+            ref: attachBrowserMap,
+            onIdle: observeStyle,
+          }
+        : { onStyleLoad: observeStyle })}
       onError={onError}
     >
-      {imagesReady && mountedStyleKey === requestedStyleKey ? (
-        <Images images={{ marker: `${base}/marker.png` }} />
+      {registerImage && native ? (
+        <components.Images images={{ marker: `${base}/marker.png` }} />
       ) : null}
       {showTransient ? (
         <Source id="blocks" type="vector" url={`${base}/tiles.json`}>
@@ -136,12 +165,12 @@ export const SourcesMap = ({
           }}
         />
       </Source>
-    </OneMap>
+    </MapView>
   );
 };
 
 // Match the facade's declarative equality so equal style values need no load event.
-const styleContentKey = (style: MapStyle): string =>
+const styleContentKey = (style: SceneStyle): string =>
   JSON.stringify(style, (_key, value: unknown) =>
     value !== null && typeof value === "object" && !Array.isArray(value)
       ? Object.fromEntries(

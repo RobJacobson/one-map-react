@@ -11,7 +11,7 @@ jest.mock(
     measureNativeViewport: async () => [0, 0, 320, 480],
   })
 );
-jest.mock("one-map-react", () => ({
+jest.mock("one-map-react/legacy", () => ({
   MapSetup: ({ children }: { readonly children: ReactNode }) => children,
 }));
 jest.mock("../../../packages/example-map/src/scenarios/tf07-scene.js", () => ({

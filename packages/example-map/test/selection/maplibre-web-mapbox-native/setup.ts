@@ -1,2 +1,2 @@
-/** Application setup selects maplibre on web; shared maps import only the common entry. */
-export { adapter } from "one-map-react/maplibre-web";
+// Browser resolution selects the upstream entry directly.
+export { Map } from "react-map-gl/maplibre";

@@ -1,4 +1,4 @@
-import { type MapRef, MapSetup } from "one-map-react";
+import { type MapRef, MapSetup } from "one-map-react/legacy";
 import {
   adapter,
   type NativeMapProps,

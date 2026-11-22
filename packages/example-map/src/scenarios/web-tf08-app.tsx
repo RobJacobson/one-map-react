@@ -1,7 +1,7 @@
-import { type Adapter, MapSetup } from "one-map-react";
 import { type ComponentProps, useCallback, useMemo } from "react";
 
 import { acquireLocation, locationPosition } from "./location-acquisition.js";
+import type { WebBackend, WebSceneComponents } from "./scene-components.js";
 import {
   type Tf08AcceptanceProbe,
   Tf08AcceptanceScene,
@@ -16,13 +16,15 @@ declare global {
 
 /** Browser TF08 acceptance shell, selected with ?tf08=services. */
 export const WebTf08App = ({
-  adapter,
+  components,
+  backend,
   renderLocation,
   navigationControl,
   ornamentControls,
   renderCoveragePopup,
 }: {
-  readonly adapter: Adapter;
+  readonly components: WebSceneComponents;
+  readonly backend: WebBackend;
   readonly renderLocation: ComponentProps<
     typeof Tf08AcceptanceScene
   >["renderLocation"];
@@ -48,28 +50,25 @@ export const WebTf08App = ({
     []
   );
   return (
-    <MapSetup adapter={adapter}>
-      <div id="tf08-map-host" style={{ width: "100vw", height: "100vh" }}>
-        <Tf08AcceptanceScene
-          renderLocation={renderLocation}
-          navigationControl={navigationControl}
-          ornamentControls={ornamentControls}
-          renderCoveragePopup={renderCoveragePopup}
-          backend={adapter.backend}
-          requestLocationPermission={requestLocationPermission}
-          getCurrentPosition={getCurrentPosition}
-          style={{ width: "100%", height: "100%" }}
-          attach={attach}
-          fixtureUrl="http://127.0.0.1:8798"
-          externalContext={externalContext ?? undefined}
-          overlay={
-            <div
-              style={{ width: 40, height: 40, backgroundColor: "#00ff00" }}
-            />
-          }
-        />
-      </div>
-    </MapSetup>
+    <div id="tf08-map-host" style={{ width: "100vw", height: "100vh" }}>
+      <Tf08AcceptanceScene
+        renderLocation={renderLocation}
+        navigationControl={navigationControl}
+        ornamentControls={ornamentControls}
+        renderCoveragePopup={renderCoveragePopup}
+        backend={backend}
+        components={components}
+        requestLocationPermission={requestLocationPermission}
+        getCurrentPosition={getCurrentPosition}
+        style={{ width: "100%", height: "100%" }}
+        attach={attach}
+        fixtureUrl="http://127.0.0.1:8798"
+        externalContext={externalContext ?? undefined}
+        overlay={
+          <div style={{ width: 40, height: 40, backgroundColor: "#00ff00" }} />
+        }
+      />
+    </div>
   );
 };
 

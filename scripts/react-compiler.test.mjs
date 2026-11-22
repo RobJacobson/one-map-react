@@ -14,8 +14,6 @@ for (const [relative, names] of [
   ["facade/source.tsx", ["Source"]],
   ["facade/use-stable-options.ts", ["useStableOptions"]],
   ["adapters/shared/use-frozen-value.ts", ["useFrozenValue"]],
-  ["adapters/web/map.tsx", ["WebMap", "useWebPadding"]],
-  ["adapters/web/images.tsx", ["WebImages", "WebImage"]],
   ["adapters/shared/native-ui.tsx", ["useNativeMarkerActivation"]],
   ["facade/use-map-interactions.ts", ["useMapInteractions"]],
   ["adapters/shared/native-marker-overlay.tsx", ["NativeMarkerOverlay"]],

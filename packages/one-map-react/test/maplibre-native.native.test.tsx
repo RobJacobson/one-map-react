@@ -24,11 +24,11 @@ import type {
   MapProps,
 } from "../src/contracts/map-types.js";
 import type { FeatureState } from "../src/contracts/query-types.js";
-import { Images } from "../src/facade/images.js";
 import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
+import { Images } from "../src/native-extensions.js";
 import { testNativeEntryBinding } from "./native-entry-binding.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());

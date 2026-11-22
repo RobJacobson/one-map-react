@@ -1,12 +1,11 @@
-import type { MapRef } from "one-map-react";
 import type {
-  WebMapProps as MapboxWebProps,
-  WebMapRef as MapboxWebRef,
-} from "one-map-react/mapbox-web";
+  MapProps as MapboxWebProps,
+  MapRef as MapboxWebRef,
+} from "react-map-gl/mapbox";
 import type {
-  WebMapProps as MaplibreWebProps,
-  WebMapRef as MaplibreWebRef,
-} from "one-map-react/maplibre-web";
+  MapProps as MaplibreWebProps,
+  MapRef as MaplibreWebRef,
+} from "react-map-gl/maplibre";
 
 /**
  * Selects constructor options for the examples' canvas observations.
@@ -22,11 +21,11 @@ export const renderingBufferOptions = (
   if (backend === "mapbox-web")
     return {
       preserveDrawingBuffer: true as const,
-    } satisfies MapboxWebProps["options"];
+    } satisfies MapboxWebProps;
   if (backend === "maplibre-web")
     return {
       canvasContextAttributes: { preserveDrawingBuffer: true },
-    } satisfies MaplibreWebProps["options"];
+    } satisfies MaplibreWebProps;
   return undefined;
 };
 
@@ -40,14 +39,12 @@ export const renderingBufferOptions = (
  */
 export const captureRendering = async (
   backend: string,
-  map: MapRef | null,
+  map: Pick<MapboxWebRef | MaplibreWebRef, "getCanvas"> | null,
   output: "data-url" | "file" = "data-url"
 ): Promise<{ uri: string }> => {
   if (!map) throw new Error("Observation map is not attached.");
   if (backend !== "mapbox-web" && backend !== "maplibre-web")
     throw new Error(`Unknown browser observation backend: ${backend}`);
   if (output === "file") throw new Error("Browser observations use data URLs.");
-  // The shell selects the adapter; the common ref intentionally has no SDK API.
-  const wrapper = await (map as MapboxWebRef | MaplibreWebRef).getWrapperMap();
-  return { uri: wrapper.getCanvas().toDataURL("image/png") };
+  return { uri: map.getCanvas().toDataURL("image/png") };
 };

@@ -27,11 +27,20 @@ export type {
 import type { StyleDocument } from "./contracts/style-types.js";
 import { useLayerOptions } from "./facade/layer.js";
 import { createNativeMapBinding } from "./facade/native-map.js";
-export type { NativeMarkerProps } from "./facade/native-map.js";
-export type { SourceProps as NativeSourceProps } from "./contracts/source-types.js";
+export type {
+  NativeMarkerProps,
+  NativeMarkerProps as MarkerProps,
+} from "./facade/native-map.js";
+export type {
+  SourceProps,
+  SourceProps as NativeSourceProps,
+} from "./contracts/source-types.js";
 
 export type { GestureSettings } from "./adapters/mapbox-native/index.js";
-export type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
+export type {
+  NativeAdvancedMapRef,
+  NativeAdvancedMapRef as MapRef,
+} from "./adapters/mapbox-native/map-ref.js";
 export {
   adapter,
   CameraGestureObserver,
@@ -86,10 +95,18 @@ const {
   MapboxNativeMap,
   adapter
 );
-export { NativeMap as Map, MapProvider, Marker, Source, useMap };
+export {
+  NativeMap as default,
+  NativeMap as Map,
+  MapProvider,
+  Marker,
+  Source,
+  useMap,
+};
 
 /** Style-spec options for an RNMapbox layer. */
 export type NativeLayerProps = NativePortableLayerProps;
+export type { NativeLayerProps as LayerProps, NativeMapProps as MapProps };
 
 /**
  * Renders a Layer through RNMapbox.

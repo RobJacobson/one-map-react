@@ -19,14 +19,14 @@ export type Backend =
   | "maplibre-native";
 
 /**
- * Backend selection and the map components that implement it.
+ * Native backend selection for the legacy setup and bound map extensions.
  *
  * Application setup passes this value to {@link MapSetup}. Shared map code
  * reads it from context and does not import a wrapper.
  */
 export interface Adapter {
   /** Backend chosen by application setup, independently of installed packages. */
-  readonly backend: Backend;
+  readonly backend: Extract<Backend, "mapbox-native" | "maplibre-native">;
   /** Map container, camera, commands, and movement events. */
   readonly Map: ForwardRefExoticComponent<MapProps & RefAttributes<MapRef>>;
   /** Source that nests child layers. */

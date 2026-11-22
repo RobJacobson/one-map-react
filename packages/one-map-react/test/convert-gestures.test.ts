@@ -2,10 +2,6 @@ import { describe, expect, expectTypeOf, test } from "vite-plus/test";
 
 import { toRnmapboxGestures } from "../src/adapters/mapbox-native/convert-gestures.js";
 import { toMaplibreGestures } from "../src/adapters/maplibre-native/convert-gestures.js";
-import {
-  toWebGestureProps,
-  webTouchZoomRotate,
-} from "../src/adapters/web/convert-gestures.js";
 import type { GestureSelection, MapProps } from "../src/contracts/map-types.js";
 
 test("gesture selection retains the common map field types", () => {
@@ -31,58 +27,6 @@ test("gesture selection retains the common map field types", () => {
 });
 
 describe("gesture conversion", () => {
-  test("web interactive false disables all mutable handlers and preserves unrelated options", () => {
-    expect(
-      toWebGestureProps({
-        interactive: false,
-        dragPan: true,
-        touchZoom: true,
-        doubleTapZoom: true,
-        hash: "camera",
-        clickTolerance: 8,
-        cooperativeGestures: true,
-      })
-    ).toEqual({
-      interactive: false,
-      dragPan: false,
-      scrollZoom: false,
-      doubleClickZoom: false,
-      dragRotate: false,
-      boxZoom: false,
-      keyboard: false,
-      touchPitch: false,
-      touchZoomRotate: false,
-      hash: "camera",
-      clickTolerance: 8,
-      cooperativeGestures: true,
-    });
-    expect(toWebGestureProps({})).toEqual({});
-    expect(toWebGestureProps({ interactive: true, dragPan: false })).toEqual({
-      interactive: true,
-      dragPan: false,
-    });
-  });
-
-  test("conflicting double zoom flags reject even when interaction is disabled", () => {
-    expect(() =>
-      toWebGestureProps({
-        interactive: false,
-        doubleTapZoom: true,
-        doubleClickZoom: false,
-      })
-    ).toThrow("must agree");
-  });
-
-  test("web keeps pinch zoom when rotation is off", () => {
-    expect(webTouchZoomRotate(undefined, false)).toBe(true);
-    expect(webTouchZoomRotate(false, false)).toBe(false);
-    expect(webTouchZoomRotate(undefined, undefined)).toBeUndefined();
-    expect(toWebGestureProps({ touchRotate: false, dragPan: false })).toEqual({
-      dragPan: false,
-      touchZoomRotate: true,
-    });
-  });
-
   test("RNMapbox renames pan and records both double-tap flags", () => {
     expect(
       toRnmapboxGestures({

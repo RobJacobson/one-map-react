@@ -60,8 +60,7 @@ export interface MapProps {
   /**
    * Camera target supplied by React.
    *
-   * Web adapters delegate controlled movement to react-map-gl. Native adapters
-   * apply changed values through Camera props; movement can leave an unchanged
+   * Native adapters apply changed values through Camera props; movement can leave an unchanged
    * target behind. Use an explicit command to reapply the same native target.
    * Removing this value releases the target. Native location follow cannot own
    * the camera at the same time. The `controlledCamera` capability remains unavailable.
@@ -81,47 +80,22 @@ export interface MapProps {
   readonly maxBounds?: Bounds;
   /**
    * Padding in logical map-view units. Missing sides become zero.
-   * Web updates are mutable; clearing an override sends a zero reset once.
    * Initial omission preserves the wrapper default.
    */
   readonly padding?: Padding;
   /** Host layout for the map container. */
   readonly style?: MapLayoutStyle;
-  /**
-   * When true, a web remount may adopt a renderer the wrapper kept.
-   *
-   * Native adapters reject `true` because those wrappers have no reuse
-   * facility. Omitted and `false` remount a new native map.
-   */
+  /** Native maps remount on replacement. A request to pool a map throws. */
   readonly reuseMaps?: boolean;
-  /**
-   * Web-only drawing context passed to react-map-gl at construction.
-   *
-   * Native adapters reject a provided context. Reuse does not move a later
-   * context onto a map that was already constructed.
-   */
+  /** Providing an external drawing context throws on native. */
   readonly gl?: ExternalDrawingContext;
-  /**
-   * Turns interaction on or off.
-   *
-   * `false` forces every web handler and the portable native gesture flags
-   * off, even when an individual flag is true. Web updates are mutable;
-   * clearing the override restores explicit flags or wrapper defaults.
-   * Omitted leaves each flag to the wrapper unless that flag is set.
-   */
+  /** Set false to disable native map gestures, including individually enabled gestures. */
   readonly interactive?: boolean;
   /** Enables one-finger panning. RNMapbox receives this as `scrollEnabled`. */
   readonly dragPan?: boolean;
   /** Enables pinch zoom. */
   readonly touchZoom?: boolean;
-  /**
-   * Enables rotation from the pinch handler.
-   *
-   * Web pinch zoom and rotation are one handler. When zoom stays on and this
-   * is `false`, the adapter leaves zoom enabled and disables rotation on that
-   * handler. Clearing this override or unmounting restores rotation without
-   * enabling a disabled pinch handler.
-   */
+  /** Enables the native rotation gesture. */
   readonly touchRotate?: boolean;
   /** Enables the pitch gesture. */
   readonly touchPitch?: boolean;
@@ -132,8 +106,6 @@ export interface MapProps {
    * recognizer independent of pinch zoom. Android SDK 13.6.1 still requires
    * zoom gestures, so this does not restore a double tap while `touchZoom`
    * is `false`. RNMapbox receives the double-tap entries of `gestureSettings`.
-   * Web uses the double-click handler. If both flags are supplied, their
-   * values must agree; omission preserves the wrapper default.
    */
   readonly doubleTapZoom?: boolean;
   /**
@@ -142,12 +114,7 @@ export interface MapProps {
    * Native adapters throw when this is set. There is no native wheel.
    */
   readonly scrollZoom?: boolean;
-  /**
-   * Enables double-click zoom.
-   *
-   * Native adapters throw when this is set. On web this shares the
-   * double-tap handler and must agree with a supplied `doubleTapZoom`.
-   */
+  /** Native adapters reject a supplied double-click flag. */
   readonly doubleClickZoom?: boolean;
   /**
    * Enables right-drag rotation.
@@ -191,14 +158,14 @@ export interface MapProps {
   /**
    * Called when a camera movement starts.
    *
-   * Web uses `movestart`. MapLibre Native uses `onRegionWillChange`.
+   * MapLibre Native uses `onRegionWillChange`.
    * RNMapbox has no separate start event, so this is not called there.
    */
   readonly onMoveStart?: (event: MoveEvent) => void;
   /**
    * Called when the camera settles.
    *
-   * This is not map idleness. Web uses `moveend`. RNMapbox uses `onMapIdle`
+   * This is not map idleness. RNMapbox uses `onMapIdle`
    * for this settled camera and also calls `onIdle`. MapLibre Native uses
    * `onRegionDidChange`.
    */
@@ -206,7 +173,7 @@ export interface MapProps {
   /**
    * Called when the map reports that it is idle.
    *
-   * Web uses `idle`. RNMapbox uses `onMapIdle`. MapLibre Native has no idle
+   * RNMapbox uses `onMapIdle`. MapLibre Native has no idle
    * callback, so this is not called there. The first native settle can also
    * call `onMove` once when the map never sent a changing event.
    */
@@ -219,12 +186,7 @@ export interface MapProps {
    * Native adapters throw when this is set.
    */
   readonly onDblClick?: (event: ClickEvent) => void;
-  /**
-   * Called for a long press.
-   *
-   * Native adapters forward it. Web throws, because react-map-gl has no
-   * long-press callback and this package does not add a browser recognizer.
-   */
+  /** Called when the native wrapper reports a long press. */
   readonly onLongPress?: (event: ClickEvent) => void;
   /** Called for the web context menu. Native adapters throw when this is set. */
   readonly onContextMenu?: (event: ClickEvent) => void;
@@ -264,24 +226,11 @@ export interface MapProps {
    * This does not mean every later tile or source has loaded.
    */
   readonly onLoad?: () => void;
-  /**
-   * Called when the map reports that a style finished loading.
-   *
-   * Web listens for the map's `style.load` event. If that event already
-   * finished and `isStyleLoaded()` is still false, the following map
-   * `load` reports this once when the style is loaded. A reused web map
-   * can attach after that `load` and still see the style as unloaded;
-   * the next `idle` then reports this once. Native uses
-   * `onDidFinishLoadingStyle`. This is not react-map-gl `onStyleData`.
-   */
+  /** Called when the native wrapper reports onDidFinishLoadingStyle. */
   readonly onStyleLoad?: () => void;
   /** Called when the wrapper reports a map error. */
   readonly onError?: (event: MapErrorEvent) => void;
-  /**
-   * Called when a web map reports a resize.
-   *
-   * Native adapters do not call this. Native size follows the host `style`.
-   */
+  /** Native views follow the host layout. The native SDK does not call this handler. */
   readonly onResize?: () => void;
   /** Sources and layers rendered inside the map. */
   readonly children?: ReactNode;

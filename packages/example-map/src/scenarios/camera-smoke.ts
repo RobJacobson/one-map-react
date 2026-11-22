@@ -1,5 +1,12 @@
-import type { ClickEvent, LngLat, MapRef, ViewState } from "one-map-react";
+import type { LngLat, ViewState } from "one-map-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+
+import {
+  coordinateTuple,
+  type SceneBounds,
+  type SceneClick,
+  type SceneMap,
+} from "./scene-components.js";
 
 /**
  * North end of the Seattle fixture, away from the opening camera.
@@ -7,13 +14,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
  * The opening camera is latitude 47.61. A fitted center inside this box
  * shows that `fitBounds` moved the map.
  */
-export const cameraSmokeBounds = [
+export const cameraSmokeBounds: SceneBounds = [
   [-122.33, 47.63],
   [-122.31, 47.65],
-] as const;
+];
 
 /** A target far enough from Seattle that a finished flight is obvious. */
-const flightTarget: LngLat = [-120, 45];
+const flightTarget: [number, number] = [-120, 45];
 
 type SmokePhase =
   | "await-load"
@@ -25,7 +32,7 @@ type SmokePhase =
   | "done";
 
 interface CameraSmokeOptions {
-  readonly mapRef: { readonly current: MapRef | null };
+  readonly mapRef: { readonly current: SceneMap | null };
   /** Native `stop()` is expected to reject. Web `stop()` is expected to cancel. */
   readonly platform: "web" | "native";
   /**
@@ -52,7 +59,7 @@ interface CameraSmoke {
   readonly onLoad: () => void;
   readonly onMove: (event: { readonly viewState: ViewState }) => void;
   readonly onMoveEnd: (event: { readonly viewState: ViewState }) => void;
-  readonly onClick: (event: ClickEvent) => void;
+  readonly onClick: (event: SceneClick) => void;
 }
 
 interface SmokeFields {
@@ -144,14 +151,14 @@ export const useCameraSmoke = ({
     publish();
   };
 
-  const onClick = (event: ClickEvent) => {
+  const onClick = (event: SceneClick) => {
     if (phaseRef.current !== "await-click" || !fitted.current) {
       return;
     }
 
-    fields.current.clickAt = formatLngLat(event.lngLat);
+    fields.current.clickAt = formatLngLat(coordinateTuple(event.lngLat));
 
-    if (!samePlace(event.lngLat, fitted.current)) {
+    if (!samePlace(coordinateTuple(event.lngLat), fitted.current)) {
       fields.current.click = "off";
       publish();
       return;
@@ -245,8 +252,8 @@ export const useCameraSmoke = ({
     }
 
     if (platform === "native") {
-      void mapRef.current
-        ?.stop()
+      void Promise.resolve()
+        .then(() => mapRef.current?.stop())
         .then(() => {
           if (phaseRef.current !== "await-stop") {
             return;
@@ -270,8 +277,7 @@ export const useCameraSmoke = ({
     void mapRef.current?.stop();
 
     const timer = setTimeout(() => {
-      void mapRef.current
-        ?.getCenter()
+      void readCenter(mapRef.current)
         .then((center) => {
           if (phaseRef.current !== "await-stop") {
             return;
@@ -306,14 +312,15 @@ export const useCameraSmoke = ({
     }
 
     const probe = setTimeout(() => {
-      void mapRef.current?.jumpTo({ center: flightTarget }).catch(() => {
-        fields.current.note = "jump-rejected";
-        if (platform === "native") fields.current.command = "rejected";
-      });
+      void Promise.resolve()
+        .then(() => mapRef.current?.jumpTo({ center: flightTarget }))
+        .catch(() => {
+          fields.current.note = "jump-rejected";
+          if (platform === "native") fields.current.command = "rejected";
+        });
     }, 800);
     const read = setTimeout(() => {
-      void mapRef.current
-        ?.getCenter()
+      void readCenter(mapRef.current)
         .then((center) => {
           if (phaseRef.current !== "await-hold" || !fitted.current) {
             return;
@@ -409,7 +416,9 @@ export const useCameraSmoke = ({
     }
 
     const readZoom = () => {
-      void mapRef.current?.getZoom().then((zoom) => {
+      const map = mapRef.current;
+      if (!map) return;
+      void Promise.resolve(map.getZoom()).then((zoom) => {
         if (phaseRef.current !== "await-double-tap") {
           return;
         }
@@ -460,15 +469,15 @@ export const useCameraSmoke = ({
 };
 
 const requestFit = (
-  mapRef: { readonly current: MapRef | null },
+  mapRef: { readonly current: SceneMap | null },
   phaseRef: { current: SmokePhase },
   fields: { current: SmokeFields },
   attempt: number,
   finish: () => void
 ) => {
-  const fit = mapRef.current?.fitBounds(cameraSmokeBounds, { duration: 500 });
+  const map = mapRef.current;
 
-  if (!fit) {
+  if (!map) {
     if (attempt < 20) {
       setTimeout(
         () => requestFit(mapRef, phaseRef, fields, attempt + 1, finish),
@@ -483,25 +492,32 @@ const requestFit = (
     return;
   }
 
-  void fit.catch((error: unknown) => {
-    if (phaseRef.current !== "await-fit") {
-      return;
-    }
+  void Promise.resolve()
+    .then(() => map.fitBounds(cameraSmokeBounds, { duration: 500 }))
+    .catch((error: unknown) => {
+      if (phaseRef.current !== "await-fit") {
+        return;
+      }
 
-    const text = errorText(error);
+      const text = errorText(error);
 
-    if (attempt < 20 && text.includes("not-attached")) {
-      setTimeout(
-        () => requestFit(mapRef, phaseRef, fields, attempt + 1, finish),
-        100
-      );
-      return;
-    }
+      if (attempt < 20 && text.includes("not-attached")) {
+        setTimeout(
+          () => requestFit(mapRef, phaseRef, fields, attempt + 1, finish),
+          100
+        );
+        return;
+      }
 
-    fields.current.fit = "rejected";
-    fields.current.note = text;
-    finish();
-  });
+      fields.current.fit = "rejected";
+      fields.current.note = text;
+      finish();
+    });
+};
+
+const readCenter = async (map: SceneMap | null): Promise<LngLat> => {
+  if (!map) throw new Error("Camera map is not attached.");
+  return coordinateTuple(await map.getCenter());
 };
 
 const parseCenter = (value: string): LngLat | undefined => {

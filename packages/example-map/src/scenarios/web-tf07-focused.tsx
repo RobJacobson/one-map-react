@@ -1,13 +1,4 @@
-import {
-  UserLocation,
-  type GeolocationPosition,
-  MapSetup,
-  type Adapter,
-  type LngLat,
-  type MapRef,
-} from "one-map-react";
-import { Map as MapboxMap } from "one-map-react/mapbox-web";
-import { Map as MaplibreMap } from "one-map-react/maplibre-web";
+import type { GeolocationPosition, LngLat } from "one-map-react";
 import {
   type ReactNode,
   type ComponentType,
@@ -20,6 +11,12 @@ import {
 } from "react";
 
 import type { NativeLocationButtonProps } from "./native-location-button.js";
+import {
+  coordinateTuple,
+  type WebSceneComponents,
+  type SceneMap,
+} from "./scene-components.js";
+import { WebPosition } from "./web-position.js";
 
 type FocusAction = "remove" | "restore" | "theme";
 interface FocusRead {
@@ -66,22 +63,21 @@ const ThemeChild = ({ activate }: { readonly activate: () => void }) => {
  * @returns One focused map with configuration-only test actions.
  */
 export const WebTf07Focused = ({
-  adapter,
+  components,
   controls,
   renderLocation: Location,
 }: {
-  readonly adapter: Adapter;
+  readonly components: WebSceneComponents;
   readonly renderLocation: ComponentType<
     Pick<NativeLocationButtonProps, "onError" | "onGeolocate">
   >;
   readonly controls: ReactNode;
 }) => {
-  const map = useRef<MapRef>(null);
-  const attach = useCallback((instance: MapRef | null) => {
+  const map = useRef<SceneMap>(null);
+  const attach = useCallback((instance: SceneMap | null) => {
     map.current = instance;
   }, []);
-  const SelectedMap =
-    adapter.backend === "mapbox-web" ? MapboxMap : MaplibreMap;
+  const { Map: SelectedMap } = components;
   const counts = useRef({
     load: 0,
     error: 0,
@@ -104,7 +100,11 @@ export const WebTf07Focused = ({
           map.current?.getCenter(),
           map.current?.getZoom(),
         ]);
-        return { ...counts.current, center, zoom };
+        return {
+          ...counts.current,
+          center: center ? coordinateTuple(center) : undefined,
+          zoom,
+        };
       },
     };
     window.__tf07Focused = probe;
@@ -115,7 +115,7 @@ export const WebTf07Focused = ({
   return (
     <>
       <Theme.Provider value={theme}>
-        <MapSetup adapter={adapter}>
+        <section aria-label="Focused acceptance map">
           <SelectedMap
             ref={attach}
             mapStyle={style}
@@ -127,17 +127,13 @@ export const WebTf07Focused = ({
               pitch: 0,
             }}
             style={{ width: "100%", height: "100vh" }}
-            hostProps={{
-              role: "region",
-              "aria-label": "Focused acceptance map",
-            }}
             onLoad={() => {
               counts.current.load += 1;
             }}
           >
             {controls}
             {mounted && (
-              <UserLocation position={displayPosition} showAccuracyCircle />
+              <WebPosition components={components} position={displayPosition} />
             )}
             {mounted && (
               <Location
@@ -151,14 +147,14 @@ export const WebTf07Focused = ({
               />
             )}
           </SelectedMap>
-          <div style={{ position: "absolute", bottom: 40, right: 8 }}>
-            <ThemeChild
-              activate={() => {
-                counts.current.clicks += 1;
-              }}
-            />
-          </div>
-        </MapSetup>
+        </section>
+        <div style={{ position: "absolute", bottom: 40, right: 8 }}>
+          <ThemeChild
+            activate={() => {
+              counts.current.clicks += 1;
+            }}
+          />
+        </div>
       </Theme.Provider>
     </>
   );

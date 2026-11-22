@@ -8,7 +8,7 @@ import {
   acceptanceScenarios,
 } from "@one-map/example-map/acceptance-selection";
 import { WebAcceptanceWorkspace } from "@one-map/example-map/acceptance-web";
-import { adapters, configureMapbox } from "@one-map/example-map/web";
+import { maps, configureMapbox } from "@one-map/example-map/web";
 
 const token = publicMapboxToken(
   import.meta.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN
@@ -36,14 +36,18 @@ export const App = () => {
 };
 
 const BasemapApp = () => {
-  const model = useExampleMap(adapters, Boolean(token));
+  const model = useExampleMap(Boolean(token));
   const testMode =
     import.meta.env.DEV &&
     new URLSearchParams(window.location.search).get("test") === "1";
   const disabled = model.status === "loading" || model.status === "switching";
   return (
     <main>
-      <ExampleMap model={model} style={{ width: "100%", height: "100%" }} />
+      <ExampleMap
+        model={model}
+        maps={maps}
+        style={{ width: "100%", height: "100%" }}
+      />
       <section className="map-controls" aria-label="Map controls">
         <fieldset className="engine-toggle" aria-label="Map engine">
           <button

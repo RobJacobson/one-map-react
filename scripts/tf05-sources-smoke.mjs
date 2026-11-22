@@ -930,18 +930,25 @@ const runWebCorrections = async (page) => {
     "initial style",
     20000
   );
-  // Instrument only completion of the real renderer's image load, after decode.
+  // Observe the application image request and its actual decode completion.
   await page.evaluate(`(() => {
-    const map = ${renderer};
-    const original = map.loadImage;
-    window.__oneMapOriginalImageLoad = original;
+    const prototype = HTMLImageElement.prototype;
+    const descriptor = Object.getOwnPropertyDescriptor(prototype, "src");
+    window.__oneMapImageSourceDescriptor = descriptor;
     window.__oneMapImageStarted = false;
     window.__oneMapImageSettled = false;
-    map.loadImage = function(url, callback) {
-      window.__oneMapImageStarted = true;
-      if (callback) return original.call(this, url, (error, image) => { callback(error, image); requestAnimationFrame(() => { window.__oneMapImageSettled = true; }); });
-      return original.call(this, url).finally(() => { requestAnimationFrame(() => { window.__oneMapImageSettled = true; }); });
-    };
+    Object.defineProperty(prototype, "src", {
+      ...descriptor,
+      set(url) {
+        if (String(url).includes("-marker.png")) {
+          window.__oneMapImageStarted = true;
+          this.addEventListener("load", () => {
+            requestAnimationFrame(() => { window.__oneMapImageSettled = true; });
+          }, { once: true });
+        }
+        descriptor.set.call(this, url);
+      },
+    });
   })()`);
   await click("image-start");
   await observe("window.__oneMapImageStarted === true", "image load started");
@@ -1014,7 +1021,7 @@ const runWebCorrections = async (page) => {
   if (await page.evaluate(`${renderer}.hasImage("held")`))
     throw new Error("Released image load registered on reused renderer");
   await page.evaluate(
-    `void (${renderer}.loadImage = window.__oneMapOriginalImageLoad)`
+    `Object.defineProperty(HTMLImageElement.prototype, "src", window.__oneMapImageSourceDescriptor)`
   );
 
   return {

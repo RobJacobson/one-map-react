@@ -4,11 +4,9 @@ Acceptance is deferred until release preparation or an explicit owner request. T
 
 The [advanced rendering record](tf09-rendering.md) describes portable terrain/projection/light/hillshade, selected advanced facilities, typed options, wrapper boundaries and the targeted acceptance procedure. Targeted acceptance passed in all six environments; the record preserves scope and earlier attempts.
 
-one-map-react is being built as a thin facade over RNMapbox, MapLibre React Native, and react-map-gl. The current TF contract targets full API coverage. The four-backend migration retains shared rendering/queries, mixed backend selection, and documented map reuse within the narrower [scope](requirements.md#purpose-and-scope). Implementation of that migration is in progress; current rc.11 APIs and historical acceptance remain separate. TF01 established the package and selection foundation. TF02 is complete. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03's reuse and lifecycle API is implemented, and its renderer smoke passed. TF04's camera, gesture, and interaction API is implemented. Its renderer smoke passed.
-
 ## Next breaking release
 
-The [native compatibility design](native-compatibility-design.md) explains why web applications will use stock react-map-gl, what the two native entries will own, and how to implement and verify the change in four stages.
+Use the [package migration guide](../packages/one-map-react/README.md) to select stock react-map-gl on web and a native compatibility entry on iOS or Android. The [native compatibility design](native-compatibility-design.md) explains the four stages, their verification and the ownership of camera, marker and query translations.
 
 ## Four-backend facade baseline
 

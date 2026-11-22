@@ -1,11 +1,12 @@
 import { act, fireEvent, render } from "@testing-library/react";
-import type { Adapter } from "one-map-react";
+import type { Adapter, ViewState } from "one-map-react";
 import type { ReactNode } from "react";
 import { expect, test, vi } from "vite-plus/test";
 
 import { NativeTf07RetainedScreen } from "../src/scenarios/native-tf07-retained-screen.js";
 
 const fixture = vi.hoisted(() => ({
+  targets: {} as Record<string, ViewState | undefined>,
   dimensions: { width: 390, height: 844, scale: 3, fontScale: 1 },
   maps: {} as Record<
     string,
@@ -65,7 +66,7 @@ vi.mock("react-native", async () => {
     useWindowDimensions: () => fixture.dimensions,
   };
 });
-vi.mock("one-map-react", async () => {
+vi.mock("one-map-react/legacy", async () => {
   const react = await import("react");
   const InMarker = react.createContext(false);
   const Content = ({ children }: { children?: ReactNode }) => children;
@@ -74,7 +75,15 @@ vi.mock("one-map-react", async () => {
     Source: Content,
     Layer: () => null,
     Map: react.forwardRef(
-      ({ id, children }: { id: string; children?: ReactNode }, ref) => {
+      (
+        {
+          id,
+          children,
+          viewState,
+        }: { id: string; children?: ReactNode; viewState?: ViewState },
+        ref
+      ) => {
+        fixture.targets[id] = viewState;
         const name = id.endsWith("a") ? "a" : "b";
         const map = react.useMemo(
           () => ({
@@ -343,4 +352,28 @@ test("more than twenty actual reads retain initial provider evidence", async () 
   });
   view.unmount();
   vi.unstubAllGlobals();
+});
+
+test("native target controls on the retained screen submit fresh equal inputs and keep renderer readback independent", async () => {
+  const mounted = mount();
+  const mapA = mounted.getByTestId("tf07-focus-a");
+  const mapB = mounted.getByTestId("tf07-focus-b");
+  fireEvent.click(mounted.getByRole("button", { name: "Target A" }));
+  const first = fixture.targets["tf07-focus-a"];
+  expect(first).toMatchObject({ longitude: -122.345, latitude: 47.612 });
+  fireEvent.click(mounted.getByRole("button", { name: "Repeat A" }));
+  expect(fixture.targets["tf07-focus-a"]).toEqual(first);
+  expect(fixture.targets["tf07-focus-a"]).not.toBe(first);
+  expect(fixture.targets["tf07-focus-b"]).toBeUndefined();
+  await act(async () => {
+    fireEvent.click(mounted.getByRole("button", { name: "Read focus" }));
+  });
+  expect(mounted.getByTestId("tf07-focused-readback").textContent).toContain(
+    '"center":[-122.34,47.61]'
+  );
+  fireEvent.click(mounted.getByRole("button", { name: "Clear A" }));
+  expect(fixture.targets["tf07-focus-a"]).toBeUndefined();
+  expect(mounted.getByTestId("tf07-focus-a")).toBe(mapA);
+  expect(mounted.getByTestId("tf07-focus-b")).toBe(mapB);
+  mounted.unmount();
 });

@@ -9,7 +9,7 @@ import {
   Source,
   Layer,
   useMap,
-} from "one-map-react";
+} from "one-map-react/legacy";
 import {
   createContext,
   useCallback,

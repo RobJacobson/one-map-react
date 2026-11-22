@@ -1,6 +1,6 @@
-import { type Adapter, MapSetup } from "one-map-react";
 import { type ComponentProps, useCallback, useState } from "react";
 
+import type { WebSceneComponents } from "./scene-components.js";
 import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
 
 declare global {
@@ -12,13 +12,13 @@ declare global {
 
 /** Web acceptance shell opened with `?tf07=ui`. */
 export const WebTf07App = ({
-  adapter,
+  components,
   renderNavigation,
   renderScale,
   renderLocation,
   renderPopup,
 }: {
-  readonly adapter: Adapter;
+  readonly components: WebSceneComponents;
   readonly renderLocation: ComponentProps<typeof Tf07Scene>["renderLocation"];
   readonly renderScale: ComponentProps<typeof Tf07Scene>["renderScale"];
   readonly renderNavigation: ComponentProps<
@@ -33,55 +33,52 @@ export const WebTf07App = ({
   }, []);
 
   return (
-    <MapSetup adapter={adapter}>
-      <div
-        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
-      >
-        <div style={{ padding: 8 }}>
-          {(["remount", "style", "offset", "popup", "units"] as const).map(
-            (action: Tf07Action) => (
-              <button
-                type="button"
-                key={action}
-                data-tf07-action={action}
-                onClick={() => window.__oneMapTf07?.configure(action)}
-              >
-                {action}
-              </button>
-            )
-          )}
-          <span data-tf07="custom-control">Custom control</span>
-          <span id="tf07-status">{status}</span>
-        </div>
-        <div id="tf07-map-host" style={{ flex: 1, position: "relative" }}>
-          <Tf07Scene
-            renderLocation={renderLocation}
-            renderNavigation={renderNavigation}
-            renderScale={renderScale}
-            renderPopup={renderPopup}
-            style={{ width: "100%", height: "100%" }}
-            attach={attach}
-            report={(event) => setStatus(`TF07 ${event}`)}
-            markerContent={(kind, activate) => (
-              <div data-tf07={kind} style={{ background: "white", padding: 8 }}>
-                <span>{kind === "live" ? "Long press to drag" : kind}</span>
-                {kind !== "annotation" && (
-                  <button
-                    type="button"
-                    data-tf07-child={kind}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      activate();
-                    }}
-                  >
-                    Child button
-                  </button>
-                )}
-              </div>
-            )}
-          />
-        </div>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <div style={{ padding: 8 }}>
+        {(["remount", "style", "offset", "popup", "units"] as const).map(
+          (action: Tf07Action) => (
+            <button
+              type="button"
+              key={action}
+              data-tf07-action={action}
+              onClick={() => window.__oneMapTf07?.configure(action)}
+            >
+              {action}
+            </button>
+          )
+        )}
+        <span data-tf07="custom-control">Custom control</span>
+        <span id="tf07-status">{status}</span>
       </div>
-    </MapSetup>
+      <div id="tf07-map-host" style={{ flex: 1, position: "relative" }}>
+        <Tf07Scene
+          components={components}
+          renderLocation={renderLocation}
+          renderNavigation={renderNavigation}
+          renderScale={renderScale}
+          renderPopup={renderPopup}
+          style={{ width: "100%", height: "100%" }}
+          attach={attach}
+          report={(event) => setStatus(`TF07 ${event}`)}
+          markerContent={(kind, activate) => (
+            <div data-tf07={kind} style={{ background: "white", padding: 8 }}>
+              <span>{kind === "live" ? "Long press to drag" : kind}</span>
+              {kind !== "annotation" && (
+                <button
+                  type="button"
+                  data-tf07-child={kind}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    activate();
+                  }}
+                >
+                  Child button
+                </button>
+              )}
+            </div>
+          )}
+        />
+      </div>
+    </div>
   );
 };

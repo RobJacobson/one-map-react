@@ -1,4 +1,4 @@
-import type { MapRef, ViewState } from "one-map-react";
+import type { ViewState } from "one-map-react";
 
 /** Shared test pose; the terrain scene separately starts with pitch 35. */
 export const nativeControlledCamera = {
@@ -12,7 +12,10 @@ export const nativeControlledCamera = {
 /** RNMapbox exposes orientation in native camera events, without ref getters. */
 export const readNativeOrientation = async (
   backend: string,
-  map: Pick<MapRef, "getBearing" | "getPitch">,
+  map: {
+    getBearing(): number | Promise<number>;
+    getPitch(): number | Promise<number>;
+  },
   observed: ViewState | undefined
 ): Promise<{
   bearing: number;
@@ -37,6 +40,8 @@ export const readNativeOrientation = async (
   return {
     bearing: await map.getBearing(),
     pitch: await map.getPitch(),
-    orientationSource: "native-camera-getters",
+    orientationSource: backend.endsWith("web")
+      ? "web-camera-getters"
+      : "native-camera-getters",
   };
 };

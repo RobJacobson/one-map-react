@@ -1,11 +1,11 @@
-import { type Adapter, type MapRef, MapSetup } from "one-map-react";
 import { useEffect, useRef } from "react";
 
 import { useCameraSmoke } from "./camera-smoke.js";
-import { RouteMap } from "./route-map.js";
+import type { SceneMap, WebSceneComponents } from "./scene-components.js";
+import { WebRouteMap } from "./web-route-map.js";
 
 interface WebCameraAppProps {
-  readonly adapter: Adapter;
+  readonly components: WebSceneComponents;
 }
 
 /**
@@ -15,8 +15,8 @@ interface WebCameraAppProps {
  * the canvas center, cancels a flight, then tries to jump away from a
  * controlled `viewState`.
  */
-export const WebCameraApp = ({ adapter }: WebCameraAppProps) => {
-  const mapRef = useRef<MapRef>(null);
+export const WebCameraApp = ({ components }: WebCameraAppProps) => {
+  const mapRef = useRef<SceneMap>(null);
   const smoke = useCameraSmoke({
     mapRef,
     platform: "web",
@@ -40,24 +40,23 @@ export const WebCameraApp = ({ adapter }: WebCameraAppProps) => {
   }, [smoke.phase]);
 
   return (
-    <MapSetup adapter={adapter}>
-      <div
-        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
-      >
-        <p id="tf04-status" style={{ margin: 0, padding: 8 }}>
-          {smoke.status}
-        </p>
-        <RouteMap
-          ref={mapRef}
-          style={{ width: "100%", height: "100%", flex: 1 }}
-          viewState={smoke.viewState}
-          onLoad={smoke.onLoad}
-          onMove={smoke.onMove}
-          onMoveEnd={smoke.onMoveEnd}
-          onClick={smoke.onClick}
-        />
-      </div>
-    </MapSetup>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <p id="tf04-status" style={{ margin: 0, padding: 8 }}>
+        {smoke.status}
+      </p>
+      <WebRouteMap
+        components={components}
+        ref={(map) => {
+          mapRef.current = map;
+        }}
+        style={{ width: "100%", height: "100%", flex: 1 }}
+        {...smoke.viewState}
+        onLoad={smoke.onLoad}
+        onMove={smoke.onMove}
+        onMoveEnd={smoke.onMoveEnd}
+        onClick={smoke.onClick}
+      />
+    </div>
   );
 };
 

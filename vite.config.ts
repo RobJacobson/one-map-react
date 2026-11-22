@@ -124,10 +124,19 @@ export default defineConfig({
         resolve: {
           alias: [
             {
-              find: /^one-map-react$/,
+              find: /^one-map-react(?:\/legacy)?$/,
               replacement: fileURLToPath(
                 new URL(
                   "./packages/one-map-react/src/index.ts",
+                  import.meta.url
+                )
+              ),
+            },
+            {
+              find: "one-map-react/native-extensions",
+              replacement: fileURLToPath(
+                new URL(
+                  "./packages/one-map-react/src/native-extensions.ts",
                   import.meta.url
                 )
               ),

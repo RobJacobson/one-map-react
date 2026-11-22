@@ -27,21 +27,34 @@ export type {
 } from "./contracts/native-types.js";
 import { useLayerOptions } from "./facade/layer.js";
 import { createNativeMapBinding } from "./facade/native-map.js";
-export type { NativeMarkerProps } from "./facade/native-map.js";
-export type { SourceProps as NativeSourceProps } from "./contracts/source-types.js";
+export type {
+  NativeMarkerProps,
+  NativeMarkerProps as MarkerProps,
+} from "./facade/native-map.js";
+export type {
+  SourceProps,
+  SourceProps as NativeSourceProps,
+} from "./contracts/source-types.js";
 
 export { adapter } from "./adapters/maplibre-native/index.js";
 import {
   MaplibreNativeLayer,
   type NativeLayerProps,
 } from "./adapters/maplibre-native/index.js";
-export type { NativeLayerProps };
+export type {
+  NativeLayerProps,
+  NativeLayerProps as LayerProps,
+  NativeMapProps as MapProps,
+};
 /** Renders a style-spec layer through MapLibre Native. */
 export const Layer = (props: NativeLayerProps): ReactElement => {
   useLayerOptions(props, adapter.backend);
   return <MaplibreNativeLayer {...props} />;
 };
-export type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
+export type {
+  NativeAdvancedMapRef,
+  NativeAdvancedMapRef as MapRef,
+} from "./adapters/maplibre-native/map-ref.js";
 
 /** Selected native map with typed renderer facilities and host attributes. */
 /** Selected SDK location follow options, applied to the existing camera. */
@@ -88,7 +101,14 @@ const {
   MaplibreNativeMap,
   adapter
 );
-export { NativeMap as Map, MapProvider, Marker, Source, useMap };
+export {
+  NativeMap as default,
+  NativeMap as Map,
+  MapProvider,
+  Marker,
+  Source,
+  useMap,
+};
 export {
   Callout,
   LayerAnnotation,

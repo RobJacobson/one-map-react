@@ -4,8 +4,8 @@ import {
   type MapRef,
   type MapStyle,
   Map as OneMap,
-  UserLocation,
-} from "one-map-react";
+} from "one-map-react/legacy";
+import { UserLocation } from "one-map-react/native-extensions";
 import { forwardRef, type ReactNode } from "react";
 
 /** Shared foreground-location scene; setup and permission UI belong to the shell. */

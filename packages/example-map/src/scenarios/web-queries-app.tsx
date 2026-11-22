@@ -1,92 +1,67 @@
-import { type Adapter, type MapRef, MapSetup } from "one-map-react";
-import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import {
+  useRef,
+  type ComponentType,
+  type ComponentProps,
+  type Ref,
+  type ReactNode,
+} from "react";
 
-import { QueriesMap } from "./queries-map.js";
+import { initialViewState } from "./map-fixture.js";
 import { useQueriesSmoke } from "./queries-smoke.js";
-import { runWebQueryRegressions } from "./web-query-regressions.js";
+import { QuerySources } from "./query-sources.js";
+import type { SceneStyle } from "./scene-components.js";
 
-interface WebQueriesAppProps {
-  readonly adapter: Adapter;
-  readonly probe: ReactNode;
-}
-
-declare global {
-  interface Window {
-    /** Actual selected SDK map, used only by the TF06 acceptance example. */
-    __oneMapQueryRenderer?: object;
-    /** Runs negative query checks after the ordinary TF06 hook completes. */
-    __oneMapQueryRegressions?: () => Promise<Readonly<Record<string, "ok">>>;
-  }
-}
-
-/** Publishes the selected wrapper's renderer without adding a facade API. */
-export const useWebQueriesProbe = (map: object | undefined): void => {
-  useLayoutEffect(() => {
-    window.__oneMapQueryRenderer = map;
-
-    return () => {
-      if (window.__oneMapQueryRenderer === map)
-        delete window.__oneMapQueryRenderer;
-    };
-  }, [map]);
+type BrowserMap =
+  | import("react-map-gl/mapbox").MapRef
+  | import("react-map-gl/maplibre").MapRef;
+type QueryMapProps = {
+  ref: Ref<BrowserMap>;
+  mapStyle: SceneStyle;
+  style: { width: string; height: string; flex: number };
+  initialViewState: typeof initialViewState;
+  onLoad: () => void;
+  onIdle: () => void;
+  onError: (event: { error: unknown }) => void;
+  children: ReactNode;
 };
 
-/**
- * Web example shell for the TF06 queries smoke.
- *
- * Open `/?tf06=queries`. The page runs rendered point, bounds, and
- * viewport queries, an empty off-screen query, a source query, cluster
- * expansion, leaves, and children, then feature-state set/get/remove and
- * explicit state clearing after source and style replacement.
- */
-export const WebQueriesApp = ({ adapter, probe }: WebQueriesAppProps) => {
-  const mapRef = useRef<MapRef>(null);
-  const expectedErrors = useRef<unknown[] | undefined>(undefined);
+/** Exercises stock renderer query, cluster, and feature-state operations. */
+export const WebQueriesApp = ({
+  Map: QueryMap,
+  Source,
+  Layer,
+}: Pick<ComponentProps<typeof QuerySources>, "Source" | "Layer"> & {
+  Map: ComponentType<QueryMapProps>;
+}) => {
+  const mapRef = useRef<BrowserMap | null>(null);
   const smoke = useQueriesSmoke({ mapRef });
-
-  useEffect(() => {
-    console.log(smoke.status);
-  }, [smoke.status]);
-
-  useEffect(() => {
-    window.__oneMapQueryRegressions = async () => {
-      const map = mapRef.current;
-      const renderer = window.__oneMapQueryRenderer;
-
-      if (!map || !renderer)
-        throw new Error("The TF06 renderer probe is not attached.");
-
-      return runWebQueryRegressions({ map, renderer, expectedErrors });
-    };
-
-    return () => {
-      delete window.__oneMapQueryRegressions;
-    };
-  }, []);
-
   return (
-    <MapSetup adapter={adapter}>
-      <div
-        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <p id="tf06-status" style={{ margin: 0, padding: 8 }}>
+        {smoke.status}
+      </p>
+      <QueryMap
+        ref={mapRef}
+        mapStyle={smoke.mapStyle}
+        initialViewState={initialViewState}
+        onLoad={smoke.onLoad}
+        onIdle={() => {
+          if (
+            smoke.phase === "reset" &&
+            mapRef.current?.isStyleLoaded() &&
+            mapRef.current.getLayer("replacement-background")
+          )
+            smoke.onStyleLoad();
+        }}
+        onError={smoke.onError}
+        style={{ width: "100%", height: "100%", flex: 1 }}
       >
-        <p id="tf06-status" style={{ margin: 0, padding: 8 }}>
-          {smoke.status}
-        </p>
-        <QueriesMap
-          ref={mapRef}
-          probe={probe}
-          mapStyle={smoke.mapStyle}
+        <QuerySources
+          Source={Source}
+          Layer={Layer}
           sourceRevision={smoke.sourceRevision}
-          style={{ width: "100%", height: "100%", flex: 1 }}
-          onLoad={smoke.onLoad}
-          onStyleLoad={smoke.onStyleLoad}
-          onError={(event) => {
-            if (expectedErrors.current)
-              expectedErrors.current.push(event.error);
-            else smoke.onError(event);
-          }}
         />
-      </div>
-    </MapSetup>
+      </QueryMap>
+    </div>
   );
 };

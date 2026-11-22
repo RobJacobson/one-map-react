@@ -1,25 +1,26 @@
-import type { Adapter } from "one-map-react";
+import type { ExampleMaps } from "./example-map.js";
 
-import type { Engine } from "./use-example-map.js";
-
-/** Resolves only the selected adapter, avoiding unselected JS offline-module initialization. */
-export const adapters: Readonly<Record<Engine, Adapter>> = {
+/** Resolves only the selected map, avoiding unselected SDK initialization. */
+export const maps: ExampleMaps = {
   get mapbox() {
-    return (
-      require("one-map-react/mapbox-native") as typeof import("one-map-react/mapbox-native")
-    ).adapter;
+    return mapboxEntry().Map;
   },
   get maplibre() {
     return (
       require("one-map-react/maplibre-native") as typeof import("one-map-react/maplibre-native")
-    ).adapter;
+    ).Map;
   },
 };
 
-/** Configures the public token before a Mapbox map is mounted. */
-export const configureMapbox = (token: string): void => {
-  if (token)
-    (
-      require("one-map-react/mapbox-native") as typeof import("one-map-react/mapbox-native")
-    ).setAccessToken(token);
+/**
+ * Configures the public token before mounting a selected Mapbox map.
+ *
+ * @param token - Validated public Mapbox token.
+ * @returns Completion of the native token setter when supplied.
+ */
+export const configureMapbox = async (token: string): Promise<void> => {
+  if (token) await mapboxEntry().setAccessToken(token);
 };
+
+const mapboxEntry = (): typeof import("one-map-react/mapbox-native") =>
+  require("one-map-react/mapbox-native") as typeof import("one-map-react/mapbox-native");

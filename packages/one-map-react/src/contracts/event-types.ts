@@ -24,8 +24,7 @@ export interface MoveEvent {
 /**
  * A press or pointer hit on the map.
  *
- * Mouse, wheel, touch, double-click, and context-menu callbacks on web use
- * this same shape. `features` is omitted when the wrapper did not include any.
+ * Legacy native events use coordinate tuples. `features` is omitted when the wrapper did not include any.
  */
 export interface ClickEvent {
   /** `[longitude, latitude]` of the hit. */
@@ -39,7 +38,7 @@ export interface ClickEvent {
 /**
  * Failure reported by the map wrapper.
  *
- * Web adapters copy the wrapper's `error` value. Mapbox native copies the
+ * Mapbox native copies the
  * error string when iOS `onMapLoadingError` includes one. Android's pinned
  * `@rnmapbox/maps` 10.3.7 does not deliver that callback. MapLibre native
  * omits `error` because that wrapper drops the message before JavaScript.

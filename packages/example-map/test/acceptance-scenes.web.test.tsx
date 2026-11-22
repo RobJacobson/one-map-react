@@ -1,9 +1,17 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import { type ReactNode, useEffect } from "react";
+import {
+  Layer,
+  Map as BrowserMap,
+  Marker,
+  Source,
+} from "react-map-gl/maplibre";
 import { expect, test, vi } from "vite-plus/test";
 
 import { GlobalStateApp } from "../src/scenarios/global-state-app.js";
 import type { NativeLocationButtonProps } from "../src/scenarios/native-location-button.js";
+import { nativeSceneComponents } from "../src/scenarios/native-scene-components.js";
+import type { WebSceneComponents } from "../src/scenarios/scene-components.js";
 import { Tf07Scene, type Tf07Probe } from "../src/scenarios/tf07-scene.js";
 import {
   Tf08AcceptanceScene,
@@ -17,6 +25,7 @@ const fixture = vi.hoisted(() => ({
     children?: ReactNode;
     mapStyle?: { name?: string; state?: Record<string, unknown> };
     options?: Record<string, unknown>;
+    canvasContextAttributes?: Record<string, unknown>;
     terrain?: unknown;
     light?: { color: string; intensity: number };
     onIdle?: () => void;
@@ -28,7 +37,15 @@ const fixture = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("one-map-react", async () => {
+vi.mock("one-map-react/native-extensions", async () => {
+  const legacy = await import("one-map-react/legacy");
+  return {
+    Images: () => null,
+    UserLocation: Reflect.get(legacy, "UserLocation"),
+  };
+});
+
+vi.mock("one-map-react/legacy", async () => {
   const react = await import("react");
   return {
     Map: react.forwardRef((props: { children?: ReactNode }, ref) => {
@@ -65,15 +82,58 @@ vi.mock("one-map-react", async () => {
   };
 });
 
-vi.mock("one-map-react/maplibre-web", async () => {
-  const portable = await import("one-map-react");
-  return { Map: portable.Map, adapter: {} };
+vi.mock("react-map-gl/maplibre", async () => {
+  const react = await import("react");
+  return {
+    Map: react.forwardRef((props: { children?: ReactNode }, ref) => {
+      fixture.props = props;
+      react.useImperativeHandle(ref, () => ({
+        getCanvas: () => ({ toDataURL: () => "data:image/png;base64,fixture" }),
+        getMap: () => ({ getTerrain: () => null }),
+        queryTerrainElevation: () => null,
+        getCenter: () => ({ lng: 0, lat: 0 }),
+        getZoom: () => 2,
+        queryRenderedFeatures: () => [{ id: 9009 }],
+      }));
+      return react.createElement("div", {}, props.children);
+    }),
+    Source: ({
+      id,
+      children,
+      data,
+    }: {
+      id?: string;
+      children?: ReactNode;
+      data?: { geometry?: { coordinates?: readonly number[] } };
+    }) =>
+      id === "fixture-location" ? (
+        <output data-testid="supplied-location">
+          {JSON.stringify(data?.geometry?.coordinates)}
+        </output>
+      ) : (
+        children
+      ),
+    Layer: () => null,
+    Marker: (props: Record<string, unknown>) => {
+      fixture.markers.push(props);
+      return null;
+    },
+  };
 });
+
+const webSceneComponents: WebSceneComponents = {
+  platform: "web",
+  Map: BrowserMap,
+  Source,
+  Layer,
+  Marker,
+};
 
 test("terrain and camera configuration preserve the style until explicit replacement", async () => {
   let probe: Tf09Probe | null = null;
   const mounted = render(
     <Tf09Scene
+      components={webSceneComponents}
       backend="maplibre-web"
       style={{ width: 400, height: 300 }}
       attach={(value) => {
@@ -91,8 +151,8 @@ test("terrain and camera configuration preserve the style until explicit replace
     return result;
   };
   const initialStyle = fixture.props.mapStyle;
-  expect(fixture.props.options).toEqual({
-    canvasContextAttributes: { preserveDrawingBuffer: true },
+  expect(fixture.props.canvasContextAttributes).toEqual({
+    preserveDrawingBuffer: true,
   });
   await expect(command("capture")).resolves.toEqual({
     uri: "data:image/png;base64,fixture",
@@ -119,7 +179,7 @@ test("terrain and camera configuration preserve the style until explicit replace
   fixture.props.onIdle();
   expect(await read()).toMatchObject({ idle: 1 });
   await command("configure", { dem: true, terrain: false, shade: false });
-  expect(fixture.props.terrain).toBeNull();
+  expect(fixture.props.terrain).toBeUndefined();
   expect(fixture.props.mapStyle).toBe(initialStyle);
   await command("controlled-camera", { enabled: true });
   expect(fixture.props.mapStyle).toBe(initialStyle);
@@ -136,7 +196,7 @@ test("terrain and camera configuration preserve the style until explicit replace
 
 test("global state starts from supported style defaults and replacement owns the null-reset default", async () => {
   const mounted = render(<GlobalStateApp />);
-  expect(fixture.props.options).not.toHaveProperty("globalState");
+  expect(fixture.props).not.toHaveProperty("globalState");
   expect(fixture.props.mapStyle?.state).toEqual({
     color: { default: "#ff00ff" },
     initial: { default: 6014 },
@@ -144,8 +204,8 @@ test("global state starts from supported style defaults and replacement owns the
 
   const probe = window.__oneMapTf09;
   if (!probe) throw new Error("Global-state probe is not attached.");
-  expect(fixture.props.options).toMatchObject({
-    canvasContextAttributes: { preserveDrawingBuffer: true },
+  expect(fixture.props.canvasContextAttributes).toEqual({
+    preserveDrawingBuffer: true,
   });
   await expect(probe.command("capture")).resolves.toEqual({
     uri: "data:image/png;base64,fixture",
@@ -167,6 +227,7 @@ test("light fixture changes supplied colors without replacing style and retains 
   let probe: Tf09Probe | null = null;
   const mounted = render(
     <Tf09Scene
+      components={nativeSceneComponents}
       backend="mapbox-native"
       style={{ width: 400, height: 300 }}
       attach={(value) => {
@@ -225,7 +286,7 @@ test.each([false, true])(
       <Tf07Scene
         renderLocation={() => null}
         renderNavigation={() => null}
-        native={native}
+        components={native ? nativeSceneComponents : webSceneComponents}
         nativeOrnaments={nativeOrnaments}
         renderScale={scale}
         style={{ width: 400, height: 300 }}
@@ -239,8 +300,7 @@ test.each([false, true])(
       expect(fixture.props.options).toBe(nativeOrnaments);
       expect(scale).not.toHaveBeenCalled();
     } else expect(scale).toHaveBeenCalledWith("metric");
-    for (const id of ["tf07-live", "tf07-annotation"]) {
-      const marker = fixture.markers.find((props) => props.id === id);
+    for (const marker of fixture.markers.slice(-2)) {
       expect(marker?.onClick).toBeTypeOf("function");
       for (const name of ["draggable", "onDragStart", "onDrag", "onDragEnd"]) {
         if (native) expect(marker).not.toHaveProperty(name);
@@ -272,7 +332,7 @@ test("TF07 application popup close removes its content and teardown stays silent
     <Tf07Scene
       renderLocation={() => null}
       renderNavigation={() => null}
-      native
+      components={nativeSceneComponents}
       style={{ width: 400, height: 300 }}
       renderPopup={popup}
       markerContent={(kind) =>
@@ -311,7 +371,7 @@ test("TF07 native scene remount retires its screen location action with the map 
   let probe: Tf07Probe | null = null;
   const mounted = render(
     <Tf07Scene
-      native
+      components={nativeSceneComponents}
       renderLocation={Location}
       renderNavigation={() => null}
       renderPopup={() => null}
@@ -352,6 +412,11 @@ test.each(["mapbox-native", "maplibre-native", "mapbox-web", "maplibre-web"])(
           accuracy: "unknown",
         })}
         getCurrentPosition={async () => ({ lngLat: [7, 8] })}
+        components={
+          backend.endsWith("native")
+            ? nativeSceneComponents
+            : webSceneComponents
+        }
         backend={backend}
         style={{ width: 400, height: 300 }}
         overlay={null}
@@ -374,7 +439,13 @@ test.each(["mapbox-native", "maplibre-native", "mapbox-web", "maplibre-web"])(
     );
     expect(mounted.getByTestId("supplied-location").textContent).toBe("[7,8]");
     await configure("coverage-base");
-    expect(mounted.getByTestId("supplied-location").textContent).toBe("hidden");
+    if (backend.endsWith("native")) {
+      expect(mounted.getByTestId("supplied-location").textContent).toBe(
+        "hidden"
+      );
+    } else {
+      expect(mounted.queryByTestId("supplied-location")).toBeNull();
+    }
     await configure("coverage-puck");
     fireEvent.click(
       mounted.getByRole("button", { name: "Deliver application fix" })
@@ -388,7 +459,13 @@ test.each(["mapbox-native", "maplibre-native", "mapbox-web", "maplibre-web"])(
       );
     }
     await configure("coverage-base");
-    expect(mounted.getByTestId("supplied-location").textContent).toBe("hidden");
+    if (backend.endsWith("native")) {
+      expect(mounted.getByTestId("supplied-location").textContent).toBe(
+        "hidden"
+      );
+    } else {
+      expect(mounted.queryByTestId("supplied-location")).toBeNull();
+    }
     mounted.unmount();
   }
 );
@@ -411,6 +488,7 @@ test("TF08 screen owns overlapping position and permission requests until each c
     );
   const mounted = render(
     <Tf08AcceptanceScene
+      components={nativeSceneComponents}
       backend="mapbox-native"
       style={{ width: 400, height: 300 }}
       overlay={null}
@@ -457,6 +535,7 @@ test.each(["position", "permission"])(
       });
     const mounted = render(
       <Tf08AcceptanceScene
+        components={nativeSceneComponents}
         backend="mapbox-native"
         style={{ width: 400, height: 300 }}
         overlay={null}
@@ -486,7 +565,7 @@ test.each([false, true])(
     const report = vi.fn();
     const view = render(
       <Tf07Scene
-        native={native}
+        components={native ? nativeSceneComponents : webSceneComponents}
         renderLocation={() => null}
         renderNavigation={() => null}
         renderPopup={() => null}

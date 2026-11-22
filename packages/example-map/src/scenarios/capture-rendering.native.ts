@@ -3,14 +3,6 @@ import type { NativeAdvancedMapRef as MapboxNativeRef } from "one-map-react/mapb
 import type { NativeAdvancedMapRef as MaplibreNativeRef } from "one-map-react/maplibre-native";
 
 /**
- * Native SDKs require no browser drawing-buffer options.
- * @param _backend - Backend selected by the application shell.
- * @returns No browser options.
- */
-export const renderingBufferOptions = (_backend: string): undefined =>
-  undefined;
-
-/**
  * Reads the selected renderer for the example harness; inclusion follows that SDK.
  *
  * @param backend - Backend selected by the application's shell.

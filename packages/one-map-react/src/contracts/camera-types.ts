@@ -90,7 +90,7 @@ export interface CameraCommandOptions {
   /**
    * Easing function.
    *
-   * Web commands forward it. Native commands reject it. The command name
+   * Native commands reject easing functions. The command name
    * selects native movement instead.
    */
   readonly easing?: CameraEasing;
@@ -122,7 +122,7 @@ export interface FitBoundsOptions {
   /**
    * Easing function.
    *
-   * Web forwards it. Native rejects it.
+   * Native wrappers reject easing functions.
    */
   readonly easing?: CameraEasing;
   /**
@@ -143,7 +143,7 @@ export interface ZoomToOptions {
   /**
    * Easing function.
    *
-   * Web forwards it. Native rejects it.
+   * Native wrappers reject easing functions.
    */
   readonly easing?: CameraEasing;
 }
@@ -195,8 +195,7 @@ export interface MapRef
    * @param options - Center, optional camera fields, and optional duration.
    * @returns A promise that adopts the wrapper call. RNMapbox resolves after
    * synchronous `setCamera` with `animationMode: "flyTo"`. MapLibre Native
-   * awaits `setStop` after style load. Web resolves after `flyTo` returns
-   * the map instance.
+   * awaits `setStop` after style load.
    * @throws When the camera or map ref is missing, MapLibre Native has not
    * reported style load, or a native caller passes `easing`.
    */
@@ -222,13 +221,7 @@ export interface MapRef
    * reported style load, or a native caller passes `easing`.
    */
   zoomTo: (zoom: number, options?: ZoomToOptions) => Promise<void>;
-  /**
-   * Cancels an in-progress camera animation when the wrapper has a cancel.
-   *
-   * @returns A promise that adopts the web `stop()` call.
-   * @throws When the map ref is missing, or when the adapter is native.
-   * Native wrappers have no camera-cancel method.
-   */
+  /** Rejects because the native wrappers have no camera-cancel method. */
   stop: () => Promise<void>;
   /**
    * Reads the camera center.
@@ -314,13 +307,6 @@ export interface MapRef
    * @throws When the map ref is missing.
    */
   unproject: (point: Point) => Promise<LngLat>;
-  /**
-   * Asks a web map to measure its container.
-   *
-   * @returns A promise that fulfills when the wrapper accepts the call.
-   * Fulfillment does not mean a frame was painted.
-   * @throws When the web map ref is missing, or when the adapter is native.
-   * Native maps take their size from the host style and have no resize method.
-   */
+  /** Rejects on native. Native maps take their size from the host style. */
   resize: () => Promise<void>;
 }

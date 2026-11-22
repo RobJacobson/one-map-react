@@ -12,14 +12,16 @@ import {
 } from "react-native-safe-area-context";
 
 // Metro selects the platform setup before bundling either renderer family.
-import { adapters, configureMapbox } from "./engines";
+import { maps, native, configureMapbox } from "./engines";
 
 const developmentAcceptance = __DEV__
   ? (require("./acceptance") as typeof import("./acceptance"))
   : undefined;
 
 const token = publicMapboxToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN);
-configureMapbox(token);
+if (!native) void configureMapbox(token);
+
+const prepareMapbox = async (): Promise<void> => configureMapbox(token);
 
 /** Expo entry shared by iOS, Android, and its Metro-powered web target. */
 export const App = () => {
@@ -43,13 +45,22 @@ const MapScreen = ({
 }: {
   readonly openAcceptance: () => void;
 }) => {
-  const model = useExampleMap(adapters, Boolean(token));
+  const model = useExampleMap(
+    Boolean(token),
+    native,
+    native ? prepareMapbox : undefined
+  );
   const insets = useSafeAreaInsets();
   const testMode = __DEV__ && process.env.EXPO_PUBLIC_ONE_MAP_TEST_MODE === "1";
   const disabled = model.status === "loading" || model.status === "switching";
   return (
     <View style={styles.screen}>
-      <ExampleMap model={model} style={{ flex: 1 }} />
+      <ExampleMap
+        model={model}
+        maps={maps}
+        native={native}
+        style={{ flex: 1 }}
+      />
       <View style={[styles.controls, { top: insets.top + 16 }]}>
         <Host matchContents>
           <Row>

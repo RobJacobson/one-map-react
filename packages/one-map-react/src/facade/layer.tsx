@@ -1,4 +1,4 @@
-import type { Backend } from "../contracts/adapter.js";
+import type { Adapter } from "../contracts/adapter.js";
 import type { LayerProps } from "../contracts/layer-types.js";
 import { useSelectedAdapter } from "./map-setup.js";
 import { useStableOptions } from "./use-stable-options.js";
@@ -31,7 +31,7 @@ export const Layer = (props: LayerProps) => {
  */
 export const useLayerOptions = (
   props: LayerOptions,
-  backend: Backend
+  backend: Adapter["backend"]
 ): void => {
   useStableOptions(
     `Layer "${props.id ?? props.type}"`,
@@ -78,12 +78,8 @@ const NATIVE_UNSUPPORTED_SYMBOL_LAYOUT = [
  */
 export const rejectNativeUnsupportedLayout = (
   props: { readonly type: string; readonly layout?: object },
-  backend: string
+  backend: Adapter["backend"]
 ): void => {
-  if (backend !== "mapbox-native" && backend !== "maplibre-native") {
-    return;
-  }
-
   if (props.type !== "symbol" || props.layout === undefined) {
     return;
   }

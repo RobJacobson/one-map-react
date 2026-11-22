@@ -146,41 +146,8 @@ async function runWeb(directory, port, label) {
       `${label} server`
     );
     const page = await attachPage(port + 1000);
-    const status = await watchWeb(page, label);
-    const ordinary = judge(status);
-
-    if (ordinary.status !== "passed") return ordinary;
-
     try {
-      const corrections = await page.evaluate(
-        "window.__oneMapQueryRegressions()",
-        true
-      );
-      const finalStatus = await page.evaluate(
-        "document.querySelector('#tf06-status')?.textContent ?? ''"
-      );
-      const expected = [
-        "missing-source",
-        "unsupported-source",
-        "vector-layer-omitted",
-        "vector-layer-0",
-        "vector-layer-3",
-        "missing-rendered-layer",
-        "omitted-layers",
-        "empty-layers",
-        "rendered-emitted-error",
-        "source-emitted-error",
-        "empty-result",
-        "subsequent-query",
-        "listener-cleanup",
-      ];
-
-      if (expected.some((name) => corrections?.[name] !== "ok"))
-        throw new Error(
-          "The TF06 web corrections did not complete every check."
-        );
-
-      return { ...judge(finalStatus), corrections };
+      return judge(await watchWeb(page, label));
     } finally {
       page.close();
     }

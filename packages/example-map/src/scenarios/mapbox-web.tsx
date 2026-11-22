@@ -1,36 +1,44 @@
-import type { MapRef } from "one-map-react";
+import { type ReactNode, useEffect } from "react";
 import {
+  Map as BrowserMap,
   Source as AdvancedSource,
   Layer as AdvancedLayer,
-  type WebMapRef,
-} from "one-map-react/mapbox-web";
-import {
-  adapter,
-  WrapperPopup,
-  WrapperGeolocateControl,
-  WrapperScaleControl,
-  WrapperAttributionControl,
-  WrapperNavigationControl,
-  WrapperFullscreenControl,
-} from "one-map-react/mapbox-web";
-import { type ReactNode, useEffect } from "react";
-import { useMap } from "react-map-gl/mapbox";
+  Marker,
+  type MapRef,
+  useMap,
+  Popup,
+  GeolocateControl,
+  ScaleControl,
+  AttributionControl,
+  NavigationControl,
+  FullscreenControl,
+} from "react-map-gl/mapbox";
 
 import type { AcceptanceScenario } from "../acceptance-selection.js";
 import type { NativeLocationButtonProps } from "./native-location-button.js";
+import type { WebSceneComponents } from "./scene-components.js";
 import { WebCameraApp } from "./web-camera-app.js";
 import {
   useWebCorrectionProbe,
   WebCorrectionsApp,
 } from "./web-corrections-app.js";
 import { WebLifecycleApp } from "./web-lifecycle-app.js";
-import { useWebQueriesProbe, WebQueriesApp } from "./web-queries-app.js";
+import { WebQueriesApp } from "./web-queries-app.js";
 import { WebSourcesApp } from "./web-sources-app.js";
 import { WebTf07App } from "./web-tf07-app.js";
 import { WebTf07Focused } from "./web-tf07-focused.js";
 import { WebTf08App } from "./web-tf08-app.js";
 import { WebTf09App } from "./web-tf09-app.js";
 import type { Tf09Media } from "./web-tf09-media.js";
+
+const components: WebSceneComponents = {
+  platform: "web",
+  Map: BrowserMap,
+  Source: AdvancedSource,
+  Layer: AdvancedLayer,
+  Marker,
+};
+const backend = "mapbox-web";
 
 export const App = ({
   scenario,
@@ -47,24 +55,25 @@ export const App = ({
   if (scenario === "tf09")
     return (
       <WebTf09App
-        adapter={adapter}
-        probe={<RenderingProbe />}
+        components={components}
+        backend={backend}
+        renderProbe={RenderingProbe}
         renderMedia={renderMedia}
-        named={namedRendering}
       />
     );
   if (scenario === "tf08")
     return (
       <WebTf08App
         renderLocation={WebLocationControl}
-        navigationControl={<WrapperNavigationControl position="top-right" />}
+        navigationControl={<NavigationControl position="top-right" />}
         ornamentControls={
           <>
-            <WrapperAttributionControl position="bottom-right" />
-            <WrapperScaleControl position="bottom-left" />
+            <AttributionControl position="bottom-right" />
+            <ScaleControl position="bottom-left" />
           </>
         }
-        adapter={adapter}
+        components={components}
+        backend={backend}
         renderCoveragePopup={renderCoveragePopup}
       />
     );
@@ -74,11 +83,11 @@ export const App = ({
         renderLocation={WebLocationControl}
         controls={
           <>
-            <WrapperNavigationControl />
-            <WrapperFullscreenControl />
+            <NavigationControl />
+            <FullscreenControl />
           </>
         }
-        adapter={adapter}
+        components={components}
       />
     );
   if (scenario === "tf07")
@@ -87,36 +96,39 @@ export const App = ({
         renderLocation={WebLocationControl}
         renderNavigation={renderNavigation}
         renderScale={renderScale}
-        adapter={adapter}
+        components={components}
         renderPopup={renderPopup}
       />
     );
   if (scenario === "corrections") {
-    return <WebCorrectionsApp adapter={adapter} probe={<CorrectionProbe />} />;
+    return (
+      <WebCorrectionsApp components={components} probe={<CorrectionProbe />} />
+    );
   }
 
   if (scenario === "tf06") {
-    return <WebQueriesApp adapter={adapter} probe={<QueriesProbe />} />;
+    return (
+      <WebQueriesApp
+        Map={BrowserMap}
+        Source={AdvancedSource}
+        Layer={AdvancedLayer}
+      />
+    );
   }
 
   if (scenario === "tf05") {
-    return <WebSourcesApp adapter={adapter} />;
+    return <WebSourcesApp components={components} />;
   }
 
   if (scenario === "tf04") {
-    return <WebCameraApp adapter={adapter} />;
+    return <WebCameraApp components={components} />;
   }
 
-  return <WebLifecycleApp adapter={adapter} />;
+  return <WebLifecycleApp components={components} />;
 };
 
 const CorrectionProbe = () => {
   useWebCorrectionProbe(useMap().current?.getMap());
-  return null;
-};
-
-const QueriesProbe = () => {
-  useWebQueriesProbe(useMap().current?.getMap());
   return null;
 };
 
@@ -153,8 +165,7 @@ const renderMedia = ({ canvas, urls, coordinates, custom }: Tf09Media) => (
 );
 
 /** Exercises selected rendering and TF10 ref paths against the actual attached map. */
-export const namedRendering = async (map: MapRef) => {
-  const selected = await (map as WebMapRef).getWrapperMap();
+export const namedRendering = async (selected: MapRef) => {
   const renderer = selected.getMap();
   const handler = renderer.dragPan;
   const before = handler.isEnabled();
@@ -197,10 +208,15 @@ export const namedRendering = async (map: MapRef) => {
   };
 };
 
-const RenderingProbe = () => {
+const RenderingProbe = ({
+  attachNamed,
+}: {
+  readonly attachNamed: (read: (() => unknown) | undefined) => void;
+}) => {
   const map = useMap().current;
   useEffect(() => {
     if (!map) return;
+    attachNamed(() => namedRendering(map));
     let renderedFrames = 0;
     let frameShade: boolean | undefined;
     const observeFrame = () => {
@@ -240,8 +256,9 @@ const RenderingProbe = () => {
     return () => {
       map.off("render", observeFrame);
       delete window.__oneMapTf09Inspect;
+      attachNamed(undefined);
     };
-  }, [map]);
+  }, [map, attachNamed]);
   return null;
 };
 
@@ -250,7 +267,7 @@ const renderPopup = (
   onOpen: () => void,
   onClose: () => void
 ): ReactNode => (
-  <WrapperPopup
+  <Popup
     longitude={-122.3}
     latitude={47.63}
     closeOnClick={false}
@@ -259,26 +276,24 @@ const renderPopup = (
     onClose={onClose}
   >
     {children}
-  </WrapperPopup>
+  </Popup>
 );
 
 const renderCoveragePopup = (children: ReactNode): ReactNode => (
-  <WrapperPopup
+  <Popup
     longitude={-122.35}
     latitude={47.61}
     closeButton={false}
     closeOnClick={false}
   >
     {children}
-  </WrapperPopup>
+  </Popup>
 );
 
-const renderNavigation = () => (
-  <WrapperNavigationControl position="top-right" />
-);
+const renderNavigation = () => <NavigationControl position="top-right" />;
 
 const renderScale = (unit: "metric" | "imperial") => (
-  <WrapperScaleControl position="bottom-left" unit={unit} />
+  <ScaleControl position="bottom-left" unit={unit} />
 );
 
 /** Browser acquisition and camera behavior are owned by the selected wrapper. */
@@ -291,7 +306,7 @@ const WebLocationControl = ({
   NativeLocationButtonProps,
   "onGeolocate" | "onError" | "zoom" | "corner"
 >) => (
-  <WrapperGeolocateControl
+  <GeolocateControl
     position={corner === "right" ? "top-right" : "top-left"}
     showUserLocation={false}
     fitBoundsOptions={{ maxZoom: zoom ?? 14 }}

@@ -223,6 +223,133 @@ const checkPeerConsumer = async (archive, entry, packages) => {
     checkNativeLoad(consumer, entry, peer, run);
   }
 
+  const engine = entry.split("-")[0];
+  writeFileSync(
+    join(consumer, "consumer.tsx"),
+    entry.endsWith("web")
+      ? webConsumer(entry, engine)
+      : nativeConsumer(entry, consumer)
+  );
+  const files = ["consumer.tsx"];
+  if (entry.endsWith("native")) {
+    const reference = join(root, "packages/example-map/reference");
+    cpSync(join(reference, `maps.${entry}.ts`), join(consumer, "maps.ts"));
+    for (const file of ["VesselMap.tsx", "vessel-fixture.ts"]) {
+      cpSync(join(reference, file), join(consumer, file));
+    }
+    files.push("VesselMap.tsx");
+  }
+  writeFileSync(
+    join(consumer, "tsconfig.json"),
+    JSON.stringify({
+      compilerOptions: {
+        target: "ES2022",
+        // Metro consumers use bundler resolution for the peers' extensionless declarations.
+        module: "ESNext",
+        moduleResolution: "Bundler",
+        jsx: "react-jsx",
+        strict: true,
+        noEmit: true,
+        skipLibCheck: true,
+        types: [],
+        lib: ["ES2022", "DOM"],
+        customConditions: entry.endsWith("native")
+          ? ["react-native"]
+          : ["browser"],
+        moduleSuffixes: entry.endsWith("native") ? [".native", ""] : [""],
+      },
+      files,
+    })
+  );
+  try {
+    run(compiler, ["-p", "tsconfig.json"], consumer);
+  } catch (error) {
+    throw new Error(`${entry}: ${error.message}`);
+  }
+
+  if (entry.endsWith("web")) {
+    writeFileSync(
+      join(consumer, "runtime.mjs"),
+      `import assert from "node:assert/strict";
+import * as upstream from "react-map-gl/${engine}";
+import * as alias from "one-map-react/${engine}";
+import * as explicit from "one-map-react/${entry}";
+assert.equal(alias, explicit);
+assert.deepEqual(Object.keys(explicit), Object.keys(upstream));
+for (const key of Object.keys(upstream)) assert.equal(explicit[key], upstream[key], key);
+`
+    );
+    run("node", [join(consumer, "runtime.mjs")], consumer);
+    run(
+      "node",
+      ["--conditions=browser", join(consumer, "runtime.mjs")],
+      consumer
+    );
+  }
+  const patchedFiles = {};
+  for (const peer of ["@rnmapbox/maps", "@maplibre/maplibre-react-native"]) {
+    if (!packages.some((specifier) => specifier.startsWith(`${peer}@`)))
+      continue;
+    const patch = readFileSync(join(consumer, "peer.patch"), "utf8");
+    for (const match of patch.matchAll(/^diff --git a\/.* b\/(.+)$/gm)) {
+      patchedFiles[`${peer}/${match[1]}`] = sha256(
+        join(consumer, "node_modules", peer, match[1])
+      );
+    }
+  }
+  let retainedLockfile;
+  if (options.evidence) {
+    const lockRoot = `${options.evidence}.locks`;
+    mkdirSync(lockRoot, { recursive: true });
+    retainedLockfile = join(lockRoot, `${evidence.length}-${entry}.bun.lock`);
+    cpSync(join(consumer, "bun.lock"), retainedLockfile);
+  }
+  evidence.push({
+    entry,
+    packages,
+    resolvedPeers: Object.fromEntries(
+      packages.map((specifier) => {
+        const name = specifier.slice(0, specifier.lastIndexOf("@"));
+        return [
+          name,
+          JSON.parse(
+            readFileSync(
+              join(consumer, "node_modules", name, "package.json"),
+              "utf8"
+            )
+          ).version,
+        ];
+      })
+    ),
+    archiveSha256: sha256(archive),
+    lockfileSha256: sha256(join(consumer, "bun.lock")),
+    retainedLockfile,
+    patchedFiles,
+    status: "passed",
+    scope: entry.endsWith("native")
+      ? "isolated declarations and vessel reference, mocked native import, peer installation and patch application; no native linking or renderer"
+      : "isolated declarations, selected web import, peer installation",
+  });
+  rmSync(consumer, { recursive: true, force: true });
+};
+
+const webConsumer = (entry, engine) => `
+import * as upstream from "react-map-gl/${engine}";
+import * as explicit from "one-map-react/${entry}";
+import * as alias from "one-map-react/${engine}";
+const stock: typeof upstream = explicit;
+const forwarded: typeof alias = upstream;
+const selected: typeof explicit = alias;
+const typedRef: 0 extends (1 & explicit.MapRef) ? false : true = true;
+void typedRef;
+declare const ref: explicit.MapRef;
+const zoom: number = ref.getZoom();
+const options: upstream.MapProps = { interactiveLayerIds: ["routes"] };
+void <alias.default {...options} onClick={event => event.features?.[0]}><explicit.NavigationControl /></alias.default>;
+void stock; void forwarded; void selected; void zoom;
+`;
+
+const nativeConsumer = (entry, consumer) => {
   const modelAvailable =
     entry === "mapbox-native" &&
     JSON.parse(
@@ -231,66 +358,8 @@ const checkPeerConsumer = async (archive, entry, packages) => {
         "utf8"
       )
     ).version === "10.3.8";
-  const selectedAssertions = entry.endsWith("web")
-    ? `
-import { Map as SelectedMap, Source as SelectedSource, Layer as SelectedLayer, type WebMapRef } from "one-map-react/${entry}";
-${entry === "mapbox-web" ? 'import { supported, LngLat, LngLatBounds, MercatorCoordinate, Point, IndoorControl } from "one-map-react/mapbox-web"; const browserSupported: boolean = supported(false); const coordinate: LngLat = new LngLat(0, 0); const bounds: LngLatBounds = new LngLatBounds([0,0], [1,1]); const mercator: MercatorCoordinate = new MercatorCoordinate(0,0,0); const pixel: Point = new Point(0,0); const indoor: IndoorControl = new IndoorControl(); void coordinate; void bounds; void mercator; void pixel; void indoor; void browserSupported;' : ""}
-import type { MapRef as WrapperMapRef } from "react-map-gl/${entry === "mapbox-web" ? "mapbox" : "maplibre"}";
-declare const selectedRef: WebMapRef;
-type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
-const exactWrapperPromise: Equal<ReturnType<WebMapRef["getWrapperMap"]>, Promise<WrapperMapRef>> = true;
-const exactSelectedKeys: Equal<Exclude<keyof WebMapRef, keyof import("one-map-react").MapRef>, "getWrapperMap"> = true;
-void exactSelectedKeys;
-const borrowed: Promise<WrapperMapRef> = selectedRef.getWrapperMap();
-void <SelectedMap mapStyle={style} initialViewState={viewState} options={${entry === "mapbox-web" ? "{ preserveDrawingBuffer: true }" : "{ canvasContextAttributes: { preserveDrawingBuffer: true } }"}} />;
-// @ts-expect-error Capture belongs to the application and selected wrapper.
-selectedRef.capture({ output: "data-url", scope: "backend" });
-void exactWrapperPromise; void borrowed;
-const useBorrowedWrapper = async (): Promise<void> => {
-  const wrapper = await selectedRef.getWrapperMap();
-  const png: string = wrapper.getCanvas().toDataURL("image/png");
-  void png;
-  ${entry === "mapbox-web" ? "wrapper.setRain({ density: 0 }); wrapper.getMap().setLanguage('en'); wrapper.getMap().fire('fixture'); wrapper.getMap().dragPan.disable(); const version: string = wrapper.getMap().version; void version;" : "wrapper.setGlobalStateProperty('fixture', 1); wrapper.getMap().refreshTiles('source'); wrapper.getMap().fire('idle'); wrapper.getMap().setEventedParent(null); wrapper.getMap().dragPan.disable(); const version: string = wrapper.getMap().version; void version;"}
-};
-void useBorrowedWrapper;
-const commonCenter: Promise<readonly [number, number]> = selectedRef.getCenter();
-void commonCenter;
-// @ts-expect-error Advanced renderer reads belong to the wrapper.
-selectedRef.getStyle();
-// @ts-expect-error Plugin event production belongs to the raw renderer.
-selectedRef.fire('fixture');
-// @ts-expect-error Gesture controls belong to the raw renderer.
-selectedRef.getGestureHandler('dragPan');
-// @ts-expect-error Debug options belong to the raw renderer.
-selectedRef.setDebugOptions({ repaint: false });
-// @ts-expect-error Renderer version belongs to the raw renderer.
-selectedRef.getVersion();
-// @ts-expect-error Media sources are accessed through the wrapper.
-selectedRef.getCanvasSource('canvas');
-void <SelectedMap mapStyle={style} initialViewState={viewState} options={{ transformRequest: (url) => ({ url }), ${entry === "maplibre-web" ? "maxCanvasSize: [4096, 4096]," : "language: 'en', worldview: 'US',"} }} />;
-void <SelectedSource id="canvas" type="canvas" canvas={"canvas-id"} coordinates={[[0,1],[1,1],[1,0],[0,0]]} />;
-void <SelectedLayer id="custom" type="custom" render={() => undefined} />;
-${
-  entry === "mapbox-web"
-    ? `// @ts-expect-error Weather methods belong to the wrapper.
-selectedRef.setRain({ density: 0 });
-// @ts-expect-error Locale methods belong to the wrapper.
-selectedRef.setLanguage('en');
-// @ts-expect-error Indoor methods belong to the wrapper.
-selectedRef.getIndoorTileOptions('source', '');`
-    : `// @ts-expect-error Style state belongs to the wrapper.
-selectedRef.setGlobalStateProperty('fixture', 1);
-// @ts-expect-error Tile refresh belongs to the wrapper.
-selectedRef.refreshTiles('source');
-// @ts-expect-error Cancellation belongs to the raw renderer.
-selectedRef.setCancelPendingTileRequestsWhileZooming(false);
-// @ts-expect-error Cancellation belongs to the raw renderer.
-selectedRef.getCancelPendingTileRequestsWhileZooming();
-// @ts-expect-error Plugin parent routing belongs to the raw renderer.
-selectedRef.setEventedParent(null);`
-}
-`
-    : entry === "mapbox-native"
+  const selectedAssertions =
+    entry === "mapbox-native"
       ? `
 import type { ComponentRef } from "react";
 import type { MapView as RnmapboxMapView, SnapshotOptions } from "@rnmapbox/maps";
@@ -440,10 +509,12 @@ NetworkManager.setConnected(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
 NetworkManager.setConnected(42);
 `;
-  const nativeBindingAssertions = entry.endsWith("native")
-    ? `
+  const nativeBindingAssertions = `
 import { Layer as BoundLayer, Marker as BoundMarker, Source as BoundSource, MapProvider, useMap as useSelectedMap } from "one-map-react/${entry}";
 import { useMap as useAliasMap, Map as AliasMap } from "one-map-react/${entry.replace("-native", "")}";
+type SelectedTypes = [import("one-map-react/${entry}").MapRef, import("one-map-react/${entry}").MapProps, import("one-map-react/${entry}").LayerProps, import("one-map-react/${entry}").SourceProps, import("one-map-react/${entry}").MarkerProps];
+const nativeTypes: Equal<SelectedTypes, [NativeAdvancedMapRef, import("one-map-react/${entry}").NativeMapProps, import("one-map-react/${entry}").NativeLayerProps, import("one-map-react/${entry}").NativeSourceProps, import("one-map-react/${entry}").NativeMarkerProps]> = true;
+void nativeTypes;
 const SelectedChildren = () => {
   const maps = useSelectedMap();
   const exactCurrent: Equal<typeof maps.current, NativeAdvancedMapRef | undefined> = true;
@@ -492,93 +563,14 @@ const useDesktopShape = async () => {
   void west;
 };
 void useDesktopShape;
-`
-    : "";
-  const popupAssertions = `
-// @ts-expect-error Applications own selected custom control layout.
-import { Control } from "one-map-react/${entry}";
-// @ts-expect-error Selected custom control props are removed.
-import type { ${entry.endsWith("web") ? "WebControlProps" : "NativeControlProps"} } from "one-map-react/${entry}";
-// @ts-expect-error Selected adapters no longer supply control composition.
-adapter.Control;
-// @ts-expect-error The selected common location control is removed.
-import { GeolocateControl } from "one-map-react/${entry}";
-${
-  entry.endsWith("web")
-    ? `// @ts-expect-error Selected facade location props are removed.
-import type { WebGeolocateControlProps } from "one-map-react/${entry}";`
-    : ""
-}
-
-// @ts-expect-error Scale belongs to the selected SDK.
-import { ScaleControl } from "one-map-react/${entry}";
-// @ts-expect-error Attribution belongs to the selected SDK.
-import { AttributionControl } from "one-map-react/${entry}";
-${
-  entry.endsWith("web")
-    ? `// @ts-expect-error Common selected scale props are removed.
-import type { WebScaleControlProps } from "one-map-react/${entry}";
-// @ts-expect-error Common selected attribution props are removed.
-import type { WebAttributionControlProps } from "one-map-react/${entry}";`
-    : `import type { NativeMapProps as OrnamentMapProps } from "one-map-react/${entry}";
-const ornaments: OrnamentMapProps["options"] = ${entry === "mapbox-native" ? "{ scaleBarEnabled: true, attributionEnabled: true, logoEnabled: true, scaleBarPosition: { top: 10, left: 10 } }" : "{ scaleBar: true, attribution: true, logo: true, scaleBarPosition: { top: 10, left: 10 } }"};
-void ornaments;`
-}
-
-// @ts-expect-error Application controls replace the selected facade.
-import { NavigationControl } from "one-map-react/${entry}";
-${
-  entry.endsWith("web")
-    ? `// @ts-expect-error Selected facade props are removed.
-import type { WebNavigationControlProps } from "one-map-react/${entry}";`
-    : ""
-}
-// @ts-expect-error Application controls replace the selected facade.
-import { FullscreenControl } from "one-map-react/${entry}";
-${
-  entry.endsWith("web")
-    ? `// @ts-expect-error Selected facade props are removed.
-import type { WebFullscreenControlProps } from "one-map-react/${entry}";`
-    : ""
-}
-${
-  entry.endsWith("web")
-    ? `import { WrapperMarker, WrapperNavigationControl, WrapperFullscreenControl, WrapperScaleControl, WrapperAttributionControl, WrapperGeolocateControl, useControl, useWrapperMap } from "one-map-react/${entry}";
-void useControl; void useWrapperMap;
-void <WrapperMarker longitude={0} latitude={0} />;
-void <WrapperGeolocateControl position="top-left" positionOptions={{enableHighAccuracy: true, timeout: 1234}} trackUserLocation showAccuracyCircle={false} fitBoundsOptions={{maxZoom: 13}} onGeolocate={position => { const longitude: number = position.coords.longitude; void longitude; }} />;
-${entry === "mapbox-web" ? "void <WrapperGeolocateControl geolocation={navigator.geolocation} />;" : ""}
-void <WrapperNavigationControl position="top-left" showZoom={false} visualizePitch />;
-void <WrapperFullscreenControl position="bottom-right" />;
-void <WrapperScaleControl position="bottom-left" unit="nautical" maxWidth={150} />;
-void <WrapperAttributionControl position="bottom-right" compact customAttribution="Application data" />;
-${
-  entry === "maplibre-web"
-    ? `import { WrapperGlobeControl, WrapperLogoControl, WrapperTerrainControl } from "one-map-react/maplibre-web";
-void WrapperGlobeControl; void WrapperLogoControl; void WrapperTerrainControl;`
-    : ""
-}`
-    : ""
-}
-
-// @ts-expect-error No selected common popup facade remains.
-import { Popup } from "one-map-react/${entry}";
-// @ts-expect-error Popup facade props are removed.
-import type { ${entry.endsWith("web") ? "WebPopupProps" : "NativePopupProps"} } from "one-map-react/${entry}";
-${
-  entry.endsWith("web")
-    ? `import { WrapperPopup } from "one-map-react/${entry}";
-void <WrapperPopup longitude={0} latitude={0} maxWidth="300px" closeOnClick={false} onClose={() => undefined}>Application content</WrapperPopup>;`
-    : `import { Callout } from "one-map-react/${entry}";
-void <Callout title="Application callout" />;`
-}
 `;
-  const markerAssertions = entry.endsWith("web")
-    ? `
-import { Marker as SelectedMarker } from "one-map-react/${entry}";
-void <SelectedMarker longitude={0} latitude={0} draggable onDragStart={() => undefined} onDrag={() => undefined} onDragEnd={() => undefined} />;
-`
-    : `
+  const nativeUiAssertions = `
+import { Callout, type NativeMapProps } from "one-map-react/${entry}";
+import { Images, UserLocation } from "one-map-react/native-extensions";
+void Images; void UserLocation;
+const ornaments: NativeMapProps["options"] = ${entry === "mapbox-native" ? "{ scaleBarEnabled: true, attributionEnabled: true, logoEnabled: true }" : "{ scaleBar: true, attribution: true, logo: true }"};
+void ornaments;
+void <Callout title="Application callout" />;
 import { Marker as SelectedMarker, ${entry === "mapbox-native" ? "PointAnnotation" : "ViewAnnotation"} as RawAnnotation } from "one-map-react/${entry}";
 void <SelectedMarker longitude={0} latitude={0} draggable={false} onClick={() => undefined} />;
 // @ts-expect-error Shared native markers do not drag.
@@ -591,9 +583,7 @@ void <SelectedMarker longitude={0} latitude={0} draggable={false} onDrag={() => 
 void <SelectedMarker longitude={0} latitude={0} onDragEnd={() => undefined} />;
 void <RawAnnotation id="raw-drag" ${entry === "mapbox-native" ? "coordinate" : "lngLat"}={[0, 0]} draggable onDragStart={() => undefined} onDrag={() => undefined} onDragEnd={() => undefined}><></></RawAnnotation>;
 `;
-  writeFileSync(
-    join(consumer, "consumer.tsx"),
-    `import { Map as OneMap, MapSetup, Source, Layer } from "one-map-react";
+  return `import { Map as OneMap, MapSetup, Source, Layer } from "one-map-react/legacy";
 import { adapter } from "one-map-react/${entry}";
 import type { Adapter } from "one-map-react";
 
@@ -614,8 +604,7 @@ const viewState = {
 const style = { version: 8 as const, sources: {}, layers: [] };
 ${selectedAssertions}
 ${nativeBindingAssertions}
-${markerAssertions}
-${popupAssertions}
+${nativeUiAssertions}
 void (
   <OneMap mapStyle={style} initialViewState={viewState} />
 );
@@ -627,97 +616,7 @@ void (
     definitelyNotAMapProp
   />
 );
-`
-  );
-  const files = ["consumer.tsx"];
-  if (entry.endsWith("native")) {
-    const reference = join(root, "packages/example-map/reference");
-    cpSync(join(reference, `maps.${entry}.ts`), join(consumer, "maps.ts"));
-    for (const file of ["VesselMap.tsx", "vessel-fixture.ts"]) {
-      cpSync(join(reference, file), join(consumer, file));
-    }
-    files.push("VesselMap.tsx");
-  }
-  writeFileSync(
-    join(consumer, "tsconfig.json"),
-    JSON.stringify({
-      compilerOptions: {
-        target: "ES2022",
-        // Metro consumers use bundler resolution for the peers' extensionless declarations.
-        module: entry.endsWith("native") ? "ESNext" : "NodeNext",
-        moduleResolution: entry.endsWith("native") ? "Bundler" : "NodeNext",
-        jsx: "react-jsx",
-        strict: true,
-        noEmit: true,
-        skipLibCheck: true,
-        types: [],
-        lib: ["ES2022", "DOM"],
-        customConditions: entry.endsWith("native") ? ["react-native"] : [],
-        moduleSuffixes: entry.endsWith("native") ? [".native", ""] : [""],
-      },
-      files,
-    })
-  );
-  try {
-    run(compiler, ["-p", "tsconfig.json"], consumer);
-  } catch (error) {
-    throw new Error(`${entry}: ${error.message}`);
-  }
-
-  if (entry.endsWith("web")) {
-    writeFileSync(
-      join(consumer, "runtime.mjs"),
-      `import { adapter } from "one-map-react/${entry}";
-console.log(adapter.backend);
-`
-    );
-    assert.equal(run("node", [join(consumer, "runtime.mjs")], consumer), entry);
-  }
-  const patchedFiles = {};
-  for (const peer of ["@rnmapbox/maps", "@maplibre/maplibre-react-native"]) {
-    if (!packages.some((specifier) => specifier.startsWith(`${peer}@`)))
-      continue;
-    const patch = readFileSync(join(consumer, "peer.patch"), "utf8");
-    for (const match of patch.matchAll(/^diff --git a\/.* b\/(.+)$/gm)) {
-      patchedFiles[`${peer}/${match[1]}`] = sha256(
-        join(consumer, "node_modules", peer, match[1])
-      );
-    }
-  }
-  let retainedLockfile;
-  if (options.evidence) {
-    const lockRoot = `${options.evidence}.locks`;
-    mkdirSync(lockRoot, { recursive: true });
-    retainedLockfile = join(lockRoot, `${evidence.length}-${entry}.bun.lock`);
-    cpSync(join(consumer, "bun.lock"), retainedLockfile);
-  }
-  evidence.push({
-    entry,
-    packages,
-    resolvedPeers: Object.fromEntries(
-      packages.map((specifier) => {
-        const name = specifier.slice(0, specifier.lastIndexOf("@"));
-        return [
-          name,
-          JSON.parse(
-            readFileSync(
-              join(consumer, "node_modules", name, "package.json"),
-              "utf8"
-            )
-          ).version,
-        ];
-      })
-    ),
-    archiveSha256: sha256(archive),
-    lockfileSha256: sha256(join(consumer, "bun.lock")),
-    retainedLockfile,
-    patchedFiles,
-    status: "passed",
-    scope: entry.endsWith("native")
-      ? "isolated declarations and vessel reference, mocked native import, peer installation and patch application; no native linking or renderer"
-      : "isolated declarations, selected web import, peer installation",
-  });
-  rmSync(consumer, { recursive: true, force: true });
+`;
 };
 
 await main();

@@ -99,20 +99,13 @@ const MapBoundary = ({ children }: { children?: ReactNode }) => {
   );
 };
 
-vi.mock("one-map-react", async () => {
-  const react = await import("react");
-  const Empty = () => null;
-  const Content = ({ children }: { children?: ReactNode }) => children;
-  return {
-    Map: react.forwardRef(({ children }: { children?: ReactNode }, _ref) => (
-      <MapBoundary>{children}</MapBoundary>
-    )),
-    Marker: Empty,
-    Source: Content,
-    Layer: Empty,
-    UserLocation: Empty,
-  };
-});
+const popupComponents = {
+  platform: "web" as const,
+  Map: MapBoundary,
+  Marker: () => null,
+  Source: ({ children }: { children?: ReactNode }) => children,
+  Layer: () => null,
+};
 
 const loadPopup = async (engine: "mapbox" | "maplibre") => {
   const require = createRequire(import.meta.url);
@@ -241,6 +234,7 @@ test.each([
       const scene = (
         <Theme value={theme}>
           <Tf07Scene
+            components={popupComponents}
             renderLocation={() => null}
             renderNavigation={() => null}
             style={{ width: 400, height: 300 }}

@@ -2,6 +2,7 @@ import { act, render, renderHook } from "@testing-library/react";
 import { expect, test, vi } from "vite-plus/test";
 
 import { useCameraSmoke } from "../../example-map/src/scenarios/camera-smoke.js";
+import { nativeSceneComponents } from "../../example-map/src/scenarios/native-scene-components.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { MoveEvent } from "../src/contracts/event-types.js";
 
@@ -9,7 +10,7 @@ const fixture = vi.hoisted(() => ({
   props: {} as { onMove?: (event: MoveEvent) => void; minZoom?: number },
   jumpTo: vi.fn(async () => undefined),
 }));
-vi.mock("one-map-react", async () => {
+vi.mock("one-map-react/legacy", async () => {
   const react = await import("react");
   return {
     Map: react.forwardRef(
@@ -33,6 +34,7 @@ vi.mock("one-map-react", async () => {
     Source: ({ children }: { children?: import("react").ReactNode }) =>
       children,
     Layer: () => null,
+    Marker: () => null,
   };
 });
 import {
@@ -44,6 +46,7 @@ test("release camera probe tracks targets, accepts movement, reports commands an
   let probe: Tf09Probe | null = null;
   const mounted = render(
     <Tf09Scene
+      components={nativeSceneComponents}
       backend="mapbox-native"
       style={{ width: 400, height: 300 }}
       attach={(value) => {

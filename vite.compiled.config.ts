@@ -27,7 +27,7 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^one-map-react$/,
+        find: /^one-map-react(?:\/legacy)?$/,
         replacement: resolve("packages/one-map-react/dist/index.js"),
       },
     ],
