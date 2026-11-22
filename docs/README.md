@@ -4,9 +4,13 @@ Acceptance is deferred until release preparation or an explicit owner request. T
 
 The [advanced rendering record](tf09-rendering.md) describes portable terrain/projection/light/hillshade, selected advanced facilities, typed options, wrapper boundaries and the targeted acceptance procedure. Targeted acceptance passed in all six environments; the record preserves scope and earlier attempts.
 
-one-map-react is being built as a thin facade over RNMapbox, MapLibre React Native, and react-map-gl. The current TF contract targets full API coverage. The next incompatible release retains shared rendering/queries, mixed backend selection, and documented map reuse within the narrower [scope](requirements.md#purpose-and-scope). Implementation of that migration is in progress; current rc.11 APIs and historical acceptance remain separate. TF01 established the package and selection foundation. TF02 is complete. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03's reuse and lifecycle API is implemented, and its renderer smoke passed. TF04's camera, gesture, and interaction API is implemented. Its renderer smoke passed.
+one-map-react is being built as a thin facade over RNMapbox, MapLibre React Native, and react-map-gl. The current TF contract targets full API coverage. The four-backend migration retains shared rendering/queries, mixed backend selection, and documented map reuse within the narrower [scope](requirements.md#purpose-and-scope). Implementation of that migration is in progress; current rc.11 APIs and historical acceptance remain separate. TF01 established the package and selection foundation. TF02 is complete. The six-environment smoke passed. Mapbox Android's opening camera matches pinned `@rnmapbox/maps` 10.3.7, which keeps latitude at 0 on a cold style cache. TF03's reuse and lifecycle API is implemented, and its renderer smoke passed. TF04's camera, gesture, and interaction API is implemented. Its renderer smoke passed.
 
-## Current direction
+## Next breaking release
+
+The [native compatibility design](native-compatibility-design.md) explains why web applications will use stock react-map-gl, what the two native entries will own, and how to implement and verify the change in four stages.
+
+## Four-backend facade baseline
 
 Read these documents in order:
 
@@ -17,7 +21,7 @@ Read these documents in order:
 
 The [TF10 implementation plan](tf10-proposal.md) defines coverage closure, expanded peer ranges, public documentation, packed consumers, and the release candidate acceptance gates. The [TF10 release record](tf10-release.md) tracks the candidate and current gates. Publication remains a separate action.
 
-The [revised shared API and migration proposal](revised-api-proposal.md) owns the agreed next-release destination with shared rendering/queries, application-owned services, explicit native exclusions, and before/after consumer changes. Its After examples target the future incompatible release; all four working selected refs expose getWrapperMap. Selected method mirrors are removed in the U06 working implementation; the audit and bounded routine verification are recorded. Other removals remain pending. The earlier [camera, marker, feature-state, and control contract review](https://github.com/RobJacobson/one-map-react/blob/1b8d683f7cf6021aefba832d457c5d4b486fc756/docs/contract-review.md) explains the broader feature-preserving alternative and underlying mechanisms.
+The [revised shared API and migration proposal](revised-api-proposal.md) records the four-backend design with shared rendering/queries, application-owned services, explicit native exclusions, and before/after consumer changes. Its After examples target the future incompatible release; all four working selected refs expose getWrapperMap. Selected method mirrors are removed in the U06 working implementation; the audit and bounded routine verification are recorded. Other removals remain pending. The earlier [camera, marker, feature-state, and control contract review](https://github.com/RobJacobson/one-map-react/blob/1b8d683f7cf6021aefba832d457c5d4b486fc756/docs/contract-review.md) explains the broader feature-preserving alternative and underlying mechanisms.
 
 The [patch and peer decision report](revised-api-patch-peer-review.md) preserves the completed pre-repair assessment and eight publication gaps; the owner-approved U23-F01 reconciliation is implemented and independently audited, with exact identities and bounded verification in its evidence record.
 
