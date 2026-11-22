@@ -48,7 +48,7 @@ import {
 import { createMaplibreMapRef, type NativeAdvancedMapRef } from "./map-ref.js";
 import {
   MaplibreSourceContext,
-  MaplibreSourceRegistry,
+  createMaplibreSourceRegistry,
 } from "./source-registry.js";
 import { assertMaplibreStyleRoots } from "./style-roots.js";
 
@@ -106,7 +106,7 @@ const MaplibreNativeMapImplementation = forwardRef<
   // drops it. The same callback is the common onLoad event.
   const mapLoaded = useRef(false);
   const sawMove = useRef(false);
-  const [sources] = useState(() => new MaplibreSourceRegistry());
+  const [sources] = useState(createMaplibreSourceRegistry);
   const frozenViewState = useFrozenValue(initialViewState ?? viewState);
   // One settled native event can report several callbacks; an earlier one may unmount the map.
   const report = useActiveCallbacks({
