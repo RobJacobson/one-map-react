@@ -28,7 +28,7 @@ Working geolocation UI uses raw selected web WrapperGeolocateControl or a native
 
 ## Development
 
-Use Bun 1.4.1 and Node.js 24.11 or newer on the 24.x line, or Node.js 26 or newer. Vite+ 1.1.0 supplies formatting, linting, unit/web tests, web example builds, and the unbundled library build. TypeScript 7.0.2 checks the four explicit library, test, web-example, and native-example configurations. Wrapper packages are root development dependencies so the library typechecks against real declarations; they remain optional peers of the published package.
+Use Bun 1.4.1 and Node.js 24.11 or newer on the 24.x line, or Node.js 26 or newer. Vite+ 1.1.0 supplies formatting, linting, unit/web tests, web example builds, and the unbundled library build. TypeScript 7.0.2 checks the library, tests, and examples. The [desktop vessel reference](packages/example-map/reference/README.md) compiles separately against the two stock react-map-gl entries. Wrapper packages are root development dependencies so the library typechecks against real declarations; they remain optional peers of the published package.
 
 ```sh
 bun install --frozen-lockfile
