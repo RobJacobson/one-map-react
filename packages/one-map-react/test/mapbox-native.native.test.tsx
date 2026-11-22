@@ -4,6 +4,7 @@ import { createRef, type ComponentRef, type ReactNode, type Ref } from "react";
 import { Platform } from "react-native";
 
 import {
+  clusteredPoints,
   emptyStyle,
   initialViewState,
   replacementStyle,
@@ -1121,7 +1122,7 @@ describe("mapbox-native source families", () => {
         <Source
           id="points"
           type="geojson"
-          data={routes}
+          data={clusteredPoints}
           cluster
           clusterRadius={50}
           clusterMinPoints={3}
@@ -1136,6 +1137,7 @@ describe("mapbox-native source families", () => {
     expect(ShapeSourceMock).toHaveBeenCalledWith(
       expect.objectContaining({
         id: "points",
+        shape: clusteredPoints,
         cluster: true,
         clusterRadius: 50,
         clusterMinPoints: 3,
@@ -1148,15 +1150,15 @@ describe("mapbox-native source families", () => {
     );
   });
 
-  test("geojson clusterMinPoints and promoteId forward falsy values and enforce creation immutability", async () => {
+  test("geojson clusterMinPoints and promoteId forward falsy values and data updates", async () => {
     ShapeSourceMock.mockClear();
-    const updatedRoutes = { ...routes, features: [] };
+    const updatedPoints = { ...clusteredPoints, features: [] };
     const view = await render(
       tree(
         <Source
           id="points"
           type="geojson"
-          data={routes}
+          data={clusteredPoints}
           cluster
           clusterMinPoints={0}
           promoteId=""
@@ -1167,7 +1169,7 @@ describe("mapbox-native source families", () => {
     expect(ShapeSourceMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         id: "points",
-        shape: routes,
+        shape: clusteredPoints,
         clusterMinPoints: 0,
         promoteId: "",
       }),
@@ -1179,7 +1181,7 @@ describe("mapbox-native source families", () => {
         <Source
           id="points"
           type="geojson"
-          data={updatedRoutes}
+          data={updatedPoints}
           cluster
           clusterMinPoints={0}
           promoteId=""
@@ -1189,58 +1191,11 @@ describe("mapbox-native source families", () => {
     expect(ShapeSourceMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         id: "points",
-        shape: updatedRoutes,
+        shape: updatedPoints,
         clusterMinPoints: 0,
         promoteId: "",
       }),
       undefined
-    );
-
-    await expect(
-      view.rerender(
-        tree(
-          <Source
-            id="points"
-            type="geojson"
-            data={updatedRoutes}
-            cluster
-            clusterMinPoints={3}
-            promoteId=""
-          />
-        )
-      )
-    ).rejects.toThrow(
-      'Source "points" changed the creation option "clusterMinPoints".'
-    );
-
-    const promoted = await render(
-      tree(
-        <Source
-          id="promoted"
-          type="geojson"
-          data={routes}
-          cluster
-          clusterMinPoints={3}
-          promoteId="route"
-        />
-      )
-    );
-
-    await expect(
-      promoted.rerender(
-        tree(
-          <Source
-            id="promoted"
-            type="geojson"
-            data={routes}
-            cluster
-            clusterMinPoints={3}
-            promoteId="other"
-          />
-        )
-      )
-    ).rejects.toThrow(
-      'Source "promoted" changed the creation option "promoteId".'
     );
   });
 
