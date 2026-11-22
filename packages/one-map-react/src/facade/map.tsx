@@ -28,7 +28,8 @@ import { useMapInteractions } from "./use-map-interactions.js";
 import { useStableOptions } from "./use-stable-options.js";
 
 interface MountedMapProps<
-  Handle extends MapRef,
+  Handle extends MapRef &
+    Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
   Props extends NativeMapInputs,
 > {
   readonly props: Props;
@@ -45,7 +46,8 @@ interface MountedMapProps<
  * @returns The mounted map and its context.
  */
 export const MountedMap = <
-  Handle extends MapRef,
+  Handle extends MapRef &
+    Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
   Props extends NativeMapInputs,
 >({
   props,
@@ -146,14 +148,21 @@ const nativeMapMethods = {
   resize: true,
 } satisfies Record<keyof NativeMapRef | "getWrapperMap", true>;
 
-type NativeMapMethodKey = keyof typeof nativeMapMethods;
+export type ForwardedMapMethodKey = keyof typeof nativeMapMethods;
 
 /** Owns the forwarded ref and the forwarding handle retained by map access hooks. */
-const useMapAttachment = <Handle extends MapRef>(forwardedRef: Ref<Handle>) => {
+const useMapAttachment = <
+  Handle extends MapRef &
+    Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
+>(
+  forwardedRef: Ref<Handle>
+) => {
   const mapRef = useRef<Handle | null>(null);
   const [handle] = useState(() => {
     const forwarding: Record<string, (...args: unknown[]) => unknown> = {};
-    for (const key of Object.keys(nativeMapMethods) as NativeMapMethodKey[]) {
+    for (const key of Object.keys(
+      nativeMapMethods
+    ) as ForwardedMapMethodKey[]) {
       forwarding[key] = (...args: unknown[]) => {
         const map = mapRef.current;
         if (!map) {

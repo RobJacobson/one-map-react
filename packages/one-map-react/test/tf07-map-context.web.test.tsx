@@ -5,6 +5,7 @@ import {
   StrictMode,
   useContext,
   useImperativeHandle,
+  useLayoutEffect,
 } from "react";
 import { describe, expect, expectTypeOf, vi, test } from "vite-plus/test";
 
@@ -24,7 +25,10 @@ import type {
 } from "../src/contracts/native-types.js";
 import type { GeoJsonFeature } from "../src/contracts/source-types.js";
 import { type MapSession, useMapSession } from "../src/facade/map-context.js";
+import type { ForwardedMapMethodKey } from "../src/facade/map.js";
 import { createNativeMapBinding } from "../src/facade/native-map.js";
+import type { MapRef as MapboxMapRef } from "../src/mapbox-native.js";
+import type { MapRef as MaplibreMapRef } from "../src/maplibre-native.js";
 
 const hit: NativeClickEvent = {
   lngLat: nativeLngLat([1, 2]),
@@ -126,27 +130,40 @@ test.each(
 test.each(["enclosing", "named"] as const)(
   "%s map handles expose only known stable methods and serialize safely",
   async (access) => {
+    expectTypeOf<keyof MapboxMapRef>().toEqualTypeOf<ForwardedMapMethodKey>();
+    expectTypeOf<keyof MaplibreMapRef>().toEqualTypeOf<ForwardedMapMethodKey>();
     const fixture = createFixture();
     const { Map: NativeMap, MapProvider, useMap } = fixture.binding;
-    const observe = vi.fn<(map: MapRef | undefined) => void>();
-    const Probe = () => {
+    const observe =
+      vi.fn<
+        (entry: {
+          readonly label: string;
+          readonly map: MapRef | undefined;
+        }) => void
+      >();
+    const Probe = ({ label }: { readonly label: string }) => {
       const maps = useMap();
-      observe(access === "named" ? maps["inspect-map"] : maps.current);
+      const map = access === "named" ? maps["inspect-map"] : maps.current;
+      useLayoutEffect(() => {
+        observe({ label, map });
+      }, [label, map]);
       return null;
     };
     const scene = (label: string) => (
       <MapProvider>
         <div>{label}</div>
-        {access === "named" && <Probe />}
+        {access === "named" && <Probe label={label} />}
         <NativeMap id="inspect-map" mapStyle={style} initialViewState={camera}>
           <div>{label}</div>
-          {access === "enclosing" && <Probe />}
+          {access === "enclosing" && <Probe label={label} />}
         </NativeMap>
       </MapProvider>
     );
 
     const view = render(scene("first"));
-    const map = observe.mock.calls.at(-1)?.[0] as
+    const first = observe.mock.calls.at(-1)?.[0];
+    expect(first?.label).toBe("first");
+    const map = first?.map as
       | (MapRef & {
           getSource?: (id: string) => unknown;
           getWrapperMap?: () => Promise<unknown>;
@@ -176,10 +193,11 @@ test.each(["enclosing", "named"] as const)(
     expect(map.getZoom).toBe(initialGetZoom);
 
     view.rerender(scene("second"));
-    const rerendered = observe.mock.calls.at(-1)?.[0];
-    expect(rerendered).toBe(map);
-    expect(rerendered?.flyTo).toBe(initialFlyTo);
-    expect(rerendered?.getZoom).toBe(initialGetZoom);
+    const second = observe.mock.calls.at(-1)?.[0];
+    expect(second?.label).toBe("second");
+    expect(second?.map).toBe(map);
+    expect(second?.map?.flyTo).toBe(initialFlyTo);
+    expect(second?.map?.getZoom).toBe(initialGetZoom);
 
     expect(String(map)).toBe("[object Object]");
     expect(JSON.stringify(map)).toBe("{}");
