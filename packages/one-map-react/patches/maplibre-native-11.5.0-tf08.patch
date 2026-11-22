@@ -354,3 +354,277 @@ diff --git a/android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolv
              }
          }
      }
+diff --git a/ios/components/images/MLRNImages.m b/ios/components/images/MLRNImages.m
+--- a/ios/components/images/MLRNImages.m
++++ b/ios/components/images/MLRNImages.m
+@@ -6,7 +6,9 @@
+ #import "MLRNMapView.h"
+ #import "MLRNUtils.h"
+ 
+-@implementation MLRNImages : UIView
++@implementation MLRNImages : UIView {
++  __weak MLNStyle *_registeredStyle;
++}
+ 
+ static UIImage *_placeHolderImage;
+ 
+@@ -42,23 +44,17 @@
+   if (self.map.style == nil) {
+     return;
+   }
++  _registeredStyle = self.map.style;
+   [self _processImages:_images];
+ }
+ 
+ - (void)removeFromMap {
+-  if (self.map.style == nil) {
+-    return;
+-  }
+-  [self _removeImages];
+-}
+-
+-- (void)_removeImages {
+-  if (_images == nil || _images.count == 0) {
+-    return;
+-  }
+-
+-  for (NSString *imageName in _images.allKeys) {
+-    [self.map.style removeImageForName:imageName];
++  MLNStyle *style = _registeredStyle;
++  _registeredStyle = nil;
++  if (style != nil && self.map.style == style) {
++    for (NSString *imageName in _images.allKeys) {
++      [style removeImageForName:imageName];
++    }
+   }
+ }
+ 
+@@ -103,6 +99,7 @@
+ 
+   id value = _images[imageName];
+   if (value == nil) return false;
++  _registeredStyle = self.map.style;
+ 
+   if ([value isKindOfClass:[NSString class]]) {
+     NSString *stringValue = (NSString *)value;
+@@ -170,9 +167,17 @@
+ 
+   if (missingImages.count > 0) {
+     // forceUpdate to ensure the placeholder images are updated
+-    [MLRNImageLoader fetchImages:self.map.style
++    __weak MLRNImages *owner = self;
++    __weak MLNStyle *style = self.map.style;
++    [MLRNImageLoader fetchImages:style
+                          objects:missingImages
+                      forceUpdate:true
++                       isCurrent:^BOOL {
++                         MLNStyle *current = style;
++                         MLRNImages *images = owner;
++                         return current != nil && images != nil &&
++                                images->_registeredStyle == current && images.map.style == current;
++                       }
+                         callback:^{
+                         }];
+   }
+diff --git a/ios/components/images/MLRNImageLoader.h b/ios/components/images/MLRNImageLoader.h
+--- a/ios/components/images/MLRNImageLoader.h
++++ b/ios/components/images/MLRNImageLoader.h
+@@ -20,6 +20,7 @@
+ + (void)fetchImages:(MLNStyle *)style
+             objects:(NSDictionary<NSString *, id> *)objects
+         forceUpdate:(BOOL)forceUpdate
++          isCurrent:(BOOL (^)(void))isCurrent
+            callback:(void (^)(void))callback;
+ 
+ @end
+diff --git a/ios/components/images/MLRNImageLoader.m b/ios/components/images/MLRNImageLoader.m
+--- a/ios/components/images/MLRNImageLoader.m
++++ b/ios/components/images/MLRNImageLoader.m
+@@ -28,6 +28,7 @@
+ + (void)fetchImages:(MLNStyle *)style
+             objects:(NSDictionary<NSString *, id> *)objects
+         forceUpdate:(BOOL)forceUpdate
++          isCurrent:(BOOL (^)(void))isCurrent
+            callback:(void (^)(void))callback {
+   if (objects == nil) {
+     callback();
+@@ -71,7 +72,7 @@
+                                 RCTLogWarn(@"Failed to fetch image: %@ error:%@", imageName, error);
+                               } else {
+                                 dispatch_async(dispatch_get_main_queue(), ^{
+-                                  [weakStyle setImage:img forName:imageName];
++                                  if (isCurrent()) [weakStyle setImage:img forName:imageName];
+                                   imageLoadedBlock();
+                                 });
+                               }
+diff --git a/ios/components/map-view/MLRNMapView.m b/ios/components/map-view/MLRNMapView.m
+--- a/ios/components/map-view/MLRNMapView.m
++++ b/ios/components/map-view/MLRNMapView.m
+@@ -155,6 +155,7 @@
+     MLRNImages *images = (MLRNImages *)subview;
+     images.map = self;
+     [_images addObject:images];
++    [images addToMap];
+   } else if ([subview isKindOfClass:[MLRNLayer class]]) {
+     MLRNLayer *layer = (MLRNLayer *)subview;
+     layer.map = self;
+@@ -182,8 +183,9 @@
+     camera.map = nil;
+   } else if ([subview isKindOfClass:[MLRNImages class]]) {
+     MLRNImages *images = (MLRNImages *)subview;
++    [_images removeObject:images];
++    [images removeFromMap];
+     images.map = nil;
+-    [_images removeObject:images];
+   } else if ([subview isKindOfClass:[MLRNLayer class]]) {
+     MLRNLayer *layer = (MLRNLayer *)subview;
+     layer.map = nil;
+@@ -823,6 +825,10 @@
+     layer.map = reactMapView;
+   }
+ 
++  for (MLRNImages *images in [reactMapView getAllImages]) {
++    [images addToMap];
++  }
++
+   [reactMapView _applyLight];
+   [reactMapView _applyScaleBar];
+   [reactMapView notifyStyleLoaded];
+diff --git a/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt b/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt
+--- a/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt
++++ b/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt
+@@ -10,6 +10,7 @@
+ import com.facebook.react.uimanager.events.Event
+ import com.facebook.react.uimanager.events.EventDispatcher
+ import org.maplibre.android.maps.MapLibreMap
++import org.maplibre.android.maps.Style
+ import org.maplibre.android.utils.BitmapUtils
+ import org.maplibre.reactnative.R
+ import org.maplibre.reactnative.components.AbstractMapFeature
+@@ -66,24 +67,30 @@
+     }
+ 
+     override fun removeFromMap(mapView: MLRNMapView) {
+-        removeImages(mapView)
++        attachment++
++        map?.style?.takeIf { it === registeredStyle }?.let { style ->
++            for (imageName in currentImages) style.removeImage(imageName)
++        }
++        registeredStyle = null
+         map = null
+         images.clear()
+         currentImages.clear()
+     }
+ 
+-    private fun removeImages(mapView: MLRNMapView) {
+-        mapView.getStyle { style ->
+-            for (imageName in images.keys) {
+-                style.removeImage(imageName)
+-            }
+-        }
++    private var attachment = 0L
++    private var registeredStyle: Style? = null
++
++    fun restoreImages() {
++        val mapInstance = map ?: return
++        processImages(images, mapInstance, context)
+     }
+ 
+     override fun addToMap(mapView: MLRNMapView) {
+         // Wait for style before adding the source to the map.
+         // Only then we can pre-load required images/placeholders into the style.
++        val currentAttachment = ++attachment
+         mapView.getStyle { _ ->
++            if (attachment != currentAttachment) return@getStyle
+             val mapInstance = mapView.mapLibreMap
+             map = mapInstance
+             map?.let {
+@@ -100,6 +107,10 @@
+         if (imagesToProcess.isEmpty()) return
+ 
+         val style = mapInstance.style ?: return
++        if (registeredStyle !== style) {
++            currentImages.clear()
++            registeredStyle = style
++        }
+         val remoteImages = mutableListOf<Map.Entry<String, ImageEntry>>()
+ 
+         for ((imageName, entry) in imagesToProcess) {
+@@ -112,7 +123,7 @@
+ 
+         // Download remote images asynchronously
+         if (remoteImages.isNotEmpty()) {
+-            val task = DownloadMapImageTask(context, mapInstance, null)
++            val task = imageDownload(mapInstance, style)
+             task.execute(*remoteImages.toTypedArray())
+         }
+     }
+@@ -125,11 +136,22 @@
+         val style = mapInstance.style ?: return false
+ 
+         style.addImage(id, imagePlaceholder!!)
+-        val task = DownloadMapImageTask(context, mapInstance, null)
++        if (registeredStyle !== style) {
++            currentImages.clear()
++            registeredStyle = style
++        }
++        val task = imageDownload(mapInstance, style)
+         task.execute(java.util.AbstractMap.SimpleEntry(id, entry))
+ 
+         currentImages.add(id)
+         return true
++    }
++
++    private fun imageDownload(mapInstance: MapLibreMap, style: Style): DownloadMapImageTask {
++        val currentAttachment = attachment
++        return DownloadMapImageTask(context, mapInstance, null) {
++            attachment == currentAttachment && map === mapInstance && mapInstance.style === style
++        }
+     }
+ 
+     val eventDispatcher: EventDispatcher?
+diff --git a/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt b/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt
+--- a/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt
++++ b/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt
+@@ -794,6 +794,7 @@
+     }
+ 
+     override fun onDidFinishLoadingStyle() {
++        images.forEach { it.restoreImages() }
+         handleMapChangedEvent("onDidFinishLoadingStyle")
+         applyLight()
+     }
+diff --git a/android/src/main/java/org/maplibre/reactnative/utils/DownloadMapImageTask.java b/android/src/main/java/org/maplibre/reactnative/utils/DownloadMapImageTask.java
+--- a/android/src/main/java/org/maplibre/reactnative/utils/DownloadMapImageTask.java
++++ b/android/src/main/java/org/maplibre/reactnative/utils/DownloadMapImageTask.java
+@@ -30,6 +30,7 @@
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.Map;
++import java.util.function.BooleanSupplier;
+ 
+ import javax.annotation.Nullable;
+ 
+@@ -41,8 +42,14 @@
+     @Nullable
+     private OnAllImagesLoaded mCallback;
+     private final Object mCallerContext;
++    private final BooleanSupplier mIsCurrent;
+ 
+     public DownloadMapImageTask(Context context, MapLibreMap map, @Nullable OnAllImagesLoaded callback) {
++        this(context, map, callback, () -> true);
++    }
++
++    public DownloadMapImageTask(Context context, MapLibreMap map, @Nullable OnAllImagesLoaded callback, BooleanSupplier isCurrent) {
++        mIsCurrent = isCurrent;
+         mContext = new WeakReference<>(context.getApplicationContext());
+         mMap = new WeakReference<>(map);
+         mCallback = callback;
+@@ -126,6 +133,7 @@
+ 
+     @Override
+     protected void onPostExecute(List<Map.Entry<String, DownloadedImage>> images) {
++        if (!mIsCurrent.getAsBoolean()) return;
+         MapLibreMap map = mMap.get();
+         if (map != null && images != null && images.size() > 0) {
+             Style style = map.getStyle();

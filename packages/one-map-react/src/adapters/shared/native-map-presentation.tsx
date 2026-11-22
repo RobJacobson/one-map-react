@@ -14,6 +14,11 @@ import {
 import type { MapRef, ViewState } from "../../contracts/camera-types.js";
 import type { MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
+import type { NativeMapInputs } from "../../contracts/native-types.js";
+import {
+  nativeCameraTarget,
+  nativeInitialCamera,
+} from "./native-camera-inputs.js";
 
 /** Native-only presentation owned by the selected adapter's map. */
 export interface NativeMapPresentation {
@@ -38,14 +43,14 @@ export const NativeCameraContext = createContext<NativeCameraState | null>(
 /** Keeps native layout and camera updates out of the common map-access context. */
 export const withNativeMapPresentation = <
   Handle extends MapRef,
-  Props extends MapProps,
+  Props extends NativeMapInputs,
 >(
   Implementation: ForwardRefExoticComponent<Props & RefAttributes<Handle>>
 ): ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<Handle>> =>
   forwardRef<Handle, Props>((props, ref) => (
     <NativePresentationProvider>
       <NativeCameraProvider
-        initial={props.initialViewState}
+        initial={props.initialViewState ?? nativeCameraTarget(props)}
         onMove={props.onMove}
         onMoveEnd={props.onMoveEnd}
       >
@@ -106,14 +111,16 @@ const NativeCameraProvider = ({
   onMoveEnd,
   children,
 }: {
-  readonly initial: ViewState;
+  readonly initial: NativeMapInputs["initialViewState"];
   readonly onMove?: MapProps["onMove"];
   readonly onMoveEnd?: MapProps["onMoveEnd"];
   readonly children: (
     callbacks: Required<Pick<MapProps, "onMove" | "onMoveEnd">>
   ) => ReactNode;
 }) => {
-  const [observed, setObserved] = useState(initial);
+  const [observed, setObserved] = useState<ViewState>(() =>
+    nativeInitialCamera(initial)
+  );
   const callbacks = useMemo(
     () => ({
       onMove: (event: MoveEvent) => {

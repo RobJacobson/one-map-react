@@ -1,11 +1,18 @@
+import type { Bounds } from "../../contracts/camera-types.js";
 import type {
-  Bounds,
-  CameraCommandOptions,
-  FitBoundsOptions,
-  LngLat,
-  ViewState,
-} from "../../contracts/camera-types.js";
+  NativeCameraCommand,
+  NativeCameraTarget,
+  NativeFitBoundsOptions,
+  NativeInitialViewState,
+} from "../../contracts/native-types.js";
 import {
+  nativeCameraCenter,
+  nativeInitialCamera,
+  nativeInitialFit,
+} from "../shared/native-camera-inputs.js";
+import { nativeBoundsInput } from "../shared/native-values.js";
+import {
+  lngLatFromWrapper,
   normalizePadding,
   rejectNativeEasing,
   toFlatBounds,
@@ -17,12 +24,33 @@ import {
  * @param viewState - Camera supplied by React.
  * @returns MapLibre center, zoom, bearing, and pitch.
  */
-export const toMaplibreViewState = (viewState: ViewState) => ({
-  center: [viewState.longitude, viewState.latitude] as LngLat,
-  zoom: viewState.zoom,
-  bearing: viewState.bearing,
-  pitch: viewState.pitch,
-});
+export const toMaplibreViewState = (viewState: NativeCameraTarget) => {
+  const center = nativeCameraCenter(viewState);
+  return {
+    ...(center ? { center } : {}),
+    zoom: viewState.zoom,
+    bearing: viewState.bearing,
+    pitch: viewState.pitch,
+    ...(viewState.padding === undefined
+      ? {}
+      : { padding: normalizePadding(viewState.padding) }),
+  };
+};
+
+export const toMaplibreInitialViewState = (
+  viewState: NativeInitialViewState = {}
+) => {
+  if (viewState.bounds !== undefined) {
+    const { duration: _duration, ...fit } = toMaplibreFitBoundsOptions(
+      nativeInitialFit(viewState)
+    );
+    return {
+      bounds: mutableFlatBounds(nativeBoundsInput(viewState.bounds)),
+      ...fit,
+    };
+  }
+  return toMaplibreViewState(nativeInitialCamera(viewState));
+};
 
 /**
  * Converts a command into MapLibre Native camera fields.
@@ -34,11 +62,15 @@ export const toMaplibreViewState = (viewState: ViewState) => ({
  * @returns Center, zoom, bearing, pitch, padding, and duration that were set.
  * @throws When `easing` is a function.
  */
-export const toMaplibreCommand = (options: CameraCommandOptions) => {
+export const toMaplibreCommand = (options: NativeCameraCommand) => {
   rejectNativeEasing(options.easing);
 
+  const center =
+    options.center === undefined
+      ? undefined
+      : lngLatFromWrapper(options.center);
   return {
-    ...(options.center === undefined ? {} : { center: options.center }),
+    ...(center === undefined ? {} : { center }),
     ...(options.zoom === undefined ? {} : { zoom: options.zoom }),
     ...(options.bearing === undefined ? {} : { bearing: options.bearing }),
     ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
@@ -58,7 +90,9 @@ export const toMaplibreCommand = (options: CameraCommandOptions) => {
  * @returns Padding, duration, bearing, and pitch that were set.
  * @throws When `easing` is a function or `maxZoom` is supplied.
  */
-export const toMaplibreFitBoundsOptions = (options: FitBoundsOptions = {}) => {
+export const toMaplibreFitBoundsOptions = (
+  options: NativeFitBoundsOptions = {}
+) => {
   if (options.maxZoom !== undefined) {
     throw new Error(
       "fitBounds.maxZoom is unavailable through the pinned native camera wrapper."

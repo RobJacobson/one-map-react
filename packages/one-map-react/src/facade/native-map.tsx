@@ -12,9 +12,14 @@ import {
 } from "react";
 import type { ViewProps } from "react-native";
 
+import { nativeLngLat, nativePoint } from "../adapters/shared/native-values.js";
 import type { Adapter } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
-import type { MapProps } from "../contracts/map-types.js";
+import type {
+  NativeClickEvent,
+  NativeMapInputs,
+  NativeMarkerEvent,
+} from "../contracts/native-types.js";
 import type { SourceProps } from "../contracts/source-types.js";
 import type { MarkerProps, MarkerRef } from "../contracts/ui-types.js";
 import { MapSessionContext } from "./map-context.js";
@@ -31,10 +36,12 @@ import { useMarkerOptions } from "./ui.js";
 /** Marker props supported by both native entries. */
 export interface NativeMarkerProps extends Omit<
   MarkerProps,
-  "draggable" | "onDragStart" | "onDrag" | "onDragEnd"
+  "draggable" | "onDragStart" | "onDrag" | "onDragEnd" | "onClick"
 > {
   /** Native shared markers support programmatic coordinates and activation only. */
   readonly draggable?: false;
+  /** Reports the desktop coordinate fields when activated. */
+  readonly onClick?: (event: NativeMarkerEvent) => void;
   /** Attributes on the native child View. */
   readonly hostProps?: ViewProps;
 }
@@ -62,7 +69,7 @@ export interface MapProviderProps {
  */
 export const createNativeMapBinding = <
   Handle extends MapRef,
-  Props extends MapProps,
+  Props extends NativeMapInputs,
 >(
   implementation: ComponentType<Props & RefAttributes<Handle>>,
   adapter: Adapter
@@ -107,7 +114,7 @@ export const createNativeMapBinding = <
     }
     return (
       <AdapterContext.Provider value={adapter}>
-        <MountedMap<Handle, Props>
+        <MountedMap<Handle, Props, NativeClickEvent>
           props={props as Props}
           implementation={implementation}
           adapter={adapter}
@@ -119,8 +126,23 @@ export const createNativeMapBinding = <
   });
 
   const Marker = forwardRef<MarkerRef, NativeMarkerProps>((props, ref) => {
-    useMarkerOptions(props, adapter.backend);
-    return <adapter.Marker {...props} ref={ref} />;
+    const { onClick, ...marker } = props;
+    useMarkerOptions(marker, adapter.backend);
+    return (
+      <adapter.Marker
+        {...marker}
+        ref={ref}
+        onClick={
+          onClick === undefined
+            ? undefined
+            : ({ lngLat, point }) =>
+                onClick({
+                  lngLat: nativeLngLat(lngLat),
+                  ...(point === undefined ? {} : { point: nativePoint(point) }),
+                })
+        }
+      />
+    );
   });
 
   const Source = (props: SourceProps): ReactElement => {

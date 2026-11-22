@@ -17,8 +17,8 @@ export type ScreenBounds = readonly [Point, Point];
 export interface QueryRenderedFeaturesOptions {
   /**
    * Style layer ids the query inspects. Omitted queries every layer.
-   * Web rejects a requested id absent from the loaded style; an empty list
-   * is forwarded with the renderer's normal semantics.
+   * An explicit empty list matches no native layers. The legacy web facade
+   * rejects a requested id absent from the loaded style.
    */
   readonly layers?: readonly string[];
   /**

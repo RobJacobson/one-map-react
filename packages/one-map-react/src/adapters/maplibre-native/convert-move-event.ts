@@ -1,10 +1,11 @@
 import type { LngLat, Point } from "../../contracts/camera-types.js";
-import type { ClickEvent, MoveEvent } from "../../contracts/event-types.js";
+import type { MoveEvent } from "../../contracts/event-types.js";
+import type { NativeClickEvent } from "../../contracts/native-types.js";
 import {
-  clickEvent,
   originFromUserInteraction,
   viewStateFromLngLat,
 } from "../shared/move-event.js";
+import { nativeClick } from "../shared/native-values.js";
 
 /**
  * Builds a move event from MapLibre Native `onRegionIsChanging` or
@@ -40,4 +41,4 @@ export const clickEventFromMaplibreNative = (
   lngLat: LngLat,
   point: Point,
   features?: readonly object[]
-): ClickEvent => clickEvent(lngLat, point, features);
+): NativeClickEvent => nativeClick(lngLat, point, features);

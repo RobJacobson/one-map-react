@@ -1,7 +1,8 @@
-import type { Camera, MapView } from "@rnmapbox/maps";
+import type { Camera, MapView, ShapeSource } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
-import type { LngLat, MapRef, Point } from "../../contracts/camera-types.js";
+import type { NativeMapRef } from "../../contracts/native-types.js";
+import type { ClusterQueryMethods } from "../../contracts/query-types.js";
 import {
   nativeResizeError,
   nativeStopError,
@@ -9,6 +10,14 @@ import {
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
+import { createNativeClusterLookup } from "../shared/native-clusters.js";
+import {
+  nativeBounds,
+  nativeBoundsInput,
+  nativeLngLat,
+  nativePoint,
+  nativeRenderedQuery,
+} from "../shared/native-values.js";
 import {
   normalizeElevation,
   validateTerrainCoordinate,
@@ -35,7 +44,7 @@ import { createMapboxFeatureStateMethods } from "./feature-state-methods.js";
 import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
 /** Common map operations and access to the selected native wrapper. */
-export type NativeAdvancedMapRef = MapRef & {
+export type NativeAdvancedMapRef = NativeMapRef & {
   /**
    * Borrows the currently attached RNMapbox MapView wrapper.
    *
@@ -60,105 +69,151 @@ export const createMapboxMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
   geoJsonSources: GeoJsonSourceRegistry
-): NativeAdvancedMapRef => ({
-  getWrapperMap: async () => requireMap(mapViewRef.current),
+): NativeAdvancedMapRef => {
+  const getSource = createNativeClusterLookup(
+    (id) => geoJsonSources.getGeoJsonOwner(id),
+    createClusterMethods
+  );
+  return {
+    getSource: (id) => (mapViewRef.current ? getSource(id) : undefined),
+    getWrapperMap: async () => requireMap(mapViewRef.current),
 
-  queryTerrainElevation: async (coordinate) => {
-    validateTerrainCoordinate(coordinate);
-    return normalizeElevation(
-      await requireMap(mapViewRef.current).queryTerrainElevation([
-        ...coordinate,
-      ])
-    );
-  },
-  jumpTo: async (options) => {
-    rejectJumpTiming(options);
-    const camera = requireCamera(cameraRef.current);
+    queryTerrainElevation: async (input, options) => {
+      const coordinate = lngLatFromWrapper(input);
+      validateTerrainCoordinate(coordinate);
+      if (options?.exaggerated === false) {
+        throw new Error(
+          "queryTerrainElevation.exaggerated=false is unavailable on mapbox-native."
+        );
+      }
+      return normalizeElevation(
+        await requireMap(mapViewRef.current).queryTerrainElevation([
+          ...coordinate,
+        ])
+      );
+    },
+    jumpTo: async (options) => {
+      rejectJumpTiming(options);
+      const camera = requireCamera(cameraRef.current);
 
-    await camera.setCamera(toRnmapboxStop(options, "none"));
-  },
-  easeTo: async (options) => {
-    const camera = requireCamera(cameraRef.current);
+      await camera.setCamera(toRnmapboxStop(options, "none"));
+    },
+    easeTo: async (options) => {
+      const camera = requireCamera(cameraRef.current);
 
-    await camera.setCamera(toRnmapboxStop(options, "easeTo"));
-  },
-  flyTo: async (options) => {
-    const camera = requireCamera(cameraRef.current);
+      await camera.setCamera(toRnmapboxStop(options, "easeTo"));
+    },
+    flyTo: async (options) => {
+      const camera = requireCamera(cameraRef.current);
 
-    await camera.setCamera(toRnmapboxStop(options, "flyTo"));
-  },
-  fitBounds: async (bounds, options) => {
-    const camera = requireCamera(cameraRef.current);
+      await camera.setCamera(toRnmapboxStop(options, "flyTo"));
+    },
+    fitBounds: async (bounds, options) => {
+      const camera = requireCamera(cameraRef.current);
 
-    await camera.setCamera(toRnmapboxFitBoundsStop(bounds, options));
-  },
-  zoomTo: async (zoom, options) => {
-    const camera = requireCamera(cameraRef.current);
+      await camera.setCamera(
+        toRnmapboxFitBoundsStop(nativeBoundsInput(bounds), options)
+      );
+    },
+    zoomTo: async (zoom, options) => {
+      const camera = requireCamera(cameraRef.current);
 
-    await camera.setCamera(toRnmapboxZoomStop(zoom, options));
-  },
-  stop: async () => {
-    throw nativeStopError();
-  },
-  getCenter: async () =>
-    lngLatFromWrapper(await requireMap(mapViewRef.current).getCenter()),
-  getZoom: async () =>
-    finiteNumber(await requireMap(mapViewRef.current).getZoom(), "Map zoom"),
-  getBearing: async () => {
-    throw unavailableMapMethodError("getBearing", "mapbox-native");
-  },
-  getPitch: async () => {
-    throw unavailableMapMethodError("getPitch", "mapbox-native");
-  },
-  getPadding: async () => {
-    throw unavailableMapMethodError("getPadding", "mapbox-native");
-  },
-  getBounds: async () =>
-    boundsFromRnmapboxVisible(
-      await requireMap(mapViewRef.current).getVisibleBounds()
-    ),
-  getMinZoom: async () => {
-    throw unavailableMapMethodError("getMinZoom", "mapbox-native");
-  },
-  getMaxZoom: async () => {
-    throw unavailableMapMethodError("getMaxZoom", "mapbox-native");
-  },
-  getMaxBounds: async () => {
-    throw unavailableMapMethodError("getMaxBounds", "mapbox-native");
-  },
-  project: async (lngLat) =>
-    pointFromWrapper(
-      await requireMap(mapViewRef.current).getPointInView(mutablePair(lngLat))
-    ),
-  unproject: async (point) =>
-    lngLatFromWrapper(
-      await requireMap(mapViewRef.current).getCoordinateFromView(
-        mutablePair(point)
-      )
-    ),
-  queryRenderedFeatures: async (target, options) => {
-    const map = requireMap(mapViewRef.current);
-    const [filter, layers] = toRnmapboxRenderedQueryArgs(options);
-    const geometry = toRnmapboxQueryRect(target);
+      await camera.setCamera(toRnmapboxZoomStop(zoom, options));
+    },
+    stop: async () => {
+      throw nativeStopError();
+    },
+    getCenter: async () =>
+      nativeLngLat(
+        lngLatFromWrapper(await requireMap(mapViewRef.current).getCenter())
+      ),
+    getZoom: async () =>
+      finiteNumber(await requireMap(mapViewRef.current).getZoom(), "Map zoom"),
+    getBearing: async () => {
+      throw unavailableMapMethodError("getBearing", "mapbox-native");
+    },
+    getPitch: async () => {
+      throw unavailableMapMethodError("getPitch", "mapbox-native");
+    },
+    getPadding: async () => {
+      throw unavailableMapMethodError("getPadding", "mapbox-native");
+    },
+    getBounds: async () =>
+      nativeBounds(
+        boundsFromRnmapboxVisible(
+          await requireMap(mapViewRef.current).getVisibleBounds()
+        )
+      ),
+    getMinZoom: async () => {
+      throw unavailableMapMethodError("getMinZoom", "mapbox-native");
+    },
+    getMaxZoom: async () => {
+      throw unavailableMapMethodError("getMaxZoom", "mapbox-native");
+    },
+    getMaxBounds: async () => {
+      throw unavailableMapMethodError("getMaxBounds", "mapbox-native");
+    },
+    project: async (lngLat) =>
+      nativePoint(
+        pointFromWrapper(
+          await requireMap(mapViewRef.current).getPointInView([
+            ...lngLatFromWrapper(lngLat),
+          ])
+        )
+      ),
+    unproject: async (point) =>
+      nativeLngLat(
+        lngLatFromWrapper(
+          await requireMap(mapViewRef.current).getCoordinateFromView([
+            ...pointFromWrapper(point),
+          ])
+        )
+      ),
+    queryRenderedFeatures: async (input, queryOptionsInput) => {
+      const [target, options] = nativeRenderedQuery(input, queryOptionsInput);
+      const map = requireMap(mapViewRef.current);
+      // Preserve an explicit empty layer selection before the SDK defaults to all layers.
+      if (options?.layers?.length === 0) return [];
+      const [filter, layers] = toRnmapboxRenderedQueryArgs(options);
+      const geometry = toRnmapboxQueryRect(target);
 
-    const collection =
-      geometry.kind === "point"
-        ? await map.queryRenderedFeaturesAtPoint(geometry.point, filter, layers)
-        : await map.queryRenderedFeaturesInRect(geometry.rect, filter, layers);
+      const collection =
+        geometry.kind === "point"
+          ? await map.queryRenderedFeaturesAtPoint(
+              geometry.point,
+              filter,
+              layers
+            )
+          : await map.queryRenderedFeaturesInRect(
+              geometry.rect,
+              filter,
+              layers
+            );
 
-    return featuresFromWrapper(collection, "queryRenderedFeatures");
-  },
-  querySourceFeatures: async (sourceId, options) => {
-    const map = requireMap(mapViewRef.current);
-    const [filter, sourceLayerIds] = toRnmapboxSourceQueryArgs(options);
+      return featuresFromWrapper(collection, "queryRenderedFeatures");
+    },
+    querySourceFeatures: async (sourceId, options) => {
+      const map = requireMap(mapViewRef.current);
+      const [filter, sourceLayerIds] = toRnmapboxSourceQueryArgs(options);
 
-    return featuresFromWrapper(
-      await map.querySourceFeatures(sourceId, filter, sourceLayerIds),
-      "querySourceFeatures"
-    );
-  },
+      return featuresFromWrapper(
+        await map.querySourceFeatures(sourceId, filter, sourceLayerIds),
+        "querySourceFeatures"
+      );
+    },
+    ...createClusterMethods((id) => geoJsonSources.require(id)),
+    ...createMapboxFeatureStateMethods(() => requireMap(mapViewRef.current)),
+    resize: async () => {
+      throw nativeResizeError();
+    },
+  };
+};
+
+const createClusterMethods = (
+  read: (id: string) => ComponentRef<typeof ShapeSource>
+): ClusterQueryMethods => ({
   getClusterExpansionZoom: async (sourceId, clusterId) => {
-    const source = geoJsonSources.require(sourceId);
+    const source = read(sourceId);
     const zoom = await source.getClusterExpansionZoom(
       toRnmapboxClusterFeature(clusterId)
     );
@@ -166,7 +221,7 @@ export const createMapboxMapRef = (
     return finiteNumber(zoom, "Cluster expansion zoom");
   },
   getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
-    const source = geoJsonSources.require(sourceId);
+    const source = read(sourceId);
 
     return featuresFromWrapper(
       await source.getClusterLeaves(
@@ -178,16 +233,12 @@ export const createMapboxMapRef = (
     );
   },
   getClusterChildren: async (sourceId, clusterId) => {
-    const source = geoJsonSources.require(sourceId);
+    const source = read(sourceId);
 
     return featuresFromWrapper(
       await source.getClusterChildren(toRnmapboxClusterFeature(clusterId)),
       "getClusterChildren"
     );
-  },
-  ...createMapboxFeatureStateMethods(() => requireMap(mapViewRef.current)),
-  resize: async () => {
-    throw nativeResizeError();
   },
 });
 
@@ -210,5 +261,3 @@ const requireMap = (
 
   return map;
 };
-
-const mutablePair = (value: LngLat | Point): number[] => [value[0], value[1]];

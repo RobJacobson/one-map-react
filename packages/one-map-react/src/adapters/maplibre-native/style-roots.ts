@@ -76,7 +76,7 @@ export const assertMaplibreLayerStyle = (layer: NativeLayerValues): void => {
   ] as const) {
     if (!values || typeof values !== "object") continue;
     for (const key of keys) {
-      if (Object.hasOwn(values, key))
+      if (Object.hasOwn(values, key) && Reflect.get(values, key) !== undefined)
         throw new Error(
           `Layer property "${key}" is unsupported by the pinned MapLibre Native SDK. Raster layers can use legacy style.rasterResampling; basic symbol overlap uses iconAllowOverlap/textAllowOverlap.`
         );

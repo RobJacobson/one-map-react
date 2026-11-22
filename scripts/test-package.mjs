@@ -28,6 +28,12 @@ const output = mkdtempSync(join(tmpdir(), "one-map-tf02-"));
 const compiler = join(root, "node_modules/.bin/tsc");
 const reactPackage = join(root, "node_modules/react");
 const reactTypes = join(root, "node_modules/@types/react");
+const styleSpecName = "@maplibre/maplibre-gl-style-spec";
+const styleSpec = join(
+  root,
+  "packages/one-map-react/node_modules",
+  styleSpecName
+);
 
 const backends = [
   "react-map-gl",
@@ -197,6 +203,19 @@ const checkConsumer = async (archive, scenario) => {
       ],
       consumer
     );
+  } else {
+    // This offline fixture hand-installs declarations. Include the version the archive declares.
+    const dependency = JSON.parse(
+      readFileSync(join(styleSpec, "package.json"), "utf8")
+    );
+    const manifest = JSON.parse(
+      readFileSync(join(installed, "package.json"), "utf8")
+    );
+    assert.equal(manifest.dependencies[styleSpecName], dependency.version);
+    const target = join(consumer, "node_modules", styleSpecName);
+    for (const file of ["package.json", dependency.types]) {
+      cpSync(join(styleSpec, file), join(target, file));
+    }
   }
 
   if (scenario.name === "common") {
@@ -254,6 +273,9 @@ import type { Adapter, Backend, MapRef } from "one-map-react";
 import { Map as OneMap, MapSetup, Source, Layer, Marker, useMap } from "one-map-react";
 import { forwardRef } from "react";
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
+// @ts-expect-error The root layer declarations must resolve the style spec and reject cross-family properties.
+void <Layer id="bad-line" type="line" paint={{ "circle-radius": 3 }} />;
+void <Layer id="routes" type="line" paint={{ "line-width-transition": { duration: 250 } }} />;
 const exactAdapterKeys: Equal<keyof Adapter, "backend" | "Map" | "Source" | "Layer" | "Images" | "Marker"> = true;
 const exactSetupKeys: Equal<keyof import("one-map-react").MapSetupProps, "adapter" | "children"> = true;
 const customAdapter: Adapter = {
@@ -421,13 +443,12 @@ const invalid: Adapter = { backend: "automatic" };
   );
   run(compiler, ["-p", "tsconfig.json"], consumer);
 
-  const installedPackages = readdirSync(join(consumer, "node_modules"));
-  assert.deepEqual(installedPackages.sort(), [
-    "@types",
-    ...(Object.keys(options.versions).length ? ["csstype"] : []),
-    "one-map-react",
-    "react",
-  ]);
+  for (const peer of [...backends, "react-dom", "react-native"]) {
+    assert(
+      !existsSync(join(consumer, "node_modules", peer)),
+      `Unexpected peer: ${peer}`
+    );
+  }
   evidence.push({
     scenario: scenario.name,
     archiveSha256: createHash("sha256")

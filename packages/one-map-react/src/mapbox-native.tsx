@@ -12,8 +12,18 @@ import type { ViewProps } from "react-native";
 import { adapter, MapboxNativeMap } from "./adapters/mapbox-native/index.js";
 import { assertLabelLocalization } from "./adapters/mapbox-native/label-localization.js";
 import type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
-import type { LayerProps } from "./contracts/layer-types.js";
-import type { MapProps } from "./contracts/map-types.js";
+import type { NativePortableLayerProps } from "./contracts/layer-types.js";
+import type { NativeMapInputs } from "./contracts/native-types.js";
+export type {
+  NativeBounds,
+  NativeBoundsLike,
+  NativeClickEvent,
+  NativeGeoJsonSource,
+  NativeLngLat,
+  NativeLngLatLike,
+  NativePoint,
+  NativePointLike,
+} from "./contracts/native-types.js";
 import type { StyleDocument } from "./contracts/style-types.js";
 import { useLayerOptions } from "./facade/layer.js";
 import { createNativeMapBinding } from "./facade/native-map.js";
@@ -40,9 +50,9 @@ export type NativeLocationOptions = Pick<
   | "onUserTrackingModeChange"
 >;
 
-export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
+export interface NativeMapProps extends Omit<NativeMapInputs, "mapStyle"> {
   /** Complete selected style document. */
-  readonly mapStyle: MapProps["mapStyle"] | NativeStyleDocument;
+  readonly mapStyle: NativeMapInputs["mapStyle"] | NativeStyleDocument;
   /** SDK follow facilities; conflicts with an explicit viewState target. */
   readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
@@ -79,7 +89,7 @@ const {
 export { NativeMap as Map, MapProvider, Marker, Source, useMap };
 
 /** Style-spec options for an RNMapbox layer. */
-export type NativeLayerProps = LayerProps;
+export type NativeLayerProps = NativePortableLayerProps;
 
 /**
  * Renders a Layer through RNMapbox.
@@ -168,6 +178,9 @@ export type {
 } from "@rnmapbox/maps";
 
 /** Native style roots; sources and layers are validated by the native SDK. */
+export type StyleSpecification = NativeStyleDocument;
+
+/** Style document accepted by the pinned RNMapbox wrapper. */
 export interface NativeStyleDocument extends StyleDocument {
   /** Style metadata. */
   readonly metadata?: object;

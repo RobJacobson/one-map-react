@@ -1,8 +1,10 @@
 import { Images as RnmapboxImages } from "@rnmapbox/maps";
 
 import type { ImagesProps } from "../../contracts/images-types.js";
+import { renderNativeImageEntries } from "../shared/native-image-entries.js";
 
-/** Mapbox-native images that forwards entries to RNMapbox `Images`. */
-export const MapboxNativeImages = ({ images }: ImagesProps) => (
-  <RnmapboxImages images={images} />
-);
+/** Registers each image through a separate RNMapbox wrapper owner. */
+export const MapboxNativeImages = ({ images }: ImagesProps) =>
+  renderNativeImageEntries(images, (name, entry) => (
+    <RnmapboxImages images={{ [name]: entry }} />
+  ));

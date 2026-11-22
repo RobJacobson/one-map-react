@@ -1,10 +1,12 @@
 import type {
   Camera,
+  GeoJSONSource,
   Map as MaplibreMap,
 } from "@maplibre/maplibre-react-native";
 import type { ComponentRef } from "react";
 
-import type { MapRef } from "../../contracts/camera-types.js";
+import type { NativeMapRef } from "../../contracts/native-types.js";
+import type { ClusterQueryMethods } from "../../contracts/query-types.js";
 import {
   nativeResizeError,
   nativeStopError,
@@ -15,6 +17,14 @@ import {
   toQueryGeometry,
 } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
+import { createNativeClusterLookup } from "../shared/native-clusters.js";
+import {
+  nativeBounds,
+  nativeBoundsInput,
+  nativeLngLat,
+  nativePoint,
+  nativeRenderedQuery,
+} from "../shared/native-values.js";
 import {
   boundsFromFlat,
   finiteNumber,
@@ -36,7 +46,7 @@ import { createMaplibreFeatureStateMethods } from "./feature-state-methods.js";
 import type { MaplibreSourceRegistry } from "./source-registry.js";
 
 /** Common map operations and access to the selected native wrapper. */
-export type NativeAdvancedMapRef = MapRef & {
+export type NativeAdvancedMapRef = NativeMapRef & {
   /**
    * Borrows the currently attached MapLibre Native Map wrapper.
    *
@@ -64,125 +74,161 @@ export const createMaplibreMapRef = (
   mapRef: { readonly current: ComponentRef<typeof MaplibreMap> | null },
   mapLoaded: { readonly current: boolean },
   sources: MaplibreSourceRegistry
-): NativeAdvancedMapRef => ({
-  getWrapperMap: async () => requireMap(mapRef.current),
+): NativeAdvancedMapRef => {
+  const getSource = createNativeClusterLookup(
+    (id) => sources.getGeoJsonOwner(id),
+    createClusterMethods
+  );
+  return {
+    getSource: (id) => (mapRef.current ? getSource(id) : undefined),
+    getWrapperMap: async () => requireMap(mapRef.current),
 
-  queryTerrainElevation: async () => {
-    throw new Error("queryTerrainElevation is unsupported on MapLibre Native.");
-  },
-  jumpTo: async (options) => {
-    rejectJumpTiming(options);
-    const camera = requireCamera(cameraRef.current, mapLoaded.current);
-
-    await camera.jumpTo(toMaplibreCommand(options));
-  },
-  easeTo: async (options) => {
-    const camera = requireCamera(cameraRef.current, mapLoaded.current);
-
-    await camera.easeTo(toMaplibreCommand(options));
-  },
-  flyTo: async (options) => {
-    const camera = requireCamera(cameraRef.current, mapLoaded.current);
-
-    await camera.flyTo(toMaplibreCommand(options));
-  },
-  fitBounds: async (bounds, options) => {
-    const camera = requireCamera(cameraRef.current, mapLoaded.current);
-
-    await camera.fitBounds(
-      mutableFlatBounds(bounds),
-      toMaplibreFitBoundsOptions(options)
-    );
-  },
-  zoomTo: async (zoom, options) => {
-    const camera = requireCamera(cameraRef.current, mapLoaded.current);
-
-    await camera.zoomTo(zoom, options ? toMaplibreCommand(options) : undefined);
-  },
-  stop: async () => {
-    throw nativeStopError();
-  },
-  getCenter: async () =>
-    lngLatFromWrapper(await requireMap(mapRef.current).getCenter()),
-  getZoom: async () =>
-    finiteNumber(
-      await requireMap(mapRef.current).getZoom(),
-      "Map camera value"
-    ),
-  getBearing: async () =>
-    finiteNumber(
-      await requireMap(mapRef.current).getBearing(),
-      "Map camera value"
-    ),
-  getPitch: async () =>
-    finiteNumber(
-      await requireMap(mapRef.current).getPitch(),
-      "Map camera value"
-    ),
-  getPadding: async () => {
-    throw unavailableMapMethodError("getPadding", "maplibre-native");
-  },
-  getBounds: async () =>
-    boundsFromFlat(await requireMap(mapRef.current).getBounds()),
-  getMinZoom: async () => {
-    throw unavailableMapMethodError("getMinZoom", "maplibre-native");
-  },
-  getMaxZoom: async () => {
-    throw unavailableMapMethodError("getMaxZoom", "maplibre-native");
-  },
-  getMaxBounds: async () => {
-    throw unavailableMapMethodError("getMaxBounds", "maplibre-native");
-  },
-  project: async (lngLat) =>
-    pointFromWrapper(
-      await requireMap(mapRef.current).project([lngLat[0], lngLat[1]])
-    ),
-  unproject: async (point) =>
-    lngLatFromWrapper(
-      await requireMap(mapRef.current).unproject([point[0], point[1]])
-    ),
-  queryRenderedFeatures: async (target, options) => {
-    const map = requireMap(mapRef.current);
-    const queryTarget = toQueryGeometry(target);
-    const queryOptions = toMaplibreRenderedQueryOptions(options);
-
-    const features =
-      queryTarget === undefined
-        ? await map.queryRenderedFeatures(
-            queryOptions as { filter?: unknown } | undefined
-          )
-        : await map.queryRenderedFeatures(queryTarget, queryOptions);
-
-    return featuresFromWrapper(features, "queryRenderedFeatures");
-  },
-  querySourceFeatures: async (sourceId, options) => {
-    const entry = sources.require(sourceId);
-
-    if (entry.kind === "geojson") {
-      // Both native getData implementations query loaded source tiles, including
-      // hidden features. Results may be clipped or duplicated at tile boundaries.
-      const collection = await entry.ref.getData(
-        toMaplibreFilter(options?.filter) as never
+    queryTerrainElevation: async () => {
+      throw new Error(
+        "queryTerrainElevation is unsupported on MapLibre Native."
       );
+    },
+    jumpTo: async (options) => {
+      rejectJumpTiming(options);
+      const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-      return featuresFromWrapper(collection, "querySourceFeatures");
-    }
+      await camera.jumpTo(toMaplibreCommand(options));
+    },
+    easeTo: async (options) => {
+      const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
-    return featuresFromWrapper(
-      await entry.ref.querySourceFeatures(
-        toMaplibreSourceQueryOptions(options)
+      await camera.easeTo(toMaplibreCommand(options));
+    },
+    flyTo: async (options) => {
+      const camera = requireCamera(cameraRef.current, mapLoaded.current);
+
+      await camera.flyTo(toMaplibreCommand(options));
+    },
+    fitBounds: async (bounds, options) => {
+      const camera = requireCamera(cameraRef.current, mapLoaded.current);
+
+      await camera.fitBounds(
+        mutableFlatBounds(nativeBoundsInput(bounds)),
+        toMaplibreFitBoundsOptions(options)
+      );
+    },
+    zoomTo: async (zoom, options) => {
+      const camera = requireCamera(cameraRef.current, mapLoaded.current);
+
+      await camera.zoomTo(
+        zoom,
+        options ? toMaplibreCommand(options) : undefined
+      );
+    },
+    stop: async () => {
+      throw nativeStopError();
+    },
+    getCenter: async () =>
+      nativeLngLat(
+        lngLatFromWrapper(await requireMap(mapRef.current).getCenter())
       ),
-      "querySourceFeatures"
-    );
-  },
+    getZoom: async () =>
+      finiteNumber(
+        await requireMap(mapRef.current).getZoom(),
+        "Map camera value"
+      ),
+    getBearing: async () =>
+      finiteNumber(
+        await requireMap(mapRef.current).getBearing(),
+        "Map camera value"
+      ),
+    getPitch: async () =>
+      finiteNumber(
+        await requireMap(mapRef.current).getPitch(),
+        "Map camera value"
+      ),
+    getPadding: async () => {
+      throw unavailableMapMethodError("getPadding", "maplibre-native");
+    },
+    getBounds: async () =>
+      nativeBounds(
+        boundsFromFlat(await requireMap(mapRef.current).getBounds())
+      ),
+    getMinZoom: async () => {
+      throw unavailableMapMethodError("getMinZoom", "maplibre-native");
+    },
+    getMaxZoom: async () => {
+      throw unavailableMapMethodError("getMaxZoom", "maplibre-native");
+    },
+    getMaxBounds: async () => {
+      throw unavailableMapMethodError("getMaxBounds", "maplibre-native");
+    },
+    project: async (lngLat) =>
+      nativePoint(
+        pointFromWrapper(
+          await requireMap(mapRef.current).project(lngLatFromWrapper(lngLat))
+        )
+      ),
+    unproject: async (point) =>
+      nativeLngLat(
+        lngLatFromWrapper(
+          await requireMap(mapRef.current).unproject(pointFromWrapper(point))
+        )
+      ),
+    queryRenderedFeatures: async (input, queryOptionsInput) => {
+      const [target, options] = nativeRenderedQuery(input, queryOptionsInput);
+      const map = requireMap(mapRef.current);
+      // Preserve an explicit empty layer selection before the SDK defaults to all layers.
+      if (options?.layers?.length === 0) return [];
+      const queryTarget = toQueryGeometry(target);
+      const queryOptions = toMaplibreRenderedQueryOptions(options);
+
+      const features =
+        queryTarget === undefined
+          ? await map.queryRenderedFeatures(
+              queryOptions as { filter?: unknown } | undefined
+            )
+          : await map.queryRenderedFeatures(queryTarget, queryOptions);
+
+      return featuresFromWrapper(features, "queryRenderedFeatures");
+    },
+    querySourceFeatures: async (sourceId, options) => {
+      requireMap(mapRef.current);
+      const entry = sources.require(sourceId);
+
+      if (entry.kind === "geojson") {
+        // Both native getData implementations query loaded source tiles, including
+        // hidden features. Results may be clipped or duplicated at tile boundaries.
+        const collection = await entry.ref.getData(
+          toMaplibreFilter(options?.filter) as never
+        );
+
+        return featuresFromWrapper(collection, "querySourceFeatures");
+      }
+
+      return featuresFromWrapper(
+        await entry.ref.querySourceFeatures(
+          toMaplibreSourceQueryOptions(options)
+        ),
+        "querySourceFeatures"
+      );
+    },
+    ...createClusterMethods((id) => sources.requireGeoJson(id)),
+    ...createMaplibreFeatureStateMethods(sources, () =>
+      requireMap(mapRef.current)
+    ),
+    resize: async () => {
+      throw nativeResizeError();
+    },
+  };
+};
+
+const createClusterMethods = (
+  read: (id: string) => ComponentRef<typeof GeoJSONSource>
+): ClusterQueryMethods => ({
   getClusterExpansionZoom: async (sourceId, clusterId) => {
-    const source = sources.requireGeoJson(sourceId);
+    const source = read(sourceId);
     const zoom = await source.getClusterExpansionZoom(clusterId);
 
     return finiteNumber(zoom, "Cluster expansion zoom");
   },
   getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
-    const source = sources.requireGeoJson(sourceId);
+    const source = read(sourceId);
 
     return featuresFromWrapper(
       await source.getClusterLeaves(clusterId, limit, offset),
@@ -190,18 +236,12 @@ export const createMaplibreMapRef = (
     );
   },
   getClusterChildren: async (sourceId, clusterId) => {
-    const source = sources.requireGeoJson(sourceId);
+    const source = read(sourceId);
 
     return featuresFromWrapper(
       await source.getClusterChildren(clusterId),
       "getClusterChildren"
     );
-  },
-  ...createMaplibreFeatureStateMethods(sources, () =>
-    requireMap(mapRef.current)
-  ),
-  resize: async () => {
-    throw nativeResizeError();
   },
 });
 

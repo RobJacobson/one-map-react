@@ -228,7 +228,9 @@ export const paddingFromWrapper = (value: unknown): Required<Padding> => {
  * @param options - Command options.
  * @throws When `easing` is set or `duration` is any number other than `0`.
  */
-export const rejectJumpTiming = (options: CameraCommandOptions): void => {
+export const rejectJumpTiming = (
+  options: Pick<CameraCommandOptions, "duration" | "easing">
+): void => {
   if (options.easing !== undefined) {
     throw new Error("jumpTo does not accept an easing function.");
   }

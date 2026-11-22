@@ -12,6 +12,10 @@ import {
 import type { ComponentType } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
+import {
+  definedStyle,
+  useNativeLayerKey,
+} from "../shared/native-layer-updates.js";
 
 /** Mapbox-native layer that dispatches to the matching RNMapbox layer. */
 export const MapboxNativeLayer = (props: LayerProps) => {
@@ -19,11 +23,13 @@ export const MapboxNativeLayer = (props: LayerProps) => {
   const NativeLayer = nativeLayers[props.type] as ComponentType<
     ReturnType<typeof rnmapboxLayerFields> & { style: Record<string, unknown> }
   >;
+  const style = toRnmapboxLayerStyle(props);
+  const key = useNativeLayerKey(style, {
+    ...props,
+    filter: "filter" in props ? props.filter : undefined,
+  });
   return (
-    <NativeLayer
-      {...rnmapboxLayerFields(props)}
-      style={toRnmapboxLayerStyle(props)}
-    />
+    <NativeLayer key={key} {...rnmapboxLayerFields(props)} style={style} />
   );
 };
 
@@ -42,20 +48,21 @@ const nativeLayers = {
 /** Renames style fields while leaving values and validation to RNMapbox. */
 const toRnmapboxLayerStyle = (props: LayerProps): Record<string, unknown> =>
   Object.fromEntries(
-    Object.entries({ ...props.paint, ...props.layout })
-      .filter(([, value]) => value !== undefined)
-      .map(([key, value]) => [
+    Object.entries(definedStyle({ ...props.paint, ...props.layout }) ?? {}).map(
+      ([key, value]) => [
         key.replace(/-([a-z])/g, (_match, letter: string) =>
           letter.toUpperCase()
         ),
         value,
-      ])
+      ]
+    )
   );
 
 /** Portable layer fields every RNMapbox layer converter reads. */
 interface PortableLayerFields {
   readonly id: string;
   readonly sourceID?: string;
+  readonly source?: string;
   readonly beforeId?: string;
   readonly minzoom?: number;
   readonly maxzoom?: number;
@@ -72,7 +79,7 @@ interface PortableLayerFields {
  */
 const rnmapboxLayerFields = (props: PortableLayerFields) => ({
   id: props.id,
-  sourceID: props.sourceID,
+  sourceID: props.sourceID ?? props.source,
   minZoomLevel: props.minzoom,
   maxZoomLevel: props.maxzoom,
   belowLayerID: props.beforeId,

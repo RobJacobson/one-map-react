@@ -1,0 +1,10 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleSuffixes": [".mapbox-native", ".native", ""]
+  },
+  "files": ["maps.mapbox-native.ts"],
+  "include": ["VesselMap.tsx"]
+}

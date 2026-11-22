@@ -17,16 +17,18 @@ import {
 import { PortalHost, PortalProvider } from "react-native-teleport";
 
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
-import type { MapProps } from "../../contracts/map-types.js";
+import type { NativeMapInputs } from "../../contracts/native-types.js";
 import type { NativeLocationOptions } from "../../mapbox-native.js";
 import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
+import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import {
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
+import { nativeBoundsInput } from "../shared/native-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import {
@@ -57,7 +59,7 @@ type RnPressFeature = Parameters<
 /** Mapbox-native map that renders RNMapbox `MapView` with a `Camera` child. */
 const MapboxNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  MapProps & {
+  NativeMapInputs & {
     locationOptions?: NativeLocationOptions;
     hostProps?: ViewProps;
     options?: Partial<ComponentProps<typeof MapView>>;
@@ -65,7 +67,7 @@ const MapboxNativeMapImplementation = forwardRef<
 >((props, ref) => {
   assertLabelLocalization(props.options?.localizeLabels);
   const session = useNativeMapPresentation();
-  if (props.viewState && props.locationOptions?.followUserLocation)
+  if (nativeCameraTarget(props) && props.locationOptions?.followUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
   const scaleBarPosition = props.options?.scaleBarPosition;
   const refreshScalePosition = useMapboxScalePosition(
@@ -74,10 +76,10 @@ const MapboxNativeMapImplementation = forwardRef<
     session.nativeLayout?.height,
     props.options?.scaleBarEnabled
   );
+  const viewState = nativeCameraTarget(props);
   const {
     mapStyle,
     initialViewState,
-    viewState,
     minZoom,
     maxZoom,
     maxBounds,
@@ -95,8 +97,8 @@ const MapboxNativeMapImplementation = forwardRef<
     gl,
     interactive,
     dragPan,
-    touchZoom,
-    touchRotate,
+    touchZoom = props.touchZoomRotate,
+    touchRotate = props.touchZoomRotate,
     touchPitch,
     doubleTapZoom,
     children,
@@ -105,7 +107,7 @@ const MapboxNativeMapImplementation = forwardRef<
   const mapViewRef = useRef<ComponentRef<typeof MapView>>(null);
   const sawMove = useRef(false);
   const [geoJsonSources] = useState(() => new GeoJsonSourceRegistry());
-  const frozenViewState = useFrozenValue(initialViewState);
+  const frozenViewState = useFrozenValue(initialViewState ?? viewState);
   const extraGestureSettings = useMapboxGestureSettings();
   // RNMapbox class event handlers read this.props, including props from a suspended render.
   const report = useActiveCallbacks({
@@ -116,6 +118,7 @@ const MapboxNativeMapImplementation = forwardRef<
     onLongPress,
     onLoad,
     onStyleLoad,
+    onStyleData: props.onStyleData,
     onError,
   });
   const styleProps = toRnmapboxStyleProps(mapStyle);
@@ -219,6 +222,7 @@ const MapboxNativeMapImplementation = forwardRef<
             }}
             onDidFinishLoadingStyle={() => {
               report.onStyleLoad();
+              report.onStyleData();
             }}
             onMapLoadingError={(payload: unknown) => {
               const event = mapLoadingErrorEvent(payload);
@@ -249,7 +253,7 @@ const MapboxNativeMapImplementation = forwardRef<
               maxBounds={
                 maxBounds === undefined
                   ? undefined
-                  : toRnmapboxCornerBounds(maxBounds)
+                  : toRnmapboxCornerBounds(nativeBoundsInput(maxBounds))
               }
               padding={
                 padding === undefined ? undefined : toRnmapboxPadding(padding)
