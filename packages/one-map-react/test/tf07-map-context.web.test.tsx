@@ -5,6 +5,7 @@ import {
   StrictMode,
   useContext,
   useImperativeHandle,
+  useLayoutEffect,
 } from "react";
 import { describe, expect, expectTypeOf, vi, test } from "vite-plus/test";
 
@@ -24,7 +25,10 @@ import type {
 } from "../src/contracts/native-types.js";
 import type { GeoJsonFeature } from "../src/contracts/source-types.js";
 import { type MapSession, useMapSession } from "../src/facade/map-context.js";
+import type { ForwardedMapMethodKey } from "../src/facade/map.js";
 import { createNativeMapBinding } from "../src/facade/native-map.js";
+import type { MapRef as MapboxMapRef } from "../src/mapbox-native.js";
+import type { MapRef as MaplibreMapRef } from "../src/maplibre-native.js";
 
 const hit: NativeClickEvent = {
   lngLat: nativeLngLat([1, 2]),
@@ -120,6 +124,99 @@ test.each(
     view.unmount();
     await expect(Promise.resolve(retained)).resolves.toBe(retained);
     await expect(retained.flyTo(command)).rejects.toThrow("not attached");
+  }
+);
+
+test.each(["enclosing", "named"] as const)(
+  "%s map handles expose only known stable methods and serialize safely",
+  async (access) => {
+    expectTypeOf<keyof MapboxMapRef>().toEqualTypeOf<ForwardedMapMethodKey>();
+    expectTypeOf<keyof MaplibreMapRef>().toEqualTypeOf<ForwardedMapMethodKey>();
+    const fixture = createFixture();
+    const { Map: NativeMap, MapProvider, useMap } = fixture.binding;
+    const observe =
+      vi.fn<
+        (entry: {
+          readonly label: string;
+          readonly map: MapRef | undefined;
+        }) => void
+      >();
+    const Probe = ({ label }: { readonly label: string }) => {
+      const maps = useMap();
+      const map = access === "named" ? maps["inspect-map"] : maps.current;
+      useLayoutEffect(() => {
+        observe({ label, map });
+      }, [label, map]);
+      return null;
+    };
+    const scene = (label: string) => (
+      <MapProvider>
+        <div>{label}</div>
+        {access === "named" && <Probe label={label} />}
+        <NativeMap id="inspect-map" mapStyle={style} initialViewState={camera}>
+          <div>{label}</div>
+          {access === "enclosing" && <Probe label={label} />}
+        </NativeMap>
+      </MapProvider>
+    );
+
+    const view = render(scene("first"));
+    const first = observe.mock.calls.at(-1)?.[0];
+    expect(first?.label).toBe("first");
+    const map = first?.map as
+      | (MapRef & {
+          getSource?: (id: string) => unknown;
+          getWrapperMap?: () => Promise<unknown>;
+          getMap?: unknown;
+          getLayer?: unknown;
+          then?: unknown;
+        })
+      | undefined;
+    if (!map) throw new Error("Map reference was not attached.");
+
+    expect(Object.isFrozen(map)).toBe(true);
+    expect("flyTo" in map).toBe(true);
+    expect("getSource" in map).toBe(true);
+    expect("getWrapperMap" in map).toBe(true);
+    expect(Object.hasOwn(map, "flyTo")).toBe(true);
+    expect("getMap" in map).toBe(false);
+    expect("getLayer" in map).toBe(false);
+    expect("then" in map).toBe(false);
+    expect(Symbol.toPrimitive in map).toBe(false);
+    expect(Symbol.toStringTag in map).toBe(false);
+    expect(typeof map.getMap).toBe("undefined");
+    expect(typeof map.then).toBe("undefined");
+
+    const initialFlyTo = map.flyTo;
+    const initialGetZoom = map.getZoom;
+    expect(map.flyTo).toBe(initialFlyTo);
+    expect(map.getZoom).toBe(initialGetZoom);
+
+    view.rerender(scene("second"));
+    const second = observe.mock.calls.at(-1)?.[0];
+    expect(second?.label).toBe("second");
+    expect(second?.map).toBe(map);
+    expect(second?.map?.flyTo).toBe(initialFlyTo);
+    expect(second?.map?.getZoom).toBe(initialGetZoom);
+
+    expect(String(map)).toBe("[object Object]");
+    expect(JSON.stringify(map)).toBe("{}");
+
+    // Partial attached fakes omit unimplemented methods; forwarding rejects cleanly.
+    await expect(map.flyTo({ center: [7, 8] })).rejects.toThrow(
+      'Map method "flyTo" is not available.'
+    );
+    expect(map.getSource?.("routes")).toBeUndefined();
+    await expect(map.getZoom()).resolves.toBe(3);
+
+    view.unmount();
+    expect(String(map)).toBe("[object Object]");
+    expect(JSON.stringify(map)).toBe("{}");
+    expect(map.getSource?.("routes")).toBeUndefined();
+    await expect(map.flyTo({ center: [7, 8] })).rejects.toThrow(
+      "Map is not attached."
+    );
+    await expect(initialGetZoom()).rejects.toThrow("Map is not attached.");
   }
 );
 

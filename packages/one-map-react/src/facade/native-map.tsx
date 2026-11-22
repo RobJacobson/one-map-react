@@ -28,7 +28,7 @@ import {
   type MapRegistry,
   noMapSubscription,
 } from "./map-registry.js";
-import { MountedMap } from "./map.js";
+import { type ForwardedMapMethodKey, MountedMap } from "./map.js";
 import { useSourceOptions } from "./source.js";
 import { useMarkerOptions } from "./ui.js";
 
@@ -83,7 +83,8 @@ interface NativeMapBinding<
  * @returns Components and hook sharing the entry's enclosing and named map access.
  */
 export const createNativeMapBinding = <
-  Handle extends MapRef,
+  Handle extends MapRef &
+    Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
   Props extends NativeMapInputs,
 >(
   implementation: ComponentType<Props & RefAttributes<Handle>>,

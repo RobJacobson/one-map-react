@@ -213,6 +213,21 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     }
     expect(access.harbor).toBeUndefined();
     expect(access["constructor"]).toBeUndefined();
+    expect(Object.keys(access.current).sort()).toEqual(
+      Object.keys(handle).sort()
+    );
+    expect("flyTo" in access.current).toBe(true);
+    expect("getMap" in access.current).toBe(false);
+    expect(typeof (access.current as { getMap?: unknown }).getMap).toBe(
+      "undefined"
+    );
+    const { flyTo } = access.current;
+    expect(access.current.flyTo).toBe(flyTo);
+    expect(String(access.current)).toBe("[object Object]");
+    expect(JSON.stringify(access.current)).toBe("{}");
+    const mountedSource = handle.getSource("routes");
+    expect(mountedSource).toBeDefined();
+    expect(access.current.getSource("routes")).toBe(mountedSource);
     await expect(access.current.getWrapperMap()).resolves.toBe(
       await handle.getWrapperMap()
     );

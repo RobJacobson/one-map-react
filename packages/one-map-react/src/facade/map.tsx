@@ -14,7 +14,10 @@ import {
 import { useActiveCallback } from "../adapters/shared/use-active-callback.js";
 import type { MapRef } from "../contracts/camera-types.js";
 import type { MapProps } from "../contracts/map-types.js";
-import type { NativeMapInputs } from "../contracts/native-types.js";
+import type {
+  NativeMapInputs,
+  NativeMapRef,
+} from "../contracts/native-types.js";
 import {
   type MapSession,
   MapSessionContext,
@@ -25,7 +28,8 @@ import { useMapInteractions } from "./use-map-interactions.js";
 import { useStableOptions } from "./use-stable-options.js";
 
 interface MountedMapProps<
-  Handle extends MapRef,
+  Handle extends MapRef &
+    Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
   Props extends NativeMapInputs,
 > {
   readonly props: Props;
@@ -42,7 +46,8 @@ interface MountedMapProps<
  * @returns The mounted map and its context.
  */
 export const MountedMap = <
-  Handle extends MapRef,
+  Handle extends MapRef &
+    Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
   Props extends NativeMapInputs,
 >({
   props,
@@ -56,9 +61,9 @@ export const MountedMap = <
   useStableOptions("Map", {
     id: props.id,
   });
-  const { mapRef, proxy, attach } = useMapAttachment(forwardedRef);
+  const { mapRef, handle, attach } = useMapAttachment(forwardedRef);
   const id = props.id;
-  useLayoutEffect(() => register?.(id, proxy), [id, register, proxy]);
+  useLayoutEffect(() => register?.(id, handle), [id, register, handle]);
   const [ready, setReady] = useState(false);
   const load = useActiveCallback(() => {
     setReady(true);
@@ -66,8 +71,8 @@ export const MountedMap = <
   });
   const { move, click } = useMapInteractions(props, mapRef);
   const session = useMemo<MapSession>(
-    () => ({ ref: mapRef, map: proxy, ready, components }),
-    [mapRef, proxy, ready, components]
+    () => ({ ref: mapRef, map: handle, ready, components }),
+    [mapRef, handle, ready, components]
   );
   return (
     <MapSessionContext.Provider value={session}>
@@ -111,29 +116,71 @@ const validateMapOptions = (
   }
 };
 
-/** Owns the forwarded ref and the proxy retained by map access hooks. */
-const useMapAttachment = <Handle extends MapRef>(forwardedRef: Ref<Handle>) => {
+const nativeMapMethods = {
+  getSource: true,
+  getWrapperMap: true,
+  queryTerrainElevation: true,
+  jumpTo: true,
+  easeTo: true,
+  flyTo: true,
+  fitBounds: true,
+  zoomTo: true,
+  stop: true,
+  getCenter: true,
+  getZoom: true,
+  getBearing: true,
+  getPitch: true,
+  getPadding: true,
+  getBounds: true,
+  getMinZoom: true,
+  getMaxZoom: true,
+  getMaxBounds: true,
+  project: true,
+  unproject: true,
+  queryRenderedFeatures: true,
+  querySourceFeatures: true,
+  getClusterExpansionZoom: true,
+  getClusterLeaves: true,
+  getClusterChildren: true,
+  setFeatureState: true,
+  getFeatureState: true,
+  removeFeatureState: true,
+  resize: true,
+} satisfies Record<keyof NativeMapRef | "getWrapperMap", true>;
+
+export type ForwardedMapMethodKey = keyof typeof nativeMapMethods;
+
+/** Owns the forwarded ref and the forwarding handle retained by map access hooks. */
+const useMapAttachment = <
+  Handle extends MapRef &
+    Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
+>(
+  forwardedRef: Ref<Handle>
+) => {
   const mapRef = useRef<Handle | null>(null);
-  const [proxy] = useState(
-    () =>
-      // Each exposed method dispatches through the attached handle of this type.
-      new Proxy({} as Handle, {
-        get: (_target, key) => {
-          if (key === "then") return undefined;
-          return (...args: unknown[]) => {
-            const map = mapRef.current;
-            if (!map) {
-              if (key === "getSource") return undefined;
-              return Promise.reject(new Error("Map is not attached."));
-            }
-            const method = Reflect.get(map, key) as (
-              ...args: unknown[]
-            ) => unknown;
-            return method.apply(map, args);
-          };
-        },
-      })
-  );
+  const [handle] = useState(() => {
+    const forwarding: Record<string, (...args: unknown[]) => unknown> = {};
+    for (const key of Object.keys(
+      nativeMapMethods
+    ) as ForwardedMapMethodKey[]) {
+      forwarding[key] = (...args: unknown[]) => {
+        const map = mapRef.current;
+        if (!map) {
+          if (key === "getSource") return undefined;
+          return Promise.reject(new Error("Map is not attached."));
+        }
+        const method: unknown = Reflect.get(map, key);
+        if (typeof method !== "function") {
+          if (key === "getSource") return undefined;
+          return Promise.reject(
+            new Error(`Map method "${key}" is not available.`)
+          );
+        }
+        return Reflect.apply(method, map, args);
+      };
+    }
+    return Object.freeze(forwarding) as unknown as Handle;
+  });
   const attach = useCallback(
     (map: Handle | null) => {
       mapRef.current = map;
@@ -147,7 +194,7 @@ const useMapAttachment = <Handle extends MapRef>(forwardedRef: Ref<Handle>) => {
     },
     [forwardedRef]
   );
-  return { mapRef, proxy, attach };
+  return { mapRef, handle, attach };
 };
 
 /** Forwards a renderer attachment, including the cleanup returned by a React 19 ref. */
