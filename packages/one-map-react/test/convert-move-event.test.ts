@@ -9,10 +9,6 @@ import {
   moveEventFromMaplibreNative,
 } from "../src/adapters/maplibre-native/convert-move-event.js";
 import { originFromUserInteraction } from "../src/adapters/shared/move-event.js";
-import {
-  clickEventFromWeb,
-  moveEventFromWeb,
-} from "../src/adapters/web/convert-move-event.js";
 
 const viewState = {
   longitude: -122.34,
@@ -56,29 +52,7 @@ describe("move event conversion", () => {
     });
   });
 
-  test("web treats a present originalEvent as user movement", () => {
-    expect(moveEventFromWeb(viewState, {})).toEqual({
-      viewState,
-      origin: "user",
-    });
-    expect(moveEventFromWeb(viewState, undefined)).toEqual({
-      viewState,
-      origin: "unknown",
-    });
-  });
-
   test("clicks use coordinate and point tuples", () => {
-    expect(
-      clickEventFromWeb({
-        lngLat: { lng: -122.34, lat: 47.61 },
-        point: { x: 8, y: 9 },
-        features: [{ id: "pier" }],
-      })
-    ).toEqual({
-      lngLat: [-122.34, 47.61],
-      point: [8, 9],
-      features: [{ id: "pier" }],
-    });
     expect(
       clickEventFromRnmapbox({
         geometry: { coordinates: [-122.34, 47.61] },

@@ -1,4 +1,25 @@
-import type { Adapter, MapRef, ViewState } from "one-map-react";
+import type { ViewState } from "one-map-react";
+
+/** Camera operations used by the basemap handoff on both platforms. */
+export interface CameraMap {
+  /** Reads longitude and latitude from the attached renderer. */
+  getCenter():
+    | { readonly lng: number; readonly lat: number }
+    | Promise<{ readonly lng: number; readonly lat: number }>;
+  /** Reads the current zoom. */
+  getZoom(): number | Promise<number>;
+  /** Reads the current heading, when supported by the selected renderer. */
+  getBearing(): number | Promise<number>;
+  /** Reads the current pitch, when supported by the selected renderer. */
+  getPitch(): number | Promise<number>;
+  /** Requests a camera position with no animation. */
+  jumpTo(target: {
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+    pitch: number;
+  }): unknown;
+}
 
 /** Seattle starting view shared by both apps and all four adapters. */
 export const initialCamera: ViewState = {
@@ -12,24 +33,24 @@ export const initialCamera: ViewState = {
 /**
  * Reads the public camera, retaining observed orientation where getters are unavailable.
  * @param map - Current map attachment.
- * @param backend - Selected adapter's backend.
+ * @param useObservedOrientation - Whether the native bridge lacks orientation getters.
  * @param observed - Latest normalized movement event.
  * @returns Camera snapshot suitable for another engine.
  */
 export const readCamera = async (
-  map: MapRef,
-  backend: Adapter["backend"],
+  map: CameraMap,
+  useObservedOrientation: boolean,
   observed: ViewState
 ): Promise<ViewState> => {
   const [center, zoom, bearing, pitch] = await Promise.all([
     map.getCenter(),
     map.getZoom(),
-    backend === "mapbox-native" ? observed.bearing : map.getBearing(),
-    backend === "mapbox-native" ? observed.pitch : map.getPitch(),
+    useObservedOrientation ? observed.bearing : map.getBearing(),
+    useObservedOrientation ? observed.pitch : map.getPitch(),
   ]);
   const camera = {
-    longitude: center[0],
-    latitude: center[1],
+    longitude: center.lng,
+    latitude: center.lat,
     zoom,
     bearing,
     pitch,

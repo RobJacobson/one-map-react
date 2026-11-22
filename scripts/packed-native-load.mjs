@@ -52,6 +52,7 @@ const concrete = await import("one-map-react/${entry}");
 const alias = await import("one-map-react/${entry.replace("-native", "")}");
 assert.equal(concrete.adapter.backend, ${JSON.stringify(entry)});
 assert.equal(concrete, alias);
+assert.equal(concrete.default, concrete.Map);
 for (const symbol of ["Map", "Source", "Layer", "Marker", "useMap"]) {
   assert.ok(concrete[symbol], "Missing native export " + symbol);
 }

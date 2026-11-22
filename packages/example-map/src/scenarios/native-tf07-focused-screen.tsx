@@ -1,6 +1,5 @@
 import {
   type Adapter,
-  UserLocation,
   type GeolocationPosition,
   Layer,
   type MapRef,
@@ -9,9 +8,10 @@ import {
   type MarkerRef,
   Map as OneMap,
   Source,
-} from "one-map-react";
+} from "one-map-react/legacy";
 import type { NativeMapProps as MapboxMapProps } from "one-map-react/mapbox-native";
 import type { NativeMapProps as MaplibreMapProps } from "one-map-react/maplibre-native";
+import { UserLocation } from "one-map-react/native-extensions";
 import {
   createContext,
   useCallback,

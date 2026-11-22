@@ -7,7 +7,7 @@ import MaplibreApp from "../../../packages/example-map/src/scenarios/maplibre-na
 const mockTf07Screen = jest.fn(
   (_props: { readonly ornaments: object }) => null
 );
-jest.mock("one-map-react", () => ({ MapSetup: () => null }));
+jest.mock("one-map-react/legacy", () => ({ MapSetup: () => null }));
 jest.mock("one-map-react/mapbox-native", () => ({
   adapter: { backend: "mapbox-native" },
 }));

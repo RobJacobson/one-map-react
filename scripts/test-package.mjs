@@ -7,6 +7,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readdirSync,
+  realpathSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -139,6 +140,9 @@ const main = async () => {
     assert(files.includes("package/patches/rnmapbox-10.3.7-tf08.patch"));
     assert(files.includes("package/patches/maplibre-native-11.5.0-tf08.patch"));
     assert(files.includes("package/patches/rnmapbox-10.3.8.patch"));
+    assert(
+      !files.some((file) => file.startsWith("package/dist/adapters/web/"))
+    );
     for (const file of files) {
       assert.match(
         file,
@@ -220,24 +224,23 @@ const checkConsumer = async (archive, scenario) => {
 
   if (scenario.name === "common") {
     walkDeclarations(join(installed, "dist/index.d.ts"), backends);
+    walkDeclarations(join(installed, "dist/native-extensions.d.ts"), backends);
     writeFileSync(
       join(consumer, "common.mjs"),
       `import * as common from "one-map-react";
+import * as legacy from "one-map-react/legacy";
+import * as extensions from "one-map-react/native-extensions";
+import assert from "node:assert/strict";
+assert.equal(legacy, common);
+assert.deepEqual(Object.keys(extensions).sort(), ["Images", "UserLocation"]);
+assert.equal(typeof extensions.Images, "function");
+assert.equal(typeof extensions.UserLocation, "function");
 console.log(JSON.stringify(Object.keys(common).sort()));
 `
     );
     assert.equal(
       run("node", [join(consumer, "common.mjs")], consumer),
-      JSON.stringify([
-        "Images",
-        "Layer",
-        "Map",
-        "MapSetup",
-        "Marker",
-        "Source",
-        "UserLocation",
-        "useMap",
-      ])
+      JSON.stringify(["Layer", "Map", "MapSetup", "Marker", "Source", "useMap"])
     );
   }
 
@@ -253,23 +256,10 @@ console.log(JSON.stringify(Object.keys(common).sort()));
     );
   }
 
-  const imports = scenario.entries
-    .map(
-      ([entry], index) =>
-        `import { adapter as selected${index} } from "one-map-react/${entry}";`
-    )
-    .join("\n");
-  const declarations = scenario.entries
-    .map(
-      ([, backend], index) =>
-        `const choice${index}: "${backend}" = selected${index}.backend;`
-    )
-    .join("\n");
-
-  writeFileSync(
-    join(consumer, "selection.tsx"),
-    `${imports}
-import type { Adapter, Backend, MapRef } from "one-map-react";
+  if (scenario.name === "common") {
+    writeFileSync(
+      join(consumer, "selection.tsx"),
+      `import type { Adapter, Backend, MapRef } from "one-map-react";
 import { Map as OneMap, MapSetup, Source, Layer, Marker, useMap } from "one-map-react";
 import { forwardRef } from "react";
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
@@ -279,7 +269,7 @@ void <Layer id="routes" type="line" paint={{ "line-width-transition": { duration
 const exactAdapterKeys: Equal<keyof Adapter, "backend" | "Map" | "Source" | "Layer" | "Images" | "Marker"> = true;
 const exactSetupKeys: Equal<keyof import("one-map-react").MapSetupProps, "adapter" | "children"> = true;
 const customAdapter: Adapter = {
-  backend: "mapbox-web",
+  backend: "mapbox-native",
   Map: forwardRef<MapRef, import("one-map-react").MapProps>(() => null),
   Source: () => null,
   Layer: () => null,
@@ -289,7 +279,8 @@ const customAdapter: Adapter = {
 const customSetup: import("one-map-react").MapSetupProps = { adapter: customAdapter, children: null };
 void customSetup; void exactAdapterKeys; void exactSetupKeys;
 
-${declarations}
+// @ts-expect-error Legacy setup only binds native adapters.
+const webAdapter: Adapter["backend"] = "mapbox-web";
 declare const commonRef: MapRef;
 // @ts-expect-error Source click events are removed.
 import type { SourceClickEvent } from "one-map-react";
@@ -300,7 +291,7 @@ type RemovedSourceCallback = import("one-map-react").GeoJsonSourceProps["onClick
 // @ts-expect-error Vector source activation belongs to Map.onClick.
 type RemovedVectorCallback = import("one-map-react").VectorSourceProps["onClick"];
 // @ts-expect-error Supplied location is display only.
-type RemovedLocationPress = import("one-map-react").UserLocationProps["onPress"];
+type RemovedLocationPress = import("one-map-react/native-extensions").UserLocationProps["onPress"];
 // @ts-expect-error Popups are selected wrapper components or application UI.
 import { Popup } from "one-map-react";
 // @ts-expect-error Common popup props are removed.
@@ -422,7 +413,18 @@ void (
 // @ts-expect-error An arbitrary backend must not type-check.
 const invalid: Adapter = { backend: "automatic" };
 `
-  );
+    );
+  } else {
+    writeFileSync(
+      join(consumer, "selection.tsx"),
+      scenario.entries
+        .map(
+          ([entry], index) =>
+            `import type * as Selected${index} from "one-map-react/${entry}";`
+        )
+        .join("\n")
+    );
+  }
   writeFileSync(
     join(consumer, "tsconfig.json"),
     JSON.stringify({
@@ -441,7 +443,19 @@ const invalid: Adapter = { backend: "automatic" };
       files: ["selection.tsx"],
     })
   );
-  run(compiler, ["-p", "tsconfig.json"], consumer);
+  const trace = run(
+    compiler,
+    ["-p", "tsconfig.json", "--traceResolution"],
+    consumer
+  );
+  for (const [entry, backend] of scenario.entries) {
+    assert(
+      trace.includes(
+        `Module name 'one-map-react/${entry}' was successfully resolved to '${realpathSync(installed)}/dist/${backend}.d.ts'`
+      ),
+      `Unexpected declaration for ${scenario.name}: ${entry}`
+    );
+  }
 
   for (const peer of [...backends, "react-dom", "react-native"]) {
     assert(

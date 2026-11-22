@@ -50,7 +50,7 @@ const createFixture = () => {
     return <div>{props.children}</div>;
   });
   const adapter = {
-    backend: "mapbox-web",
+    backend: "mapbox-native",
     Map: FakeMap,
     Source: ({ children }: { children?: ReactNode }) => <>{children}</>,
   } as unknown as Adapter;

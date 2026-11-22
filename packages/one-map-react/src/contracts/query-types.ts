@@ -17,8 +17,7 @@ export type ScreenBounds = readonly [Point, Point];
 export interface QueryRenderedFeaturesOptions {
   /**
    * Style layer ids the query inspects. Omitted queries every layer.
-   * An explicit empty list matches no native layers. The legacy web facade
-   * rejects a requested id absent from the loaded style.
+   * An explicit empty list matches no native layers.
    */
   readonly layers?: readonly string[];
   /**
@@ -37,8 +36,7 @@ export interface QuerySourceFeaturesOptions {
   /**
    * Layer inside a vector tile source to query.
    *
-   * Ignored for GeoJSON sources. A nonempty name is required for web vector
-   * queries. MapLibre Native requires the field; RNMapbox forwards the
+   * Ignored for GeoJSON sources. MapLibre Native vector queries require the field; RNMapbox forwards the
    * source-layer list, including an empty list when omitted.
    */
   readonly sourceLayer?: string;
@@ -149,16 +147,14 @@ export interface FeatureQueryMethods {
    * Queries features rendered at a screen point or rectangle.
    *
    * Only rendered features match: a feature in loaded-but-hidden state does
-   * not. An empty successful result resolves to `[]`. Web errors emitted
-   * synchronously during dispatch reject the query promise and continue
-   * reaching the map's error callback.
+   * not. An empty successful result resolves to `[]`.
    *
    * @param target - `[x, y]` point, `[[left, top], [right, bottom]]`
    * rectangle, or `undefined` for the visible viewport.
    * @param options - Layer ids and filter limiting the query.
    * @returns Matched features in backend order, duplicates preserved.
    * @throws When the map ref is missing, a wrapper result is malformed,
-   * a requested web layer is missing, or the renderer rejects the query.
+   * or the renderer rejects the query.
    */
   queryRenderedFeatures: (
     target: Point | ScreenBounds | undefined,
@@ -177,8 +173,7 @@ export interface FeatureQueryMethods {
    * @returns Matched features in backend order, duplicates preserved.
    * @throws When the source is missing, a native source ref required by the
    * adapter is not mounted through a facade `Source`, the adapter cannot
-   * query that source family, or a required source layer is absent. Web
-   * errors emitted synchronously during dispatch also reject.
+   * query that source family, or a required source layer is absent.
    */
   querySourceFeatures: (
     sourceId: string,
@@ -219,7 +214,7 @@ export interface FeatureStateMethods {
    *
    * @param identifier - Source, feature id, and optional vector source layer.
    * @returns The feature's state; `{}` when the feature has no state. Native
-   * nullish state is normalized; absent web read results reject.
+   * nullish state is normalized.
    * @throws When the identifier is malformed, the map ref is missing, or the
    * wrapper call fails.
    */

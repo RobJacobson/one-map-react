@@ -20,11 +20,6 @@ export type {
   MoveOrigin,
 } from "./contracts/event-types.js";
 export type {
-  ImageEntry,
-  ImagesProps,
-  UrlImage,
-} from "./contracts/images-types.js";
-export type {
   AlignmentAuto,
   AlignmentMap,
   BackgroundLayerProps,
@@ -62,7 +57,6 @@ export type {
   SymbolPaint,
   Visibility,
 } from "./contracts/layer-types.js";
-export type { UserLocationProps } from "./contracts/location-types.js";
 export type {
   LegacyLight,
   StyleTransition,
@@ -104,11 +98,9 @@ export type {
   MarkerProps,
   MarkerRef,
 } from "./contracts/ui-types.js";
-export { Images } from "./facade/images.js";
 export { Layer } from "./facade/layer.js";
 export { Map, useMap } from "./facade/map.js";
 export type { MapSetupProps } from "./facade/map-setup.js";
 export { MapSetup } from "./facade/map-setup.js";
 export { Source } from "./facade/source.js";
 export { Marker } from "./facade/ui.js";
-export { UserLocation } from "./facade/user-location.js";

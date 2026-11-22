@@ -138,6 +138,60 @@ const tick = (ms: number) =>
     await vi.advanceTimersByTimeAsync(ms);
   });
 
+test.each(["mapbox", "maplibre"] as const)(
+  "stock %s uses the source cluster API and the options-only viewport query",
+  async (engine) => {
+    const fixture = scene();
+    type Hit = { id: number };
+    const leaves: Hit[] = [{ id: 1 }, { id: 2 }];
+    type Done<T> = (error: null, result: T) => void;
+    const source = {
+      getClusterExpansionZoom: vi.fn((_id: number, done?: Done<number>) =>
+        done ? done(null, 13) : Promise.resolve(13)
+      ),
+      getClusterLeaves: vi.fn(
+        (_id: number, limit: number, offset: number, done?: Done<Hit[]>) => {
+          const page = leaves.slice(offset, offset + limit);
+          return done ? done(null, page) : Promise.resolve(page);
+        }
+      ),
+      getClusterChildren: vi.fn((_id: number, done?: Done<Hit[]>) =>
+        done ? done(null, leaves) : Promise.resolve(leaves)
+      ),
+    };
+    const sdk = {
+      getSource: (id: string) =>
+        id === "queries-clusters" ? source : undefined,
+      ...(engine === "mapbox" && { setRain: () => {} }),
+    };
+    const map = {
+      ...fixture.mapRef.current,
+      getMap: () => sdk,
+      getCenter: () => ({ lng: -122.34, lat: 47.61 }),
+      project: () => ({ x: 600, y: 400 }),
+      queryRenderedFeatures: (
+        target?: number[] | { layers?: string[] },
+        options?: { layers?: string[] }
+      ) =>
+        Array.isArray(target)
+          ? fixture.queryRenderedFeatures(target, options)
+          : fixture.queryRenderedFeatures(undefined, target),
+    };
+    const mapRef = {
+      current: map as unknown as import("react-map-gl/mapbox").MapRef,
+    };
+    const hook = renderHook(() => useQueriesSmoke({ mapRef }));
+    act(() => hook.result.current.onLoad());
+    await tick(1500);
+    expect(hook.result.current.status).toContain("pagination=ok");
+    expect(hook.result.current.status).toContain("filters=ok");
+    expect(source.getClusterExpansionZoom.mock.calls[0]).toHaveLength(
+      engine === "mapbox" ? 2 : 1
+    );
+    hook.unmount();
+  }
+);
+
 test("query dispatch is single-flight and late completion after unmount is ignored", async () => {
   const fixture = scene();
   let resolve: (point: number[]) => void = () => {};

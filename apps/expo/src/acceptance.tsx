@@ -4,9 +4,11 @@ import {
   acceptanceScenario,
   acceptanceScenarios,
 } from "@one-map/example-map/acceptance-selection";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { configureMapbox } from "./engines";
 
 /** Explicit development launch selection; ordinary startup stays on the basemap. */
 export const acceptanceRequested = Boolean(
@@ -22,6 +24,10 @@ export const Acceptance = ({
   readonly close: () => void;
 }) => {
   const insets = useSafeAreaInsets();
+  const prepareMapbox = useCallback(
+    async () => configureMapbox(token),
+    [token]
+  );
   const initialEngine = process.env.EXPO_PUBLIC_ONE_MAP_ENGINE ?? "maplibre";
   if (initialEngine !== "mapbox" && initialEngine !== "maplibre")
     throw new Error("Choose mapbox or maplibre.");
@@ -67,7 +73,11 @@ export const Acceptance = ({
           </Picker>
         </Row>
       </Host>
-      <NativeAcceptance engine={engine} scenario={scenario} />
+      <NativeAcceptance
+        engine={engine}
+        scenario={scenario}
+        prepareMapbox={prepareMapbox}
+      />
     </View>
   );
 };

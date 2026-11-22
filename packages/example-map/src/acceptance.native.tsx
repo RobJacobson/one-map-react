@@ -12,13 +12,16 @@ const MaplibreAcceptance = lazy(() => import("./scenarios/maplibre-native.js"));
  * @param props - The explicit engine and scenario selection.
  * @returns The selected development scenario and its controls.
  */
-export const NativeAcceptance = (props: AcceptanceSelection) => (
-  <NativeScenario key={`${props.engine}:${props.scenario}`} {...props} />
-);
+export const NativeAcceptance = (
+  props: AcceptanceSelection & {
+    readonly prepareMapbox?: () => Promise<void>;
+  }
+) => <NativeScenario key={`${props.engine}:${props.scenario}`} {...props} />;
 
 const NativeScenario = ({
   engine,
   scenario,
+  prepareMapbox,
 }: Parameters<typeof NativeAcceptance>[0]) => {
   const [prepared, setPrepared] = useState(false);
   const [failure, setFailure] = useState<Error>();
@@ -27,6 +30,8 @@ const NativeScenario = ({
     let stop = () => {};
     const prepare = async () => {
       try {
+        if (engine === "mapbox") await prepareMapbox?.();
+        if (!active) return;
         // Match the adapter's import condition to avoid duplicate SDK view registration.
         const cameras =
           scenario === "tf09"
@@ -50,7 +55,7 @@ const NativeScenario = ({
       active = false;
       stop();
     };
-  }, [engine, scenario]);
+  }, [engine, scenario, prepareMapbox]);
   if (failure) throw failure;
   if (!prepared) return null;
   if (scenario === "global-state" || scenario === "corrections")

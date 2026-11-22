@@ -1,7 +1,8 @@
-import { type Adapter, MapSetup } from "one-map-react";
+import { type Adapter, MapSetup } from "one-map-react/legacy";
 import { useCallback, useEffect, useRef } from "react";
 import { Platform, View } from "react-native";
 
+import { nativeSceneComponents } from "./native-scene-components.js";
 import { Tf09Scene, type Tf09Probe } from "./tf09-scene.js";
 
 /** Native runner transport; does not start until this acceptance screen mounts. */
@@ -72,7 +73,12 @@ export const NativeTf09Screen = ({
   return (
     <View style={{ flex: 1 }}>
       <MapSetup adapter={adapter}>
-        <Scene backend={adapter.backend} attach={attach} style={{ flex: 1 }} />
+        <Scene
+          components={nativeSceneComponents}
+          backend={adapter.backend}
+          attach={attach}
+          style={{ flex: 1 }}
+        />
       </MapSetup>
     </View>
   );

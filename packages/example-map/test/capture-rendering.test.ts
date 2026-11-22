@@ -1,11 +1,11 @@
 import type { MapRef } from "one-map-react";
 import { describe, expect, test, vi } from "vite-plus/test";
 
+import { captureRendering as captureNativeRendering } from "../src/scenarios/capture-rendering.native.js";
 import {
   captureRendering,
   renderingBufferOptions,
-} from "../src/scenarios/capture-rendering.js";
-import { captureRendering as captureNativeRendering } from "../src/scenarios/capture-rendering.native.js";
+} from "../src/scenarios/capture-web-rendering.js";
 
 const observationMap = (wrapper: object) => {
   const getWrapperMap = vi.fn(async () => wrapper);
@@ -14,16 +14,17 @@ const observationMap = (wrapper: object) => {
 };
 
 describe("application renderer observations", () => {
-  test("borrows a fresh web wrapper for each PNG and propagates canvas failures", async () => {
+  test("reads the stock map canvas for each PNG and propagates canvas failures", async () => {
     const toDataURL = vi.fn(() => "data:image/png;base64,pixels");
-    const { map, getWrapperMap } = observationMap({
-      getCanvas: () => ({ toDataURL }),
-    });
+    const getCanvas = vi.fn(
+      () => ({ toDataURL }) as unknown as HTMLCanvasElement
+    );
+    const map = { getCanvas };
     await expect(captureRendering("mapbox-web", map)).resolves.toEqual({
       uri: "data:image/png;base64,pixels",
     });
     await captureRendering("maplibre-web", map);
-    expect(getWrapperMap).toHaveBeenCalledTimes(2);
+    expect(getCanvas).toHaveBeenCalledTimes(2);
     expect(toDataURL).toHaveBeenCalledWith("image/png");
     toDataURL.mockImplementation(() => {
       throw new Error("SecurityError");
@@ -80,9 +81,11 @@ describe("application renderer observations", () => {
     await expect(captureNativeRendering("mapbox-native", map)).rejects.toThrow(
       "not attached"
     );
-    await expect(captureRendering("unknown", map)).rejects.toThrow(
-      "Unknown browser observation backend"
-    );
+    await expect(
+      captureRendering("unknown", {
+        getCanvas: () => ({}) as HTMLCanvasElement,
+      })
+    ).rejects.toThrow("Unknown browser observation backend");
   });
 
   test("requests selected web drawing buffers without native options", () => {

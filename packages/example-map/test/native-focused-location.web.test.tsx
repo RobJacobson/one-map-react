@@ -23,7 +23,15 @@ const fixture = vi.hoisted(() => ({
   secondZoom: vi.fn(async () => 12),
   dimensions: { width: 400, height: 800, scale: 1, fontScale: 1 },
 }));
-vi.mock("one-map-react", async () => {
+vi.mock("one-map-react/native-extensions", async () => {
+  const legacy = await import("one-map-react/legacy");
+  return {
+    Images: () => null,
+    UserLocation: Reflect.get(legacy, "UserLocation"),
+  };
+});
+
+vi.mock("one-map-react/legacy", async () => {
   const react = await import("react");
   const Parent = ({ children }: { children?: ReactNode }) => children;
   return {

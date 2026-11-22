@@ -3,12 +3,11 @@ import { useSelectedAdapter } from "./map-setup.js";
 import { useMapEnclosure } from "./map.js";
 
 /**
- * Shared style images that render through the selected adapter.
+ * Registers style images through the enclosing native map's adapter.
  *
  * Renders inside {@link Map}; registration waits for style readiness,
  * entries update independently and successful registrations are removed on
- * unmount. Web consumers must finish cleanup before changing the style, then
- * mount fresh Images after readiness. Native wrappers retain SDK behavior.
+ * unmount. Registration follows the selected native wrapper's behavior.
  *
  * @param props - Image entries keyed by style image name.
  * @throws When rendered outside {@link Map}.

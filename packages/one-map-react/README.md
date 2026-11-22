@@ -1,125 +1,61 @@
 # one-map-react
 
-**Popup fixture correction; acceptance pending.** The [third browser attempt](https://github.com/RobJacobson/one-map-react/blob/7eb042eff97cf405fee61bc4816d79861f532896/records/evidence/revised-api-u25-web-attempt-03.json) passed commands 1-5 on both web engines, then command 6 failed the Mapbox popup-teardown assertion; commands 7-9 were not run. The application fixture now filters popup open/close callbacks using the owning map generation and mounted lifetime, so teardown from an old map cannot dismiss its replacement popup. The driver retains the teardown assertion and verifies the replacement popup can still be closed. The library facade and raw selected popup callback semantics are unchanged. Applicable routine verification and independent source audit passed; browser acceptance remains incomplete. The [acceptance proposal](../../docs/revised-api-acceptance-plan.md) owns the next corrected browser candidate and inputs; commands 1-6 require reruns and commands 7-9 would execute for the first time, after new explicit permission. Native execution remains unapproved. The original rc.11 archive and its historical evidence remain unchanged.
-
-**Known native composition limit.** A pure Node codegen probe using React Native 0.87.1 reported three duplicate globals for co-installed RNMapbox 10.3.7 and MapLibre Native 11.5.0; the RNMapbox 10.3.8 pair passed that probe. Neither result is a native build/link result. Candidate native environments each install one SDK, and the retained mixed-selection contract pairs a web backend with one native backend. See the [scope and limitation](../../docs/revised-api-acceptance-plan.md#current-handoff).
-
-**Shared Images exception.** Images is an intentional extension to react-map-gl: it has no Images component, while its renderers expose loadImage/addImage/removeImage. The small web polyfill registers named assets for symbol and pattern layers; native adapters delegate to their Images wrappers and retain normal SDK restoration/collision behavior. See [named style images](../../docs/sources-and-layers.md#named-style-images).
-
-On web, before any mapStyle prop change or raw setStyle call, unmount Images and wait for its effect cleanup to finish in a separate committed step; only then replace the style, and mount fresh Images after readiness. An Images key change in onStyleLoad alone, or unmounting in the same update as the style change, is insufficient. A new keyed Map with reuseMaps={false} is an alternative that resets the camera. Initial usable-style waiting, individual updates/removals and pending-load release remain; automatic replay/retry does not. Existing web image names are conflicts: reserve distinct names and do not mutate owned registrations through raw APIs. Renderer verification remains open.
-
-one-map-react supplies shared React map components over react-map-gl, RNMapbox, and MapLibre React Native. Application setup selects an adapter; shared map components import the common entry. The package is ESM and includes TypeScript declarations.
-
-This prerelease targets the minimum peers listed below. Endpoint verification also covers React/DOM 19.3.1 on web, Mapbox GL JS 3.33.0, MapLibre GL JS 6.14.0, RNMapbox 10.3.8, and Teleport 1.2.2. Native React/DOM remain 19.2.3 with React Native 0.87.1. The configured minimum release age remains enabled. The source checkout records exact artifacts, scoped routine and renderer outcomes, and verification limits in `records/support-matrix.json`. Forwarded upstream fields do not each have independent renderer certification.
-
-This README describes the working checkout's narrower [scope and migration contract](../../docs/revised-api-proposal.md) for the next incompatible release. The archived rc.11 candidate retains its broader API and artifact-specific evidence. The common runtime exports are MapSetup, Map, Source, Layer, Images, Marker, UserLocation and useMap. The four working selected refs add asynchronous getWrapperMap returning the attached react-map-gl MapRef, RNMapbox MapView, or MapLibre Native Map wrapper; each call looks up the current borrowed handle without waiting for load and rejects when detached. Working selected refs retain common portable operations and getWrapperMap; advanced calls use these borrowed handles instead of facade method mirrors. Working common native markers reject draggable=true and any drag callback in both render modes; selected native Marker types permit draggable=false and omit drag callbacks. Web dragging and selected raw native annotation dragging remain available. Live native markers retain activation, interactive children, providers, offsets, refresh, coordinate updates, and cleanup. Touch acceptance for native marker changes remains unverified. Native viewState uses changed targets and explicit commands rather than unchanged-target rollback; see Current limitations below. Final surface and release verification remain separate. Working current-map capture uses selected wrapper access: RNMapbox takeSnap, MapLibre Native createStaticMapImage, or web getMap().getCanvas().toDataURL after application-selected drawing-buffer setup. MapRef.capture and Map.captureEnabled are removed. Applications own ref checks, readiness, output validation, errors, inclusion, dimensions, files, and bounded waiting. Working independent images use selected WrapperSnapshotManager and WrapperStaticMapImageManager. MapServices.staticMapImage and common capture/image-output types are removed; applications own inputs, output, errors, and waiting. Changed image routes have no renderer acceptance. See the [unit status](../../docs/revised-api-implementation-plan.md#work-order) for review and verification gates. Current peers, required patches, installation instructions, and release verification limits remain applicable to this candidate.
-
-Working popups use direct selected web WrapperPopup exports or an application-owned bubble inside a retained native Marker. Common Popup, PopupProps, Adapter.Popup and selected facade Popup aliases are removed. Web popup props and lifetime follow react-map-gl; the native application owns its accessible close action and conditional visibility. The old common automatic dismissal, focus and maxWidth guarantees no longer apply. Native marker hosts, portals and selected raw Callout/annotation exports remain. See [popup migration guidance](../../docs/revised-api-proposal.md#markers-images-popups-and-controls). Renderer interaction, native bubble touches and provider/state retention remain unverified for this change.
-
-Working navigation and fullscreen UI uses selected web WrapperNavigationControl and WrapperFullscreenControl. Native camera buttons are ordinary application screen UI; the application chooses activation, unavailable-map handling, errors, and camera commands. Common NavigationControl, FullscreenControl, their props, adapter fields and selected facade aliases are removed. Camera methods/getters, native SDK compass options, and raw selected web controls remain. See [control migration guidance](../../docs/revised-api-proposal.md#markers-images-popups-and-controls). Renderer interaction and native screen button touches remain unverified.
-
-Working scale and attribution UI uses selected web WrapperScaleControl and WrapperAttributionControl, or selected native SDK ornament options. Common ScaleControl, AttributionControl, their props, adapter fields and selected facade aliases are removed. Native scale units and placement follow the selected wrapper; there is no common native width or units policy. SDK defaults, explicit selected positions, legal attribution and logos remain. Native compass options, live-marker hosts/portals and the RNMapbox scale-position/resize workaround remain. See [ornament migration guidance](../../docs/revised-api-proposal.md#markers-images-popups-and-controls). Renderer integration remains unverified.
-
-Working geolocation UI uses raw selected web WrapperGeolocateControl or a native application button with its chosen location integration. Common GeolocateControl, its props, adapter field, selected facade aliases and common following are removed. The raw web control retains upstream geolocation behavior. UserLocation still displays supplied geometry and accuracy; GeolocationPosition, raw SDK pucks and selected follow options remain. Native viewState and locationOptions follow remain mutually exclusive camera owners. Library location services, useMapServices, MapServices, MapSetup.locationProvider, Adapter.services, service contexts/scoping and acquisition-only types/factories are removed. Applications own permissions, acquisition and cleanup through selected SDK or browser facilities; UserLocation is display-only; source activation uses Map.onClick with interactiveLayerIds. See [location migration guidance](../../docs/revised-api-proposal.md#setup-and-location). Browser geolocation, native location button interaction, sensors, Metro and native builds/installations remain unverified.
-
-Working custom UI uses ordinary application screen or DOM siblings beside the map. Common Control, ControlProps, ControlPosition, Adapter.Control and selected facade Control aliases are removed, along with custom-control hosts, native corner registration/measurement and automatic SDK ornament avoidance. Applications own placement, safe areas, stacking and overlap, and target the intended map through a ref or named useMap access. Native live-marker hosts/portals, viewport layout, observed camera state and react-native-teleport remain. SDK ornament options/defaults, legal attribution and logos, and the RNMapbox scale-position/resize refresh remain. See [layout migration guidance](../../docs/revised-api-proposal.md#markers-images-popups-and-controls). Renderer layout, touches, assistive technology, Metro and native builds/installations remain unverified.
-
-Working feature clicks use Map.onClick with interactiveLayerIds. Source.onClick, SourceClickEvent, source callback registration/dispatch and synthetic bubbling, selected facade native source hitbox additions, and UserLocation.onPress are removed. Native filtered clicks query the actual logical map point, retain query errors through onError and suppress obsolete results after map detachment or replacement. Applications identify returned features through IDs or properties from their supplied data; native results need not contain source or layer metadata. Pressable location geometry uses application-owned Source/Layer IDs and map clicks. Raw selected native Wrapper source onPress/hitbox facilities, source refs/queries/state, live markers/portals, and supplied UserLocation geometry/accuracy remain. See [feature-click migration guidance](../../docs/revised-api-proposal.md#rendering-and-queries-stay-shared). Renderer/query/touch behavior, Metro and native builds/installations remain unverified.
+Use the same map screen with stock react-map-gl on web and a native map on iOS or Android. one-map-react translates desktop camera, source, layer, marker and query calls to RNMapbox or MapLibre React Native. Choose the renderer in a platform file. The browser can run without installing one-map-react.
 
 ## Install one backend
 
-Install this candidate from its local archive until it is published. Replace `VERSION` with the version in the archive filename:
+A stock browser app installs React, React DOM, react-map-gl and its chosen GL JS engine. Import the matching stylesheet from `mapbox-gl/dist/mapbox-gl.css` or `maplibre-gl/dist/maplibre-gl.css`. Pass a public Mapbox token in `mapboxAccessToken` when your style requires one.
+
+For native development, install the candidate archive and the peers for one engine. These are the package-check versions. Each application owns its React Native host version and SDK configuration.
 
 ```sh
 bun add /absolute/path/one-map-react-VERSION.tgz
+bun add react@19.2.3 react-dom@19.2.3 react-native@0.87.1 react-native-teleport@1.2.2
+# Choose one
+bun add @rnmapbox/maps@10.3.7
+bun add @maplibre/maplibre-react-native@11.5.0 @types/geojson@7946.0.16
 ```
 
-Add only the peers for the selected adapter. These commands use the minimum host tuple; use the endpoint tuple above only within the stated verification scope.
+Apply the [version-specific native repair](#native-patches-and-linking) and rebuild the app. RNMapbox applications call the native entry's `setAccessToken` with their public token. Native live markers use react-native-teleport to keep interactive children in the React tree.
 
-| Adapter entry | Application-owned peers |
+## Migration from the four-backend facade
+
+This is a breaking change in the development checkout. Keep your previous archive or pinned release while migrating, and use a distinct version when publishing the new API.
+
+Replace the old web `MapSetup` and its adapter with a platform import. The example below selects MapLibre GL JS and RNMapbox independently. Swap either import to choose the other engine on that platform.
+
+```ts
+// maps.web.ts
+export { Map, Layer, Marker, Source, MapProvider, useMap } from "react-map-gl/maplibre";
+```
+
+```ts
+// maps.native.ts
+export { Map, Layer, Marker, Source, MapProvider, useMap } from "one-map-react/mapbox-native";
+```
+
+Import from `./maps` in your screen and mount `<Map>` directly. TypeScript platform files can also re-export `MapRef`, `MapProps`, `SourceProps`, `LayerProps`, and `MarkerProps` with the same names on each platform. Each type describes the selected implementation. Use the same selection for its descendants and hook. The [vessel example](https://github.com/RobJacobson/one-map-react/tree/main/packages/example-map/reference) shares its source, layers, click handling and camera call across all four choices. The host supplies marker controls and a sized map container.
+
+| Previous usage | Replacement |
 | --- | --- |
-| `one-map-react/mapbox-web` | `bun add react@19.2.3 react-dom@19.2.3 react-map-gl@8.1.3 mapbox-gl@3.32.0` |
-| `one-map-react/maplibre-web` | `bun add react@19.2.3 react-dom@19.2.3 react-map-gl@8.1.3 maplibre-gl@6.13.0` |
-| `one-map-react/mapbox-native` | `bun add react@19.2.3 react-dom@19.2.3 react-native@0.87.1 @rnmapbox/maps@10.3.7 react-native-teleport@1.2.2` |
-| `one-map-react/maplibre-native` | `bun add react@19.2.3 react-dom@19.2.3 react-native@0.87.1 @maplibre/maplibre-react-native@11.5.0 react-native-teleport@1.2.2 @types/geojson@7946.0.16` |
+| Root components and `MapSetup` on web | Stock `react-map-gl/mapbox` or `react-map-gl/maplibre`. The optional `one-map-react/mapbox-web` and `/maplibre-web` paths forward all upstream exports, including the default and types. |
+| A single engine across platforms | Import `one-map-react/mapbox` or `one-map-react/maplibre`. Browser and default resolve upstream. The React Native condition resolves the bound native shim. Browser wins when both conditions are active. |
+| Root components and `MapSetup` on native | Import from the bound native entry. During migration, the root and `one-map-react/legacy` expose the same deprecated, native-only setup and hook. |
+| `WrapperPopup`, `WrapperMarker`, `useWrapperMap`, other browser aliases | Use upstream names such as `Popup`, `Marker`, and `useMap`. Import SDK classes and functions directly from the chosen GL JS package. |
+| Web `options`, `hostProps`, and `getWrapperMap()` | Pass the supported upstream props directly to `Map`. Put DOM attributes on its parent. The ref is already a react-map-gl `MapRef`. Use its `getMap()` to borrow the GL JS instance. |
+| `Images` and `UserLocation` | Import from `one-map-react/native-extensions` within a native map. On web, manage style images through the chosen SDK's load/add/update/remove APIs and reinstall owned images when replacing the style. Draw supplied location with a marker or a GeoJSON source and circle layers. The application owns acquisition and permissions. |
 
-React is required. Other host, wrapper, SDK, and portal peers are optional so a common-entry consumer does not install a map engine. Native portals require React DOM as a transitive declaration/runtime dependency; its presence does not mean a web map engine is bundled. React Native 0.87.1 embeds React 19.2.3; keep that exact native React tuple even though its npm peer declaration permits newer React releases.
-
-Web entry files also import their selected SDK stylesheet:
-
-```tsx
-// MapLibre web setup. Mapbox uses mapbox-gl/dist/mapbox-gl.css instead.
-import "maplibre-gl/dist/maplibre-gl.css";
-```
-
-Mapbox applications set their public access token before mounting maps. Web applications set `mapboxgl.accessToken` on their application-owned `mapbox-gl` import. Native applications call the selected entry's `setAccessToken(token)`. Token names and storage belong to the application; never embed a secret download token.
-
-Native applications must apply the shipped patch for their exact wrapper version and rebuild the native app. The patches cover native image registration cleanup and pending downloads. On RNMapbox iOS the patch also selects the immediate camera mode. The `jumpTo` command, camera target updates, and zero-duration `zoomTo` use that mode.
-
-## Shared map
-
-This component runs on either host. Web supplies a sized container; native can replace the style with `{ flex: 1 }`.
+**Clicks and queries.** Pass layer IDs to `interactiveLayerIds` and read upstream results in `onClick`. A browser event already carries the hit features. Replace tuple destructuring with `event.lngLat.lng`, `event.lngLat.lat`, `event.point.x`, and `event.point.y`. Wheel events expose the upstream wheel event. Applications which previously relied on facade errors for unavailable layers can check `map.getLayer(id)` and issue an explicit renderer query when they need that diagnostic.
 
 ```tsx
-import { Layer, Map as OneMap, Source } from "one-map-react";
-
-export const SharedMap = () => (
-  <OneMap
-    style={{ width: 600, height: 400 }}
-    mapStyle={{ version: 8, sources: {}, layers: [] }}
-    initialViewState={{
-      longitude: -122.34,
-      latitude: 47.61,
-      zoom: 11,
-      bearing: 0,
-      pitch: 0,
-    }}
-  >
-    <Source
-      id="route"
-      type="geojson"
-      data={{
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: [[-122.36, 47.60], [-122.32, 47.64]],
-        },
-      }}
-    >
-      <Layer
-        id="route-line"
-        type="line"
-        paint={{ "line-color": "#2563eb", "line-width": 3 }}
-      />
-    </Source>
-  </OneMap>
-);
+<Map interactiveLayerIds={["vessels"]} onClick={event => {
+  selectVessel(event.features?.[0]?.id, event.lngLat.lng, event.lngLat.lat);
+}} />
 ```
 
-For the root facade, wrap that component in `MapSetup`.
+**Camera reads.** Web reads such as `map.getZoom()` are synchronous. Replace `map.getZoom().then(...)` in shared handlers with `const zoom = await map.getZoom()`. Native reads cross the bridge. Use `const center = await map.getCenter()` and read `center.lng` and `center.lat`. Pass an options object to commands, for example `map.flyTo({ center: [-122.45, 47.61], zoom: 12 })`.
 
-```tsx
-import { MapSetup } from "one-map-react";
-import { adapter } from "one-map-react/maplibre-web";
-import { SharedMap } from "./shared-map.js";
-
-export const App = () => (
-  <MapSetup adapter={adapter}>
-    <SharedMap />
-  </MapSetup>
-);
-```
-
-For mixed engines, keep this setup import in platform files. A `setup.ts` can select `mapbox-web`, while `setup.native.ts` selects `maplibre-native`; reverse those choices for the other combination. The shared component remains unchanged. The `mapbox` and `maplibre` aliases select web under `browser`, native under `react-native`, and web by default. Browser takes precedence when both conditions are active. Explicit adapter paths avoid relying on tool-specific conditions. Changing the `MapSetup` adapter requires a new React key to reset the map tree and its pending work. MapSetup accepts adapter and children; application location work has its own lifetime and cleanup.
-
-`MapRef` camera, query, cluster, and feature-state methods return promises. A camera command resolves when its wrapper accepts dispatch, before an animation necessarily finishes. Queries propagate failures; empty successful results remain distinct. The root `useMap()` reads the enclosing map. For maps registered with `MapSetup`, set `Map.id` and call the root `useMap(id)`. Named lookup returns `undefined` before attachment and after removal, and updates when the map attaches. See [camera and events](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf04-camera.md) and [queries](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf06-queries.md).
-
-Feature-state lifetime follows the selected renderer. Explicit `setFeatureState`, `getFeatureState`, and `removeFeatureState` calls validate and copy arguments, use the current attached map/source handle, and propagate SDK errors. Same-ID source remounts and style replacement provide no automatic clearing, replay, queue, or transaction guarantee. Applications retain the desired state and explicitly clear or reapply it after the relevant source is attached and ready; awaiting removal acknowledges dispatch rather than rendered visibility. Already dispatched SDK calls retain SDK ordering and lifetime. See the [migration status](https://github.com/RobJacobson/one-map-react/blob/main/docs/revised-api-implementation-plan.md#work-order) for review and verification gates.
-
-Marker creation inputs compare their effective defaults. Supplying renderMode="view" after omitting it keeps the same effective value. Changing id, anchor or renderMode requires a new React key. Each marker freezes its content-dependent default anchor at creation; backend-specific defaults and unsupported requests retain their selected implementation's behavior.
-
-The package JavaScript includes React Compiler optimizations targeting React 19; build diagnostics identify functions the compiler skips. Applications do not need to enable a compiler or install a compiler runtime package. Callback teardown, immutable creation rules, and resource ownership remain explicit library behavior.
+**Clusters.** Retrieve the mounted source by ID. Narrow the stock web source to the selected SDK's `GeoJSONSource` (for example, `map.getSource<GeoJSONSource>("vessels")` on Mapbox). With the pinned Mapbox GL JS use `source?.getClusterExpansionZoom(id, callback)`. With MapLibre GL JS use `await source?.getClusterExpansionZoom(id)`. Native source handles accept either form. Check for a missing source after replacement or teardown.
 
 ### Direct native entries
 
@@ -164,55 +100,15 @@ export const HarborScreen = () => (
 
 Inside a map, read `useMap().current`. A sibling reads `useMap().harbor` for a mounted map with `id="harbor"` in its provider. A map without an ID registers as `default`. Each provider requires unique IDs and reserves `current` for the enclosing map. Lookup yields `undefined` when the corresponding map is absent. Both forms expose the selected `NativeAdvancedMapRef`, including `getWrapperMap()`.
 
-Native selected maps accept partial initial camera settings, desktop camera commands, and click fields such as `event.lngLat.lng` and `event.point.x`. Await native reads including `getCenter()`, `project()`, and `getBounds()`. Use `map.getSource(id)` to access a mounted GeoJSON source's cluster methods. Both promise and error-first callback calls are supported on native. [Native compatibility contract](../../docs/revised-api-proposal.md#native-compatibility-contract).
+Native selected maps accept partial initial camera settings, desktop camera commands, and click fields such as `event.lngLat.lng` and `event.point.x`. Await native reads including `getCenter()`, `project()`, and `getBounds()`. Use `map.getSource(id)` to access a mounted GeoJSON source's cluster methods. Both promise and error-first callback calls are supported on native. [Native compatibility contract](https://github.com/RobJacobson/one-map-react/blob/main/docs/revised-api-proposal.md#native-compatibility-contract).
 
 Existing root components inside a selected native map follow that map's adapter. With `MapSetup` alone, explicit IDs remain available to the root hook. When a selected `MapProvider` encloses the map, it owns named lookup through the selected hook. The MapLibre native `Layer` also accepts SDK-specific props, including `afterId`, `layerIndex`, and legacy `style`.
 
-## Selected extensions
+## Advanced native APIs
 
-Selected `Map` components add typed `options` and `hostProps`; common props take precedence. Selected web `Source` and `Layer` accept their complete SDK style families. SDK-specific props and expression types stay outside portable declarations.
-
-```tsx
-import { Map as SelectedMap } from "one-map-react/maplibre-web";
-
-export const WebMap = () => (
-  <SelectedMap
-    mapStyle={{ version: 8, sources: {}, layers: [] }}
-    initialViewState={{ longitude: 0, latitude: 0, zoom: 0, bearing: 0, pitch: 0 }}
-    style={{ width: 600, height: 400 }}
-    options={{ maxCanvasSize: [4096, 4096] }}
-    hostProps={{ "aria-label": "Route map" }}
-  />
-);
-```
-
-Render this inside `MapSetup` with the matching adapter. In the working implementation, selected `WebMapRef` retains common portable operations and asynchronous `getWrapperMap()`. Obtain `const borrowedWrapper = await map.getWrapperMap()` for each advanced operation. The getter rejects when detached and does not wait for renderer readiness. Web SDK operations use `borrowedWrapper.getMap()`, including `version`, `dragPan`, `fire`, and MapLibre `setEventedParent`; existing `useWrapperMap` access remains available. Borrowed wrapper, source, and handler objects retain upstream lifetime and timing. Applications remove their dynamic subscriptions and controls before map teardown. Keep style, source, layer, and control resources owned by React in their component props and composition.
-
-For complete native wrapper-specific composition, use the named wrapper exports together:
-
-```tsx
-import { WrapperMapView, WrapperCamera, WrapperShapeSource } from "one-map-react/mapbox-native";
-
-export const NativeWrapperMap = () => (
-  <WrapperMapView
-    style={{ flex: 1 }}
-    styleJSON={JSON.stringify({ version: 8, sources: {}, layers: [] })}
-  >
-    <WrapperCamera centerCoordinate={[0, 0]} zoomLevel={0} />
-    <WrapperShapeSource id="selected" shape={{ type: "FeatureCollection", features: [] }} />
-  </WrapperMapView>
-);
-```
-
-This composition uses wrapper props and refs directly and does not create the facade's map registry. Keep `WrapperCamera` inside its `WrapperMapView` (MapLibre uses `WrapperMap`). The shared `Map` already owns its camera. RNMapbox 10.3.8 adds selected `setLanguage` and `normalizeLanguageTag`; calling either with 10.3.7 reports that the operation requires the newer wrapper. Language tags pass unchanged to `setLanguage`.
-
-See [advanced rendering](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf09-rendering.md) and [UI](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf07-ui.md) for supported compositions and observed differences.
+Use `await map.getWrapperMap()` when an operation needs the mounted native wrapper. RNMapbox exposes `takeSnap` and MapLibre React Native exposes `createStaticMapImage`. Both native entries expose version-specific wrapper components and offline/location managers. An application owns permission requests, listener cleanup, offline pack identity and snapshot storage. For a raw map and camera, compose RNMapbox’s `WrapperCamera` inside `WrapperMapView`, or the MapLibre equivalent inside `WrapperMap`.
 
 ## Native patches and linking
-
-**Bundle scope.** The original working-tree patches are unchanged. The publication bundles now implement the P1-P8 reconciliation; pristine patch application produces the same version-specific repaired SDK output as the original intent, although patch-text hashes remain separate identities. The [reconciliation evidence](../../records/evidence/revised-api-u23-native-patch-reconciliation.json) records exact identities and focused proof limits; [unit status](../../docs/revised-api-implementation-plan.md#u23-f01-reconcile-retained-publication-repairs) owns final review and candidate gates. Native builds, linking and renderer acceptance remain unverified.
-
-Focused evidence uses pristine patch application, static Android assertions, extracted Swift/Objective-C++ methods with stubbed SDK boundaries and Node codegen. Executable Kotlin checks were skipped because the compiler was unavailable. These are bounded routine proofs, not a native application build or renderer result. Peers, locks, versions and SDK pins are unchanged.
 
 Apply the repair for the exact installed native wrapper. Patches ship inside this package and belong in the application's dependency installation. The RNMapbox repairs preserve SDK feature-state errors, guard removeFeatureState against an absent or changed source family, and correct iOS light-color conversion. The MapLibre repair reports absent Fabric views as attachment errors; explicit native source operations retain dispatch error reporting. Rebuild the native application after updating these patches.
 
@@ -257,16 +153,6 @@ RNMapboxMapsVersion = '11.23.1'
 
 Record the resolved SDK version in each application lockfile/build. Follow the selected wrapper's native setup for any SDK overrides.
 
-## Location, offline storage, and capture
-
-Applications acquire location through their selected SDK manager, browser geolocation or application integration. No library service manager is created by MapSetup. Dispose each application request or subscription at its owning cleanup boundary; unmounting MapSetup does not dispose application services. `UserLocation` draws a supplied GeolocationPosition and accuracy geometry without starting a sensor. Selected pucks and location options retain upstream tracking. Independent images use selected WrapperSnapshotManager and WrapperStaticMapImageManager; common capture/image-output types are removed.
-
-Browser acquisition needs a secure context and permission from the user. Native applications declare location usage descriptions in `Info.plist`, add the relevant Android foreground location permissions, and request permission before acquisition. RNMapbox iOS explicit permission requests need the application's permission integration; the wrapper does not supply that request path. The maintained native one-shot example accepts selected manager cached replay without a common freshness guarantee. Native permission prompts cannot be cancelled; application disposal suppresses their late results and releases owned acquisition listeners. Browser acquisition releases its owned watch on disposal. Background permission and physical sensor behavior are outside the recorded certification.
-
-Native offline operations use the selected `WrapperOfflineManager`; common `MapServices.offline`, `OfflineService`, and `OfflinePack` are removed. Packs persist in application storage. Applications own selected SDK arguments, native operation keys, observers, errors, and recovery. Preserve existing metadata and imported `backend:<native-id>` aliases; changing the JavaScript API requires no deletion, rename, database reset, or redownload. The [offline migration](../../docs/revised-api-proposal.md#offline-creation-and-existing-packs) explains existing pack discovery. Live download/import/cache/database behavior remains unverified for this migration. Independent native images use selected WrapperSnapshotManager or WrapperStaticMapImageManager with application-owned inputs, output, errors, and waiting. Common MapServices.staticMapImage and capture/image-output types are removed. These images take their own style, camera, dimensions, and resources; they do not inherit mounted map children. Browser offline and independent native-style snapshot services are absent.
-
-Current-map capture in the working tree uses a selected Map ref and getWrapperMap for each operation. RNMapbox uses wrapper.takeSnap, MapLibre Native uses wrapper.createStaticMapImage, and web uses wrapper.getMap().getCanvas().toDataURL("image/png"). Configure Mapbox web options.preserveDrawingBuffer or MapLibre web options.canvasContextAttributes.preserveDrawingBuffer when constructing the map. Handle renderer readiness, context compatibility, SDK/canvas errors, returned output and intended inclusion in the application. No common map capture scope, dimensions, file persistence or deadline is promised. The [capture migration examples](../../docs/revised-api-proposal.md#capture-and-advanced-ref-access) show the selected routes; [TF08](../../docs/tf08-location-offline-capture.md) preserves the former common contract and its artifact-specific acceptance.
-
 ## Current limitations
 
 Web map reuse delegates to react-map-gl. Native reuseMaps={true}, external `gl`, and `resize()` reject; reuseMaps={false} is accepted. Native imperative `stop()` and some getters lack a wrapper path; their errors remain explicit. Native viewState is a camera target applied through ordinary Camera props when its values change. With target A, user movement to B stays at B while A remains unchanged, including a fresh equal-valued target object. A changed target C requests C; jumpTo with A explicitly requests A again. Removing viewState releases the target. Native onMove and camera readouts use observed movement; SDK ornaments retain selected renderer behavior. Native location following and an explicit viewState remain mutually exclusive owners. Web viewState continues to delegate controlled behavior to react-map-gl. The strict controlledCamera capability stays unavailable. Renderer acceptance for the changed native behavior remains unverified.
@@ -277,10 +163,10 @@ The owner excludes physical-device testing and RNMapbox `invalidateAmbientCache(
 
 The [requirements](https://github.com/RobJacobson/one-map-react/blob/main/docs/requirements.md), [stage plan](https://github.com/RobJacobson/one-map-react/blob/main/docs/stage-plan.md), and [testing policy](https://github.com/RobJacobson/one-map-react/blob/main/docs/testing-policy.md) describe release scope and evidence. The archive includes built output, this README, the manifest, the license, and native repairs.
 
-## License
-
-[MIT](LICENSE).
-
 MapLibre Native 11.5.0 uses native SDK iOS6.31.0 and Android13.6.1. Its parser supports Mercator projection, without terrain, sky or global-state style roots. Explicit unsupported roots and silently ignored source/layer fields reject. Unsupported expression operators retain native parser errors; `format.vertical-align` and `number-format.unit` reject before dispatch. The selected style types also describe newer JS features, so their presence alone does not promise native rendering. Use legacy `Layer` style `rasterResampling` for native raster sampling and `iconAllowOverlap`/`textAllowOverlap` for basic symbol overlap. Complete URL styles remain wrapper-owned; their loading/errors use native callbacks.
 
 RNMapbox 10.3.8 adds `LocationPuck.model`, structured `WrapperMapView.onMapLoadingError` payloads and optional edges in `WrapperCamera` stop padding; these selected signatures follow the installed peer. Common padding still fills omitted edges with zero. `localizeLabels` explicitly rejects on 10.3.7 with native SDK 11 and delegates on 10.3.8. `setLanguage`/`normalizeLanguageTag` also require 10.3.8 and reject clearly on 10.3.7.
+
+## License
+
+[MIT](LICENSE).

@@ -61,13 +61,9 @@ export const withNativeMapPresentation = <
     </NativePresentationProvider>
   ));
 
-/** Reads native presentation where a browser implementation may also call the hook. */
-export const useOptionalNativeMapPresentation =
-  (): NativeMapPresentation | null => useContext(NativeMapPresentationContext);
-
 /** Returns the enclosing native map's presentation owner. */
 export const useNativeMapPresentation = (): NativeMapPresentation => {
-  const presentation = useOptionalNativeMapPresentation();
+  const presentation = useContext(NativeMapPresentationContext);
   if (!presentation)
     throw new Error("This component must render inside a native Map.");
   return presentation;

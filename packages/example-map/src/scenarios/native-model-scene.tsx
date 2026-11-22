@@ -1,11 +1,15 @@
-import { Map as OneMap, type MapLayoutStyle, type MapRef } from "one-map-react";
+import {
+  Map as OneMap,
+  type MapLayoutStyle,
+  type MapRef,
+} from "one-map-react/legacy";
 import {
   CustomLocationProvider,
   LocationPuck,
 } from "one-map-react/mapbox-native";
 import { useEffect, useRef, useState } from "react";
 
-import { captureRendering } from "./capture-rendering.js";
+import { captureRendering } from "./capture-rendering.native.js";
 import type { Tf09Probe } from "./tf09-scene.js";
 
 const presets = {

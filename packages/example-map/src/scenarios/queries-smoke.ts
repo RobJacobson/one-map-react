@@ -1,4 +1,4 @@
-import type { GeoJsonFeature, MapRef, MapStyle } from "one-map-react";
+import type { MapRef as NativeQueryMap } from "one-map-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
@@ -7,6 +7,17 @@ import {
   queriesStyle,
   replacementStyle,
 } from "./map-fixture.js";
+
+type BrowserMap =
+  | import("react-map-gl/mapbox").MapRef
+  | import("react-map-gl/maplibre").MapRef;
+type MapRef = NativeQueryMap | BrowserMap;
+type MapStyle = typeof queriesStyle;
+type Hit = {
+  readonly id?: string | number;
+  readonly properties?: object | null;
+};
+type RouteFilter = ["==", ["get", string], string];
 
 type QueriesPhase =
   | "await-load"
@@ -175,7 +186,8 @@ export const useQueriesSmoke = ({
           assertActive(signal);
           await observe(
             async () => {
-              const center = await map.getCenter();
+              const value = await map.getCenter();
+              const center = "lng" in value ? [value.lng, value.lat] : value;
               assertActive(signal);
               const zoom = await map.getZoom();
               return (
@@ -282,11 +294,75 @@ const observe = async (
   }
 };
 
+const requireState = (state: Record<string, unknown> | null | undefined) => {
+  if (state == null)
+    throw new Error("The route has no attached feature state.");
+  return state;
+};
+
+const queryViewport = (
+  map: MapRef,
+  options?: { layers: string[]; filter?: RouteFilter }
+) =>
+  "getMap" in map
+    ? map.queryRenderedFeatures(options)
+    : map.queryRenderedFeatures(undefined, options);
+
+const callbackResult = <T>(
+  dispatch: (done: (error?: Error | null, value?: T | null) => void) => void
+) =>
+  new Promise<T>((resolve, reject) =>
+    dispatch((error, value) => {
+      if (error) reject(error);
+      else if (value == null)
+        reject(new Error("Cluster query returned no result."));
+      else resolve(value);
+    })
+  );
+
+const clusterQueries = (map: MapRef, id: number) => {
+  const name = "queries-clusters";
+  if (!("getMap" in map))
+    return {
+      zoom: () => map.getClusterExpansionZoom(name, id),
+      leaves: (limit: number, offset: number) =>
+        map.getClusterLeaves(name, id, limit, offset),
+      children: () => map.getClusterChildren(name, id),
+    };
+  const sdk = map.getMap();
+  if ("setRain" in sdk) {
+    const source = sdk.getSource<import("mapbox-gl").GeoJSONSource>(name);
+    if (!source) throw new Error("Cluster source detached.");
+    return {
+      zoom: () =>
+        callbackResult<number>((done) =>
+          source.getClusterExpansionZoom(id, done)
+        ),
+      leaves: (limit: number, offset: number) =>
+        callbackResult<GeoJSON.Feature[]>((done) =>
+          source.getClusterLeaves(id, limit, offset, done)
+        ),
+      children: () =>
+        callbackResult<GeoJSON.Feature[]>((done) =>
+          source.getClusterChildren(id, done)
+        ),
+    };
+  }
+  const source = sdk.getSource<import("maplibre-gl").GeoJSONSource>(name);
+  if (!source) throw new Error("Cluster source detached.");
+  return {
+    zoom: () => source.getClusterExpansionZoom(id),
+    leaves: (limit: number, offset: number) =>
+      source.getClusterLeaves(id, limit, offset),
+    children: () => source.getClusterChildren(id),
+  };
+};
+
 const identifier = { source: "queries-routes", id: 1 };
 const observeStateRemoval = (map: MapRef, signal: AbortSignal, whole = false) =>
   observe(
     async () => {
-      const state = await map.getFeatureState(identifier);
+      const state = requireState(await map.getFeatureState(identifier));
       return whole
         ? Object.keys(state).length === 0
         : state.selected === undefined;
@@ -304,11 +380,7 @@ const sourceReady = async (
   // A React ref may already exist while Fabric has not published its native
   // tag. New-generation rendered data establishes Source/layer attachment.
   await observe(
-    async () =>
-      hasSourceRevision(
-        await map.queryRenderedFeatures(undefined),
-        sourceRevision
-      ),
+    async () => hasSourceRevision(await queryViewport(map), sourceRevision),
     "rendered source readiness",
     signal,
     10000
@@ -336,13 +408,15 @@ const sourceReady = async (
 };
 
 const hasSourceRevision = (
-  features: readonly GeoJsonFeature[],
+  features: readonly Hit[],
   sourceRevision: number
 ): boolean =>
   features.some(
     (feature) =>
       String(feature.id) === "1" &&
-      feature.properties?.__oneMapSourceRevision === sourceRevision
+      (feature.properties &&
+        "__oneMapSourceRevision" in feature.properties &&
+        feature.properties.__oneMapSourceRevision) === sourceRevision
   );
 
 // Both pinned SDKs can throw when an empty-source removal precedes a write
@@ -352,7 +426,7 @@ const clearAndVerifyState = async (
   signal: AbortSignal
 ): Promise<void> => {
   assertActive(signal);
-  const state = await map.getFeatureState(identifier);
+  const state = requireState(await map.getFeatureState(identifier));
   assertActive(signal);
   if (Object.keys(state).length > 0) {
     await map.removeFeatureState(identifier);
@@ -367,7 +441,7 @@ const setAndVerifyState = async (
 ): Promise<void> => {
   await map.setFeatureState(identifier, { selected: true, count: 2 });
   assertActive(signal);
-  const state = await map.getFeatureState(identifier);
+  const state = requireState(await map.getFeatureState(identifier));
   assertActive(signal);
   if (state.selected !== true || state.count !== 2)
     throw new Error(`state get after set was ${JSON.stringify(state)}`);
@@ -391,7 +465,9 @@ const assertQueries = async (
 
   // The projected vertex sits exactly on route 1, so the point query must
   // return it. The nearby routes are within a few hundred pixels.
-  const onLine = await map.project([-122.34, 47.62]);
+  const point = await map.project([-122.34, 47.62]);
+  const onLine: [number, number] =
+    "x" in point ? [point.x, point.y] : [point[0], point[1]];
   assertActive(signal);
   const pointFeatures = await map.queryRenderedFeatures(onLine);
   assertActive(signal);
@@ -414,7 +490,7 @@ const assertQueries = async (
 
   fields.current.bounds = "ok";
 
-  const viewportFeatures = await map.queryRenderedFeatures(undefined, {
+  const viewportFeatures = await queryViewport(map, {
     layers: ["queries-line"],
   });
   assertActive(signal);
@@ -456,8 +532,8 @@ const assertQueries = async (
   }
 
   fields.current.source = "ok";
-  const filter = ["==", ["get", "route"], "north"] as const;
-  const filteredRendered = await map.queryRenderedFeatures(undefined, {
+  const filter: RouteFilter = ["==", ["get", "route"], "north"];
+  const filteredRendered = await queryViewport(map, {
     layers: ["queries-line"],
     filter,
   });
@@ -478,10 +554,8 @@ const assertQueries = async (
 
   const clusterId = await findClusterId(map, signal);
   assertActive(signal);
-  const expansionZoom = await map.getClusterExpansionZoom(
-    "queries-clusters",
-    clusterId
-  );
+  const clusters = clusterQueries(map, clusterId);
+  const expansionZoom = await clusters.zoom();
   assertActive(signal);
 
   if (typeof expansionZoom !== "number" || !Number.isFinite(expansionZoom)) {
@@ -490,12 +564,7 @@ const assertQueries = async (
 
   fields.current.clusterZoom = "ok";
 
-  const leaves = await map.getClusterLeaves(
-    "queries-clusters",
-    clusterId,
-    10,
-    0
-  );
+  const leaves = await clusters.leaves(10, 0);
   assertActive(signal);
 
   const knownIds = new Set(
@@ -511,7 +580,7 @@ const assertQueries = async (
   }
 
   fields.current.leaves = "ok";
-  const page = await map.getClusterLeaves("queries-clusters", clusterId, 1, 1);
+  const page = await clusters.leaves(1, 1);
   assertActive(signal);
   if (
     leaves.length < 2 ||
@@ -521,7 +590,7 @@ const assertQueries = async (
     throw new Error("cluster pagination disagreed with leaves");
   fields.current.pagination = "ok";
 
-  const children = await map.getClusterChildren("queries-clusters", clusterId);
+  const children = await clusters.children();
   assertActive(signal);
 
   if (children.length === 0 || children.length > leaves.length) {
@@ -554,7 +623,7 @@ const assertState = async (
   assertActive(signal);
   await observeStateRemoval(map, signal);
   assertActive(signal);
-  const remaining = await map.getFeatureState(identifier);
+  const remaining = requireState(await map.getFeatureState(identifier));
   assertActive(signal);
   if (remaining.count !== 2) throw new Error("key removal also removed count");
   fields.current.removeState = "ok";
@@ -596,7 +665,7 @@ const findClusterId = async (
   let clusterId: number | undefined;
   await observe(
     async () => {
-      const features = await map.queryRenderedFeatures(undefined, {
+      const features = await queryViewport(map, {
         layers: ["queries-cluster-circles"],
       });
       const cluster = features.find(

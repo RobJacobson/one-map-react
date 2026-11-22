@@ -1,5 +1,5 @@
-import type { LngLat, Point, ViewState } from "../../contracts/camera-types.js";
-import type { ClickEvent, MoveOrigin } from "../../contracts/event-types.js";
+import type { ViewState } from "../../contracts/camera-types.js";
+import type { MoveOrigin } from "../../contracts/event-types.js";
 
 /**
  * Maps a wrapper user-interaction flag to a portable origin.
@@ -33,22 +33,4 @@ export const viewStateFromLngLat = (
   zoom,
   bearing,
   pitch,
-});
-
-/**
- * Assembles a portable click event from converted fields.
- *
- * @param lngLat - `[longitude, latitude]` of the hit.
- * @param point - `[x, y]` in logical map-view units.
- * @param features - Features the wrapper included, when it included any.
- * @returns The common click event.
- */
-export const clickEvent = (
-  lngLat: LngLat,
-  point: Point,
-  features?: readonly object[]
-): ClickEvent => ({
-  lngLat,
-  point,
-  ...(features === undefined ? {} : { features }),
 });

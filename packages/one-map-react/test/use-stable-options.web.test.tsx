@@ -1,12 +1,13 @@
 import { render, renderHook } from "@testing-library/react";
-import { type ReactNode, StrictMode } from "react";
-import { describe, expect, vi, test } from "vite-plus/test";
+import { forwardRef, type ReactNode, StrictMode } from "react";
+import { describe, expect, test } from "vite-plus/test";
 
 import {
   emptyStyle,
   initialViewState,
   routes,
 } from "../../example-map/src/scenarios/map-fixture.js";
+import type { Adapter } from "../src/contracts/adapter.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
@@ -14,13 +15,15 @@ import {
   changedOptionKey,
   useStableOptions,
 } from "../src/facade/use-stable-options.js";
-import { adapter } from "../src/mapbox-web.js";
 
-vi.mock("react-map-gl/mapbox", async () => {
-  const { createWebMapMock } = await import("./create-web-map-mock.js");
-
-  return createWebMapMock();
-});
+const adapter: Adapter = {
+  backend: "mapbox-native",
+  Map: forwardRef(({ children }, _ref) => <>{children}</>),
+  Source: () => null,
+  Layer: () => null,
+  Images: () => null,
+  Marker: forwardRef(() => null),
+};
 
 const Probe = ({
   options,

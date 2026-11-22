@@ -1,20 +1,36 @@
 import { act, render } from "@testing-library/react";
+import { forwardRef, useImperativeHandle } from "react";
 import { expect, test, vi } from "vite-plus/test";
 
 import {
   Tf09Scene,
   type Tf09Probe,
 } from "../../../packages/example-map/src/scenarios/tf09-scene.js";
+import { nativeSceneComponents } from "../../example-map/src/scenarios/native-scene-components.js";
 import { MapSetup } from "../src/facade/map-setup.js";
+import type { Adapter, MapRef, MapProps } from "../src/index.js";
 
-vi.mock("react-map-gl/mapbox", async () => {
-  const { createWebMapMock } = await import("./create-web-map-mock.js");
-  return createWebMapMock();
+const wrapper = vi.fn((_props: MapProps) => {});
+const Camera = forwardRef<MapRef, MapProps>((props, ref) => {
+  useImperativeHandle(
+    ref,
+    () =>
+      ({
+        getCenter: async () => [0, 0],
+        getZoom: async () => 2,
+      }) as unknown as MapRef
+  );
+  wrapper(props);
+  return <>{props.children}</>;
 });
-
-import { Map as WrapperMap } from "react-map-gl/mapbox";
-
-import { adapter } from "../src/mapbox-web.js";
+const adapter: Adapter = {
+  backend: "mapbox-native",
+  Map: Camera,
+  Source: () => null,
+  Layer: () => null,
+  Images: () => null,
+  Marker: forwardRef(() => null),
+};
 
 const target = { longitude: 0, latitude: 0, zoom: 2, bearing: 0, pitch: 0 };
 
@@ -27,6 +43,7 @@ test("native camera probe reports observed movement independently of an unchange
   const view = render(
     <MapSetup adapter={adapter}>
       <Tf09Scene
+        components={nativeSceneComponents}
         backend="mapbox-native"
         style={{ width: 400, height: 400 }}
         attach={(value) => {
@@ -41,11 +58,11 @@ test("native camera probe reports observed movement independently of an unchange
       accept: false,
     });
   });
-  const wrapper = () => vi.mocked(WrapperMap).mock.calls.at(-1)?.[0];
+  const callbacks = wrapper.mock.calls.at(-1)?.[0];
   const proposal = { ...target, longitude: 0.25 };
   act(() => {
-    wrapper()?.onMove?.({ viewState: proposal, originalEvent: {} } as never);
-    wrapper()?.onMoveEnd?.({ viewState: proposal, originalEvent: {} } as never);
+    callbacks?.onMove?.({ viewState: proposal, origin: "user" });
+    callbacks?.onMoveEnd?.({ viewState: proposal, origin: "user" });
   });
   const read = (await probe().command("camera-read")) as {
     lastUserViewState: object;

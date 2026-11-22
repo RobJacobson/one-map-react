@@ -1,5 +1,7 @@
 # Sources and layers
 
+This reference records the four-backend facade and upstream research that preceded the native compatibility release. For the current entry points, event and ref shapes, and browser replacements, see the [migration guide](../packages/one-map-react/README.md).
+
 **Working feature-click migration.** The [map-click migration](revised-api-proposal.md#rendering-and-queries-stay-shared) uses Map.onClick with interactiveLayerIds for source activation. Source.onClick, SourceClickEvent, synthetic source bubbling, selected facade native source hitbox additions and UserLocation.onPress are removed. Raw native Wrapper source onPress/hitbox facilities, source refs/queries/state, live markers/portals and supplied location geometry/accuracy remain. Native filtered clicks retain queries at the actual logical map point, observable errors and stale-map callback protection. The future native focused source stop/bubbling probe is retired; historical scenario IDs and outcomes remain attached to their recorded artifacts. Renderer/query/touch behavior, Metro and native builds/installations remain unverified.
 
 **Current advanced source/layer routes:** See [advanced rendering](tf09-rendering.md) for selected canvas/video/custom and renderer-specific families. Both web engines passed canvas/video/custom output and teardown; all six environments passed hillshade. Other advanced families retain explicit runtime-unverified status.

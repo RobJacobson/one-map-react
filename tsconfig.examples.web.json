@@ -6,11 +6,9 @@
     "resolveJsonModule": true,
     "paths": {
       "one-map-react": ["./packages/one-map-react/src/index.ts"],
-      "one-map-react/mapbox-web": [
-        "./packages/one-map-react/src/mapbox-web.tsx"
-      ],
-      "one-map-react/maplibre-web": [
-        "./packages/one-map-react/src/maplibre-web.tsx"
+      "one-map-react/legacy": ["./packages/one-map-react/src/index.ts"],
+      "one-map-react/native-extensions": [
+        "./packages/one-map-react/src/native-extensions.ts"
       ]
     }
   },

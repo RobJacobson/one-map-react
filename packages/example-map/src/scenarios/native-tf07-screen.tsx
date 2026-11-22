@@ -1,4 +1,4 @@
-import { type Adapter, MapSetup, Marker } from "one-map-react";
+import { type Adapter, MapSetup, Marker } from "one-map-react/legacy";
 import {
   type ReactNode,
   useCallback,
@@ -22,6 +22,7 @@ import {
 import { NativeCameraButtons } from "./native-camera-buttons.js";
 import { NativeLocationButton } from "./native-location-button.js";
 import { NativePopupBubble } from "./native-popup-bubble.js";
+import { nativeSceneComponents } from "./native-scene-components.js";
 import { measureNativeViewport } from "./native-viewport.js";
 import { type Tf07Action, type Tf07Probe, Tf07Scene } from "./tf07-scene.js";
 
@@ -126,11 +127,11 @@ export const NativeTf07Screen = ({
         <Text>Custom control</Text>
         <View ref={mapHost} collapsable={false} style={{ flex: 1 }}>
           <Tf07Scene
+            components={nativeSceneComponents}
             renderLocation={NativeLocationButton}
             renderNavigation={NativeCameraButtons}
             nativeOrnaments={ornaments}
             renderPopup={renderPopup}
-            native
             style={{ flex: 1 }}
             attach={attach}
             report={(event) => setStatus(`TF07 ${event}`)}

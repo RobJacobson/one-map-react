@@ -1,10 +1,4 @@
-import type {
-  Adapter,
-  MapErrorEvent,
-  MapRef,
-  MoveEvent,
-  ViewState,
-} from "one-map-react";
+import type { ViewState } from "one-map-react";
 import {
   useCallback,
   useEffect,
@@ -13,7 +7,12 @@ import {
   useState,
 } from "react";
 
-import { cameraMatches, initialCamera, readCamera } from "./camera.js";
+import {
+  cameraMatches,
+  type CameraMap,
+  initialCamera,
+  readCamera,
+} from "./camera.js";
 
 /** Engine choices offered by both application shells. */
 export type Engine = "maplibre" | "mapbox";
@@ -26,13 +25,15 @@ interface Attachment {
 
 /**
  * Bounds map loading and camera handoff outside the keyed map tree, rejecting stale callbacks.
- * @param adapters - Platform-specific adapters imported through public package entries.
  * @param mapboxEnabled - Whether a public Mapbox token is configured.
+ * @param native - Whether Mapbox orientation must come from native move events.
+ * @param prepareMapbox - Optional token setup for the selected engine.
  * @returns Shared map callbacks and engine controls for either application shell.
  */
 export const useExampleMap = (
-  adapters: Readonly<Record<Engine, Adapter>>,
-  mapboxEnabled: boolean
+  mapboxEnabled: boolean,
+  native = false,
+  prepareMapbox?: () => Promise<void>
 ) => {
   const [attachment, setAttachment] = useState<Attachment>({
     engine: "maplibre",
@@ -44,7 +45,7 @@ export const useExampleMap = (
   >("loading");
   const [error, setError] = useState<string>();
   const [camera, setCamera] = useState(initialCamera);
-  const mapRef = useRef<MapRef | null>(null);
+  const mapRef = useRef<CameraMap | null>(null);
   const observed = useRef(initialCamera);
   const observedGeneration = useRef(-1);
   const currentGeneration = useRef(0);
@@ -54,8 +55,8 @@ export const useExampleMap = (
   const loadingTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
   );
-  const adapter = adapters[attachment.engine];
-  const attachMap = useCallback((map: MapRef | null): void => {
+  const useObservedOrientation = native && attachment.engine === "mapbox";
+  const attachMap = useCallback((map: CameraMap | null): void => {
     mapRef.current = map;
   }, []);
   const isCurrent = () =>
@@ -109,13 +110,13 @@ export const useExampleMap = (
         while (!controller.signal.aborted && isCurrent()) {
           const actual = await readCamera(
             map,
-            adapter.backend,
+            useObservedOrientation,
             observed.current
           );
           if (controller.signal.aborted || !isCurrent()) return;
           // Native Mapbox orientation must come from this map's event, not the outgoing snapshot.
           const orientationObserved =
-            adapter.backend !== "mapbox-native" ||
+            !useObservedOrientation ||
             observedGeneration.current === attachment.generation;
           if (orientationObserved && cameraMatches(actual, attachment.camera)) {
             observed.current = actual;
@@ -152,10 +153,14 @@ export const useExampleMap = (
         status === "error" || !map
           ? attachment.camera
           : await withCameraDeadline(
-              () => readCamera(map, adapter.backend, observed.current),
+              () => readCamera(map, useObservedOrientation, observed.current),
               controller.signal
             );
       if (controller.signal.aborted || !isCurrent()) return;
+      if (engine === "mapbox" && prepareMapbox) {
+        await withCameraDeadline(prepareMapbox, controller.signal);
+        if (controller.signal.aborted || !isCurrent()) return;
+      }
       currentGeneration.current += 1;
       observed.current = snapshot;
       setCamera(snapshot);
@@ -169,7 +174,7 @@ export const useExampleMap = (
     }
   };
 
-  const onMove = (event: MoveEvent): void => {
+  const onMove = (event: { readonly viewState: ViewState }): void => {
     if (!isCurrent()) return;
     observed.current = event.viewState;
     observedGeneration.current = attachment.generation;
@@ -179,25 +184,26 @@ export const useExampleMap = (
     const map = mapRef.current;
     if (!map || !isCurrent()) return;
     try {
-      const actual = await readCamera(map, adapter.backend, observed.current);
+      const actual = await readCamera(
+        map,
+        useObservedOrientation,
+        observed.current
+      );
       if (isCurrent()) setCamera(actual);
     } catch {
       fail();
     }
   };
 
-  const onError = (_event: MapErrorEvent): void => fail();
-
   return {
     attachment,
-    adapter,
     attachMap,
     status,
     error,
     camera,
     onLoad,
     onMove,
-    onError,
+    onError: fail,
     selectEngine,
     inspectCamera,
   };

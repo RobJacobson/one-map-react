@@ -1,4 +1,4 @@
-import { type Adapter, MapSetup, Marker } from "one-map-react";
+import { type Adapter, MapSetup, Marker } from "one-map-react/legacy";
 import {
   type ReactNode,
   useCallback,
@@ -17,6 +17,7 @@ import {
 } from "react-native";
 
 import { NativeLocationButton } from "./native-location-button.js";
+import { nativeSceneComponents } from "./native-scene-components.js";
 import {
   type Tf08AcceptanceProbe,
   Tf08AcceptanceScene,
@@ -233,6 +234,7 @@ export const NativeTf08Screen = ({
         <View ref={mapHost} collapsable={false} style={{ flex: 1 }}>
           {sceneMounted && (
             <Tf08AcceptanceScene
+              components={nativeSceneComponents}
               renderLocation={NativeLocationButton}
               renderCoveragePopup={renderCoveragePopup}
               backend={adapter.backend}

@@ -3,8 +3,8 @@
 ```text
 one-map/                         # Repository root (0)
 ├── packages/                    # Published library and shared example package (1)
-│   ├── one-map-react/           # Cross-platform map facade (2)
-│   │   ├── src/                 # Contracts, facade, and adapter implementations (3)
+│   ├── one-map-react/           # Native compatibility library (2)
+│   │   ├── src/                 # Native adapters, contracts, and web exports (3)
 │   │   ├── patches/             # Required exact-version native fixes (3)
 │   │   └── test/                # Existing package tests; migrate to tests/ (3)
 │   └── example-map/             # Shared application example (2)

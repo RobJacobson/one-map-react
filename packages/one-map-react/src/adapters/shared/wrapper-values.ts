@@ -203,26 +203,6 @@ export const pointFromWrapper = (value: unknown): Point => {
 };
 
 /**
- * Reads padding fields and fills missing sides with zero.
- *
- * @param value - Wrapper padding object.
- * @returns Padding with every side present.
- * @throws When `value` is not an object.
- */
-export const paddingFromWrapper = (value: unknown): Required<Padding> => {
-  if (!isRecord(value)) {
-    throw new Error("Map padding must be an object.");
-  }
-
-  return normalizePadding({
-    top: finiteField(value, "top"),
-    right: finiteField(value, "right"),
-    bottom: finiteField(value, "bottom"),
-    left: finiteField(value, "left"),
-  });
-};
-
-/**
  * Rejects animation requests on `jumpTo`.
  *
  * @param options - Command options.

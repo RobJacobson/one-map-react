@@ -30,8 +30,18 @@ export interface MapSetupProps {
   readonly children?: ReactNode;
 }
 
-/** Provides backend selection and a provider-local named map registry. */
+/**
+ * Provides native backend selection and a provider-local named map registry.
+ *
+ * @deprecated Import Map from the selected native entry and use MapProvider
+ * for optional named lookup.
+ */
 export const MapSetup = ({ adapter, children }: MapSetupProps) => {
+  if (
+    adapter.backend !== "mapbox-native" &&
+    adapter.backend !== "maplibre-native"
+  )
+    throw new Error("MapSetup requires a native adapter.");
   const [registry] = useState(() => createMapRegistry<MapRef>("MapSetup"));
   const [initialAdapter] = useState(() => adapter);
   if (initialAdapter !== adapter)

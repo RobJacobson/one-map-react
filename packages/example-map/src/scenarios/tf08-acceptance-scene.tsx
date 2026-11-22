@@ -1,29 +1,33 @@
-import {
-  type GeolocationPosition,
-  Layer,
-  type MapLayoutStyle,
-  type MapProps,
-  type MapRef,
-  type MapStyle,
-  Marker,
-  type MarkerRef,
-  Map as OneMap,
-  Source,
-  UserLocation,
+import type {
+  GeolocationPosition,
+  MapLayoutStyle,
+  MapRef,
+  MarkerRef,
 } from "one-map-react";
 import {
   type ComponentType,
   type ReactNode,
+  useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
 
 import {
-  captureRendering,
+  captureRendering as captureWebRendering,
   renderingBufferOptions,
-} from "./capture-rendering.js";
+} from "./capture-web-rendering.js";
 import type { NativeLocationButtonProps } from "./native-location-button.js";
+import {
+  coordinateTuple,
+  isBrowserMap,
+  type NativeSceneComponents,
+  type SceneMap,
+  type WebSceneMap,
+  type SceneStyle,
+  type WebSceneComponents,
+} from "./scene-components.js";
+import { WebPosition } from "./web-position.js";
 
 /** Commands expose application actions and independent renderer readback only. */
 export interface Tf08AcceptanceProbe {
@@ -44,12 +48,13 @@ interface Tf08AcceptanceSceneProps {
     timeoutMs?: number
   ) => Promise<GeolocationPosition>;
   readonly backend: string;
+  readonly components: WebSceneComponents | NativeSceneComponents;
   readonly style: MapLayoutStyle;
   readonly overlay: ReactNode;
   readonly renderCoveragePopup: (children: ReactNode) => ReactNode;
   readonly attach: (probe: Tf08AcceptanceProbe | null) => void;
   readonly fixtureUrl: string;
-  readonly externalContext?: MapProps["gl"];
+  readonly externalContext?: WebGLRenderingContext;
   readonly nativePuck?: ReactNode;
   readonly navigationControl?: ReactNode;
   readonly ornamentControls?: ReactNode;
@@ -63,7 +68,7 @@ const initialCamera = {
   pitch: 0,
 };
 
-const localStyle: MapStyle = {
+const localStyle: SceneStyle = {
   version: 8,
   sources: {},
   layers: [
@@ -81,6 +86,7 @@ export const Tf08AcceptanceScene = ({
   getCurrentPosition,
   renderLocation: Location,
   backend,
+  components,
   style,
   overlay,
   renderCoveragePopup,
@@ -91,12 +97,19 @@ export const Tf08AcceptanceScene = ({
   navigationControl,
   ornamentControls,
 }: Tf08AcceptanceSceneProps) => {
-  const mapRef = useRef<MapRef>(null);
+  const { Map: MapView, Marker, Source, Layer } = components;
+  const native = components.platform === "native";
+  const mapRef = useRef<SceneMap>(null);
+  const nativeMapRef = useRef<MapRef>(null);
+  const attachMap = useCallback((map: WebSceneMap | MapRef | null) => {
+    mapRef.current = map;
+    nativeMapRef.current = map && !isBrowserMap(map) ? map : null;
+  }, []);
   const annotationRef = useRef<MarkerRef>(null);
   const [generation, setGeneration] = useState(0);
   const [mounted, setMounted] = useState(true);
   const [mode, setMode] = useState("injected");
-  const [mapStyle, setMapStyle] = useState<MapStyle>(localStyle);
+  const [mapStyle, setMapStyle] = useState<SceneStyle | string>(localStyle);
   // Offline coverage is deliberately bounded to the downloaded region and zooms.
   const camera =
     typeof mapStyle === "string" && mapStyle.includes("/offline-style.json")
@@ -119,7 +132,7 @@ export const Tf08AcceptanceScene = ({
 
   useEffect(() => {
     const requests = new Set<AbortController>();
-    const requireMap = (): MapRef => {
+    const requireMap = (): SceneMap => {
       if (!mapRef.current) throw new Error("Acceptance map is detached.");
       return mapRef.current;
     };
@@ -137,7 +150,7 @@ export const Tf08AcceptanceScene = ({
         ]);
         return {
           ...observations.current,
-          center,
+          center: coordinateTuple(center),
           zoom,
           features,
           position: lastPosition.current,
@@ -153,10 +166,14 @@ export const Tf08AcceptanceScene = ({
         return null;
       }
       if (action === "capture") {
-        return captureRendering(
+        const map = mapRef.current;
+        const output = value.output === "file" ? "file" : "data-url";
+        if (isBrowserMap(map)) return captureWebRendering(backend, map, output);
+        if (!native) throw new Error("Observation map is not attached.");
+        return components.captureRendering(
           backend,
-          mapRef.current,
-          value.output === "file" ? "file" : "data-url"
+          nativeMapRef.current,
+          output
         );
       }
       if (action === "annotation-refresh") {
@@ -201,6 +218,8 @@ export const Tf08AcceptanceScene = ({
   }, [
     attach,
     backend,
+    components,
+    native,
     fixtureUrl,
     requestLocationPermission,
     getCurrentPosition,
@@ -210,7 +229,7 @@ export const Tf08AcceptanceScene = ({
   const locationControl = (
     <Location
       key={`${generation}-${mode}`}
-      mapRef={mapRef}
+      mapRef={nativeMapRef}
       corner="right"
       getCurrentPosition={(signal) =>
         mode === "default"
@@ -234,18 +253,15 @@ export const Tf08AcceptanceScene = ({
   );
   return (
     <>
-      <OneMap
+      <MapView
         key={generation}
-        ref={mapRef}
+        ref={attachMap}
         mapStyle={mapStyle}
         style={style}
         initialViewState={camera}
-        {...{
-          options:
-            mode === "unpreserved"
-              ? undefined
-              : renderingBufferOptions(backend),
-        }}
+        {...(!native && mode !== "unpreserved"
+          ? renderingBufferOptions(backend)
+          : {})}
         reuseMaps={
           backend.endsWith("web") &&
           (mode === "unpreserved" || mode === "retained")
@@ -273,16 +289,17 @@ export const Tf08AcceptanceScene = ({
                     },
             }
           : {})}
-        onLoad={() => {
+        onLoad={async () => {
           observations.current.loads += 1;
-          void mapRef.current
-            ?.jumpTo({
+          const map = mapRef.current;
+          try {
+            await map?.jumpTo({
               center: [camera.longitude, camera.latitude],
               zoom: camera.zoom,
-            })
-            .catch(() => {
-              observations.current.errors += 1;
             });
+          } catch {
+            if (mapRef.current === map) observations.current.errors += 1;
+          }
         }}
         onError={() => {
           observations.current.errors += 1;
@@ -294,7 +311,12 @@ export const Tf08AcceptanceScene = ({
           observations.current.moves = [
             ...observations.current.moves,
             {
-              origin: event.origin,
+              origin:
+                "origin" in event && event.origin
+                  ? event.origin
+                  : "originalEvent" in event && event.originalEvent
+                    ? "user"
+                    : "unknown",
               center: [
                 event.viewState.longitude,
                 event.viewState.latitude,
@@ -329,17 +351,28 @@ export const Tf08AcceptanceScene = ({
             paint={{ "circle-color": "#ff0000", "circle-radius": 14 }}
           />
         </Source>
-        {!(backend.endsWith("native") && mode === "coverage-puck") && (
-          <UserLocation position={displayPosition} showAccuracyCircle />
-        )}
+        {!(backend.endsWith("native") && mode === "coverage-puck") &&
+          (native ? (
+            <components.UserLocation
+              position={displayPosition}
+              showAccuracyCircle
+            />
+          ) : (
+            <WebPosition components={components} position={displayPosition} />
+          ))}
         {backend.endsWith("web") && locationControl}
 
         {(!mode.startsWith("coverage") || mode === "coverage-annotation") && (
           <Marker
-            ref={annotationRef}
+            {...(native && {
+              ref: annotationRef,
+              renderMode:
+                mode === "coverage-annotation"
+                  ? ("annotation" as const)
+                  : ("view" as const),
+            })}
             longitude={-122.35}
             latitude={47.61}
-            renderMode={mode === "coverage-annotation" ? "annotation" : "view"}
           >
             {overlay}
           </Marker>
@@ -352,7 +385,7 @@ export const Tf08AcceptanceScene = ({
           </>
         )}
         {mode === "coverage-puck" && nativePuck}
-      </OneMap>
+      </MapView>
       {backend.endsWith("native") && locationControl}
     </>
   );

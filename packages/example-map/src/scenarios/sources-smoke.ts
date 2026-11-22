@@ -1,7 +1,8 @@
-import type { GeoJsonFeatureCollection, MapStyle } from "one-map-react";
+import type { FeatureCollection } from "geojson";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { emptyStyle, replacementStyle, routes } from "./map-fixture.js";
+import type { SceneStyle } from "./scene-components.js";
 
 type SourcesPhase =
   | "await-load"
@@ -24,8 +25,8 @@ interface SourcesSmokeOptions {
 interface SourcesSmoke {
   readonly phase: SourcesPhase;
   readonly status: string;
-  readonly mapStyle: MapStyle;
-  readonly routeData: GeoJsonFeatureCollection;
+  readonly mapStyle: SceneStyle;
+  readonly routeData: FeatureCollection;
   /** Line paint color while set; `undefined` removes the paint key. */
   readonly lineColor: string | undefined;
   /** Whether the vector and image sources are mounted. */
@@ -46,7 +47,7 @@ interface SmokeFields {
 }
 
 /** Routes reduced to their first feature for the data-update phase. */
-const updatedRoutes: GeoJsonFeatureCollection = {
+const updatedRoutes: FeatureCollection = {
   type: "FeatureCollection",
   features: routes.features.slice(0, 1),
 };
@@ -70,8 +71,8 @@ export const useSourcesSmoke = ({
   const loadedRef = useRef(false);
   const loadedAt = useRef<number | null>(null);
   const [phase, setPhase] = useState<SourcesPhase>("await-load");
-  const [mapStyle, setMapStyle] = useState<MapStyle>(emptyStyle);
-  const [routeData, setRouteData] = useState<GeoJsonFeatureCollection>(routes);
+  const [mapStyle, setSceneStyle] = useState<SceneStyle>(emptyStyle);
+  const [routeData, setRouteData] = useState<FeatureCollection>(routes);
   const [lineColor, setLineColor] = useState<string | undefined>("#2563eb");
   const [showTransient, setShowTransient] = useState(true);
   const [status, setStatus] = useState(() =>
@@ -190,7 +191,7 @@ export const useSourcesSmoke = ({
       }
 
       fields.current.data = "updated";
-      setMapStyle(replacementStyle);
+      setSceneStyle(replacementStyle);
       enterRef.current("await-style");
     }, 2000);
 

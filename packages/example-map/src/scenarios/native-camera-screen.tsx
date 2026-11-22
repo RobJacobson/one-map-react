@@ -1,5 +1,5 @@
 import type { Adapter } from "one-map-react";
-import { type MapRef, MapSetup } from "one-map-react";
+import { type MapRef, MapSetup } from "one-map-react/legacy";
 import { useRef } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 

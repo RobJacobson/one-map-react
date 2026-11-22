@@ -1,13 +1,4 @@
-import {
-  Layer,
-  type LngLat,
-  type MapLayoutStyle,
-  type MapRef,
-  Marker,
-  Map as OneMap,
-  Source,
-  UserLocation,
-} from "one-map-react";
+import type { LngLat, MapLayoutStyle, MapRef } from "one-map-react";
 import {
   type ComponentType,
   type ReactNode,
@@ -25,6 +16,17 @@ import {
   replacementStyle,
 } from "./map-fixture.js";
 import type { NativeLocationButtonProps } from "./native-location-button.js";
+import {
+  coordinateTuple,
+  isBrowserMap,
+  pointTuple,
+  type MapCoordinate,
+  type NativeSceneComponents,
+  type SceneMap,
+  type WebSceneComponents,
+  type WebSceneMap,
+} from "./scene-components.js";
+import { WebPosition } from "./web-position.js";
 
 /** Configuration changes driven by the acceptance toolbar. */
 export type Tf07Action = "remount" | "style" | "offset" | "popup" | "units";
@@ -60,7 +62,7 @@ export interface Tf07Probe {
 
 interface Tf07SceneProps {
   readonly renderLocation: ComponentType<NativeLocationButtonProps>;
-  readonly native?: boolean;
+  readonly components: WebSceneComponents | NativeSceneComponents;
   readonly nativeOrnaments?: object;
   readonly renderScale?: (unit: "metric" | "imperial") => ReactNode;
   readonly renderNavigation: ComponentType<{
@@ -97,7 +99,7 @@ const location = { lngLat: [-122.33, 47.62] as LngLat, accuracy: 12 };
  * the renderer; it does not dispatch callbacks or certify visual behavior.
  */
 export const Tf07Scene = ({
-  native = false,
+  components,
   nativeOrnaments,
   renderScale,
   renderLocation: Location,
@@ -108,9 +110,19 @@ export const Tf07Scene = ({
   report,
   attach,
 }: Tf07SceneProps) => {
+  const { Map: MapView, Marker, Source, Layer } = components;
+  const native = components.platform === "native";
   const [displayPosition, setDisplayPosition] =
     useState<import("one-map-react").GeolocationPosition>();
-  const mapRef = useRef<MapRef>(null);
+  const mapRef = useRef<SceneMap>(null);
+  const nativeMapRef = useRef<MapRef>(null);
+  const attachMap = useCallback((map: WebSceneMap | MapRef | null) => {
+    mapRef.current = map;
+    nativeMapRef.current = !isBrowserMap(map) ? map : null;
+  }, []);
+  const countedStyle = useRef<{ style: unknown; generation: number } | null>(
+    null
+  );
   const observations = useRef<Record<string, number>>({});
   const lastPositions = useRef<Record<string, LngLat>>({});
   const generationRef = useRef(0);
@@ -119,7 +131,7 @@ export const Tf07Scene = ({
   const [mapStyle, setMapStyle] = useState(emptyStyle);
   const [live, setLive] = useState(targets.live);
   const [annotation, setAnnotation] = useState(targets.annotation);
-  const [offset, setOffset] = useState<readonly [number, number] | undefined>();
+  const [offset, setOffset] = useState<[number, number] | undefined>();
   const [popup, setPopup] = useState(true);
   const [unit, setUnit] = useState<"metric" | "imperial">("metric");
 
@@ -142,18 +154,20 @@ export const Tf07Scene = ({
     report(error instanceof Error ? error.name : "operation-failed");
   };
 
-  const loaded = (): void => {
+  const loaded = async (): Promise<void> => {
     record("load");
-    // TF07 tests attachment UI, not the pinned Mapbox Android opening-camera
-    // behavior. Establish the fixture viewport through an actual camera command.
-    void mapRef.current
-      ?.jumpTo({
+    // Establish the fixture viewport on RNMapbox before exercising marker interactions.
+    const map = mapRef.current;
+    try {
+      await map?.jumpTo({
         center: [initialViewState.longitude, initialViewState.latitude],
         zoom: initialViewState.zoom,
         bearing: initialViewState.bearing,
         pitch: initialViewState.pitch,
-      })
-      .catch(fail);
+      });
+    } catch (error) {
+      if (mapRef.current === map) fail(error);
+    }
   };
 
   const configure = useCallback(
@@ -191,7 +205,7 @@ export const Tf07Scene = ({
   );
 
   useEffect(() => {
-    const requireMap = (): MapRef => {
+    const requireMap = (): SceneMap => {
       if (!mapRef.current) throw new Error("TF07 map is not attached.");
       return mapRef.current;
     };
@@ -208,13 +222,14 @@ export const Tf07Scene = ({
         return {
           events: { ...observations.current },
           positions: { ...lastPositions.current },
-          center,
+          center: coordinateTuple(center),
           zoom,
           features,
           generation: generationRef.current,
         };
       },
-      project: (target) => requireMap().project(targets[target]),
+      project: async (target) =>
+        pointTuple(await requireMap().project([...targets[target]])),
       configure,
     });
 
@@ -223,17 +238,29 @@ export const Tf07Scene = ({
 
   return (
     <>
-      <OneMap
+      <MapView
         key={generation}
         id="tf07-map"
-        ref={mapRef}
+        ref={attachMap}
+        {...(!native
+          ? {
+              onIdle: () => {
+                if (
+                  countedStyle.current?.style === mapStyle &&
+                  countedStyle.current.generation === generation
+                )
+                  return;
+                countedStyle.current = { style: mapStyle, generation };
+                record("style");
+              },
+            }
+          : { onStyleLoad: () => record("style") })}
         mapStyle={mapStyle}
         {...(native ? { options: nativeOrnaments } : {})}
         initialViewState={initialViewState}
         style={style}
         interactiveLayerIds={["tf07-point"]}
         onLoad={loaded}
-        onStyleLoad={() => record("style")}
         onMove={() => record("move")}
         onClick={(event) => {
           if (
@@ -254,7 +281,7 @@ export const Tf07Scene = ({
             type: "Feature",
             id: 707,
             properties: { fixture: "tf07" },
-            geometry: { type: "Point", coordinates: targets.source },
+            geometry: { type: "Point", coordinates: [...targets.source] },
           }}
         >
           <Layer
@@ -263,9 +290,13 @@ export const Tf07Scene = ({
             paint={{ "circle-color": "#16a34a", "circle-radius": 16 }}
           />
         </Source>
-        <Marker id="tf07-default" longitude={-122.38} latitude={47.63} />
         <Marker
-          id="tf07-live"
+          {...(native && { id: "tf07-default" })}
+          longitude={-122.38}
+          latitude={47.63}
+        />
+        <Marker
+          {...(native && { id: "tf07-live", onError: fail })}
           longitude={live[0]}
           latitude={live[1]}
           offset={offset}
@@ -273,39 +304,41 @@ export const Tf07Scene = ({
           {...(!native && {
             draggable: true,
             onDragStart: () => record("live-start"),
-            onDrag: (event) => {
-              lastPositions.current.live = event.lngLat;
-              setLive(event.lngLat);
+            onDrag: (event: { readonly lngLat: MapCoordinate }) => {
+              lastPositions.current.live = coordinateTuple(event.lngLat);
+              setLive(coordinateTuple(event.lngLat));
               record("live-drag");
             },
-            onDragEnd: (event) => {
-              lastPositions.current.live = event.lngLat;
-              setLive(event.lngLat);
+            onDragEnd: (event: { readonly lngLat: MapCoordinate }) => {
+              lastPositions.current.live = coordinateTuple(event.lngLat);
+              setLive(coordinateTuple(event.lngLat));
               record("live-end");
             },
           })}
-          onError={fail}
         >
           {/* eslint-disable-next-line react/refs -- markerContent receives an event callback; the callback reads observation refs only when clicked. */}
           {markerContent("live", () => record("child-click"))}
         </Marker>
         <Marker
-          id="tf07-annotation"
+          {...(native && {
+            id: "tf07-annotation",
+            renderMode: "annotation" as const,
+            onError: fail,
+          })}
           longitude={annotation[0]}
           latitude={annotation[1]}
-          renderMode="annotation"
           onClick={() => record("annotation-click")}
           {...(!native && {
             draggable: true,
             onDragStart: () => record("annotation-start"),
-            onDrag: (event) => setAnnotation(event.lngLat),
-            onDragEnd: (event) => {
-              lastPositions.current.annotation = event.lngLat;
-              setAnnotation(event.lngLat);
+            onDrag: (event: { readonly lngLat: MapCoordinate }) =>
+              setAnnotation(coordinateTuple(event.lngLat)),
+            onDragEnd: (event: { readonly lngLat: MapCoordinate }) => {
+              lastPositions.current.annotation = coordinateTuple(event.lngLat);
+              setAnnotation(coordinateTuple(event.lngLat));
               record("annotation-end");
             },
           })}
-          onError={fail}
         >
           {markerContent("annotation", () => undefined)}
         </Marker>
@@ -332,12 +365,19 @@ export const Tf07Scene = ({
             }
           )}
         {/* eslint-enable react/refs */}
-        {!native && <Navigation mapRef={mapRef} onError={fail} />}
-        <UserLocation position={displayPosition} showAccuracyCircle />
+        {!native && <Navigation mapRef={nativeMapRef} onError={fail} />}
+        {native ? (
+          <components.UserLocation
+            position={displayPosition}
+            showAccuracyCircle
+          />
+        ) : (
+          <WebPosition components={components} position={displayPosition} />
+        )}
         {!native && (
           <Location
             key={generation}
-            mapRef={mapRef}
+            mapRef={nativeMapRef}
             getCurrentPosition={async () => location}
             zoom={11}
             onGeolocate={(position) => {
@@ -348,13 +388,13 @@ export const Tf07Scene = ({
           />
         )}
         {!native && renderScale?.(unit)}
-      </OneMap>
+      </MapView>
       {native && (
         <>
-          <Navigation mapRef={mapRef} onError={fail} />
+          <Navigation mapRef={nativeMapRef} onError={fail} />
           <Location
             key={generation}
-            mapRef={mapRef}
+            mapRef={nativeMapRef}
             getCurrentPosition={async () => location}
             zoom={11}
             onGeolocate={(position) => {

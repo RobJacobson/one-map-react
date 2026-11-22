@@ -1,24 +1,22 @@
 import { act, renderHook } from "@testing-library/react";
-import type { Adapter, MapRef, ViewState } from "one-map-react";
+import type { ViewState } from "one-map-react";
 import { StrictMode } from "react";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-import { initialCamera } from "../src/camera.js";
+import { type CameraMap, initialCamera } from "../src/camera.js";
 import { useExampleMap } from "../src/use-example-map.js";
 
-const adapters = {
-  maplibre: { backend: "maplibre-web" } as Adapter,
-  mapbox: { backend: "mapbox-web" } as Adapter,
-};
-
-const cameraMap = (camera: ViewState = initialCamera): MapRef =>
+const cameraMap = (camera: ViewState = initialCamera) =>
   ({
-    getCenter: vi.fn(async () => [camera.longitude, camera.latitude]),
+    getCenter: vi.fn(async () => ({
+      lng: camera.longitude,
+      lat: camera.latitude,
+    })),
     getZoom: vi.fn(async () => camera.zoom),
     getBearing: vi.fn(async () => camera.bearing),
     getPitch: vi.fn(async () => camera.pitch),
-    jumpTo: vi.fn(async () => undefined),
-  }) as unknown as MapRef;
+    jumpTo: vi.fn(async (): Promise<void> => undefined),
+  }) satisfies CameraMap;
 
 afterEach(() => vi.useRealTimers());
 
@@ -27,7 +25,7 @@ describe("engine handoff", () => {
     "permits a slow cold %s renderer to load before restoring its camera",
     async (phase) => {
       vi.useFakeTimers();
-      const { result } = renderHook(() => useExampleMap(adapters, true));
+      const { result } = renderHook(() => useExampleMap(true));
       if (phase === "switched") {
         result.current.attachMap(cameraMap());
         await act(async () => result.current.onLoad());
@@ -46,7 +44,7 @@ describe("engine handoff", () => {
 
   it("gives camera restoration its own deadline after the renderer loads", async () => {
     vi.useFakeTimers();
-    const { result } = renderHook(() => useExampleMap(adapters, true));
+    const { result } = renderHook(() => useExampleMap(true));
     await act(async () => vi.advanceTimersByTimeAsync(9000));
     const map = cameraMap();
     vi.mocked(map.jumpTo).mockImplementationOnce(
@@ -66,7 +64,7 @@ describe("engine handoff", () => {
     "times out a stalled %s map load and permits retry without reviving the failed attachment",
     async (phase) => {
       vi.useFakeTimers();
-      const { result } = renderHook(() => useExampleMap(adapters, true));
+      const { result } = renderHook(() => useExampleMap(true));
       if (phase === "switched") {
         result.current.attachMap(cameraMap());
         await act(async () => result.current.onLoad());
@@ -103,7 +101,7 @@ describe("engine handoff", () => {
 
   it("releases the loading deadline on StrictMode teardown", () => {
     vi.useFakeTimers();
-    const mounted = renderHook(() => useExampleMap(adapters, true), {
+    const mounted = renderHook(() => useExampleMap(true), {
       wrapper: StrictMode,
     });
     expect(vi.getTimerCount()).toBe(1);
@@ -113,11 +111,7 @@ describe("engine handoff", () => {
 
   it("requires fresh Mapbox Native orientation observations before declaring restoration complete", async () => {
     vi.useFakeTimers();
-    const nativeAdapters = {
-      ...adapters,
-      mapbox: { backend: "mapbox-native" } as Adapter,
-    };
-    const { result } = renderHook(() => useExampleMap(nativeAdapters, true));
+    const { result } = renderHook(() => useExampleMap(true, true));
     const moved = { ...initialCamera, bearing: 45, pitch: 30 };
     result.current.attachMap(cameraMap(moved));
     await act(async () => {
@@ -131,14 +125,29 @@ describe("engine handoff", () => {
     });
     expect(result.current.status).toBe("switching");
     await act(async () => {
-      result.current.onMove({ origin: "unknown", viewState: moved });
+      result.current.onMove({ viewState: moved });
       await vi.advanceTimersByTimeAsync(50);
       await loading;
     });
     expect(result.current.status).toBe("ready");
   });
+  it("prepares the native Mapbox token only on selection and retries a failed preparation", async () => {
+    const prepareMapbox = vi.fn(async () => {});
+    prepareMapbox.mockRejectedValueOnce(new Error("Token setup failed"));
+    const { result } = renderHook(() =>
+      useExampleMap(true, true, prepareMapbox)
+    );
+    expect(prepareMapbox).not.toHaveBeenCalled();
+    await act(async () => result.current.selectEngine("mapbox"));
+    expect(result.current.status).toBe("error");
+    expect(result.current.attachment.engine).toBe("maplibre");
+    await act(async () => result.current.selectEngine("mapbox"));
+    expect(prepareMapbox).toHaveBeenCalledTimes(2);
+    expect(result.current.attachment.engine).toBe("mapbox");
+  });
+
   it("starts in Seattle with MapLibre and prevents a missing-token Mapbox switch", async () => {
-    const { result } = renderHook(() => useExampleMap(adapters, false));
+    const { result } = renderHook(() => useExampleMap(false));
     await act(async () => {
       await result.current.selectEngine("mapbox");
     });
@@ -148,7 +157,7 @@ describe("engine handoff", () => {
   });
 
   it("preserves camera readbacks through repeated switches and ignores old callbacks", async () => {
-    const { result } = renderHook(() => useExampleMap(adapters, true));
+    const { result } = renderHook(() => useExampleMap(true));
     const moved = {
       ...initialCamera,
       longitude: -122.2,
@@ -163,8 +172,8 @@ describe("engine handoff", () => {
     });
     expect(result.current.attachment.camera).toEqual(moved);
     act(() => {
-      old.onMove({ viewState: initialCamera, origin: "unknown" });
-      old.onError({ error: new Error("stale") });
+      old.onMove({ viewState: initialCamera });
+      old.onError();
     });
     result.current.attachMap(cameraMap(moved));
     await act(async () => {
@@ -182,7 +191,7 @@ describe("engine handoff", () => {
   });
 
   it("keeps the current engine and shows safe guidance when camera capture fails", async () => {
-    const { result } = renderHook(() => useExampleMap(adapters, true));
+    const { result } = renderHook(() => useExampleMap(true));
     const map = cameraMap();
     vi.mocked(map.getCenter).mockRejectedValue(
       new Error("https://service/?access_token=private")
@@ -202,7 +211,7 @@ describe("engine handoff", () => {
 
   it("waits for rendered camera readback rather than command acknowledgement", async () => {
     vi.useFakeTimers();
-    const { result } = renderHook(() => useExampleMap(adapters, true));
+    const { result } = renderHook(() => useExampleMap(true));
     const map = cameraMap();
     vi.mocked(map.getZoom).mockResolvedValueOnce(0).mockResolvedValue(11);
     result.current.attachMap(map);
@@ -221,7 +230,7 @@ describe("engine handoff", () => {
 
   it("reports a camera that never restores without looping forever", async () => {
     vi.useFakeTimers();
-    const { result } = renderHook(() => useExampleMap(adapters, true));
+    const { result } = renderHook(() => useExampleMap(true));
     result.current.attachMap(cameraMap({ ...initialCamera, zoom: 0 }));
     await act(async () => {
       const loading = result.current.onLoad();
@@ -235,7 +244,7 @@ describe("engine handoff", () => {
     "times out a stalled restoration %s and ignores its late result",
     async (method) => {
       vi.useFakeTimers();
-      const { result } = renderHook(() => useExampleMap(adapters, true));
+      const { result } = renderHook(() => useExampleMap(true));
       const map = cameraMap();
       let finish: (zoom: number) => void = () => {};
       const pending = new Promise<number>((resolve) => {
@@ -277,7 +286,7 @@ describe("engine handoff", () => {
 
   it("shares one restoration deadline across command dispatch and readback", async () => {
     vi.useFakeTimers();
-    const { result } = renderHook(() => useExampleMap(adapters, true));
+    const { result } = renderHook(() => useExampleMap(true));
     const map = cameraMap({ ...initialCamera, zoom: 0 });
     vi.mocked(map.jumpTo).mockImplementationOnce(
       () => new Promise((resolve) => setTimeout(resolve, 5000))
@@ -293,7 +302,7 @@ describe("engine handoff", () => {
 
   it("times out a stalled switch read and permits retry without a late replacement", async () => {
     vi.useFakeTimers();
-    const { result } = renderHook(() => useExampleMap(adapters, true));
+    const { result } = renderHook(() => useExampleMap(true));
     const map = cameraMap();
     result.current.attachMap(map);
     await act(async () => {
@@ -329,7 +338,7 @@ describe("engine handoff", () => {
 
   it("does not replace a map after unmount while capture is pending", async () => {
     vi.useFakeTimers();
-    const { result, unmount } = renderHook(() => useExampleMap(adapters, true));
+    const { result, unmount } = renderHook(() => useExampleMap(true));
     const map = cameraMap();
     let finish: ((zoom: number) => void) | undefined;
     vi.mocked(map.getZoom).mockImplementation(

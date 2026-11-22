@@ -70,7 +70,6 @@
         "@one-map/example-map": "workspace:*",
         "mapbox-gl": "3.32.0",
         "maplibre-gl": "6.13.0",
-        "one-map-react": "workspace:*",
         "react": "19.2.3",
         "react-dom": "19.2.3",
         "react-map-gl": "8.1.3",
@@ -89,8 +88,15 @@
       },
       "peerDependencies": {
         "mapbox-gl": "^3.32.0",
+        "maplibre-gl": "^6.13.0",
         "react": "19.2.3",
+        "react-map-gl": "^8.1.3",
       },
+      "optionalPeers": [
+        "mapbox-gl",
+        "maplibre-gl",
+        "react-map-gl",
+      ],
     },
     "packages/one-map-react": {
       "name": "one-map-react",

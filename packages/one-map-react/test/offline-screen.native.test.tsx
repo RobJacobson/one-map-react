@@ -5,7 +5,7 @@ import { type ReactNode, StrictMode } from "react";
 
 import { NativeTf08Screen } from "../../example-map/src/scenarios/native-tf08-screen.js";
 
-jest.mock("one-map-react", () => ({
+jest.mock("one-map-react/legacy", () => ({
   MapSetup: ({ children }: { children: ReactNode }) => children,
 }));
 

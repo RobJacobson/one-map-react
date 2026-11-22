@@ -10,7 +10,7 @@ import {
   Map as OneMap,
   Source,
   type ViewState,
-} from "one-map-react";
+} from "one-map-react/legacy";
 import { forwardRef } from "react";
 
 import { emptyStyle, initialViewState, routes } from "./map-fixture.js";

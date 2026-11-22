@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "@one-map/example-map": "workspace:*",
-    "one-map-react": "workspace:*",
     "mapbox-gl": "3.32.0",
     "maplibre-gl": "6.13.0",
     "react": "19.2.3",

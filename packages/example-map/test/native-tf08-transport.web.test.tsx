@@ -5,8 +5,11 @@ import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 
 import { NativeTf08Screen } from "../src/scenarios/native-tf08-screen.js";
 
-vi.mock("one-map-react", () => ({
+vi.mock("one-map-react/legacy", () => ({
   MapSetup: ({ children }: { children?: ReactNode }) => children,
+}));
+vi.mock("../src/scenarios/native-scene-components.js", () => ({
+  nativeSceneComponents: {},
 }));
 vi.mock("../src/scenarios/tf08-acceptance-scene.js", () => ({
   Tf08AcceptanceScene: () => null,

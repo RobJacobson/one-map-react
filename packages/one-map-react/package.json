@@ -1,7 +1,7 @@
 {
   "name": "one-map-react",
   "version": "0.1.0-rc.11",
-  "description": "A thin React map facade with explicitly selected Mapbox and MapLibre backends.",
+  "description": "A native compatibility layer for shared React maps, with stock react-map-gl forwards for web.",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -11,6 +11,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./legacy": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./native-extensions": {
+      "types": "./dist/native-extensions.d.ts",
+      "import": "./dist/native-extensions.js",
+      "default": "./dist/native-extensions.js"
     },
     "./package.json": "./package.json",
     "./mapbox-web": {

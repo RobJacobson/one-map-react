@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { forwardRef, type ReactNode, StrictMode } from "react";
 import { describe, expect, test } from "vite-plus/test";
 
-import type { Adapter, Backend } from "../src/contracts/adapter.js";
+import type { Adapter } from "../src/contracts/adapter.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
 import { MapSetup } from "../src/facade/map-setup.js";
@@ -15,7 +15,7 @@ const FakeMap = forwardRef<MapRef, MapProps>(({ children }, _ref) => (
   <>{children}</>
 ));
 const Empty = () => null;
-const fakeAdapter = (backend: Backend): Adapter => ({
+const fakeAdapter = (backend: Adapter["backend"]): Adapter => ({
   backend,
   Map: FakeMap,
   Source: Empty,
@@ -49,73 +49,71 @@ const genuineChanges = [
   ],
 ] as const;
 
-describe.each<Backend>([
-  "mapbox-web",
-  "maplibre-web",
-  "mapbox-native",
-  "maplibre-native",
-])("%s custom adapter creation contracts", (backend) => {
-  const adapter = fakeAdapter(backend);
-  const tree = (children: ReactNode) => (
-    <StrictMode>
-      <MapSetup adapter={adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          {children}
-        </OneMap>
-      </MapSetup>
-    </StrictMode>
-  );
+describe.each<Adapter["backend"]>(["mapbox-native", "maplibre-native"])(
+  "%s custom adapter creation contracts",
+  (backend) => {
+    const adapter = fakeAdapter(backend);
+    const tree = (children: ReactNode) => (
+      <StrictMode>
+        <MapSetup adapter={adapter}>
+          <OneMap mapStyle={style} initialViewState={camera}>
+            {children}
+          </OneMap>
+        </MapSetup>
+      </StrictMode>
+    );
 
-  test.each(genuineChanges)(
-    "%s rejects a genuine creation change",
-    (name, component) => {
-      const mounted = render(tree(component(false)));
-      expect(() => mounted.rerender(tree(component(true)))).toThrow(
-        `${name.split(" ")[0]} changed the creation option`
+    test.each(genuineChanges)(
+      "%s rejects a genuine creation change",
+      (name, component) => {
+        const mounted = render(tree(component(false)));
+        expect(() => mounted.rerender(tree(component(true)))).toThrow(
+          `${name.split(" ")[0]} changed the creation option`
+        );
+      }
+    );
+
+    test("equivalent defaults work in both directions, and mutable fields remain mutable", () => {
+      const controls = (explicit: boolean) => (
+        <>
+          <Marker
+            longitude={explicit ? 1 : 0}
+            latitude={0}
+            anchor={explicit ? "bottom" : undefined}
+            renderMode={explicit ? "view" : undefined}
+          />
+        </>
       );
-    }
-  );
+      const mounted = render(tree(controls(false)));
+      mounted.rerender(tree(controls(true)));
+      mounted.rerender(tree(controls(false)));
+    });
 
-  test("equivalent defaults work in both directions, and mutable fields remain mutable", () => {
-    const controls = (explicit: boolean) => (
-      <>
-        <Marker
-          longitude={explicit ? 1 : 0}
-          latitude={0}
-          anchor={explicit ? "bottom" : undefined}
-          renderMode={explicit ? "view" : undefined}
-        />
-      </>
-    );
-    const mounted = render(tree(controls(false)));
-    mounted.rerender(tree(controls(true)));
-    mounted.rerender(tree(controls(false)));
-  });
-
-  test("marker content changes retain the original default", () => {
-    const mounted = render(tree(<Marker longitude={0} latitude={0} />));
-    mounted.rerender(
-      tree(
-        <Marker longitude={0} latitude={0}>
-          custom
-        </Marker>
-      )
-    );
-    mounted.rerender(
-      tree(
-        <Marker longitude={0} latitude={0} anchor="bottom">
-          custom
-        </Marker>
-      )
-    );
-    expect(() =>
+    test("marker content changes retain the original default", () => {
+      const mounted = render(tree(<Marker longitude={0} latitude={0} />));
       mounted.rerender(
         tree(
-          <Marker longitude={0} latitude={0} anchor="center">
+          <Marker longitude={0} latitude={0}>
             custom
           </Marker>
         )
-      )
-    ).toThrow('creation option "anchor"');
-  });
-});
+      );
+      mounted.rerender(
+        tree(
+          <Marker longitude={0} latitude={0} anchor="bottom">
+            custom
+          </Marker>
+        )
+      );
+      expect(() =>
+        mounted.rerender(
+          tree(
+            <Marker longitude={0} latitude={0} anchor="center">
+              custom
+            </Marker>
+          )
+        )
+      ).toThrow('creation option "anchor"');
+    });
+  }
+);

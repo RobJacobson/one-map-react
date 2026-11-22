@@ -1,19 +1,26 @@
+import type { Bounds, MapLayoutStyle, MapRef, ViewState } from "one-map-react";
 import {
-  type Bounds,
-  Layer,
-  Map as OneMap,
-  type MapLayoutStyle,
-  type MapRef,
-  type MoveEvent,
-  type ViewState,
-  Source,
-} from "one-map-react";
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
-  captureRendering,
+  captureRendering as captureWebRendering,
   renderingBufferOptions,
-} from "./capture-rendering.js";
+} from "./capture-web-rendering.js";
+import {
+  coordinateTuple,
+  isBrowserMap,
+  type NativeSceneComponents,
+  type SceneMap,
+  type WebSceneMap,
+  type SceneMove,
+  type WebSceneComponents,
+} from "./scene-components.js";
 import { cameraDispatchObservation } from "./tf10-camera-observer.js";
 import {
   nativeControlledCamera,
@@ -36,7 +43,7 @@ const baseStyle = {
   layers: [
     {
       id: "background",
-      type: "background",
+      type: "background" as const,
       paint: { "background-color": "#17324d" },
     },
   ],
@@ -45,18 +52,28 @@ const baseStyle = {
 /** Local DEM and known-feature scene shared by all six renderer environments. */
 export const Tf09Scene = ({
   backend,
+  components,
   style,
   attach,
   children,
   named,
 }: {
   readonly backend: string;
+  readonly components: WebSceneComponents | NativeSceneComponents;
   readonly style: MapLayoutStyle;
   readonly attach: (probe: Tf09Probe | null) => void;
   readonly children?: ReactNode;
-  readonly named?: (map: MapRef) => unknown;
+  readonly named?: () => unknown;
 }) => {
-  const ref = useRef<MapRef>(null);
+  const { Source, Layer } = components;
+  const native = components.platform === "native";
+  const ref = useRef<SceneMap>(null);
+  const nativeRef = useRef<MapRef>(null);
+  const attachMap = useCallback((map: WebSceneMap | MapRef | null) => {
+    ref.current = map;
+    nativeRef.current = map && !isBrowserMap(map) ? map : null;
+  }, []);
+  const countedStyle = useRef<unknown>(null);
   const nativeCameraObservation = useRef<ViewState | undefined>(undefined);
   const [controlled, setControlled] = useState<ViewState | undefined>(
     undefined
@@ -95,6 +112,12 @@ export const Tf09Scene = ({
   }, [lightColor, lightFixture]);
   const [enabled, setEnabled] = useState(false);
   const [dem, setDem] = useState(false);
+  useEffect(() => {
+    if (enabled || backend !== "maplibre-web" || !isBrowserMap(ref.current))
+      return;
+    const renderer = ref.current.getMap();
+    if (renderer.getTerrain()) renderer.setTerrain(null);
+  }, [enabled, backend]);
   const [shade, setShade] = useState(true);
   const [projection, setProjection] = useState<"mercator" | "globe">(
     "mercator"
@@ -183,16 +206,16 @@ export const Tf09Scene = ({
         const map = ref.current;
         if (!map) throw new Error("Map is not attached.");
         if (action === "bounds-command") {
-          const center =
+          const center: [number, number] =
             value.target === "edge"
-              ? ([-19, 19] as const)
+              ? [-19, 19]
               : value.target === "north-west"
-                ? ([-100, 65] as const)
+                ? [-100, 65]
                 : value.target === "south-east"
-                  ? ([100, -65] as const)
+                  ? [100, -65]
                   : value.target === "reset"
-                    ? ([100, 50] as const)
-                    : ([0, 0] as const);
+                    ? [100, 50]
+                    : [0, 0];
           await map.jumpTo({
             center,
             zoom: value.target === "edge" ? 4 : 5,
@@ -221,7 +244,7 @@ export const Tf09Scene = ({
             clamp: committedClamp.current,
             cameraBounds: committedBounds.current,
             dispatches: [...cameraDispatchObservation.events],
-            center: await map.getCenter(),
+            center: coordinateTuple(await map.getCenter()),
             zoom: await map.getZoom(),
             ...(await readNativeOrientation(
               backend,
@@ -244,13 +267,17 @@ export const Tf09Scene = ({
               layers: ["lit-building"],
             }),
           };
-        if (action === "named") return named?.(map);
-        if (action === "capture") return captureRendering(backend, map);
+        if (action === "named") return named?.();
+        if (action === "capture") {
+          if (isBrowserMap(map)) return captureWebRendering(backend, map);
+          if (!native) throw new Error("Observation map is not attached.");
+          return components.captureRendering(backend, nativeRef.current);
+        }
         if (action === "read") {
           let elevation: number | null = null;
           let unsupported: string | undefined;
           try {
-            elevation = await map.queryTerrainElevation([0, 0]);
+            elevation = (await map.queryTerrainElevation?.([0, 0])) ?? null;
           } catch (error) {
             if (backend === "maplibre-native") unsupported = String(error);
             else throw error;
@@ -262,7 +289,7 @@ export const Tf09Scene = ({
             styleLoads: styleLoads.current,
             elevation,
             unsupported,
-            center: await map.getCenter(),
+            center: coordinateTuple(await map.getCenter()),
             zoom: await map.getZoom(),
             features: await map.queryRenderedFeatures(undefined, {
               layers: ["known"],
@@ -275,61 +302,59 @@ export const Tf09Scene = ({
     return () => {
       attach(null);
     };
-  }, [attach, backend, named]);
-  const recordCamera = (event: MoveEvent, ending: boolean): void => {
+  }, [attach, backend, components, named, native]);
+  const recordCamera = (event: SceneMove, ending: boolean): void => {
     nativeCameraObservation.current = event.viewState;
     const observation = cameraObservations.current;
     if (ending) observation.ends += 1;
     else observation.moves += 1;
-    observation.origin = event.origin;
+    const origin = event.origin ?? (event.originalEvent ? "user" : "unknown");
+    observation.origin = origin;
     observation.viewState = event.viewState;
-    if (event.origin === "user") {
+    if (origin === "user") {
       if (ending) observation.userEnds += 1;
       else observation.userMoves += 1;
-      observation.lastUserOrigin = event.origin;
+      observation.lastUserOrigin = origin;
       observation.lastUserViewState = event.viewState;
       observation.lastUserProposal = event.viewState;
     }
     if (acceptProposals.current) setControlled(event.viewState);
   };
 
-  return (
-    <OneMap
-      ref={ref}
-      mapStyle={mapStyle}
-      initialViewState={camera}
-      viewState={controlled}
-      minZoom={clamped ? 3 : undefined}
-      maxBounds={cameraBounds}
-      onMove={(event) => recordCamera(event, false)}
-      onMoveEnd={(event) => recordCamera(event, true)}
-      {...{ options: renderingBufferOptions(backend) }}
-      style={style}
-      projection={projection}
-      terrain={
-        backend === "maplibre-native"
-          ? undefined
-          : enabled
-            ? { source: "dem", exaggeration: 2 }
-            : null
-      }
-      light={{
-        anchor: "map",
-        color: lightColor,
-        // Keep shadowed faces tinted; full contrast produces complementary ambient colors.
-        intensity: lightFixture ? 0.25 : 0.5,
-        position: [1.15, 210, 30],
-      }}
-      onIdle={() => {
-        idle.current += 1;
-      }}
-      onStyleLoad={() => {
+  const terrain =
+    backend === "maplibre-native"
+      ? undefined
+      : enabled
+        ? { source: "dem", exaggeration: 2 }
+        : null;
+  const mapProps = {
+    ref: attachMap,
+    mapStyle,
+    initialViewState: camera,
+    minZoom: clamped ? 3 : undefined,
+    onMove: (event: SceneMove) => recordCamera(event, false),
+    onMoveEnd: (event: SceneMove) => recordCamera(event, true),
+    style,
+    projection,
+    light: {
+      anchor: "map" as const,
+      color: lightColor,
+      intensity: lightFixture ? 0.25 : 0.5,
+      position: [1.15, 210, 30] satisfies [number, number, number],
+    },
+    onIdle: () => {
+      idle.current += 1;
+      if (!native && countedStyle.current !== mapStyle) {
+        countedStyle.current = mapStyle;
         styleLoads.current += 1;
-      }}
-      onLoad={() => {
-        loads.current += 1;
-      }}
-    >
+      }
+    },
+    onLoad: () => {
+      loads.current += 1;
+    },
+  };
+  const scene = (
+    <>
       {dem && (
         <Source
           id="dem"
@@ -399,6 +424,35 @@ export const Tf09Scene = ({
         </Source>
       )}
       {children}
-    </OneMap>
+    </>
+  );
+  if (native) {
+    return (
+      <components.Map
+        {...mapProps}
+        viewState={controlled}
+        maxBounds={cameraBounds}
+        terrain={terrain}
+        onStyleLoad={() => {
+          styleLoads.current += 1;
+        }}
+      >
+        {scene}
+      </components.Map>
+    );
+  }
+  const maxBounds: [number, number, number, number] | undefined = cameraBounds
+    ? [...cameraBounds[0], ...cameraBounds[1]]
+    : undefined;
+  return (
+    <components.Map
+      {...mapProps}
+      {...controlled}
+      {...renderingBufferOptions(backend)}
+      maxBounds={maxBounds}
+      terrain={terrain ?? undefined}
+    >
+      {scene}
+    </components.Map>
   );
 };

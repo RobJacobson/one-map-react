@@ -1,7 +1,8 @@
 import type { Adapter } from "one-map-react";
-import { MapSetup } from "one-map-react";
+import { MapSetup } from "one-map-react/legacy";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
+import { nativeSceneComponents } from "./native-scene-components.js";
 import { SourcesMap } from "./sources-map.js";
 import { useSourcesSmoke } from "./sources-smoke.js";
 import { tf05Base } from "./tf05-base.js";
@@ -26,6 +27,7 @@ export const NativeSourcesScreen = ({ adapter }: NativeSourcesScreenProps) => {
       <View style={styles.screen}>
         <Text testID="tf05-status">{smoke.status}</Text>
         <SourcesMap
+          components={nativeSceneComponents}
           base={tf05Base}
           mapStyle={smoke.mapStyle}
           routeData={smoke.routeData}

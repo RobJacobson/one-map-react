@@ -12,11 +12,7 @@ Use the [worker policy](testing-policy.md#smoke-workers-and-models) for approved
 
 ## Agreed project direction
 
-one-map-react is a facade under implementation over RNMapbox, MapLibre React Native, and react-map-gl. Its shared API should follow react-map-gl where portable. The four adapter paths are web Mapbox, web MapLibre, native Mapbox, and native MapLibre; each native adapter covers iOS and Android.
-
-Reuse the existing wrappers initially. Publish one-map-react separately, with backend packages as optional peer dependencies installed and versioned by the application. Select the backend at application setup and isolate adapter imports so unused backends are not required by the common entry point.
-
-The agreed exports include `one-map-react`, four explicit adapter paths (`mapbox-web`, `maplibre-web`, `mapbox-native`, `maplibre-native`), and two platform-aware aliases (`mapbox`, `maplibre`). Mixed web/native engine choices must work through shared application map code.
+one-map-react adapts RNMapbox and MapLibre React Native to desktop call shapes. Applications choose the renderer through platform imports. Web applications use stock react-map-gl directly or through the two browser convenience exports. The root and `/legacy` retain native setup for migrating consumers. Keep renderer peers optional and imports isolated across engines. The [package guide](../packages/one-map-react/README.md) describes the current entries.
 
 The [requirements](requirements.md) define scope and ownership. The [stage plan](stage-plan.md) defines implementation order. For next-release API work, read the [migration contract](revised-api-proposal.md), [unit protocol](revised-api-implementation-plan.md), and [API coverage checklist](api-coverage.md). Acceptance is deferred under the [current handoff](revised-api-acceptance-plan.md#current-handoff); historical outcomes apply only to their tested inputs. Delegate to wrappers by default and preserve every retained API mapping or substantiated disposition.
 

@@ -1,4 +1,3 @@
-import type { MapRef } from "one-map-react";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import { cameraMatches, initialCamera, readCamera } from "../src/camera.js";
@@ -9,13 +8,14 @@ describe("shared example camera", () => {
     const getBearing = vi.fn().mockRejectedValue(new Error("unsupported"));
     const getPitch = vi.fn().mockRejectedValue(new Error("unsupported"));
     const map = {
-      getCenter: async () => [-122.3, 47.7],
+      getCenter: async () => ({ lng: -122.3, lat: 47.7 }),
       getZoom: async () => 13,
       getBearing,
       getPitch,
-    } as unknown as MapRef;
+      jumpTo: () => {},
+    };
     expect(
-      await readCamera(map, "mapbox-native", {
+      await readCamera(map, true, {
         ...initialCamera,
         bearing: 35,
         pitch: 40,
@@ -49,12 +49,15 @@ describe("shared example camera", () => {
 
   it("rejects invalid public camera readback", async () => {
     const map = {
-      getCenter: async () => [NaN, 47],
-      getZoom: async () => 11,
-    } as unknown as MapRef;
-    await expect(
-      readCamera(map, "mapbox-native", initialCamera)
-    ).rejects.toThrow("invalid camera");
+      getCenter: async () => ({ lng: NaN, lat: 47 }),
+      getZoom: () => 11,
+      getBearing: () => 0,
+      getPitch: () => 0,
+      jumpTo: () => {},
+    };
+    await expect(readCamera(map, true, initialCamera)).rejects.toThrow(
+      "invalid camera"
+    );
   });
 });
 

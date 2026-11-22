@@ -70,16 +70,16 @@ const evaluate = (directory, name, dependency) => {
   return exports;
 };
 for (const directory of ["src", "dist"]) {
-  test(`${directory}: native adapter import and absent token do not initialize either SDK; getters select stable adapters`, () => {
+  test(`${directory}: native map import and absent token do not initialize either SDK; getters select upstream bound maps`, async () => {
     const imports = [];
     const mapbox = {
-      adapter: {
+      Map: {
         backend: "mapbox-native",
       },
       setAccessToken: (token) => imports.push(`token:${token}`),
     };
     const maplibre = {
-      adapter: {
+      Map: {
         backend: "maplibre-native",
       },
     };
@@ -90,18 +90,18 @@ for (const directory of ["src", "dist"]) {
       throw new Error(`Unexpected native dependency: ${name}`);
     });
     expect(imports).toEqual([]);
-    module.configureMapbox("");
+    await module.configureMapbox("");
     expect(imports).toEqual([]);
-    expect(module.adapters.mapbox).toBe(mapbox.adapter);
-    expect(module.adapters.mapbox).toBe(mapbox.adapter);
+    expect(module.maps.mapbox).toBe(mapbox.Map);
+    expect(module.maps.mapbox).toBe(mapbox.Map);
     expect(
       imports.every((value) => value === "one-map-react/mapbox-native")
     ).toBe(true);
-    module.configureMapbox("pk.fixture");
+    await module.configureMapbox("pk.fixture");
     expect(imports).not.toContain("one-map-react/maplibre-native");
     expect(imports).toContain("token:pk.fixture");
-    expect(module.adapters.maplibre).toBe(maplibre.adapter);
-    expect(module.adapters.mapbox).toBe(mapbox.adapter);
+    expect(module.maps.maplibre).toBe(maplibre.Map);
+    expect(module.maps.mapbox).toBe(mapbox.Map);
   });
   test.each(["mapbox", "maplibre"])(
     `${directory}: native acceptance evaluates only selected %s scene and retires camera observation before switching`,
