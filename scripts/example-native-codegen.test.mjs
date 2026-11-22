@@ -13,18 +13,34 @@ const codegen = dirname(
 const { combineSchemasInFileList } = require(
   join(codegen, "lib/cli/combine/combine-js-to-schema.js")
 );
-const generator = require(
+const objcGenerator = require(
   join(codegen, "lib/generators/modules/GenerateModuleObjCpp/index.js")
+);
+const javaGenerator = require(
+  join(codegen, "lib/generators/modules/GenerateModuleJavaSpec.js")
 );
 const declarations = [];
 
 // Helper precedes eager generation so its const binding is initialized.
 /** Checks source, emitted and native references agree without changing the runtime module name. */
 const verifyMapboxNamespace = (root) => {
-  const { version } = JSON.parse(
+  const { codegenConfig } = JSON.parse(
     readFileSync(join(root, "package.json"), "utf8")
   );
-  if (version !== "10.3.8") return;
+  const androidSchema = combineSchemasInFileList(
+    [join(root, codegenConfig.jsSrcsDir)],
+    "android"
+  );
+  const java = javaGenerator.generate(
+    codegenConfig.name,
+    androidSchema,
+    codegenConfig.android.javaPackageName
+  );
+  const javaSpec = java.get(
+    "java/com/rnmapbox/rnmbx/NativeRNMBXMapViewModuleSpec.java"
+  );
+  assert.ok(javaSpec, "Android codegen did not emit the RNMapbox view module");
+  assert.match(javaSpec, /String NAME = "RNMBXMapViewModule"/);
 
   for (const file of [
     "src/specs/NativeRNMBXMapViewModule.ts",
@@ -89,7 +105,7 @@ for (const [peer, override] of [
     "ios"
   );
   const output = [
-    ...generator.generate(codegenConfig.name, schema).values(),
+    ...objcGenerator.generate(codegenConfig.name, schema).values(),
   ].join("\n");
   const symbols = new Set(
     [
@@ -114,5 +130,5 @@ verifyMapboxNamespace(
 );
 
 console.log(
-  "PASS dual native codegen: real pinned React Native generator emits no shared module classes or protocols."
+  "PASS native codegen: distinct iOS module classes and protocols, Android RNMapbox view module class and unchanged runtime name."
 );

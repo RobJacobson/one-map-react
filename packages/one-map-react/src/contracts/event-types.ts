@@ -38,10 +38,8 @@ export interface ClickEvent {
 /**
  * Failure reported by the map wrapper.
  *
- * Mapbox native copies the
- * error string when iOS `onMapLoadingError` includes one. Android's pinned
- * `@rnmapbox/maps` 10.3.7 does not deliver that callback. MapLibre native
- * omits `error` because that wrapper drops the message before JavaScript.
+ * Mapbox native copies the wrapper's error string when present. MapLibre
+ * native omits `error` because its wrapper drops the message before JavaScript.
  */
 export interface MapErrorEvent {
   /** Wrapper or renderer error, when the callback includes one. */

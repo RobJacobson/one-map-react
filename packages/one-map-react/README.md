@@ -12,8 +12,8 @@ For native development, install the candidate archive and the peers for one engi
 bun add /absolute/path/one-map-react-VERSION.tgz
 bun add react@19.2.3 react-dom@19.2.3 react-native@0.87.1 react-native-teleport@1.2.2
 # Choose one
-bun add @rnmapbox/maps@10.3.7
-bun add @maplibre/maplibre-react-native@11.5.0 @types/geojson@7946.0.16
+bun add --exact @rnmapbox/maps@10.3.19
+bun add --exact @maplibre/maplibre-react-native@11.5.1 @types/geojson@7946.0.16
 ```
 
 Apply the [version-specific native repair](#native-patches-and-linking) and rebuild the app. RNMapbox applications call the native entry's `setAccessToken` with their public token. Native live markers use react-native-teleport to keep interactive children in the React tree.
@@ -108,19 +108,18 @@ Use `await map.getWrapperMap()` when an operation needs the mounted native wrapp
 
 ## Native patches and linking
 
-Apply the repair for the exact installed native wrapper. Patches ship inside this package and belong in the application's dependency installation. The RNMapbox repairs preserve SDK feature-state errors, guard removeFeatureState against an absent or changed source family, and correct iOS light-color conversion. The MapLibre repair reports absent Fabric views as attachment errors; explicit native source operations retain dispatch error reporting. Rebuild the native application after updating these patches.
+Each release of one-map-react supports one exact version of each native wrapper. Pin the wrapper in your application's manifest and apply its matching patch from the installed one-map-react package. Applications that include both wrappers apply both patches. The RNMapbox patch keeps Android map events independent per view and separates generated module names when both wrappers are installed. The MapLibre patch releases cleared camera bounds and reports detached Fabric views to callers.
 
 | Wrapper | Included combined repair |
 | --- | --- |
-| RNMapbox 10.3.7 | `patches/rnmapbox-10.3.7-tf08.patch` |
-| RNMapbox 10.3.8 | `patches/rnmapbox-10.3.8.patch` |
-| MapLibre native 11.5.0 | `patches/maplibre-native-11.5.0-tf08.patch` |
+| RNMapbox 10.3.19 | `patches/rnmapbox-10.3.19.patch` |
+| MapLibre React Native 11.5.1 | `patches/maplibre-native-11.5.1.patch` |
 
-For RNMapbox 10.3.7, copy the installed package's repair into the application and register it with Bun:
+For RNMapbox, copy the repair from the installed package into the application and register it with Bun.
 
 ```sh
 mkdir -p patches
-cp node_modules/one-map-react/patches/rnmapbox-10.3.7-tf08.patch patches/rnmapbox.patch
+cp node_modules/one-map-react/patches/rnmapbox-10.3.19.patch patches/rnmapbox.patch
 ```
 
 Merge this field into the application `package.json`:
@@ -128,25 +127,23 @@ Merge this field into the application `package.json`:
 ```json
 {
   "patchedDependencies": {
-    "@rnmapbox/maps@10.3.7": "patches/rnmapbox.patch"
+    "@rnmapbox/maps@10.3.19": "patches/rnmapbox.patch"
   }
 }
 ```
 
-Run `bun install --force` to establish the patched lockfile, then verify a clean application install with `bun install --frozen-lockfile`. For another wrapper/version, change both the dependency key and copied repair. The combined RNMapbox repair includes the older per-view-event fix; apply one combined repair per version. Unknown later native wrapper versions need a patch audit before use.
+Run `bun install --force`, commit the copied patch and lockfile, and verify a clean install with `bun install --frozen-lockfile`. For MapLibre React Native, use its dependency key and patch from the table. Rebuild native applications after applying or updating a patch.
 
-The versioned repairs also release camera bounds when `maxBounds` is cleared. RNMapbox 10.3.7 requires an explicit unrestricted SDK bound on both platforms and forwarding of the cleared Fabric prop on iOS; 10.3.8 already supplies those resets. MapLibre 11.5.0 requires clearing the retained iOS delegate constraint and Android SDK target bounds. Rebuild native applications after applying these repairs.
-
-Native applications require `react-native-teleport` 1.2.2 or newer in the supported 1.x range. Version 1.2.2 includes the [Android transition/reparenting repair](https://github.com/kirillzyusko/react-native-teleport/commit/9cebbb23c645c31113cb913cb1f73465d4c8ca96) and React Native 0.87 support; rebuild after upgrading. Native autolinking must include the selected wrapper and `react-native-teleport`. Install the iOS dependencies (`cd ios && bundle exec pod install` in a standard React Native application), then rebuild the iOS and Android apps. A JavaScript reload cannot install patched native files. RNMapbox requires New Architecture and Mapbox v11. Pin the native Mapbox Maps SDK to exactly **11.23.1** on both platforms. The npm wrapper's 10.x version is separate from the deprecated native SDK v10. Set the iOS Podfile variable before native dependency discovery:
+Native applications require `react-native-teleport` 1.2.2 or newer in the supported 1.x range. Version 1.2.2 includes the [Android transition/reparenting repair](https://github.com/kirillzyusko/react-native-teleport/commit/9cebbb23c645c31113cb913cb1f73465d4c8ca96) and React Native 0.87 support; rebuild after upgrading. Native autolinking must include the selected wrapper and `react-native-teleport`. Install the iOS dependencies (`cd ios && bundle exec pod install` in a standard React Native application), then rebuild the iOS and Android apps. A JavaScript reload cannot install patched native files. RNMapbox requires New Architecture and Mapbox v11. Pin the native Mapbox Maps SDK to exactly **11.33.0** on both platforms. The npm wrapper's 10.x version is separate from the deprecated native SDK v10. Set the iOS Podfile variable before native dependency discovery:
 
 ```ruby
-$RNMapboxMapsVersion = '= 11.23.1'
+$RNMapboxMapsVersion = '= 11.33.0'
 ```
 
 Set Android's root `android/build.gradle` inside `buildscript { ext { ... } }`:
 
 ```groovy
-RNMapboxMapsVersion = '11.23.1'
+RNMapboxMapsVersion = '11.33.0'
 ```
 
 Record the resolved SDK version in each application lockfile/build. Follow the selected wrapper's native setup for any SDK overrides.
@@ -155,15 +152,15 @@ Record the resolved SDK version in each application lockfile/build. Follow the s
 
 Web map reuse delegates to react-map-gl. Native reuseMaps={true}, external `gl`, and `resize()` reject; reuseMaps={false} is accepted. Native imperative `stop()` and some getters lack a wrapper path; their errors remain explicit. Native viewState is a camera target applied through ordinary Camera props when its values change. With target A, user movement to B stays at B while A remains unchanged, including a fresh equal-valued target object. A changed target C requests C; jumpTo with A explicitly requests A again. Removing viewState releases the target. Native onMove and camera readouts use observed movement; SDK ornaments retain selected renderer behavior. Native location following and an explicit viewState remain mutually exclusive owners. Web viewState continues to delegate controlled behavior to react-map-gl. The strict controlledCamera capability stays unavailable. Renderer acceptance for the changed native behavior remains unverified.
 
-Native `fitBounds.maxZoom` remains owner-deferred and rejects every supplied value, including zero. MapLibre native terrain, globe projection, and elevation queries are unsupported by the pinned wrapper/SDK boundary. RNMapbox Android's opening camera retains its documented cold-style-cache behavior. MapLibre iOS applies `maxBounds` to user panning; imperative camera commands can bypass that constraint. Clearing bounds releases the panning limit.
+Native `fitBounds.maxZoom` remains owner-deferred and rejects every supplied value, including zero. MapLibre native terrain, globe projection, and elevation queries are unsupported by the pinned wrapper/SDK boundary. Cold-style-cache opening camera behavior on RNMapbox Android awaits verification on this wrapper version. MapLibre iOS applies `maxBounds` to user panning; imperative camera commands can bypass that constraint. Clearing bounds releases the panning limit.
 
 The owner excludes physical-device testing and RNMapbox `invalidateAmbientCache()` and `setMaximumAmbientCacheSize()` from release requirements. These operations are not certified as implemented. Full VoiceOver and TalkBack audits are outside the release certification; facade-owned interaction accessibility remains part of its checks. Representative integration does not certify every upstream expression operator, host property, hardware sensor, or build setting.
 
 The [requirements](https://github.com/RobJacobson/one-map-react/blob/main/docs/requirements.md), [stage plan](https://github.com/RobJacobson/one-map-react/blob/main/docs/stage-plan.md), and [testing policy](https://github.com/RobJacobson/one-map-react/blob/main/docs/testing-policy.md) describe release scope and evidence. The archive includes built output, this README, the manifest, the license, and native repairs.
 
-MapLibre Native 11.5.0 uses native SDK iOS6.31.0 and Android13.6.1. Its parser supports Mercator projection, without terrain, sky or global-state style roots. Explicit unsupported roots and silently ignored source/layer fields reject. Unsupported expression operators retain native parser errors; `format.vertical-align` and `number-format.unit` reject before dispatch. The selected style types also describe newer JS features, so their presence alone does not promise native rendering. Use legacy `Layer` style `rasterResampling` for native raster sampling and `iconAllowOverlap`/`textAllowOverlap` for basic symbol overlap. Complete URL styles remain wrapper-owned; their loading/errors use native callbacks.
+MapLibre React Native 11.5.1 selects MapLibre Native 6.31.0 on iOS and 13.6.1 on Android. Its parser supports Mercator projection, without terrain, sky or global-state style roots. Explicit unsupported roots and silently ignored source/layer fields reject. Unsupported expression operators retain native parser errors; `format.vertical-align` and `number-format.unit` reject before dispatch. The selected style types also describe newer JS features, so their presence alone does not promise native rendering. Use legacy `Layer` style `rasterResampling` for native raster sampling and `iconAllowOverlap`/`textAllowOverlap` for basic symbol overlap. Complete URL styles remain wrapper-owned; their loading/errors use native callbacks.
 
-RNMapbox 10.3.8 adds `LocationPuck.model`, structured `WrapperMapView.onMapLoadingError` payloads and optional edges in `WrapperCamera` stop padding; these selected signatures follow the installed peer. Common padding still fills omitted edges with zero. `localizeLabels` explicitly rejects on 10.3.7 with native SDK 11 and delegates on 10.3.8. `setLanguage`/`normalizeLanguageTag` also require 10.3.8 and reject clearly on 10.3.7.
+RNMapbox exposes `LocationPuck.model`, structured `WrapperMapView.onMapLoadingError` payloads, label localization, and `setLanguage` and `normalizeLanguageTag` through the selected entry. Its camera accepts partial edge padding. The shared camera fills omitted edges with zero.
 
 ## License
 

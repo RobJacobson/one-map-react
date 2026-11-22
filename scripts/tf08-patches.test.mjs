@@ -75,43 +75,48 @@ const verifyPeerPatch = (peerRoot, filename) => {
   }
 };
 
-const source = readFileSync(
-  resolve(rnRoot, "src/modules/snapshot/SnapshotOptions.ts"),
-  "utf8"
-);
-const compiled = transformSync(source, {
-  filename: "SnapshotOptions.ts",
-  configFile: resolve(root, "babel.config.cjs"),
-}).code;
-const exports = {};
-runInNewContext(compiled, {
-  exports,
-  require: (name) => {
-    if (name.startsWith("@babel/runtime/helpers/")) return requireHelper(name);
-    if (name === "react-native")
-      return {
-        NativeModules: {
-          RNMBXModule: { StyleURL: { Street: "fixture://style" } },
-        },
-      };
-    if (name.endsWith("geoUtils"))
-      return {
-        makePoint: (coordinates) => ({ type: "Point", coordinates }),
-        makeFeatureCollection: (features) => ({
-          type: "FeatureCollection",
-          features,
-        }),
-      };
-    if (name.endsWith("utils")) return { toJSONString: JSON.stringify };
-    throw new Error(`Unexpected snapshot dependency: ${name}`);
-  },
-});
-const zero = new exports.default({ centerCoordinate: [0, 0], zoomLevel: 0 });
-assert.equal(zero.toJSON().zoomLevel, 0);
-assert.equal(
-  new exports.default({ centerCoordinate: [0, 0] }).toJSON().zoomLevel,
-  16
-);
+for (const file of [
+  "src/modules/snapshot/SnapshotOptions.ts",
+  "lib/module/modules/snapshot/SnapshotOptions.js",
+]) {
+  const filename = resolve(rnRoot, file);
+  const compiled = transformSync(readFileSync(filename, "utf8"), {
+    filename,
+    configFile: resolve(root, "babel.config.cjs"),
+  }).code;
+  const exports = {};
+  runInNewContext(compiled, {
+    exports,
+    require: (name) => {
+      if (name.startsWith("@babel/runtime/helpers/"))
+        return requireHelper(name);
+      if (name === "react-native")
+        return {
+          NativeModules: {
+            RNMBXModule: { StyleURL: { Street: "fixture://style" } },
+          },
+        };
+      if (/geoUtils(?:\.js)?$/.test(name))
+        return {
+          makePoint: (coordinates) => ({ type: "Point", coordinates }),
+          makeFeatureCollection: (features) => ({
+            type: "FeatureCollection",
+            features,
+          }),
+        };
+      if (/utils(?:\/index\.js)?$/.test(name))
+        return { toJSONString: JSON.stringify };
+      throw new Error(`Unexpected snapshot dependency: ${name}`);
+    },
+  });
+  const defaults = { centerCoordinate: [0, 0] };
+  assert.equal(
+    new exports.default({ ...defaults, zoomLevel: 0 }).toJSON().zoomLevel,
+    0,
+    file
+  );
+  assert.equal(new exports.default(defaults).toJSON().zoomLevel, 16, file);
+}
 
 const android = readFileSync(
   resolve(
@@ -305,7 +310,7 @@ for (const [peerRoot, file, boundary] of [
   [
     rnRoot,
     "ios/RNMBX/RNMBXImages.swift",
-    /attachment = UUID\(\)[\s\S]*map\.images\.removeAll[\s\S]*style\.removeImage/,
+    /attachment = UUID\(\)[\s\S]*map\.images\.removeAll[\s\S]*removeImages\(style:[\s\S]*loadedImages\.removeAll\(\)/,
   ],
   [
     rnRoot,
@@ -346,22 +351,18 @@ for (const [peerRoot, file, boundary] of [
   assert.match(readFileSync(join(peerRoot, file), "utf8"), boundary, file);
 }
 
-const rnVersion = JSON.parse(
-  readFileSync(join(rnRoot, "package.json"), "utf8")
-).version;
-assert(
-  ["10.3.7", "10.3.8"].includes(rnVersion),
-  "Unknown RNMapbox patch version."
-);
-verifyPeerPatch(
-  rnRoot,
-  rnVersion === "10.3.8"
-    ? "rnmapbox-10.3.8.patch"
-    : "rnmapbox-10.3.7-tf08.patch"
-);
-verifyPeerPatch(mlRoot, "maplibre-native-11.5.0-tf08.patch");
+for (const [peerRoot, name, version] of [
+  [rnRoot, "rnmapbox", "10.3.19"],
+  [mlRoot, "maplibre-native", "11.5.1"],
+]) {
+  const installed = JSON.parse(
+    readFileSync(join(peerRoot, "package.json"), "utf8")
+  );
+  assert.equal(installed.version, version, name);
+  verifyPeerPatch(peerRoot, `${name}-${version}.patch`);
+}
 console.log(
-  "PASS TF08 peer patches: clean application round trips, RNMapbox zero-zoom constructor execution, and native source assertions for image cleanup/scale and offline download ownership."
+  "PASS TF08 peer patches: clean application round trips, RNMapbox zero-zoom constructor execution from source and compiled JavaScript, and native source assertions for image cleanup/scale and offline download ownership."
 );
 console.log(
   "SCOPE: mocked JavaScript execution and native source checks only; no native compilation, SDK rendering, or device/service acceptance."

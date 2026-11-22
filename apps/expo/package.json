@@ -5,9 +5,9 @@
   "dependencies": {
     "@expo/metro-runtime": "57.0.17",
     "@expo/ui": "57.0.25",
-    "@maplibre/maplibre-react-native": "11.5.0",
+    "@maplibre/maplibre-react-native": "11.5.1",
     "@one-map/example-map": "workspace:*",
-    "@rnmapbox/maps": "10.3.8",
+    "@rnmapbox/maps": "10.3.19",
     "expo": "57.0.23",
     "expo-build-properties": "57.0.22",
     "expo-dev-client": "57.0.20",

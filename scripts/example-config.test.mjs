@@ -66,7 +66,7 @@ assert(config.ios.infoPlist.NSLocationWhenInUseUsageDescription);
 assert(config.android.permissions.includes("ACCESS_FINE_LOCATION"));
 assert(config.android.permissions.includes("ACCESS_COARSE_LOCATION"));
 assert(config.android.permissions.includes("ACCESS_LOCAL_NETWORK"));
-assert.equal(config.plugins[1][1].RNMapboxMapsVersion, "11.23.1");
+assert.equal(config.plugins[1][1].RNMapboxMapsVersion, "11.33.0");
 assert.equal(config.plugins[2][1].ios.nativeVersion, "6.31.0");
 assert.equal(config.plugins[2][1].android.nativeVersion, "13.6.1");
 console.log(

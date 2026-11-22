@@ -136,16 +136,15 @@ const main = async () => {
       archive = join(output, archives[0]);
     }
     const files = run("tar", ["-tzf", archive], output).split("\n");
-    const rnmapboxPatch = "package/patches/rnmapbox-10.3.7-tf08.patch";
+    const rnmapboxPatch = "package/patches/rnmapbox-10.3.19.patch";
     assert.deepEqual(
       files.filter((file) => !file.startsWith("package/dist/")).sort(),
       [
         "package/LICENSE",
         "package/README.md",
         "package/package.json",
-        "package/patches/maplibre-native-11.5.0-tf08.patch",
+        "package/patches/maplibre-native-11.5.1.patch",
         rnmapboxPatch,
-        "package/patches/rnmapbox-10.3.8.patch",
       ]
     );
     assert(files.includes("package/dist/index.d.ts"));

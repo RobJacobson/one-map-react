@@ -78,8 +78,8 @@
     "react-map-gl": "^8.1.3",
     "mapbox-gl": "^3.32.0",
     "maplibre-gl": "^6.13.0",
-    "@rnmapbox/maps": "^10.3.7",
-    "@maplibre/maplibre-react-native": "^11.5.0",
+    "@rnmapbox/maps": "10.3.19",
+    "@maplibre/maplibre-react-native": "11.5.1",
     "react-native-teleport": "^1.2.2"
   },
   "peerDependenciesMeta": {

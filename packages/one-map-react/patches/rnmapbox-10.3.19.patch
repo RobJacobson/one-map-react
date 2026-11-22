@@ -27,6 +27,152 @@ index e51687f..e3d2b95 100644
      }
  
      companion object {
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt
+index 5dbbfcf..f363c3e 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt
+@@ -70,6 +70,8 @@ class RNMBXImages(context: Context, private val mManager: RNMBXImagesManager) :
+     private var mNativeImages = mutableMapOf<String, NativeImage>()
+     private var mSendMissingImageEvents = false
+     private var mMap: MapboxMap? = null
++    private var registeredStyle: Style? = null
++    private var attachment = 0L
+ 
+     fun setImages(images: List<Map.Entry<String, ImageEntry>>) {
+         val newImages: MutableMap<String, ImageEntry> = HashMap()
+@@ -105,7 +107,12 @@ class RNMBXImages(context: Context, private val mManager: RNMBXImagesManager) :
+     }
+ 
+     override fun removeFromMap(mapView: RNMBXMapView, reason: RemovalReason): Boolean {
+-        removeImages(mapView)
++        attachment++
++        mMap?.getStyle()?.takeIf { it === registeredStyle }?.let { style ->
++            for (name in mCurrentImages.filterNotNull()) style.removeStyleImage(name)
++        }
++        registeredStyle = null
++        mCurrentImages.clear()
+         mMap = null
+         if (reason == RemovalReason.ON_DESTROY) {
+             mNativeImages = mutableMapOf()
+@@ -115,31 +122,6 @@ class RNMBXImages(context: Context, private val mManager: RNMBXImagesManager) :
+         return super.removeFromMap(mapView, reason)
+     }
+ 
+-    private fun removeImages(mapView: RNMBXMapView) {
+-        mapView.getStyle(object : Style.OnStyleLoaded {
+-            override fun onStyleLoaded(style: Style) {
+-                if (hasImages()) {
+-                    for ((key) in mImages!!) {
+-                        style.removeStyleImage(key)
+-                    }
+-                }
+-                if (hasNativeImages()) {
+-                    for ((key) in mNativeImages!!) {
+-                        style.removeStyleImage(key!!)
+-                    }
+-                }
+-            }
+-        })
+-    }
+-
+-    private fun hasImages(): Boolean {
+-        return mImages != null && mImages!!.size > 0
+-    }
+-
+-    private fun hasNativeImages(): Boolean {
+-        return mNativeImages != null && mNativeImages!!.size > 0
+-    }
+-
+     fun addMissingImageToStyle(id: String, map: MapboxMap): Boolean {
+         val nativeImage = mNativeImages.get(id)
+         if (nativeImage != null) {
+@@ -183,6 +165,7 @@ class RNMBXImages(context: Context, private val mManager: RNMBXImagesManager) :
+ 
+     override fun addToMap(mapView: RNMBXMapView) {
+         super.addToMap(mapView)
++        val currentAttachment = ++attachment
+ 
+         mImageViews.forEach {
+             it.addToMap(mapView)
+@@ -192,6 +175,8 @@ class RNMBXImages(context: Context, private val mManager: RNMBXImagesManager) :
+         // before we add the ShapeSource to the map
+         mapView.getStyle(object : Style.OnStyleLoaded {
+             override fun onStyleLoaded(style: Style) {
++                if (attachment != currentAttachment) return
++                registeredStyle = style
+                 val map = mapView.getMapboxMap()
+                 mMap = map
+                 addNativeImagesToStyle(mNativeImages, map)
+@@ -266,7 +251,10 @@ class RNMBXImages(context: Context, private val mManager: RNMBXImagesManager) :
+             missingImages.add(imageEntry)
+         }
+         if (missingImages.size > 0) {
+-            val task = DownloadMapImageTask(context, map, mMapView!!.imageManager)
++            val currentAttachment = attachment
++            val task = DownloadMapImageTask(context, map, mMapView!!.imageManager, isCurrent = {
++                attachment == currentAttachment && mMap === map && map.getStyle() === style
++            })
+             val params = missingImages.toTypedArray()
+             task.execute(params)
+         }
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
+index f9d6940..0c58956 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/NativeMapViewModule.kt
+@@ -7,7 +7,7 @@ import com.facebook.react.bridge.ReadableMap
+ import com.facebook.react.bridge.WritableMap
+ import com.facebook.react.bridge.WritableNativeMap
+ import com.mapbox.bindgen.Value
+-import com.rnmapbox.rnmbx.NativeMapViewModuleSpec
++import com.rnmapbox.rnmbx.NativeRNMBXMapViewModuleSpec
+ import com.rnmapbox.rnmbx.utils.ConvertUtils
+ import com.rnmapbox.rnmbx.utils.ExpressionParser
+ import com.rnmapbox.rnmbx.utils.ViewRefTag
+@@ -17,7 +17,7 @@ import com.rnmapbox.rnmbx.utils.extensions.toScreenBox
+ import com.rnmapbox.rnmbx.utils.extensions.toScreenCoordinate
+ import com.rnmapbox.rnmbx.utils.extensions.toValueHashMap
+ 
+-class NativeMapViewModule(context: ReactApplicationContext, val viewTagResolver: ViewTagResolver) : NativeMapViewModuleSpec(context) {
++class NativeMapViewModule(context: ReactApplicationContext, val viewTagResolver: ViewTagResolver) : NativeRNMBXMapViewModuleSpec(context) {
+     private fun withMapViewOnUIThread(
+         viewRef: ViewRefTag?,
+         reject: Promise,
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+index 07bbfd5..cef0d62 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
+@@ -29,6 +29,8 @@ import com.mapbox.maps.extension.style.expressions.generated.Expression
+ import com.mapbox.maps.extension.style.layers.Layer
+ import com.mapbox.maps.extension.style.layers.generated.*
+ import com.mapbox.maps.extension.style.layers.getLayer
++import com.mapbox.maps.extension.style.sources.getSource
++import com.mapbox.maps.extension.style.sources.generated.VectorSource
+ import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
+ import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
+ import com.mapbox.maps.extension.style.projection.generated.Projection
+@@ -1370,7 +1372,7 @@ open class RNMBXMapView(private val mContext: Context, var mManager: RNMBXMapVie
+                 it.putDouble("data", result)
+             }
+         } else {
+-            response.error("no elevation data")
++            response.success { it.putNull("data") }
+         }
+     }
+ 
+@@ -1448,6 +1450,13 @@ open class RNMBXMapView(private val mContext: Context, var mManager: RNMBXMapVie
+       sourceLayerId: String?,
+       response: CommandResponse
+     ) {
++        // A JS source ref can precede native replacement of the previous family.
++        val source = mMap.getStyle()?.getSource(sourceId)
++        if (source == null || (sourceLayerId != null && source !is VectorSource)) {
++            response.error("source_not_attached")
++            return
++        }
++
+         mMap.removeFeatureStateCompat(
+             sourceId,
+             sourceLayerId,
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
 index 7b6de8a..e234791 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
@@ -56,10 +202,10 @@ index f8b6edb..9b815d3 100644
  
      @ReactProp(name = "reactStyle")
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
-index b236fdf..ccdf6b9 100644
+index 17f3f62..ef13333 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
 +++ b/android/src/main/java/com/rnmapbox/rnmbx/modules/RNMBXModule.kt
-@@ -155,6 +155,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon
+@@ -181,6 +181,13 @@ class RNMBXModule(private val mReactContext: ReactApplicationContext) : ReactCon
          }
      }
  
@@ -308,6 +454,59 @@ index 771884c..cf96ca3 100644
          )
          builder.accessToken(getAccessToken(mContext))
          return builder.build()
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt b/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
+index aefaf6f..7d43770 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
+@@ -24,7 +24,13 @@ import kotlinx.coroutines.flow.*
+ 
+ data class DownloadedImage(val name: String, val bitmap: Bitmap, val info: ImageInfo)
+ 
+-class DownloadMapImageTask(context: Context, map: MapboxMap, imageManager: ImageManager?, callback: OnAllImagesLoaded? = null) {
++class DownloadMapImageTask(
++    context: Context,
++    map: MapboxMap,
++    imageManager: ImageManager?,
++    callback: OnAllImagesLoaded? = null,
++    private val isCurrent: () -> Boolean = { true }
++) {
+     private val mMap: WeakReference<MapboxMap> = WeakReference(map)
+     private val mCallback: OnAllImagesLoaded? = callback
+     private val mImageManager: WeakReference<ImageManager> = WeakReference(imageManager)
+@@ -82,6 +88,7 @@ class DownloadMapImageTask(context: Context, map: MapboxMap, imageManager: Image
+                     bitmap.density = DisplayMetrics.DENSITY_DEFAULT
+ 
+                     CoroutineScope(Dispatchers.Main).launch {
++                        if (!isCurrent()) return@launch
+                         val style = mMap.get()?.getStyle()
+                         if (style != null) {
+                             mImageManager.get()?.resolve(key, bitmap)
+diff --git a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
+index e69ab60..248be77 100644
+--- a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
++++ b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
+@@ -19,8 +19,8 @@ fun MapboxMap.setFeatureStateCompat(
+     state: Value,
+     callback: (Expected<String, None>) -> Unit
+ ) {
+-    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { _ ->
+-        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())
++    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { expected ->
++        callback(expected)
+     }
+ }
+ 
+@@ -31,8 +31,8 @@ fun MapboxMap.removeFeatureStateCompat(
+     stateKey: String?,
+     callback: (Expected<String, None>) -> Unit
+ ) {
+-    this.removeFeatureState(sourceId, sourceLayerId, featureId, stateKey) { _ ->
+-        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())
++    this.removeFeatureState(sourceId, sourceLayerId, featureId, stateKey) { expected ->
++        callback(expected)
+     }
+ }
+ 
 diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.m b/ios/RNMBX/Offline/RNMBXOfflineModule.m
 index 1808393..95b1081 100644
 --- a/ios/RNMBX/Offline/RNMBXOfflineModule.m
@@ -632,8 +831,85 @@ index 79187f4..34bd0c8 100644
    }
  
    func remove(headingObserver: HeadingObserver) {
+diff --git a/ios/RNMBX/RNMBXImages.swift b/ios/RNMBX/RNMBXImages.swift
+index edbac8d..1983b40 100644
+--- a/ios/RNMBX/RNMBXImages.swift
++++ b/ios/RNMBX/RNMBXImages.swift
+@@ -29,6 +29,7 @@ open class RNMBXImages : UIView, RNMBXMapComponent {
+   }
+     
+   var loadedImages : Set<String> = []
++  private var attachment = UUID()
+   
+   var imageViews: [RNMBXImage] = []
+ 
+@@ -81,6 +82,7 @@ open class RNMBXImages : UIView, RNMBXMapComponent {
+   }
+ 
+   public func addToMap(_ map: RNMBXMapView, style: Style) {
++    attachment = UUID()
+     self.style = style
+     imageManager = map.imageManager
+     map.images.append(self)
+@@ -91,12 +93,14 @@ open class RNMBXImages : UIView, RNMBXMapComponent {
+   }
+   
+   public func removeFromMap(_ map: RNMBXMapView, reason: RemovalReason) -> Bool {
++    attachment = UUID()
+     map.images.removeAll { $0 === self }
+     if reason == .ViewRemoval, let style = style {
+       removeImages(style: style, names: Array(images.keys) + nativeImageInfos.map { $0.name } + imageViews.map { $0.name })
+     }
+     self.style = nil
+     imageManager = nil
++    loadedImages.removeAll()
+     return true
+   }
+ 
+@@ -156,9 +160,12 @@ open class RNMBXImages : UIView, RNMBXMapComponent {
+         Logger.log(level: .error, message: "RNMBXImages: bridge is nil, cannot fetch images. Use nativeAssetImages instead.")
+         return
+       }
+-      RNMBXUtils.fetchImages(bridge, style: style, objects: missingImages, forceUpdate: true) { name, image in
+-        self.loadedImages.insert(name)
+-        self.imageManager?.resolve(name: name, image: image)
++      let attachment = self.attachment
++      RNMBXUtils.fetchImages(bridge, style: style, objects: missingImages, forceUpdate: true, isCurrent: { [weak self] in
++        self?.attachment == attachment
++      }) { [weak self] name, image in
++        self?.loadedImages.insert(name)
++        self?.imageManager?.resolve(name: name, image: image)
+       }
+     }
+   }
+diff --git a/ios/RNMBX/RNMBXMapViewModule.h b/ios/RNMBX/RNMBXMapViewModule.h
+index a826c22..7ce5802 100644
+--- a/ios/RNMBX/RNMBXMapViewModule.h
++++ b/ios/RNMBX/RNMBXMapViewModule.h
+@@ -5,7 +5,7 @@
+ #ifdef __cplusplus
+ #import "rnmapbox_maps_specs.h"
+ 
+-@interface RNMBXMapViewModule : NSObject <NativeMapViewModuleSpec, RNMBXViewResolverDelegate>
++@interface RNMBXMapViewModule : NSObject <NativeRNMBXMapViewModuleSpec, RNMBXViewResolverDelegate>
+ @end
+ 
+ #else
+diff --git a/ios/RNMBX/RNMBXMapViewModule.mm b/ios/RNMBX/RNMBXMapViewModule.mm
+index 5c5af08..5c5b016 100644
+--- a/ios/RNMBX/RNMBXMapViewModule.mm
++++ b/ios/RNMBX/RNMBXMapViewModule.mm
+@@ -158,7 +158,7 @@ RCT_EXPORT_METHOD(querySourceFeatures:(nonnull NSNumber*)viewRef sourceId:(NSStr
+ - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+     (const facebook::react::ObjCTurboModule::InitParams &)params
+ {
+-    return std::make_shared<facebook::react::NativeMapViewModuleSpecJSI>(params);
++    return std::make_shared<facebook::react::NativeRNMBXMapViewModuleSpecJSI>(params);
+ }
+ 
+ @end
 diff --git a/ios/RNMBX/RNMBXModule.m b/ios/RNMBX/RNMBXModule.m
-index 493e3fa..4f8fb3e 100644
+index 61978cd..737f3cd 100644
 --- a/ios/RNMBX/RNMBXModule.m
 +++ b/ios/RNMBX/RNMBXModule.m
 @@ -2,6 +2,8 @@
@@ -646,7 +922,7 @@ index 493e3fa..4f8fb3e 100644
  
  RCT_EXTERN_METHOD(addCustomHeader:(NSString *)headerName forHeaderValue:(NSString *) headerValue)
 diff --git a/ios/RNMBX/RNMBXModule.swift b/ios/RNMBX/RNMBXModule.swift
-index 6d6b169..88631b2 100644
+index 25f3eff..73cea9c 100644
 --- a/ios/RNMBX/RNMBXModule.swift
 +++ b/ios/RNMBX/RNMBXModule.swift
 @@ -56,7 +56,8 @@ class RNMBXModule : NSObject {
@@ -689,11 +965,41 @@ index e3cfdc5..5030e1b 100644
      let terrain = self.makeTerrain()
      self.terrain = terrain
      addStylesAndUpdate()
+diff --git a/ios/RNMBX/RNMBXUtils.swift b/ios/RNMBX/RNMBXUtils.swift
+index 8d5f4ed..434caad 100644
+--- a/ios/RNMBX/RNMBXUtils.swift
++++ b/ios/RNMBX/RNMBXUtils.swift
+@@ -8,7 +8,7 @@ class RNMBXUtils {
+     RNMBXImageQueue.sharedInstance.addImage(url, scale: scale, bridge: bridge, handler: callback)
+   }
+   
+-  static func fetchImages(_ bridge: RCTBridge, style: Style, objects: [String:Any], forceUpdate: Bool, loaded: @escaping (String, UIImage) -> Void) {
++  static func fetchImages(_ bridge: RCTBridge, style: Style, objects: [String:Any], forceUpdate: Bool, isCurrent: @escaping () -> Bool, loaded: @escaping (String, UIImage) -> Void) {
+     guard !objects.isEmpty else {
+       return
+     }
+@@ -48,6 +48,7 @@ class RNMBXUtils {
+             }
+             else {
+               DispatchQueue.main.async {
++                guard isCurrent() else { return }
+                 if let image = image {
+                   logged("RNMBXUtils.fetchImage-\(imageName)") {
+                     try style.addImage(image, id: imageName, sdf:sdf, stretchX: stretchX, stretchY: stretchY, content: content)
 diff --git a/lib/module/components/MapView.js b/lib/module/components/MapView.js
-index 667e5f9..3e99a81 100644
+index 04d9638..0101aab 100644
 --- a/lib/module/components/MapView.js
 +++ b/lib/module/components/MapView.js
-@@ -343,7 +343,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo
+@@ -4,7 +4,7 @@ import React from 'react';
+ import { View, StyleSheet, NativeModules } from 'react-native';
+ import debounce from 'debounce';
+ import NativeMapView from '../specs/RNMBXMapViewNativeComponent';
+-import NativeMapViewModule from "../specs/NativeMapViewModule.js";
++import NativeMapViewModule from "../specs/NativeRNMBXMapViewModule.js";
+ import { isFunction, isAndroid } from "../utils/index.js";
+ import { getFilter } from "../utils/filterUtils.js";
+ import Logger from "../utils/Logger.js";
+@@ -350,7 +350,7 @@ class MapView extends NativeBridgeComponent(React.PureComponent, NativeMapViewMo
     */
    async queryTerrainElevation(coordinate) {
      const res = await this._runNative('queryTerrainElevation', [coordinate]);
@@ -767,8 +1073,19 @@ index ea91cd6..b6fd036 100644
      this.width = options.width || 50.0;
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
+diff --git a/lib/module/specs/NativeMapViewModule.js.map b/lib/module/specs/NativeMapViewModule.js.map
+index 3113c50..c8b3392 100644
+--- a/lib/module/specs/NativeMapViewModule.js.map
++++ b/lib/module/specs/NativeMapViewModule.js.map
+@@ -1 +1 @@
+-{"version":3,"names":["TurboModuleRegistry","getEnforcing"],"sourceRoot":"../../../src","sources":["specs/NativeMapViewModule.ts"],"mappings":";;AACA;;AAEA,SAASA,mBAAmB,QAAQ,cAAc;AA4ElD,eAAeA,mBAAmB,CAACC,YAAY,CAAO,oBAAoB,CAAC","ignoreList":[]}
++{"version":3,"names":["TurboModuleRegistry","getEnforcing"],"sourceRoot":"../../../src","sources":["specs/NativeRNMBXMapViewModule.ts"],"mappings":";;AACA;;AAEA,SAASA,mBAAmB,QAAQ,cAAc;AA4ElD,eAAeA,mBAAmB,CAACC,YAAY,CAAO,oBAAoB,CAAC","ignoreList":[]}
+diff --git a/lib/module/specs/NativeMapViewModule.js b/lib/module/specs/NativeRNMBXMapViewModule.js
+similarity index 100%
+rename from lib/module/specs/NativeMapViewModule.js
+rename to lib/module/specs/NativeRNMBXMapViewModule.js
 diff --git a/lib/typescript/src/Mapbox.native.d.ts b/lib/typescript/src/Mapbox.native.d.ts
-index 3b8ac93..e252609 100644
+index 504e37c..64a7d1d 100644
 --- a/lib/typescript/src/Mapbox.native.d.ts
 +++ b/lib/typescript/src/Mapbox.native.d.ts
 @@ -1,4 +1,4 @@
@@ -777,52 +1094,11 @@ index 3b8ac93..e252609 100644
  export { Camera, UserTrackingMode, type CameraPadding, type CameraAnimationMode, type CameraBounds, type CameraStop, } from './components/Camera';
  export { Atmosphere } from './components/Atmosphere';
  export { Snow } from './components/Snow';
-diff --git a/lib/typescript/src/RNMBXModule.d.ts b/lib/typescript/src/RNMBXModule.d.ts
-index c2aa2d1..fb14153 100644
---- a/lib/typescript/src/RNMBXModule.d.ts
-+++ b/lib/typescript/src/RNMBXModule.d.ts
-@@ -14,19 +14,30 @@ export declare const StyleURL: {
-     Dark: URL;
-     Satellite: URL;
-     SatelliteStreet: URL;
--}, OfflinePackDownloadState: {
-+};
-+export declare const OfflinePackDownloadState: {
-     Inactive: string;
-     Active: string;
-     Complete: string;
-     Unknown?: string;
--}, LineJoin: {
-+};
-+export declare const LineJoin: {
-     Bevel: string | number;
-     Round: string | number;
-     Miter: string | number;
--}, StyleSource: {
-+};
-+export declare const StyleSource: {
-     DefaultSourceID: string;
--}, TileServers: {
-+};
-+export declare const TileServers: {
-     Mapbox: string;
--}, removeCustomHeader: (headerName: string) => void, setAccessToken: (accessToken: string | null) => Promise<string | null>, setWellKnownTileServer: (tileServer: string) => void, clearData: () => Promise<void>, getAccessToken: () => Promise<string>, setTelemetryEnabled: (telemetryEnabled: boolean) => void, setConnected: (connected: boolean) => void;
-+};
-+export declare const removeCustomHeader: (headerName: string) => void;
-+export declare const setAccessToken: (accessToken: string | null) => Promise<string | null>;
-+export declare const setWellKnownTileServer: (tileServer: string) => void;
-+export declare const clearData: () => Promise<void>;
-+export declare const getAccessToken: () => Promise<string>;
-+export declare const setTelemetryEnabled: (telemetryEnabled: boolean) => void;
-+export declare const setConnected: (connected: boolean) => void;
- export { addCustomHeader };
- //# sourceMappingURL=RNMBXModule.d.ts.map
-\ No newline at end of file
 diff --git a/lib/typescript/src/components/MapView.d.ts b/lib/typescript/src/components/MapView.d.ts
-index d003868..11ce79f 100644
+index c754299..e23e4cc 100644
 --- a/lib/typescript/src/components/MapView.d.ts
 +++ b/lib/typescript/src/components/MapView.d.ts
-@@ -547,7 +547,7 @@ declare class MapView extends MapView_base {
+@@ -633,7 +633,7 @@ declare class MapView extends MapView_base {
       * @param {Position} coordinate - The geographic coordinates `[longitude, latitude]` at which to query elevation.
       * @return {number} Elevation in meters relative to mean sea-level.
       */
@@ -856,11 +1132,33 @@ index fd0c239..cccc144 100644
       * @example
       * await Mapbox.offlineManager.clearAmbientCache();
       *
+diff --git a/lib/typescript/src/specs/NativeMapViewModule.d.ts.map b/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
+index 467ed1a..420a64e 100644
+--- a/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
++++ b/lib/typescript/src/specs/NativeMapViewModule.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"NativeMapViewModule.d.ts","sourceRoot":"","sources":["../../../../src/specs/NativeMapViewModule.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"NativeRNMBXMapViewModule.d.ts","sourceRoot":"","sources":["../../../../src/specs/NativeRNMBXMapViewModule.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/lib/typescript/src/specs/NativeMapViewModule.d.ts b/lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts
+similarity index 100%
+rename from lib/typescript/src/specs/NativeMapViewModule.d.ts
+rename to lib/typescript/src/specs/NativeRNMBXMapViewModule.d.ts
 diff --git a/src/components/MapView.tsx b/src/components/MapView.tsx
-index 44ff5cc..96e4879 100644
+index 995a5fe..285728c 100644
 --- a/src/components/MapView.tsx
 +++ b/src/components/MapView.tsx
-@@ -916,12 +916,12 @@ class MapView extends NativeBridgeComponent(
+@@ -14,7 +14,7 @@ import debounce from 'debounce';
+ import NativeMapView, {
+   type NativeMapViewActual,
+ } from '../specs/RNMBXMapViewNativeComponent';
+-import NativeMapViewModule from '../specs/NativeMapViewModule';
++import NativeMapViewModule from '../specs/NativeRNMBXMapViewModule';
+ import {
+   isFunction,
+   isAndroid,
+@@ -1017,12 +1017,12 @@ class MapView extends NativeBridgeComponent(
     * @param {Position} coordinate - The geographic coordinates `[longitude, latitude]` at which to query elevation.
     * @return {number} Elevation in meters relative to mean sea-level.
     */
@@ -941,302 +1239,7 @@ index 766dbd8..b9791a0 100644
      this.width = options.width || 50.0;
      this.height = options.height || 50.0;
      this.writeToDisk = options.writeToDisk || false;
-diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt
---- a/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt
-+++ b/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt
-@@ -184,7 +184,7 @@
-         val map = mapView.getMapboxMap()
-         val currentBounds = map.getBounds()
-         val builder = CameraBoundsOptions.Builder()
--        builder.bounds(mMaxBounds?.toBounds())
-+        builder.bounds(mMaxBounds?.toBounds() ?: CoordinateBounds.world()) // Passing null retains the SDK constraint.
-         builder.minZoom(mMinZoomLevel ?: 0.0) // Passing null does not reset this value.
-         builder.maxZoom(mMaxZoomLevel ?: 25.0) // Passing null does not reset this value.
-         builder.minPitch(currentBounds.minPitch)
-diff --git a/ios/RNMBX/RNMBXCamera.swift b/ios/RNMBX/RNMBXCamera.swift
---- a/ios/RNMBX/RNMBXCamera.swift
-+++ b/ios/RNMBX/RNMBXCamera.swift
-@@ -346,7 +346,12 @@
-           options.bounds = try self._toCoordinateBounds(maxBounds)
-         }
-       } else {
--        options.bounds = nil
-+        // Passing nil retains the SDK constraint; restore its unrestricted default.
-+        options.bounds = CoordinateBounds(
-+          southwest: CLLocationCoordinate2D(latitude: -90, longitude: -180),
-+          northeast: CLLocationCoordinate2D(latitude: 90, longitude: 180),
-+          infiniteBounds: true
-+        )
-       }
-       options.minZoom = self.minZoomLevel?.CGFloat
-       options.maxZoom = self.maxZoomLevel?.CGFloat
-diff --git a/ios/RNMBX/RNMBXCameraComponentView.mm b/ios/RNMBX/RNMBXCameraComponentView.mm
---- a/ios/RNMBX/RNMBXCameraComponentView.mm
-+++ b/ios/RNMBX/RNMBXCameraComponentView.mm
-@@ -77,7 +77,7 @@
-     const auto &oldViewProps = static_cast<const RNMBXCameraProps &>(*oldProps);
-     const auto &newViewProps = static_cast<const RNMBXCameraProps &>(*props);
-     id maxBounds = RNMBXConvertFollyDynamicToId(newViewProps.maxBounds);
--    if (maxBounds != nil) {
-+    if (!oldProps.get() || oldViewProps.maxBounds != newViewProps.maxBounds) {
-         _view.maxBounds = maxBounds;
-     }
-     id animationDuration = RNMBXConvertFollyDynamicToId(newViewProps.animationDuration);
-diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
---- a/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
-+++ b/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapView.kt
-@@ -24,6 +24,8 @@
- import com.mapbox.maps.extension.style.layers.Layer
- import com.mapbox.maps.extension.style.layers.generated.*
- import com.mapbox.maps.extension.style.layers.getLayer
-+import com.mapbox.maps.extension.style.sources.getSource
-+import com.mapbox.maps.extension.style.sources.generated.VectorSource
- import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
- import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
- import com.mapbox.maps.extension.style.projection.generated.Projection
-@@ -1113,7 +1115,7 @@
-                 it.putDouble("data", result)
-             }
-         } else {
--            response.error("no elevation data")
-+            response.success { it.putNull("data") }
-         }
-     }
- 
-@@ -1177,6 +1179,13 @@
-       sourceLayerId: String?,
-       response: CommandResponse
-     ) {
-+        // A JS source ref can precede native replacement of the previous family.
-+        val source = mapView.getMapboxMap().getStyle()?.getSource(sourceId)
-+        if (source == null || (sourceLayerId != null && source !is VectorSource)) {
-+            response.error("source_not_attached")
-+            return
-+        }
-+
-         mapView.getMapboxMap().removeFeatureStateCompat(
-             sourceId,
-             sourceLayerId,
-diff --git a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
---- a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
-+++ b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/MapboxMap.kt
-@@ -19,8 +19,8 @@
-     state: Value,
-     callback: (Expected<String, None>) -> Unit
- ) {
--    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { _ ->
--        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())
-+    this.setFeatureState(sourceId, sourceLayerId, featureId, state) { expected ->
-+        callback(expected)
-     }
- }
- 
-@@ -31,8 +31,8 @@
-     stateKey: String?,
-     callback: (Expected<String, None>) -> Unit
- ) {
--    this.removeFeatureState(sourceId, sourceLayerId, featureId, stateKey) { _ ->
--        callback(com.mapbox.bindgen.ExpectedFactory.createNone<String>())
-+    this.removeFeatureState(sourceId, sourceLayerId, featureId, stateKey) { expected ->
-+        callback(expected)
-     }
- }
- 
-diff --git a/ios/RNMBX/RNMBXStyleValue.swift b/ios/RNMBX/RNMBXStyleValue.swift
---- a/ios/RNMBX/RNMBXStyleValue.swift
-+++ b/ios/RNMBX/RNMBXStyleValue.swift
-@@ -264,7 +264,7 @@
-     }
-     let valueObj = RNMBXStyleValue.convert(value["stylevalue"] as! [String:Any])
- 
--    if let num = value as? Int {
-+    if let num = valueObj as? Int {
-       let uicolor = uicolor(num)
-       return .constant(StyleColor(uicolor))
-     } else {
-diff --git a/ios/RNMBX/RNMBXImages.swift b/ios/RNMBX/RNMBXImages.swift
---- a/ios/RNMBX/RNMBXImages.swift
-+++ b/ios/RNMBX/RNMBXImages.swift
-@@ -29,6 +29,7 @@
-   }
-     
-   var loadedImages : Set<String> = []
-+  private var attachment = UUID()
-   
-   var imageViews: [RNMBXImage] = []
- 
-@@ -74,6 +75,7 @@
-   }
- 
-   public func addToMap(_ map: RNMBXMapView, style: Style) {
-+    attachment = UUID()
-     self.style = style
-     imageManager = map.imageManager
-     map.images.append(self)
-@@ -84,9 +86,16 @@
-   }
-   
-   public func removeFromMap(_ map: RNMBXMapView, reason: RemovalReason) -> Bool {
-+    attachment = UUID()
-+    map.images.removeAll { $0 === self }
-+    if let style = self.style {
-+      for name in images.keys where style.imageExists(withId: name) {
-+        logged("RNMBXImages.removeImage") { try style.removeImage(withId: name) }
-+      }
-+    }
-     self.style = nil
-     imageManager = nil
--    // v10todo
-+    loadedImages.removeAll()
-     return true
-   }
-   
-@@ -137,9 +146,12 @@
-         Logger.log(level: .error, message: "RNMBXImages: bridge is nil, cannot fetch images. Use nativeAssetImages instead.")
-         return
-       }
--      RNMBXUtils.fetchImages(bridge, style: style, objects: missingImages, forceUpdate: true) { name, image in
--        self.loadedImages.insert(name)
--        self.imageManager?.resolve(name: name, image: image)
-+      let attachment = self.attachment
-+      RNMBXUtils.fetchImages(bridge, style: style, objects: missingImages, forceUpdate: true, isCurrent: { [weak self] in
-+        self?.attachment == attachment
-+      }) { [weak self] name, image in
-+        self?.loadedImages.insert(name)
-+        self?.imageManager?.resolve(name: name, image: image)
-       }
-     }
-   }
-diff --git a/ios/RNMBX/RNMBXUtils.swift b/ios/RNMBX/RNMBXUtils.swift
---- a/ios/RNMBX/RNMBXUtils.swift
-+++ b/ios/RNMBX/RNMBXUtils.swift
-@@ -8,7 +8,7 @@
-     RNMBXImageQueue.sharedInstance.addImage(url, scale: scale, bridge: bridge, handler: callback)
-   }
-   
--  static func fetchImages(_ bridge: RCTBridge, style: Style, objects: [String:Any], forceUpdate: Bool, loaded: @escaping (String, UIImage) -> Void) {
-+  static func fetchImages(_ bridge: RCTBridge, style: Style, objects: [String:Any], forceUpdate: Bool, isCurrent: @escaping () -> Bool, loaded: @escaping (String, UIImage) -> Void) {
-     guard !objects.isEmpty else {
-       return
-     }
-@@ -48,6 +48,7 @@
-             }
-             else {
-               DispatchQueue.main.async {
-+                guard isCurrent() else { return }
-                 if let image = image {
-                   logged("RNMBXUtils.fetchImage-\(imageName)") {
-                     try style.addImage(image, id: imageName, sdf:sdf, stretchX: stretchX, stretchY: stretchY, content: content)
-diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt
---- a/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt
-+++ b/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt
-@@ -70,6 +70,8 @@
-     private var mNativeImages = mutableMapOf<String, NativeImage>()
-     private var mSendMissingImageEvents = false
-     private var mMap: MapboxMap? = null
-+    private var registeredStyle: Style? = null
-+    private var attachment = 0L
- 
-     fun setImages(images: List<Map.Entry<String, ImageEntry>>) {
-         val newImages: MutableMap<String, ImageEntry> = HashMap()
-@@ -105,7 +107,12 @@
-     }
- 
-     override fun removeFromMap(mapView: RNMBXMapView, reason: RemovalReason): Boolean {
--        removeImages(mapView)
-+        attachment++
-+        mMap?.getStyle()?.takeIf { it === registeredStyle }?.let { style ->
-+            for (name in mCurrentImages.filterNotNull()) style.removeStyleImage(name)
-+        }
-+        registeredStyle = null
-+        mCurrentImages.clear()
-         mMap = null
-         if (reason == RemovalReason.ON_DESTROY) {
-             mNativeImages = mutableMapOf()
-@@ -115,31 +122,6 @@
-         return super.removeFromMap(mapView, reason)
-     }
- 
--    private fun removeImages(mapView: RNMBXMapView) {
--        mapView.getStyle(object : Style.OnStyleLoaded {
--            override fun onStyleLoaded(style: Style) {
--                if (hasImages()) {
--                    for ((key) in mImages!!) {
--                        style.removeStyleImage(key)
--                    }
--                }
--                if (hasNativeImages()) {
--                    for ((key) in mNativeImages!!) {
--                        style.removeStyleImage(key!!)
--                    }
--                }
--            }
--        })
--    }
--
--    private fun hasImages(): Boolean {
--        return mImages != null && mImages!!.size > 0
--    }
--
--    private fun hasNativeImages(): Boolean {
--        return mNativeImages != null && mNativeImages!!.size > 0
--    }
--
-     fun addMissingImageToStyle(id: String, map: MapboxMap): Boolean {
-         val nativeImage = mNativeImages.get(id)
-         if (nativeImage != null) {
-@@ -179,6 +161,7 @@
- 
-     override fun addToMap(mapView: RNMBXMapView) {
-         super.addToMap(mapView)
-+        val currentAttachment = ++attachment
- 
-         mImageViews.forEach {
-             it.addToMap(mapView)
-@@ -188,6 +171,8 @@
-         // before we add the ShapeSource to the map
-         mapView.getStyle(object : Style.OnStyleLoaded {
-             override fun onStyleLoaded(style: Style) {
-+                if (attachment != currentAttachment) return
-+                registeredStyle = style
-                 val map = mapView.getMapboxMap()
-                 mMap = map
-                 addNativeImagesToStyle(mNativeImages, map)
-@@ -262,7 +247,10 @@
-             missingImages.add(imageEntry)
-         }
-         if (missingImages.size > 0) {
--            val task = DownloadMapImageTask(context, map, mMapView!!.imageManager)
-+            val currentAttachment = attachment
-+            val task = DownloadMapImageTask(context, map, mMapView!!.imageManager, isCurrent = {
-+                attachment == currentAttachment && mMap === map && map.getStyle() === style
-+            })
-             val params = missingImages.toTypedArray()
-             task.execute(params)
-         }
-diff --git a/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt b/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
---- a/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
-+++ b/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
-@@ -24,7 +24,13 @@
- 
- data class DownloadedImage(val name: String, val bitmap: Bitmap, val info: ImageInfo)
- 
--class DownloadMapImageTask(context: Context, map: MapboxMap, imageManager: ImageManager?, callback: OnAllImagesLoaded? = null) {
-+class DownloadMapImageTask(
-+    context: Context,
-+    map: MapboxMap,
-+    imageManager: ImageManager?,
-+    callback: OnAllImagesLoaded? = null,
-+    private val isCurrent: () -> Boolean = { true }
-+) {
-     private val mMap: WeakReference<MapboxMap> = WeakReference(map)
-     private val mCallback: OnAllImagesLoaded? = callback
-     private val mImageManager: WeakReference<ImageManager> = WeakReference(imageManager)
-@@ -82,6 +88,7 @@
-                     bitmap.density = DisplayMetrics.DENSITY_DEFAULT
- 
-                     CoroutineScope(Dispatchers.Main).launch {
-+                        if (!isCurrent()) return@launch
-                         val style = mMap.get()?.getStyle()
-                         if (style != null) {
-                             mImageManager.get()?.resolve(key, bitmap)
+diff --git a/src/specs/NativeMapViewModule.ts b/src/specs/NativeRNMBXMapViewModule.ts
+similarity index 100%
+rename from src/specs/NativeMapViewModule.ts
+rename to src/specs/NativeRNMBXMapViewModule.ts

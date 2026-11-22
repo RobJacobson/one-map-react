@@ -44,7 +44,7 @@ const presets = {
   },
 };
 
-/** Selected model fixture for RNMapbox 10.3.8; not applicable to 10.3.7. */
+/** Selected model fixture for RNMapbox. */
 export const NativeModelScene = ({
   attach,
   style,

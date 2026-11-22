@@ -61,7 +61,7 @@ const peers = {
     "react-dom@19.2.3",
     "react-native@0.87.1",
     "@types/react@19.2.18",
-    "@rnmapbox/maps@10.3.7",
+    "@rnmapbox/maps@10.3.19",
     "react-native-teleport@1.2.2",
   ],
   "maplibre-native": [
@@ -69,7 +69,7 @@ const peers = {
     "react-dom@19.2.3",
     "react-native@0.87.1",
     "@types/react@19.2.18",
-    "@maplibre/maplibre-react-native@11.5.0",
+    "@maplibre/maplibre-react-native@11.5.1",
     "react-native-teleport@1.2.2",
     "@types/geojson@7946.0.16",
   ],
@@ -189,9 +189,14 @@ const checkPeerConsumer = async (archive, entry, packages) => {
   );
   run("bun", ["add", archive, ...packages], consumer);
 
+  const patchedFiles = {};
   for (const peer of ["@rnmapbox/maps", "@maplibre/maplibre-react-native"]) {
     if (packages.some((specifier) => specifier.startsWith(`${peer}@`))) {
-      installConsumerPatch(consumer, peer, run);
+      for (const file of installConsumerPatch(consumer, peer, run)) {
+        patchedFiles[`${peer}/${file}`] = sha256(
+          join(consumer, "node_modules", peer, file)
+        );
+      }
     }
   }
 
@@ -226,9 +231,7 @@ const checkPeerConsumer = async (archive, entry, packages) => {
   const engine = entry.split("-")[0];
   writeFileSync(
     join(consumer, "consumer.tsx"),
-    entry.endsWith("web")
-      ? webConsumer(entry, engine)
-      : nativeConsumer(entry, consumer)
+    entry.endsWith("web") ? webConsumer(entry, engine) : nativeConsumer(entry)
   );
   const files = ["consumer.tsx"];
   if (entry.endsWith("native")) {
@@ -286,17 +289,6 @@ for (const key of Object.keys(upstream)) assert.equal(explicit[key], upstream[ke
       consumer
     );
   }
-  const patchedFiles = {};
-  for (const peer of ["@rnmapbox/maps", "@maplibre/maplibre-react-native"]) {
-    if (!packages.some((specifier) => specifier.startsWith(`${peer}@`)))
-      continue;
-    const patch = readFileSync(join(consumer, "peer.patch"), "utf8");
-    for (const match of patch.matchAll(/^diff --git a\/.* b\/(.+)$/gm)) {
-      patchedFiles[`${peer}/${match[1]}`] = sha256(
-        join(consumer, "node_modules", peer, match[1])
-      );
-    }
-  }
   let retainedLockfile;
   if (options.evidence) {
     const lockRoot = `${options.evidence}.locks`;
@@ -349,15 +341,7 @@ void <alias.default {...options} onClick={event => event.features?.[0]}><explici
 void stock; void forwarded; void selected; void zoom;
 `;
 
-const nativeConsumer = (entry, consumer) => {
-  const modelAvailable =
-    entry === "mapbox-native" &&
-    JSON.parse(
-      readFileSync(
-        join(consumer, "node_modules/@rnmapbox/maps/package.json"),
-        "utf8"
-      )
-    ).version === "10.3.8";
+const nativeConsumer = (entry) => {
   const selectedAssertions =
     entry === "mapbox-native"
       ? `
@@ -370,7 +354,6 @@ const selectedLocationManager: typeof import("@rnmapbox/maps").locationManager =
 const addLocationListener: typeof selectedLocationManager.addListener = WrapperLocationManager.addListener;
 const removeLocationListener: typeof selectedLocationManager.removeListener = WrapperLocationManager.removeListener;
 void addLocationListener; void removeLocationListener;
-${modelAvailable ? "" : "// @ts-expect-error The minimum peer has no model puck."}
 void <LocationPuck model={{ uri: 'http://127.0.0.1/model.glb', scale: [1,2,3], rotation: [0,0,90], opacity: 0.5 }} />;
 setTelemetryEnabled(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
