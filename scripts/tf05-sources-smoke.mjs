@@ -56,8 +56,6 @@ async function main() {
         results["mapbox-android"] = await runNative({
           directory: "native-mapbox",
           platform: "android",
-          applicationId:
-            process.env.TF05_MAPBOX_ANDROID_ID ?? "com.onemapmapbox",
         });
         if (results["mapbox-android"].status !== "passed")
           throw new Error("Native smoke failed; no later engine was started.");
@@ -66,8 +64,6 @@ async function main() {
         results["maplibre-android"] = await runNative({
           directory: "native-maplibre",
           platform: "android",
-          applicationId:
-            process.env.TF05_MAPLIBRE_ANDROID_ID ?? "com.onemapmaplibre",
         });
         if (results["maplibre-android"].status !== "passed")
           throw new Error("Native smoke failed; no later engine was started.");
@@ -79,9 +75,6 @@ async function main() {
         results["mapbox-ios"] = await runNative({
           directory: "native-mapbox",
           platform: "ios",
-          applicationId:
-            process.env.TF05_MAPBOX_IOS_ID ??
-            "org.reactjs.native.example.OneMapMapbox",
         });
         if (results["mapbox-ios"].status !== "passed")
           throw new Error("Native smoke failed; no later engine was started.");
@@ -90,9 +83,6 @@ async function main() {
         results["maplibre-ios"] = await runNative({
           directory: "native-maplibre",
           platform: "ios",
-          applicationId:
-            process.env.TF05_MAPLIBRE_IOS_ID ??
-            "org.reactjs.native.example.OneMapMaplibre",
         });
         if (results["maplibre-ios"].status !== "passed")
           throw new Error("Native smoke failed; no later engine was started.");
@@ -333,8 +323,8 @@ function openStatusPort() {
   });
 }
 
-async function runNative({ directory, platform, applicationId }) {
-  applicationId = nativeApplicationId();
+async function runNative({ directory, platform }) {
+  const applicationId = nativeApplicationId();
   const shell = join(root, "apps/expo");
 
   await freePort(8081);
@@ -374,7 +364,7 @@ async function runNative({ directory, platform, applicationId }) {
   let statusPort = null;
 
   try {
-    if (platform === "ios" && !statusPort) statusPort = await openStatusPort();
+    if (platform === "ios") statusPort = await openStatusPort();
     await waitFor(
       async () => {
         if (metroFailure) throw metroFailure;

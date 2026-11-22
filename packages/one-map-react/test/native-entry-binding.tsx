@@ -98,6 +98,31 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     ).rejects.toThrow(`${field} is not available on ${backend}.`);
   });
 
+  test.each([
+    { "icon-overlap": "always" },
+    { "text-overlap": "always" },
+  ] as const)(
+    "rejects unsupported symbol layout %j nested under a source on mount and update",
+    async (unsupported) => {
+      const [field] = Object.keys(unsupported);
+      const scene = (layout: SymbolLayout) => (
+        <NativeMap mapStyle={emptyStyle} initialViewState={initialViewState}>
+          <Source id="routes" type="geojson" data={routes}>
+            <Layer id="labels" type="symbol" layout={layout} />
+          </Source>
+        </NativeMap>
+      );
+      const message = `${field} is not available on ${backend}.`;
+      await expect(render(scene(unsupported))).rejects.toThrow(message);
+
+      const valid: SymbolLayout = { "text-field": ["get", "name"] };
+      const view = await render(scene(valid));
+      await expect(
+        view.rerender(scene({ ...valid, ...unsupported }))
+      ).rejects.toThrow(message);
+    }
+  );
+
   test("treats undefined as unset and still rejects a falsy symbol option on update", async () => {
     const view = await render(
       <Layer id="symbol" type="symbol" layout={{ "text-overlap": undefined }} />

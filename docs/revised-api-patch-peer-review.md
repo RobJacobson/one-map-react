@@ -1,10 +1,10 @@
 # Patch and peer review decision
 
-**Historical assessment and completed follow-up.** The U23 assessment body below preserves its pre-repair findings, identities/counts and proposed scope; the original evidence/matrix is unchanged. The owner-approved [U23-F01 reconciliation](revised-api-implementation-plan.md#u23-f01-reconcile-retained-publication-repairs) is implemented and independently audited. The [reconciliation evidence](../records/evidence/revised-api-u23-native-patch-reconciliation.json) owns final identities, bounded verification and remaining acceptance gates. The reviewed reconciliation PR44 is open; U24 candidate preparation is implemented and independently audited; a reviewed PR is authorized and acceptance still requires explicit permission.
+**Historical assessment and completed follow-up.** The U23 assessment below records the pre-repair findings, bundle identities and proposed scope. The owner-approved [U23-F01 reconciliation](revised-api-implementation-plan.md#u23-f01-reconcile-retained-publication-repairs) is implemented and independently audited. The [reconciliation evidence](../records/evidence/revised-api-u23-native-patch-reconciliation.json) owns final identities, bounded verification and remaining acceptance gates. The reviewed reconciliation PR44 is open; U24 candidate preparation is implemented and independently audited; a reviewed PR is authorized and acceptance still requires explicit permission.
 
 ## Current publication reconciliation
 
-P1-P8 are implemented in the three publication bundles. Pristine forward/reverse application and repaired SDK-output comparison preserve the original version-specific intent and all prior publication section semantics. The original patch files, production library modules, peers, locks, versions and SDK pins are unchanged. RNMapbox 10.3.8 keeps its existing bounds-reset behavior rather than receiving copied 10.3.7 camera hunks.
+P1-P8 are implemented in the three publication bundles. Pristine forward/reverse application and repaired SDK-output comparison preserve the original version-specific intent and all prior publication section semantics. RNMapbox 10.3.8 keeps its existing bounds-reset behavior. The combined RNMapbox bundles supply per-view event throttling and cache cleanup. See the [historical standalone patch](https://github.com/RobJacobson/one-map-react/blob/d6bda75196298e1bd041cf66933adea60ea4b961/packages/one-map-react/patches/rnmapbox-10.3.7-per-view-events.patch) for the separate file discussed below and the [native wrapper repairs](../packages/one-map-react/README.md) for current installs.
 
 | Publication bundle | Final sections/hunks | Final SHA-256 |
 | --- | --- | --- |
@@ -14,7 +14,7 @@ P1-P8 are implemented in the three publication bundles. Pristine forward/reverse
 
 Focused proofs cover the repaired source boundaries, extracted Swift/Objective-C++ methods with stubbed SDK boundaries and Node codegen; executable Kotlin checks were skipped because the compiler was unavailable. Static Android checks, routine source/compiled tests and exact archive/isolated cases remain bounded evidence. They do not establish native application builds/linking, device/service behavior or renderer acceptance. The peer/development-host distinctions in the historical assessment remain relevant because no range, version or SDK pin changed.
 
-**Pre-repair U23 assessment body follows unchanged.**
+**Pre-repair U23 assessment.**
 
 Keep all three active repair bundles. The publication bundles omit eight repair groups still needed by retained behavior; the original working tree contains those repairs. Reconcile the omissions through a separately approved bounded follow-up before U24. The read-only assessment is complete; native implementation readiness is not.
 
@@ -32,7 +32,7 @@ Original means the preserved working tree; publication means the reviewed branch
 
 The original bundles contain 80 sections/161 hunks; publication contains 60/129. Every active hunk has a retained reader. Shared camera commands and bounds, per-map events, terrain/elevation, light values, explicit feature-state operations and detached-view errors still need repairs. Selected application-owned offline, snapshot, network and custom-location operations also remain SDK callers after removal of common services. Declaration and native namespace repairs serve retained imports and build boundaries. No active repair was proven obsolete; remove one only after a verified replacement in the chosen upstream version.
 
-The root patchedDependencies and [isolated consumer selector](../scripts/consumer-peer-patches.mjs) select these combined bundles. The separate 28-line rnmapbox-10.3.7-per-view-events.patch is inactive, but it is still shipped and checked by [package tests](../scripts/test-package.mjs), referenced by the historical [TF07 record](tf07-ui.md), and recorded in the version baseline. Its one section/two hunks duplicate event isolation/teardown intent. Keep it by default; retirement would be a separate shipping/test/history decision, not a prerequisite for the repair follow-up.
+The root `patchedDependencies` and [isolated consumer selector](../scripts/consumer-peer-patches.mjs) selected the combined bundles. At the time of the assessment, the package shipped the inactive 28-line `rnmapbox-10.3.7-per-view-events.patch`, and the package check required it. Its two hunks duplicated the combined bundle’s event isolation and teardown. The assessment deferred retirement of that file to a separate change. The [TF07 record](tf07-ui.md#runtime-checkpoint) preserves its role in the original acceptance run.
 
 Native scale-position/resize refresh and the live-marker portal still have production readers. Common control removal does not authorize removing either.
 

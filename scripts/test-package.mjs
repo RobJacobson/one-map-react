@@ -136,8 +136,18 @@ const main = async () => {
       archive = join(output, archives[0]);
     }
     const files = run("tar", ["-tzf", archive], output).split("\n");
-    assert(files.includes("package/LICENSE"));
-    assert(files.includes("package/README.md"));
+    const rnmapboxPatch = "package/patches/rnmapbox-10.3.7-tf08.patch";
+    assert.deepEqual(
+      files.filter((file) => !file.startsWith("package/dist/")).sort(),
+      [
+        "package/LICENSE",
+        "package/README.md",
+        "package/package.json",
+        "package/patches/maplibre-native-11.5.0-tf08.patch",
+        rnmapboxPatch,
+        "package/patches/rnmapbox-10.3.8.patch",
+      ]
+    );
     assert(files.includes("package/dist/index.d.ts"));
     for (const retired of [
       "package/dist/index.js",
@@ -146,21 +156,22 @@ const main = async () => {
     ]) {
       assert(!files.includes(retired), `Retired file is packed: ${retired}`);
     }
+    const repair = run("tar", ["-xOzf", archive, rnmapboxPatch], output);
     assert(
-      files.includes("package/patches/rnmapbox-10.3.7-per-view-events.patch")
+      repair.includes(
+        '+        return String.format("%s-%s-%s", event.iD, event.key, event.type)'
+      ),
+      "The combined RNMapbox repair must throttle events per view."
     );
-    assert(files.includes("package/patches/rnmapbox-10.3.7-tf08.patch"));
-    assert(files.includes("package/patches/maplibre-native-11.5.0-tf08.patch"));
-    assert(files.includes("package/patches/rnmapbox-10.3.8.patch"));
+    assert(
+      repair.includes(
+        '+        val prefix = "${view.id}-"\n+        mRateLimitedEvents.keys.removeAll { it.startsWith(prefix) }'
+      ),
+      "The combined RNMapbox repair must remove the retired view's cache entries."
+    );
     assert(
       !files.some((file) => file.startsWith("package/dist/adapters/web/"))
     );
-    for (const file of files) {
-      assert.match(
-        file,
-        /^package\/(?:dist\/.+|patches\/(?:rnmapbox-10\.3\.(?:7-(?:per-view-events|tf08)|8)|maplibre-native-11\.5\.0-tf08)\.patch|package.json|README.md|LICENSE)$/
-      );
-    }
 
     for (const scenario of cases) {
       await checkConsumer(archive, scenario);

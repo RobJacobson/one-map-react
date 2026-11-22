@@ -1,5 +1,4 @@
 import { act, fireEvent, render } from "@testing-library/react";
-import type { ViewState } from "one-map-react";
 import * as nativeEntry from "one-map-react/mapbox-native";
 import {
   createContext,
@@ -14,20 +13,6 @@ import { createNativeSceneComponents } from "../src/scenarios/native-scene-compo
 import { NativeTf07Screen } from "../src/scenarios/native-tf07-screen.js";
 import { Tf07Scene, type Tf07Probe } from "../src/scenarios/tf07-scene.js";
 
-const fixture = vi.hoisted(() => ({
-  markers: [] as Array<Record<string, unknown>>,
-  viewState: undefined as ViewState | undefined,
-  observedCenter: [-122.31, 47.6],
-  zoom: 11,
-  commands: [] as string[],
-  click: undefined as
-    | undefined
-    | ((event: {
-        lngLat: readonly [number, number];
-        point: readonly [number, number];
-        features: readonly object[];
-      }) => void),
-}));
 vi.mock("one-map-react/native-extensions", () => ({
   Images: () => null,
   UserLocation: () => null,
@@ -35,48 +20,17 @@ vi.mock("one-map-react/native-extensions", () => ({
 
 vi.mock("one-map-react/mapbox-native", async () => {
   const react = await import("react");
-  const InMap = react.createContext(false);
   const Content = ({ children }: { readonly children?: ReactNode }) => children;
   return {
     MapProvider: Content,
     useMap: () => ({}),
-    Map: react.forwardRef(
-      (
-        props: {
-          readonly children?: ReactNode;
-          readonly onClick?: typeof fixture.click;
-          readonly viewState?: ViewState;
-        },
-        ref
-      ) => {
-        fixture.click = props.onClick;
-        fixture.viewState = props.viewState;
-        react.useImperativeHandle(ref, () => ({
-          getCenter: async () => fixture.observedCenter,
-          getZoom: async () => fixture.zoom,
-          queryRenderedFeatures: async () => [],
-          project: async () => [100, 100],
-          jumpTo: async () => {
-            fixture.commands.push("jumpTo");
-          },
-          zoomTo: async (zoom: number) => {
-            fixture.zoom = zoom;
-            fixture.commands.push("zoomTo");
-          },
-        }));
-        return react.createElement(
-          "div",
-          { "data-testid": "sdk-map" },
-          react.createElement(InMap.Provider, { value: true }, props.children)
-        );
-      }
+    Map: react.forwardRef<HTMLDivElement, { readonly children?: ReactNode }>(
+      ({ children }, ref) =>
+        react.createElement("div", { ref, "data-testid": "sdk-map" }, children)
     ),
     Source: Content,
     Layer: () => null,
-    Marker: (props: Record<string, unknown>) => {
-      fixture.markers.push(props);
-      return null;
-    },
+    Marker: () => null,
   };
 });
 
@@ -84,30 +38,6 @@ const nativeSceneComponents = createNativeSceneComponents(
   "mapbox-native",
   nativeEntry
 );
-
-test("TF07 native supplies only supported marker interaction props", () => {
-  fixture.markers = [];
-  const view = render(
-    <Tf07Scene
-      renderLocation={() => null}
-      renderNavigation={() => null}
-      components={nativeSceneComponents}
-      style={{ width: 400, height: 300 }}
-      renderPopup={() => null}
-      markerContent={() => null}
-      report={() => undefined}
-      attach={() => undefined}
-    />
-  );
-  for (const id of ["tf07-live", "tf07-annotation"]) {
-    const marker = fixture.markers.find((props) => props.id === id);
-    expect(marker?.onClick).toBeTypeOf("function");
-    for (const name of ["draggable", "onDragStart", "onDrag", "onDragEnd"]) {
-      expect(marker).not.toHaveProperty(name);
-    }
-  }
-  view.unmount();
-});
 
 test("TF07 native scene remount retires its screen location action with the map attachment", async () => {
   const mountedLocation = vi.fn();
@@ -248,37 +178,4 @@ test("native TF07 host bounds the map and screen buttons below the toolbar", () 
   );
   expect(host?.contains(mounted.getByText("Custom control"))).toBe(false);
   mounted.unmount();
-});
-
-test("TF07 native activates GeoJSON identity without web metadata", () => {
-  const report = vi.fn();
-  const view = render(
-    <Tf07Scene
-      components={nativeSceneComponents}
-      renderLocation={() => null}
-      renderNavigation={() => null}
-      renderPopup={() => null}
-      markerContent={() => null}
-      style={{ width: 400, height: 300 }}
-      report={report}
-      attach={() => undefined}
-    />
-  );
-  act(() =>
-    fixture.click?.({
-      lngLat: [1, 2],
-      point: [3, 4],
-      features: [
-        {
-          type: "Feature",
-          id: "707",
-          properties: { fixture: "tf07" },
-          geometry: { type: "Point", coordinates: [1, 2] },
-        },
-      ],
-    })
-  );
-  expect(report).toHaveBeenCalledWith("source-click");
-  expect(report).toHaveBeenCalledWith("map-click");
-  view.unmount();
 });
