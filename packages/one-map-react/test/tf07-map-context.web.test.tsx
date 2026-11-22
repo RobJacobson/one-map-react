@@ -13,22 +13,28 @@ import {
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../src/adapters/shared/native-map-presentation.js";
-import type { Adapter } from "../src/contracts/adapter.js";
+import {
+  nativeLngLat,
+  nativePoint,
+} from "../src/adapters/shared/native-values.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
-import type { ClickEvent } from "../src/contracts/event-types.js";
-import type { MapProps } from "../src/contracts/map-types.js";
+import type {
+  NativeClickEvent,
+  NativeMapInputs,
+} from "../src/contracts/native-types.js";
 import type { GeoJsonFeature } from "../src/contracts/source-types.js";
 import { type MapSession, useMapSession } from "../src/facade/map-context.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import { Map as OneMap, useMap } from "../src/facade/map.js";
-import { Source } from "../src/facade/source.js";
+import { createNativeMapBinding } from "../src/facade/native-map.js";
 
-const hit: ClickEvent = { lngLat: [1, 2], point: [3, 4] };
+const hit: NativeClickEvent = {
+  lngLat: nativeLngLat([1, 2]),
+  point: nativePoint([3, 4]),
+};
 const camera = { longitude: 1, latitude: 2, zoom: 3, bearing: 0, pitch: 0 };
 const style = { version: 8 as const, sources: {}, layers: [] };
 
 const createFixture = () => {
-  let mapProps: MapProps | undefined;
+  let mapProps: NativeMapInputs | undefined;
   const query = vi.fn<MapRef["queryRenderedFeatures"]>();
   const features: (GeoJsonFeature & { source: string })[] = [
     {
@@ -43,28 +49,34 @@ const createFixture = () => {
     queryRenderedFeatures: query,
     getZoom: vi.fn<MapRef["getZoom"]>().mockResolvedValue(3),
   } as unknown as MapRef;
-  const FakeMap = forwardRef<MapRef, MapProps>((props, ref) => {
+  const FakeMap = forwardRef<MapRef, NativeMapInputs>((props, ref) => {
     // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
     mapProps = props;
     useImperativeHandle(ref, () => map, []);
     return <div>{props.children}</div>;
   });
-  const adapter = {
-    backend: "mapbox-native",
-    Map: FakeMap,
+  const components = {
+    backend: "mapbox-native" as const,
     Source: ({ children }: { children?: ReactNode }) => <>{children}</>,
-  } as unknown as Adapter;
+    Layer: () => null,
+    Images: () => null,
+    Marker: () => null,
+  };
+  const binding = createNativeMapBinding(FakeMap, components);
   const click = async () => {
     await act(async () => {
       mapProps?.onClick?.(hit);
     });
   };
-  return { adapter, map, query, click, props: () => mapProps };
-};
-
-const Probe = ({ capture }: { capture: (map: MapRef) => void }) => {
-  capture(useMap());
-  return null;
+  return {
+    binding,
+    components,
+    FakeMap,
+    map,
+    query,
+    click,
+    props: () => mapProps,
+  };
 };
 
 test.each(
@@ -81,17 +93,20 @@ test.each(
     const flyTo = vi.fn<MapRef["flyTo"]>().mockResolvedValue(undefined);
     fixture.map.flyTo = flyTo;
     let observed: MapRef | undefined;
+    const { Map: NativeMap, MapProvider, useMap } = fixture.binding;
     const Capture = () => {
+      const maps = useMap();
       // eslint-disable-next-line react/globals -- Test readback captures the map reference returned by the public hook.
-      observed = useMap(access === "named" ? "promise-map" : undefined);
+      observed = access === "named" ? maps["promise-map"] : maps.current;
       return null;
     };
     const view = render(
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap id="promise-map" mapStyle={style} initialViewState={camera}>
-          <Capture />
-        </OneMap>
-      </MapSetup>
+      <MapProvider>
+        {access === "named" && <Capture />}
+        <NativeMap id="promise-map" mapStyle={style} initialViewState={camera}>
+          {access === "enclosing" && <Capture />}
+        </NativeMap>
+      </MapProvider>
     );
     if (!observed) throw new Error("Map reference was not attached.");
     const retained = observed;
@@ -108,14 +123,32 @@ test.each(
   }
 );
 
+test("a provider reserves current and detects a collision with its default map", () => {
+  const { Map: NativeMap, MapProvider } = createFixture().binding;
+  expect(() =>
+    render(
+      <MapProvider>
+        <NativeMap id="current" mapStyle={style} />
+      </MapProvider>
+    )
+  ).toThrow('MapProvider reserves the map id "current".');
+  expect(() =>
+    render(
+      <MapProvider>
+        <NativeMap mapStyle={style} />
+        <NativeMap id="default" mapStyle={style} />
+      </MapProvider>
+    )
+  ).toThrow('Map id "default" is already registered');
+});
+
 describe("TF07 map-local UI lifetime", () => {
   test("movement callback teardown suppresses its retained handler", () => {
     const fixture = createFixture();
+    const { Map: NativeMap } = fixture.binding;
     const onMove = vi.fn(() => mounted.unmount());
     const mounted = render(
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera} onMove={onMove} />
-      </MapSetup>
+      <NativeMap mapStyle={style} initialViewState={camera} onMove={onMove} />
     );
     const move = fixture.props()?.onMove;
 
@@ -127,16 +160,17 @@ describe("TF07 map-local UI lifetime", () => {
   test("enclosing useMap forwards commands after attachment and rejects after teardown", async () => {
     const fixture = createFixture();
     let observed: MapRef | undefined;
+    const { Map: NativeMap, useMap } = fixture.binding;
+    const Probe = () => {
+      const { current } = useMap();
+      // eslint-disable-next-line react/globals -- Capture the handle for lifecycle assertions.
+      observed = current;
+      return null;
+    };
     const rendered = render(
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap mapStyle={style} initialViewState={camera}>
-          <Probe
-            capture={(map) => {
-              observed = map;
-            }}
-          />
-        </OneMap>
-      </MapSetup>
+      <NativeMap mapStyle={style} initialViewState={camera}>
+        <Probe />
+      </NativeMap>
     );
     await expect(observed?.getZoom()).resolves.toBe(3);
     rendered.unmount();
@@ -152,18 +186,17 @@ describe("TF07 map-local UI lifetime", () => {
           resolve = done;
         })
     );
+    const { Map: NativeMap, Source } = fixture.binding;
     const mapClick = vi.fn();
     const rendered = render(
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap
-          mapStyle={style}
-          initialViewState={camera}
-          onClick={mapClick}
-          interactiveLayerIds={["places-layer"]}
-        >
-          <Source id="places" type="vector" url="fixture://places" />
-        </OneMap>
-      </MapSetup>
+      <NativeMap
+        mapStyle={style}
+        initialViewState={camera}
+        onClick={mapClick}
+        interactiveLayerIds={["places-layer"]}
+      >
+        <Source id="places" type="vector" url="fixture://places" />
+      </NativeMap>
     );
     await fixture.click();
     rendered.unmount();
@@ -184,19 +217,18 @@ describe("TF07 map-local UI lifetime", () => {
     const error = new Error("query failed");
     fixture.query.mockRejectedValue(error);
     const report = vi.fn();
+    const { Map: NativeMap, Source } = fixture.binding;
     const mapClick = vi.fn();
     render(
-      <MapSetup adapter={fixture.adapter}>
-        <OneMap
-          mapStyle={style}
-          initialViewState={camera}
-          onError={report}
-          interactiveLayerIds={["places-layer"]}
-          onClick={mapClick}
-        >
-          <Source id="places" type="vector" url="fixture://places" />
-        </OneMap>
-      </MapSetup>
+      <NativeMap
+        mapStyle={style}
+        initialViewState={camera}
+        onError={report}
+        interactiveLayerIds={["places-layer"]}
+        onClick={mapClick}
+      >
+        <Source id="places" type="vector" url="fixture://places" />
+      </NativeMap>
     );
     await fixture.click();
     expect(report).toHaveBeenCalledWith({ error });
@@ -204,9 +236,10 @@ describe("TF07 map-local UI lifetime", () => {
   });
   test("named consumers can mount with their map and observe removal and reattachment", async () => {
     const fixture = createFixture();
+    const { Map: NativeMap, MapProvider, useMap } = fixture.binding;
     let named: MapRef | undefined;
     const NamedProbe = () => {
-      const map = useMap("named");
+      const map = useMap().named;
       expectTypeOf(map).toEqualTypeOf<MapRef | undefined>();
       // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
       named = map;
@@ -214,12 +247,12 @@ describe("TF07 map-local UI lifetime", () => {
     };
     const tree = (attached: boolean) => (
       <StrictMode>
-        <MapSetup adapter={fixture.adapter}>
+        <MapProvider>
           <NamedProbe />
           {attached && (
-            <OneMap id="named" mapStyle={style} initialViewState={camera} />
+            <NativeMap id="named" mapStyle={style} initialViewState={camera} />
           )}
-        </MapSetup>
+        </MapProvider>
       </StrictMode>
     );
     const rendered = render(tree(true));
@@ -240,21 +273,7 @@ describe("TF07 map-local UI lifetime", () => {
     await expect(named?.getZoom()).rejects.toThrow("not attached");
   });
 
-  test("changing the adapter requires a new MapSetup key", () => {
-    const first = createFixture();
-    const second = createFixture();
-    const tree = (adapter: Adapter) => (
-      <MapSetup adapter={adapter}>
-        <OneMap mapStyle={style} initialViewState={camera} />
-      </MapSetup>
-    );
-    const rendered = render(tree(first.adapter));
-    expect(() => rendered.rerender(tree(second.adapter))).toThrow(
-      "MapSetup adapter changed. Remount with a new key."
-    );
-  });
-
-  test("keyed adapter replacement resets readiness and discards pending hits", async () => {
+  test("bound map replacement resets readiness and discards pending hits", async () => {
     const first = createFixture();
     const second = createFixture();
     let resolve: ((features: readonly GeoJsonFeature[]) => void) | undefined;
@@ -271,21 +290,19 @@ describe("TF07 map-local UI lifetime", () => {
       observed(useMapSession());
       return null;
     };
-    const tree = (replacement: boolean) => (
-      <MapSetup
-        key={replacement ? "second" : "first"}
-        adapter={replacement ? second.adapter : first.adapter}
-      >
-        <OneMap
+    const tree = (replacement: boolean) => {
+      const { Map: NativeMap } = replacement ? second.binding : first.binding;
+      return (
+        <NativeMap
           mapStyle={style}
           initialViewState={camera}
           interactiveLayerIds={["places"]}
           onClick={replacement ? secondClick : firstClick}
         >
           <SessionProbe />
-        </OneMap>
-      </MapSetup>
-    );
+        </NativeMap>
+      );
+    };
     const rendered = render(tree(false));
     act(() => first.props()?.onLoad?.());
     expect(observed.mock.calls.at(-1)?.[0].ready).toBe(true);
@@ -305,6 +322,7 @@ describe("TF07 map-local UI lifetime", () => {
 
 test("camera movement and controlled camera updates preserve map-access consumers", async () => {
   const fixture = createFixture();
+  const { Map: NativeMap } = fixture.binding;
   const observed = vi.fn();
   const AccessProbe = () => {
     observed(useMapSession());
@@ -312,15 +330,13 @@ test("camera movement and controlled camera updates preserve map-access consumer
   };
   const children = <AccessProbe />;
   const tree = (zoom: number) => (
-    <MapSetup adapter={fixture.adapter}>
-      <OneMap
-        mapStyle={style}
-        initialViewState={camera}
-        viewState={{ ...camera, zoom }}
-      >
-        {children}
-      </OneMap>
-    </MapSetup>
+    <NativeMap
+      mapStyle={style}
+      initialViewState={camera}
+      viewState={{ ...camera, zoom }}
+    >
+      {children}
+    </NativeMap>
   );
   const mounted = render(tree(3));
   const session = observed.mock.calls.at(-1)?.[0];
@@ -339,15 +355,15 @@ test("camera movement and controlled camera updates preserve map-access consumer
 test("native camera observations and controls leave unrelated contexts unchanged", async () => {
   const fixture = createFixture();
   const rendererRendered = vi.fn();
-  const ObservedMap = forwardRef<MapRef, MapProps>((props, ref) => {
+  const { FakeMap, components } = fixture;
+  const ObservedMap = forwardRef<MapRef, NativeMapInputs>((props, ref) => {
     rendererRendered();
-    return <fixture.adapter.Map {...props} ref={ref} />;
+    return <FakeMap {...props} ref={ref} />;
   });
-  const adapter = {
-    ...fixture.adapter,
-    backend: "mapbox-native" as const,
-    Map: withNativeMapPresentation(ObservedMap),
-  };
+  const { Map: NativeMap } = createNativeMapBinding(
+    withNativeMapPresentation(ObservedMap),
+    components
+  );
   const access = vi.fn();
   const presentation = vi.fn();
   const cameraChanged = vi.fn();
@@ -371,15 +387,13 @@ test("native camera observations and controls leave unrelated contexts unchanged
     </>
   );
   const tree = (zoom?: number) => (
-    <MapSetup adapter={adapter}>
-      <OneMap
-        mapStyle={style}
-        initialViewState={camera}
-        viewState={zoom === undefined ? undefined : { ...camera, zoom }}
-      >
-        {children}
-      </OneMap>
-    </MapSetup>
+    <NativeMap
+      mapStyle={style}
+      initialViewState={camera}
+      viewState={zoom === undefined ? undefined : { ...camera, zoom }}
+    >
+      {children}
+    </NativeMap>
   );
   const mounted = render(tree());
   const accessRenders = access.mock.calls.length;
@@ -415,22 +429,19 @@ test("native camera observations and controls leave unrelated contexts unchanged
 
 test("native presentation retains viewport layout and stable setters", async () => {
   const fixture = createFixture();
-  const adapter = {
-    ...fixture.adapter,
-    backend: "mapbox-native" as const,
-    Map: withNativeMapPresentation(fixture.adapter.Map),
-  };
+  const { Map: NativeMap } = createNativeMapBinding(
+    withNativeMapPresentation(fixture.FakeMap),
+    fixture.components
+  );
   const observe = vi.fn();
   const Probe = () => {
     observe(useNativeMapPresentation());
     return null;
   };
   const mounted = render(
-    <MapSetup adapter={adapter}>
-      <OneMap mapStyle={style} initialViewState={camera}>
-        <Probe />
-      </OneMap>
-    </MapSetup>
+    <NativeMap mapStyle={style} initialViewState={camera}>
+      <Probe />
+    </NativeMap>
   );
   const initial = observe.mock.calls.at(-1)?.[0];
   await act(async () => {

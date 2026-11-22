@@ -1,6 +1,7 @@
 import type { LngLat, MapLayoutStyle, MapRef } from "one-map-react";
 import {
   type ComponentType,
+  type ComponentProps,
   type ReactNode,
   type RefObject,
   useCallback,
@@ -20,7 +21,6 @@ import {
   coordinateTuple,
   isBrowserMap,
   pointTuple,
-  type MapCoordinate,
   type NativeSceneComponents,
   type SceneMap,
   type WebSceneComponents,
@@ -63,7 +63,9 @@ export interface Tf07Probe {
 interface Tf07SceneProps {
   readonly renderLocation: ComponentType<NativeLocationButtonProps>;
   readonly components: WebSceneComponents | NativeSceneComponents;
-  readonly nativeOrnaments?: object;
+  readonly nativeOrnaments?: ComponentProps<
+    NativeSceneComponents["Map"]
+  >["options"];
   readonly renderScale?: (unit: "metric" | "imperial") => ReactNode;
   readonly renderNavigation: ComponentType<{
     readonly mapRef: RefObject<MapRef | null>;
@@ -236,6 +238,21 @@ export const Tf07Scene = ({
     return () => attach(null);
   }, [attach, configure]);
 
+  const liveMarker = {
+    longitude: live[0],
+    latitude: live[1],
+    offset,
+    onClick: () => record("marker-click"),
+    // eslint-disable-next-line react/refs -- The callback reads observations only when activated.
+    children: markerContent("live", () => record("child-click")),
+  };
+  const annotationMarker = {
+    longitude: annotation[0],
+    latitude: annotation[1],
+    onClick: () => record("annotation-click"),
+    children: markerContent("annotation", () => undefined),
+  };
+
   return (
     <>
       <MapView
@@ -295,53 +312,48 @@ export const Tf07Scene = ({
           longitude={-122.38}
           latitude={47.63}
         />
-        <Marker
-          {...(native && { id: "tf07-live", onError: fail })}
-          longitude={live[0]}
-          latitude={live[1]}
-          offset={offset}
-          onClick={() => record("marker-click")}
-          {...(!native && {
-            draggable: true,
-            onDragStart: () => record("live-start"),
-            onDrag: (event: { readonly lngLat: MapCoordinate }) => {
-              lastPositions.current.live = coordinateTuple(event.lngLat);
-              setLive(coordinateTuple(event.lngLat));
-              record("live-drag");
-            },
-            onDragEnd: (event: { readonly lngLat: MapCoordinate }) => {
-              lastPositions.current.live = coordinateTuple(event.lngLat);
-              setLive(coordinateTuple(event.lngLat));
-              record("live-end");
-            },
-          })}
-        >
-          {/* eslint-disable-next-line react/refs -- markerContent receives an event callback; the callback reads observation refs only when clicked. */}
-          {markerContent("live", () => record("child-click"))}
-        </Marker>
-        <Marker
-          {...(native && {
-            id: "tf07-annotation",
-            renderMode: "annotation" as const,
-            onError: fail,
-          })}
-          longitude={annotation[0]}
-          latitude={annotation[1]}
-          onClick={() => record("annotation-click")}
-          {...(!native && {
-            draggable: true,
-            onDragStart: () => record("annotation-start"),
-            onDrag: (event: { readonly lngLat: MapCoordinate }) =>
-              setAnnotation(coordinateTuple(event.lngLat)),
-            onDragEnd: (event: { readonly lngLat: MapCoordinate }) => {
-              lastPositions.current.annotation = coordinateTuple(event.lngLat);
-              setAnnotation(coordinateTuple(event.lngLat));
-              record("annotation-end");
-            },
-          })}
-        >
-          {markerContent("annotation", () => undefined)}
-        </Marker>
+        {native ? (
+          <>
+            <components.Marker id="tf07-live" onError={fail} {...liveMarker} />
+            <components.Marker
+              id="tf07-annotation"
+              renderMode="annotation"
+              onError={fail}
+              {...annotationMarker}
+            />
+          </>
+        ) : (
+          <>
+            <components.Marker
+              {...liveMarker}
+              draggable
+              onDragStart={() => record("live-start")}
+              onDrag={(event) => {
+                lastPositions.current.live = coordinateTuple(event.lngLat);
+                setLive(coordinateTuple(event.lngLat));
+                record("live-drag");
+              }}
+              onDragEnd={(event) => {
+                lastPositions.current.live = coordinateTuple(event.lngLat);
+                setLive(coordinateTuple(event.lngLat));
+                record("live-end");
+              }}
+            />
+            <components.Marker
+              {...annotationMarker}
+              draggable
+              onDragStart={() => record("annotation-start")}
+              onDrag={(event) => setAnnotation(coordinateTuple(event.lngLat))}
+              onDragEnd={(event) => {
+                lastPositions.current.annotation = coordinateTuple(
+                  event.lngLat
+                );
+                setAnnotation(coordinateTuple(event.lngLat));
+                record("annotation-end");
+              }}
+            />
+          </>
+        )}
         {/* eslint-disable react/refs -- Host renderers receive event callbacks; observation refs are read only when activated. */}
         {popup &&
           renderPopup(

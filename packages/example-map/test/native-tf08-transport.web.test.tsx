@@ -1,16 +1,10 @@
 import { act, render } from "@testing-library/react";
-import type { Adapter } from "one-map-react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 
+import { createNativeSceneComponents } from "../src/scenarios/native-scene-components.js";
 import { NativeTf08Screen } from "../src/scenarios/native-tf08-screen.js";
 
-vi.mock("one-map-react/legacy", () => ({
-  MapSetup: ({ children }: { children?: ReactNode }) => children,
-}));
-vi.mock("../src/scenarios/native-scene-components.js", () => ({
-  nativeSceneComponents: {},
-}));
 vi.mock("../src/scenarios/tf08-acceptance-scene.js", () => ({
   Tf08AcceptanceScene: () => null,
 }));
@@ -19,6 +13,16 @@ vi.mock("react-native", async () => {
   const View = ({ children }: { children?: ReactNode }) =>
     react.createElement("div", {}, children);
   return { View, SafeAreaView: View, Text: View, Platform: { OS: "android" } };
+});
+
+// This transport fixture replaces the map scene and uses only the backend identity.
+const components = createNativeSceneComponents("mapbox-native", {
+  Map: () => null,
+  Marker: () => null,
+  Source: () => <></>,
+  Layer: () => <></>,
+  MapProvider: () => <></>,
+  useMap: () => ({}),
 });
 
 beforeEach(() => vi.useFakeTimers());
@@ -40,11 +44,9 @@ test.each([false, true])(
       return { json: () => request };
     });
     vi.stubGlobal("fetch", fetchMock);
-    // This transport regression only needs the adapter's environment identity.
-    const adapter = { backend: "mapbox-native" } as Adapter;
     const mounted = render(
       <NativeTf08Screen
-        adapter={adapter}
+        components={components}
         requestLocationPermission={async () => undefined}
         getCurrentPosition={async () => ({ lngLat: [0, 0] })}
         offlineOperations={{ clear: operation }}

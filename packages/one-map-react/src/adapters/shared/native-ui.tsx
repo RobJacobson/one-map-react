@@ -17,7 +17,6 @@ import {
   type ViewProps,
 } from "react-native";
 
-import type { Adapter } from "../../contracts/adapter.js";
 import type { LngLat, Point } from "../../contracts/camera-types.js";
 import type {
   Anchor,
@@ -25,6 +24,7 @@ import type {
   MarkerProps,
   MarkerRef,
 } from "../../contracts/ui-types.js";
+import type { NativeComponents } from "../../facade/map-context.js";
 import { useActiveCallback } from "./use-active-callback.js";
 import { useFrozenValue } from "./use-frozen-value.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
@@ -65,7 +65,7 @@ export interface NativeUIOptions {
   readonly backend: "mapbox-native" | "maplibre-native";
 }
 
-type NativeUI = Pick<Adapter, "Marker">;
+type NativeUI = Pick<NativeComponents, "Marker">;
 
 /**
  * Composes native markers.

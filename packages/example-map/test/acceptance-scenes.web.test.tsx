@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from "@testing-library/react";
+import * as nativeEntry from "one-map-react/mapbox-native";
 import { type ReactNode, useEffect } from "react";
 import {
   Layer,
@@ -10,7 +11,7 @@ import { expect, test, vi } from "vite-plus/test";
 
 import { GlobalStateApp } from "../src/scenarios/global-state-app.js";
 import type { NativeLocationButtonProps } from "../src/scenarios/native-location-button.js";
-import { nativeSceneComponents } from "../src/scenarios/native-scene-components.js";
+import { createNativeSceneComponents } from "../src/scenarios/native-scene-components.js";
 import type { WebSceneComponents } from "../src/scenarios/scene-components.js";
 import { Tf07Scene, type Tf07Probe } from "../src/scenarios/tf07-scene.js";
 import {
@@ -37,15 +38,20 @@ const fixture = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("one-map-react/native-extensions", async () => {
-  const legacy = await import("one-map-react/legacy");
-  return {
-    Images: () => null,
-    UserLocation: Reflect.get(legacy, "UserLocation"),
-  };
-});
+vi.mock("one-map-react/native-extensions", () => ({
+  Images: () => null,
+  UserLocation: ({
+    position,
+  }: {
+    position?: { lngLat: readonly [number, number] };
+  }) => (
+    <output data-testid="supplied-location">
+      {position ? JSON.stringify(position.lngLat) : "hidden"}
+    </output>
+  ),
+}));
 
-vi.mock("one-map-react/legacy", async () => {
+vi.mock("one-map-react/mapbox-native", async () => {
   const react = await import("react");
   return {
     Map: react.forwardRef((props: { children?: ReactNode }, ref) => {
@@ -63,24 +69,21 @@ vi.mock("one-map-react/legacy", async () => {
       }));
       return react.createElement("div", {}, props.children);
     }),
-    MapSetup: ({ children }: { children?: ReactNode }) => children,
+    MapProvider: ({ children }: { children?: ReactNode }) => children,
+    useMap: () => ({}),
     Source: ({ children }: { children?: ReactNode }) => children,
     Layer: () => null,
     Marker: (props: Record<string, unknown>) => {
       fixture.markers.push(props);
       return null;
     },
-    UserLocation: ({
-      position,
-    }: {
-      position?: { lngLat: readonly [number, number] };
-    }) => (
-      <output data-testid="supplied-location">
-        {position ? JSON.stringify(position.lngLat) : "hidden"}
-      </output>
-    ),
   };
 });
+
+const nativeSceneComponents = createNativeSceneComponents(
+  "mapbox-native",
+  nativeEntry
+);
 
 vi.mock("react-map-gl/maplibre", async () => {
   const react = await import("react");

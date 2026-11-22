@@ -24,14 +24,6 @@ export default defineConfig({
       },
     },
   ],
-  resolve: {
-    alias: [
-      {
-        find: /^one-map-react(?:\/legacy)?$/,
-        replacement: resolve("packages/one-map-react/dist/index.js"),
-      },
-    ],
-  },
   test: {
     name: "compiled-web",
     include: ["packages/one-map-react/test/**/*.web.test.tsx"],

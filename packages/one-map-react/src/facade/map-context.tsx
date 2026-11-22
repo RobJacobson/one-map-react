@@ -1,22 +1,52 @@
-import { createContext, type MutableRefObject, useContext } from "react";
+import {
+  type ComponentType,
+  createContext,
+  type RefAttributes,
+  type RefObject,
+  useContext,
+} from "react";
 
-import type { Adapter } from "../contracts/adapter.js";
+import type { NativeBackend } from "../contracts/backend.js";
 import type { MapRef } from "../contracts/camera-types.js";
+import type { ImagesProps } from "../contracts/images-types.js";
+import type { LayerProps } from "../contracts/layer-types.js";
+import type { SourceProps } from "../contracts/source-types.js";
+import type { MarkerProps, MarkerRef } from "../contracts/ui-types.js";
 
-/** Map-local resources owned by the facade, released on logical unmount. */
+/** Renderer components bound by one native entry. */
+export interface NativeComponents {
+  /** Native renderer used by these components. */
+  readonly backend: NativeBackend;
+  /** Source that nests child layers. */
+  readonly Source: ComponentType<SourceProps>;
+  /** Layer that receives a source ID from its parent. */
+  readonly Layer: ComponentType<LayerProps>;
+  /** Images registered with the mounted map. */
+  readonly Images: ComponentType<ImagesProps>;
+  /** Live view or annotation anchored to a coordinate. */
+  readonly Marker: ComponentType<MarkerProps & RefAttributes<MarkerRef>>;
+}
+
+/** Resources owned by a mounted native map. */
 export interface MapSession {
-  readonly ref: MutableRefObject<MapRef | null>;
+  readonly ref: RefObject<MapRef | null>;
   readonly map: MapRef;
   readonly ready: boolean;
-  /** Backend that owns the mounted map. */
-  readonly adapter?: Adapter;
+  /** Components belonging to this map. */
+  readonly components: NativeComponents;
 }
 
 export const MapSessionContext = createContext<MapSession | null>(null);
 
-/** Returns map-local context, failing explicitly outside a shared Map. */
-export const useMapSession = (): MapSession => {
+/**
+ * Reads resources belonging to the nearest native map.
+ *
+ * @param component - Component name for a render without an enclosing map.
+ * @returns The mounted map session.
+ * @throws When the component renders outside Map.
+ */
+export const useMapSession = (component = "This component"): MapSession => {
   const session = useContext(MapSessionContext);
-  if (!session) throw new Error("This component must render inside Map.");
+  if (!session) throw new Error(`${component} must render inside Map.`);
   return session;
 };

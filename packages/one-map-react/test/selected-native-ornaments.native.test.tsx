@@ -7,13 +7,8 @@ import MaplibreApp from "../../../packages/example-map/src/scenarios/maplibre-na
 const mockTf07Screen = jest.fn(
   (_props: { readonly ornaments: object }) => null
 );
-jest.mock("one-map-react/legacy", () => ({ MapSetup: () => null }));
-jest.mock("one-map-react/mapbox-native", () => ({
-  adapter: { backend: "mapbox-native" },
-}));
-jest.mock("one-map-react/maplibre-native", () => ({
-  adapter: { backend: "maplibre-native" },
-}));
+jest.mock("one-map-react/mapbox-native", () => ({}));
+jest.mock("one-map-react/maplibre-native", () => ({}));
 jest.mock(
   "../../../packages/example-map/src/scenarios/native-tf07-screen.js",
   () => ({

@@ -1,13 +1,11 @@
 import { expect, jest, test } from "@jest/globals";
 import { render } from "@testing-library/react-native";
-import type { Adapter } from "one-map-react";
-import { type ReactNode, StrictMode } from "react";
+import { StrictMode } from "react";
 
 import { NativeTf08Screen } from "../../example-map/src/scenarios/native-tf08-screen.js";
+import { createNativeSceneFixture } from "./native-scene-fixture.js";
 
-jest.mock("one-map-react/legacy", () => ({
-  MapSetup: ({ children }: { children: ReactNode }) => children,
-}));
+const components = createNativeSceneFixture();
 
 test("StrictMode effect replay owns a fresh offline command instance", async () => {
   const instances: {
@@ -19,11 +17,10 @@ test("StrictMode effect replay owns a fresh offline command instance", async () 
     instances.push(instance);
     return instance;
   });
-  const adapter = { backend: "mapbox-native" } as Adapter;
   const screen = await render(
     <StrictMode>
       <NativeTf08Screen
-        adapter={adapter}
+        components={components}
         createOfflineCommands={createCommands}
         requestLocationPermission={async () => undefined}
         getCurrentPosition={async () => ({ lngLat: [0, 0] })}

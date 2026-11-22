@@ -1,5 +1,7 @@
 import {
   type ComponentType,
+  type ForwardRefExoticComponent,
+  type PropsWithoutRef,
   createContext,
   forwardRef,
   type ReactElement,
@@ -13,22 +15,19 @@ import {
 import type { ViewProps } from "react-native";
 
 import { nativeLngLat, nativePoint } from "../adapters/shared/native-values.js";
-import type { Adapter } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
 import type {
-  NativeClickEvent,
   NativeMapInputs,
   NativeMarkerEvent,
 } from "../contracts/native-types.js";
 import type { SourceProps } from "../contracts/source-types.js";
 import type { MarkerProps, MarkerRef } from "../contracts/ui-types.js";
-import { MapSessionContext } from "./map-context.js";
+import { MapSessionContext, type NativeComponents } from "./map-context.js";
 import {
-  AdapterContext,
   createMapRegistry,
   type MapRegistry,
   noMapSubscription,
-} from "./map-setup.js";
+} from "./map-registry.js";
 import { MountedMap } from "./map.js";
 import { useSourceOptions } from "./source.js";
 import { useMarkerOptions } from "./ui.js";
@@ -60,11 +59,27 @@ export interface MapProviderProps {
   readonly children?: ReactNode;
 }
 
+/** Components and lookup exposed by a bound native entry. */
+interface NativeMapBinding<
+  Handle extends MapRef,
+  Props extends NativeMapInputs,
+> {
+  readonly Map: ForwardRefExoticComponent<
+    PropsWithoutRef<Props> & RefAttributes<Handle>
+  >;
+  readonly MapProvider: (props: MapProviderProps) => ReactElement;
+  readonly Source: (props: SourceProps) => ReactElement;
+  readonly Marker: ForwardRefExoticComponent<
+    NativeMarkerProps & RefAttributes<MarkerRef>
+  >;
+  readonly useMap: () => MapCollection<Handle>;
+}
+
 /**
  * Binds native map access to one concrete renderer and its typed handle.
  *
  * @param implementation - Renderer component exposing the selected handle.
- * @param adapter - Adapter used by legacy map descendants in this map.
+ * @param components - Components bound to the same renderer.
  * @returns Components and hook sharing the entry's enclosing and named map access.
  */
 export const createNativeMapBinding = <
@@ -72,13 +87,13 @@ export const createNativeMapBinding = <
   Props extends NativeMapInputs,
 >(
   implementation: ComponentType<Props & RefAttributes<Handle>>,
-  adapter: Adapter
-) => {
+  components: NativeComponents
+): NativeMapBinding<Handle, Props> => {
   const RegistryContext = createContext<MapRegistry<Handle> | null>(null);
 
   /** Shares attached maps by ID with descendants of this provider. */
   const MapProvider = ({ children }: MapProviderProps): ReactElement => {
-    const [registry] = useState(() => createMapRegistry<Handle>("MapProvider"));
+    const [registry] = useState(createMapRegistry<Handle>);
     return (
       <RegistryContext.Provider value={registry}>
         {children}
@@ -95,9 +110,9 @@ export const createNativeMapBinding = <
       registry?.getSnapshot ?? noMaps,
       noMaps
     );
-    // The bound adapter identifies the concrete handle, including under legacy MapSetup.
+    // The component bundle identifies the entry that created this handle.
     const current =
-      session?.adapter === adapter ? (session.map as Handle) : undefined;
+      session?.components === components ? (session.map as Handle) : undefined;
     return useMemo(() => {
       // Map IDs are arbitrary strings, including names inherited from Object.prototype.
       const maps: Record<string, Handle | undefined> = Object.create(null);
@@ -113,23 +128,21 @@ export const createNativeMapBinding = <
       throw new Error('MapProvider reserves the map id "current".');
     }
     return (
-      <AdapterContext.Provider value={adapter}>
-        <MountedMap<Handle, Props, NativeClickEvent>
-          props={props as Props}
-          implementation={implementation}
-          adapter={adapter}
-          forwardedRef={ref}
-          register={registry?.register}
-        />
-      </AdapterContext.Provider>
+      <MountedMap
+        props={props as Props}
+        implementation={implementation}
+        components={components}
+        forwardedRef={ref}
+        register={registry?.register}
+      />
     );
   });
 
   const Marker = forwardRef<MarkerRef, NativeMarkerProps>((props, ref) => {
     const { onClick, ...marker } = props;
-    useMarkerOptions(marker, adapter.backend);
+    useMarkerOptions(marker, components.backend);
     return (
-      <adapter.Marker
+      <components.Marker
         {...marker}
         ref={ref}
         onClick={
@@ -147,7 +160,7 @@ export const createNativeMapBinding = <
 
   const Source = (props: SourceProps): ReactElement => {
     useSourceOptions(props);
-    return <adapter.Source {...props} />;
+    return <components.Source {...props} />;
   };
 
   return { Map: NativeMap, MapProvider, useMap, Marker, Source };

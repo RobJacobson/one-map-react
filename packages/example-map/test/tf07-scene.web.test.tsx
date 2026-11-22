@@ -1,5 +1,6 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import type { ViewState } from "one-map-react";
+import * as nativeEntry from "one-map-react/mapbox-native";
 import {
   createContext,
   type ReactNode,
@@ -9,7 +10,7 @@ import {
 } from "react";
 import { expect, test, vi } from "vite-plus/test";
 
-import { nativeSceneComponents } from "../src/scenarios/native-scene-components.js";
+import { createNativeSceneComponents } from "../src/scenarios/native-scene-components.js";
 import { NativeTf07Screen } from "../src/scenarios/native-tf07-screen.js";
 import { Tf07Scene, type Tf07Probe } from "../src/scenarios/tf07-scene.js";
 
@@ -27,20 +28,18 @@ const fixture = vi.hoisted(() => ({
         features: readonly object[];
       }) => void),
 }));
-vi.mock("one-map-react/native-extensions", async () => {
-  const legacy = await import("one-map-react/legacy");
-  return {
-    Images: () => null,
-    UserLocation: Reflect.get(legacy, "UserLocation"),
-  };
-});
+vi.mock("one-map-react/native-extensions", () => ({
+  Images: () => null,
+  UserLocation: () => null,
+}));
 
-vi.mock("one-map-react/legacy", async () => {
+vi.mock("one-map-react/mapbox-native", async () => {
   const react = await import("react");
   const InMap = react.createContext(false);
   const Content = ({ children }: { readonly children?: ReactNode }) => children;
   return {
-    MapSetup: Content,
+    MapProvider: Content,
+    useMap: () => ({}),
     Map: react.forwardRef(
       (
         props: {
@@ -78,9 +77,13 @@ vi.mock("one-map-react/legacy", async () => {
       fixture.markers.push(props);
       return null;
     },
-    UserLocation: () => null,
   };
 });
+
+const nativeSceneComponents = createNativeSceneComponents(
+  "mapbox-native",
+  nativeEntry
+);
 
 test("TF07 native supplies only supported marker interaction props", () => {
   fixture.markers = [];
@@ -226,10 +229,7 @@ vi.mock("react-native", async () => {
 
 test("native TF07 host bounds the map and screen buttons below the toolbar", () => {
   const mounted = render(
-    <NativeTf07Screen
-      adapter={{} as import("one-map-react").Adapter}
-      ornaments={{}}
-    />
+    <NativeTf07Screen components={nativeSceneComponents} ornaments={{}} />
   );
   const renderer = mounted.getByTestId("sdk-map");
   const host = renderer.parentElement;

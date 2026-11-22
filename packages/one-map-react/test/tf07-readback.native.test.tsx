@@ -1,9 +1,8 @@
 import { expect, jest, test } from "@jest/globals";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
-import type { ReactNode } from "react";
 
 import { NativeTf07Screen } from "../../../packages/example-map/src/scenarios/native-tf07-screen.js";
-import type { Adapter } from "../src/contracts/adapter.js";
+import { createNativeSceneFixture } from "./native-scene-fixture.js";
 
 jest.mock(
   "../../../packages/example-map/src/scenarios/native-viewport.js",
@@ -11,9 +10,6 @@ jest.mock(
     measureNativeViewport: async () => [0, 0, 320, 480],
   })
 );
-jest.mock("one-map-react/legacy", () => ({
-  MapSetup: ({ children }: { readonly children: ReactNode }) => children,
-}));
 jest.mock("../../../packages/example-map/src/scenarios/tf07-scene.js", () => ({
   Tf07Scene: ({ attach }: { readonly attach: (probe: unknown) => void }) => {
     attach({
@@ -24,15 +20,17 @@ jest.mock("../../../packages/example-map/src/scenarios/tf07-scene.js", () => ({
   },
 }));
 
+const components = createNativeSceneFixture();
+
 test("renderer reads expose fresh receipts even when observations do not change", async () => {
   const fetchSpy = jest
     .spyOn(globalThis, "fetch")
     .mockResolvedValue({} as Response);
   try {
-    // The scene and setup are mocked; this test exercises only readback delivery.
+    // The scene is mocked; this test exercises only readback delivery.
     const screen = await render(
       <NativeTf07Screen
-        adapter={{} as Adapter}
+        components={components}
         ornaments={{ scaleBarEnabled: true }}
       />
     );

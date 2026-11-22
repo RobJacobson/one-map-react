@@ -7,23 +7,24 @@ import {
   initialViewState,
   routes,
 } from "../../example-map/src/scenarios/map-fixture.js";
-import type { Adapter } from "../src/contracts/adapter.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import { Map as OneMap } from "../src/facade/map.js";
-import { Source } from "../src/facade/source.js";
+import type { MapRef } from "../src/contracts/camera-types.js";
+import type { NativeMapInputs } from "../src/contracts/native-types.js";
+import { createNativeMapBinding } from "../src/facade/native-map.js";
 import {
   changedOptionKey,
   useStableOptions,
 } from "../src/facade/use-stable-options.js";
 
-const adapter: Adapter = {
+const FakeMap = forwardRef<MapRef, NativeMapInputs>(({ children }, _ref) => (
+  <>{children}</>
+));
+const { Map: NativeMap, Source } = createNativeMapBinding(FakeMap, {
   backend: "mapbox-native",
-  Map: forwardRef(({ children }, _ref) => <>{children}</>),
   Source: () => null,
   Layer: () => null,
   Images: () => null,
-  Marker: forwardRef(() => null),
-};
+  Marker: () => null,
+});
 
 const Probe = ({
   options,
@@ -104,11 +105,9 @@ describe("useStableOptions", () => {
 
 describe("source creation option families", () => {
   const tree = (source: ReactNode) => (
-    <MapSetup adapter={adapter}>
-      <OneMap mapStyle={emptyStyle} initialViewState={initialViewState}>
-        {source}
-      </OneMap>
-    </MapSetup>
+    <NativeMap mapStyle={emptyStyle} initialViewState={initialViewState}>
+      {source}
+    </NativeMap>
   );
 
   test("geojson data may change without remounting", () => {

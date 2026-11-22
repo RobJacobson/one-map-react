@@ -6,12 +6,12 @@ import {
   Tf09Scene,
   type Tf09Probe,
 } from "../../../packages/example-map/src/scenarios/tf09-scene.js";
-import { nativeSceneComponents } from "../../example-map/src/scenarios/native-scene-components.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import type { Adapter, MapRef, MapProps } from "../src/index.js";
+import type { NativeMapInputs } from "../src/contracts/native-types.js";
+import type { MapRef } from "../src/index.js";
+import { createNativeSceneFixture } from "./native-scene-fixture.js";
 
-const wrapper = vi.fn((_props: MapProps) => {});
-const Camera = forwardRef<MapRef, MapProps>((props, ref) => {
+const wrapper = vi.fn((_props: NativeMapInputs) => {});
+const Camera = forwardRef<MapRef, NativeMapInputs>((props, ref) => {
   useImperativeHandle(
     ref,
     () =>
@@ -23,14 +23,7 @@ const Camera = forwardRef<MapRef, MapProps>((props, ref) => {
   wrapper(props);
   return <>{props.children}</>;
 });
-const adapter: Adapter = {
-  backend: "mapbox-native",
-  Map: Camera,
-  Source: () => null,
-  Layer: () => null,
-  Images: () => null,
-  Marker: forwardRef(() => null),
-};
+const components = createNativeSceneFixture(Camera);
 
 const target = { longitude: 0, latitude: 0, zoom: 2, bearing: 0, pitch: 0 };
 
@@ -41,16 +34,14 @@ test("native camera probe reports observed movement independently of an unchange
     return attached;
   };
   const view = render(
-    <MapSetup adapter={adapter}>
-      <Tf09Scene
-        components={nativeSceneComponents}
-        backend="mapbox-native"
-        style={{ width: 400, height: 400 }}
-        attach={(value) => {
-          attached = value;
-        }}
-      />
-    </MapSetup>
+    <Tf09Scene
+      components={components}
+      backend="mapbox-native"
+      style={{ width: 400, height: 400 }}
+      attach={(value) => {
+        attached = value;
+      }}
+    />
   );
   await act(async () => {
     await probe().command("controlled-camera", {

@@ -2,7 +2,7 @@
 
 The next breaking release should let a React application run the same map screen with stock react-map-gl on web and with RNMapbox or MapLibre React Native on native. The application chooses a backend in its platform imports. one-map-react translates the native calls. The browser gets its components, events, refs, and types directly from react-map-gl.
 
-The checkout implements all four stages. Each native entry binds its renderer. Browser convenience paths forward react-map-gl, and stock web apps can omit one-map-react entirely. The [package migration guide](../packages/one-map-react/README.md) covers the breaking imports and event, ref and source changes. The [coverage checklist](api-coverage.md#native-compatibility-verification) lists routine proofs. Renderer acceptance remains open in the [current handoff](revised-api-acceptance-plan.md#current-handoff).
+The checkout implements all four stages. Each native entry binds its renderer and owns named lookup through its optional `MapProvider`. The package root exports shared types. Browser convenience paths forward react-map-gl, and stock web apps can omit one-map-react entirely. The [package guide](../packages/one-map-react/README.md) covers the breaking imports and event, ref and source changes. The [coverage checklist](api-coverage.md#native-compatibility-verification) lists routine proofs. Renderer acceptance remains open in the [current handoff](revised-api-acceptance-plan.md#current-handoff).
 
 ## Why change the boundary?
 

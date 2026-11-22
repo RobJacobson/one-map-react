@@ -1,8 +1,10 @@
 import { act, fireEvent, render } from "@testing-library/react";
-import type { Adapter, ViewState } from "one-map-react";
+import type { ViewState } from "one-map-react";
+import * as nativeEntry from "one-map-react/mapbox-native";
 import type { ReactNode } from "react";
 import { expect, test, vi } from "vite-plus/test";
 
+import { createNativeSceneComponents } from "../src/scenarios/native-scene-components.js";
 import { NativeTf07RetainedScreen } from "../src/scenarios/native-tf07-retained-screen.js";
 
 const fixture = vi.hoisted(() => ({
@@ -66,12 +68,14 @@ vi.mock("react-native", async () => {
     useWindowDimensions: () => fixture.dimensions,
   };
 });
-vi.mock("one-map-react/legacy", async () => {
+vi.mock("one-map-react/mapbox-native", async () => {
   const react = await import("react");
   const InMarker = react.createContext(false);
+  const InMapProvider = react.createContext(false);
   const Content = ({ children }: { children?: ReactNode }) => children;
   return {
-    MapSetup: Content,
+    MapProvider: ({ children }: { children?: ReactNode }) =>
+      react.createElement(InMapProvider.Provider, { value: true }, children),
     Source: Content,
     Layer: () => null,
     Map: react.forwardRef(
@@ -129,20 +133,32 @@ vi.mock("one-map-react/legacy", async () => {
         );
       }
     ),
-    useMap: (id: string) => {
-      if (!react.useContext(InMarker))
-        throw new Error("Named lookup must run inside the live marker portal.");
-      return fixture.maps[id];
+    useMap: () => {
+      const inMarker = react.useContext(InMarker);
+      const inMapProvider = react.useContext(InMapProvider);
+      if (!inMarker || !inMapProvider)
+        throw new Error(
+          "Named lookup requires MapProvider and the live marker portal."
+        );
+      return fixture.maps;
     },
   };
 });
 
+const nativeSceneComponents = createNativeSceneComponents(
+  "mapbox-native",
+  nativeEntry
+);
+
 const mount = () => {
+  fixture.maps = {};
   fixture.images = [];
   fixture.post.mockClear();
   fixture.refresh.mockClear();
   vi.stubGlobal("fetch", fixture.post);
-  return render(<NativeTf07RetainedScreen adapter={{} as Adapter} />);
+  return render(
+    <NativeTf07RetainedScreen components={nativeSceneComponents} />
+  );
 };
 
 test("both live marker children retain provider/local state and query their own named renderer", async () => {

@@ -1,26 +1,5 @@
-import type { Adapter } from "../contracts/adapter.js";
-import type { LayerProps } from "../contracts/layer-types.js";
-import { useSelectedAdapter } from "./map-setup.js";
+import type { NativeBackend } from "../contracts/backend.js";
 import { useStableOptions } from "./use-stable-options.js";
-
-/**
- * Shared layer that renders the selected adapter's layer component.
- *
- * Remains the direct child of the wrapper source so injected `source` or
- * `sourceID` reaches the wrapper layer. Paint, layout, filter, zoom range,
- * and `beforeId` may change between renders; `id`, `type`,
- * `"source-layer"`, and an injected `source` or `sourceID` are creation
- * inputs.
- *
- * @param props - Layer type, id, style, and any parent-injected source id.
- */
-export const Layer = (props: LayerProps) => {
-  const { backend, Layer: AdapterLayer } = useSelectedAdapter();
-
-  useLayerOptions(props, backend);
-
-  return <AdapterLayer {...props} />;
-};
 
 /**
  * Enforces stable creation inputs and native layout support for a portable layer.
@@ -31,7 +10,7 @@ export const Layer = (props: LayerProps) => {
  */
 export const useLayerOptions = (
   props: LayerOptions,
-  backend: Adapter["backend"]
+  backend: NativeBackend
 ): void => {
   useStableOptions(
     `Layer "${props.id ?? props.type}"`,
@@ -78,7 +57,7 @@ const NATIVE_UNSUPPORTED_SYMBOL_LAYOUT = [
  */
 export const rejectNativeUnsupportedLayout = (
   props: { readonly type: string; readonly layout?: object },
-  backend: Adapter["backend"]
+  backend: NativeBackend
 ): void => {
   if (props.type !== "symbol" || props.layout === undefined) {
     return;

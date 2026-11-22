@@ -6,7 +6,7 @@ The [advanced rendering record](tf09-rendering.md) describes portable terrain/pr
 
 ## Next breaking release
 
-Use the [package migration guide](../packages/one-map-react/README.md) to select stock react-map-gl on web and a native compatibility entry on iOS or Android. The [native compatibility design](native-compatibility-design.md) explains the four stages, their verification and the ownership of camera, marker and query translations.
+Use the [package guide](../packages/one-map-react/README.md) to select stock react-map-gl on web and a native compatibility entry on iOS or Android. The [native compatibility design](native-compatibility-design.md) explains the four stages, their verification and the ownership of camera, marker and query translations.
 
 ## Four-backend facade baseline
 

@@ -12,7 +12,7 @@ export { Map, Source, Layer, Marker, useMap } from "react-map-gl/maplibre";
 export { Map, Source, Layer, Marker, useMap } from "one-map-react/mapbox-native";
 ```
 
-Import `./maps` from shared JSX. Camera commands, queries, marker children and style updates are translated on native. A stock web-only application has no dependency on this package. See the [installation and migration guide](packages/one-map-react/README.md) and the [shared vessel screen](packages/example-map/reference/VesselMap.tsx).
+Import `./maps` from shared JSX. Camera commands, queries, marker children and style updates are translated on native. A stock web-only application has no dependency on this package. See the [installation and API guide](packages/one-map-react/README.md) and the [shared vessel screen](packages/example-map/reference/VesselMap.tsx).
 
 ## Development
 

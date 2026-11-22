@@ -2,16 +2,18 @@ import { render } from "@testing-library/react";
 import { expect, test, vi } from "vite-plus/test";
 
 import { validateTerrainCoordinate } from "../src/adapters/shared/terrain-values.js";
-import type { Adapter } from "../src/contracts/adapter.js";
 import type { LngLat } from "../src/contracts/camera-types.js";
-import type { MapProps } from "../src/contracts/map-types.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import { Map as OneMap } from "../src/facade/map.js";
+import type { NativeMapInputs } from "../src/contracts/native-types.js";
+import { createNativeMapBinding } from "../src/facade/native-map.js";
 
-const adapter = {
+const renderer = vi.fn(() => null);
+const { Map: NativeMap } = createNativeMapBinding(renderer, {
   backend: "maplibre-native",
-  Map: vi.fn(() => null),
-} as unknown as Adapter;
+  Source: () => null,
+  Layer: () => null,
+  Images: () => null,
+  Marker: () => null,
+});
 const camera = { longitude: 0, latitude: 0, zoom: 0, bearing: 0, pitch: 0 };
 const style = { version: 8 as const, sources: {}, layers: [] };
 
@@ -23,19 +25,17 @@ test.each([
   { terrain: { source: "dem", exaggeration: -1 } },
   { terrain: { source: "dem", exaggeration: Infinity } },
 ])("rejects malformed rendering input before adapter dispatch: %j", (props) => {
-  vi.mocked(adapter.Map).mockClear();
+  renderer.mockClear();
   expect(() =>
     render(
-      <MapSetup adapter={adapter}>
-        <OneMap
-          {...(props as unknown as Partial<MapProps>)}
-          mapStyle={style}
-          initialViewState={camera}
-        />
-      </MapSetup>
+      <NativeMap
+        {...(props as unknown as Partial<NativeMapInputs>)}
+        mapStyle={style}
+        initialViewState={camera}
+      />
     )
   ).toThrow(RangeError);
-  expect(adapter.Map).not.toHaveBeenCalled();
+  expect(renderer).not.toHaveBeenCalled();
 });
 
 // eslint-disable-next-line unicorn/no-new-array -- Sparse coordinates must regress Array.every skipping missing elements.

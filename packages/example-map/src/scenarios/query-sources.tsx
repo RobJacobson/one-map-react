@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import type { LayerProps } from "react-map-gl/maplibre";
 
 import { clusteredPoints, queryRoutes } from "./map-fixture.js";
@@ -38,8 +38,8 @@ export const QuerySources = ({
   Layer,
   sourceRevision,
 }: {
-  Source: ComponentType<QuerySourceProps>;
-  Layer: ComponentType<typeof routeLayer | typeof clusterLayer>;
+  Source: (props: QuerySourceProps) => ReactNode;
+  Layer: (props: typeof routeLayer | typeof clusterLayer) => ReactNode;
   sourceRevision: number;
 }) => {
   const routes = useMemo(

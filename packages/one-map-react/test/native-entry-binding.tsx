@@ -15,9 +15,9 @@ import {
   initialViewState,
   routes,
 } from "../../example-map/src/scenarios/map-fixture.js";
-import type { Adapter } from "../src/contracts/adapter.js";
+import type { NativeBackend } from "../src/contracts/backend.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
-import type { NativePortableLayerProps } from "../src/contracts/layer-types.js";
+import type { LayerProps } from "../src/contracts/layer-types.js";
 import type {
   NativeClickEvent,
   NativeMapInputs,
@@ -25,8 +25,7 @@ import type {
 } from "../src/contracts/native-types.js";
 import type { SourceProps } from "../src/contracts/source-types.js";
 import type { MarkerRef } from "../src/contracts/ui-types.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import { useMap as useLegacyMap } from "../src/facade/map.js";
+import { createNativeMapBinding } from "../src/facade/native-map.js";
 
 type SelectedHandle = NativeMapRef & { getWrapperMap(): Promise<unknown> };
 type MarkerCoordinates = {
@@ -40,9 +39,8 @@ interface NativeEntry<Handle extends SelectedHandle> {
   readonly Map: ComponentType<NativeMapInputs & RefAttributes<Handle>>;
   readonly MapProvider: ComponentType<{ readonly children?: ReactNode }>;
   readonly Source: ComponentType<SourceProps>;
-  readonly Layer: ComponentType<NativePortableLayerProps>;
+  readonly Layer: ComponentType<LayerProps>;
   readonly Marker: ComponentType<MarkerCoordinates & RefAttributes<MarkerRef>>;
-  readonly adapter: Adapter;
   useMap(): MapLookup<Handle>;
 }
 
@@ -55,6 +53,7 @@ type WrapperEvents = {
  * Tests the selected entry using its actual wrapper mocks.
  *
  * @param entry - Native entry under test.
+ * @param backend - SDK represented by this entry.
  * @param press - The selected wrapper's press payload.
  * @param beginPressQuery - Fakes a pending rendered-feature query and returns its completion.
  * @param clusterZoom - Mock cluster call exposed by mounted source refs.
@@ -62,6 +61,7 @@ type WrapperEvents = {
  */
 export const testNativeEntryBinding = <Handle extends SelectedHandle>(
   entry: NativeEntry<Handle>,
+  backend: NativeBackend,
   press: object,
   beginPressQuery: () => () => void,
   clusterZoom: jest.Mock<(...args: never[]) => Promise<number>>,
@@ -74,12 +74,9 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
       <NativeMap mapStyle={emptyStyle} touchZoomRotate={false} />
     );
     const gestureProps = () => view.getByTestId("wrapper-map").props;
-    const zoom =
-      entry.adapter.backend === "mapbox-native" ? "zoomEnabled" : "touchZoom";
+    const zoom = backend === "mapbox-native" ? "zoomEnabled" : "touchZoom";
     const rotate =
-      entry.adapter.backend === "mapbox-native"
-        ? "rotateEnabled"
-        : "touchRotate";
+      backend === "mapbox-native" ? "rotateEnabled" : "touchRotate";
     expect(gestureProps()[zoom]).toBe(false);
     expect(gestureProps()[rotate]).toBe(false);
     await view.rerender(
@@ -87,6 +84,17 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     );
     expect(gestureProps()[zoom]).toBe(true);
     expect(gestureProps()[rotate]).toBe(false);
+  });
+
+  test.each([
+    { "icon-overlap": "always" },
+    { "text-overlap": "always" },
+    { "text-variable-anchor-offset": ["top", [0, 1]] },
+  ] as const)("rejects unsupported native symbol layout %j", async (layout) => {
+    const [field] = Object.keys(layout);
+    await expect(
+      render(<Layer id="symbol" type="symbol" layout={layout} />)
+    ).rejects.toThrow(`${field} is not available on ${backend}.`);
   });
 
   test("binds a map, source, layer, and marker without setup", async () => {
@@ -164,20 +172,23 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     const named = jest.fn<(map: Handle | undefined) => void>();
     const defaultNamed = jest.fn<(map: Handle | undefined) => void>();
     const innerNamed = jest.fn<(map: Handle | undefined) => void>();
-    const legacyNamed = jest.fn<(map: MapRef | undefined) => void>();
     const unexpected = (): never => {
-      throw new Error("Selected components reached the ambient adapter.");
+      throw new Error("Selected components reached the foreign binding.");
     };
-    const ambient: Adapter = {
-      ...entry.adapter,
-      backend:
-        entry.adapter.backend === "mapbox-native"
-          ? "maplibre-native"
-          : "mapbox-native",
-      Map: forwardRef(unexpected),
-      Source: unexpected,
-      Layer: unexpected,
-      Marker: forwardRef(unexpected),
+    const { MapProvider: ForeignProvider, useMap: useForeignMap } =
+      createNativeMapBinding(forwardRef<MapRef, NativeMapInputs>(unexpected), {
+        backend:
+          backend === "mapbox-native" ? "maplibre-native" : "mapbox-native",
+        Source: unexpected,
+        Layer: unexpected,
+        Images: unexpected,
+        Marker: unexpected,
+      });
+    const ForeignProbe = () => {
+      const maps = useForeignMap();
+      expect(maps.default).toBeUndefined();
+      expect(maps.current).toBeUndefined();
+      return <Text>Foreign lookup</Text>;
     };
     const Probe = ({
       observe,
@@ -192,13 +203,8 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
       expect(maps.current).toBeUndefined();
       return null;
     };
-    const LegacyProbe = () => {
-      const map = useLegacyMap("legacy");
-      useLayoutEffect(() => legacyNamed(map), [map]);
-      return null;
-    };
     const scene = (generation: number | null) => (
-      <MapSetup adapter={ambient}>
+      <>
         <MapProvider>
           <Probe observe={named} id="harbor" />
           <Probe observe={defaultNamed} id="default" />
@@ -230,13 +236,12 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
             />
           </MapProvider>
         </MapProvider>
-        <LegacyProbe />
-        <NativeMap
-          id="legacy"
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-        />
-      </MapSetup>
+        <ForeignProvider>
+          <NativeMap mapStyle={emptyStyle}>
+            <ForeignProbe />
+          </NativeMap>
+        </ForeignProvider>
+      </>
     );
 
     const view = await render(scene(1));
@@ -246,7 +251,7 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(old).toBeDefined();
     expect(inner).toBeDefined();
     expect(defaultMap).toBeDefined();
-    await expect(legacyNamed.mock.lastCall?.[0]?.getZoom()).resolves.toBe(11);
+    expect(view.getByText("Foreign lookup")).toBeDefined();
     expect(old).not.toBe(inner);
     expect(defaultMap).not.toBe(old);
     expect(view.getByText("Vessel")).toBeDefined();

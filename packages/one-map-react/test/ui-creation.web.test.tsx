@@ -2,44 +2,42 @@ import { render } from "@testing-library/react";
 import { forwardRef, type ReactNode, StrictMode } from "react";
 import { describe, expect, test } from "vite-plus/test";
 
-import type { Adapter } from "../src/contracts/adapter.js";
+import type { NativeBackend } from "../src/contracts/backend.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
-import type { MapProps } from "../src/contracts/map-types.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import { Map as OneMap } from "../src/facade/map.js";
-import { Marker } from "../src/facade/ui.js";
+import type { NativeMapInputs } from "../src/contracts/native-types.js";
+import { createNativeMapBinding } from "../src/facade/native-map.js";
 
 const camera = { longitude: 0, latitude: 0, zoom: 1, bearing: 0, pitch: 0 };
 const style = { version: 8 as const, sources: {}, layers: [] };
-const FakeMap = forwardRef<MapRef, MapProps>(({ children }, _ref) => (
+const FakeMap = forwardRef<MapRef, NativeMapInputs>(({ children }, _ref) => (
   <>{children}</>
 ));
 const Empty = () => null;
-const fakeAdapter = (backend: Adapter["backend"]): Adapter => ({
-  backend,
-  Map: FakeMap,
-  Source: Empty,
-  Layer: Empty,
-  Images: Empty,
-  Marker: forwardRef((_props, _ref) => null),
-});
+const createFixture = (backend: NativeBackend) =>
+  createNativeMapBinding(FakeMap, {
+    backend,
+    Source: Empty,
+    Layer: Empty,
+    Images: Empty,
+    Marker: forwardRef((_props, _ref) => null),
+  });
 
 const genuineChanges = [
   [
     "Marker",
-    (changed: boolean) => (
+    (Marker: ReturnType<typeof createFixture>["Marker"], changed: boolean) => (
       <Marker longitude={0} latitude={0} anchor={changed ? "bottom" : "top"} />
     ),
   ],
   [
     "Marker id",
-    (changed: boolean) => (
+    (Marker: ReturnType<typeof createFixture>["Marker"], changed: boolean) => (
       <Marker longitude={0} latitude={0} id={changed ? "other" : "original"} />
     ),
   ],
   [
     "Marker mode",
-    (changed: boolean) => (
+    (Marker: ReturnType<typeof createFixture>["Marker"], changed: boolean) => (
       <Marker
         longitude={0}
         latitude={0}
@@ -49,25 +47,23 @@ const genuineChanges = [
   ],
 ] as const;
 
-describe.each<Adapter["backend"]>(["mapbox-native", "maplibre-native"])(
-  "%s custom adapter creation contracts",
+describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
+  "%s selected marker creation options",
   (backend) => {
-    const adapter = fakeAdapter(backend);
+    const { Map: NativeMap, Marker } = createFixture(backend);
     const tree = (children: ReactNode) => (
       <StrictMode>
-        <MapSetup adapter={adapter}>
-          <OneMap mapStyle={style} initialViewState={camera}>
-            {children}
-          </OneMap>
-        </MapSetup>
+        <NativeMap mapStyle={style} initialViewState={camera}>
+          {children}
+        </NativeMap>
       </StrictMode>
     );
 
     test.each(genuineChanges)(
       "%s rejects a genuine creation change",
       (name, component) => {
-        const mounted = render(tree(component(false)));
-        expect(() => mounted.rerender(tree(component(true)))).toThrow(
+        const mounted = render(tree(component(Marker, false)));
+        expect(() => mounted.rerender(tree(component(Marker, true)))).toThrow(
           `${name.split(" ")[0]} changed the creation option`
         );
       }

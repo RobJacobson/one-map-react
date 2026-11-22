@@ -1,4 +1,4 @@
-export type { Adapter, Backend } from "./contracts/adapter.js";
+export type { Backend } from "./contracts/backend.js";
 export type {
   Bounds,
   CameraCommandOptions,
@@ -20,15 +20,12 @@ export type {
   MoveOrigin,
 } from "./contracts/event-types.js";
 export type {
-  AlignmentAuto,
-  AlignmentMap,
   BackgroundLayerProps,
   BackgroundLayout,
   BackgroundPaint,
   CircleLayerProps,
   CircleLayout,
   CirclePaint,
-  Expression,
   FillExtrusionLayerProps,
   FillExtrusionLayout,
   FillExtrusionPaint,
@@ -46,16 +43,12 @@ export type {
   LineLayerProps,
   LineLayout,
   LinePaint,
-  Overlap,
   RasterLayerProps,
   RasterLayout,
   RasterPaint,
-  StyleValue,
-  SymbolAnchor,
   SymbolLayerProps,
   SymbolLayout,
   SymbolPaint,
-  Visibility,
 } from "./contracts/layer-types.js";
 export type {
   LegacyLight,
@@ -98,9 +91,3 @@ export type {
   MarkerProps,
   MarkerRef,
 } from "./contracts/ui-types.js";
-export { Layer } from "./facade/layer.js";
-export { Map, useMap } from "./facade/map.js";
-export type { MapSetupProps } from "./facade/map-setup.js";
-export { MapSetup } from "./facade/map-setup.js";
-export { Source } from "./facade/source.js";
-export { Marker } from "./facade/ui.js";

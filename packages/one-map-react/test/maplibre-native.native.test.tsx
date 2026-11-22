@@ -17,17 +17,9 @@ import {
 } from "../../example-map/src/scenarios/map-fixture.js";
 import { NativeCameraContext } from "../src/adapters/shared/native-map-presentation.js";
 import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
-import type { MapRef } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
-import type {
-  ExternalDrawingContext,
-  MapProps,
-} from "../src/contracts/map-types.js";
+import type { ExternalDrawingContext } from "../src/contracts/map-types.js";
 import type { FeatureState } from "../src/contracts/query-types.js";
-import { Layer } from "../src/facade/layer.js";
-import { MapSetup } from "../src/facade/map-setup.js";
-import { Map as OneMap, useMap } from "../src/facade/map.js";
-import { Source } from "../src/facade/source.js";
 import { Images } from "../src/native-extensions.js";
 import { testNativeEntryBinding } from "./native-entry-binding.js";
 
@@ -268,7 +260,12 @@ import {
 } from "@maplibre/maplibre-react-native";
 
 import {
-  adapter,
+  Layer,
+  MapProvider,
+  Source,
+  useMap,
+  type MapProps,
+  type MapRef,
   Map as NativeMap,
   type NativeAdvancedMapRef,
 } from "../src/maplibre-native.js";
@@ -322,40 +319,36 @@ const example = (
   onMove?: (event: object) => void,
   extra?: Partial<MapProps>
 ) => (
-  <MapSetup adapter={adapter}>
-    <OneMap
-      ref={ref}
-      mapStyle={emptyStyle}
-      initialViewState={initialViewState}
-      style={{ flex: 1 }}
-      onMove={onMove}
-      {...extra}
-    >
-      <Source id="routes" type="geojson" data={routes}>
-        <Layer
-          id="route-line"
-          type="line"
-          paint={{ "line-color": "#2563eb", "line-width": 3 }}
-          layout={{ "line-cap": "round" }}
-        />
-      </Source>
-    </OneMap>
-  </MapSetup>
+  <NativeMap
+    ref={ref}
+    mapStyle={emptyStyle}
+    initialViewState={initialViewState}
+    style={{ flex: 1 }}
+    onMove={onMove}
+    {...extra}
+  >
+    <Source id="routes" type="geojson" data={routes}>
+      <Layer
+        id="route-line"
+        type="line"
+        paint={{ "line-color": "#2563eb", "line-width": 3 }}
+        layout={{ "line-cap": "round" }}
+      />
+    </Source>
+  </NativeMap>
 );
 
 const vectorTree = (ref?: Ref<MapRef>) => (
-  <MapSetup adapter={adapter}>
-    <OneMap
-      ref={ref}
-      mapStyle={emptyStyle}
-      initialViewState={initialViewState}
-      style={{ flex: 1 }}
-    >
-      <Source id="tiles" type="vector" url="maplibre://tiles">
-        <Layer id="tile-line" type="line" source-layer="way" />
-      </Source>
-    </OneMap>
-  </MapSetup>
+  <NativeMap
+    ref={ref}
+    mapStyle={emptyStyle}
+    initialViewState={initialViewState}
+    style={{ flex: 1 }}
+  >
+    <Source id="tiles" type="vector" url="maplibre://tiles">
+      <Layer id="tile-line" type="line" source-layer="way" />
+    </Source>
+  </NativeMap>
 );
 
 describe("maplibre-native adapter", () => {
@@ -365,27 +358,25 @@ describe("maplibre-native adapter", () => {
       const ref = createRef<NativeAdvancedMapRef>();
       let observed: NativeAdvancedMapRef | undefined;
       const Probe = () => {
-        // The common type omits selected access; exercise its real runtime proxy.
-        // eslint-disable-next-line react/globals -- Capture the attached facade proxy for lifecycle assertions.
-        observed = useMap(access === "named" ? "borrowed" : undefined) as
-          | NativeAdvancedMapRef
-          | undefined;
+        const maps = useMap();
+        // eslint-disable-next-line react/globals -- Capture the handle for lifecycle assertions.
+        observed = access === "named" ? maps.borrowed : maps.current;
         return null;
       };
-      const MapComponent = access === "selected" ? NativeMap : OneMap;
       const loaded = jest.fn();
       const scene = (mapStyle: MapProps["mapStyle"]) => (
-        <MapSetup adapter={adapter}>
-          <MapComponent
+        <MapProvider>
+          {access === "named" && <Probe />}
+          <NativeMap
             id="borrowed"
             ref={ref}
             mapStyle={mapStyle}
             initialViewState={initialViewState}
             onLoad={loaded}
           >
-            {access !== "selected" && <Probe />}
-          </MapComponent>
-        </MapSetup>
+            {access === "enclosing" && <Probe />}
+          </NativeMap>
+        </MapProvider>
       );
       mockFlyTo.mockClear();
       const view = await render(scene(emptyStyle));
@@ -438,13 +429,11 @@ describe("maplibre-native adapter", () => {
   test("forwards selected frame observation callbacks without common capture ownership", async () => {
     const onFrame = jest.fn();
     await render(
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          options={{ onDidFinishRenderingFrameFully: onFrame }}
-        />
-      </MapSetup>
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        options={{ onDidFinishRenderingFrameFully: onFrame }}
+      />
     );
     const props = lastMapProps<{
       onDidFinishRenderingFrameFully: () => void;
@@ -456,23 +445,21 @@ describe("maplibre-native adapter", () => {
 
   test("selected SDK ornament flags and positions update and reset to defaults", async () => {
     const scene = (enabled: boolean | undefined) => (
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          options={{
-            attribution: enabled,
-            logo: enabled,
-            scaleBar: enabled,
-            logoPosition:
-              enabled === undefined ? undefined : { bottom: 3, left: 4 },
-            compassPosition:
-              enabled === undefined ? undefined : { top: 7, right: 8 },
-            attributionPosition:
-              enabled === undefined ? undefined : { top: 5, right: 6 },
-          }}
-        />
-      </MapSetup>
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        options={{
+          attribution: enabled,
+          logo: enabled,
+          scaleBar: enabled,
+          logoPosition:
+            enabled === undefined ? undefined : { bottom: 3, left: 4 },
+          compassPosition:
+            enabled === undefined ? undefined : { top: 7, right: 8 },
+          attributionPosition:
+            enabled === undefined ? undefined : { top: 5, right: 6 },
+        }}
+      />
     );
     const view = await render(scene(true));
     for (const enabled of [true, false, undefined]) {
@@ -1080,15 +1067,13 @@ describe("maplibre-native adapter", () => {
 });
 
 const tree = (children: ReactNode) => (
-  <MapSetup adapter={adapter}>
-    <OneMap
-      mapStyle={emptyStyle}
-      initialViewState={initialViewState}
-      style={{ flex: 1 }}
-    >
-      {children}
-    </OneMap>
-  </MapSetup>
+  <NativeMap
+    mapStyle={emptyStyle}
+    initialViewState={initialViewState}
+    style={{ flex: 1 }}
+  >
+    {children}
+  </NativeMap>
 );
 
 describe("maplibre-native source families", () => {
@@ -1591,11 +1576,7 @@ describe("maplibre-native images", () => {
 
   test("images outside a map are rejected", async () => {
     await expect(
-      render(
-        <MapSetup adapter={adapter}>
-          <Images images={{ marker: "https://example.com/m.png" }} />
-        </MapSetup>
-      )
+      render(<Images images={{ marker: "https://example.com/m.png" }} />)
     ).rejects.toThrow("Images must render inside Map.");
   });
 });
@@ -1870,29 +1851,27 @@ describe("maplibre-native queries and feature state", () => {
       }
       const ref = createRef<MapRef>();
       const scene = (family: "geojson" | "vector", revision: number) => (
-        <MapSetup adapter={adapter}>
-          <OneMap
-            ref={ref}
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-          >
-            {family === "geojson" ? (
-              <Source
-                key={`${family}-${revision}`}
-                id="shared"
-                type="geojson"
-                data={routes}
-              />
-            ) : (
-              <Source
-                key={`${family}-${revision}`}
-                id="shared"
-                type="vector"
-                url="maplibre://tiles"
-              />
-            )}
-          </OneMap>
-        </MapSetup>
+        <NativeMap
+          ref={ref}
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+        >
+          {family === "geojson" ? (
+            <Source
+              key={`${family}-${revision}`}
+              id="shared"
+              type="geojson"
+              data={routes}
+            />
+          ) : (
+            <Source
+              key={`${family}-${revision}`}
+              id="shared"
+              type="vector"
+              url="maplibre://tiles"
+            />
+          )}
+        </NativeMap>
       );
       const mounted = await render(scene(initialFamily, 0));
       const otherFamily = initialFamily === "geojson" ? "vector" : "geojson";
@@ -1931,24 +1910,22 @@ describe("maplibre-native queries and feature state", () => {
       });
       methods[previous].mockImplementationOnce(() => pending);
       const scene = (family: "geojson" | "vector") => (
-        <MapSetup adapter={adapter}>
-          <OneMap
-            ref={ref}
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-          >
-            {family === "geojson" ? (
-              <Source key={family} id="shared" type="geojson" data={routes} />
-            ) : (
-              <Source
-                key={family}
-                id="shared"
-                type="vector"
-                url="maplibre://tiles"
-              />
-            )}
-          </OneMap>
-        </MapSetup>
+        <NativeMap
+          ref={ref}
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+        >
+          {family === "geojson" ? (
+            <Source key={family} id="shared" type="geojson" data={routes} />
+          ) : (
+            <Source
+              key={family}
+              id="shared"
+              type="vector"
+              url="maplibre://tiles"
+            />
+          )}
+        </NativeMap>
       );
       const mounted = await render(scene(previous));
       const target = { source: "shared", id: 9, sourceLayer: "way" };
@@ -1968,15 +1945,13 @@ describe("maplibre-native queries and feature state", () => {
     const ref = createRef<MapRef>();
     const updatedRoutes = { ...routes, features: routes.features.slice(0, 1) };
     const scene = (data: typeof routes) => (
-      <MapSetup adapter={adapter}>
-        <OneMap
-          ref={ref}
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-        >
-          <Source id="routes" type="geojson" data={data} />
-        </OneMap>
-      </MapSetup>
+      <NativeMap
+        ref={ref}
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+      >
+        <Source id="routes" type="geojson" data={data} />
+      </NativeMap>
     );
     const mounted = await render(scene(routes));
     await ref.current?.querySourceFeatures("routes");
@@ -2100,21 +2075,19 @@ test("native fitBounds maxZoom rejects before camera dispatch", async () => {
 test("MapLibre Native forwards legacy light and rejects unsupported terrain/globe/elevation", async () => {
   const ref = createRef<MapRef>();
   const mounted = await render(
-    <MapSetup adapter={adapter}>
-      <OneMap
-        ref={ref}
-        mapStyle={emptyStyle}
-        initialViewState={initialViewState}
-        projection="mercator"
-        light={{ intensity: 0, position: [1, 2, 3] }}
-      >
-        <Layer
-          id="shade"
-          type="hillshade"
-          paint={{ "hillshade-exaggeration": 0 }}
-        />
-      </OneMap>
-    </MapSetup>
+    <NativeMap
+      ref={ref}
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      projection="mercator"
+      light={{ intensity: 0, position: [1, 2, 3] }}
+    >
+      <Layer
+        id="shade"
+        type="hillshade"
+        paint={{ "hillshade-exaggeration": 0 }}
+      />
+    </NativeMap>
   );
   expect(lastMapProps<{ light: object }>().light).toMatchObject({
     intensity: 0,
@@ -2130,13 +2103,11 @@ test("MapLibre Native forwards legacy light and rejects unsupported terrain/glob
   ]) {
     await expect(
       render(
-        <MapSetup adapter={adapter}>
-          <OneMap
-            mapStyle={emptyStyle}
-            initialViewState={initialViewState}
-            {...props}
-          />
-        </MapSetup>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          {...props}
+        />
       )
     ).rejects.toThrow("unsupported");
   }
@@ -2151,26 +2122,24 @@ test("settled camera updates live overlays without another public move", async (
     return null;
   };
   const view = await render(
-    <MapSetup adapter={adapter}>
-      <OneMap
-        mapStyle={emptyStyle}
-        initialViewState={initialViewState}
-        viewState={initialViewState}
-        onMove={onMove}
-        onMoveEnd={onMoveEnd}
-      >
-        <Probe />
+    <NativeMap
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      viewState={initialViewState}
+      onMove={onMove}
+      onMoveEnd={onMoveEnd}
+    >
+      <Probe />
 
-        <NativeMarkerOverlay
-          id="settled"
-          lngLat={[1, 2]}
-          anchor="top-left"
-          offset={[0, 0]}
-        >
-          <Text>Final position</Text>
-        </NativeMarkerOverlay>
-      </OneMap>
-    </MapSetup>
+      <NativeMarkerOverlay
+        id="settled"
+        lngLat={[1, 2]}
+        anchor="top-left"
+        offset={[0, 0]}
+      >
+        <Text>Final position</Text>
+      </NativeMarkerOverlay>
+    </NativeMap>
   );
   const events = lastMapProps<{
     onDidFinishLoadingMap: () => void;
@@ -2213,17 +2182,15 @@ test("settled camera updates live overlays without another public move", async (
 test("selected native location follow rejects a simultaneous viewState target", async () => {
   await expect(
     render(
-      <MapSetup adapter={adapter}>
-        <NativeMap
-          mapStyle={emptyStyle}
-          initialViewState={initialViewState}
-          viewState={initialViewState}
-          locationOptions={{
-            trackUserLocation: "default",
-            onTrackUserLocationChange: undefined,
-          }}
-        />
-      </MapSetup>
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        viewState={initialViewState}
+        locationOptions={{
+          trackUserLocation: "default",
+          onTrackUserLocationChange: undefined,
+        }}
+      />
     )
   ).rejects.toThrow("Selected location follow conflicts with viewState.");
 });
@@ -2247,6 +2214,7 @@ describe("maplibre-native entry binding", () => {
 
   testNativeEntryBinding(
     nativeEntry,
+    "maplibre-native",
     {
       nativeEvent: { lngLat: [-122.34, 47.61], point: [23, 41] },
     },

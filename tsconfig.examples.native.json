@@ -13,7 +13,6 @@
       "one-map-react/maplibre-native": [
         "./packages/one-map-react/src/maplibre-native.tsx"
       ],
-      "one-map-react/legacy": ["./packages/one-map-react/src/index.ts"],
       "one-map-react/native-extensions": [
         "./packages/one-map-react/src/native-extensions.ts"
       ]
@@ -22,7 +21,6 @@
   },
   "include": [
     "packages/example-map/src/scenarios/route-map.tsx",
-    "packages/example-map/src/scenarios/tf08-map.tsx",
     "packages/example-map/src/scenarios/lifecycle-smoke.ts",
     "packages/example-map/src/scenarios/camera-smoke.ts",
     "packages/example-map/src/scenarios/native-camera-screen.tsx",
