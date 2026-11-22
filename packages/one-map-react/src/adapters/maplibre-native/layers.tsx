@@ -1,8 +1,8 @@
 import { Layer as MaplibreLayer } from "@maplibre/maplibre-react-native";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactElement } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
-import { rejectNativeUnsupportedLayout } from "../../facade/layer.js";
+import { useLayerOptions } from "../../facade/layer.js";
 import {
   definedStyle,
   useNativeLayerKey,
@@ -19,11 +19,11 @@ export type NativeLayerProps =
  *
  * @param props - Layer style, placement, and any source injected by its parent.
  * @returns The selected wrapper's layer.
- * @throws When a known layer field or expression is unsupported.
+ * @throws When a creation option changes or a layer field or expression is unsupported.
  */
-export const MaplibreNativeLayer = (props: NativeLayerProps) => {
+export const MaplibreNativeLayer = (props: NativeLayerProps): ReactElement => {
+  useLayerOptions(props, "maplibre-native");
   assertMaplibreLayerStyle(props);
-  rejectNativeUnsupportedLayout(props, "maplibre-native");
 
   // Only RNMapbox consumes sourceID. The remaining portable style values
   // use MapLibre's style format, whose declarations require mutable arrays.

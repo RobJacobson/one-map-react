@@ -9,16 +9,25 @@ import {
   RasterLayer,
   SymbolLayer,
 } from "@rnmapbox/maps";
-import type { ComponentType } from "react";
+import type { ComponentType, ReactElement } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
+import { useLayerOptions } from "../../facade/layer.js";
 import {
   definedStyle,
   useNativeLayerKey,
 } from "../shared/native-layer-updates.js";
 
-/** Mapbox-native layer that dispatches to the matching RNMapbox layer. */
-export const MapboxNativeLayer = (props: LayerProps) => {
+/**
+ * Renders a style-spec layer through RNMapbox.
+ *
+ * @param props - Layer type, style, and any source passed by its parent.
+ * @returns The matching RNMapbox layer.
+ * @throws When a creation option changes or a symbol layout key is unsupported.
+ */
+export const MapboxNativeLayer = (props: LayerProps): ReactElement => {
+  useLayerOptions(props, "mapbox-native");
+
   // Wrapper style unions are narrower than the preserved portable expressions.
   const NativeLayer = nativeLayers[props.type] as ComponentType<
     ReturnType<typeof rnmapboxLayerFields> & { style: Record<string, unknown> }

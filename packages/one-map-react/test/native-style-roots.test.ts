@@ -142,6 +142,22 @@ test.each([
   }
 );
 
+test("the style document guard leaves text-variable-anchor-offset to the SDK", () => {
+  const style = {
+    version: 8,
+    sources: {},
+    layers: [
+      {
+        id: "labels",
+        type: "symbol",
+        layout: { "text-variable-anchor-offset": ["top", [0, 1]] },
+      },
+    ],
+  };
+  expect(() => assertMaplibreStyleRoots(style)).not.toThrow();
+  expect(() => assertMaplibreStyleRoots(JSON.stringify(style))).not.toThrow();
+});
+
 test("legacy native raster sampling and basic symbol overlap remain available", () => {
   expect(() =>
     assertMaplibreLayerStyle({

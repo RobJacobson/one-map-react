@@ -17,4 +17,5 @@ export { CameraGestureObserver } from "@rnmapbox/maps";
 
 export type { GestureSettings } from "./gesture-settings.js";
 export { MapboxGestureSettings } from "./gesture-settings.js";
+export { MapboxNativeLayer } from "./layers.js";
 export { MapboxNativeMap } from "./map.js";

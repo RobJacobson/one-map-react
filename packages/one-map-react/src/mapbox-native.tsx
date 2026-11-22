@@ -1,12 +1,7 @@
 import * as Rnmapbox from "@rnmapbox/maps";
 import { MapView } from "@rnmapbox/maps";
 import type { Camera as WrapperCamera } from "@rnmapbox/maps";
-import {
-  type ComponentProps,
-  type ComponentRef,
-  forwardRef,
-  type ReactElement,
-} from "react";
+import { type ComponentProps, type ComponentRef, forwardRef } from "react";
 import type { ViewProps } from "react-native";
 
 import {
@@ -28,7 +23,6 @@ export type {
   NativePointLike,
 } from "./contracts/native-types.js";
 import type { StyleDocument } from "./contracts/style-types.js";
-import { useLayerOptions } from "./facade/layer.js";
 import { createNativeMapBinding } from "./facade/native-map.js";
 export type {
   NativeMarkerProps,
@@ -47,6 +41,7 @@ export type {
 export {
   CameraGestureObserver,
   MapboxGestureSettings,
+  MapboxNativeLayer as Layer,
 } from "./adapters/mapbox-native/index.js";
 
 /** Selected native map with typed renderer facilities and host attributes. */
@@ -109,17 +104,6 @@ export {
 /** Style-spec options for an RNMapbox layer. */
 export type NativeLayerProps = LayerProps;
 export type { NativeLayerProps as LayerProps, NativeMapProps as MapProps };
-
-/**
- * Renders a Layer through RNMapbox.
- *
- * @param props - Layer type, style, and any source passed by its parent.
- * @returns The selected layer.
- */
-export const Layer = (props: NativeLayerProps): ReactElement => {
-  useLayerOptions(props, nativeComponents.backend);
-  return <nativeComponents.Layer {...props} />;
-};
 
 export { getAnnotationsLayerID, PointAnnotationManager } from "@rnmapbox/maps";
 
