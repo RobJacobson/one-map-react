@@ -6,7 +6,7 @@ import {
   VectorSource,
 } from "@maplibre/maplibre-react-native";
 import type { ComponentProps, ComponentRef } from "react";
-import { useLayoutEffect, useRef } from "react";
+import { useContext, useLayoutEffect, useRef } from "react";
 
 import type {
   GeoJsonSourceProps,
@@ -17,7 +17,7 @@ import {
   rejectNativeGeoJsonOptions,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
-import { useMaplibreSourceRegistry } from "./source-registry.js";
+import { MaplibreSourceContext } from "./source-registry.js";
 
 /** Maplibre-native source that dispatches to the matching MapLibre source. */
 export const MaplibreNativeSource = (props: SourceProps) => {
@@ -86,7 +86,7 @@ export const MaplibreNativeSource = (props: SourceProps) => {
  * @returns The MapLibre `GeoJSONSource` with nested layers.
  */
 const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
-  const registry = useMaplibreSourceRegistry();
+  const registry = useContext(MaplibreSourceContext);
   const sourceRef = useRef<ComponentRef<typeof GeoJSONSource>>(null);
 
   useLayoutEffect(() => {
@@ -134,7 +134,7 @@ const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
  * @returns The MapLibre `VectorSource` with nested layers.
  */
 const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
-  const registry = useMaplibreSourceRegistry();
+  const registry = useContext(MaplibreSourceContext);
   const sourceRef = useRef<ComponentRef<typeof VectorSource>>(null);
 
   useLayoutEffect(() => {

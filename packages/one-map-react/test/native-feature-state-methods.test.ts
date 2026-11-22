@@ -2,7 +2,10 @@ import { expect, test, vi } from "vite-plus/test";
 
 import { createMapboxFeatureStateMethods } from "../src/adapters/mapbox-native/feature-state-methods.js";
 import { createMaplibreFeatureStateMethods } from "../src/adapters/maplibre-native/feature-state-methods.js";
-import { MaplibreSourceRegistry } from "../src/adapters/maplibre-native/source-registry.js";
+import {
+  createMaplibreSourceRegistry,
+  type MaplibreNativeSourceRef,
+} from "../src/adapters/maplibre-native/source-registry.js";
 
 const wrapper = () => ({
   setFeatureState: vi.fn(async (..._args: unknown[]): Promise<void> => {}),
@@ -23,16 +26,14 @@ const fixture = (
     if (!attached || !current) throw new Error("Map is detached");
     return current;
   };
-  const sources = new MaplibreSourceRegistry();
-  const cleanups = ["source-a", "source-b"].map((id) =>
+  const sources = createMaplibreSourceRegistry();
+  const registerSource = (id: string) =>
     sources.register(id, () =>
       current
-        ? ({ kind: family, ref: current } as unknown as NonNullable<
-            ReturnType<Parameters<MaplibreSourceRegistry["register"]>[1]>
-          >)
+        ? ({ kind: family, ref: current } as unknown as MaplibreNativeSourceRef)
         : undefined
-    )
-  );
+    );
+  const cleanups = ["source-a", "source-b"].map(registerSource);
   const methods =
     backend === "mapbox"
       ? createMapboxFeatureStateMethods(

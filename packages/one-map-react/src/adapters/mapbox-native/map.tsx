@@ -44,7 +44,7 @@ import {
 } from "./convert-move-event.js";
 import {
   GeoJsonSourceContext,
-  GeoJsonSourceRegistry,
+  createGeoJsonSourceRegistry,
 } from "./geojson-source-registry.js";
 import { useMapboxGestureSettings } from "./gesture-settings.js";
 import { assertLabelLocalization } from "./label-localization.js";
@@ -106,7 +106,7 @@ const MapboxNativeMapImplementation = forwardRef<
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
   const mapViewRef = useRef<ComponentRef<typeof MapView>>(null);
   const sawMove = useRef(false);
-  const [geoJsonSources] = useState(() => new GeoJsonSourceRegistry());
+  const [geoJsonSources] = useState(createGeoJsonSourceRegistry);
   const frozenViewState = useFrozenValue(initialViewState ?? viewState);
   const extraGestureSettings = useMapboxGestureSettings();
   // RNMapbox class event handlers read this.props, including props from a suspended render.

@@ -6,7 +6,7 @@ import {
   VectorSource,
 } from "@rnmapbox/maps";
 import type { ComponentProps, ComponentRef } from "react";
-import { useLayoutEffect, useRef } from "react";
+import { useContext, useLayoutEffect, useRef } from "react";
 
 import type {
   GeoJsonSourceProps,
@@ -21,7 +21,7 @@ import {
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
-import { useGeoJsonSourceRegistry } from "./geojson-source-registry.js";
+import { GeoJsonSourceContext } from "./geojson-source-registry.js";
 
 /** Mapbox-native source that dispatches to the matching RNMapbox source. */
 export const MapboxNativeSource = (props: SourceProps) => {
@@ -62,7 +62,7 @@ export const MapboxNativeSource = (props: SourceProps) => {
  * @throws When an option is unavailable on the pinned RNMapbox wrapper.
  */
 const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
-  const registry = useGeoJsonSourceRegistry();
+  const registry = useContext(GeoJsonSourceContext);
   const sourceRef = useRef<ComponentRef<typeof ShapeSource>>(null);
 
   useLayoutEffect(() => {
