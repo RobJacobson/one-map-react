@@ -1114,7 +1114,8 @@ describe("mapbox-native source families", () => {
     );
   });
 
-  test("geojson cluster options use wrapper names", async () => {
+  test("geojson cluster options and promoteId forward under wrapper names", async () => {
+    ShapeSourceMock.mockClear();
     await render(
       tree(
         <Source
@@ -1123,8 +1124,11 @@ describe("mapbox-native source families", () => {
           data={routes}
           cluster
           clusterRadius={50}
+          clusterMinPoints={3}
           clusterMaxZoom={12}
           maxzoom={14}
+          lineMetrics
+          promoteId="route"
         />
       )
     );
@@ -1134,34 +1138,121 @@ describe("mapbox-native source families", () => {
         id: "points",
         cluster: true,
         clusterRadius: 50,
+        clusterMinPoints: 3,
         clusterMaxZoomLevel: 12,
         maxZoomLevel: 14,
+        lineMetrics: true,
+        promoteId: "route",
       }),
       undefined
     );
   });
 
-  test("clusterMinPoints, generateId, and promoteId are rejected", async () => {
+  test("geojson clusterMinPoints and promoteId forward falsy values and enforce creation immutability", async () => {
+    ShapeSourceMock.mockClear();
+    const updatedRoutes = { ...routes, features: [] };
+    const view = await render(
+      tree(
+        <Source
+          id="points"
+          type="geojson"
+          data={routes}
+          cluster
+          clusterMinPoints={0}
+          promoteId=""
+        />
+      )
+    );
+
+    expect(ShapeSourceMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        id: "points",
+        shape: routes,
+        clusterMinPoints: 0,
+        promoteId: "",
+      }),
+      undefined
+    );
+
+    await view.rerender(
+      tree(
+        <Source
+          id="points"
+          type="geojson"
+          data={updatedRoutes}
+          cluster
+          clusterMinPoints={0}
+          promoteId=""
+        />
+      )
+    );
+    expect(ShapeSourceMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        id: "points",
+        shape: updatedRoutes,
+        clusterMinPoints: 0,
+        promoteId: "",
+      }),
+      undefined
+    );
+
     await expect(
-      render(
+      view.rerender(
         tree(
           <Source
             id="points"
             type="geojson"
-            data={routes}
+            data={updatedRoutes}
+            cluster
             clusterMinPoints={3}
+            promoteId=""
           />
         )
       )
-    ).rejects.toThrow("clusterMinPoints is not available on mapbox-native.");
+    ).rejects.toThrow(
+      'Source "points" changed the creation option "clusterMinPoints".'
+    );
+
+    const promoted = await render(
+      tree(
+        <Source
+          id="promoted"
+          type="geojson"
+          data={routes}
+          cluster
+          clusterMinPoints={3}
+          promoteId="route"
+        />
+      )
+    );
+
+    await expect(
+      promoted.rerender(
+        tree(
+          <Source
+            id="promoted"
+            type="geojson"
+            data={routes}
+            cluster
+            clusterMinPoints={3}
+            promoteId="other"
+          />
+        )
+      )
+    ).rejects.toThrow(
+      'Source "promoted" changed the creation option "promoteId".'
+    );
+  });
+
+  test("generateId is rejected", async () => {
     await expect(
       render(tree(<Source id="a" type="geojson" data={routes} generateId />))
     ).rejects.toThrow("generateId is not available on mapbox-native.");
     await expect(
       render(
-        tree(<Source id="b" type="geojson" data={routes} promoteId="route" />)
+        tree(<Source id="b" type="geojson" data={routes} generateId={false} />)
       )
-    ).rejects.toThrow("promoteId is not available on mapbox-native.");
+    ).rejects.toThrow("generateId is not available on mapbox-native.");
   });
 
   test("geojson url data becomes the wrapper url prop", async () => {

@@ -24,27 +24,21 @@ export const rejectProvided = (
 };
 
 /**
- * Rejects GeoJSON options the pinned native wrappers cannot honor.
+ * Rejects GeoJSON `generateId`, which neither pinned native wrapper declares.
  *
- * @param props - GeoJSON source props from the current render.
+ * @param generateId - Portable GeoJSON `generateId` option.
  * @param backend - Native adapter the source will render through.
- * @throws When `generateId` or `promoteId` was provided.
+ * @throws When `generateId` was provided.
  */
-export const rejectNativeGeoJsonOptions = (
-  props: GeoJsonSourceProps,
+export const rejectNativeGeoJsonGenerateId = (
+  generateId: GeoJsonSourceProps["generateId"],
   backend: "mapbox-native" | "maplibre-native"
 ): void => {
   rejectProvided(
-    props.generateId,
+    generateId,
     "generateId",
     backend,
     "The pinned native wrappers declare no generateId source prop."
-  );
-  rejectProvided(
-    props.promoteId,
-    "promoteId",
-    backend,
-    "The pinned native wrappers declare no promoteId source prop."
   );
 };
 

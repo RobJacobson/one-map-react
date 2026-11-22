@@ -14,7 +14,8 @@ import type {
   VectorSourceProps,
 } from "../../contracts/source-types.js";
 import {
-  rejectNativeGeoJsonOptions,
+  rejectNativeGeoJsonGenerateId,
+  rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
 import { MaplibreSourceContext } from "./source-registry.js";
@@ -84,6 +85,7 @@ export const MaplibreNativeSource = (props: SourceProps) => {
  *
  * @param props - Common GeoJSON source props.
  * @returns The MapLibre `GeoJSONSource` with nested layers.
+ * @throws When an option is unavailable on the pinned MapLibre wrapper.
  */
 const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
   const registry = useContext(MaplibreSourceContext);
@@ -103,7 +105,13 @@ const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
     );
   }, [registry, props.id]);
 
-  rejectNativeGeoJsonOptions(props, "maplibre-native");
+  rejectNativeGeoJsonGenerateId(props.generateId, "maplibre-native");
+  rejectProvided(
+    props.promoteId,
+    "promoteId",
+    "maplibre-native",
+    "The pinned MapLibre GeoJSONSource declares no promoteId prop."
+  );
 
   return (
     <GeoJSONSource

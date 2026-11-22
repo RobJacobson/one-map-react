@@ -92,12 +92,7 @@ export interface GeoJsonSourceProps extends SourceBaseProps {
   readonly clusterRadius?: number;
   /** Maximum zoom level at which points are clustered. */
   readonly clusterMaxZoom?: number;
-  /**
-   * Minimum points required to form a cluster.
-   *
-   * @throws Not available on mapbox-native: the pinned RNMapbox `ShapeSource`
-   * has no `clusterMinPoints` prop.
-   */
+  /** Minimum points required to form a cluster. */
   readonly clusterMinPoints?: number;
   /**
    * Aggregated properties computed on generated clusters. Each value is a
@@ -112,10 +107,10 @@ export interface GeoJsonSourceProps extends SourceBaseProps {
    */
   readonly generateId?: boolean;
   /**
-   * Property promoted to the feature id.
+   * Property promoted to the feature id. Forwarded on mapbox-native.
    *
-   * @throws Not available on native maps: the pinned native wrappers do not
-   * declare a `promoteId` source prop.
+   * @throws Not available on maplibre-native: the pinned MapLibre
+   * `GeoJSONSource` declares no `promoteId` prop.
    */
   readonly promoteId?: string;
 }

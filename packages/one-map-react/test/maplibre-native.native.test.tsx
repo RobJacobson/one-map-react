@@ -763,6 +763,9 @@ describe("maplibre-native source families", () => {
         tree(<Source id="b" type="geojson" data={routes} promoteId="route" />)
       )
     ).rejects.toThrow("promoteId is not available on maplibre-native.");
+    await expect(
+      render(tree(<Source id="c" type="geojson" data={routes} promoteId="" />))
+    ).rejects.toThrow("promoteId is not available on maplibre-native.");
   });
 
   test("a vector source forwards spec fields", async () => {
