@@ -4,9 +4,8 @@ import type { ComponentRef } from "react";
 import type { FeatureStateMethods } from "../../contracts/query-types.js";
 import {
   assertFeatureIdentifier,
-  assertFeatureState,
+  copyValidatedFeatureState,
   featureStateFromWrapper,
-  mutableFeatureState,
 } from "../shared/feature-values.js";
 import { toRnmapboxFeatureArgs, toRnmapboxStateKey } from "./convert-query.js";
 
@@ -17,8 +16,7 @@ export const createMapboxFeatureStateMethods = (
   setFeatureState: async (identifier, state) => {
     const target = assertFeatureIdentifier(identifier);
     const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
-    assertFeatureState(state);
-    const mutableState = mutableFeatureState(state);
+    const mutableState = copyValidatedFeatureState(state);
 
     await getMap().setFeatureState(
       featureId,

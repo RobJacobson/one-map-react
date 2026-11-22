@@ -6,6 +6,7 @@ import {
   createMaplibreSourceRegistry,
   type MaplibreNativeSourceRef,
 } from "../src/adapters/maplibre-native/source-registry.js";
+import type { FeatureState } from "../src/contracts/query-types.js";
 
 const wrapper = () => ({
   setFeatureState: vi.fn(async (..._args: unknown[]): Promise<void> => {}),
@@ -302,3 +303,98 @@ test("RNMapbox state methods dispatch style-owned vector sources without facade 
     "way"
   );
 });
+
+test.each(["mapbox", "maplibre"] as const)(
+  "%s reads state getters once during setFeatureState",
+  async (backend) => {
+    const renderer = fixture(backend);
+    let reads = 0;
+    const state = {
+      get count() {
+        reads += 1;
+        return reads === 1 ? 1 : Number.NaN;
+      },
+    };
+
+    await renderer.methods.setFeatureState(
+      { source: "source-a", id: 7 },
+      state
+    );
+
+    expect(reads).toBe(1);
+    expect(renderer.set).toHaveBeenCalledWith(
+      ...(backend === "mapbox"
+        ? ["7", { count: 1 }, "source-a", null]
+        : [{ id: 7 }, { count: 1 }])
+    );
+  }
+);
+
+test.each(["mapbox", "maplibre"] as const)(
+  "%s reads identifier getters once across set, get, and remove",
+  async (backend) => {
+    const renderer = fixture(backend, "vector");
+    const makeIdentifier = () => {
+      const counts = { source: 0, id: 0, sourceLayer: 0 };
+      const identifier = {
+        get source() {
+          counts.source += 1;
+          return counts.source === 1 ? "source-a" : "";
+        },
+        get id() {
+          counts.id += 1;
+          return counts.id === 1 ? 7 : (undefined as unknown as number);
+        },
+        get sourceLayer() {
+          counts.sourceLayer += 1;
+          return counts.sourceLayer === 1 ? "way" : undefined;
+        },
+      };
+      return { identifier, counts };
+    };
+
+    const forSet = makeIdentifier();
+    await renderer.methods.setFeatureState(forSet.identifier, {
+      selected: true,
+    });
+    expect(forSet.counts).toEqual({ source: 1, id: 1, sourceLayer: 1 });
+    expect(renderer.set).toHaveBeenCalledWith(
+      ...(backend === "mapbox"
+        ? ["7", { selected: true }, "source-a", "way"]
+        : [{ id: 7, sourceLayer: "way" }, { selected: true }])
+    );
+
+    const forGet = makeIdentifier();
+    await renderer.methods.getFeatureState(forGet.identifier);
+    expect(forGet.counts).toEqual({ source: 1, id: 1, sourceLayer: 1 });
+    expect(renderer.get).toHaveBeenCalledWith(
+      ...(backend === "mapbox"
+        ? ["7", "source-a", "way"]
+        : [{ id: 7, sourceLayer: "way" }])
+    );
+
+    const forRemove = makeIdentifier();
+    await renderer.methods.removeFeatureState(forRemove.identifier, "selected");
+    expect(forRemove.counts).toEqual({ source: 1, id: 1, sourceLayer: 1 });
+    expect(renderer.remove).toHaveBeenCalledWith(
+      ...(backend === "mapbox"
+        ? ["7", "selected", "source-a", "way"]
+        : [{ id: 7, sourceLayer: "way" }, "selected"])
+    );
+  }
+);
+
+test.each(["mapbox", "maplibre"] as const)(
+  "%s rejects a top-level array feature state before dispatch",
+  async (backend) => {
+    const renderer = fixture(backend);
+
+    await expect(
+      renderer.methods.setFeatureState(
+        { source: "source-a", id: 1 },
+        [] as unknown as FeatureState
+      )
+    ).rejects.toThrow("must be an object");
+    expect(renderer.set).not.toHaveBeenCalled();
+  }
+);

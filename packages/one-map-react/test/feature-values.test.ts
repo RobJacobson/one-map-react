@@ -2,14 +2,17 @@ import { describe, expect, test } from "vite-plus/test";
 
 import {
   assertFeatureIdentifier,
-  assertFeatureState,
+  copyValidatedFeatureState,
   featureStateFromWrapper,
   featuresFromWrapper,
   isScreenBounds,
-  mutableFeatureState,
   toQueryGeometry,
   toRnmapboxRect,
 } from "../src/adapters/shared/feature-values.js";
+import type {
+  FeatureIdentifier,
+  FeatureState,
+} from "../src/contracts/query-types.js";
 
 describe("featuresFromWrapper", () => {
   test("returns a feature array unchanged", () => {
@@ -137,17 +140,74 @@ describe("toRnmapboxRect", () => {
 });
 
 describe("assertFeatureIdentifier", () => {
-  test("accepts a string id", () => {
+  test("accepts a string id and returns a fresh snapshot", () => {
     const identifier = { source: "routes", id: "route-1" };
+    const snapshot = assertFeatureIdentifier(identifier);
 
-    expect(assertFeatureIdentifier(identifier)).toBe(identifier);
+    expect(snapshot).toEqual(identifier);
+    expect(snapshot).not.toBe(identifier);
+    expect(Object.hasOwn(snapshot, "sourceLayer")).toBe(false);
   });
 
-  test("accepts a numeric id with a source layer", () => {
+  test("accepts a numeric id with a source layer and isolates caller mutation", () => {
     const identifier = { source: "tiles", id: 7, sourceLayer: "buildings" };
+    const snapshot = assertFeatureIdentifier(identifier);
 
-    expect(assertFeatureIdentifier(identifier)).toBe(identifier);
+    expect(snapshot).toEqual({
+      source: "tiles",
+      id: 7,
+      sourceLayer: "buildings",
+    });
+    expect(snapshot).not.toBe(identifier);
+
+    identifier.source = "changed";
+    identifier.id = 99;
+    identifier.sourceLayer = "roads";
+
+    expect(snapshot).toEqual({
+      source: "tiles",
+      id: 7,
+      sourceLayer: "buildings",
+    });
   });
+
+  test("reads identifier getters only once", () => {
+    let sourceReads = 0;
+    let idReads = 0;
+    let sourceLayerReads = 0;
+    const identifier = {
+      get source() {
+        sourceReads += 1;
+        return sourceReads === 1 ? "tiles" : "";
+      },
+      get id() {
+        idReads += 1;
+        return idReads === 1 ? 7 : (undefined as unknown as number);
+      },
+      get sourceLayer() {
+        sourceLayerReads += 1;
+        return sourceLayerReads === 1 ? "buildings" : undefined;
+      },
+    };
+
+    expect(assertFeatureIdentifier(identifier)).toEqual({
+      source: "tiles",
+      id: 7,
+      sourceLayer: "buildings",
+    });
+    expect(sourceReads).toBe(1);
+    expect(idReads).toBe(1);
+    expect(sourceLayerReads).toBe(1);
+  });
+
+  test.each([null, undefined, [], ["routes", 1], "routes", 42])(
+    "rejects a non-object or array identifier: %p",
+    (value) => {
+      expect(() =>
+        assertFeatureIdentifier(value as unknown as FeatureIdentifier)
+      ).toThrow("nonempty string");
+    }
+  );
 
   test("rejects an empty source", () => {
     expect(() => assertFeatureIdentifier({ source: "", id: 1 })).toThrow(
@@ -165,56 +225,104 @@ describe("assertFeatureIdentifier", () => {
   });
 });
 
-describe("assertFeatureState", () => {
-  test("accepts JSON values including nested objects and arrays", () => {
-    expect(() =>
-      assertFeatureState({
-        selected: true,
-        count: 2,
-        name: "route",
-        tags: ["a", "b"],
-        empty: [],
-        meta: { depth: { level: 1 } },
-      })
-    ).not.toThrow();
+describe("copyValidatedFeatureState", () => {
+  test("accepts and copies JSON values including nested objects and arrays", () => {
+    const state = {
+      selected: true,
+      count: 2,
+      name: "route",
+      tags: ["a", "b"],
+      empty: [],
+      meta: { depth: { level: 1 } },
+    };
+    const copied = copyValidatedFeatureState(state);
+
+    expect(copied).toEqual(state);
+    expect(copied).not.toBe(state);
   });
+
+  test.each([[], [1], null, undefined, "selected", 42, true])(
+    "rejects a top-level array, null, or primitive state: %p",
+    (value) => {
+      expect(() =>
+        copyValidatedFeatureState(value as unknown as FeatureState)
+      ).toThrow("must be an object");
+    }
+  );
 
   test("rejects a null value", () => {
     expect(() =>
-      assertFeatureState({ selected: null as unknown as boolean })
+      copyValidatedFeatureState({ selected: null as unknown as boolean })
     ).toThrow('Feature state key "selected"');
   });
 
   test("rejects an undefined value", () => {
     expect(() =>
-      assertFeatureState({ selected: undefined as unknown as boolean })
+      copyValidatedFeatureState({ selected: undefined as unknown as boolean })
     ).toThrow("Feature state key");
   });
 
   test("rejects a non-finite number", () => {
-    expect(() => assertFeatureState({ score: Number.NaN })).toThrow(
+    expect(() => copyValidatedFeatureState({ score: Number.NaN })).toThrow(
       "non-finite"
     );
     expect(() =>
-      assertFeatureState({ score: Number.POSITIVE_INFINITY })
+      copyValidatedFeatureState({ score: Number.POSITIVE_INFINITY })
     ).toThrow("non-finite");
+    expect(() =>
+      copyValidatedFeatureState({ score: Number.NEGATIVE_INFINITY })
+    ).toThrow("non-finite");
+  });
+
+  test("rejects non-JSON primitive types", () => {
+    expect(() =>
+      copyValidatedFeatureState({
+        handler: (() => {}) as unknown as boolean,
+      })
+    ).toThrow('Feature state key "handler"');
+    expect(() =>
+      copyValidatedFeatureState({
+        token: Symbol("state") as unknown as string,
+      })
+    ).toThrow('Feature state key "token"');
+    expect(() =>
+      copyValidatedFeatureState({
+        large: 1n as unknown as number,
+      })
+    ).toThrow('Feature state key "large"');
   });
 
   test("rejects a null nested in an object", () => {
     expect(() =>
-      assertFeatureState({ meta: { depth: null as unknown as number } })
+      copyValidatedFeatureState({
+        meta: { depth: null as unknown as number },
+      })
     ).toThrow("non-finite");
   });
 
   test("rejects a null array element", () => {
     expect(() =>
-      assertFeatureState({ tags: [1, null as unknown as number] })
+      copyValidatedFeatureState({ tags: [1, null as unknown as number] })
     ).toThrow("non-finite");
   });
 
   test("rejects an array consisting only of empty slots", () => {
+    expect(() =>
+      // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
+      copyValidatedFeatureState({ values: new Array<number>(1) })
+    ).toThrow('Feature state key "values"');
+  });
+
+  test("rejects a sparse array hole even with an inherited index property", () => {
     // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
-    expect(() => assertFeatureState({ values: new Array<number>(1) })).toThrow(
+    const values = new Array<string>(1);
+    const inherited = Object.assign(
+      Object.create(Array.prototype) as Record<number, string>,
+      { 0: "inherited" }
+    );
+    Object.setPrototypeOf(values, inherited);
+
+    expect(() => copyValidatedFeatureState({ values })).toThrow(
       'Feature state key "values"'
     );
   });
@@ -223,7 +331,7 @@ describe("assertFeatureState", () => {
     const values = [1, 2, 3];
     delete values[index];
 
-    expect(() => assertFeatureState({ values })).toThrow(
+    expect(() => copyValidatedFeatureState({ values })).toThrow(
       'Feature state key "values"'
     );
     expect(values).toHaveLength(3);
@@ -233,15 +341,65 @@ describe("assertFeatureState", () => {
   test("rejects sparse arrays nested inside objects", () => {
     expect(() =>
       // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
-      assertFeatureState({ meta: { values: new Array<number>(1) } })
+      copyValidatedFeatureState({ meta: { values: new Array<number>(1) } })
     ).toThrow('Feature state key "meta"');
   });
 
   test("rejects sparse arrays nested inside arrays", () => {
     expect(() =>
       // eslint-disable-next-line unicorn/no-new-array -- A sparse array is intentional invalid input; filling its hole would weaken this validation test.
-      assertFeatureState({ values: [[1], new Array<number>(1)] })
+      copyValidatedFeatureState({ values: [[1], new Array<number>(1)] })
     ).toThrow('Feature state key "values"');
+  });
+
+  test("reads top-level, nested, and array-element getters only once", () => {
+    let topReads = 0;
+    let nestedReads = 0;
+    let elementReads = 0;
+    const items: number[] = [];
+    Object.defineProperty(items, 0, {
+      enumerable: true,
+      get: () => {
+        elementReads += 1;
+        return elementReads === 1 ? 42 : Number.NaN;
+      },
+    });
+    const state = {
+      get count() {
+        topReads += 1;
+        return topReads === 1 ? 1 : Number.NaN;
+      },
+      nested: {
+        get label() {
+          nestedReads += 1;
+          return nestedReads === 1 ? "ok" : (null as unknown as string);
+        },
+      },
+      items,
+    };
+
+    expect(copyValidatedFeatureState(state)).toEqual({
+      count: 1,
+      nested: { label: "ok" },
+      items: [42],
+    });
+    expect(topReads).toBe(1);
+    expect(nestedReads).toBe(1);
+    expect(elementReads).toBe(1);
+  });
+
+  test("preserves __proto__ keys as own data properties without mutating prototypes", () => {
+    const nested = JSON.parse('{"__proto__":{"polluted":true}}') as Record<
+      string,
+      FeatureState
+    >;
+    const copied = copyValidatedFeatureState({ nested });
+    const copiedNested = copied.nested as Record<string, unknown>;
+
+    expect(Object.getPrototypeOf(copiedNested)).toBe(Object.prototype);
+    expect(Object.hasOwn(copiedNested, "__proto__")).toBe(true);
+    expect(copiedNested["__proto__"]).toEqual({ polluted: true });
+    expect((copiedNested as { polluted?: boolean }).polluted).toBeUndefined();
   });
 });
 
@@ -294,8 +452,7 @@ test("JSON syntax failures retain their cause", () => {
 
 test("feature-state dispatch copies validated nested values before a caller can mutate them", () => {
   const state = { nested: { selected: true }, values: [1, { count: 2 }] };
-  assertFeatureState(state);
-  const copied = mutableFeatureState(state);
+  const copied = copyValidatedFeatureState(state);
   state.nested.selected = false;
   state.values.push(3);
   (state.values[1] as { count: number }).count = 9;

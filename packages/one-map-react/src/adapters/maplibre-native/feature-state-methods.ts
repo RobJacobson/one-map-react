@@ -1,9 +1,8 @@
 import type { FeatureStateMethods } from "../../contracts/query-types.js";
 import {
   assertFeatureIdentifier,
-  assertFeatureState,
+  copyValidatedFeatureState,
   featureStateFromWrapper,
-  mutableFeatureState,
 } from "../shared/feature-values.js";
 import {
   toMaplibreFeatureId,
@@ -17,9 +16,8 @@ export const createMaplibreFeatureStateMethods = (
   requireMap: () => unknown
 ): FeatureStateMethods => ({
   setFeatureState: async (identifier, state) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
-    assertFeatureState(state);
-    const mutableState = mutableFeatureState(state);
+    const target = assertFeatureIdentifier(identifier);
+    const mutableState = copyValidatedFeatureState(state);
 
     requireMap();
     const source = sources.require(target.source);
@@ -32,7 +30,7 @@ export const createMaplibreFeatureStateMethods = (
         ));
   },
   getFeatureState: async (identifier) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
+    const target = assertFeatureIdentifier(identifier);
     requireMap();
     const source = sources.require(target.source);
 
@@ -43,7 +41,7 @@ export const createMaplibreFeatureStateMethods = (
     );
   },
   removeFeatureState: async (identifier, key) => {
-    const target = { ...assertFeatureIdentifier(identifier) };
+    const target = assertFeatureIdentifier(identifier);
     requireMap();
     const source = sources.require(target.source);
 
