@@ -17,14 +17,18 @@ import {
 } from "../../example-map/src/scenarios/map-fixture.js";
 import type { Adapter } from "../src/contracts/adapter.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
-import type { LayerProps } from "../src/contracts/layer-types.js";
-import type { MapProps } from "../src/contracts/map-types.js";
+import type { NativePortableLayerProps } from "../src/contracts/layer-types.js";
+import type {
+  NativeClickEvent,
+  NativeMapInputs,
+  NativeMapRef,
+} from "../src/contracts/native-types.js";
 import type { SourceProps } from "../src/contracts/source-types.js";
 import type { MarkerRef } from "../src/contracts/ui-types.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { useMap as useLegacyMap } from "../src/facade/map.js";
 
-type SelectedHandle = MapRef & { getWrapperMap(): Promise<unknown> };
+type SelectedHandle = NativeMapRef & { getWrapperMap(): Promise<unknown> };
 type MarkerCoordinates = {
   readonly longitude: number;
   readonly latitude: number;
@@ -33,10 +37,10 @@ type MarkerCoordinates = {
 type MapLookup<Handle> = Readonly<Record<string, Handle | undefined>>;
 
 interface NativeEntry<Handle extends SelectedHandle> {
-  readonly Map: ComponentType<MapProps & RefAttributes<Handle>>;
+  readonly Map: ComponentType<NativeMapInputs & RefAttributes<Handle>>;
   readonly MapProvider: ComponentType<{ readonly children?: ReactNode }>;
   readonly Source: ComponentType<SourceProps>;
-  readonly Layer: ComponentType<LayerProps>;
+  readonly Layer: ComponentType<NativePortableLayerProps>;
   readonly Marker: ComponentType<MarkerCoordinates & RefAttributes<MarkerRef>>;
   readonly adapter: Adapter;
   useMap(): MapLookup<Handle>;
@@ -64,6 +68,26 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
   checkLayer: () => void
 ): void => {
   const { Map: NativeMap, MapProvider, Source, Layer, Marker, useMap } = entry;
+
+  test("maps the desktop touchZoomRotate flag to both native gestures", async () => {
+    const view = await render(
+      <NativeMap mapStyle={emptyStyle} touchZoomRotate={false} />
+    );
+    const gestureProps = () => view.getByTestId("wrapper-map").props;
+    const zoom =
+      entry.adapter.backend === "mapbox-native" ? "zoomEnabled" : "touchZoom";
+    const rotate =
+      entry.adapter.backend === "mapbox-native"
+        ? "rotateEnabled"
+        : "touchRotate";
+    expect(gestureProps()[zoom]).toBe(false);
+    expect(gestureProps()[rotate]).toBe(false);
+    await view.rerender(
+      <NativeMap mapStyle={emptyStyle} touchZoomRotate touchRotate={false} />
+    );
+    expect(gestureProps()[zoom]).toBe(true);
+    expect(gestureProps()[rotate]).toBe(false);
+  });
 
   test("binds a map, source, layer, and marker without setup", async () => {
     const ref = createRef<Handle>();
@@ -128,6 +152,7 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(detach).toHaveBeenCalledTimes(1);
     expect(ref.current).toBeNull();
     expect(markerRef.current).toBeNull();
+    expect(access.current.getSource("routes")).toBeUndefined();
     await expect(access.current.getWrapperMap()).rejects.toThrow(
       "not attached"
     );
@@ -235,11 +260,80 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(defaultNamed.mock.lastCall?.[0]).toBe(defaultMap);
   });
 
+  test("maps desktop point and bounds fields, viewport queries, and style readiness", async () => {
+    const ref = createRef<Handle>();
+    const onStyleData = jest.fn();
+    const view = await render(
+      <NativeMap ref={ref} mapStyle={emptyStyle} onStyleData={onStyleData} />
+    );
+    const map = ref.current;
+    if (!map) throw new Error("Map is detached.");
+
+    const center = await map.getCenter();
+    expect([center.lng, center.lat]).toEqual(center);
+    const point = await map.project({ lng: center.lng, lat: center.lat });
+    expect([point.x, point.y]).toEqual(point);
+    const unprojected = await map.unproject({ x: point.x, y: point.y });
+    expect(unprojected.lng).toBe(unprojected[0]);
+    const bounds = await map.getBounds();
+    expect(bounds.toArray()).toEqual(bounds);
+    expect(bounds.getWest()).toBe(bounds[0][0]);
+    expect(bounds.getNorthEast().lat).toBe(bounds[1][1]);
+    await expect(
+      map.queryRenderedFeatures({ layers: ["route-line"] })
+    ).resolves.toBeDefined();
+    await expect(
+      map.queryRenderedFeatures({ x: 3, y: 4 })
+    ).resolves.toBeDefined();
+    await expect(
+      map.queryRenderedFeatures([
+        { x: 1, y: 2 },
+        { x: 3, y: 4 },
+      ])
+    ).resolves.toBeDefined();
+
+    const { onDidFinishLoadingStyle } = view.getByTestId("wrapper-map")
+      .props as { onDidFinishLoadingStyle(): void };
+    expect(onStyleData).not.toHaveBeenCalled();
+    await act(async () => onDidFinishLoadingStyle());
+    expect(onStyleData).toHaveBeenCalledTimes(1);
+  });
+
+  test("an explicit empty layer list matches no layers on an attached map", async () => {
+    const ref = createRef<Handle>();
+    const onClick = jest.fn<(event: NativeClickEvent) => void>();
+    const view = await render(
+      <NativeMap
+        ref={ref}
+        mapStyle={emptyStyle}
+        interactiveLayerIds={[]}
+        onClick={onClick}
+      />
+    );
+    const map = ref.current;
+    if (!map) throw new Error("Map is detached.");
+
+    await expect(map.queryRenderedFeatures({ layers: [] })).resolves.toEqual(
+      []
+    );
+    await expect(
+      map.queryRenderedFeatures({ x: 10, y: 20 }, { layers: [] })
+    ).resolves.toEqual([]);
+    const wrapper = view.getByTestId("wrapper-map").props as WrapperEvents;
+    await act(async () => wrapper.onPress(press));
+    expect(onClick.mock.lastCall?.[0]?.features).toEqual([]);
+
+    await view.unmount();
+    await expect(map.queryRenderedFeatures({ layers: [] })).rejects.toThrow(
+      "not attached"
+    );
+  });
+
   test("preserves dispatched source queries across replacement and drops detached clicks", async () => {
     const ref = createRef<Handle>();
-    const onClick = jest.fn();
+    const onClick = jest.fn<(event: NativeClickEvent) => void>();
     const onError = jest.fn();
-    const scene = (mapKey: number, sourceKey: number | null) => (
+    const scene = (mapKey: number, sourceKey: number | null, data = routes) => (
       <NativeMap
         key={mapKey}
         ref={ref}
@@ -254,7 +348,7 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
             key={sourceKey}
             id="routes"
             type="geojson"
-            data={routes}
+            data={data}
             cluster
           >
             <Layer id="route-line" type="line" />
@@ -274,12 +368,41 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
           completeSource = resolve;
         })
     );
-    const sourceQuery = original.getClusterExpansionZoom("routes", 7);
+    const source = original.getSource("routes");
+    if (!source) throw new Error("GeoJSON source is detached.");
+    expect(original.getSource("missing")).toBeUndefined();
+    expect(original.getSource("routes")).toBe(source);
+    await view.rerender(scene(1, 1, { ...routes, features: [] }));
+    expect(original.getSource("routes")).toBe(source);
+    const sourceQuery = source.getClusterExpansionZoom(7);
     await view.rerender(scene(1, 2));
+    const replacement = original.getSource("routes");
+    expect(replacement).toBeDefined();
+    expect(replacement).not.toBe(source);
+    await expect(source.getClusterExpansionZoom(7)).rejects.toThrow(
+      "no longer mounted"
+    );
+    const onExpansion = jest.fn();
+    expect(replacement?.getClusterExpansionZoom(7, onExpansion)).toBe(
+      replacement
+    );
+    await act(async () => {});
+    expect(onExpansion).toHaveBeenCalledWith(null, 13);
+    const onFailure = jest.fn();
+    expect(source.getClusterExpansionZoom(7, onFailure)).toBe(source);
+    await act(async () => {});
+    expect(onFailure).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("no longer mounted"),
+      })
+    );
+    await expect(replacement?.getClusterChildren(7)).resolves.toBeDefined();
+    await expect(replacement?.getClusterLeaves(7, 5, 2)).resolves.toBeDefined();
     await expect(original.getClusterExpansionZoom("routes", 7)).resolves.toBe(
       13
     );
     await view.rerender(scene(1, null));
+    expect(original.getSource("routes")).toBeUndefined();
     await expect(original.getClusterExpansionZoom("routes", 7)).rejects.toThrow(
       "not a mounted"
     );
@@ -300,5 +423,8 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     const newWrapper = view.getByTestId("wrapper-map").props as WrapperEvents;
     await act(async () => newWrapper.onPress(press));
     expect(onClick).toHaveBeenCalledTimes(1);
+    const event = onClick.mock.lastCall?.[0];
+    expect(event?.lngLat.lng).toEqual(event?.lngLat[0]);
+    expect(event?.point.x).toEqual(event?.point[0]);
   });
 };

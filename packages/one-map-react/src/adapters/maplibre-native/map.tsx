@@ -20,20 +20,26 @@ import {
 } from "react-native";
 import { PortalHost, PortalProvider } from "react-native-teleport";
 
-import type { MapProps } from "../../contracts/map-types.js";
+import type { NativeMapInputs } from "../../contracts/native-types.js";
 import type { NativeLocationOptions } from "../../maplibre-native.js";
 import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
+import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import {
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
+import { nativeBoundsInput } from "../shared/native-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding } from "../shared/wrapper-values.js";
-import { mutableFlatBounds, toMaplibreViewState } from "./convert-camera.js";
+import {
+  mutableFlatBounds,
+  toMaplibreInitialViewState,
+  toMaplibreViewState,
+} from "./convert-camera.js";
 import { toMaplibreGestures } from "./convert-gestures.js";
 import {
   clickEventFromMaplibreNative,
@@ -57,7 +63,7 @@ type MaplibreRegionEvent = Parameters<
 /** Maplibre-native map that renders MapLibre React Native `Map` with a `Camera` child. */
 const MaplibreNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  MapProps & {
+  NativeMapInputs & {
     locationOptions?: NativeLocationOptions;
     hostProps?: ViewProps;
     options?: Partial<ComponentProps<typeof MaplibreMap>>;
@@ -66,10 +72,10 @@ const MaplibreNativeMapImplementation = forwardRef<
   assertMaplibreStyleRoots(props.mapStyle);
   const session = useNativeMapPresentation();
   validateMaplibreMapOptions(props);
+  const viewState = nativeCameraTarget(props);
   const {
     mapStyle,
     initialViewState,
-    viewState,
     minZoom,
     maxZoom,
     maxBounds,
@@ -87,8 +93,8 @@ const MaplibreNativeMapImplementation = forwardRef<
     gl,
     interactive,
     dragPan,
-    touchZoom,
-    touchRotate,
+    touchZoom = props.touchZoomRotate,
+    touchRotate = props.touchZoomRotate,
     touchPitch,
     doubleTapZoom,
     children,
@@ -101,9 +107,19 @@ const MaplibreNativeMapImplementation = forwardRef<
   const mapLoaded = useRef(false);
   const sawMove = useRef(false);
   const [sources] = useState(() => new MaplibreSourceRegistry());
-  const frozenViewState = useFrozenValue(initialViewState);
+  const frozenViewState = useFrozenValue(initialViewState ?? viewState);
   // One settled native event can report several callbacks; an earlier one may unmount the map.
-  const report = useActiveCallbacks({ onMove, onMoveEnd });
+  const report = useActiveCallbacks({
+    onMove,
+    onMoveStart,
+    onMoveEnd,
+    onClick,
+    onLongPress,
+    onLoad,
+    onStyleLoad,
+    onStyleData: props.onStyleData,
+    onError,
+  });
   const gestures = toMaplibreGestures({
     interactive,
     dragPan,
@@ -146,7 +162,7 @@ const MaplibreNativeMapImplementation = forwardRef<
     );
 
     if (phase === "start") {
-      onMoveStart?.(move);
+      report.onMoveStart(move);
       return;
     }
 
@@ -165,7 +181,9 @@ const MaplibreNativeMapImplementation = forwardRef<
   };
   const controlled = viewState ? toMaplibreViewState(viewState) : undefined;
   const flatMaxBounds =
-    maxBounds === undefined ? undefined : mutableFlatBounds(maxBounds);
+    maxBounds === undefined
+      ? undefined
+      : mutableFlatBounds(nativeBoundsInput(maxBounds));
 
   return (
     <PortalProvider>
@@ -200,13 +218,14 @@ const MaplibreNativeMapImplementation = forwardRef<
             {...gestures}
             onDidFinishLoadingMap={() => {
               mapLoaded.current = true;
-              onLoad?.();
+              report.onLoad();
             }}
             onDidFinishLoadingStyle={() => {
-              onStyleLoad?.();
+              report.onStyleLoad();
+              report.onStyleData();
             }}
             onDidFailLoadingMap={() => {
-              onError?.({});
+              report.onError({});
             }}
             onRegionWillChange={
               onMoveStart
@@ -224,21 +243,21 @@ const MaplibreNativeMapImplementation = forwardRef<
             onPress={
               onClick
                 ? (event: MaplibrePressEvent) => {
-                    onClick?.(pressEvent(event.nativeEvent));
+                    report.onClick(pressEvent(event.nativeEvent));
                   }
                 : undefined
             }
             onLongPress={
               onLongPress
                 ? (event: MaplibrePressEvent) => {
-                    onLongPress?.(pressEvent(event.nativeEvent));
+                    report.onLongPress(pressEvent(event.nativeEvent));
                   }
                 : undefined
             }
           >
             <Camera
               ref={cameraRef}
-              initialViewState={toMaplibreViewState(frozenViewState)}
+              initialViewState={toMaplibreInitialViewState(frozenViewState)}
               minZoom={minZoom}
               maxZoom={maxZoom}
               maxBounds={flatMaxBounds}
@@ -270,13 +289,13 @@ const MaplibreNativeMapImplementation = forwardRef<
 
 /** Rejects portable requests the selected MapLibre native map cannot honor. */
 const validateMaplibreMapOptions = (
-  props: MapProps & { readonly locationOptions?: NativeLocationOptions }
+  props: NativeMapInputs & { readonly locationOptions?: NativeLocationOptions }
 ): void => {
   if (props.terrain != null)
     throw new Error("Terrain is unsupported on MapLibre Native.");
   if (props.projection === "globe")
     throw new Error("Globe projection is unsupported on MapLibre Native.");
-  if (props.viewState && props.locationOptions?.trackUserLocation)
+  if (nativeCameraTarget(props) && props.locationOptions?.trackUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
 };
 

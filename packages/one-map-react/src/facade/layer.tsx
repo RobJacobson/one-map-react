@@ -29,12 +29,29 @@ export const Layer = (props: LayerProps) => {
  * @param backend - Backend drawing the layer.
  * @throws When a creation option changes or a layout field is unsupported.
  */
-export const useLayerOptions = (props: LayerProps, backend: Backend): void => {
-  useStableOptions(`Layer "${props.id}"`, layerCreationOptions(props));
+export const useLayerOptions = (
+  props: LayerOptions,
+  backend: Backend
+): void => {
+  useStableOptions(
+    `Layer "${props.id ?? props.type}"`,
+    layerCreationOptions(props)
+  );
   rejectNativeUnsupportedLayout(props, backend);
 };
 
-const layerCreationOptions = (props: LayerProps): Record<string, unknown> => ({
+interface LayerOptions {
+  readonly id?: string;
+  readonly type: string;
+  readonly source?: string;
+  readonly sourceID?: string;
+  readonly "source-layer"?: string;
+  readonly layout?: object;
+}
+
+const layerCreationOptions = (
+  props: LayerOptions
+): Record<string, unknown> => ({
   id: props.id,
   type: props.type,
   ...("source-layer" in props ? { "source-layer": props["source-layer"] } : {}),

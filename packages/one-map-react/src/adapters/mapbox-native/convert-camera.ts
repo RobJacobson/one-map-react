@@ -1,13 +1,19 @@
+import type { Bounds, ZoomToOptions } from "../../contracts/camera-types.js";
 import type {
-  Bounds,
-  CameraCommandOptions,
-  FitBoundsOptions,
-  LngLat,
-  ViewState,
-  ZoomToOptions,
-} from "../../contracts/camera-types.js";
+  NativeCameraCommand,
+  NativeCameraTarget,
+  NativeFitBoundsOptions,
+  NativeInitialViewState,
+} from "../../contracts/native-types.js";
+import {
+  nativeCameraCenter,
+  nativeInitialCamera,
+  nativeInitialFit,
+} from "../shared/native-camera-inputs.js";
+import { nativeBoundsInput } from "../shared/native-values.js";
 import {
   assertBounds,
+  lngLatFromWrapper,
   normalizePadding,
   rejectNativeEasing,
 } from "../shared/wrapper-values.js";
@@ -18,11 +24,30 @@ import {
  * @param viewState - Shared camera fields.
  * @returns RNMapbox center, zoom, heading, and pitch.
  */
-export const toRnmapboxDefaultSettings = (viewState: ViewState) => ({
-  centerCoordinate: [viewState.longitude, viewState.latitude],
+export const toRnmapboxDefaultSettings = (
+  viewState: NativeInitialViewState = {}
+) => {
+  if (viewState.bounds !== undefined) {
+    return {
+      ...toRnmapboxFitBoundsStop(
+        nativeBoundsInput(viewState.bounds),
+        nativeInitialFit(viewState)
+      ),
+      animationMode: "none" as const,
+      animationDuration: 0,
+    };
+  }
+  return toRnmapboxViewState(nativeInitialCamera(viewState));
+};
+
+const toRnmapboxViewState = (viewState: NativeCameraTarget) => ({
+  centerCoordinate: nativeCameraCenter(viewState),
   zoomLevel: viewState.zoom,
   heading: viewState.bearing,
   pitch: viewState.pitch,
+  ...(viewState.padding === undefined
+    ? {}
+    : { padding: toRnmapboxPadding(viewState.padding) }),
 });
 
 /**
@@ -35,11 +60,8 @@ export const toRnmapboxDefaultSettings = (viewState: ViewState) => ({
  * @param viewState - Camera supplied by React.
  * @returns RNMapbox center, zoom, heading, pitch, and a non-animated update.
  */
-export const toRnmapboxControlledCamera = (viewState: ViewState) => ({
-  centerCoordinate: [viewState.longitude, viewState.latitude] as LngLat,
-  zoomLevel: viewState.zoom,
-  heading: viewState.bearing,
-  pitch: viewState.pitch,
+export const toRnmapboxControlledCamera = (viewState: NativeCameraTarget) => ({
+  ...toRnmapboxViewState(viewState),
   animationDuration: 0,
   animationMode: "none" as const,
 });
@@ -85,7 +107,7 @@ export const toRnmapboxPadding = (padding?: PaddingOrNumber) => {
  * @throws When `options.easing` is set.
  */
 export const toRnmapboxStop = (
-  options: CameraCommandOptions,
+  options: NativeCameraCommand,
   animationMode: "flyTo" | "easeTo" | "none"
 ) => {
   rejectNativeEasing(options.easing);
@@ -94,7 +116,7 @@ export const toRnmapboxStop = (
     type: "CameraStop" as const,
     ...(options.center === undefined
       ? {}
-      : { centerCoordinate: options.center }),
+      : { centerCoordinate: lngLatFromWrapper(options.center) }),
     ...(options.zoom === undefined ? {} : { zoomLevel: options.zoom }),
     ...(options.bearing === undefined ? {} : { heading: options.bearing }),
     ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
@@ -121,7 +143,7 @@ export const toRnmapboxStop = (
  */
 export const toRnmapboxFitBoundsStop = (
   bounds: Bounds,
-  options: FitBoundsOptions = {}
+  options: NativeFitBoundsOptions = {}
 ) => {
   if (options.maxZoom !== undefined) {
     throw new Error(

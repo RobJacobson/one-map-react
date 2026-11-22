@@ -247,8 +247,12 @@ jest.mock("@maplibre/maplibre-react-native", () => {
     RasterSource: sourceComponent("RasterSource"),
     RasterDEMSource: sourceComponent("RasterDEMSource"),
     ImageSource: sourceComponent("ImageSource"),
-    Images: jest.fn(() => null),
-    Layer: jest.fn((props: object) => React.createElement("Layer", props)),
+    Images: jest.fn((props: object) =>
+      React.createElement("Images", { ...props, testID: "wrapper-images" })
+    ),
+    Layer: jest.fn((props: object) =>
+      React.createElement("Layer", { ...props, testID: "Layer" })
+    ),
   };
 });
 
@@ -1537,7 +1541,7 @@ describe("maplibre-native layers", () => {
 describe("maplibre-native images", () => {
   test("entries convert to source and sdf fields", async () => {
     ImagesMock.mockClear();
-    await render(
+    const view = await render(
       tree(
         <Images
           images={{
@@ -1548,18 +1552,41 @@ describe("maplibre-native images", () => {
       )
     );
 
-    expect(ImagesMock).toHaveBeenCalledWith(
-      {
-        images: {
-          marker: "https://example.com/marker.png",
-          shield: {
-            source: { uri: "https://example.com/shield.png" },
-            sdf: true,
-          },
-        },
-      },
-      undefined
+    const [marker, shield] = view.getAllByTestId("wrapper-images");
+    expect(marker.props.images).toEqual({
+      marker: { source: { uri: "https://example.com/marker.png" } },
+    });
+    expect(shield.props.images).toEqual({
+      shield: { source: { uri: "https://example.com/shield.png" }, sdf: true },
+    });
+
+    await view.rerender(
+      tree(
+        <Images
+          images={{
+            marker: "https://example.com/new-marker.png",
+            shield: { url: "https://example.com/shield.png", sdf: true },
+          }}
+        />
+      )
     );
+    const [newMarker, sameShield] = view.getAllByTestId("wrapper-images");
+    expect(newMarker).not.toBe(marker);
+    expect(sameShield).toBe(shield);
+    expect(newMarker.props.images).toEqual({
+      marker: { source: { uri: "https://example.com/new-marker.png" } },
+    });
+
+    await view.rerender(
+      tree(
+        <Images
+          images={{
+            shield: { url: "https://example.com/shield.png", sdf: true },
+          }}
+        />
+      )
+    );
+    expect(view.getAllByTestId("wrapper-images")).toEqual([shield]);
   });
 
   test("images outside a map are rejected", async () => {
@@ -2242,4 +2269,62 @@ describe("maplibre-native entry binding", () => {
         paint: { "line-width": 3 },
       })
   );
+});
+
+test("selected Layer forwards source, transitions and ordering, then resets removed paint", async () => {
+  const scene = (width: number | undefined, beforeId: string | undefined) => (
+    <nativeEntry.Map mapStyle={emptyStyle}>
+      <nativeEntry.Source id="route-data" type="geojson" data={routes} />
+      <nativeEntry.Layer
+        id="route-layer"
+        type="line"
+        source="route-data"
+        beforeId={beforeId}
+        filter={
+          width === undefined
+            ? undefined
+            : ["==", ["geometry-type"], "LineString"]
+        }
+        paint={{
+          "line-width": width,
+          "line-width-transition": { duration: 450 },
+        }}
+      />
+    </nativeEntry.Map>
+  );
+  const view = await render(scene(2, "water"));
+  const original = view.getByTestId("Layer");
+  expect(original.props.source).toBe("route-data");
+  expect(original.props.paint).toEqual({
+    "line-width": 2,
+    "line-width-transition": { duration: 450 },
+  });
+
+  await view.rerender(scene(3, "label"));
+  expect(view.getByTestId("Layer")).toBe(original);
+  expect(view.getByTestId("Layer").props.beforeId).toBe("label");
+  await view.rerender(scene(undefined, undefined));
+  const replacement = view.getByTestId("Layer");
+  expect(replacement).not.toBe(original);
+  expect(replacement.props.paint).toEqual({
+    "line-width-transition": { duration: 450 },
+  });
+  expect(replacement.props.beforeId).toBeUndefined();
+  expect(replacement.props.filter).toBeUndefined();
+});
+
+test("removes an undefined legacy style value before native bridge conversion", async () => {
+  const scene = (width?: number) => (
+    <nativeEntry.Map mapStyle={emptyStyle}>
+      <nativeEntry.Layer
+        type="line"
+        id="route"
+        source="routes"
+        style={{ lineWidth: width }}
+      />
+    </nativeEntry.Map>
+  );
+  const view = await render(scene(2));
+  await view.rerender(scene());
+  expect(view.getByTestId("Layer").props.style).not.toHaveProperty("lineWidth");
 });

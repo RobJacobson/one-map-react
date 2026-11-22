@@ -15,11 +15,18 @@ import { runInNewContext } from "node:vm";
 import { transformSync } from "@babel/core";
 
 const root = resolve(import.meta.dirname, "..");
+const libraryRequire = createRequire(
+  join(root, "packages/one-map-react/package.json")
+);
 const rnRoot = resolve(
-  process.argv[2] ?? join(root, "node_modules/@rnmapbox/maps")
+  process.argv[2] ??
+    dirname(libraryRequire.resolve("@rnmapbox/maps/package.json"))
 );
 const mlRoot = resolve(
-  process.argv[3] ?? join(root, "node_modules/@maplibre/maplibre-react-native")
+  process.argv[3] ??
+    dirname(
+      libraryRequire.resolve("@maplibre/maplibre-react-native/package.json")
+    )
 );
 const requireHelper = createRequire(import.meta.url);
 
@@ -290,6 +297,54 @@ const resume = nativeSection(
   "override fun mergeOfflineRegions("
 );
 assert.match(resume, /setDownloadState\(OfflineRegion\.STATE_ACTIVE\)/);
+
+// Delay the native write until the wrapper can confirm the same image owner and style.
+const rnImageRoot = "android/src/main/java/com/rnmapbox/rnmbx";
+const mlImageRoot = "android/src/main/java/org/maplibre/reactnative";
+for (const [peerRoot, file, boundary] of [
+  [
+    rnRoot,
+    "ios/RNMBX/RNMBXImages.swift",
+    /attachment = UUID\(\)[\s\S]*map\.images\.removeAll[\s\S]*style\.removeImage/,
+  ],
+  [
+    rnRoot,
+    "ios/RNMBX/RNMBXUtils.swift",
+    /guard isCurrent\(\)[\s\S]*try style\.addImage/,
+  ],
+  [
+    rnRoot,
+    `${rnImageRoot}/components/images/RNMBXImages.kt`,
+    /attachment == currentAttachment && mMap === map && map\.getStyle\(\) === style/,
+  ],
+  [
+    rnRoot,
+    `${rnImageRoot}/utils/DownloadMapImageTask.kt`,
+    /if \(!isCurrent\(\)\) return@launch[\s\S]*style\.addBitmapImage/,
+  ],
+  [
+    mlRoot,
+    "ios/components/map-view/MLRNMapView.m",
+    /\[_images removeObject:images\];\s*\[images removeFromMap\];\s*images\.map = nil;/,
+  ],
+  [
+    mlRoot,
+    "ios/components/images/MLRNImageLoader.m",
+    /if \(isCurrent\(\)\) \[weakStyle setImage:img forName:imageName\]/,
+  ],
+  [
+    mlRoot,
+    `${mlImageRoot}/components/images/MLRNImages.kt`,
+    /attachment == currentAttachment && map === mapInstance && mapInstance\.style === style/,
+  ],
+  [
+    mlRoot,
+    `${mlImageRoot}/utils/DownloadMapImageTask.java`,
+    /if \(!mIsCurrent\.getAsBoolean\(\)\) return;[\s\S]*style\.addImage/,
+  ],
+]) {
+  assert.match(readFileSync(join(peerRoot, file), "utf8"), boundary, file);
+}
 
 const rnVersion = JSON.parse(
   readFileSync(join(rnRoot, "package.json"), "utf8")

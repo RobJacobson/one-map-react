@@ -1,9 +1,10 @@
-import type { ClickEvent, MoveEvent } from "../../contracts/event-types.js";
+import type { MoveEvent } from "../../contracts/event-types.js";
+import type { NativeClickEvent } from "../../contracts/native-types.js";
 import {
-  clickEvent,
   originFromUserInteraction,
   viewStateFromLngLat,
 } from "../shared/move-event.js";
+import { nativeClick } from "../shared/native-values.js";
 
 /**
  * Builds a move event from RNMapbox `onCameraChanged` fields.
@@ -53,7 +54,7 @@ export const clickEventFromRnmapbox = (feature: {
     readonly screenPointX?: number;
     readonly screenPointY?: number;
   };
-}): ClickEvent => {
+}): NativeClickEvent => {
   const coordinates = feature.geometry?.coordinates;
   const longitude = coordinates?.[0];
   const latitude = coordinates?.[1];
@@ -71,5 +72,5 @@ export const clickEventFromRnmapbox = (feature: {
     );
   }
 
-  return clickEvent([longitude, latitude], [x, y]);
+  return nativeClick([longitude, latitude], [x, y]);
 };

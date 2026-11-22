@@ -16,6 +16,7 @@ import {
 import { useActiveCallback } from "../adapters/shared/use-active-callback.js";
 import type { Adapter } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
+import type { ClickEvent } from "../contracts/event-types.js";
 import type { MapProps } from "../contracts/map-types.js";
 import { type MapSession, MapSessionContext } from "./map-context.js";
 import {
@@ -69,9 +70,26 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
   );
 });
 
-interface MountedMapProps<Handle extends MapRef, Props extends MapProps> {
-  readonly props: Props;
-  readonly implementation: ComponentType<Props & RefAttributes<Handle>>;
+type MountedMapOptions<Event extends ClickEvent = ClickEvent> = Pick<
+  MapProps,
+  | "id"
+  | "onLoad"
+  | "onMove"
+  | "projection"
+  | "terrain"
+  | "interactiveLayerIds"
+  | "onError"
+> & { readonly onClick?: (event: Event) => void };
+
+interface MountedMapProps<
+  Handle extends MapRef,
+  Props,
+  Event extends ClickEvent,
+> {
+  readonly props: Props & MountedMapOptions<Event>;
+  readonly implementation: ComponentType<
+    Props & MountedMapOptions<Event> & RefAttributes<Handle>
+  >;
   readonly adapter: Adapter;
   readonly forwardedRef: ForwardedRef<Handle>;
   readonly register?: MapRegistry<Handle>["register"];
@@ -83,13 +101,17 @@ interface MountedMapProps<Handle extends MapRef, Props extends MapProps> {
  * @param options - Concrete implementation, props, ref, and optional map access.
  * @returns The mounted map and its context.
  */
-export const MountedMap = <Handle extends MapRef, Props extends MapProps>({
+export const MountedMap = <
+  Handle extends MapRef,
+  Props,
+  Event extends ClickEvent,
+>({
   props,
   implementation: AdapterMap,
   adapter,
   forwardedRef,
   register,
-}: MountedMapProps<Handle, Props>): ReactElement => {
+}: MountedMapProps<Handle, Props, Event>): ReactElement => {
   validateMapOptions(props);
 
   useStableOptions("Map", {
@@ -130,7 +152,9 @@ export const MountedMap = <Handle extends MapRef, Props extends MapProps>({
 };
 
 /** Validates portable projection and terrain inputs before adapter rendering. */
-const validateMapOptions = (props: MapProps): void => {
+const validateMapOptions = (
+  props: Pick<MapProps, "projection" | "terrain">
+): void => {
   if (
     props.projection !== undefined &&
     props.projection !== "mercator" &&
@@ -165,7 +189,10 @@ const useMapAttachment = <Handle extends MapRef>(forwardedRef: Ref<Handle>) => {
           if (key === "then") return undefined;
           return (...args: unknown[]) => {
             const map = mapRef.current;
-            if (!map) return Promise.reject(new Error("Map is not attached."));
+            if (!map) {
+              if (key === "getSource") return undefined;
+              return Promise.reject(new Error("Map is not attached."));
+            }
             const method = Reflect.get(map, key) as (
               ...args: unknown[]
             ) => unknown;

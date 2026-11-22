@@ -14,7 +14,10 @@ import { createContext, useContext } from "react";
 export class GeoJsonSourceRegistry {
   private readonly refs = new Map<
     string,
-    { readonly read: () => ComponentRef<typeof ShapeSource> | null }
+    {
+      readonly read: () => ComponentRef<typeof ShapeSource> | null;
+      readonly requireGeoJson: () => ComponentRef<typeof ShapeSource>;
+    }
   >();
 
   /**
@@ -28,13 +31,29 @@ export class GeoJsonSourceRegistry {
     id: string,
     read: () => ComponentRef<typeof ShapeSource> | null
   ): () => void {
-    const owner = { read };
+    const owner = {
+      read,
+      requireGeoJson: () => {
+        const source = this.refs.get(id) === owner ? read() : undefined;
+        if (source) return source;
+        throw new Error(`Source "${id}" is no longer mounted.`);
+      },
+    };
     this.refs.set(id, owner);
     return () => {
       if (this.refs.get(id) === owner) {
         this.refs.delete(id);
       }
     };
+  }
+
+  /** Captures a mounted GeoJSON registration, including its identity across wrapper ref refreshes. */
+  getGeoJsonOwner(
+    id: string
+  ): (() => ComponentRef<typeof ShapeSource>) | undefined {
+    const owner = this.refs.get(id);
+    if (!owner?.read()) return undefined;
+    return owner.requireGeoJson;
   }
 
   /**

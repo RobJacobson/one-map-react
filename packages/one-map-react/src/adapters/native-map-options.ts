@@ -101,7 +101,9 @@ const nativeRejectedNames = [
  * @param props - Map props that may include web-only fields.
  * @throws When any listed field is set.
  */
-export const assertNativeDesktopOptions = (props: MapProps): void => {
+export const assertNativeDesktopOptions = (
+  props: Pick<MapProps, (typeof nativeRejectedNames)[number]>
+): void => {
   for (const name of nativeRejectedNames) {
     if (props[name] !== undefined) {
       throw nativeDesktopOptionError(name);

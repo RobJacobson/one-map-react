@@ -1,0 +1,10 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleSuffixes": [".maplibre-native", ".native", ""]
+  },
+  "files": ["maps.maplibre-native.ts"],
+  "include": ["VesselMap.tsx"]
+}

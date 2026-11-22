@@ -2,12 +2,14 @@ import { describe, expect, test } from "vite-plus/test";
 
 import {
   toRnmapboxCornerBounds,
+  toRnmapboxControlledCamera,
   toRnmapboxDefaultSettings,
   toRnmapboxStop,
   toRnmapboxZoomStop,
 } from "../src/adapters/mapbox-native/convert-camera.js";
 import {
   toMaplibreCommand,
+  toMaplibreInitialViewState,
   toMaplibreViewState,
 } from "../src/adapters/maplibre-native/convert-camera.js";
 import {
@@ -57,6 +59,71 @@ describe("camera conversion", () => {
       center: [-122.34, 47.61],
       duration: 1000,
     });
+  });
+
+  test("fills desktop camera defaults only on initialization", () => {
+    expect(toRnmapboxDefaultSettings()).toMatchObject({
+      centerCoordinate: [0, 0],
+      zoomLevel: 0,
+      heading: 0,
+      pitch: 0,
+    });
+    expect(toMaplibreInitialViewState({ longitude: 17 })).toMatchObject({
+      center: [17, 0],
+      zoom: 0,
+      bearing: 0,
+      pitch: 0,
+    });
+    expect(
+      toRnmapboxControlledCamera({ zoom: 8 }).centerCoordinate
+    ).toBeUndefined();
+    expect(toMaplibreViewState({ zoom: 8 }).center).toBeUndefined();
+  });
+
+  test("fits initial bounds with orientation and fit padding", () => {
+    const initial = {
+      ...viewState,
+      bounds: [1, 2, 3, 4] as const,
+      bearing: 30,
+      pitch: 45,
+      padding: { top: 8 },
+      fitBoundsOptions: { padding: 12 },
+    };
+    expect(toRnmapboxDefaultSettings(initial)).toMatchObject({
+      bounds: { sw: [1, 2], ne: [3, 4] },
+      heading: 30,
+      pitch: 45,
+      padding: {
+        paddingTop: 12,
+        paddingBottom: 12,
+        paddingLeft: 12,
+        paddingRight: 12,
+      },
+    });
+    expect(toMaplibreInitialViewState(initial)).toMatchObject({
+      bounds: [1, 2, 3, 4],
+      bearing: 30,
+      pitch: 45,
+      padding: { top: 12, bottom: 12, left: 12, right: 12 },
+    });
+  });
+
+  test("reports initial fit constraints the native wrappers cannot apply", () => {
+    const bounds = [1, 2, 3, 4] as const;
+    for (const convert of [
+      toRnmapboxDefaultSettings,
+      toMaplibreInitialViewState,
+    ]) {
+      expect(() =>
+        convert({ bounds, fitBoundsOptions: { offset: [3, 5] } })
+      ).toThrow(/offset/);
+      expect(() =>
+        convert({ bounds, fitBoundsOptions: { minZoom: 2 } })
+      ).toThrow(/minZoom/);
+      expect(() =>
+        convert({ bounds, fitBoundsOptions: { maxZoom: 12 } })
+      ).toThrow(/maxZoom/);
+    }
   });
 
   test("RNMapbox flyTo stop sets animationMode flyTo", () => {

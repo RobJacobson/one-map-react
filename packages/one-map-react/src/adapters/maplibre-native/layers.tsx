@@ -1,13 +1,20 @@
 import { Layer as MaplibreLayer } from "@maplibre/maplibre-react-native";
 import type { ComponentProps } from "react";
 
-import type { LayerProps } from "../../contracts/layer-types.js";
+import type {
+  LayerProps,
+  NativePortableLayerProps,
+} from "../../contracts/layer-types.js";
 import { rejectNativeUnsupportedLayout } from "../../facade/layer.js";
+import {
+  definedStyle,
+  useNativeLayerKey,
+} from "../shared/native-layer-updates.js";
 import { assertMaplibreLayerStyle } from "./style-roots.js";
 
 /** Style-spec and SDK-specific options for a MapLibre native Layer. */
 export type NativeLayerProps =
-  | LayerProps
+  | NativePortableLayerProps
   | ComponentProps<typeof MaplibreLayer>;
 
 /**
@@ -17,19 +24,44 @@ export type NativeLayerProps =
  * @returns The selected wrapper's layer.
  * @throws When a known layer field or expression is unsupported.
  */
-export const MaplibreNativeLayer = (props: NativeLayerProps) => {
+export const MaplibreNativeLayer = (props: NativeLayerProps | LayerProps) => {
   assertMaplibreLayerStyle(props);
   rejectNativeUnsupportedLayout(props, "maplibre-native");
 
   // Only RNMapbox consumes sourceID. The remaining portable style values
   // use MapLibre's style format, whose declarations require mutable arrays.
-  const { sourceID: _sourceID, ...wrapperProps } = props as NativeLayerProps & {
+  const {
+    sourceID,
+    paint: paintProps,
+    layout: layoutProps,
+    ...wrapperProps
+  } = props as (NativeLayerProps | LayerProps) & {
     readonly sourceID?: string;
   };
   const filter = "filter" in props ? props.filter : undefined;
+  const paint = definedStyle(paintProps);
+  const layout = definedStyle(layoutProps);
+  const legacyStyle = "style" in props ? definedStyle(props.style) : undefined;
+  const source = "source" in props ? (props.source ?? sourceID) : sourceID;
+  const key = useNativeLayerKey(
+    { ...legacyStyle, ...layout, ...paint },
+    {
+      ...wrapperProps,
+      filter,
+    }
+  );
+  const layer = {
+    ...wrapperProps,
+    source,
+    filter,
+    paint,
+    layout,
+    style: legacyStyle,
+  };
   return (
     <MaplibreLayer
-      {...({ ...wrapperProps, filter } as ComponentProps<typeof MaplibreLayer>)}
+      key={key}
+      {...(layer as ComponentProps<typeof MaplibreLayer>)}
     />
   );
 };

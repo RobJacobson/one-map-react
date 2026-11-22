@@ -1,6 +1,11 @@
 import { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
 import type { Camera as WrapperCamera } from "@maplibre/maplibre-react-native";
-import { type ComponentProps, type ComponentRef, forwardRef } from "react";
+import {
+  type ComponentProps,
+  type ReactElement,
+  type ComponentRef,
+  forwardRef,
+} from "react";
 import type { ViewProps } from "react-native";
 
 import {
@@ -9,16 +14,33 @@ import {
 } from "./adapters/maplibre-native/index.js";
 import type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
 import { assertMaplibreStyleRoots } from "./adapters/maplibre-native/style-roots.js";
-import type { MapProps } from "./contracts/map-types.js";
+import type { NativeMapInputs } from "./contracts/native-types.js";
+export type {
+  NativeBounds,
+  NativeBoundsLike,
+  NativeClickEvent,
+  NativeGeoJsonSource,
+  NativeLngLat,
+  NativeLngLatLike,
+  NativePoint,
+  NativePointLike,
+} from "./contracts/native-types.js";
+import { useLayerOptions } from "./facade/layer.js";
 import { createNativeMapBinding } from "./facade/native-map.js";
 export type { NativeMarkerProps } from "./facade/native-map.js";
 export type { SourceProps as NativeSourceProps } from "./contracts/source-types.js";
 
 export { adapter } from "./adapters/maplibre-native/index.js";
-export {
-  MaplibreNativeLayer as Layer,
+import {
+  MaplibreNativeLayer,
   type NativeLayerProps,
 } from "./adapters/maplibre-native/index.js";
+export type { NativeLayerProps };
+/** Renders a style-spec layer through MapLibre Native. */
+export const Layer = (props: NativeLayerProps): ReactElement => {
+  useLayerOptions(props, adapter.backend);
+  return <MaplibreNativeLayer {...props} />;
+};
 export type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
 
 /** Selected native map with typed renderer facilities and host attributes. */
@@ -28,10 +50,10 @@ export type NativeLocationOptions = Pick<
   "trackUserLocation" | "onTrackUserLocationChange"
 >;
 
-export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
+export interface NativeMapProps extends Omit<NativeMapInputs, "mapStyle"> {
   /** Complete selected style document. */
   readonly mapStyle:
-    | MapProps["mapStyle"]
+    | NativeMapInputs["mapStyle"]
     | import("@maplibre/maplibre-react-native").StyleSpecification;
   /** SDK follow facilities; conflicts with an explicit viewState target. */
   readonly locationOptions?: NativeLocationOptions;

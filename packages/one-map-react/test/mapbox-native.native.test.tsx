@@ -130,7 +130,9 @@ jest.mock("@rnmapbox/maps", () => {
     );
 
   const layerComponent = (name: string) =>
-    jest.fn((props: object) => React.createElement(name, props));
+    jest.fn((props: object) =>
+      React.createElement(name, { ...props, testID: name })
+    );
 
   // ShapeSource carries cluster methods on its ref, so it forwards the
   // caller's ref onto an imperative handle.
@@ -238,7 +240,9 @@ jest.mock("@rnmapbox/maps", () => {
     RasterLayer: layerComponent("RasterLayer"),
     HeatmapLayer: layerComponent("HeatmapLayer"),
     FillExtrusionLayer: layerComponent("FillExtrusionLayer"),
-    Images: jest.fn(() => null),
+    Images: jest.fn((props: object) =>
+      React.createElement("Images", { ...props, testID: "wrapper-images" })
+    ),
     CameraGestureObserver: () => null,
   };
 });
@@ -2025,7 +2029,7 @@ describe("mapbox-native layers", () => {
 describe("mapbox-native images", () => {
   test("entries are forwarded to the wrapper Images", async () => {
     ImagesMock.mockClear();
-    await render(
+    const view = await render(
       tree(
         <Images
           images={{
@@ -2036,15 +2040,41 @@ describe("mapbox-native images", () => {
       )
     );
 
-    expect(ImagesMock).toHaveBeenCalledWith(
-      {
-        images: {
-          marker: "https://example.com/marker.png",
-          shield: { url: "https://example.com/shield.png", sdf: true },
-        },
-      },
-      undefined
+    const [marker, shield] = view.getAllByTestId("wrapper-images");
+    expect(marker.props.images).toEqual({
+      marker: { url: "https://example.com/marker.png" },
+    });
+    expect(shield.props.images).toEqual({
+      shield: { url: "https://example.com/shield.png", sdf: true },
+    });
+
+    await view.rerender(
+      tree(
+        <Images
+          images={{
+            marker: "https://example.com/new-marker.png",
+            shield: { url: "https://example.com/shield.png", sdf: true },
+          }}
+        />
+      )
     );
+    const [newMarker, sameShield] = view.getAllByTestId("wrapper-images");
+    expect(newMarker).not.toBe(marker);
+    expect(sameShield).toBe(shield);
+    expect(newMarker.props.images).toEqual({
+      marker: { url: "https://example.com/new-marker.png" },
+    });
+
+    await view.rerender(
+      tree(
+        <Images
+          images={{
+            shield: { url: "https://example.com/shield.png", sdf: true },
+          }}
+        />
+      )
+    );
+    expect(view.getAllByTestId("wrapper-images")).toEqual([shield]);
   });
 
   test("images outside a map are rejected", async () => {
@@ -2576,4 +2606,46 @@ describe("mapbox-native entry binding", () => {
         style: { lineWidth: 3 },
       })
   );
+});
+
+test("selected Layer forwards source, transitions and ordering, then resets removed paint", async () => {
+  const scene = (width: number | undefined, beforeId: string | undefined) => (
+    <nativeEntry.Map mapStyle={emptyStyle}>
+      <nativeEntry.Source id="route-data" type="geojson" data={routes} />
+      <nativeEntry.Layer
+        id="route-layer"
+        type="line"
+        source="route-data"
+        beforeId={beforeId}
+        filter={
+          width === undefined
+            ? undefined
+            : ["==", ["geometry-type"], "LineString"]
+        }
+        paint={{
+          "line-width": width,
+          "line-width-transition": { duration: 450 },
+        }}
+      />
+    </nativeEntry.Map>
+  );
+  const view = await render(scene(2, "water"));
+  const original = view.getByTestId("LineLayer");
+  expect(original.props.sourceID).toBe("route-data");
+  expect(original.props.style).toEqual({
+    lineWidth: 2,
+    lineWidthTransition: { duration: 450 },
+  });
+
+  await view.rerender(scene(3, "label"));
+  expect(view.getByTestId("LineLayer")).toBe(original);
+  expect(view.getByTestId("LineLayer").props.belowLayerID).toBe("label");
+  await view.rerender(scene(undefined, undefined));
+  const replacement = view.getByTestId("LineLayer");
+  expect(replacement).not.toBe(original);
+  expect(replacement.props.style).toEqual({
+    lineWidthTransition: { duration: 450 },
+  });
+  expect(replacement.props.belowLayerID).toBeUndefined();
+  expect(replacement.props.filter).toBeUndefined();
 });

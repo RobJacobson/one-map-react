@@ -321,7 +321,7 @@ type RemovedSelectedVectorCallback = Extract<import("one-map-react/mapbox-native
 type RemovedSelectedVectorHitbox = Extract<import("one-map-react/mapbox-native").NativeSourceProps, { type: "vector" }>["hitbox"];
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof RnmapboxMapView>>> = true;
-const exactSelectedKeys: Equal<Exclude<keyof NativeAdvancedMapRef, keyof import("one-map-react").MapRef>, "getWrapperMap"> = true;
+const exactSelectedKeys: Equal<Exclude<keyof NativeAdvancedMapRef, keyof import("one-map-react").MapRef>, "getWrapperMap" | "getSource"> = true;
 void exactSelectedKeys;
 const borrowed: Promise<ComponentRef<typeof RnmapboxMapView>> = selectedRef.getWrapperMap();
 void exactWrapperPromise; void borrowed;
@@ -388,7 +388,7 @@ type RemovedSelectedVectorCallback = Extract<import("one-map-react/maplibre-nati
 type RemovedSelectedVectorHitbox = Extract<import("one-map-react/maplibre-native").NativeSourceProps, { type: "vector" }>["hitbox"];
 type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends (<Value>() => Value extends Right ? 1 : 2) ? true : false;
 const exactWrapperPromise: Equal<ReturnType<NativeAdvancedMapRef["getWrapperMap"]>, Promise<ComponentRef<typeof MaplibreMap>>> = true;
-const exactSelectedKeys: Equal<Exclude<keyof NativeAdvancedMapRef, keyof import("one-map-react").MapRef>, "getWrapperMap"> = true;
+const exactSelectedKeys: Equal<Exclude<keyof NativeAdvancedMapRef, keyof import("one-map-react").MapRef>, "getWrapperMap" | "getSource"> = true;
 void exactSelectedKeys;
 const borrowed: Promise<ComponentRef<typeof MaplibreMap>> = selectedRef.getWrapperMap();
 void exactWrapperPromise; void borrowed;
@@ -453,12 +453,45 @@ const SelectedChildren = () => {
   void exactCurrent; void exactNamed; void exactAlias; void exactMapAlias;
   return <BoundMarker longitude={0} latitude={0} />;
 };
-void <MapProvider><SelectedMap id="harbor" mapStyle={style} initialViewState={viewState}>
+void <MapProvider><SelectedMap id="harbor" mapStyle={style} initialViewState={{ zoom: 1 }} onClick={(event) => {
+  const longitude: number = event.lngLat.lng;
+  const x: number = event.point.x;
+  const hit: string | number | undefined = event.features?.[0]?.id;
+  void longitude; void x; void hit;
+}}>
   <BoundSource id="routes" type="geojson" data={{ type: "FeatureCollection", features: [] }}>
-    <BoundLayer id="route-line" type="line" paint={{ "line-width": 3 }} />
+    <BoundLayer id="route-line" type="line" paint={{ "line-width": 3, "line-width-transition": { duration: 450 } }} />
+    <BoundLayer id="route-point" type="circle" paint={{ "circle-radius-transition": { delay: 0 }, "circle-stroke-width-transition": { duration: 450 } }} />
   </BoundSource>
   <SelectedChildren />
 </SelectedMap></MapProvider>;
+// @ts-expect-error A circle transition belongs to a circle layer.
+void <BoundLayer id="invalid" type="line" paint={{ "circle-radius-transition": { duration: 450 } }} />;
+// @ts-expect-error A transition's duration is numeric.
+void <BoundLayer id="invalid" type="line" paint={{ "line-width-transition": { duration: "slow" } }} />;
+const useDesktopShape = async () => {
+  await selectedRef.flyTo({ center: { lng: -122.3, lat: 47.6 }, zoom: 9 });
+  await selectedRef.flyTo({ zoom: 10, padding: 12 });
+  await selectedRef.fitBounds([-123, 47, -122, 48], { padding: 8 });
+  const center = await selectedRef.getCenter();
+  const point = await selectedRef.project(center);
+  const x: number = point.x;
+  const west: number = (await selectedRef.getBounds()).getWest();
+  await selectedRef.queryRenderedFeatures({ x, y: point.y }, { layers: ["route-line"] });
+  await selectedRef.queryRenderedFeatures({ layers: ["route-point"] });
+  const source = selectedRef.getSource("routes");
+  if (source) {
+    const callbackResult: typeof source = source.getClusterExpansionZoom(7, (error, zoom) => {
+      const result: number | undefined = zoom;
+      const failure: Error | null = error;
+      void result; void failure;
+    });
+    const leaves = await source.getClusterLeaves(7, 2, 0);
+    void callbackResult; void leaves;
+  }
+  void west;
+};
+void useDesktopShape;
 `
     : "";
   const popupAssertions = `
@@ -596,6 +629,15 @@ void (
 );
 `
   );
+  const files = ["consumer.tsx"];
+  if (entry.endsWith("native")) {
+    const reference = join(root, "packages/example-map/reference");
+    cpSync(join(reference, `maps.${entry}.ts`), join(consumer, "maps.ts"));
+    for (const file of ["VesselMap.tsx", "vessel-fixture.ts"]) {
+      cpSync(join(reference, file), join(consumer, file));
+    }
+    files.push("VesselMap.tsx");
+  }
   writeFileSync(
     join(consumer, "tsconfig.json"),
     JSON.stringify({
@@ -613,7 +655,7 @@ void (
         customConditions: entry.endsWith("native") ? ["react-native"] : [],
         moduleSuffixes: entry.endsWith("native") ? [".native", ""] : [""],
       },
-      files: ["consumer.tsx"],
+      files,
     })
   );
   try {
@@ -672,7 +714,7 @@ console.log(adapter.backend);
     patchedFiles,
     status: "passed",
     scope: entry.endsWith("native")
-      ? "isolated declarations and mocked native import for explicit and conditional paths, peer installation, patch application; no native linking or renderer"
+      ? "isolated declarations and vessel reference, mocked native import, peer installation and patch application; no native linking or renderer"
       : "isolated declarations, selected web import, peer installation",
   });
   rmSync(consumer, { recursive: true, force: true });

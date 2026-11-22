@@ -54,7 +54,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 Mapbox applications set their public access token before mounting maps. Web applications set `mapboxgl.accessToken` on their application-owned `mapbox-gl` import. Native applications call the selected entry's `setAccessToken(token)`. Token names and storage belong to the application; never embed a secret download token.
 
-RNMapbox iOS applications must apply the shipped patch for their exact wrapper version and rebuild the native app. The patch exports the immediate camera mode used by `jumpTo`, declarative camera target props, and zero-duration `zoomTo`; without it, the wrapper can fall back to a flight animation.
+Native applications must apply the shipped patch for their exact wrapper version and rebuild the native app. The patches cover native image registration cleanup and pending downloads. On RNMapbox iOS the patch also selects the immediate camera mode. The `jumpTo` command, camera target updates, and zero-duration `zoomTo` use that mode.
 
 ## Shared map
 
@@ -163,6 +163,8 @@ export const HarborScreen = () => (
 ```
 
 Inside a map, read `useMap().current`. A sibling reads `useMap().harbor` for a mounted map with `id="harbor"` in its provider. A map without an ID registers as `default`. Each provider requires unique IDs and reserves `current` for the enclosing map. Lookup yields `undefined` when the corresponding map is absent. Both forms expose the selected `NativeAdvancedMapRef`, including `getWrapperMap()`.
+
+Native selected maps accept partial initial camera settings, desktop camera commands, and click fields such as `event.lngLat.lng` and `event.point.x`. Await native reads including `getCenter()`, `project()`, and `getBounds()`. Use `map.getSource(id)` to access a mounted GeoJSON source's cluster methods. Both promise and error-first callback calls are supported on native. [Native compatibility contract](../../docs/revised-api-proposal.md#native-compatibility-contract).
 
 Existing root components inside a selected native map follow that map's adapter. With `MapSetup` alone, explicit IDs remain available to the root hook. When a selected `MapProvider` encloses the map, it owns named lookup through the selected hook. The MapLibre native `Layer` also accepts SDK-specific props, including `afterId`, `layerIndex`, and legacy `style`.
 

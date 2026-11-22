@@ -11,13 +11,15 @@ import type { MapProps } from "../contracts/map-types.js";
  * @param mapRef - The concrete renderer attachment, captured before queries.
  * @returns Movement and click handlers that suppress obsolete delivery.
  */
-export const useMapInteractions = (
-  props: MapProps,
+export const useMapInteractions = <Event extends ClickEvent>(
+  props: Pick<MapProps, "onMove" | "onError" | "interactiveLayerIds"> & {
+    readonly onClick?: (event: Event) => void;
+  },
   mapRef: { readonly current: MapRef | null }
 ): {
   /** Delivers movement only while its map attachment remains active. */
   readonly move: (event: MoveEvent) => void;
-  readonly click: (event: ClickEvent) => Promise<void>;
+  readonly click: (event: Event) => Promise<void>;
 } => {
   const propsRef = useRef(props);
   const active = useRef(true);
@@ -39,7 +41,7 @@ export const useMapInteractions = (
     if (active.current) propsRef.current.onMove?.(event);
   };
 
-  const click = async (event: ClickEvent): Promise<void> => {
+  const click = async (event: Event): Promise<void> => {
     const currentGeneration = generation.current;
     const map = mapRef.current;
     const isCurrent = (): boolean =>
