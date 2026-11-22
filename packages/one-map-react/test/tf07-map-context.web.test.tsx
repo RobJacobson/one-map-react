@@ -123,6 +123,85 @@ test.each(
   }
 );
 
+test.each(["enclosing", "named"] as const)(
+  "%s map handles expose only known stable methods and serialize safely",
+  async (access) => {
+    const fixture = createFixture();
+    const { Map: NativeMap, MapProvider, useMap } = fixture.binding;
+    const observe = vi.fn<(map: MapRef | undefined) => void>();
+    const Probe = () => {
+      const maps = useMap();
+      observe(access === "named" ? maps["inspect-map"] : maps.current);
+      return null;
+    };
+    const scene = (label: string) => (
+      <MapProvider>
+        <div>{label}</div>
+        {access === "named" && <Probe />}
+        <NativeMap id="inspect-map" mapStyle={style} initialViewState={camera}>
+          <div>{label}</div>
+          {access === "enclosing" && <Probe />}
+        </NativeMap>
+      </MapProvider>
+    );
+
+    const view = render(scene("first"));
+    const map = observe.mock.calls.at(-1)?.[0] as
+      | (MapRef & {
+          getSource?: (id: string) => unknown;
+          getWrapperMap?: () => Promise<unknown>;
+          getMap?: unknown;
+          getLayer?: unknown;
+          then?: unknown;
+        })
+      | undefined;
+    if (!map) throw new Error("Map reference was not attached.");
+
+    expect(Object.isFrozen(map)).toBe(true);
+    expect("flyTo" in map).toBe(true);
+    expect("getSource" in map).toBe(true);
+    expect("getWrapperMap" in map).toBe(true);
+    expect(Object.hasOwn(map, "flyTo")).toBe(true);
+    expect("getMap" in map).toBe(false);
+    expect("getLayer" in map).toBe(false);
+    expect("then" in map).toBe(false);
+    expect(Symbol.toPrimitive in map).toBe(false);
+    expect(Symbol.toStringTag in map).toBe(false);
+    expect(typeof map.getMap).toBe("undefined");
+    expect(typeof map.then).toBe("undefined");
+
+    const initialFlyTo = map.flyTo;
+    const initialGetZoom = map.getZoom;
+    expect(map.flyTo).toBe(initialFlyTo);
+    expect(map.getZoom).toBe(initialGetZoom);
+
+    view.rerender(scene("second"));
+    const rerendered = observe.mock.calls.at(-1)?.[0];
+    expect(rerendered).toBe(map);
+    expect(rerendered?.flyTo).toBe(initialFlyTo);
+    expect(rerendered?.getZoom).toBe(initialGetZoom);
+
+    expect(String(map)).toBe("[object Object]");
+    expect(JSON.stringify(map)).toBe("{}");
+
+    // Partial attached fakes omit unimplemented methods; forwarding rejects cleanly.
+    await expect(map.flyTo({ center: [7, 8] })).rejects.toThrow(
+      'Map method "flyTo" is not available.'
+    );
+    expect(map.getSource?.("routes")).toBeUndefined();
+    await expect(map.getZoom()).resolves.toBe(3);
+
+    view.unmount();
+    expect(String(map)).toBe("[object Object]");
+    expect(JSON.stringify(map)).toBe("{}");
+    expect(map.getSource?.("routes")).toBeUndefined();
+    await expect(map.flyTo({ center: [7, 8] })).rejects.toThrow(
+      "Map is not attached."
+    );
+    await expect(initialGetZoom()).rejects.toThrow("Map is not attached.");
+  }
+);
+
 test("a provider reserves current and detects a collision with its default map", () => {
   const { Map: NativeMap, MapProvider } = createFixture().binding;
   expect(() =>
