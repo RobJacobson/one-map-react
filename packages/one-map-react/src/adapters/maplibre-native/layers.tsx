@@ -2,32 +2,34 @@ import { Layer as MaplibreLayer } from "@maplibre/maplibre-react-native";
 import type { ComponentProps } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
+import { rejectNativeUnsupportedLayout } from "../../facade/layer.js";
 import { assertMaplibreLayerStyle } from "./style-roots.js";
 
-/** Maplibre-native layer that forwards portable fields to the wrapper layer. */
-export const MaplibreNativeLayer = (props: LayerProps) => {
+/** Style-spec and SDK-specific options for a MapLibre native Layer. */
+export type NativeLayerProps =
+  | LayerProps
+  | ComponentProps<typeof MaplibreLayer>;
+
+/**
+ * Renders a MapLibre layer using both portable and wrapper style fields.
+ *
+ * @param props - Layer style, placement, and any source injected by its parent.
+ * @returns The selected wrapper's layer.
+ * @throws When a known layer field or expression is unsupported.
+ */
+export const MaplibreNativeLayer = (props: NativeLayerProps) => {
   assertMaplibreLayerStyle(props);
+  rejectNativeUnsupportedLayout(props, "maplibre-native");
 
-  const wrapperProps = {
-    id: props.id,
-    type: props.type,
-    source: props.source,
-    beforeId: props.beforeId,
-    minzoom: props.minzoom,
-    maxzoom: props.maxzoom,
-    paint: props.paint,
-    layout: props.layout,
-    ...("source-layer" in props
-      ? { "source-layer": props["source-layer"] }
-      : {}),
-    filter: "filter" in props ? props.filter : undefined,
+  // Only RNMapbox consumes sourceID. The remaining portable style values
+  // use MapLibre's style format, whose declarations require mutable arrays.
+  const { sourceID: _sourceID, ...wrapperProps } = props as NativeLayerProps & {
+    readonly sourceID?: string;
   };
-
-  // The wrapper accepts style-spec paint, layout, and filter values; the
-  // facade's readonly contracts cross into its mutable spec types here.
+  const filter = "filter" in props ? props.filter : undefined;
   return (
     <MaplibreLayer
-      {...(wrapperProps as ComponentProps<typeof MaplibreLayer>)}
+      {...({ ...wrapperProps, filter } as ComponentProps<typeof MaplibreLayer>)}
     />
   );
 };

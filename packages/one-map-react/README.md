@@ -97,7 +97,7 @@ export const SharedMap = () => (
 );
 ```
 
-Setup wraps that component once:
+For the root facade, wrap that component in `MapSetup`.
 
 ```tsx
 import { MapSetup } from "one-map-react";
@@ -113,13 +113,58 @@ export const App = () => (
 
 For mixed engines, keep this setup import in platform files. A `setup.ts` can select `mapbox-web`, while `setup.native.ts` selects `maplibre-native`; reverse those choices for the other combination. The shared component remains unchanged. The `mapbox` and `maplibre` aliases select web under `browser`, native under `react-native`, and web by default. Browser takes precedence when both conditions are active. Explicit adapter paths avoid relying on tool-specific conditions. Changing the `MapSetup` adapter requires a new React key to reset the map tree and its pending work. MapSetup accepts adapter and children; application location work has its own lifetime and cleanup.
 
-`MapRef` camera, query, cluster, and feature-state methods return promises. A camera command resolves when its wrapper accepts dispatch, before an animation necessarily finishes. Queries propagate failures; empty successful results remain distinct. `useMap()` reads the enclosing map; `Map.id` and `useMap(id)` provide setup-local named maps. Named lookup returns `undefined` before attachment and after removal, and updates when the map attaches. See [camera and events](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf04-camera.md) and [queries](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf06-queries.md).
+`MapRef` camera, query, cluster, and feature-state methods return promises. A camera command resolves when its wrapper accepts dispatch, before an animation necessarily finishes. Queries propagate failures; empty successful results remain distinct. The root `useMap()` reads the enclosing map. For maps registered with `MapSetup`, set `Map.id` and call the root `useMap(id)`. Named lookup returns `undefined` before attachment and after removal, and updates when the map attaches. See [camera and events](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf04-camera.md) and [queries](https://github.com/RobJacobson/one-map-react/blob/main/docs/tf06-queries.md).
 
 Feature-state lifetime follows the selected renderer. Explicit `setFeatureState`, `getFeatureState`, and `removeFeatureState` calls validate and copy arguments, use the current attached map/source handle, and propagate SDK errors. Same-ID source remounts and style replacement provide no automatic clearing, replay, queue, or transaction guarantee. Applications retain the desired state and explicitly clear or reapply it after the relevant source is attached and ready; awaiting removal acknowledges dispatch rather than rendered visibility. Already dispatched SDK calls retain SDK ordering and lifetime. See the [migration status](https://github.com/RobJacobson/one-map-react/blob/main/docs/revised-api-implementation-plan.md#work-order) for review and verification gates.
 
 Marker creation inputs compare their effective defaults. Supplying renderMode="view" after omitting it keeps the same effective value. Changing id, anchor or renderMode requires a new React key. Each marker freezes its content-dependent default anchor at creation; backend-specific defaults and unsupported requests retain their selected implementation's behavior.
 
 The package JavaScript includes React Compiler optimizations targeting React 19; build diagnostics identify functions the compiler skips. Applications do not need to enable a compiler or install a compiler runtime package. Callback teardown, immutable creation rules, and resource ownership remain explicit library behavior.
+
+### Direct native entries
+
+Import `Map`, `Source`, `Layer`, `Marker`, and `useMap` from `one-map-react/mapbox-native` or `one-map-react/maplibre-native`. The import selects the renderer. Mount the map directly for enclosing access, or wrap the tree in the same entry's `MapProvider` for named lookup.
+
+```tsx
+import {
+  Map as NativeMap,
+  MapProvider,
+  Marker,
+  useMap,
+} from "one-map-react/maplibre-native";
+import { Text, View } from "react-native";
+
+const HarborStatus = () => {
+  const { harbor } = useMap();
+  return <Text>{harbor ? "Map attached" : "Waiting for map"}</Text>;
+};
+
+export const HarborScreen = () => (
+  <MapProvider>
+    <View style={{ flex: 1 }}>
+      <HarborStatus />
+      <NativeMap
+        id="harbor"
+        mapStyle="https://tiles.openfreemap.org/styles/liberty"
+        initialViewState={{
+          longitude: -122.34,
+          latitude: 47.61,
+          zoom: 11,
+          bearing: 0,
+          pitch: 0,
+        }}
+        style={{ flex: 1 }}
+      >
+        <Marker longitude={-122.34} latitude={47.61} />
+      </NativeMap>
+    </View>
+  </MapProvider>
+);
+```
+
+Inside a map, read `useMap().current`. A sibling reads `useMap().harbor` for a mounted map with `id="harbor"` in its provider. A map without an ID registers as `default`. Each provider requires unique IDs and reserves `current` for the enclosing map. Lookup yields `undefined` when the corresponding map is absent. Both forms expose the selected `NativeAdvancedMapRef`, including `getWrapperMap()`.
+
+Existing root components inside a selected native map follow that map's adapter. With `MapSetup` alone, explicit IDs remain available to the root hook. When a selected `MapProvider` encloses the map, it owns named lookup through the selected hook. The MapLibre native `Layer` also accepts SDK-specific props, including `afterId`, `layerIndex`, and legacy `style`.
 
 ## Selected extensions
 

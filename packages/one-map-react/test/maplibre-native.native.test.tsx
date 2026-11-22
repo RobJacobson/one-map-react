@@ -29,6 +29,7 @@ import { Layer } from "../src/facade/layer.js";
 import { MapSetup } from "../src/facade/map-setup.js";
 import { Map as OneMap, useMap } from "../src/facade/map.js";
 import { Source } from "../src/facade/source.js";
+import { testNativeEntryBinding } from "./native-entry-binding.js";
 
 const mockFlyTo = jest.fn(() => Promise.resolve());
 const mockJumpTo = jest.fn(() => Promise.resolve());
@@ -267,6 +268,7 @@ import {
   Map as NativeMap,
   type NativeAdvancedMapRef,
 } from "../src/maplibre-native.js";
+import * as nativeEntry from "../src/maplibre-native.js";
 
 const MapMock = MaplibreMap as unknown as jest.Mock;
 const LayerMock = MaplibreLayer as unknown as jest.Mock;
@@ -2197,4 +2199,47 @@ test("selected native location follow rejects a simultaneous viewState target", 
       </MapSetup>
     )
   ).rejects.toThrow("Selected location follow conflicts with viewState.");
+});
+
+describe("maplibre-native entry binding", () => {
+  test("forwards wrapper-only options on the selected Layer", async () => {
+    await render(
+      <nativeEntry.Layer
+        type="raster"
+        afterId="water"
+        layerIndex={2}
+        style={{ rasterResampling: "nearest" }}
+      />
+    );
+    expect(LayerMock.mock.lastCall?.[0]).toMatchObject({
+      afterId: "water",
+      layerIndex: 2,
+      style: { rasterResampling: "nearest" },
+    });
+  });
+
+  testNativeEntryBinding(
+    nativeEntry,
+    {
+      nativeEvent: { lngLat: [-122.34, 47.61], point: [23, 41] },
+    },
+    () => {
+      let complete: () => void = () => {
+        throw new Error("Rendered query was never dispatched.");
+      };
+      mockQueryRenderedFeatures.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            complete = () => resolve(queryFeatures);
+          })
+      );
+      return () => complete();
+    },
+    mockGetClusterExpansionZoom,
+    () =>
+      expect(LayerMock.mock.lastCall?.[0]).toMatchObject({
+        source: "routes",
+        paint: { "line-width": 3 },
+      })
+  );
 });

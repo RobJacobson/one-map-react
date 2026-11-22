@@ -2,7 +2,7 @@
 
 ## Native compatibility contract
 
-Applications use stock react-map-gl on web. A platform import binds the shared screen to one-map-react's RNMapbox or MapLibre React Native entry on native. The native entries are a proposed release contract. The checked-in [vessel map](../packages/example-map/reference/VesselMap.tsx) establishes the desktop reference for shared JSX. The [requirements](requirements.md#native-compatibility-target) define retained scope and the [checklist](api-coverage.md#native-compatibility-verification) records verification.
+The target uses stock react-map-gl on web and one-map-react's selected entry on native. The working checkout implements direct native entry selection and map access, as documented in the [package guide](../packages/one-map-react/README.md). The [vessel map](../packages/example-map/reference/VesselMap.tsx) establishes the desktop reference for shared JSX. The [requirements](requirements.md#native-compatibility-target) define retained scope and the [checklist](api-coverage.md#native-compatibility-verification) records verification.
 
 The research basis is react-map-gl 8.1.3, Mapbox GL JS 3.32.0, MapLibre GL JS 6.13.0, RNMapbox 10.3.8, and MapLibre React Native 11.5.0, inspected on 2026-11-21. See the pinned [react-map-gl source](https://github.com/visgl/react-map-gl/tree/3df834290bdecf4f5c9b90d7c117d95af12c1f0a), the [support matrix](../records/support-matrix.json), and the [native adapter research](upstream-research.md).
 
@@ -370,7 +370,7 @@ Common Control, ControlProps, ControlPosition, Adapter.Control and selected faca
 
 These boundaries were checked against installed RNMapbox 10.3.8 and integrity-verified npm source archives for RNMapbox 10.3.7 and 10.3.8: src/components/MapView.tsx, ios/RNMBX/RNMBXMapView.swift, and Android RNMBXMapViewManager.kt/RNMBXMapView.kt. Both versions forward scaleBarUnits to native metric/imperial/nautical mappings. MapLibre React Native 11.5.0 src/components/map/Map.tsx exposes scaleBar and scaleBarPosition; both native component schemas retain those fields without a units field. Its Android MLRNMapViewManager.kt forwards position to MLRNMapView.kt, which reads top/left margins and applies ScaleBarOptions.marginTop/marginLeft. That is a wrapper boundary, not an SDK impossibility. Selected option types live in the [Mapbox native entry](../packages/one-map-react/src/mapbox-native.tsx) and [MapLibre native entry](../packages/one-map-react/src/maplibre-native.tsx). Source inspection and declarations do not establish renderer behavior; the migrated ornament configuration still needs scoped renderer acceptance.
 
-For example, these are separate native modules using the same selected option boundary. The surrounding screen supplies mapStyle and initialCamera and renders within MapSetup. RNMapbox enables its SDK scale without replacing its default units or legal ornaments:
+These examples use the selected option boundary with mapStyle and initialCamera supplied by the screen. RNMapbox enables its SDK scale with its default units and legal ornaments.
 
 ```tsx
 import { Map as OneMap } from "one-map-react/mapbox-native";
@@ -560,7 +560,7 @@ The maintained native service example uses separate RNMapbox and MapLibre comman
 const image = await map.capture({ output: "file", scope: "backend" });
 ```
 
-**After, working selected refs.** Import Map and NativeAdvancedMapRef from the selected native entry and hold its ref at the screen that owns capture. Shared Source/Layer children can remain unchanged. getWrapperMap is the only new access method; all four selected getters exist in the working implementation. For example, the MapLibre screen uses these imports and ref inside its existing component:
+**After, working selected refs.** Import Map and NativeAdvancedMapRef from the selected native entry and hold its ref at the screen that owns capture. Existing root Source and Layer children also follow the bound map. getWrapperMap is the only new access method; all four selected getters exist in the working implementation. The MapLibre screen uses these imports and ref inside its existing component.
 
 ```tsx
 import { useRef } from "react";

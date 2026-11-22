@@ -18,8 +18,14 @@ import {
   packageCheckOptions,
   selectedVersions,
 } from "./package-check-options.mjs";
+import { walkDeclarations } from "./packed-declarations.mjs";
+import { checkNativeLoad } from "./packed-native-load.mjs";
 
-const options = packageCheckOptions();
+const args = process.argv.slice(2);
+const nativeOnly = args.includes("--native-only");
+const options = packageCheckOptions(
+  args.filter((arg) => arg !== "--native-only")
+);
 const evidence = [];
 const sha256 = (file) =>
   createHash("sha256").update(readFileSync(file)).digest("hex");
@@ -124,11 +130,17 @@ const main = async () => {
     }
 
     for (const [entry, packages] of Object.entries(peers)) {
+      if (nativeOnly && !entry.endsWith("native")) continue;
       await checkPeerConsumer(
         archive,
         entry,
         selectedVersions(packages, options.versions, entry)
       );
+    }
+
+    if (nativeOnly) {
+      console.log("PASS two isolated packed native entries and aliases.");
+      return;
     }
 
     for (const pair of [
@@ -194,6 +206,21 @@ const checkPeerConsumer = async (archive, entry, packages) => {
       false,
       `${entry} consumer installed ${backend}`
     );
+  }
+
+  if (entry.endsWith("native")) {
+    const peer =
+      entry === "mapbox-native"
+        ? "@rnmapbox/maps"
+        : "@maplibre/maplibre-react-native";
+    const forbidden = backends.filter(
+      (backend) => backend !== peer && backend !== "react-native-teleport"
+    );
+    walkDeclarations(
+      join(consumer, "node_modules/one-map-react/dist", `${entry}.d.ts`),
+      forbidden
+    );
+    checkNativeLoad(consumer, entry, peer, run);
   }
 
   const modelAvailable =
@@ -407,11 +434,33 @@ selectedRef.showAttribution();
 // @ts-expect-error Selected camera reads belong to the borrowed native wrapper.
 selectedRef.getViewState();
 void <WrapperMap mapStyle={style}><WrapperCamera initialViewState={{center: [0,0], zoom: 0}} /><WrapperGeoJSONSource id="selected" data={{ type: "FeatureCollection", features: [] }} hitbox={{ top: 10, right: 10, bottom: 10, left: 10 }} onPress={() => {}} /></WrapperMap>;
-void Animated; void SelectedLayer; void TransformRequestManager;
+void <SelectedLayer type="raster" afterId="labels" layerIndex={7} style={{ rasterResampling: "nearest" }} />;
+void Animated; void TransformRequestManager;
 NetworkManager.setConnected(false);
 // @ts-expect-error Selected native settings preserve their boolean input.
 NetworkManager.setConnected(42);
 `;
+  const nativeBindingAssertions = entry.endsWith("native")
+    ? `
+import { Layer as BoundLayer, Marker as BoundMarker, Source as BoundSource, MapProvider, useMap as useSelectedMap } from "one-map-react/${entry}";
+import { useMap as useAliasMap, Map as AliasMap } from "one-map-react/${entry.replace("-native", "")}";
+const SelectedChildren = () => {
+  const maps = useSelectedMap();
+  const exactCurrent: Equal<typeof maps.current, NativeAdvancedMapRef | undefined> = true;
+  const exactNamed: Equal<typeof maps.harbor, NativeAdvancedMapRef | undefined> = true;
+  const exactAlias: Equal<typeof useAliasMap, typeof useSelectedMap> = true;
+  const exactMapAlias: Equal<typeof AliasMap, typeof SelectedMap> = true;
+  void exactCurrent; void exactNamed; void exactAlias; void exactMapAlias;
+  return <BoundMarker longitude={0} latitude={0} />;
+};
+void <MapProvider><SelectedMap id="harbor" mapStyle={style} initialViewState={viewState}>
+  <BoundSource id="routes" type="geojson" data={{ type: "FeatureCollection", features: [] }}>
+    <BoundLayer id="route-line" type="line" paint={{ "line-width": 3 }} />
+  </BoundSource>
+  <SelectedChildren />
+</SelectedMap></MapProvider>;
+`
+    : "";
   const popupAssertions = `
 // @ts-expect-error Applications own selected custom control layout.
 import { Control } from "one-map-react/${entry}";
@@ -531,6 +580,7 @@ const viewState = {
 };
 const style = { version: 8 as const, sources: {}, layers: [] };
 ${selectedAssertions}
+${nativeBindingAssertions}
 ${markerAssertions}
 ${popupAssertions}
 void (
@@ -560,6 +610,7 @@ void (
         skipLibCheck: true,
         types: [],
         lib: ["ES2022", "DOM"],
+        customConditions: entry.endsWith("native") ? ["react-native"] : [],
         moduleSuffixes: entry.endsWith("native") ? [".native", ""] : [""],
       },
       files: ["consumer.tsx"],
@@ -620,8 +671,9 @@ console.log(adapter.backend);
     retainedLockfile,
     patchedFiles,
     status: "passed",
-    scope:
-      "isolated declarations, selected web import, peer installation, patch application; no native linking or renderer",
+    scope: entry.endsWith("native")
+      ? "isolated declarations and mocked native import for explicit and conditional paths, peer installation, patch application; no native linking or renderer"
+      : "isolated declarations, selected web import, peer installation",
   });
   rmSync(consumer, { recursive: true, force: true });
 };

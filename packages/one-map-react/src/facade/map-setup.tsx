@@ -8,14 +8,19 @@ import {
 
 import type { Adapter } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
-interface MapRegistry {
-  register(id: string, map: MapRef): () => void;
-  get(id: string): MapRef | undefined;
+/** Registers mounted handles and publishes a new snapshot on attachment changes. */
+export interface MapRegistry<Handle extends MapRef> {
+  /** Registers one handle and returns its matching cleanup. */
+  register(id: string, map: Handle): () => void;
+  /** Reads the current attachment snapshot. */
+  getSnapshot(): ReadonlyMap<string, Handle>;
+  /** Subscribes to attachment changes and returns the unsubscribe callback. */
   subscribe(listener: () => void): () => void;
 }
 
-const AdapterContext = createContext<Adapter | null>(null);
-const MapRegistryContext = createContext<MapRegistry | null>(null);
+/** Adapter for the legacy facade and root components nested in a bound map. */
+export const AdapterContext = createContext<Adapter | null>(null);
+const MapRegistryContext = createContext<MapRegistry<MapRef> | null>(null);
 
 /** Props for the selected backend and its map tree. */
 export interface MapSetupProps {
@@ -27,7 +32,7 @@ export interface MapSetupProps {
 
 /** Provides backend selection and a provider-local named map registry. */
 export const MapSetup = ({ adapter, children }: MapSetupProps) => {
-  const [registry] = useState(createRegistry);
+  const [registry] = useState(() => createMapRegistry<MapRef>("MapSetup"));
   const [initialAdapter] = useState(() => adapter);
   if (initialAdapter !== adapter)
     throw new Error("MapSetup adapter changed. Remount with a new key.");
@@ -50,31 +55,43 @@ export const useSelectedAdapter = (): Adapter => {
   return adapter;
 };
 
-/** Internal registry accessor; registration occurs during map attachment. */
-export const useMapRegistry = (): MapRegistry => {
-  const registry = useContext(MapRegistryContext);
-  if (!registry) throw new Error("useMap requires MapSetup.");
-  return registry;
-};
+/**
+ * Reads the legacy setup's registry when one is present.
+ *
+ * @returns Registry owned by the nearest MapSetup, or null.
+ */
+export const useMapRegistry = (): MapRegistry<MapRef> | null =>
+  useContext(MapRegistryContext);
 
 /** Reads a named map and rerenders after its attachment changes. */
 export const useNamedMap = (id: string | undefined): MapRef | undefined => {
-  const registry = useMapRegistry();
-  return useSyncExternalStore(
-    registry.subscribe,
-    () => (id === undefined ? undefined : registry.get(id)),
+  const registry = useContext(MapRegistryContext);
+  const named = useSyncExternalStore(
+    registry?.subscribe ?? noMapSubscription,
+    () => (id === undefined ? undefined : registry?.getSnapshot().get(id)),
     () => undefined
   );
+  if (id !== undefined && !registry)
+    throw new Error("useMap requires MapSetup.");
+  return named;
 };
 
-const createRegistry = (): MapRegistry => {
-  const maps = new globalThis.Map<string, MapRef>();
+/**
+ * Creates independent storage for one mounted provider.
+ *
+ * @param provider - Public component name for duplicate-ID errors.
+ * @returns Registry that keeps its snapshot stable until a map attaches or detaches.
+ */
+export const createMapRegistry = <Handle extends MapRef>(
+  provider: "MapSetup" | "MapProvider"
+): MapRegistry<Handle> => {
+  let maps = new globalThis.Map<string, Handle>();
   const listeners = new Set<() => void>();
   const notify = () => {
     for (const listener of listeners) listener();
   };
   return {
-    get: (id) => maps.get(id),
+    getSnapshot: () => maps,
     subscribe: (listener) => {
       listeners.add(listener);
       return () => {
@@ -84,12 +101,13 @@ const createRegistry = (): MapRegistry => {
     register: (id, map) => {
       if (maps.has(id))
         throw new Error(
-          `Map id "${id}" is already registered in this MapSetup.`
+          `Map id "${id}" is already registered in this ${provider}.`
         );
-      maps.set(id, map);
+      maps = new globalThis.Map(maps).set(id, map);
       notify();
       return () => {
         if (maps.get(id) === map) {
+          maps = new globalThis.Map(maps);
           maps.delete(id);
           notify();
         }
@@ -97,3 +115,10 @@ const createRegistry = (): MapRegistry => {
     },
   };
 };
+
+/**
+ * Supplies the external-store unsubscribe protocol outside a provider.
+ *
+ * @returns Inert unsubscribe callback.
+ */
+export const noMapSubscription = (): (() => void) => () => undefined;

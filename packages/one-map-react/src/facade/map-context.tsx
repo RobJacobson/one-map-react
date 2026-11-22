@@ -1,5 +1,6 @@
 import { createContext, type MutableRefObject, useContext } from "react";
 
+import type { Adapter } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
 
 /** Map-local resources owned by the facade, released on logical unmount. */
@@ -7,6 +8,8 @@ export interface MapSession {
   readonly ref: MutableRefObject<MapRef | null>;
   readonly map: MapRef;
   readonly ready: boolean;
+  /** Backend that owns the mounted map. */
+  readonly adapter?: Adapter;
 }
 
 export const MapSessionContext = createContext<MapSession | null>(null);

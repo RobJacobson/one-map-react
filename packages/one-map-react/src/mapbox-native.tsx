@@ -1,29 +1,27 @@
 import * as Rnmapbox from "@rnmapbox/maps";
-import { forwardRef } from "react";
-
-import { assertLabelLocalization } from "./adapters/mapbox-native/label-localization.js";
-import type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
-export type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
 import { MapView } from "@rnmapbox/maps";
 import type { Camera as WrapperCamera } from "@rnmapbox/maps";
-import type {
-  ComponentProps,
-  ComponentRef,
-  ComponentType,
-  ForwardRefExoticComponent,
-  RefAttributes,
+import {
+  type ComponentProps,
+  type ComponentRef,
+  forwardRef,
+  type ReactElement,
 } from "react";
 import type { ViewProps } from "react-native";
 
+import { adapter, MapboxNativeMap } from "./adapters/mapbox-native/index.js";
+import { assertLabelLocalization } from "./adapters/mapbox-native/label-localization.js";
+import type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
+import type { LayerProps } from "./contracts/layer-types.js";
 import type { MapProps } from "./contracts/map-types.js";
-import type { SourceProps } from "./contracts/source-types.js";
 import type { StyleDocument } from "./contracts/style-types.js";
-import type { MarkerProps, MarkerRef } from "./contracts/ui-types.js";
-import { Map as SharedMap } from "./facade/map.js";
-import { Source as SharedSource } from "./facade/source.js";
-import { Marker as SharedMarker } from "./facade/ui.js";
+import { useLayerOptions } from "./facade/layer.js";
+import { createNativeMapBinding } from "./facade/native-map.js";
+export type { NativeMarkerProps } from "./facade/native-map.js";
+export type { SourceProps as NativeSourceProps } from "./contracts/source-types.js";
 
 export type { GestureSettings } from "./adapters/mapbox-native/index.js";
+export type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
 export {
   adapter,
   CameraGestureObserver,
@@ -68,32 +66,31 @@ export interface NativeMapProps extends Omit<MapProps, "mapStyle"> {
     | "onMapLoadingError"
   >;
 }
-/** Selected map retaining shared map context and named access. */
-// eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
-export const Map = SharedMap as ForwardRefExoticComponent<
-  NativeMapProps & RefAttributes<NativeAdvancedMapRef>
->;
+const {
+  Map: NativeMap,
+  Source,
+  Marker,
+  MapProvider,
+  useMap,
+} = createNativeMapBinding<NativeAdvancedMapRef, NativeMapProps>(
+  MapboxNativeMap,
+  adapter
+);
+export { NativeMap as Map, MapProvider, Marker, Source, useMap };
 
-/** Selected marker content host, including accessibility and layout attributes. */
-export interface NativeMarkerProps extends Omit<
-  MarkerProps,
-  "draggable" | "onDragStart" | "onDrag" | "onDragEnd"
-> {
-  /** Native shared markers support programmatic coordinates and activation only. */
-  readonly draggable?: false;
-  /** Attributes composed on the marker's owned native child View. */
-  readonly hostProps?: ViewProps;
-}
-/** Selected marker retaining shared geometry and activation. */
-export const Marker = SharedMarker as ForwardRefExoticComponent<
-  NativeMarkerProps & RefAttributes<MarkerRef>
->;
+/** Style-spec options for an RNMapbox layer. */
+export type NativeLayerProps = LayerProps;
 
-/** Selected source using the shared rendering contract. */
-export type NativeSourceProps = SourceProps;
-
-/** Selected source using the shared rendering contract. */
-export const Source = SharedSource as ComponentType<NativeSourceProps>;
+/**
+ * Renders a Layer through RNMapbox.
+ *
+ * @param props - Layer type, style, and any source passed by its parent.
+ * @returns The selected layer.
+ */
+export const Layer = (props: NativeLayerProps): ReactElement => {
+  useLayerOptions(props, adapter.backend);
+  return <adapter.Layer {...props} />;
+};
 
 export { getAnnotationsLayerID, PointAnnotationManager } from "@rnmapbox/maps";
 

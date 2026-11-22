@@ -1,18 +1,25 @@
 import {
+  type ComponentType,
   forwardRef,
   useContext,
-  useImperativeHandle,
+  useCallback,
   type ForwardedRef,
+  type ReactElement,
+  type Ref,
+  type RefAttributes,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 
+import { useActiveCallback } from "../adapters/shared/use-active-callback.js";
+import type { Adapter } from "../contracts/adapter.js";
 import type { MapRef } from "../contracts/camera-types.js";
 import type { MapProps } from "../contracts/map-types.js";
 import { type MapSession, MapSessionContext } from "./map-context.js";
 import {
+  type MapRegistry,
   useMapRegistry,
   useNamedMap,
   useSelectedAdapter,
@@ -28,7 +35,7 @@ export const useMapEnclosure = (): boolean =>
  * Returns the enclosing common map ref.
  *
  * @returns A stable ref to the enclosing Map.
- * @throws When MapSetup or the enclosing Map is missing.
+ * @throws When the enclosing Map is missing.
  */
 export function useMap(): MapRef;
 /**
@@ -36,7 +43,7 @@ export function useMap(): MapRef;
  *
  * @param id - Map ID, or undefined to read the enclosing Map.
  * @returns The map ref, or undefined while a named map is not attached.
- * @throws When MapSetup is missing, or id is omitted outside a Map.
+ * @throws When named lookup lacks MapSetup, or id is omitted outside a Map.
  */
 export function useMap(id: string | undefined): MapRef | undefined;
 // Overloads keep enclosing access required and named access optional without casts.
@@ -51,28 +58,68 @@ export function useMap(id?: string): MapRef | undefined {
 /** Shared map with scoped callbacks and named map attachment. */
 // eslint-disable-next-line one-map/no-shadow-language-globals -- public Map API
 export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
-  const { Map: AdapterMap } = useSelectedAdapter();
+  const adapter = useSelectedAdapter();
+  return (
+    <MountedMap
+      props={props}
+      implementation={adapter.Map}
+      adapter={adapter}
+      forwardedRef={forwardedRef}
+    />
+  );
+});
+
+interface MountedMapProps<Handle extends MapRef, Props extends MapProps> {
+  readonly props: Props;
+  readonly implementation: ComponentType<Props & RefAttributes<Handle>>;
+  readonly adapter: Adapter;
+  readonly forwardedRef: ForwardedRef<Handle>;
+  readonly register?: MapRegistry<Handle>["register"];
+}
+
+/**
+ * Owns the mounted renderer attachment and its common callbacks and resources.
+ *
+ * @param options - Concrete implementation, props, ref, and optional map access.
+ * @returns The mounted map and its context.
+ */
+export const MountedMap = <Handle extends MapRef, Props extends MapProps>({
+  props,
+  implementation: AdapterMap,
+  adapter,
+  forwardedRef,
+  register,
+}: MountedMapProps<Handle, Props>): ReactElement => {
   validateMapOptions(props);
 
   useStableOptions("Map", {
     id: props.id,
   });
-  const { mapRef, proxy } = useMapAttachment(props.id, forwardedRef);
+  const { mapRef, proxy, attach } = useMapAttachment(forwardedRef);
+  const legacyRegistry = useMapRegistry();
+  // The native provider owns unnamed maps under "default". Legacy lookup requires an ID.
+  const registerMap = register ?? legacyRegistry?.register;
+  const id = props.id ?? (register ? "default" : undefined);
+  useLayoutEffect(
+    () => (id === undefined ? undefined : registerMap?.(id, proxy)),
+    [id, registerMap, proxy]
+  );
   const [ready, setReady] = useState(false);
+  const load = useActiveCallback(() => {
+    setReady(true);
+    props.onLoad?.();
+  });
   const { move, click } = useMapInteractions(props, mapRef);
   const session = useMemo<MapSession>(
-    () => ({ ref: mapRef, map: proxy, ready }),
-    [mapRef, proxy, ready]
+    () => ({ ref: mapRef, map: proxy, ready, adapter }),
+    [mapRef, proxy, ready, adapter]
   );
   return (
     <MapSessionContext.Provider value={session}>
       <AdapterMap
         {...props}
-        ref={mapRef}
-        onLoad={() => {
-          setReady(true);
-          props.onLoad?.();
-        }}
+        ref={attach}
+        onLoad={load}
         onMove={move}
         onClick={(event) => {
           void click(event);
@@ -80,7 +127,7 @@ export const Map = forwardRef<MapRef, MapProps>((props, forwardedRef) => {
       />
     </MapSessionContext.Provider>
   );
-});
+};
 
 /** Validates portable projection and terrain inputs before adapter rendering. */
 const validateMapOptions = (props: MapProps): void => {
@@ -107,31 +154,47 @@ const validateMapOptions = (props: MapProps): void => {
   }
 };
 
-/** Owns the attached ref, its retained proxy, and named registration. */
-const useMapAttachment = (
-  id: string | undefined,
-  forwardedRef: ForwardedRef<MapRef>
-) => {
-  const registry = useMapRegistry();
-  const mapRef = useRef<MapRef | null>(null);
+/** Owns the forwarded ref and the proxy retained by map access hooks. */
+const useMapAttachment = <Handle extends MapRef>(forwardedRef: Ref<Handle>) => {
+  const mapRef = useRef<Handle | null>(null);
   const [proxy] = useState(
     () =>
-      new Proxy({} as MapRef, {
-        get: (_target, key: keyof MapRef | "then") => {
+      // Each exposed method dispatches through the attached handle of this type.
+      new Proxy({} as Handle, {
+        get: (_target, key) => {
           if (key === "then") return undefined;
           return (...args: unknown[]) => {
             const map = mapRef.current;
             if (!map) return Promise.reject(new Error("Map is not attached."));
-            const method = map[key] as (...args: unknown[]) => unknown;
-            return method(...args);
+            const method = Reflect.get(map, key) as (
+              ...args: unknown[]
+            ) => unknown;
+            return method.apply(map, args);
           };
         },
       })
   );
-  useImperativeHandle(forwardedRef, () => mapRef.current ?? proxy);
-  useLayoutEffect(
-    () => (id === undefined ? undefined : registry.register(id, proxy)),
-    [id, registry, proxy]
+  const attach = useCallback(
+    (map: Handle | null) => {
+      mapRef.current = map;
+      const cleanup = assignMapRef(forwardedRef, map);
+      if (typeof cleanup === "function") {
+        return () => {
+          mapRef.current = null;
+          cleanup();
+        };
+      }
+    },
+    [forwardedRef]
   );
-  return { mapRef, proxy };
+  return { mapRef, proxy, attach };
+};
+
+/** Forwards a renderer attachment, including the cleanup returned by a React 19 ref. */
+const assignMapRef = <Handle extends MapRef>(
+  ref: Ref<Handle>,
+  map: Handle | null
+) => {
+  if (typeof ref === "function") return ref(map);
+  if (ref) ref.current = map;
 };

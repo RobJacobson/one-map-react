@@ -12,13 +12,14 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
   packageCheckOptions,
   selectedVersions,
 } from "./package-check-options.mjs";
+import { walkDeclarations } from "./packed-declarations.mjs";
 
 const options = packageCheckOptions();
 const evidence = [];
@@ -104,38 +105,6 @@ const resolvePackage = (consumer, specifier, conditions) => {
   );
 
   return fileURLToPath(resolved);
-};
-
-const walkDeclarations = (file, seen = new Set()) => {
-  const declaration = file.endsWith(".d.ts")
-    ? file
-    : file.replace(/\.js$/, ".d.ts");
-
-  if (seen.has(declaration) || !existsSync(declaration)) {
-    return;
-  }
-
-  seen.add(declaration);
-  const text = readFileSync(declaration, "utf8");
-  const specifiers = [
-    ...text.matchAll(/(?:from|import)\s*["']([^"']+)["']/g),
-    ...text.matchAll(/import\(["']([^"']+)["']\)/g),
-  ].map((match) => match[1]);
-
-  for (const specifier of specifiers) {
-    for (const backend of backends) {
-      assert.notEqual(specifier, backend, `${declaration} imports ${backend}`);
-      assert.notEqual(
-        specifier.startsWith(`${backend}/`),
-        true,
-        `${declaration} imports ${specifier}`
-      );
-    }
-
-    if (specifier.startsWith(".")) {
-      walkDeclarations(join(dirname(declaration), specifier), seen);
-    }
-  }
 };
 
 const main = async () => {
@@ -231,7 +200,7 @@ const checkConsumer = async (archive, scenario) => {
   }
 
   if (scenario.name === "common") {
-    walkDeclarations(join(installed, "dist/index.d.ts"));
+    walkDeclarations(join(installed, "dist/index.d.ts"), backends);
     writeFileSync(
       join(consumer, "common.mjs"),
       `import * as common from "one-map-react";
