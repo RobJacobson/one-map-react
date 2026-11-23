@@ -371,7 +371,7 @@ test("forwards selected label localization to RNMapbox", async () => {
 
 test("NativeMapProps options accepts valid RNMapbox options", () => {
   // Rejection of facade-owned keys cannot be asserted offline: under NodeNext
-  // the RNMapbox declarations resolve to any. scripts/test-peers.mjs asserts
+  // the RNMapbox declarations resolve to any. tests/package/peers.test.mjs asserts
   // it against the real packed types.
   const validOptions: MapProps["options"] = {
     scaleBarEnabled: true,
