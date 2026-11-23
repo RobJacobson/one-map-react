@@ -1,10 +1,39 @@
 import type { NativeGeoJsonSource } from "../../contracts/native-types.js";
-import type { ClusterQueryMethods } from "../../contracts/query-types.js";
+import type { GeoJsonFeature } from "../../contracts/source-types.js";
 
-/** Adds the desktop source methods to dispatch functions already bound to one owner. */
-export const createNativeClusterSource = (
-  sourceId: string,
-  methods: ClusterQueryMethods
+/** Promise-based cluster operations bound to a GeoJSON registration. */
+export interface NativeClusterSourceMethods {
+  /** Reads the zoom at which the cluster expands. */
+  getClusterExpansionZoom(clusterId: number): Promise<number>;
+  /** Reads the cluster's child features at the next zoom. */
+  getClusterChildren(clusterId: number): Promise<readonly GeoJsonFeature[]>;
+  /** Reads a page of the cluster's leaf features. */
+  getClusterLeaves(
+    clusterId: number,
+    limit: number,
+    offset: number
+  ): Promise<readonly GeoJsonFeature[]>;
+}
+
+/** Associates a stable source handle with each source registration. */
+export const createNativeClusterLookup = <Source>(
+  findOwner: (id: string) => (() => Source) | undefined,
+  bind: (read: () => Source) => NativeClusterSourceMethods
+): ((id: string) => NativeGeoJsonSource | undefined) => {
+  const handles = new WeakMap<() => Source, NativeGeoJsonSource>();
+  return (id) => {
+    const owner = findOwner(id);
+    if (!owner) return undefined;
+    const existing = handles.get(owner);
+    if (existing) return existing;
+    const handle = createNativeClusterSource(bind(owner));
+    handles.set(owner, handle);
+    return handle;
+  };
+};
+
+const createNativeClusterSource = (
+  methods: NativeClusterSourceMethods
 ): NativeGeoJsonSource => {
   // Reference the same source for Mapbox-style chaining.
   const complete = <Value>(
@@ -20,24 +49,21 @@ export const createNativeClusterSource = (
     return source;
   };
   function expansion(
-    zoomId: number
-  ): ReturnType<ClusterQueryMethods["getClusterExpansionZoom"]>;
+    clusterId: number
+  ): ReturnType<NativeClusterSourceMethods["getClusterExpansionZoom"]>;
   function expansion(
-    zoomId: number,
+    clusterId: number,
     callback: Parameters<NativeGeoJsonSource["getClusterExpansionZoom"]>[1]
   ): NativeGeoJsonSource;
   function expansion(
-    zoomId: number,
+    clusterId: number,
     callback?: Parameters<NativeGeoJsonSource["getClusterExpansionZoom"]>[1]
   ) {
-    return complete(
-      methods.getClusterExpansionZoom(sourceId, zoomId),
-      callback
-    );
+    return complete(methods.getClusterExpansionZoom(clusterId), callback);
   }
   function children(
     clusterId: number
-  ): ReturnType<ClusterQueryMethods["getClusterChildren"]>;
+  ): ReturnType<NativeClusterSourceMethods["getClusterChildren"]>;
   function children(
     clusterId: number,
     callback: Parameters<NativeGeoJsonSource["getClusterChildren"]>[1]
@@ -46,13 +72,13 @@ export const createNativeClusterSource = (
     clusterId: number,
     callback?: Parameters<NativeGeoJsonSource["getClusterChildren"]>[1]
   ) {
-    return complete(methods.getClusterChildren(sourceId, clusterId), callback);
+    return complete(methods.getClusterChildren(clusterId), callback);
   }
   function leaves(
     clusterId: number,
     limit: number,
     offset: number
-  ): ReturnType<ClusterQueryMethods["getClusterLeaves"]>;
+  ): ReturnType<NativeClusterSourceMethods["getClusterLeaves"]>;
   function leaves(
     clusterId: number,
     limit: number,
@@ -66,7 +92,7 @@ export const createNativeClusterSource = (
     callback?: Parameters<NativeGeoJsonSource["getClusterLeaves"]>[3]
   ) {
     return complete(
-      methods.getClusterLeaves(sourceId, clusterId, limit, offset),
+      methods.getClusterLeaves(clusterId, limit, offset),
       callback
     );
   }
@@ -77,21 +103,4 @@ export const createNativeClusterSource = (
     getClusterLeaves: leaves,
   } satisfies NativeGeoJsonSource;
   return source;
-};
-
-/** Associates a stable source handle with each source registration. */
-export const createNativeClusterLookup = <Source>(
-  findOwner: (id: string) => (() => Source) | undefined,
-  bind: (read: (id: string) => Source) => ClusterQueryMethods
-): ((id: string) => NativeGeoJsonSource | undefined) => {
-  const handles = new WeakMap<() => Source, NativeGeoJsonSource>();
-  return (id) => {
-    const owner = findOwner(id);
-    if (!owner) return undefined;
-    const existing = handles.get(owner);
-    if (existing) return existing;
-    const handle = createNativeClusterSource(id, bind(owner));
-    handles.set(owner, handle);
-    return handle;
-  };
 };

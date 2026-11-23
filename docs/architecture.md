@@ -10,7 +10,7 @@ Each native map owns its camera conversion, attached ref, source registry, click
 
 Camera converters translate desktop camera inputs for RNMapbox and MapLibre React Native. Initial defaults, a later target, and movement observed after a gesture stay distinct. `viewState` applies a changed camera target. An unchanged target stays where the gesture left it. The strict `controlledCamera` capability is not offered. See the [RNMapbox converter](../packages/one-map-react/src/adapters/mapbox-native/convert-camera.ts) and the [MapLibre converter](../packages/one-map-react/src/adapters/maplibre-native/convert-camera.ts).
 
-A source handle belongs to one registration. Replacing a source under the same id keeps the replacement when the old registration cleans up. See the [source registry](../packages/one-map-react/src/adapters/shared/native-source-registry.ts).
+Native cluster queries use the GeoJSON source handle returned by `map.getSource(id)`. A source handle belongs to one registration. Replacing a source under the same id keeps the replacement when the old registration cleans up. See the [source registry](../packages/one-map-react/src/adapters/shared/native-source-registry.ts).
 
 A filtered click can finish after its map detaches. Completion reaches the current callback only while the original map is still attached. See [click delivery](../packages/one-map-react/src/facade/use-map-interactions.ts).
 
@@ -21,8 +21,6 @@ Live marker children stay in the React tree through `react-native-teleport`. Pla
 ## What the application owns
 
 The application owns credentials, host layout, browser CSS, permissions, location acquisition, offline packs, snapshots, and screen controls. Selected SDK operations use `getWrapperMap()` or a direct SDK import. Offline, snapshot, and location managers stay on the selected native entry. The application owns their policy, cleanup, and storage.
-
-Map-level `getClusterExpansionZoom`, `getClusterLeaves`, and `getClusterChildren` still exist on the native refs. The desktop shape is the GeoJSON source returned by `map.getSource(id)`. Removing the map-level methods is an open owner decision. Until that decision, keep both forms and keep lookup by source id.
 
 ## Native fit cap
 

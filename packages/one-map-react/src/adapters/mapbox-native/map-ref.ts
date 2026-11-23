@@ -2,7 +2,6 @@ import type { Camera, MapView, ShapeSource } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
 import type { NativeMapRef } from "../../contracts/native-types.js";
-import type { ClusterQueryMethods } from "../../contracts/query-types.js";
 import {
   nativeResizeError,
   nativeStopError,
@@ -10,7 +9,10 @@ import {
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
-import { createNativeClusterLookup } from "../shared/native-clusters.js";
+import {
+  createNativeClusterLookup,
+  type NativeClusterSourceMethods,
+} from "../shared/native-clusters.js";
 import {
   nativeBounds,
   nativeBoundsInput,
@@ -201,7 +203,6 @@ export const createMapboxMapRef = (
         "querySourceFeatures"
       );
     },
-    ...createClusterMethods((id) => geoJsonSources.require(id)),
     ...createMapboxFeatureStateMethods(() => requireMap(mapViewRef.current)),
     resize: async () => {
       throw nativeResizeError();
@@ -210,18 +211,18 @@ export const createMapboxMapRef = (
 };
 
 const createClusterMethods = (
-  read: (id: string) => ComponentRef<typeof ShapeSource>
-): ClusterQueryMethods => ({
-  getClusterExpansionZoom: async (sourceId, clusterId) => {
-    const source = read(sourceId);
+  read: () => ComponentRef<typeof ShapeSource>
+): NativeClusterSourceMethods => ({
+  getClusterExpansionZoom: async (clusterId) => {
+    const source = read();
     const zoom = await source.getClusterExpansionZoom(
       toRnmapboxClusterFeature(clusterId)
     );
 
     return finiteNumber(zoom, "Cluster expansion zoom");
   },
-  getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
-    const source = read(sourceId);
+  getClusterLeaves: async (clusterId, limit, offset) => {
+    const source = read();
 
     return featuresFromWrapper(
       await source.getClusterLeaves(
@@ -232,8 +233,8 @@ const createClusterMethods = (
       "getClusterLeaves"
     );
   },
-  getClusterChildren: async (sourceId, clusterId) => {
-    const source = read(sourceId);
+  getClusterChildren: async (clusterId) => {
+    const source = read();
 
     return featuresFromWrapper(
       await source.getClusterChildren(toRnmapboxClusterFeature(clusterId)),

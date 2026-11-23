@@ -71,13 +71,4 @@ export class NativeSourceRegistry<Source, GeoJsonRef> {
     if (source == null) throw new Error(this.missingSourceMessage(id));
     return source;
   }
-
-  /** Reads the current GeoJSON ref for a map-scoped cluster call. */
-  requireGeoJson(id: string): GeoJsonRef {
-    const ref = this.selectGeoJson(this.require(id));
-    if (ref !== undefined) return ref;
-    throw new Error(
-      `Source "${id}" is not a GeoJSON Source. Cluster methods need a mounted clustered GeoJSON source.`
-    );
-  }
 }

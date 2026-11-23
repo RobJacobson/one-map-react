@@ -1365,34 +1365,33 @@ describe("maplibre-native queries and feature state", () => {
 
     await render(example(ref));
 
-    await expect(
-      ref.current?.getClusterExpansionZoom("routes", 7)
-    ).resolves.toBe(13);
+    const source = ref.current?.getSource("routes");
+    if (!source) throw new Error("Expected a mounted GeoJSON source.");
+
+    await expect(source.getClusterExpansionZoom(7)).resolves.toBe(13);
     expect(mockGetClusterExpansionZoom).toHaveBeenCalledWith(7);
 
-    await expect(
-      ref.current?.getClusterLeaves("routes", 7, 10, 2)
-    ).resolves.toHaveLength(2);
+    await expect(source.getClusterLeaves(7, 10, 2)).resolves.toHaveLength(2);
     expect(mockGetClusterLeaves).toHaveBeenCalledWith(7, 10, 2);
 
-    await expect(
-      ref.current?.getClusterChildren("routes", 7)
-    ).resolves.toHaveLength(1);
+    await expect(source.getClusterChildren(7)).resolves.toHaveLength(1);
     expect(mockGetClusterChildren).toHaveBeenCalledWith(7);
+
+    mockGetClusterExpansionZoom.mockResolvedValueOnce(Infinity);
+    await expect(source.getClusterExpansionZoom(7)).rejects.toThrow(
+      "Cluster expansion zoom must be a finite number."
+    );
   });
 
-  test("cluster methods reject an unknown or non-GeoJSON source", async () => {
+  test("getSource omits unknown and vector sources", async () => {
     const ref = createRef<MapRef>();
 
     await render(vectorTree(ref));
 
-    await expect(ref.current?.getClusterChildren("unknown", 7)).rejects.toThrow(
-      'Source "unknown" is not a mounted GeoJSON or vector'
-    );
-
-    await expect(
-      ref.current?.getClusterExpansionZoom("tiles", 7)
-    ).rejects.toThrow('Source "tiles" is not a GeoJSON Source');
+    const map = ref.current;
+    if (!map) throw new Error("Expected a mounted map.");
+    expect(map.getSource("unknown")).toBeUndefined();
+    expect(map.getSource("tiles")).toBeUndefined();
   });
 
   test("feature state dispatches by source family", async () => {

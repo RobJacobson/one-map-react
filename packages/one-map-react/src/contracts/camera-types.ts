@@ -1,5 +1,4 @@
 import type {
-  ClusterQueryMethods,
   FeatureQueryMethods,
   FeatureStateMethods,
 } from "./query-types.js";
@@ -155,12 +154,10 @@ export interface ZoomToOptions {
  * accepted the call. It does not mean the animation finished or a frame
  * was painted. A missing camera or map ref rejects before the wrapper call.
  *
- * Query, cluster, and feature-state methods are defined by
- * {@link FeatureQueryMethods}, {@link ClusterQueryMethods}, and
- * {@link FeatureStateMethods}.
+ * Query and feature-state methods are defined by {@link FeatureQueryMethods}
+ * and {@link FeatureStateMethods}.
  */
-export interface MapRef
-  extends FeatureQueryMethods, ClusterQueryMethods, FeatureStateMethods {
+export interface MapRef extends FeatureQueryMethods, FeatureStateMethods {
   /**
    * Reads loaded terrain elevation in rendered meters, including the terrain exaggeration.
    * @param coordinate - Longitude and latitude in degrees.

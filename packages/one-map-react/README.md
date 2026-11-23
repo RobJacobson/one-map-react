@@ -55,6 +55,8 @@ Import from `./maps` in your screen and mount `<Map>` directly. TypeScript platf
 
 **Clusters.** Retrieve the mounted source by ID. Narrow the stock web source to the selected SDK's `GeoJSONSource` (for example, `map.getSource<GeoJSONSource>("vessels")` on Mapbox). With the pinned Mapbox GL JS use `source?.getClusterExpansionZoom(id, callback)`. With MapLibre GL JS use `await source?.getClusterExpansionZoom(id)`. Native source handles accept either form. Check for a missing source after replacement or teardown.
 
+On native, move `getClusterExpansionZoom`, `getClusterLeaves`, and `getClusterChildren` calls from the map ref to the source handle. Pass the source ID to `map.getSource(sourceId)` and omit it from the cluster method's arguments. For example, use `await map.getSource(sourceId)?.getClusterLeaves(clusterId, limit, offset)`. The `ClusterQueryMethods` type was removed. Import `NativeGeoJsonSource` from the selected native entry to type the source handle.
+
 ### Direct native entries
 
 Import `Map`, `Source`, `Layer`, `Marker`, and `useMap` from `one-map-react/mapbox-native` or `one-map-react/maplibre-native`. The import selects the renderer. Mount the map directly for enclosing access, or wrap the tree in the same entry's `MapProvider` for named lookup.
