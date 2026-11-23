@@ -4,11 +4,13 @@ import {
   toRnmapboxCornerBounds,
   toRnmapboxControlledCamera,
   toRnmapboxDefaultSettings,
+  toRnmapboxFitBoundsStop,
   toRnmapboxStop,
   toRnmapboxZoomStop,
 } from "../src/adapters/mapbox-native/convert-camera.js";
 import {
   toMaplibreCommand,
+  toMaplibreFitBoundsOptions,
   toMaplibreInitialViewState,
   toMaplibreViewState,
 } from "../src/adapters/maplibre-native/convert-camera.js";
@@ -106,9 +108,26 @@ describe("camera conversion", () => {
         convert({ bounds, fitBoundsOptions: { minZoom: 2 } })
       ).toThrow(/minZoom/);
       expect(() =>
-        convert({ bounds, fitBoundsOptions: { maxZoom: 12 } })
+        convert({ bounds, fitBoundsOptions: { maxZoom: 0 } })
       ).toThrow(/maxZoom/);
     }
+  });
+
+  test("rejects a zero fit maxZoom before rejecting easing", () => {
+    const options = { maxZoom: 0, easing: () => 1 };
+    const message =
+      "fitBounds.maxZoom is unavailable through the pinned native camera wrapper.";
+
+    expect(() =>
+      toRnmapboxFitBoundsStop(
+        [
+          [1, 2],
+          [3, 4],
+        ],
+        options
+      )
+    ).toThrow(message);
+    expect(() => toMaplibreFitBoundsOptions(options)).toThrow(message);
   });
 
   test("RNMapbox flyTo stop sets animationMode flyTo", () => {

@@ -1,10 +1,10 @@
 import type { Camera, MapView } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
-import type { NativeMapRef } from "../../contracts/native-types.js";
+import type { NativeMapRefWithWrapper } from "../../contracts/native-types.js";
 import {
-  nativeResizeError,
-  nativeStopError,
+  rejectNativeResize,
+  rejectNativeStop,
   unavailableMapMethodError,
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
@@ -42,19 +42,10 @@ import {
 import { createMapboxFeatureStateMethods } from "./feature-state-methods.js";
 import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
 
-/** Common map operations and access to the selected native wrapper. */
-export type NativeAdvancedMapRef = NativeMapRef & {
-  /**
-   * Borrows the currently attached RNMapbox MapView wrapper.
-   *
-   * @returns The current wrapper handle, without waiting for map load.
-   * @remarks Call again for each operation. Handles retain the wrapper's
-   * lifetime and ownership; facade detachment does not invalidate them or
-   * expose the separate Camera.
-   * @throws Rejects when the MapView is not attached.
-   */
-  readonly getWrapperMap: () => Promise<ComponentRef<typeof MapView>>;
-};
+/** Common map operations and access to the RNMapbox `MapView` wrapper. */
+export type NativeAdvancedMapRef = NativeMapRefWithWrapper<
+  ComponentRef<typeof MapView>
+>;
 
 /**
  * Builds the imperative map handle over RNMapbox camera and map refs.
@@ -119,9 +110,7 @@ export const createMapboxMapRef = (
 
       await camera.setCamera(toRnmapboxZoomStop(zoom, options));
     },
-    stop: async () => {
-      throw nativeStopError();
-    },
+    stop: rejectNativeStop,
     getCenter: async () =>
       nativeLngLat(
         lngLatFromWrapper(await requireMap(mapViewRef.current).getCenter())
@@ -201,9 +190,7 @@ export const createMapboxMapRef = (
       );
     },
     ...createMapboxFeatureStateMethods(() => requireMap(mapViewRef.current)),
-    resize: async () => {
-      throw nativeResizeError();
-    },
+    resize: rejectNativeResize,
   };
 };
 

@@ -10,15 +10,12 @@ import { useState } from "react";
  *
  * @param owner - Description of the owned resource, such as `Source "routes"`.
  * @param options - Creation options captured for this render.
- * @returns The original options, retained across equivalent renders.
  * @throws When an option value differs from the first render.
  */
-export const useStableOptions = <
-  Options extends Readonly<Record<string, unknown>>,
->(
+export const useStableOptions = (
   owner: string,
-  options: Options
-): Options => {
+  options: Readonly<Record<string, unknown>>
+): void => {
   const [initial] = useState(() => options);
 
   const changed = changedOptionKey(initial, options);
@@ -29,8 +26,6 @@ export const useStableOptions = <
         "Remount it with a new React key to recreate the resource."
     );
   }
-
-  return initial;
 };
 
 /**

@@ -9,6 +9,7 @@ import {
   nativeCameraCenter,
   nativeInitialCamera,
   nativeInitialFit,
+  rejectNativeFitBoundsMaxZoom,
 } from "../shared/native-camera-inputs.js";
 import { nativeBoundsInput } from "../shared/native-values.js";
 import {
@@ -145,11 +146,7 @@ export const toRnmapboxFitBoundsStop = (
   bounds: Bounds,
   options: NativeFitBoundsOptions = {}
 ) => {
-  if (options.maxZoom !== undefined) {
-    throw new Error(
-      "fitBounds.maxZoom is unavailable through the pinned native camera wrapper."
-    );
-  }
+  rejectNativeFitBoundsMaxZoom(options.maxZoom);
   rejectNativeEasing(options.easing);
 
   return {
