@@ -141,10 +141,11 @@ export const createNativeMapBinding = <
 
   const Marker = forwardRef<MarkerRef, NativeMarkerProps>((props, ref) => {
     const { onClick, ...marker } = props;
-    useMarkerOptions(marker, components.backend);
+    const anchor = useMarkerOptions(marker, components.backend);
     return (
       <components.Marker
         {...marker}
+        anchor={anchor}
         ref={ref}
         onClick={
           onClick === undefined

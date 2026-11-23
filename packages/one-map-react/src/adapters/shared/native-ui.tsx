@@ -26,11 +26,12 @@ import type {
 } from "../../contracts/ui-types.js";
 import type { NativeComponents } from "../../facade/map-context.js";
 import { useActiveCallback } from "./use-active-callback.js";
-import { useFrozenValue } from "./use-frozen-value.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 
 /** Selected native marker host presentation. */
-export interface NativeMarkerProps extends MarkerProps {
+export interface NativeMarkerProps extends Omit<MarkerProps, "anchor"> {
+  /** Resolved named anchor on the content bounds. */
+  readonly anchor: Anchor;
   /** Props for the owned content View; facade responder handlers stay composed. */
   readonly hostProps?: ViewProps;
 }
@@ -81,13 +82,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       const generatedId = useId();
       const annotationRef = useRef<MarkerRef>(null);
       const [annotationRevision, setAnnotationRevision] = useState(0);
-      const defaultAnchor = useFrozenValue(
-        props.children === undefined || props.children === null
-          ? "bottom"
-          : "center"
-      );
       const markerId = props.id ?? generatedId;
-      const anchor = props.anchor ?? defaultAnchor;
       const isAnnotation = props.renderMode === "annotation";
       const reportError = useActiveCallback(props.onError);
       const responders = useNativeMarkerActivation(props);
@@ -103,15 +98,19 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         );
       }
 
-      useImperativeHandle(ref, () => ({
-        refresh: async () => {
-          if (isAnnotation) {
-            if (!annotationRef.current)
-              throw new Error("Annotation is detached.");
-            await annotationRef.current.refresh();
-          }
-        },
-      }));
+      useImperativeHandle(
+        ref,
+        () => ({
+          refresh: async () => {
+            if (isAnnotation) {
+              if (!annotationRef.current)
+                throw new Error("Annotation is detached.");
+              await annotationRef.current.refresh();
+            }
+          },
+        }),
+        [isAnnotation]
+      );
 
       const Host = isAnnotation ? options.Annotation : options.Marker;
       const markerClick = useActiveCallback((event: MarkerEvent): void => {
@@ -128,53 +127,14 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
           ref={annotationRef}
           id={markerId}
           lngLat={[coordinate[0], coordinate[1]]}
-          anchor={anchor}
+          anchor={props.anchor}
           offset={offset}
           onProjectionError={reportError}
           onClick={isAnnotation ? markerClick : undefined}
         >
           <View
-            {...props.hostProps}
+            {...composeViewResponders(responders, props.hostProps)}
             collapsable={false}
-            {...responders}
-            onStartShouldSetResponder={(event) =>
-              Boolean(
-                responders.onStartShouldSetResponder?.(event) ||
-                props.hostProps?.onStartShouldSetResponder?.(event)
-              )
-            }
-            onResponderGrant={(event) => {
-              responders.onResponderGrant?.(event);
-              props.hostProps?.onResponderGrant?.(event);
-            }}
-            onResponderMove={(event) => {
-              responders.onResponderMove?.(event);
-              props.hostProps?.onResponderMove?.(event);
-            }}
-            onResponderRelease={(event) => {
-              responders.onResponderRelease?.(event);
-              props.hostProps?.onResponderRelease?.(event);
-            }}
-            onResponderTerminate={(event) => {
-              responders.onResponderTerminate?.(event);
-              props.hostProps?.onResponderTerminate?.(event);
-            }}
-            onTouchStart={(event) => {
-              responders.onTouchStart?.(event);
-              props.hostProps?.onTouchStart?.(event);
-            }}
-            onTouchEnd={(event) => {
-              responders.onTouchEnd?.(event);
-              props.hostProps?.onTouchEnd?.(event);
-            }}
-            onTouchMove={(event) => {
-              responders.onTouchMove?.(event);
-              props.hostProps?.onTouchMove?.(event);
-            }}
-            onTouchCancel={(event) => {
-              responders.onTouchCancel?.(event);
-              props.hostProps?.onTouchCancel?.(event);
-            }}
           >
             {props.children ?? <DefaultPin />}
           </View>
@@ -188,8 +148,90 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
   };
 };
 
+const composeHandler = (
+  first: ((event: GestureResponderEvent) => void) | undefined,
+  second: ((event: GestureResponderEvent) => void) | undefined
+): ((event: GestureResponderEvent) => void) | undefined => {
+  if (!first) return second;
+  if (!second) return first;
+  return (event) => {
+    first(event);
+    second(event);
+  };
+};
+
+const composeStartResponder = (
+  first: ViewProps["onStartShouldSetResponder"],
+  second: ViewProps["onStartShouldSetResponder"]
+): ViewProps["onStartShouldSetResponder"] => {
+  if (!first) return second;
+  if (!second) return first;
+  return (event) => Boolean(first(event) || second(event));
+};
+
+const composeViewResponders = (
+  responders: ViewProps,
+  hostProps: ViewProps | undefined
+): ViewProps => {
+  const onStartShouldSetResponder = composeStartResponder(
+    responders.onStartShouldSetResponder,
+    hostProps?.onStartShouldSetResponder
+  );
+  const onResponderTerminationRequest =
+    hostProps?.onResponderTerminationRequest ??
+    responders.onResponderTerminationRequest;
+  const onResponderGrant = composeHandler(
+    responders.onResponderGrant,
+    hostProps?.onResponderGrant
+  );
+  const onResponderMove = composeHandler(
+    responders.onResponderMove,
+    hostProps?.onResponderMove
+  );
+  const onResponderRelease = composeHandler(
+    responders.onResponderRelease,
+    hostProps?.onResponderRelease
+  );
+  const onResponderTerminate = composeHandler(
+    responders.onResponderTerminate,
+    hostProps?.onResponderTerminate
+  );
+  const onTouchStart = composeHandler(
+    responders.onTouchStart,
+    hostProps?.onTouchStart
+  );
+  const onTouchMove = composeHandler(
+    responders.onTouchMove,
+    hostProps?.onTouchMove
+  );
+  const onTouchEnd = composeHandler(
+    responders.onTouchEnd,
+    hostProps?.onTouchEnd
+  );
+  const onTouchCancel = composeHandler(
+    responders.onTouchCancel,
+    hostProps?.onTouchCancel
+  );
+
+  return {
+    ...hostProps,
+    ...(onStartShouldSetResponder ? { onStartShouldSetResponder } : {}),
+    ...(onResponderTerminationRequest ? { onResponderTerminationRequest } : {}),
+    ...(onResponderGrant ? { onResponderGrant } : {}),
+    ...(onResponderMove ? { onResponderMove } : {}),
+    ...(onResponderRelease ? { onResponderRelease } : {}),
+    ...(onResponderTerminate ? { onResponderTerminate } : {}),
+    ...(onTouchStart ? { onTouchStart } : {}),
+    ...(onTouchMove ? { onTouchMove } : {}),
+    ...(onTouchEnd ? { onTouchEnd } : {}),
+    ...(onTouchCancel ? { onTouchCancel } : {}),
+  };
+};
+
 /** Observes live-marker activation without claiming scrolling or child-button touches. */
-const useNativeMarkerActivation = (props: MarkerProps): ViewProps => {
+const useNativeMarkerActivation = (props: NativeMarkerProps): ViewProps => {
+  const enabled =
+    props.renderMode !== "annotation" && props.onClick !== undefined;
   const eligible = useRef(false);
   const origin = useRef<Point | null>(null);
   const foreground = useRef(
@@ -204,6 +246,12 @@ const useNativeMarkerActivation = (props: MarkerProps): ViewProps => {
   }, []);
 
   useLayoutEffect(() => {
+    if (!enabled) {
+      cancel();
+      return;
+    }
+    foreground.current =
+      AppState.currentState === null || AppState.currentState === "active";
     // Home can transform native touch coordinates before touch cancellation arrives.
     const subscription = AppState.addEventListener("change", (state) => {
       foreground.current = state === "active";
@@ -213,13 +261,13 @@ const useNativeMarkerActivation = (props: MarkerProps): ViewProps => {
       subscription.remove();
       cancel();
     };
-  }, [cancel]);
+  }, [enabled, cancel]);
 
   useLayoutEffect(() => {
     cancel();
   }, [props.longitude, props.latitude, props.renderMode, cancel]);
 
-  if (props.renderMode === "annotation") return {};
+  if (!enabled) return {};
   return {
     // Fabric blocks native scrolling below a responder ancestor; observe only.
     onStartShouldSetResponder: (event) => {

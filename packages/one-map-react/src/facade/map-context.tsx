@@ -11,7 +11,7 @@ import type { MapRef } from "../contracts/camera-types.js";
 import type { ImagesProps } from "../contracts/images-types.js";
 import type { LayerProps } from "../contracts/layer-types.js";
 import type { SourceProps } from "../contracts/source-types.js";
-import type { MarkerProps, MarkerRef } from "../contracts/ui-types.js";
+import type { Anchor, MarkerProps, MarkerRef } from "../contracts/ui-types.js";
 
 /** Renderer components bound by one native entry. */
 export interface NativeComponents {
@@ -24,7 +24,11 @@ export interface NativeComponents {
   /** Images registered with the mounted map. */
   readonly Images: ComponentType<ImagesProps>;
   /** Live view or annotation anchored to a coordinate. */
-  readonly Marker: ComponentType<MarkerProps & RefAttributes<MarkerRef>>;
+  readonly Marker: ComponentType<
+    Omit<MarkerProps, "anchor"> & {
+      readonly anchor: Anchor;
+    } & RefAttributes<MarkerRef>
+  >;
 }
 
 /** Resources owned by a mounted native map. */
