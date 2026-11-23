@@ -162,8 +162,14 @@ export const boundsFromGeographic = (value: unknown): Bounds => {
  * @throws When neither shape contains both numbers.
  */
 export const lngLatFromWrapper = (value: unknown): LngLat => {
-  if (isLngLat(value)) {
-    return [value[0], value[1]];
+  if (Array.isArray(value) && value.length === 2) {
+    const longitude: unknown = value[0];
+    if (isFiniteNumber(longitude)) {
+      const latitude: unknown = value[1];
+      if (isFiniteNumber(latitude)) {
+        return [longitude, latitude];
+      }
+    }
   }
 
   if (isRecord(value)) {

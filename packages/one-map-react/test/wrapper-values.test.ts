@@ -6,11 +6,20 @@ import {
   boundsFromGeographic,
   boundsFromRnmapboxVisible,
   finiteNumber,
+  lngLatFromWrapper,
   normalizePadding,
   toFlatBounds,
 } from "../src/adapters/shared/wrapper-values.js";
 
 describe("camera conversion", () => {
+  test("coordinates accept wrapper fields when a finite tuple is unavailable", () => {
+    expect(lngLatFromWrapper({ lng: 1, lat: 2 })).toEqual([1, 2]);
+    expect(lngLatFromWrapper({ lng: NaN, lon: 1, lat: 2 })).toEqual([1, 2]);
+    expect(
+      lngLatFromWrapper(Object.assign([NaN, 2], { lng: 1, lat: 2 }))
+    ).toEqual([1, 2]);
+  });
+
   test("numeric wrapper results stay finite numbers without coercion", () => {
     expect(finiteNumber(0, "Map zoom")).toBe(0);
     expect(finiteNumber(-2.5, "Map zoom")).toBe(-2.5);
