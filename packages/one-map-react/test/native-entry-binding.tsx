@@ -531,6 +531,16 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(onChildren.mock.calls).toEqual([[null, children]]);
     expect(onLeaves.mock.calls).toEqual([[null, leaves]]);
 
+    clusterZoom.mockResolvedValueOnce(Infinity);
+    const onInvalidExpansion = jest.fn();
+    expect(replacement.getClusterExpansionZoom(7, onInvalidExpansion)).toBe(
+      replacement
+    );
+    await act(async () => {});
+    expect(onInvalidExpansion.mock.calls).toEqual([
+      [new Error("Cluster expansion zoom must be a finite number.")],
+    ]);
+
     const onStaleExpansion = jest.fn();
     const onStaleChildren = jest.fn();
     const onStaleLeaves = jest.fn();

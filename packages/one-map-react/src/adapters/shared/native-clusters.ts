@@ -1,39 +1,50 @@
 import type { NativeGeoJsonSource } from "../../contracts/native-types.js";
-import type { GeoJsonFeature } from "../../contracts/source-types.js";
+import { featuresFromWrapper } from "./feature-values.js";
+import { finiteNumber } from "./wrapper-values.js";
 
-/** Promise-based cluster operations bound to a GeoJSON registration. */
-export interface NativeClusterSourceMethods {
-  /** Reads the zoom at which the cluster expands. */
-  getClusterExpansionZoom(clusterId: number): Promise<number>;
-  /** Reads the cluster's child features at the next zoom. */
-  getClusterChildren(clusterId: number): Promise<readonly GeoJsonFeature[]>;
-  /** Reads a page of the cluster's leaf features. */
-  getClusterLeaves(
-    clusterId: number,
-    limit: number,
-    offset: number
-  ): Promise<readonly GeoJsonFeature[]>;
-}
-
-/** Associates a stable source handle with each source registration. */
-export const createNativeClusterLookup = <Source>(
-  findOwner: (id: string) => (() => Source) | undefined,
-  bind: (read: () => Source) => NativeClusterSourceMethods
+/**
+ * Associates a stable source handle with each source registration.
+ *
+ * @param findOwner - Looks up the getter for a mounted GeoJSON registration.
+ * @param toClusterArgument - Converts the cluster ID to the wrapper's argument.
+ * @returns A lookup for the current registration's cluster handle.
+ */
+export const createNativeClusterLookup = <ClusterArgument>(
+  findOwner: (
+    id: string
+  ) => (() => WrapperClusterSource<ClusterArgument>) | undefined,
+  toClusterArgument: (clusterId: number) => ClusterArgument
 ): ((id: string) => NativeGeoJsonSource | undefined) => {
-  const handles = new WeakMap<() => Source, NativeGeoJsonSource>();
+  const handles = new WeakMap<
+    () => WrapperClusterSource<ClusterArgument>,
+    NativeGeoJsonSource
+  >();
   return (id) => {
     const owner = findOwner(id);
     if (!owner) return undefined;
     const existing = handles.get(owner);
     if (existing) return existing;
-    const handle = createNativeClusterSource(bind(owner));
+    const handle = createNativeClusterSource(owner, toClusterArgument);
     handles.set(owner, handle);
     return handle;
   };
 };
 
-const createNativeClusterSource = (
-  methods: NativeClusterSourceMethods
+interface WrapperClusterSource<ClusterArgument> {
+  readonly getClusterExpansionZoom: (
+    cluster: ClusterArgument
+  ) => Promise<unknown>;
+  readonly getClusterChildren: (cluster: ClusterArgument) => Promise<unknown>;
+  readonly getClusterLeaves: (
+    cluster: ClusterArgument,
+    limit: number,
+    offset: number
+  ) => Promise<unknown>;
+}
+
+const createNativeClusterSource = <ClusterArgument>(
+  read: () => WrapperClusterSource<ClusterArgument>,
+  toClusterArgument: (clusterId: number) => ClusterArgument
 ): NativeGeoJsonSource => {
   // Reference the same source for Mapbox-style chaining.
   const complete = <Value>(
@@ -48,9 +59,14 @@ const createNativeClusterSource = (
     );
     return source;
   };
-  function expansion(
-    clusterId: number
-  ): ReturnType<NativeClusterSourceMethods["getClusterExpansionZoom"]>;
+
+  // Async readers reject stale registrations and dispatch before the first await.
+  const readExpansionZoom = async (clusterId: number) =>
+    finiteNumber(
+      await read().getClusterExpansionZoom(toClusterArgument(clusterId)),
+      "Cluster expansion zoom"
+    );
+  function expansion(clusterId: number): ReturnType<typeof readExpansionZoom>;
   function expansion(
     clusterId: number,
     callback: Parameters<NativeGeoJsonSource["getClusterExpansionZoom"]>[1]
@@ -59,11 +75,15 @@ const createNativeClusterSource = (
     clusterId: number,
     callback?: Parameters<NativeGeoJsonSource["getClusterExpansionZoom"]>[1]
   ) {
-    return complete(methods.getClusterExpansionZoom(clusterId), callback);
+    return complete(readExpansionZoom(clusterId), callback);
   }
-  function children(
-    clusterId: number
-  ): ReturnType<NativeClusterSourceMethods["getClusterChildren"]>;
+
+  const readChildren = async (clusterId: number) =>
+    featuresFromWrapper(
+      await read().getClusterChildren(toClusterArgument(clusterId)),
+      "getClusterChildren"
+    );
+  function children(clusterId: number): ReturnType<typeof readChildren>;
   function children(
     clusterId: number,
     callback: Parameters<NativeGeoJsonSource["getClusterChildren"]>[1]
@@ -72,13 +92,23 @@ const createNativeClusterSource = (
     clusterId: number,
     callback?: Parameters<NativeGeoJsonSource["getClusterChildren"]>[1]
   ) {
-    return complete(methods.getClusterChildren(clusterId), callback);
+    return complete(readChildren(clusterId), callback);
   }
+
+  const readLeaves = async (clusterId: number, limit: number, offset: number) =>
+    featuresFromWrapper(
+      await read().getClusterLeaves(
+        toClusterArgument(clusterId),
+        limit,
+        offset
+      ),
+      "getClusterLeaves"
+    );
   function leaves(
     clusterId: number,
     limit: number,
     offset: number
-  ): ReturnType<NativeClusterSourceMethods["getClusterLeaves"]>;
+  ): ReturnType<typeof readLeaves>;
   function leaves(
     clusterId: number,
     limit: number,
@@ -91,10 +121,7 @@ const createNativeClusterSource = (
     offset: number,
     callback?: Parameters<NativeGeoJsonSource["getClusterLeaves"]>[3]
   ) {
-    return complete(
-      methods.getClusterLeaves(clusterId, limit, offset),
-      callback
-    );
+    return complete(readLeaves(clusterId, limit, offset), callback);
   }
   const source = {
     type: "geojson",
