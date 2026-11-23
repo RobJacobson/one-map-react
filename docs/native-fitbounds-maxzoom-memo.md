@@ -16,7 +16,7 @@ The following comparison uses the same request on every backend: fit a tight Sea
 
 Both native converters throw an ordinary `Error` whenever `maxZoom !== undefined`, including a supplied value of 0. The public asynchronous `MapRef.fitBounds` therefore rejects before dispatching the camera command. The message is `fitBounds.maxZoom is unavailable through the pinned native camera wrapper.` Omitting the option, or supplying `undefined`, preserves the existing native fit path. See the [RNMapbox converter](../packages/one-map-react/src/adapters/mapbox-native/convert-camera.ts), [MapLibre converter](../packages/one-map-react/src/adapters/maplibre-native/convert-camera.ts), and [common contract](../packages/one-map-react/src/contracts/camera-types.ts).
 
-The previous facade accepted this option without reliably enforcing it. The current rejection makes the unsupported request observable. Native cap support remains pending; the [TF04 record](tf04-camera.md) distinguishes the corrected behavior from historical renderer acceptance.
+The previous facade accepted this option without reliably enforcing it. The current rejection makes the unsupported request observable. Native cap support remains pending. The rejection is the current behavior, and historical renderer acceptance does not certify it.
 
 ## Wrapper gap and mobile SDK facilities
 

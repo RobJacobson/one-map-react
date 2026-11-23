@@ -1,6 +1,6 @@
 # Thin facade testing policy
 
-This policy governs the replacement implementation described in [requirements](requirements.md) and the [stage plan](stage-plan.md). The previous testing plan was retired with the old implementation. Test the facade's forwarding, conversions, added lifecycle behavior, packaging, and advertised compatibility. Upstream libraries own their general regression suites.
+This policy governs the replacement implementation described in the [native compatibility design](native-compatibility-design.md). The previous testing plan was retired with the old implementation. Test the facade's forwarding, conversions, added lifecycle behavior, packaging, and advertised compatibility. Upstream libraries own their general regression suites.
 
 ## Current acceptance status
 
