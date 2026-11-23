@@ -1,4 +1,4 @@
-import type { Camera, MapView, ShapeSource } from "@rnmapbox/maps";
+import type { Camera, MapView } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
 import type { NativeMapRef } from "../../contracts/native-types.js";
@@ -9,10 +9,7 @@ import {
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
-import {
-  createNativeClusterLookup,
-  type NativeClusterSourceMethods,
-} from "../shared/native-clusters.js";
+import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
   nativeBounds,
   nativeBoundsInput,
@@ -74,7 +71,7 @@ export const createMapboxMapRef = (
 ): NativeAdvancedMapRef => {
   const getSource = createNativeClusterLookup(
     (id) => geoJsonSources.getGeoJsonOwner(id),
-    createClusterMethods
+    toRnmapboxClusterFeature
   );
   return {
     getSource: (id) => (mapViewRef.current ? getSource(id) : undefined),
@@ -209,39 +206,6 @@ export const createMapboxMapRef = (
     },
   };
 };
-
-const createClusterMethods = (
-  read: () => ComponentRef<typeof ShapeSource>
-): NativeClusterSourceMethods => ({
-  getClusterExpansionZoom: async (clusterId) => {
-    const source = read();
-    const zoom = await source.getClusterExpansionZoom(
-      toRnmapboxClusterFeature(clusterId)
-    );
-
-    return finiteNumber(zoom, "Cluster expansion zoom");
-  },
-  getClusterLeaves: async (clusterId, limit, offset) => {
-    const source = read();
-
-    return featuresFromWrapper(
-      await source.getClusterLeaves(
-        toRnmapboxClusterFeature(clusterId),
-        limit,
-        offset
-      ),
-      "getClusterLeaves"
-    );
-  },
-  getClusterChildren: async (clusterId) => {
-    const source = read();
-
-    return featuresFromWrapper(
-      await source.getClusterChildren(toRnmapboxClusterFeature(clusterId)),
-      "getClusterChildren"
-    );
-  },
-});
 
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null

@@ -1,6 +1,5 @@
 import type {
   Camera,
-  GeoJSONSource,
   Map as MaplibreMap,
 } from "@maplibre/maplibre-react-native";
 import type { ComponentRef } from "react";
@@ -13,10 +12,7 @@ import {
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
-import {
-  createNativeClusterLookup,
-  type NativeClusterSourceMethods,
-} from "../shared/native-clusters.js";
+import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
   isScreenBounds,
   nativeBounds,
@@ -80,7 +76,7 @@ export const createMaplibreMapRef = (
 ): NativeAdvancedMapRef => {
   const getSource = createNativeClusterLookup(
     (id) => sources.getGeoJsonOwner(id),
-    createClusterMethods
+    (clusterId) => clusterId
   );
   return {
     getSource: (id) => (mapRef.current ? getSource(id) : undefined),
@@ -221,33 +217,6 @@ export const createMaplibreMapRef = (
     },
   };
 };
-
-const createClusterMethods = (
-  read: () => ComponentRef<typeof GeoJSONSource>
-): NativeClusterSourceMethods => ({
-  getClusterExpansionZoom: async (clusterId) => {
-    const source = read();
-    const zoom = await source.getClusterExpansionZoom(clusterId);
-
-    return finiteNumber(zoom, "Cluster expansion zoom");
-  },
-  getClusterLeaves: async (clusterId, limit, offset) => {
-    const source = read();
-
-    return featuresFromWrapper(
-      await source.getClusterLeaves(clusterId, limit, offset),
-      "getClusterLeaves"
-    );
-  },
-  getClusterChildren: async (clusterId) => {
-    const source = read();
-
-    return featuresFromWrapper(
-      await source.getClusterChildren(clusterId),
-      "getClusterChildren"
-    );
-  },
-});
 
 const requireCamera = (
   camera: ComponentRef<typeof Camera> | null,
