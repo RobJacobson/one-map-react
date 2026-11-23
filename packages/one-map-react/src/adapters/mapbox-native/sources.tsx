@@ -6,7 +6,7 @@ import {
   VectorSource,
 } from "@rnmapbox/maps";
 import type { ComponentProps, ComponentRef } from "react";
-import { useContext, useLayoutEffect, useRef } from "react";
+import { useContext, useRef } from "react";
 
 import type {
   GeoJsonSourceProps,
@@ -21,7 +21,10 @@ import {
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
-import { copyNativeStringArray } from "../shared/wrapper-values.js";
+import {
+  copyNativeStringArray,
+  useNativeSourceRegistration,
+} from "../shared/index.js";
 import { GeoJsonSourceContext } from "./geojson-source-registry.js";
 
 /** Mapbox-native source that dispatches to the matching RNMapbox source. */
@@ -69,13 +72,12 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
   const registry = useContext(GeoJsonSourceContext);
   const sourceRef = useRef<ComponentRef<typeof ShapeSource>>(null);
 
-  useLayoutEffect(() => {
-    if (!registry) {
-      return;
-    }
-
-    return registry.register(props.id, () => sourceRef.current);
-  }, [registry, props.id]);
+  useNativeSourceRegistration({
+    registry,
+    id: props.id,
+    sourceRef,
+    toRegistration: toShapeRegistration,
+  });
 
   return (
     <ShapeSource ref={sourceRef} {...toRnmapboxShapeSource(props)}>
@@ -83,6 +85,8 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
     </ShapeSource>
   );
 };
+
+const toShapeRegistration = (ref: ComponentRef<typeof ShapeSource>) => ref;
 
 /** Forwards vector data to RNMapbox. */
 const MapboxNativeVectorSource = (props: VectorSourceProps) => (

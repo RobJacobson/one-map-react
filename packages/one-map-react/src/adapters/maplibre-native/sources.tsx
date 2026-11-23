@@ -6,7 +6,7 @@ import {
   VectorSource,
 } from "@maplibre/maplibre-react-native";
 import type { ComponentProps, ComponentRef } from "react";
-import { useContext, useLayoutEffect, useRef } from "react";
+import { useContext, useRef } from "react";
 
 import type {
   GeoJsonSourceProps,
@@ -18,7 +18,11 @@ import {
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
-import { copyNativeStringArray } from "../shared/wrapper-values.js";
+import {
+  copyNativeStringArray,
+  useNativeSourceRegistration,
+} from "../shared/index.js";
+import type { MaplibreNativeSourceRef } from "./source-registry.js";
 import { MaplibreSourceContext } from "./source-registry.js";
 
 /** Maplibre-native source that dispatches to the matching MapLibre source. */
@@ -92,19 +96,12 @@ const MaplibreNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
   const registry = useContext(MaplibreSourceContext);
   const sourceRef = useRef<ComponentRef<typeof GeoJSONSource>>(null);
 
-  useLayoutEffect(() => {
-    if (!registry) {
-      return;
-    }
-
-    // The pinned wrapper refreshes its imperative handle on each render.
-    // Read it when dispatching instead of retaining an earlier native handle.
-    return registry.register(props.id, () =>
-      sourceRef.current
-        ? { kind: "geojson", ref: sourceRef.current }
-        : undefined
-    );
-  }, [registry, props.id]);
+  useNativeSourceRegistration({
+    registry,
+    id: props.id,
+    sourceRef,
+    toRegistration: toGeoJsonRegistration,
+  });
 
   rejectNativeGeoJsonGenerateId(props.generateId, "maplibre-native");
   rejectProvided(
@@ -146,15 +143,12 @@ const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
   const registry = useContext(MaplibreSourceContext);
   const sourceRef = useRef<ComponentRef<typeof VectorSource>>(null);
 
-  useLayoutEffect(() => {
-    if (!registry) {
-      return;
-    }
-
-    return registry.register(props.id, () =>
-      sourceRef.current ? { kind: "vector", ref: sourceRef.current } : undefined
-    );
-  }, [registry, props.id]);
+  useNativeSourceRegistration({
+    registry,
+    id: props.id,
+    sourceRef,
+    toRegistration: toVectorRegistration,
+  });
 
   return (
     <VectorSource
@@ -171,6 +165,14 @@ const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
     </VectorSource>
   );
 };
+
+const toGeoJsonRegistration = (
+  ref: ComponentRef<typeof GeoJSONSource>
+): MaplibreNativeSourceRef => ({ kind: "geojson", ref });
+
+const toVectorRegistration = (
+  ref: ComponentRef<typeof VectorSource>
+): MaplibreNativeSourceRef => ({ kind: "vector", ref });
 
 const mutableTiles = (
   tiles: readonly string[] | undefined

@@ -1689,7 +1689,7 @@ describe("maplibre-native queries and feature state", () => {
     }
   );
 
-  test("source queries read the wrapper handle refreshed by a rerender", async () => {
+  test("GeoJSON rerenders retain the source handle and refresh wrapper dispatch", async () => {
     const ref = createRef<MapRef>();
     const updatedRoutes = { ...routes, features: routes.features.slice(0, 1) };
     const scene = (data: typeof routes) => (
@@ -1702,10 +1702,18 @@ describe("maplibre-native queries and feature state", () => {
       </NativeMap>
     );
     const mounted = await render(scene(routes));
-    await ref.current?.querySourceFeatures("routes");
+    const map = ref.current;
+    const source = map?.getSource("routes");
+    if (!map || !source) throw new Error("Expected a mounted GeoJSON source.");
+
+    await map.querySourceFeatures("routes");
     expect(mockGeoJsonHandleData).toHaveBeenLastCalledWith(routes);
+
     await mounted.rerender(scene(updatedRoutes));
-    await ref.current?.querySourceFeatures("routes");
+
+    expect(map.getSource("routes")).toBe(source);
+    await expect(source.getClusterExpansionZoom(7)).resolves.toBe(13);
+    await map.querySourceFeatures("routes");
     expect(mockGeoJsonHandleData).toHaveBeenLastCalledWith(updatedRoutes);
   });
 
