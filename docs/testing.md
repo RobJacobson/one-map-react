@@ -6,6 +6,8 @@ Test the behavior this library owns: forwarding, conversions, lifecycle, packagi
 
 Run the checks that match the change. `bun run validate` checks formatting and lint, runs `bun run check:docs`, builds the packages, and then runs type checks, unit and component tests, and packed-package selection. It does not open a browser, start Metro, or build a native app.
 
+GitHub Actions runs `bun run validate` when a pull request opens, reopens, or receives new commits. The job uses macOS for the Swift and Objective-C++ regression checks. See the [pull request validation workflow](../.github/workflows/validate.yml).
+
 `bun run check:docs` checks Markdown structure and local links in tracked files and unignored new files in the Git checkout. Use the referenced source and examples to verify the claims in the text.
 
 | Change | Checks |

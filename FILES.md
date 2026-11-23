@@ -2,6 +2,9 @@
 
 ```text
 one-map/                         # Repository root (0)
+├── .github/                     # GitHub repository configuration (1)
+│   └── workflows/              # Pull request validation (2)
+│       └── validate.yml         # Runs the workspace validation command (3)
 ├── packages/                    # Published library and shared example package (1)
 │   ├── one-map-react/           # Native compatibility library (2)
 │   │   ├── src/                 # Native adapters, contracts, and web exports (3)
