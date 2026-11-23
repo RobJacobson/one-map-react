@@ -946,6 +946,7 @@ describe("mapbox-native adapter", () => {
     await render(
       example(undefined, undefined, {
         dragPan: false,
+        touchZoomRotate: true,
         touchZoom: false,
         doubleTapZoom: true,
       })
@@ -955,6 +956,7 @@ describe("mapbox-native adapter", () => {
       expect.objectContaining({
         scrollEnabled: false,
         zoomEnabled: false,
+        rotateEnabled: true,
         gestureSettings: {
           doubleTapToZoomInEnabled: true,
           doubleTouchToZoomOutEnabled: true,
@@ -1095,12 +1097,20 @@ describe("mapbox-native adapter", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  test("MapboxGestureSettings are passed to the map", async () => {
+  test("portable double tap overrides context while context overrides selected options", async () => {
     await render(
       <MapboxGestureSettings
-        settings={{ pinchZoomEnabled: false, quickZoomEnabled: true }}
+        settings={{ quickZoomEnabled: true, doubleTapToZoomInEnabled: false }}
       >
-        {example(undefined, undefined, { doubleTapZoom: true })}
+        {example(undefined, undefined, {
+          doubleTapZoom: true,
+          options: {
+            gestureSettings: {
+              pinchZoomEnabled: false,
+              quickZoomEnabled: false,
+            },
+          },
+        })}
       </MapboxGestureSettings>
     );
 

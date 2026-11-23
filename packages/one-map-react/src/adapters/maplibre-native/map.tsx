@@ -90,12 +90,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     onError,
     reuseMaps,
     gl,
-    interactive,
-    dragPan,
-    touchZoom = props.touchZoomRotate,
-    touchRotate = props.touchZoomRotate,
-    touchPitch,
-    doubleTapZoom,
     children,
   } = props;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
@@ -119,14 +113,7 @@ const MaplibreNativeMapImplementation = forwardRef<
     onStyleData: props.onStyleData,
     onError,
   });
-  const gestures = toMaplibreGestures({
-    interactive,
-    dragPan,
-    touchZoom,
-    touchRotate,
-    touchPitch,
-    doubleTapZoom,
-  });
+  const gestures = toMaplibreGestures(props);
 
   const [mapHandle] = useState(
     // eslint-disable-next-line react/refs -- This lazy initializer only captures refs; commands dereference them after attachment.

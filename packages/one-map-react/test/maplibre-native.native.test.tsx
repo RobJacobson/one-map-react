@@ -615,6 +615,7 @@ describe("maplibre-native adapter", () => {
   test("touchZoom false still passes an explicit double tap", async () => {
     await render(
       example(undefined, undefined, {
+        touchZoomRotate: true,
         touchZoom: false,
         doubleTapZoom: true,
       })
@@ -623,10 +624,42 @@ describe("maplibre-native adapter", () => {
     expect(lastMapProps<object>()).toEqual(
       expect.objectContaining({
         touchZoom: false,
+        touchRotate: true,
         doubleTapZoom: true,
         doubleTapHoldZoom: true,
       })
     );
+  });
+
+  test("a temporary gesture lock overrides and restores selected gesture options", async () => {
+    const options = {
+      dragPan: true,
+      touchZoom: true,
+      touchRotate: true,
+      touchPitch: true,
+      doubleTapZoom: true,
+      doubleTapHoldZoom: false,
+    };
+    const scene = (interactive: boolean) => (
+      <NativeMap
+        mapStyle={emptyStyle}
+        interactive={interactive}
+        options={options}
+      />
+    );
+
+    const view = await render(scene(false));
+    expect(lastMapProps<object>()).toMatchObject({
+      dragPan: false,
+      touchZoom: false,
+      touchRotate: false,
+      touchPitch: false,
+      doubleTapZoom: false,
+      doubleTapHoldZoom: false,
+    });
+    await view.rerender(scene(true));
+    expect(lastMapProps<object>()).toMatchObject(options);
+    await view.unmount();
   });
 
   test("hash is rejected before a map is created", async () => {

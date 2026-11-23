@@ -1,21 +1,36 @@
-import type { GestureSelection } from "../../contracts/map-types.js";
+import {
+  type NativeGestureSelection,
+  normalizeNativeGestures,
+} from "../native-gestures.js";
 
 /**
  * Maps portable gestures onto RNMapbox map props.
  *
- * `interactive: false` forces every flag off. `dragPan` becomes
- * `scrollEnabled`. Double-tap sets both the zoom-in and two-finger zoom-out
- * entries so the requested double-tap intent is explicit.
+ * `dragPan` becomes `scrollEnabled`. Double-tap sets both the zoom-in and
+ * two-finger zoom-out entries so the requested double-tap intent is explicit.
  *
  * @param selection - Portable gesture flags.
  * @returns Scroll, zoom, rotate, pitch, and double-tap settings that were set.
  */
-export const toRnmapboxGestures = (selection: GestureSelection) => {
-  const scrollEnabled = forcedOff(selection.interactive, selection.dragPan);
-  const zoomEnabled = forcedOff(selection.interactive, selection.touchZoom);
-  const rotateEnabled = forcedOff(selection.interactive, selection.touchRotate);
-  const pitchEnabled = forcedOff(selection.interactive, selection.touchPitch);
-  const doubleTap = forcedOff(selection.interactive, selection.doubleTapZoom);
+export const toRnmapboxGestures = (
+  selection: NativeGestureSelection
+): {
+  scrollEnabled?: boolean;
+  zoomEnabled?: boolean;
+  rotateEnabled?: boolean;
+  pitchEnabled?: boolean;
+  gestureSettings?: {
+    doubleTapToZoomInEnabled: boolean;
+    doubleTouchToZoomOutEnabled: boolean;
+  };
+} => {
+  const {
+    dragPan: scrollEnabled,
+    touchZoom: zoomEnabled,
+    touchRotate: rotateEnabled,
+    touchPitch: pitchEnabled,
+    doubleTapZoom: doubleTap,
+  } = normalizeNativeGestures(selection);
 
   return {
     ...(scrollEnabled === undefined ? {} : { scrollEnabled }),
@@ -32,8 +47,3 @@ export const toRnmapboxGestures = (selection: GestureSelection) => {
         }),
   };
 };
-
-const forcedOff = (
-  interactive: boolean | undefined,
-  flag: boolean | undefined
-): boolean | undefined => (interactive === false ? false : flag);

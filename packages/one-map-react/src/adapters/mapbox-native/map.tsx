@@ -87,12 +87,6 @@ const MapboxNativeMapImplementation = forwardRef<
     onError,
     reuseMaps,
     gl,
-    interactive,
-    dragPan,
-    touchZoom = props.touchZoomRotate,
-    touchRotate = props.touchZoomRotate,
-    touchPitch,
-    doubleTapZoom,
     children,
   } = props;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
@@ -114,14 +108,7 @@ const MapboxNativeMapImplementation = forwardRef<
     onError,
   });
   const styleProps = toRnmapboxStyleProps(mapStyle);
-  const gestures = toRnmapboxGestures({
-    interactive,
-    dragPan,
-    touchZoom,
-    touchRotate,
-    touchPitch,
-    doubleTapZoom,
-  });
+  const gestures = toRnmapboxGestures(props);
   const selectedGestureSettings = mergeGestureSettings(
     props.options?.gestureSettings,
     extraGestureSettings
@@ -131,9 +118,9 @@ const MapboxNativeMapImplementation = forwardRef<
   // the pinned Android setter, which unconditionally reads a ReadableMap.
   const portableGestureSettings =
     Platform.OS === "android" &&
-    interactive === false &&
+    props.interactive === false &&
     selectedGestureSettings === undefined &&
-    doubleTapZoom === undefined
+    props.doubleTapZoom === undefined
       ? undefined
       : gestures.gestureSettings;
   const gestureSettings = mergeGestureSettings(

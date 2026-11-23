@@ -1,7 +1,12 @@
-import type { GestureSelection } from "../../contracts/map-types.js";
+import type { MapProps as MaplibreMapProps } from "@maplibre/maplibre-react-native";
+
+import {
+  type NativeGestureSelection,
+  normalizeNativeGestures,
+} from "../native-gestures.js";
 
 /**
- * Maps portable gestures onto MapLibre Native map props.
+ * Maps portable gestures onto MapLibre React Native map props.
  *
  * `doubleTapZoom` and `doubleTapHoldZoom` are passed together, including
  * beside `touchZoom: false`. iOS enables that recognizer on its own. Android
@@ -11,15 +16,19 @@ import type { GestureSelection } from "../../contracts/map-types.js";
  * @param selection - Portable gesture flags.
  * @returns Drag, pinch, rotate, pitch, and double-tap props that were set.
  */
-export const toMaplibreGestures = (selection: GestureSelection) => {
-  const dragPan = forcedOff(selection.interactive, selection.dragPan);
-  const touchZoom = forcedOff(selection.interactive, selection.touchZoom);
-  const touchRotate = forcedOff(selection.interactive, selection.touchRotate);
-  const touchPitch = forcedOff(selection.interactive, selection.touchPitch);
-  const doubleTapZoom = forcedOff(
-    selection.interactive,
-    selection.doubleTapZoom
-  );
+export const toMaplibreGestures = (
+  selection: NativeGestureSelection
+): Pick<
+  MaplibreMapProps,
+  | "dragPan"
+  | "touchZoom"
+  | "touchRotate"
+  | "touchPitch"
+  | "doubleTapZoom"
+  | "doubleTapHoldZoom"
+> => {
+  const { dragPan, touchZoom, touchRotate, touchPitch, doubleTapZoom } =
+    normalizeNativeGestures(selection);
 
   return {
     ...(dragPan === undefined ? {} : { dragPan }),
@@ -31,8 +40,3 @@ export const toMaplibreGestures = (selection: GestureSelection) => {
       : { doubleTapZoom, doubleTapHoldZoom: doubleTapZoom }),
   };
 };
-
-const forcedOff = (
-  interactive: boolean | undefined,
-  flag: boolean | undefined
-): boolean | undefined => (interactive === false ? false : flag);
