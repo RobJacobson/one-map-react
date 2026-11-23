@@ -1,19 +1,27 @@
-import { useContext, useId } from "react";
+import { type JSX, useContext, useId } from "react";
 
 import { validatePosition } from "../adapters/shared/location-values.js";
 import type { UserLocationProps } from "../contracts/location-types.js";
 import type { GeoJsonFeatureCollection } from "../contracts/source-types.js";
+import type { GeolocationPosition } from "../contracts/ui-types.js";
 import { MapSessionContext } from "./map-context.js";
 
-/** Displays supplied coordinates and meter-based accuracy without starting sensors. */
+/**
+ * Displays supplied coordinates and meter-based accuracy without starting sensors.
+ *
+ * @param props - Position and accuracy display options.
+ * @returns The location source and layers, or null when no position is supplied.
+ * @throws When a supplied position is invalid or rendered outside a map.
+ */
 export const UserLocation = ({
   position,
   showAccuracyCircle = false,
-}: UserLocationProps) => {
+}: UserLocationProps): JSX.Element | null => {
   const session = useContext(MapSessionContext);
   const id = `one-map-location-${useId()}`;
-  const data = locationGeometry(position, showAccuracyCircle);
   if (!position) return null;
+
+  const data = locationGeometry(position, showAccuracyCircle);
   if (!session) throw new Error("UserLocation must render inside Map.");
   const { Layer, Source } = session.components;
   return (
@@ -40,10 +48,9 @@ export const UserLocation = ({
 };
 
 const locationGeometry = (
-  position: UserLocationProps["position"],
+  position: GeolocationPosition,
   accuracy: boolean
 ): GeoJsonFeatureCollection => {
-  if (!position) return { type: "FeatureCollection", features: [] };
   const { lngLat, accuracy: radius } = validatePosition(position);
   const dot = {
     type: "Feature" as const,
