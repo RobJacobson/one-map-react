@@ -118,11 +118,11 @@ export const featuresFromWrapper = (
  *
  * @param identifier - Source, feature id, and optional source layer.
  * @returns A shallow snapshot of the validated identifier fields.
- * @throws When the source is not a nonempty string or the feature id is
- * missing.
+ * @throws When the source or a supplied source layer is not a nonempty
+ * string, or the feature id is not a string or number.
  */
 export const assertFeatureIdentifier = (
-  identifier: FeatureIdentifier
+  identifier: unknown
 ): FeatureIdentifier => {
   if (!isRecord(identifier) || Array.isArray(identifier)) {
     throw new Error(
@@ -148,7 +148,22 @@ export const assertFeatureIdentifier = (
 
   return sourceLayer === undefined
     ? { source, id }
-    : { source, id, sourceLayer };
+    : { source, id, sourceLayer: requireSourceLayerName(sourceLayer) };
+};
+
+/**
+ * Validates a supplied vector source layer name.
+ *
+ * @param sourceLayer - Layer name from a feature identifier or query.
+ * @returns The exact layer name supplied by the caller.
+ * @throws When the layer name is not a nonempty string.
+ */
+export const requireSourceLayerName = (sourceLayer: unknown): string => {
+  if (typeof sourceLayer !== "string" || sourceLayer.length === 0) {
+    throw new Error("sourceLayer must be a nonempty string.");
+  }
+
+  return sourceLayer;
 };
 
 /**

@@ -1323,19 +1323,24 @@ describe("maplibre-native queries and feature state", () => {
     expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith(undefined);
   });
 
-  test("querySourceFeatures dispatches through the vector ref", async () => {
+  test("querySourceFeatures forwards the vector sourceLayer it reads once", async () => {
     const ref = createRef<MapRef>();
+    let sourceLayerReads = 0;
 
     await render(vectorTree(ref));
     await ref.current?.querySourceFeatures("tiles", {
-      sourceLayer: "way",
+      get sourceLayer() {
+        sourceLayerReads += 1;
+        return sourceLayerReads === 1 ? " way " : "";
+      },
       filter: ["==", "kind", "route"],
     });
 
     expect(mockQuerySourceFeatures).toHaveBeenCalledWith({
-      sourceLayer: "way",
+      sourceLayer: " way ",
       filter: ["==", "kind", "route"],
     });
+    expect(sourceLayerReads).toBe(1);
   });
 
   test("querySourceFeatures requires sourceLayer for vector sources", async () => {
@@ -1346,13 +1351,26 @@ describe("maplibre-native queries and feature state", () => {
     await expect(ref.current?.querySourceFeatures("tiles")).rejects.toThrow(
       "needs sourceLayer"
     );
+    expect(mockQuerySourceFeatures).not.toHaveBeenCalled();
   });
 
-  test("querySourceFeatures reads GeoJSON data through getData", async () => {
+  test("querySourceFeatures rejects an empty vector sourceLayer before dispatch", async () => {
+    const ref = createRef<MapRef>();
+
+    await render(vectorTree(ref));
+
+    await expect(
+      ref.current?.querySourceFeatures("tiles", { sourceLayer: "" })
+    ).rejects.toThrow("sourceLayer must be a nonempty string");
+    expect(mockQuerySourceFeatures).not.toHaveBeenCalled();
+  });
+
+  test("querySourceFeatures reads GeoJSON data through getData and ignores sourceLayer", async () => {
     const ref = createRef<MapRef>();
 
     await render(example(ref));
     const features = await ref.current?.querySourceFeatures("routes", {
+      sourceLayer: "",
       filter: ["==", "kind", "route"],
     });
 
