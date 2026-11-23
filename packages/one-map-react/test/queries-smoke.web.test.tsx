@@ -13,7 +13,7 @@ import {
   queryRoutes,
   replacementStyle,
 } from "../../example-map/src/scenarios/map-fixture.js";
-import type { MapRef } from "../src/contracts/camera-types.js";
+import type { NativeSceneMap } from "../../example-map/src/scenarios/scene-components.js";
 import type { FeatureState } from "../src/contracts/query-types.js";
 import { sdkFeatureState } from "./sdk-feature-state.js";
 
@@ -31,6 +31,17 @@ const scene = (removalReads = 2, stringIds = false) => {
     geometry: null,
   });
   const leaves = [route(1), route(2)];
+  const source = {
+    getClusterExpansionZoom: vi.fn(async (_clusterId: number) => 13),
+    getClusterLeaves: vi.fn(
+      async (_clusterId: number, limit: number, offset: number) =>
+        leaves.slice(offset, offset + limit)
+    ),
+    getClusterChildren: vi.fn(async (_clusterId: number) => leaves),
+  };
+  const getSource = vi.fn((id: string) =>
+    id === "queries-clusters" ? source : undefined
+  );
   const project = vi.fn(async () => [600, 400]);
   const queryRenderedFeatures = vi.fn(
     async (
@@ -89,16 +100,13 @@ const scene = (removalReads = 2, stringIds = false) => {
     getFeatureState,
     setFeatureState,
     removeFeatureState,
-    getClusterExpansionZoom: vi.fn(async () => 13),
-    getClusterLeaves: vi.fn(
-      async (_id: string, _cluster: number, limit: number, offset: number) =>
-        leaves.slice(offset, offset + limit)
-    ),
-    getClusterChildren: vi.fn(async () => leaves),
-  } as unknown as MapRef;
+    getSource,
+  } as unknown as NativeSceneMap;
   const mapRef = { current: map };
   return {
     mapRef,
+    getSource,
+    source,
     project,
     queryRenderedFeatures,
     querySourceFeatures,
@@ -192,6 +200,20 @@ test.each(["mapbox", "maplibre"] as const)(
   }
 );
 
+test("a detached native cluster source ends the query phase", async () => {
+  const fixture = scene();
+  fixture.getSource.mockReturnValueOnce(undefined);
+  const hook = renderHook(() => useQueriesSmoke({ mapRef: fixture.mapRef }));
+  act(() => hook.result.current.onLoad());
+  await tick(250);
+  expect(hook.result.current.phase).toBe("done");
+  expect(hook.result.current.status).toContain(
+    "error=Cluster-source-detached."
+  );
+  expect(fixture.getSource.mock.calls).toEqual([["queries-clusters"]]);
+  expect(fixture.setFeatureState).not.toHaveBeenCalled();
+});
+
 test("query dispatch is single-flight and late completion after unmount is ignored", async () => {
   const fixture = scene();
   let resolve: (point: number[]) => void = () => {};
@@ -241,6 +263,17 @@ test.each([false, true])(
       step += 1
     )
       await tick(250);
+    expect(hook.result.current.status).toContain(
+      "cluster-zoom=ok leaves=ok children=ok"
+    );
+    expect(hook.result.current.status).toContain("pagination=ok");
+    expect(fixture.getSource.mock.calls).toEqual([["queries-clusters"]]);
+    expect(fixture.source.getClusterExpansionZoom.mock.calls).toEqual([[7]]);
+    expect(fixture.source.getClusterLeaves.mock.calls).toEqual([
+      [7, 10, 0],
+      [7, 1, 1],
+    ]);
+    expect(fixture.source.getClusterChildren.mock.calls).toEqual([[7]]);
     expect(hook.result.current.status).toContain("remove-state=ok");
     expect(hook.result.current.status).toContain("whole-state=ok");
     expect(hook.result.current.status).toContain(

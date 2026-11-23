@@ -6,7 +6,10 @@ import type {
   Point,
   ViewState,
 } from "one-map-react";
-import type { NativeMapProps as MapboxMapProps } from "one-map-react/mapbox-native";
+import type {
+  MapRef as MapboxMapRef,
+  NativeMapProps as MapboxMapProps,
+} from "one-map-react/mapbox-native";
 import type { NativeMapProps as MaplibreMapProps } from "one-map-react/maplibre-native";
 import type {
   ComponentProps,
@@ -187,6 +190,9 @@ export interface NativeSceneComponents {
 /** Renderer identity used by native command and observation receipts. */
 export type NativeBackend = "mapbox-native" | "maplibre-native";
 
+/** Ref delivered by either native scene binding, including source lookup. */
+export type NativeSceneMap = MapRef & Pick<MapboxMapRef, "getSource">;
+
 /** Both native entries accept these props and deliver their selected map ref. */
 type NativeSceneMapProps = Omit<
   MapboxMapProps,
@@ -194,7 +200,7 @@ type NativeSceneMapProps = Omit<
 > & {
   readonly mapStyle: MapStyle;
   readonly options?: MapboxMapProps["options"] & MaplibreMapProps["options"];
-  readonly ref?: RefCallback<MapRef>;
+  readonly ref?: RefCallback<NativeSceneMap>;
 };
 
 /**

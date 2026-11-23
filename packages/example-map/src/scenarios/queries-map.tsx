@@ -1,21 +1,19 @@
-import type {
-  MapErrorEvent,
-  MapLayoutStyle,
-  MapRef,
-  MapStyle,
-} from "one-map-react";
+import type { MapErrorEvent, MapLayoutStyle, MapStyle } from "one-map-react";
 import { type ReactNode, type RefCallback } from "react";
 
 import { initialViewState } from "./map-fixture.js";
 import { QuerySources } from "./query-sources.js";
-import type { NativeSceneComponents } from "./scene-components.js";
+import type {
+  NativeSceneComponents,
+  NativeSceneMap,
+} from "./scene-components.js";
 
 interface QueriesMapProps {
   readonly components: Pick<NativeSceneComponents, "Map" | "Source" | "Layer">;
   readonly mapStyle: MapStyle;
   readonly sourceRevision: number;
   readonly style?: MapLayoutStyle;
-  readonly ref?: RefCallback<MapRef>;
+  readonly ref?: RefCallback<NativeSceneMap>;
   readonly onLoad?: () => void;
   readonly onStyleLoad?: () => void;
   readonly onError?: (event: MapErrorEvent) => void;

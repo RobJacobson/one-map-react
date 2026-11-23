@@ -1,4 +1,3 @@
-import type { MapRef as NativeQueryMap } from "one-map-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
@@ -7,11 +6,12 @@ import {
   queriesStyle,
   replacementStyle,
 } from "./map-fixture.js";
+import type { NativeSceneMap } from "./scene-components.js";
 
 type BrowserMap =
   | import("react-map-gl/mapbox").MapRef
   | import("react-map-gl/maplibre").MapRef;
-type MapRef = NativeQueryMap | BrowserMap;
+type MapRef = NativeSceneMap | BrowserMap;
 type MapStyle = typeof queriesStyle;
 type Hit = {
   readonly id?: string | number;
@@ -322,13 +322,16 @@ const callbackResult = <T>(
 
 const clusterQueries = (map: MapRef, id: number) => {
   const name = "queries-clusters";
-  if (!("getMap" in map))
+  if (!("getMap" in map)) {
+    const source = map.getSource(name);
+    if (!source) throw new Error("Cluster source detached.");
     return {
-      zoom: () => map.getClusterExpansionZoom(name, id),
+      zoom: () => source.getClusterExpansionZoom(id),
       leaves: (limit: number, offset: number) =>
-        map.getClusterLeaves(name, id, limit, offset),
-      children: () => map.getClusterChildren(name, id),
+        source.getClusterLeaves(id, limit, offset),
+      children: () => source.getClusterChildren(id),
     };
+  }
   const sdk = map.getMap();
   if ("setRain" in sdk) {
     const source = sdk.getSource<import("mapbox-gl").GeoJSONSource>(name);
