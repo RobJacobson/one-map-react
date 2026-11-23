@@ -150,13 +150,13 @@ describe("assertFeatureIdentifier", () => {
   });
 
   test("accepts a numeric id with a source layer and isolates caller mutation", () => {
-    const identifier = { source: "tiles", id: 7, sourceLayer: "buildings" };
+    const identifier = { source: "tiles", id: 7, sourceLayer: " buildings " };
     const snapshot = assertFeatureIdentifier(identifier);
 
     expect(snapshot).toEqual({
       source: "tiles",
       id: 7,
-      sourceLayer: "buildings",
+      sourceLayer: " buildings ",
     });
     expect(snapshot).not.toBe(identifier);
 
@@ -167,7 +167,7 @@ describe("assertFeatureIdentifier", () => {
     expect(snapshot).toEqual({
       source: "tiles",
       id: 7,
-      sourceLayer: "buildings",
+      sourceLayer: " buildings ",
     });
   });
 
@@ -213,6 +213,12 @@ describe("assertFeatureIdentifier", () => {
     expect(() => assertFeatureIdentifier({ source: "", id: 1 })).toThrow(
       "nonempty string"
     );
+  });
+
+  test.each(["", null, 42])("rejects %j as sourceLayer", (value) => {
+    expect(() =>
+      assertFeatureIdentifier({ source: "tiles", id: 7, sourceLayer: value })
+    ).toThrow("sourceLayer must be a nonempty string");
   });
 
   test("rejects a missing feature id", () => {

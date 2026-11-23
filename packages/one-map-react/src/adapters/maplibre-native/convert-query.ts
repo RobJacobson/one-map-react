@@ -6,6 +6,7 @@ import type {
   QueryRenderedFeaturesOptions,
   QuerySourceFeaturesOptions,
 } from "../../contracts/query-types.js";
+import { requireSourceLayerName } from "../shared/feature-values.js";
 
 /**
  * Converts a query filter into MapLibre React Native's filter value.
@@ -47,20 +48,21 @@ export const toMaplibreRenderedQueryOptions = (
  *
  * @param options - Source layer and filter.
  * @returns Options with the required `sourceLayer`.
- * @throws When `sourceLayer` is missing; the vector wrapper requires it.
+ * @throws When `sourceLayer` is missing or is not a nonempty string.
  */
 export const toMaplibreSourceQueryOptions = (
   options?: QuerySourceFeaturesOptions
 ): { sourceLayer: string; filter?: FilterSpecification } => {
-  if (options?.sourceLayer === undefined) {
+  const sourceLayer = options?.sourceLayer;
+  if (sourceLayer === undefined) {
     throw new Error(
       "querySourceFeatures needs sourceLayer on maplibre-native. The pinned vector wrapper requires it."
     );
   }
 
   return {
-    sourceLayer: options.sourceLayer,
-    ...(options.filter === undefined
+    sourceLayer: requireSourceLayerName(sourceLayer),
+    ...(options?.filter === undefined
       ? {}
       : { filter: toMaplibreFilter(options.filter) }),
   };

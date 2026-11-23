@@ -234,22 +234,43 @@ test.each(["mapbox", "maplibre"] as const)(
 );
 
 test.each(["mapbox", "maplibre"] as const)(
-  "%s validates malformed identifiers and nested state before dispatch",
+  "%s validates malformed identifiers and nested state before checking attachment",
   async (backend) => {
     const renderer = fixture(backend);
+    renderer.detachMap();
     await expect(
       renderer.methods.setFeatureState(
         { source: "", id: 1 },
         { selected: true }
       )
-    ).rejects.toThrow();
+    ).rejects.toThrow("must name a source");
     await expect(
       renderer.methods.setFeatureState(
-        { source: "source-a", id: 1 },
+        { source: "missing", id: 1 },
         { nested: { bad: Number.NaN } }
       )
     ).rejects.toThrow("non-finite");
     expect(renderer.set).not.toHaveBeenCalled();
+  }
+);
+
+test.each(["mapbox", "maplibre"] as const)(
+  "%s rejects an empty sourceLayer for every feature-state operation",
+  async (backend) => {
+    const { methods, set, get, remove } = fixture(backend, "vector");
+    const target = { source: "source-a", id: 1, sourceLayer: "" };
+    const invalidLayer = "sourceLayer must be a nonempty string";
+
+    await Promise.all([
+      expect(
+        methods.setFeatureState(target, { selected: true })
+      ).rejects.toThrow(invalidLayer),
+      expect(methods.getFeatureState(target)).rejects.toThrow(invalidLayer),
+      expect(methods.removeFeatureState(target)).rejects.toThrow(invalidLayer),
+    ]);
+    expect(set).not.toHaveBeenCalled();
+    expect(get).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
   }
 );
 
