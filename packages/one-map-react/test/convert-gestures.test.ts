@@ -45,7 +45,16 @@ describe("gesture conversion", () => {
   });
 
   test("interactive false forces native flags off", () => {
-    expect(toRnmapboxGestures({ interactive: false, dragPan: true })).toEqual({
+    const selection = {
+      interactive: false,
+      dragPan: true,
+      touchZoomRotate: true,
+      touchZoom: true,
+      touchPitch: true,
+      doubleTapZoom: true,
+    };
+
+    expect(toRnmapboxGestures(selection)).toEqual({
       scrollEnabled: false,
       zoomEnabled: false,
       rotateEnabled: false,
@@ -55,6 +64,38 @@ describe("gesture conversion", () => {
         doubleTouchToZoomOutEnabled: false,
       },
     });
+    expect(toMaplibreGestures(selection)).toEqual({
+      dragPan: false,
+      touchZoom: false,
+      touchRotate: false,
+      touchPitch: false,
+      doubleTapZoom: false,
+      doubleTapHoldZoom: false,
+    });
+  });
+
+  test.each([false, true])(
+    "specific gestures take precedence over touchZoomRotate=%s",
+    (combined) => {
+      expect(
+        toRnmapboxGestures({
+          touchZoomRotate: combined,
+          touchZoom: !combined,
+          touchRotate: undefined,
+        })
+      ).toEqual({ zoomEnabled: !combined, rotateEnabled: combined });
+      expect(
+        toMaplibreGestures({
+          touchZoomRotate: combined,
+          touchRotate: !combined,
+        })
+      ).toEqual({ touchZoom: combined, touchRotate: !combined });
+    }
+  );
+
+  test("omitted portable flags leave wrapper fields unset", () => {
+    expect(toRnmapboxGestures({})).toStrictEqual({});
+    expect(toMaplibreGestures({})).toStrictEqual({});
   });
 
   test("MapLibre passes double tap beside a disabled pinch zoom", () => {
