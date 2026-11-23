@@ -308,10 +308,13 @@ test.each(["document", "url"] as const)(
       <NativeMap
         mapStyle={mapStyle}
         initialViewState={initialViewState}
-        options={{
-          styleURL: "https://example.test/selected.json",
-          styleJSON: JSON.stringify(replacementStyle),
-        }}
+        // Exercise raw runtime options outside the narrowed TypeScript surface.
+        options={
+          {
+            styleURL: "https://example.test/selected.json",
+            styleJSON: JSON.stringify(replacementStyle),
+          } as unknown as MapProps["options"]
+        }
       />
     );
     const view = await render(tree(styles[0]));
@@ -364,6 +367,18 @@ test("forwards selected label localization to RNMapbox", async () => {
     localizeLabels
   );
   expect(nativeEntry.WrapperMapView).toBe(MapView);
+});
+
+test("NativeMapProps options accepts valid RNMapbox options", () => {
+  // Rejection of facade-owned keys cannot be asserted offline: under NodeNext
+  // the RNMapbox declarations resolve to any. scripts/test-peers.mjs asserts
+  // it against the real packed types.
+  const validOptions: MapProps["options"] = {
+    scaleBarEnabled: true,
+    projection: "mercator",
+    gestureSettings: { quickZoomEnabled: false },
+  };
+  expect(validOptions).toBeDefined();
 });
 
 describe("mapbox-native adapter", () => {

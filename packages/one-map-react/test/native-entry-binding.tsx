@@ -73,6 +73,27 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
 ): void => {
   const { Map: NativeMap, MapProvider, Source, Layer, Marker, useMap } = entry;
 
+  test("omits wrapper onPress when neither onClick nor interactiveLayerIds is supplied", async () => {
+    const onClick = jest.fn();
+    const view = await render(<NativeMap mapStyle={emptyStyle} />);
+    expect(view.getByTestId("wrapper-map").props.onPress).toBeUndefined();
+
+    await view.rerender(<NativeMap mapStyle={emptyStyle} onClick={onClick} />);
+    expect(view.getByTestId("wrapper-map").props.onPress).toEqual(
+      expect.any(Function)
+    );
+
+    await view.rerender(
+      <NativeMap mapStyle={emptyStyle} interactiveLayerIds={["route-line"]} />
+    );
+    expect(view.getByTestId("wrapper-map").props.onPress).toEqual(
+      expect.any(Function)
+    );
+
+    await view.rerender(<NativeMap mapStyle={emptyStyle} />);
+    expect(view.getByTestId("wrapper-map").props.onPress).toBeUndefined();
+  });
+
   test("maps the desktop touchZoomRotate flag to both native gestures", async () => {
     const view = await render(
       <NativeMap mapStyle={emptyStyle} touchZoomRotate={false} />

@@ -63,17 +63,15 @@ export interface NativeMapProps extends Omit<NativeMapInputs, "mapStyle"> {
     | "children"
     | "ref"
     | "style"
+    | "mapStyle"
     | "onPress"
     | "onLongPress"
-    | "onCameraChanged"
-    | "onRegionIsChanging"
     | "onRegionWillChange"
+    | "onRegionIsChanging"
     | "onRegionDidChange"
-    | "onMapIdle"
     | "onDidFinishLoadingMap"
     | "onDidFinishLoadingStyle"
     | "onDidFailLoadingMap"
-    | "onMapLoadingError"
   >;
 }
 const {

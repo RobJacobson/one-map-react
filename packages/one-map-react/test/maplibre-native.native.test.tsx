@@ -1772,3 +1772,58 @@ test("removes an undefined legacy style value before native bridge conversion", 
   await view.rerender(scene());
   expect(view.getByTestId("Layer").props.style).not.toHaveProperty("lineWidth");
 });
+
+test("NativeMapProps options excludes overwritten mapStyle and callback props while accepting valid MapLibre options", () => {
+  const validOptions: MapProps["options"] = {
+    scaleBar: true,
+    light: { intensity: 0.5 },
+  };
+  const rejectedMapStyle: MapProps["options"] = {
+    // @ts-expect-error mapStyle owns MapLibre mapStyle.
+    mapStyle: "https://example.test/style.json",
+  };
+  const rejectedOnPress: MapProps["options"] = {
+    // @ts-expect-error Facade owns onPress.
+    onPress: () => {},
+  };
+  const rejectedOnLongPress: MapProps["options"] = {
+    // @ts-expect-error Facade owns onLongPress.
+    onLongPress: () => {},
+  };
+  const rejectedOnRegionWillChange: MapProps["options"] = {
+    // @ts-expect-error Facade owns onRegionWillChange.
+    onRegionWillChange: () => {},
+  };
+  const rejectedOnRegionIsChanging: MapProps["options"] = {
+    // @ts-expect-error Facade owns onRegionIsChanging.
+    onRegionIsChanging: () => {},
+  };
+  const rejectedOnRegionDidChange: MapProps["options"] = {
+    // @ts-expect-error Facade owns onRegionDidChange.
+    onRegionDidChange: () => {},
+  };
+  const rejectedOnDidFinishLoadingMap: MapProps["options"] = {
+    // @ts-expect-error Facade owns onDidFinishLoadingMap.
+    onDidFinishLoadingMap: () => {},
+  };
+  const rejectedOnDidFinishLoadingStyle: MapProps["options"] = {
+    // @ts-expect-error Facade owns onDidFinishLoadingStyle.
+    onDidFinishLoadingStyle: () => {},
+  };
+  const rejectedOnDidFailLoadingMap: MapProps["options"] = {
+    // @ts-expect-error Facade owns onDidFailLoadingMap.
+    onDidFailLoadingMap: () => {},
+  };
+  expect(validOptions).toBeDefined();
+  expect([
+    rejectedMapStyle,
+    rejectedOnPress,
+    rejectedOnLongPress,
+    rejectedOnRegionWillChange,
+    rejectedOnRegionIsChanging,
+    rejectedOnRegionDidChange,
+    rejectedOnDidFinishLoadingMap,
+    rejectedOnDidFinishLoadingStyle,
+    rejectedOnDidFailLoadingMap,
+  ]).toHaveLength(9);
+});

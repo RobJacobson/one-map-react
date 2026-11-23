@@ -331,6 +331,51 @@ describe("TF07 map-local UI lifetime", () => {
     expect(report).toHaveBeenCalledWith({ error });
     expect(mapClick).not.toHaveBeenCalled();
   });
+
+  test("MountedMap gates renderer onClick on onClick or interactiveLayerIds", async () => {
+    const fixture = createFixture();
+    const { Map: NativeMap } = fixture.binding;
+    const onClick = vi.fn();
+    const onError = vi.fn();
+
+    const view = render(
+      <NativeMap mapStyle={style} initialViewState={camera} />
+    );
+    expect(fixture.props()?.onClick).toBeUndefined();
+
+    view.rerender(
+      <NativeMap mapStyle={style} initialViewState={camera} onClick={onClick} />
+    );
+    expect(fixture.props()?.onClick).toEqual(expect.any(Function));
+    await fixture.click();
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(fixture.query).not.toHaveBeenCalled();
+
+    view.rerender(
+      <NativeMap
+        mapStyle={style}
+        initialViewState={camera}
+        interactiveLayerIds={["places-layer"]}
+        onError={onError}
+      />
+    );
+    expect(fixture.props()?.onClick).toEqual(expect.any(Function));
+    await fixture.click();
+    expect(fixture.query).toHaveBeenCalledWith(hit.point, {
+      layers: ["places-layer"],
+    });
+    expect(onError).not.toHaveBeenCalled();
+
+    const queryError = new Error("interactive query failed");
+    fixture.query.mockRejectedValueOnce(queryError);
+    await fixture.click();
+    expect(onError).toHaveBeenCalledWith({ error: queryError });
+
+    view.rerender(<NativeMap mapStyle={style} initialViewState={camera} />);
+    expect(fixture.props()?.onClick).toBeUndefined();
+    view.unmount();
+  });
+
   test("named consumers can mount with their map and observe removal and reattachment", async () => {
     const fixture = createFixture();
     const { Map: NativeMap, MapProvider, useMap } = fixture.binding;

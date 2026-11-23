@@ -1,3 +1,6 @@
+const hasDefinedOwn = (value: object, key: string): boolean =>
+  Object.hasOwn(value, key) && Reflect.get(value, key) !== undefined;
+
 /**
  * Rejects formatting modifiers silently ignored by the pinned native parser.
  * @param value - A layer/style expression or object of expressions.
@@ -11,7 +14,7 @@ export const assertMaplibreExpressions = (value: unknown): void => {
       operator === "number-format" &&
       value[2] &&
       typeof value[2] === "object" &&
-      Object.hasOwn(value[2], "unit")
+      hasDefinedOwn(value[2], "unit")
     ) {
       throw new Error(
         "number-format.unit is unsupported by the pinned MapLibre Native SDK."
@@ -31,7 +34,7 @@ export const assertMaplibreExpressions = (value: unknown): void => {
         index % 2 === 0 &&
         member &&
         typeof member === "object" &&
-        Object.hasOwn(member, "vertical-align")
+        hasDefinedOwn(member, "vertical-align")
       ) {
         throw new Error(
           "format.vertical-align is unsupported by the pinned MapLibre Native SDK."
@@ -76,7 +79,7 @@ export const assertMaplibreLayerStyle = (layer: NativeLayerValues): void => {
   ] as const) {
     if (!values || typeof values !== "object") continue;
     for (const key of keys) {
-      if (Object.hasOwn(values, key) && Reflect.get(values, key) !== undefined)
+      if (hasDefinedOwn(values, key))
         throw new Error(
           `Layer property "${key}" is unsupported by the pinned MapLibre Native SDK. Raster layers can use legacy style.rasterResampling; basic symbol overlap uses iconAllowOverlap/textAllowOverlap.`
         );
@@ -99,18 +102,19 @@ export const assertMaplibreStyleRoots = (input: unknown): void => {
   if (style === null || typeof style !== "object") return;
   // Native SDK android-v13.6.1/ios-v6.31.0 parser.cpp has no transport for these roots.
   for (const key of ["terrain", "sky", "state"]) {
-    if (Object.hasOwn(style, key))
+    if (hasDefinedOwn(style, key))
       throw new Error(
         `Style root "${key}" is unsupported by the pinned MapLibre Native SDK.`
       );
   }
-  if ("projection" in style) {
-    const projection = style.projection;
+  if (Object.hasOwn(style, "projection")) {
+    const projection: unknown = Reflect.get(style, "projection");
     if (
-      !projection ||
-      typeof projection !== "object" ||
-      !("type" in projection) ||
-      projection.type !== "mercator"
+      projection !== undefined &&
+      (!projection ||
+        typeof projection !== "object" ||
+        !("type" in projection) ||
+        projection.type !== "mercator")
     ) {
       throw new Error("MapLibre Native supports only Mercator projection.");
     }
@@ -141,7 +145,7 @@ export const assertMaplibreStyleRoots = (input: unknown): void => {
       if (source.type === "raster-dem")
         unsupported.push("redFactor", "greenFactor", "blueFactor", "baseShift");
       for (const key of unsupported) {
-        if (Object.hasOwn(source, key))
+        if (hasDefinedOwn(source, key))
           throw new Error(
             `Source option "${key}" is unsupported by the pinned MapLibre Native SDK.`
           );

@@ -189,3 +189,107 @@ test("operator-looking strings in GeoJSON properties remain literal data", () =>
     })
   ).not.toThrow();
 });
+
+test("treats undefined style roots as omitted while keeping null and invalid projections rejected", () => {
+  expect(() =>
+    assertMaplibreStyleRoots({
+      version: 8,
+      sources: {},
+      layers: [],
+      terrain: undefined,
+      sky: undefined,
+      state: undefined,
+      projection: undefined,
+    })
+  ).not.toThrow();
+
+  for (const key of ["terrain", "sky", "state"]) {
+    expect(() => assertMaplibreStyleRoots({ [key]: null })).toThrow(
+      `Style root "${key}" is unsupported`
+    );
+  }
+  for (const projection of [null, {}, { type: undefined }]) {
+    expect(() => assertMaplibreStyleRoots({ projection })).toThrow(
+      "only Mercator"
+    );
+  }
+});
+
+test.each([
+  ["geojson", "generateId"],
+  ["geojson", "promoteId"],
+  ["geojson", "filter"],
+  ["geojson", "attribution"],
+  ["geojson", "volatile"],
+  ["vector", "promoteId"],
+  ["vector", "volatile"],
+  ["raster", "volatile"],
+  ["raster-dem", "redFactor"],
+  ["raster-dem", "greenFactor"],
+  ["raster-dem", "blueFactor"],
+  ["raster-dem", "baseShift"],
+  ["raster-dem", "volatile"],
+])(
+  "treats undefined %s.%s source option as omitted while rejecting false and null",
+  (type, key) => {
+    expect(() =>
+      assertMaplibreStyleRoots({
+        sources: { fixture: { type, [key]: undefined } },
+      })
+    ).not.toThrow();
+    for (const value of [false, null]) {
+      expect(() =>
+        assertMaplibreStyleRoots({
+          sources: { fixture: { type, [key]: value } },
+        })
+      ).toThrow(`Source option "${key}" is unsupported`);
+    }
+  }
+);
+
+test("treats undefined expression modifiers and layer properties as omitted while rejecting defined values", () => {
+  expect(() =>
+    assertMaplibreExpressions(["number-format", 1, { unit: undefined }])
+  ).not.toThrow();
+  expect(() =>
+    assertMaplibreExpressions([
+      "format",
+      "text",
+      { "vertical-align": undefined },
+    ])
+  ).not.toThrow();
+  expect(() =>
+    assertMaplibreExpressions(["number-format", 1, { unit: null }])
+  ).toThrow("number-format.unit");
+  expect(() =>
+    assertMaplibreExpressions(["format", "text", { "vertical-align": null }])
+  ).toThrow("format.vertical-align");
+
+  expect(() =>
+    assertMaplibreLayerStyle({
+      type: "symbol",
+      paint: {
+        resampling: undefined,
+        "fill-layer-opacity": undefined,
+        "line-layer-opacity": undefined,
+      },
+      layout: {
+        "icon-overlap": undefined,
+        "text-overlap": undefined,
+      },
+      style: {
+        resampling: undefined,
+        fillLayerOpacity: undefined,
+        lineLayerOpacity: undefined,
+        iconOverlap: undefined,
+        textOverlap: undefined,
+      },
+    })
+  ).not.toThrow();
+  expect(() =>
+    assertMaplibreLayerStyle({
+      type: "symbol",
+      style: { iconOverlap: "always" },
+    })
+  ).toThrow('Layer property "iconOverlap" is unsupported');
+});
