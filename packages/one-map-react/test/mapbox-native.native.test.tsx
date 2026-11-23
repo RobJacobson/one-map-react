@@ -35,9 +35,9 @@ const queryCollection = {
     { type: "Feature", id: 1, properties: { kind: "route" } },
   ],
 };
-const mockQueryRenderedFeaturesAtPoint = jest.fn<() => Promise<unknown>>(
-  async () => queryCollection
-);
+const mockQueryRenderedFeaturesAtPoint = jest.fn<
+  (point: number[], filter: unknown[], layers: string[]) => Promise<unknown>
+>(async () => queryCollection);
 const mockQueryRenderedFeaturesInRect = jest.fn<() => Promise<unknown>>(
   async () => queryCollection
 );
@@ -1166,6 +1166,40 @@ describe("mapbox-native source families", () => {
     );
   });
 
+  test("a raster source forwards tile options and child layers", async () => {
+    const view = await render(
+      tree(
+        <Source
+          id="imagery"
+          type="raster"
+          url="https://example.com/imagery.json"
+          minzoom={0}
+          maxzoom={16}
+          tileSize={256}
+          scheme="xyz"
+          attribution="Example"
+        >
+          <Layer id="imagery-layer" type="raster" />
+        </Source>
+      )
+    );
+
+    expect(RasterSourceMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        id: "imagery",
+        url: "https://example.com/imagery.json",
+        tileUrlTemplates: undefined,
+        minZoomLevel: 0,
+        maxZoomLevel: 16,
+        tileSize: 256,
+        tms: false,
+        attribution: "Example",
+      }),
+      undefined
+    );
+    expect(view.getByTestId("RasterLayer").props.sourceID).toBe("imagery");
+  });
+
   test("a raster-dem source rejects attribution and scheme", async () => {
     await expect(
       render(
@@ -1206,7 +1240,7 @@ describe("mapbox-native source families", () => {
       )
     );
 
-    expect(RasterDemSourceMock).toHaveBeenCalledWith(
+    expect(RasterDemSourceMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         id: "terrain",
         url: "https://example.com/terrain.json",
@@ -1215,6 +1249,9 @@ describe("mapbox-native source families", () => {
       }),
       undefined
     );
+    const wrapperProps = RasterDemSourceMock.mock.lastCall?.[0];
+    expect(wrapperProps).not.toHaveProperty("tms");
+    expect(wrapperProps).not.toHaveProperty("attribution");
   });
 
   test("geojson cluster options and promoteId forward under wrapper names", async () => {
@@ -1724,17 +1761,21 @@ describe("mapbox-native queries and feature state", () => {
 
   test("queryRenderedFeaturesAtPoint receives reordered arguments", async () => {
     const ref = createRef<MapRef>();
+    const layers = ["route-line"] as const;
 
     await render(example(ref));
     const features = await ref.current?.queryRenderedFeatures([240, 320], {
-      layers: ["route-line"],
+      layers,
       filter: ["==", "kind", "route"],
     });
 
-    expect(mockQueryRenderedFeaturesAtPoint).toHaveBeenCalledWith(
+    expect(mockQueryRenderedFeaturesAtPoint).toHaveBeenLastCalledWith(
       [240, 320],
       ["==", "kind", "route"],
       ["route-line"]
+    );
+    expect(mockQueryRenderedFeaturesAtPoint.mock.lastCall?.[2]).not.toBe(
+      layers
     );
     expect(features).toHaveLength(2);
   });

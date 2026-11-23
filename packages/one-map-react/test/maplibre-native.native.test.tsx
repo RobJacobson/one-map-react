@@ -48,7 +48,9 @@ const queryFeatures = [
   { type: "Feature", id: 1, properties: { kind: "route" } },
   { type: "Feature", id: 1, properties: { kind: "route" } },
 ];
-const mockQueryRenderedFeatures = jest.fn(async () => queryFeatures);
+const mockQueryRenderedFeatures = jest.fn(
+  async (_input?: unknown, _options?: { layers?: string[] }) => queryFeatures
+);
 const mockQuerySourceFeatures = jest.fn(async () => queryFeatures.slice(0, 1));
 interface NativeStateFeature {
   readonly id: string | number;
@@ -1326,17 +1328,21 @@ describe("maplibre-native queries and feature state", () => {
 
   test("queryRenderedFeatures forwards point, bounds, and viewport targets", async () => {
     const ref = createRef<MapRef>();
+    const layers = ["route-line"] as const;
 
     await render(example(ref));
     await ref.current?.queryRenderedFeatures([240, 320], {
-      layers: ["route-line"],
+      layers,
       filter: ["==", "kind", "route"],
     });
 
-    expect(mockQueryRenderedFeatures).toHaveBeenCalledWith([240, 320], {
+    expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith([240, 320], {
       layers: ["route-line"],
       filter: ["==", "kind", "route"],
     });
+    expect(mockQueryRenderedFeatures.mock.lastCall?.[1]?.layers).not.toBe(
+      layers
+    );
 
     await ref.current?.queryRenderedFeatures([
       [10, 20],

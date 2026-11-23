@@ -241,6 +241,21 @@ export const rejectNativeEasing = (easing: CameraEasing | undefined): void => {
   }
 };
 
+/**
+ * Copies a caller's list of strings into a mutable wrapper argument.
+ *
+ * @param values - Layer IDs or tile URL templates.
+ * @returns A new array for the wrapper to own.
+ * @throws TypeError when a JavaScript caller passes a non-array value.
+ */
+export const copyNativeStringArray = (values: readonly string[]): string[] => {
+  if (!Array.isArray(values)) {
+    throw new TypeError("Expected an array for the native wrapper.");
+  }
+
+  return values.slice();
+};
+
 const boundsFromCornerMethods = (value: unknown): Bounds | undefined => {
   if (!isRecord(value)) {
     return undefined;

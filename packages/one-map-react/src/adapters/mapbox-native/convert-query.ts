@@ -10,6 +10,7 @@ import {
   isScreenBounds,
   type NativeQueryTarget,
 } from "../shared/native-values.js";
+import { copyNativeStringArray } from "../shared/wrapper-values.js";
 
 /**
  * Selects the RNMapbox rendered-query call for a target.
@@ -52,7 +53,7 @@ export const toRnmapboxRenderedQueryArgs = (
   options?: QueryRenderedFeaturesOptions
 ): readonly [filter: unknown[], layers: string[]] => [
   options?.filter === undefined ? [] : [...options.filter],
-  options?.layers === undefined ? [] : options.layers.map((id) => id),
+  options?.layers === undefined ? [] : copyNativeStringArray(options.layers),
 ];
 
 /**

@@ -21,6 +21,7 @@ import {
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
+import { copyNativeStringArray } from "../shared/wrapper-values.js";
 import { GeoJsonSourceContext } from "./geojson-source-registry.js";
 
 /** Mapbox-native source that dispatches to the matching RNMapbox source. */
@@ -32,7 +33,10 @@ export const MapboxNativeSource = (props: SourceProps) => {
       return <MapboxNativeVectorSource {...props} />;
     case "raster":
       return (
-        <RasterSource {...toRnmapboxRasterSource(props)}>
+        <RasterSource
+          {...toRnmapboxVectorOrRasterSource(props)}
+          tileSize={props.tileSize}
+        >
           {props.children}
         </RasterSource>
       );
@@ -82,7 +86,7 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
 
 /** Forwards vector data to RNMapbox. */
 const MapboxNativeVectorSource = (props: VectorSourceProps) => (
-  <VectorSource {...toRnmapboxVectorSource(props)}>
+  <VectorSource {...toRnmapboxVectorOrRasterSource(props)}>
     {props.children}
   </VectorSource>
 );
@@ -122,39 +126,16 @@ const toRnmapboxShapeSource = (
 };
 
 /**
- * Converts common vector source props into RNMapbox `VectorSource` props.
+ * Converts the fields shared by RNMapbox vector and raster sources.
  *
- * @param props - Common vector source props.
- * @returns VectorSource field names for the wrapper component.
+ * @param props - Common vector or raster source props.
+ * @returns Props for the wrapper component, including scheme and attribution.
  */
-const toRnmapboxVectorSource = (
-  props: VectorSourceProps
-): ComponentProps<typeof VectorSource> => ({
-  id: props.id,
-  url: props.url,
-  tileUrlTemplates: props.tiles?.map((template) => template),
-  minZoomLevel: props.minzoom,
-  maxZoomLevel: props.maxzoom,
+const toRnmapboxVectorOrRasterSource = (
+  props: VectorSourceProps | RasterSourceProps
+) => ({
+  ...toRnmapboxTileSource(props),
   tms: props.scheme === undefined ? undefined : props.scheme === "tms",
-  attribution: props.attribution,
-});
-
-/**
- * Converts common raster source props into RNMapbox `RasterSource` props.
- *
- * @param props - Common raster source props.
- * @returns RasterSource field names for the wrapper component.
- */
-const toRnmapboxRasterSource = (
-  props: RasterSourceProps
-): ComponentProps<typeof RasterSource> => ({
-  id: props.id,
-  url: props.url,
-  tileUrlTemplates: props.tiles?.map((template) => template),
-  minZoomLevel: props.minzoom,
-  maxZoomLevel: props.maxzoom,
-  tms: props.scheme === undefined ? undefined : props.scheme === "tms",
-  tileSize: props.tileSize,
   attribution: props.attribution,
 });
 
@@ -184,11 +165,7 @@ const toRnmapboxRasterDemSource = (
   rejectRasterDemScheme(props.scheme, "mapbox-native");
 
   return {
-    id: props.id,
-    url: props.url,
-    tileUrlTemplates: props.tiles?.map((template) => template),
-    minZoomLevel: props.minzoom,
-    maxZoomLevel: props.maxzoom,
+    ...toRnmapboxTileSource(props),
     tileSize: props.tileSize,
   };
 };
@@ -213,4 +190,18 @@ const toRnmapboxImageSource = (
     [props.coordinates[2][0], props.coordinates[2][1]],
     [props.coordinates[3][0], props.coordinates[3][1]],
   ],
+});
+
+const toRnmapboxTileSource = ({
+  id,
+  url,
+  tiles,
+  minzoom,
+  maxzoom,
+}: VectorSourceProps | RasterSourceProps | RasterDemSourceProps) => ({
+  id,
+  url,
+  tileUrlTemplates: tiles == null ? undefined : copyNativeStringArray(tiles),
+  minZoomLevel: minzoom,
+  maxZoomLevel: maxzoom,
 });
