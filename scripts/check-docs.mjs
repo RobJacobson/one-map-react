@@ -136,6 +136,6 @@ if (failures.length) {
     `PASS documentation structure: ${files.length} Markdown files, ${comparisonTables} SDK comparison tables, paragraphs, fences and local links.`
   );
   console.log(
-    "SCOPE: structural checks only. Source accuracy, equivalent examples, terminology, contract status and editorial quality require recorded review."
+    "SCOPE: structural checks only. They do not judge source accuracy, examples, terminology, or whether the text matches the code."
   );
 }

@@ -44,4 +44,4 @@ These rows are source, compiled-method, and package checks. Native linking, rend
 
 ## Renderer acceptance
 
-Mocked tests and package checks cover the adapter mappings. Renderer acceptance for this checkout is open. Results under `records/` apply only to the artifact and scenarios they name.
+Mocked tests and package checks cover the adapter mappings. Seeing the map render still requires a browser or a device. [Testing](testing.md) says when to run that.

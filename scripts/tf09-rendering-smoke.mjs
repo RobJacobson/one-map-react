@@ -396,17 +396,17 @@ try {
     "Example has a different library copy."
   );
   if (platform !== "web") {
+    const evidencePath = process.env.TF09_PEER_EVIDENCE;
+    if (!evidencePath) {
+      throw new Error(
+        "Set TF09_PEER_EVIDENCE to the peer-file manifest for this native run."
+      );
+    }
     const peer =
       engine === "mapbox"
         ? "@rnmapbox/maps"
         : "@maplibre/maplibre-react-native";
-    const evidence = JSON.parse(
-      readFileSync(
-        process.env.TF09_PEER_EVIDENCE ??
-          join(root, "records/evidence/tf09-implementation.json"),
-        "utf8"
-      )
-    );
+    const evidence = JSON.parse(readFileSync(evidencePath, "utf8"));
     for (const file of evidence.nativePeerDeltaVsHead[peer])
       assert.equal(
         createHash("sha256")
