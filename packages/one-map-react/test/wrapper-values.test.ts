@@ -8,6 +8,7 @@ import {
   finiteNumber,
   lngLatFromWrapper,
   normalizePadding,
+  pointFromWrapper,
   toFlatBounds,
 } from "../src/adapters/shared/wrapper-values.js";
 
@@ -18,6 +19,45 @@ describe("camera conversion", () => {
     expect(
       lngLatFromWrapper(Object.assign([NaN, 2], { lng: 1, lat: 2 }))
     ).toEqual([1, 2]);
+  });
+
+  test("a point tuple contains the finite coordinates read from its getters", () => {
+    const point = [0, 0];
+    let xReads = 0;
+    let yReads = 0;
+    Object.defineProperties(point, {
+      0: {
+        get: () => {
+          xReads += 1;
+          return xReads === 1 ? 10 : NaN;
+        },
+      },
+      1: {
+        get: () => {
+          yReads += 1;
+          return yReads === 1 ? 20 : NaN;
+        },
+      },
+    });
+
+    const snapshot = pointFromWrapper(point);
+
+    expect(snapshot).toEqual([10, 20]);
+    expect(snapshot).not.toBe(point);
+    snapshot[0] = 30;
+    expect(snapshot).toEqual([30, 20]);
+  });
+
+  test("points require two finite tuple coordinates or finite x and y fields", () => {
+    expect(pointFromWrapper({ x: 0, y: 2 })).toEqual([0, 2]);
+    expect(pointFromWrapper(Object.assign([NaN, 2], { x: 0, y: 2 }))).toEqual([
+      0, 2,
+    ]);
+    for (const value of [[1, 2, 3], [1, Infinity], { x: 1, y: "2" }]) {
+      expect(() => pointFromWrapper(value)).toThrow(
+        "A map point must contain x and y."
+      );
+    }
   });
 
   test("numeric wrapper results stay finite numbers without coercion", () => {

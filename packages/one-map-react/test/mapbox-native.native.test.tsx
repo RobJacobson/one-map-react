@@ -1759,12 +1759,20 @@ describe("mapbox-native queries and feature state", () => {
     }
   );
 
-  test("queryRenderedFeaturesAtPoint receives reordered arguments", async () => {
+  test("queryRenderedFeaturesAtPoint receives finite coordinates and reordered arguments", async () => {
     const ref = createRef<MapRef>();
     const layers = ["route-line"] as const;
+    const point: [number, number] = [240, 320];
+    let xReads = 0;
+    Object.defineProperty(point, 0, {
+      get: () => {
+        xReads += 1;
+        return xReads === 1 ? 240 : NaN;
+      },
+    });
 
     await render(example(ref));
-    const features = await ref.current?.queryRenderedFeatures([240, 320], {
+    const features = await ref.current?.queryRenderedFeatures(point, {
       layers,
       filter: ["==", "kind", "route"],
     });
