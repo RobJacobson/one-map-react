@@ -163,6 +163,4 @@ for (const file of [
   );
 }
 
-console.log(
-  "PASS offline manager peers: source and published JavaScript."
-);
+console.log("PASS offline manager peers: source and published JavaScript.");

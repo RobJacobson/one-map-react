@@ -31,11 +31,30 @@ export type MaplibreSourceRegistry = NativeSourceRegistry<
 
 /** Creates the source registry for one MapLibre map. */
 export const createMaplibreSourceRegistry = (): MaplibreSourceRegistry =>
-  new NativeSourceRegistry(
-    (source) => (source?.kind === "geojson" ? source.ref : undefined),
-    (id) =>
-      `Source "${id}" is not a mounted GeoJSON or vector Source. Mount it through a Source to use source-scoped methods.`
+  new NativeSourceRegistry((source) =>
+    source?.kind === "geojson" ? source.ref : undefined
   );
+
+/**
+ * Reads the source for a map-scoped query or feature-state operation.
+ *
+ * @param sources - Registry owned by the attached map.
+ * @param id - Source ID supplied by the caller.
+ * @returns The attached GeoJSON or vector source.
+ * @throws When the requested source has no attached ref.
+ */
+export const requireMaplibreSource = (
+  sources: MaplibreSourceRegistry,
+  id: string
+): MaplibreNativeSourceRef => {
+  const source = sources.get(id);
+  if (source === undefined) {
+    throw new Error(
+      `Source "${id}" is not a mounted GeoJSON or vector Source. Mount it through a Source to use source-scoped methods.`
+    );
+  }
+  return source;
+};
 
 /** Sources rendered outside a map have no registration. */
 export const MaplibreSourceContext =

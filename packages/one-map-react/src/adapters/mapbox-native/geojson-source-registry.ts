@@ -9,11 +9,7 @@ export type GeoJsonSourceRegistry = NativeSourceRegistry<ShapeRef, ShapeRef>;
 
 /** Creates the source registry for one RNMapbox map. */
 export const createGeoJsonSourceRegistry = (): GeoJsonSourceRegistry =>
-  new NativeSourceRegistry(
-    (ref) => ref ?? undefined,
-    (id) =>
-      `Source "${id}" is not a mounted GeoJSON Source. Cluster methods need a mounted clustered GeoJSON source.`
-  );
+  new NativeSourceRegistry((ref) => ref ?? undefined);
 
 /** Sources rendered outside a map have no registration. */
 export const GeoJsonSourceContext = createContext<GeoJsonSourceRegistry | null>(

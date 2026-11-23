@@ -33,3 +33,12 @@ test.each([MapboxApp, MaplibreApp])(
     await view.unmount();
   }
 );
+
+test.each([MapboxApp, MaplibreApp])(
+  "selected native entry rejects the web-only corrections scene",
+  async (App) => {
+    await expect(render(<App scenario="corrections" />)).rejects.toThrow(
+      "corrections is a web acceptance scenario."
+    );
+  }
+);

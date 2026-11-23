@@ -18,6 +18,14 @@ const cameraMap = (camera: ViewState = initialCamera) =>
     jumpTo: vi.fn(async (): Promise<void> => undefined),
   }) satisfies CameraMap;
 
+const deferred = () => {
+  let resolve = () => {};
+  const promise = new Promise<void>((finish) => {
+    resolve = finish;
+  });
+  return { promise, resolve };
+};
+
 afterEach(() => vi.useRealTimers());
 
 describe("engine handoff", () => {
@@ -188,6 +196,49 @@ describe("engine handoff", () => {
       generation: 2,
       camera: moved,
     });
+  });
+
+  it("ignores repeated load events during camera restoration and engine preparation", async () => {
+    const preparation = deferred();
+    const started = deferred();
+    const prepareMapbox = (): Promise<void> => {
+      started.resolve();
+      return preparation.promise;
+    };
+    const { result } = renderHook(() =>
+      useExampleMap(true, false, prepareMapbox)
+    );
+    const outgoing = cameraMap();
+    const jump = deferred();
+    outgoing.jumpTo.mockReturnValueOnce(jump.promise);
+    result.current.attachMap(outgoing);
+    await act(async () => {
+      const firstLoad = result.current.onLoad();
+      const repeatLoad = result.current.onLoad();
+      jump.resolve();
+      await Promise.all([firstLoad, repeatLoad]);
+    });
+    expect(result.current.status).toBe("ready");
+
+    let switching: Promise<void> | undefined;
+    await act(async () => {
+      switching = result.current.selectEngine("mapbox");
+      await started.promise;
+    });
+    await act(async () => result.current.onLoad());
+    await act(async () => {
+      preparation.resolve();
+      await switching;
+    });
+    expect(outgoing.jumpTo).toHaveBeenCalledTimes(1);
+    expect(result.current.attachment.engine).toBe("mapbox");
+    expect(result.current.status).toBe("switching");
+
+    const incoming = cameraMap();
+    result.current.attachMap(incoming);
+    await act(async () => result.current.onLoad());
+    expect(incoming.jumpTo).toHaveBeenCalledTimes(1);
+    expect(result.current.status).toBe("ready");
   });
 
   it("keeps the current engine and shows safe guidance when camera capture fails", async () => {

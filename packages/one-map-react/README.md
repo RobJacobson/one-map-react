@@ -6,7 +6,7 @@ Use the same map screen with stock react-map-gl on web and a native map on iOS o
 
 A stock browser app installs React, React DOM, react-map-gl and its chosen GL JS engine. Import the matching stylesheet from `mapbox-gl/dist/mapbox-gl.css` or `maplibre-gl/dist/maplibre-gl.css`. Pass a public Mapbox token in `mapboxAccessToken` when your style requires one.
 
-For native development, install the candidate archive and the peers for one engine. These are the package-check versions. Each application owns its React Native host version and SDK configuration.
+For native development, install the candidate archive and the peers for one engine. The native peer range accepts React Native 0.86.3 through the 0.86 minor line and 0.87.1 through the 0.87 minor line. The Expo example uses 0.86.3. The commands below use 0.87.1 for a standalone host.
 
 ```sh
 bun add /absolute/path/one-map-react-VERSION.tgz

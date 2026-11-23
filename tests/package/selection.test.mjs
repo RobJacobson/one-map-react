@@ -1,3 +1,4 @@
+import { semver } from "bun";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -135,6 +136,20 @@ const main = async () => {
       archive = join(output, archives[0]);
     }
     const files = run("tar", ["-tzf", archive], output).split("\n");
+    const manifest = JSON.parse(
+      run("tar", ["-xOzf", archive, "package/package.json"], output)
+    );
+    const expo = JSON.parse(
+      readFileSync(join(root, "apps/expo/package.json"), "utf8")
+    );
+    const nativeVersion = expo.dependencies["react-native"];
+    assert(
+      semver.satisfies(
+        nativeVersion,
+        manifest.peerDependencies["react-native"]
+      ),
+      `The packed native peer range must accept the Expo example's React Native ${nativeVersion}.`
+    );
     const rnmapboxPatch = "package/patches/rnmapbox-10.3.19.patch";
     assert.deepEqual(
       files.filter((file) => !file.startsWith("package/dist/")).sort(),

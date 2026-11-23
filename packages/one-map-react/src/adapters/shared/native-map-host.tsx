@@ -11,7 +11,7 @@ import type { MapProps } from "../../contracts/map-types.js";
 import { useNativeMapPresentation } from "./native-map-presentation.js";
 
 /** Props for the shared native map container and overlay portal host. */
-export interface NativeMapHostProps {
+interface NativeMapHostProps {
   readonly style?: MapProps["style"];
   readonly hostProps?: ViewProps;
   readonly children: ReactNode;

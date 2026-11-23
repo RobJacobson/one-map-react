@@ -12,13 +12,11 @@ export class NativeSourceRegistry<Source, GeoJsonRef> {
    * Creates a registry with the adapter's selection for GeoJSON refs.
    *
    * @param selectGeoJson - Returns the GeoJSON ref, if present.
-   * @param missingSourceMessage - Describes which source families the adapter registers.
    */
   constructor(
     private readonly selectGeoJson: (
       source: Source | null | undefined
-    ) => GeoJsonRef | undefined,
-    private readonly missingSourceMessage: (id: string) => string
+    ) => GeoJsonRef | undefined
   ) {}
 
   /**
@@ -65,10 +63,13 @@ export class NativeSourceRegistry<Source, GeoJsonRef> {
     return owner.requireGeoJson;
   }
 
-  /** Reads the current source for map-scoped queries and feature state. */
-  require(id: string): Source {
-    const source = this.refs.get(id)?.read();
-    if (source == null) throw new Error(this.missingSourceMessage(id));
-    return source;
+  /**
+   * Reads the current source registration.
+   *
+   * @param id - Facade source id.
+   * @returns The attached source, if present.
+   */
+  get(id: string): Source | undefined {
+    return this.refs.get(id)?.read() ?? undefined;
   }
 }

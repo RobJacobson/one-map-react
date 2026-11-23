@@ -289,12 +289,8 @@ const moveFromState = (state: MapState): MoveEvent =>
 /**
  * Copies the error string RNMapbox passes at runtime.
  *
- * The public callback type takes no argument. iOS still delivers
- * `{ error, tileId?, sourceId? }`. Android registers that listener through
- * the pinned v11 compat `MapboxMap.subscribe`, whose body is empty, so a
- * load failure never reaches this helper. Tile and source ids stay out of
- * the common event. Drop the Android sentence when a pinned release both
- * subscribes to `MapLoadingError` and passes `error`.
+ * The wrapper supplies a structured payload on both platforms. The common
+ * event carries the error field.
  *
  * @param payload - Decoded native event, when the bridge included one.
  * @returns The common error event, or an empty event when `error` is absent.
