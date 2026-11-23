@@ -9,8 +9,11 @@ import {
 } from "react";
 import { type LayoutChangeEvent, Platform, View } from "react-native";
 
-import type { Anchor, MarkerRef } from "../../contracts/ui-types.js";
-import { NativeMarkerOverlay } from "../shared/native-marker-overlay.js";
+import type { MarkerRef } from "../../contracts/ui-types.js";
+import {
+  anchorFraction,
+  NativeMarkerOverlay,
+} from "../shared/native-marker-overlay.js";
 import {
   createNativeUI,
   type NativeMarkerHostProps,
@@ -127,9 +130,3 @@ export const PointAnnotation = Mapbox.PointAnnotation;
 export const Callout = Mapbox.Callout;
 /** Native layer annotation for animated and rotated marker imagery. */
 export const Annotation = Mapbox.Annotation;
-
-const anchorFraction = (anchor: Anchor): readonly [number, number] => {
-  const x = anchor.includes("left") ? 0 : anchor.includes("right") ? 1 : 0.5;
-  const y = anchor.includes("top") ? 0 : anchor.includes("bottom") ? 1 : 0.5;
-  return [x, y];
-};
