@@ -91,6 +91,9 @@ export const assertMaplibreLayerStyle = (layer: NativeLayerValues): void => {
 
 /**
  * Rejects explicit style roots ignored by the pinned native SDK parser.
+ * Object styles must go through {@link maplibreStyleForNative} so this check
+ * sees the document the wrapper forwards.
+ *
  * @param input - Selected style document, JSON string, or URL delegated to the wrapper.
  * @throws For unsupported explicit terrain/sky/global-state or non-Mercator projection.
  */
@@ -152,4 +155,20 @@ export const assertMaplibreStyleRoots = (input: unknown): void => {
       }
     }
   }
+};
+
+/**
+ * Validates the style document MapLibre Native forwards and returns that document.
+ * Object styles are serialized once, with the wrapper's `typeof === "object"`
+ * check, so a getter cannot change the document between validation and dispatch.
+ *
+ * @param input - Style document, JSON string, or URL.
+ * @returns The string or URL the wrapper map should receive unchanged.
+ * @throws For unsupported roots in the serialized document, or invalid JSON text.
+ */
+export const maplibreStyleForNative = (input: unknown): unknown => {
+  // Peer Map forwards object styles through JSON.stringify and leaves other values as-is.
+  const forwarded = typeof input === "object" ? JSON.stringify(input) : input;
+  assertMaplibreStyleRoots(forwarded);
+  return forwarded;
 };

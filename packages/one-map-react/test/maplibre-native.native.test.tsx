@@ -2,6 +2,7 @@ import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import {
   createRef,
+  type ComponentProps,
   type ComponentRef,
   type ReactNode,
   type Ref,
@@ -313,6 +314,28 @@ const finishMapLoad = async (): Promise<void> => {
   }
 
   await act(async () => onDidFinishLoadingMap());
+};
+
+/** Loads MapLibre React Native 11.5.1's style converter. Package exports hide it. */
+const pinnedMaplibreConverter = () => {
+  const peerModule = (name: string) =>
+    jest.requireActual(
+      `../../../node_modules/@maplibre/maplibre-react-native/lib/commonjs/utils/${name}`
+    );
+  const { transformStyle } = peerModule("StyleValue.js") as {
+    transformStyle: (style: object | undefined) => unknown;
+  };
+  const { mergeStyleProps, convertToInternalStyle } = peerModule(
+    "convertStyleSpec.js"
+  ) as {
+    mergeStyleProps: (
+      paint: object | undefined,
+      layout: object | undefined,
+      style: object | undefined
+    ) => object | undefined;
+    convertToInternalStyle: (style: object | undefined) => object | undefined;
+  };
+  return { transformStyle, mergeStyleProps, convertToInternalStyle };
 };
 
 const example = (
@@ -1114,6 +1137,121 @@ describe("maplibre-native layers", () => {
     ).rejects.toThrow("number-format.unit");
   });
 
+  test("omitted expression modifiers reach the pinned style converter", async () => {
+    const { transformStyle, mergeStyleProps } = pinnedMaplibreConverter();
+    const convert = (layout: object) =>
+      transformStyle(mergeStyleProps(undefined, layout, undefined));
+    const cases = [
+      {
+        expression: Object.freeze([
+          "number-format",
+          1,
+          Object.freeze({ unit: undefined }),
+        ]),
+        forwarded: ["number-format", 1, {}],
+      },
+      {
+        expression: Object.freeze([
+          "format",
+          "text",
+          Object.freeze({ "vertical-align": undefined }),
+        ]),
+        forwarded: ["format", "text", {}],
+      },
+      {
+        expression: Object.freeze([
+          "number-format",
+          1,
+          Object.freeze({ unit: undefined, currency: "USD" }),
+        ]),
+        forwarded: ["number-format", 1, { currency: "USD" }],
+      },
+      {
+        expression: Object.freeze([
+          "format",
+          "text",
+          Object.freeze({ "vertical-align": undefined, "font-scale": 1 }),
+        ]),
+        forwarded: ["format", "text", { "font-scale": 1 }],
+      },
+    ];
+
+    for (const { expression, forwarded: expected } of cases) {
+      const callerModifier = expression[2];
+      const layout = { "text-field": expression };
+      expect(() => convert(layout)).toThrow(
+        "BridgeValue must be a primitive/array/object"
+      );
+      LayerMock.mockClear();
+      await render(
+        <Layer
+          id="labels"
+          type="symbol"
+          layout={layout as ComponentProps<typeof Layer>["layout"]}
+        />
+      );
+      const rendered = LayerMock.mock.calls.at(-1);
+      if (!rendered) throw new Error("Layer was not rendered");
+      const forwarded = (rendered[0] as { layout: { "text-field": unknown[] } })
+        .layout["text-field"];
+      expect(forwarded).toEqual(expected);
+      expect(expression[2]).toBe(callerModifier);
+      expect(() => convert({ "text-field": forwarded })).not.toThrow();
+    }
+  });
+
+  test("layout guards and the wrapper share one snapshot", async () => {
+    const { transformStyle, mergeStyleProps } = pinnedMaplibreConverter();
+    const convert = (layout: object) =>
+      transformStyle(mergeStyleProps(undefined, layout, undefined));
+    const currencyReads = ["USD", undefined];
+    const modifier = {
+      get currency() {
+        return currencyReads.shift();
+      },
+    };
+    LayerMock.mockClear();
+    await render(
+      <Layer
+        id="labels"
+        type="symbol"
+        layout={
+          {
+            "text-field": ["number-format", 1, modifier],
+          } as ComponentProps<typeof Layer>["layout"]
+        }
+      />
+    );
+    const rendered = LayerMock.mock.calls.at(-1);
+    if (!rendered) throw new Error("Layer was not rendered");
+    const forwarded = (rendered[0] as { layout: { "text-field": unknown } })
+      .layout["text-field"];
+    expect(forwarded).toEqual(["number-format", 1, { currency: "USD" }]);
+    expect(() => convert({ "text-field": forwarded as object })).not.toThrow();
+    expect(modifier.currency).toBeUndefined();
+
+    const anchorReads: unknown[] = [undefined, ["top", [0, 1]]];
+    const layout = {
+      get "text-variable-anchor-offset"() {
+        return anchorReads.shift();
+      },
+    };
+    LayerMock.mockClear();
+    await render(
+      <Layer
+        id="anchors"
+        type="symbol"
+        layout={layout as ComponentProps<typeof Layer>["layout"]}
+      />
+    );
+    const anchors = LayerMock.mock.calls.at(-1);
+    if (!anchors) throw new Error("Layer was not rendered");
+    expect((anchors[0] as { layout: object }).layout).not.toHaveProperty(
+      "text-variable-anchor-offset"
+    );
+    expect(layout["text-variable-anchor-offset"]).toEqual(["top", [0, 1]]);
+  });
+
   test("SDK property validation covers overlap outside portable symbol layout", async () => {
     const layout = { visibility: "visible", "icon-overlap": "always" } as const;
     await expect(
@@ -1639,6 +1777,26 @@ test("MapLibre Native forwards legacy light and rejects unsupported terrain/glob
     intensity: 0,
     position: [1, 2, 3],
   });
+  const { transformStyle, convertToInternalStyle } = pinnedMaplibreConverter();
+  const supplied = { intensity: 0.4 };
+  await mounted.rerender(
+    <NativeMap
+      ref={ref}
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      projection="mercator"
+      light={supplied}
+    />
+  );
+  const forwarded = lastMapProps<{ light: object }>().light;
+  expect(supplied).toEqual({ intensity: 0.4 });
+  expect(forwarded).toEqual({ intensity: 0.4 });
+  expect(() =>
+    transformStyle(
+      convertToInternalStyle({ intensity: 0.4, position: undefined })
+    )
+  ).toThrow("BridgeValue must be a primitive/array/object");
+  expect(() => transformStyle(convertToInternalStyle(forwarded))).not.toThrow();
   await expect(ref.current?.queryTerrainElevation([0, 0])).rejects.toThrow(
     "unsupported"
   );
@@ -1657,6 +1815,32 @@ test("MapLibre Native forwards legacy light and rejects unsupported terrain/glob
       )
     ).rejects.toThrow("unsupported");
   }
+});
+
+test("a changing light position is snapshotted on its first read", async () => {
+  const { transformStyle, convertToInternalStyle } = pinnedMaplibreConverter();
+  const supplied = [1, 2, 3] as const;
+  const reads: unknown[] = [supplied, undefined];
+  const light = {
+    intensity: 0,
+    get position() {
+      return reads.shift();
+    },
+  };
+  await render(
+    <NativeMap
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      light={light as MapProps["light"]}
+    />
+  );
+  const forwarded = lastMapProps<{
+    light: { position?: readonly number[] };
+  }>().light;
+  expect(forwarded.position).toEqual([1, 2, 3]);
+  expect(forwarded.position).not.toBe(supplied);
+  expect(() => transformStyle(convertToInternalStyle(forwarded))).not.toThrow();
+  expect(light.position).toBeUndefined();
 });
 
 test("selected native location follow rejects a simultaneous viewState target", async () => {
@@ -1755,6 +1939,88 @@ describe("maplibre-native entry binding", () => {
         paint: { "line-width": 3 },
       })
   );
+});
+
+test.each([
+  [
+    "selected map",
+    (mapStyle: object) => (
+      <NativeMap
+        mapStyle={mapStyle as MapProps["mapStyle"]}
+        initialViewState={initialViewState}
+      />
+    ),
+  ],
+  [
+    "wrapper map",
+    (mapStyle: object) => (
+      <nativeEntry.WrapperMap
+        mapStyle={
+          mapStyle as ComponentProps<typeof nativeEntry.WrapperMap>["mapStyle"]
+        }
+      />
+    ),
+  ],
+])("%s validates the serialized style it forwards", async (_label, scene) => {
+  const reads: unknown[] = [undefined, {}];
+  const style = {
+    version: 8,
+    sources: {},
+    layers: [],
+    get sky() {
+      return reads.shift();
+    },
+  };
+  MapMock.mockClear();
+  await render(scene(style));
+  const forwarded = lastMapProps<{ mapStyle: unknown }>().mapStyle;
+  expect(forwarded).toBe(
+    JSON.stringify({ version: 8, sources: {}, layers: [] })
+  );
+  expect(style.sky).toEqual({});
+
+  MapMock.mockClear();
+  await expect(
+    render(
+      scene({
+        version: 8,
+        sources: {},
+        layers: [],
+        get sky() {
+          return {};
+        },
+      })
+    )
+  ).rejects.toThrow('Style root "sky"');
+  expect(MapMock).not.toHaveBeenCalled();
+});
+
+test("a stable object style is validated once across an unrelated update", async () => {
+  const reads = [undefined, "later"];
+  const style = {
+    version: 8,
+    sources: {},
+    layers: [],
+    get sky() {
+      return reads.shift();
+    },
+  };
+  const scene = (interactive: boolean) => (
+    <NativeMap
+      mapStyle={style as MapProps["mapStyle"]}
+      initialViewState={initialViewState}
+      interactive={interactive}
+    />
+  );
+  const view = await render(scene(true));
+  const forwarded = lastMapProps<{ mapStyle: string; touchZoom?: boolean }>()
+    .mapStyle;
+  expect(forwarded).not.toContain('"sky"');
+  await view.rerender(scene(false));
+  const updated = lastMapProps<{ mapStyle: string; touchZoom?: boolean }>();
+  expect(updated.touchZoom).toBe(false);
+  expect(updated.mapStyle).toBe(forwarded);
+  expect(style.sky).toBe("later");
 });
 
 test("removes an undefined legacy style value before native bridge conversion", async () => {

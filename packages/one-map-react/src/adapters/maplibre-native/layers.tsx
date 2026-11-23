@@ -4,7 +4,7 @@ import type { ComponentProps, ReactElement } from "react";
 import type { LayerProps } from "../../contracts/layer-types.js";
 import { useLayerOptions } from "../../facade/layer.js";
 import {
-  definedStyle,
+  omitUndefinedFields,
   useNativeLayerKey,
 } from "../shared/native-layer-updates.js";
 import { assertMaplibreLayerStyle } from "./style-roots.js";
@@ -22,9 +22,6 @@ export type NativeLayerProps =
  * @throws When a creation option changes or a layer field or expression is unsupported.
  */
 export const MaplibreNativeLayer = (props: NativeLayerProps): ReactElement => {
-  useLayerOptions(props, "maplibre-native");
-  assertMaplibreLayerStyle(props);
-
   // Only RNMapbox consumes sourceID. The remaining portable style values
   // use MapLibre's style format, whose declarations require mutable arrays.
   const {
@@ -35,10 +32,15 @@ export const MaplibreNativeLayer = (props: NativeLayerProps): ReactElement => {
   } = props as NativeLayerProps & {
     readonly sourceID?: string;
   };
-  const filter = "filter" in props ? props.filter : undefined;
-  const paint = definedStyle(paintProps);
-  const layout = definedStyle(layoutProps);
-  const legacyStyle = "style" in props ? definedStyle(props.style) : undefined;
+  const rawFilter = "filter" in props ? props.filter : undefined;
+  const filter = omitUndefinedFields(rawFilter) as typeof rawFilter;
+  const paint = nativeStyleFields(paintProps);
+  const layout = nativeStyleFields(layoutProps);
+  const legacyStyle =
+    "style" in props ? nativeStyleFields(props.style) : undefined;
+  // Both guards see this snapshot. A later getter read must not reach the wrapper.
+  useLayerOptions({ ...props, layout }, "maplibre-native");
+  assertMaplibreLayerStyle({ paint, layout, filter, style: legacyStyle });
   const source = "source" in props ? (props.source ?? sourceID) : sourceID;
   const key = useNativeLayerKey(
     { ...legacyStyle, ...layout, ...paint },
@@ -61,4 +63,17 @@ export const MaplibreNativeLayer = (props: NativeLayerProps): ReactElement => {
       {...(layer as ComponentProps<typeof MaplibreLayer>)}
     />
   );
+};
+
+/**
+ * Copies a style object with undefined fields removed at every depth.
+ *
+ * @param style - Paint, layout, or legacy style object from the caller.
+ * @returns A converter-safe copy, or `undefined` when the caller omitted the object.
+ */
+const nativeStyleFields = (
+  style?: object
+): Record<string, unknown> | undefined => {
+  if (!style) return undefined;
+  return omitUndefinedFields(style) as Record<string, unknown>;
 };

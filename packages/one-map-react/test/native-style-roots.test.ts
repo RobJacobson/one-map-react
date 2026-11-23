@@ -4,6 +4,7 @@ import {
   assertMaplibreExpressions,
   assertMaplibreLayerStyle,
   assertMaplibreStyleRoots,
+  maplibreStyleForNative,
 } from "../src/adapters/maplibre-native/style-roots.js";
 
 test("supported style documents and metadata pass unchanged; URLs remain wrapper-owned", () => {
@@ -292,4 +293,74 @@ test("treats undefined expression modifiers and layer properties as omitted whil
       style: { iconOverlap: "always" },
     })
   ).toThrow('Layer property "iconOverlap" is unsupported');
+});
+
+test("object styles validate the serialized document the wrapper forwards", () => {
+  const reads: unknown[] = [undefined, {}];
+  const style = {
+    version: 8,
+    sources: {},
+    layers: [],
+    get sky() {
+      return reads.shift();
+    },
+  };
+  const forwarded = maplibreStyleForNative(style);
+  const wrapperDocument =
+    typeof forwarded === "object" ? JSON.stringify(forwarded) : forwarded;
+
+  expect(wrapperDocument).toBe(forwarded);
+  expect(JSON.parse(String(forwarded))).toEqual({
+    version: 8,
+    sources: {},
+    layers: [],
+  });
+  expect(style.sky).toEqual({});
+  expect(() =>
+    maplibreStyleForNative({
+      version: 8,
+      sources: {},
+      layers: [],
+      get sky() {
+        return {};
+      },
+    })
+  ).toThrow('Style root "sky"');
+  expect(() => maplibreStyleForNative({ sky: {} })).toThrow('Style root "sky"');
+
+  const url = "https://example.test/style.json";
+  const json = JSON.stringify({ version: 8, sources: {}, layers: [] });
+  expect(maplibreStyleForNative(url)).toBe(url);
+  expect(maplibreStyleForNative(json)).toBe(json);
+  expect(maplibreStyleForNative(undefined)).toBeUndefined();
+  expect(() =>
+    maplibreStyleForNative({
+      layers: [
+        {
+          type: "symbol",
+          layout: { "text-field": ["number-format", 1, { unit: "meter" }] },
+        },
+      ],
+    })
+  ).toThrow("number-format.unit");
+  expect(
+    JSON.parse(
+      String(
+        maplibreStyleForNative({
+          layers: [
+            {
+              type: "symbol",
+              layout: {
+                "text-field": [
+                  "format",
+                  "text",
+                  { "vertical-align": undefined },
+                ],
+              },
+            },
+          ],
+        })
+      )
+    ).layers[0].layout["text-field"]
+  ).toEqual(["format", "text", {}]);
 });

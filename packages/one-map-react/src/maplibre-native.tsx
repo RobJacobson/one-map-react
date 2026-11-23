@@ -8,7 +8,7 @@ import {
   MaplibreNativeMap,
 } from "./adapters/maplibre-native/index.js";
 import type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
-import { assertMaplibreStyleRoots } from "./adapters/maplibre-native/style-roots.js";
+import { maplibreStyleForNative } from "./adapters/maplibre-native/style-roots.js";
 import type { NativeMapInputs } from "./contracts/native-types.js";
 export type {
   NativeBounds,
@@ -147,6 +147,8 @@ export const WrapperMap = forwardRef<
   ComponentRef<typeof MaplibreMap>,
   ComponentProps<typeof MaplibreMap>
 >((props, ref) => {
-  assertMaplibreStyleRoots(props.mapStyle);
-  return <MaplibreMap {...props} ref={ref} />;
+  const mapStyle = maplibreStyleForNative(props.mapStyle) as ComponentProps<
+    typeof MaplibreMap
+  >["mapStyle"];
+  return <MaplibreMap {...props} ref={ref} mapStyle={mapStyle} />;
 });
