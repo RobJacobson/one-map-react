@@ -7,14 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  Platform,
-  type StyleProp,
-  View,
-  type ViewProps,
-  type ViewStyle,
-} from "react-native";
-import { PortalHost, PortalProvider } from "react-native-teleport";
+import { Platform, type ViewProps } from "react-native";
 
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { NativeMapInputs } from "../../contracts/native-types.js";
@@ -24,6 +17,7 @@ import {
   assertNativeMapOptions,
 } from "../native-map-options.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
+import { NativeMapHost } from "../shared/native-map-host.js";
 import {
   useNativeMapPresentation,
   withNativeMapPresentation,
@@ -185,124 +179,101 @@ const MapboxNativeMapImplementation = forwardRef<
     : undefined;
 
   return (
-    <PortalProvider>
-      <View
-        {...props.hostProps}
-        onLayout={(event) => {
-          const { width, height } = event.nativeEvent.layout;
-          session?.setNativeLayout(width, height);
-          props.hostProps?.onLayout?.(event);
-        }}
-        // Common width strings cross the native host dimension boundary here.
-        style={[style as StyleProp<ViewStyle>, props.hostProps?.style]}
-      >
-        <GeoJsonSourceContext.Provider value={geoJsonSources}>
-          <MapView
-            {...props.options}
-            projection={props.projection ?? props.options?.projection}
-            scaleBarPosition={scaleBarPosition}
-            {...(refreshScalePosition ? { scaleBarEnabled: false } : {})}
-            ref={mapViewRef}
-            style={{ flex: 1 }}
-            {...styleProps}
-            {...gestures}
-            {...(Platform.OS === "android"
-              ? {
-                  // Unlike the other flags, the wrapper has no zoom default.
-                  // Restore its enabled baseline instead of clearing to null.
-                  zoomEnabled:
-                    gestures.zoomEnabled ?? props.options?.zoomEnabled ?? true,
-                }
-              : {})}
-            gestureSettings={gestureSettings}
-            onDidFinishLoadingMap={() => {
-              report.onLoad();
-            }}
-            onDidFinishLoadingStyle={() => {
-              report.onStyleLoad();
-              report.onStyleData();
-            }}
-            onMapLoadingError={(payload: unknown) => {
-              const event = mapLoadingErrorEvent(payload);
-              report.onError(event);
-            }}
-            onCameraChanged={reportChanging}
-            onMapIdle={reportSettled}
-            onPress={
-              onClick
-                ? (feature: RnPressFeature) => {
-                    report.onClick(clickEventFromRnmapbox(feature));
-                  }
-                : undefined
-            }
-            onLongPress={
-              onLongPress
-                ? (feature: RnPressFeature) => {
-                    report.onLongPress(clickEventFromRnmapbox(feature));
-                  }
-                : undefined
-            }
-          >
-            <Camera
-              ref={cameraRef}
-              defaultSettings={toRnmapboxDefaultSettings(frozenViewState)}
-              minZoomLevel={minZoom}
-              maxZoomLevel={maxZoom}
-              maxBounds={
-                maxBounds === undefined
-                  ? undefined
-                  : toRnmapboxCornerBounds(nativeBoundsInput(maxBounds))
+    <NativeMapHost style={style} hostProps={props.hostProps}>
+      <GeoJsonSourceContext.Provider value={geoJsonSources}>
+        <MapView
+          {...props.options}
+          projection={props.projection ?? props.options?.projection}
+          scaleBarPosition={scaleBarPosition}
+          {...(refreshScalePosition ? { scaleBarEnabled: false } : {})}
+          ref={mapViewRef}
+          style={{ flex: 1 }}
+          {...styleProps}
+          {...gestures}
+          {...(Platform.OS === "android"
+            ? {
+                // Unlike the other flags, the wrapper has no zoom default.
+                // Restore its enabled baseline instead of clearing to null.
+                zoomEnabled:
+                  gestures.zoomEnabled ?? props.options?.zoomEnabled ?? true,
               }
-              padding={
-                padding === undefined ? undefined : toRnmapboxPadding(padding)
-              }
-              {...props.locationOptions}
-              {...(controlled ?? {})}
-            />
-            {children}
-            {props.terrain !== undefined && (
-              <Terrain
-                key={
-                  props.terrain === null
-                    ? "disabled"
-                    : `enabled:${props.terrain.source}`
+            : {})}
+          gestureSettings={gestureSettings}
+          onDidFinishLoadingMap={() => {
+            report.onLoad();
+          }}
+          onDidFinishLoadingStyle={() => {
+            report.onStyleLoad();
+            report.onStyleData();
+          }}
+          onMapLoadingError={(payload: unknown) => {
+            const event = mapLoadingErrorEvent(payload);
+            report.onError(event);
+          }}
+          onCameraChanged={reportChanging}
+          onMapIdle={reportSettled}
+          onPress={
+            onClick
+              ? (feature: RnPressFeature) => {
+                  report.onClick(clickEventFromRnmapbox(feature));
                 }
-                sourceID={props.terrain?.source}
-                style={{ exaggeration: props.terrain?.exaggeration }}
-              />
-            )}
-            {props.light && (
-              <Light
-                style={{
-                  anchor: props.light.anchor,
-                  color: props.light.color,
-                  intensity: props.light.intensity,
-                  position:
-                    props.light.position === undefined
-                      ? undefined
-                      : [...props.light.position],
-                  colorTransition: props.light["color-transition"],
-                  intensityTransition: props.light["intensity-transition"],
-                  positionTransition: props.light["position-transition"],
-                }}
-              />
-            )}
-          </MapView>
-        </GeoJsonSourceContext.Provider>
-        {session && (
-          <PortalHost
-            name={session.overlayHostName}
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              bottom: 0,
-              left: 0,
-            }}
+              : undefined
+          }
+          onLongPress={
+            onLongPress
+              ? (feature: RnPressFeature) => {
+                  report.onLongPress(clickEventFromRnmapbox(feature));
+                }
+              : undefined
+          }
+        >
+          <Camera
+            ref={cameraRef}
+            defaultSettings={toRnmapboxDefaultSettings(frozenViewState)}
+            minZoomLevel={minZoom}
+            maxZoomLevel={maxZoom}
+            maxBounds={
+              maxBounds === undefined
+                ? undefined
+                : toRnmapboxCornerBounds(nativeBoundsInput(maxBounds))
+            }
+            padding={
+              padding === undefined ? undefined : toRnmapboxPadding(padding)
+            }
+            {...props.locationOptions}
+            {...(controlled ?? {})}
           />
-        )}
-      </View>
-    </PortalProvider>
+          {children}
+          {props.terrain !== undefined && (
+            <Terrain
+              key={
+                props.terrain === null
+                  ? "disabled"
+                  : `enabled:${props.terrain.source}`
+              }
+              sourceID={props.terrain?.source}
+              style={{ exaggeration: props.terrain?.exaggeration }}
+            />
+          )}
+          {props.light && (
+            <Light
+              style={{
+                anchor: props.light.anchor,
+                color: props.light.color,
+                intensity: props.light.intensity,
+                position:
+                  props.light.position === undefined
+                    ? undefined
+                    : [...props.light.position],
+                colorTransition: props.light["color-transition"],
+                intensityTransition: props.light["intensity-transition"],
+                positionTransition: props.light["position-transition"],
+              }}
+            />
+          )}
+        </MapView>
+      </GeoJsonSourceContext.Provider>
+    </NativeMapHost>
   );
 });
 

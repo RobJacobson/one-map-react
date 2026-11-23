@@ -17,6 +17,7 @@ for (const [relative, names] of [
   ["adapters/shared/native-ui.tsx", ["useNativeMarkerActivation"]],
   ["facade/use-map-interactions.ts", ["useMapInteractions"]],
   ["adapters/shared/native-marker-overlay.tsx", ["NativeMarkerOverlay"]],
+  ["adapters/shared/native-map-host.tsx", ["NativeMapHost"]],
   [
     "adapters/shared/native-map-presentation.tsx",
     ["NativePresentationProvider", "NativeCameraProvider"],

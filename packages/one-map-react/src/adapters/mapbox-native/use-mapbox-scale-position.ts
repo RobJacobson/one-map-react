@@ -9,17 +9,19 @@ export const useMapboxScalePosition = (
   height: number | undefined,
   enabled: boolean | undefined
 ): boolean => {
-  const scalePositionKey = JSON.stringify([scaleBarPosition, width, height]);
+  const isIos = Platform.OS === "ios";
+  const scalePositionKey = isIos
+    ? JSON.stringify([scaleBarPosition, width, height])
+    : "";
   const [appliedScalePosition, setAppliedScalePosition] =
     useState(scalePositionKey);
   // RNMapbox iOS stores position updates without marking its scale dirty.
   // Native layout can reset the scale. Separate its hide/restore commits by a
   // frame so Fabric cannot merge away the enabled setter's dirty notification.
   const refreshScalePosition =
-    Platform.OS === "ios" &&
-    appliedScalePosition !== scalePositionKey &&
-    enabled !== false;
+    isIos && appliedScalePosition !== scalePositionKey && enabled !== false;
   useEffect(() => {
+    if (!isIos) return;
     if (!refreshScalePosition) {
       // eslint-disable-next-line react/set-state-in-effect -- Keep the RNMapbox iOS scale hide/restore commits separate; synchronizing this key preserves the native dirty notification.
       setAppliedScalePosition(scalePositionKey);
@@ -29,7 +31,7 @@ export const useMapboxScalePosition = (
       setAppliedScalePosition(scalePositionKey)
     );
     return () => cancelAnimationFrame(frame);
-  }, [scalePositionKey, refreshScalePosition]);
+  }, [isIos, scalePositionKey, refreshScalePosition]);
 
   return refreshScalePosition;
 };

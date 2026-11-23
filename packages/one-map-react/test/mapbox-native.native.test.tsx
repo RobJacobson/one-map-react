@@ -1,7 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { createRef, type ComponentRef, type ReactNode, type Ref } from "react";
-import { Platform } from "react-native";
+import { Platform, StyleSheet, Text } from "react-native";
 
 import {
   clusteredPoints,
@@ -10,6 +10,7 @@ import {
   replacementStyle,
   routes,
 } from "../../example-map/src/scenarios/map-fixture.js";
+import { useNativeMapPresentation } from "../src/adapters/shared/native-map-presentation.js";
 import type { ViewState } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
 import { testNativeCamera } from "./native-camera-cases.js";
@@ -258,6 +259,7 @@ import {
 import {
   Layer,
   MapProvider,
+  Marker,
   Source,
   useMap,
   type MapProps,
@@ -619,6 +621,7 @@ describe("mapbox-native adapter", () => {
           expect(commits[0]?.scaleBarEnabled).toBe(false);
           expect(commits.at(-1)?.scaleBarEnabled).toBe(true);
         } else {
+          if (os === "android") expect(commits).toHaveLength(1);
           expect(
             commits.every((props) => props.scaleBarEnabled === enabled)
           ).toBe(true);
@@ -629,6 +632,170 @@ describe("mapbox-native adapter", () => {
       }
     }
   );
+
+  test("Android scale position and host layout updates avoid follow-up MapView renders", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "android");
+    const scene = (top: number) => (
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        hostProps={{ testID: "android-scale-host" }}
+        options={{
+          scaleBarPosition: { top, left: 8 },
+          scaleBarEnabled: true,
+        }}
+      />
+    );
+    try {
+      const beforeMount = MapViewMock.mock.calls.length;
+      const view = await render(scene(8));
+      expect(MapViewMock.mock.calls.length - beforeMount).toBe(1);
+
+      const beforePosition = MapViewMock.mock.calls.length;
+      await view.rerender(scene(56));
+      expect(MapViewMock.mock.calls.length - beforePosition).toBe(1);
+      expect(
+        lastMapProps<{
+          scaleBarPosition: object;
+          scaleBarEnabled: boolean;
+        }>()
+      ).toMatchObject({
+        scaleBarPosition: { top: 56, left: 8 },
+        scaleBarEnabled: true,
+      });
+
+      const beforeLayout = MapViewMock.mock.calls.length;
+      await fireEvent(view.getByTestId("android-scale-host"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 0, width: 375, height: 237 } },
+      });
+      expect(MapViewMock.mock.calls.length - beforeLayout).toBe(1);
+      expect(lastMapProps<{ scaleBarEnabled: boolean }>().scaleBarEnabled).toBe(
+        true
+      );
+
+      await view.unmount();
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test("iOS keeps scale position key synchronized while scaleBarEnabled is false", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "ios");
+    const scene = (top: number, enabled: boolean) => (
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        options={{
+          scaleBarPosition: { top, left: 8 },
+          scaleBarEnabled: enabled,
+        }}
+      />
+    );
+    try {
+      const view = await render(scene(8, false));
+      await view.rerender(scene(56, false));
+      const beforeEnable = MapViewMock.mock.calls.length;
+      await view.rerender(scene(56, true));
+      const commits = MapViewMock.mock.calls
+        .slice(beforeEnable)
+        .map(([props]) => props as { scaleBarEnabled: boolean });
+      expect(commits).toHaveLength(1);
+      expect(commits[0]?.scaleBarEnabled).toBe(true);
+      await view.unmount();
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test("host shell forwards layout events, applies style precedence, and isolates sibling PortalHost names", async () => {
+    const observeLayout = jest.fn();
+    const hostOnLayout = jest.fn();
+    const LayoutProbe = () => {
+      observeLayout(useNativeMapPresentation().nativeLayout);
+      return null;
+    };
+    const mapStyle = { flex: 1, backgroundColor: "#111111" };
+    const hostStyle = { backgroundColor: "#222222", marginTop: 12 };
+    const view = await render(
+      <>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          style={mapStyle}
+          hostProps={{
+            testID: "mapbox-host-a",
+            style: hostStyle,
+            onLayout: hostOnLayout,
+          }}
+        >
+          <LayoutProbe />
+          <Marker longitude={-122.34} latitude={47.61}>
+            <Text>Pin A</Text>
+          </Marker>
+        </NativeMap>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          hostProps={{ testID: "mapbox-host-b" }}
+        >
+          <Marker longitude={-122.34} latitude={47.61}>
+            <Text>Pin B</Text>
+          </Marker>
+        </NativeMap>
+      </>
+    );
+
+    const hostA = view.getByTestId("mapbox-host-a");
+    const hostB = view.getByTestId("mapbox-host-b");
+    expect(hostA.parent?.type).toBe("PortalProvider");
+    expect(hostA.props.style).toEqual([mapStyle, hostStyle]);
+    expect(StyleSheet.flatten(hostA.props.style)).toMatchObject({
+      flex: 1,
+      backgroundColor: "#222222",
+      marginTop: 12,
+    });
+    expect(hostA.children).toHaveLength(2);
+    const [rendererA, portalHostA] = hostA.children;
+    const [, portalHostB] = hostB.children;
+    if (
+      !rendererA ||
+      typeof rendererA === "string" ||
+      !portalHostA ||
+      typeof portalHostA === "string" ||
+      !portalHostB ||
+      typeof portalHostB === "string"
+    ) {
+      throw new Error("Expected renderer and PortalHost host children.");
+    }
+    expect(rendererA.type).toBe("MapView");
+    expect(rendererA.props.testID).toBe("wrapper-map");
+    expect(portalHostA.type).toBe("PortalHost");
+    expect(portalHostA.props.style).toEqual({
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+    });
+    expect(typeof portalHostA.props.name).toBe("string");
+    expect(portalHostA.props.name).not.toBe("");
+    expect(typeof portalHostB.props.name).toBe("string");
+    expect(portalHostB.props.name).not.toBe("");
+    expect(portalHostA.props.name).not.toBe(portalHostB.props.name);
+
+    const overlays = view.getAllByTestId("native-marker-overlay");
+    expect(overlays[0]?.parent?.props.hostName).toBe(portalHostA.props.name);
+    expect(overlays[1]?.parent?.props.hostName).toBe(portalHostB.props.name);
+
+    const layoutEvent = {
+      nativeEvent: { layout: { x: 0, y: 0, width: 390, height: 500 } },
+    };
+    await fireEvent(hostA, "layout", layoutEvent);
+    expect(hostOnLayout).toHaveBeenCalledTimes(1);
+    expect(hostOnLayout.mock.calls[0]?.[0]).toBe(layoutEvent);
+    expect(observeLayout).toHaveBeenLastCalledWith({ width: 390, height: 500 });
+    await view.unmount();
+  });
 
   test("iOS layout changes reapply unchanged scale margins without remounting", async () => {
     const platform = jest.replaceProperty(Platform, "OS", "ios");
