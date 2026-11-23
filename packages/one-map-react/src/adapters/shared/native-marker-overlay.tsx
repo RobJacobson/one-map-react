@@ -10,6 +10,7 @@ import { View } from "react-native";
 import { Portal } from "react-native-teleport";
 
 import type { Point } from "../../contracts/camera-types.js";
+import type { Anchor } from "../../contracts/ui-types.js";
 import { useMapSession } from "../../facade/map-context.js";
 import {
   NativeCameraContext,
@@ -69,16 +70,7 @@ export const NativeMarkerOverlay = (
     props.backend,
   ]);
 
-  const horizontal = props.anchor.includes("left")
-    ? 0
-    : props.anchor.includes("right")
-      ? 1
-      : 0.5;
-  const vertical = props.anchor.includes("top")
-    ? 0
-    : props.anchor.includes("bottom")
-      ? 1
-      : 0.5;
+  const [horizontal, vertical] = anchorFraction(props.anchor);
   return (
     <Portal
       name={name}
@@ -107,6 +99,24 @@ export const NativeMarkerOverlay = (
       </View>
     </Portal>
   );
+};
+
+/**
+ * Converts a marker anchor to fractions of the content bounds.
+ *
+ * @param anchor - Named anchor on the marker content.
+ * @returns Horizontal and vertical fractions from the top-left corner.
+ * @remarks Raw JavaScript strings match direction substrings, with left and
+ * top taking precedence and unmatched axes staying centered.
+ */
+export const anchorFraction = (anchor: Anchor): readonly [number, number] => [
+  fractionOnAxis(anchor, "left", "right"),
+  fractionOnAxis(anchor, "top", "bottom"),
+];
+
+const fractionOnAxis = (anchor: Anchor, start: string, end: string): number => {
+  if (anchor.includes(start)) return 0;
+  return anchor.includes(end) ? 1 : 0.5;
 };
 
 const visiblePoint = (

@@ -752,6 +752,31 @@ describe("TF07 native UI composition", () => {
     }
   );
 
+  test("RNMapbox annotation anchors measured content within its offset padding", async () => {
+    const view = await render(
+      <mapboxNativeUI.Marker
+        longitude={10}
+        latitude={20}
+        anchor="top-right"
+        offset={[10, -15]}
+        renderMode="annotation"
+      >
+        <Text>Annotation content</Text>
+      </mapboxNativeUI.Marker>
+    );
+    const annotation = () => view.getByTestId("mapbox-annotation");
+    expect(annotation().props.anchor).toEqual({ x: 0.5, y: 0.5 });
+
+    const [content] = annotation().queryAll(
+      (node) => typeof node.props.onLayout === "function"
+    );
+    if (!content) throw new Error("Expected a measured annotation view.");
+    await fireEvent(content, "layout", {
+      nativeEvent: { layout: { width: 30, height: 45, x: 0, y: 0 } },
+    });
+    expect(annotation().props.anchor).toEqual({ x: 0.8, y: 0.2 });
+  });
+
   test.each(["ios", "android"] as const)(
     "Mapbox %s annotation reports consecutive taps and retains refresh",
     async (os) => {
