@@ -401,6 +401,36 @@ describe("copyValidatedFeatureState", () => {
     expect(copiedNested["__proto__"]).toEqual({ polluted: true });
     expect((copiedNested as { polluted?: boolean }).polluted).toBeUndefined();
   });
+
+  test("ignores elements appended by an array getter during copying", () => {
+    const values: number[] = [0, 2];
+    Object.defineProperty(values, 0, {
+      enumerable: true,
+      configurable: true,
+      get() {
+        values.push(3);
+        return 1;
+      },
+    });
+
+    expect(copyValidatedFeatureState({ values })).toEqual({ values: [1, 2] });
+  });
+
+  test("rejects an array shortened by an element getter during copying", () => {
+    const values: number[] = [0, 2];
+    Object.defineProperty(values, 0, {
+      enumerable: true,
+      configurable: true,
+      get() {
+        values.pop();
+        return 1;
+      },
+    });
+
+    expect(() => copyValidatedFeatureState({ values })).toThrow(
+      'Feature state key "values"'
+    );
+  });
 });
 
 describe("featureStateFromWrapper", () => {

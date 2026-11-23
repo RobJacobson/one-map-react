@@ -157,13 +157,15 @@ export const assertFeatureIdentifier = (
  * The portable contract excludes `null`, `undefined`, and non-finite numbers
  * so every backend stores the same shape: MapLibre wrappers drop `null` keys
  * rather than storing them, and `undefined` never crosses a native bridge.
- * Reading each property once prevents getter-based validation bypasses while
- * producing a mutable copy isolated from caller and SDK mutations.
+ * Each value is validated as it is copied, preventing second-read getter
+ * bypasses while producing a mutable copy isolated from caller and SDK
+ * mutations.
  *
  * @param state - State object to merge onto a feature.
  * @returns A validated mutable copy for the wrapper call.
  * @throws When `state` is not an object or any value is `null`, `undefined`,
- * a non-finite number, a sparse array hole, or a non-JSON type.
+ * a non-finite number, a sparse array hole, or a non-JSON primitive
+ * (`bigint`, `function`, or `symbol`).
  */
 export const copyValidatedFeatureState = (
   state: FeatureState
@@ -172,12 +174,7 @@ export const copyValidatedFeatureState = (
     throw new Error("Feature state must be an object.");
   }
 
-  return Object.fromEntries(
-    Object.entries(state).map(([key, value]) => [
-      key,
-      copyStateValue(value, key),
-    ])
-  );
+  return copyRecord(state);
 };
 
 /**
@@ -219,10 +216,11 @@ const copyStateValue = (value: unknown, topKey: string): unknown => {
   }
 
   if (Array.isArray(value)) {
+    const { length } = value;
     const copied: unknown[] = [];
 
     // Array methods skip holes, and Object.hasOwn blocks inherited indices.
-    for (let index = 0; index < value.length; index += 1) {
+    for (let index = 0; index < length; index += 1) {
       if (!Object.hasOwn(value, index)) {
         throw invalidStateError(topKey);
       }
@@ -234,16 +232,22 @@ const copyStateValue = (value: unknown, topKey: string): unknown => {
   }
 
   if (isRecord(value)) {
-    return Object.fromEntries(
-      Object.entries(value).map(([childKey, child]) => [
-        childKey,
-        copyStateValue(child, topKey),
-      ])
-    );
+    return copyRecord(value, topKey);
   }
 
   throw invalidStateError(topKey);
 };
+
+const copyRecord = (
+  record: Record<string, unknown>,
+  topKey?: string
+): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(record).map(([key, value]) => [
+      key,
+      copyStateValue(value, topKey ?? key),
+    ])
+  );
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
