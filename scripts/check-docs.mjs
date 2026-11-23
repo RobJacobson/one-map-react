@@ -1,15 +1,22 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 
-const documents = (directory) =>
-  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    if (entry.isDirectory()) return documents(join(directory, entry.name));
-    if (entry.name.endsWith(".md")) return [join(directory, entry.name)];
-
-    return [];
-  });
-
-const files = documents("docs");
+const files = execFileSync(
+  "git",
+  [
+    "ls-files",
+    "--cached",
+    "--others",
+    "--exclude-standard",
+    "-z",
+    "--",
+    "*.md",
+  ],
+  { encoding: "utf8" }
+)
+  .split("\0")
+  .filter(existsSync);
 const failures = [];
 
 const fail = (file, line, message) =>

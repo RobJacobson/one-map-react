@@ -4,7 +4,9 @@ Test the behavior this library owns: forwarding, conversions, lifecycle, packagi
 
 ## During development
 
-Run the checks that match the change. `bun run validate` checks formatting and documentation links, builds the packages, then runs type checks, unit and component tests, and packed-package selection. It does not open a browser, start Metro, or build a native app.
+Run the checks that match the change. `bun run validate` checks formatting and lint, runs `bun run check:docs`, builds the packages, and then runs type checks, unit and component tests, and packed-package selection. It does not open a browser, start Metro, or build a native app.
+
+`bun run check:docs` checks Markdown structure and local links in tracked files and unignored new files in the Git checkout. Use the referenced source and examples to verify the claims in the text.
 
 | Change | Checks |
 | --- | --- |

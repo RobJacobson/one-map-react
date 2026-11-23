@@ -6,21 +6,23 @@ Browser convenience entries re-export react-map-gl. A browser application can om
 
 ## What the library owns
 
-Each native map owns its camera conversion, attached ref, source registry, click delivery, and live marker overlay.
+The [RNMapbox entry](../packages/one-map-react/src/mapbox-native.tsx) and the [MapLibre React Native entry](../packages/one-map-react/src/maplibre-native.tsx) bind their backend to the [shared native components and hooks](../packages/one-map-react/src/facade/native-map.tsx). `MapProvider` owns named lookup for its entry. The [mounted map](../packages/one-map-react/src/facade/map.tsx) owns its renderer attachment, stable `useMap()` handle, and common callbacks. The handle forwards each call to the current attachment.
 
 Camera converters translate desktop camera inputs for RNMapbox and MapLibre React Native. Initial defaults, a later target, and movement observed after a gesture stay distinct. `viewState` applies a changed camera target. An unchanged target stays where the gesture left it. The strict `controlledCamera` capability is not offered. See the [RNMapbox converter](../packages/one-map-react/src/adapters/mapbox-native/convert-camera.ts) and the [MapLibre converter](../packages/one-map-react/src/adapters/maplibre-native/convert-camera.ts).
 
-Native cluster queries use the GeoJSON source handle returned by `map.getSource(id)`. A source handle belongs to one registration. Replacing a source under the same id keeps the replacement when the old registration cleans up. See the [source registry](../packages/one-map-react/src/adapters/shared/native-source-registry.ts).
+Each native map owns its source registry. The [shared registry](../packages/one-map-react/src/adapters/shared/native-source-registry.ts) keeps the replacement when an old source registration with the same ID cleans up. The [cluster helper](../packages/one-map-react/src/adapters/shared/native-clusters.ts) caches one GeoJSON handle per registration and normalizes cluster results for both backends. Consumers query clusters through the handle returned by `map.getSource(id)`.
 
 A filtered click can finish after its map detaches. Completion reaches the current callback only while the original map is still attached. See [click delivery](../packages/one-map-react/src/facade/use-map-interactions.ts).
 
-Live marker children stay in the React tree through `react-native-teleport`. Placement follows camera movement, host layout, and an asynchronous projection that can finish after the marker moves or unmounts. See the [marker overlay](../packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx).
+Both adapters render through the [shared native host](../packages/one-map-react/src/adapters/shared/native-map-host.tsx). It measures the viewport and mounts the portal host for live marker children. The [marker overlay](../packages/one-map-react/src/adapters/shared/native-marker-overlay.tsx) keeps those children in the React tree through `react-native-teleport`. It projects the marker position when the camera, viewport, or marker coordinates change and ignores results from retired projections.
 
 `Images` and `UserLocation` are exported from `one-map-react/native-extensions`. On web, the application registers style images through the selected SDK and draws a supplied location with a marker or a GeoJSON layer.
 
 ## What the application owns
 
 The application owns credentials, host layout, browser CSS, permissions, location acquisition, offline packs, snapshots, and screen controls. Selected SDK operations use `getWrapperMap()` or a direct SDK import. Offline, snapshot, and location managers stay on the selected native entry. The application owns their policy, cleanup, and storage.
+
+The Vite and Expo apps import the shared example package. Backend-specific example modules supply renderer components and services to the shared [web acceptance scene](../packages/example-map/src/scenarios/WebAcceptanceScene.tsx) and [native acceptance scene](../packages/example-map/src/scenarios/NativeAcceptanceScene.tsx).
 
 ## Native fit cap
 
