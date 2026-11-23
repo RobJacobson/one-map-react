@@ -114,21 +114,25 @@ export const featuresFromWrapper = (
 };
 
 /**
- * Asserts a feature identifier and returns it unchanged.
+ * Validates a feature identifier and returns a fresh single-read snapshot.
  *
  * @param identifier - Source, feature id, and optional source layer.
- * @returns The same identifier.
+ * @returns A shallow snapshot of the validated identifier fields.
  * @throws When the source is not a nonempty string or the feature id is
  * missing.
  */
 export const assertFeatureIdentifier = (
   identifier: FeatureIdentifier
 ): FeatureIdentifier => {
-  if (
-    !isRecord(identifier) ||
-    typeof identifier.source !== "string" ||
-    identifier.source.length === 0
-  ) {
+  if (!isRecord(identifier) || Array.isArray(identifier)) {
+    throw new Error(
+      "A feature identifier must name a source with a nonempty string."
+    );
+  }
+
+  const source = identifier.source;
+
+  if (typeof source !== "string" || source.length === 0) {
     throw new Error(
       "A feature identifier must name a source with a nonempty string."
     );
@@ -140,28 +144,37 @@ export const assertFeatureIdentifier = (
     throw new Error("A feature identifier must carry a string or number id.");
   }
 
-  return identifier;
+  const sourceLayer = identifier.sourceLayer;
+
+  return sourceLayer === undefined
+    ? { source, id }
+    : { source, id, sourceLayer };
 };
 
 /**
- * Validates feature state before dispatch.
+ * Validates and deep-copies feature state in a single pass before dispatch.
  *
  * The portable contract excludes `null`, `undefined`, and non-finite numbers
  * so every backend stores the same shape: MapLibre wrappers drop `null` keys
  * rather than storing them, and `undefined` never crosses a native bridge.
+ * Each value is validated as it is copied, preventing second-read getter
+ * bypasses while producing a mutable copy isolated from caller and SDK
+ * mutations.
  *
  * @param state - State object to merge onto a feature.
- * @throws When a value is `null`, `undefined`, or a non-finite number,
- * directly or nested.
+ * @returns A validated mutable copy for the wrapper call.
+ * @throws When `state` is not an object or any value is `null`, `undefined`,
+ * a non-finite number, a sparse array hole, or a non-JSON primitive
+ * (`bigint`, `function`, or `symbol`).
  */
-export const assertFeatureState = (state: FeatureState): void => {
-  for (const [key, value] of Object.entries(state)) {
-    if (!isStateValue(value)) {
-      throw new Error(
-        `Feature state key "${key}" must be JSON without null, undefined, or non-finite numbers.`
-      );
-    }
+export const copyValidatedFeatureState = (
+  state: FeatureState
+): Record<string, unknown> => {
+  if (!isRecord(state) || Array.isArray(state)) {
+    throw new Error("Feature state must be an object.");
   }
+
+  return copyRecord(state);
 };
 
 /**
@@ -184,59 +197,57 @@ export const featureStateFromWrapper = (value: unknown): FeatureState => {
   return value as FeatureState;
 };
 
-/**
- * Wraps a mutable copy of feature state for the wrapper call.
- *
- * Readonly facade values cross into the wrappers' mutable record types;
- * values are not modified. Nested values are copied before native queueing.
- *
- * @param state - Validated feature state.
- * @returns A mutable copy for the wrapper call.
- */
-export const mutableFeatureState = (
-  state: FeatureState
-): Record<string, unknown> =>
-  Object.fromEntries(
-    Object.entries(state).map(([key, value]) => [key, copyStateValue(value)])
+const invalidStateError = (topKey: string): Error =>
+  new Error(
+    `Feature state key "${topKey}" must be JSON without null, undefined, or non-finite numbers.`
   );
 
-const copyStateValue = (value: unknown): unknown => {
-  if (Array.isArray(value)) return value.map(copyStateValue);
-  if (isRecord(value)) {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, child]) => [key, copyStateValue(child)])
-    );
-  }
-  return value;
-};
-
-const isStateValue = (value: unknown): boolean => {
-  if (value === null || value === undefined) {
-    return false;
+const copyStateValue = (value: unknown, topKey: string): unknown => {
+  if (typeof value === "boolean" || typeof value === "string") {
+    return value;
   }
 
   if (typeof value === "number") {
-    return Number.isFinite(value);
-  }
+    if (!Number.isFinite(value)) {
+      throw invalidStateError(topKey);
+    }
 
-  if (typeof value === "boolean" || typeof value === "string") {
-    return true;
+    return value;
   }
 
   if (Array.isArray(value)) {
-    // every() skips holes, which serialize as forbidden null array elements.
-    for (const child of value) {
-      if (!isStateValue(child)) return false;
+    const { length } = value;
+    const copied: unknown[] = [];
+
+    // Array methods skip holes, and Object.hasOwn blocks inherited indices.
+    for (let index = 0; index < length; index += 1) {
+      if (!Object.hasOwn(value, index)) {
+        throw invalidStateError(topKey);
+      }
+
+      copied.push(copyStateValue(value[index], topKey));
     }
-    return true;
+
+    return copied;
   }
 
   if (isRecord(value)) {
-    return Object.values(value).every(isStateValue);
+    return copyRecord(value, topKey);
   }
 
-  return false;
+  throw invalidStateError(topKey);
 };
+
+const copyRecord = (
+  record: Record<string, unknown>,
+  topKey?: string
+): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(record).map(([key, value]) => [
+      key,
+      copyStateValue(value, topKey ?? key),
+    ])
+  );
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
