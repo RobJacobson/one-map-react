@@ -619,6 +619,7 @@ describe("mapbox-native adapter", () => {
           expect(commits[0]?.scaleBarEnabled).toBe(false);
           expect(commits.at(-1)?.scaleBarEnabled).toBe(true);
         } else {
+          if (os === "android") expect(commits).toHaveLength(1);
           expect(
             commits.every((props) => props.scaleBarEnabled === enabled)
           ).toBe(true);
@@ -629,6 +630,82 @@ describe("mapbox-native adapter", () => {
       }
     }
   );
+
+  test("Android scale position and host layout updates avoid follow-up MapView renders", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "android");
+    const scene = (top: number) => (
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        hostProps={{ testID: "android-scale-host" }}
+        options={{
+          scaleBarPosition: { top, left: 8 },
+          scaleBarEnabled: true,
+        }}
+      />
+    );
+    try {
+      const beforeMount = MapViewMock.mock.calls.length;
+      const view = await render(scene(8));
+      expect(MapViewMock.mock.calls.length - beforeMount).toBe(1);
+
+      const beforePosition = MapViewMock.mock.calls.length;
+      await view.rerender(scene(56));
+      expect(MapViewMock.mock.calls.length - beforePosition).toBe(1);
+      expect(
+        lastMapProps<{
+          scaleBarPosition: object;
+          scaleBarEnabled: boolean;
+        }>()
+      ).toMatchObject({
+        scaleBarPosition: { top: 56, left: 8 },
+        scaleBarEnabled: true,
+      });
+
+      const beforeLayout = MapViewMock.mock.calls.length;
+      await fireEvent(view.getByTestId("android-scale-host"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 0, width: 375, height: 237 } },
+      });
+      expect(MapViewMock.mock.calls.length - beforeLayout).toBeLessThanOrEqual(
+        1
+      );
+      expect(lastMapProps<{ scaleBarEnabled: boolean }>().scaleBarEnabled).toBe(
+        true
+      );
+
+      await view.unmount();
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test("iOS keeps scale position key synchronized while scaleBarEnabled is false", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "ios");
+    const scene = (top: number, enabled: boolean) => (
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        options={{
+          scaleBarPosition: { top, left: 8 },
+          scaleBarEnabled: enabled,
+        }}
+      />
+    );
+    try {
+      const view = await render(scene(8, false));
+      await view.rerender(scene(56, false));
+      const beforeEnable = MapViewMock.mock.calls.length;
+      await view.rerender(scene(56, true));
+      const commits = MapViewMock.mock.calls
+        .slice(beforeEnable)
+        .map(([props]) => props as { scaleBarEnabled: boolean });
+      expect(commits).toHaveLength(1);
+      expect(commits[0]?.scaleBarEnabled).toBe(true);
+      await view.unmount();
+    } finally {
+      platform.restore();
+    }
+  });
 
   test("iOS layout changes reapply unchanged scale margins without remounting", async () => {
     const platform = jest.replaceProperty(Platform, "OS", "ios");

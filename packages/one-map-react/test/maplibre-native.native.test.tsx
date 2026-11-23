@@ -1,6 +1,19 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { act, render } from "@testing-library/react-native";
-import { createRef, type ComponentRef, type ReactNode, type Ref } from "react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
+import {
+  createRef,
+  type ComponentRef,
+  type ReactNode,
+  type Ref,
+  useState,
+} from "react";
+import {
+  type LayoutChangeEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import {
   clusteredPoints,
@@ -9,6 +22,8 @@ import {
   replacementStyle,
   routes,
 } from "../../example-map/src/scenarios/map-fixture.js";
+import { NativeMapHost } from "../src/adapters/shared/native-map-host.js";
+import { NativeMapPresentationContext } from "../src/adapters/shared/native-map-presentation.js";
 import type { ViewState } from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
 import type { FeatureState } from "../src/contracts/query-types.js";
@@ -254,6 +269,7 @@ import {
 import {
   Layer,
   MapProvider,
+  Marker,
   Source,
   useMap,
   type MapProps,
@@ -709,6 +725,103 @@ describe("maplibre-native adapter", () => {
     });
 
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  test("NativeMapHost records layout before forwarding the exact host event and requires presentation context", async () => {
+    await expect(
+      render(
+        <NativeMapHost>
+          <View />
+        </NativeMapHost>
+      )
+    ).rejects.toThrow("This component must render inside a native Map.");
+
+    const order: string[] = [];
+    const setNativeLayout = jest.fn((width: number, height: number) => {
+      order.push(`setNativeLayout:${width}x${height}`);
+    });
+    const hostOnLayout = jest.fn((_event: LayoutChangeEvent) => {
+      order.push("hostOnLayout");
+    });
+    const view = await render(
+      <NativeMapPresentationContext.Provider
+        value={{ overlayHostName: "direct-overlay", setNativeLayout }}
+      >
+        <NativeMapHost
+          hostProps={{ testID: "direct-host", onLayout: hostOnLayout }}
+        >
+          <View testID="direct-child" />
+        </NativeMapHost>
+      </NativeMapPresentationContext.Provider>
+    );
+    const layoutEvent = {
+      nativeEvent: { layout: { x: 0, y: 0, width: 320, height: 240 } },
+    } as LayoutChangeEvent;
+
+    await fireEvent(view.getByTestId("direct-host"), "layout", layoutEvent);
+
+    expect(order).toEqual(["setNativeLayout:320x240", "hostOnLayout"]);
+    expect(hostOnLayout).toHaveBeenCalledTimes(1);
+    expect(hostOnLayout.mock.calls[0]?.[0]).toBe(layoutEvent);
+    await view.unmount();
+  });
+
+  test("host layout updates reproject mounted live markers and preserve child state without re-rendering MaplibreMap", async () => {
+    const StatefulPin = () => {
+      const [count, setCount] = useState(0);
+      return (
+        <Pressable
+          testID="maplibre-pin-button"
+          onPress={() => setCount((current) => current + 1)}
+        >
+          <Text testID="maplibre-pin-count">{count}</Text>
+        </Pressable>
+      );
+    };
+    mockProject.mockClear();
+    mockProject.mockResolvedValueOnce([12, 34]);
+    const view = await render(
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        hostProps={{ testID: "maplibre-layout-host" }}
+      >
+        <Marker longitude={-122.34} latitude={47.61}>
+          <StatefulPin />
+        </Marker>
+      </NativeMap>
+    );
+    await finishMapLoad();
+    await waitFor(() =>
+      expect(
+        StyleSheet.flatten(
+          view.getByTestId("native-marker-overlay").props.style
+        )
+      ).toMatchObject({ left: 12, top: 34, opacity: 1 })
+    );
+
+    await fireEvent.press(view.getByTestId("maplibre-pin-button"));
+    expect(view.getByTestId("maplibre-pin-count").props.children).toBe(1);
+
+    const mapRendersBeforeLayout = MapMock.mock.calls.length;
+    mockProject.mockClear();
+    mockProject.mockResolvedValueOnce([88, 99]);
+
+    await fireEvent(view.getByTestId("maplibre-layout-host"), "layout", {
+      nativeEvent: { layout: { x: 0, y: 0, width: 412, height: 640 } },
+    });
+
+    await waitFor(() =>
+      expect(
+        StyleSheet.flatten(
+          view.getByTestId("native-marker-overlay").props.style
+        )
+      ).toMatchObject({ left: 88, top: 99, opacity: 1 })
+    );
+    expect(mockProject).toHaveBeenCalledTimes(1);
+    expect(MapMock).toHaveBeenCalledTimes(mapRendersBeforeLayout);
+    expect(view.getByTestId("maplibre-pin-count").props.children).toBe(1);
+    await view.unmount();
   });
 });
 
