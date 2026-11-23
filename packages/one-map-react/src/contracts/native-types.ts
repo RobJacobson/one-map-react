@@ -123,6 +123,13 @@ export interface NativeGeoJsonSource {
    * @returns A promise for the expansion zoom.
    */
   getClusterExpansionZoom(clusterId: number): Promise<number>;
+  /**
+   * Reads the zoom level at which a cluster expands.
+   *
+   * @param clusterId - Cluster ID from a queried feature.
+   * @param callback - Receives `null` and the expansion zoom on success, or an error on failure.
+   * @returns This source handle for chaining.
+   */
   getClusterExpansionZoom(
     clusterId: number,
     callback: ClusterCallback<number>
@@ -133,6 +140,13 @@ export interface NativeGeoJsonSource {
    * @returns A promise for the child features in backend order.
    */
   getClusterChildren(clusterId: number): Promise<ClusterFeatures>;
+  /**
+   * Reads the cluster's children at the next zoom level.
+   *
+   * @param clusterId - Cluster ID from a queried feature.
+   * @param callback - Receives `null` and the child features in backend order on success, or an error on failure.
+   * @returns This source handle for chaining.
+   */
   getClusterChildren(
     clusterId: number,
     callback: ClusterCallback<ClusterFeatures>
@@ -149,6 +163,15 @@ export interface NativeGeoJsonSource {
     limit: number,
     offset: number
   ): Promise<ClusterFeatures>;
+  /**
+   * Reads a page of the point features in a cluster.
+   *
+   * @param clusterId - Cluster ID from a queried feature.
+   * @param limit - Maximum number of leaves to return.
+   * @param offset - Number of leaves to skip.
+   * @param callback - Receives `null` and the leaf features in backend order on success, or an error on failure.
+   * @returns This source handle for chaining.
+   */
   getClusterLeaves(
     clusterId: number,
     limit: number,

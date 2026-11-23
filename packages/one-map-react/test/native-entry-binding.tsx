@@ -509,22 +509,45 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     await expect(source.getClusterExpansionZoom(7)).rejects.toThrow(
       "no longer mounted"
     );
+
+    const route = { type: "Feature", id: 1, properties: { kind: "route" } };
+    const leaves = [route, route];
+    const children = backend === "mapbox-native" ? leaves : [route];
+    await expect(replacement.getClusterChildren(7)).resolves.toEqual(children);
+    await expect(replacement.getClusterLeaves(7, 5, 2)).resolves.toEqual(
+      leaves
+    );
+
     const onExpansion = jest.fn();
+    const onChildren = jest.fn();
+    const onLeaves = jest.fn();
     expect(replacement.getClusterExpansionZoom(7, onExpansion)).toBe(
       replacement
     );
+    expect(replacement.getClusterChildren(7, onChildren)).toBe(replacement);
+    expect(replacement.getClusterLeaves(7, 5, 2, onLeaves)).toBe(replacement);
     await act(async () => {});
-    expect(onExpansion).toHaveBeenCalledWith(null, 13);
-    const onFailure = jest.fn();
-    expect(source.getClusterExpansionZoom(7, onFailure)).toBe(source);
+    expect(onExpansion.mock.calls).toEqual([[null, 13]]);
+    expect(onChildren.mock.calls).toEqual([[null, children]]);
+    expect(onLeaves.mock.calls).toEqual([[null, leaves]]);
+
+    const onStaleExpansion = jest.fn();
+    const onStaleChildren = jest.fn();
+    const onStaleLeaves = jest.fn();
+    expect(source.getClusterExpansionZoom(7, onStaleExpansion)).toBe(source);
+    expect(source.getClusterChildren(7, onStaleChildren)).toBe(source);
+    expect(source.getClusterLeaves(7, 5, 2, onStaleLeaves)).toBe(source);
     await act(async () => {});
-    expect(onFailure).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: expect.stringContaining("no longer mounted"),
-      })
-    );
-    await expect(replacement.getClusterChildren(7)).resolves.toBeDefined();
-    await expect(replacement.getClusterLeaves(7, 5, 2)).resolves.toBeDefined();
+    for (const callback of [onStaleExpansion, onStaleChildren, onStaleLeaves]) {
+      expect(callback.mock.calls).toEqual([
+        [
+          expect.objectContaining({
+            message: expect.stringContaining("no longer mounted"),
+          }),
+        ],
+      ]);
+    }
+
     await view.rerender(scene(1, null));
     expect(original.getSource("routes")).toBeUndefined();
     await expect(replacement.getClusterChildren(7)).rejects.toThrow(
