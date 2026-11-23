@@ -7,6 +7,7 @@ import type {
   QuerySourceFeaturesOptions,
 } from "../../contracts/query-types.js";
 import { requireSourceLayerName } from "../shared/feature-values.js";
+import { copyNativeStringArray } from "../shared/wrapper-values.js";
 
 /**
  * Converts a query filter into MapLibre React Native's filter value.
@@ -36,7 +37,7 @@ export const toMaplibreRenderedQueryOptions = (
     : {
         ...(options.layers === undefined
           ? {}
-          : { layers: options.layers.map((id) => id) }),
+          : { layers: copyNativeStringArray(options.layers) }),
         ...(options.filter === undefined
           ? {}
           : { filter: toMaplibreFilter(options.filter) }),

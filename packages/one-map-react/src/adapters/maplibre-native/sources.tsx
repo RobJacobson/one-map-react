@@ -18,6 +18,7 @@ import {
   rejectProvided,
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
+import { copyNativeStringArray } from "../shared/wrapper-values.js";
 import { MaplibreSourceContext } from "./source-registry.js";
 
 /** Maplibre-native source that dispatches to the matching MapLibre source. */
@@ -173,7 +174,8 @@ const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
 
 const mutableTiles = (
   tiles: readonly string[] | undefined
-): string[] | undefined => tiles?.map((template) => template);
+): string[] | undefined =>
+  tiles == null ? undefined : copyNativeStringArray(tiles);
 
 const mutableCorner = (corner: readonly [number, number]): [number, number] => [
   corner[0],

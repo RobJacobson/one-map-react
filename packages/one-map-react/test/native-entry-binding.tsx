@@ -172,6 +172,29 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     );
   });
 
+  test.each(["vector", "raster", "raster-dem"] as const)(
+    "rejects a raw string of tile URL templates for a %s source",
+    async (type) => {
+      const tile = "https://example.com/{z}/{x}/{y}";
+      await expect(
+        render(
+          // @ts-expect-error Exercise a raw JavaScript source prop.
+          <Source id="tiles" type={type} tiles={tile} />
+        )
+      ).rejects.toThrow(TypeError);
+    }
+  );
+
+  test("treats a raw null tile list as omitted", async () => {
+    const url = "https://example.com/tiles.json";
+    await expect(
+      render(
+        // @ts-expect-error Exercise a raw JavaScript source prop.
+        <Source id="tiles" type="vector" url={url} tiles={null} />
+      )
+    ).resolves.toBeDefined();
+  });
+
   test("supplied location updates keep its accuracy and dot layers mounted", async () => {
     const scene = (latitude: number) => (
       <NativeMap mapStyle={emptyStyle}>
@@ -455,6 +478,21 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
       "not attached"
     );
   });
+
+  test.each(["route-line", null])(
+    "rejects a raw rendered-query layer list of %j",
+    async (layers) => {
+      const ref = createRef<Handle>();
+      await render(<NativeMap ref={ref} mapStyle={emptyStyle} />);
+      const map = ref.current;
+      if (!map) throw new Error("Map is detached.");
+
+      await expect(
+        // @ts-expect-error Exercise a raw JavaScript query option.
+        map.queryRenderedFeatures({ layers })
+      ).rejects.toThrow(TypeError);
+    }
+  );
 
   test("preserves dispatched source queries across replacement and drops detached clicks", async () => {
     const ref = createRef<Handle>();
