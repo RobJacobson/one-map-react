@@ -1788,35 +1788,32 @@ describe("mapbox-native queries and feature state", () => {
 
     await render(example(ref));
 
-    await expect(
-      ref.current?.getClusterExpansionZoom("routes", 7)
-    ).resolves.toBe(13);
+    const map = ref.current;
+    const source = map?.getSource("routes");
+    if (!map || !source) throw new Error("Expected a mounted GeoJSON source.");
+    expect(map.getSource("unknown")).toBeUndefined();
+
+    await expect(source.getClusterExpansionZoom(7)).resolves.toBe(13);
     expect(mockGetClusterExpansionZoom).toHaveBeenCalledWith(
       expect.objectContaining({ properties: { cluster: true, cluster_id: 7 } })
     );
 
-    await expect(
-      ref.current?.getClusterLeaves("routes", 7, 10, 2)
-    ).resolves.toHaveLength(2);
+    await expect(source.getClusterLeaves(7, 10, 2)).resolves.toHaveLength(2);
     expect(mockGetClusterLeaves).toHaveBeenCalledWith(
       expect.objectContaining({ properties: { cluster: true, cluster_id: 7 } }),
       10,
       2
     );
 
-    await expect(
-      ref.current?.getClusterChildren("routes", 7)
-    ).resolves.toHaveLength(2);
-  });
+    await expect(source.getClusterChildren(7)).resolves.toHaveLength(2);
+    expect(mockGetClusterChildren).toHaveBeenCalledWith(
+      expect.objectContaining({ properties: { cluster: true, cluster_id: 7 } })
+    );
 
-  test("cluster methods reject for an unmounted source", async () => {
-    const ref = createRef<MapRef>();
-
-    await render(example(ref));
-
-    await expect(
-      ref.current?.getClusterExpansionZoom("unknown", 7)
-    ).rejects.toThrow('Source "unknown" is not a mounted GeoJSON Source');
+    mockGetClusterExpansionZoom.mockResolvedValueOnce(Infinity);
+    await expect(source.getClusterExpansionZoom(7)).rejects.toThrow(
+      "Cluster expansion zoom must be a finite number."
+    );
   });
 
   test("a ref captured before unmount stops dispatching after remount", async () => {
@@ -1824,16 +1821,19 @@ describe("mapbox-native queries and feature state", () => {
     const rendered = await render(example(firstRef));
     const firstHandle = firstRef.current;
 
-    expect(firstHandle).not.toBeNull();
+    const firstSource = firstHandle?.getSource("routes");
+    if (!firstHandle || !firstSource) {
+      throw new Error("Expected a mounted GeoJSON source.");
+    }
     await rendered.unmount();
 
-    // The stale handle from the unmounted map cannot reach the fresh
-    // registry a remounted map owns, so its source is gone.
-    const second = await render(example());
-
-    await expect(
-      firstHandle?.getClusterLeaves("routes", 7, 10, 0)
-    ).rejects.toThrow('Source "routes" is not a mounted GeoJSON Source');
+    const secondRef = createRef<MapRef>();
+    const second = await render(example(secondRef));
+    expect(secondRef.current?.getSource("routes")).toBeDefined();
+    expect(firstHandle.getSource("routes")).toBeUndefined();
+    await expect(firstSource.getClusterLeaves(7, 10, 0)).rejects.toThrow(
+      'Source "routes" is no longer mounted.'
+    );
 
     await second.unmount();
   });

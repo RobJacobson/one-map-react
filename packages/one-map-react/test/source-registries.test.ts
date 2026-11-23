@@ -79,12 +79,11 @@ test("MapLibre cluster lookup and captured owner track the current source family
   registry.register("routes", () => entry);
   const owner = registry.getGeoJsonOwner("routes");
   expect(owner?.()).toBe(entry.ref);
-  expect(registry.requireGeoJson("routes")).toBe(entry.ref);
+  expect(registry.require("routes")).toBe(entry);
   entry = { kind: "vector", ref: {} } as MaplibreNativeSourceRef;
   expect(registry.getGeoJsonOwner("routes")).toBeUndefined();
   expect(() => owner?.()).toThrow("no longer mounted");
   expect(registry.require("routes")).toBe(entry);
-  expect(() => registry.requireGeoJson("routes")).toThrow("not a GeoJSON");
   entry = undefined;
   expect(registry.getGeoJsonOwner("routes")).toBeUndefined();
   expect(() => owner?.()).toThrow("no longer mounted");
@@ -92,5 +91,5 @@ test("MapLibre cluster lookup and captured owner track the current source family
   entry = { kind: "geojson", ref: {} } as MaplibreNativeSourceRef;
   expect(registry.getGeoJsonOwner("routes")).toBe(owner);
   expect(owner?.()).toBe(entry.ref);
-  expect(registry.requireGeoJson("routes")).toBe(entry.ref);
+  expect(registry.require("routes")).toBe(entry);
 });

@@ -60,7 +60,6 @@ export type {
 } from "./contracts/map-types.js";
 
 export type {
-  ClusterQueryMethods,
   FeatureIdentifier,
   FeatureQueryMethods,
   FeatureState,

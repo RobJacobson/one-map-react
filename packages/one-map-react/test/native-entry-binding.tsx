@@ -241,6 +241,14 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
       Object.keys(handle).sort()
     );
     expect("flyTo" in access.current).toBe(true);
+    for (const clusterMethod of [
+      "getClusterExpansionZoom",
+      "getClusterLeaves",
+      "getClusterChildren",
+    ]) {
+      expect(handle).not.toHaveProperty(clusterMethod);
+      expect(access.current).not.toHaveProperty(clusterMethod);
+    }
     expect("getMap" in access.current).toBe(false);
     expect(typeof (access.current as { getMap?: unknown }).getMap).toBe(
       "undefined"
@@ -250,12 +258,12 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(String(access.current)).toBe("[object Object]");
     expect(JSON.stringify(access.current)).toBe("{}");
     const mountedSource = handle.getSource("routes");
-    expect(mountedSource).toBeDefined();
+    if (!mountedSource) throw new Error("Expected a mounted GeoJSON source.");
     expect(access.current.getSource("routes")).toBe(mountedSource);
     await expect(access.current.getWrapperMap()).resolves.toBe(
       await handle.getWrapperMap()
     );
-    await expect(handle.getClusterExpansionZoom("routes", 7)).resolves.toBe(13);
+    await expect(mountedSource.getClusterExpansionZoom(7)).resolves.toBe(13);
     checkLayer();
     expect(markerRef.current).not.toBeNull();
     const wrapper = view.getByTestId("wrapper-map");
@@ -496,34 +504,54 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     const sourceQuery = source.getClusterExpansionZoom(7);
     await view.rerender(scene(1, 2));
     const replacement = original.getSource("routes");
-    expect(replacement).toBeDefined();
+    if (!replacement) throw new Error("Replacement source is detached.");
     expect(replacement).not.toBe(source);
     await expect(source.getClusterExpansionZoom(7)).rejects.toThrow(
       "no longer mounted"
     );
+
+    const route = { type: "Feature", id: 1, properties: { kind: "route" } };
+    const leaves = [route, route];
+    const children = backend === "mapbox-native" ? leaves : [route];
+    await expect(replacement.getClusterChildren(7)).resolves.toEqual(children);
+    await expect(replacement.getClusterLeaves(7, 5, 2)).resolves.toEqual(
+      leaves
+    );
+
     const onExpansion = jest.fn();
-    expect(replacement?.getClusterExpansionZoom(7, onExpansion)).toBe(
+    const onChildren = jest.fn();
+    const onLeaves = jest.fn();
+    expect(replacement.getClusterExpansionZoom(7, onExpansion)).toBe(
       replacement
     );
+    expect(replacement.getClusterChildren(7, onChildren)).toBe(replacement);
+    expect(replacement.getClusterLeaves(7, 5, 2, onLeaves)).toBe(replacement);
     await act(async () => {});
-    expect(onExpansion).toHaveBeenCalledWith(null, 13);
-    const onFailure = jest.fn();
-    expect(source.getClusterExpansionZoom(7, onFailure)).toBe(source);
+    expect(onExpansion.mock.calls).toEqual([[null, 13]]);
+    expect(onChildren.mock.calls).toEqual([[null, children]]);
+    expect(onLeaves.mock.calls).toEqual([[null, leaves]]);
+
+    const onStaleExpansion = jest.fn();
+    const onStaleChildren = jest.fn();
+    const onStaleLeaves = jest.fn();
+    expect(source.getClusterExpansionZoom(7, onStaleExpansion)).toBe(source);
+    expect(source.getClusterChildren(7, onStaleChildren)).toBe(source);
+    expect(source.getClusterLeaves(7, 5, 2, onStaleLeaves)).toBe(source);
     await act(async () => {});
-    expect(onFailure).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: expect.stringContaining("no longer mounted"),
-      })
-    );
-    await expect(replacement?.getClusterChildren(7)).resolves.toBeDefined();
-    await expect(replacement?.getClusterLeaves(7, 5, 2)).resolves.toBeDefined();
-    await expect(original.getClusterExpansionZoom("routes", 7)).resolves.toBe(
-      13
-    );
+    for (const callback of [onStaleExpansion, onStaleChildren, onStaleLeaves]) {
+      expect(callback.mock.calls).toEqual([
+        [
+          expect.objectContaining({
+            message: expect.stringContaining("no longer mounted"),
+          }),
+        ],
+      ]);
+    }
+
     await view.rerender(scene(1, null));
     expect(original.getSource("routes")).toBeUndefined();
-    await expect(original.getClusterExpansionZoom("routes", 7)).rejects.toThrow(
-      "not a mounted"
+    await expect(replacement.getClusterChildren(7)).rejects.toThrow(
+      "no longer mounted"
     );
 
     const oldWrapper = view.getByTestId("wrapper-map").props as WrapperEvents;

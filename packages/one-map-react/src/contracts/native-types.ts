@@ -107,24 +107,71 @@ export type NativeCameraCommand = Omit<
 type ClusterCallback<Result> = (error: Error | null, result?: Result) => void;
 type ClusterFeatures = readonly GeoJsonFeature[];
 
-/** Cluster operations on a mounted declarative GeoJSON source. */
+/**
+ * Cluster operations on a mounted declarative GeoJSON source.
+ *
+ * @remarks Read cluster IDs from queried features. They can change when
+ * source data changes. New calls fail after the source registration is
+ * removed or replaced. Query failures reject the promise or reach the
+ * callback as an error. Callback calls return this handle for chaining.
+ */
 export interface NativeGeoJsonSource {
   readonly type: "geojson";
+  /**
+   * Reads the zoom level at which a cluster expands.
+   * @param clusterId - Cluster ID from a queried feature.
+   * @returns A promise for the expansion zoom.
+   */
   getClusterExpansionZoom(clusterId: number): Promise<number>;
+  /**
+   * Reads the zoom level at which a cluster expands.
+   *
+   * @param clusterId - Cluster ID from a queried feature.
+   * @param callback - Receives `null` and the expansion zoom on success, or an error on failure.
+   * @returns This source handle for chaining.
+   */
   getClusterExpansionZoom(
     clusterId: number,
     callback: ClusterCallback<number>
   ): NativeGeoJsonSource;
+  /**
+   * Reads the cluster's children at the next zoom level.
+   * @param clusterId - Cluster ID from a queried feature.
+   * @returns A promise for the child features in backend order.
+   */
   getClusterChildren(clusterId: number): Promise<ClusterFeatures>;
+  /**
+   * Reads the cluster's children at the next zoom level.
+   *
+   * @param clusterId - Cluster ID from a queried feature.
+   * @param callback - Receives `null` and the child features in backend order on success, or an error on failure.
+   * @returns This source handle for chaining.
+   */
   getClusterChildren(
     clusterId: number,
     callback: ClusterCallback<ClusterFeatures>
   ): NativeGeoJsonSource;
+  /**
+   * Reads a page of the point features in a cluster.
+   * @param clusterId - Cluster ID from a queried feature.
+   * @param limit - Maximum number of leaves to return.
+   * @param offset - Number of leaves to skip.
+   * @returns A promise for the leaf features in backend order.
+   */
   getClusterLeaves(
     clusterId: number,
     limit: number,
     offset: number
   ): Promise<ClusterFeatures>;
+  /**
+   * Reads a page of the point features in a cluster.
+   *
+   * @param clusterId - Cluster ID from a queried feature.
+   * @param limit - Maximum number of leaves to return.
+   * @param offset - Number of leaves to skip.
+   * @param callback - Receives `null` and the leaf features in backend order on success, or an error on failure.
+   * @returns This source handle for chaining.
+   */
   getClusterLeaves(
     clusterId: number,
     limit: number,
@@ -135,6 +182,11 @@ export interface NativeGeoJsonSource {
 
 /** Arguments shared by the native selected map handles. */
 export interface NativeMapRef extends MapRef {
+  /**
+   * Looks up the mounted GeoJSON source handle for this map.
+   * @param id - ID of the declarative source.
+   * @returns The source handle, or undefined when no GeoJSON source is attached under that ID.
+   */
   getSource(id: string): NativeGeoJsonSource | undefined;
   getCenter(): Promise<NativeLngLat>;
   getBounds(): Promise<NativeBounds>;

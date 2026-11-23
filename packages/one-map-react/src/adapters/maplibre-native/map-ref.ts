@@ -6,7 +6,6 @@ import type {
 import type { ComponentRef } from "react";
 
 import type { NativeMapRef } from "../../contracts/native-types.js";
-import type { ClusterQueryMethods } from "../../contracts/query-types.js";
 import {
   nativeResizeError,
   nativeStopError,
@@ -17,7 +16,10 @@ import {
   toQueryGeometry,
 } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
-import { createNativeClusterLookup } from "../shared/native-clusters.js";
+import {
+  createNativeClusterLookup,
+  type NativeClusterSourceMethods,
+} from "../shared/native-clusters.js";
 import {
   nativeBounds,
   nativeBoundsInput,
@@ -208,7 +210,6 @@ export const createMaplibreMapRef = (
         "querySourceFeatures"
       );
     },
-    ...createClusterMethods((id) => sources.requireGeoJson(id)),
     ...createMaplibreFeatureStateMethods(sources, () =>
       requireMap(mapRef.current)
     ),
@@ -219,24 +220,24 @@ export const createMaplibreMapRef = (
 };
 
 const createClusterMethods = (
-  read: (id: string) => ComponentRef<typeof GeoJSONSource>
-): ClusterQueryMethods => ({
-  getClusterExpansionZoom: async (sourceId, clusterId) => {
-    const source = read(sourceId);
+  read: () => ComponentRef<typeof GeoJSONSource>
+): NativeClusterSourceMethods => ({
+  getClusterExpansionZoom: async (clusterId) => {
+    const source = read();
     const zoom = await source.getClusterExpansionZoom(clusterId);
 
     return finiteNumber(zoom, "Cluster expansion zoom");
   },
-  getClusterLeaves: async (sourceId, clusterId, limit, offset) => {
-    const source = read(sourceId);
+  getClusterLeaves: async (clusterId, limit, offset) => {
+    const source = read();
 
     return featuresFromWrapper(
       await source.getClusterLeaves(clusterId, limit, offset),
       "getClusterLeaves"
     );
   },
-  getClusterChildren: async (sourceId, clusterId) => {
-    const source = read(sourceId);
+  getClusterChildren: async (clusterId) => {
+    const source = read();
 
     return featuresFromWrapper(
       await source.getClusterChildren(clusterId),

@@ -26,6 +26,8 @@ const output = mkdtempSync(join(tmpdir(), "one-map-tf02-"));
 const compiler = join(root, "node_modules/.bin/tsc");
 const reactPackage = join(root, "node_modules/react");
 const reactTypes = join(root, "node_modules/@types/react");
+const retiredClusterMethods =
+  '"getClusterExpansionZoom" | "getClusterLeaves" | "getClusterChildren"';
 const styleSpecName = "@maplibre/maplibre-gl-style-spec";
 const styleSpec = join(
   root,
@@ -298,6 +300,10 @@ const badLine: LayerProps = { id: "bad-line", type: "line", paint: { "circle-rad
 const routes: LayerProps = { id: "routes", type: "line", paint: { "line-width-transition": { duration: 250 } } };
 void routes;
 declare const commonRef: MapRef;
+// @ts-expect-error Native cluster queries use the source handle.
+import type { ClusterQueryMethods } from "one-map-react";
+const commonRefHasNoClusterMethods: Equal<Extract<${retiredClusterMethods}, keyof MapRef>, never> = true;
+void commonRefHasNoClusterMethods;
 // @ts-expect-error Source click events are removed.
 import type { SourceClickEvent } from "one-map-react";
 // @ts-expect-error Common source activation belongs to Map.onClick.
@@ -381,14 +387,18 @@ const invalid: Backend = "automatic";
 `
     );
   } else {
+    const selectedEntry = ([entry, backend], index) => {
+      const importEntry = `import type * as Selected${index} from "one-map-react/${entry}";`;
+      if (!backend.endsWith("-native")) return importEntry;
+
+      return `${importEntry}
+type MapClusterMethods${index} = Extract<${retiredClusterMethods}, keyof Selected${index}.MapRef>;
+const selectedRefHasNoClusterMethods${index}: MapClusterMethods${index} extends never ? true : false = true;
+void selectedRefHasNoClusterMethods${index};`;
+    };
     writeFileSync(
       join(consumer, "selection.tsx"),
-      scenario.entries
-        .map(
-          ([entry], index) =>
-            `import type * as Selected${index} from "one-map-react/${entry}";`
-        )
-        .join("\n")
+      scenario.entries.map(selectedEntry).join("\n")
     );
   }
   writeFileSync(
