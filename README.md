@@ -29,15 +29,21 @@ Run `bun run test` or `vp run test` for the complete test chain; `vp test run` r
 
 ## Library ownership and compilation
 
-Each native map owns its camera, attached ref, source registry, interaction callbacks and live marker overlays. The library compiles these components with React Compiler and ships ESM and declarations. Browser convenience imports forward react-map-gl directly. The [native compatibility design](docs/native-compatibility-design.md) covers the ownership boundaries and remaining verification.
+Each native map owns its camera, attached ref, source registry, interaction callbacks and live marker overlays. The library compiles these components with React Compiler and ships ESM and declarations. Browser convenience imports forward react-map-gl directly. The [library boundary](docs/architecture.md) covers that ownership and the open decisions.
 
 ## Examples
 
-The maintained examples are `apps/web` for Vite and `apps/expo` for Expo web, iOS, and Android. Run `bun install` at the repository root, then `bun run dev:web` or `bun run dev:expo`. Both apps import the private shared example package and expose development acceptance scenarios. See the [example workspace guide](docs/examples-workspace.md) for public Mapbox token configuration, scenario selection, native preparation, and verification status. Native builds and renderer acceptance are separate from `validate`.
+The maintained examples are `apps/web` for Vite and `apps/expo` for Expo web, iOS, and Android. Run `bun install` at the repository root, then `bun run dev:web` or `bun run dev:expo`. `dev:expo` serves Metro on port 8081. Both apps import the private shared example package and expose development acceptance scenarios. `validate` does not generate, compile, install, or run a native app.
+
+Set a public `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN` in the shell or in the root `.env.local` or `.env`. `MAPBOX_ACCESS_TOKEN` is accepted when the new setting is absent. An explicit empty `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN` disables Mapbox. Secret tokens are rejected before they enter a client bundle. Restart the development command after changing configuration.
+
+The default map is Seattle at longitude -122.34, latitude 47.61, zoom 11. Both engines use the OpenFreeMap Liberty style. MapLibre starts without a token. Vite and Expo web accept `?engine=maplibre&scenario=tf04`. `?test=1` shows the basemap readback panel. Production exports omit these controls. For native, set `EXPO_PUBLIC_ONE_MAP_TEST_MODE=1` to show the scenario button, and set `EXPO_PUBLIC_ONE_MAP_SCENARIO` and `EXPO_PUBLIC_ONE_MAP_ENGINE` to open one scenario directly. Mapbox selection requires a public token.
+
+Expo uses SDK 57.0.23 with React Native 0.86.3. The app includes RNMapbox 10.3.19 and MapLibre React Native 11.5.1. Configuration pins the Mapbox Maps SDK to 11.33.0 and MapLibre Native to iOS 6.31.0 and Android 13.6.1. Native projects are generated from that configuration and ignored by Git.
 
 ## Project documents
 
-Read the [native compatibility design](docs/native-compatibility-design.md) and [testing policy](docs/testing-policy.md). The [project files](FILES.md) show the source layout, and the [documentation index](docs/README.md) links the API research and style guides.
+Read the [library boundary](docs/architecture.md) and [testing](docs/testing.md). The [project files](FILES.md) show the source layout, and the [documentation index](docs/README.md) points at the current guides.
 
 The `records/` directory preserves historical inventory and compact checkpoint evidence. No historical implementation code is required to develop this project.
 

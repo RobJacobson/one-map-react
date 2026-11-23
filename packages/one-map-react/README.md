@@ -98,7 +98,7 @@ export const HarborScreen = () => (
 
 Inside a map, read `useMap().current`. A sibling reads `useMap().harbor` for a mounted map with `id="harbor"` in its provider. A map without an ID registers as `default`. Each provider requires unique IDs and reserves `current` for the enclosing map. Lookup yields `undefined` when the corresponding map is absent. Both forms expose the selected `NativeAdvancedMapRef`, including `getWrapperMap()`.
 
-Native selected maps accept partial initial camera settings, desktop camera commands, and click fields such as `event.lngLat.lng` and `event.point.x`. Await native reads including `getCenter()`, `project()`, and `getBounds()`. Use `map.getSource(id)` to access a mounted GeoJSON source's cluster methods. Both promise and error-first callback calls are supported on native. [Native compatibility contract](https://github.com/RobJacobson/one-map-react/blob/main/docs/revised-api-proposal.md#native-compatibility-contract).
+Native selected maps accept partial initial camera settings, desktop camera commands, and click fields such as `event.lngLat.lng` and `event.point.x`. Await native reads including `getCenter()`, `project()`, and `getBounds()`. Use `map.getSource(id)` to access a mounted GeoJSON source's cluster methods. Both promise and error-first callback calls are supported on native. [Library boundary](https://github.com/RobJacobson/one-map-react/blob/main/docs/architecture.md).
 
 The MapLibre native `Layer` also accepts SDK-specific props, including `afterId`, `layerIndex`, and `style`.
 
@@ -156,7 +156,7 @@ Native `fitBounds.maxZoom` remains owner-deferred and rejects every supplied val
 
 The owner excludes physical-device testing and RNMapbox `invalidateAmbientCache()` and `setMaximumAmbientCacheSize()` from release requirements. These operations are not certified as implemented. Full VoiceOver and TalkBack audits are outside the release certification; facade-owned interaction accessibility remains part of its checks. Representative integration does not certify every upstream expression operator, host property, hardware sensor, or build setting.
 
-The [native compatibility design](https://github.com/RobJacobson/one-map-react/blob/main/docs/native-compatibility-design.md) and [testing policy](https://github.com/RobJacobson/one-map-react/blob/main/docs/testing-policy.md) describe release scope and evidence. The archive includes built output, this README, the manifest, the license, and native repairs.
+The [library boundary](https://github.com/RobJacobson/one-map-react/blob/main/docs/architecture.md) and [testing policy](https://github.com/RobJacobson/one-map-react/blob/main/docs/testing.md) describe release scope and evidence. The archive includes built output, this README, the manifest, the license, and native repairs.
 
 MapLibre React Native 11.5.1 selects MapLibre Native 6.31.0 on iOS and 13.6.1 on Android. Its parser supports Mercator projection, without terrain, sky or global-state style roots. Explicit unsupported roots and silently ignored source/layer fields reject. Unsupported expression operators retain native parser errors; `format.vertical-align` and `number-format.unit` reject before dispatch. The selected style types also describe newer JS features, so their presence alone does not promise native rendering. Use legacy `Layer` style `rasterResampling` for native raster sampling and `iconAllowOverlap`/`textAllowOverlap` for basic symbol overlap. Complete URL styles remain wrapper-owned; their loading/errors use native callbacks.
 

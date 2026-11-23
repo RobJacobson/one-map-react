@@ -1,6 +1,6 @@
 # Inventory research snapshot retirement
 
-Recorded on October 16, 2026 against commit 241816e73eb12a38a4b4b729757986500eb2a950. This checkpoint removes the remaining JSON inventory snapshots from the working tree. The [API coverage checklist](../../docs/api-coverage.md) remains the sole coverage record; [upstream research notes](../../docs/upstream-research.md) preserve useful historical findings and primary-source citations without implementation or verification statuses.
+Recorded on October 16, 2026 against commit 241816e73eb12a38a4b4b729757986500eb2a950. This checkpoint removes the remaining JSON inventory snapshots from the working tree. At this checkpoint the [API coverage checklist](https://github.com/RobJacobson/one-map-react/blob/241816e73eb12a38a4b4b729757986500eb2a950/docs/api-coverage.md) was the coverage record, and the [upstream research notes](https://github.com/RobJacobson/one-map-react/blob/241816e73eb12a38a4b4b729757986500eb2a950/docs/upstream-research.md) preserved historical findings and primary-source citations without implementation or verification statuses.
 
 ## Removed snapshots
 
