@@ -63,3 +63,19 @@ export const nativeInitialFit = (
     pitch: initial.pitch,
   };
 };
+
+/**
+ * Rejects a fit zoom cap, which neither pinned native camera wrapper accepts.
+ *
+ * @param maxZoom - Requested fit zoom cap, including zero.
+ * @throws When `maxZoom` is supplied.
+ */
+export const rejectNativeFitBoundsMaxZoom = (
+  maxZoom: NativeFitBoundsOptions["maxZoom"]
+): void => {
+  if (maxZoom !== undefined) {
+    throw new Error(
+      "fitBounds.maxZoom is unavailable through the pinned native camera wrapper."
+    );
+  }
+};

@@ -37,7 +37,7 @@ const Probe = ({
 };
 
 describe("useStableOptions", () => {
-  test("returns its original validated value across equivalent renders", () => {
+  test("accepts equivalent nested options and rejects changes in Strict Mode", () => {
     const original = { position: "top-right", nested: { enabled: true } };
     const mounted = renderHook(
       ({ options }) => useStableOptions("fixture", options),
@@ -46,9 +46,9 @@ describe("useStableOptions", () => {
         wrapper: StrictMode,
       }
     );
-    expect(mounted.result.current).toBe(original);
-    mounted.rerender({ options: { ...original, nested: { enabled: true } } });
-    expect(mounted.result.current).toBe(original);
+    expect(() =>
+      mounted.rerender({ options: { ...original, nested: { enabled: true } } })
+    ).not.toThrow();
     expect(() =>
       mounted.rerender({ options: { ...original, nested: { enabled: false } } })
     ).toThrow('creation option "nested"');

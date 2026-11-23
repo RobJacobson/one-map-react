@@ -44,7 +44,6 @@ export {
   MapboxNativeLayer as Layer,
 } from "./adapters/mapbox-native/index.js";
 
-/** Selected native map with typed renderer facilities and host attributes. */
 /** Selected SDK location follow options, applied to the existing camera. */
 export type NativeLocationOptions = Pick<
   ComponentProps<typeof WrapperCamera>,

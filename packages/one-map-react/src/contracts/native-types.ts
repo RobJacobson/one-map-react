@@ -211,3 +211,17 @@ export interface NativeMapRef extends MapRef {
     options?: { readonly exaggerated?: boolean }
   ): Promise<number | null>;
 }
+
+/** Common map operations and access to the selected native wrapper. */
+export type NativeMapRefWithWrapper<WrapperMap> = NativeMapRef & {
+  /**
+   * Borrows the currently attached native map wrapper.
+   *
+   * @returns The current wrapper handle, without waiting for map load.
+   * @remarks Call again for each operation. The SDK wrapper owns each handle
+   * and determines its lifetime, including after the facade detaches.
+   * The `Camera` has a separate ref.
+   * @throws Rejects when the map wrapper is not attached.
+   */
+  readonly getWrapperMap: () => Promise<WrapperMap>;
+};

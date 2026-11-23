@@ -4,10 +4,10 @@ import type {
 } from "@maplibre/maplibre-react-native";
 import type { ComponentRef } from "react";
 
-import type { NativeMapRef } from "../../contracts/native-types.js";
+import type { NativeMapRefWithWrapper } from "../../contracts/native-types.js";
 import {
-  nativeResizeError,
-  nativeStopError,
+  rejectNativeResize,
+  rejectNativeStop,
   unavailableMapMethodError,
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
@@ -44,19 +44,10 @@ import {
   requireMaplibreSource,
 } from "./source-registry.js";
 
-/** Common map operations and access to the selected native wrapper. */
-export type NativeAdvancedMapRef = NativeMapRef & {
-  /**
-   * Borrows the currently attached MapLibre Native Map wrapper.
-   *
-   * @returns The current wrapper handle, without waiting for map load.
-   * @remarks Call again for each operation. Handles retain the wrapper's
-   * lifetime and ownership; facade detachment does not invalidate them or
-   * expose the separate Camera.
-   * @throws Rejects when the Map is not attached.
-   */
-  readonly getWrapperMap: () => Promise<ComponentRef<typeof MaplibreMap>>;
-};
+/** Common map operations and access to the MapLibre React Native `Map` wrapper. */
+export type NativeAdvancedMapRef = NativeMapRefWithWrapper<
+  ComponentRef<typeof MaplibreMap>
+>;
 
 /**
  * Builds the imperative map handle over MapLibre Native camera and map refs.
@@ -119,9 +110,7 @@ export const createMaplibreMapRef = (
         options ? toMaplibreCommand(options) : undefined
       );
     },
-    stop: async () => {
-      throw nativeStopError();
-    },
+    stop: rejectNativeStop,
     getCenter: async () =>
       nativeLngLat(
         lngLatFromWrapper(await requireMap(mapRef.current).getCenter())
@@ -212,9 +201,7 @@ export const createMaplibreMapRef = (
     ...createMaplibreFeatureStateMethods(sources, () =>
       requireMap(mapRef.current)
     ),
-    resize: async () => {
-      throw nativeResizeError();
-    },
+    resize: rejectNativeResize,
   };
 };
 
