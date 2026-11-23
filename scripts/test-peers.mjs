@@ -559,6 +559,35 @@ import { Images, UserLocation } from "one-map-react/native-extensions";
 void Images; void UserLocation;
 const ornaments: NativeMapProps["options"] = ${entry === "mapbox-native" ? "{ scaleBarEnabled: true, attributionEnabled: true, logoEnabled: true }" : "{ scaleBar: true, attribution: true, logo: true }"};
 void ornaments;
+${
+  entry === "mapbox-native"
+    ? `const validOptions: NativeMapProps["options"] = { scaleBarEnabled: true, projection: "mercator", gestureSettings: { quickZoomEnabled: false } };
+// @ts-expect-error mapStyle owns RNMapbox styleURL.
+const rejectedStyleURL: NativeMapProps["options"] = { styleURL: "https://example.test/style.json" };
+// @ts-expect-error mapStyle owns RNMapbox styleJSON.
+const rejectedStyleJSON: NativeMapProps["options"] = { styleJSON: "{}" };
+// @ts-expect-error Facade owns onPress.
+const rejectedOnPress: NativeMapProps["options"] = { onPress: () => {} };
+// @ts-expect-error Facade owns onCameraChanged.
+const rejectedOnCameraChanged: NativeMapProps["options"] = { onCameraChanged: () => {} };
+// @ts-expect-error Conflicting legacy region callback is excluded.
+const rejectedOnRegionIsChanging: NativeMapProps["options"] = { onRegionIsChanging: () => {} };
+// @ts-expect-error Facade owns onMapIdle.
+const rejectedOnMapIdle: NativeMapProps["options"] = { onMapIdle: () => {} };
+// @ts-expect-error Conflicting legacy load-failure callback is excluded.
+const rejectedOnDidFailLoadingMap: NativeMapProps["options"] = { onDidFailLoadingMap: () => {} };
+void validOptions; void rejectedStyleURL; void rejectedStyleJSON; void rejectedOnPress; void rejectedOnCameraChanged; void rejectedOnRegionIsChanging; void rejectedOnMapIdle; void rejectedOnDidFailLoadingMap;`
+    : `const validOptions: NativeMapProps["options"] = { scaleBar: true, light: { intensity: 0.5 } };
+// @ts-expect-error mapStyle owns MapLibre mapStyle.
+const rejectedMapStyle: NativeMapProps["options"] = { mapStyle: "https://example.test/style.json" };
+// @ts-expect-error Facade owns onPress.
+const rejectedOnPress: NativeMapProps["options"] = { onPress: () => {} };
+// @ts-expect-error Facade owns onRegionIsChanging.
+const rejectedOnRegionIsChanging: NativeMapProps["options"] = { onRegionIsChanging: () => {} };
+// @ts-expect-error Facade owns onDidFailLoadingMap.
+const rejectedOnDidFailLoadingMap: NativeMapProps["options"] = { onDidFailLoadingMap: () => {} };
+void validOptions; void rejectedMapStyle; void rejectedOnPress; void rejectedOnRegionIsChanging; void rejectedOnDidFailLoadingMap;`
+}
 void <Callout title="Application callout" />;
 import { Marker as SelectedMarker, ${entry === "mapbox-native" ? "PointAnnotation" : "ViewAnnotation"} as RawAnnotation } from "one-map-react/${entry}";
 void <SelectedMarker longitude={0} latitude={0} draggable={false} onClick={() => undefined} />;

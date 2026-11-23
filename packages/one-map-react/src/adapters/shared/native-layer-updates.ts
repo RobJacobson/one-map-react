@@ -19,6 +19,31 @@ export const definedStyle = (
   );
 };
 
+/**
+ * Copies arrays and objects, dropping object fields whose values are undefined.
+ * The copy is the value forwarded to MapLibre. Returning the caller's container
+ * would let a getter change between validation and the style converter.
+ * The caller's value is not mutated.
+ *
+ * @param value - Expression, style object, or other field forwarded to the wrapper.
+ * @returns A new array or record, or the original primitive when the value is not a container.
+ */
+export const omitUndefinedFields = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    const copy: unknown[] = [];
+    for (const member of value) copy.push(omitUndefinedFields(member));
+    return copy;
+  }
+  if (!value || typeof value !== "object") return value;
+
+  const entries: [string, unknown][] = [];
+  for (const [key, member] of Object.entries(value)) {
+    if (member === undefined) continue;
+    entries.push([key, omitUndefinedFields(member)]);
+  }
+  return Object.fromEntries(entries);
+};
+
 /** Recreates only the wrapper layer when a setting must return to its SDK default. */
 export const useNativeLayerKey = (
   style: object,

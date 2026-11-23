@@ -8,6 +8,7 @@ import {
   type ComponentRef,
   forwardRef,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -20,6 +21,7 @@ import {
   assertNativeMapOptions,
 } from "../native-map-options.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
+import { omitUndefinedFields } from "../shared/native-layer-updates.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import { withNativeMapPresentation } from "../shared/native-map-presentation.js";
 import { nativeBoundsInput } from "../shared/native-values.js";
@@ -41,7 +43,7 @@ import {
   MaplibreSourceContext,
   createMaplibreSourceRegistry,
 } from "./source-registry.js";
-import { assertMaplibreStyleRoots } from "./style-roots.js";
+import { maplibreStyleForNative } from "./style-roots.js";
 
 type MaplibrePressEvent = Parameters<
   NonNullable<ComponentProps<typeof MaplibreMap>["onPress"]>
@@ -60,11 +62,18 @@ const MaplibreNativeMapImplementation = forwardRef<
     options?: Partial<ComponentProps<typeof MaplibreMap>>;
   }
 >((props, ref) => {
-  assertMaplibreStyleRoots(props.mapStyle);
+  // This component is not compiled, so reuse the serialized document while
+  // the style object keeps its identity. Compiled WrapperMap caches the same way.
+  const mapStyle = useMemo(
+    () =>
+      maplibreStyleForNative(props.mapStyle) as ComponentProps<
+        typeof MaplibreMap
+      >["mapStyle"],
+    [props.mapStyle]
+  );
   validateMaplibreMapOptions(props);
   const viewState = nativeCameraTarget(props);
   const {
-    mapStyle,
     initialViewState,
     minZoom,
     maxZoom,
@@ -181,18 +190,13 @@ const MaplibreNativeMapImplementation = forwardRef<
         <MaplibreMap
           {...props.options}
           light={
-            props.light
-              ? {
-                  ...props.light,
-                  position: props.light.position
-                    ? [...props.light.position]
-                    : undefined,
-                }
-              : props.options?.light
+            omitUndefinedFields(props.light ?? props.options?.light) as
+              | ComponentProps<typeof MaplibreMap>["light"]
+              | undefined
           }
           ref={mapRef}
           style={{ flex: 1 }}
-          mapStyle={mapStyle as ComponentProps<typeof MaplibreMap>["mapStyle"]}
+          mapStyle={mapStyle}
           {...gestures}
           onDidFinishLoadingMap={() => {
             mapLoaded.current = true;

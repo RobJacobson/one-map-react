@@ -69,6 +69,8 @@ export interface NativeMapProps extends Omit<NativeMapInputs, "mapStyle"> {
     | "children"
     | "ref"
     | "style"
+    | "styleURL"
+    | "styleJSON"
     | "onPress"
     | "onLongPress"
     | "onCameraChanged"
