@@ -1249,11 +1249,7 @@ describe("TF07 native UI composition", () => {
     const clicked = jest.fn();
     let change: (state: AppStateStatus) => void = () => {};
     const remove = jest.fn();
-    const appState = jest.replaceProperty(
-      AppState,
-      "currentState",
-      "background"
-    );
+    const appState = jest.replaceProperty(AppState, "currentState", "active");
     const subscription = jest
       .spyOn(AppState, "addEventListener")
       .mockImplementation((_event, callback) => {
@@ -1276,6 +1272,7 @@ describe("TF07 native UI composition", () => {
       const view = await render(tree(false));
       expect(subscription).not.toHaveBeenCalled();
 
+      appState.replaceValue("background");
       await view.rerender(tree(true));
       expect(subscription).toHaveBeenCalledTimes(1);
       const marker = view.getByTestId("dynamic-marker");
@@ -1283,6 +1280,7 @@ describe("TF07 native UI composition", () => {
       await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
       expect(clicked).not.toHaveBeenCalled();
 
+      appState.replaceValue("active");
       await act(async () => change("active"));
       await beginTouch(marker, touch(0, 0));
       await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
@@ -1295,6 +1293,8 @@ describe("TF07 native UI composition", () => {
       expect(
         view.getByTestId("dynamic-marker").props.onTouchEnd
       ).toBeUndefined();
+      await view.rerender(tree(true));
+      expect(subscription).toHaveBeenCalledTimes(2);
       await act(async () => capturedEnd(touch(0, 0, 0)));
       expect(clicked).toHaveBeenCalledTimes(1);
       await view.unmount();

@@ -14,20 +14,16 @@ const FakeMap = forwardRef<MapRef, NativeMapInputs>(({ children }, _ref) => (
   <>{children}</>
 ));
 const Empty = () => null;
-const createFixture = (backend: NativeBackend) => {
-  const anchors: Anchor[] = [];
-  const binding = createNativeMapBinding(FakeMap, {
+const createFixture = (backend: NativeBackend) =>
+  createNativeMapBinding(FakeMap, {
     backend,
     Source: Empty,
     Layer: Empty,
     Images: Empty,
-    Marker: forwardRef((props, _ref) => {
-      anchors.push(props.anchor);
-      return null;
-    }),
+    Marker: forwardRef((props, _ref) => (
+      <div data-testid="marker" data-anchor={props.anchor} />
+    )),
   });
-  return { ...binding, anchors };
-};
 
 const genuineChanges = [
   [
@@ -57,7 +53,7 @@ const genuineChanges = [
 describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
   "%s selected marker creation options",
   (backend) => {
-    const { Map: NativeMap, Marker, anchors } = createFixture(backend);
+    const { Map: NativeMap, Marker } = createFixture(backend);
     const tree = (children: ReactNode) => (
       <StrictMode>
         <NativeMap mapStyle={style} initialViewState={camera}>
@@ -87,19 +83,25 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
           />
         </>
       );
-      anchors.length = 0;
       const mounted = render(tree(controls(false)));
-      expect(anchors.at(-1)).toBe("bottom");
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(tree(controls(true)));
-      expect(anchors.at(-1)).toBe("bottom");
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(tree(controls(false)));
-      expect(anchors.at(-1)).toBe("bottom");
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
     });
 
     test("marker content changes retain the original default", () => {
-      anchors.length = 0;
       const mounted = render(tree(<Marker longitude={0} latitude={0} />));
-      expect(anchors.at(-1)).toBe("bottom");
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(
         tree(
           <Marker longitude={0} latitude={0}>
@@ -107,7 +109,9 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
           </Marker>
         )
       );
-      expect(anchors.at(-1)).toBe("bottom");
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(
         tree(
           <Marker longitude={0} latitude={0} anchor="bottom">
@@ -115,7 +119,9 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
           </Marker>
         )
       );
-      expect(anchors.at(-1)).toBe("bottom");
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(
         tree(
           <Marker longitude={0} latitude={0}>
@@ -123,7 +129,9 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
           </Marker>
         )
       );
-      expect(anchors.at(-1)).toBe("bottom");
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       expect(() =>
         mounted.rerender(
           tree(
@@ -139,7 +147,6 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
       "resolves and retains effective default anchor when initially explicit (custom content: %s)",
       (custom) => {
         const expected: Anchor = custom ? "center" : "bottom";
-        anchors.length = 0;
         const mounted = render(
           tree(
             <Marker longitude={0} latitude={0} anchor={expected}>
@@ -147,7 +154,9 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
             </Marker>
           )
         );
-        expect(anchors.at(-1)).toBe(expected);
+        expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+          expected
+        );
         mounted.rerender(
           tree(
             <Marker longitude={0} latitude={0}>
@@ -155,7 +164,9 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
             </Marker>
           )
         );
-        expect(anchors.at(-1)).toBe(expected);
+        expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+          expected
+        );
         mounted.rerender(
           tree(
             <Marker longitude={0} latitude={0}>
@@ -163,7 +174,9 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
             </Marker>
           )
         );
-        expect(anchors.at(-1)).toBe(expected);
+        expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+          expected
+        );
       }
     );
   }

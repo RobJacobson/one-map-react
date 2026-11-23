@@ -148,88 +148,71 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
   };
 };
 
+type ActivationResponders = Required<
+  Pick<
+    ViewProps,
+    | "onStartShouldSetResponder"
+    | "onResponderTerminate"
+    | "onResponderTerminationRequest"
+    | "onTouchStart"
+    | "onTouchMove"
+    | "onTouchEnd"
+    | "onTouchCancel"
+  >
+>;
+
 const composeHandler = (
-  first: ((event: GestureResponderEvent) => void) | undefined,
+  first: (event: GestureResponderEvent) => void,
   second: ((event: GestureResponderEvent) => void) | undefined
-): ((event: GestureResponderEvent) => void) | undefined => {
-  if (!first) return second;
-  if (!second) return first;
-  return (event) => {
-    first(event);
-    second(event);
-  };
-};
+): ((event: GestureResponderEvent) => void) =>
+  second
+    ? (event) => {
+        first(event);
+        second(event);
+      }
+    : first;
 
 const composeStartResponder = (
-  first: ViewProps["onStartShouldSetResponder"],
+  first: (event: GestureResponderEvent) => boolean,
   second: ViewProps["onStartShouldSetResponder"]
-): ViewProps["onStartShouldSetResponder"] => {
-  if (!first) return second;
-  if (!second) return first;
-  return (event) => Boolean(first(event) || second(event));
-};
+): ((event: GestureResponderEvent) => boolean) =>
+  second ? (event) => Boolean(first(event) || second(event)) : first;
 
 const composeViewResponders = (
-  responders: ViewProps,
+  responders: ActivationResponders | undefined,
   hostProps: ViewProps | undefined
 ): ViewProps => {
-  const onStartShouldSetResponder = composeStartResponder(
-    responders.onStartShouldSetResponder,
-    hostProps?.onStartShouldSetResponder
-  );
-  const onResponderTerminationRequest =
-    hostProps?.onResponderTerminationRequest ??
-    responders.onResponderTerminationRequest;
-  const onResponderGrant = composeHandler(
-    responders.onResponderGrant,
-    hostProps?.onResponderGrant
-  );
-  const onResponderMove = composeHandler(
-    responders.onResponderMove,
-    hostProps?.onResponderMove
-  );
-  const onResponderRelease = composeHandler(
-    responders.onResponderRelease,
-    hostProps?.onResponderRelease
-  );
-  const onResponderTerminate = composeHandler(
-    responders.onResponderTerminate,
-    hostProps?.onResponderTerminate
-  );
-  const onTouchStart = composeHandler(
-    responders.onTouchStart,
-    hostProps?.onTouchStart
-  );
-  const onTouchMove = composeHandler(
-    responders.onTouchMove,
-    hostProps?.onTouchMove
-  );
-  const onTouchEnd = composeHandler(
-    responders.onTouchEnd,
-    hostProps?.onTouchEnd
-  );
-  const onTouchCancel = composeHandler(
-    responders.onTouchCancel,
-    hostProps?.onTouchCancel
-  );
-
+  if (!responders) return hostProps ?? {};
   return {
     ...hostProps,
-    ...(onStartShouldSetResponder ? { onStartShouldSetResponder } : {}),
-    ...(onResponderTerminationRequest ? { onResponderTerminationRequest } : {}),
-    ...(onResponderGrant ? { onResponderGrant } : {}),
-    ...(onResponderMove ? { onResponderMove } : {}),
-    ...(onResponderRelease ? { onResponderRelease } : {}),
-    ...(onResponderTerminate ? { onResponderTerminate } : {}),
-    ...(onTouchStart ? { onTouchStart } : {}),
-    ...(onTouchMove ? { onTouchMove } : {}),
-    ...(onTouchEnd ? { onTouchEnd } : {}),
-    ...(onTouchCancel ? { onTouchCancel } : {}),
+    onStartShouldSetResponder: composeStartResponder(
+      responders.onStartShouldSetResponder,
+      hostProps?.onStartShouldSetResponder
+    ),
+    onResponderTerminationRequest:
+      hostProps?.onResponderTerminationRequest ??
+      responders.onResponderTerminationRequest,
+    onResponderTerminate: composeHandler(
+      responders.onResponderTerminate,
+      hostProps?.onResponderTerminate
+    ),
+    onTouchStart: composeHandler(
+      responders.onTouchStart,
+      hostProps?.onTouchStart
+    ),
+    onTouchMove: composeHandler(responders.onTouchMove, hostProps?.onTouchMove),
+    onTouchEnd: composeHandler(responders.onTouchEnd, hostProps?.onTouchEnd),
+    onTouchCancel: composeHandler(
+      responders.onTouchCancel,
+      hostProps?.onTouchCancel
+    ),
   };
 };
 
 /** Observes live-marker activation without claiming scrolling or child-button touches. */
-const useNativeMarkerActivation = (props: NativeMarkerProps): ViewProps => {
+const useNativeMarkerActivation = (
+  props: NativeMarkerProps
+): ActivationResponders | undefined => {
   const enabled =
     props.renderMode !== "annotation" && props.onClick !== undefined;
   const eligible = useRef(false);
@@ -267,7 +250,7 @@ const useNativeMarkerActivation = (props: NativeMarkerProps): ViewProps => {
     cancel();
   }, [props.longitude, props.latitude, props.renderMode, cancel]);
 
-  if (!enabled) return {};
+  if (!enabled) return undefined;
   return {
     // Fabric blocks native scrolling below a responder ancestor; observe only.
     onStartShouldSetResponder: (event) => {
