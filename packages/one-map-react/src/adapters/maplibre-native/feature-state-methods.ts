@@ -8,7 +8,10 @@ import {
   toMaplibreFeatureId,
   toMaplibreVectorFeature,
 } from "./convert-query.js";
-import type { MaplibreSourceRegistry } from "./source-registry.js";
+import {
+  type MaplibreSourceRegistry,
+  requireMaplibreSource,
+} from "./source-registry.js";
 
 /** Validates and copies inputs before dispatch to the current source ref. */
 export const createMaplibreFeatureStateMethods = (
@@ -20,7 +23,7 @@ export const createMaplibreFeatureStateMethods = (
     const mutableState = copyValidatedFeatureState(state);
 
     requireMap();
-    const source = sources.require(target.source);
+    const source = requireMaplibreSource(sources, target.source);
 
     await (source.kind === "geojson"
       ? source.ref.setFeatureState(toMaplibreFeatureId(target), mutableState)
@@ -32,7 +35,7 @@ export const createMaplibreFeatureStateMethods = (
   getFeatureState: async (identifier) => {
     const target = assertFeatureIdentifier(identifier);
     requireMap();
-    const source = sources.require(target.source);
+    const source = requireMaplibreSource(sources, target.source);
 
     return featureStateFromWrapper(
       await (source.kind === "geojson"
@@ -43,7 +46,7 @@ export const createMaplibreFeatureStateMethods = (
   removeFeatureState: async (identifier, key) => {
     const target = assertFeatureIdentifier(identifier);
     requireMap();
-    const source = sources.require(target.source);
+    const source = requireMaplibreSource(sources, target.source);
 
     await (source.kind === "geojson"
       ? source.ref.removeFeatureState(

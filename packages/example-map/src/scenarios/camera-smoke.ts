@@ -14,7 +14,7 @@ import {
  * The opening camera is latitude 47.61. A fitted center inside this box
  * shows that `fitBounds` moved the map.
  */
-export const cameraSmokeBounds: SceneBounds = [
+const cameraSmokeBounds: SceneBounds = [
   [-122.33, 47.63],
   [-122.31, 47.65],
 ];

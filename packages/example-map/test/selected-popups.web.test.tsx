@@ -60,6 +60,7 @@ const RawPopup = (props: {
 };
 
 vi.mock("react-map-gl/mapbox", () => ({
+  useMap: () => ({}),
   Map: ({ children }: { children?: ReactNode }) => children,
   Source: ({ children }: { children?: ReactNode }) => children,
   Layer: () => null,
@@ -87,6 +88,7 @@ vi.mock("react-map-gl/mapbox", () => ({
   Popup: (props: ComponentProps<typeof RawPopup>) => <RawPopup {...props} />,
 }));
 vi.mock("react-map-gl/maplibre", () => ({
+  useMap: () => ({}),
   Map: ({ children }: { children?: ReactNode }) => children,
   Source: ({ children }: { children?: ReactNode }) => children,
   Layer: () => null,
@@ -113,6 +115,15 @@ vi.mock("react-map-gl/maplibre", () => ({
   },
   Popup: (props: ComponentProps<typeof RawPopup>) => <RawPopup {...props} />,
 }));
+
+test.each([MapboxApp, MaplibreApp])(
+  "selected web entry rejects the native-only retained scene",
+  (App) => {
+    expect(() => render(<App scenario="tf07-retained" />)).toThrow(
+      "tf07-retained requires a native acceptance host."
+    );
+  }
+);
 
 test.each([MapboxApp, MaplibreApp])(
   "selected web TF07 app uses raw popup and owns conditional dismissal",

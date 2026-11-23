@@ -49,6 +49,7 @@ export const useExampleMap = (
   const observed = useRef(initialCamera);
   const observedGeneration = useRef(-1);
   const currentGeneration = useRef(0);
+  const handledLoadGeneration = useRef(-1);
   const busy = useRef(false);
   const active = useRef(true);
   const verification = useRef<AbortController | null>(null);
@@ -93,7 +94,15 @@ export const useExampleMap = (
 
   const onLoad = async (): Promise<void> => {
     const map = mapRef.current;
-    if (!map || !isCurrent() || verification.current?.signal.aborted) return;
+    if (
+      !map ||
+      !isCurrent() ||
+      handledLoadGeneration.current === attachment.generation ||
+      verification.current?.signal.aborted
+    ) {
+      return;
+    }
+    handledLoadGeneration.current = attachment.generation;
     clearTimeout(loadingTimer.current);
     verification.current?.abort();
     const controller = new AbortController();
@@ -142,6 +151,8 @@ export const useExampleMap = (
       return;
     if (engine === attachment.engine && status !== "error") return;
     busy.current = true;
+    // The outgoing attachment can still emit load events during preparation.
+    handledLoadGeneration.current = attachment.generation;
     setStatus("switching");
     setError(undefined);
     verification.current?.abort();

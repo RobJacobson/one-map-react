@@ -23,7 +23,7 @@ bun install --frozen-lockfile
 bun run validate
 ```
 
-`validate` checks formatting, documentation links, inventory consistency, types, Vitest unit/web tests, native Jest Testing Library mounts, the cross-package regressions in `tests/`, the library build, and packed-package selection without installing wrapper peers into consumers. `bun run test:peers` installs one selected peer set into temporary consumers outside the workspace. It is not part of `validate`. Neither command launches a browser, Metro session, simulator, or native build. `bun run pack` builds an archive in `artifacts/`.
+`validate` checks formatting and documentation links, then builds the packages before checking types. It runs Vitest, native Jest, the cross-package regressions in `tests/`, and packed-package selection. Run `bun run test:peers` to check temporary consumers with installed wrapper peers. Run `bun run pack` to build an archive in `artifacts/`.
 
 Run `bun run test` or `vp run test` for the complete test chain; `vp test run` runs only unit/web Vitest tests, and `bun run test:native` runs native Jest tests. `vp check` runs formatting and linting; the separate `typecheck` script remains part of `validate` so all four TypeScript configurations are checked.
 

@@ -13,29 +13,18 @@ import {
   CustomLocationProvider,
   LocationPuck,
 } from "one-map-react/mapbox-native";
-import { Button, NativeModules, StyleSheet, Text, View } from "react-native";
+import { NativeModules } from "react-native";
 
 import type { AcceptanceScenario } from "../acceptance-selection.js";
-import { useLifecycleSmoke } from "./lifecycle-smoke.js";
 import { createMapboxOfflineCommands } from "./mapbox-offline-commands.js";
 import { createMapboxSnapshot } from "./mapbox-snapshot.js";
-import { NativeCameraScreen } from "./native-camera-screen.js";
-import { NativeLifetimesScreen } from "./native-lifetimes-screen.js";
 import {
   acquireNativeLocation,
   requestNativeLocationPermission,
 } from "./native-location.js";
 import { NativeModelScene } from "./native-model-scene.js";
-import { NativeQueriesScreen } from "./native-queries-screen.js";
 import { createNativeSceneComponents } from "./native-scene-components.js";
-import { NativeSourcesScreen } from "./native-sources-screen.js";
-import { NativeTf07FocusedScreen } from "./native-tf07-focused-screen.js";
-import { NativeTf07RetainedScreen } from "./native-tf07-retained-screen.js";
-import { NativeTf07Screen } from "./native-tf07-screen.js";
-import { NativeTf08Screen } from "./native-tf08-screen.js";
-import { NativeTf09Screen } from "./native-tf09-screen.js";
-import { RouteMap } from "./route-map.js";
-import { useNativeMapRef } from "./use-native-map-ref.js";
+import { NativeAcceptanceScene } from "./NativeAcceptanceScene.js";
 
 /** Uses the wrapper's SDK network switch while keeping test transport available. */
 const setNetworkConnected = (connected: boolean): Promise<boolean> =>
@@ -115,95 +104,32 @@ const components = createNativeSceneComponents("mapbox-native", {
   useMap,
 });
 
-const App = ({ scenario }: { readonly scenario: AcceptanceScenario }) => {
-  if (scenario === "tf09-model")
-    return (
-      <NativeTf09Screen components={components} scene={NativeModelScene} />
-    );
-  if (scenario === "tf09") return <NativeTf09Screen components={components} />;
-  if (scenario === "tf08" || scenario === "tf08-storage")
-    return (
-      <NativeTf08Screen
-        components={components}
-        createSnapshot={createMapboxSnapshot}
-        getCurrentPosition={getCurrentPosition}
-        requestLocationPermission={requestLocationPermission}
-        getLocationDiagnostic={() =>
-          WrapperLocationManager.getLastKnownLocation()
-        }
-        setNetworkConnected={setNetworkConnected}
-        offlineOperations={offlineOperations}
-        createOfflineCommands={createMapboxOfflineCommands}
-        startDetached={scenario === "tf08-storage"}
-        nativePuck={
-          <>
-            <CustomLocationProvider coordinate={[-122.34, 47.615]} />
-            <LocationPuck puckBearingEnabled={false} />
-          </>
-        }
-      />
-    );
-  if (scenario === "tf07-retained")
-    return <NativeTf07RetainedScreen components={components} />;
-  if (scenario === "tf07-focused")
-    return <NativeTf07FocusedScreen components={components} />;
-  if (scenario === "tf07")
-    return (
-      <NativeTf07Screen components={components} ornaments={tf07Ornaments} />
-    );
-  if (scenario === "tf06-lifetimes") {
-    return <NativeLifetimesScreen components={components} />;
-  }
+const App = ({ scenario }: { readonly scenario: AcceptanceScenario }) => (
+  <NativeAcceptanceScene
+    scenario={scenario}
+    components={components}
+    doubleTap={false}
+    ornaments={tf07Ornaments}
+    services={services}
+    modelScene={NativeModelScene}
+  />
+);
 
-  if (scenario === "tf06") {
-    return <NativeQueriesScreen components={components} />;
-  }
-
-  if (scenario === "tf05") {
-    return <NativeSourcesScreen components={components} />;
-  }
-
-  if (scenario === "tf04") {
-    return <NativeCameraScreen components={components} doubleTap={false} />;
-  }
-
-  return <LifecycleApp />;
+const services = {
+  createSnapshot: createMapboxSnapshot,
+  getCurrentPosition,
+  requestLocationPermission,
+  getLocationDiagnostic: () => WrapperLocationManager.getLastKnownLocation(),
+  setNetworkConnected,
+  offlineOperations,
+  createOfflineCommands: createMapboxOfflineCommands,
+  nativePuck: (
+    <>
+      <CustomLocationProvider coordinate={[-122.34, 47.615]} />
+      <LocationPuck puckBearingEnabled={false} />
+    </>
+  ),
 };
-
-const LifecycleApp = () => {
-  const [mapRef, attachMap] = useNativeMapRef();
-  const smoke = useLifecycleSmoke({
-    mapRef,
-    failureStyleUrl: "http://127.0.0.1:8798/missing-style.json",
-  });
-
-  return (
-    <View style={styles.screen}>
-      <View style={styles.toolbar}>
-        <Button title="Fly north" onPress={smoke.flyNorth} />
-        <Button title="Remount" onPress={smoke.remount} />
-        <Button title="Bad style" onPress={smoke.failStyle} />
-      </View>
-      <Text testID="tf03-status">{smoke.status}</Text>
-      <RouteMap
-        key={smoke.generation}
-        components={components}
-        ref={attachMap}
-        mapStyle={smoke.mapStyle}
-        style={{ flex: 1 }}
-        onLoad={smoke.onLoad}
-        onStyleLoad={smoke.onStyleLoad}
-        onError={smoke.onError}
-        onMove={smoke.onMove}
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  screen: { flex: 1 },
-  toolbar: { padding: 8 },
-});
 
 export default App;
 

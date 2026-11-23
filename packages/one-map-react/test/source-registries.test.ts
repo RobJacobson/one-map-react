@@ -6,6 +6,7 @@ import { createGeoJsonSourceRegistry } from "../src/adapters/mapbox-native/geojs
 import {
   type MaplibreNativeSourceRef,
   createMaplibreSourceRegistry,
+  requireMaplibreSource,
 } from "../src/adapters/maplibre-native/source-registry.js";
 import type { NativeSourceRegistry } from "../src/adapters/shared/native-source-registry.js";
 
@@ -29,12 +30,12 @@ const checkReplacement = <Source, GeoJsonRef>(
   expect(() => oldOwner?.()).toThrow("no longer mounted");
   oldCleanup();
   expect(owner?.()).toBe(ref);
-  expect(registry.require("routes")).toBe(source);
+  expect(registry.get("routes")).toBe(source);
 
   cleanup();
   expect(() => owner?.()).toThrow("no longer mounted");
-  expect(() => registry.require("routes")).toThrow("not a mounted");
-  expect(registry.require("other")).toBe(source);
+  expect(registry.get("routes")).toBeUndefined();
+  expect(registry.get("other")).toBe(source);
 };
 
 test("RNMapbox replacement invalidates only the old registration", () => {
@@ -56,15 +57,12 @@ test("RNMapbox cluster lookup and captured owner track ref refresh, detachment a
   registry.register("routes", () => ref);
   const owner = registry.getGeoJsonOwner("routes");
   expect(owner?.()).toBe(ref);
-  expect(registry.require("routes")).toBe(ref);
   ref = {} as ShapeRef;
   expect(registry.getGeoJsonOwner("routes")).toBe(owner);
   expect(owner?.()).toBe(ref);
-  expect(registry.require("routes")).toBe(ref);
   ref = null;
   expect(registry.getGeoJsonOwner("routes")).toBeUndefined();
   expect(() => owner?.()).toThrow("no longer mounted");
-  expect(() => registry.require("routes")).toThrow("not a mounted");
   ref = {} as ShapeRef;
   expect(registry.getGeoJsonOwner("routes")).toBe(owner);
   expect(owner?.()).toBe(ref);
@@ -79,17 +77,19 @@ test("MapLibre cluster lookup and captured owner track the current source family
   registry.register("routes", () => entry);
   const owner = registry.getGeoJsonOwner("routes");
   expect(owner?.()).toBe(entry.ref);
-  expect(registry.require("routes")).toBe(entry);
+  expect(requireMaplibreSource(registry, "routes")).toBe(entry);
   entry = { kind: "vector", ref: {} } as MaplibreNativeSourceRef;
   expect(registry.getGeoJsonOwner("routes")).toBeUndefined();
   expect(() => owner?.()).toThrow("no longer mounted");
-  expect(registry.require("routes")).toBe(entry);
+  expect(requireMaplibreSource(registry, "routes")).toBe(entry);
   entry = undefined;
   expect(registry.getGeoJsonOwner("routes")).toBeUndefined();
   expect(() => owner?.()).toThrow("no longer mounted");
-  expect(() => registry.require("routes")).toThrow("not a mounted");
+  expect(() => requireMaplibreSource(registry, "routes")).toThrow(
+    "not a mounted"
+  );
   entry = { kind: "geojson", ref: {} } as MaplibreNativeSourceRef;
   expect(registry.getGeoJsonOwner("routes")).toBe(owner);
   expect(owner?.()).toBe(entry.ref);
-  expect(registry.require("routes")).toBe(entry);
+  expect(requireMaplibreSource(registry, "routes")).toBe(entry);
 });

@@ -107,13 +107,24 @@ for (const directory of ["src", "dist"]) {
         expect(doubleTap).toBe(backend === "maplibre-native");
         return createElement("p", null, backend);
       };
+      const nativeAcceptance = evaluate(
+        directory,
+        "scenarios/NativeAcceptanceScene.tsx",
+        (name) => {
+          if (name === "react-native")
+            return { StyleSheet: { create: (styles) => styles } };
+          if (name === "./native-camera-screen.js")
+            return { NativeCameraScreen };
+          if (name.startsWith("./")) return {};
+          throw new Error(`Unexpected native acceptance dependency: ${name}`);
+        }
+      );
       const selectedEntry = `one-map-react/${backend}`;
       const scene = evaluate(directory, `scenarios/${backend}.tsx`, (name) => {
         if (name === selectedEntry) return bindings;
-        if (name === "react-native")
-          return { StyleSheet: { create: (styles) => styles } };
+        if (name === "react-native") return { NativeModules: {} };
         if (name === "./native-scene-components.js") return factory;
-        if (name === "./native-camera-screen.js") return { NativeCameraScreen };
+        if (name === "./NativeAcceptanceScene.js") return nativeAcceptance;
         if (name.startsWith("./")) return {};
         throw new Error(`Unexpected scenario dependency: ${name}`);
       });

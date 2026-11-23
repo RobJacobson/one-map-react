@@ -58,17 +58,7 @@ export const webAcceptanceSelection = (
   const requested = query.get("scenario");
   let scenario = requested;
   if (!scenario) {
-    for (const family of [
-      "tf03",
-      "tf04",
-      "tf05",
-      "tf06",
-      "tf07",
-      "tf07-focused",
-      "tf08",
-      "tf09",
-      "tf10",
-    ]) {
+    for (const family of legacyScenarioKeys) {
       const value = query.get(family);
       if (value)
         scenario =
@@ -94,19 +84,8 @@ export const webAcceptanceUrl = (
   scenario: AcceptanceScenario | undefined
 ): string => {
   const url = new URL(href);
-  for (const key of [
-    "scenario",
-    "tf03",
-    "tf04",
-    "tf05",
-    "tf06",
-    "tf07",
-    "tf07-focused",
-    "tf08",
-    "tf09",
-    "tf10",
-  ])
-    url.searchParams.delete(key);
+  url.searchParams.delete("scenario");
+  for (const key of legacyScenarioKeys) url.searchParams.delete(key);
   url.searchParams.set("engine", engine);
   if (scenario)
     url.searchParams.set(
@@ -115,3 +94,15 @@ export const webAcceptanceUrl = (
     );
   return url.href;
 };
+
+const legacyScenarioKeys = [
+  "tf03",
+  "tf04",
+  "tf05",
+  "tf06",
+  "tf07",
+  "tf07-focused",
+  "tf08",
+  "tf09",
+  "tf10",
+] as const;

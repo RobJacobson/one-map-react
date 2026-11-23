@@ -45,7 +45,10 @@ import {
   toMaplibreSourceQueryOptions,
 } from "./convert-query.js";
 import { createMaplibreFeatureStateMethods } from "./feature-state-methods.js";
-import type { MaplibreSourceRegistry } from "./source-registry.js";
+import {
+  type MaplibreSourceRegistry,
+  requireMaplibreSource,
+} from "./source-registry.js";
 
 /** Common map operations and access to the selected native wrapper. */
 export type NativeAdvancedMapRef = NativeMapRef & {
@@ -191,7 +194,7 @@ export const createMaplibreMapRef = (
     },
     querySourceFeatures: async (sourceId, options) => {
       requireMap(mapRef.current);
-      const entry = sources.require(sourceId);
+      const entry = requireMaplibreSource(sources, sourceId);
 
       if (entry.kind === "geojson") {
         // Both native getData implementations query loaded source tiles, including

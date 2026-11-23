@@ -57,7 +57,7 @@ export interface NativeMarkerHostProps {
 }
 
 /** Wrapper components needed by native UI compositions. */
-export interface NativeUIOptions {
+interface NativeUIOptions {
   /** Live-view wrapper. */
   readonly Marker: ComponentType<NativeMarkerHostProps>;
   /** Snapshot annotation wrapper. */
