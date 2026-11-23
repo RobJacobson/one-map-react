@@ -17,8 +17,7 @@ The baseline research was recorded on October 8, 2026. Later endpoint research c
 
 The original Mapbox commit download returned HTTP 404. Researchers inspected the public 3.32.0 tag and npm declarations instead. The supplied commit in the [historical baseline](../records/version-baseline.json) must be confirmed before substituting commit citations for the release tag.
 
-The historical web host extraction used @types/react and @types/react-dom 19.3.0 with csstype 3.2.3. Type-package versions describe the extraction, not React runtime compatibility. The [React host decision](decisions/0001-baselines-and-ownership.md#compatible-react-host-baseline) records the separate runtime reconciliation.
-
+The historical web host extraction used @types/react and @types/react-dom 19.3.0 with csstype 3.2.3. Type-package versions describe the extraction, not React runtime compatibility.
 ## Interpreting declarations
 
 - Inherited host fields, union alternatives, style-schema vocabulary and overloaded signatures inflated the retired field count. They do not establish separate renderer operations or independent compatibility guarantees.
@@ -63,7 +62,7 @@ The [config plugin](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed
 | Pinch/rotate deceleration and zoomAnimationAmount were Android-specific gesture settings. surfaceView and requestDisallowInterceptTouchEvent were Android only; compassImage documentation referred to the older iOS v10 implementation. | [MapView](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx). Old platform annotations need native source review before becoming a support claim. |
 | MapView.setCamera, contentInset and onDidFailLoadingMap had replacements in Camera.setCamera, Camera padding and onMapLoadingError. mapViewImpl/_nativeImpl were private experimental custom-view paths. | [MapView](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/MapView.tsx). Distinguish application operations from implementation injection. |
 | UserLocation androidRenderMode was Android only; requestsAlwaysUse was iOS only; native renderMode was deprecated in favor of LocationPuck. | [UserLocation](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/components/UserLocation.tsx). Background permission and physical-sensor behavior need their own evidence. |
-| Offline/cache declarations retained pre-v10 deprecation text, including clearAmbientCache and invalidateAmbientCache. | [Offline manager](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/modules/offline/offlineManager.ts). A stale declaration is not evidence of successful v11 behavior; owner exclusions live only in the checklist/requirements. |
+| Offline/cache declarations retained pre-v10 deprecation text, including clearAmbientCache and invalidateAmbientCache. | [Offline manager](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/modules/offline/offlineManager.ts). A stale declaration is not evidence of successful v11 behavior; owner exclusions live in the [coverage checklist](api-coverage.md) and the [package guide](../packages/one-map-react/README.md#current-limitations). |
 | Independent snapshot pitch, heading and zoom depended on centerCoordinate. Bounds supplied another camera route; withLogo was Android specific, and writeToDisk selected temporary file output. | [Snapshot manager](https://github.com/rnmapbox/maps/blob/0f50e8164c1aefe45de9ed9cde310f310076a310/src/modules/snapshot/snapshotManager.ts). Independent images do not inherit mounted React children. |
 
 ### Ref reachability and legacy events

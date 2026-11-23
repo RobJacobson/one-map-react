@@ -2,7 +2,7 @@
 
 Follow the [shared coding style](https://github.com/RobJacobson/react-style-guide/blob/v0.1.0/coding-style.md) for first-party code, tests, scripts, and examples.
 
-The [thin-facade requirements](requirements.md) define architecture and ownership; the [testing policy](testing-policy.md) defines verification and acceptance. Mapping-specific documentation rules are in [STYLE_GUIDE.md](STYLE_GUIDE.md).
+The [native compatibility design](native-compatibility-design.md) defines architecture and ownership; the [testing policy](testing-policy.md) defines verification and acceptance. Mapping-specific documentation rules are in [STYLE_GUIDE.md](STYLE_GUIDE.md).
 
 - Keep the common package entry free of backend SDK and wrapper dependencies. Put backend-specific options and helpers behind the selected adapter entry, and verify optional-peer isolation and conditional resolution when exports change.
 - Preserve the common API, selected adapter, wrapper, and SDK boundaries. Adapters own conversion and facade-added resources; wrappers normally own renderer lifecycle and SDK integration. Share code only after checking equivalent behavior and ordering across backends.
