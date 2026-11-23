@@ -5,6 +5,7 @@ const root = resolve(import.meta.dirname, "..");
 
 // Vitest and Jest do not own these process, compiler, and peer-source checks.
 const regressions = [
+  ["node", "tests/docs.test.mjs"],
   ["bun", "tests/example/fixture-base.test.mjs"],
   ["bun", "tests/peers/patches.test.mjs"],
   ["node", "tests/peers/offline-manager.test.mjs"],

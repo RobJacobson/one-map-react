@@ -23,7 +23,7 @@ Apply the [version-specific native repair](#native-patches-and-linking) and rebu
 The example below selects MapLibre GL JS on web and RNMapbox on native. Change either import to use the other engine on that platform.
 
 ```ts
-// maps.web.ts
+// maps.ts
 export { Map, Layer, Marker, Source, MapProvider, useMap } from "react-map-gl/maplibre";
 ```
 
@@ -32,7 +32,7 @@ export { Map, Layer, Marker, Source, MapProvider, useMap } from "react-map-gl/ma
 export { Map, Layer, Marker, Source, MapProvider, useMap } from "one-map-react/mapbox-native";
 ```
 
-Import from `./maps` in your screen and mount `<Map>` directly. TypeScript platform files can also re-export `MapRef`, `MapProps`, `SourceProps`, `LayerProps`, and `MarkerProps` with the same names on each platform. Each type describes the selected implementation. Use the same selection for its descendants and hook. The [vessel example](https://github.com/RobJacobson/one-map-react/tree/main/packages/example-map/reference) shares its source, layers, click handling and camera call across all four choices. The host supplies marker controls and a sized map container.
+Import from `./maps` in your screen and mount `<Map>` directly. Vite resolves `maps.ts` by default. Metro selects `maps.native.ts` on iOS and Android. For a shared screen, configure TypeScript to resolve the same file as your bundler for each platform. Platform files can also re-export `MapRef`, `MapProps`, `SourceProps`, `LayerProps`, and `MarkerProps` with the same names on each platform. Each type describes the selected implementation. Use the same selection for its descendants and hook. The [vessel example](https://github.com/RobJacobson/one-map-react/tree/main/packages/example-map/reference) shares its source, layers, click handling, and camera call across all four choices. The host supplies marker controls and a sized map container.
 
 | Task | Import or call |
 | --- | --- |
@@ -53,7 +53,9 @@ Import from `./maps` in your screen and mount `<Map>` directly. TypeScript platf
 
 **Camera reads.** Web reads such as `map.getZoom()` are synchronous. In shared handlers, use `const zoom = await map.getZoom()`. Native reads cross the bridge. Use `const center = await map.getCenter()` and read `center.lng` and `center.lat`. Pass an options object to commands, for example `map.flyTo({ center: [-122.45, 47.61], zoom: 12 })`.
 
-**Clusters.** Retrieve the mounted source by ID. Narrow the stock web source to the selected SDK's `GeoJSONSource` (for example, `map.getSource<GeoJSONSource>("vessels")` on Mapbox). With the pinned Mapbox GL JS use `source?.getClusterExpansionZoom(id, callback)`. With MapLibre GL JS use `await source?.getClusterExpansionZoom(id)`. Native source handles accept either form. Check for a missing source after replacement or teardown.
+**Clusters.** Retrieve the mounted source by ID. Narrow the stock web source to the selected SDK's `GeoJSONSource` (for example, `map.getSource<GeoJSONSource>("vessels")` on Mapbox). With the pinned Mapbox GL JS use `source?.getClusterExpansionZoom(id, callback)`. With MapLibre GL JS use `await source?.getClusterExpansionZoom(id)`. Native source handles accept either form.
+
+On native, `map.getSource(id)` returns `undefined` when no declarative GeoJSON source is attached under that ID. Each handle belongs to one source registration. After removal or replacement, a new call on the old handle rejects or delivers an error to its callback. Look up the source again after replacement to get its new handle.
 
 On native, move `getClusterExpansionZoom`, `getClusterLeaves`, and `getClusterChildren` calls from the map ref to the source handle. Pass the source ID to `map.getSource(sourceId)` and omit it from the cluster method's arguments. If callers rely on a rejected promise when the source is missing, throw from your async function.
 
