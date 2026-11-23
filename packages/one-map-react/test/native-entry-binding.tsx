@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { act, render } from "@testing-library/react-native";
+import { act, fireEvent, render } from "@testing-library/react-native";
 import {
   type ComponentType,
   createRef,
@@ -8,13 +8,14 @@ import {
   type RefAttributes,
   useLayoutEffect,
 } from "react";
-import { Text } from "react-native";
+import { StyleSheet, Text, type ViewProps } from "react-native";
 
 import {
   emptyStyle,
   initialViewState,
   routes,
 } from "../../example-map/src/scenarios/map-fixture.js";
+import { useNativeMapPresentation } from "../src/adapters/shared/native-map-presentation.js";
 import type { NativeBackend } from "../src/contracts/backend.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { LayerProps, SymbolLayout } from "../src/contracts/layer-types.js";
@@ -37,7 +38,9 @@ type MarkerCoordinates = {
 type MapLookup<Handle> = Readonly<Record<string, Handle | undefined>>;
 
 interface NativeEntry<Handle extends SelectedHandle> {
-  readonly Map: ComponentType<NativeMapInputs & RefAttributes<Handle>>;
+  readonly Map: ComponentType<
+    NativeMapInputs & { readonly hostProps?: ViewProps } & RefAttributes<Handle>
+  >;
   readonly MapProvider: ComponentType<{ readonly children?: ReactNode }>;
   readonly Source: ComponentType<SourceProps>;
   readonly Layer: ComponentType<LayerProps>;
@@ -521,5 +524,101 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     const event = onClick.mock.lastCall?.[0];
     expect(event?.lngLat.lng).toEqual(event?.lngLat[0]);
     expect(event?.point.x).toEqual(event?.point[0]);
+  });
+
+  test("host shell applies style precedence, mounts trailing PortalHost, forwards layout, and isolates sibling portal names", async () => {
+    const hostOnLayout = jest.fn();
+    const LayoutProbe = () => {
+      const layout = useNativeMapPresentation().nativeLayout;
+      return (
+        <Text testID="observed-layout">
+          {layout ? `${layout.width}x${layout.height}` : "unset"}
+        </Text>
+      );
+    };
+    const mapStyle = { flex: 1, backgroundColor: "#111111" };
+    const hostStyle = { backgroundColor: "#222222", marginTop: 12 };
+    const view = await render(
+      <>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          style={mapStyle}
+          hostProps={{
+            testID: "native-host-a",
+            style: hostStyle,
+            onLayout: hostOnLayout,
+          }}
+        >
+          <LayoutProbe />
+          <Marker longitude={-122.34} latitude={47.61}>
+            <Text>Pin A</Text>
+          </Marker>
+        </NativeMap>
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={initialViewState}
+          hostProps={{ testID: "native-host-b" }}
+        >
+          <Marker longitude={-122.34} latitude={47.61}>
+            <Text>Pin B</Text>
+          </Marker>
+        </NativeMap>
+      </>
+    );
+
+    const hostA = view.getByTestId("native-host-a");
+    const hostB = view.getByTestId("native-host-b");
+    expect(hostA.parent?.type).toBe("PortalProvider");
+    expect(hostA.props.style).toEqual([mapStyle, hostStyle]);
+    expect(StyleSheet.flatten(hostA.props.style)).toMatchObject({
+      flex: 1,
+      backgroundColor: "#222222",
+      marginTop: 12,
+    });
+    expect(hostA.children).toHaveLength(2);
+    const [rendererA, portalHostA] = hostA.children;
+    const [, portalHostB] = hostB.children;
+    if (
+      !rendererA ||
+      typeof rendererA === "string" ||
+      !portalHostA ||
+      typeof portalHostA === "string" ||
+      !portalHostB ||
+      typeof portalHostB === "string"
+    ) {
+      throw new Error("Expected renderer and PortalHost host children.");
+    }
+    expect(rendererA.type).toBe(
+      backend === "mapbox-native" ? "MapView" : "MaplibreMap"
+    );
+    expect(rendererA.props.testID).toBe("wrapper-map");
+    expect(portalHostA.type).toBe("PortalHost");
+    expect(portalHostA.props.style).toEqual({
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+    });
+    expect(typeof portalHostA.props.name).toBe("string");
+    expect(portalHostA.props.name).not.toBe("");
+    expect(typeof portalHostB.props.name).toBe("string");
+    expect(portalHostB.props.name).not.toBe("");
+    expect(portalHostA.props.name).not.toBe(portalHostB.props.name);
+
+    const overlays = view.getAllByTestId("native-marker-overlay");
+    expect(overlays[0]?.parent?.props.hostName).toBe(portalHostA.props.name);
+    expect(overlays[1]?.parent?.props.hostName).toBe(portalHostB.props.name);
+    expect(view.getByTestId("observed-layout").props.children).toBe("unset");
+
+    const layoutEvent = {
+      nativeEvent: { layout: { x: 0, y: 0, width: 320, height: 240 } },
+    };
+    await fireEvent(hostA, "layout", layoutEvent);
+    expect(hostOnLayout).toHaveBeenCalledTimes(1);
+    expect(hostOnLayout.mock.calls[0]?.[0]).toBe(layoutEvent);
+    expect(view.getByTestId("observed-layout").props.children).toBe("320x240");
+    await view.unmount();
   });
 };
