@@ -14,8 +14,7 @@ one-map/                         # Repository root (0)
 │   └── expo/                    # Native example (2)
 ├── tests/                       # Cross-package tests and fixtures (1)
 ├── docs/                        # Library boundary and testing policy (1)
-├── scripts/                     # Development and verification tooling (1)
-└── records/                     # Evidence and support-matrix records (1)
+└── scripts/                     # Development and verification tooling (1)
 ```
 
 Follow the [coding style](https://github.com/RobJacobson/react-style-guide/blob/v0.1.0/coding-style.md) for new test placement and folder APIs. The `test/` branch above describes the current checkout.

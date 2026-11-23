@@ -36,7 +36,6 @@ export default defineConfig({
       "**/.agents/**",
       "**/.codex/**",
       "**/bun.lock",
-      "records/**",
       "**/*.md",
     ],
   },
@@ -57,7 +56,6 @@ export default defineConfig({
       "**/coverage/**",
       "**/.agents/**",
       "**/.codex/**",
-      "records/**",
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",

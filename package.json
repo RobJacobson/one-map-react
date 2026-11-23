@@ -30,7 +30,6 @@
     "build:web": "bun run build && vp -C apps/web build",
     "build:expo:web": "bun run build && bun run --filter @one-map/expo build:web",
     "typecheck:apps": "tsc --noEmit -p packages/example-map/tsconfig.test.json && tsc --noEmit -p apps/web/tsconfig.json && tsc --noEmit -p apps/expo/tsconfig.json",
-    "verify:example-checkpoint": "node scripts/verify-example-checkpoint.mjs records/evidence/ios-home-drag-repair.json",
     "test:compiled": "bun run build && vp test run --config vite.compiled.config.ts && jest --config jest.compiled.config.cjs --runInBand && node scripts/react-compiler.test.mjs"
   },
   "devDependencies": {

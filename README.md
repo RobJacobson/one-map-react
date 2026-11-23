@@ -23,7 +23,7 @@ bun install --frozen-lockfile
 bun run validate
 ```
 
-`validate` checks formatting, documentation links, inventory consistency, types, Vitest unit/web tests, native Jest Testing Library mounts, standalone regression scripts, the library build, and packed-package selection without installing wrapper peers into consumers. `bun run test:peers` is the checkpoint isolation check that installs one selected peer set into OS-temp consumers; it is not part of `validate`. Neither command launches a browser, Metro session, simulator, or native build. `bun run pack` builds an archive in `artifacts/`.
+`validate` checks formatting, documentation links, inventory consistency, types, Vitest unit/web tests, native Jest Testing Library mounts, standalone regression scripts, the library build, and packed-package selection without installing wrapper peers into consumers. `bun run test:peers` installs one selected peer set into temporary consumers outside the workspace. It is not part of `validate`. Neither command launches a browser, Metro session, simulator, or native build. `bun run pack` builds an archive in `artifacts/`.
 
 Run `bun run test` or `vp run test` for the complete test chain; `vp test run` runs only unit/web Vitest tests, and `bun run test:native` runs native Jest tests. `vp check` runs formatting and linting; the separate `typecheck` script remains part of `validate` so all four TypeScript configurations are checked.
 
@@ -44,8 +44,6 @@ Expo uses SDK 57.0.23 with React Native 0.86.3. The app includes RNMapbox 10.3.1
 ## Project documents
 
 Read the [library boundary](docs/architecture.md) and [testing](docs/testing.md). The [project files](FILES.md) show the source layout, and the [documentation index](docs/README.md) points at the current guides.
-
-The `records/` directory preserves historical inventory and compact checkpoint evidence. No historical implementation code is required to develop this project.
 
 ## License
 
