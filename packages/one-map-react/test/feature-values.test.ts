@@ -5,10 +5,12 @@ import {
   copyValidatedFeatureState,
   featureStateFromWrapper,
   featuresFromWrapper,
-  isScreenBounds,
-  toQueryGeometry,
   toRnmapboxRect,
 } from "../src/adapters/shared/feature-values.js";
+import {
+  isScreenBounds,
+  nativeRenderedQuery,
+} from "../src/adapters/shared/native-values.js";
 import type {
   FeatureIdentifier,
   FeatureState,
@@ -24,25 +26,28 @@ describe("featuresFromWrapper", () => {
   });
 
   test("reads the features out of a feature collection", () => {
-    const features = [{ type: "Feature", id: 1 }];
+    const first = { type: "Feature", id: 2 };
+    const second = { type: "Feature", id: 1 };
+    const features = [first, second, first];
 
-    expect(
-      featuresFromWrapper(
-        { type: "FeatureCollection", features },
-        "queryRenderedFeatures"
-      )
-    ).toBe(features);
+    const result = featuresFromWrapper(
+      { type: "FeatureCollection", features },
+      "queryRenderedFeatures"
+    );
+
+    expect(result).toBe(features);
+    expect(result).toEqual([first, second, first]);
   });
 
-  test("parses an Android JSON string payload", () => {
+  test("rejects an encoded collection as an invalid container", () => {
     const payload = JSON.stringify({
       type: "FeatureCollection",
       features: [{ type: "Feature", id: 2 }],
     });
 
-    expect(featuresFromWrapper(payload, "getClusterLeaves")).toEqual([
-      { type: "Feature", id: 2 },
-    ]);
+    expect(() => featuresFromWrapper(payload, "getClusterLeaves")).toThrow(
+      "getClusterLeaves returned a result that is not a feature container."
+    );
   });
 
   test("preserves an empty result as an empty array", () => {
@@ -54,31 +59,28 @@ describe("featuresFromWrapper", () => {
     ).toEqual([]);
   });
 
-  test("rejects an absent native result", () => {
-    expect(() =>
-      featuresFromWrapper(undefined, "queryRenderedFeatures")
-    ).toThrow("queryRenderedFeatures returned no result.");
-  });
+  test.each([undefined, null])(
+    "rejects an absent native result (%s)",
+    (value) => {
+      expect(() => featuresFromWrapper(value, "queryRenderedFeatures")).toThrow(
+        "queryRenderedFeatures returned no result."
+      );
+    }
+  );
 
-  test("rejects a collection without a feature array", () => {
-    expect(() =>
-      featuresFromWrapper(
-        { type: "FeatureCollection" },
-        "queryRenderedFeatures"
-      )
-    ).toThrow("without a feature array");
+  test.each([
+    { type: "FeatureCollection" },
+    { type: "FeatureCollection", features: null },
+  ])("rejects a collection without a feature array (%j)", (value) => {
+    expect(() => featuresFromWrapper(value, "queryRenderedFeatures")).toThrow(
+      "without a feature array"
+    );
   });
 
   test("rejects a non-container payload", () => {
     expect(() => featuresFromWrapper(42, "queryRenderedFeatures")).toThrow(
       "not a feature container"
     );
-  });
-
-  test("rejects an invalid JSON string payload", () => {
-    expect(() =>
-      featuresFromWrapper("not-json{", "getClusterChildren")
-    ).toThrow("not valid JSON");
   });
 });
 
@@ -115,14 +117,17 @@ test.each([
     ],
   },
 ] as const)(
-  "query geometry preserves $target without sharing coordinates",
+  "native rendered query preserves $target without sharing coordinates",
   ({ target, expected }) => {
-    const geometry = toQueryGeometry(target);
+    const [geometry] = nativeRenderedQuery(target);
     expect(geometry).toEqual(expected);
 
-    if (Array.isArray(geometry)) {
-      const coordinates = Array.isArray(geometry[0]) ? geometry : [geometry];
-      for (const coordinate of coordinates) coordinate[0] = 99;
+    if (isScreenBounds(geometry)) {
+      geometry[0][0] = 99;
+      geometry[1][0] = 99;
+      geometry[0] = [99, 99];
+    } else if (geometry !== undefined) {
+      geometry[0] = 99;
     }
     expect(target).toEqual(expected);
   }
@@ -463,27 +468,6 @@ describe("featureStateFromWrapper", () => {
       "must be an object"
     );
   });
-});
-
-test.each([
-  ["null", "returned no result"],
-  ["{}", "not a feature container"],
-  ['{"type":"FeatureCollection","features":null}', "without a feature array"],
-])("valid JSON %s retains its normalization error", (payload, message) => {
-  expect(() => featuresFromWrapper(payload, "querySourceFeatures")).toThrow(
-    message
-  );
-});
-
-test("JSON syntax failures retain their cause", () => {
-  try {
-    featuresFromWrapper("{", "querySourceFeatures");
-    throw new Error("expected parse failure");
-  } catch (error) {
-    expect(error).toEqual(
-      expect.objectContaining({ cause: expect.any(SyntaxError) })
-    );
-  }
 });
 
 test("feature-state dispatch copies validated nested values before a caller can mutate them", () => {

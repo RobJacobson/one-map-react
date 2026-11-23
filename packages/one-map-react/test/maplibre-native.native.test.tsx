@@ -1321,6 +1321,14 @@ describe("maplibre-native queries and feature state", () => {
     await ref.current?.queryRenderedFeatures(undefined);
 
     expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith(undefined);
+
+    const viewportOptions = {
+      layers: ["route-line"],
+      filter: ["==", "kind", "route"],
+    };
+    await ref.current?.queryRenderedFeatures(viewportOptions);
+
+    expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith(viewportOptions);
   });
 
   test("querySourceFeatures forwards the vector sourceLayer it reads once", async () => {

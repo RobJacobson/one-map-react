@@ -30,7 +30,7 @@ export const toMaplibreFilter = (
  */
 export const toMaplibreRenderedQueryOptions = (
   options?: QueryRenderedFeaturesOptions
-): Record<string, unknown> | undefined =>
+): { layers?: string[]; filter?: FilterSpecification } | undefined =>
   options === undefined
     ? undefined
     : {

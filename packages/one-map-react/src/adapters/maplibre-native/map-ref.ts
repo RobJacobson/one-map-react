@@ -11,16 +11,14 @@ import {
   nativeStopError,
   unavailableMapMethodError,
 } from "../native-map-options.js";
-import {
-  featuresFromWrapper,
-  toQueryGeometry,
-} from "../shared/feature-values.js";
+import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
 import {
   createNativeClusterLookup,
   type NativeClusterSourceMethods,
 } from "../shared/native-clusters.js";
 import {
+  isScreenBounds,
   nativeBounds,
   nativeBoundsInput,
   nativeLngLat,
@@ -180,15 +178,17 @@ export const createMaplibreMapRef = (
       const map = requireMap(mapRef.current);
       // Preserve an explicit empty layer selection before the SDK defaults to all layers.
       if (options?.layers?.length === 0) return [];
-      const queryTarget = toQueryGeometry(target);
-      const queryOptions = toMaplibreRenderedQueryOptions(options);
 
-      const features =
-        queryTarget === undefined
-          ? await map.queryRenderedFeatures(
-              queryOptions as { filter?: unknown } | undefined
-            )
-          : await map.queryRenderedFeatures(queryTarget, queryOptions);
+      const queryOptions = toMaplibreRenderedQueryOptions(options);
+      // Narrow each target separately for the wrapper's overloads.
+      let features;
+      if (target === undefined) {
+        features = await map.queryRenderedFeatures(queryOptions);
+      } else if (isScreenBounds(target)) {
+        features = await map.queryRenderedFeatures(target, queryOptions);
+      } else {
+        features = await map.queryRenderedFeatures(target, queryOptions);
+      }
 
       return featuresFromWrapper(features, "queryRenderedFeatures");
     },

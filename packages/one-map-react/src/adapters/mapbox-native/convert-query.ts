@@ -1,13 +1,15 @@
 import type { Feature, Point as GeoJsonPoint } from "geojson";
 
-import type { Point } from "../../contracts/camera-types.js";
 import type {
   FeatureIdentifier,
   QueryRenderedFeaturesOptions,
   QuerySourceFeaturesOptions,
-  ScreenBounds,
 } from "../../contracts/query-types.js";
-import { isScreenBounds, toRnmapboxRect } from "../shared/feature-values.js";
+import { toRnmapboxRect } from "../shared/feature-values.js";
+import {
+  isScreenBounds,
+  type NativeQueryTarget,
+} from "../shared/native-values.js";
 
 /**
  * Selects the RNMapbox rendered-query call for a target.
@@ -19,10 +21,10 @@ import { isScreenBounds, toRnmapboxRect } from "../shared/feature-values.js";
  * visible area.
  *
  * @param target - Point, screen bounds, or `undefined` for the viewport.
- * @returns The wrapper geometry, `null` for a point call, or the rect.
+ * @returns The wrapper point or rectangle argument, including an empty viewport rect.
  */
 export const toRnmapboxQueryRect = (
-  target: Point | ScreenBounds | undefined
+  target: NativeQueryTarget
 ):
   | { readonly kind: "point"; readonly point: number[] }
   | {
@@ -34,7 +36,7 @@ export const toRnmapboxQueryRect = (
   }
 
   if (!isScreenBounds(target)) {
-    return { kind: "point", point: [target[0], target[1]] };
+    return { kind: "point", point: target };
   }
 
   return { kind: "rect", rect: toRnmapboxRect(target) };

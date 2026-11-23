@@ -1,45 +1,9 @@
-import type { Point } from "../../contracts/camera-types.js";
 import type {
   FeatureIdentifier,
   FeatureState,
   ScreenBounds,
 } from "../../contracts/query-types.js";
 import type { GeoJsonFeature } from "../../contracts/source-types.js";
-
-/**
- * A query target: a screen point, a screen rectangle, or the viewport.
- */
-export type QueryTarget = Point | ScreenBounds | undefined;
-
-/**
- * Copies logical screen coordinates for web and MapLibre Native queries.
- *
- * @param target - Point, screen bounds, or undefined for the viewport.
- * @returns Mutable coordinate arrays, preserving an omitted viewport target.
- */
-export const toQueryGeometry = (target: QueryTarget): unknown => {
-  if (target === undefined) {
-    return undefined;
-  }
-
-  if (!isScreenBounds(target)) {
-    return [target[0], target[1]];
-  }
-
-  return [
-    [target[0][0], target[0][1]],
-    [target[1][0], target[1][1]],
-  ];
-};
-
-/**
- * Detects whether a query target is a screen rectangle.
- *
- * @param target - Query target from the common method.
- * @returns `true` when the target is a two-corner rectangle.
- */
-export const isScreenBounds = (target: QueryTarget): target is ScreenBounds =>
-  target !== undefined && Array.isArray(target[0]);
 
 /**
  * Converts screen corners into RNMapbox's `[top, left, bottom, right]` rect.
@@ -60,14 +24,15 @@ export const toRnmapboxRect = (bounds: ScreenBounds): number[] => [
 /**
  * Normalizes a wrapper query result into a feature array.
  *
- * Wrappers return a feature collection (native), a feature array (web),
- * or an Android string payload that is already JSON. An empty array is a
- * successful empty result; `undefined` or a malformed payload is a failure.
+ * RNMapbox returns feature collections and decodes Android bridge payloads
+ * in its wrapper. MapLibre React Native returns feature arrays or collections.
+ * An empty feature array is a successful empty result.
  *
  * @param value - Wrapper query result.
  * @param operation - Common method name for error messages.
  * @returns The features in backend order, duplicates preserved.
- * @throws When the result is absent or not a feature container.
+ * @throws When the result is absent, is not a feature container, or is a
+ * collection without a feature array.
  */
 export const featuresFromWrapper = (
   value: unknown,
@@ -91,21 +56,6 @@ export const featuresFromWrapper = (
     }
 
     return features as readonly GeoJsonFeature[];
-  }
-
-  // RNMapbox Android passes the collection as a JSON string; iOS and the
-  // source refs return the decoded object.
-  if (typeof value === "string") {
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(value);
-    } catch (error) {
-      throw new Error(
-        `${operation} returned a result that is not valid JSON.`,
-        { cause: error }
-      );
-    }
-    return featuresFromWrapper(parsed, operation);
   }
 
   throw new Error(

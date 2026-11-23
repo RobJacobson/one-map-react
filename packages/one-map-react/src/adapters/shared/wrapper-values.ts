@@ -4,7 +4,6 @@ import type {
   CameraEasing,
   LngLat,
   Padding,
-  Point,
 } from "../../contracts/camera-types.js";
 
 /**
@@ -188,10 +187,10 @@ export const lngLatFromWrapper = (value: unknown): LngLat => {
  * Reads a view point from a tuple or `{ x, y }`.
  *
  * @param value - `[x, y]` or a point with `x` and `y`.
- * @returns An x/y tuple in logical map-view units.
+ * @returns A fresh mutable x/y tuple in logical map-view units.
  * @throws When both numbers are not present.
  */
-export const pointFromWrapper = (value: unknown): Point => {
+export const pointFromWrapper = (value: unknown): [x: number, y: number] => {
   if (isLngLat(value)) {
     return [value[0], value[1]];
   }

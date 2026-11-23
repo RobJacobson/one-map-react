@@ -7,10 +7,7 @@ import type {
   NativePoint,
   NativePointLike,
 } from "../../contracts/native-types.js";
-import type {
-  QueryRenderedFeaturesOptions,
-  ScreenBounds,
-} from "../../contracts/query-types.js";
+import type { QueryRenderedFeaturesOptions } from "../../contracts/query-types.js";
 import { featuresFromWrapper } from "./feature-values.js";
 import {
   boundsFromGeographic,
@@ -86,13 +83,24 @@ type RenderedTarget =
   | readonly [NativePointLike, NativePointLike]
   | QueryRenderedFeaturesOptions;
 
+type QueryPoint = ReturnType<typeof pointFromWrapper>;
+type QueryBounds = [QueryPoint, QueryPoint];
+
+/** A normalized screen point, screen rectangle, or omitted viewport target. */
+export type NativeQueryTarget = QueryPoint | QueryBounds | undefined;
+
+/**
+ * Reads the rendered-query overload and validates its coordinates.
+ *
+ * @param target - A point, screen rectangle, options object, or omitted viewport.
+ * @param options - Layer ids and filter for the geometry form.
+ * @returns Fresh mutable coordinates in logical map-view units and query options.
+ * @throws When the supplied coordinates lack a finite x or y value.
+ */
 export const nativeRenderedQuery = (
   target?: RenderedTarget,
   options?: QueryRenderedFeaturesOptions
-): readonly [
-  Point | ScreenBounds | undefined,
-  QueryRenderedFeaturesOptions | undefined,
-] => {
+): readonly [NativeQueryTarget, QueryRenderedFeaturesOptions | undefined] => {
   if (target === undefined) return [undefined, options];
   if ("x" in target) return [pointFromWrapper(target), options];
   if (Array.isArray(target)) {
@@ -105,3 +113,13 @@ export const nativeRenderedQuery = (
   }
   return [undefined, target as QueryRenderedFeaturesOptions];
 };
+
+/**
+ * Detects a two-corner rectangle in a normalized rendered query.
+ *
+ * @param target - Normalized point, screen rectangle, or omitted viewport.
+ * @returns `true` when the target contains mutable screen corners.
+ */
+export const isScreenBounds = (
+  target: NativeQueryTarget
+): target is QueryBounds => target !== undefined && Array.isArray(target[0]);
