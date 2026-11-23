@@ -144,9 +144,13 @@ jest.mock("@maplibre/maplibre-react-native", () => {
 });
 const Host = forwardRef<MarkerRef, NativeMarkerHostProps>((props, ref) => {
   const nativeID = useId();
-  useImperativeHandle(ref, () => ({ refresh }));
+  useImperativeHandle(ref, () => ({ refresh }), []);
   return (
-    <View testID="native-marker" nativeID={nativeID}>
+    <View
+      testID="native-marker"
+      nativeID={nativeID}
+      accessibilityLabel={props.anchor}
+    >
       {props.children}
     </View>
   );
@@ -479,7 +483,7 @@ describe("TF07 native UI composition", () => {
     const tree = (value: string) => (
       <FixtureSessionProvider value={fixture.session}>
         <theme.Provider value={value}>
-          <ui.Marker longitude={10} latitude={20}>
+          <ui.Marker longitude={10} latitude={20} anchor="center">
             <Consumer />
           </ui.Marker>
         </theme.Provider>
@@ -511,6 +515,7 @@ describe("TF07 native UI composition", () => {
               <ui.Marker
                 longitude={10}
                 latitude={20}
+                anchor="bottom"
                 renderMode={renderMode}
                 {...request}
               />
@@ -526,7 +531,7 @@ describe("TF07 native UI composition", () => {
     await expect(
       render(
         <FixtureSessionProvider value={fixture.session}>
-          <ui.Marker longitude={Number.NaN} latitude={20} />
+          <ui.Marker longitude={Number.NaN} latitude={20} anchor="bottom" />
         </FixtureSessionProvider>
       )
     ).rejects.toThrow("coordinate");
@@ -536,6 +541,7 @@ describe("TF07 native UI composition", () => {
           <ui.Marker
             longitude={10}
             latitude={20}
+            anchor="bottom"
             offset={[Number.POSITIVE_INFINITY, 0]}
           />
         </FixtureSessionProvider>
@@ -547,7 +553,12 @@ describe("TF07 native UI composition", () => {
     const fixture = sessionFixture();
     const view = await render(
       <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker longitude={10} latitude={20}>
+        <ui.Marker
+          longitude={10}
+          latitude={20}
+          anchor="center"
+          onClick={jest.fn()}
+        >
           <View testID="child-scroll" />
         </ui.Marker>
       </FixtureSessionProvider>
@@ -571,6 +582,7 @@ describe("TF07 native UI composition", () => {
         <ui.Marker
           longitude={10}
           latitude={20}
+          anchor="center"
           onClick={clicked}
           {...{ hostProps: { testID: "label-marker" } }}
         >
@@ -627,6 +639,7 @@ describe("TF07 native UI composition", () => {
           <ui.Marker
             longitude={10}
             latitude={20}
+            anchor="center"
             onClick={clicked}
             {...{ hostProps: { testID: "scroll-marker" } }}
           >
@@ -680,6 +693,7 @@ describe("TF07 native UI composition", () => {
           <ui.Marker
             longitude={10}
             latitude={20}
+            anchor="center"
             onClick={clicked}
             {...{ hostProps: { testID: "android-marker" } }}
           >
@@ -718,7 +732,12 @@ describe("TF07 native UI composition", () => {
       const fixture = sessionFixture();
       const view = await render(
         <FixtureSessionProvider value={fixture.session}>
-          <ui.Marker longitude={10} latitude={20}>
+          <ui.Marker
+            longitude={10}
+            latitude={20}
+            anchor="center"
+            onClick={jest.fn()}
+          >
             <View testID="child" />
           </ui.Marker>
         </FixtureSessionProvider>
@@ -747,6 +766,7 @@ describe("TF07 native UI composition", () => {
               ref={ref}
               longitude={10}
               latitude={20}
+              anchor="bottom"
               renderMode="annotation"
               onClick={clicked}
             />
@@ -789,6 +809,7 @@ describe("TF07 native UI composition", () => {
         <maplibreNativeUI.Marker
           longitude={10}
           latitude={20}
+          anchor="bottom"
           onClick={clicked}
           {...{ hostProps: { testID: "live-content" } }}
         />
@@ -805,6 +826,7 @@ describe("TF07 native UI composition", () => {
         <maplibreNativeUI.Marker
           longitude={10}
           latitude={20}
+          anchor="bottom"
           renderMode="annotation"
           onClick={clicked}
         />
@@ -846,6 +868,7 @@ describe("TF07 native UI composition", () => {
             <mapboxNativeUI.Marker
               longitude={10}
               latitude={20}
+              anchor="bottom"
               renderMode={renderMode}
               onClick={enabled ? abandoned : committed}
               {...{ hostProps: { testID: "committed-marker" } }}
@@ -881,6 +904,7 @@ describe("TF07 native UI composition", () => {
         <ui.Marker
           longitude={10}
           latitude={20}
+          anchor="bottom"
           onClick={() => order.push("click")}
           {...{
             hostProps: {
@@ -933,6 +957,7 @@ describe("TF07 native UI composition", () => {
           <ui.Marker
             longitude={10}
             latitude={20}
+            anchor="bottom"
             onClick={clicked}
             {...{ hostProps: { testID: "activation" } }}
           />
@@ -971,12 +996,14 @@ describe("TF07 native UI composition", () => {
         change = callback;
         return { remove };
       });
+    subscription.mockClear();
     try {
       const view = await render(
         <FixtureSessionProvider value={fixture.session}>
           <ui.Marker
             longitude={10}
             latitude={20}
+            anchor="bottom"
             onClick={clicked}
             {...{ hostProps: { testID: "activation" } }}
           />
@@ -1013,6 +1040,7 @@ describe("TF07 native UI composition", () => {
         <ui.Marker
           longitude={longitude}
           latitude={20}
+          anchor="bottom"
           renderMode={renderMode}
           onClick={longitude === 10 ? first : latest}
           {...{ hostProps: { testID: "activation" } }}
@@ -1055,6 +1083,7 @@ describe("TF07 native UI composition", () => {
         <ui.Marker
           longitude={10}
           latitude={20}
+          anchor="bottom"
           ref={ref}
           renderMode="annotation"
         />
@@ -1065,12 +1094,278 @@ describe("TF07 native UI composition", () => {
     await view.unmount();
     await render(
       <FixtureSessionProvider value={fixture.session}>
-        <ui.Marker longitude={10} latitude={20} ref={ref} />
+        <ui.Marker longitude={10} latitude={20} anchor="bottom" ref={ref} />
       </FixtureSessionProvider>
     );
     await ref.current?.refresh();
     expect(refresh).toHaveBeenCalledTimes(1);
   });
+
+  test("onResponderTerminationRequest honors hostProps and defaults to true on active live markers", async () => {
+    const fixture = sessionFixture();
+    const defaultView = await render(
+      <FixtureSessionProvider value={fixture.session}>
+        <ui.Marker
+          longitude={10}
+          latitude={20}
+          anchor="bottom"
+          onClick={jest.fn()}
+          {...{ hostProps: { testID: "default-term" } }}
+        />
+      </FixtureSessionProvider>
+    );
+    const defaultMarker = defaultView.getByTestId("default-term");
+    expect(defaultMarker.props.onResponderTerminationRequest(touch(0, 0))).toBe(
+      true
+    );
+    expect(defaultMarker.props.onResponderGrant).toBeUndefined();
+    expect(defaultMarker.props.onResponderMove).toBeUndefined();
+    expect(defaultMarker.props.onResponderRelease).toBeUndefined();
+    expect("onResponderGrant" in defaultMarker.props).toBe(false);
+    expect("onResponderMove" in defaultMarker.props).toBe(false);
+    expect("onResponderRelease" in defaultMarker.props).toBe(false);
+    await defaultView.unmount();
+
+    const termination = jest.fn(() => false);
+    const grant = jest.fn();
+    const customView = await render(
+      <FixtureSessionProvider value={fixture.session}>
+        <ui.Marker
+          longitude={10}
+          latitude={20}
+          anchor="bottom"
+          onClick={jest.fn()}
+          {...{
+            hostProps: {
+              testID: "custom-term",
+              onResponderTerminationRequest: termination,
+              onResponderGrant: grant,
+            },
+          }}
+        />
+      </FixtureSessionProvider>
+    );
+    const customMarker = customView.getByTestId("custom-term");
+    expect(customMarker.props.onResponderTerminationRequest(touch(0, 0))).toBe(
+      false
+    );
+    expect(termination).toHaveBeenCalledTimes(1);
+    customMarker.props.onResponderGrant(touch(0, 0));
+    expect(grant).toHaveBeenCalledTimes(1);
+    await customView.unmount();
+  });
+
+  test.each([
+    { label: "passive live", renderMode: "view" as const, hasClick: false },
+    {
+      label: "passive annotation",
+      renderMode: "annotation" as const,
+      hasClick: false,
+    },
+    {
+      label: "interactive annotation",
+      renderMode: "annotation" as const,
+      hasClick: true,
+    },
+  ])(
+    "$label marker skips AppState and facade touch props while preserving hostProps handlers",
+    async ({ renderMode, hasClick }) => {
+      const fixture = sessionFixture();
+      const onClick = hasClick ? jest.fn() : undefined;
+      const addListener = jest.spyOn(AppState, "addEventListener");
+      addListener.mockClear();
+      const plain = await render(
+        <FixtureSessionProvider value={fixture.session}>
+          <ui.Marker
+            longitude={10}
+            latitude={20}
+            anchor="bottom"
+            renderMode={renderMode}
+            onClick={onClick}
+            {...{ hostProps: { testID: "plain-marker" } }}
+          />
+        </FixtureSessionProvider>
+      );
+      expect(addListener).not.toHaveBeenCalled();
+      const plainNode = plain.getByTestId("plain-marker");
+      expect(plainNode.props.collapsable).toBe(false);
+      for (const prop of [
+        "onStartShouldSetResponder",
+        "onResponderTerminationRequest",
+        "onResponderGrant",
+        "onResponderMove",
+        "onResponderRelease",
+        "onResponderTerminate",
+        "onTouchStart",
+        "onTouchMove",
+        "onTouchEnd",
+        "onTouchCancel",
+      ]) {
+        expect(plainNode.props[prop]).toBeUndefined();
+        expect(prop in plainNode.props).toBe(false);
+      }
+      await plain.unmount();
+
+      const hostStart = jest.fn(() => true);
+      const hostTerminate = jest.fn(() => false);
+      const hostTouchStart = jest.fn();
+      const withHost = await render(
+        <FixtureSessionProvider value={fixture.session}>
+          <ui.Marker
+            longitude={10}
+            latitude={20}
+            anchor="bottom"
+            renderMode={renderMode}
+            onClick={onClick}
+            {...{
+              hostProps: {
+                testID: "host-handlers-marker",
+                onStartShouldSetResponder: hostStart,
+                onResponderTerminationRequest: hostTerminate,
+                onTouchStart: hostTouchStart,
+              },
+            }}
+          />
+        </FixtureSessionProvider>
+      );
+      expect(addListener).not.toHaveBeenCalled();
+      const hostNode = withHost.getByTestId("host-handlers-marker");
+      expect(hostNode.props.collapsable).toBe(false);
+      expect(hostNode.props.onStartShouldSetResponder).toBe(hostStart);
+      expect(hostNode.props.onResponderTerminationRequest).toBe(hostTerminate);
+      expect(hostNode.props.onTouchStart).toBe(hostTouchStart);
+      expect(hostNode.props.onStartShouldSetResponder(touch(0, 0))).toBe(true);
+      expect(hostNode.props.onResponderTerminationRequest(touch(0, 0))).toBe(
+        false
+      );
+      hostNode.props.onTouchStart(touch(0, 0));
+      expect(hostTouchStart).toHaveBeenCalledTimes(1);
+      await withHost.unmount();
+    }
+  );
+
+  test("dynamically enabling onClick in background and disabling mid-touch manages AppState and touch cancellation", async () => {
+    const fixture = sessionFixture();
+    const clicked = jest.fn();
+    let change: (state: AppStateStatus) => void = () => {};
+    const remove = jest.fn();
+    const appState = jest.replaceProperty(AppState, "currentState", "active");
+    const subscription = jest
+      .spyOn(AppState, "addEventListener")
+      .mockImplementation((_event, callback) => {
+        change = callback;
+        return { remove };
+      });
+    subscription.mockClear();
+    try {
+      const tree = (enabled: boolean) => (
+        <FixtureSessionProvider value={fixture.session}>
+          <ui.Marker
+            longitude={10}
+            latitude={20}
+            anchor="bottom"
+            onClick={enabled ? clicked : undefined}
+            {...{ hostProps: { testID: "dynamic-marker" } }}
+          />
+        </FixtureSessionProvider>
+      );
+      const view = await render(tree(false));
+      expect(subscription).not.toHaveBeenCalled();
+
+      appState.replaceValue("background");
+      await view.rerender(tree(true));
+      expect(subscription).toHaveBeenCalledTimes(1);
+      const marker = view.getByTestId("dynamic-marker");
+      await beginTouch(marker, touch(0, 0));
+      await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+      expect(clicked).not.toHaveBeenCalled();
+
+      appState.replaceValue("active");
+      await act(async () => change("active"));
+      await beginTouch(marker, touch(0, 0));
+      await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
+      expect(clicked).toHaveBeenCalledTimes(1);
+
+      await beginTouch(marker, touch(0, 0));
+      const capturedEnd = marker.props.onTouchEnd;
+      await view.rerender(tree(false));
+      expect(remove).toHaveBeenCalledTimes(1);
+      expect(
+        view.getByTestId("dynamic-marker").props.onTouchEnd
+      ).toBeUndefined();
+      await view.rerender(tree(true));
+      expect(subscription).toHaveBeenCalledTimes(2);
+      await act(async () => capturedEnd(touch(0, 0, 0)));
+      expect(clicked).toHaveBeenCalledTimes(1);
+      await view.unmount();
+    } finally {
+      subscription.mockRestore();
+      appState.restore();
+    }
+  });
+
+  test.each([
+    {
+      label: "ui live",
+      MarkerComponent: ui.Marker,
+      renderMode: "view" as const,
+    },
+    {
+      label: "ui annotation",
+      MarkerComponent: ui.Marker,
+      renderMode: "annotation" as const,
+    },
+    {
+      label: "mapbox live",
+      MarkerComponent: mapboxNativeUI.Marker,
+      renderMode: "view" as const,
+    },
+    {
+      label: "mapbox annotation",
+      MarkerComponent: mapboxNativeUI.Marker,
+      renderMode: "annotation" as const,
+    },
+    {
+      label: "maplibre live",
+      MarkerComponent: maplibreNativeUI.Marker,
+      renderMode: "view" as const,
+    },
+    {
+      label: "maplibre annotation",
+      MarkerComponent: maplibreNativeUI.Marker,
+      renderMode: "annotation" as const,
+    },
+  ])(
+    "$label marker keeps a stable MarkerRef identity across coordinate rerenders",
+    async ({ MarkerComponent, renderMode }) => {
+      const fixture = sessionFixture();
+      const refSpy = jest.fn<(handle: MarkerRef | null) => void>();
+      const tree = (longitude: number) => (
+        <FixtureSessionProvider value={fixture.session}>
+          <MarkerComponent
+            ref={refSpy}
+            longitude={longitude}
+            latitude={20}
+            anchor="bottom"
+            renderMode={renderMode}
+          />
+        </FixtureSessionProvider>
+      );
+      const view = await render(tree(10));
+      expect(refSpy).toHaveBeenCalledTimes(1);
+      const initialHandle = refSpy.mock.calls[0]?.[0];
+      expect(initialHandle).toBeTruthy();
+
+      await view.rerender(tree(11));
+      await view.rerender(tree(12));
+      expect(refSpy).toHaveBeenCalledTimes(1);
+      await expect(initialHandle?.refresh()).resolves.toBeUndefined();
+
+      await view.unmount();
+      expect(refSpy).toHaveBeenCalledTimes(2);
+      expect(refSpy).toHaveBeenLastCalledWith(null);
+    }
+  );
 });
 
 test("native creation defaults compare by their effective values", async () => {
@@ -1086,8 +1381,17 @@ test("native creation defaults compare by their effective values", async () => {
     </FixtureSessionProvider>
   );
   const mounted = await render(tree(false));
+  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+    "bottom"
+  );
   await mounted.rerender(tree(true));
+  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+    "bottom"
+  );
   await mounted.rerender(tree(false));
+  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+    "bottom"
+  );
   await mounted.unmount();
 });
 
@@ -1103,6 +1407,9 @@ test.each([false, true])(
       </FixtureSessionProvider>
     );
     const mounted = await render(tree("top"));
+    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+      "top"
+    );
     await expect(mounted.rerender(tree())).rejects.toThrow(
       'Marker changed the creation option "anchor"'
     );
@@ -1119,9 +1426,21 @@ test("native marker defaults stay frozen when content changes", async () => {
     </FixtureSessionProvider>
   );
   const mounted = await render(tree(false));
+  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+    "bottom"
+  );
   await mounted.rerender(tree(true));
+  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+    "bottom"
+  );
   await mounted.rerender(tree(true, "bottom"));
+  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+    "bottom"
+  );
   await mounted.rerender(tree(true));
+  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+    "bottom"
+  );
   await expect(mounted.rerender(tree(true, "center"))).rejects.toThrow(
     'creation option "anchor"'
   );
@@ -1130,21 +1449,31 @@ test("native marker defaults stay frozen when content changes", async () => {
 test.each([false, true])(
   "native marker effective defaults work when initially explicit (custom content: %s)",
   async (custom) => {
+    const expected = custom ? "center" : "bottom";
     const fixture = sessionFixture();
     const tree = (explicit: boolean) => (
       <FixtureSessionProvider value={fixture.session}>
         <BoundMarker
           longitude={10}
           latitude={20}
-          anchor={explicit ? (custom ? "center" : "bottom") : undefined}
+          anchor={explicit ? expected : undefined}
         >
           {custom ? <Text>custom</Text> : undefined}
         </BoundMarker>
       </FixtureSessionProvider>
     );
     const mounted = await render(tree(true));
+    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+      expected
+    );
     await mounted.rerender(tree(false));
+    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+      expected
+    );
     await mounted.rerender(tree(true));
+    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
+      expected
+    );
     await mounted.unmount();
   }
 );

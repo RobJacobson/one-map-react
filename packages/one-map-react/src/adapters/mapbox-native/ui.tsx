@@ -21,24 +21,6 @@ import {
   pointFromWrapper,
 } from "../shared/wrapper-values.js";
 
-/** Native Mapbox annotations and controls used by the selected adapter. */
-export const mapboxNativeUI = createNativeUI({
-  Marker: (props) => <NativeMarkerOverlay {...props} backend="mapbox-native" />,
-  Annotation: forwardRef<MarkerRef, NativeMarkerHostProps>((props, ref) => (
-    <MapboxAnnotationHost {...props} ref={ref} />
-  )),
-  backend: "mapbox-native",
-});
-
-/** Direct live native marker, including wrapper-specific collision options. */
-export const MarkerView = Mapbox.MarkerView;
-/** Direct snapshot annotation, selection, callout, and native drag facilities. */
-export const PointAnnotation = Mapbox.PointAnnotation;
-/** Native annotation callout content. */
-export const Callout = Mapbox.Callout;
-/** Native layer annotation for animated and rotated marker imagery. */
-export const Annotation = Mapbox.Annotation;
-
 type AnnotationEvent = Parameters<
   NonNullable<ComponentProps<typeof Mapbox.PointAnnotation>["onSelected"]>
 >[0];
@@ -66,13 +48,17 @@ const MapboxAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
           : fraction[1],
     };
 
-    useImperativeHandle(ref, () => ({
-      refresh: async () => {
-        const annotation = annotationRef.current;
-        if (!annotation) throw new Error("RNMapbox annotation is detached.");
-        annotation.refresh();
-      },
-    }));
+    useImperativeHandle(
+      ref,
+      () => ({
+        refresh: async () => {
+          const annotation = annotationRef.current;
+          if (!annotation) throw new Error("RNMapbox annotation is detached.");
+          annotation.refresh();
+        },
+      }),
+      []
+    );
 
     const measure = (event: LayoutChangeEvent): void => {
       const { width: measuredWidth, height: measuredHeight } =
@@ -125,6 +111,22 @@ const MapboxAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
     );
   }
 );
+
+/** Native Mapbox annotations and controls used by the selected adapter. */
+export const mapboxNativeUI = createNativeUI({
+  Marker: (props) => <NativeMarkerOverlay {...props} backend="mapbox-native" />,
+  Annotation: MapboxAnnotationHost,
+  backend: "mapbox-native",
+});
+
+/** Direct live native marker, including wrapper-specific collision options. */
+export const MarkerView = Mapbox.MarkerView;
+/** Direct snapshot annotation, selection, callout, and native drag facilities. */
+export const PointAnnotation = Mapbox.PointAnnotation;
+/** Native annotation callout content. */
+export const Callout = Mapbox.Callout;
+/** Native layer annotation for animated and rotated marker imagery. */
+export const Annotation = Mapbox.Annotation;
 
 const anchorFraction = (anchor: Anchor): readonly [number, number] => {
   const x = anchor.includes("left") ? 0 : anchor.includes("right") ? 1 : 0.5;

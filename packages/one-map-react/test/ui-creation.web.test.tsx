@@ -5,6 +5,7 @@ import { describe, expect, test } from "vite-plus/test";
 import type { NativeBackend } from "../src/contracts/backend.js";
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { NativeMapInputs } from "../src/contracts/native-types.js";
+import type { Anchor } from "../src/contracts/ui-types.js";
 import { createNativeMapBinding } from "../src/facade/native-map.js";
 
 const camera = { longitude: 0, latitude: 0, zoom: 1, bearing: 0, pitch: 0 };
@@ -19,7 +20,9 @@ const createFixture = (backend: NativeBackend) =>
     Source: Empty,
     Layer: Empty,
     Images: Empty,
-    Marker: forwardRef((_props, _ref) => null),
+    Marker: forwardRef((props, _ref) => (
+      <div data-testid="marker" data-anchor={props.anchor} />
+    )),
   });
 
 const genuineChanges = [
@@ -81,12 +84,24 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
         </>
       );
       const mounted = render(tree(controls(false)));
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(tree(controls(true)));
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(tree(controls(false)));
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
     });
 
     test("marker content changes retain the original default", () => {
       const mounted = render(tree(<Marker longitude={0} latitude={0} />));
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(
         tree(
           <Marker longitude={0} latitude={0}>
@@ -94,12 +109,28 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
           </Marker>
         )
       );
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
       mounted.rerender(
         tree(
           <Marker longitude={0} latitude={0} anchor="bottom">
             custom
           </Marker>
         )
+      );
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
+      );
+      mounted.rerender(
+        tree(
+          <Marker longitude={0} latitude={0}>
+            custom
+          </Marker>
+        )
+      );
+      expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+        "bottom"
       );
       expect(() =>
         mounted.rerender(
@@ -111,5 +142,42 @@ describe.each<NativeBackend>(["mapbox-native", "maplibre-native"])(
         )
       ).toThrow('creation option "anchor"');
     });
+
+    test.each([false, true])(
+      "resolves and retains effective default anchor when initially explicit (custom content: %s)",
+      (custom) => {
+        const expected: Anchor = custom ? "center" : "bottom";
+        const mounted = render(
+          tree(
+            <Marker longitude={0} latitude={0} anchor={expected}>
+              {custom ? "custom" : undefined}
+            </Marker>
+          )
+        );
+        expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+          expected
+        );
+        mounted.rerender(
+          tree(
+            <Marker longitude={0} latitude={0}>
+              {custom ? "custom" : undefined}
+            </Marker>
+          )
+        );
+        expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+          expected
+        );
+        mounted.rerender(
+          tree(
+            <Marker longitude={0} latitude={0}>
+              {custom ? undefined : "custom"}
+            </Marker>
+          )
+        );
+        expect(mounted.getByTestId("marker").getAttribute("data-anchor")).toBe(
+          expected
+        );
+      }
+    );
   }
 );
