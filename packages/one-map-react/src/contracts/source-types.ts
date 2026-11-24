@@ -115,20 +115,23 @@ export interface GeoJsonSourceProps extends SourceBaseProps {
   readonly promoteId?: string;
 }
 
-/**
- * Vector tile source creation options shared by every adapter.
- */
-export interface VectorSourceProps extends SourceBaseProps {
-  /** Selects the vector tile source family. */
-  readonly type: "vector";
-  /** URL of a TileJSON document. Supply `url` or `tiles`, not both. */
+interface TileSourceBaseProps extends SourceBaseProps {
+  /** URL of a TileJSON document. Supply only one of `url` and `tiles`. */
   readonly url?: string;
-  /** Tile URL templates such as `https://…/{z}/{x}/{y}.pbf`. */
+  /** Tile URL templates such as `https://…/{z}/{x}/{y}`. */
   readonly tiles?: readonly string[];
   /** Minimum zoom level at which tiles are displayed, 0–22. */
   readonly minzoom?: number;
   /** Maximum zoom level at which tiles are displayed, 0–22. */
   readonly maxzoom?: number;
+}
+
+/**
+ * Vector tile source creation options shared by every adapter.
+ */
+export interface VectorSourceProps extends TileSourceBaseProps {
+  /** Selects the vector tile source family. */
+  readonly type: "vector";
   /** Tile coordinate scheme; `tms` inverts the y axis. */
   readonly scheme?: "xyz" | "tms";
   /** Attribution text shown with the map's attribution control. */
@@ -138,17 +141,9 @@ export interface VectorSourceProps extends SourceBaseProps {
 /**
  * Raster tile source creation options shared by every adapter.
  */
-export interface RasterSourceProps extends SourceBaseProps {
+export interface RasterSourceProps extends TileSourceBaseProps {
   /** Selects the raster tile source family. */
   readonly type: "raster";
-  /** URL of a TileJSON document. Supply `url` or `tiles`, not both. */
-  readonly url?: string;
-  /** Tile URL templates such as `https://…/{z}/{x}/{y}.png`. */
-  readonly tiles?: readonly string[];
-  /** Minimum zoom level at which tiles are displayed, 0–22. */
-  readonly minzoom?: number;
-  /** Maximum zoom level at which tiles are displayed, 0–22. */
-  readonly maxzoom?: number;
   /** Tile coordinate scheme; `tms` inverts the y axis. */
   readonly scheme?: "xyz" | "tms";
   /** Tile edge length in pixels; 512 by default. */
@@ -161,17 +156,9 @@ export interface RasterSourceProps extends SourceBaseProps {
  * Source options for raster digital elevation model (DEM) tiles.
  * Hillshade layers and terrain rendering use these tiles as elevation data.
  */
-export interface RasterDemSourceProps extends SourceBaseProps {
+export interface RasterDemSourceProps extends TileSourceBaseProps {
   /** Selects the raster DEM source family. */
   readonly type: "raster-dem";
-  /** URL of a TileJSON document. Supply `url` or `tiles`, not both. */
-  readonly url?: string;
-  /** Tile URL templates such as `https://…/{z}/{x}/{y}.png`. */
-  readonly tiles?: readonly string[];
-  /** Minimum zoom level at which tiles are displayed, 0–22. */
-  readonly minzoom?: number;
-  /** Maximum zoom level at which tiles are displayed, 0–22. */
-  readonly maxzoom?: number;
   /** Tile edge length in pixels; 512 by default. */
   readonly tileSize?: number;
   /**
