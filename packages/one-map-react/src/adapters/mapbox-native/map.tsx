@@ -134,19 +134,18 @@ const MapboxNativeMapImplementation = forwardRef<
     portableGestureSettings
   );
 
-  const [mapHandle] = useState(
-    // eslint-disable-next-line react/refs -- This lazy initializer only captures refs; commands dereference them after attachment.
-    () =>
-      createMapboxMapRef(
-        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
+  const mapHandle = useRef<NativeAdvancedMapRef | null>(null);
+  useImperativeHandle(ref, () => {
+    // Keep the attachment identity when a callback ref changes mid-query.
+    if (mapHandle.current === null) {
+      mapHandle.current = createMapboxMapRef(
         cameraRef,
-        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapViewRef,
         geoJsonSources
-      )
-  );
-  // Descendant control effects must retain the attached ref during prop updates.
-  useImperativeHandle(ref, () => mapHandle, [mapHandle]);
+      );
+    }
+    return mapHandle.current;
+  }, [geoJsonSources]);
 
   assertNativeMapOptions(reuseMaps, gl);
   assertNativeDesktopOptions(props);

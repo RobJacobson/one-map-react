@@ -235,6 +235,35 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(updatedDot).toBe(dot);
   });
 
+  test("delivers a pending filtered click after replacing the callback ref", async () => {
+    const attach = jest.fn<(map: Handle | null) => void>();
+    const replacement = jest.fn<(map: Handle | null) => void>();
+    const onClick = jest.fn<(event: NativeClickEvent) => void>();
+    const scene = (ref: typeof attach) => (
+      <NativeMap
+        ref={ref}
+        mapStyle={emptyStyle}
+        interactiveLayerIds={["route-line"]}
+        onClick={onClick}
+      />
+    );
+    const view = await render(scene(attach));
+    const map = attach.mock.lastCall?.[0];
+    expect(map).toBeTruthy();
+
+    const wrapper = view.getByTestId("wrapper-map").props as WrapperEvents;
+    const completePress = beginPressQuery();
+    await act(async () => wrapper.onPress(press));
+    await view.rerender(scene(replacement));
+    expect(attach).toHaveBeenLastCalledWith(null);
+    expect(replacement.mock.lastCall?.[0]).toBe(map);
+    expect(onClick).not.toHaveBeenCalled();
+
+    await act(async () => completePress());
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.lastCall?.[0].features).toHaveLength(2);
+  });
+
   test("binds a map, source, layer, and marker without setup", async () => {
     const ref = createRef<Handle>();
     const detach = jest.fn<() => void>(() => {
