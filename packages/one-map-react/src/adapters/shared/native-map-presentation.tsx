@@ -22,11 +22,12 @@ import {
   nativeCameraTarget,
   nativeInitialCamera,
 } from "./native-camera-inputs.js";
+import { type NativeLayoutSize, updateLayoutSize } from "./wrapper-values.js";
 
 /** Native-only presentation owned by the selected adapter's map. */
 export interface NativeMapPresentation {
   readonly overlayHostName: string;
-  readonly nativeLayout?: { readonly width: number; readonly height: number };
+  readonly nativeLayout?: NativeLayoutSize;
   setNativeLayout(width: number, height: number): void;
 }
 
@@ -85,9 +86,7 @@ const NativePresentationProvider = ({
   const [{ setNativeLayout }] = useState(() => ({
     setNativeLayout: (width: number, height: number): void => {
       storeNativeLayout((previous) =>
-        previous?.width === width && previous.height === height
-          ? previous
-          : { width, height }
+        updateLayoutSize(previous, width, height)
       );
     },
   }));

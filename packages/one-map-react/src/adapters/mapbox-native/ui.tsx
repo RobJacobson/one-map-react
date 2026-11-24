@@ -3,7 +3,6 @@ import {
   type ComponentProps,
   forwardRef,
   type ReactElement,
-  useImperativeHandle,
   useRef,
   useState,
 } from "react";
@@ -14,11 +13,13 @@ import { anchorFraction } from "../shared/native-marker-overlay.js";
 import {
   createNativeUI,
   type NativeAnnotationHostProps,
+  useNativeAnnotationRefresh,
 } from "../shared/native-ui.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import {
   lngLatFromWrapper,
   pointFromWrapper,
+  updateLayoutSize,
 } from "../shared/wrapper-values.js";
 
 type AnnotationEvent = Parameters<
@@ -48,26 +49,11 @@ const MapboxAnnotationHost = forwardRef<MarkerRef, NativeAnnotationHostProps>(
           : fraction[1],
     };
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        refresh: async () => {
-          const annotation = annotationRef.current;
-          if (!annotation) throw new Error("RNMapbox annotation is detached.");
-          annotation.refresh();
-        },
-      }),
-      []
-    );
+    useNativeAnnotationRefresh(ref, annotationRef, "RNMapbox");
 
     const measure = (event: LayoutChangeEvent): void => {
-      const { width: measuredWidth, height: measuredHeight } =
-        event.nativeEvent.layout;
-      setSize((previous) =>
-        previous.width === measuredWidth && previous.height === measuredHeight
-          ? previous
-          : { width: measuredWidth, height: measuredHeight }
-      );
+      const { width, height } = event.nativeEvent.layout;
+      setSize((previous) => updateLayoutSize(previous, width, height));
     };
     const content = (
       <View

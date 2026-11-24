@@ -5,6 +5,32 @@ import type {
   LngLat,
   Padding,
 } from "../../contracts/camera-types.js";
+import type { ImageSourceCorners } from "../../contracts/source-types.js";
+
+/** Logical dimensions measured by a React Native layout event. */
+export interface NativeLayoutSize {
+  /** Measured width in logical units. */
+  readonly width: number;
+  /** Measured height in logical units. */
+  readonly height: number;
+}
+
+/**
+ * Preserves layout state identity when the measured dimensions repeat.
+ *
+ * @param previous - Last measured size, if available.
+ * @param width - Measured width in logical units.
+ * @param height - Measured height in logical units.
+ * @returns The previous size or the newly measured dimensions.
+ */
+export const updateLayoutSize = (
+  previous: NativeLayoutSize | undefined,
+  width: number,
+  height: number
+): NativeLayoutSize =>
+  previous?.width === width && previous.height === height
+    ? previous
+    : { width, height };
 
 /**
  * Reads a finite numeric wrapper result without coercion.
@@ -250,6 +276,46 @@ export const copyNativeStringArray = (values: readonly string[]): string[] => {
   return values.slice();
 };
 
+/**
+ * Copies the four image corners into mutable tuples for a native wrapper.
+ *
+ * @param corners - Top-left, top-right, bottom-right, and bottom-left corners.
+ * @returns A new tuple containing four new coordinate pairs.
+ */
+export const copyNativeImageCorners = (
+  corners: ImageSourceCorners
+): [MutableCorner, MutableCorner, MutableCorner, MutableCorner] => [
+  copyCorner(corners[0]),
+  copyCorner(corners[1]),
+  copyCorner(corners[2]),
+  copyCorner(corners[3]),
+];
+
+/**
+ * Copies tile templates supplied to a native source.
+ *
+ * @param tiles - Tile URL templates, if supplied.
+ * @returns A new mutable template list, or undefined when absent.
+ * @throws TypeError when a JavaScript caller passes a non-array value.
+ */
+export const copyOptionalNativeTiles = (
+  tiles: readonly string[] | null | undefined
+): string[] | undefined =>
+  tiles == null ? undefined : copyNativeStringArray(tiles);
+
+type MutableCorner = [number, number];
+
+const copyCorner = (corner: LngLat): MutableCorner => [corner[0], corner[1]];
+
+/**
+ * Checks for non-null wrapper objects, including arrays with named properties.
+ *
+ * @param value - Value received from the wrapper.
+ * @returns Whether the input is a non-null object.
+ */
+export const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
 const readFinitePair = (
   value: unknown,
   firstCoordinate?: number
@@ -341,6 +407,3 @@ const isLngLat = (value: unknown): value is LngLat =>
 
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value);
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;

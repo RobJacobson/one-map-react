@@ -4,6 +4,7 @@ import type {
   ScreenBounds,
 } from "../../contracts/query-types.js";
 import type { GeoJsonFeature } from "../../contracts/source-types.js";
+import { isRecord } from "./wrapper-values.js";
 
 /**
  * Converts screen corners into RNMapbox's `[top, left, bottom, right]` rect.
@@ -213,6 +214,3 @@ const copyRecord = (
       copyStateValue(value, topKey ?? key),
     ])
   );
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;

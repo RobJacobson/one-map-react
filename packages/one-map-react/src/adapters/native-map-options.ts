@@ -1,3 +1,5 @@
+import type { NativeBackend } from "../contracts/backend.js";
+
 /**
  * Rejects `resize()` because native size follows the host style.
  *
@@ -21,13 +23,14 @@ export const rejectNativeStop = async (): Promise<never> => {
 };
 
 /**
- * Error for a getter the selected native wrapper does not expose.
+ * Creates a rejecting getter for a method the selected wrapper does not expose.
  *
  * @param method - Common method name, without parentheses.
  * @param backend - Adapter backend name.
- * @returns An error naming the method and backend.
+ * @returns A getter that rejects with an error naming the method and backend.
  */
-export const unavailableMapMethodError = (
-  method: string,
-  backend: string
-): Error => new Error(`${method}() is not available on ${backend}.`);
+export const unavailableMapMethod =
+  (method: string, backend: NativeBackend): (() => Promise<never>) =>
+  async () => {
+    throw new Error(`${method}() is not available on ${backend}.`);
+  };

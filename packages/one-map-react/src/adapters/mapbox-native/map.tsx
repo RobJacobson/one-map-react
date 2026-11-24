@@ -25,6 +25,7 @@ import {
 import { nativeBoundsInput } from "../shared/native-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
+import { isRecord } from "../shared/wrapper-values.js";
 import {
   toRnmapboxControlledCamera,
   toRnmapboxCornerBounds,
@@ -282,9 +283,6 @@ const mapLoadingErrorEvent = (payload: unknown): MapErrorEvent => {
 
   return { error: payload.error };
 };
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
 
 /** Selected native map with adapter-owned presentation. */
 export const MapboxNativeMap = withNativeMapPresentation(

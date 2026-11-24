@@ -9,7 +9,6 @@ import {
   type ComponentProps,
   forwardRef,
   type ReactElement,
-  useImperativeHandle,
   useRef,
 } from "react";
 
@@ -17,6 +16,7 @@ import type { MarkerRef } from "../../contracts/ui-types.js";
 import {
   createNativeUI,
   type NativeAnnotationHostProps,
+  useNativeAnnotationRefresh,
 } from "../shared/native-ui.js";
 import {
   lngLatFromWrapper,
@@ -31,17 +31,7 @@ const MaplibreAnnotationHost = forwardRef<MarkerRef, NativeAnnotationHostProps>(
   (props, ref): ReactElement => {
     const annotationRef = useRef<ViewAnnotationRef>(null);
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        refresh: async () => {
-          const annotation = annotationRef.current;
-          if (!annotation) throw new Error("MapLibre annotation is detached.");
-          annotation.refresh();
-        },
-      }),
-      []
-    );
+    useNativeAnnotationRefresh(ref, annotationRef, "MapLibre");
 
     const normalize = (event: AnnotationEvent) => ({
       lngLat: lngLatFromWrapper(event.nativeEvent.lngLat),

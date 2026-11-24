@@ -19,6 +19,7 @@ import {
   useNativeMapPresentation,
 } from "./native-map-presentation.js";
 import type { NativeMarkerOverlayProps } from "./native-ui.js";
+import { updateLayoutSize } from "./wrapper-values.js";
 
 /**
  * Projects live children into the map's native overlay, outside SDK recognizers.
@@ -123,11 +124,7 @@ export const NativeMarkerOverlay = (
         pointerEvents={point ? "auto" : "none"}
         onLayout={(event) => {
           const { width, height } = event.nativeEvent.layout;
-          setSize((previous) =>
-            previous.width === width && previous.height === height
-              ? previous
-              : { width, height }
-          );
+          setSize((previous) => updateLayoutSize(previous, width, height));
         }}
         style={{
           position: "absolute",
