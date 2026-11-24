@@ -1,9 +1,6 @@
 import type { MoveEvent } from "../../contracts/event-types.js";
 import type { NativeClickEvent } from "../../contracts/native-types.js";
-import {
-  originFromUserInteraction,
-  viewStateFromLngLat,
-} from "../shared/move-event.js";
+import { moveEventFromNative } from "../shared/index.js";
 import { nativeClick } from "../shared/native-values.js";
 
 /**
@@ -31,10 +28,14 @@ export const moveEventFromRnmapbox = (
     throw new Error("RNMapbox camera center is missing longitude or latitude.");
   }
 
-  return {
-    viewState: viewStateFromLngLat(longitude, latitude, zoom, heading, pitch),
-    origin: originFromUserInteraction(isGestureActive),
-  };
+  return moveEventFromNative(
+    longitude,
+    latitude,
+    zoom,
+    heading,
+    pitch,
+    isGestureActive
+  );
 };
 
 /**

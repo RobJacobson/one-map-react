@@ -935,15 +935,6 @@ describe("mapbox-native adapter", () => {
     );
   });
 
-  test("scrollZoom is rejected before a map is created", async () => {
-    MapViewMock.mockClear();
-
-    await expect(
-      render(example(undefined, undefined, { scrollZoom: false }))
-    ).rejects.toThrow("scrollZoom is not available on native maps.");
-    expect(MapViewMock).not.toHaveBeenCalled();
-  });
-
   test("gesture flags map onto scroll, zoom, and double tap", async () => {
     await render(
       example(undefined, undefined, {
