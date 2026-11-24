@@ -21,7 +21,8 @@ import {
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
 import {
-  copyNativeStringArray,
+  copyNativeImageCorners,
+  copyOptionalNativeTiles,
   useNativeSourceRegistration,
 } from "../shared/index.js";
 import type { MaplibreNativeSourceRef } from "./source-registry.js";
@@ -63,12 +64,7 @@ export const MaplibreNativeSource = (props: SourceProps) => {
         <ImageSource
           id={props.id}
           url={props.url}
-          coordinates={[
-            mutableCorner(props.coordinates[0]),
-            mutableCorner(props.coordinates[1]),
-            mutableCorner(props.coordinates[2]),
-            mutableCorner(props.coordinates[3]),
-          ]}
+          coordinates={copyNativeImageCorners(props.coordinates)}
         >
           {props.children}
         </ImageSource>
@@ -164,16 +160,6 @@ const toVectorRegistration = (
   ref: ComponentRef<typeof VectorSource>
 ): MaplibreNativeSourceRef => ({ kind: "vector", ref });
 
-const mutableTiles = (
-  tiles: readonly string[] | undefined
-): string[] | undefined =>
-  tiles == null ? undefined : copyNativeStringArray(tiles);
-
-const mutableCorner = (corner: readonly [number, number]): [number, number] => [
-  corner[0],
-  corner[1],
-];
-
 const toMaplibreTileSource = ({
   id,
   url,
@@ -183,7 +169,7 @@ const toMaplibreTileSource = ({
 }: VectorSourceProps | RasterSourceProps | RasterDemSourceProps) => ({
   id,
   url,
-  tiles: mutableTiles(tiles),
+  tiles: copyOptionalNativeTiles(tiles),
   minzoom,
   maxzoom,
 });

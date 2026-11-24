@@ -3,6 +3,7 @@ import {
   forwardRef,
   type ReactElement,
   type Ref,
+  type RefObject,
   useCallback,
   useId,
   useImperativeHandle,
@@ -167,6 +168,32 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
   return {
     Marker: NativeMarker,
   };
+};
+
+/**
+ * Exposes refresh against the currently attached native annotation.
+ *
+ * @param ref - Snapshot refresh handle to expose.
+ * @param annotationRef - Current wrapper annotation.
+ * @param wrapperName - Wrapper name used in the detached error.
+ */
+export const useNativeAnnotationRefresh = (
+  ref: Ref<MarkerRef>,
+  annotationRef: RefObject<{ refresh(): void } | null>,
+  wrapperName: string
+): void => {
+  useImperativeHandle(
+    ref,
+    () => ({
+      refresh: async () => {
+        const annotation = annotationRef.current;
+        if (!annotation)
+          throw new Error(`${wrapperName} annotation is detached.`);
+        annotation.refresh();
+      },
+    }),
+    [annotationRef, wrapperName]
+  );
 };
 
 type ActivationResponders = Required<

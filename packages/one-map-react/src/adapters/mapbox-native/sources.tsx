@@ -10,7 +10,6 @@ import { useContext, useRef } from "react";
 
 import type {
   GeoJsonSourceProps,
-  ImageSourceProps,
   RasterDemSourceProps,
   RasterSourceProps,
   SourceProps,
@@ -22,7 +21,8 @@ import {
   rejectRasterDemScheme,
 } from "../native-source-gates.js";
 import {
-  copyNativeStringArray,
+  copyNativeImageCorners,
+  copyOptionalNativeTiles,
   useNativeSourceRegistration,
 } from "../shared/index.js";
 import { GeoJsonSourceContext } from "./geojson-source-registry.js";
@@ -33,7 +33,11 @@ export const MapboxNativeSource = (props: SourceProps) => {
     case "geojson":
       return <MapboxNativeGeoJsonSource {...props} />;
     case "vector":
-      return <MapboxNativeVectorSource {...props} />;
+      return (
+        <VectorSource {...toRnmapboxVectorOrRasterSource(props)}>
+          {props.children}
+        </VectorSource>
+      );
     case "raster":
       return (
         <RasterSource
@@ -51,7 +55,11 @@ export const MapboxNativeSource = (props: SourceProps) => {
       );
     case "image":
       return (
-        <ImageSource {...toRnmapboxImageSource(props)}>
+        <ImageSource
+          id={props.id}
+          url={props.url}
+          coordinates={copyNativeImageCorners(props.coordinates)}
+        >
           {props.children}
         </ImageSource>
       );
@@ -87,13 +95,6 @@ const MapboxNativeGeoJsonSource = (props: GeoJsonSourceProps) => {
 };
 
 const toShapeRegistration = (ref: ComponentRef<typeof ShapeSource>) => ref;
-
-/** Forwards vector data to RNMapbox. */
-const MapboxNativeVectorSource = (props: VectorSourceProps) => (
-  <VectorSource {...toRnmapboxVectorOrRasterSource(props)}>
-    {props.children}
-  </VectorSource>
-);
 
 /**
  * Converts common GeoJSON source props into RNMapbox `ShapeSource` props.
@@ -174,28 +175,6 @@ const toRnmapboxRasterDemSource = (
   };
 };
 
-/**
- * Converts common image source props into RNMapbox `ImageSource` props.
- *
- * The readonly corner pairs are copied into the mutable tuple the wrapper
- * declares.
- *
- * @param props - Common image source props.
- * @returns ImageSource field names for the wrapper component.
- */
-const toRnmapboxImageSource = (
-  props: ImageSourceProps
-): ComponentProps<typeof ImageSource> => ({
-  id: props.id,
-  url: props.url,
-  coordinates: [
-    [props.coordinates[0][0], props.coordinates[0][1]],
-    [props.coordinates[1][0], props.coordinates[1][1]],
-    [props.coordinates[2][0], props.coordinates[2][1]],
-    [props.coordinates[3][0], props.coordinates[3][1]],
-  ],
-});
-
 const toRnmapboxTileSource = ({
   id,
   url,
@@ -205,7 +184,7 @@ const toRnmapboxTileSource = ({
 }: VectorSourceProps | RasterSourceProps | RasterDemSourceProps) => ({
   id,
   url,
-  tileUrlTemplates: tiles == null ? undefined : copyNativeStringArray(tiles),
+  tileUrlTemplates: copyOptionalNativeTiles(tiles),
   minZoomLevel: minzoom,
   maxZoomLevel: maxzoom,
 });

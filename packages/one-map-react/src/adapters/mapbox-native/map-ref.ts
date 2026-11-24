@@ -6,7 +6,7 @@ import { requireAttachedMap } from "../index.js";
 import {
   rejectNativeResize,
   rejectNativeStop,
-  unavailableMapMethodError,
+  unavailableMapMethod,
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
@@ -115,28 +115,16 @@ export const createMapboxMapRef = (
     getCenter: async () =>
       nativeLngLat(lngLatFromWrapper(await getMap().getCenter())),
     getZoom: async () => finiteNumber(await getMap().getZoom(), "Map zoom"),
-    getBearing: async () => {
-      throw unavailableMapMethodError("getBearing", "mapbox-native");
-    },
-    getPitch: async () => {
-      throw unavailableMapMethodError("getPitch", "mapbox-native");
-    },
-    getPadding: async () => {
-      throw unavailableMapMethodError("getPadding", "mapbox-native");
-    },
+    getBearing: unavailableMapMethod("getBearing", "mapbox-native"),
+    getPitch: unavailableMapMethod("getPitch", "mapbox-native"),
+    getPadding: unavailableMapMethod("getPadding", "mapbox-native"),
     getBounds: async () =>
       nativeBounds(
         boundsFromRnmapboxVisible(await getMap().getVisibleBounds())
       ),
-    getMinZoom: async () => {
-      throw unavailableMapMethodError("getMinZoom", "mapbox-native");
-    },
-    getMaxZoom: async () => {
-      throw unavailableMapMethodError("getMaxZoom", "mapbox-native");
-    },
-    getMaxBounds: async () => {
-      throw unavailableMapMethodError("getMaxBounds", "mapbox-native");
-    },
+    getMinZoom: unavailableMapMethod("getMinZoom", "mapbox-native"),
+    getMaxZoom: unavailableMapMethod("getMaxZoom", "mapbox-native"),
+    getMaxBounds: unavailableMapMethod("getMaxBounds", "mapbox-native"),
     project: async (lngLat) =>
       nativePoint(
         pointFromWrapper(
@@ -146,7 +134,7 @@ export const createMapboxMapRef = (
     unproject: async (point) =>
       nativeLngLat(
         lngLatFromWrapper(
-          await getMap().getCoordinateFromView([...pointFromWrapper(point)])
+          await getMap().getCoordinateFromView(pointFromWrapper(point))
         )
       ),
     queryRenderedFeatures: async (input, queryOptionsInput) => {

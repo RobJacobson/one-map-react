@@ -1,6 +1,7 @@
+import type { NativeBackend } from "../contracts/backend.js";
 import type {
   GeoJsonSourceProps,
-  SourceProps,
+  RasterDemSourceProps,
 } from "../contracts/source-types.js";
 
 /**
@@ -15,7 +16,7 @@ import type {
 export const rejectProvided = (
   value: unknown,
   name: string,
-  backend: string,
+  backend: NativeBackend,
   reason: string
 ): void => {
   if (value !== undefined) {
@@ -32,7 +33,7 @@ export const rejectProvided = (
  */
 export const rejectNativeGeoJsonGenerateId = (
   generateId: GeoJsonSourceProps["generateId"],
-  backend: "mapbox-native" | "maplibre-native"
+  backend: NativeBackend
 ): void => {
   rejectProvided(
     generateId,
@@ -50,8 +51,8 @@ export const rejectNativeGeoJsonGenerateId = (
  * @throws When a scheme was provided.
  */
 export const rejectRasterDemScheme = (
-  scheme: Extract<SourceProps, { type: "raster-dem" }>["scheme"],
-  backend: "mapbox-native" | "maplibre-native"
+  scheme: RasterDemSourceProps["scheme"],
+  backend: NativeBackend
 ): void => {
   rejectProvided(
     scheme,

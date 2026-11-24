@@ -9,7 +9,7 @@ import { requireAttachedMap } from "../index.js";
 import {
   rejectNativeResize,
   rejectNativeStop,
-  unavailableMapMethodError,
+  unavailableMapMethod,
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
 import { missingCameraError } from "../shared/missing-camera.js";
@@ -121,20 +121,12 @@ export const createMaplibreMapRef = (
       finiteNumber(await getMap().getBearing(), "Map camera value"),
     getPitch: async () =>
       finiteNumber(await getMap().getPitch(), "Map camera value"),
-    getPadding: async () => {
-      throw unavailableMapMethodError("getPadding", "maplibre-native");
-    },
+    getPadding: unavailableMapMethod("getPadding", "maplibre-native"),
     getBounds: async () =>
       nativeBounds(boundsFromFlat(await getMap().getBounds())),
-    getMinZoom: async () => {
-      throw unavailableMapMethodError("getMinZoom", "maplibre-native");
-    },
-    getMaxZoom: async () => {
-      throw unavailableMapMethodError("getMaxZoom", "maplibre-native");
-    },
-    getMaxBounds: async () => {
-      throw unavailableMapMethodError("getMaxBounds", "maplibre-native");
-    },
+    getMinZoom: unavailableMapMethod("getMinZoom", "maplibre-native"),
+    getMaxZoom: unavailableMapMethod("getMaxZoom", "maplibre-native"),
+    getMaxBounds: unavailableMapMethod("getMaxBounds", "maplibre-native"),
     project: async (lngLat) =>
       nativePoint(
         pointFromWrapper(await getMap().project(lngLatFromWrapper(lngLat)))
