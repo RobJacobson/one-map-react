@@ -133,6 +133,37 @@ test.each([
   }
 );
 
+test.each([
+  { target: [] },
+  { target: [[10, 20]] },
+  {
+    target: [
+      [10, 20],
+      [30, 40],
+      [50, 60],
+    ],
+  },
+])("native rendered query rejects a rectangle with $target", ({ target }) => {
+  expect(() =>
+    nativeRenderedQuery(
+      target as unknown as Parameters<typeof nativeRenderedQuery>[0]
+    )
+  ).toThrow("A rendered query rectangle must contain exactly two corners.");
+});
+
+test.each([null, 42, "viewport", true, 1n, Symbol("viewport")])(
+  "native rendered query rejects a non-object target (%s)",
+  (target) => {
+    expect(() =>
+      nativeRenderedQuery(
+        target as unknown as Parameters<typeof nativeRenderedQuery>[0]
+      )
+    ).toThrow(
+      "A rendered query target must be a point, rectangle, or options object."
+    );
+  }
+);
+
 describe("toRnmapboxRect", () => {
   test("reorders corners into top, left, bottom, right", () => {
     expect(
