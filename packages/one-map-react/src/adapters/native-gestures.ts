@@ -1,12 +1,11 @@
-import type { GestureSelection } from "../contracts/map-types.js";
 import type { NativeMapInputs } from "../contracts/native-types.js";
 
-/** Portable gesture selection with the native combined zoom and rotation flag. */
-export type NativeGestureSelection = GestureSelection &
-  Pick<NativeMapInputs, "touchZoomRotate">;
+/** Gesture flags read by the native adapters. */
+export type NativeGestureSelection = NativeGestureFlags &
+  Pick<NativeMapInputs, "interactive" | "touchZoomRotate">;
 
 type NativeGestureFlags = Pick<
-  GestureSelection,
+  NativeMapInputs,
   "dragPan" | "touchZoom" | "touchRotate" | "touchPitch" | "doubleTapZoom"
 >;
 
