@@ -240,27 +240,6 @@ export interface MapProps {
   readonly children?: ReactNode;
 }
 
-/**
- * Portable gesture flags and the web-only options that share their props.
- */
-export type GestureSelection = Pick<
-  MapProps,
-  | "interactive"
-  | "dragPan"
-  | "touchZoom"
-  | "touchRotate"
-  | "touchPitch"
-  | "doubleTapZoom"
-  | "scrollZoom"
-  | "doubleClickZoom"
-  | "dragRotate"
-  | "boxZoom"
-  | "keyboard"
-  | "cooperativeGestures"
-  | "clickTolerance"
-  | "hash"
->;
-
 /** Portable terrain using a mounted raster DEM source. */
 export interface Terrain {
   /** Raster DEM source id. */
