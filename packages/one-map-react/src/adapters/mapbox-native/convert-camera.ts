@@ -1,6 +1,6 @@
-import type { CameraStop } from "@rnmapbox/maps";
+import type { CameraBounds, CameraStop } from "@rnmapbox/maps";
 
-import type { Bounds, ZoomToOptions } from "../../contracts/camera-types.js";
+import type { ZoomToOptions } from "../../contracts/camera-types.js";
 import type {
   NativeCameraCommand,
   NativeCameraTarget,
@@ -15,10 +15,10 @@ import {
 } from "../shared/native-camera-inputs.js";
 import { nativeBoundsInput } from "../shared/native-values.js";
 import {
-  assertBounds,
   lngLatFromWrapper,
   normalizePadding,
   rejectNativeEasing,
+  type NativeBoundsSnapshot,
 } from "../shared/wrapper-values.js";
 
 /**
@@ -72,15 +72,13 @@ export const toRnmapboxControlledCamera = (viewState: NativeCameraTarget) => ({
 /**
  * Converts bounds to RNMapbox `{ sw, ne }`.
  *
- * @param bounds - Southwest then northeast corners.
- * @returns Named corners in the same order.
- * @throws When a corner is missing.
+ * @param bounds - Owned, normalized southwest then northeast corners.
+ * @returns The same corners named for RNMapbox.
  */
-export const toRnmapboxCornerBounds = (bounds: Bounds) => {
-  const [southwest, northeast] = assertBounds(bounds);
-
-  return { sw: southwest, ne: northeast };
-};
+export const toRnmapboxCornerBounds = ([
+  southwest,
+  northeast,
+]: NativeBoundsSnapshot): CameraBounds => ({ sw: southwest, ne: northeast });
 
 /**
  * Converts RNMapbox padding fields from a shared padding value.
@@ -132,13 +130,13 @@ export const toRnmapboxStop = (
  * The wrapper's own `fitBounds` also eases. Building the stop here keeps
  * `animationMode` explicit.
  *
- * @param bounds - Southwest then northeast corners.
+ * @param bounds - Normalized southwest then northeast corners.
  * @param options - Padding, duration, bearing, and pitch.
  * @returns An RNMapbox camera stop with `animationMode: "easeTo"`.
- * @throws When the bounds are invalid, `easing` is set, or `maxZoom` is supplied.
+ * @throws When `easing` is set or `maxZoom` is supplied.
  */
 export const toRnmapboxFitBoundsStop = (
-  bounds: Bounds,
+  bounds: NativeBoundsSnapshot,
   options: NativeFitBoundsOptions = {}
 ): CameraStop => {
   rejectNativeFitBoundsMaxZoom(options.maxZoom);

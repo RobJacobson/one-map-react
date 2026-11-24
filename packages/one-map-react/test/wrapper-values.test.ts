@@ -3,7 +3,6 @@ import { describe, expect, test } from "vite-plus/test";
 import { boundsFromRnmapboxVisible } from "../src/adapters/mapbox-native/map-results.js";
 import { nativeBoundsInput } from "../src/adapters/shared/native-values.js";
 import {
-  assertBounds,
   boundsFromFlat,
   boundsFromGeographic,
   finiteNumber,
@@ -111,7 +110,9 @@ describe("camera conversion", () => {
       [-170, 10],
     ] as const;
 
-    expect(toFlatBounds(bounds)).toEqual([170, -10, -170, 10]);
+    expect(toFlatBounds(nativeBoundsInput(bounds))).toEqual([
+      170, -10, -170, 10,
+    ]);
     expect(boundsFromFlat([170, -10, -170, 10])).toEqual([
       [170, -10],
       [-170, 10],
@@ -139,8 +140,8 @@ describe("camera conversion", () => {
   );
 
   test("invalid bounds are rejected", () => {
-    expect(() => assertBounds([[-122.34], [-122, 47]] as never)).toThrow(
-      "Bounds must be [[west, south], [east, north]]."
+    expect(() => nativeBoundsInput([[-122.34], [-122, 47]] as never)).toThrow(
+      "A map coordinate must contain longitude and latitude."
     );
     const sparseBounds = [170, -10, -170, 10];
     delete sparseBounds[2];
@@ -160,7 +161,7 @@ describe("camera conversion", () => {
   });
 
   test.each([
-    { name: "Common bounds", readBounds: assertBounds },
+    { name: "Native camera bounds", readBounds: nativeBoundsInput },
     {
       name: "RNMapbox visible bounds",
       readBounds: ([southwest, northeast]: Bounds) =>

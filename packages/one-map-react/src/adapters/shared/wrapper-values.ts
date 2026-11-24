@@ -15,6 +15,12 @@ export interface NativeLayoutSize {
   readonly height: number;
 }
 
+/** Finite southwest and northeast corners owned by the native adapter. */
+export type NativeBoundsSnapshot = [
+  southwest: MutableCorner,
+  northeast: MutableCorner,
+];
+
 /**
  * Preserves layout state identity when the measured dimensions repeat.
  *
@@ -70,38 +76,16 @@ export const normalizePadding = (
 };
 
 /**
- * Validates southwest-then-northeast bounds while preserving corner order.
- *
- * @param bounds - Candidate bounds.
- * @returns Fresh southwest and northeast coordinate tuples.
- * @throws When either corner is not a finite longitude and latitude.
- */
-export const assertBounds = (bounds: Bounds): Bounds => {
-  const southwestCorner = bounds?.[0];
-  const northeastCorner = bounds?.[1];
-  const southwest = readFinitePair(southwestCorner);
-  const northeast = southwest && readFinitePair(northeastCorner);
-
-  if (!southwest || !northeast) {
-    throw new Error("Bounds must be [[west, south], [east, north]].");
-  }
-
-  return [southwest, northeast];
-};
-
-/**
  * Converts bounds to `[west, south, east, north]`.
  *
- * @param bounds - Southwest then northeast corners.
+ * @param bounds - Normalized southwest then northeast corners.
  * @returns A new mutable flat bounds tuple. West may be greater than east.
- * @throws When either corner is not a finite longitude and latitude.
  */
 export const toFlatBounds = (
-  bounds: Bounds
+  bounds: NativeBoundsSnapshot
 ): [number, number, number, number] => {
-  const [southwest, northeast] = assertBounds(bounds);
-
-  return [southwest[0], southwest[1], northeast[0], northeast[1]];
+  const [[west, south], [east, north]] = bounds;
+  return [west, south, east, north];
 };
 
 /**
@@ -125,10 +109,10 @@ export const boundsFromFlat = (flat: unknown): Bounds => {
  * Reads a flat tuple or falls back to geographic bounds methods.
  *
  * @param value - `LngLatBounds` methods or `[west, south, east, north]`.
- * @returns Common bounds.
+ * @returns Fresh southwest and northeast corners.
  * @throws When neither representation provides four finite coordinates.
  */
-export const boundsFromGeographic = (value: unknown): Bounds => {
+export const boundsFromGeographic = (value: unknown): NativeBoundsSnapshot => {
   const bounds = parseFlatBounds(value) ?? boundsFromCornerMethods(value);
 
   if (bounds) {
@@ -145,13 +129,13 @@ export const boundsFromGeographic = (value: unknown): Bounds => {
  *
  * @param value - `[longitude, latitude]`, `{ lng, lat }`, or `{ lon, lat }`.
  * @param InvalidCoordinateError - Error class for invalid coordinates. Defaults to `Error`.
- * @returns A longitude/latitude tuple.
+ * @returns A fresh longitude/latitude tuple.
  * @throws When neither shape contains both finite numbers.
  */
 export const lngLatFromWrapper = (
   value: unknown,
   InvalidCoordinateError: new (message: string) => Error = Error
-): LngLat => {
+): MutableCorner => {
   const tuple = readFinitePair(value);
   if (tuple) return tuple;
 
@@ -305,7 +289,7 @@ export const readFinitePair = (
   return isFiniteNumber(second) ? [first, second] : undefined;
 };
 
-const parseFlatBounds = (flat: unknown): Bounds | undefined => {
+const parseFlatBounds = (flat: unknown): NativeBoundsSnapshot | undefined => {
   if (!Array.isArray(flat) || flat.length !== 4) return undefined;
 
   const west: unknown = flat[0];
@@ -328,7 +312,9 @@ const parseFlatBounds = (flat: unknown): Bounds | undefined => {
   ];
 };
 
-const boundsFromCornerMethods = (value: unknown): Bounds | undefined => {
+const boundsFromCornerMethods = (
+  value: unknown
+): NativeBoundsSnapshot | undefined => {
   if (!isRecord(value)) {
     return undefined;
   }
