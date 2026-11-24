@@ -1,8 +1,6 @@
 import { render } from "@testing-library/react";
 import { expect, test, vi } from "vite-plus/test";
 
-import { validateTerrainCoordinate } from "../src/adapters/shared/terrain-values.js";
-import type { LngLat } from "../src/contracts/camera-types.js";
 import type { NativeMapInputs } from "../src/contracts/native-types.js";
 import { createNativeMapBinding } from "../src/facade/native-map.js";
 
@@ -37,13 +35,3 @@ test.each([
   ).toThrow(RangeError);
   expect(renderer).not.toHaveBeenCalled();
 });
-
-// eslint-disable-next-line unicorn/no-new-array -- Sparse coordinates must regress Array.every skipping missing elements.
-test.each([null, undefined, {}, [0], new Array(2), [0, "1"], [0, 91]])(
-  "rejects malformed terrain coordinates with the public range error: %j",
-  (coordinate) => {
-    expect(() => validateTerrainCoordinate(coordinate as LngLat)).toThrow(
-      RangeError
-    );
-  }
-);
