@@ -15,7 +15,6 @@ import {
   type NativeViewportBounds,
   reportSettledMove,
 } from "../shared/index.js";
-import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import {
   useNativeMapPresentation,
@@ -23,7 +22,6 @@ import {
 } from "../shared/native-map-presentation.js";
 import { nativeBoundsInput } from "../shared/native-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
-import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { isRecord } from "../shared/wrapper-values.js";
 import {
   toRnmapboxControlledCamera,
@@ -54,7 +52,7 @@ const MapboxNativeMapImplementation = forwardRef<
   NativeMapProps & Partial<NativeMoveCallbacks>
 >((props, ref) => {
   const session = useNativeMapPresentation();
-  const viewState = nativeCameraTarget(props);
+  const { viewState } = props;
   if (viewState && props.locationOptions?.followUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
   const scaleBarPosition = props.options?.scaleBarPosition;
@@ -86,7 +84,6 @@ const MapboxNativeMapImplementation = forwardRef<
   const mapViewRef = useRef<ComponentRef<typeof MapView>>(null);
   const sawMove = useRef(false);
   const [geoJsonSources] = useState(createGeoJsonSourceRegistry);
-  const frozenViewState = useFrozenValue(initialViewState ?? viewState);
   const gestures = useRnmapboxGestures(props, props.options);
   // RNMapbox class event handlers read this.props, including props from a suspended render.
   const report = useActiveCallbacks({
@@ -162,7 +159,7 @@ const MapboxNativeMapImplementation = forwardRef<
         >
           <Camera
             ref={cameraRef}
-            defaultSettings={toRnmapboxDefaultSettings(frozenViewState)}
+            defaultSettings={toRnmapboxDefaultSettings(initialViewState)}
             minZoomLevel={minZoom}
             maxZoomLevel={maxZoom}
             maxBounds={

@@ -22,6 +22,7 @@ import {
   nativeCameraTarget,
   nativeInitialCamera,
 } from "./native-camera-inputs.js";
+import { useFrozenValue } from "./use-frozen-value.js";
 import { type NativeLayoutSize, updateLayoutSize } from "./wrapper-values.js";
 
 /** Native-only presentation owned by the selected adapter's map. */
@@ -46,26 +47,43 @@ export const NativeCameraContext = createContext<NativeCameraState | null>(
   null
 );
 
-/** Keeps native layout and camera updates out of the common map-access context. */
+/**
+ * Resolves the camera inputs and keeps native layout and observations map-local.
+ *
+ * @param Implementation - Selected native map renderer.
+ * @returns The map with native presentation and camera providers.
+ */
 export const withNativeMapPresentation = <
   Handle extends MapRef,
   Props extends NativeMapInputs,
 >(
   Implementation: ForwardRefExoticComponent<Props & RefAttributes<Handle>>
 ): ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<Handle>> =>
-  forwardRef<Handle, Props>((props, ref) => (
-    <NativePresentationProvider>
-      <NativeCameraProvider
-        initial={props.initialViewState ?? nativeCameraTarget(props)}
-        onMove={props.onMove}
-        onMoveEnd={props.onMoveEnd}
-      >
-        {(callbacks) => (
-          <Implementation {...(props as Props)} {...callbacks} ref={ref} />
-        )}
-      </NativeCameraProvider>
-    </NativePresentationProvider>
-  ));
+  forwardRef<Handle, Props>((props, ref) => {
+    const viewState = nativeCameraTarget(props);
+    const initialViewState = useFrozenValue(
+      props.initialViewState ?? viewState
+    );
+    return (
+      <NativePresentationProvider>
+        <NativeCameraProvider
+          initial={initialViewState}
+          onMove={props.onMove}
+          onMoveEnd={props.onMoveEnd}
+        >
+          {(callbacks) => (
+            <Implementation
+              {...(props as Props)}
+              {...callbacks}
+              viewState={viewState}
+              initialViewState={initialViewState}
+              ref={ref}
+            />
+          )}
+        </NativeCameraProvider>
+      </NativePresentationProvider>
+    );
+  });
 
 /** Returns the enclosing native map's presentation owner. */
 export const useNativeMapPresentation = (): NativeMapPresentation => {

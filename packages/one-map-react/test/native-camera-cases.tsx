@@ -34,6 +34,7 @@ type CameraFixture = {
   readonly centerProp: string;
   readonly zoomProp: string;
   readonly bearingProp: string;
+  readonly initialProp: string;
   readonly getZoom: jest.Mock<() => Promise<number>>;
   readonly project: jest.Mock<() => Promise<number[]>>;
 };
@@ -54,9 +55,39 @@ export const testNativeCamera = <Handle extends NativeMapRef>(
     centerProp,
     zoomProp,
     bearingProp,
+    initialProp,
     getZoom,
     project,
   } = fixture;
+
+  test("the first target seeds camera defaults and observations once", async () => {
+    const observe = jest.fn();
+    const Probe = () => {
+      observe(useContext(NativeCameraContext)?.viewState.zoom);
+      return null;
+    };
+    const scene = (camera: Pick<NativeMapInputs, "zoom" | "viewState">) => (
+      <NativeMap mapStyle={emptyStyle} {...camera}>
+        <Probe />
+      </NativeMap>
+    );
+    const mounted = await render(scene({ zoom: 3 }));
+    const camera = () => mounted.getByTestId("wrapper-camera").props;
+    expect(camera()[initialProp][zoomProp]).toBe(3);
+    expect(camera()[zoomProp]).toBe(3);
+    expect(observe).toHaveBeenLastCalledWith(3);
+
+    await mounted.rerender(scene({ zoom: 4, viewState: { zoom: 5 } }));
+    expect(camera()[initialProp][zoomProp]).toBe(3);
+    expect(camera()[zoomProp]).toBe(5);
+    expect(observe).toHaveBeenLastCalledWith(3);
+
+    await mounted.rerender(scene({}));
+    expect(camera()[initialProp][zoomProp]).toBe(3);
+    expect(camera()[zoomProp]).toBeUndefined();
+    expect(observe).toHaveBeenLastCalledWith(3);
+    await mounted.unmount();
+  });
 
   test("native movement does not dispatch an unchanged target, including an equal new object", async () => {
     const frames = new Map<number, FrameRequestCallback>();

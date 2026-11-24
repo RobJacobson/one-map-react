@@ -19,12 +19,10 @@ import {
   moveEventFromNative,
   reportSettledMove,
 } from "../shared/index.js";
-import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import { withNativeMapPresentation } from "../shared/native-map-presentation.js";
 import { nativeBoundsInput, nativeClick } from "../shared/native-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
-import { useFrozenValue } from "../shared/use-frozen-value.js";
 import { normalizePadding, toFlatBounds } from "../shared/wrapper-values.js";
 import {
   toMaplibreInitialViewState,
@@ -54,7 +52,7 @@ const MaplibreNativeMapImplementation = forwardRef<
 >((props, ref) => {
   const mapStyle = useMaplibreMapStyle(props.mapStyle);
   validateMaplibreMapOptions(props);
-  const viewState = nativeCameraTarget(props);
+  const { viewState } = props;
   if (viewState && props.locationOptions?.trackUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
   const {
@@ -82,7 +80,6 @@ const MaplibreNativeMapImplementation = forwardRef<
   const mapLoaded = useRef(false);
   const sawMove = useRef(false);
   const [sources] = useState(createMaplibreSourceRegistry);
-  const frozenViewState = useFrozenValue(initialViewState ?? viewState);
   // One settled native event can report several callbacks; an earlier one may unmount the map.
   const report = useActiveCallbacks({
     onMove,
@@ -190,7 +187,7 @@ const MaplibreNativeMapImplementation = forwardRef<
         >
           <Camera
             ref={cameraRef}
-            initialViewState={toMaplibreInitialViewState(frozenViewState)}
+            initialViewState={toMaplibreInitialViewState(initialViewState)}
             minZoom={minZoom}
             maxZoom={maxZoom}
             maxBounds={flatMaxBounds}

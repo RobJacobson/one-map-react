@@ -2091,6 +2091,7 @@ describe("maplibre-native entry binding", () => {
     centerProp: "center",
     zoomProp: "zoom",
     bearingProp: "bearing",
+    initialProp: "initialViewState",
     getZoom: mockGetZoom,
     project: mockProject,
   });
