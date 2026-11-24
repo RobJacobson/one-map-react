@@ -153,15 +153,8 @@ export const boundsFromGeographic = (value: unknown): Bounds => {
  * @throws When neither shape contains both numbers.
  */
 export const lngLatFromWrapper = (value: unknown): LngLat => {
-  if (Array.isArray(value) && value.length === 2) {
-    const longitude: unknown = value[0];
-    if (isFiniteNumber(longitude)) {
-      const latitude: unknown = value[1];
-      if (isFiniteNumber(latitude)) {
-        return [longitude, latitude];
-      }
-    }
-  }
+  const tuple = readFinitePair(value);
+  if (tuple) return tuple;
 
   if (isRecord(value)) {
     const longitude = finiteField(value, "lng") ?? finiteField(value, "lon");
@@ -187,15 +180,8 @@ export const pointFromWrapper = (
   value: unknown,
   tupleX?: number
 ): [x: number, y: number] => {
-  if (Array.isArray(value) && value.length === 2) {
-    const x: unknown = tupleX ?? value[0];
-    if (isFiniteNumber(x)) {
-      const y: unknown = value[1];
-      if (isFiniteNumber(y)) {
-        return [x, y];
-      }
-    }
-  }
+  const tuple = readFinitePair(value, tupleX);
+  if (tuple) return tuple;
 
   if (isRecord(value)) {
     const x = finiteField(value, "x");
@@ -256,6 +242,19 @@ export const copyNativeStringArray = (values: readonly string[]): string[] => {
   }
 
   return values.slice();
+};
+
+const readFinitePair = (
+  value: unknown,
+  firstCoordinate?: number
+): [number, number] | undefined => {
+  if (!Array.isArray(value) || value.length !== 2) return undefined;
+
+  const first: unknown = firstCoordinate ?? value[0];
+  if (!isFiniteNumber(first)) return undefined;
+
+  const second: unknown = value[1];
+  return isFiniteNumber(second) ? [first, second] : undefined;
 };
 
 const parseFlatBounds = (flat: readonly unknown[]): Bounds | undefined => {
