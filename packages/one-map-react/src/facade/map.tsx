@@ -165,6 +165,7 @@ const nativeDesktopOptions = [
   "onTouchMove",
   "onTouchEnd",
   "onTouchCancel",
+  "onResize",
 ] as const;
 
 const nativeMapMethods = {

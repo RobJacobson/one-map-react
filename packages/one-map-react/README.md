@@ -164,6 +164,8 @@ Record the resolved SDK version in each application lockfile/build. Follow the s
 
 ## Current limitations
 
+Native maps reject `onResize`. Use `hostProps.onLayout` to observe the native map host's layout.
+
 Web map reuse delegates to react-map-gl. Native reuseMaps={true}, external `gl`, and `resize()` reject; reuseMaps={false} is accepted. Native imperative `stop()` and some getters lack a wrapper path; their errors remain explicit. Native viewState is a camera target applied through ordinary Camera props when its values change. With target A, user movement to B stays at B while A remains unchanged, including a fresh equal-valued target object. A changed target C requests C; jumpTo with A explicitly requests A again. Removing viewState releases the target. Native onMove and camera readouts use observed movement; SDK ornaments retain selected renderer behavior. Native location following and an explicit viewState remain mutually exclusive owners. Web viewState continues to delegate controlled behavior to react-map-gl. The strict controlledCamera capability stays unavailable. Renderer acceptance for the changed native behavior remains unverified.
 
 Native `fitBounds.maxZoom` remains owner-deferred and rejects every supplied value, including zero. MapLibre native terrain, globe projection, and elevation queries are unsupported by the pinned wrapper/SDK boundary. Cold-style-cache opening camera behavior on RNMapbox Android awaits verification on this wrapper version. MapLibre iOS applies `maxBounds` to user panning; imperative camera commands can bypass that constraint. Clearing bounds releases the panning limit.
