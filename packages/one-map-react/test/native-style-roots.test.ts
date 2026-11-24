@@ -128,11 +128,11 @@ test("silent native formatting modifiers reject without dropping supported optio
 });
 
 test.each([
-  { type: "raster", paint: { resampling: "nearest" } },
-  { type: "line", paint: { "line-layer-opacity": 0 } },
-  { type: "fill", paint: { "fill-layer-opacity": 0 } },
-  { type: "symbol", layout: { "icon-overlap": "cooperative" } },
-  { type: "symbol", layout: { "text-overlap": "always" } },
+  { paint: { resampling: "nearest" } },
+  { paint: { "line-layer-opacity": 0 } },
+  { paint: { "fill-layer-opacity": 0 } },
+  { layout: { "icon-overlap": "cooperative" } },
+  { layout: { "text-overlap": "always" } },
 ])(
   "unsupported native layer properties fail with a usable legacy route where equivalent",
   (layer) => {
@@ -162,13 +162,11 @@ test("the style document guard leaves text-variable-anchor-offset to the SDK", (
 test("legacy native raster sampling and basic symbol overlap remain available", () => {
   expect(() =>
     assertMaplibreLayerStyle({
-      type: "raster",
       style: { rasterResampling: "nearest" },
     })
   ).not.toThrow();
   expect(() =>
     assertMaplibreLayerStyle({
-      type: "symbol",
       style: { iconAllowOverlap: true, textAllowOverlap: false },
     })
   ).not.toThrow();
@@ -268,7 +266,6 @@ test("treats undefined expression modifiers and layer properties as omitted whil
 
   expect(() =>
     assertMaplibreLayerStyle({
-      type: "symbol",
       paint: {
         resampling: undefined,
         "fill-layer-opacity": undefined,
@@ -289,7 +286,6 @@ test("treats undefined expression modifiers and layer properties as omitted whil
   ).not.toThrow();
   expect(() =>
     assertMaplibreLayerStyle({
-      type: "symbol",
       style: { iconOverlap: "always" },
     })
   ).toThrow('Layer property "iconOverlap" is unsupported');

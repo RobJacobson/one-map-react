@@ -1151,28 +1151,42 @@ describe("maplibre-native layers", () => {
     expect(props.filter).toBeUndefined();
   });
 
-  test("creation and symbol validation precede SDK expression validation", async () => {
-    const layout = {
-      "icon-overlap": "always",
-      "text-field": ["number-format", 1, { unit: "meter" }],
-    } as const;
-    const view = await render(<Layer id="labels" type="symbol" />);
-    await expect(
-      view.rerender(<Layer id="other-labels" type="symbol" layout={layout} />)
-    ).rejects.toThrow('Layer "other-labels" changed the creation option "id".');
-    await expect(
-      render(<Layer id="labels" type="symbol" layout={layout} />)
-    ).rejects.toThrow("icon-overlap is not available on maplibre-native.");
-    await expect(
-      render(
-        <Layer
-          id="labels"
-          type="symbol"
-          layout={{ "text-field": layout["text-field"] }}
-        />
-      )
-    ).rejects.toThrow("number-format.unit");
-  });
+  test.each(["icon-overlap", "text-overlap"] as const)(
+    "rejects %s in JSX and serialized styles before checking expressions",
+    async (property) => {
+      const layout = {
+        [property]: "always",
+        "text-field": ["number-format", 1, { unit: "meter" }],
+      } as const;
+      const style = JSON.stringify({
+        ...emptyStyle,
+        layers: [{ id: "labels", type: "symbol", layout }],
+      });
+      const message = `Layer property "${property}" is unsupported`;
+      await expect(render(<NativeMap mapStyle={style} />)).rejects.toThrow(
+        message
+      );
+
+      const view = await render(<Layer id="labels" type="symbol" />);
+      await expect(
+        view.rerender(<Layer id="other-labels" type="symbol" layout={layout} />)
+      ).rejects.toThrow(
+        'Layer "other-labels" changed the creation option "id".'
+      );
+      await expect(
+        render(<Layer id="labels" type="symbol" layout={layout} />)
+      ).rejects.toThrow(message);
+      await expect(
+        render(
+          <Layer
+            id="labels"
+            type="symbol"
+            layout={{ "text-field": layout["text-field"] }}
+          />
+        )
+      ).rejects.toThrow("number-format.unit");
+    }
+  );
 
   test("omitted expression modifiers reach the pinned style converter", async () => {
     const { transformStyle, mergeStyleProps } = pinnedMaplibreConverter();
