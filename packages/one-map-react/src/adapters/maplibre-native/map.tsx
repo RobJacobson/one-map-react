@@ -22,7 +22,6 @@ import {
 } from "../native-map-options.js";
 import { reportSettledMove } from "../shared/move-event.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
-import { omitUndefinedFields } from "../shared/native-layer-updates.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import { withNativeMapPresentation } from "../shared/native-map-presentation.js";
 import { nativeBoundsInput, nativeClick } from "../shared/native-values.js";
@@ -40,7 +39,10 @@ import {
   MaplibreSourceContext,
   createMaplibreSourceRegistry,
 } from "./source-registry.js";
-import { maplibreStyleForNative } from "./style-roots.js";
+import {
+  maplibreLightForNative,
+  maplibreStyleForNative,
+} from "./style-roots.js";
 
 type MaplibrePressEvent = Parameters<
   NonNullable<ComponentProps<typeof MaplibreMap>["onPress"]>
@@ -60,7 +62,7 @@ const MaplibreNativeMapImplementation = forwardRef<
   }
 >((props, ref) => {
   // This component is not compiled, so reuse the serialized document while
-  // the style object keeps its identity. Compiled WrapperMap caches the same way.
+  // the style object keeps its identity. WrapperMap caches the same way.
   const mapStyle = useMemo(
     () =>
       maplibreStyleForNative(props.mapStyle) as ComponentProps<
@@ -162,17 +164,17 @@ const MaplibreNativeMapImplementation = forwardRef<
     maxBounds === undefined
       ? undefined
       : toFlatBounds(nativeBoundsInput(maxBounds));
+  const { light: optionLight, ...options } = props.options ?? {};
+  const light = maplibreLightForNative(props.light ?? optionLight, {
+    omitUndefinedFields: true,
+  });
 
   return (
     <NativeMapHost style={style} hostProps={props.hostProps}>
       <MaplibreSourceContext.Provider value={sources}>
         <MaplibreMap
-          {...props.options}
-          light={
-            omitUndefinedFields(props.light ?? props.options?.light) as
-              | ComponentProps<typeof MaplibreMap>["light"]
-              | undefined
-          }
+          {...options}
+          light={light}
           ref={mapRef}
           style={{ flex: 1 }}
           mapStyle={mapStyle}

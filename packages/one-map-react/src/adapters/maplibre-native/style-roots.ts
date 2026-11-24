@@ -1,3 +1,8 @@
+import type { LightSpecification } from "@maplibre/maplibre-react-native";
+
+import type { LegacyLight } from "../../contracts/map-types.js";
+import { snapshotNativeStyleValue } from "../shared/index.js";
+
 const hasDefinedOwn = (value: object, key: string): boolean =>
   Object.hasOwn(value, key) && Reflect.get(value, key) !== undefined;
 
@@ -171,4 +176,22 @@ export const maplibreStyleForNative = (input: unknown): unknown => {
   const forwarded = typeof input === "object" ? JSON.stringify(input) : input;
   assertMaplibreStyleRoots(forwarded);
   return forwarded;
+};
+
+/**
+ * Validates the light snapshot MapLibre Native will receive.
+ *
+ * @param input - Managed or wrapper light settings.
+ * @param options - Drop undefined fields for managed light settings when requested.
+ * @returns The checked light snapshot, or undefined when omitted.
+ * @throws For formatting modifiers unsupported by the pinned native parser.
+ */
+export const maplibreLightForNative = (
+  input: LegacyLight | LightSpecification | undefined,
+  options?: { readonly omitUndefinedFields: boolean }
+): LightSpecification | undefined => {
+  const light = snapshotNativeStyleValue(input, options?.omitUndefinedFields);
+  assertMaplibreExpressions(light);
+  // The snapshot preserves the bridge shape and copies any readonly position tuple.
+  return light as LightSpecification | undefined;
 };

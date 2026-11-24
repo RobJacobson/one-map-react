@@ -11,25 +11,37 @@ interface LayerSettings {
 
 /**
  * Copies arrays and objects, dropping object fields whose values are undefined.
- * The copy is the value forwarded to MapLibre. Returning the caller's container
- * would let a getter change between validation and the style converter.
- * The caller's value is not mutated.
  *
  * @param value - Expression, style object, or other field forwarded to the wrapper.
- * @returns A new array or record, or the original primitive when the value is not a container.
+ * @returns A snapshot with undefined object fields removed.
  */
-export const omitUndefinedFields = (value: unknown): unknown => {
+export const omitUndefinedFields = (value: unknown): unknown =>
+  snapshotNativeStyleValue(value, true);
+
+/**
+ * Copies the arrays and enumerable string-keyed fields the style bridge reads.
+ * A getter cannot change the forwarded value after validation.
+ *
+ * @param value - Expression, style object, or other field forwarded to the wrapper.
+ * @param skipUndefinedFields - Drop undefined object fields for managed inputs.
+ * @returns A copied array or record, or the original value for a non-container.
+ */
+export const snapshotNativeStyleValue = (
+  value: unknown,
+  skipUndefinedFields = false
+): unknown => {
   if (Array.isArray(value)) {
     const copy: unknown[] = [];
-    for (const member of value) copy.push(omitUndefinedFields(member));
+    for (const member of value)
+      copy.push(snapshotNativeStyleValue(member, skipUndefinedFields));
     return copy;
   }
   if (!value || typeof value !== "object") return value;
 
   const entries: [string, unknown][] = [];
   for (const [key, member] of Object.entries(value)) {
-    if (member === undefined) continue;
-    entries.push([key, omitUndefinedFields(member)]);
+    if (skipUndefinedFields && member === undefined) continue;
+    entries.push([key, snapshotNativeStyleValue(member, skipUndefinedFields)]);
   }
   return Object.fromEntries(entries);
 };
