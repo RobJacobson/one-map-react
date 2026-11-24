@@ -1,4 +1,3 @@
-import type { Bounds } from "../../contracts/camera-types.js";
 import type {
   NativeCameraCommand,
   NativeCameraTarget,
@@ -42,11 +41,9 @@ export const toMaplibreInitialViewState = (
   viewState: NativeInitialViewState = {}
 ) => {
   if (viewState.bounds !== undefined) {
-    const { duration: _duration, ...fit } = toMaplibreFitBoundsOptions(
-      nativeInitialFit(viewState)
-    );
+    const fit = toMaplibreFitBoundsOptions(nativeInitialFit(viewState));
     return {
-      bounds: mutableFlatBounds(nativeBoundsInput(viewState.bounds)),
+      bounds: toFlatBounds(nativeBoundsInput(viewState.bounds)),
       ...fit,
     };
   }
@@ -105,19 +102,4 @@ export const toMaplibreFitBoundsOptions = (
     ...(options.bearing === undefined ? {} : { bearing: options.bearing }),
     ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
   };
-};
-
-/**
- * Copies the readonly corner pair into the mutable flat-bounds tuple the
- * MapLibre Native `Camera` props declare.
- *
- * @param bounds - Southwest then northeast corners.
- * @returns `[west, south, east, north]` as a mutable tuple.
- */
-export const mutableFlatBounds = (
-  bounds: Bounds
-): [number, number, number, number] => {
-  const [west, south, east, north] = toFlatBounds(bounds);
-
-  return [west, south, east, north];
 };

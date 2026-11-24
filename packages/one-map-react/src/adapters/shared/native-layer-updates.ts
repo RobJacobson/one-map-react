@@ -9,16 +9,6 @@ interface LayerSettings {
   readonly maxzoom?: number;
 }
 
-/** Removes undefined entries before they reach the wrapper style converter. */
-export const definedStyle = (
-  style?: object
-): Record<string, unknown> | undefined => {
-  if (!style) return undefined;
-  return Object.fromEntries(
-    Object.entries(style).filter(([, value]) => value !== undefined)
-  );
-};
-
 /**
  * Copies arrays and objects, dropping object fields whose values are undefined.
  * The copy is the value forwarded to MapLibre. Returning the caller's container

@@ -65,12 +65,12 @@ export const assertBounds = (bounds: Bounds): Bounds => {
  * Converts bounds to `[west, south, east, north]`.
  *
  * @param bounds - Southwest then northeast corners.
- * @returns A flat bounds tuple. West may be greater than east.
+ * @returns A new mutable flat bounds tuple. West may be greater than east.
  * @throws When a corner is missing.
  */
 export const toFlatBounds = (
   bounds: Bounds
-): readonly [number, number, number, number] => {
+): [number, number, number, number] => {
   const [southwest, northeast] = assertBounds(bounds);
 
   return [southwest[0], southwest[1], northeast[0], northeast[1]];

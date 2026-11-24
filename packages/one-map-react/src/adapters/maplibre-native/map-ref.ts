@@ -28,9 +28,9 @@ import {
   lngLatFromWrapper,
   pointFromWrapper,
   rejectJumpTiming,
+  toFlatBounds,
 } from "../shared/wrapper-values.js";
 import {
-  mutableFlatBounds,
   toMaplibreCommand,
   toMaplibreFitBoundsOptions,
 } from "./convert-camera.js";
@@ -100,7 +100,7 @@ export const createMaplibreMapRef = (
       const camera = requireCamera(cameraRef.current, mapLoaded.current);
 
       await camera.fitBounds(
-        mutableFlatBounds(nativeBoundsInput(bounds)),
+        toFlatBounds(nativeBoundsInput(bounds)),
         toMaplibreFitBoundsOptions(options)
       );
     },
@@ -170,7 +170,7 @@ export const createMaplibreMapRef = (
         // Both native getData implementations query loaded source tiles, including
         // hidden features. Results may be clipped or duplicated at tile boundaries.
         const collection = await entry.ref.getData(
-          toMaplibreFilter(options?.filter) as never
+          toMaplibreFilter(options?.filter)
         );
 
         return featuresFromWrapper(collection, "querySourceFeatures");

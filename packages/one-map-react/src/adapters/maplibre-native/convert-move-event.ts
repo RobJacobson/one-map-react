@@ -1,11 +1,8 @@
-import type { LngLat, Point } from "../../contracts/camera-types.js";
 import type { MoveEvent } from "../../contracts/event-types.js";
-import type { NativeClickEvent } from "../../contracts/native-types.js";
 import {
   originFromUserInteraction,
   viewStateFromLngLat,
 } from "../shared/move-event.js";
-import { nativeClick } from "../shared/native-values.js";
 
 /**
  * Builds a move event from MapLibre Native `onRegionIsChanging` or
@@ -28,17 +25,3 @@ export const moveEventFromMaplibreNative = (
   viewState: viewStateFromLngLat(center[0], center[1], zoom, bearing, pitch),
   origin: originFromUserInteraction(userInteraction),
 });
-
-/**
- * Builds a click from MapLibre Native `onPress` or `onLongPress`.
- *
- * @param lngLat - `nativeEvent.lngLat`.
- * @param point - `nativeEvent.point`.
- * @param features - Features included when the press bubbled from a source.
- * @returns Longitude, latitude, view point, and features when present.
- */
-export const clickEventFromMaplibreNative = (
-  lngLat: LngLat,
-  point: Point,
-  features?: readonly object[]
-): NativeClickEvent => nativeClick(lngLat, point, features);
