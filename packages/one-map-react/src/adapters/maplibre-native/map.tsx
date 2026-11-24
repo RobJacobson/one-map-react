@@ -7,14 +7,13 @@ import {
   type ComponentProps,
   type ComponentRef,
   forwardRef,
-  useImperativeHandle,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import type { NativeSyntheticEvent } from "react-native";
 
 import type { NativeMapProps } from "../../maplibre-native.js";
+import { useNativeMapHandle } from "../index.js";
 import {
   type NativeMoveCallbacks,
   moveEventFromNative,
@@ -37,10 +36,8 @@ import {
   MaplibreSourceContext,
   createMaplibreSourceRegistry,
 } from "./source-registry.js";
-import {
-  maplibreLightForNative,
-  maplibreStyleForNative,
-} from "./style-roots.js";
+import { maplibreLightForNative } from "./style-roots.js";
+import { useMaplibreMapStyle } from "./use-maplibre-map-style.js";
 
 type MaplibrePressEvent = Parameters<
   NonNullable<ComponentProps<typeof MaplibreMap>["onPress"]>
@@ -55,14 +52,7 @@ const MaplibreNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
   NativeMapProps & Partial<NativeMoveCallbacks>
 >((props, ref) => {
-  // Reuse the serialized document while the style object keeps its identity.
-  const mapStyle = useMemo(
-    () =>
-      maplibreStyleForNative(props.mapStyle) as ComponentProps<
-        typeof MaplibreMap
-      >["mapStyle"],
-    [props.mapStyle]
-  );
+  const mapStyle = useMaplibreMapStyle(props.mapStyle);
   validateMaplibreMapOptions(props);
   const viewState = nativeCameraTarget(props);
   if (viewState && props.locationOptions?.trackUserLocation)
@@ -107,19 +97,9 @@ const MaplibreNativeMapImplementation = forwardRef<
   });
   const gestures = toMaplibreGestures(props);
 
-  const mapHandle = useRef<NativeAdvancedMapRef | null>(null);
-  useImperativeHandle(ref, () => {
-    // Keep the attachment identity when a callback ref changes mid-query.
-    if (mapHandle.current === null) {
-      mapHandle.current = createMaplibreMapRef(
-        cameraRef,
-        mapRef,
-        mapLoaded,
-        sources
-      );
-    }
-    return mapHandle.current;
-  }, [sources]);
+  useNativeMapHandle(ref, () =>
+    createMaplibreMapRef(cameraRef, mapRef, mapLoaded, sources)
+  );
 
   const reportRegion = (
     event: NativeSyntheticEvent<ViewStateChangeEvent>,

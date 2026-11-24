@@ -2229,6 +2229,12 @@ describe("mapbox-native entry binding", () => {
       return (error) => complete(error);
     },
     mockGetClusterExpansionZoom,
+    (layers) =>
+      expect(mockQueryRenderedFeaturesAtPoint).toHaveBeenLastCalledWith(
+        [10, 20],
+        [],
+        layers
+      ),
     () =>
       expect(LineLayerMock.mock.lastCall?.[0]).toMatchObject({
         sourceID: "routes",

@@ -9,14 +9,15 @@ import {
   unavailableMapMethod,
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
-import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
   nativeBounds,
   nativeBoundsInput,
   nativeLngLat,
   nativePoint,
   nativeRenderedQuery,
-} from "../shared/native-values.js";
+  prepareNativeRenderedQueryLayers,
+} from "../shared/index.js";
+import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
   finiteNumber,
   lngLatFromWrapper,
@@ -141,9 +142,12 @@ export const createMapboxMapRef = (
     queryRenderedFeatures: async (input, queryOptionsInput) => {
       const [target, options] = nativeRenderedQuery(input, queryOptionsInput);
       const map = getMap();
-      // Preserve an explicit empty layer selection before the SDK defaults to all layers.
-      if (options?.layers?.length === 0) return [];
-      const [filter, layers] = toRnmapboxRenderedQueryArgs(options);
+      const layerSelection = prepareNativeRenderedQueryLayers(options);
+      if (layerSelection === null) return [];
+      const [filter, layers] = toRnmapboxRenderedQueryArgs(
+        options,
+        layerSelection
+      );
       const geometry = toRnmapboxQueryRect(target);
 
       const collection =

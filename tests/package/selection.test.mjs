@@ -162,6 +162,15 @@ const main = async () => {
       ]
     );
     assert(files.includes("package/dist/index.d.ts"));
+    assert(files.includes("package/dist/contracts/camera-types.d.ts"));
+    const contractJavaScript = files.find((file) =>
+      /^package\/dist\/contracts\/[^/]+\.js$/.test(file)
+    );
+    assert.equal(
+      contractJavaScript,
+      undefined,
+      `Type-only contract JavaScript is packed: ${contractJavaScript}`
+    );
     for (const retired of [
       "package/dist/index.js",
       "package/dist/facade/map-setup.js",

@@ -42,92 +42,70 @@ interface WrapperClusterSource<ClusterArgument> {
   ) => Promise<unknown>;
 }
 
+type ClusterArguments = {
+  1: [clusterId: number];
+  3: [clusterId: number, limit: number, offset: number];
+};
+
+type ClusterCallback<Value> = (error: Error | null, value?: Value) => void;
+
+type ClusterCall<Count extends keyof ClusterArguments, Value> =
+  | ClusterArguments[Count]
+  | [...ClusterArguments[Count], callback: ClusterCallback<Value>];
+
 const createNativeClusterSource = <ClusterArgument>(
   read: () => WrapperClusterSource<ClusterArgument>,
   toClusterArgument: (clusterId: number) => ClusterArgument
 ): NativeGeoJsonSource => {
-  // Reference the same source for Mapbox-style chaining.
-  const complete = <Value>(
-    result: Promise<Value>,
-    callback?: (error: Error | null, value?: Value) => void
+  const withCallback = <Count extends keyof ClusterArguments, Value>(
+    callbackIndex: Count,
+    query: (args: ClusterCall<Count, Value>) => Promise<Value>
   ) => {
-    if (!callback) return result;
-    void result.then(
-      (value) => callback(null, value),
-      (error: unknown) =>
-        callback(error instanceof Error ? error : new Error(String(error)))
-    );
-    return source;
+    function run(...args: ClusterArguments[Count]): Promise<Value>;
+    function run(
+      ...args: [...ClusterArguments[Count], callback: ClusterCallback<Value>]
+    ): NativeGeoJsonSource;
+    function run(
+      ...args: ClusterCall<Count, Value>
+    ): Promise<Value> | NativeGeoJsonSource {
+      // Start the query before a source replacement can invalidate the registration.
+      const result = query(args);
+      const callback = args[callbackIndex];
+      if (typeof callback !== "function") return result;
+      void result.then(
+        (value) => callback(null, value),
+        (error: unknown) =>
+          callback(error instanceof Error ? error : new Error(String(error)))
+      );
+      return source;
+    }
+    return run;
   };
 
-  // Async readers reject stale registrations and dispatch before the first await.
-  const readExpansionZoom = async (clusterId: number) =>
-    finiteNumber(
-      await read().getClusterExpansionZoom(toClusterArgument(clusterId)),
-      "Cluster expansion zoom"
-    );
-  function expansion(clusterId: number): ReturnType<typeof readExpansionZoom>;
-  function expansion(
-    clusterId: number,
-    callback: Parameters<NativeGeoJsonSource["getClusterExpansionZoom"]>[1]
-  ): NativeGeoJsonSource;
-  function expansion(
-    clusterId: number,
-    callback?: Parameters<NativeGeoJsonSource["getClusterExpansionZoom"]>[1]
-  ) {
-    return complete(readExpansionZoom(clusterId), callback);
-  }
-
-  const readChildren = async (clusterId: number) =>
-    featuresFromWrapper(
-      await read().getClusterChildren(toClusterArgument(clusterId)),
-      "getClusterChildren"
-    );
-  function children(clusterId: number): ReturnType<typeof readChildren>;
-  function children(
-    clusterId: number,
-    callback: Parameters<NativeGeoJsonSource["getClusterChildren"]>[1]
-  ): NativeGeoJsonSource;
-  function children(
-    clusterId: number,
-    callback?: Parameters<NativeGeoJsonSource["getClusterChildren"]>[1]
-  ) {
-    return complete(readChildren(clusterId), callback);
-  }
-
-  const readLeaves = async (clusterId: number, limit: number, offset: number) =>
-    featuresFromWrapper(
-      await read().getClusterLeaves(
-        toClusterArgument(clusterId),
-        limit,
-        offset
-      ),
-      "getClusterLeaves"
-    );
-  function leaves(
-    clusterId: number,
-    limit: number,
-    offset: number
-  ): ReturnType<typeof readLeaves>;
-  function leaves(
-    clusterId: number,
-    limit: number,
-    offset: number,
-    callback: Parameters<NativeGeoJsonSource["getClusterLeaves"]>[3]
-  ): NativeGeoJsonSource;
-  function leaves(
-    clusterId: number,
-    limit: number,
-    offset: number,
-    callback?: Parameters<NativeGeoJsonSource["getClusterLeaves"]>[3]
-  ) {
-    return complete(readLeaves(clusterId, limit, offset), callback);
-  }
   const source = {
     type: "geojson",
-    getClusterExpansionZoom: expansion,
-    getClusterChildren: children,
-    getClusterLeaves: leaves,
+    getClusterExpansionZoom: withCallback(1, async ([clusterId]) =>
+      finiteNumber(
+        await read().getClusterExpansionZoom(toClusterArgument(clusterId)),
+        "Cluster expansion zoom"
+      )
+    ),
+    getClusterChildren: withCallback(1, async ([clusterId]) =>
+      featuresFromWrapper(
+        await read().getClusterChildren(toClusterArgument(clusterId)),
+        "getClusterChildren"
+      )
+    ),
+    getClusterLeaves: withCallback(3, async ([clusterId, limit, offset]) =>
+      featuresFromWrapper(
+        await read().getClusterLeaves(
+          toClusterArgument(clusterId),
+          limit,
+          offset
+        ),
+        "getClusterLeaves"
+      )
+    ),
   } satisfies NativeGeoJsonSource;
   return source;
 };

@@ -11,6 +11,7 @@ import type { QueryRenderedFeaturesOptions } from "../../contracts/query-types.j
 import { featuresFromWrapper } from "./feature-values.js";
 import {
   boundsFromGeographic,
+  copyNativeStringArray,
   lngLatFromWrapper,
   pointFromWrapper,
 } from "./wrapper-values.js";
@@ -125,6 +126,24 @@ export const nativeRenderedQuery = (
     return [[pointFromWrapper(first), pointFromWrapper(target[1])], options];
   }
   return [undefined, target as QueryRenderedFeaturesOptions];
+};
+
+/**
+ * Snapshots the layer selection for the empty check and the wrapper call.
+ *
+ * @param options - Resolved rendered query options.
+ * @returns Copied layer ids, `undefined` for all layers, or `null` for no layers.
+ * @throws TypeError when the supplied layer selection is not an array.
+ */
+export const prepareNativeRenderedQueryLayers = (
+  options: QueryRenderedFeaturesOptions | undefined
+): string[] | null | undefined => {
+  const layers = options?.layers;
+  if (layers === undefined) return undefined;
+
+  const selection = copyNativeStringArray(layers);
+  // Both wrappers treat an empty layer list as all layers.
+  return selection.length === 0 ? null : selection;
 };
 
 /**
