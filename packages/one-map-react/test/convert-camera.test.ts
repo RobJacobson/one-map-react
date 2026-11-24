@@ -14,12 +14,13 @@ import {
   toMaplibreInitialViewState,
   toMaplibreViewState,
 } from "../src/adapters/maplibre-native/convert-camera.js";
+import { nativeBoundsInput } from "../src/adapters/shared/native-values.js";
 import type { FlyToOptions, ViewState } from "../src/contracts/camera-types.js";
 
-const fitBounds = [
+const fitBounds = nativeBoundsInput([
   [1, 2],
   [3, 4],
-] as const;
+]);
 
 const viewState: ViewState = {
   longitude: -122.34,
@@ -128,12 +129,17 @@ describe("camera conversion", () => {
   });
 
   test("validates easing before converting the center or fit bounds", () => {
-    const bounds = [
-      [Number.NaN, 2],
+    const bounds = nativeBoundsInput([
+      [1, 2],
       [3, 4],
-    ] as const;
+    ]);
+    Object.defineProperty(bounds, 0, {
+      get: () => {
+        throw new Error("Bounds were read before validating easing.");
+      },
+    });
     const timing = { easing: () => 1 };
-    const command = { ...timing, center: bounds[0] };
+    const command = { ...timing, center: [NaN, 2] as const };
     const message = /An easing function is not available on native maps/;
 
     expect(() => toRnmapboxStop(command, "easeTo")).toThrow(message);
@@ -229,16 +235,20 @@ describe("camera conversion", () => {
     });
   });
 
-  test("RNMapbox corner bounds keep the corner pair order", () => {
+  test("RNMapbox corner bounds keep corner order and isolate wrapper mutations", () => {
     const bounds = [
       [170, -10],
       [-170, 10],
     ] as const;
 
-    expect(toRnmapboxCornerBounds(bounds)).toEqual({
+    const corners = toRnmapboxCornerBounds(nativeBoundsInput(bounds));
+
+    expect(corners).toEqual({
       sw: [170, -10],
       ne: [-170, 10],
     });
+    corners.sw[0] = 0;
+    expect(bounds[0][0]).toBe(170);
   });
 
   test("RNMapbox ease and jump set animationMode explicitly", () => {

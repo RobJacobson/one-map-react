@@ -14,6 +14,7 @@ import {
   copyNativeStringArray,
   lngLatFromWrapper,
   pointFromWrapper,
+  type NativeBoundsSnapshot,
 } from "./wrapper-values.js";
 
 /** Adds desktop fields without changing legacy tuple enumeration or serialization. */
@@ -62,7 +63,16 @@ export const nativeBounds = (bounds: Bounds): NativeBounds => {
   ) as unknown as NativeBounds;
 };
 
-export const nativeBoundsInput = (bounds: NativeBoundsLike): Bounds =>
+/**
+ * Validates and snapshots native camera bounds without sorting the corners.
+ *
+ * @param bounds - A pair of corners, flat bounds, or geographic bounds methods.
+ * @returns Owned southwest and northeast tuples of finite coordinates.
+ * @throws When the input does not provide four finite coordinates.
+ */
+export const nativeBoundsInput = (
+  bounds: NativeBoundsLike
+): NativeBoundsSnapshot =>
   Array.isArray(bounds) && bounds.length === 2
     ? [lngLatFromWrapper(bounds[0]), lngLatFromWrapper(bounds[1])]
     : boundsFromGeographic(bounds);
