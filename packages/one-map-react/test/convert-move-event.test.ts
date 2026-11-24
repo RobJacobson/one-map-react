@@ -4,7 +4,11 @@ import {
   clickEventFromRnmapbox,
   moveEventFromRnmapbox,
 } from "../src/adapters/mapbox-native/convert-move-event.js";
-import { moveEventFromNative } from "../src/adapters/shared/index.js";
+import {
+  moveEventFromNative,
+  nativeLngLat,
+  nativePoint,
+} from "../src/adapters/shared/index.js";
 import { nativeClick } from "../src/adapters/shared/native-values.js";
 
 describe("move event conversion", () => {
@@ -64,3 +68,34 @@ describe("move event conversion", () => {
     });
   });
 });
+
+test.each([
+  { convert: nativeLngLat, firstField: "lng", secondField: "lat" },
+  { convert: nativePoint, firstField: "x", secondField: "y" },
+])(
+  "native tuples preserve $firstField and $secondField as readonly named fields",
+  ({ convert, firstField, secondField }) => {
+    const input: [number, number] = [0, -12];
+    const result = convert(input);
+    input[0] = 99;
+    const fieldFlags = {
+      enumerable: false,
+      writable: false,
+      configurable: false,
+    };
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(Reflect.ownKeys(result)).toEqual([
+      "0",
+      "1",
+      "length",
+      firstField,
+      secondField,
+    ]);
+    expect(Object.getOwnPropertyDescriptors(result)).toMatchObject({
+      [firstField]: { value: 0, ...fieldFlags },
+      [secondField]: { value: -12, ...fieldFlags },
+    });
+    expect(JSON.stringify(result)).toBe("[0,-12]");
+  }
+);
