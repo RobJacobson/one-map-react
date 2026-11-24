@@ -20,7 +20,10 @@ import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
-import { reportSettledMove } from "../shared/move-event.js";
+import {
+  type NativeMoveCallbacks,
+  reportSettledMove,
+} from "../shared/move-event.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { omitUndefinedFields } from "../shared/native-layer-updates.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
@@ -53,11 +56,12 @@ type MaplibreRegionEvent = Parameters<
 /** Maplibre-native map that renders MapLibre React Native `Map` with a `Camera` child. */
 const MaplibreNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  NativeMapInputs & {
-    locationOptions?: NativeLocationOptions;
-    hostProps?: ViewProps;
-    options?: Partial<ComponentProps<typeof MaplibreMap>>;
-  }
+  NativeMapInputs &
+    Partial<NativeMoveCallbacks> & {
+      locationOptions?: NativeLocationOptions;
+      hostProps?: ViewProps;
+      options?: Partial<ComponentProps<typeof MaplibreMap>>;
+    }
 >((props, ref) => {
   // This component is not compiled, so reuse the serialized document while
   // the style object keeps its identity. Compiled WrapperMap caches the same way.
@@ -151,11 +155,11 @@ const MaplibreNativeMapImplementation = forwardRef<
 
     if (phase === "change") {
       sawMove.current = true;
-      report.onMove(move);
+      report.onMove(move, nativeEvent.bounds);
       return;
     }
 
-    reportSettledMove(sawMove, move, report);
+    reportSettledMove(sawMove, move, report, nativeEvent.bounds);
   };
   const controlled = viewState ? toMaplibreViewState(viewState) : undefined;
   const flatMaxBounds =

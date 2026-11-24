@@ -12,9 +12,12 @@ import {
 } from "react";
 
 import type { MapRef, ViewState } from "../../contracts/camera-types.js";
-import type { MoveEvent } from "../../contracts/event-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
 import type { NativeMapInputs } from "../../contracts/native-types.js";
+import type {
+  NativeMoveCallbacks,
+  NativeViewportBounds,
+} from "./move-event.js";
 import {
   nativeCameraTarget,
   nativeInitialCamera,
@@ -34,6 +37,8 @@ export const NativeMapPresentationContext =
 interface NativeCameraState {
   /** Observed native camera. */
   readonly viewState: ViewState;
+  /** Visible native viewport, which can change independently of the camera fields. */
+  readonly bounds?: NativeViewportBounds;
 }
 
 export const NativeCameraContext = createContext<NativeCameraState | null>(
@@ -110,32 +115,59 @@ const NativeCameraProvider = ({
   readonly initial: NativeMapInputs["initialViewState"];
   readonly onMove?: MapProps["onMove"];
   readonly onMoveEnd?: MapProps["onMoveEnd"];
-  readonly children: (
-    callbacks: Required<Pick<MapProps, "onMove" | "onMoveEnd">>
-  ) => ReactNode;
+  readonly children: (callbacks: NativeMoveCallbacks) => ReactNode;
 }) => {
-  const [observed, setObserved] = useState<ViewState>(() =>
-    nativeInitialCamera(initial)
-  );
-  const callbacks = useMemo(
-    () => ({
-      onMove: (event: MoveEvent) => {
-        setObserved(event.viewState);
+  const [observed, setObserved] = useState<NativeCameraState>(() => ({
+    viewState: nativeInitialCamera(initial),
+  }));
+  const callbacks = useMemo<NativeMoveCallbacks>(() => {
+    const observeCamera = (
+      viewState: ViewState,
+      bounds?: NativeViewportBounds
+    ): void => {
+      setObserved((previous) => {
+        if (
+          isSameCamera(previous.viewState, viewState) &&
+          isSameBounds(previous.bounds, bounds)
+        ) {
+          return previous;
+        }
+        return { viewState, bounds };
+      });
+    };
+
+    return {
+      onMove: (event, bounds) => {
+        observeCamera(event.viewState, bounds);
         onMove?.(event);
       },
-      onMoveEnd: (event: MoveEvent) => {
-        setObserved(event.viewState);
+      onMoveEnd: (event, bounds) => {
+        observeCamera(event.viewState, bounds);
         onMoveEnd?.(event);
       },
-    }),
-    [onMove, onMoveEnd]
-  );
+    };
+  }, [onMove, onMoveEnd]);
   // Observations update camera consumers without recreating the renderer child.
   const content = useMemo(() => children(callbacks), [children, callbacks]);
-  const camera = useMemo(() => ({ viewState: observed }), [observed]);
   return (
-    <NativeCameraContext.Provider value={camera}>
+    <NativeCameraContext.Provider value={observed}>
       {content}
     </NativeCameraContext.Provider>
   );
 };
+
+const isSameCamera = (previous: ViewState, next: ViewState): boolean =>
+  previous.longitude === next.longitude &&
+  previous.latitude === next.latitude &&
+  previous.zoom === next.zoom &&
+  previous.bearing === next.bearing &&
+  previous.pitch === next.pitch;
+
+const isSameBounds = (
+  previous: NativeViewportBounds | undefined,
+  next: NativeViewportBounds | undefined
+): boolean =>
+  previous?.[0] === next?.[0] &&
+  previous?.[1] === next?.[1] &&
+  previous?.[2] === next?.[2] &&
+  previous?.[3] === next?.[3];

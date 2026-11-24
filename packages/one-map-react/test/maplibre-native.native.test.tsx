@@ -1942,20 +1942,23 @@ describe("maplibre-native entry binding", () => {
       }>();
       const payload = (
         { longitude, latitude, zoom, bearing, pitch }: ViewState,
-        userInteraction: boolean
+        userInteraction: boolean,
+        bounds?: readonly [number, number, number, number]
       ) => ({
         nativeEvent: {
           center: [longitude, latitude],
           zoom,
           bearing,
           pitch,
+          bounds,
           userInteraction,
         },
       });
       return {
-        move: (viewState, userInteraction) =>
-          onRegionIsChanging(payload(viewState, userInteraction)),
-        settle: (viewState) => onRegionDidChange(payload(viewState, false)),
+        move: (viewState, userInteraction, bounds) =>
+          onRegionIsChanging(payload(viewState, userInteraction, bounds)),
+        settle: (viewState, bounds) =>
+          onRegionDidChange(payload(viewState, false, bounds)),
       };
     },
     jump: mockJumpTo,

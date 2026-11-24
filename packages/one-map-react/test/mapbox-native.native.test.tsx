@@ -1006,6 +1006,7 @@ describe("mapbox-native adapter", () => {
     const state = {
       properties: {
         center: [-122.34, 47.61],
+        bounds: { sw: [-123, 47] },
         zoom: 11,
         heading: 0,
         pitch: 0,
@@ -2114,20 +2115,26 @@ describe("mapbox-native entry binding", () => {
       }>();
       const payload = (
         { longitude, latitude, zoom, bearing, pitch }: ViewState,
-        isGestureActive: boolean
+        isGestureActive: boolean,
+        bounds?: readonly [number, number, number, number]
       ) => ({
         properties: {
           center: [longitude, latitude],
           zoom,
           heading: bearing,
           pitch,
+          bounds: bounds && {
+            sw: [bounds[0], bounds[1]],
+            ne: [bounds[2], bounds[3]],
+          },
         },
         gestures: { isGestureActive },
       });
       return {
-        move: (viewState, isGestureActive) =>
-          onCameraChanged(payload(viewState, isGestureActive)),
-        settle: (viewState) => onMapIdle(payload(viewState, false)),
+        move: (viewState, isGestureActive, bounds) =>
+          onCameraChanged(payload(viewState, isGestureActive, bounds)),
+        settle: (viewState, bounds) =>
+          onMapIdle(payload(viewState, false, bounds)),
       };
     },
     jump: mockSetCamera,
