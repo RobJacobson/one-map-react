@@ -160,26 +160,18 @@ export const toRnmapboxFitBoundsStop = (
  * which is not this command.
  *
  * @param zoom - Target zoom.
- * @param options - Duration.
+ * @param options - Duration and easing.
  * @returns An RNMapbox camera stop.
  * @throws When `easing` is set.
  */
 export const toRnmapboxZoomStop = (
   zoom: number,
-  options: ZoomToOptions = {}
-) => {
-  rejectNativeEasing(options.easing);
-
-  return {
-    type: "CameraStop" as const,
-    zoomLevel: zoom,
-    ...(options.duration === undefined
-      ? {}
-      : { animationDuration: options.duration }),
-    animationMode:
-      options.duration === 0 ? ("none" as const) : ("easeTo" as const),
-  };
-};
+  { easing, duration }: ZoomToOptions = {}
+): CameraStop =>
+  toRnmapboxStop(
+    { zoom, duration, easing },
+    duration === 0 ? "none" : "easeTo"
+  );
 
 const toRnmapboxMovementOptions = (
   options: Pick<

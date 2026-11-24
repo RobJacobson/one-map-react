@@ -28,6 +28,7 @@ import {
   lngLatFromWrapper,
   pointFromWrapper,
   rejectJumpTiming,
+  rejectNativeEasing,
   toFlatBounds,
 } from "../shared/wrapper-values.js";
 import {
@@ -106,11 +107,11 @@ export const createMaplibreMapRef = (
     },
     zoomTo: async (zoom, options) => {
       const camera = requireCamera(cameraRef.current, mapLoaded.current);
+      rejectNativeEasing(options?.easing);
 
-      await camera.zoomTo(
-        zoom,
-        options ? toMaplibreCommand(options) : undefined
-      );
+      const duration = options?.duration;
+      const animationOptions = duration === undefined ? {} : { duration };
+      await camera.zoomTo(zoom, options ? animationOptions : undefined);
     },
     stop: rejectNativeStop,
     getCenter: async () =>
