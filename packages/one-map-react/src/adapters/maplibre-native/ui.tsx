@@ -17,7 +17,7 @@ import type { MarkerRef } from "../../contracts/ui-types.js";
 import { NativeMarkerOverlay } from "../shared/native-marker-overlay.js";
 import {
   createNativeUI,
-  type NativeMarkerHostProps,
+  type NativeAnnotationHostProps,
 } from "../shared/native-ui.js";
 import {
   lngLatFromWrapper,
@@ -28,7 +28,7 @@ type AnnotationEvent = Parameters<
   NonNullable<ComponentProps<typeof ViewAnnotation>["onPress"]>
 >[0];
 
-const MaplibreAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
+const MaplibreAnnotationHost = forwardRef<MarkerRef, NativeAnnotationHostProps>(
   (props, ref): ReactElement => {
     const annotationRef = useRef<ViewAnnotationRef>(null);
 

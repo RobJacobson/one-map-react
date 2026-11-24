@@ -261,12 +261,7 @@ export const testNativeCamera = <Handle extends NativeMapRef>(
         onMoveEnd={onMoveEnd}
       >
         <Probe />
-        <NativeMarkerOverlay
-          id="settled"
-          lngLat={[1, 2]}
-          anchor="top-left"
-          offset={[0, 0]}
-        >
+        <NativeMarkerOverlay lngLat={[1, 2]} anchor="top-left" offset={[0, 0]}>
           <Text>Final position</Text>
         </NativeMarkerOverlay>
       </NativeMap>

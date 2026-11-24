@@ -16,7 +16,7 @@ import {
 } from "../shared/native-marker-overlay.js";
 import {
   createNativeUI,
-  type NativeMarkerHostProps,
+  type NativeAnnotationHostProps,
 } from "../shared/native-ui.js";
 import { useActiveCallback } from "../shared/use-active-callback.js";
 import {
@@ -28,7 +28,7 @@ type AnnotationEvent = Parameters<
   NonNullable<ComponentProps<typeof Mapbox.PointAnnotation>["onSelected"]>
 >[0];
 
-const MapboxAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
+const MapboxAnnotationHost = forwardRef<MarkerRef, NativeAnnotationHostProps>(
   (props, ref): ReactElement => {
     // PointAnnotation's class handler reads props even during a suspended render.
     const click = useActiveCallback(props.onClick);
@@ -117,7 +117,7 @@ const MapboxAnnotationHost = forwardRef<MarkerRef, NativeMarkerHostProps>(
 
 /** Native Mapbox annotations and controls used by the selected adapter. */
 export const mapboxNativeUI = createNativeUI({
-  Marker: (props) => <NativeMarkerOverlay {...props} backend="mapbox-native" />,
+  Marker: NativeMarkerOverlay,
   Annotation: MapboxAnnotationHost,
   backend: "mapbox-native",
 });
