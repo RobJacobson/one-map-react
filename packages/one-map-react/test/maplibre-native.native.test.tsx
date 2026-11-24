@@ -2117,15 +2117,24 @@ describe("maplibre-native entry binding", () => {
     });
   });
 
-  test("equivalent legacy and portable style keys preserve the selected Layer host", async () => {
+  test("overlapping legacy and portable style keys preserve the host until a key disappears", async () => {
+    // The wrapper merges both forms at runtime when JavaScript callers pass both.
+    const legacyProps = { style: { fillColor: "#2563eb", fillSortKey: 1 } };
     const view = await render(
       <nativeEntry.Layer
         id="water"
         type="fill"
-        style={{ fillColor: "#2563eb", fillSortKey: 1 }}
+        {...legacyProps}
+        paint={{ "fill-color": "#2563eb" }}
+        layout={{ "fill-sort-key": 1 }}
       />
     );
     const original = view.getByTestId("Layer");
+
+    await view.rerender(
+      <nativeEntry.Layer id="water" type="fill" {...legacyProps} />
+    );
+    expect(view.getByTestId("Layer")).toBe(original);
 
     await view.rerender(
       <nativeEntry.Layer

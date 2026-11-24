@@ -15,7 +15,5 @@ export const nativeComponents = {
 
 export { MaplibreNativeMap } from "./map.js";
 export { MaplibreNativeLayer, type NativeLayerProps } from "./layers.js";
-export {
-  maplibreLightForNative,
-  maplibreStyleForNative,
-} from "./style-roots.js";
+export { maplibreLightForNative } from "./style-roots.js";
+export { useMaplibreMapStyle } from "./use-maplibre-map-style.js";

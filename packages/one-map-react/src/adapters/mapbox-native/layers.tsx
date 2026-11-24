@@ -30,7 +30,7 @@ export const MapboxNativeLayer = (props: LayerProps): ReactElement => {
     ReturnType<typeof rnmapboxLayerFields> & { style: Record<string, unknown> }
   >;
   const style = toRnmapboxLayerStyle(props);
-  const key = useNativeLayerKey(style, {
+  const key = useNativeLayerKey(Object.keys(style), {
     ...props,
     filter: "filter" in props ? props.filter : undefined,
   });

@@ -7,7 +7,6 @@ import {
   type ComponentProps,
   type ComponentRef,
   forwardRef,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -37,10 +36,8 @@ import {
   MaplibreSourceContext,
   createMaplibreSourceRegistry,
 } from "./source-registry.js";
-import {
-  maplibreLightForNative,
-  maplibreStyleForNative,
-} from "./style-roots.js";
+import { maplibreLightForNative } from "./style-roots.js";
+import { useMaplibreMapStyle } from "./use-maplibre-map-style.js";
 
 type MaplibrePressEvent = Parameters<
   NonNullable<ComponentProps<typeof MaplibreMap>["onPress"]>
@@ -55,14 +52,7 @@ const MaplibreNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
   NativeMapProps & Partial<NativeMoveCallbacks>
 >((props, ref) => {
-  // Reuse the serialized document while the style object keeps its identity.
-  const mapStyle = useMemo(
-    () =>
-      maplibreStyleForNative(props.mapStyle) as ComponentProps<
-        typeof MaplibreMap
-      >["mapStyle"],
-    [props.mapStyle]
-  );
+  const mapStyle = useMaplibreMapStyle(props.mapStyle);
   validateMaplibreMapOptions(props);
   const viewState = nativeCameraTarget(props);
   if (viewState && props.locationOptions?.trackUserLocation)

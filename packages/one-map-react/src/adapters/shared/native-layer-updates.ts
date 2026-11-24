@@ -55,13 +55,18 @@ export const snapshotNativeStyleValue = (
 export const toNativeLayerStyleKey = (key: string): string =>
   key.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase());
 
-/** Recreates only the wrapper layer when a setting must return to its SDK default. */
+/**
+ * Recreates only the wrapper layer when a field must return to its SDK default.
+ * @param styleKeys - Distinct style keys as seen by the selected wrapper.
+ * @param settings - Wrapper layer settings that can require a reset.
+ * @returns The React key for the wrapper layer.
+ */
 export const useNativeLayerKey = (
-  style: object,
+  styleKeys: Iterable<string>,
   settings: LayerSettings
 ): number => {
   const fields = [
-    ...Object.keys(style),
+    ...styleKeys,
     ...resettableSettings.filter((name) => settings[name] !== undefined),
   ].sort();
   const signature = JSON.stringify(fields);
