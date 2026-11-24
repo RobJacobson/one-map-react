@@ -16,6 +16,11 @@ import {
 } from "../src/adapters/maplibre-native/convert-camera.js";
 import type { FlyToOptions, ViewState } from "../src/contracts/camera-types.js";
 
+const fitBounds = [
+  [1, 2],
+  [3, 4],
+] as const;
+
 const viewState: ViewState = {
   longitude: -122.34,
   latitude: 47.61,
@@ -118,16 +123,94 @@ describe("camera conversion", () => {
     const message =
       "fitBounds.maxZoom is unavailable through the pinned native camera wrapper.";
 
-    expect(() =>
-      toRnmapboxFitBoundsStop(
-        [
-          [1, 2],
-          [3, 4],
-        ],
-        options
-      )
-    ).toThrow(message);
+    expect(() => toRnmapboxFitBoundsStop(fitBounds, options)).toThrow(message);
     expect(() => toMaplibreFitBoundsOptions(options)).toThrow(message);
+  });
+
+  test("validates easing before converting the center or fit bounds", () => {
+    const bounds = [
+      [Number.NaN, 2],
+      [3, 4],
+    ] as const;
+    const timing = { easing: () => 1 };
+    const command = { ...timing, center: bounds[0] };
+    const message = /An easing function is not available on native maps/;
+
+    expect(() => toRnmapboxStop(command, "easeTo")).toThrow(message);
+    expect(() => toMaplibreCommand(command)).toThrow(message);
+    expect(() => toRnmapboxFitBoundsStop(bounds, timing)).toThrow(message);
+    expect(() => toMaplibreFitBoundsOptions(timing)).toThrow(message);
+  });
+
+  test("fit options ignore extra camera fields and keep explicit zeroes", () => {
+    const options = {
+      center: "invalid coordinate",
+      zoom: 99,
+      bearing: 0,
+      pitch: 0,
+      duration: 0,
+      padding: { top: 5 },
+    };
+
+    expect(toRnmapboxFitBoundsStop(fitBounds, options)).toStrictEqual({
+      type: "CameraStop",
+      bounds: { sw: [1, 2], ne: [3, 4] },
+      heading: 0,
+      pitch: 0,
+      animationDuration: 0,
+      padding: {
+        paddingTop: 5,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0,
+      },
+      animationMode: "easeTo",
+    });
+    expect(toMaplibreFitBoundsOptions(options)).toStrictEqual({
+      bearing: 0,
+      pitch: 0,
+      duration: 0,
+      padding: { top: 5, right: 0, bottom: 0, left: 0 },
+    });
+  });
+
+  test("omitted command and fit options leave wrapper fields unset", () => {
+    expect(toRnmapboxStop({}, "flyTo")).toStrictEqual({
+      type: "CameraStop",
+      animationMode: "flyTo",
+    });
+    expect(toRnmapboxFitBoundsStop(fitBounds)).toStrictEqual({
+      type: "CameraStop",
+      bounds: { sw: [1, 2], ne: [3, 4] },
+      animationMode: "easeTo",
+    });
+    expect(toMaplibreCommand({})).toStrictEqual({});
+    expect(toMaplibreFitBoundsOptions()).toStrictEqual({});
+  });
+
+  test("RNMapbox zoomTo forwards only the zoom argument and optional duration", () => {
+    const options = {
+      center: "invalid coordinate",
+      zoom: 99,
+      bearing: 41,
+      padding: 10,
+      duration: 0,
+    };
+
+    expect(toRnmapboxZoomStop(9, options)).toStrictEqual({
+      type: "CameraStop",
+      zoomLevel: 9,
+      animationDuration: 0,
+      animationMode: "none",
+    });
+    expect(toRnmapboxZoomStop(9)).toStrictEqual({
+      type: "CameraStop",
+      zoomLevel: 9,
+      animationMode: "easeTo",
+    });
+    expect(() => toRnmapboxZoomStop(9, { easing: () => 1 })).toThrow(
+      /An easing function is not available on native maps/
+    );
   });
 
   test("RNMapbox flyTo stop sets animationMode flyTo", () => {
@@ -170,9 +253,5 @@ describe("camera conversion", () => {
       centerCoordinate: [-122.34, 47.61],
       animationMode: "none",
     });
-    expect(toRnmapboxZoomStop(9, { duration: 0 }).animationMode).toBe("none");
-    expect(() => toRnmapboxStop({ easing: () => 1 }, "easeTo")).toThrow(
-      "An easing function is not available on native maps."
-    );
   });
 });
