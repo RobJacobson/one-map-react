@@ -12,8 +12,6 @@ import {
   unavailableMapMethod,
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
-import { missingCameraError } from "../shared/missing-camera.js";
-import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
   isScreenBounds,
   nativeBounds,
@@ -21,7 +19,10 @@ import {
   nativeLngLat,
   nativePoint,
   nativeRenderedQuery,
-} from "../shared/native-values.js";
+  prepareNativeRenderedQueryLayers,
+} from "../shared/index.js";
+import { missingCameraError } from "../shared/missing-camera.js";
+import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
   boundsFromFlat,
   finiteNumber,
@@ -139,10 +140,10 @@ export const createMaplibreMapRef = (
     queryRenderedFeatures: async (input, queryOptionsInput) => {
       const [target, options] = nativeRenderedQuery(input, queryOptionsInput);
       const map = getMap();
-      // Preserve an explicit empty layer selection before the SDK defaults to all layers.
-      if (options?.layers?.length === 0) return [];
+      const layers = prepareNativeRenderedQueryLayers(options);
+      if (layers === null) return [];
 
-      const queryOptions = toMaplibreRenderedQueryOptions(options);
+      const queryOptions = toMaplibreRenderedQueryOptions(options, layers);
       // Narrow each target separately for the wrapper's overloads.
       let features;
       if (target === undefined) {

@@ -2170,6 +2170,10 @@ describe("maplibre-native entry binding", () => {
       return (error) => complete(error);
     },
     mockGetClusterExpansionZoom,
+    (layers) =>
+      expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith([10, 20], {
+        layers,
+      }),
     () =>
       expect(LayerMock.mock.lastCall?.[0]).toMatchObject({
         source: "routes",
