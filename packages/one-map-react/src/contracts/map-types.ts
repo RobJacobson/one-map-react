@@ -230,7 +230,11 @@ export interface MapProps {
   readonly onStyleLoad?: () => void;
   /** Called when the wrapper reports a map error. */
   readonly onError?: (event: MapErrorEvent) => void;
-  /** Native views follow the host layout. The native SDK does not call this handler. */
+  /**
+   * Called when the web map resizes. Use `hostProps.onLayout` on native.
+   *
+   * @throws Error when a callback is supplied to a native map.
+   */
   readonly onResize?: () => void;
   /** Sources and layers rendered inside the map. */
   readonly children?: ReactNode;

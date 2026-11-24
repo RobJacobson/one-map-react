@@ -88,6 +88,11 @@ export const testNativeRendering = <Handle extends NativeMapRef>(
       props: { scrollZoom: false },
       message: "scrollZoom is not available on native maps.",
     },
+    {
+      option: "onResize",
+      props: { onResize: jest.fn() },
+      message: "onResize is not available on native maps.",
+    },
   ])(
     "rejects $option before creating a wrapper",
     async ({ props, message }) => {
