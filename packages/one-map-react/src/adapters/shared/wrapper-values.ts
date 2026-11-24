@@ -83,22 +83,14 @@ export const toFlatBounds = (
  * @returns Common bounds.
  * @throws When the tuple does not contain four finite numbers.
  */
-export const boundsFromFlat = (flat: readonly number[]): Bounds => {
-  const [west, south, east, north] = flat;
+export const boundsFromFlat = (flat: unknown): Bounds => {
+  const bounds = Array.isArray(flat) ? parseFlatBounds(flat) : undefined;
 
-  if (
-    !isFiniteNumber(west) ||
-    !isFiniteNumber(south) ||
-    !isFiniteNumber(east) ||
-    !isFiniteNumber(north)
-  ) {
+  if (!bounds) {
     throw new Error("Flat bounds must be [west, south, east, north].");
   }
 
-  return [
-    [west, south],
-    [east, north],
-  ];
+  return bounds;
 };
 
 /**
@@ -138,14 +130,14 @@ export const boundsFromRnmapboxVisible = (
  * @throws When the value has neither four numbers nor corner methods.
  */
 export const boundsFromGeographic = (value: unknown): Bounds => {
-  if (isFlatBounds(value)) {
-    return boundsFromFlat(value);
-  }
+  const fromFlat =
+    Array.isArray(value) && value.length === 4
+      ? parseFlatBounds(value)
+      : undefined;
+  const bounds = fromFlat ?? boundsFromCornerMethods(value);
 
-  const fromMethods = boundsFromCornerMethods(value);
-
-  if (fromMethods) {
-    return fromMethods;
+  if (bounds) {
+    return bounds;
   }
 
   throw new Error(
@@ -266,6 +258,27 @@ export const copyNativeStringArray = (values: readonly string[]): string[] => {
   return values.slice();
 };
 
+const parseFlatBounds = (flat: readonly unknown[]): Bounds | undefined => {
+  const west = flat[0];
+  const south = flat[1];
+  const east = flat[2];
+  const north = flat[3];
+
+  if (
+    !isFiniteNumber(west) ||
+    !isFiniteNumber(south) ||
+    !isFiniteNumber(east) ||
+    !isFiniteNumber(north)
+  ) {
+    return undefined;
+  }
+
+  return [
+    [west, south],
+    [east, north],
+  ];
+};
+
 const boundsFromCornerMethods = (value: unknown): Bounds | undefined => {
   if (!isRecord(value)) {
     return undefined;
@@ -314,13 +327,6 @@ const finiteField = (
 
   return isFiniteNumber(field) ? field : undefined;
 };
-
-const isFlatBounds = (
-  value: unknown
-): value is readonly [number, number, number, number] =>
-  Array.isArray(value) &&
-  value.length === 4 &&
-  value.every((item) => isFiniteNumber(item));
 
 const isLngLat = (value: unknown): value is LngLat =>
   Array.isArray(value) &&

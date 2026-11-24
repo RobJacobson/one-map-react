@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
 
+import { nativeBoundsInput } from "../src/adapters/shared/native-values.js";
 import {
   assertBounds,
   boundsFromFlat,
@@ -98,10 +99,44 @@ describe("camera conversion", () => {
     ]);
   });
 
+  test.each([20, NaN])(
+    "native flat bounds keep the first west coordinate when a second read would return %s",
+    (nextWest) => {
+      const bounds: [number, number, number, number] = [0, -10, -170, 10];
+      let west = 12;
+      Object.defineProperty(bounds, 0, {
+        get: () => {
+          const currentWest = west;
+          west = nextWest;
+          return currentWest;
+        },
+      });
+
+      expect(nativeBoundsInput(bounds)).toEqual([
+        [12, -10],
+        [-170, 10],
+      ]);
+    }
+  );
+
   test("invalid bounds are rejected", () => {
     expect(() => assertBounds([[-122.34], [-122, 47]] as never)).toThrow(
       "Bounds must be [[west, south], [east, north]]."
     );
+    const sparseBounds = [170, -10, -170, 10];
+    delete sparseBounds[2];
+    for (const bounds of [
+      sparseBounds,
+      [170, -10, "-170", 10],
+      [170, -10, Infinity, 10],
+    ]) {
+      expect(() => boundsFromFlat(bounds)).toThrow(
+        "Flat bounds must be [west, south, east, north]."
+      );
+      expect(() => boundsFromGeographic(bounds)).toThrow(
+        "Map bounds must be [west, south, east, north]"
+      );
+    }
   });
 
   test("RNMapbox visible bounds are northeast then southwest", () => {
