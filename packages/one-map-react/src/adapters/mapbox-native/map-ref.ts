@@ -2,6 +2,7 @@ import type { Camera, MapView } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
 import type { NativeMapRefWithWrapper } from "../../contracts/native-types.js";
+import { requireAttachedMap } from "../index.js";
 import {
   rejectNativeResize,
   rejectNativeStop,
@@ -64,9 +65,10 @@ export const createMapboxMapRef = (
     (id) => geoJsonSources.getGeoJsonOwner(id),
     toRnmapboxClusterFeature
   );
+  const getMap = () => requireAttachedMap(mapViewRef.current);
   return {
     getSource: (id) => (mapViewRef.current ? getSource(id) : undefined),
-    getWrapperMap: async () => requireMap(mapViewRef.current),
+    getWrapperMap: async () => getMap(),
 
     queryTerrainElevation: async (input, options) => {
       const coordinate = lngLatFromWrapper(input);
@@ -77,9 +79,7 @@ export const createMapboxMapRef = (
         );
       }
       return normalizeElevation(
-        await requireMap(mapViewRef.current).queryTerrainElevation([
-          ...coordinate,
-        ])
+        await getMap().queryTerrainElevation([...coordinate])
       );
     },
     jumpTo: async (options) => {
@@ -112,11 +112,8 @@ export const createMapboxMapRef = (
     },
     stop: rejectNativeStop,
     getCenter: async () =>
-      nativeLngLat(
-        lngLatFromWrapper(await requireMap(mapViewRef.current).getCenter())
-      ),
-    getZoom: async () =>
-      finiteNumber(await requireMap(mapViewRef.current).getZoom(), "Map zoom"),
+      nativeLngLat(lngLatFromWrapper(await getMap().getCenter())),
+    getZoom: async () => finiteNumber(await getMap().getZoom(), "Map zoom"),
     getBearing: async () => {
       throw unavailableMapMethodError("getBearing", "mapbox-native");
     },
@@ -128,9 +125,7 @@ export const createMapboxMapRef = (
     },
     getBounds: async () =>
       nativeBounds(
-        boundsFromRnmapboxVisible(
-          await requireMap(mapViewRef.current).getVisibleBounds()
-        )
+        boundsFromRnmapboxVisible(await getMap().getVisibleBounds())
       ),
     getMinZoom: async () => {
       throw unavailableMapMethodError("getMinZoom", "mapbox-native");
@@ -144,22 +139,18 @@ export const createMapboxMapRef = (
     project: async (lngLat) =>
       nativePoint(
         pointFromWrapper(
-          await requireMap(mapViewRef.current).getPointInView([
-            ...lngLatFromWrapper(lngLat),
-          ])
+          await getMap().getPointInView([...lngLatFromWrapper(lngLat)])
         )
       ),
     unproject: async (point) =>
       nativeLngLat(
         lngLatFromWrapper(
-          await requireMap(mapViewRef.current).getCoordinateFromView([
-            ...pointFromWrapper(point),
-          ])
+          await getMap().getCoordinateFromView([...pointFromWrapper(point)])
         )
       ),
     queryRenderedFeatures: async (input, queryOptionsInput) => {
       const [target, options] = nativeRenderedQuery(input, queryOptionsInput);
-      const map = requireMap(mapViewRef.current);
+      const map = getMap();
       // Preserve an explicit empty layer selection before the SDK defaults to all layers.
       if (options?.layers?.length === 0) return [];
       const [filter, layers] = toRnmapboxRenderedQueryArgs(options);
@@ -181,7 +172,7 @@ export const createMapboxMapRef = (
       return featuresFromWrapper(collection, "queryRenderedFeatures");
     },
     querySourceFeatures: async (sourceId, options) => {
-      const map = requireMap(mapViewRef.current);
+      const map = getMap();
       const [filter, sourceLayerIds] = toRnmapboxSourceQueryArgs(options);
 
       return featuresFromWrapper(
@@ -189,7 +180,7 @@ export const createMapboxMapRef = (
         "querySourceFeatures"
       );
     },
-    ...createMapboxFeatureStateMethods(() => requireMap(mapViewRef.current)),
+    ...createMapboxFeatureStateMethods(getMap),
     resize: rejectNativeResize,
   };
 };
@@ -202,14 +193,4 @@ const requireCamera = (
   }
 
   return camera;
-};
-
-const requireMap = (
-  map: ComponentRef<typeof MapView> | null
-): NonNullable<ComponentRef<typeof MapView>> => {
-  if (!map) {
-    throw missingCameraError();
-  }
-
-  return map;
 };

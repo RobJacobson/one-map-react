@@ -240,7 +240,7 @@ export const testNativeCamera = <Handle extends NativeMapRef>(
     await expect(map.getZoom()).rejects.toThrow();
     expect(getZoom.mock.calls.length).toBe(calls + 4);
     await view.unmount();
-    await expect(map.getZoom()).rejects.toThrow("not attached");
+    await expect(map.getZoom()).rejects.toThrow("Map is not attached.");
     expect(getZoom.mock.calls.length).toBe(calls + 4);
   });
 

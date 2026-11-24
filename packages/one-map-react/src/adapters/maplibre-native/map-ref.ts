@@ -5,6 +5,7 @@ import type {
 import type { ComponentRef } from "react";
 
 import type { NativeMapRefWithWrapper } from "../../contracts/native-types.js";
+import { requireAttachedMap } from "../index.js";
 import {
   rejectNativeResize,
   rejectNativeStop,
@@ -69,9 +70,10 @@ export const createMaplibreMapRef = (
     (id) => sources.getGeoJsonOwner(id),
     (clusterId) => clusterId
   );
+  const getMap = () => requireAttachedMap(mapRef.current);
   return {
     getSource: (id) => (mapRef.current ? getSource(id) : undefined),
-    getWrapperMap: async () => requireMap(mapRef.current),
+    getWrapperMap: async () => getMap(),
 
     queryTerrainElevation: async () => {
       throw new Error(
@@ -112,31 +114,18 @@ export const createMaplibreMapRef = (
     },
     stop: rejectNativeStop,
     getCenter: async () =>
-      nativeLngLat(
-        lngLatFromWrapper(await requireMap(mapRef.current).getCenter())
-      ),
+      nativeLngLat(lngLatFromWrapper(await getMap().getCenter())),
     getZoom: async () =>
-      finiteNumber(
-        await requireMap(mapRef.current).getZoom(),
-        "Map camera value"
-      ),
+      finiteNumber(await getMap().getZoom(), "Map camera value"),
     getBearing: async () =>
-      finiteNumber(
-        await requireMap(mapRef.current).getBearing(),
-        "Map camera value"
-      ),
+      finiteNumber(await getMap().getBearing(), "Map camera value"),
     getPitch: async () =>
-      finiteNumber(
-        await requireMap(mapRef.current).getPitch(),
-        "Map camera value"
-      ),
+      finiteNumber(await getMap().getPitch(), "Map camera value"),
     getPadding: async () => {
       throw unavailableMapMethodError("getPadding", "maplibre-native");
     },
     getBounds: async () =>
-      nativeBounds(
-        boundsFromFlat(await requireMap(mapRef.current).getBounds())
-      ),
+      nativeBounds(boundsFromFlat(await getMap().getBounds())),
     getMinZoom: async () => {
       throw unavailableMapMethodError("getMinZoom", "maplibre-native");
     },
@@ -148,19 +137,15 @@ export const createMaplibreMapRef = (
     },
     project: async (lngLat) =>
       nativePoint(
-        pointFromWrapper(
-          await requireMap(mapRef.current).project(lngLatFromWrapper(lngLat))
-        )
+        pointFromWrapper(await getMap().project(lngLatFromWrapper(lngLat)))
       ),
     unproject: async (point) =>
       nativeLngLat(
-        lngLatFromWrapper(
-          await requireMap(mapRef.current).unproject(pointFromWrapper(point))
-        )
+        lngLatFromWrapper(await getMap().unproject(pointFromWrapper(point)))
       ),
     queryRenderedFeatures: async (input, queryOptionsInput) => {
       const [target, options] = nativeRenderedQuery(input, queryOptionsInput);
-      const map = requireMap(mapRef.current);
+      const map = getMap();
       // Preserve an explicit empty layer selection before the SDK defaults to all layers.
       if (options?.layers?.length === 0) return [];
 
@@ -178,7 +163,7 @@ export const createMaplibreMapRef = (
       return featuresFromWrapper(features, "queryRenderedFeatures");
     },
     querySourceFeatures: async (sourceId, options) => {
-      requireMap(mapRef.current);
+      getMap();
       const entry = requireMaplibreSource(sources, sourceId);
 
       if (entry.kind === "geojson") {
@@ -198,9 +183,7 @@ export const createMaplibreMapRef = (
         "querySourceFeatures"
       );
     },
-    ...createMaplibreFeatureStateMethods(sources, () =>
-      requireMap(mapRef.current)
-    ),
+    ...createMaplibreFeatureStateMethods(sources, getMap),
     resize: rejectNativeResize,
   };
 };
@@ -214,14 +197,4 @@ const requireCamera = (
   }
 
   return camera;
-};
-
-const requireMap = (
-  map: ComponentRef<typeof MaplibreMap> | null
-): NonNullable<ComponentRef<typeof MaplibreMap>> => {
-  if (!map) {
-    throw missingCameraError();
-  }
-
-  return map;
 };
