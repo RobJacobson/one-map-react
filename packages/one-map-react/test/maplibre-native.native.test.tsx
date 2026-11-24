@@ -1917,6 +1917,81 @@ test("a changing light position is snapshotted on its first read", async () => {
   expect(light.position).toBeUndefined();
 });
 
+const unsupportedLight: nativeEntry.LightSpecification = {
+  intensity: [
+    "case",
+    ["==", ["number-format", 1, { unit: "meter" }], "1 m"],
+    0.6,
+    0.2,
+  ],
+};
+
+test("selected MapLibre Native light options reject unsupported expressions before dispatch", async () => {
+  const light = {
+    intensity: 0.5,
+    position: undefined,
+  } satisfies nativeEntry.LightSpecification;
+  const view = await render(
+    <NativeMap mapStyle={emptyStyle} options={{ light }} />
+  );
+  expect(lastMapProps<{ light: object }>().light).toStrictEqual({
+    intensity: 0.5,
+  });
+
+  await view.rerender(
+    <NativeMap
+      mapStyle={emptyStyle}
+      light={{ intensity: 0 }}
+      options={{ light: unsupportedLight }}
+    />
+  );
+  expect(lastMapProps<{ light: object }>().light).toStrictEqual({
+    intensity: 0,
+  });
+
+  MapMock.mockClear();
+  await expect(
+    render(
+      <NativeMap mapStyle={emptyStyle} options={{ light: unsupportedLight }} />
+    )
+  ).rejects.toThrow("number-format.unit");
+  expect(MapMock).not.toHaveBeenCalled();
+
+  await view.rerender(<NativeMap mapStyle={emptyStyle} />);
+  expect(lastMapProps<{ light?: object }>().light).toBeUndefined();
+});
+
+test("MapLibre Native WrapperMap validates a fresh light snapshot on every render", async () => {
+  let intensity: nativeEntry.LightSpecification["intensity"] = 0.5;
+  let reads = 0;
+  const light: nativeEntry.LightSpecification = {
+    position: undefined,
+    get intensity() {
+      reads += 1;
+      return intensity;
+    },
+  };
+  const scene = (testID: string) => (
+    <nativeEntry.WrapperMap
+      mapStyle={emptyStyle}
+      light={light}
+      testID={testID}
+    />
+  );
+  const view = await render(scene("before"));
+  const forwarded = lastMapProps<{ light: object }>().light;
+  const readsBeforeUpdate = reads;
+
+  intensity = unsupportedLight.intensity;
+  MapMock.mockClear();
+  await expect(view.rerender(scene("after"))).rejects.toThrow(
+    "number-format.unit"
+  );
+  expect(MapMock).not.toHaveBeenCalled();
+  expect(readsBeforeUpdate).toBe(1);
+  expect(forwarded).toStrictEqual({ intensity: 0.5, position: undefined });
+});
+
 test("selected native location follow rejects a simultaneous viewState target", async () => {
   await expect(
     render(

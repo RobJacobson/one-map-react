@@ -1,14 +1,20 @@
 import { Map as MaplibreMap } from "@maplibre/maplibre-react-native";
 import type { Camera as WrapperCamera } from "@maplibre/maplibre-react-native";
-import { type ComponentProps, type ComponentRef, forwardRef } from "react";
+import {
+  type ComponentProps,
+  type ComponentRef,
+  forwardRef,
+  useMemo,
+} from "react";
 import type { ViewProps } from "react-native";
 
 import {
+  maplibreLightForNative,
+  maplibreStyleForNative,
   nativeComponents,
   MaplibreNativeMap,
 } from "./adapters/maplibre-native/index.js";
 import type { NativeAdvancedMapRef } from "./adapters/maplibre-native/map-ref.js";
-import { maplibreStyleForNative } from "./adapters/maplibre-native/style-roots.js";
 import type { NativeMapInputs } from "./contracts/native-types.js";
 export type {
   NativeBounds,
@@ -141,13 +147,32 @@ export {
   OfflinePack as WrapperOfflinePack,
 } from "@maplibre/maplibre-react-native";
 
-/** Selected wrapper map with explicit native SDK style-root boundaries. */
+/** Selected wrapper map with explicit native SDK style and light boundaries. */
 export const WrapperMap = forwardRef<
   ComponentRef<typeof MaplibreMap>,
   ComponentProps<typeof MaplibreMap>
 >((props, ref) => {
-  const mapStyle = maplibreStyleForNative(props.mapStyle) as ComponentProps<
-    typeof MaplibreMap
-  >["mapStyle"];
-  return <MaplibreMap {...props} ref={ref} mapStyle={mapStyle} />;
+  // Read the current light fields even when the caller reuses the object.
+  "use no memo";
+
+  const mapStyle = useMemo(
+    () =>
+      maplibreStyleForNative(props.mapStyle) as ComponentProps<
+        typeof MaplibreMap
+      >["mapStyle"],
+    [props.mapStyle]
+  );
+  const { light, ...otherProps } = props;
+  const lightProps = Object.hasOwn(props, "light")
+    ? { light: maplibreLightForNative(light) }
+    : {};
+
+  return (
+    <MaplibreMap
+      {...otherProps}
+      {...lightProps}
+      ref={ref}
+      mapStyle={mapStyle}
+    />
+  );
 });
