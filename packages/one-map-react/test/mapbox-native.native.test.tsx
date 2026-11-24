@@ -2028,15 +2028,9 @@ test("invalid terrain coordinates reject before options and native dispatch", as
 
   for (const coordinate of malformed) {
     await expect(
-      // Bypass the public input type to exercise invalid runtime shapes.
-      ref.current?.queryTerrainElevation(
-        coordinate as Parameters<MapRef["queryTerrainElevation"]>[0],
-        options
-      )
-    ).rejects.toMatchObject({
-      name: "Error",
-      message: "A map coordinate must contain longitude and latitude.",
-    });
+      // @ts-expect-error Exercise invalid coordinates from JavaScript callers.
+      ref.current?.queryTerrainElevation(coordinate, options)
+    ).rejects.toBeInstanceOf(RangeError);
   }
 
   for (const latitude of [-91, 91]) {
@@ -2048,6 +2042,16 @@ test("invalid terrain coordinates reject before options and native dispatch", as
         "Terrain coordinates require finite longitude and latitude within -90 to 90 degrees.",
     });
   }
+
+  const coordinateReadError = new Error("coordinate read failed");
+  await expect(
+    ref.current?.queryTerrainElevation({
+      lng: 0,
+      get lat(): number {
+        throw coordinateReadError;
+      },
+    })
+  ).rejects.toBe(coordinateReadError);
 
   await expect(
     ref.current?.queryTerrainElevation([0, 0], options)
@@ -2095,11 +2099,18 @@ test("terrain/light/projection and hillshade use native public components, inclu
   expect(lastMapProps<{ projection: string }>().projection).toBe("globe");
   await expect(ref.current?.queryTerrainElevation([1, 90])).resolves.toBe(0);
   expect(mockTerrainElevation).toHaveBeenLastCalledWith([1, 90]);
+  const readLongitude = jest.fn(() => 362);
   mockTerrainElevation.mockResolvedValueOnce(null);
   await expect(
-    ref.current?.queryTerrainElevation({ lon: 2, lat: -90 })
+    ref.current?.queryTerrainElevation({
+      get lon() {
+        return readLongitude();
+      },
+      lat: -90,
+    })
   ).resolves.toBeNull();
-  expect(mockTerrainElevation).toHaveBeenLastCalledWith([2, -90]);
+  expect(readLongitude).toHaveBeenCalledTimes(1);
+  expect(mockTerrainElevation).toHaveBeenLastCalledWith([362, -90]);
   mockTerrainElevation.mockRejectedValueOnce(new Error("bridge failure"));
   await expect(
     ref.current?.queryTerrainElevation({ lng: 3, lat: 0 })
@@ -2203,16 +2214,19 @@ describe("mapbox-native entry binding", () => {
       properties: { screenPointX: 23, screenPointY: 41 },
     },
     () => {
-      let complete: () => void = () => {
+      let complete: (error?: Error) => void = () => {
         throw new Error("Rendered query was never dispatched.");
       };
       mockQueryRenderedFeaturesAtPoint.mockImplementationOnce(
         () =>
-          new Promise((resolve) => {
-            complete = () => resolve(queryCollection);
+          new Promise((resolve, reject) => {
+            complete = (error) => {
+              if (error) reject(error);
+              else resolve(queryCollection);
+            };
           })
       );
-      return () => complete();
+      return (error) => complete(error);
     },
     mockGetClusterExpansionZoom,
     () =>

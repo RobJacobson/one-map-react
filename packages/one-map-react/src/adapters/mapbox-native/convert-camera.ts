@@ -1,3 +1,5 @@
+import type { CameraStop } from "@rnmapbox/maps";
+
 import type { Bounds, ZoomToOptions } from "../../contracts/camera-types.js";
 import type {
   NativeCameraCommand,
@@ -110,23 +112,16 @@ export const toRnmapboxPadding = (padding?: PaddingOrNumber) => {
 export const toRnmapboxStop = (
   options: NativeCameraCommand,
   animationMode: "flyTo" | "easeTo" | "none"
-) => {
+): CameraStop => {
   rejectNativeEasing(options.easing);
 
   return {
-    type: "CameraStop" as const,
+    type: "CameraStop",
     ...(options.center === undefined
       ? {}
       : { centerCoordinate: lngLatFromWrapper(options.center) }),
     ...(options.zoom === undefined ? {} : { zoomLevel: options.zoom }),
-    ...(options.bearing === undefined ? {} : { heading: options.bearing }),
-    ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
-    ...(options.padding === undefined
-      ? {}
-      : { padding: toRnmapboxPadding(options.padding) }),
-    ...(options.duration === undefined
-      ? {}
-      : { animationDuration: options.duration }),
+    ...toRnmapboxMovementOptions(options),
     animationMode,
   };
 };
@@ -145,22 +140,15 @@ export const toRnmapboxStop = (
 export const toRnmapboxFitBoundsStop = (
   bounds: Bounds,
   options: NativeFitBoundsOptions = {}
-) => {
+): CameraStop => {
   rejectNativeFitBoundsMaxZoom(options.maxZoom);
   rejectNativeEasing(options.easing);
 
   return {
-    type: "CameraStop" as const,
+    type: "CameraStop",
     bounds: toRnmapboxCornerBounds(bounds),
-    ...(options.padding === undefined
-      ? {}
-      : { padding: toRnmapboxPadding(options.padding) }),
-    ...(options.bearing === undefined ? {} : { heading: options.bearing }),
-    ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
-    ...(options.duration === undefined
-      ? {}
-      : { animationDuration: options.duration }),
-    animationMode: "easeTo" as const,
+    ...toRnmapboxMovementOptions(options),
+    animationMode: "easeTo",
   };
 };
 
@@ -192,5 +180,21 @@ export const toRnmapboxZoomStop = (
       options.duration === 0 ? ("none" as const) : ("easeTo" as const),
   };
 };
+
+const toRnmapboxMovementOptions = (
+  options: Pick<
+    NativeFitBoundsOptions,
+    "bearing" | "pitch" | "padding" | "duration"
+  >
+) => ({
+  ...(options.bearing === undefined ? {} : { heading: options.bearing }),
+  ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
+  ...(options.padding === undefined
+    ? {}
+    : { padding: toRnmapboxPadding(options.padding) }),
+  ...(options.duration === undefined
+    ? {}
+    : { animationDuration: options.duration }),
+});
 
 type PaddingOrNumber = Parameters<typeof normalizePadding>[0];

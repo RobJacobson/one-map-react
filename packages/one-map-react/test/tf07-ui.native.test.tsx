@@ -9,7 +9,6 @@ import {
   forwardRef,
   type ReactNode,
   useContext,
-  useId,
   useImperativeHandle,
   useLayoutEffect,
   useState,
@@ -143,25 +142,14 @@ jest.mock("@maplibre/maplibre-react-native", () => {
     LayerAnnotation: () => null,
   };
 });
-const Host = forwardRef<
-  MarkerRef,
-  Pick<NativeAnnotationHostProps, "anchor" | "children">
->((props, ref) => {
-  const nativeID = useId();
-  useImperativeHandle(ref, () => ({ refresh }), []);
-  return (
-    <View
-      testID="native-marker"
-      nativeID={nativeID}
-      accessibilityLabel={props.anchor}
-    >
-      {props.children}
-    </View>
-  );
-});
+const AnnotationHost = forwardRef<MarkerRef, NativeAnnotationHostProps>(
+  ({ children }, ref) => {
+    useImperativeHandle(ref, () => ({ refresh }), []);
+    return <View>{children}</View>;
+  }
+);
 const ui = createNativeUI({
-  Marker: Host,
-  Annotation: Host,
+  Annotation: AnnotationHost,
   backend: "mapbox-native",
 });
 
@@ -199,6 +187,16 @@ const sessionFixture = (backend: NativeBackend = "mapbox-native") => {
       setNativeLayout: jest.fn(),
     };
   return { session, project, unproject, easeTo, lock };
+};
+
+const deferredPoint = () => {
+  let resolve = (_point: Point): void => {};
+  let reject = (_reason: unknown): void => {};
+  const promise = new Promise<Point>((accept, fail) => {
+    resolve = accept;
+    reject = fail;
+  });
+  return { promise, resolve, reject };
 };
 
 const scaleCamera: ViewState = {
@@ -361,18 +359,54 @@ describe("TF07 native UI composition", () => {
     );
   });
 
+  test("live overlay publishes completed projections while camera changes keep arriving", async () => {
+    const fixture = sessionFixture();
+    const first = deferredPoint();
+    const second = deferredPoint();
+    const third = deferredPoint();
+    fixture.project
+      .mockReturnValueOnce(first.promise)
+      .mockReturnValueOnce(second.promise)
+      .mockReturnValueOnce(third.promise);
+    const scene = (zoom: number) => (
+      <FixtureSessionProvider
+        value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
+      >
+        <NativeMarkerOverlay lngLat={[10, 20]} anchor="center" offset={[0, 0]}>
+          <Text>Content</Text>
+        </NativeMarkerOverlay>
+      </FixtureSessionProvider>
+    );
+    const view = await render(scene(4));
+    const style = () =>
+      StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style);
+    await view.rerender(scene(5));
+    await view.rerender(scene(6));
+    await act(async () => first.resolve([110, 210]));
+    expect(style()).toMatchObject({ left: 110, top: 210, opacity: 1 });
+    expect(fixture.project).toHaveBeenCalledTimes(2);
+
+    await view.rerender(scene(7));
+    await view.rerender(scene(8));
+    expect(fixture.project).toHaveBeenCalledTimes(2);
+    await act(async () => second.resolve([120, 220]));
+    expect(style()).toMatchObject({ left: 120, top: 220, opacity: 1 });
+    expect(fixture.project).toHaveBeenCalledTimes(3);
+
+    await act(async () => third.resolve([130, 230]));
+    expect(style()).toMatchObject({ left: 130, top: 230, opacity: 1 });
+    expect(fixture.project).toHaveBeenCalledTimes(3);
+  });
+
   test("live overlay discards projection results from earlier coordinates and after unmount", async () => {
     const fixture = sessionFixture();
-    let resolveOld: (point: Point) => void = () => {};
-    fixture.project.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          resolveOld = resolve;
-        })
-    );
+    const old = deferredPoint();
+    fixture.project.mockReturnValueOnce(old.promise);
     const error = jest.fn();
-    const scene = (longitude: number) => (
-      <FixtureSessionProvider value={fixture.session}>
+    const scene = (longitude: number, zoom = 4) => (
+      <FixtureSessionProvider
+        value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
+      >
         <NativeMarkerOverlay
           lngLat={[longitude, 20]}
           anchor="center"
@@ -384,7 +418,9 @@ describe("TF07 native UI composition", () => {
       </FixtureSessionProvider>
     );
     const view = await render(scene(10));
-    await view.rerender(scene(11));
+    await view.rerender(scene(10, 5));
+    await view.rerender(scene(11, 5));
+    expect(fixture.project.mock.calls).toEqual([[[10, 20]], [[11, 20]]]);
     await waitFor(() =>
       expect(
         StyleSheet.flatten(
@@ -392,33 +428,102 @@ describe("TF07 native UI composition", () => {
         )
       ).toMatchObject({ left: 100, top: 200 })
     );
-    await act(async () => resolveOld([999, 999]));
+    await act(async () => old.resolve([999, 999]));
     expect(
       StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style)
     ).toMatchObject({ left: 100, top: 200 });
-    let rejectLate: (reason: unknown) => void = () => {};
-    fixture.project.mockImplementationOnce(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejectLate = reject;
-        })
-    );
+    expect(fixture.project).toHaveBeenCalledTimes(2);
+
+    const late = deferredPoint();
+    fixture.project.mockReturnValueOnce(late.promise);
     await view.rerender(scene(12));
+    await view.rerender(scene(12, 6));
     await view.unmount();
-    await act(async () => rejectLate(new Error("Detached")));
+    await act(async () => late.reject(new Error("Detached")));
     expect(error).not.toHaveBeenCalled();
+    expect(fixture.project).toHaveBeenCalledTimes(3);
+  });
+
+  test("live overlay starts on a replacement attachment while the old projection is pending", async () => {
+    const fixture = sessionFixture();
+    const replacement = sessionFixture();
+    const old = deferredPoint();
+    fixture.project.mockReturnValueOnce(old.promise);
+    replacement.project.mockResolvedValueOnce([130, 230]);
+    const error = jest.fn();
+    const scene = (zoom: number) => (
+      <FixtureSessionProvider
+        value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
+      >
+        <NativeMarkerOverlay
+          lngLat={[10, 20]}
+          anchor="center"
+          offset={[0, 0]}
+          onProjectionError={error}
+        >
+          <Text>Content</Text>
+        </NativeMarkerOverlay>
+      </FixtureSessionProvider>
+    );
+    const view = await render(scene(4));
+    await view.rerender(scene(5));
+    fixture.session.ref.current = replacement.session.map;
+    await view.rerender(scene(6));
+    expect(replacement.project).toHaveBeenCalledWith([10, 20]);
+
+    await act(async () => old.reject(new Error("Detached")));
+    expect(error).not.toHaveBeenCalled();
+    expect(fixture.project).toHaveBeenCalledTimes(1);
+    expect(
+      StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style)
+    ).toMatchObject({ left: 130, top: 230, opacity: 1 });
+  });
+
+  test("live overlay resumes projection when Suspense reveals its map", async () => {
+    const fixture = sessionFixture();
+    const suspended = deferredPoint();
+    const old = deferredPoint();
+    fixture.project.mockReturnValueOnce(old.promise);
+    const MaybeSuspend = ({ hidden }: { readonly hidden: boolean }) => {
+      if (hidden) throw suspended.promise;
+      return null;
+    };
+    const marker = (
+      <FixtureSessionProvider value={fixture.session}>
+        <NativeMarkerOverlay lngLat={[10, 20]} anchor="center" offset={[0, 0]}>
+          <Text>Content</Text>
+        </NativeMarkerOverlay>
+      </FixtureSessionProvider>
+    );
+    const AttachedMap = ({ hidden }: { readonly hidden: boolean }) => {
+      useImperativeHandle(fixture.session.ref, () => fixture.session.map, []);
+      return (
+        <>
+          {marker}
+          <MaybeSuspend hidden={hidden} />
+        </>
+      );
+    };
+    const scene = (hidden: boolean) => (
+      <Suspense fallback={<Text>Loading</Text>}>
+        <AttachedMap hidden={hidden} />
+      </Suspense>
+    );
+    const view = await render(scene(false));
+    await view.rerender(scene(true));
+    expect(view.getByText("Loading")).toBeTruthy();
+
+    await view.rerender(scene(false));
+    await act(async () => old.resolve([999, 999]));
+    expect(fixture.project).toHaveBeenCalledTimes(2);
+    expect(
+      StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style)
+    ).toMatchObject({ left: 100, top: 200, opacity: 1 });
   });
 
   test("live overlay follows observed cameras under an unchanged controlled target", async () => {
     const fixture = sessionFixture();
     const error = jest.fn();
-    let resolveOld: (point: Point) => void = () => {};
-    fixture.project.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          resolveOld = resolve;
-        })
-    );
     const view = await render(
       <MapSessionContext.Provider value={fixture.session}>
         <ScaleMap
@@ -437,13 +542,14 @@ describe("TF07 native UI composition", () => {
         </ScaleMap>
       </MapSessionContext.Provider>
     );
+    fixture.project.mockResolvedValueOnce([120, 220]);
     await act(async () =>
       moveScale({ viewState: { ...scaleCamera, zoom: 5 }, origin: "user" })
     );
     const host = () => view.getByTestId("native-marker-overlay");
     expect(StyleSheet.flatten(host().props.style)).toMatchObject({
-      left: 100,
-      top: 200,
+      left: 120,
+      top: 220,
     });
     fixture.project.mockResolvedValueOnce([150, 250]);
     await act(async () =>
@@ -452,7 +558,6 @@ describe("TF07 native UI composition", () => {
         origin: "unknown",
       })
     );
-    await act(async () => resolveOld([999, 999]));
     expect(StyleSheet.flatten(host().props.style)).toMatchObject({
       left: 150,
       top: 250,
@@ -987,6 +1092,7 @@ describe("TF07 native UI composition", () => {
           />
         </FixtureSessionProvider>
       );
+      const projectionCount = fixture.project.mock.calls.length;
       const marker = view.getByTestId("activation");
       await beginTouch(marker, touch(0, 0));
       if (ending === "movement")
@@ -1000,7 +1106,7 @@ describe("TF07 native UI composition", () => {
       await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
       await act(async () => jest.advanceTimersByTime(1000));
       expect(clicked).not.toHaveBeenCalled();
-      expect(fixture.project).not.toHaveBeenCalled();
+      expect(fixture.project).toHaveBeenCalledTimes(projectionCount);
       expect(fixture.unproject).not.toHaveBeenCalled();
       expect(fixture.lock).not.toHaveBeenCalled();
       await beginTouch(marker, touch(0, 0));
@@ -1033,6 +1139,7 @@ describe("TF07 native UI composition", () => {
           />
         </FixtureSessionProvider>
       );
+      const projectionCount = fixture.project.mock.calls.length;
       const marker = view.getByTestId("activation");
       await beginTouch(marker, touch(0, 0));
       await act(async () => change("background"));
@@ -1047,7 +1154,7 @@ describe("TF07 native UI composition", () => {
       expect(clicked).toHaveBeenCalledTimes(1);
       await view.unmount();
       expect(remove).toHaveBeenCalledTimes(1);
-      expect(fixture.project).not.toHaveBeenCalled();
+      expect(fixture.project).toHaveBeenCalledTimes(projectionCount);
       expect(fixture.unproject).not.toHaveBeenCalled();
       expect(fixture.lock).not.toHaveBeenCalled();
     } finally {
@@ -1091,10 +1198,11 @@ describe("TF07 native UI composition", () => {
     marker = view.getByTestId("activation");
     await beginTouch(marker, touch(0, 0));
     const detachedEnd = marker.props.onTouchEnd;
+    const projectionCount = fixture.project.mock.calls.length;
     await view.unmount();
     await act(async () => detachedEnd(touch(0, 0, 0)));
     expect(latest).toHaveBeenCalledTimes(1);
-    expect(fixture.project).not.toHaveBeenCalled();
+    expect(fixture.project).toHaveBeenCalledTimes(projectionCount);
     expect(fixture.unproject).not.toHaveBeenCalled();
     expect(fixture.lock).not.toHaveBeenCalled();
   });
@@ -1394,6 +1502,16 @@ describe("TF07 native UI composition", () => {
   );
 });
 
+type MarkerView = Awaited<ReturnType<typeof render>>;
+
+const measureLiveMarker = async (view: MarkerView): Promise<void> =>
+  fireEvent(view.getByTestId("native-marker-overlay"), "layout", {
+    nativeEvent: { layout: { width: 20, height: 40 } },
+  });
+
+const markerTop = (view: MarkerView): number =>
+  StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style).top;
+
 test("native creation defaults compare by their effective values", async () => {
   const fixture = sessionFixture();
   const tree = (explicit: boolean) => (
@@ -1407,17 +1525,12 @@ test("native creation defaults compare by their effective values", async () => {
     </FixtureSessionProvider>
   );
   const mounted = await render(tree(false));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  await measureLiveMarker(mounted);
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(true));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(false));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await mounted.unmount();
 });
 
@@ -1433,9 +1546,8 @@ test.each([false, true])(
       </FixtureSessionProvider>
     );
     const mounted = await render(tree("top"));
-    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-      "top"
-    );
+    await measureLiveMarker(mounted);
+    expect(markerTop(mounted)).toBe(200);
     await expect(mounted.rerender(tree())).rejects.toThrow(
       'Marker changed the creation option "anchor"'
     );
@@ -1452,21 +1564,14 @@ test("native marker defaults stay frozen when content changes", async () => {
     </FixtureSessionProvider>
   );
   const mounted = await render(tree(false));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  await measureLiveMarker(mounted);
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(true));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(true, "bottom"));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(true));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await expect(mounted.rerender(tree(true, "center"))).rejects.toThrow(
     'creation option "anchor"'
   );
@@ -1475,31 +1580,27 @@ test("native marker defaults stay frozen when content changes", async () => {
 test.each([false, true])(
   "native marker effective defaults work when initially explicit (custom content: %s)",
   async (custom) => {
-    const expected = custom ? "center" : "bottom";
+    const expectedAnchor = custom ? "center" : "bottom";
+    const expectedTop = custom ? 180 : 160;
     const fixture = sessionFixture();
     const tree = (explicit: boolean) => (
       <FixtureSessionProvider value={fixture.session}>
         <BoundMarker
           longitude={10}
           latitude={20}
-          anchor={explicit ? expected : undefined}
+          anchor={explicit ? expectedAnchor : undefined}
         >
           {custom ? <Text>custom</Text> : undefined}
         </BoundMarker>
       </FixtureSessionProvider>
     );
     const mounted = await render(tree(true));
-    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-      expected
-    );
+    await measureLiveMarker(mounted);
+    expect(markerTop(mounted)).toBe(expectedTop);
     await mounted.rerender(tree(false));
-    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-      expected
-    );
+    expect(markerTop(mounted)).toBe(expectedTop);
     await mounted.rerender(tree(true));
-    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-      expected
-    );
+    expect(markerTop(mounted)).toBe(expectedTop);
     await mounted.unmount();
   }
 );

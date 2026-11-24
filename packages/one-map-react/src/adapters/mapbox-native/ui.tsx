@@ -9,10 +9,7 @@ import {
 import { type LayoutChangeEvent, Platform, View } from "react-native";
 
 import type { MarkerRef } from "../../contracts/ui-types.js";
-import {
-  anchorFraction,
-  NativeMarkerOverlay,
-} from "../shared/native-marker-overlay.js";
+import { anchorFraction } from "../shared/native-marker-overlay.js";
 import {
   createNativeUI,
   type NativeAnnotationHostProps,
@@ -103,7 +100,6 @@ const MapboxAnnotationHost = forwardRef<MarkerRef, NativeAnnotationHostProps>(
 
 /** Native Mapbox annotations and controls used by the selected adapter. */
 export const mapboxNativeUI = createNativeUI({
-  Marker: NativeMarkerOverlay,
   Annotation: MapboxAnnotationHost,
   backend: "mapbox-native",
 });

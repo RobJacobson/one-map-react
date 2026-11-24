@@ -68,7 +68,7 @@ export const createMapboxMapRef = (
     getWrapperMap: async () => getMap(),
 
     queryTerrainElevation: async (input, options) => {
-      const coordinate = lngLatFromWrapper(input);
+      const coordinate = lngLatFromWrapper(input, RangeError);
       if (Math.abs(coordinate[1]) > 90) {
         throw new RangeError(
           "Terrain coordinates require finite longitude and latitude within -90 to 90 degrees."

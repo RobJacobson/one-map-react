@@ -1,16 +1,17 @@
 import {
   type ReactElement,
   useContext,
-  useEffect,
   useEffectEvent,
   useId,
+  useLayoutEffect,
+  useRef,
   useState,
 } from "react";
 import { View } from "react-native";
 import { Portal } from "react-native-teleport";
 
 import type { NativeBackend } from "../../contracts/backend.js";
-import type { Point } from "../../contracts/camera-types.js";
+import type { MapRef, Point } from "../../contracts/camera-types.js";
 import type { Anchor } from "../../contracts/ui-types.js";
 import { useMapSession } from "../../facade/map-context.js";
 import {
@@ -30,9 +31,9 @@ import { updateLayoutSize } from "./wrapper-values.js";
 export const NativeMarkerOverlay = (
   props: NativeMarkerOverlayProps
 ): ReactElement => {
-  const session = useMapSession();
-  const { backend } = session.components;
-  const presentation = useNativeMapPresentation();
+  const { ref, ready, components } = useMapSession();
+  const { backend } = components;
+  const { nativeLayout, overlayHostName } = useNativeMapPresentation();
   const observed = useContext(NativeCameraContext);
   const name = useId();
   const [point, setPoint] = useState<Point | null>(null);
@@ -43,42 +44,79 @@ export const NativeMarkerOverlay = (
   const longitude = props.lngLat[0];
   const latitude = props.lngLat[1];
 
-  // Viewport dimensions change projection even when the camera is unchanged.
-  useEffect(() => {
+  const projection = useRef<{
+    readonly map: MapRef;
+    readonly refresh: () => void;
+  } | null>(null);
+
+  // Retire the projection at commit even if there is no new camera sample.
+  useLayoutEffect(
+    () => () => {
+      projection.current = null;
+    },
+    [ref, ready, nativeLayout, longitude, latitude, backend]
+  );
+
+  useLayoutEffect(() => {
     let active = true;
-    const project = async (): Promise<void> => {
-      const map = session.ref.current;
-      if (!map || !session.ready) return;
-      try {
-        const next = await map.project([longitude, latitude]);
-        // Reserve the off-screen (-1, -1) sentinel for RNMapbox.
-        if (active) setPoint(visiblePoint(next, backend));
-      } catch (error) {
-        if (active) {
-          setPoint(null);
-          reportError(error);
-        }
+    const request = (): void => {
+      const map = ref.current;
+      if (!map || !ready) {
+        projection.current = null;
+        return;
       }
+      const previous = projection.current;
+      if (previous?.map === map) {
+        previous.refresh();
+        return;
+      }
+
+      let running = false;
+      let pending = false;
+      const isCurrent = (): boolean =>
+        projection.current?.refresh === refresh && ref.current === map;
+      const run = async (): Promise<void> => {
+        try {
+          const next = await map.project([longitude, latitude]);
+          // Publish each completed sample even if a newer camera is pending.
+          if (isCurrent()) setPoint(visiblePoint(next, backend));
+        } catch (error) {
+          if (isCurrent()) {
+            setPoint(null);
+            reportError(error);
+          }
+        }
+      };
+      const refresh = (): void => {
+        if (running) {
+          pending = true;
+          return;
+        }
+        running = true;
+        pending = false;
+        void run().finally(() => {
+          running = false;
+          if (isCurrent() && pending) refresh();
+        });
+      };
+      projection.current = { map, refresh };
+      refresh();
     };
-    void project();
+
+    // The map's imperative ref can attach later in the same layout commit.
+    void Promise.resolve().then(() => {
+      if (active) request();
+    });
     return () => {
       active = false;
     };
-  }, [
-    session.ref,
-    session.ready,
-    observed,
-    presentation.nativeLayout,
-    longitude,
-    latitude,
-    backend,
-  ]);
+  }, [ref, ready, nativeLayout, longitude, latitude, backend, observed]);
 
   const [horizontal, vertical] = anchorFraction(props.anchor);
   return (
     <Portal
       name={name}
-      hostName={presentation.overlayHostName}
+      hostName={overlayHostName}
       style={{ position: "absolute", top: 0, left: 0 }}
     >
       <View

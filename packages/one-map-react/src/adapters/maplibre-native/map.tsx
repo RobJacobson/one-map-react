@@ -55,8 +55,7 @@ const MaplibreNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
   NativeMapProps & Partial<NativeMoveCallbacks>
 >((props, ref) => {
-  // This component is not compiled, so reuse the serialized document while
-  // the style object keeps its identity. WrapperMap caches the same way.
+  // Reuse the serialized document while the style object keeps its identity.
   const mapStyle = useMemo(
     () =>
       maplibreStyleForNative(props.mapStyle) as ComponentProps<
@@ -108,21 +107,19 @@ const MaplibreNativeMapImplementation = forwardRef<
   });
   const gestures = toMaplibreGestures(props);
 
-  const [mapHandle] = useState(
-    // eslint-disable-next-line react/refs -- This lazy initializer only captures refs; commands dereference them after attachment.
-    () =>
-      createMaplibreMapRef(
-        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
+  const mapHandle = useRef<NativeAdvancedMapRef | null>(null);
+  useImperativeHandle(ref, () => {
+    // Keep the attachment identity when a callback ref changes mid-query.
+    if (mapHandle.current === null) {
+      mapHandle.current = createMaplibreMapRef(
         cameraRef,
-        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapRef,
-        // eslint-disable-next-line react/refs -- The map-handle factory captures refs without reading them; only later imperative commands dereference them.
         mapLoaded,
         sources
-      )
-  );
-  // Descendant control effects must retain the attached ref during prop updates.
-  useImperativeHandle(ref, () => mapHandle, [mapHandle]);
+      );
+    }
+    return mapHandle.current;
+  }, [sources]);
 
   const reportRegion = (
     event: NativeSyntheticEvent<ViewStateChangeEvent>,

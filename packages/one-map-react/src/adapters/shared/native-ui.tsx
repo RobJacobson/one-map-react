@@ -18,6 +18,7 @@ import {
   type ViewProps,
 } from "react-native";
 
+import type { NativeBackend } from "../../contracts/backend.js";
 import type { LngLat, Point } from "../../contracts/camera-types.js";
 import type {
   Anchor,
@@ -26,11 +27,12 @@ import type {
   MarkerRef,
 } from "../../contracts/ui-types.js";
 import type { NativeComponents } from "../../facade/map-context.js";
+import { NativeMarkerOverlay } from "./native-marker-overlay.js";
 import { useActiveCallback } from "./use-active-callback.js";
 import { lngLatFromWrapper, pointFromWrapper } from "./wrapper-values.js";
 
 /** Selected native marker host presentation. */
-export interface NativeMarkerProps extends Omit<MarkerProps, "anchor"> {
+interface NativeMarkerProps extends Omit<MarkerProps, "anchor"> {
   /** Resolved named anchor on the content bounds. */
   readonly anchor: Anchor;
   /** Props for the owned content View; facade responder handlers stay composed. */
@@ -66,12 +68,10 @@ export interface NativeAnnotationHostProps extends NativeMarkerContentProps {
 
 /** Wrapper components needed by native UI compositions. */
 interface NativeUIOptions {
-  /** Live-view wrapper. */
-  readonly Marker: ComponentType<NativeMarkerOverlayProps>;
   /** Snapshot annotation wrapper. */
   readonly Annotation: ComponentType<NativeAnnotationHostProps>;
   /** Selected native backend. */
-  readonly backend: "mapbox-native" | "maplibre-native";
+  readonly backend: NativeBackend;
 }
 
 type NativeUI = Pick<NativeComponents, "Marker">;
@@ -79,7 +79,7 @@ type NativeUI = Pick<NativeComponents, "Marker">;
 /**
  * Composes native markers.
  *
- * @param options - Native wrappers with converted marker props.
+ * @param options - The backend and its snapshot annotation wrapper.
  * @returns UI implementations for a native adapter.
  */
 export const createNativeUI = (options: NativeUIOptions): NativeUI => {
@@ -156,7 +156,7 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
       }
 
       return (
-        <options.Marker
+        <NativeMarkerOverlay
           {...hostProps}
           key="view"
           onProjectionError={reportError}

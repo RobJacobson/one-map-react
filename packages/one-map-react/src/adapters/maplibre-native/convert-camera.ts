@@ -1,4 +1,10 @@
 import type {
+  CameraAnimationOptions,
+  CameraCenterOptions,
+  CameraOptions,
+} from "@maplibre/maplibre-react-native";
+
+import type {
   NativeCameraCommand,
   NativeCameraTarget,
   NativeFitBoundsOptions,
@@ -60,7 +66,11 @@ export const toMaplibreInitialViewState = (
  * @returns Center, zoom, bearing, pitch, padding, and duration that were set.
  * @throws When `easing` is a function.
  */
-export const toMaplibreCommand = (options: NativeCameraCommand) => {
+export const toMaplibreCommand = (
+  options: NativeCameraCommand
+): MaplibreMovementOptions &
+  Pick<CameraOptions, "zoom"> &
+  Partial<CameraCenterOptions> => {
   rejectNativeEasing(options.easing);
 
   const center =
@@ -70,12 +80,7 @@ export const toMaplibreCommand = (options: NativeCameraCommand) => {
   return {
     ...(center === undefined ? {} : { center }),
     ...(options.zoom === undefined ? {} : { zoom: options.zoom }),
-    ...(options.bearing === undefined ? {} : { bearing: options.bearing }),
-    ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
-    ...(options.padding === undefined
-      ? {}
-      : { padding: normalizePadding(options.padding) }),
-    ...(options.duration === undefined ? {} : { duration: options.duration }),
+    ...toMaplibreMovementOptions(options),
   };
 };
 
@@ -90,16 +95,28 @@ export const toMaplibreCommand = (options: NativeCameraCommand) => {
  */
 export const toMaplibreFitBoundsOptions = (
   options: NativeFitBoundsOptions = {}
-) => {
+): MaplibreMovementOptions => {
   rejectNativeFitBoundsMaxZoom(options.maxZoom);
   rejectNativeEasing(options.easing);
 
-  return {
-    ...(options.padding === undefined
-      ? {}
-      : { padding: normalizePadding(options.padding) }),
-    ...(options.duration === undefined ? {} : { duration: options.duration }),
-    ...(options.bearing === undefined ? {} : { bearing: options.bearing }),
-    ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
-  };
+  return toMaplibreMovementOptions(options);
 };
+
+type MaplibreMovementOptions = Pick<
+  CameraOptions & CameraAnimationOptions,
+  "bearing" | "pitch" | "padding" | "duration"
+>;
+
+const toMaplibreMovementOptions = (
+  options: Pick<
+    NativeFitBoundsOptions,
+    "bearing" | "pitch" | "padding" | "duration"
+  >
+) => ({
+  ...(options.bearing === undefined ? {} : { bearing: options.bearing }),
+  ...(options.pitch === undefined ? {} : { pitch: options.pitch }),
+  ...(options.padding === undefined
+    ? {}
+    : { padding: normalizePadding(options.padding) }),
+  ...(options.duration === undefined ? {} : { duration: options.duration }),
+});

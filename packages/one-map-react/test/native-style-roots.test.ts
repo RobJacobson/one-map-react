@@ -128,20 +128,23 @@ test("silent native formatting modifiers reject without dropping supported optio
 });
 
 test.each([
-  { paint: { resampling: "nearest" } },
-  { paint: { "line-layer-opacity": 0 } },
-  { paint: { "fill-layer-opacity": 0 } },
-  { layout: { "icon-overlap": "cooperative" } },
-  { layout: { "text-overlap": "always" } },
-])(
-  "unsupported native layer properties fail with a usable legacy route where equivalent",
-  (layer) => {
-    expect(() => assertMaplibreLayerStyle(layer)).toThrow("Layer property");
-    expect(() => assertMaplibreStyleRoots({ layers: [layer] })).toThrow(
-      "Layer property"
-    );
-  }
-);
+  ["paint", "resampling", "nearest"],
+  ["paint", "line-layer-opacity", 0],
+  ["paint", "fill-layer-opacity", 0],
+  ["layout", "icon-overlap", "cooperative"],
+  ["layout", "text-overlap", "always"],
+  ["style", "resampling", "nearest"],
+  ["style", "lineLayerOpacity", 0],
+  ["style", "fillLayerOpacity", 0],
+  ["style", "iconOverlap", "cooperative"],
+  ["style", "textOverlap", "always"],
+])("rejects unsupported native layer property %s.%s", (section, key, value) => {
+  const layer = { [section]: { [key]: value } };
+  const message = `Layer property "${key}" is unsupported`;
+
+  expect(() => assertMaplibreLayerStyle(layer)).toThrow(message);
+  expect(() => assertMaplibreStyleRoots({ layers: [layer] })).toThrow(message);
+});
 
 test("the style document guard leaves text-variable-anchor-offset to the SDK", () => {
   const style = {
@@ -284,11 +287,6 @@ test("treats undefined expression modifiers and layer properties as omitted whil
       },
     })
   ).not.toThrow();
-  expect(() =>
-    assertMaplibreLayerStyle({
-      style: { iconOverlap: "always" },
-    })
-  ).toThrow('Layer property "iconOverlap" is unsupported');
 });
 
 test("object styles validate the serialized document the wrapper forwards", () => {

@@ -175,10 +175,14 @@ export const boundsFromGeographic = (value: unknown): Bounds => {
  * Reads a center from a tuple or a wrapper longitude/latitude object.
  *
  * @param value - `[longitude, latitude]`, `{ lng, lat }`, or `{ lon, lat }`.
+ * @param InvalidCoordinateError - Error class for invalid coordinates. Defaults to `Error`.
  * @returns A longitude/latitude tuple.
- * @throws When neither shape contains both numbers.
+ * @throws When neither shape contains both finite numbers.
  */
-export const lngLatFromWrapper = (value: unknown): LngLat => {
+export const lngLatFromWrapper = (
+  value: unknown,
+  InvalidCoordinateError: new (message: string) => Error = Error
+): LngLat => {
   const tuple = readFinitePair(value);
   if (tuple) return tuple;
 
@@ -191,7 +195,9 @@ export const lngLatFromWrapper = (value: unknown): LngLat => {
     }
   }
 
-  throw new Error("A map coordinate must contain longitude and latitude.");
+  throw new InvalidCoordinateError(
+    "A map coordinate must contain longitude and latitude."
+  );
 };
 
 /**
