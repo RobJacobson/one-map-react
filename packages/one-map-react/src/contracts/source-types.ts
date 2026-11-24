@@ -158,9 +158,8 @@ export interface RasterSourceProps extends SourceBaseProps {
 }
 
 /**
- * Raster digital elevation model source creation options shared by every
- * adapter. Terrain rendering itself is TF09 work; this source can back
- * hillshade-style elevation data.
+ * Source options for raster digital elevation model (DEM) tiles.
+ * Hillshade layers and terrain rendering use these tiles as elevation data.
  */
 export interface RasterDemSourceProps extends SourceBaseProps {
   /** Selects the raster DEM source family. */

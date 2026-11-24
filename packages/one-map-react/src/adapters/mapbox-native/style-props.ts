@@ -19,20 +19,19 @@ export const toRnmapboxStyleProps = (
 };
 
 /**
- * Merges a context-supplied gesture settings object over the double-tap
- * entries derived from common gesture flags.
+ * Merges two gesture settings objects. The second object wins for shared keys.
  *
- * @param extra - Settings from {@link MapboxGestureSettings}.
- * @param doubleTap - Double-tap entries derived from `doubleTapZoom`.
- * @returns The merged settings, or `undefined` when neither was provided.
+ * @param base - Settings to use as a starting point.
+ * @param overrides - Settings to apply over the base.
+ * @returns The merged settings, or `undefined` when both inputs are absent.
  */
 export const mergeGestureSettings = (
-  extra: GestureSettings | undefined,
-  doubleTap: GestureSettings | undefined
+  base: GestureSettings | undefined,
+  overrides: GestureSettings | undefined
 ): GestureSettings | undefined => {
-  if (extra === undefined && doubleTap === undefined) {
+  if (base === undefined && overrides === undefined) {
     return undefined;
   }
 
-  return { ...extra, ...doubleTap };
+  return { ...base, ...overrides };
 };
