@@ -17,22 +17,23 @@ import {
   type NativeBoundsSnapshot,
 } from "./wrapper-values.js";
 
-/** Adds desktop fields without changing legacy tuple enumeration or serialization. */
-export const nativeLngLat = (coordinate: LngLat): NativeLngLat => {
-  const [lng, lat] = coordinate;
-  return Object.defineProperties([lng, lat], {
-    lng: { value: lng },
-    lat: { value: lat },
-  }) as unknown as NativeLngLat;
-};
+/**
+ * Adds named longitude and latitude fields to a coordinate tuple.
+ *
+ * @param coordinate - Longitude and latitude in degrees.
+ * @returns A fresh tuple with non-enumerable `lng` and `lat` fields.
+ */
+export const nativeLngLat = (coordinate: LngLat): NativeLngLat =>
+  nativePair(coordinate, "lng", "lat");
 
-export const nativePoint = (point: Point): NativePoint => {
-  const [x, y] = point;
-  return Object.defineProperties([x, y], {
-    x: { value: x },
-    y: { value: y },
-  }) as unknown as NativePoint;
-};
+/**
+ * Adds named axes to a map-view point tuple.
+ *
+ * @param point - X and Y in native layout points.
+ * @returns A fresh tuple with non-enumerable `x` and `y` fields.
+ */
+export const nativePoint = (point: Point): NativePoint =>
+  nativePair(point, "x", "y");
 
 export const nativeBounds = (bounds: Bounds): NativeBounds => {
   const [[west, south], [east, north]] = bounds;
@@ -165,3 +166,17 @@ export const prepareNativeRenderedQueryLayers = (
 export const isScreenBounds = (
   target: NativeQueryTarget
 ): target is QueryBounds => target !== undefined && Array.isArray(target[0]);
+
+const nativePair = <Field extends string>(
+  [first, second]: readonly [number, number],
+  firstField: Field,
+  secondField: Field
+) => {
+  const pair: readonly [number, number] = [first, second];
+
+  // defineProperties adds the fields at runtime but keeps the input type.
+  return Object.defineProperties(pair, {
+    [firstField]: { value: first },
+    [secondField]: { value: second },
+  }) as typeof pair & Readonly<Record<Field, number>>;
+};
