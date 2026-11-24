@@ -6,11 +6,7 @@ import type {
   QuerySourceFeaturesOptions,
 } from "../../contracts/query-types.js";
 import { toRnmapboxRect } from "../shared/feature-values.js";
-import {
-  isScreenBounds,
-  type NativeQueryTarget,
-} from "../shared/native-values.js";
-import { copyNativeStringArray } from "../shared/wrapper-values.js";
+import { isScreenBounds, type NativeQueryTarget } from "../shared/index.js";
 
 /**
  * Selects the RNMapbox rendered-query call for a target.
@@ -46,14 +42,16 @@ export const toRnmapboxQueryRect = (
 /**
  * Reads the query options the RNMapbox rendered-query calls share.
  *
- * @param options - Layer ids and filter.
+ * @param options - Resolved query options supplying the filter.
+ * @param layers - Copied layer selection for the query.
  * @returns The filter and layer id arguments for the wrapper call.
  */
 export const toRnmapboxRenderedQueryArgs = (
-  options?: QueryRenderedFeaturesOptions
+  options: Pick<QueryRenderedFeaturesOptions, "filter"> | undefined,
+  layers: string[] | undefined
 ): readonly [filter: unknown[], layers: string[]] => [
   options?.filter === undefined ? [] : [...options.filter],
-  options?.layers === undefined ? [] : copyNativeStringArray(options.layers),
+  layers ?? [],
 ];
 
 /**

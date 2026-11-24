@@ -7,7 +7,6 @@ import type {
   QuerySourceFeaturesOptions,
 } from "../../contracts/query-types.js";
 import { requireSourceLayerName } from "../shared/feature-values.js";
-import { copyNativeStringArray } from "../shared/wrapper-values.js";
 
 /**
  * Converts a query filter into MapLibre React Native's filter value.
@@ -26,18 +25,18 @@ export const toMaplibreFilter = (
 /**
  * Converts common rendered-query options into wrapper options.
  *
- * @param options - Layer ids and filter.
+ * @param options - Resolved query options supplying the filter.
+ * @param layers - Copied layer selection for the query.
  * @returns Options for the wrapper call.
  */
 export const toMaplibreRenderedQueryOptions = (
-  options?: QueryRenderedFeaturesOptions
+  options: Pick<QueryRenderedFeaturesOptions, "filter"> | undefined,
+  layers: string[] | undefined
 ): { layers?: string[]; filter?: FilterSpecification } | undefined =>
   options === undefined
     ? undefined
     : {
-        ...(options.layers === undefined
-          ? {}
-          : { layers: copyNativeStringArray(options.layers) }),
+        ...(layers === undefined ? {} : { layers }),
         ...(options.filter === undefined
           ? {}
           : { filter: toMaplibreFilter(options.filter) }),
