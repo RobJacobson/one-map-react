@@ -12,6 +12,7 @@ import {
   pointFromWrapper,
   toFlatBounds,
 } from "../src/adapters/shared/wrapper-values.js";
+import type { Bounds } from "../src/contracts/camera-types.js";
 
 describe("camera conversion", () => {
   test("coordinates accept wrapper fields when a finite tuple is unavailable", () => {
@@ -145,6 +146,7 @@ describe("camera conversion", () => {
     delete sparseBounds[2];
     for (const bounds of [
       sparseBounds,
+      [170, -10, -170, 10, 0],
       [170, -10, "-170", 10],
       [170, -10, Infinity, 10],
     ]) {
@@ -156,6 +158,42 @@ describe("camera conversion", () => {
       );
     }
   });
+
+  test.each([
+    { name: "Common bounds", readBounds: assertBounds },
+    {
+      name: "RNMapbox visible bounds",
+      readBounds: ([southwest, northeast]: Bounds) =>
+        boundsFromRnmapboxVisible([northeast, southwest]),
+    },
+  ])(
+    "$name return the validated coordinates from getters",
+    ({ readBounds }) => {
+      const southwest = [170, -10] as const;
+      const northeast = [-170, 10] as const;
+      let west = 170;
+      let north = 10;
+      Object.defineProperty(southwest, 0, {
+        get: () => {
+          const longitude = west;
+          west = NaN;
+          return longitude;
+        },
+      });
+      Object.defineProperty(northeast, 1, {
+        get: () => {
+          const latitude = north;
+          north = NaN;
+          return latitude;
+        },
+      });
+
+      expect(readBounds([southwest, northeast])).toEqual([
+        [170, -10],
+        [-170, 10],
+      ]);
+    }
+  );
 
   test("RNMapbox visible bounds are northeast then southwest", () => {
     expect(
@@ -170,17 +208,20 @@ describe("camera conversion", () => {
   });
 
   test("web bounds read corner methods and reject a two-element array", () => {
-    expect(
-      boundsFromGeographic({
-        getWest: () => 170,
-        getSouth: () => -10,
-        getEast: () => -170,
-        getNorth: () => 10,
-      })
-    ).toEqual([
-      [170, -10],
-      [-170, 10],
-    ]);
+    const methods = {
+      getWest: () => 170,
+      getSouth: () => -10,
+      getEast: () => -170,
+      getNorth: () => 10,
+    };
+
+    for (const value of [methods, Object.assign([0, 0, 0, 0, 0], methods)]) {
+      expect(boundsFromGeographic(value)).toEqual([
+        [170, -10],
+        [-170, 10],
+      ]);
+    }
+
     expect(() =>
       boundsFromGeographic([
         [170, -10],

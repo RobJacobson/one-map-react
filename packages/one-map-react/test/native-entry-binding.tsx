@@ -61,6 +61,7 @@ type WrapperEvents = {
  * @param press - The selected wrapper's press payload.
  * @param beginPressQuery - Fakes a pending rendered-feature query and returns a function to resolve it or reject it with an error.
  * @param clusterZoom - Mock cluster call exposed by mounted source refs.
+ * @param checkRenderedQuery - Verifies the wrapper receives the selected layer ids.
  * @param checkLayer - Verifies style conversion and source injection on the wrapper layer.
  */
 export const testNativeEntryBinding = <Handle extends SelectedHandle>(
@@ -69,6 +70,7 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
   press: object,
   beginPressQuery: () => (error?: Error) => void,
   clusterZoom: jest.Mock<(...args: never[]) => Promise<number>>,
+  checkRenderedQuery: (layers: readonly string[]) => void,
   checkLayer: () => void
 ): void => {
   const { Map: NativeMap, MapProvider, Source, Layer, Marker, useMap } = entry;
@@ -494,6 +496,25 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(onStyleData).toHaveBeenCalledTimes(1);
   });
 
+  test("dispatches the layer selection read from a rendered query", async () => {
+    const ref = createRef<Handle>();
+    await render(<NativeMap ref={ref} mapStyle={emptyStyle} />);
+    const map = ref.current;
+    if (!map) throw new Error("Map is detached.");
+
+    const layers = ["roads"];
+    let layerReads = 0;
+    await map.queryRenderedFeatures([10, 20], {
+      get layers() {
+        layerReads += 1;
+        return layerReads === 1 ? layers : [];
+      },
+    });
+
+    checkRenderedQuery(layers);
+    expect(layerReads).toBe(1);
+  });
+
   test("an explicit empty layer list matches no layers on an attached map", async () => {
     const ref = createRef<Handle>();
     const onClick = jest.fn<(event: NativeClickEvent) => void>();
@@ -512,7 +533,15 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
       []
     );
     await expect(
-      map.queryRenderedFeatures({ x: 10, y: 20 }, { layers: [] })
+      map.queryRenderedFeatures(
+        { x: 10, y: 20 },
+        {
+          layers: [],
+          get filter(): never {
+            throw new Error("An empty layer selection does not use a filter.");
+          },
+        }
+      )
     ).resolves.toEqual([]);
     const wrapper = view.getByTestId("wrapper-map").props as WrapperEvents;
     await act(async () => wrapper.onPress(press));
@@ -524,7 +553,7 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     );
   });
 
-  test.each(["route-line", null])(
+  test.each(["route-line", "", null])(
     "rejects a raw rendered-query layer list of %j",
     async (layers) => {
       const ref = createRef<Handle>();

@@ -1,16 +1,11 @@
 import type { Feature, Point as GeoJsonPoint } from "geojson";
 
 import type {
-  FeatureIdentifier,
   QueryRenderedFeaturesOptions,
   QuerySourceFeaturesOptions,
 } from "../../contracts/query-types.js";
 import { toRnmapboxRect } from "../shared/feature-values.js";
-import {
-  isScreenBounds,
-  type NativeQueryTarget,
-} from "../shared/native-values.js";
-import { copyNativeStringArray } from "../shared/wrapper-values.js";
+import { isScreenBounds, type NativeQueryTarget } from "../shared/index.js";
 
 /**
  * Selects the RNMapbox rendered-query call for a target.
@@ -46,14 +41,16 @@ export const toRnmapboxQueryRect = (
 /**
  * Reads the query options the RNMapbox rendered-query calls share.
  *
- * @param options - Layer ids and filter.
+ * @param options - Resolved query options supplying the filter.
+ * @param layers - Copied layer selection for the query.
  * @returns The filter and layer id arguments for the wrapper call.
  */
 export const toRnmapboxRenderedQueryArgs = (
-  options?: QueryRenderedFeaturesOptions
+  options: Pick<QueryRenderedFeaturesOptions, "filter"> | undefined,
+  layers: string[] | undefined
 ): readonly [filter: unknown[], layers: string[]] => [
   options?.filter === undefined ? [] : [...options.filter],
-  options?.layers === undefined ? [] : copyNativeStringArray(options.layers),
+  layers ?? [],
 ];
 
 /**
@@ -67,24 +64,6 @@ export const toRnmapboxSourceQueryArgs = (
 ): readonly [filter: unknown[], sourceLayerIds: string[]] => [
   options?.filter === undefined ? [] : [...options.filter],
   options?.sourceLayer === undefined ? [] : [options.sourceLayer],
-];
-
-/**
- * Converts a feature identifier into RNMapbox's positional arguments.
- *
- * @param identifier - Source, feature id, and optional vector source layer.
- * @returns Feature id, source id, and source layer id for the wrapper call.
- */
-export const toRnmapboxFeatureArgs = (
-  identifier: FeatureIdentifier
-): readonly [
-  featureId: string,
-  sourceId: string,
-  sourceLayerId: string | null,
-] => [
-  String(identifier.id),
-  identifier.source,
-  identifier.sourceLayer === undefined ? null : identifier.sourceLayer,
 ];
 
 /**

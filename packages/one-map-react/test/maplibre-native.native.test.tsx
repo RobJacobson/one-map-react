@@ -25,7 +25,10 @@ import {
 } from "../../example-map/src/scenarios/map-fixture.js";
 import { NativeMapHost } from "../src/adapters/shared/native-map-host.js";
 import { NativeMapPresentationContext } from "../src/adapters/shared/native-map-presentation.js";
-import type { ViewState } from "../src/contracts/camera-types.js";
+import type {
+  ViewState,
+  ZoomToOptions,
+} from "../src/contracts/camera-types.js";
 import type { LayerProps, LayerType } from "../src/contracts/layer-types.js";
 import type { FeatureState } from "../src/contracts/query-types.js";
 import { testNativeCamera } from "./native-camera-cases.js";
@@ -596,6 +599,40 @@ describe("maplibre-native adapter", () => {
     await expect(ref.current?.stop()).rejects.toThrow(
       "stop() is not available on native maps."
     );
+  });
+
+  test("zoomTo forwards the positional zoom and optional duration", async () => {
+    mockZoomTo.mockClear();
+    const ref = createRef<MapRef>();
+    const options = {
+      center: "invalid coordinate",
+      zoom: 99,
+      bearing: 41,
+      pitch: 30,
+      padding: 10,
+      duration: 0,
+    } satisfies ZoomToOptions & Record<string, unknown>;
+
+    await render(example(ref));
+    await expect(ref.current?.zoomTo(9, options)).rejects.toThrow(
+      "Map camera is not attached."
+    );
+    await finishMapLoad();
+
+    await ref.current?.zoomTo(9, options);
+    await ref.current?.zoomTo(10, { duration: 300 });
+    await ref.current?.zoomTo(11, {});
+    await ref.current?.zoomTo(12);
+    await expect(ref.current?.zoomTo(13, { easing: () => 0 })).rejects.toThrow(
+      "An easing function is not available on native maps."
+    );
+
+    expect(mockZoomTo.mock.calls).toStrictEqual([
+      [9, { duration: 0 }],
+      [10, { duration: 300 }],
+      [11, {}],
+      [12, undefined],
+    ]);
   });
 
   test("getters convert flat bounds and reject padding", async () => {
@@ -2142,6 +2179,10 @@ describe("maplibre-native entry binding", () => {
       return (error) => complete(error);
     },
     mockGetClusterExpansionZoom,
+    (layers) =>
+      expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith([10, 20], {
+        layers,
+      }),
     () =>
       expect(LayerMock.mock.lastCall?.[0]).toMatchObject({
         source: "routes",
